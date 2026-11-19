@@ -14,10 +14,7 @@ private class RollupPreviewEaseTest {
 	}
 
 	private static User maria() {
-		return TestDataFactory.createUser(
-			'Maria',
-			new List<String>{ 'BarnCRM_Admin', 'Rollup_Builder_Admin' }
-		);
+		return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin', 'Rollup_Builder_Admin' });
 	}
 
 	private static RollupBuilderController.Draft childCount() {
@@ -63,10 +60,7 @@ private class RollupPreviewEaseTest {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			RollupBuilderController.PreviewResult preview;
 			System.runAs(maria()) {
-				Account parent = parentWith(
-					'Parent Org',
-					new List<String>{ 'Kid One', 'Kid Two', 'Other' }
-				);
+				Account parent = parentWith('Parent Org', new List<String>{ 'Kid One', 'Kid Two', 'Other' });
 				RollupBuilderController.Draft draft = childCount();
 				draft.filterJson = nameStartsWith('Kid');
 				preview = RollupBuilderController.preview(draft, parent.Id);
@@ -79,10 +73,7 @@ private class RollupPreviewEaseTest {
 				byName.put(row.name, row);
 			}
 			System.Assert.isTrue(byName.get('Kid One').counted);
-			System.Assert.areEqual(
-				Label.Rollups_RollupEase_RowCounted,
-				byName.get('Kid One').reason
-			);
+			System.Assert.areEqual(Label.Rollups_RollupEase_RowCounted, byName.get('Kid One').reason);
 			System.Assert.isFalse(byName.get('Other').counted);
 			System.Assert.areEqual(
 				String.format(Label.Rollups_RollupEase_RowFails, new List<String>{ '1' }),
@@ -128,10 +119,7 @@ private class RollupPreviewEaseTest {
 			}
 
 			System.Assert.areEqual(0, preview.rows.total);
-			System.Assert.areEqual(
-				BarnHelp.text('Rollups', 'Core_RollupEase_RowsNone'),
-				preview.rows.note
-			);
+			System.Assert.areEqual(BarnHelp.text('Rollups', 'Core_RollupEase_RowsNone'), preview.rows.note);
 			System.Assert.isNull(preview.rows.summary);
 		}
 	}
@@ -195,10 +183,7 @@ private class RollupPreviewEaseTest {
 					message = refused.getMessage();
 				}
 			}
-			System.Assert.areEqual(
-				BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'),
-				message
-			);
+			System.Assert.areEqual(BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'), message);
 		}
 	}
 

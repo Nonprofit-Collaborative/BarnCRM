@@ -10,9 +10,7 @@ private class WaitlistQueueTest {
 	private static final Id OPEN_PARENT = Id.valueOf('001000000000002');
 
 	private static Account candidate(Id parentId, Integer size) {
-		return TestDataFactory.organization(
-			new Account(ParentId = parentId, NumberOfEmployees = size)
-		);
+		return TestDataFactory.organization(new Account(ParentId = parentId, NumberOfEmployees = size));
 	}
 
 	@IsTest
@@ -41,28 +39,16 @@ private class WaitlistQueueTest {
 		Map<Id, Decimal> free = new Map<Id, Decimal>{ FULL_PARENT => 0 };
 		List<SObject> fits = WaitlistQueue.fitting(
 			free,
-			new List<SObject>{
-				candidate(OPEN_PARENT, 9),
-				candidate(null, 1),
-				candidate(FULL_PARENT, 1)
-			},
+			new List<SObject>{ candidate(OPEN_PARENT, 9), candidate(null, 1), candidate(FULL_PARENT, 1) },
 			'ParentId',
 			null
 		);
-		Assert.areEqual(
-			2,
-			fits.size(),
-			'No limit and no parent always fit; a full parent takes nobody'
-		);
+		Assert.areEqual(2, fits.size(), 'No limit and no parent always fit; a full parent takes nobody');
 	}
 
 	@IsTest
 	static void blankOrBelowOneTakesOnePlace() {
-		Assert.areEqual(
-			1,
-			WaitlistQueue.placesOf(candidate(null, null), 'NumberOfEmployees'),
-			'Blank'
-		);
+		Assert.areEqual(1, WaitlistQueue.placesOf(candidate(null, null), 'NumberOfEmployees'), 'Blank');
 		Assert.areEqual(1, WaitlistQueue.placesOf(candidate(null, 0), 'NumberOfEmployees'), 'Zero');
 		Assert.areEqual(5, WaitlistQueue.placesOf(candidate(null, 5), 'NumberOfEmployees'), 'Five');
 		Assert.areEqual(1, WaitlistQueue.placesOf(candidate(null, 5), null), 'No places field');

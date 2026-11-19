@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+  <labels>
+    <fullName>Mirror_Access_AddOnProviderRequests</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Access page: what Provider Requests grants</shortDescription>
+    <value>See the Provider Requests tab: the Cases sent to a service provider and the status it sends back. Reading the Cases themselves also needs Case access in Setup.</value>
+  </labels>
+</CustomLabels>

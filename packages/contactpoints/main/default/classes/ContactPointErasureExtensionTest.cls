@@ -24,10 +24,7 @@ private class ContactPointErasureExtensionTest {
 	/** Ana and Sam in one household, each with an email; Ana also has an address of her own. */
 	private static List<Contact> household(String lastName) {
 		Account home = TestDataFactory.household(
-			new Account(
-				Name = lastName + ' Household',
-				RecordTypeId = HouseholdService.householdRecordTypeId()
-			)
+			new Account(Name = lastName + ' Household', RecordTypeId = HouseholdService.householdRecordTypeId())
 		);
 		Database.insert(home, AccessLevel.SYSTEM_MODE);
 		Database.insert(
@@ -62,12 +59,12 @@ private class ContactPointErasureExtensionTest {
 			new Household_Member__c(
 				Household__c = home.Id,
 				Contact__c = people[0].Id,
-				Start_Date__c = Date.today().addDays(-30)
+				Start_Date__c = OrgDate.today().addDays(-30)
 			),
 			new Household_Member__c(
 				Household__c = home.Id,
 				Contact__c = people[1].Id,
-				Start_Date__c = Date.today().addDays(-30)
+				Start_Date__c = OrgDate.today().addDays(-30)
 			),
 			new Address__c(
 				Contact__c = people[0].Id,
@@ -179,10 +176,7 @@ private class ContactPointErasureExtensionTest {
 		}
 		System.runAs(eraser()) {
 			Integer syncs = eraseAna(false, 'Birch');
-			Assert.isTrue(
-				syncs >= 2,
-				'Deleting the address and ending the membership each synced: ' + syncs
-			);
+			Assert.isTrue(syncs >= 2, 'Deleting the address and ending the membership each synced: ' + syncs);
 		}
 	}
 

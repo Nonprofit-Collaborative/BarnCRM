@@ -14,10 +14,7 @@ private class RollupExplainTest {
 	}
 
 	private static User maria() {
-		return TestDataFactory.createUser(
-			'Maria',
-			new List<String>{ 'BarnCRM_Admin', 'Rollup_Builder_Admin' }
-		);
+		return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin', 'Rollup_Builder_Admin' });
 	}
 
 	private static Rollup_Definition__c kidCount(String targetFilter, Boolean active) {
@@ -63,15 +60,9 @@ private class RollupExplainTest {
 		);
 		insert parent;
 		insert new List<Account>{
-			TestDataFactory.organization(
-				new Account(Name = 'Kid One', ParentId = parent.Id, OwnerId = ownerId)
-			),
-			TestDataFactory.organization(
-				new Account(Name = 'Kid Two', ParentId = parent.Id, OwnerId = ownerId)
-			),
-			TestDataFactory.organization(
-				new Account(Name = 'Other', ParentId = parent.Id, OwnerId = ownerId)
-			)
+			TestDataFactory.organization(new Account(Name = 'Kid One', ParentId = parent.Id, OwnerId = ownerId)),
+			TestDataFactory.organization(new Account(Name = 'Kid Two', ParentId = parent.Id, OwnerId = ownerId)),
+			TestDataFactory.organization(new Account(Name = 'Other', ParentId = parent.Id, OwnerId = ownerId))
 		};
 		return parent;
 	}
@@ -90,10 +81,7 @@ private class RollupExplainTest {
 			System.Assert.areEqual(1, explained.size());
 			RollupExplainController.Explanation only = explained[0];
 			System.Assert.areEqual(rollup.Id, only.definitionId);
-			System.Assert.areEqual(
-				Account.Member_Count__c.getDescribe().getLabel(),
-				only.fieldLabel
-			);
+			System.Assert.areEqual(Account.Member_Count__c.getDescribe().getLabel(), only.fieldLabel);
 			System.Assert.areEqual((2).format(), only.value);
 			System.Assert.areEqual(RollupSentence.of(rollup), only.sentence);
 			System.Assert.areEqual(
@@ -105,10 +93,7 @@ private class RollupExplainTest {
 				'Two kids count, Other is left out'
 			);
 			System.Assert.areEqual(3, only.rows.rows.size());
-			System.Assert.areEqual(
-				BarnHelp.text('Rollups', 'Core_RollupEase_ExplainNever'),
-				only.lastCalculated
-			);
+			System.Assert.areEqual(BarnHelp.text('Rollups', 'Core_RollupEase_ExplainNever'), only.lastCalculated);
 			System.Assert.areEqual(
 				String.format(
 					BarnHelp.text('Rollups', 'Core_RollupBuilder_PreviewResult'),

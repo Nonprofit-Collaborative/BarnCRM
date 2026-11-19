@@ -111,14 +111,10 @@ public with sharing class AutomationRegistrySelector {
 	 * The query orders the rows, but an override supplied by a test may not be ordered, so the
 	 * grouping sorts by execution order and then by name.
 	 */
-	private static List<Automation_Registry__mdt> sortedByOrder(
-		List<Automation_Registry__mdt> entries
-	) {
+	private static List<Automation_Registry__mdt> sortedByOrder(List<Automation_Registry__mdt> entries) {
 		Map<String, Automation_Registry__mdt> bySortKey = new Map<String, Automation_Registry__mdt>();
 		for (Automation_Registry__mdt entry : entries) {
-			Integer order = entry.Execution_Order__c == null
-				? 999999
-				: entry.Execution_Order__c.intValue();
+			Integer order = entry.Execution_Order__c == null ? 999999 : entry.Execution_Order__c.intValue();
 			String sortKey = String.valueOf(1000000 + order) + '.' + entry.DeveloperName;
 			bySortKey.put(sortKey, entry);
 		}

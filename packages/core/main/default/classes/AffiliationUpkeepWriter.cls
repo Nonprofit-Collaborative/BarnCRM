@@ -28,7 +28,7 @@ public without sharing class AffiliationUpkeepWriter {
 		if (flagsToClear == null || flagsToClear.isEmpty()) {
 			return;
 		}
-		Database.update(flagsToClear, true, AccessLevel.SYSTEM_MODE);
+		update as system flagsToClear;
 	}
 
 	/** Writes the Primary Affiliation field on people held as contacts or as accounts. */
@@ -36,6 +36,6 @@ public without sharing class AffiliationUpkeepWriter {
 		if (people == null || people.isEmpty()) {
 			return;
 		}
-		Database.update(people, true, AccessLevel.SYSTEM_MODE);
+		update as system people;
 	}
 }

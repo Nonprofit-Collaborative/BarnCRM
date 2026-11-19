@@ -8,7 +8,7 @@
     {
       "files": "*.{cls,trigger}",
       "options": {
-        "printWidth": 100,
+        "printWidth": 120,
         "tabWidth": 4,
         "useTabs": true,
         "apexInsertFinalNewline": true
@@ -41,6 +41,7 @@
         "*.flow-meta.xml",
         "*.validationRule-meta.xml",
         "*.object-meta.xml",
+        "*.permissionset-meta.xml",
         "*.js-meta.xml",
         "*.prompt-meta.xml",
         "*.genAiPlugin-meta.xml",

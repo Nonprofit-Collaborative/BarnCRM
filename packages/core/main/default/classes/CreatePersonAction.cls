@@ -25,11 +25,7 @@ global with sharing class CreatePersonAction {
 		@InvocableVariable(label='First Name' description='Optional. The person\'s first name.')
 		global String firstName;
 
-		@InvocableVariable(
-			label='Last Name'
-			description='Required. The person\'s last name.'
-			required=true
-		)
+		@InvocableVariable(label='Last Name' description='Required. The person\'s last name.' required=true)
 		global String lastName;
 
 		@InvocableVariable(label='Email' description='Optional. The person\'s email address.')
@@ -168,10 +164,7 @@ global with sharing class CreatePersonAction {
 		for (Integer i = 0; i < asked.size(); i++) {
 			Request request = asked[i];
 			if (request == null || String.isBlank(request.lastName)) {
-				results[i].errorMessage = BarnHelp.text(
-					'Core',
-					'Core_HouseholdPanel_AddMemberMissingName'
-				);
+				results[i].errorMessage = BarnHelp.text('Core', 'Core_HouseholdPanel_AddMemberMissingName');
 				continue;
 			}
 			if (String.isBlank(request.householdId)) {
@@ -179,10 +172,7 @@ global with sharing class CreatePersonAction {
 			}
 			Id householdId = accountIdOf(request.householdId);
 			if (householdId == null) {
-				results[i].errorMessage = BarnHelp.text(
-					'Core',
-					'Core_Households_ErrorNotAHousehold'
-				);
+				results[i].errorMessage = BarnHelp.text('Core', 'Core_Households_ErrorNotAHousehold');
 				continue;
 			}
 			householdByPosition.put(i, householdId);
@@ -196,15 +186,9 @@ global with sharing class CreatePersonAction {
 		for (Integer i : new List<Integer>(householdByPosition.keySet())) {
 			Id householdId = householdByPosition.get(i);
 			if (!households.contains(householdId)) {
-				results[i].errorMessage = BarnHelp.text(
-					'Core',
-					'Core_Households_ErrorNotAHousehold'
-				);
+				results[i].errorMessage = BarnHelp.text('Core', 'Core_Households_ErrorNotAHousehold');
 			} else if (!editable.contains(householdId)) {
-				results[i].errorMessage = BarnHelp.text(
-					'Core',
-					'Core_AgentActions_HouseholdNoEditAccess'
-				);
+				results[i].errorMessage = BarnHelp.text('Core', 'Core_AgentActions_HouseholdNoEditAccess');
 			} else {
 				continue;
 			}
@@ -241,9 +225,7 @@ global with sharing class CreatePersonAction {
 		for (Database.Error error : refused.getErrors()) {
 			reasons.add(error.getMessage());
 		}
-		return reasons.isEmpty()
-			? BarnHelp.text('Core', 'Core_AgentActions_Unexpected')
-			: String.join(reasons, ' ');
+		return reasons.isEmpty() ? BarnHelp.text('Core', 'Core_AgentActions_Unexpected') : String.join(reasons, ' ');
 	}
 
 	private static Id accountIdOf(String value) {

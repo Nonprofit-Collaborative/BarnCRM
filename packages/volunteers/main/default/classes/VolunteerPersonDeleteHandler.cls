@@ -45,9 +45,7 @@ public with sharing class VolunteerPersonDeleteHandler extends TriggerHandler {
 				accountIds.add(person.Id);
 			}
 		}
-		notedByPerson.putAll(
-			VolunteerIntegritySelector.selectRowsNamingPeople(contactIds, accountIds)
-		);
+		notedByPerson.putAll(VolunteerIntegritySelector.selectRowsNamingPeople(contactIds, accountIds));
 	}
 
 	public override void afterDelete() {

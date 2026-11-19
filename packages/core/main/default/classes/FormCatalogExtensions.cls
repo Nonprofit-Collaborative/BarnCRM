@@ -8,9 +8,7 @@
 public with sharing class FormCatalogExtensions {
 	/** The class names modules register. Forms registers its class here. */
 	@NamespaceAccessible
-	public static final List<String> EXTENSION_CLASSES = new List<String>{
-		'FormsCatalogExtension'
-	};
+	public static final List<String> EXTENSION_CLASSES = new List<String>{ 'FormsCatalogExtension' };
 
 	/** Injected by tests by class name, since no module is there to resolve. */
 	@TestVisible

@@ -61,19 +61,13 @@ private class HealthCheckHouseholdChecksTest {
 
 	/** Junction mode, keeping empty households, so a test can leave one empty on purpose. */
 	private static void junctionModeKeepingEmptyHouseholds() {
-		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-			HouseholdTestDataFactory.MODE_JUNCTION
-		);
+		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
 		settings.Delete_Empty_Households__c = false;
 		HouseholdTestDataFactory.save(settings);
 	}
 
 	private static Household_Member__c membership(Id contactId, Id householdId, Date ended) {
-		return new Household_Member__c(
-			Contact__c = contactId,
-			Household__c = householdId,
-			End_Date__c = ended
-		);
+		return new Household_Member__c(Contact__c = contactId, Household__c = householdId, End_Date__c = ended);
 	}
 
 	// ------------------------------------------------------------------------ contact mode
@@ -102,8 +96,7 @@ private class HealthCheckHouseholdChecksTest {
 			Assert.isNotNull(finding, 'Contacts with no account are reported.');
 			Assert.isTrue(
 				finding.title.startsWith('2 '),
-				'Two of them: the organization contact belongs to its organization. ' +
-				finding.title
+				'Two of them: the organization contact belongs to its organization. ' + finding.title
 			);
 			Assert.areEqual(HealthCheckService.SEVERITY_WARNING, finding.severity, 'A warning.');
 			Assert.isNull(finding.fixTarget, 'Detection only: there is no fix button.');
@@ -149,9 +142,7 @@ private class HealthCheckHouseholdChecksTest {
 	@IsTest
 	static void withAutomaticCreationOffAPersonWithNoHouseholdIsExpected() {
 		System.runAs(TestUsers.admin()) {
-			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-				HouseholdTestDataFactory.MODE_CONTACT
-			);
+			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			settings.Auto_Create_Households__c = false;
 			HouseholdTestDataFactory.save(settings);
 			insert HouseholdTestDataFactory.newContact('Eve', 'Loose');
@@ -176,10 +167,7 @@ private class HealthCheckHouseholdChecksTest {
 			Test.stopTest();
 
 			Assert.isNull(findings.get(PEOPLE), 'Everyone is in a household.');
-			Assert.isNull(
-				findings.get(HOUSEHOLDS),
-				'And the household made for Flo has Flo in it.'
-			);
+			Assert.isNull(findings.get(HOUSEHOLDS), 'And the household made for Flo has Flo in it.');
 		}
 	}
 
@@ -227,14 +215,11 @@ private class HealthCheckHouseholdChecksTest {
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
 			Contact erased = HouseholdTestDataFactory.newContact('Cy', 'Erased');
 			insertWithoutAutomaticHouseholds(new List<Contact>{ erased });
-			insert membership(erased.Id, household.Id, Date.today());
+			insert membership(erased.Id, household.Id, OrgDate.today());
 			recordErasureOf(erased.Id);
 			platformOnlyShape();
 
-			Assert.isNull(
-				runAsMaria(PEOPLE),
-				'The erasure ended the membership on purpose, so nobody is reported.'
-			);
+			Assert.isNull(runAsMaria(PEOPLE), 'The erasure ended the membership on purpose, so nobody is reported.');
 		}
 	}
 
@@ -257,7 +242,7 @@ private class HealthCheckHouseholdChecksTest {
 				new List<Contact>{ noAccount, atOrganization, left, current, linkedDirectly }
 			);
 			insert new List<Household_Member__c>{
-				membership(left.Id, household.Id, Date.today().addDays(-1)),
+				membership(left.Id, household.Id, OrgDate.today().addDays(-1)),
 				membership(current.Id, household.Id, null)
 			};
 			platformOnlyShape();
@@ -276,10 +261,7 @@ private class HealthCheckHouseholdChecksTest {
 			for (HealthCheckService.Link link : finding.links) {
 				named.add(link.label);
 			}
-			Assert.isTrue(
-				named.contains('Ida Left'),
-				'An ended membership is not a household (R-M2).'
-			);
+			Assert.isTrue(named.contains('Ida Left'), 'An ended membership is not a household (R-M2).');
 			Assert.isFalse(named.contains('Jo Kept'), 'A current member is not an orphan.');
 		}
 	}
@@ -295,8 +277,8 @@ private class HealthCheckHouseholdChecksTest {
 			Contact present = HouseholdTestDataFactory.newContact('Mo', 'Present');
 			insertWithoutAutomaticHouseholds(new List<Contact>{ former, present });
 			insert new List<Household_Member__c>{
-				membership(former.Id, ended.Id, Date.today().addDays(-1)),
-				membership(present.Id, kept.Id, Date.today().addDays(30))
+				membership(former.Id, ended.Id, OrgDate.today().addDays(-1)),
+				membership(present.Id, kept.Id, OrgDate.today().addDays(30))
 			};
 			platformOnlyShape();
 
@@ -336,10 +318,7 @@ private class HealthCheckHouseholdChecksTest {
 
 			HealthCheckService.Finding finding = runAsMaria(PEOPLE);
 
-			Assert.isNotNull(
-				finding,
-				'A person stored as an account with no membership is reported.'
-			);
+			Assert.isNotNull(finding, 'A person stored as an account with no membership is reported.');
 			Assert.isTrue(
 				finding.title.startsWith('1 '),
 				'Counted once, as the account, and not again as its contact. ' + finding.title
@@ -371,10 +350,7 @@ private class HealthCheckHouseholdChecksTest {
 
 			Assert.isTrue(
 				finding.title.startsWith(
-					String.format(
-						System.Label.Core_HealthCheck_OrphansMoreThan,
-						new List<Object>{ '2' }
-					)
+					String.format(System.Label.Core_HealthCheck_OrphansMoreThan, new List<Object>{ '2' })
 				),
 				'Past the cap the count is not taken: it says more than. ' + finding.title
 			);
@@ -385,17 +361,13 @@ private class HealthCheckHouseholdChecksTest {
 	static void anOrgWithNonprofitCloudHouseholdsIsToldSomeMayBeInOne() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-			insertWithoutAutomaticHouseholds(
-				new List<Contact>{ HouseholdTestDataFactory.newContact('Rae', 'Native') }
-			);
+			insertWithoutAutomaticHouseholds(new List<Contact>{ HouseholdTestDataFactory.newContact('Rae', 'Native') });
 			OrgShapeDetector.overrideShape = new OrgShapeDetector.OrgShape();
 
 			HealthCheckService.Finding finding = runAsMaria(PEOPLE);
 
 			Assert.isTrue(
-				finding.detail.contains(
-					BarnHelp.text('Core', 'Core_HealthCheck_OrphansNativeNote')
-				),
+				finding.detail.contains(BarnHelp.text('Core', 'Core_HealthCheck_OrphansNativeNote')),
 				'BarnCRM cannot see native membership, and says so (R-H12).'
 			);
 		}
@@ -405,19 +377,13 @@ private class HealthCheckHouseholdChecksTest {
 	static void theOrphanCountsAreShownOnlyToSomebodyWhoManagesSettings() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-			insertWithoutAutomaticHouseholds(
-				new List<Contact>{ HouseholdTestDataFactory.newContact('Sol', 'Loose') }
-			);
+			insertWithoutAutomaticHouseholds(new List<Contact>{ HouseholdTestDataFactory.newContact('Sol', 'Loose') });
 			platformOnlyShape();
 			User priya = HealthCheckTestHelper.priyaWithoutManageSettings();
 
 			System.runAs(priya) {
 				for (HealthCheckService.Finding finding : HealthCheckService.run()) {
-					Assert.areNotEqual(
-						PEOPLE,
-						finding.key,
-						'A count from her access would be wrong.'
-					);
+					Assert.areNotEqual(PEOPLE, finding.key, 'A count from her access would be wrong.');
 					Assert.areNotEqual(HOUSEHOLDS, finding.key, 'So neither is shown.');
 				}
 			}

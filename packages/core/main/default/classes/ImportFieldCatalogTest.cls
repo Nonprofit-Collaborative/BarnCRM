@@ -25,19 +25,11 @@ private class ImportFieldCatalogTest {
 	private static void assertWritable(Schema.SObjectType type, List<ImportMapping.Target> found) {
 		Map<String, Schema.SObjectField> fields = type.getDescribe().fields.getMap();
 		for (ImportMapping.Target target : found) {
-			Schema.DescribeFieldResult describe = fields.get(target.value.toLowerCase())
-				.getDescribe();
+			Schema.DescribeFieldResult describe = fields.get(target.value.toLowerCase()).getDescribe();
 			Assert.isTrue(describe.isAccessible(), 'Readable: ' + target.value);
-			Assert.isTrue(
-				describe.isCreateable() || describe.isUpdateable(),
-				'Writable: ' + target.value
-			);
+			Assert.isTrue(describe.isCreateable() || describe.isUpdateable(), 'Writable: ' + target.value);
 			Assert.isFalse(describe.isCalculated(), 'Not a formula: ' + target.value);
-			Assert.areNotEqual(
-				Schema.DisplayType.REFERENCE,
-				describe.getType(),
-				'Not a lookup: ' + target.value
-			);
+			Assert.areNotEqual(Schema.DisplayType.REFERENCE, describe.getType(), 'Not a lookup: ' + target.value);
 			Assert.areEqual(describe.getLabel(), target.label, 'Listed by its label.');
 		}
 	}
@@ -51,18 +43,13 @@ private class ImportFieldCatalogTest {
 
 			assertWritable(Contact.SObjectType, found);
 			Set<String> offered = names(found);
-			Assert.isTrue(
-				offered.contains('department'),
-				'A standard field not in the fixed list.'
-			);
+			Assert.isTrue(offered.contains('department'), 'A standard field not in the fixed list.');
 			Assert.isFalse(offered.contains('accountid'), 'No lookup.');
 			Assert.isFalse(offered.contains('name'), 'No compound name.');
 			Assert.isFalse(offered.contains('mailingaddress'), 'No compound address.');
 			Assert.isFalse(offered.contains('jigsaw'), 'No system field.');
 			Assert.isFalse(
-				offered.contains(
-					Contact.Created_By_Import_Batch__c.getDescribe().getName().toLowerCase()
-				),
+				offered.contains(Contact.Created_By_Import_Batch__c.getDescribe().getName().toLowerCase()),
 				'Not the package bookkeeping.'
 			);
 			for (Integer i = 1; i < found.size(); i++) {
@@ -104,11 +91,7 @@ private class ImportFieldCatalogTest {
 			Test.startTest();
 			ImportController.MatchFieldsView view = ImportController.getMatchFields();
 			Test.stopTest();
-			Assert.areEqual(
-				names(ImportFieldCatalog.personFields()),
-				names(view.personFields),
-				'The person list.'
-			);
+			Assert.areEqual(names(ImportFieldCatalog.personFields()), names(view.personFields), 'The person list.');
 			Assert.areEqual(
 				names(ImportFieldCatalog.organizationFields()),
 				names(view.organizationFields),

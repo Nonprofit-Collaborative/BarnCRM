@@ -9,6 +9,14 @@
         <value>Installed</value>
     </labels>
     <labels>
+        <fullName>Core_ModuleManager_Beta</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Beta badge beside a module name (Module Manager, Setup Assistant, Home)</shortDescription>
+        <value>Beta</value>
+    </labels>
+    <labels>
         <fullName>Core_ModuleManager_OpenApp</fullName>
         <categories>Core</categories>
         <language>en_US</language>

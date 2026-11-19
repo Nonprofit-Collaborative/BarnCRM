@@ -97,9 +97,7 @@ public with sharing class ErrorDigestController {
 
 	private static void requirePermission() {
 		if (!canManage()) {
-			throw new ErrorDigestException(
-				BarnHelp.text('Core', 'Core_ErrorDigest_PermissionRequired')
-			);
+			throw new ErrorDigestException(BarnHelp.text('Core', 'Core_ErrorDigest_PermissionRequired'));
 		}
 	}
 }

@@ -29,16 +29,8 @@ private class RelationshipServiceTest {
 			Relationship__c second = all[1];
 			Assert.areEqual(second.Id, first.Reciprocal_Relationship__c, 'The two sides pair up');
 			Assert.areEqual(first.Id, second.Reciprocal_Relationship__c, 'And they pair both ways');
-			Assert.areEqual(
-				people[1].Id,
-				second.Contact__c,
-				'The other side is described from the other person'
-			);
-			Assert.areEqual(
-				people[0].Id,
-				second.Related_Contact__c,
-				'And points back at the first'
-			);
+			Assert.areEqual(people[1].Id, second.Contact__c, 'The other side is described from the other person');
+			Assert.areEqual(people[0].Id, second.Related_Contact__c, 'And points back at the first');
 			Assert.areEqual('Spouse', second.Type__c, 'Spouse mirrors to Spouse');
 		}
 	}
@@ -54,11 +46,7 @@ private class RelationshipServiceTest {
 			Test.stopTest();
 
 			Relationship__c other = otherSideOf(people[1].Id);
-			Assert.areEqual(
-				'Child',
-				other.Type__c,
-				'The parent of someone is that person\'s child'
-			);
+			Assert.areEqual('Child', other.Type__c, 'The parent of someone is that person\'s child');
 			Assert.areEqual('Parent', other.Reciprocal_Type__c, 'And the reciprocal reads back');
 		}
 	}
@@ -74,11 +62,7 @@ private class RelationshipServiceTest {
 			Test.stopTest();
 
 			List<Relationship__c> all = RelationshipTestDataFactory.allRelationships();
-			Assert.areEqual(
-				2,
-				all.size(),
-				'A relationship between two accounts still gets both sides'
-			);
+			Assert.areEqual(2, all.size(), 'A relationship between two accounts still gets both sides');
 			Relationship__c other = all[0].Person_Account__c == people[1].Id ? all[0] : all[1];
 			Assert.areEqual(people[1].Id, other.Person_Account__c, 'The account pair swaps whole');
 			Assert.areEqual(people[0].Id, other.Related_Person_Account__c, 'Both halves of it');
@@ -98,16 +82,8 @@ private class RelationshipServiceTest {
 			Test.stopTest();
 
 			Relationship__c other = otherSideOf(asAccount[0].Id);
-			Assert.areEqual(
-				asAccount[0].Id,
-				other.Person_Account__c,
-				'The account person owns the other side'
-			);
-			Assert.areEqual(
-				asContact[0].Id,
-				other.Related_Contact__c,
-				'And the contact is the related one'
-			);
+			Assert.areEqual(asAccount[0].Id, other.Person_Account__c, 'The account person owns the other side');
+			Assert.areEqual(asContact[0].Id, other.Related_Contact__c, 'And the contact is the related one');
 			Assert.isNull(other.Contact__c, 'The two halves never both fill in');
 		}
 	}
@@ -117,11 +93,7 @@ private class RelationshipServiceTest {
 		System.runAs(TestUsers.admin()) {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Contact> people = RelationshipTestDataFactory.contacts(2, 'Garcia');
-			Relationship__c saved = RelationshipTestDataFactory.between(
-				people[0],
-				people[1],
-				'Spouse'
-			);
+			Relationship__c saved = RelationshipTestDataFactory.between(people[0], people[1], 'Spouse');
 			insert saved;
 
 			Test.startTest();
@@ -135,11 +107,7 @@ private class RelationshipServiceTest {
 			Relationship__c other = otherSideOf(people[1].Id);
 			Assert.areEqual('Former', other.Status__c, 'An end date makes both sides former');
 			Assert.areEqual(Date.today().addDays(-30), other.End_Date__c, 'With the same end date');
-			Assert.areEqual(
-				'Separated last month',
-				other.Description__c,
-				'And the same description'
-			);
+			Assert.areEqual('Separated last month', other.Description__c, 'And the same description');
 		}
 	}
 
@@ -148,11 +116,7 @@ private class RelationshipServiceTest {
 		System.runAs(TestUsers.admin()) {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Contact> people = RelationshipTestDataFactory.contacts(2, 'Garcia');
-			Relationship__c saved = RelationshipTestDataFactory.between(
-				people[0],
-				people[1],
-				'Parent'
-			);
+			Relationship__c saved = RelationshipTestDataFactory.between(people[0], people[1], 'Parent');
 			insert saved;
 
 			Test.startTest();
@@ -169,17 +133,9 @@ private class RelationshipServiceTest {
 		System.runAs(TestUsers.admin()) {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Contact> people = RelationshipTestDataFactory.contacts(2, 'Garcia');
-			Relationship__c saved = RelationshipTestDataFactory.between(
-				people[0],
-				people[1],
-				'Spouse'
-			);
+			Relationship__c saved = RelationshipTestDataFactory.between(people[0], people[1], 'Spouse');
 			insert saved;
-			Assert.areEqual(
-				2,
-				RelationshipTestDataFactory.allRelationships().size(),
-				'Two to start'
-			);
+			Assert.areEqual(2, RelationshipTestDataFactory.allRelationships().size(), 'Two to start');
 
 			Test.startTest();
 			delete saved;
@@ -240,11 +196,7 @@ private class RelationshipServiceTest {
 		System.runAs(TestUsers.admin()) {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Contact> people = RelationshipTestDataFactory.contacts(2, 'Garcia');
-			Relationship__c oneSided = RelationshipTestDataFactory.between(
-				people[0],
-				people[1],
-				'Friend'
-			);
+			Relationship__c oneSided = RelationshipTestDataFactory.between(people[0], people[1], 'Friend');
 			oneSided.Is_Reciprocal_Managed__c = false;
 
 			Test.startTest();
@@ -276,11 +228,7 @@ private class RelationshipServiceTest {
 
 			List<Relationship__c> all = RelationshipTestDataFactory.allRelationships();
 			Assert.areEqual(2, all.size(), 'Both sides were already there, so nothing was created');
-			Assert.areEqual(
-				all[1].Id,
-				all[0].Reciprocal_Relationship__c,
-				'They pair with each other'
-			);
+			Assert.areEqual(all[1].Id, all[0].Reciprocal_Relationship__c, 'They pair with each other');
 			Assert.areEqual(all[0].Id, all[1].Reciprocal_Relationship__c, 'Both ways');
 		}
 	}
@@ -292,9 +240,7 @@ private class RelationshipServiceTest {
 			List<Contact> people = RelationshipTestDataFactory.contacts(400, 'Bulk');
 			List<Relationship__c> batch = new List<Relationship__c>();
 			for (Integer i = 0; i < 200; i++) {
-				batch.add(
-					RelationshipTestDataFactory.between(people[i], people[i + 200], 'Colleague')
-				);
+				batch.add(RelationshipTestDataFactory.between(people[i], people[i + 200], 'Colleague'));
 			}
 
 			Test.startTest();
@@ -302,22 +248,14 @@ private class RelationshipServiceTest {
 			Test.stopTest();
 
 			List<Relationship__c> all = RelationshipTestDataFactory.allRelationships();
-			Assert.areEqual(
-				400,
-				all.size(),
-				'Two hundred saved relationships leave four hundred records'
-			);
+			Assert.areEqual(400, all.size(), 'Two hundred saved relationships leave four hundred records');
 			Integer unpaired = 0;
 			for (Relationship__c record : all) {
 				if (record.Reciprocal_Relationship__c == null) {
 					unpaired++;
 				}
 			}
-			Assert.areEqual(
-				0,
-				unpaired,
-				'Every record in a two hundred record save has its other side'
-			);
+			Assert.areEqual(0, unpaired, 'Every record in a two hundred record save has its other side');
 		}
 	}
 
@@ -328,9 +266,7 @@ private class RelationshipServiceTest {
 			List<Contact> people = RelationshipTestDataFactory.contacts(400, 'Bulk');
 			List<Relationship__c> batch = new List<Relationship__c>();
 			for (Integer i = 0; i < 200; i++) {
-				batch.add(
-					RelationshipTestDataFactory.between(people[i], people[i + 200], 'Colleague')
-				);
+				batch.add(RelationshipTestDataFactory.between(people[i], people[i + 200], 'Colleague'));
 			}
 			insert batch;
 			for (Relationship__c record : batch) {
@@ -347,11 +283,7 @@ private class RelationshipServiceTest {
 					former++;
 				}
 			}
-			Assert.areEqual(
-				400,
-				former,
-				'Ending two hundred relationships ends four hundred records'
-			);
+			Assert.areEqual(400, former, 'Ending two hundred relationships ends four hundred records');
 		}
 	}
 
@@ -362,9 +294,7 @@ private class RelationshipServiceTest {
 			List<Contact> people = RelationshipTestDataFactory.contacts(400, 'Bulk');
 			List<Relationship__c> batch = new List<Relationship__c>();
 			for (Integer i = 0; i < 200; i++) {
-				batch.add(
-					RelationshipTestDataFactory.between(people[i], people[i + 200], 'Colleague')
-				);
+				batch.add(RelationshipTestDataFactory.between(people[i], people[i + 200], 'Colleague'));
 			}
 			insert batch;
 
@@ -392,11 +322,7 @@ private class RelationshipServiceTest {
 			String reciprocal = RelationshipService.reciprocalOf('Grandparent');
 			Test.stopTest();
 
-			Assert.areEqual(
-				'Other',
-				reciprocal,
-				'A type with no mapping still produces a usable other side'
-			);
+			Assert.areEqual('Other', reciprocal, 'A type with no mapping still produces a usable other side');
 		}
 	}
 
@@ -413,10 +339,7 @@ private class RelationshipServiceTest {
 			Boolean upkeepIsOn = RelationshipService.isAutoReciprocalOn();
 			Test.stopTest();
 
-			Assert.isTrue(
-				upkeepIsOn,
-				'The upkeep ships on, so both sides are written before anyone saves a setting'
-			);
+			Assert.isTrue(upkeepIsOn, 'The upkeep ships on, so both sides are written before anyone saves a setting');
 		}
 	}
 
@@ -429,11 +352,7 @@ private class RelationshipServiceTest {
 		System.runAs(TestUsers.admin()) {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Contact> people = RelationshipTestDataFactory.contacts(2, 'Garcia');
-			Relationship__c saved = RelationshipTestDataFactory.between(
-				people[0],
-				people[1],
-				'Employer contact'
-			);
+			Relationship__c saved = RelationshipTestDataFactory.between(people[0], people[1], 'Employer contact');
 			insert saved;
 			Relationship__c other = otherSideOf(people[1].Id);
 			Assert.areEqual('Colleague', other.Type__c, 'The other side is a colleague');
@@ -443,16 +362,8 @@ private class RelationshipServiceTest {
 			Test.stopTest();
 
 			Relationship__c original = otherSideOf(people[0].Id);
-			Assert.areEqual(
-				'Employer contact',
-				original.Type__c,
-				'The original keeps the type it was given'
-			);
-			Assert.areEqual(
-				'Met at the food bank',
-				original.Description__c,
-				'And still follows the edit'
-			);
+			Assert.areEqual('Employer contact', original.Type__c, 'The original keeps the type it was given');
+			Assert.areEqual('Met at the food bank', original.Description__c, 'And still follows the edit');
 			Assert.areEqual(
 				'Employer contact',
 				otherSideOf(people[1].Id).Reciprocal_Type__c,
@@ -495,11 +406,7 @@ private class RelationshipServiceTest {
 		System.runAs(TestUsers.admin()) {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Contact> people = RelationshipTestDataFactory.contacts(2, 'Garcia');
-			Relationship__c saved = RelationshipTestDataFactory.between(
-				people[0],
-				people[1],
-				'Spouse'
-			);
+			Relationship__c saved = RelationshipTestDataFactory.between(people[0], people[1], 'Spouse');
 			saved.Description__c = 'Married in 2010';
 			insert saved;
 			BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
@@ -614,17 +521,9 @@ private class RelationshipServiceTest {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Contact> people = RelationshipTestDataFactory.contacts(3, 'Garcia');
 			shippedTypes('Grandchild');
-			Relationship__c grandparent = RelationshipTestDataFactory.between(
-				people[0],
-				people[1],
-				'Grandparent'
-			);
+			Relationship__c grandparent = RelationshipTestDataFactory.between(people[0], people[1], 'Grandparent');
 			insert grandparent;
-			Relationship__c spouse = RelationshipTestDataFactory.between(
-				people[0],
-				people[2],
-				'Spouse'
-			);
+			Relationship__c spouse = RelationshipTestDataFactory.between(people[0], people[2], 'Spouse');
 			insert spouse;
 			turnOff('Grandparent');
 
@@ -638,11 +537,7 @@ private class RelationshipServiceTest {
 			Assert.isTrue(edited.isSuccess(), 'An existing Grandparent relationship is edited');
 			Relationship__c other = otherSideOf(people[1].Id);
 			Assert.areEqual('Grandchild', other.Type__c, 'Its other side keeps its type');
-			Assert.areEqual(
-				'Visits every Sunday',
-				other.Description__c,
-				'And is still kept in step'
-			);
+			Assert.areEqual('Visits every Sunday', other.Description__c, 'And is still kept in step');
 			Assert.isFalse(retyped.isSuccess(), 'Changing another one to Grandparent is refused');
 			Assert.areEqual(
 				'Grandchild',

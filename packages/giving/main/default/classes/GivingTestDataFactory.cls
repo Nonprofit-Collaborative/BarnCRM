@@ -10,12 +10,7 @@ public class GivingTestDataFactory {
 	 * A fund. Pass isDefault true for the one that undesignated gifts should go to.
 	 */
 	public static Fund__c buildFund(String name, Boolean isDefault) {
-		return new Fund__c(
-			Name = name,
-			Active__c = true,
-			Restricted__c = false,
-			Is_Default__c = isDefault
-		);
+		return new Fund__c(Name = name, Active__c = true, Restricted__c = false, Is_Default__c = isDefault);
 	}
 
 	/**
@@ -143,23 +138,12 @@ public class GivingTestDataFactory {
 	 * the contact, whose AccountId is the household.
 	 */
 	@NamespaceAccessible
-	public static Contact insertHouseholdContact(
-		String householdName,
-		String firstName,
-		String lastName
-	) {
+	public static Contact insertHouseholdContact(String householdName, String firstName, String lastName) {
 		// The record type is set rather than left to the running user's default, because the
 		// household on a gift is derived only from an account of the Household record type.
-		Account household = new Account(
-			Name = householdName,
-			RecordTypeId = HouseholdService.householdRecordTypeId()
-		);
+		Account household = new Account(Name = householdName, RecordTypeId = HouseholdService.householdRecordTypeId());
 		Database.insert(household, AccessLevel.SYSTEM_MODE);
-		Contact person = new Contact(
-			FirstName = firstName,
-			LastName = lastName,
-			AccountId = household.Id
-		);
+		Contact person = new Contact(FirstName = firstName, LastName = lastName, AccountId = household.Id);
 		insert person;
 		return person;
 	}
@@ -213,9 +197,6 @@ public class GivingTestDataFactory {
 		]) {
 			facts.add(entry.Context__c + ': ' + entry.Technical_Detail__c);
 		}
-		Assert.fail(
-			'The rollup engine wrote nothing to the total. Jobs and Error Log: ' +
-			String.join(facts, ' | ')
-		);
+		Assert.fail('The rollup engine wrote nothing to the total. Jobs and Error Log: ' + String.join(facts, ' | '));
 	}
 }

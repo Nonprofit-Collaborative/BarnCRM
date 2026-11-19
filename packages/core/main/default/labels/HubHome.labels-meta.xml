@@ -69,7 +69,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Overdue badge: a late nightly job tile; Funders Grant Calendar overdue mark</shortDescription>
+        <shortDescription>Overdue badge: a late nightly job tile; Grants Grant Calendar overdue mark</shortDescription>
         <value>Overdue</value>
     </labels>
 </CustomLabels>

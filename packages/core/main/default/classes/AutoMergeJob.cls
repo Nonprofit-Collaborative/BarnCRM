@@ -75,7 +75,7 @@ public with sharing class AutoMergeJob implements Database.Batchable<String>, Da
 				Moved_Records__c,
 				Notes__c
 			FROM Merge_Journal__c
-			WHERE Id IN :scope AND Status__c = :AutoMergeService.MERGED
+			WHERE Id IN :scope AND Kind__c = :AutoMergeService.KIND_MERGE AND Status__c = :AutoMergeService.MERGED
 			WITH USER_MODE
 		];
 		AutoMergeService.undo(journals);

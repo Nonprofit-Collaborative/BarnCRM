@@ -120,12 +120,7 @@ public with sharing class ModuleManagerService {
 			'Grant_Payment__c',
 			'Grant_Requirement__c'
 		},
-		'Forms' => new List<String>{
-			'Form__c',
-			'Form_Draft__c',
-			'Form_Submission__c',
-			'Form_Version__c'
-		},
+		'Forms' => new List<String>{ 'Form__c', 'Form_Draft__c', 'Form_Submission__c', 'Form_Version__c' },
 		'ContactPoints' => new List<String>{ 'Contact_Point_Link__c' },
 		'Events' => new List<String>{
 			'Event__c',
@@ -243,7 +238,8 @@ public with sharing class ModuleManagerService {
 		'Territory' => 'Territory_Admin',
 		'Memberships' => 'Memberships_Admin',
 		'Projects' => 'Projects_Admin',
-		'AddressVerification' => 'Address_Verification_Admin'
+		'AddressVerification' => 'Address_Verification_Admin',
+		'Reporting' => 'Reporting_Admin'
 	};
 
 	/** Raised for a module the org does not have, or one that cannot be switched. */
@@ -280,6 +276,9 @@ public with sharing class ModuleManagerService {
 		/** True when only the Nonprofit Edition offers it, so the page groups it under Nonprofit Modules. */
 		@AuraEnabled
 		public Boolean nonprofitOnly;
+		/** True when the catalog marks it as in beta, so the page shows a Beta badge (D-211). */
+		@AuraEnabled
+		public Boolean beta;
 		/** True when it is here but its setup steps never ran, so the page offers Finish Setup (FS1). */
 		@AuraEnabled
 		public Boolean setupPending;
@@ -326,6 +325,7 @@ public with sharing class ModuleManagerService {
 			row.appUrl = info.appUrl;
 			row.installFirst = info.installFirst;
 			row.nonprofitOnly = info.nonprofitOnly == true;
+			row.beta = info.beta == true;
 			row.setupPending = info.present == true && ModuleSetups.isPending(info.name, setupRan);
 			row.canSwitch = info.present == true && info.name != CORE;
 			row.status = info.present != true
@@ -459,9 +459,7 @@ public with sharing class ModuleManagerService {
 			if (apiName != null) {
 				apiNames.add(apiName);
 				RecordCount line = new RecordCount();
-				line.objectLabel = describes.get(apiName)
-					.getDescribe(SObjectDescribeOptions.DEFERRED)
-					.getLabelPlural();
+				line.objectLabel = describes.get(apiName).getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural();
 				lines.add(line);
 			}
 		}
@@ -492,9 +490,7 @@ public with sharing class ModuleManagerService {
 				return row;
 			}
 		}
-		throw new ModuleManagerException(
-			BarnHelp.text('Core', 'Core_ModuleManager_UnknownModuleError')
-		);
+		throw new ModuleManagerException(BarnHelp.text('Core', 'Core_ModuleManager_UnknownModuleError'));
 	}
 
 	private static void setTurnedOff(String moduleName, Boolean off) {
@@ -519,9 +515,7 @@ public with sharing class ModuleManagerService {
 		}
 		String joined = String.join(names, ',');
 		if (joined.length() > TURNED_OFF_LENGTH) {
-			throw new ModuleManagerException(
-				BarnHelp.text('Core', 'Core_ModuleManager_SaveErrorMessage')
-			);
+			throw new ModuleManagerException(BarnHelp.text('Core', 'Core_ModuleManager_SaveErrorMessage'));
 		}
 		SettingsService.saveSystemValue(TURNED_OFF_KEY, joined);
 		AutomationControl.clearCache();

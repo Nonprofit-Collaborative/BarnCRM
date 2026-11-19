@@ -6,6 +6,10 @@
     Adds, renews and updates memberships and member certifications and their credits, and reads
     levels, benefits and certifications. Given to Team Member and Fundraising Staff.
   </description>
+  <applicationVisibilities>
+    <application>BarnCRM_Memberships</application>
+    <visible>true</visible>
+  </applicationVisibilities>
   <classAccesses>
     <apexClass>CertificationController</apexClass>
     <enabled>true</enabled>

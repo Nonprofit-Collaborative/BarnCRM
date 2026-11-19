@@ -37,9 +37,7 @@ public with sharing class SoftCreditTriggerHandler extends TriggerHandler {
 				giftIds.add(credit.Gift__c);
 			}
 		}
-		Map<Id, Gift__c> giftById = new Map<Id, Gift__c>(
-			GiftLookupSelector.selectForRecognition(giftIds)
-		);
+		Map<Id, Gift__c> giftById = new Map<Id, Gift__c>(GiftLookupSelector.selectForRecognition(giftIds));
 
 		for (Soft_Credit__c credit : credits) {
 			if (credit.Gift__c == null) {

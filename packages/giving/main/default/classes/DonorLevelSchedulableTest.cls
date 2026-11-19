@@ -20,10 +20,7 @@ private class DonorLevelSchedulableTest {
 	static void noRecordedRecalculationOrAWeekGoneByMeansEveryDonor() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Assert.isTrue(DonorLevelSchedulable.needsFullPass(null), 'Never recalculated');
-			Assert.isTrue(
-				DonorLevelSchedulable.needsFullPass(Datetime.now().addDays(-8)),
-				'Older than a week'
-			);
+			Assert.isTrue(DonorLevelSchedulable.needsFullPass(Datetime.now().addDays(-8)), 'Older than a week');
 		}
 	}
 
@@ -66,11 +63,7 @@ private class DonorLevelSchedulableTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Integer month = FiscalYearSelector.fiscalYearStartMonth();
 			Date today = Date.today();
-			Date fiscalStart = Date.newInstance(
-				today.month() >= month ? today.year() : today.year() - 1,
-				month,
-				1
-			);
+			Date fiscalStart = Date.newInstance(today.month() >= month ? today.year() : today.year() - 1, month, 1);
 			DonorLevelSchedulable.todayOverride = fiscalStart.addYears(1);
 			Assert.isTrue(
 				DonorLevelSchedulable.needsFullPass(Datetime.now().addSeconds(-5)),
@@ -112,11 +105,7 @@ private class DonorLevelSchedulableTest {
 
 			List<Date> edges = DonorLevelSchedulable.recencyEdges(Date.today().addDays(-1));
 			Set<Id> read = new Set<Id>();
-			Database.QueryLocatorIterator rows = DonorLevelSelector.recencyEdgeLocator(
-					'Account',
-					edges
-				)
-				.iterator();
+			Database.QueryLocatorIterator rows = DonorLevelSelector.recencyEdgeLocator('Account', edges).iterator();
 			while (rows.hasNext()) {
 				read.add(rows.next().Id);
 			}

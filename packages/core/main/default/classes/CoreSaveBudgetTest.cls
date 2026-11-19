@@ -9,9 +9,7 @@
  * no more than a few queries above 1 row (a query inside a loop shows as about 200 more).
  * Async work started by the save runs after Test.stopTest() and is not counted.
  */
-@IsTest(
-	testFor='ApexTrigger:ContactTrigger, ApexTrigger:AccountTrigger, ApexTrigger:AddressTrigger'
-)
+@IsTest(testFor='ApexTrigger:ContactTrigger, ApexTrigger:AccountTrigger, ApexTrigger:AddressTrigger')
 private class CoreSaveBudgetTest {
 	/** Half the 100-query synchronous limit, left for everything that is not BarnCRM Core. */
 	private static final Integer SOQL_CEILING = 50;
@@ -97,9 +95,7 @@ private class CoreSaveBudgetTest {
 		System.runAs(TestUsers.admin()) {
 			List<Account> rows = new List<Account>();
 			for (Integer i = 0; i < 200; i++) {
-				rows.add(
-					TestDataFactory.organization(new Account(Name = 'Budget Foundation ' + i))
-				);
+				rows.add(TestDataFactory.organization(new Account(Name = 'Budget Foundation ' + i)));
 			}
 			assertWithin(measureInsert(rows), 'Two hundred organizations');
 		}

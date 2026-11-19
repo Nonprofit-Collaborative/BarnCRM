@@ -99,9 +99,7 @@ public with sharing class AsyncStarter {
 			if (refusalForTest != null) {
 				throw refusalForTest;
 			}
-			return delayMinutes == null
-				? System.enqueueJob(work)
-				: System.enqueueJob(work, delayMinutes);
+			return delayMinutes == null ? System.enqueueJob(work) : System.enqueueJob(work, delayMinutes);
 		} catch (AsyncException refused) {
 			throw refusal(context, refused);
 		}
@@ -136,8 +134,7 @@ public with sharing class AsyncStarter {
 	}
 
 	private static Boolean flexQueueFull() {
-		return [SELECT COUNT() FROM AsyncApexJob WHERE Status = 'Holding' WITH SYSTEM_MODE] >=
-			FLEX_QUEUE_ROOM;
+		return [SELECT COUNT() FROM AsyncApexJob WHERE Status = 'Holding' WITH SYSTEM_MODE] >= FLEX_QUEUE_ROOM;
 	}
 
 	private static BusyException busy(String context, Exception refused) {

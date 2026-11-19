@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+  <hasActivationRequired>false</hasActivationRequired>
+  <label>Address Verification User</label>
+  <description>
+    For everyone whose address saves should be looked up on save: principal access to the Smarty
+    and Google credentials (never their values), and nothing else. Without it, their new and
+    changed addresses wait for the nightly step.
+  </description>
+  <externalCredentialPrincipalAccesses>
+    <enabled>true</enabled>
+    <externalCredentialPrincipal>Barn_Google_Address-Barn_Google_Address_Key</externalCredentialPrincipal>
+  </externalCredentialPrincipalAccesses>
+  <externalCredentialPrincipalAccesses>
+    <enabled>true</enabled>
+    <externalCredentialPrincipal>Barn_Smarty-Barn_Smarty_Key</externalCredentialPrincipal>
+  </externalCredentialPrincipalAccesses>
+</PermissionSet>

@@ -32,9 +32,7 @@ public with sharing class GrantFinderController {
 	@AuraEnabled
 	public static Id save(String listing) {
 		try {
-			return GrantFinder.save(
-				(GrantFinder.Listing) JSON.deserialize(listing, GrantFinder.Listing.class)
-			);
+			return GrantFinder.save((GrantFinder.Listing) JSON.deserialize(listing, GrantFinder.Listing.class));
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.save', null);
 			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Funders', 'Funders_Shared_NotSaved'));

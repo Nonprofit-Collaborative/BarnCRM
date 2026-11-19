@@ -13,13 +13,7 @@ public with sharing class PermissionSetAssignmentSelector {
 			return new List<PermissionSetAssignment>();
 		}
 		return [
-			SELECT
-				Id,
-				AssigneeId,
-				Assignee.Name,
-				Assignee.Email,
-				Assignee.IsActive,
-				PermissionSetGroupId
+			SELECT Id, AssigneeId, Assignee.Name, Assignee.Email, Assignee.IsActive, PermissionSetGroupId
 			FROM PermissionSetAssignment
 			WHERE PermissionSetGroupId IN :groupIds AND Assignee.IsActive = TRUE
 			WITH USER_MODE
@@ -35,10 +29,7 @@ public with sharing class PermissionSetAssignmentSelector {
 	 * @param userIds the users to look for
 	 * @return the matching assignments
 	 */
-	public List<PermissionSetAssignment> selectByGroupIdsAndUserIds(
-		Set<Id> groupIds,
-		Set<Id> userIds
-	) {
+	public List<PermissionSetAssignment> selectByGroupIdsAndUserIds(Set<Id> groupIds, Set<Id> userIds) {
 		if (groupIds == null || groupIds.isEmpty() || userIds == null || userIds.isEmpty()) {
 			return new List<PermissionSetAssignment>();
 		}
@@ -120,10 +111,7 @@ public with sharing class PermissionSetAssignmentSelector {
 	 * @param userIds the users to look for
 	 * @return the matching assignments
 	 */
-	public List<PermissionSetAssignment> selectByPermissionSetIdAndUserIds(
-		Id permissionSetId,
-		Set<Id> userIds
-	) {
+	public List<PermissionSetAssignment> selectByPermissionSetIdAndUserIds(Id permissionSetId, Set<Id> userIds) {
 		if (permissionSetId == null || userIds == null || userIds.isEmpty()) {
 			return new List<PermissionSetAssignment>();
 		}

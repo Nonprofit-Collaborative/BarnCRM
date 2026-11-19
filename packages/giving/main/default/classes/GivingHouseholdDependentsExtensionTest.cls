@@ -80,8 +80,7 @@ private class GivingHouseholdDependentsExtensionTest {
 			);
 			Assert.areEqual(
 				leftHousehold,
-				[SELECT Household__c FROM Commitment__c WHERE Donor_Contact__c = :sarah.Id]
-				.Household__c,
+				[SELECT Household__c FROM Commitment__c WHERE Donor_Contact__c = :sarah.Id].Household__c,
 				'The pledge keeps the household it was made to'
 			);
 		}
@@ -116,8 +115,7 @@ private class GivingHouseholdDependentsExtensionTest {
 			Test.startTest();
 			Set<Id> answer = new GivingHouseholdDependentsExtension()
 				.householdsWithDependents(new Set<Id>{ ana.AccountId, emptyOfGifts });
-			Set<Id> none = new GivingHouseholdDependentsExtension()
-				.householdsWithDependents(new Set<Id>());
+			Set<Id> none = new GivingHouseholdDependentsExtension().householdsWithDependents(new Set<Id>());
 			Test.stopTest();
 
 			Assert.areEqual(new Set<Id>{ ana.AccountId }, answer, 'Only the household with a gift');

@@ -44,12 +44,7 @@ public with sharing class UserErrors {
 	 * @param fallbackLabel the feature's label for anything else, which is logged
 	 */
 	@NamespaceAccessible
-	public static AuraHandledException wrap(
-		Exception caught,
-		Boolean shown,
-		String context,
-		String fallbackLabel
-	) {
+	public static AuraHandledException wrap(Exception caught, Boolean shown, String context, String fallbackLabel) {
 		return wrap(caught, shown, context, null, fallbackLabel);
 	}
 
@@ -178,8 +173,6 @@ public with sharing class UserErrors {
 	@TestVisible
 	private static Boolean isKnown(Exception caught) {
 		String typeName = caught.getTypeName();
-		return !typeName.startsWith('System.') &&
-			!typeName.startsWith('Database.') &&
-			typeName.endsWith('Exception');
+		return !typeName.startsWith('System.') && !typeName.startsWith('Database.') && typeName.endsWith('Exception');
 	}
 }

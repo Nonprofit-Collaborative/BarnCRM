@@ -112,10 +112,7 @@ private class RollupTriggerHandlerTest {
 			TriggerHandler.clearRunClaims();
 			Account renamed = child.clone(true);
 			renamed.Name = 'Child, renamed';
-			TriggerHandler.setTestRecords(
-				new List<SObject>{ renamed },
-				new Map<Id, SObject>{ child.Id => child }
-			);
+			TriggerHandler.setTestRecords(new List<SObject>{ renamed }, new Map<Id, SObject>{ child.Id => child });
 			RollupTriggerHandler handler = new RollupTriggerHandler();
 
 			Test.startTest();
@@ -156,10 +153,7 @@ private class RollupTriggerHandlerTest {
 
 			Test.startTest();
 			update underFirst;
-			TriggerHandler.setTestRecords(
-				new List<SObject>{ underFirst },
-				new Map<Id, SObject>{ child.Id => child }
-			);
+			TriggerHandler.setTestRecords(new List<SObject>{ underFirst }, new Map<Id, SObject>{ child.Id => child });
 			handler.afterUpdate();
 			update underSecond;
 			TriggerHandler.setTestRecords(
@@ -231,10 +225,7 @@ private class RollupTriggerHandlerTest {
 				'So the entry can be grouped by what it is about'
 			);
 			System.Assert.areEqual(
-				String.format(
-					System.Label.Core_ErrorLog_UnexpectedFailureIn,
-					new List<Object>{ 'RollupPlanner.plan' }
-				),
+				String.format(System.Label.Core_ErrorLog_UnexpectedFailureIn, new List<Object>{ 'RollupPlanner.plan' }),
 				logged[0].Message__c,
 				'What Maria reads is plain language'
 			);

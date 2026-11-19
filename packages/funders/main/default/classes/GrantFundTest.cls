@@ -4,21 +4,13 @@
  * also for staff, who cannot set the entry's Payment themselves; entries typed by hand are left
  * alone; the Giving Fund is a fund's record identifier, and the card works with or without Giving.
  */
-@IsTest(
-	testFor='ApexClass:GrantFundService, ApexClass:GrantFundController, ApexClass:GrantPaymentService'
-)
+@IsTest(testFor='ApexClass:GrantFundService, ApexClass:GrantFundController, ApexClass:GrantPaymentService')
 private class GrantFundTest {
 	@TestSetup
 	static void createTestUsers() {
 		TestUsers.adminWithInstalledModules();
-		TestUsers.standardUserWith(
-			'Gfundstaff',
-			new List<String>{ 'BarnCRM_Read_Only', 'Funders_Staff' }
-		);
-		TestUsers.standardUserWith(
-			'Gfundreader',
-			new List<String>{ 'BarnCRM_Read_Only', 'Funders_Read_Only' }
-		);
+		TestUsers.standardUserWith('Gfundstaff', new List<String>{ 'BarnCRM_Read_Only', 'Funders_Staff' });
+		TestUsers.standardUserWith('Gfundreader', new List<String>{ 'BarnCRM_Read_Only', 'Funders_Read_Only' });
 		TestUsers.standardUser('Gfundnoaccess');
 	}
 
@@ -42,11 +34,7 @@ private class GrantFundTest {
 
 	private static Grant__c totals(Id grantId) {
 		return [
-			SELECT
-				Restricted_Received__c,
-				Restricted_Spent__c,
-				Restricted_Released__c,
-				Restricted_Balance__c
+			SELECT Restricted_Received__c, Restricted_Spent__c, Restricted_Released__c, Restricted_Balance__c
 			FROM Grant__c
 			WHERE Id = :grantId
 			WITH SYSTEM_MODE
@@ -70,11 +58,7 @@ private class GrantFundTest {
 
 			Test.startTest();
 			insert new List<Grant_Fund_Entry__c>{
-				new Grant_Fund_Entry__c(
-					Grant__c = grant.Id,
-					Type__c = 'Received',
-					Amount__c = 1000
-				),
+				new Grant_Fund_Entry__c(Grant__c = grant.Id, Type__c = 'Received', Amount__c = 1000),
 				new Grant_Fund_Entry__c(Grant__c = grant.Id, Type__c = 'Spent', Amount__c = 1500),
 				new Grant_Fund_Entry__c(Grant__c = grant.Id, Type__c = 'Released', Amount__c = 200)
 			};
@@ -92,11 +76,7 @@ private class GrantFundTest {
 			Assert.areEqual(200, saved.Restricted_Released__c, 'Released is summed');
 			Assert.areEqual(-700, saved.Restricted_Balance__c, 'A balance below zero is shown');
 			Assert.areEqual('FIELD_CUSTOM_VALIDATION_EXCEPTION', refusal, 'R-FE1: above zero');
-			Assert.areEqual(
-				Date.today(),
-				entries(grant.Id)[0].Entry_Date__c,
-				'The entry date defaults to today'
-			);
+			Assert.areEqual(Date.today(), entries(grant.Id)[0].Entry_Date__c, 'The entry date defaults to today');
 		}
 	}
 
@@ -124,10 +104,7 @@ private class GrantFundTest {
 				Received_Date__c = Date.newInstance(2027, 3, 1)
 			);
 			List<Grant_Fund_Entry__c> followed = entries(grant.Id);
-			update new Grant_Payment__c(
-				Id = first.Id,
-				Status__c = GrantPaymentService.STATUS_CANCELLED
-			);
+			update new Grant_Payment__c(Id = first.Id, Status__c = GrantPaymentService.STATUS_CANCELLED);
 			delete second;
 			Test.stopTest();
 
@@ -206,16 +183,8 @@ private class GrantFundTest {
 			if (fundType == null) {
 				Test.stopTest();
 				Assert.isFalse(card.available, 'Without Giving there is nothing to choose');
-				Assert.areEqual(
-					BarnHelp.text('Funders', 'Funders_Grant_BadFund'),
-					refusedText,
-					'Text is refused'
-				);
-				Assert.areEqual(
-					BarnHelp.text('Funders', 'Funders_Grant_BadFund'),
-					refusedGrant,
-					'And so is saving'
-				);
+				Assert.areEqual(BarnHelp.text('Funders', 'Funders_Grant_BadFund'), refusedText, 'Text is refused');
+				Assert.areEqual(BarnHelp.text('Funders', 'Funders_Grant_BadFund'), refusedGrant, 'And so is saving');
 				return;
 			}
 			SObject fund = fundType.newSObject();
@@ -233,16 +202,8 @@ private class GrantFundTest {
 				card.title,
 				'Titled by the field label'
 			);
-			Assert.areEqual(
-				BarnHelp.text('Funders', 'Funders_Grant_BadFund'),
-				refusedText,
-				'Text is refused'
-			);
-			Assert.areEqual(
-				BarnHelp.text('Funders', 'Funders_Grant_BadFund'),
-				refusedGrant,
-				'A grant is not a fund'
-			);
+			Assert.areEqual(BarnHelp.text('Funders', 'Funders_Grant_BadFund'), refusedText, 'Text is refused');
+			Assert.areEqual(BarnHelp.text('Funders', 'Funders_Grant_BadFund'), refusedGrant, 'A grant is not a fund');
 			Assert.areEqual(String.valueOf(fund.Id), chosen.fundId, 'Stored in 18 characters');
 			Assert.areEqual('Literacy Fund', chosen.fundName, 'Shown by name');
 			Assert.isFalse(chosen.missing, 'It is there');

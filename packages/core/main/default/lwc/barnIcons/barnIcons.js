@@ -118,6 +118,8 @@ const ICONS = Object.freeze({
   Territory_Management: 'custom:custom34',
   // Address Verification
   Address_Verification_Setup: 'custom:custom73',
+  // Advanced Reporting
+  Advanced_Reporting: 'custom:custom84',
   // Memberships
   Membership_Level__c: 'custom:custom48',
   Membership_Term__c: 'custom:custom45',
@@ -137,8 +139,9 @@ const ICONS = Object.freeze({
   Projects_Staffing: 'custom:custom84',
   Request_Connection__c: 'custom:custom68',
   // Mirror
-  Accounting_Export: 'custom:custom21',
   Provider_Request__c: 'custom:custom68',
+  // Fundraising: accounting export and the gift mirrors
+  Accounting_Export: 'custom:custom16',
   Campaign_Sync: 'custom:custom35',
   Gift_Transaction_Mirror: 'custom:custom31',
   Opportunity_Mirror: 'custom:custom30',

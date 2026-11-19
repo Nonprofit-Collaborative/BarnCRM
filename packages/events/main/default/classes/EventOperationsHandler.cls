@@ -96,11 +96,7 @@ public with sharing class EventOperationsHandler extends TriggerHandler {
 		Set<Id> roomIds = new Set<Id>();
 		for (Event_Session__c record : sessions) {
 			SObject old = oldById == null ? null : oldById.get(record.Id);
-			if (
-				record.Venue_Room__c != null &&
-				(old == null ||
-				old.get('Venue_Room__c') != record.Venue_Room__c)
-			) {
+			if (record.Venue_Room__c != null && (old == null || old.get('Venue_Room__c') != record.Venue_Room__c)) {
 				roomIds.add(record.Venue_Room__c);
 			}
 		}
@@ -111,9 +107,7 @@ public with sharing class EventOperationsHandler extends TriggerHandler {
 			[SELECT Id, Name, Capacity__c FROM Event_Room__c WHERE Id IN :roomIds WITH USER_MODE]
 		);
 		for (Event_Session__c record : sessions) {
-			Event_Room__c room = roomIds.contains(record.Venue_Room__c)
-				? rooms.get(record.Venue_Room__c)
-				: null;
+			Event_Room__c room = roomIds.contains(record.Venue_Room__c) ? rooms.get(record.Venue_Room__c) : null;
 			if (room == null) {
 				continue;
 			}
@@ -179,10 +173,7 @@ public with sharing class EventOperationsHandler extends TriggerHandler {
 			for (Sponsor_Lead__c lead : leads) {
 				Event_Attendee__c attendee = attendees.get(attendeeCode(lead.Badge_Code__c));
 				Id eventId = attendee == null ? null : attendee.Event_Registration__r.Event__c;
-				Event_Sponsor__c sponsor = sponsorshipAt(
-					sponsorships.get(lead.Scanned_By__c),
-					eventId
-				);
+				Event_Sponsor__c sponsor = sponsorshipAt(sponsorships.get(lead.Scanned_By__c), eventId);
 				if (sponsor == null) {
 					sponsor = named.get(lead.Event_Sponsor__c);
 				}
@@ -242,10 +233,7 @@ public with sharing class EventOperationsHandler extends TriggerHandler {
 			]) {
 				for (Id scanner : scanners) {
 					Set<Id> staffOf = sponsorIdsByScanner.get(scanner);
-					if (
-						sponsor.Contact__c == scanner ||
-						(staffOf != null && staffOf.contains(sponsor.Id))
-					) {
+					if (sponsor.Contact__c == scanner || (staffOf != null && staffOf.contains(sponsor.Id))) {
 						if (!result.containsKey(scanner)) {
 							result.put(scanner, new List<Event_Sponsor__c>());
 						}
@@ -307,9 +295,7 @@ public with sharing class EventOperationsHandler extends TriggerHandler {
 			Set<Id> sessionIds = new Set<Id>();
 			for (Agenda_Item__c item : items) {
 				Agenda_Item__c old = (Agenda_Item__c) oldById.get(item.Id);
-				Boolean changed =
-					item.My_Rating__c != old.My_Rating__c ||
-					item.My_Comment__c != old.My_Comment__c;
+				Boolean changed = item.My_Rating__c != old.My_Rating__c || item.My_Comment__c != old.My_Comment__c;
 				if (!changed) {
 					continue;
 				}
@@ -329,11 +315,7 @@ public with sharing class EventOperationsHandler extends TriggerHandler {
 			List<Session_Rating__c> ratings = new List<Session_Rating__c>();
 			for (Agenda_Item__c item : rating) {
 				Event_Session__c session = sessions.get(item.Event_Session__c);
-				if (
-					session == null ||
-					session.Start__c == null ||
-					session.Start__c > Datetime.now()
-				) {
+				if (session == null || session.Start__c == null || session.Start__c > Datetime.now()) {
 					item.addError(BarnHelp.text('Events', 'Events_Agenda_RateAfterStart'));
 					continue;
 				}

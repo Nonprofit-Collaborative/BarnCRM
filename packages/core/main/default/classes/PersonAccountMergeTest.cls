@@ -151,8 +151,7 @@ private class PersonAccountMergeTest {
 				membership(hers.Id, ana.Id, true),
 				membership(theirs.Id, bea.Id, true)
 			};
-			Id anaContact = PersonRecordSelector.getPersonContactIds(new Set<Id>{ ana.Id })
-				.get(ana.Id);
+			Id anaContact = PersonRecordSelector.getPersonContactIds(new Set<Id>{ ana.Id }).get(ana.Id);
 
 			Test.startTest();
 			Database.merge(ana, bea.Id);
@@ -172,9 +171,7 @@ private class PersonAccountMergeTest {
 	// ------------------------------------------------------------------------------ helpers
 
 	private static void settingsThatTidyEmptyHouseholds() {
-		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-			HouseholdTestDataFactory.MODE_JUNCTION
-		);
+		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
 		settings.Auto_Create_Households__c = false;
 		settings.Delete_Empty_Households__c = true;
 		HouseholdTestDataFactory.save(settings);
@@ -212,32 +209,23 @@ private class PersonAccountMergeTest {
 	}
 
 	private static Household_Member__c membership(Id householdId, Id personId, Boolean primary) {
-		return new Household_Member__c(
-			Household__c = householdId,
-			Account__c = personId,
-			Is_Primary__c = primary
-		);
+		return new Household_Member__c(Household__c = householdId, Account__c = personId, Is_Primary__c = primary);
 	}
 
 	/** The household has exactly one current primary, the survivor, and mirrors them. */
 	private static void assertOnePrimaryMirrored(Id householdId, Id survivorId, Id contactId) {
-		Date today = Date.today();
+		Date today = OrgDate.today();
 		List<Household_Member__c> primaries = [
 			SELECT Account__c
 			FROM Household_Member__c
-			WHERE
-				Household__c = :householdId
-				AND Is_Primary__c = TRUE
-				AND (End_Date__c = NULL
-				OR End_Date__c > :today)
+			WHERE Household__c = :householdId AND Is_Primary__c = TRUE AND (End_Date__c = NULL OR End_Date__c > :today)
 			WITH SYSTEM_MODE
 		];
 		Assert.areEqual(1, primaries.size(), 'The household has exactly one current primary');
 		Assert.areEqual(survivorId, primaries[0].Account__c, 'And it is the survivor');
 		Assert.areEqual(
 			contactId,
-			[SELECT Primary_Contact__c FROM Account WHERE Id = :householdId WITH SYSTEM_MODE]
-			.Primary_Contact__c,
+			[SELECT Primary_Contact__c FROM Account WHERE Id = :householdId WITH SYSTEM_MODE].Primary_Contact__c,
 			'Its Primary Contact mirrors the survivor (R-M3)'
 		);
 	}

@@ -165,9 +165,7 @@ public with sharing class BulkDeleteService {
 			throw new BulkDeleteException(refused.getMessage());
 		}
 		if (!FeatureManagement.checkPermission(BulkDeleteController.PERMISSION)) {
-			throw new BulkDeleteException(
-				BarnHelp.text('Core', 'Core_Import_ErrorDeleteNeedsPermission')
-			);
+			throw new BulkDeleteException(BarnHelp.text('Core', 'Core_Import_ErrorDeleteNeedsPermission'));
 		}
 		Plan result = checked(described);
 		result.fromFile = true;
@@ -194,9 +192,7 @@ public with sharing class BulkDeleteService {
 
 	/** Checks a job's stored definition again, as the person running the job. */
 	public static Plan planFromDefinition(String definitionJson) {
-		Map<String, Object> definition = (Map<String, Object>) JSON.deserializeUntyped(
-			definitionJson
-		);
+		Map<String, Object> definition = (Map<String, Object>) JSON.deserializeUntyped(definitionJson);
 		if (SOURCE_FILE.equals(definition.get('source'))) {
 			return planForFile((String) definition.get('object'));
 		}
@@ -244,16 +240,10 @@ public with sharing class BulkDeleteService {
 		if (result.count > ceiling) {
 			throw new BulkDeleteException(overLimit(ceiling));
 		}
-		Schema.DescribeSObjectResult described = checked.objectType.getDescribe(
-			SObjectDescribeOptions.DEFERRED
-		);
+		Schema.DescribeSObjectResult described = checked.objectType.getDescribe(SObjectDescribeOptions.DEFERRED);
 		fillObjectAndCascades(result, described);
 		result.undoDeadline = undoDeadlineFrom(Datetime.now());
-		QueryCompiler.Compiled sample = QueryCompiler.compileSelection(
-			queryJson,
-			checked.readFields(),
-			null
-		);
+		QueryCompiler.Compiled sample = QueryCompiler.compileSelection(queryJson, checked.readFields(), null);
 		sample.binds.put('sampleSize', SAMPLE_SIZE);
 		for (
 			SObject record : Database.queryWithBinds(
@@ -271,10 +261,7 @@ public with sharing class BulkDeleteService {
 	}
 
 	/** The object's labels and the kinds deleted with it, cut to what the preview shows. */
-	private static void fillObjectAndCascades(
-		Preview result,
-		Schema.DescribeSObjectResult described
-	) {
+	private static void fillObjectAndCascades(Preview result, Schema.DescribeSObjectResult described) {
 		result.objectLabel = described.getLabelPlural();
 		result.objectLabelSingular = described.getLabel();
 		List<String> all = cascades(described);
@@ -321,11 +308,7 @@ public with sharing class BulkDeleteService {
 			}
 			Schema.DescribeSObjectResult childObject = child.getChildSObject()
 				.getDescribe(SObjectDescribeOptions.DEFERRED);
-			if (
-				!childObject.isAccessible() ||
-				!childObject.isQueryable() ||
-				isSystemChild(childObject.getName())
-			) {
+			if (!childObject.isAccessible() || !childObject.isQueryable() || isSystemChild(childObject.getName())) {
 				continue;
 			}
 			if (childObject.isCustom()) {
@@ -350,14 +333,10 @@ public with sharing class BulkDeleteService {
 	public static Integer countWithin(Plan checked, Integer ceiling) {
 		Integer count = DataJobs.countWithin(checked.queryJson, ceiling, COUNT_MARGIN);
 		if (count == null) {
-			throw new BulkDeleteException(
-				BarnHelp.text('Core', 'Core_BulkUpdate_ErrorTooManyToCount')
-			);
+			throw new BulkDeleteException(BarnHelp.text('Core', 'Core_BulkUpdate_ErrorTooManyToCount'));
 		}
 		if (count == 0) {
-			throw new BulkDeleteException(
-				BarnHelp.text('Core', 'Core_BulkDelete_ErrorNothingMatches')
-			);
+			throw new BulkDeleteException(BarnHelp.text('Core', 'Core_BulkDelete_ErrorNothingMatches'));
 		}
 		return count;
 	}
@@ -403,11 +382,7 @@ public with sharing class BulkDeleteService {
 	 * whose finish starts the delete. `emptyConfirmedCount`, the count typed a second time, asks
 	 * for the Recycle Bin to be emptied too; null leaves it.
 	 */
-	public static Import_Batch__c startArchive(
-		String queryJson,
-		Integer confirmedCount,
-		Integer emptyConfirmedCount
-	) {
+	public static Import_Batch__c startArchive(String queryJson, Integer confirmedCount, Integer emptyConfirmedCount) {
 		Plan checked = plan(queryJson);
 		if (emptyConfirmedCount != null && emptyConfirmedCount != confirmedCount) {
 			throw new BulkDeleteException(BarnHelp.text('Core', 'Core_Archive_ErrorEmptyConfirm'));
@@ -428,10 +403,7 @@ public with sharing class BulkDeleteService {
 			BACKUP_PAGE_SIZE,
 			'BulkDeleteService'
 		);
-		Database.update(
-			new Import_Batch__c(Id = job.Id, Job_Id__c = job.Job_Id__c),
-			AccessLevel.SYSTEM_MODE
-		);
+		Database.update(new Import_Batch__c(Id = job.Id, Job_Id__c = job.Job_Id__c), AccessLevel.SYSTEM_MODE);
 		return job;
 	}
 
@@ -440,12 +412,7 @@ public with sharing class BulkDeleteService {
 	 * rows the file holds, or, when the file was not saved in full or more records match now,
 	 * marks the job Failed with nothing deleted. Never throws.
 	 */
-	public static void afterArchiveExport(
-		Id jobId,
-		Boolean exportFailed,
-		Integer rows,
-		String file
-	) {
+	public static void afterArchiveExport(Id jobId, Boolean exportFailed, Integer rows, String file) {
 		List<Import_Batch__c> found = [
 			SELECT Id, Operation_JSON__c, Run_Log__c, Chunk_Size__c
 			FROM Import_Batch__c
@@ -528,8 +495,7 @@ public with sharing class BulkDeleteService {
 					UserInfo.getName(),
 					now.format(),
 					count.format(),
-					checked.objectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-						.getLabelPlural(),
+					checked.objectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural(),
 					confirmedCount.format()
 				}
 			)
@@ -551,19 +517,14 @@ public with sharing class BulkDeleteService {
 		Plan checked = planForFile(objectOfFile(batch));
 		Preview result = new Preview();
 		result.count = matchedRows(batch.Id);
-		Schema.DescribeSObjectResult described = checked.objectType.getDescribe(
-			SObjectDescribeOptions.DEFERRED
-		);
+		Schema.DescribeSObjectResult described = checked.objectType.getDescribe(SObjectDescribeOptions.DEFERRED);
 		fillObjectAndCascades(result, described);
 		result.undoDeadline = undoDeadlineFrom(Datetime.now());
 		Set<Id> firstIds = new Set<Id>();
 		for (Import_Row__c row : [
 			SELECT Gift_Id__c
 			FROM Import_Row__c
-			WHERE
-				Import_Batch__c = :batch.Id
-				AND Status__c = :ImportRowProcessor.STATUS_MATCHED
-				AND Gift_Id__c != NULL
+			WHERE Import_Batch__c = :batch.Id AND Status__c = :ImportRowProcessor.STATUS_MATCHED AND Gift_Id__c != NULL
 			WITH SYSTEM_MODE
 			ORDER BY Row_Number__c
 			LIMIT :SAMPLE_SIZE
@@ -589,9 +550,7 @@ public with sharing class BulkDeleteService {
 		Plan checked = planForFile(objectOfFile(batch));
 		Integer count = matchedRows(batch.Id);
 		if (count == 0) {
-			throw new BulkDeleteException(
-				BarnHelp.text('Core', 'Core_BulkDelete_ErrorNothingMatches')
-			);
+			throw new BulkDeleteException(BarnHelp.text('Core', 'Core_BulkDelete_ErrorNothingMatches'));
 		}
 		Integer ceiling = runLimit();
 		if (count > ceiling) {
@@ -661,21 +620,15 @@ public with sharing class BulkDeleteService {
 	private static String objectOfFile(Import_Batch__c batch) {
 		Import_Template__c template = ImportTemplateSelector.selectById(batch.Import_Template__c);
 		Schema.SObjectType type = ImportObjectSchema.typeOf(template);
-		if (
-			type == null ||
-			ImportObjectSchema.operationOf(template) != ImportObjectSchema.OPERATION_DELETE
-		) {
-			throw new BulkDeleteException(
-				BarnHelp.text('Core', 'Core_Import_ErrorNotDeleteByFile')
-			);
+		if (type == null || ImportObjectSchema.operationOf(template) != ImportObjectSchema.OPERATION_DELETE) {
+			throw new BulkDeleteException(BarnHelp.text('Core', 'Core_Import_ErrorNotDeleteByFile'));
 		}
 		return type.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
 	}
 
 	/** How many rows the dry run Matched: the records a delete by file deletes. */
 	private static Integer matchedRows(Id batchId) {
-		Integer matched = ImportBatchSelector.countRowsByStatus(batchId)
-			.get(ImportRowProcessor.STATUS_MATCHED);
+		Integer matched = ImportBatchSelector.countRowsByStatus(batchId).get(ImportRowProcessor.STATUS_MATCHED);
 		return matched == null ? 0 : matched;
 	}
 
@@ -741,11 +694,7 @@ public with sharing class BulkDeleteService {
 		} else {
 			checked = plan(queryJson);
 			Id after = String.isBlank(afterId) ? null : Id.valueOf(afterId);
-			for (
-				SObject record : QueryCompiler.run(
-					QueryCompiler.compileIdPage(queryJson, after, BACKUP_PAGE_SIZE)
-				)
-			) {
+			for (SObject record : QueryCompiler.run(QueryCompiler.compileIdPage(queryJson, after, BACKUP_PAGE_SIZE))) {
 				ids.add(record.Id);
 			}
 		}
@@ -871,17 +820,12 @@ public with sharing class BulkDeleteService {
 			);
 		}
 		ImportUndoService.latch(jobId);
-		return AsyncStarter.batch(
-			new BulkDeleteUndoBatch(jobId, view.records),
-			1,
-			'BulkDeleteService'
-		);
+		return AsyncStarter.batch(new BulkDeleteUndoBatch(jobId, view.records), 1, 'BulkDeleteService');
 	}
 
 	/** An archive that emptied the Recycle Bin, so has nothing to undelete (R-BD9). */
 	public static Boolean binEmptied(Import_Batch__c job) {
-		return String.isNotBlank(job.Operation_JSON__c) &&
-			job.Operation_JSON__c.contains('"emptyRecycleBin":true');
+		return String.isNotBlank(job.Operation_JSON__c) && job.Operation_JSON__c.contains('"emptyRecycleBin":true');
 	}
 
 	/** A data job by Id, with the fields the undo guards read, in system mode (ADR-0021). */
@@ -921,12 +865,7 @@ public with sharing class BulkDeleteService {
 
 	/** The run limit from BarnCRM Settings, held between 1 and MAX_RUN_LIMIT (R-BD2). */
 	public static Integer runLimit() {
-		return DataJobs.wholeNumberSetting(
-			'Bulk_Delete_Run_Limit__c',
-			DEFAULT_RUN_LIMIT,
-			1,
-			MAX_RUN_LIMIT
-		);
+		return DataJobs.wholeNumberSetting('Bulk_Delete_Run_Limit__c', DEFAULT_RUN_LIMIT, 1, MAX_RUN_LIMIT);
 	}
 
 	public static String overLimit(Integer ceiling) {

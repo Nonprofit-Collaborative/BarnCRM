@@ -101,11 +101,7 @@ public with sharing class GivingPostInstall implements InstallHandler, ModuleSet
 		AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
 		ImportTemplateService.materializeDefaultsDuringInstall(IMPORT_CONTEXT);
 		FundDefaultsService.installDefaultFundDuringInstall(FUND_CONTEXT);
-		ShippedDefaultUpgrades.apply(
-			MODULE_KEY,
-			Giving_Settings__c.SObjectType,
-			SHIPPED_ON_ADDED_IN_UPGRADES
-		);
+		ShippedDefaultUpgrades.apply(MODULE_KEY, Giving_Settings__c.SObjectType, SHIPPED_ON_ADDED_IN_UPGRADES);
 		// BarnCRM Admin holders get Giving Admin (ADR-0194 D2); queued, since it writes setup
 		// objects, and it never throws.
 		ModuleAccessSyncs.requestFor(MODULE_KEY);

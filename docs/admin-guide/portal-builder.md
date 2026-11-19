@@ -211,7 +211,7 @@ marked `edit` can be changed. The portal's API user needs no access to any of th
 |---|---|---|
 | Volunteer Portal | `volunteer.json`, Volunteers | Open Shifts (Sign Up), My Shifts (Cancel Sign-Up), My Hours (view and log), My Profile |
 | Speaker Portal | `speaker.json`, Event Management | Events Open for Proposals (Propose a Talk), Open Proposals (edit, Withdraw), All My Proposals, My Sessions, My Speaker Details, My Details |
-| Donor Portal | `donor.json`, Giving | My Giving, Gift History, Pledges and Recurring Gifts, Receipts, My Contact Details |
+| Donor Portal | `donor.json`, Fundraising | My Fundraising, Gift History, Pledges and Recurring Gifts, Receipts, My Contact Details |
 | Board Portal | `board.json`, Corporate Hub | My Meetings (I Have Read the Packet), Minutes (Approve Minutes), My Votes (Vote For, Vote Against, Abstain), Disclosures and Policies (edit, I Have Read and Acknowledge), Board Self-Assessment (edit), Meeting Availability (edit), My Board Seats, My Details |
 | Applicant Portal | `applicant.json`, Scholarships | Open Cycles (Apply), My Applications (Withdraw), My Awards (Accept Award), My Reports and Conditions, My Details |
 | Member Portal | `member.json`, Memberships | My Membership (Pay Dues), My Directory Listing (edit: show me to other members, where I am, about me), Member Directory (searchable) |
@@ -219,7 +219,7 @@ marked `edit` can be changed. The portal's API user needs no access to any of th
 | Sponsor Portal | `sponsor.json`, Event Management | My Sponsorships, My Leads (Scan to add, notes and interest, Download CSV), My Details |
 | Service Portal | `service.json`, Programs | My Programs, My Services, Upcoming Sessions, My Goals, My Referrals, My Details |
 | Requests | `requests.json`, Project Management | My Requests (send a request, reply, satisfaction), Updates (comments your staff shared). See [Requests and Issues](projects-requests.md) |
-| Partner Portal | `partner.json`, Programs; `partner-funders.json`, Programs and Funders | Shared Referrals, My Organizations, My Details; with Funders also My Grants and Grant Reports |
+| Partner Portal | `partner.json`, Programs; `partner-funders.json`, Programs and Grants | Shared Referrals, My Organizations, My Details; with Grants also My Grants and Grant Reports |
 
 **Attendee and Sponsor.** See [Event Management, Attendee App](events.md#attendee-app): the
 attendee list, connections, messages and agenda, and how sponsor lead scanning works. Every page
@@ -235,9 +235,9 @@ address. See [Programs](programs.md).
 **Partner.** For staff of partner organizations. A person sees the referrals whose **Partner
 Organization** is an organization they have a Current affiliation with, and only those with
 **Shared With Partner** on (off by default), without notes. My Organizations lists their current
-affiliations. `partner-funders.json` adds, where Funders is installed, My Grants (grants whose
+affiliations. `partner-funders.json` adds, where Grants is installed, My Grants (grants whose
 Funder Contact is the person) and Grant Reports (those grants' report, application and other
-document requirements once submitted). Use `partner.json` where Funders is not installed: a
+document requirements once submitted). Use `partner.json` where Grants is not installed: a
 template naming a missing module's object fails whole.
 
 **Member.** Pay Dues emails the member a payment link for the membership's dues, once Payments
@@ -272,8 +272,7 @@ pledge balance) on your own Stripe or PayPal checkout page. BarnCRM holds no mon
 a card. It needs the **Payments** module with your keys entered; without them the donor is told
 paying online isn't available. When the processor reports the payment, a **Received** gift
 appears on the pledge, dated the day it was paid, and is linked to the payment it covers. A
-refund at the processor sets it to **Refunded**. A portal saved before this release keeps its
-template: paste the new `donor.json` to add the button.
+refund at the processor sets it to **Refunded**.
 
 **Automatic payments and Update Card (donor template, PAY-04).** With **Automatic Recurring
 Payments** on in the Payments settings, **Pay Online** on a recurring gift sets up automatic

@@ -61,19 +61,14 @@ private class LogicModelsWhereUsedExtensionTest {
 			Assert.areEqual(1, byDate.size(), 'The date field the source counts by.');
 			Assert.areEqual('Results summed', byDate[0].getName());
 			Assert.areEqual(
-				new List<String>{
-					Schema.SObjectType.Indicator__c.fields.Source_Definition__c.getLabel()
-				},
+				new List<String>{ Schema.SObjectType.Indicator__c.fields.Source_Definition__c.getLabel() },
 				byDate[0].getParts()
 			);
 			Assert.areEqual(System.Label.Core_WhereUsed_BreaksModuleRecord, byDate[0].getBreaks());
 			Assert.areEqual('/lightning/r/' + model.Id + '/view', byDate[0].editUrl);
 			Assert.areEqual(1, bySum.size(), 'The field the source sums.');
 			Assert.isTrue(other.isEmpty(), 'A field the source does not read is not listed.');
-			Assert.isTrue(
-				wholeObject.isEmpty(),
-				'The counted object is the saved query\'s, in Core.'
-			);
+			Assert.isTrue(wholeObject.isEmpty(), 'The counted object is the saved query\'s, in Core.');
 			Assert.isInstanceOfType(
 				WhereUsedExtensions.findAll().get('LogicModelsWhereUsedExtension'),
 				LogicModelsWhereUsedExtension.class

@@ -93,27 +93,15 @@ private class AccountKindsTest {
 	static void householdAndPersonRecordTypesAreNeverOffered() {
 		System.runAs(TestUsers.admin()) {
 			Assert.isFalse(AccountKinds.isOffered('Household', 'Household', false), 'By name.');
-			Assert.isFalse(
-				AccountKinds.isOffered('HH_Account', 'Household Account', false),
-				'By label.'
-			);
-			Assert.isFalse(
-				AccountKinds.isOffered('Individual_Type', 'Individual', true),
-				'Person.'
-			);
+			Assert.isFalse(AccountKinds.isOffered('HH_Account', 'Household Account', false), 'By label.');
+			Assert.isFalse(AccountKinds.isOffered('Individual_Type', 'Individual', true), 'Person.');
 			Assert.isTrue(AccountKinds.isOffered('Business', 'Business', false), 'A business one.');
 
 			Set<Id> personTypes = OrgShapeDetector.personRecordTypeIds();
 			for (Schema.RecordTypeInfo info : AccountKinds.candidateRecordTypes()) {
 				Assert.isTrue(info.isActive() && !info.isMaster(), 'Only active real ones.');
-				Assert.isFalse(
-					personTypes.contains(info.getRecordTypeId()),
-					'Never a person type.'
-				);
-				Assert.isFalse(
-					info.getDeveloperName().toLowerCase().contains('household'),
-					'Never a household type.'
-				);
+				Assert.isFalse(personTypes.contains(info.getRecordTypeId()), 'Never a person type.');
+				Assert.isFalse(info.getDeveloperName().toLowerCase().contains('household'), 'Never a household type.');
 			}
 			Assert.isFalse(AccountKinds.isCandidate('Household'), 'BarnCRM Household is refused.');
 		}
@@ -135,8 +123,7 @@ private class AccountKindsTest {
 			}
 			Boolean hasOwn = !AccountKinds.candidateRecordTypes().isEmpty();
 			Assert.areEqual(!hasOwn, offered.contains(shipped), 'Offered only without one');
-			Schema.RecordTypeInfo own = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-				.get(shipped);
+			Schema.RecordTypeInfo own = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get(shipped);
 			Assert.isNotNull(own, 'Core ships the record type');
 			Assert.isTrue(own.isActive(), 'Shipped active');
 
@@ -167,19 +154,9 @@ private class AccountKindsTest {
 		System.runAs(TestUsers.admin()) {
 			store(AccountKinds.NO_RECORD_TYPE);
 
-			Assert.areEqual(
-				AccountKinds.NO_RECORD_TYPE,
-				AccountKinds.organizationRecordTypeName(),
-				'Stored wins.'
-			);
-			Assert.isNull(
-				AccountKinds.organizationRecordTypeId(),
-				'A new organization gets no record type.'
-			);
-			Assert.isTrue(
-				AccountKinds.isOrganization(null),
-				'An account with none is an organization.'
-			);
+			Assert.areEqual(AccountKinds.NO_RECORD_TYPE, AccountKinds.organizationRecordTypeName(), 'Stored wins.');
+			Assert.isNull(AccountKinds.organizationRecordTypeId(), 'A new organization gets no record type.');
+			Assert.isTrue(AccountKinds.isOrganization(null), 'An account with none is an organization.');
 			Assert.isTrue(
 				AccountKinds.organizationRecordTypeUsable(),
 				'Every user can create an organization with no record type.'
@@ -199,30 +176,15 @@ private class AccountKindsTest {
 		System.runAs(TestUsers.admin()) {
 			List<Schema.RecordTypeInfo> offered = AccountKinds.candidateRecordTypes();
 			if (offered.isEmpty()) {
-				Assert.areEqual(
-					AccountKinds.NO_RECORD_TYPE,
-					AccountKinds.organizationRecordTypeName(),
-					'None.'
-				);
+				Assert.areEqual(AccountKinds.NO_RECORD_TYPE, AccountKinds.organizationRecordTypeName(), 'None.');
 				return;
 			}
 			Schema.RecordTypeInfo chosen = offered[offered.size() - 1];
 			store(chosen.getDeveloperName());
 
-			Assert.areEqual(
-				chosen.getDeveloperName(),
-				AccountKinds.organizationRecordTypeName(),
-				'Stored wins.'
-			);
-			Assert.areEqual(
-				chosen.getRecordTypeId(),
-				AccountKinds.organizationRecordTypeId(),
-				'Its Id.'
-			);
-			Assert.isTrue(
-				AccountKinds.isOrganization(chosen.getRecordTypeId()),
-				'Its accounts are organizations.'
-			);
+			Assert.areEqual(chosen.getDeveloperName(), AccountKinds.organizationRecordTypeName(), 'Stored wins.');
+			Assert.areEqual(chosen.getRecordTypeId(), AccountKinds.organizationRecordTypeId(), 'Its Id.');
+			Assert.isTrue(AccountKinds.isOrganization(chosen.getRecordTypeId()), 'Its accounts are organizations.');
 			Assert.isFalse(AccountKinds.isOrganization(null), 'An account with none is not.');
 			Assert.isTrue(
 				AccountKinds.isOrganizationRecordTypeName(chosen.getDeveloperName()),
@@ -250,10 +212,7 @@ private class AccountKindsTest {
 				WHERE Id = :organization.Id
 				WITH SYSTEM_MODE
 			];
-			Assert.isTrue(
-				AccountKinds.isOrganization(read.RecordTypeId),
-				'And what it creates is an organization.'
-			);
+			Assert.isTrue(AccountKinds.isOrganization(read.RecordTypeId), 'And what it creates is an organization.');
 		}
 	}
 
@@ -337,9 +296,7 @@ private class AccountKindsTest {
 					read.Is_Organization__c,
 					'The field and the resolver agree for ' + read.Name + '.'
 				);
-				Schema.RecordTypeInfo info = read.RecordTypeId == null
-					? null
-					: byId.get(read.RecordTypeId);
+				Schema.RecordTypeInfo info = read.RecordTypeId == null ? null : byId.get(read.RecordTypeId);
 				if (read.Id == household.Id) {
 					Assert.isFalse(read.Is_Organization__c, 'A household never is.');
 				} else if (info == null || info.isMaster()) {
@@ -435,11 +392,7 @@ private class AccountKindsTest {
 			String stored = BarnCRM_Settings__c.getOrgDefaults().Organization_Record_Type__c;
 			if (hasCandidate) {
 				Assert.isTrue(AccountKinds.isCandidate(stored), 'A candidate replaced it.');
-				Assert.areEqual(
-					AccountKinds.detectOrganizationRecordType(),
-					stored,
-					'The detected one.'
-				);
+				Assert.areEqual(AccountKinds.detectOrganizationRecordType(), stored, 'The detected one.');
 			} else {
 				Assert.areEqual(AccountKinds.NO_RECORD_TYPE, stored, 'Kept where it works.');
 			}

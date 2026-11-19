@@ -13,10 +13,7 @@
  */
 @NamespaceAccessible
 public with sharing class ContactPointPersonHandler extends TriggerHandler {
-	private static final Set<String> VALUE_KINDS = new Set<String>{
-		ContactPointPlan.EMAIL,
-		ContactPointPlan.PHONE
-	};
+	private static final Set<String> VALUE_KINDS = new Set<String>{ ContactPointPlan.EMAIL, ContactPointPlan.PHONE };
 	/** Built once, not for every record of a save. */
 	private static final List<String> PERSON_FIELDS = ContactPointPlan.personFields();
 	/** What a sync of a person depends on: their values, household and Individual. */
@@ -81,10 +78,7 @@ public with sharing class ContactPointPersonHandler extends TriggerHandler {
 			}
 		}
 		ContactPointSyncService.syncOrQueue(claimValues('afterUpdate', everything), null);
-		ContactPointSyncService.syncOrQueue(
-			claimValues('afterUpdateValues', valuesOnly),
-			VALUE_KINDS
-		);
+		ContactPointSyncService.syncOrQueue(claimValues('afterUpdateValues', valuesOnly), VALUE_KINDS);
 	}
 
 	/**
@@ -151,7 +145,6 @@ public with sharing class ContactPointPersonHandler extends TriggerHandler {
 		if (old == null || record.get('AccountId') != old.get('AccountId')) {
 			return true;
 		}
-		return ContactPointSyncService.individualsAvailable() &&
-			record.get('IndividualId') != old.get('IndividualId');
+		return ContactPointSyncService.individualsAvailable() && record.get('IndividualId') != old.get('IndividualId');
 	}
 }

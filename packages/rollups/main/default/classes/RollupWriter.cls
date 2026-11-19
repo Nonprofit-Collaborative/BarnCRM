@@ -41,10 +41,7 @@ public without sharing class RollupWriter {
 		List<Rollup_Definition__c> toStamp = new List<Rollup_Definition__c>();
 		for (Id definitionId : completedAtById.keySet()) {
 			toStamp.add(
-				new Rollup_Definition__c(
-					Id = definitionId,
-					Last_Calculated__c = completedAtById.get(definitionId)
-				)
+				new Rollup_Definition__c(Id = definitionId, Last_Calculated__c = completedAtById.get(definitionId))
 			);
 		}
 		Database.update(toStamp, AccessLevel.SYSTEM_MODE);
@@ -198,12 +195,9 @@ public without sharing class RollupWriter {
 			return value instanceof Datetime ? ((Datetime) value).date() : value;
 		}
 		if (type == Schema.DisplayType.DATETIME) {
-			return value instanceof Date
-				? Datetime.newInstance((Date) value, Time.newInstance(0, 0, 0, 0))
-				: value;
+			return value instanceof Date ? Datetime.newInstance((Date) value, Time.newInstance(0, 0, 0, 0)) : value;
 		}
-		Decimal amount = RollupAggregator.toDecimal(value)
-			.setScale(describe.getScale(), System.RoundingMode.HALF_UP);
+		Decimal amount = RollupAggregator.toDecimal(value).setScale(describe.getScale(), System.RoundingMode.HALF_UP);
 		if (type == Schema.DisplayType.INTEGER) {
 			return amount.intValue();
 		}
@@ -244,10 +238,7 @@ public without sharing class RollupWriter {
 	}
 
 	private static Boolean isNumber(Object value) {
-		return value instanceof Decimal ||
-			value instanceof Integer ||
-			value instanceof Long ||
-			value instanceof Double;
+		return value instanceof Decimal || value instanceof Integer || value instanceof Long || value instanceof Double;
 	}
 
 	/** Saves an administrator's edit to a definition, in user mode, where it belongs. */

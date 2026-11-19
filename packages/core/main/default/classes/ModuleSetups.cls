@@ -87,9 +87,7 @@ public with sharing class ModuleSetups {
 				}
 			}
 			entries.add(revision > 1 ? key + REVISION_SEPARATOR + revision : key);
-			SettingsService.saveBookkeeping(
-				new Map<String, Object>{ MARKER_KEY => String.join(entries, ',') }
-			);
+			SettingsService.saveBookkeeping(new Map<String, Object>{ MARKER_KEY => String.join(entries, ',') });
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT);
 		}
@@ -120,9 +118,7 @@ public with sharing class ModuleSetups {
 	/** The revision the package's setup class declares now, 1 when it declares none. */
 	private static Integer revisionOf(String moduleKey) {
 		ModuleSetup setup = setupFor(moduleKey);
-		Integer revision = setup instanceof Revisioned
-			? ((Revisioned) setup).setupRevision()
-			: null;
+		Integer revision = setup instanceof Revisioned ? ((Revisioned) setup).setupRevision() : null;
 		return revision == null || revision < 1 ? 1 : revision;
 	}
 
@@ -250,10 +246,7 @@ public with sharing class ModuleSetups {
 			if (names.isEmpty()) {
 				return null;
 			}
-			List<Object> values = new List<Object>{
-				String.valueOf(names.size()),
-				String.join(names, ', ')
-			};
+			List<Object> values = new List<Object>{ String.valueOf(names.size()), String.join(names, ', ') };
 			return new HealthCheckService.Finding(
 					'module_setup_not_run',
 					HealthCheckService.forCount(
@@ -267,10 +260,7 @@ public with sharing class ModuleSetups {
 					HealthCheckService.CATEGORY_SETTINGS
 				)
 				.withScope(names)
-				.withFix(
-					System.Label.Core_ModuleSetup_FinishButton,
-					HealthCheckService.FIX_ACTION_PREFIX + FIX_KEY
-				);
+				.withFix(System.Label.Core_ModuleSetup_FinishButton, HealthCheckService.FIX_ACTION_PREFIX + FIX_KEY);
 		}
 	}
 }

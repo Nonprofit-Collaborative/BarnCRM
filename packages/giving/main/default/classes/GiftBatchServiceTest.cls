@@ -11,10 +11,7 @@ private class GiftBatchServiceTest {
 	static void createTestUser() {
 		// Built once for the class rather than in every test that runs as him.
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			TestDataFactory.createUser(
-				'David',
-				new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' }
-			);
+			TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' });
 		}
 	}
 
@@ -132,22 +129,10 @@ private class GiftBatchServiceTest {
 					anaGift.Gift_Date__c,
 					'A line with no date takes the batch date.'
 				);
-				Assert.areEqual(
-					'Check',
-					anaGift.Type__c,
-					'A line with no method takes the batch one.'
-				);
+				Assert.areEqual('Check', anaGift.Type__c, 'A line with no method takes the batch one.');
 				Assert.areEqual('Received', anaGift.Status__c, 'A posted gift has been received.');
-				Assert.areEqual(
-					spring.Id,
-					anaGift.Appeal__c,
-					'A line with no appeal takes the batch one.'
-				);
-				Assert.areEqual(
-					'1042',
-					anaGift.Payment_Reference__c,
-					'The check number is carried.'
-				);
+				Assert.areEqual(spring.Id, anaGift.Appeal__c, 'A line with no appeal takes the batch one.');
+				Assert.areEqual('1042', anaGift.Payment_Reference__c, 'The check number is carried.');
 
 				Gift__c riversideGift = [
 					SELECT Type__c
@@ -167,11 +152,7 @@ private class GiftBatchServiceTest {
 					WHERE Gift__c = :riversideGift.Id
 				];
 				Assert.areEqual(building.Id, buildingAllocation.Fund__c, 'The line fund is used.');
-				Assert.areEqual(
-					250,
-					buildingAllocation.Amount__c,
-					'The allocation totals the gift.'
-				);
+				Assert.areEqual(250, buildingAllocation.Amount__c, 'The allocation totals the gift.');
 
 				Assert.areEqual(
 					'Posted',
@@ -204,10 +185,7 @@ private class GiftBatchServiceTest {
 				GiftBatchService.PostOutcome outcome = GiftBatchService.post(tuesday.Id);
 				Test.stopTest();
 
-				Assert.isTrue(
-					AutomationControl.isPaused(),
-					'Gift automation was paused throughout.'
-				);
+				Assert.isTrue(AutomationControl.isPaused(), 'Gift automation was paused throughout.');
 				Assert.isTrue(outcome.success, 'The batch posts: ' + outcome.formError);
 				Gift_Allocation__c allocation = [
 					SELECT Fund__c, Amount__c
@@ -271,15 +249,13 @@ private class GiftBatchServiceTest {
 
 				Assert.isFalse(shortOutcome.success, 'A short batch does not post.');
 				Assert.areEqual(
-					BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorShortOfControlTotal')
-						.replace('{0}', '12.50'),
+					BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorShortOfControlTotal').replace('{0}', '12.50'),
 					shortOutcome.formError,
 					'It says how far out, to the cent, and which way, as the grid does.'
 				);
 				Assert.isFalse(overOutcome.success, 'An over batch does not post.');
 				Assert.areEqual(
-					BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorOverControlTotal')
-						.replace('{0}', '10.00'),
+					BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorOverControlTotal').replace('{0}', '10.00'),
 					overOutcome.formError,
 					'A whole number of dollars still shows its cents.'
 				);
@@ -361,27 +337,13 @@ private class GiftBatchServiceTest {
 					found.add(problem.lineNumber + ':' + problem.message);
 				}
 				Assert.isTrue(
-					found.contains(
-						'1:' + BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorRowDonorMissing')
-					),
+					found.contains('1:' + BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorRowDonorMissing')),
 					'1'
 				);
+				Assert.isTrue(found.contains('2:' + BarnHelp.text('Giving', 'Giving_GiftEntry_ErrorOneDonor')), '2');
+				Assert.isTrue(found.contains('3:' + BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorRowAmount')), '3');
 				Assert.isTrue(
-					found.contains(
-						'2:' + BarnHelp.text('Giving', 'Giving_GiftEntry_ErrorOneDonor')
-					),
-					'2'
-				);
-				Assert.isTrue(
-					found.contains(
-						'3:' + BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorRowAmount')
-					),
-					'3'
-				);
-				Assert.isTrue(
-					found.contains(
-						'1:' + BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorRowPaymentMethod')
-					),
+					found.contains('1:' + BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorRowPaymentMethod')),
 					'With no method anywhere, every line is missing one.'
 				);
 				Assert.areEqual(0, [SELECT COUNT() FROM Gift__c], 'Nothing was created.');
@@ -508,9 +470,7 @@ private class GiftBatchServiceTest {
 			}
 			fund('General', true);
 			User fundraiser = david();
-			Contact hidden = TestDataFactory.person(
-				new Contact(FirstName = 'Private', LastName = 'Donor')
-			);
+			Contact hidden = TestDataFactory.person(new Contact(FirstName = 'Private', LastName = 'Donor'));
 			insert hidden;
 			Gift_Batch__c yearEnd;
 			Contact ana;
@@ -564,10 +524,7 @@ private class GiftBatchServiceTest {
 				Gift_Batch__c tuesday = batch(100, null, null);
 				Gift_Batch_Row__c only = line(tuesday.Id, ana.Id, null, 100);
 				insert only;
-				Assert.isTrue(
-					GiftBatchService.post(tuesday.Id).success,
-					'The first post succeeds.'
-				);
+				Assert.isTrue(GiftBatchService.post(tuesday.Id).success, 'The first post succeeds.');
 
 				Test.startTest();
 				GiftBatchService.PostOutcome again = GiftBatchService.post(tuesday.Id);
@@ -635,20 +592,13 @@ private class GiftBatchServiceTest {
 			// reader would create the gifts and then fail on the batch: refuse first, in words.
 			fund('General', true);
 			User fundraiser = david();
-			User colleague = TestDataFactory.createUser(
-				'Priya',
-				new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' }
-			);
+			User colleague = TestDataFactory.createUser('Priya', new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' });
 			Gift_Batch__c tuesday;
 			System.runAs(fundraiser) {
 				Contact ana = person();
 				tuesday = batch(100, null, null);
 				insert line(tuesday.Id, ana.Id, null, 100);
-				insert new Gift_Batch__Share(
-					ParentId = tuesday.Id,
-					UserOrGroupId = colleague.Id,
-					AccessLevel = 'Read'
-				);
+				insert new Gift_Batch__Share(ParentId = tuesday.Id, UserOrGroupId = colleague.Id, AccessLevel = 'Read');
 			}
 
 			System.runAs(colleague) {
@@ -657,11 +607,7 @@ private class GiftBatchServiceTest {
 				Test.stopTest();
 
 				Assert.isFalse(outcome.success, 'Read access is not enough to post.');
-				Assert.areEqual(
-					BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorNoAccess'),
-					outcome.formError,
-					'Why.'
-				);
+				Assert.areEqual(BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorNoAccess'), outcome.formError, 'Why.');
 			}
 			Assert.areEqual(0, [SELECT COUNT() FROM Gift__c], 'No gift was created.');
 			Assert.areEqual(
@@ -842,9 +788,7 @@ private class GiftBatchServiceTest {
 					[
 						SELECT COUNT()
 						FROM Installment__c
-						WHERE
-							Commitment__c = :payments[0].Commitment__c
-							AND Status__c != 'Scheduled'
+						WHERE Commitment__c = :payments[0].Commitment__c AND Status__c != 'Scheduled'
 					],
 					'Every payment received something.'
 				);

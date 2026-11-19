@@ -31,10 +31,7 @@ public with sharing class FilesImportController {
 
 	/** Saves one group of files. */
 	@AuraEnabled
-	public static FilesImportService.GroupResult addFiles(
-		Id jobId,
-		List<FilesImportService.IncomingFile> files
-	) {
+	public static FilesImportService.GroupResult addFiles(Id jobId, List<FilesImportService.IncomingFile> files) {
 		try {
 			return FilesImportService.addFiles(jobId, files);
 		} catch (Exception e) {

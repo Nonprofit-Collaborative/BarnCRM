@@ -76,7 +76,7 @@ private class FindPeopleActionTest {
 				Household__c = household.Id,
 				Contact__c = wei.Id,
 				Is_Primary__c = true,
-				Start_Date__c = Date.today()
+				Start_Date__c = OrgDate.today()
 			);
 			indexContacts();
 
@@ -87,11 +87,7 @@ private class FindPeopleActionTest {
 			Test.stopTest();
 
 			Assert.areEqual(1, results[0].matches.size(), 'Wei is found');
-			Assert.areEqual(
-				household.Id,
-				results[0].matches[0].householdId,
-				'His household comes from his membership'
-			);
+			Assert.areEqual(household.Id, results[0].matches[0].householdId, 'His household comes from his membership');
 			Assert.areEqual('The Lee Family', results[0].matches[0].householdName);
 		}
 	}
@@ -110,15 +106,9 @@ private class FindPeopleActionTest {
 			Test.stopTest();
 
 			Assert.areEqual(3, results.size(), 'Every search is answered');
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_AgentActions_SearchTooShort'),
-				results[0].errorMessage
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_AgentActions_SearchTooShort'), results[0].errorMessage);
 			Assert.areEqual(1, results[1].matches.size(), 'The good search still ran');
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_AgentActions_SearchTooShort'),
-				results[2].errorMessage
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_AgentActions_SearchTooShort'), results[2].errorMessage);
 		}
 	}
 
@@ -188,16 +178,11 @@ private class FindPeopleActionTest {
 
 		Test.startTest();
 		System.runAs(restricted) {
-			results = FindPeopleAction.find(
-				new List<FindPeopleAction.Request>{ request('Garcia') }
-			);
+			results = FindPeopleAction.find(new List<FindPeopleAction.Request>{ request('Garcia') });
 		}
 		Test.stopTest();
 
-		Assert.areEqual(
-			BarnHelp.text('Core', 'Core_AgentActions_NoAccess'),
-			results[0].errorMessage
-		);
+		Assert.areEqual(BarnHelp.text('Core', 'Core_AgentActions_NoAccess'), results[0].errorMessage);
 		Assert.isTrue(results[0].matches.isEmpty(), 'Nobody is returned');
 	}
 
@@ -205,9 +190,7 @@ private class FindPeopleActionTest {
 
 	/** Name searches go through the search index, which a test fills by hand (D-200 P5). */
 	private static void indexContacts() {
-		Test.setFixedSearchResults(
-			new List<Id>(new Map<Id, Contact>([SELECT Id FROM Contact]).keySet())
-		);
+		Test.setFixedSearchResults(new List<Id>(new Map<Id, Contact>([SELECT Id FROM Contact]).keySet()));
 	}
 
 	private static FindPeopleAction.Request request(String searchText) {

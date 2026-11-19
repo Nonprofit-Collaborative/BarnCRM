@@ -92,10 +92,7 @@ private class SampleDataModulesTest {
 			Assert.isFalse(SampleDataModules.anyHasSampleRecords(), 'No module has any');
 
 			second.loaded = 2;
-			Assert.isTrue(
-				SampleDataModules.anyHasSampleRecords(),
-				'One module with sample records is enough'
-			);
+			Assert.isTrue(SampleDataModules.anyHasSampleRecords(), 'One module with sample records is enough');
 		}
 	}
 
@@ -126,16 +123,8 @@ private class SampleDataModulesTest {
 
 			SampleDataModules.startAfter('First');
 
-			System.assertEquals(
-				true,
-				second.loadStarted,
-				'the module after the named one is started'
-			);
-			System.assertEquals(
-				false,
-				first.loadStarted,
-				'the module that finished is not restarted'
-			);
+			System.assertEquals(true, second.loadStarted, 'the module after the named one is started');
+			System.assertEquals(false, first.loadStarted, 'the module that finished is not restarted');
 		}
 	}
 
@@ -147,11 +136,7 @@ private class SampleDataModulesTest {
 
 			SampleDataModules.startAfter('Only');
 
-			System.assertEquals(
-				false,
-				only.loadStarted,
-				'the end of the chain is quiet rather than an error'
-			);
+			System.assertEquals(false, only.loadStarted, 'the end of the chain is quiet rather than an error');
 		}
 	}
 
@@ -202,11 +187,7 @@ private class SampleDataModulesTest {
 
 			System.assertEquals(1, second.removeCalls, 'the last module is removed first');
 			System.assertEquals(0, first.removeCalls, 'the earlier module waits for the hand-off');
-			System.assertEquals(
-				0,
-				SampleDataStageBatch.started.size(),
-				'Core\'s own records wait for every module'
-			);
+			System.assertEquals(0, SampleDataStageBatch.started.size(), 'Core\'s own records wait for every module');
 		}
 	}
 
@@ -249,9 +230,7 @@ private class SampleDataModulesTest {
 	@IsTest
 	static void testCountsCarryEachModuleNameLabelAndNumber() {
 		System.runAs(TestUsers.adminWithInstalledModules()) {
-			SampleDataModules.moduleOverride = new List<SampleDataModule>{
-				new StubModule('Giving', 709)
-			};
+			SampleDataModules.moduleOverride = new List<SampleDataModule>{ new StubModule('Giving', 709) };
 
 			List<SampleDataLoader.ModuleCount> counts = SampleDataModules.counts();
 

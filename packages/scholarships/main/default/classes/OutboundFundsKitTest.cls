@@ -39,12 +39,7 @@ private class OutboundFundsKitTest {
 					template.Target_Object__c.endsWith(TARGET_BY_STEP.get(key)),
 					key + ' loads ' + TARGET_BY_STEP.get(key)
 				);
-				for (
-					ImportMapping.Column column : ImportMapping.parse(
-							template.Column_Mapping_JSON__c
-						)
-						.getColumns()
-				) {
+				for (ImportMapping.Column column : ImportMapping.parse(template.Column_Mapping_JSON__c).getColumns()) {
 					String heading = column.getSource();
 					Assert.isTrue(
 						step.fields.contains(heading) || heading == OutboundFundsKit.PARENT_COLUMN,
@@ -64,11 +59,7 @@ private class OutboundFundsKitTest {
 		};
 		OutboundFundsKit.linkToParent(rows);
 		Assert.areEqual('a0x000000000001AAA', rows[0].get(OutboundFundsKit.PARENT_COLUMN), 'first');
-		Assert.areEqual(
-			'a0x000000000002AAA',
-			rows[1].get(OutboundFundsKit.PARENT_COLUMN),
-			'second'
-		);
+		Assert.areEqual('a0x000000000002AAA', rows[1].get(OutboundFundsKit.PARENT_COLUMN), 'second');
 	}
 
 	@IsTest
@@ -76,8 +67,7 @@ private class OutboundFundsKitTest {
 		System.runAs(TestUsers.adminWith(ScholarshipsTestData.ADMIN_SET)) {
 			for (String key : new List<String>{ 'cycles', 'awards' }) {
 				try {
-					List<Map<String, Object>> rows = new OutboundFundsKit()
-						.rows(key, new List<SObject>());
+					List<Map<String, Object>> rows = new OutboundFundsKit().rows(key, new List<SObject>());
 					Assert.isTrue(rows.isEmpty(), key + ': no records, no rows');
 				} catch (Exception refused) {
 					Assert.isTrue(

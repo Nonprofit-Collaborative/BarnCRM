@@ -75,11 +75,7 @@ private class HouseholdCatchUpBatchTest {
 			TestSettings.newInstall();
 			List<Account> people = personAccounts(251, 'Garcia');
 			Set<Id> ids = new Map<Id, Account>(people).keySet();
-			Assert.areEqual(
-				0,
-				currentAccountMemberships(ids).size(),
-				'No membership while the feature is off'
-			);
+			Assert.areEqual(0, currentAccountMemberships(ids).size(), 'No membership while the feature is off');
 			HouseholdCatchUpBatch.chunkSize = 300;
 
 			Test.startTest();
@@ -218,10 +214,7 @@ private class HouseholdCatchUpBatchTest {
 
 			Contact later = HouseholdTestDataFactory.newContact('Mr.', 'David', 'Adeyemi');
 			insert later;
-			Assert.isNotNull(
-				accountOf(later.Id),
-				'A contact added after gets one from the trigger'
-			);
+			Assert.isNotNull(accountOf(later.Id), 'A contact added after gets one from the trigger');
 		}
 	}
 
@@ -273,9 +266,7 @@ private class HouseholdCatchUpBatchTest {
 	@IsTest
 	static void nothingIsCreatedWhenAutomaticHouseholdsAreOff() {
 		System.runAs(TestUsers.admin()) {
-			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-				HouseholdTestDataFactory.MODE_CONTACT
-			);
+			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			settings.Auto_Create_Households__c = false;
 			HouseholdTestDataFactory.save(settings);
 			TestSettings.newInstall();
@@ -304,10 +295,7 @@ private class HouseholdCatchUpBatchTest {
 
 			Test.startTest();
 			FeatureSwitchService.turnOn(
-				new Set<String>{
-					FeatureSwitchService.HOUSEHOLD_UPKEEP,
-					FeatureSwitchService.PREFERRED_EMAIL
-				}
+				new Set<String>{ FeatureSwitchService.HOUSEHOLD_UPKEEP, FeatureSwitchService.PREFERRED_EMAIL }
 			);
 			Test.stopTest();
 

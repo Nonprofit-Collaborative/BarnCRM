@@ -5,7 +5,7 @@ last year but not yet this year. You keep it, and each time you open it, it find
 matches today. You can count it, see who is in it, and export a file to import into Mailchimp
 or Constant Contact.
 
-**Before you start:** you need the **BarnCRM Find and Export** permission set and a Giving
+**Before you start:** you need the **BarnCRM Find and Export** permission set and a Fundraising
 permission set. If the page says you need Find, ask your admin (see
 [Donor segments](../admin-guide/donor-segments.md)).
 

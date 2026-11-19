@@ -59,7 +59,9 @@ Salesforce org is needed for this job. Steps:
 5. `scripts/ci/check-namespace.sh`, failing the build if a hard-coded namespace prefix
    appears in source.
 6. `scripts/ci/check-standard-objects.sh`, failing the build if a standard Salesforce
-   object is referenced outside `packages/mirror`, and separately if any Apex or metadata
+   object is referenced outside `packages/mirror` and the gift mirror classes of
+   `packages/giving` (ADR-0228: there only in string literals, checked with
+   comments and strings blanked, so a static reference still fails), and separately if any Apex or metadata
    file names a Nonprofit Cloud object. The second half covers the fundraising objects, the
    objects a household is actually built out of there (`PartyRelationshipGroup`, whose Type
    of Household is what makes an Account a native household, and `AccountContactRelation`,
@@ -68,8 +70,8 @@ Salesforce org is needed for this job. Steps:
    our own component names are the same words. This half was added after an audit found the
    gate matched `GiftTransaction` alone, so Core could have named the two objects Nonprofit
    Cloud households are made of and the build would have passed.
-   It also checks Mirror's object and field declarations (everything under
-   `packages/mirror/**/objects/`): Mirror's Apex may name Campaign or Opportunity as strings,
+   It also checks Mirror's and Fundraising's object and field declarations (everything
+   under `packages/mirror/**/objects/` and `packages/giving/**/objects/`): their Apex may name Campaign or Opportunity as strings,
    but a lookup, formula or field declared on one of those objects is resolved at deploy time
    and refuses the install where the object is absent. A folder named after a denied object
    fails, and so does a denied name in the file outside its prose (label, description, help

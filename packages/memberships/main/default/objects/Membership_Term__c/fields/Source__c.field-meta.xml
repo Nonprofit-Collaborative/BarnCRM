@@ -34,7 +34,7 @@
       </value>
     </valueSetDefinition>
   </valueSet>
-  <inlineHelpText>How this term was made: by staff, from a Giving gift or recurring gift, from an online payment, or by an import.</inlineHelpText>
+  <inlineHelpText>How this term was made: by staff, from a gift or recurring gift, from an online payment, or by an import.</inlineHelpText>
   <label>Source</label>
   <type>Picklist</type>
 </CustomField>

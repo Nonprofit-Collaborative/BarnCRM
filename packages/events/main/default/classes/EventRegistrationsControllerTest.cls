@@ -24,12 +24,7 @@ private class EventRegistrationsControllerTest {
 			Capacity__c = 100
 		);
 		insert as user record;
-		insert as user new Ticket_Type__c(
-			Event__c = record.Id,
-			Name = 'General',
-			Price__c = 20,
-			Active__c = true
-		);
+		insert as user new Ticket_Type__c(Event__c = record.Id, Name = 'General', Price__c = 20, Active__c = true);
 		return record;
 	}
 
@@ -53,9 +48,7 @@ private class EventRegistrationsControllerTest {
 			EventRegistrationService.Result result = EventRegistrationsController.register(
 				requestJson(event.Id, 'Jane', 'Doe')
 			);
-			EventRegistrationsController.Registrations view = EventRegistrationsController.getRegistrations(
-				event.Id
-			);
+			EventRegistrationsController.Registrations view = EventRegistrationsController.getRegistrations(event.Id);
 			Test.stopTest();
 
 			Assert.areEqual('Registered', result.status, 'Seat taken');

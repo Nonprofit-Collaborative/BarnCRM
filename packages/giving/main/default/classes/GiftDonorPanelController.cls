@@ -13,11 +13,7 @@ public with sharing class GiftDonorPanelController {
 	private static final Integer ROWS = 3;
 
 	private static final Set<String> OPEN_COMMITMENT = new Set<String>{ 'Active', 'Paused' };
-	private static final Set<String> OWED = new Set<String>{
-		'Scheduled',
-		'Overdue',
-		'Partially paid'
-	};
+	private static final Set<String> OWED = new Set<String>{ 'Scheduled', 'Overdue', 'Partially paid' };
 
 	/** What the panel shows about one donor. */
 	public class Panel {

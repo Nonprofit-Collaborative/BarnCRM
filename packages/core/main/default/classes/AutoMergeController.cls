@@ -98,9 +98,7 @@ public with sharing class AutoMergeController {
 				refs.add(pair.ref);
 			}
 			if (refs.isEmpty()) {
-				throw new DuplicateService.DuplicateException(
-					BarnHelp.text('Core', 'Core_AutoMerge_ErrorNothing')
-				);
+				throw new DuplicateService.DuplicateException(BarnHelp.text('Core', 'Core_AutoMerge_ErrorNothing'));
 			}
 			AutoMergeJob.startMerge(refs);
 			return currentView();
@@ -122,7 +120,8 @@ public with sharing class AutoMergeController {
 							SELECT Id
 							FROM Merge_Journal__c
 							WHERE
-								Run_Id__c = :runId
+								Kind__c = :AutoMergeService.KIND_MERGE
+								AND Run_Id__c = :runId
 								AND Status__c = :AutoMergeService.MERGED
 								AND CreatedDate >= :since
 							WITH USER_MODE
@@ -131,9 +130,7 @@ public with sharing class AutoMergeController {
 					.keySet()
 			);
 			if (journalIds.isEmpty()) {
-				throw new DuplicateService.DuplicateException(
-					BarnHelp.text('Core', 'Core_AutoMerge_ErrorNoUndo')
-				);
+				throw new DuplicateService.DuplicateException(BarnHelp.text('Core', 'Core_AutoMerge_ErrorNoUndo'));
 			}
 			AutoMergeJob.startUndo(runId, journalIds);
 			return currentView();
@@ -152,12 +149,11 @@ public with sharing class AutoMergeController {
 		Datetime since = Datetime.now().addDays(-AutoMergeService.UNDO_DAYS);
 		Map<String, RunView> byRun = new Map<String, RunView>();
 		// People merges only: Merge Records (C-62) lists its own.
-		String people =
-			Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() + '%';
+		String people = Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() + '%';
 		for (Merge_Journal__c journal : [
 			SELECT Run_Id__c, Status__c, Merged_Name__c, Notes__c, CreatedDate
 			FROM Merge_Journal__c
-			WHERE CreatedDate >= :since AND Survivor_Id__c LIKE :people
+			WHERE Kind__c = :AutoMergeService.KIND_MERGE AND CreatedDate >= :since AND Survivor_Id__c LIKE :people
 			WITH USER_MODE
 			ORDER BY CreatedDate DESC
 			LIMIT 5000
@@ -208,9 +204,7 @@ public with sharing class AutoMergeController {
 	/** One run or undo at a time, and none while a scan is still writing the pairs. */
 	private static void requireNothingRunning() {
 		if (DuplicateSelector.scanRunning(JOB_CLASS) || DuplicateSelector.scanRunning(SCAN_CLASS)) {
-			throw new DuplicateService.DuplicateException(
-				BarnHelp.text('Core', 'Core_AutoMerge_ErrorRunning')
-			);
+			throw new DuplicateService.DuplicateException(BarnHelp.text('Core', 'Core_AutoMerge_ErrorRunning'));
 		}
 	}
 }

@@ -1,24 +1,25 @@
 # Address Verification
 
-Scripts for the optional BarnCRM Address Verification module: settings and keys, Health Check, checks on save, corrections, the nightly check and its limit, and switching it off. Setup detail: [Address Verification](../admin-guide/address-verification.md).
+Scripts for the optional BarnCRM Address Verification module: settings and connecting through Named Credentials, Health Check, checks on save, corrections, the nightly check and its limit, and switching it off. Setup detail: [Address Verification](../admin-guide/address-verification.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core and Address Verification deployed, the Addresses feature on, and a Smarty account (the free plan is enough) with a secret key pair. T-AV-04 also needs a Google Cloud API key with the Address Validation API enabled; skip it without one.
 
-## T-AV-01: Settings, Keys and Health Check
+## T-AV-01: Settings, Connecting and Health Check
 
-**Purpose:** confirm the settings show their defaults, keys are write-only and Health Check lists missing keys.
+**Purpose:** confirm the settings show their defaults, the key is entered only in Setup and never reaches BarnCRM, and Check Connection and Health Check work (N-13, D-209).
 **Prerequisites:** admin (BarnCRM Admin, which gives Address Verification Admin).
 **Smoke:** yes
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, **Addresses**. | **Address verification provider** Smarty, **Verify addresses when saved** on, **Apply corrections** off, **Re-check verified addresses (months)** 12, **Most addresses checked a night** 200, and an **Address Verification Setup** link. |
-| 2 | Open **Health Check**. | `Address Verification Keys Are Missing`. |
-| 3 | Open **Address Verification Setup**. Every key reads **Not set**; **Verify Waiting Addresses** is greyed out. | As described. |
-| 4 | Enter your Smarty Auth ID and Auth Token and select **Save Keys**. | **Saved.** Both read **Set, ending** and their last four characters; the boxes are empty. |
-| 5 | Reload the page and look at the network response. | No key appears, only the last four characters. Health Check no longer lists missing keys. |
+| 2 | Open **Health Check**. | `Address Provider Is Not Connected`. |
+| 3 | Open **Address Verification Setup**. | A Smarty and a Google card, each **Not connected**, naming its External Credential, principal and parameters (`AuthId, AuthToken`; `ApiKey`) with the Setup steps. No box for a key; **Verify Waiting Addresses** is greyed out. |
+| 4 | In **Setup > Named Credentials > External Credentials**, open **BarnCRM Smarty**, edit the principal `Barn_Smarty_Key`, add `AuthId` and `AuthToken` with your Smarty secret key pair and save. On Address Verification Setup select **Check Connection** on the Smarty card. | `Smarty is connected.` with a note that one test lookup was made; the card reads **Connected**. |
+| 5 | Reload the page and look at the network responses. | No key appears anywhere. Health Check no longer lists the provider as not connected. |
+| 6 | In Setup, change `AuthToken` to `wrong` and select **Check Connection**. | A message that Smarty could not be reached (answer 401); **Not connected**, and a row in the **Error Log**. Put the right token back and check again: connected. |
 
-**Cleanup:** None (the keys are used below).
+**Cleanup:** None (the connection is used below).
 
 ## T-AV-02: A Saved Address Is Checked
 
@@ -56,7 +57,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | With Smarty chosen, add the address `290 Bremner Blvd`, `Toronto`, `ON`, `M5V 3L9`, country `Canada`. Wait a minute. | Still Unverified: Smarty checks United States addresses only. |
-| 2 | Enter your Google key on Address Verification Setup, choose **Google** as the provider, then edit the street to `290 Bremner Boulevard`. Wait a minute. | Verified, today. |
+| 2 | In Setup, add `ApiKey` with your Google key to the **BarnCRM Google Address Validation** External Credential's principal `Barn_Google_Address_Key`. Choose **Google** as the provider, select **Check Connection** on the Google card (**Connected**), then edit the street to `290 Bremner Boulevard`. Wait a minute. | Verified, today. |
 
 **Cleanup:** Set the provider back to Smarty and delete the test address.
 
@@ -83,6 +84,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 |---|---|---|
 | 1 | On **Automation**, switch **Address Verification** off. Change the street of a verified address. | It keeps its old Verification Status; nothing is looked up. |
 | 2 | Switch it back on and change the street again. | Unverified, then checked within a minute. |
-| 3 | Sign in as a staff user (Team Member) and open BarnCRM Settings. | No Address Verification Setup tab; their own address edits are still checked. |
+| 3 | Sign in as a staff user (Team Member) without **Address Verification User** and open BarnCRM Settings. Change the street of an address. | No Address Verification Setup tab. The address is **Unverified** and stays so (it waits for the nightly check); no lookup is queued, and the **Error Log** has one Warning (context `AddressVerifier.noAccess`) for the day, however many saves or addresses. |
+| 4 | As admin, open the **Access** page: **Address Verification User** is among the extra permissions and no staff user holds it until you add it. Add it to that staff user. As the staff user, change the street again. | Checked within a minute. |
 
-**Cleanup:** None.
+**Cleanup:** Remove Address Verification User from the staff user.

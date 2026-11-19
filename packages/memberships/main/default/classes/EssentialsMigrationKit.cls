@@ -40,10 +40,7 @@ public with sharing class EssentialsMigrationKit implements MigrationKitExtensio
 	private static void shapeRows(String stepKey, List<Map<String, Object>> rows, Date today) {
 		for (Map<String, Object> row : rows) {
 			if (stepKey == LEVELS) {
-				row.put(
-					'Months',
-					months((String) row.get('Term__c'), (String) row.get('Term_Unit__c'))
-				);
+				row.put('Months', months((String) row.get('Term__c'), (String) row.get('Term_Unit__c')));
 			} else {
 				Boolean forever = (String) row.get('Does_Not_Expire__c') == 'true';
 				String ends = forever ? '' : (String) row.get('End_Date__c');

@@ -21,14 +21,14 @@ segments can filter on them like any other field.
 
 ## Who Sees It
 
-**Giving Admin** and **Giving Staff** read and edit the five fields. **Giving Read Only** does
+**Fundraising Admin** and **Fundraising Staff Access** read and edit the five fields. **Fundraising Read Only** does
 not see them: screening data is a judgment about a person's means, so it stays with the people
 who fundraise. To show it to someone else, give them field access in a permission set of your
 own.
 
 ## How to Turn It On
 
-Nothing to turn on: the fields and the import template come with the Giving module.
+Nothing to turn on: the fields and the import template come with the Fundraising module.
 
 ## Loading a Vendor's File
 

@@ -16,26 +16,15 @@ private class ScholarshipsPortalExtensionTest {
 			Contact lee = ScholarshipsTestData.person('Lee');
 			Contact kim = ScholarshipsTestData.person('Kim');
 			ScholarshipsPortalExtension actions = new ScholarshipsPortalExtension();
-			Assert.isTrue(
-				actions.actionNames().contains(ScholarshipsPortalExtension.APPLY),
-				'Apply offered'
-			);
+			Assert.isTrue(actions.actionNames().contains(ScholarshipsPortalExtension.APPLY), 'Apply offered');
 
 			Test.startTest();
 			String applied = actions.run(ScholarshipsPortalExtension.APPLY, lee.Id, cycle.Id);
 			String again = actions.run(ScholarshipsPortalExtension.APPLY, lee.Id, cycle.Id);
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Scholarships', 'Scholarships_Portal_Applied'),
-				applied,
-				'Applied'
-			);
-			Assert.areEqual(
-				BarnHelp.text('Scholarships', 'Scholarships_Portal_AlreadyApplied'),
-				again,
-				'Once only'
-			);
+			Assert.areEqual(BarnHelp.text('Scholarships', 'Scholarships_Portal_Applied'), applied, 'Applied');
+			Assert.areEqual(BarnHelp.text('Scholarships', 'Scholarships_Portal_AlreadyApplied'), again, 'Once only');
 			Award_Application__c draft = [
 				SELECT Id, Status__c
 				FROM Award_Application__c
@@ -58,11 +47,7 @@ private class ScholarshipsPortalExtensionTest {
 			Award__c award = ScholarshipsTestData.award(cycle.Id, null, lee.Id, 500);
 			update new Award__c(Id = award.Id, Status__c = 'Offered');
 			actions.run(ScholarshipsPortalExtension.ACCEPT, lee.Id, award.Id);
-			Assert.areEqual(
-				'Accepted',
-				[SELECT Status__c FROM Award__c WHERE Id = :award.Id].Status__c,
-				'Accepted'
-			);
+			Assert.areEqual('Accepted', [SELECT Status__c FROM Award__c WHERE Id = :award.Id].Status__c, 'Accepted');
 			Assert.areEqual(
 				BarnHelp.text('Scholarships', 'Scholarships_Award_NotOffered'),
 				actions.run(ScholarshipsPortalExtension.ACCEPT, lee.Id, award.Id),
@@ -88,8 +73,7 @@ private class ScholarshipsPortalExtensionTest {
 
 			Assert.areEqual(
 				BarnHelp.text('Scholarships', 'Scholarships_Portal_Closed'),
-				new ScholarshipsPortalExtension()
-					.run(ScholarshipsPortalExtension.APPLY, lee.Id, gone),
+				new ScholarshipsPortalExtension().run(ScholarshipsPortalExtension.APPLY, lee.Id, gone),
 				'Closed'
 			);
 		}

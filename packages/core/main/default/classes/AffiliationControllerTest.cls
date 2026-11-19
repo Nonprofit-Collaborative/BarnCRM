@@ -17,15 +17,9 @@ private class AffiliationControllerTest {
 	@IsTest
 	static void theCardIsHiddenWhileAffiliationsIsOff() {
 		System.runAs(TestUsers.admin()) {
-			SettingsService.saveSystemValue(
-				'Features_Turned_On__c',
-				FeatureSwitchService.RELATIONSHIPS
-			);
+			SettingsService.saveSystemValue('Features_Turned_On__c', FeatureSwitchService.RELATIONSHIPS);
 			Boolean whileOff = AffiliationController.isFeatureOn();
-			SettingsService.saveSystemValue(
-				'Features_Turned_On__c',
-				FeatureSwitchService.AFFILIATIONS
-			);
+			SettingsService.saveSystemValue('Features_Turned_On__c', FeatureSwitchService.AFFILIATIONS);
 			Boolean whileOn = AffiliationController.isFeatureOn();
 
 			Assert.isFalse(whileOff, 'The card is hidden while the feature is off');
@@ -40,9 +34,7 @@ private class AffiliationControllerTest {
 			List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
 
 			Test.startTest();
-			AffiliationController.CardContext context = AffiliationController.getCardContext(
-				people[0].Id
-			);
+			AffiliationController.CardContext context = AffiliationController.getCardContext(people[0].Id);
 			Test.stopTest();
 
 			Assert.areEqual(CONTACT, context.ownerField, 'The contact is the person end');
@@ -61,9 +53,7 @@ private class AffiliationControllerTest {
 			List<Account> orgs = RelationshipTestDataFactory.organizations(1, 'Union Foundation');
 
 			Test.startTest();
-			AffiliationController.CardContext context = AffiliationController.getCardContext(
-				orgs[0].Id
-			);
+			AffiliationController.CardContext context = AffiliationController.getCardContext(orgs[0].Id);
 			Test.stopTest();
 
 			Assert.areEqual(ORGANIZATION, context.ownerField, 'The organization end');
@@ -85,16 +75,13 @@ private class AffiliationControllerTest {
 		System.runAs(TestUsers.admin()) {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Account> orgs = RelationshipTestDataFactory.organizations(1, 'Garcia Household');
-			Id recordTypeId = [SELECT RecordTypeId FROM Account WHERE Id = :orgs[0].Id]
-			.RecordTypeId;
+			Id recordTypeId = [SELECT RecordTypeId FROM Account WHERE Id = :orgs[0].Id].RecordTypeId;
 			OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
 			shape.personAccountRecordTypeIds = new Set<Id>{ recordTypeId };
 			OrgShapeDetector.overrideShape = shape;
 
 			Test.startTest();
-			AffiliationController.CardContext context = AffiliationController.getCardContext(
-				orgs[0].Id
-			);
+			AffiliationController.CardContext context = AffiliationController.getCardContext(orgs[0].Id);
 			Test.stopTest();
 
 			Assert.areEqual(PERSON_ACCOUNT, context.ownerField, 'The person account is owner');
@@ -114,9 +101,7 @@ private class AffiliationControllerTest {
 			HouseholdService.personAccountOverride = true;
 
 			Test.startTest();
-			AffiliationController.CardContext context = AffiliationController.getCardContext(
-				orgs[0].Id
-			);
+			AffiliationController.CardContext context = AffiliationController.getCardContext(orgs[0].Id);
 			Test.stopTest();
 
 			Assert.areEqual(ORGANIZATION, context.ownerField, 'The organization end');
@@ -133,9 +118,7 @@ private class AffiliationControllerTest {
 			HouseholdService.personAccountOverride = false;
 
 			Test.startTest();
-			AffiliationController.CardContext context = AffiliationController.getCardContext(
-				orgs[0].Id
-			);
+			AffiliationController.CardContext context = AffiliationController.getCardContext(orgs[0].Id);
 			Test.stopTest();
 
 			Assert.areEqual(ORGANIZATION, context.ownerField, 'The organization end');
@@ -163,10 +146,7 @@ private class AffiliationControllerTest {
 		List<Account> orgs;
 		User staff;
 		System.runAs(TestUsers.admin()) {
-			SettingsService.saveSystemValue(
-				'Features_Turned_On__c',
-				FeatureSwitchService.AFFILIATIONS
-			);
+			SettingsService.saveSystemValue('Features_Turned_On__c', FeatureSwitchService.AFFILIATIONS);
 			RelationshipTestDataFactory.quietOtherAutomations();
 			orgs = RelationshipTestDataFactory.organizations(1, 'Union Foundation');
 			staff = TestDataFactory.createUser('Staff', new List<String>{ 'BarnCRM_Staff' });

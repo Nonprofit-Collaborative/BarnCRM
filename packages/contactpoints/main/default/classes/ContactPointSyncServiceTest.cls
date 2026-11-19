@@ -31,30 +31,18 @@ private class ContactPointSyncServiceTest {
 
 	private static Contact person(String lastName, String email, String homePhone) {
 		return (Contact) TestDataFactory.pastDuplicateRules(
-			new Contact(
-				FirstName = 'Ana',
-				LastName = lastName,
-				Personal_Email__c = email,
-				HomePhone = homePhone
-			)
+			new Contact(FirstName = 'Ana', LastName = lastName, Personal_Email__c = email, HomePhone = homePhone)
 		);
 	}
 
 	private static Id individualOf(Id personId) {
-		return (Id) Database.query(
-				'SELECT IndividualId FROM Contact WHERE Id = :personId',
-				AccessLevel.SYSTEM_MODE
-			)[0]
+		return (Id) Database.query('SELECT IndividualId FROM Contact WHERE Id = :personId', AccessLevel.SYSTEM_MODE)[0]
 			.get('IndividualId');
 	}
 
 	private static List<SObject> copies(String objectName, Id parent, String fields) {
 		return Database.query(
-			'SELECT Id, ' +
-				fields +
-				' FROM ' +
-				objectName +
-				' WHERE ParentId = :parent ORDER BY Id',
+			'SELECT Id, ' + fields + ' FROM ' + objectName + ' WHERE ParentId = :parent ORDER BY Id',
 			AccessLevel.SYSTEM_MODE
 		);
 	}
@@ -118,10 +106,7 @@ private class ContactPointSyncServiceTest {
 			Database.update(copy, AccessLevel.SYSTEM_MODE);
 
 			Test.startTest();
-			ContactPointSyncService.Result result = ContactPointSyncService.syncPeople(
-				new Set<Id>{ ana.Id },
-				null
-			);
+			ContactPointSyncService.Result result = ContactPointSyncService.syncPeople(new Set<Id>{ ana.Id }, null);
 			Test.stopTest();
 
 			Assert.areEqual(1, result.updated, 'BarnCRM is the source: one copy put back');
@@ -233,8 +218,7 @@ private class ContactPointSyncServiceTest {
 			Assert.areEqual(1, links.size(), 'One link per source on the survivor');
 			Assert.areEqual(
 				'ana@home.example',
-				copies('ContactPointEmail', individualOf(keep.Id), 'EmailAddress')[0]
-					.get('EmailAddress')
+				copies('ContactPointEmail', individualOf(keep.Id), 'EmailAddress')[0].get('EmailAddress')
 			);
 		}
 	}
@@ -246,10 +230,7 @@ private class ContactPointSyncServiceTest {
 				return;
 			}
 			Account household = TestDataFactory.household(
-				new Account(
-					Name = 'Rivera Household',
-					RecordTypeId = HouseholdService.householdRecordTypeId()
-				)
+				new Account(Name = 'Rivera Household', RecordTypeId = HouseholdService.householdRecordTypeId())
 			);
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
 			Contact ana = person('Rivera', null, null);
@@ -269,11 +250,7 @@ private class ContactPointSyncServiceTest {
 				City__c = 'Springfield',
 				Status__c = 'Current'
 			);
-			Address__c old = new Address__c(
-				Contact__c = ana.Id,
-				Street__c = '9 Old Rd',
-				Status__c = 'Former'
-			);
+			Address__c old = new Address__c(Contact__c = ana.Id, Street__c = '9 Old Rd', Status__c = 'Former');
 
 			Test.startTest();
 			Database.insert(new List<Address__c>{ home, work, old }, AccessLevel.SYSTEM_MODE);
@@ -317,10 +294,7 @@ private class ContactPointSyncServiceTest {
 			Database.insert(new List<SObject>{ same, other }, AccessLevel.SYSTEM_MODE);
 
 			Test.startTest();
-			ContactPointSyncService.Result result = ContactPointSyncService.syncPeople(
-				new Set<Id>{ ana.Id },
-				null
-			);
+			ContactPointSyncService.Result result = ContactPointSyncService.syncPeople(new Set<Id>{ ana.Id }, null);
 			Test.stopTest();
 
 			Assert.areEqual(0, result.created, 'The matching one is adopted, not doubled');

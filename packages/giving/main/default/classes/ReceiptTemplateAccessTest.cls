@@ -32,10 +32,7 @@ private class ReceiptTemplateAccessTest {
 				Limits.getDmlStatements(),
 				'A cacheable method performs no DML, which is the platform rule this broke.'
 			);
-			Assert.isTrue(
-				views.isEmpty(),
-				'It reports what is there, which on this org is nothing.'
-			);
+			Assert.isTrue(views.isEmpty(), 'It reports what is there, which on this org is nothing.');
 			Assert.areEqual(
 				0,
 				[SELECT COUNT() FROM Receipt_Template__c],
@@ -73,10 +70,7 @@ private class ReceiptTemplateAccessTest {
 				);
 			}
 			Assert.areEqual(
-				new Set<String>{
-					ReceiptNumberSequence.TYPE_PER_GIFT,
-					ReceiptNumberSequence.TYPE_STATEMENT
-				},
+				new Set<String>{ ReceiptNumberSequence.TYPE_PER_GIFT, ReceiptNumberSequence.TYPE_STATEMENT },
 				types,
 				'One letter of each kind, which is what the two tabs on the page expect.'
 			);
@@ -101,11 +95,7 @@ private class ReceiptTemplateAccessTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Receipt_Template__c],
-				'Nothing was written by the refused call.'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Receipt_Template__c], 'Nothing was written by the refused call.');
 		}
 	}
 
@@ -184,16 +174,8 @@ private class ReceiptTemplateAccessTest {
 				ReceiptTestDataFactory.setUpReceipting();
 				delete [SELECT Id FROM Receipt_Template__c];
 				ReceiptTemplateService.managePermission = false;
-				Contact lin = GivingTestDataFactory.insertHouseholdContact(
-					'The Lin Family',
-					'Wei',
-					'Lin'
-				);
-				Gift__c gift = ReceiptTestDataFactory.plainCashGift(
-					lin.Id,
-					75,
-					Date.newInstance(2026, 1, 5)
-				);
+				Contact lin = GivingTestDataFactory.insertHouseholdContact('The Lin Family', 'Wei', 'Lin');
+				Gift__c gift = ReceiptTestDataFactory.plainCashGift(lin.Id, 75, Date.newInstance(2026, 1, 5));
 				insert gift;
 
 				Test.startTest();

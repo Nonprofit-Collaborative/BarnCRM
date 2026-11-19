@@ -15,9 +15,7 @@ private class ServiceDeliveryRulesTest {
 	}
 
 	private static void contactMode() {
-		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-			HouseholdTestDataFactory.MODE_CONTACT
-		);
+		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 		settings.Auto_Create_Households__c = false;
 		TestDataFactory.saveSettings(settings);
 	}
@@ -29,11 +27,7 @@ private class ServiceDeliveryRulesTest {
 	}
 
 	private static Service__c serviceIn(Program__c program) {
-		Service__c service = new Service__c(
-			Program__c = program.Id,
-			Name = 'Hot meal',
-			Unit_Of_Measure__c = 'meals'
-		);
+		Service__c service = new Service__c(Program__c = program.Id, Name = 'Hot meal', Unit_Of_Measure__c = 'meals');
 		insert service;
 		return service;
 	}
@@ -54,10 +48,7 @@ private class ServiceDeliveryRulesTest {
 			insert pantry;
 			Service__c meal = serviceIn(pantry);
 			Contact ana = person('Rivera');
-			Service_Delivery__c present = new Service_Delivery__c(
-				Service__c = meal.Id,
-				Contact__c = ana.Id
-			);
+			Service_Delivery__c present = new Service_Delivery__c(Service__c = meal.Id, Contact__c = ana.Id);
 			Service_Delivery__c absent = new Service_Delivery__c(
 				Service__c = meal.Id,
 				Contact__c = ana.Id,
@@ -134,11 +125,7 @@ private class ServiceDeliveryRulesTest {
 			List<Database.SaveResult> results = Database.insert(
 				new List<Service_Delivery__c>{
 					new Service_Delivery__c(Service__c = meal.Id),
-					new Service_Delivery__c(
-						Service__c = meal.Id,
-						Contact__c = ana.Id,
-						Quantity__c = -1
-					),
+					new Service_Delivery__c(Service__c = meal.Id, Contact__c = ana.Id, Quantity__c = -1),
 					new Service_Delivery__c(Service__c = meal.Id, Contact__c = ana.Id)
 				},
 				false
@@ -180,10 +167,7 @@ private class ServiceDeliveryRulesTest {
 			// The same account read as a person account, which an org without them cannot hold.
 			ProgramPersonRule.personAccountIdsForTest = new Set<Id>{ business.Id };
 			Assert.isTrue(
-				Database.insert(
-						new Service_Delivery__c(Service__c = meal.Id, Account__c = business.Id),
-						false
-					)
+				Database.insert(new Service_Delivery__c(Service__c = meal.Id, Account__c = business.Id), false)
 					.isSuccess(),
 				'A person account receives services.'
 			);

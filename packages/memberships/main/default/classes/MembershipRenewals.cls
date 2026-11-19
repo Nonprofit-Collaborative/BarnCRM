@@ -135,12 +135,7 @@ public with sharing class MembershipRenewals implements Schedulable {
 				? yearly.get(gift.commitmentId)
 				: gift.amount;
 			Membership_Level__c level = levelMet(byFund.get(gift.fundId.left(15)), counts);
-			if (
-				!used.contains(gift.giftId) ||
-				member == null ||
-				level == null ||
-				taken.contains(member)
-			) {
+			if (!used.contains(gift.giftId) || member == null || level == null || taken.contains(member)) {
 				continue;
 			}
 			taken.add(member);
@@ -154,9 +149,7 @@ public with sharing class MembershipRenewals implements Schedulable {
 						Status__c = MembershipService.CURRENT,
 						Start_Date__c = gift.giftDate,
 						End_Date__c = MembershipService.endOf(gift.giftDate, level),
-						Member_Since__c = last.Member_Since__c != null
-							? last.Member_Since__c
-							: gift.giftDate,
+						Member_Since__c = last.Member_Since__c != null ? last.Member_Since__c : gift.giftDate,
 						Source__c = source,
 						Amount_Paid__c = gift.amount,
 						Gift_Id__c = gift.giftId,
@@ -197,9 +190,7 @@ public with sharing class MembershipRenewals implements Schedulable {
 	/** The highest active level on the fund whose dues the amount meets (levels by dues, high first). */
 	@TestVisible
 	private static Membership_Level__c levelMet(List<Membership_Level__c> levels, Decimal amount) {
-		for (
-			Membership_Level__c level : levels == null ? new List<Membership_Level__c>() : levels
-		) {
+		for (Membership_Level__c level : levels == null ? new List<Membership_Level__c>() : levels) {
 			if (amount != null && amount >= (level.Dues__c == null ? 0 : level.Dues__c)) {
 				return level;
 			}
@@ -276,11 +267,7 @@ public with sharing class MembershipRenewals implements Schedulable {
 		}
 		ids.remove(null);
 		Map<Id, Decimal> yearly = new Map<Id, Decimal>();
-		if (
-			ids.isEmpty() ||
-			giftsOverride != null ||
-			NamespaceUtil.objectType('Commitment__c') == null
-		) {
+		if (ids.isEmpty() || giftsOverride != null || NamespaceUtil.objectType('Commitment__c') == null) {
 			return yearly;
 		}
 		String ns = NamespaceUtil.prefix();

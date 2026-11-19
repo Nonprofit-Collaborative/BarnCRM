@@ -41,17 +41,13 @@ public with sharing class FirstRunController {
 	@AuraEnabled
 	public static FirstRunState finish(String suite, List<String> featureKeys) {
 		if (!BarnCRMPermissions.canManageSettings()) {
-			throw UserErrors.message(
-				BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError')
-			);
+			throw UserErrors.message(BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError'));
 		}
 		String chosen = knownSuite(suite);
 		try {
 			SetupAssistantService.ensureStarted();
 			SettingsService.saveValues(new Map<String, Object>{ 'Suite__c' => chosen });
-			FeatureSwitchService.finishFirstRun(
-				featureKeys == null ? new Set<String>() : new Set<String>(featureKeys)
-			);
+			FeatureSwitchService.finishFirstRun(featureKeys == null ? new Set<String>() : new Set<String>(featureKeys));
 			giveTabsToEveryRole();
 			return state();
 		} catch (Exception e) {
@@ -100,8 +96,7 @@ public with sharing class FirstRunController {
 
 	private static FirstRunState state() {
 		FirstRunState model = new FirstRunState();
-		model.needsSetup =
-			ModuleDetectionService.chosenSuite() == null || FeatureSwitchService.awaitingFirstRun();
+		model.needsSetup = ModuleDetectionService.chosenSuite() == null || FeatureSwitchService.awaitingFirstRun();
 		model.canFinish = BarnCRMPermissions.canManageSettings();
 		if (model.needsSetup && model.canFinish) {
 			// The saved edition when there is one (set in Setup), otherwise the suggestion.
@@ -115,10 +110,7 @@ public with sharing class FirstRunController {
 
 	private static String knownSuite(String suite) {
 		String chosen = suite == null ? '' : suite.trim();
-		if (
-			chosen != ModuleDetectionService.SUITE_STANDARD &&
-			chosen != ModuleDetectionService.SUITE_NONPROFIT
-		) {
+		if (chosen != ModuleDetectionService.SUITE_STANDARD && chosen != ModuleDetectionService.SUITE_NONPROFIT) {
 			throw UserErrors.message(BarnHelp.text('Core', 'Core_SuiteChoice_UnknownSuiteError'));
 		}
 		return chosen;

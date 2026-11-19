@@ -13,40 +13,23 @@ private class LogicModelRulesTest {
 	@TestSetup
 	static void createTestUsers() {
 		TestUsers.adminWith(ADMIN);
-		TestUsers.standardUserWith(
-			'Staffer',
-			new List<String>{ 'BarnCRM_Staff', 'Logic_Models_Staff' }
-		);
-		TestUsers.standardUserWith(
-			'Reader',
-			new List<String>{ 'BarnCRM_Read_Only', 'Logic_Models_Read_Only' }
-		);
+		TestUsers.standardUserWith('Staffer', new List<String>{ 'BarnCRM_Staff', 'Logic_Models_Staff' });
+		TestUsers.standardUserWith('Reader', new List<String>{ 'BarnCRM_Read_Only', 'Logic_Models_Read_Only' });
 	}
 
 	private static User staffer() {
-		return TestUsers.standardUserWith(
-			'Staffer',
-			new List<String>{ 'BarnCRM_Staff', 'Logic_Models_Staff' }
-		);
+		return TestUsers.standardUserWith('Staffer', new List<String>{ 'BarnCRM_Staff', 'Logic_Models_Staff' });
 	}
 
 	private static User reader() {
-		return TestUsers.standardUserWith(
-			'Reader',
-			new List<String>{ 'BarnCRM_Read_Only', 'Logic_Models_Read_Only' }
-		);
+		return TestUsers.standardUserWith('Reader', new List<String>{ 'BarnCRM_Read_Only', 'Logic_Models_Read_Only' });
 	}
 
 	private static Logic_Model__c newModel(String name, String programId) {
 		return new Logic_Model__c(Name = name, Program_Id__c = programId);
 	}
 
-	private static Logic_Model_Element__c newElement(
-		Id modelId,
-		String name,
-		String type,
-		String term
-	) {
+	private static Logic_Model_Element__c newElement(Id modelId, String name, String type, String term) {
 		return new Logic_Model_Element__c(
 			Logic_Model__c = modelId,
 			Name = name,
@@ -110,10 +93,7 @@ private class LogicModelRulesTest {
 			// Any record identifiers stand in for programs: Logic Models never reads the program.
 			String tutoring = UserInfo.getUserId();
 			String pantry = UserInfo.getOrganizationId();
-			insert new List<Logic_Model__c>{
-				newModel('Organization', null),
-				newModel('Tutoring', tutoring.left(15))
-			};
+			insert new List<Logic_Model__c>{ newModel('Organization', null), newModel('Tutoring', tutoring.left(15)) };
 
 			Test.startTest();
 			Database.SaveResult again = Database.insert(newModel('Tutoring 2', tutoring), false);
@@ -127,11 +107,7 @@ private class LogicModelRulesTest {
 				'The program has a model, saved under its short identifier'
 			);
 			Assert.isTrue(other.isSuccess(), 'Another program may have its own');
-			Assert.areEqual(
-				BarnHelp.text('LogicModels', 'LogicModels_Scope_BadProgram'),
-				firstError(bad),
-				'Refused'
-			);
+			Assert.areEqual(BarnHelp.text('LogicModels', 'LogicModels_Scope_BadProgram'), firstError(bad), 'Refused');
 			Logic_Model__c saved = [
 				SELECT Program_Id__c, Scope_Key__c
 				FROM Logic_Model__c
@@ -218,10 +194,7 @@ private class LogicModelRulesTest {
 					link(model.Id, parts.get('Outcome'), parts.get('Output')),
 					link(model.Id, parts.get('Output'), parts.get('Output')),
 					link(model.Id, parts.get('Activity'), elsewhere),
-					new Logic_Model_Link__c(
-						Logic_Model__c = model.Id,
-						From_Element__c = parts.get('Input').Id
-					)
+					new Logic_Model_Link__c(Logic_Model__c = model.Id, From_Element__c = parts.get('Input').Id)
 				},
 				false
 			);
@@ -293,10 +266,7 @@ private class LogicModelRulesTest {
 			insert model;
 			Map<String, Logic_Model_Element__c> parts = chain(model.Id);
 			insert link(model.Id, parts.get('Input'), parts.get('Activity'));
-			Indicator__c readers = new Indicator__c(
-				Element__c = parts.get('Outcome').Id,
-				Name = 'Readers'
-			);
+			Indicator__c readers = new Indicator__c(Element__c = parts.get('Outcome').Id, Name = 'Readers');
 			insert readers;
 			Date start = Date.newInstance(2026, 1, 1);
 
@@ -358,11 +328,7 @@ private class LogicModelRulesTest {
 		}
 		Boolean readerCreated = true;
 		System.runAs(reader()) {
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Logic_Model__c WITH USER_MODE],
-				'A reader sees the model'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Logic_Model__c WITH USER_MODE], 'A reader sees the model');
 			try {
 				insert as user newElement(model.Id, 'More', 'Input', null);
 			} catch (Exception e) {

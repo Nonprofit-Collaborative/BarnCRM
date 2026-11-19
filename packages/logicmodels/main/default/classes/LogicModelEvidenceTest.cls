@@ -9,21 +9,14 @@ private class LogicModelEvidenceTest {
 	@TestSetup
 	static void createTestUsers() {
 		TestUsers.adminWith('Logic_Models_Admin');
-		TestUsers.standardUserWith(
-			'Reader',
-			new List<String>{ 'BarnCRM_Read_Only', 'Logic_Models_Read_Only' }
-		);
+		TestUsers.standardUserWith('Reader', new List<String>{ 'BarnCRM_Read_Only', 'Logic_Models_Read_Only' });
 	}
 
 	private static Id newLink() {
 		Logic_Model__c model = new Logic_Model__c(Name = 'Reading Program Model');
 		insert as user model;
 		List<Logic_Model_Element__c> parts = new List<Logic_Model_Element__c>{
-			new Logic_Model_Element__c(
-				Logic_Model__c = model.Id,
-				Name = 'Sessions',
-				Type__c = 'Activity'
-			),
+			new Logic_Model_Element__c(Logic_Model__c = model.Id, Name = 'Sessions', Type__c = 'Activity'),
 			new Logic_Model_Element__c(
 				Logic_Model__c = model.Id,
 				Name = 'Reads at home',
@@ -116,16 +109,13 @@ private class LogicModelEvidenceTest {
 		}
 		User reader = [SELECT Id FROM User WHERE LastName = 'Reader' WITH SYSTEM_MODE LIMIT 1];
 		System.runAs(reader) {
-			Id modelId = [SELECT Logic_Model__c FROM Logic_Model_Link__c WITH SYSTEM_MODE]
-			.Logic_Model__c;
+			Id modelId = [SELECT Logic_Model__c FROM Logic_Model_Link__c WITH SYSTEM_MODE].Logic_Model__c;
 			Test.startTest();
 			Map<String, Object> model = LogicModelBuilderController.getModel(modelId);
 			Boolean refused = false;
 			try {
 				LogicModelBuilderController.saveEvidence(
-					JSON.serialize(
-						new Map<String, Object>{ 'linkId' => linkId, 'summary' => 'No.' }
-					)
+					JSON.serialize(new Map<String, Object>{ 'linkId' => linkId, 'summary' => 'No.' })
 				);
 			} catch (AuraHandledException e) {
 				refused = true;

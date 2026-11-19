@@ -53,8 +53,8 @@ You never assign the Forms permission sets by hand. Give people their BarnCRM ro
 
 | BarnCRM role | Forms set they get | What they can do |
 |---|---|---|
-| Admin (anyone holding BarnCRM Admin) | Forms Admin | Everything: build, publish and delete forms, fill them in, work submissions |
-| Team Member, Fundraising Staff (Giving) | Forms Staff | Fill in published forms and work their submissions, including Process Again; never builds or deletes a form |
+| Admin (anyone holding BarnCRM Admin) | Forms Admin | Everything: build, publish and delete forms (a form with submissions too, through Manage Forms), fill them in, work submissions |
+| Team Member, Fundraising Staff (Fundraising) | Forms Staff | Fill in published forms and work their submissions, including Process Again; never builds or deletes a form |
 | Read Only | Forms Read Only | Look at forms and submissions |
 
 Filling in a form writes the person, organization and related records **as the person filling
@@ -243,7 +243,23 @@ Every sent form is a **Form Submission**: its **Status** (Received, Processed, N
 Failed), its **Source** (Staff or Public), the
 answers, the **Person** and **Organization** it matched or added, and the version of the form it
 was filled in from. Its record page shows the answers by question and the records written,
-each linked. Reports on Form Submissions work like any other.
+each linked. Reports on Form Submissions work like any other. Each submission also keeps the
+**Form Name** and **Version Number** it answered, filled in by BarnCRM when it is saved.
+
+### Closing or Deleting a Form
+
+To stop people filling a form in, set its **Status** to **Closed**. Everything stays, and you can
+publish it again later.
+
+A form that has submissions can be deleted only by a Forms administrator (the **Manage Forms**
+custom permission, in Forms Admin, which every BarnCRM Admin gets). Anyone else who tries is told
+the form has submissions and to close it instead. When a Forms administrator deletes it, its
+versions and saved drafts go with it, but **every submission is kept**: its **Form** and **Form
+Version** are cleared, and its **Form Name** and **Version Number** still say what was answered.
+The record page shows the deleted form's name and the answers by their question keys; **Process
+Again** is no longer offered, since the questions are gone. Deleting one form version that
+submissions answer works the same way. A form or version with no submissions deletes as it always
+has. On reports, group a deleted form's submissions by **Form Name**.
 
 ## Sample Data
 

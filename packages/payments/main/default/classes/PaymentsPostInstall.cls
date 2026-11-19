@@ -9,8 +9,9 @@
  *    setup object write).
  * 2. Give the Payments sets to BarnCRM's roles (`ModuleAccessSyncs`), queued for the same reason.
  *
- * Nothing is scheduled and no key is set at install: processing is scheduled from Health Check
- * and the keys are entered on Payments Setup, so a fresh install takes no payment.
+ * Nothing is scheduled and no key is shipped: processing is scheduled from Health Check, the
+ * secrets are entered on the processor's External Credential in Setup and Check Connection on
+ * Payments Setup connects it, so a fresh install takes no payment.
  */
 @NamespaceAccessible
 public with sharing class PaymentsPostInstall implements InstallHandler, ModuleSetup {

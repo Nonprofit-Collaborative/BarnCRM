@@ -99,11 +99,7 @@ public class HealthCheckTestHelper {
 	}
 
 	private static User newUser(String alias) {
-		String unique =
-			alias +
-			'.' +
-			String.valueOf(System.now().getTime()) +
-			Crypto.getRandomInteger();
+		String unique = alias + '.' + String.valueOf(System.now().getTime()) + Crypto.getRandomInteger();
 		return new User(
 			Alias = alias.left(8),
 			Email = alias + '@example.invalid',

@@ -75,8 +75,7 @@ private class VolunteerJobTriggerHandlerTest {
 			);
 			Assert.areEqual(
 				job.Id,
-				[SELECT Volunteer_Job__c FROM Volunteer_Hours__c WHERE Id = :hours.Id]
-				.Volunteer_Job__c,
+				[SELECT Volunteer_Job__c FROM Volunteer_Hours__c WHERE Id = :hours.Id].Volunteer_Job__c,
 				'The hours still name the job.'
 			);
 		}

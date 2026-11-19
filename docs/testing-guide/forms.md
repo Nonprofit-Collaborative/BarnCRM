@@ -151,3 +151,21 @@ steps 6 and 7 done; an inbox you can read.
 | 6 | **Remove Sample Data**. | The three sample forms with their versions and submissions are gone; your own form and its submission stay. |
 
 **Cleanup:** None.
+
+## T-FORM-09: Deleting a Form With Submissions
+
+**Purpose:** confirm only a Forms administrator deletes a form that has submissions, and the submissions stay.
+**Prerequisites:** admin with the BarnCRM Admin role (so Forms Admin and Manage Forms); a second
+System Administrator user without the BarnCRM Admin role or any Forms set (may delete any record,
+is not a Forms administrator); a published form `Zzdelete Test` with one submission, and a
+second published form `Zzdelete Empty` with none.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the submission. | **Form Name** reads `Zzdelete Test` and **Version Number** `1`. |
+| 2 | As the second administrator, delete `Zzdelete Test`. | Refused: "Zzdelete Test has submissions, so only a Forms administrator can delete it. To stop people filling it in, set its Status to Closed instead; its submissions stay." The form is still there. |
+| 3 | As the second administrator, delete `Zzdelete Empty`. | It is deleted: a form nobody answered needs no Forms administrator. |
+| 4 | As admin, delete `Zzdelete Test`. | It is deleted. |
+| 5 | Open **Form Submissions** and the submission. | It is still there: **Form** and **Form Version** are empty, **Form Name** reads `Zzdelete Test`, **Version Number** `1`. The **Submission** tab shows the answers by question key and no **Process Again**. |
+
+**Cleanup:** delete the submission.

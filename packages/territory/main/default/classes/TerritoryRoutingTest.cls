@@ -27,9 +27,7 @@ private class TerritoryRoutingTest {
 		);
 		Assert.areEqual(
 			CHO,
-			TerritoryRouting.ownerFor(
-				pool(TerritoryRouting.TERRITORY_OWNER, new List<Integer>{ null, null })
-			),
+			TerritoryRouting.ownerFor(pool(TerritoryRouting.TERRITORY_OWNER, new List<Integer>{ null, null })),
 			'The territory owner'
 		);
 		TerritoryRouting.Pool empty = pool(TerritoryRouting.ROUND_ROBIN, new List<Integer>());
@@ -39,10 +37,7 @@ private class TerritoryRoutingTest {
 
 	@IsTest
 	static void roundRobinTakesTurnsAndSkipsAFullMember() {
-		TerritoryRouting.Pool turns = pool(
-			TerritoryRouting.ROUND_ROBIN,
-			new List<Integer>{ 1, null }
-		);
+		TerritoryRouting.Pool turns = pool(TerritoryRouting.ROUND_ROBIN, new List<Integer>{ 1, null });
 		turns.next = 0;
 		Assert.areEqual(ANA, TerritoryRouting.ownerFor(turns), 'Ana first');
 		Assert.areEqual(BEN, TerritoryRouting.ownerFor(turns), 'Then Ben');

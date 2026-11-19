@@ -30,11 +30,8 @@ private class AppealTriggerHandlerTest {
 			// loop check in the trigger. The requirement is that the save is refused and nothing moves.
 			Assert.isNotNull(message, 'An appeal above itself is refused.');
 			Assert.isTrue(
-				message.contains('own parent') ||
-					message.contains('loop') ||
-					message.contains('Hierarchy'),
-				'Refused as a hierarchy that points at itself, not for some other reason: ' +
-				message
+				message.contains('own parent') || message.contains('loop') || message.contains('Hierarchy'),
+				'Refused as a hierarchy that points at itself, not for some other reason: ' + message
 			);
 			Assert.isNull(
 				[SELECT Parent_Appeal__c FROM Appeal__c WHERE Id = :appeal.Id].Parent_Appeal__c,

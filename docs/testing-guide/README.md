@@ -1,6 +1,6 @@
 # BarnCRM Testing Guide
 
-Applies to: BarnCRM main f69141c1c (landing batch L, with batch K). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM landing/batch-n at 40915b25c (batch N: releases 1.26 to 1.28). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 Manual, step-by-step test scripts for checking a build in a scratch org or sandbox, feature by
 feature. Written for a tester: the project owner or a pilot org admin. Start with
@@ -57,27 +57,28 @@ page, even if that puts it out of reading order.
 | [Record Inspector](record-inspector.md) | RI | 3 | Inspect This Record button, the Record Inspector page, a pasted ID or link, search fields, copy an API name, field security and permission |
 | [Org Optimizer and Health Check](org-optimizer-and-health-check.md) | HC | 22 | Health Check findings and fixes, Org Optimizer sections, technical debt checks, storage and limits, Data Dictionary and its automation inventory, Access Explorer, Access compare and Modify All report, Field Access Manager, weekly admin summary, Setup Changes, AI-Readiness Export, Where Used and Retire a Field, NPSP households check, Report Subscriptions |
 | [Erase a person](erase-a-person.md) | ERASE | 8 | Person erasure, preview, permission |
-| [Giving: gifts, funds and batches](giving-gifts-funds-batches.md) | GIFT | 26 | Funds, gifts, Quick Gift Entry, in-kind, appeals, gift batches, closed periods, gift import (with the gift templates for other CRMs), splitting a gift across funds, gift and commitment page tabs, Giving at a Glance, stock, planned and donor-advised fund gift details, the Quick Gift Entry donor panel, NPSP funds, levels, recurring donations and engagement plans kit with its parity report, online donation pages |
-| [Giving: commitments](giving-commitments.md) | COM | 11 | Pledges, recurring gifts, payments, nightly jobs, pledge reminders |
-| [Giving: asks](giving-asks.md) | ASK | 10 | Ask stages, the Ask Pipeline board, moving and closing asks, gifts and pledges from won asks, reopening (board and ask page), history, read only access, the donor's Next Ask Date from open asks, a person account as one donor |
-| [Giving: soft credits, tributes and matching](giving-soft-credits-tributes-matching.md) | CRED | 10 | Soft credits, tributes, matching gifts |
-| [Giving: receipts and acknowledgments](giving-receipts-and-acknowledgments.md) | RCPT | 15 | Receipts, year-end statements, void and reissue, receipt lock, acknowledgments, one-step gift and plan actions |
-| [Giving: ask cadence](giving-ask-cadence.md) | ASK | 2 | Next Ask Date, nightly reminder task, Who Is Due list |
-| [Giving: donor scoring](giving-donor-scoring.md) | RFM | 4 | Scores and segment on the donor, cutoffs, segment templates, wealth screening fields and import |
-| [Giving: refunds and write-offs](giving-refunds.md) | REF | 7 | Refunds and their effect on totals |
-| [Giving: rollups and dashboards](giving-rollups-and-dashboards.md) | GRD | 10 | Giving totals, recalculation, dashboards and reports, donor segments, Fundraising Home and report charts, recurring donor health |
+| [Fundraising: gifts, funds and batches](giving-gifts-funds-batches.md) | GIFT | 26 | Funds, gifts, Quick Gift Entry, in-kind, appeals, gift batches, closed periods, gift import (with the gift templates for other CRMs), splitting a gift across funds, gift and commitment page tabs, Giving at a Glance, stock, planned and donor-advised fund gift details, the Quick Gift Entry donor panel, NPSP funds, levels, recurring donations and engagement plans kit with its parity report, online donation pages |
+| [Fundraising: commitments](giving-commitments.md) | COM | 11 | Pledges, recurring gifts, payments, nightly jobs, pledge reminders |
+| [Fundraising: asks](giving-asks.md) | ASK | 10 | Ask stages, the Ask Pipeline board, moving and closing asks, gifts and pledges from won asks, reopening (board and ask page), history, read only access, the donor's Next Ask Date from open asks, a person account as one donor |
+| [Fundraising: soft credits, tributes and matching](giving-soft-credits-tributes-matching.md) | CRED | 10 | Soft credits, tributes, matching gifts |
+| [Fundraising: receipts and acknowledgments](giving-receipts-and-acknowledgments.md) | RCPT | 15 | Receipts, year-end statements, void and reissue, receipt lock, acknowledgments, one-step gift and plan actions |
+| [Fundraising: ask cadence](giving-ask-cadence.md) | ASK | 2 | Next Ask Date, nightly reminder task, Who Is Due list |
+| [Fundraising: donor scoring](giving-donor-scoring.md) | RFM | 4 | Scores and segment on the donor, cutoffs, segment templates, wealth screening fields and import |
+| [Fundraising: refunds and write-offs](giving-refunds.md) | REF | 7 | Refunds and their effect on totals |
+| [Fundraising: rollups and dashboards](giving-rollups-and-dashboards.md) | GRD | 10 | Giving totals, recalculation, dashboards and reports, donor segments, Fundraising Home and report charts, recurring donor health |
 | [Contact Point Sync](contact-point-sync.md) | CPS | 7 | Copies to Contact Points, BarnCRM as the source, addresses, delete and restore, switches and Pause All, the backfill page, an org without the Individual object |
 | [Address Verification](address-verification.md) | AV | 6 | Settings, write-only keys and Health Check, checks on save, corrections, Smarty and Google, the nightly check and its limit, switching it off |
-| [Mirror](mirror.md) | MIR | 16 | Campaign sync, Opportunity mirror, accounting export, Inbound Gift API, Gift Transaction mirror, Cases sent to a service provider |
+| [Mirror](mirror.md) | MIR | 19 | Fundraising gift mirrors: Campaign sync, Opportunity mirror, accounting export, Inbound Gift API, Gift Transaction mirror. Mirror: Cases sent to a service provider, Mirror with Core alone, the hourly Case check |
 | [Volunteers](volunteers.md) | VOL | 32 | Jobs, shifts, sign-ups, hours and approval, skills, shift reminders and unfilled shift nudges, suggested volunteers, person accounts, moving from V4S, Volunteering at a Glance and the Log Hours tab |
 | [Programs](programs.md) | PRG | 28 | Moving from PMM, programs, services, enrollments, roster import, the Program Roster panel, a person's Programs card and last service, Programs access, Health Check, sample data, the Service Delivery Log and the delivery rules, intake and eligibility, the Programs Settings page, case notes, participant privacy, the Programs Dashboard, only a person enrolled or served, counts without names, referrals, eligibility screening rules, service plans and goals, cohorts, sessions and attendance per session, no duplicate sessions, the unsaved attendance question, repeating session schedules, program capacity and waitlist, Programs at a Glance, Enroll and the Record Service tab |
 | [Forms](forms.md) | FORM | 7 | The Form Builder: steps, questions, records to write, conditions, preview, draft and publish; filling in a form with conditions and answer checks; matching and adding the person; a submission held for review and Process Again; staff and read-only access; publish refusing a missing field; public forms on a Salesforce Site; files and save for later |
 | [Logic Models](logic-models.md) | LM | 13 | The Logic Model Builder: parts, arrows and assumptions, evidence for assumptions, drag and drop, whose model it is, indicators and periods with progress, staff and read-only access, imported and computed results, the Logic Model Report |
-| [Funders](funders.md) | FUN | 21 | Grants and their stage dates, the Grant Pipeline board, totals and deadlines, the Grant Calendar, moving and awarding a grant, the program a grant pays for, Funders access, Health Check and sample data, grant requirements, reminder tasks and emails and their settings, Mark Submitted, overdue requirements, award schedules, restricted funds and the Giving fund, government award fields, the answer library, requirements linked to Logic Models outcomes, funder reports from a template, the Board Dashboard, the Grant Finder, application checklists, grant documents, budget versus awarded, renewals |
+| [Grants](funders.md) | FUN | 22 | Grants and their stage dates, the Grant Pipeline board, totals and deadlines, the Grant Calendar, moving and awarding a grant, the program a grant pays for, Grants access, Health Check and sample data, grant requirements, reminder tasks and emails and their settings, Mark Submitted, overdue requirements, award schedules, restricted funds and the Giving fund, government award fields, the answer library, requirements linked to Logic Models outcomes, funder reports from a template, the Board Dashboard, the Grant Finder, application checklists, grant documents, budget versus awarded, renewals |
 | [Event Management](events.md) | EV | 29 | Events and their rules, the Events page, Repeat Event, Events access, ticket types and promo codes, the Agenda Builder, speakers, the call for speakers, sponsorship, registrations and the waitlist, reminders, follow-ups and no-shows, the Summit Events import, the event dashboard and conference template, appointments, event volunteers, check-in and QR codes, sample data, gala tables and seating, badges and sign-in sheets, the post-event survey, the event calendar, public event pages and registration |
 | [Portal Builder](portal-builder.md) | PB | 16 | Sign-in by emailed code, no user enumeration, lockout, the second factor, template pages and edits scoped to the person, staff ending sessions, the volunteer, speaker, donor, board and member templates, donor Pay Online and Update Card, the portal on a WordPress page at phone width and by keyboard |
 | [Corporate Hub](corporate-hub.md) | CH | 15 | Install and access, templates loaded once, Library Documents and versions, acknowledgments requested and answered, only the person attests, completing a compliance cycle with evidence, agreements renewing and expiring, nightly reminders once per date, board governance, data subject requests and the erasure link, breaches and DPIA reviews |
 | [LWC Builder](lwc-builder.md) | LB | 7 | Install and access, the builder tab for admins, building on the grid with drag and drop and keyboard moves, preview and save, placing the component and reading as the viewer, lists and report charts, buttons for quick actions and flows, visibility rules, export as LWC source |
+| [Advanced Reporting](advanced-reporting.md) | AR | 10 | Install and access, a list report across lookups and related records, totals and charts as the viewer, saving and sharing with people and groups, export, dashboards and their filters, the templates by module installed, large reports, refused requests, dates in the person's time zone and week |
 | [Scholarships and Outbound Grants](scholarships.md) | SG | 9 | Install and access, applications from a form with eligibility rules and files, panel assignment and recusal, scoring and the ranked board, decisions and letters, schedules and conditional disbursements, the export, recipient reports, reminders and renewal, the applicant portal, moving from Outbound Funds |
 | [Territory Management](territory-management.md) | TM | 5 | Install and access, rules and priority, Preview changes nothing, Assign and Undo, owner routing by round robin, capacity and territory owner, the nightly assignment shipped off |
 | [Project Management](projects.md) | PM | 8 | Install and access, a project from the Salesforce Implementation template, tasks and progress, a template of your own, health and the Projects at Risk card, time, budget and utilization, Export Billable Time, Draft Status Update, reports, PSA, requests and issues (T-PM-30 on) |
@@ -93,7 +94,7 @@ Run these in this order on one Person Accounts org set up as in
 scripts use what an earlier one created, so keep the order.
 
 **Core-only real-org sandbox (for example `mwdbdevsb`).** Run items 1 to 15 only; skip 16 to 25
-(Giving, Volunteers and Rollup Builder are not deployed). Set up as in
+(Fundraising, Volunteers and Rollup Builder are not deployed). Set up as in
 [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox): Core deployed
 with `--core-only`, no sample data, work in the **BarnCRM** app, hold **BarnCRM Admin**,
 and create the **Zztest** fixture first. Read Garcia as Zztest in every script. Extra
@@ -118,7 +119,7 @@ steps 1 and 2 need a staff user, so run steps 3 to 8 only.
 | 13 | [T-DUP-01](duplicates.md) | Duplicate scan |
 | 14 | [T-HC-03](org-optimizer-and-health-check.md) | Health Check report (skipped install steps add findings: see the script) |
 | 15 | [T-ERASE-02](erase-a-person.md) | Erase a person (in a real-org sandbox: only Luis Zztest, with **BarnCRM Erase People** given for this script only) |
-| 16 | [T-GIFT-01](giving-gifts-funds-batches.md) | Default fund (later Giving scripts need it) |
+| 16 | [T-GIFT-01](giving-gifts-funds-batches.md) | Default fund (later Fundraising scripts need it) |
 | 17 | [T-GIFT-04](giving-gifts-funds-batches.md) | Quick Gift Entry |
 | 18 | [T-GIFT-08](giving-gifts-funds-batches.md) | Gift batch: enter, balance, post |
 | 19 | [T-COM-01](giving-commitments.md) | Pledge and schedule |
@@ -135,10 +136,10 @@ list in the same org, run them last or refresh the org first.
 ## Full Regression List
 
 Every script on every page above, before a release or after a change that touches many areas.
-Run Core pages first (People and households through Erase a person), then Giving, then Mirror,
-Volunteers, Programs, Logic Models, Funders and Rollup Builder, then Accessibility and mobile. Within a page, run in ID order.
+Run Core pages first (People and households through Erase a person), then Fundraising, then Mirror,
+Volunteers, Programs, Logic Models, Grants and Rollup Builder, then Accessibility and mobile. Within a page, run in ID order.
 
-Run it on the Person Accounts shape, then repeat the Core pages and the Giving pages on the
+Run it on the Person Accounts shape, then repeat the Core pages and the Fundraising pages on the
 platform-only shape (Mirror needs Opportunity and Campaign, so skip it there). Scripts that need
 their own org (for example T-SA-01 and T-SA-02, which need an org never opened) say so in their
 prerequisites.

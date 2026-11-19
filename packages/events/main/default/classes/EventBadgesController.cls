@@ -95,9 +95,7 @@ public with sharing class EventBadgesController {
 				Person person = new Person();
 				person.id = rows[i].Id;
 				// EV-26: the badge overrides win when set (ADR-0207 decision 13).
-				person.name = String.isNotBlank(rows[i].Badge_Name__c)
-					? rows[i].Badge_Name__c
-					: rows[i].Name;
+				person.name = String.isNotBlank(rows[i].Badge_Name__c) ? rows[i].Badge_Name__c : rows[i].Name;
 				person.title = rows[i].Badge_Title__c;
 				person.ticketName = rows[i].Ticket_Type__r?.Name;
 				person.organization = String.isNotBlank(rows[i].Badge_Company__c)

@@ -220,12 +220,7 @@ public with sharing class FieldAccessController {
 				new Set<String>{ result.objectName }
 			);
 			Map<String, FieldOption> byName = new Map<String, FieldOption>();
-			for (
-				Schema.DescribeFieldResult field : FieldAccessService.permissionableFields(
-						described
-					)
-					.values()
-			) {
+			for (Schema.DescribeFieldResult field : FieldAccessService.permissionableFields(described).values()) {
 				FieldOption option = new FieldOption();
 				option.name = field.getName();
 				option.label = field.getLabel();

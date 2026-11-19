@@ -4,10 +4,11 @@
  * the Automation page that Pause All covers; the dispatcher skips it while the module is off.
  *
  * Before a change to the street, city, state, postal code or country is saved, the address goes
- * back to Unverified. After the save, with Verify On Save on and the keys entered, one queued job
- * looks up the new and changed Current addresses, up to `AddressVerifier.PER_TRANSACTION`; the
- * rest, and saves made inside a batch or a queued job, wait for the nightly step. Saves the
- * module makes itself are skipped. Never fails a save.
+ * back to Unverified. After the save, with Verify On Save on and the provider connected, one
+ * queued job looks up the new and changed Current addresses, up to
+ * `AddressVerifier.PER_TRANSACTION`, when the person saving holds Address Verification User or
+ * Admin (one Warning a day says when not); the rest, and saves made inside a batch or a queued job, wait
+ * for the nightly step. Saves the module makes itself are skipped. Never fails a save.
  */
 @NamespaceAccessible
 public with sharing class AddressVerificationHandler extends TriggerHandler {
@@ -73,14 +74,17 @@ public with sharing class AddressVerificationHandler extends TriggerHandler {
 		List<Id> ids = new List<Id>();
 		for (SObject record : records) {
 			String status = (String) record.get(Address__c.Status__c);
-			if (
-				(status == null || status == 'Current') &&
-				ids.size() < AddressVerifier.PER_TRANSACTION
-			) {
+			if ((status == null || status == 'Current') && ids.size() < AddressVerifier.PER_TRANSACTION) {
 				ids.add(record.Id);
 			}
 		}
 		if (ids.isEmpty()) {
+			return;
+		}
+		// The lookup runs as the person saving, who needs principal access; the nightly step covers
+		// the addresses of those without it.
+		if (!AddressVerifier.canLookUpOnSave()) {
+			AddressVerifier.logNoAccessOnce();
 			return;
 		}
 		try {

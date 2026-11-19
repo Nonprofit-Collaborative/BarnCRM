@@ -11,14 +11,7 @@ public with sharing class VolunteerSettings {
 	public static final String SETTINGS_OBJECT = 'Volunteer_Settings__c';
 
 	/** The milestones a stored list with no usable part falls back to (the field's default). */
-	private static final List<Integer> DEFAULT_MILESTONES = new List<Integer>{
-		25,
-		50,
-		100,
-		250,
-		500,
-		1000
-	};
+	private static final List<Integer> DEFAULT_MILESTONES = new List<Integer>{ 25, 50, 100, 250, 500, 1000 };
 
 	/**
 	 * R-VG6: whether a new hours entry waits for a coordinator. On unless an administrator

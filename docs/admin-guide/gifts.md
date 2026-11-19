@@ -18,22 +18,22 @@ what it was worth. [In-kind gifts](in-kind-gifts.md) is the page for that.
 
 ## How to Turn It On
 
-Gifts arrive with the Giving module. Before David enters his first gift, do two things
+Gifts arrive with the Fundraising module. Before David enters his first gift, do two things
 once:
 
 1. Create at least one fund and mark it as the default (see the Funds page). A gift saved
    without a designation goes there.
-2. Open **BarnCRM Settings**, choose **Giving**, and check the settings on that page:
+2. Open **BarnCRM Settings**, choose **Fundraising**, and check the settings on that page:
    **Default fund**, **Default appeal** (optional), and **Auto-create household soft credits**.
 
 Then give your fundraising staff the **Fundraising Staff** role on the Access page: it
-includes the **Giving Staff** permission set. Give yourself **Giving Admin**. People who only
-need to see gifts get **Giving Read Only**.
+includes the **Fundraising Staff Access** permission set. Give yourself **Fundraising Admin**. People who only
+need to see gifts get **Fundraising Read Only**.
 
 Those two are given on the **Access** page in BarnCRM Settings, under Extra Permissions,
 beside the person's role: the BarnCRM Admin and Read Only roles carry what Core provides and
-do not include a module's permission sets. The Module Manager also gives you **Giving
-Admin** when you turn Giving on there.
+do not include a module's permission sets. The Module Manager also gives you **Fundraising
+Admin** when you turn Fundraising on there.
 
 ## A Five-Minute Walkthrough
 
@@ -106,10 +106,10 @@ total the gift, and a gift posted to accounting or dated in a closed period keep
 On such a gift the card shows the lock's own message, "This gift is in the books ... Record a
 refund instead", in place of **Edit Funds**.
 
-Access: the person needs create and edit on Gift Allocations (**Giving Staff** and **Giving
-Admin** have both) and the `GiftAllocationController` class (both, and **Giving Read Only**
+Access: the person needs create and edit on Gift Allocations (**Fundraising Staff Access** and **Fundraising
+Admin** have both) and the `GiftAllocationController` class (both, and **Fundraising Read Only**
 to see the card). Taking a fund off a gift deletes an allocation, which needs delete on Gift
-Allocations: **Giving Admin** and **Giving Staff** both have it (plan D-176), so staff can
+Allocations: **Fundraising Admin** and **Fundraising Staff Access** both have it (plan D-176), so staff can
 correct a split without an admin. A custom permission set without delete can still move money
 between funds and add funds, and is told to ask an admin to remove one. Quick Gift Entry
 offers the same editor as **Split Across Funds** for a new gift.

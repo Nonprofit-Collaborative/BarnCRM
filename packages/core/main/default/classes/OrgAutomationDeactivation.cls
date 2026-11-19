@@ -71,9 +71,7 @@ public with sharing class OrgAutomationDeactivation implements Queueable, Databa
 	/** Saves a Running snapshot of the chosen items and queues the snapshot job. */
 	public static Id start(List<Item> chosen) {
 		if (chosen == null || chosen.isEmpty() || chosen.size() > MAX_ITEMS) {
-			throw new DeactivationException(
-				BarnHelp.text('Core', 'Core_AutomationDeactivate_ChooseItems')
-			);
+			throw new DeactivationException(BarnHelp.text('Core', 'Core_AutomationDeactivate_ChooseItems'));
 		}
 		refuseWhileRunning();
 		List<Item> items = new List<Item>();
@@ -85,53 +83,41 @@ public with sharing class OrgAutomationDeactivation implements Queueable, Databa
 			item.name = each.name;
 			item.objectName = each.objectName;
 			if (!isValidItem(item)) {
-				throw new DeactivationException(
-					BarnHelp.text('Core', 'Core_AutomationDeactivate_ChooseItems')
-				);
+				throw new DeactivationException(BarnHelp.text('Core', 'Core_AutomationDeactivate_ChooseItems'));
 			}
 			items.add(item);
 		}
-		Automation_Snapshot__c snapshot = new Automation_Snapshot__c(
+		Merge_Journal__c snapshot = new Merge_Journal__c(
 			Kind__c = KIND,
 			Status__c = OrgAutomationScan.STATUS_RUNNING,
 			Items__c = JSON.serialize(items)
 		);
 		insert as user snapshot;
-		AsyncStarter.queue(
-			new OrgAutomationDeactivation(snapshot.Id, MODE_SNAPSHOT),
-			'OrgAutomationDeactivation'
-		);
+		AsyncStarter.queue(new OrgAutomationDeactivation(snapshot.Id, MODE_SNAPSHOT), 'OrgAutomationDeactivation');
 		return snapshot.Id;
 	}
 
 	/** Marks the snapshot Restoring and queues the restore job. */
 	public static Id restore(Id snapshotId) {
 		refuseWhileRunning();
-		Automation_Snapshot__c snapshot = load(snapshotId);
+		Merge_Journal__c snapshot = load(snapshotId);
 		if (
 			snapshot == null ||
 			snapshot.Kind__c != KIND ||
 			(snapshot.Status__c != 'Done' &&
 			snapshot.Status__c != 'Partial')
 		) {
-			throw new DeactivationException(
-				BarnHelp.text('Core', 'Core_AutomationDeactivate_CannotRestore')
-			);
+			throw new DeactivationException(BarnHelp.text('Core', 'Core_AutomationDeactivate_CannotRestore'));
 		}
 		snapshot.Status__c = 'Restoring';
 		update as user snapshot;
-		AsyncStarter.queue(
-			new OrgAutomationDeactivation(snapshot.Id, MODE_RESTORE),
-			'OrgAutomationDeactivation'
-		);
+		AsyncStarter.queue(new OrgAutomationDeactivation(snapshot.Id, MODE_RESTORE), 'OrgAutomationDeactivation');
 		return snapshot.Id;
 	}
 
 	/** A flow definition (300) or validation rule (03d) Id of the kind named. */
 	private static Boolean isValidItem(Item item) {
-		String prefix = item.kind == KIND_FLOW
-			? '300'
-			: (item.kind == KIND_VALIDATION ? '03d' : null);
+		String prefix = item.kind == KIND_FLOW ? '300' : (item.kind == KIND_VALIDATION ? '03d' : null);
 		return prefix != null &&
 			item.recordId != null &&
 			Pattern.matches('[a-zA-Z0-9]{15}([a-zA-Z0-9]{3})?', item.recordId) &&
@@ -141,21 +127,19 @@ public with sharing class OrgAutomationDeactivation implements Queueable, Databa
 	private static void refuseWhileRunning() {
 		Integer running = [
 			SELECT COUNT()
-			FROM Automation_Snapshot__c
+			FROM Merge_Journal__c
 			WHERE Kind__c = :KIND AND Status__c IN ('Running', 'Restoring')
 			WITH USER_MODE
 		];
 		if (running > 0) {
-			throw new DeactivationException(
-				BarnHelp.text('Core', 'Core_AutomationDeactivate_AlreadyRunning')
-			);
+			throw new DeactivationException(BarnHelp.text('Core', 'Core_AutomationDeactivate_AlreadyRunning'));
 		}
 	}
 
 	// -------------------------------------------------------------------------- the jobs
 
 	public void execute(QueueableContext context) {
-		Automation_Snapshot__c snapshot = load(snapshotId);
+		Merge_Journal__c snapshot = load(snapshotId);
 		List<Item> items = (List<Item>) JSON.deserialize(snapshot.Items__c, List<Item>.class);
 		try {
 			if (mode == MODE_SNAPSHOT) {
@@ -184,10 +168,7 @@ public with sharing class OrgAutomationDeactivation implements Queueable, Databa
 		// A test cannot chain a queued job: it runs each job itself.
 		if (more && !Test.isRunningTest()) {
 			System.enqueueJob(
-				new OrgAutomationDeactivation(
-					snapshotId,
-					mode == MODE_RESTORE ? MODE_RESTORE : MODE_APPLY
-				)
+				new OrgAutomationDeactivation(snapshotId, mode == MODE_RESTORE ? MODE_RESTORE : MODE_APPLY)
 			);
 		}
 	}
@@ -247,8 +228,7 @@ public with sharing class OrgAutomationDeactivation implements Queueable, Databa
 			return BarnHelp.text('Core', 'Core_AutomationDeactivate_NotFound');
 		}
 		Boolean barnFlow =
-			item.kind == KIND_FLOW &&
-			OrgAutomationInventory.BARN_FLOWS.contains((String) row.get('DeveloperName'));
+			item.kind == KIND_FLOW && OrgAutomationInventory.BARN_FLOWS.contains((String) row.get('DeveloperName'));
 		if (String.isNotBlank((String) row.get('NamespacePrefix')) || barnFlow) {
 			return BarnHelp.text('Core', 'Core_AutomationDeactivate_NotOwn');
 		}
@@ -281,9 +261,7 @@ public with sharing class OrgAutomationDeactivation implements Queueable, Databa
 					OrgToolingApi.updateMetadata(
 						'FlowDefinition',
 						item.recordId,
-						new Map<String, Object>{
-							'activeVersionNumber' => restoring ? item.activeVersion : 0
-						}
+						new Map<String, Object>{ 'activeVersionNumber' => restoring ? item.activeVersion : 0 }
 					);
 				} else {
 					Map<String, Object> metadata = (Map<String, Object>) OrgToolingApi.read(
@@ -302,9 +280,7 @@ public with sharing class OrgAutomationDeactivation implements Queueable, Databa
 	}
 
 	private static Boolean isWaiting(Item item, Boolean restoring) {
-		return restoring
-			? item.result == RESULT_CHANGED && item.restoreResult == null
-			: item.result == RESULT_PENDING;
+		return restoring ? item.result == RESULT_CHANGED && item.restoreResult == null : item.result == RESULT_PENDING;
 	}
 
 	private static Boolean hasWaiting(List<Item> items, Boolean restoring) {
@@ -360,10 +336,10 @@ public with sharing class OrgAutomationDeactivation implements Queueable, Databa
 
 	// -------------------------------------------------------------------------- reading
 
-	private static Automation_Snapshot__c load(Id snapshotId) {
-		List<Automation_Snapshot__c> found = [
+	private static Merge_Journal__c load(Id snapshotId) {
+		List<Merge_Journal__c> found = [
 			SELECT Id, Kind__c, Status__c, Items__c
-			FROM Automation_Snapshot__c
+			FROM Merge_Journal__c
 			WHERE Id = :snapshotId
 			WITH USER_MODE
 			LIMIT 1
@@ -374,9 +350,9 @@ public with sharing class OrgAutomationDeactivation implements Queueable, Databa
 	/** The newest deactivation snapshots, for the page. */
 	public static List<OrgAutomationInventory.Snapshot> recent() {
 		List<OrgAutomationInventory.Snapshot> recent = new List<OrgAutomationInventory.Snapshot>();
-		for (Automation_Snapshot__c each : [
+		for (Merge_Journal__c each : [
 			SELECT Id, Name, Status__c, Items__c, Restored_At__c, CreatedDate, CreatedBy.Name
-			FROM Automation_Snapshot__c
+			FROM Merge_Journal__c
 			WHERE Kind__c = :KIND
 			WITH USER_MODE
 			ORDER BY CreatedDate DESC

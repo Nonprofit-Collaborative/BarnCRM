@@ -22,9 +22,7 @@ public with sharing class PortalTokens {
 
 	/** SHA-256 of the text, as 64 lower-case hex characters. */
 	public static String hash(String value) {
-		return EncodingUtil.convertToHex(
-			Crypto.generateDigest('SHA-256', Blob.valueOf(value == null ? '' : value))
-		);
+		return EncodingUtil.convertToHex(Crypto.generateDigest('SHA-256', Blob.valueOf(value == null ? '' : value)));
 	}
 
 	/** A new six-digit code, with leading zeros. */

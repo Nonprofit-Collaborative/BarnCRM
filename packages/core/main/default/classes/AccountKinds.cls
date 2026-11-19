@@ -125,9 +125,7 @@ public with sharing class AccountKinds {
 		if (NO_RECORD_TYPE.equalsIgnoreCase(name)) {
 			return null;
 		}
-		Schema.RecordTypeInfo info = accountDescribe()
-			.getRecordTypeInfosByDeveloperName()
-			.get(name);
+		Schema.RecordTypeInfo info = accountDescribe().getRecordTypeInfosByDeveloperName().get(name);
 		return info == null ? null : info.getRecordTypeId();
 	}
 
@@ -172,9 +170,7 @@ public with sharing class AccountKinds {
 			if (recordTypeId == null) {
 				return true;
 			}
-			Schema.RecordTypeInfo info = accountDescribe()
-				.getRecordTypeInfosById()
-				.get(recordTypeId);
+			Schema.RecordTypeInfo info = accountDescribe().getRecordTypeInfosById().get(recordTypeId);
 			return info != null && info.isMaster();
 		}
 		return recordTypeId != null && recordTypeId == organizationRecordTypeId();
@@ -204,11 +200,7 @@ public with sharing class AccountKinds {
 			if (
 				info.isActive() &&
 				!info.isMaster() &&
-				isOffered(
-					info.getDeveloperName(),
-					info.getName(),
-					personTypes.contains(info.getRecordTypeId())
-				)
+				isOffered(info.getDeveloperName(), info.getName(), personTypes.contains(info.getRecordTypeId()))
 			) {
 				byLabel.put(info.getName().toLowerCase() + '|' + info.getDeveloperName(), info);
 			}
@@ -267,10 +259,7 @@ public with sharing class AccountKinds {
 		if (usableNone || isCandidate(stored) || isShippedInForce(stored)) {
 			return;
 		}
-		SettingsService.saveSystemValue(
-			KEY_ORGANIZATION_RECORD_TYPE,
-			detectOrganizationRecordType()
-		);
+		SettingsService.saveSystemValue(KEY_ORGANIZATION_RECORD_TYPE, detectOrganizationRecordType());
 	}
 
 	/**
@@ -306,9 +295,7 @@ public with sharing class AccountKinds {
 
 	/** Core's own record type for organizations when it is active here, else null. */
 	private static Schema.RecordTypeInfo shippedRecordType() {
-		Schema.RecordTypeInfo info = accountDescribe()
-			.getRecordTypeInfosByDeveloperName()
-			.get(SHIPPED_RECORD_TYPE);
+		Schema.RecordTypeInfo info = accountDescribe().getRecordTypeInfosByDeveloperName().get(SHIPPED_RECORD_TYPE);
 		return info != null && info.isActive() ? info : null;
 	}
 

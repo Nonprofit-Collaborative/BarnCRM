@@ -12,8 +12,8 @@
 public with sharing class HealthCheckExtensions {
 	/**
 	 * The class names dependent packages register to add findings, in the order they are asked:
-	 * the Rollup Builder module's rollup checks (ADR-0125), Giving's (G-20 follow-up), then
-	 * Mirror's, for its nightly mirror run (X-01), then Volunteers' (canonical model Part G), then Programs' (29ZA), then Funders' (29ZH), then Forms' public form checks (29ZY, C-42b), then Events' public page checks (29EV1, EV-16), then Payments' (29PAY1, PAY-01), then Address Verification's (29AV1, C-46).
+	 * the Rollup Builder module's rollup checks (ADR-0125), Fundraising's (G-20 follow-up, and its nightly gift mirror runs, X-01), then
+	 * Mirror's (its household drift report), then Volunteers' (canonical model Part G), then Programs' (29ZA), then Funders' (29ZH), then Forms' public form checks (29ZY, C-42b), then Events' public page checks (29EV1, EV-16), then Payments' (29PAY1, PAY-01), then Address Verification's (29AV1, C-46).
 	 */
 	@NamespaceAccessible
 	public static final List<String> EXTENSION_CLASSES = new List<String>{
@@ -57,10 +57,7 @@ public with sharing class HealthCheckExtensions {
 				extension = found.get(className);
 			}
 			if (extension != null) {
-				byKey.put(
-					className.removeEnd('HealthCheckExtension').toLowerCase() + '_extension',
-					extension
-				);
+				byKey.put(className.removeEnd('HealthCheckExtension').toLowerCase() + '_extension', extension);
 			}
 		}
 		return byKey;

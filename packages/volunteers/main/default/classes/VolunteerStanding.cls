@@ -15,18 +15,13 @@ public inherited sharing class VolunteerStanding {
 	private static Boolean extending = false;
 
 	/** After save: extends the schedules of the sign-ups that became standing. */
-	public static void extendFor(
-		List<Volunteer_Signup__c> signups,
-		Map<Id, Volunteer_Signup__c> previousById
-	) {
+	public static void extendFor(List<Volunteer_Signup__c> signups, Map<Id, Volunteer_Signup__c> previousById) {
 		if (extending) {
 			return;
 		}
 		Set<Id> shiftIds = new Set<Id>();
 		for (Volunteer_Signup__c signup : signups) {
-			Volunteer_Signup__c previous = previousById == null
-				? null
-				: previousById.get(signup.Id);
+			Volunteer_Signup__c previous = previousById == null ? null : previousById.get(signup.Id);
 			if (signup.Standing__c == true && (previous == null || previous.Standing__c != true)) {
 				shiftIds.add(signup.Volunteer_Shift__c);
 			}
@@ -103,18 +98,11 @@ public inherited sharing class VolunteerStanding {
 		}
 		List<Volunteer_Signup__c> copies = new List<Volunteer_Signup__c>();
 		for (Volunteer_Signup__c last : latest.values()) {
-			if (
-				last.Standing__c != true ||
-				last.Status__c == VolunteerSignupService.STATUS_CANCELLED
-			) {
+			if (last.Standing__c != true || last.Status__c == VolunteerSignupService.STATUS_CANCELLED) {
 				continue;
 			}
 			Id person = last.Contact__c != null ? last.Contact__c : last.Account__c;
-			for (
-				Volunteer_Shift__c shift : comingBySchedule.get(
-					last.Volunteer_Shift__r.Shift_Schedule__c
-				)
-			) {
+			for (Volunteer_Shift__c shift : comingBySchedule.get(last.Volunteer_Shift__r.Shift_Schedule__c)) {
 				if (
 					shift.Start_Time__c > last.Volunteer_Shift__r.Start_Time__c &&
 					!booked.contains(person + ':' + shift.Id)
@@ -143,11 +131,7 @@ public inherited sharing class VolunteerStanding {
 		Integer saved = 0;
 		extending = true;
 		try {
-			List<Database.SaveResult> results = Database.insert(
-				copies,
-				false,
-				AccessLevel.SYSTEM_MODE
-			);
+			List<Database.SaveResult> results = Database.insert(copies, false, AccessLevel.SYSTEM_MODE);
 			for (Database.SaveResult result : results) {
 				saved += result.isSuccess() ? 1 : 0;
 			}

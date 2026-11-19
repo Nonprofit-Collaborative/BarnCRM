@@ -10,9 +10,7 @@ private class VolunteersRecordGlanceExtensionTest {
 	}
 
 	private static Map<String, Object> view(RecordGlance.Card card) {
-		return card == null
-			? null
-			: (Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(card));
+		return card == null ? null : (Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(card));
 	}
 
 	@IsTest
@@ -21,9 +19,7 @@ private class VolunteersRecordGlanceExtensionTest {
 			Contact person = VolunteersTestData.contacts(1)[0];
 
 			Test.startTest();
-			Map<String, Object> card = view(
-				new VolunteersRecordGlanceExtension().glance(person.Id)
-			);
+			Map<String, Object> card = view(new VolunteersRecordGlanceExtension().glance(person.Id));
 			Test.stopTest();
 
 			Assert.isNotNull(card, 'An admin sees the card');
@@ -54,28 +50,19 @@ private class VolunteersRecordGlanceExtensionTest {
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
 			Account organization = AccountKindsTestData.organization('Glance Hardware');
 			insert organization;
-			Assert.isNull(
-				new VolunteersRecordGlanceExtension().glance(organization.Id),
-				'Hours belong to a person'
-			);
+			Assert.isNull(new VolunteersRecordGlanceExtension().glance(organization.Id), 'Hours belong to a person');
 		}
 	}
 
 	@IsTest
 	static void someoneWithoutVolunteersAccessGetsNoCard() {
-		User reader = TestUsers.peopleReaderWith(
-			'GlanceVolReader',
-			new List<String>{ 'BarnCRM_Read_Only' }
-		);
+		User reader = TestUsers.peopleReaderWith('GlanceVolReader', new List<String>{ 'BarnCRM_Read_Only' });
 		Contact person;
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
 			person = VolunteersTestData.contacts(1)[0];
 		}
 		System.runAs(reader) {
-			Assert.isNull(
-				new VolunteersRecordGlanceExtension().glance(person.Id),
-				'No Volunteers access, no card'
-			);
+			Assert.isNull(new VolunteersRecordGlanceExtension().glance(person.Id), 'No Volunteers access, no card');
 		}
 	}
 }

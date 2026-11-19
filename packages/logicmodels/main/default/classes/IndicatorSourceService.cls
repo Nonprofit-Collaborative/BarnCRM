@@ -76,9 +76,7 @@ public with sharing class IndicatorSourceService {
 			definition.field = textOf(raw.get('field'));
 			definition.dateLabel = textOf(raw.get('dateLabel'));
 			definition.fieldLabel = textOf(raw.get('fieldLabel'));
-			return String.isBlank(definition.dateField) || !FUNCTIONS.contains(definition.function)
-				? null
-				: definition;
+			return String.isBlank(definition.dateField) || !FUNCTIONS.contains(definition.function) ? null : definition;
 		} catch (Exception unreadable) {
 			return null;
 		}
@@ -93,9 +91,7 @@ public with sharing class IndicatorSourceService {
 	 */
 	public static List<Map<String, String>> queries() {
 		List<Map<String, String>> options = new List<Map<String, String>>();
-		if (
-			!Saved_Query__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()
-		) {
+		if (!Saved_Query__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
 			return options;
 		}
 		for (Saved_Query__c query : [
@@ -176,9 +172,7 @@ public with sharing class IndicatorSourceService {
 		Id indicatorId = Id.valueOf(textOf(fields.get('id')));
 		String source = textOf(fields.get('source'));
 		if (!SOURCES.contains(source)) {
-			throw new LogicModelService.BuilderException(
-				BarnHelp.text('LogicModels', 'LogicModels_Source_Invalid')
-			);
+			throw new LogicModelService.BuilderException(BarnHelp.text('LogicModels', 'LogicModels_Source_Invalid'));
 		}
 		Indicator__c change = new Indicator__c(
 			Id = indicatorId,
@@ -210,10 +204,7 @@ public with sharing class IndicatorSourceService {
 	 * @param indicatorId the indicator
 	 */
 	public static void refresh(Id indicatorId) {
-		if (
-			!Indicator_Period__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-				.isUpdateable()
-		) {
+		if (!Indicator_Period__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isUpdateable()) {
 			throw new LogicModelService.BuilderException(
 				BarnHelp.text('LogicModels', 'LogicModels_Source_CannotRefresh')
 			);
@@ -263,9 +254,7 @@ public with sharing class IndicatorSourceService {
 	 */
 	public static void check(String objectName, Definition definition) {
 		if (definition == null || !FUNCTIONS.contains(definition.function)) {
-			throw new LogicModelService.BuilderException(
-				BarnHelp.text('LogicModels', 'LogicModels_Source_Invalid')
-			);
+			throw new LogicModelService.BuilderException(BarnHelp.text('LogicModels', 'LogicModels_Source_Invalid'));
 		}
 		Schema.DescribeFieldResult dateField = resolve(objectName, definition.dateField);
 		if (!DATES.contains(dateField.getType()) || !dateField.isFilterable()) {
@@ -282,9 +271,7 @@ public with sharing class IndicatorSourceService {
 		}
 		Schema.DescribeFieldResult measured = resolve(objectName, definition.field);
 		definition.fieldLabel = measured.getLabel();
-		Boolean fits = definition.function == SUM
-			? NUMBERS.contains(measured.getType())
-			: measured.isGroupable();
+		Boolean fits = definition.function == SUM ? NUMBERS.contains(measured.getType()) : measured.isGroupable();
 		if (!fits) {
 			throw new LogicModelService.BuilderException(
 				String.format(
@@ -299,9 +286,7 @@ public with sharing class IndicatorSourceService {
 
 	private static Schema.DescribeFieldResult resolve(String objectName, String path) {
 		if (String.isBlank(path)) {
-			throw new LogicModelService.BuilderException(
-				BarnHelp.text('LogicModels', 'LogicModels_Source_Invalid')
-			);
+			throw new LogicModelService.BuilderException(BarnHelp.text('LogicModels', 'LogicModels_Source_Invalid'));
 		}
 		try {
 			return QueryCompiler.resolve(objectName, path);

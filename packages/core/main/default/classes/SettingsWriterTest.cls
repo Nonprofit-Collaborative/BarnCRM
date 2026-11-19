@@ -12,10 +12,7 @@ private class SettingsWriterTest {
 			User maria = SettingsTestPermissions.buildStandardUser('Maria', 'Alvarez', 'mariaw');
 			User david = SettingsTestPermissions.buildStandardUser('David', 'Okonkwo', 'davidw');
 			insert new List<User>{ maria, david };
-			insert new PermissionSetAssignment(
-				AssigneeId = maria.Id,
-				PermissionSetId = permissionSet.Id
-			);
+			insert new PermissionSetAssignment(AssigneeId = maria.Id, PermissionSetId = permissionSet.Id);
 		}
 	}
 
@@ -40,10 +37,7 @@ private class SettingsWriterTest {
 			}
 			Test.stopTest();
 
-			Assert.isTrue(
-				saved,
-				'Maria holds the permission and is not an administrator, and she saves'
-			);
+			Assert.isTrue(saved, 'Maria holds the permission and is not an administrator, and she saves');
 			Assert.areEqual(
 				'The {LastName} Family',
 				BarnCRM_Settings__c.getOrgDefaults().Household_Name_Pattern__c,
@@ -136,11 +130,7 @@ private class SettingsWriterTest {
 				FROM BarnCRM_Settings__c
 				WHERE Id = :stored.Id
 			];
-			Assert.areEqual(
-				'{LastName} Household',
-				saved.Household_Name_Pattern__c,
-				'Her key is saved'
-			);
+			Assert.areEqual('{LastName} Household', saved.Household_Name_Pattern__c, 'Her key is saved');
 			Assert.isFalse(
 				saved.Relationship_Auto_Reciprocal__c,
 				'And the key the other administrator saved is not written back from her copy'
@@ -149,8 +139,6 @@ private class SettingsWriterTest {
 	}
 
 	private static Map<Schema.SObjectField, Object> patternChange(String pattern) {
-		return new Map<Schema.SObjectField, Object>{
-			BarnCRM_Settings__c.Household_Name_Pattern__c => pattern
-		};
+		return new Map<Schema.SObjectField, Object>{ BarnCRM_Settings__c.Household_Name_Pattern__c => pattern };
 	}
 }

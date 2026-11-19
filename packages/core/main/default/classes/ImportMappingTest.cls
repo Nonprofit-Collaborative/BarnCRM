@@ -55,10 +55,7 @@ private class ImportMappingTest {
 		Assert.areEqual('Contact1', ImportMapping.entityOf('Contact1.Email'), 'Entity half.');
 		Assert.areEqual('Email', ImportMapping.attributeOf('Contact1.Email'), 'Attribute half.');
 		Assert.isNull(ImportMapping.entityOf('Email'), 'A target with no dot names no entity.');
-		Assert.isNull(
-			ImportMapping.attributeOf('Contact1.'),
-			'Nor does one with nothing after it.'
-		);
+		Assert.isNull(ImportMapping.attributeOf('Contact1.'), 'Nor does one with nothing after it.');
 	}
 
 	@IsTest
@@ -80,10 +77,7 @@ private class ImportMappingTest {
 			mapping.ignoredSourceKeys(),
 			'Only a column explicitly set to Do not load, keyed as a header row is matched.'
 		);
-		Assert.isFalse(
-			mapping.targetsBySourceKey().containsKey('email'),
-			'Loading a row still leaves it out.'
-		);
+		Assert.isFalse(mapping.targetsBySourceKey().containsKey('email'), 'Loading a row still leaves it out.');
 	}
 
 	@IsTest
@@ -190,11 +184,7 @@ private class ImportMappingTest {
 			'With their lookups.'
 		);
 		Assert.areEqual(new Set<String>{ 'code__c' }, sessions.clearingAttributes(), 'Clears.');
-		Assert.areEqual(
-			1,
-			mapping.forEntity('Course__c').transformsBySourceKey().get('course').size(),
-			'And changes.'
-		);
+		Assert.areEqual(1, mapping.forEntity('Course__c').transformsBySourceKey().get('course').size(), 'And changes.');
 		Assert.isFalse(new ImportMapping().loadsSeveralObjects(), 'None by default.');
 	}
 }

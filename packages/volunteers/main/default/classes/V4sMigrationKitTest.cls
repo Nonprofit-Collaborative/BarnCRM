@@ -11,12 +11,7 @@ private class V4sMigrationKitTest {
 		TestUsers.adminWith('Volunteers_Admin');
 	}
 
-	private static final List<String> STEPS = new List<String>{
-		'jobs',
-		'shifts',
-		'signups',
-		'hours'
-	};
+	private static final List<String> STEPS = new List<String>{ 'jobs', 'shifts', 'signups', 'hours' };
 
 	@IsTest
 	static void eachStepHasItsTemplateAndLinksBackwards() {
@@ -42,19 +37,11 @@ private class V4sMigrationKitTest {
 					WHERE Template_Key__c = :step.templateKey
 					WITH SYSTEM_MODE
 				];
-				Assert.isTrue(
-					template.Target_Object__c.startsWith('Volunteer_'),
-					key + ' loads one Volunteers object'
-				);
+				Assert.isTrue(template.Target_Object__c.startsWith('Volunteer_'), key + ' loads one Volunteers object');
 				Set<String> extra = key == V4sMigrationKit.SHIFTS
 					? new Set<String>{ V4sMigrationKit.END_COLUMN, V4sMigrationKit.STATUS_COLUMN }
 					: new Set<String>();
-				for (
-					ImportMapping.Column column : ImportMapping.parse(
-							template.Column_Mapping_JSON__c
-						)
-						.getColumns()
-				) {
+				for (ImportMapping.Column column : ImportMapping.parse(template.Column_Mapping_JSON__c).getColumns()) {
 					String heading = column.getSource();
 					Assert.isTrue(
 						extra.contains(heading) || step.fields.contains(heading),
@@ -80,11 +67,7 @@ private class V4sMigrationKitTest {
 			'a shift with no length is one hour'
 		);
 		Assert.areEqual('', V4sMigrationKit.endOf(null, 2), 'no start, no end');
-		Assert.areEqual(
-			'Completed',
-			V4sMigrationKit.statusOf(starts, starts.addDays(1)),
-			'past shift'
-		);
+		Assert.areEqual('Completed', V4sMigrationKit.statusOf(starts, starts.addDays(1)), 'past shift');
 		Assert.areEqual('Open', V4sMigrationKit.statusOf(starts, starts.addDays(-1)), 'future');
 	}
 
@@ -92,10 +75,7 @@ private class V4sMigrationKitTest {
 	static void theShiftsStepIsRefusedWithoutV4sAndLongShiftsRoundToMinutes() {
 		System.runAs(TestUsers.adminWith('Volunteers_Admin')) {
 			try {
-				Assert.isNotNull(
-					new V4sMigrationKit().rows(V4sMigrationKit.SHIFTS, new List<SObject>()),
-					'staged'
-				);
+				Assert.isNotNull(new V4sMigrationKit().rows(V4sMigrationKit.SHIFTS, new List<SObject>()), 'staged');
 			} catch (Exception refused) {
 				Assert.isTrue(
 					refused.getMessage().contains('this org does not have'),
@@ -126,10 +106,7 @@ private class V4sMigrationKitTest {
 				'GW_Volunteers.Start_Date_Time__c' => JSON.serialize(starts).remove('"'),
 				'GW_Volunteers.Duration__c' => '2'
 			},
-			new Map<String, Object>{
-				'GW_Volunteers.Start_Date_Time__c' => '',
-				'GW_Volunteers.Duration__c' => ''
-			}
+			new Map<String, Object>{ 'GW_Volunteers.Start_Date_Time__c' => '', 'GW_Volunteers.Duration__c' => '' }
 		};
 		V4sMigrationKit.shapeShifts(rows);
 		Assert.areEqual(

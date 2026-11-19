@@ -50,12 +50,12 @@ private class PersonSameNameControllerTest {
 				new Household_Member__c(
 					Household__c = household.Id,
 					Contact__c = inside.Id,
-					Start_Date__c = Date.today()
+					Start_Date__c = OrgDate.today()
 				),
 				new Household_Member__c(
 					Household__c = other.Id,
 					Contact__c = outside.Id,
-					Start_Date__c = Date.today()
+					Start_Date__c = OrgDate.today()
 				)
 			};
 
@@ -80,14 +80,8 @@ private class PersonSameNameControllerTest {
 	@IsTest
 	static void aShortOrMissingLastNameAsksNothing() {
 		System.runAs(TestUsers.admin()) {
-			Assert.isTrue(
-				PersonSameNameController.findSameName('Ana', 'G', null).isEmpty(),
-				'One letter is too short'
-			);
-			Assert.isTrue(
-				PersonSameNameController.findSameName('Ana', null, null).isEmpty(),
-				'No last name, no hint'
-			);
+			Assert.isTrue(PersonSameNameController.findSameName('Ana', 'G', null).isEmpty(), 'One letter is too short');
+			Assert.isTrue(PersonSameNameController.findSameName('Ana', null, null).isEmpty(), 'No last name, no hint');
 		}
 	}
 
@@ -99,11 +93,7 @@ private class PersonSameNameControllerTest {
 			insert HouseholdTestDataFactory.newContact('Ana', 'Okafor');
 
 			Test.startTest();
-			List<PersonSameNameController.Match> matches = PersonSameNameController.findSameName(
-				'',
-				'Okafor',
-				null
-			);
+			List<PersonSameNameController.Match> matches = PersonSameNameController.findSameName('', 'Okafor', null);
 			Test.stopTest();
 
 			Assert.areEqual(1, matches.size(), 'The last name alone matches');

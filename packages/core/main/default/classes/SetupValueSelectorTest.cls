@@ -36,17 +36,11 @@ private class SetupValueSelectorTest {
 	@IsTest
 	static void onlyTheListedValuesAreShown() {
 		System.runAs(TestUsers.admin()) {
-			Assert.isTrue(
-				SetupValueSelector.supports('Organization', 'name'),
-				'Capitals do not matter'
-			);
+			Assert.isTrue(SetupValueSelector.supports('Organization', 'name'), 'Capitals do not matter');
 			Assert.isFalse(SetupValueSelector.supports('Organization', 'Phone'), 'Not listed');
 			Assert.isFalse(SetupValueSelector.supports('Account', 'Name'), 'Not the org');
 			Assert.isFalse(SetupValueSelector.supports(null, 'Name'), 'No object');
-			Assert.isNull(
-				SetupValueSelector.valueOf('Organization', 'Phone'),
-				'An unlisted key reads as nothing'
-			);
+			Assert.isNull(SetupValueSelector.valueOf('Organization', 'Phone'), 'An unlisted key reads as nothing');
 		}
 	}
 }

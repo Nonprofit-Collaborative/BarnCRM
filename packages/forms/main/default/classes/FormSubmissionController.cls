@@ -45,6 +45,8 @@ public with sharing class FormSubmissionController {
 				SELECT
 					Id,
 					Form__r.Name,
+					Form_Name__c,
+					Form_Version__c,
 					Form_Version__r.Definition__c,
 					Status__c,
 					Message__c,
@@ -60,11 +62,13 @@ public with sharing class FormSubmissionController {
 			Form_Submission__c submission = found[0];
 			SubmissionView view = new SubmissionView();
 			view.id = submission.Id;
-			view.formName = submission.Form__r.Name;
+			// A deleted form leaves the name stored with the submission (R-FS8).
+			view.formName = submission.Form__r?.Name ?? submission.Form_Name__c;
 			view.status = submission.Status__c;
 			view.message = submission.Message__c;
 			view.canProcess =
 				submission.Status__c != FormSubmitService.PROCESSED &&
+				submission.Form_Version__c != null &&
 				Schema.SObjectType.Form_Submission__c.isUpdateable();
 			view.answers = rows(submission);
 			if (String.isNotBlank(submission.Outcome__c)) {

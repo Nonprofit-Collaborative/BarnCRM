@@ -5,10 +5,7 @@ private class MessagingEmailSenderTest {
 		System.runAs(TestUsers.admin()) {
 			MessagingEmailSender sender = new MessagingEmailSender();
 			Assert.isTrue(sender.send(null).isEmpty(), 'No messages, no answers');
-			Assert.isTrue(
-				sender.send(new List<Messaging.SingleEmailMessage>()).isEmpty(),
-				'An empty list is the same'
-			);
+			Assert.isTrue(sender.send(new List<Messaging.SingleEmailMessage>()).isEmpty(), 'An empty list is the same');
 
 			Messaging.SingleEmailMessage noRecipient = new Messaging.SingleEmailMessage();
 			noRecipient.setSubject('Thank you');

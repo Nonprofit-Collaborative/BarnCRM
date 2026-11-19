@@ -33,10 +33,7 @@ public class SettingsTestPermissions {
 		insert permissionSet;
 		List<CustomPermission> permissions = getCustomPermissions();
 		if (!permissions.isEmpty()) {
-			insert new SetupEntityAccess(
-				ParentId = permissionSet.Id,
-				SetupEntityId = permissions[0].Id
-			);
+			insert new SetupEntityAccess(ParentId = permissionSet.Id, SetupEntityId = permissions[0].Id);
 		}
 		insert new ObjectPermissions(
 			ParentId = permissionSet.Id,
@@ -50,9 +47,7 @@ public class SettingsTestPermissions {
 				new FieldPermissions(
 					ParentId = permissionSet.Id,
 					SobjectType = String.valueOf(Setting_Change__c.SObjectType),
-					Field = String.valueOf(Setting_Change__c.SObjectType) +
-						'.' +
-						NamespaceUtil.qualify(field),
+					Field = String.valueOf(Setting_Change__c.SObjectType) + '.' + NamespaceUtil.qualify(field),
 					PermissionsRead = true,
 					PermissionsEdit = true
 				)

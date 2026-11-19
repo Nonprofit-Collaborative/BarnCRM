@@ -21,14 +21,8 @@ private class GrantFinderTest {
 		}
 		public HttpResponse respond(HttpRequest request) {
 			Assert.areEqual(GrantFinder.ENDPOINT, request.getEndpoint(), 'The public search API');
-			Map<String, Object> sent = (Map<String, Object>) JSON.deserializeUntyped(
-				request.getBody()
-			);
-			Assert.areEqual(
-				'posted|forecasted',
-				sent.get('oppStatuses'),
-				'Only known statuses are sent'
-			);
+			Map<String, Object> sent = (Map<String, Object>) JSON.deserializeUntyped(request.getBody());
+			Assert.areEqual('posted|forecasted', sent.get('oppStatuses'), 'Only known statuses are sent');
 			HttpResponse response = new HttpResponse();
 			response.setStatusCode(status);
 			response.setBody(body);
@@ -39,10 +33,7 @@ private class GrantFinderTest {
 	@TestSetup
 	static void createTestUsers() {
 		TestUsers.adminWith(GrantTestData.ADMIN);
-		TestUsers.standardUserWith(
-			'Gfreader',
-			new List<String>{ 'BarnCRM_Read_Only', 'Funders_Read_Only' }
-		);
+		TestUsers.standardUserWith('Gfreader', new List<String>{ 'BarnCRM_Read_Only', 'Funders_Read_Only' });
 	}
 
 	private static final List<String> BOTH = new List<String>{ 'Posted', 'forecasted', 'archived' };
@@ -62,18 +53,10 @@ private class GrantFinderTest {
 			Test.stopTest();
 
 			Assert.areEqual(2, listings.size(), 'Both hits');
-			Assert.areEqual(
-				Date.newInstance(2027, 3, 31),
-				listings[0].closeDate,
-				'MM/DD/YYYY read'
-			);
+			Assert.areEqual(Date.newInstance(2027, 3, 31), listings[0].closeDate, 'MM/DD/YYYY read');
 			Assert.isNull(listings[1].closeDate, 'No date');
 			Assert.areEqual('HHS', listings[1].agency, 'The agency code when no name');
-			Assert.areEqual(
-				GrantFinder.LISTING_PAGE + '350001',
-				listings[0].url,
-				'Its Grants.gov page'
-			);
+			Assert.areEqual(GrantFinder.LISTING_PAGE + '350001', listings[0].url, 'Its Grants.gov page');
 			Assert.areEqual(grantId, again, 'Saved once');
 			Assert.areEqual(grantId, marked[0].grantId, 'Marked saved');
 			Grant__c grant = [
@@ -91,18 +74,10 @@ private class GrantFinderTest {
 			];
 			Assert.areEqual('Literacy Grants', grant.Name, 'The title');
 			Assert.areEqual('Prospect', grant.Stage__c, 'A prospect');
-			Assert.areEqual(
-				Date.newInstance(2027, 3, 31),
-				grant.Application_Deadline__c,
-				'The close date'
-			);
+			Assert.areEqual(Date.newInstance(2027, 3, 31), grant.Application_Deadline__c, 'The close date');
 			Assert.areEqual('Federal', grant.Funding_Source__c, 'Federal');
 			Assert.areEqual('84.287', grant.Assistance_Listing_Number__c, 'The listing number');
-			Assert.areEqual(
-				'Department of Education',
-				grant.Funder__r.Name,
-				'A funder of the agency name'
-			);
+			Assert.areEqual('Department of Education', grant.Funder__r.Name, 'A funder of the agency name');
 
 			GrantFinder.Listing forecast = listings[1];
 			Id second = GrantFinder.save(forecast);
@@ -150,9 +125,7 @@ private class GrantFinderTest {
 		System.runAs(TestUsers.adminWith(GrantTestData.ADMIN)) {
 			OrgSettingsSystemWriter.save(
 				Funders_Settings__c.SObjectType,
-				new Map<Schema.SObjectField, Object>{
-					Funders_Settings__c.Grant_Finder_Enabled__c => false
-				}
+				new Map<Schema.SObjectField, Object>{ Funders_Settings__c.Grant_Finder_Enabled__c => false }
 			);
 			SettingsService.clearCaches();
 			Boolean refused = false;
@@ -182,10 +155,7 @@ private class GrantFinderTest {
 				refused = true;
 			}
 			Test.stopTest();
-			Assert.isFalse(
-				(Boolean) GrantFinderController.getStatus().get('canSave'),
-				'No Save to Pipeline'
-			);
+			Assert.isFalse((Boolean) GrantFinderController.getStatus().get('canSave'), 'No Save to Pipeline');
 			Assert.isTrue(refused, 'Saving is refused');
 		}
 	}

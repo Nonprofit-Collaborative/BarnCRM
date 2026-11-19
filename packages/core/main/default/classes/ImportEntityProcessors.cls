@@ -83,8 +83,7 @@ public with sharing class ImportEntityProcessors {
 
 	/** Whether records of this type name the import that created them, and have a Name. */
 	private static Boolean carriesTheTag(Schema.SObjectType type) {
-		Map<String, Schema.SObjectField> fields = type.getDescribe(SObjectDescribeOptions.DEFERRED)
-			.fields.getMap();
+		Map<String, Schema.SObjectField> fields = type.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap();
 		Schema.SObjectField tag = fields.get(NamespaceUtil.qualify(TAG_FIELD));
 		return tag != null &&
 			fields.containsKey('name') &&

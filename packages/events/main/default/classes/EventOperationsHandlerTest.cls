@@ -2,9 +2,7 @@
  * Dana keeps the conference center as a venue with its rooms, picks it on a batch of events and
  * picks rooms on sessions (EV-24, R-EVN1).
  */
-@IsTest(
-	testFor='ApexClass:EventOperationsHandler, ApexTrigger:EventTrigger, ApexTrigger:EventSessionTrigger'
-)
+@IsTest(testFor='ApexClass:EventOperationsHandler, ApexTrigger:EventTrigger, ApexTrigger:EventSessionTrigger')
 private class EventOperationsHandlerTest {
 	@TestSetup
 	static void createTestUser() {
@@ -30,10 +28,7 @@ private class EventOperationsHandlerTest {
 	@IsTest
 	static void fillsBlankVenueFieldsForABatchAndKeepsTypedOnes() {
 		System.runAs(staff()) {
-			Event_Venue__c venue = new Event_Venue__c(
-				Name = 'Riverside Center',
-				Venue_Address__c = '1 Main St'
-			);
+			Event_Venue__c venue = new Event_Venue__c(Name = 'Riverside Center', Venue_Address__c = '1 Main St');
 			insert as user venue;
 			List<Event__c> events = new List<Event__c>();
 			for (Integer i = 0; i < 200; i++) {
@@ -76,16 +71,8 @@ private class EventOperationsHandlerTest {
 		System.runAs(staff()) {
 			Event_Venue__c venue = new Event_Venue__c(Name = 'Riverside Center');
 			insert as user venue;
-			Event_Room__c roomA = new Event_Room__c(
-				Venue__c = venue.Id,
-				Name = 'Room A',
-				Capacity__c = 40
-			);
-			Event_Room__c roomB = new Event_Room__c(
-				Venue__c = venue.Id,
-				Name = 'Room B',
-				Capacity__c = 90
-			);
+			Event_Room__c roomA = new Event_Room__c(Venue__c = venue.Id, Name = 'Room A', Capacity__c = 40);
+			Event_Room__c roomB = new Event_Room__c(Venue__c = venue.Id, Name = 'Room B', Capacity__c = 90);
 			insert as user new List<Event_Room__c>{ roomA, roomB };
 			Event__c record = event('Summit', venue.Id);
 			insert as user record;
@@ -115,11 +102,7 @@ private class EventOperationsHandlerTest {
 			];
 			update as user new Event_Session__c(Id = open.Id, Venue_Room__c = roomB.Id);
 			Test.stopTest();
-			Assert.areEqual(
-				'Typed Room',
-				kept.Room__c,
-				'An unchanged room record keeps typed text'
-			);
+			Assert.areEqual('Typed Room', kept.Room__c, 'An unchanged room record keeps typed text');
 			Map<Id, Event_Session__c> saved = new Map<Id, Event_Session__c>(
 				[
 					SELECT Room__c, Capacity__c

@@ -84,11 +84,7 @@ public without sharing class RecordRetentionBatch implements Database.Batchable<
 
 	/** As a step of the nightly run: starts the first pass. */
 	public void execute(SchedulableContext context) {
-		AsyncStarter.batch(
-			new RecordRetentionBatch(SETTING_CHANGES),
-			CHUNK_SIZE,
-			'RecordRetentionBatch'
-		);
+		AsyncStarter.batch(new RecordRetentionBatch(SETTING_CHANGES), CHUNK_SIZE, 'RecordRetentionBatch');
 	}
 
 	/** The step: twenty past one. No switch. The import row cleanup is its pass 7. */
@@ -108,19 +104,13 @@ public without sharing class RecordRetentionBatch implements Database.Batchable<
 
 	public void execute(Database.BatchableContext context, List<SObject> scope) {
 		List<String> failures = new List<String>();
-		for (
-			Database.DeleteResult result : Database.delete(scope, false, AccessLevel.SYSTEM_MODE)
-		) {
+		for (Database.DeleteResult result : Database.delete(scope, false, AccessLevel.SYSTEM_MODE)) {
 			if (!result.isSuccess()) {
 				failures.add(result.getId() + ': ' + result.getErrors()[0].getMessage());
 			}
 		}
 		if (!failures.isEmpty()) {
-			ErrorLogger.logMessage(
-				String.join(failures, '\n').left(30000),
-				LOG_CONTEXT,
-				ErrorLogger.SEVERITY_WARNING
-			);
+			ErrorLogger.logMessage(String.join(failures, '\n').left(30000), LOG_CONTEXT, ErrorLogger.SEVERITY_WARNING);
 		}
 	}
 
@@ -146,7 +136,10 @@ public without sharing class RecordRetentionBatch implements Database.Batchable<
 		if (pass == SETTING_CHANGES) {
 			return 'SELECT Id FROM Setting_Change__c WHERE Changed_At__c < :cutoff ORDER BY Changed_At__c';
 		} else if (pass == MERGE_JOURNAL) {
-			return 'SELECT Id FROM Merge_Journal__c WHERE CreatedDate < :cutoff ORDER BY CreatedDate';
+			// Merge rows only: the Admin Journal's other kinds are kept until deleted.
+			return 'SELECT Id FROM Merge_Journal__c WHERE Kind__c = \'' +
+				AutoMergeService.KIND_MERGE +
+				'\' AND CreatedDate < :cutoff ORDER BY CreatedDate';
 		} else if (pass == IMPORT_JOURNAL) {
 			return 'SELECT Id FROM Import_Journal__c WHERE ' + batchDone;
 		} else if (pass == IMPORT_ROWS) {

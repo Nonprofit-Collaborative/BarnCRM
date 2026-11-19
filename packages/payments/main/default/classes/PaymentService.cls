@@ -91,11 +91,6 @@ public with sharing class PaymentService {
 		return s == null ? new Payments_Settings__c() : s;
 	}
 
-	public static Payment_Keys__c keys() {
-		Payment_Keys__c k = Payment_Keys__c.getOrgDefaults();
-		return k == null ? new Payment_Keys__c() : k;
-	}
-
 	public static String mode() {
 		return settings().Mode__c == LIVE ? LIVE : TEST;
 	}
@@ -104,15 +99,56 @@ public with sharing class PaymentService {
 		return settings().Processor__c == PAYPAL ? PAYPAL : STRIPE;
 	}
 
-	/** True when every key the processor needs is entered. */
+	/**
+	 * True when the processor is connected: Check Connection on Payments Setup reached it through
+	 * its Named Credential (R-PK1), and for PayPal the webhook id is entered. No secret is read.
+	 */
 	public static Boolean isReady(String processor) {
-		Payment_Keys__c k = keys();
+		Payments_Settings__c s = settings();
 		return processor == PAYPAL
-			? String.isNotBlank(k.PayPal_Client_Id__c) &&
-			  String.isNotBlank(k.PayPal_Client_Secret__c) &&
-			  String.isNotBlank(k.PayPal_Webhook_Id__c)
-			: String.isNotBlank(k.Stripe_Secret_Key__c) &&
-			  String.isNotBlank(k.Stripe_Webhook_Secret__c);
+			? s.PayPal_Connected__c == true && String.isNotBlank(s.PayPal_Webhook_Id__c)
+			: s.Stripe_Connected__c == true;
+	}
+
+	// ---- The receiver's address token (pre-batch review M1) ----
+
+	/** The token a processor's post must carry; made and saved on first need, or replaced. */
+	public static String webhookToken(Boolean replace) {
+		Payments_Settings__c s = settings();
+		if (replace == true || String.isBlank(s.Webhook_Token__c)) {
+			s.SetupOwnerId = UserInfo.getOrganizationId();
+			s.Webhook_Token__c = EncodingUtil.convertToHex(Crypto.generateAesKey(256));
+			upsert as system s;
+		}
+		return s.Webhook_Token__c;
+	}
+
+	/** True when the post's token is the saved one; every character is compared, so timing tells nothing. */
+	public static Boolean tokenMatches(String given) {
+		String saved = settings().Webhook_Token__c;
+		if (String.isBlank(saved) || given == null) {
+			return false;
+		}
+		Integer wrong = Math.abs(given.length() - saved.length());
+		for (Integer i = 0; i < saved.length(); i++) {
+			if (i >= given.length() || given.charAt(i) != saved.charAt(i)) {
+				wrong++;
+			}
+		}
+		return wrong == 0;
+	}
+
+	/** Records a refusal at the hourly cap; true for the first one in an hour (the one to log). */
+	public static Boolean noteCapHit() {
+		Payments_Settings__c s = settings();
+		Datetime now = Datetime.now();
+		if (s.Webhook_Cap_Hit_At__c != null && s.Webhook_Cap_Hit_At__c > now.addHours(-1)) {
+			return false;
+		}
+		s.SetupOwnerId = UserInfo.getOrganizationId();
+		s.Webhook_Cap_Hit_At__c = now;
+		upsert as system s;
+		return true;
 	}
 
 	// ---- Starting a checkout ----
@@ -132,9 +168,7 @@ public with sharing class PaymentService {
 		String description = text(args, 'description');
 		String successUrl = text(args, 'successUrl');
 		String cancelUrl = text(args, 'cancelUrl');
-		String processor = String.isBlank(text(args, 'processor'))
-			? defaultProcessor()
-			: text(args, 'processor');
+		String processor = String.isBlank(text(args, 'processor')) ? defaultProcessor() : text(args, 'processor');
 		String currencyCode = (String.isBlank(text(args, 'currency'))
 				? (settings().Currency__c ?? 'USD')
 				: text(args, 'currency'))
@@ -155,9 +189,7 @@ public with sharing class PaymentService {
 			throw problem(BarnHelp.text('Payments', 'Payments_Error_BadCurrency'));
 		}
 		if (!isReady(processor)) {
-			throw problem(
-				BarnHelp.text('Payments', 'Payments_Error_NotReady', new List<Object>{ processor })
-			);
+			throw problem(BarnHelp.text('Payments', 'Payments_Error_NotReady', new List<Object>{ processor }));
 		}
 		Payment__c payment = new Payment__c(
 			Status__c = PENDING,
@@ -190,9 +222,7 @@ public with sharing class PaymentService {
 			}
 		} catch (CalloutException e) {
 			ErrorLogger.log(e, CONTEXT + '.startCheckout');
-			throw problem(
-				BarnHelp.text('Payments', 'Payments_Error_Processor', new List<Object>{ processor })
-			);
+			throw problem(BarnHelp.text('Payments', 'Payments_Error_Processor', new List<Object>{ processor }));
 		}
 		Database.insert(payment, AccessLevel.SYSTEM_MODE);
 		return payment;
@@ -214,9 +244,7 @@ public with sharing class PaymentService {
 			throw problem(BarnHelp.text('Payments', 'Payments_Error_BadUrl'));
 		}
 		if (!isReady(processor)) {
-			throw problem(
-				BarnHelp.text('Payments', 'Payments_Error_NotReady', new List<Object>{ processor })
-			);
+			throw problem(BarnHelp.text('Payments', 'Payments_Error_NotReady', new List<Object>{ processor }));
 		}
 		if (processor == PAYPAL) {
 			return mode() == LIVE ? PaymentPayPal.AUTOPAY : PaymentPayPal.AUTOPAY_TEST;
@@ -225,9 +253,7 @@ public with sharing class PaymentService {
 			return PaymentStripe.updateCardUrl(customer, subscription, back);
 		} catch (CalloutException e) {
 			ErrorLogger.log(e, CONTEXT + '.updateCard');
-			throw problem(
-				BarnHelp.text('Payments', 'Payments_Error_Processor', new List<Object>{ processor })
-			);
+			throw problem(BarnHelp.text('Payments', 'Payments_Error_Processor', new List<Object>{ processor }));
 		}
 	}
 
@@ -459,10 +485,7 @@ public with sharing class PaymentService {
 			System.Savepoint before = Database.setSavepoint();
 			try {
 				((Callable) NamespaceUtil.build(name, Callable.class, CONTEXT + '.notify'))
-					?.call(
-						'subscriptionsChanged',
-						new Map<String, Object>{ 'changes' => news.get(name) }
-					);
+					?.call('subscriptionsChanged', new Map<String, Object>{ 'changes' => news.get(name) });
 			} catch (Exception e) {
 				Database.rollback(before);
 				ErrorLogger.log(e, CONTEXT + '.notify');
@@ -495,10 +518,7 @@ public with sharing class PaymentService {
 	private static Payment__c match(List<Payment__c> found, Change change) {
 		Payment__c first;
 		for (Payment__c p : found) {
-			if (
-				change.processorPaymentId != null &&
-				p.Processor_Payment_Id__c == change.processorPaymentId
-			) {
+			if (change.processorPaymentId != null && p.Processor_Payment_Id__c == change.processorPaymentId) {
 				return p;
 			}
 			if (
@@ -623,11 +643,7 @@ public with sharing class PaymentService {
 			List<Payment__c> mine = byListener.get(name);
 			Callable listener;
 			try {
-				listener = (Callable) NamespaceUtil.build(
-					name,
-					Callable.class,
-					CONTEXT + '.notify'
-				);
+				listener = (Callable) NamespaceUtil.build(name, Callable.class, CONTEXT + '.notify');
 			} catch (Exception e) {
 				ErrorLogger.log(e, CONTEXT + '.notify', mine[0].Id);
 			}
@@ -642,12 +658,7 @@ public with sharing class PaymentService {
 			}
 			System.Savepoint before = Database.setSavepoint();
 			try {
-				if (
-					listener.call(
-						'paymentsChanged',
-						new Map<String, Object>{ 'payments' => told }
-					) == true
-				) {
+				if (listener.call('paymentsChanged', new Map<String, Object>{ 'payments' => told }) == true) {
 					continue;
 				}
 			} catch (Exception e) {

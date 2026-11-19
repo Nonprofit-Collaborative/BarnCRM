@@ -35,9 +35,7 @@ private class RollupQueueTest {
 		List<Account> parents = new List<Account>();
 		for (Integer i = 0; i < count; i++) {
 			parents.add(
-				TestDataFactory.organization(
-					new Account(Name = 'Parent ' + i, RecordTypeId = organizationType())
-				)
+				TestDataFactory.organization(new Account(Name = 'Parent ' + i, RecordTypeId = organizationType()))
 			);
 		}
 		insert parents;
@@ -45,11 +43,7 @@ private class RollupQueueTest {
 		for (Account parent : parents) {
 			children.add(
 				TestDataFactory.organization(
-					new Account(
-						Name = parent.Name + ' child',
-						RecordTypeId = organizationType(),
-						ParentId = parent.Id
-					)
+					new Account(Name = parent.Name + ' child', RecordTypeId = organizationType(), ParentId = parent.Id)
 				)
 			);
 		}
@@ -114,11 +108,7 @@ private class RollupQueueTest {
 			// their entry merges into the first slice; the two entries that do not fit wait for
 			// the next run, which a test cannot run.
 			List<Rollup_Queue__c> left = entries();
-			Assert.areEqual(
-				2,
-				left.size(),
-				'Records with no totals to write are finished and their entries deleted'
-			);
+			Assert.areEqual(2, left.size(), 'Records with no totals to write are finished and their entries deleted');
 			Decimal stillWaiting = 0;
 			for (Rollup_Queue__c entry : left) {
 				stillWaiting += entry.Record_Count__c;
@@ -147,10 +137,7 @@ private class RollupQueueTest {
 				'The run recalculated them'
 			);
 			Assert.isTrue(entries().isEmpty(), 'And finished every entry');
-			Assert.isTrue(
-				RollupQueue.emptiedForTest >= 1,
-				'Every finished entry is emptied from the bin'
-			);
+			Assert.isTrue(RollupQueue.emptiedForTest >= 1, 'Every finished entry is emptied from the bin');
 		}
 	}
 
@@ -174,11 +161,7 @@ private class RollupQueueTest {
 			List<Rollup_Queue__c> left = entries();
 			Assert.areEqual(1, left.size(), 'Its records are queued again');
 			Assert.areNotEqual(held[0].Id, left[0].Id, 'In a new entry, charged an attempt');
-			Assert.areEqual(
-				1,
-				RollupQueue.emptiedForTest,
-				'The emptied entry is emptied from the bin'
-			);
+			Assert.areEqual(1, RollupQueue.emptiedForTest, 'The emptied entry is emptied from the bin');
 		}
 	}
 
@@ -229,11 +212,7 @@ private class RollupQueueTest {
 
 			RollupQueue.Slice slice = RollupQueue.take(due, 4);
 
-			Assert.areEqual(
-				4,
-				slice.idsByTarget.get('Account').size(),
-				'Two entries, four records'
-			);
+			Assert.areEqual(4, slice.idsByTarget.get('Account').size(), 'Two entries, four records');
 			Assert.areEqual(2, slice.finished.size(), 'Both merged entries are finished');
 			Assert.areEqual(0, slice.attemptsByTarget.get('Account'), 'None tried yet');
 			Assert.isTrue(slice.remainders.isEmpty(), 'Nothing split');
@@ -252,12 +231,12 @@ private class RollupQueueTest {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			List<Id> ids = new List<Id>(fakeAccountIds(3));
 			Id gifts = Id.valueOf(
-				Rollup_Definition__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-					.getKeyPrefix() + '000000000001'
+				Rollup_Definition__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() +
+				'000000000001'
 			);
 			Id softCredits = Id.valueOf(
-				Rollup_Definition__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-					.getKeyPrefix() + '000000000002'
+				Rollup_Definition__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() +
+				'000000000002'
 			);
 			List<Rollup_Queue__c> named = new List<Rollup_Queue__c>{
 				new Rollup_Queue__c(
@@ -281,13 +260,7 @@ private class RollupQueueTest {
 				'The union of what the entries name'
 			);
 
-			named.add(
-				new Rollup_Queue__c(
-					Target_Object__c = 'Account',
-					Record_Ids__c = ids[2],
-					Attempts__c = 0
-				)
-			);
+			named.add(new Rollup_Queue__c(Target_Object__c = 'Account', Record_Ids__c = ids[2], Attempts__c = 0));
 			Assert.isNull(
 				RollupQueue.take(named, 200).definitionIdsFor('Account'),
 				'An entry naming none runs every definition'
@@ -299,8 +272,8 @@ private class RollupQueueTest {
 	static void anEntryNamesTheDefinitionsThatQueuedIt() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			Id gifts = Id.valueOf(
-				Rollup_Definition__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-					.getKeyPrefix() + '000000000001'
+				Rollup_Definition__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() +
+				'000000000001'
 			);
 
 			Test.startTest();
@@ -379,15 +352,8 @@ private class RollupQueueTest {
 			Assert.areEqual(1, charged[0].Attempts__c, 'One attempt charged');
 			Assert.areEqual(RollupQueue.STATUS_PENDING, charged[0].Status__c, 'Tried again later');
 			Assert.isTrue(charged[0].Next_Attempt__c > Datetime.now(), 'After a pause');
-			Assert.isTrue(
-				charged[0].Last_Error__c.contains('Apex CPU time limit exceeded'),
-				'With the reason'
-			);
-			Assert.areEqual(
-				RollupQueue.STATUS_FAILED,
-				charged[1].Status__c,
-				'Fifth attempt: Failed'
-			);
+			Assert.isTrue(charged[0].Last_Error__c.contains('Apex CPU time limit exceeded'), 'With the reason');
+			Assert.areEqual(RollupQueue.STATUS_FAILED, charged[1].Status__c, 'Fifth attempt: Failed');
 		}
 	}
 
@@ -398,19 +364,14 @@ private class RollupQueueTest {
 			Assert.isTrue(RollupQueue.nextAttempt(1) >= now.addMinutes(2), 'Two minutes first');
 			Assert.isTrue(RollupQueue.nextAttempt(2) >= now.addMinutes(4), 'Then four');
 			Assert.isTrue(RollupQueue.nextAttempt(4) >= now.addMinutes(16), 'Then sixteen');
-			Assert.isTrue(
-				RollupQueue.nextAttempt(9) < now.addMinutes(17),
-				'Never longer than the last'
-			);
+			Assert.isTrue(RollupQueue.nextAttempt(9) < now.addMinutes(17), 'Never longer than the last');
 		}
 	}
 
 	@IsTest
 	static void anEntryIdThatIsNotAnIdIsDropped() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			List<Id> ids = RollupQueue.idsOf(
-				new Rollup_Queue__c(Record_Ids__c = '001000000000001, nonsense')
-			);
+			List<Id> ids = RollupQueue.idsOf(new Rollup_Queue__c(Record_Ids__c = '001000000000001, nonsense'));
 			Assert.areEqual(1, ids.size(), 'Only the identifier is kept');
 		}
 	}
@@ -598,10 +559,7 @@ private class RollupQueueTest {
 			RollupQueue.readStampInTests = true;
 			RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(5) });
 			Assert.areEqual(1, processorsQueued(), 'Nothing recent, so it queues one');
-			Assert.isNotNull(
-				Rollup_Settings__c.getOrgDefaults().Processor_Requested_At__c,
-				'And stamps when'
-			);
+			Assert.isNotNull(Rollup_Settings__c.getOrgDefaults().Processor_Requested_At__c, 'And stamps when');
 
 			RollupQueue.newTransactionForTest();
 			Integer queriesBefore = Limits.getQueries();
@@ -611,8 +569,7 @@ private class RollupQueueTest {
 			Assert.areEqual(1, RollupQueue.readyEventsPublished, 'The subscriber checks exactly');
 
 			RollupQueue.newTransactionForTest();
-			RollupQueue.requestedAtForTest = Datetime.now()
-				.addMinutes(-RollupQueue.REQUEST_FRESH_MINUTES - 1);
+			RollupQueue.requestedAtForTest = Datetime.now().addMinutes(-RollupQueue.REQUEST_FRESH_MINUTES - 1);
 			RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(5) });
 			Assert.areEqual(2, processorsQueued(), 'Old: the one asked for may be gone');
 			Test.stopTest();

@@ -33,8 +33,9 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 NS = "http://soap.sforce.com/2006/04/metadata"
 # The module folders whose app a capped org does not get: the five module apps added on
-# 2026-11-13 (Event Management, Forms, Portal Builder, Corporate Hub, Project Management).
-LEFT_OUT = ("events", "forms", "portal", "corporatehub", "projects")
+# 2026-11-13 (Event Management, Forms, Portal Builder, Corporate Hub, Project Management) and
+# the two added on 2026-11-14 (Memberships, Scholarships and Outbound Grants).
+LEFT_OUT = ("events", "forms", "portal", "corporatehub", "projects", "memberships", "scholarships")
 CAPPED_ORG_APP_BUDGET = 9
 BLOCK = re.compile(r"  <applicationVisibilities>(.*?)</applicationVisibilities>\n", re.S)
 APP = re.compile(r"<application>([^<]*)</application>")

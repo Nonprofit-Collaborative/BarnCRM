@@ -81,24 +81,11 @@ private class PortalDataTest {
 			Assert.areEqual('Pat', menu.get('firstName'), 'Greets the person');
 			Assert.areEqual(2, ((List<Object>) menu.get('pages')).size(), 'Two pages');
 			List<Object> rows = (List<Object>) roles.get('records');
-			Assert.areEqual(
-				1,
-				rows.size(),
-				'Only their current role, not the former one or anyone else'
-			);
-			Map<String, Object> values = (Map<String, Object>) ((Map<String, Object>) rows[0])
-				.get('values');
-			Assert.areEqual(
-				'Zzdata Foundation',
-				values.get('Organization__r.Name'),
-				'A parent field is read'
-			);
+			Assert.areEqual(1, rows.size(), 'Only their current role, not the former one or anyone else');
+			Map<String, Object> values = (Map<String, Object>) ((Map<String, Object>) rows[0]).get('values');
+			Assert.areEqual('Zzdata Foundation', values.get('Organization__r.Name'), 'A parent field is read');
 			List<Object> people = (List<Object>) profile.get('records');
-			Assert.areEqual(
-				f.pat.Id,
-				((Map<String, Object>) people[0]).get('id'),
-				'Their own record'
-			);
+			Assert.areEqual(f.pat.Id, ((Map<String, Object>) people[0]).get('id'), 'Their own record');
 			Assert.isNull(menu.get('brand'), 'No brand while brands are off');
 		}
 	}
@@ -111,26 +98,17 @@ private class PortalDataTest {
 			settings.Brand_Management__c = true;
 			upsert settings;
 			SettingsService.clearCaches();
-			Brand__c thrift = new Brand__c(
-				Name = 'Barn Thrift',
-				Primary_Color__c = '#1B5E20',
-				City__c = 'Shelbyville'
-			);
+			Brand__c thrift = new Brand__c(Name = 'Barn Thrift', Primary_Color__c = '#1B5E20', City__c = 'Shelbyville');
 			insert thrift;
 			f.session.portal.Brand__c = thrift.Id;
 
 			Test.startTest();
-			Map<String, Object> brand = (Map<String, Object>) PortalData.describe(f.session)
-				.get('brand');
+			Map<String, Object> brand = (Map<String, Object>) PortalData.describe(f.session).get('brand');
 			Test.stopTest();
 
 			Assert.areEqual('Barn Thrift', brand.get('name'), 'The brand name');
 			Assert.areEqual('#1B5E20', brand.get('primaryColor'), 'The brand color');
-			Assert.areEqual(
-				new List<String>{ 'Shelbyville' },
-				brand.get('address'),
-				'The address lines'
-			);
+			Assert.areEqual(new List<String>{ 'Shelbyville' }, brand.get('address'), 'The address lines');
 		}
 	}
 
@@ -140,59 +118,20 @@ private class PortalDataTest {
 			Fixture f = fixture();
 
 			Test.startTest();
-			PortalData.save(
-				f.session,
-				'profile',
-				f.pat.Id,
-				new Map<String, Object>{ 'MobilePhone' => '555-0100' }
-			);
-			PortalData.save(
-				f.session,
-				'roles',
-				f.current.Id,
-				new Map<String, Object>{ 'Role__c' => 'Team Captain' }
-			);
+			PortalData.save(f.session, 'profile', f.pat.Id, new Map<String, Object>{ 'MobilePhone' => '555-0100' });
+			PortalData.save(f.session, 'roles', f.current.Id, new Map<String, Object>{ 'Role__c' => 'Team Captain' });
 			List<String> refusals = new List<String>{
-				refusal(
-					f.session,
-					'profile',
-					f.pat.Id,
-					new Map<String, Object>{ 'FirstName' => 'Mallory' }
-				),
-				refusal(
-					f.session,
-					'roles',
-					f.othersRole.Id,
-					new Map<String, Object>{ 'Role__c' => 'Mine' }
-				),
-				refusal(
-					f.session,
-					'roles',
-					f.former.Id,
-					new Map<String, Object>{ 'Role__c' => 'Back' }
-				),
+				refusal(f.session, 'profile', f.pat.Id, new Map<String, Object>{ 'FirstName' => 'Mallory' }),
+				refusal(f.session, 'roles', f.othersRole.Id, new Map<String, Object>{ 'Role__c' => 'Mine' }),
+				refusal(f.session, 'roles', f.former.Id, new Map<String, Object>{ 'Role__c' => 'Back' }),
 				refusal(f.session, 'roles', null, new Map<String, Object>{ 'Role__c' => 'New' }),
-				refusal(
-					f.session,
-					'roles',
-					f.current.Id,
-					new Map<String, Object>{ 'Role__c' => '' }
-				),
-				refusal(
-					f.session,
-					'profile',
-					f.other.Id,
-					new Map<String, Object>{ 'MobilePhone' => '1' }
-				),
+				refusal(f.session, 'roles', f.current.Id, new Map<String, Object>{ 'Role__c' => '' }),
+				refusal(f.session, 'profile', f.other.Id, new Map<String, Object>{ 'MobilePhone' => '1' }),
 				refusal(f.session, 'nope', f.pat.Id, new Map<String, Object>())
 			};
 			Test.stopTest();
 
-			Assert.areEqual(
-				'555-0100',
-				[SELECT MobilePhone FROM Contact WHERE Id = :f.pat.Id].MobilePhone,
-				'Saved'
-			);
+			Assert.areEqual('555-0100', [SELECT MobilePhone FROM Contact WHERE Id = :f.pat.Id].MobilePhone, 'Saved');
 			Assert.areEqual(
 				'Team Captain',
 				[SELECT Role__c FROM Affiliation__c WHERE Id = :f.current.Id].Role__c,
@@ -200,11 +139,7 @@ private class PortalDataTest {
 			);
 			Assert.areEqual('not_allowed', refusals[0], 'A read-only field is refused');
 			Assert.areEqual('not_found', refusals[1], 'Someone else\'s record is not there');
-			Assert.areEqual(
-				'not_found',
-				refusals[2],
-				'A record outside the page tests is not there'
-			);
+			Assert.areEqual('not_found', refusals[2], 'A record outside the page tests is not there');
 			Assert.areEqual('not_allowed', refusals[3], 'The page does not create');
 			Assert.areEqual('required_missing', refusals[4], 'A required field stays filled');
 			Assert.areEqual('not_found', refusals[5], 'Another person is not their record');
@@ -242,16 +177,9 @@ private class PortalDataTest {
 
 			Assert.areEqual('Thanks sent', message, 'The module answered');
 			Assert.areEqual(1, PortalTestModule.ran.size(), 'Run once, for their own record');
-			Assert.isTrue(
-				PortalTestModule.ran[0].contains(String.valueOf(f.pat.Id)),
-				'For the verified person'
-			);
+			Assert.isTrue(PortalTestModule.ran[0].contains(String.valueOf(f.pat.Id)), 'For the verified person');
 			Assert.areEqual('not_found', refusedOnOthers, 'Never on someone else\'s record');
-			Assert.areEqual(
-				'action_failed',
-				failed,
-				'A module refusal is reported, not its detail'
-			);
+			Assert.areEqual('action_failed', failed, 'A module refusal is reported, not its detail');
 		}
 	}
 
@@ -275,15 +203,11 @@ private class PortalDataTest {
 	}
 
 	private static void addScopedPage(Fixture f, Map<String, Object> scope) {
-		Map<String, Object> template = (Map<String, Object>) JSON.deserializeUntyped(
-			PortalTestData.template()
-		);
+		Map<String, Object> template = (Map<String, Object>) JSON.deserializeUntyped(PortalTestData.template());
 		Map<String, Object> page = PortalTestData.scopedPage(scope);
 		page.put(
 			'actions',
-			new List<Object>{
-				new Map<String, Object>{ 'extension' => 'Test.Thanks', 'label' => 'Say Thanks' }
-			}
+			new List<Object>{ new Map<String, Object>{ 'extension' => 'Test.Thanks', 'label' => 'Say Thanks' } }
 		);
 		((List<Object>) template.get('pages')).add(page);
 		f.session.portal.Template__c = JSON.serialize(template);
@@ -317,9 +241,7 @@ private class PortalDataTest {
 	static void aScopedCatalogShowsOnlyRecordsTiedToThePerson() {
 		System.runAs(TestUsers.adminWith('Portal_Admin')) {
 			Fixture f = fixture();
-			Account elsewhere = TestDataFactory.organization(
-				new Account(Name = 'Zzdata Elsewhere')
-			);
+			Account elsewhere = TestDataFactory.organization(new Account(Name = 'Zzdata Elsewhere'));
 			insert elsewhere;
 			Affiliation__c stranger = new Affiliation__c(
 				Contact__c = f.other.Id,
@@ -333,30 +255,18 @@ private class PortalDataTest {
 
 			Test.startTest();
 			Map<String, Object> page = PortalData.read(f.session, 'colleagues');
-			String onColleague = PortalData.runAction(
-				f.session,
-				'colleagues',
-				f.othersRole.Id,
-				'Test.Thanks'
-			);
+			String onColleague = PortalData.runAction(f.session, 'colleagues', f.othersRole.Id, 'Test.Thanks');
 			String onStranger;
 			try {
 				PortalData.runAction(f.session, 'colleagues', stranger.Id, 'Test.Thanks');
 			} catch (PortalAuth.RefusalException refused) {
 				onStranger = refused.getMessage();
 			}
-			Map<String, Object> noScope = PortalTestData.scope(
-				'Organization__c',
-				'Organization__c'
-			);
+			Map<String, Object> noScope = PortalTestData.scope('Organization__c', 'Organization__c');
 			noScope.put(
 				'where',
 				new List<Object>{
-					new Map<String, Object>{
-						'field' => 'Role__c',
-						'op' => 'equals',
-						'value' => 'Nobody'
-					}
+					new Map<String, Object>{ 'field' => 'Role__c', 'op' => 'equals', 'value' => 'Nobody' }
 				}
 			);
 			addScopedPage(f, noScope);
@@ -365,9 +275,7 @@ private class PortalDataTest {
 
 			Set<Object> roles = new Set<Object>();
 			for (Object row : (List<Object>) page.get('records')) {
-				roles.add(
-					((Map<String, Object>) ((Map<String, Object>) row).get('values')).get('Role__c')
-				);
+				roles.add(((Map<String, Object>) ((Map<String, Object>) row).get('values')).get('Role__c'));
 			}
 			Assert.areEqual(
 				new Set<Object>{ 'Volunteer', 'Chair' },
@@ -376,11 +284,7 @@ private class PortalDataTest {
 			);
 			Assert.areEqual('Thanks sent', onColleague, 'An action on a record in scope');
 			Assert.areEqual('not_found', onStranger, 'Never on a record outside the scope');
-			Assert.areEqual(
-				0,
-				((List<Object>) empty.get('records')).size(),
-				'An empty scope shows nothing'
-			);
+			Assert.areEqual(0, ((List<Object>) empty.get('records')).size(), 'An empty scope shows nothing');
 			Assert.areEqual(true, page.get('download'), 'Download CSV is offered');
 			Assert.areEqual(
 				'Start_Date__c',
@@ -396,18 +300,9 @@ private class PortalDataTest {
 	static void coercesValuesToTheFieldType() {
 		System.runAs(TestUsers.adminWith('Portal_Admin')) {
 			Test.startTest();
-			Object day = PortalData.coerce(
-				Schema.SObjectType.Contact.fields.Birthdate,
-				'2001-02-03'
-			);
-			Object off = PortalData.coerce(
-				Schema.SObjectType.Affiliation__c.fields.Is_Primary__c,
-				null
-			);
-			Object staff = PortalData.coerce(
-				Schema.SObjectType.Account.fields.NumberOfEmployees,
-				'12'
-			);
+			Object day = PortalData.coerce(Schema.SObjectType.Contact.fields.Birthdate, '2001-02-03');
+			Object off = PortalData.coerce(Schema.SObjectType.Affiliation__c.fields.Is_Primary__c, null);
+			Object staff = PortalData.coerce(Schema.SObjectType.Account.fields.NumberOfEmployees, '12');
 			String bad;
 			try {
 				PortalData.coerce(Schema.SObjectType.Affiliation__c.fields.Status__c, 'Invented');

@@ -60,9 +60,7 @@ public with sharing class PreferredPhoneService {
 
 	/** The choice as the picklist shows it, which may differ from its stored value. */
 	private static String labelOf(String preference) {
-		for (
-			Schema.PicklistEntry entry : Schema.SObjectType.Contact.fields.Preferred_Phone__c.getPicklistValues()
-		) {
+		for (Schema.PicklistEntry entry : Schema.SObjectType.Contact.fields.Preferred_Phone__c.getPicklistValues()) {
 			if (entry.getValue() == preference) {
 				return entry.getLabel();
 			}

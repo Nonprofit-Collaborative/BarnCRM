@@ -63,12 +63,7 @@ public with sharing class FieldUtilizationHistory {
 	}
 
 	/** One person's saves between two times, told apart by Taken At. */
-	private static List<Run> split(
-		String objectName,
-		Id savedBy,
-		Datetime firstAt,
-		Datetime lastAt
-	) {
+	private static List<Run> split(String objectName, Id savedBy, Datetime firstAt, Datetime lastAt) {
 		Map<Datetime, Run> byTakenAt = new Map<Datetime, Run>();
 		for (
 			Field_Utilization_Snapshot__c row : FieldUtilizationSelector.rowsBetween(

@@ -65,10 +65,7 @@ private class SampleDataFileTest {
 				'A ref is the Id of the record of that key'
 			);
 			Assert.areEqual(UserInfo.getUserId(), byName.get('Sample second').Query_JSON__c);
-			Assert.isNull(
-				byName.get('Sample optional').Object_Name__c,
-				'An optional link is blank'
-			);
+			Assert.isNull(byName.get('Sample optional').Object_Name__c, 'An optional link is blank');
 
 			SampleDataModule module = SampleDataFile.find(FILE);
 			Assert.areEqual('Testing', module.moduleName());
@@ -97,22 +94,13 @@ private class SampleDataFileTest {
 			Assert.areEqual(0, [SELECT COUNT() FROM Saved_Query__c], 'Every sample row went');
 			Assert.isFalse(SampleDataFile.find(FILE).hasSampleRecords());
 
-			Saved_Query__c kept = new Saved_Query__c(
-				Name = 'Sample kept',
-				Object_Name__c = 'Contact'
-			);
+			Saved_Query__c kept = new Saved_Query__c(Name = 'Sample kept', Object_Name__c = 'Contact');
 			insert kept;
-			String message = SampleDataFile.logKept(
-				'Testing',
-				new Map<Id, String>{ kept.Id => 'Saved_Query__c' }
-			);
+			String message = SampleDataFile.logKept('Testing', new Map<Id, String>{ kept.Id => 'Saved_Query__c' });
 			Assert.isTrue(message.contains('Sample kept'), 'The Warning names the kept record');
 			// The entry travels as a platform event; after stopTest it must be delivered.
 			Test.getEventBus().deliver();
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'SampleDataFile']
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'SampleDataFile']);
 			Assert.isNull(SampleDataFile.logKept('Testing', new Map<Id, String>()));
 		}
 	}

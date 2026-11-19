@@ -1,6 +1,6 @@
 # Commitments: Pledges and Recurring Gifts
 
-**Feature:** G-07 and G-11 | **Package:** Giving | **Iteration:** v0.3
+**Feature:** G-07 and G-11 | **Package:** Fundraising | **Iteration:** v0.3
 
 ## What It Does
 
@@ -16,7 +16,7 @@ to a spreadsheet.
 
 ## How to Turn It On
 
-Commitments come with the Giving module. When Giving is on, the Commitments and
+Commitments come with the Fundraising module. When Fundraising is on, the Commitments and
 Scheduled Payments tabs are in the app and no further step is required. Scheduled Payments
 is the tab for the payment (Installment) records; only its label changed, and its API name
 is still `Installment__c`.
@@ -44,7 +44,7 @@ form, which is where **Day of Month** is set. To put the standard New form back,
 and choose **No override**.
 
 Three settings control how the schedules behave. Open **BarnCRM Settings** and choose
-**Giving**; they sit in that section alongside the default fund and appeal:
+**Fundraising**; they sit in that section alongside the default fund and appeal:
 
 | Setting | What it does | Default |
 |---|---|---|
@@ -62,11 +62,10 @@ runs. This is the step that makes a payment turn Overdue on its own.
 
 Open **BarnCRM Settings**, choose **General**, and find the **Nightly Jobs** panel
 ([BarnCRM Nightly Jobs](nightly-jobs.md), the one nightly run). It lists every module's steps,
-Giving's five among them, each on its own row. Four of the five ship on and the pledge
+Fundraising's five among them, each on its own row. Four of the five ship on and the pledge
 reminders ship off; the steps run only once the nightly run is scheduled, so choose
 **Schedule Nightly Jobs** on the panel if it says the run is not scheduled. **Turn On** or **Turn Off** on a
-row switches that one job and leaves the others as they were (1.23, D-200; the Giving Nightly
-Jobs page that switched all five together is retired).
+row switches that one job and leaves the others as they were (D-200).
 
 | Job | Runs at | What it does |
 |---|---|---|
@@ -113,7 +112,7 @@ changed; the schedules simply stop being extended, or payments stop turning Over
 Scheduling, switching and Run Now need the **Manage BarnCRM Settings** permission, which
 comes with the BarnCRM Admin permission set. The jobs run as the person who scheduled the
 nightly run and reach only the commitments that person can see and edit, so schedule it as a
-system administrator. Commitments are private, like gifts, and Giving Admin does not give View
+system administrator. Commitments are private, like gifts, and Fundraising Admin does not give View
 All on them (see [Access](access.md)). Somebody without that permission can open the panel and
 see whether the jobs are running; the buttons are not shown.
 
@@ -237,7 +236,7 @@ Erasing a person is not a delete either, so it works with an open pledge: the pl
 credited to the anonymized record.
 
 **A commitment somebody cannot find.** Commitments are private: a person sees the ones they
-own and the ones your role hierarchy or sharing settings give them, and Giving Admin adds
+own and the ones your role hierarchy or sharing settings give them, and Fundraising Admin adds
 nothing to that, exactly as for gifts. If a fundraiser cannot find a pledge a colleague
 entered, give them a role above the owner, add a sharing rule, or use **Sharing** on the
 commitment.

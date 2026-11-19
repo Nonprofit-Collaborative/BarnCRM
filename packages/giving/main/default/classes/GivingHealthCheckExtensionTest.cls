@@ -8,10 +8,7 @@
 @IsTest(testFor='ApexClass:GivingHealthCheckExtension')
 private class GivingHealthCheckExtensionTest {
 	private static User jen() {
-		return TestDataFactory.createUser(
-			'Jen',
-			new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
-		);
+		return TestDataFactory.createUser('Jen', new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' });
 	}
 
 	/**
@@ -27,11 +24,7 @@ private class GivingHealthCheckExtensionTest {
 	static void makeData() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GivingTestDataFactory.insertDefaultFund();
-			Contact ana = GivingTestDataFactory.insertHouseholdContact(
-				'The Nolan Family',
-				'Ana',
-				'Nolan'
-			);
+			Contact ana = GivingTestDataFactory.insertHouseholdContact('The Nolan Family', 'Ana', 'Nolan');
 			Gift__c gift = GivingTestDataFactory.buildGift(ana.Id, 250);
 			gift.Gift_Date__c = Date.today().toStartOfMonth().addDays(-1);
 			insert gift;
@@ -52,8 +45,7 @@ private class GivingHealthCheckExtensionTest {
 			GivingTestDataFactory.closeBooksThrough(Date.today().toStartOfMonth().addDays(-1));
 			User jen = jen();
 			System.runAs(jen) {
-				List<HealthCheckService.Finding> findings = new GivingHealthCheckExtension()
-					.findings();
+				List<HealthCheckService.Finding> findings = new GivingHealthCheckExtension().findings();
 
 				System.assertEquals(1, findings.size());
 				System.assertEquals('unposted_gifts_closed_period', asMap(findings[0]).get('key'));

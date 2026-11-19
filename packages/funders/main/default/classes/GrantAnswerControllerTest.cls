@@ -11,10 +11,7 @@ private class GrantAnswerControllerTest {
 	@TestSetup
 	static void createTestUsers() {
 		TestUsers.adminWith(STAFF);
-		TestUsers.standardUserWith(
-			READER,
-			new List<String>{ 'BarnCRM_Read_Only', 'Funders_Read_Only' }
-		);
+		TestUsers.standardUserWith(READER, new List<String>{ 'BarnCRM_Read_Only', 'Funders_Read_Only' });
 	}
 
 	private static List<Grant_Answer__c> answers() {
@@ -24,11 +21,7 @@ private class GrantAnswerControllerTest {
 				Topics__c = 'Need',
 				Answer__c = 'Half read below grade level.'
 			),
-			new Grant_Answer__c(
-				Name = 'Mission',
-				Topics__c = 'Mission, Organization',
-				Answer__c = 'We teach reading.'
-			),
+			new Grant_Answer__c(Name = 'Mission', Topics__c = 'Mission, Organization', Answer__c = 'We teach reading.'),
 			new Grant_Answer__c(Name = 'Blank draft', Topics__c = 'Budget')
 		};
 		insert as user rows;
@@ -36,8 +29,7 @@ private class GrantAnswerControllerTest {
 	}
 
 	private static Date lastUsed(Id answerId) {
-		return [SELECT Last_Used_Date__c FROM Grant_Answer__c WHERE Id = :answerId WITH SYSTEM_MODE]
-		.Last_Used_Date__c;
+		return [SELECT Last_Used_Date__c FROM Grant_Answer__c WHERE Id = :answerId WITH SYSTEM_MODE].Last_Used_Date__c;
 	}
 
 	@IsTest
@@ -97,11 +89,7 @@ private class GrantAnswerControllerTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Funders', 'Funders_Answers_ErrorStamp'),
-				message,
-				'Reported plainly'
-			);
+			Assert.areEqual(BarnHelp.text('Funders', 'Funders_Answers_ErrorStamp'), message, 'Reported plainly');
 		}
 	}
 }

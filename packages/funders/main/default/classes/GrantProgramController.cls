@@ -57,8 +57,7 @@ public with sharing class GrantProgramController {
 			}
 			card.programId = grants[0].Program_Id__c;
 			card.available = GrantService.programsAvailable();
-			card.canEdit =
-				card.available && Schema.SObjectType.Grant__c.fields.Program_Id__c.isUpdateable();
+			card.canEdit = card.available && Schema.SObjectType.Grant__c.fields.Program_Id__c.isUpdateable();
 			if (!card.available) {
 				return card;
 			}
@@ -80,9 +79,7 @@ public with sharing class GrantProgramController {
 	@AuraEnabled
 	public static void setProgram(Id grantId, String programId) {
 		if (!Schema.SObjectType.Grant__c.fields.Program_Id__c.isUpdateable()) {
-			throw UserErrors.message(
-				BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission')
-			);
+			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission'));
 		}
 		try {
 			GrantService.setProgram(grantId, programId);

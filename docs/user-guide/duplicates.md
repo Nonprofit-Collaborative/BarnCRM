@@ -20,7 +20,7 @@ Ask your admin; see [Duplicates](../admin-guide/duplicates.md).
 4. Confirm the merge.
 
 You should see: one person. This is Salesforce's own merge: it keeps the activities and files
-of both (and, with Giving, their gifts). Salesforce lets you merge people only if you may
+of both (and, with Fundraising, their gifts). Salesforce lets you merge people only if you may
 delete people. The staff roles do not include that on purpose, so if you cannot, ask your
 admin. Merging two households with **Merge or Split** needs no such permission.
 
@@ -124,9 +124,8 @@ is never blocked, and the pair is reported for your admin's review list.
 - Problem: "You can see this list. Scanning, dismissing and merging here need the Manage
   BarnCRM Settings permission." Only admins act from the list. Merge people from their own
   page and households with **Merge or Split**.
-- Problem: there is no **Duplicate Matching** tab, or no **Duplicates** section on **Org
-  Optimizer** where you used to find it. The list moved to the **Duplicate Matching** tab, which
-  is for admins and holders of the BarnCRM Duplicate Review add-on. Ask your admin, or use the
+- Problem: there is no **Duplicate Matching** tab. The list of possible duplicates is on the
+  **Duplicate Matching** tab, which is for admins and holders of the BarnCRM Duplicate Review add-on. Ask your admin, or use the
   **Potential Duplicates** card on the person.
 - Problem: **No Possible Duplicates**, "No possible duplicates are waiting. Scan again after a
   large import." Nothing to review. Ask your admin to scan after an import.

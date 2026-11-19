@@ -14,11 +14,7 @@ private class GivingSampleDataCoverageTest {
 
 	private static void insertSamplePerson() {
 		Account household = TestDataFactory.household(
-			new Account(
-				Name = 'The Sample Family',
-				Sample_Data__c = true,
-				Sample_Data_Key__c = 'H001'
-			)
+			new Account(Name = 'The Sample Family', Sample_Data__c = true, Sample_Data_Key__c = 'H001')
 		);
 		insert household;
 		insert TestDataFactory.person(
@@ -44,9 +40,7 @@ private class GivingSampleDataCoverageTest {
 			'acknowledgmentStatus' => 'Acknowledged',
 			'paymentReference' => 'Check 1001',
 			'commitment' => null,
-			'allocations' => new List<Object>{
-				new Map<String, Object>{ 'fund' => 'General Fund', 'amount' => amount }
-			}
+			'allocations' => new List<Object>{ new Map<String, Object>{ 'fund' => 'General Fund', 'amount' => amount } }
 		};
 	}
 
@@ -95,16 +89,8 @@ private class GivingSampleDataCoverageTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GivingSampleData module = new GivingSampleData();
 
-			Assert.areEqual(
-				GivingSampleData.MODULE_NAME,
-				module.moduleName(),
-				'Core finds it by name'
-			);
-			Assert.areEqual(
-				System.Label.Core_Import_KindGiftsTitle,
-				module.countLabel(),
-				'It counts gifts'
-			);
+			Assert.areEqual(GivingSampleData.MODULE_NAME, module.moduleName(), 'Core finds it by name');
+			Assert.areEqual(System.Label.Core_Import_KindGiftsTitle, module.countLabel(), 'It counts gifts');
 			Assert.areEqual(0, module.countLoaded(), 'Nothing is loaded yet');
 			Assert.areEqual(
 				0,
@@ -133,10 +119,7 @@ private class GivingSampleDataCoverageTest {
 				);
 				resolved = true;
 			}
-			Assert.isTrue(
-				resolved,
-				'Either the shipped payload is read or the absence is explained'
-			);
+			Assert.isTrue(resolved, 'Either the shipped payload is read or the absence is explained');
 		}
 	}
 
@@ -157,11 +140,7 @@ private class GivingSampleDataCoverageTest {
 				[SELECT COUNT() FROM Fund__c WHERE Sample_Data__c = TRUE],
 				'The first job loads the funds'
 			);
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Appeal__c WHERE Sample_Data__c = TRUE],
-				'And the appeals'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Appeal__c WHERE Sample_Data__c = TRUE], 'And the appeals');
 		}
 	}
 
@@ -230,11 +209,7 @@ private class GivingSampleDataCoverageTest {
 			}
 
 			Assert.isTrue(failed, 'The failure is passed on to the stage batch, which logs it');
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Fund__c WHERE Sample_Data__c = TRUE],
-				'Nothing loaded'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Fund__c WHERE Sample_Data__c = TRUE], 'Nothing loaded');
 		}
 	}
 }

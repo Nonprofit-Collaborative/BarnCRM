@@ -109,13 +109,7 @@ private class RollupLargeParentBatchTest {
 
 	private static List<Rollup_Queue__c> entries() {
 		return [
-			SELECT
-				Record_Ids__c,
-				Record_Count__c,
-				Status__c,
-				Attempts__c,
-				Next_Attempt__c,
-				Last_Error__c
+			SELECT Record_Ids__c, Record_Count__c, Status__c, Attempts__c, Next_Attempt__c, Last_Error__c
 			FROM Rollup_Queue__c
 			WITH SYSTEM_MODE
 			ORDER BY CreatedDate, Id
@@ -144,10 +138,7 @@ private class RollupLargeParentBatchTest {
 	 * Calculates these definitions for the parent in one transaction, then again through the
 	 * batch three source rows a chunk, and asserts the two give the same totals.
 	 */
-	private static void assertBatchMatchesEngine(
-		List<Rollup_Definition__c> definitions,
-		Id parentId
-	) {
+	private static void assertBatchMatchesEngine(List<Rollup_Definition__c> definitions, Id parentId) {
 		insert definitions;
 		delete [SELECT Id FROM Rollup_Queue__c];
 		RollupEngine.recalculate(new Set<Id>{ parentId }, definitions);
@@ -161,8 +152,7 @@ private class RollupLargeParentBatchTest {
 		);
 		delete [SELECT Id FROM Rollup_Queue__c];
 
-		RollupLargeParentBatch.forEntries(new List<Rollup_Queue__c>{ entryFor(parentId, 0) })
-			.runInline(3);
+		RollupLargeParentBatch.forEntries(new List<Rollup_Queue__c>{ entryFor(parentId, 0) }).runInline(3);
 
 		Account actual = totalsOf(parentId);
 		Assert.areEqual(expected.NumberOfEmployees, actual.NumberOfEmployees, 'Number');
@@ -213,10 +203,7 @@ private class RollupLargeParentBatchTest {
 			Account parent = parentWith(1, 0);
 
 			Test.startTest();
-			Boolean started = RollupLargeParentBatch.begin(
-				new List<Rollup_Queue__c>{ entryFor(parent.Id, 0) },
-				true
-			);
+			Boolean started = RollupLargeParentBatch.begin(new List<Rollup_Queue__c>{ entryFor(parent.Id, 0) }, true);
 			Boolean again = RollupLargeParentBatch.lockRuns();
 			Test.stopTest();
 
@@ -273,9 +260,7 @@ private class RollupLargeParentBatchTest {
 			RollupLargeParentBatch.largeParentRowsForTest = 30;
 
 			Test.startTest();
-			RollupQueue.add(
-				new Map<String, Set<Id>>{ 'Account' => new Set<Id>{ large.Id, small.Id } }
-			);
+			RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => new Set<Id>{ large.Id, small.Id } });
 			Test.stopTest();
 
 			Assert.areEqual(1, totalsOf(small.Id).NumberOfEmployees, 'Small: in the run');
@@ -285,10 +270,7 @@ private class RollupLargeParentBatchTest {
 			Assert.areEqual(1, held.size(), 'One entry, for the large parent');
 			Assert.areEqual(String.valueOf(large.Id), held[0].Record_Ids__c, 'Holding it alone');
 			Assert.areEqual(1, held[0].Attempts__c, 'Charged as the batch takes it');
-			Assert.isTrue(
-				held[0].Next_Attempt__c > Datetime.now().addMinutes(30),
-				'Held while the batch runs'
-			);
+			Assert.isTrue(held[0].Next_Attempt__c > Datetime.now().addMinutes(30), 'Held while the batch runs');
 		}
 	}
 
@@ -457,14 +439,7 @@ private class RollupLargeParentBatchTest {
 	/** Count and revenue in one grouped query, and the first child's name in an ordered one. */
 	private static void insertTwoQueryDefinitions() {
 		insertDefinitions();
-		Rollup_Definition__c first = definition(
-			'First',
-			'Account',
-			'ParentId',
-			'FIRST',
-			'Name',
-			'Preferred_Name__c'
-		);
+		Rollup_Definition__c first = definition('First', 'Account', 'ParentId', 'FIRST', 'Name', 'Preferred_Name__c');
 		first.Order_By_Field__c = 'AnnualRevenue';
 		insert first;
 	}
@@ -575,14 +550,7 @@ private class RollupLargeParentBatchTest {
 
 			assertBatchMatchesEngine(
 				new List<Rollup_Definition__c>{
-					definition(
-						'Average',
-						'Account',
-						'ParentId',
-						'AVG',
-						'AnnualRevenue',
-						'AnnualRevenue'
-					),
+					definition('Average', 'Account', 'ParentId', 'AVG', 'AnnualRevenue', 'AnnualRevenue'),
 					filtered,
 					first
 				},
@@ -616,14 +584,7 @@ private class RollupLargeParentBatchTest {
 				);
 			}
 			insert children;
-			Rollup_Definition__c last = definition(
-				'Last',
-				'Account',
-				'ParentId',
-				'LAST',
-				'Name',
-				'Preferred_Name__c'
-			);
+			Rollup_Definition__c last = definition('Last', 'Account', 'ParentId', 'LAST', 'Name', 'Preferred_Name__c');
 			last.Order_By_Field__c = 'NumberOfEmployees';
 
 			assertBatchMatchesEngine(new List<Rollup_Definition__c>{ last }, parent.Id);
@@ -667,33 +628,15 @@ private class RollupLargeParentBatchTest {
 
 			assertBatchMatchesEngine(
 				new List<Rollup_Definition__c>{
-					definition(
-						'Distinct',
-						'Contact',
-						'AccountId',
-						'COUNT_DISTINCT',
-						'Title',
-						'NumberOfEmployees'
-					),
+					definition('Distinct', 'Contact', 'AccountId', 'COUNT_DISTINCT', 'Title', 'NumberOfEmployees'),
 					names,
-					definition(
-						'Titles',
-						'Contact',
-						'AccountId',
-						'TEXT_LIST_DISTINCT',
-						'Title',
-						'Preferred_Name__c'
-					)
+					definition('Titles', 'Contact', 'AccountId', 'TEXT_LIST_DISTINCT', 'Title', 'Preferred_Name__c')
 				},
 				parent.Id
 			);
 			Account written = totalsOf(parent.Id);
 			Assert.areEqual(3, written.NumberOfEmployees, 'Three titles, blanks left out');
-			Assert.areEqual(
-				'P0; P1; P2; P3; P4; P5; P6; P7; P8',
-				written.Description,
-				'Every name'
-			);
+			Assert.areEqual('P0; P1; P2; P3; P4; P5; P6; P7; P8', written.Description, 'Every name');
 			Assert.areEqual('Role 0, Role 1, Role 2', written.Preferred_Name__c, 'Each once');
 		}
 	}
@@ -703,14 +646,7 @@ private class RollupLargeParentBatchTest {
 		// runs-as: deploying user (pure function over in-memory values, no data access)
 		RollupAggregator.Tally tally = new RollupAggregator.Tally();
 		for (Integer i = 9; i >= 0; i--) {
-			tally.add(
-				new RollupAggregator.Listed(
-					'role',
-					'001' + String.valueOf(i).leftPad(15, '0'),
-					'Role'
-				),
-				true
-			);
+			tally.add(new RollupAggregator.Listed('role', '001' + String.valueOf(i).leftPad(15, '0'), 'Role'), true);
 		}
 		Assert.areEqual(1, tally.listed.size(), 'Ten rows, one value, one entry');
 		Assert.isTrue(tally.listed[0].recordId.endsWith('0'), 'The earliest row is the one kept');
@@ -727,10 +663,7 @@ private class RollupLargeParentBatchTest {
 			Rollup_Queue__c entry = entryFor(parent.Id, 0);
 
 			Test.startTest();
-			Database.executeBatch(
-				RollupLargeParentBatch.forEntries(new List<Rollup_Queue__c>{ entry }),
-				2000
-			);
+			Database.executeBatch(RollupLargeParentBatch.forEntries(new List<Rollup_Queue__c>{ entry }), 2000);
 			Test.stopTest();
 
 			Account written = totalsOf(parent.Id);
@@ -757,10 +690,7 @@ private class RollupLargeParentBatchTest {
 			Assert.areEqual(1, left.size(), 'The entry stays');
 			Assert.areEqual(1, left[0].Attempts__c, 'Charged once, when the batch took it');
 			Assert.areEqual(RollupQueue.STATUS_PENDING, left[0].Status__c, 'Tried again later');
-			Assert.isTrue(
-				left[0].Next_Attempt__c < Datetime.now().addMinutes(10),
-				'No longer held'
-			);
+			Assert.isTrue(left[0].Next_Attempt__c < Datetime.now().addMinutes(10), 'No longer held');
 			Assert.isTrue(left[0].Last_Error__c.contains('Too many query rows'), 'Saying why');
 		}
 	}
@@ -773,13 +703,9 @@ private class RollupLargeParentBatchTest {
 			Rollup_Queue__c entry = entryFor(parent.Id, RollupQueue.MAX_ATTEMPTS - 1);
 
 			Test.startTest();
-			Boolean started = RollupLargeParentBatch.begin(
-				new List<Rollup_Queue__c>{ entry },
-				true
-			);
+			Boolean started = RollupLargeParentBatch.begin(new List<Rollup_Queue__c>{ entry }, true);
 			RollupLargeParentBatch.stoppedChunksForTest = 1;
-			RollupLargeParentBatch.forEntries(new List<Rollup_Queue__c>{ reread(entry.Id) })
-				.runInline(2);
+			RollupLargeParentBatch.forEntries(new List<Rollup_Queue__c>{ reread(entry.Id) }).runInline(2);
 			Test.stopTest();
 
 			Assert.isTrue(started, 'The batch took it');
@@ -798,18 +724,12 @@ private class RollupLargeParentBatchTest {
 			Rollup_Queue__c entry = entryFor(parent.Id, 0);
 			RollupLargeParentBatch.runningForTest = true;
 
-			Boolean started = RollupLargeParentBatch.begin(
-				new List<Rollup_Queue__c>{ entry },
-				true
-			);
+			Boolean started = RollupLargeParentBatch.begin(new List<Rollup_Queue__c>{ entry }, true);
 
 			Assert.isFalse(started, 'One run at a time');
 			Rollup_Queue__c waiting = reread(entry.Id);
 			Assert.areEqual(0, waiting.Attempts__c, 'Not charged');
-			Assert.isTrue(
-				waiting.Next_Attempt__c <= Datetime.now().addMinutes(3),
-				'Routed again in two minutes'
-			);
+			Assert.isTrue(waiting.Next_Attempt__c <= Datetime.now().addMinutes(3), 'Routed again in two minutes');
 		}
 	}
 
@@ -823,10 +743,7 @@ private class RollupLargeParentBatchTest {
 			insertDefinitions();
 			Account parent = parentWith(1, 0);
 			Test.startTest();
-			Boolean first = RollupLargeParentBatch.begin(
-				new List<Rollup_Queue__c>{ entryFor(parent.Id, 0) },
-				true
-			);
+			Boolean first = RollupLargeParentBatch.begin(new List<Rollup_Queue__c>{ entryFor(parent.Id, 0) }, true);
 			Rollup_Queue__c later = entryFor(parent.Id, 0);
 			Boolean second = RollupLargeParentBatch.begin(new List<Rollup_Queue__c>{ later }, true);
 			Test.stopTest();
@@ -864,11 +781,7 @@ private class RollupLargeParentBatchTest {
 			Assert.areEqual(1, held.size(), 'Still one entry for the parent');
 			Assert.areEqual(2, held[0].Attempts__c, 'A batch that never ended costs an attempt');
 			Assert.isTrue(held[0].Next_Attempt__c > Datetime.now().addMinutes(30), 'Held again');
-			Assert.areEqual(
-				40,
-				totalsOf(large.Id).NumberOfEmployees,
-				'Not recalculated in the run'
-			);
+			Assert.areEqual(40, totalsOf(large.Id).NumberOfEmployees, 'Not recalculated in the run');
 		}
 	}
 
@@ -923,10 +836,7 @@ private class RollupLargeParentBatchTest {
 			Assert.isTrue(held[0].Next_Attempt__c > Datetime.now().addMinutes(30), 'Held');
 			Assert.isTrue(RollupLargeParentBatch.startedForTest, 'By the batch');
 			Assert.areEqual(1, RollupQueue.readyEventsPublished, 'The queue carries on');
-			Assert.isTrue(
-				[SELECT COUNT() FROM Error_Log__c WHERE Severity__c = 'Error'] > 0,
-				'The stop is logged'
-			);
+			Assert.isTrue([SELECT COUNT() FROM Error_Log__c WHERE Severity__c = 'Error'] > 0, 'The stop is logged');
 		}
 	}
 
@@ -1068,13 +978,7 @@ private class RollupLargeParentBatchTest {
 				)
 			);
 		}
-		due.add(
-			new Rollup_Queue__c(
-				Target_Object__c = 'Contact',
-				Record_Ids__c = '003000000000001',
-				Attempts__c = 1
-			)
-		);
+		due.add(new Rollup_Queue__c(Target_Object__c = 'Contact', Record_Ids__c = '003000000000001', Attempts__c = 1));
 		RollupQueue.Slice slice = RollupQueue.take(due, 200);
 		Assert.areEqual(50, slice.idsByTarget.get('Account').size(), 'Fifty, merged');
 		Assert.isFalse(slice.idsByTarget.get('Account').contains(ids[1]), 'Not another attempt');

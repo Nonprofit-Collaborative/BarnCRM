@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
   <hasActivationRequired>false</hasActivationRequired>
-  <label>Funders Admin</label>
+  <label>Grants Admin</label>
   <description>Manages grants and their requirements, including deleting a grant.</description>
   <applicationVisibilities>
     <application>BarnCRM_Funders</application>

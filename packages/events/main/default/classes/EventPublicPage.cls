@@ -62,29 +62,14 @@ public without sharing class EventPublicPage implements PublicPageExtension {
 				Public_Speakers__c,
 				Public_Seats__c,
 				(
-					SELECT
-						Id,
-						Name,
-						Description__c,
-						Price__c,
-						Quantity__c,
-						Sales_Start__c,
-						Sales_End__c
+					SELECT Id, Name, Description__c, Price__c, Quantity__c, Sales_Start__c, Sales_End__c
 					FROM Ticket_Types__r
 					WHERE Active__c = TRUE AND (Sales_End__c = NULL OR Sales_End__c >= :current)
 					ORDER BY Sort_Order__c ASC NULLS LAST, Name
 					LIMIT :ITEM_LIMIT
 				),
 				(
-					SELECT
-						Id,
-						Name,
-						Description__c,
-						Start__c,
-						End__c,
-						Room__c,
-						Session_Type__c,
-						Track__r.Name
+					SELECT Id, Name, Description__c, Start__c, End__c, Room__c, Session_Type__c, Track__r.Name
 					FROM Sessions__r
 					WHERE Status__c = :CONFIRMED
 					ORDER BY Start__c ASC NULLS LAST, Name
@@ -116,12 +101,7 @@ public without sharing class EventPublicPage implements PublicPageExtension {
 			'facts' => facts(event)
 		};
 		List<Object> sections = new List<Object>();
-		addSection(
-			sections,
-			'tickets',
-			BarnHelp.text('Events', 'Events_Public_Tickets'),
-			tickets(event)
-		);
+		addSection(sections, 'tickets', BarnHelp.text('Events', 'Events_Public_Tickets'), tickets(event));
 		Map<Id, List<String>> speakersBySession = event.Public_Speakers__c
 			? speakerNamesBySession(event.Id)
 			: new Map<Id, List<String>>();
@@ -132,12 +112,7 @@ public without sharing class EventPublicPage implements PublicPageExtension {
 			sessions(event, speakersBySession)
 		);
 		if (event.Public_Speakers__c) {
-			addSection(
-				sections,
-				'speakers',
-				BarnHelp.text('Events', 'Events_Public_Speakers'),
-				speakers(event)
-			);
+			addSection(sections, 'speakers', BarnHelp.text('Events', 'Events_Public_Speakers'), speakers(event));
 		}
 		view.put('sections', sections);
 		String registration = registrationState(event);
@@ -163,9 +138,7 @@ public without sharing class EventPublicPage implements PublicPageExtension {
 				new Map<String, Object>{
 					'recordId' => event.Id,
 					'title' => event.Name,
-					'subtitle' => String.isNotBlank(event.Venue_Name__c)
-						? event.Venue_Name__c
-						: event.Format__c,
+					'subtitle' => String.isNotBlank(event.Venue_Name__c) ? event.Venue_Name__c : event.Format__c,
 					'start' => event.Start__c,
 					'end' => event.End__c
 				}
@@ -235,9 +208,7 @@ public without sharing class EventPublicPage implements PublicPageExtension {
 			place.add(event.Venue_Address__c);
 		}
 		if (!place.isEmpty()) {
-			found.add(
-				fact(BarnHelp.text('Events', 'Events_Public_Where'), String.join(place, ', '))
-			);
+			found.add(fact(BarnHelp.text('Events', 'Events_Public_Where'), String.join(place, ', ')));
 		}
 		if (String.isNotBlank(event.Format__c)) {
 			found.add(fact(BarnHelp.text('Events', 'Events_Public_Format'), event.Format__c));
@@ -286,11 +257,7 @@ public without sharing class EventPublicPage implements PublicPageExtension {
 				Integer seats = left.get(ticket.Id);
 				badges.add(
 					seats > 0
-						? BarnHelp.text(
-								'Events',
-								'Events_Public_SeatsLeft',
-								new List<Object>{ seats }
-						  )
+						? BarnHelp.text('Events', 'Events_Public_SeatsLeft', new List<Object>{ seats })
 						: BarnHelp.text('Events', 'Events_Public_Full')
 				);
 			}
@@ -305,13 +272,7 @@ public without sharing class EventPublicPage implements PublicPageExtension {
 		List<Object> items = new List<Object>();
 		for (Event_Session__c session : event.Sessions__r) {
 			List<String> parts = new List<String>();
-			for (
-				String part : new List<String>{
-					session.Track__r?.Name,
-					session.Room__c,
-					session.Session_Type__c
-				}
-			) {
+			for (String part : new List<String>{ session.Track__r?.Name, session.Room__c, session.Session_Type__c }) {
 				if (String.isNotBlank(part)) {
 					parts.add(part);
 				}
@@ -343,10 +304,7 @@ public without sharing class EventPublicPage implements PublicPageExtension {
 	private static Map<Id, List<String>> speakerNamesBySession(Id eventId) {
 		Map<Id, List<String>> names = new Map<Id, List<String>>();
 		for (Session_Speaker__c assignment : [
-			SELECT
-				Event_Session__c,
-				Event_Speaker__r.Contact__r.FirstName,
-				Event_Speaker__r.Contact__r.LastName
+			SELECT Event_Session__c, Event_Speaker__r.Contact__r.FirstName, Event_Speaker__r.Contact__r.LastName
 			FROM Session_Speaker__c
 			WHERE
 				Event_Session__r.Event__c = :eventId
@@ -389,16 +347,9 @@ public without sharing class EventPublicPage implements PublicPageExtension {
 		return String.isBlank(first) ? last : first + ' ' + last;
 	}
 
-	private static void addSection(
-		List<Object> sections,
-		String key,
-		String title,
-		List<Object> items
-	) {
+	private static void addSection(List<Object> sections, String key, String title, List<Object> items) {
 		if (!items.isEmpty()) {
-			sections.add(
-				new Map<String, Object>{ 'key' => key, 'title' => title, 'items' => items }
-			);
+			sections.add(new Map<String, Object>{ 'key' => key, 'title' => title, 'items' => items });
 		}
 	}
 

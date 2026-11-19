@@ -16,10 +16,7 @@ public with sharing class OtherRollupTools {
 	@NamespaceAccessible
 	public static final String ROLLUP_HELPER_NAMESPACE = 'rh2';
 
-	private static final List<String> NAMESPACES = new List<String>{
-		DLRS_NAMESPACE,
-		ROLLUP_HELPER_NAMESPACE
-	};
+	private static final List<String> NAMESPACES = new List<String>{ DLRS_NAMESPACE, ROLLUP_HELPER_NAMESPACE };
 
 	private static Set<String> found;
 

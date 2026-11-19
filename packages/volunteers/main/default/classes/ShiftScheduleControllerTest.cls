@@ -54,9 +54,7 @@ private class ShiftScheduleControllerTest {
 			Shift_Schedule__c schedule = saved(true);
 
 			Test.startTest();
-			ShiftScheduleController.Preview before = ShiftScheduleController.getPreview(
-				schedule.Id
-			);
+			ShiftScheduleController.Preview before = ShiftScheduleController.getPreview(schedule.Id);
 			ShiftScheduleController.Preview after = ShiftScheduleController.createNow(schedule.Id);
 			Test.stopTest();
 
@@ -81,9 +79,7 @@ private class ShiftScheduleControllerTest {
 			Boolean refused = false;
 
 			Test.startTest();
-			ShiftScheduleController.Preview preview = ShiftScheduleController.getPreview(
-				schedule.Id
-			);
+			ShiftScheduleController.Preview preview = ShiftScheduleController.getPreview(schedule.Id);
 			try {
 				ShiftScheduleController.createNow(schedule.Id);
 			} catch (AuraHandledException denied) {
@@ -122,16 +118,8 @@ private class ShiftScheduleControllerTest {
 			settings = ShiftScheduleController.getFormSettings();
 			Test.stopTest();
 		}
-		Assert.areEqual(
-			Date.newInstance(2026, 3, 2),
-			settings.today,
-			'Today in the org time zone.'
-		);
+		Assert.areEqual(Date.newInstance(2026, 3, 2), settings.today, 'Today in the org time zone.');
 		Assert.areEqual('12:00', settings.now, 'Noon in the org time zone.');
-		Assert.areEqual(
-			VolunteerSettings.shiftHorizonWeeks(),
-			settings.horizonWeeks,
-			'The horizon the run uses.'
-		);
+		Assert.areEqual(VolunteerSettings.shiftHorizonWeeks(), settings.horizonWeeks, 'The horizon the run uses.');
 	}
 }

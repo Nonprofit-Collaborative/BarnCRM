@@ -22,11 +22,7 @@ private class LwcBuilderPostInstallTest {
 	static void theInstallerGetsTheAdminSetOnceAndTheRolesTheirSets() {
 		System.runAs(TestUsers.admin()) {
 			Id fresh = TestDataFactory.createUser('Installer', new List<String>()).Id;
-			Id alreadyHolding = TestDataFactory.createUser(
-					'Holder',
-					new List<String>{ 'LWC_Builder_Admin' }
-				)
-				.Id;
+			Id alreadyHolding = TestDataFactory.createUser('Holder', new List<String>{ 'LWC_Builder_Admin' }).Id;
 			User member = TestUsers.standardUser('Member');
 			insert new PermissionSetAssignment(
 				AssigneeId = member.Id,
@@ -41,11 +37,7 @@ private class LwcBuilderPostInstallTest {
 
 			Assert.areEqual(1, setsHeldBy(fresh, 'LWC_Builder_Admin'), 'The installer holds it');
 			Assert.areEqual(1, setsHeldBy(alreadyHolding, 'LWC_Builder_Admin'), 'Never twice');
-			Assert.areEqual(
-				1,
-				setsHeldBy(member.Id, 'LWC_Builder_Staff'),
-				'Team Member holds Staff'
-			);
+			Assert.areEqual(1, setsHeldBy(member.Id, 'LWC_Builder_Staff'), 'Team Member holds Staff');
 			Assert.areEqual(
 				0,
 				[
@@ -96,11 +88,7 @@ private class LwcBuilderPostInstallTest {
 			new LwcBuilderPostInstall().runSetup(null);
 			Test.stopTest();
 
-			Assert.areEqual(
-				1,
-				setsHeldBy(reader.Id, 'LWC_Builder_Read_Only'),
-				'Read Only holds it'
-			);
+			Assert.areEqual(1, setsHeldBy(reader.Id, 'LWC_Builder_Read_Only'), 'Read Only holds it');
 		}
 	}
 }

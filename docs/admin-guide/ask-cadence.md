@@ -16,9 +16,9 @@ Every night at 3:30 AM, BarnCRM finds donors whose Next Ask Date is today or ear
 
 Everything is in the app. You never open Setup.
 
-1. Open **BarnCRM Settings**, choose the **Giving** section, and find **Ask Reminders** under **Acknowledgments and Stewardship**. It is **on** by default, also in an org that saved its Giving settings before this setting existed (the upgrade that adds it turns it on once, and an administrator who turns it off afterwards keeps it off), and does nothing until somebody enters a Next Ask Date. Turn it off if you do not want tasks created. The dates and the list below keep working when it is off.
+1. Open **BarnCRM Settings**, choose the **Fundraising** section, and find **Ask Reminders** under **Acknowledgments and Stewardship**. It is **on** by default and does nothing until somebody enters a Next Ask Date. Turn it off if you do not want tasks created. The dates and the list below keep working when it is off.
 2. Open the **Nightly Jobs** panel on the **General** page of BarnCRM Settings and choose **Schedule Nightly Jobs** if the nightly run is not scheduled yet. **Ask Reminders** is one of its rows (on unless turned off), with its last run, a one sentence summary (how many reminders it created, how many it could not), **Turn Off** and **Run Now**.
-3. Add **Next Ask Date** and **Last Touch Date** to the record pages your fundraisers use. They are on the Contact and Account objects, and the Giving permission sets already grant them: **Giving Staff** and **Giving Admin** can edit the two dates, **Giving Read Only** can read them. Nobody edits **Ask Reminder For Date**.
+3. Add **Next Ask Date** and **Last Touch Date** to the record pages your fundraisers use. They are on the Contact and Account objects, and the Fundraising permission sets already grant them: **Fundraising Staff Access** and **Fundraising Admin** can edit the two dates, **Fundraising Read Only** can read them. Nobody edits **Ask Reminder For Date**.
 
 ## Who Is Due
 
@@ -32,7 +32,7 @@ Open the **Contacts** or **Accounts** tab and choose the list view **Who Is Due 
 - **The owner gets the task.** If a donor's owner is an inactive user, no task can be made. The job counts the donor in its summary, writes the reason to the **Error Log**, and tries again the next night. Reassign the donor to an active owner to fix it.
 - **One run at a time.** **Run Now** (Nightly Jobs) and the nightly schedule start nothing while an ask reminder run is already queued or running. The **Ask Reminders** setting is read again as a queued run processes, so turning it off stops a run already queued: it makes no tasks and does not go on to the contacts pass.
 - **No emails.** Reminders are tasks inside Salesforce. Nothing is sent to the donor or to the owner by email.
-- **Health Check.** **Schedule all nightly jobs** in Health Check schedules the nightly run. This job is a step of [BarnCRM Nightly Jobs](nightly-jobs.md) at 3:30 AM, switched on and off with the other Giving jobs on the **Nightly Jobs** page.
+- **Health Check.** **Schedule all nightly jobs** in Health Check schedules the nightly run. This job is a step of [BarnCRM Nightly Jobs](nightly-jobs.md) at 3:30 AM, switched on and off with the other Fundraising jobs on the **Nightly Jobs** page.
 
 ## Asks Set the Next Ask Date
 
@@ -52,4 +52,4 @@ When the [Ask Pipeline](ask-pipeline.md) is in use, a donor's open asks keep the
 
 - [Stewardship plans](stewardship-plans.md): sequences of follow-up tasks that start when a gift arrives.
 - [Donor levels](donor-levels.md): the level shown in the **Who Is Due for an Ask** list.
-- User Guide: [Ask reminders](../user-guide/ask-reminders.md). Testing Guide: [Giving: ask cadence](../testing-guide/giving-ask-cadence.md).
+- User Guide: [Ask reminders](../user-guide/ask-reminders.md). Testing Guide: [Fundraising: ask cadence](../testing-guide/giving-ask-cadence.md).

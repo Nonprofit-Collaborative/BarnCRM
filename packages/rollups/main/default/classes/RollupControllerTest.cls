@@ -33,20 +33,9 @@ private class RollupControllerTest {
 			RollupController.RollupPageView page = RollupController.getPage();
 
 			System.Assert.areEqual(1, page.rollups.size(), 'Every rollup is listed');
-			System.Assert.areEqual(
-				'Household member count',
-				page.rollups[0].name,
-				'By the name the admin gave it'
-			);
-			System.Assert.areEqual(
-				'Member_Count__c',
-				page.rollups[0].targetField,
-				'And where the number shows'
-			);
-			System.Assert.isTrue(
-				page.stale,
-				'Nothing has been calculated yet, which the page says'
-			);
+			System.Assert.areEqual('Household member count', page.rollups[0].name, 'By the name the admin gave it');
+			System.Assert.areEqual('Member_Count__c', page.rollups[0].targetField, 'And where the number shows');
+			System.Assert.isTrue(page.stale, 'Nothing has been calculated yet, which the page says');
 			System.Assert.isTrue(
 				page.builderTabApiName.endsWith('Rollup_Builder'),
 				'The page links to the Builder tab'
@@ -84,10 +73,7 @@ private class RollupControllerTest {
 				FROM Rollup_Definition__c
 				WHERE Id = :rollup.Id
 			];
-			System.Assert.isFalse(
-				saved.Active__c,
-				'R-R6: an admin turns a shipped rollup off rather than deleting it'
-			);
+			System.Assert.isFalse(saved.Active__c, 'R-R6: an admin turns a shipped rollup off rather than deleting it');
 		}
 	}
 
@@ -106,11 +92,7 @@ private class RollupControllerTest {
 				FROM Rollup_Definition__c
 				WHERE Id = :rollup.Id
 			];
-			System.Assert.areEqual(
-				RollupService.MODE_SCHEDULED,
-				saved.Mode__c,
-				'The mode the admin chose'
-			);
+			System.Assert.areEqual(RollupService.MODE_SCHEDULED, saved.Mode__c, 'The mode the admin chose');
 		}
 	}
 
@@ -146,10 +128,7 @@ private class RollupControllerTest {
 				message = refused.getMessage();
 			}
 
-			System.Assert.areEqual(
-				BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorInstantMovesWithDate'),
-				message
-			);
+			System.Assert.areEqual(BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorInstantMovesWithDate'), message);
 			System.Assert.areEqual(
 				RollupService.MODE_BOTH,
 				[SELECT Mode__c FROM Rollup_Definition__c WHERE Id = :rollup.Id].Mode__c,
@@ -178,10 +157,7 @@ private class RollupControllerTest {
 			System.Assert.areEqual(
 				String.format(
 					BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorNoInstant'),
-					new List<String>{
-						Task.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-							.getLabelPlural()
-					}
+					new List<String>{ Task.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural() }
 				),
 				message
 			);
@@ -200,10 +176,7 @@ private class RollupControllerTest {
 				RollupController.recalculate(null);
 				System.Assert.fail('An unknown definition is refused');
 			} catch (AuraHandledException expected) {
-				System.Assert.isNotNull(
-					expected.getMessage(),
-					'The message tells the admin to refresh'
-				);
+				System.Assert.isNotNull(expected.getMessage(), 'The message tells the admin to refresh');
 			}
 		}
 	}
@@ -231,11 +204,7 @@ private class RollupControllerTest {
 			RollupController.RollupPageView page = RollupController.restoreDefaults();
 			Test.stopTest();
 
-			System.Assert.areEqual(
-				1,
-				page.rollups.size(),
-				'The shipped rollup is there after restoring'
-			);
+			System.Assert.areEqual(1, page.rollups.size(), 'The shipped rollup is there after restoring');
 		}
 	}
 
@@ -337,10 +306,8 @@ private class RollupControllerTest {
 
 			Test.startTest();
 			Boolean evening = estimateAt(admin, monday, Time.newInstance(18, 0, 0, 0)).workingHours;
-			Boolean saturday = estimateAt(admin, monday.addDays(5), Time.newInstance(10, 0, 0, 0))
-				.workingHours;
-			Boolean early = estimateAt(admin, monday.addDays(1), Time.newInstance(7, 59, 0, 0))
-				.workingHours;
+			Boolean saturday = estimateAt(admin, monday.addDays(5), Time.newInstance(10, 0, 0, 0)).workingHours;
+			Boolean early = estimateAt(admin, monday.addDays(1), Time.newInstance(7, 59, 0, 0)).workingHours;
 			Test.stopTest();
 
 			System.Assert.isFalse(evening, 'Six in the evening is after hours');
@@ -377,10 +344,7 @@ private class RollupControllerTest {
 				[SELECT COUNT() FROM CronJobDetail WHERE Name LIKE :pattern],
 				'Asking twice sets up one run'
 			);
-			System.Assert.isFalse(
-				RollupScheduler.isScheduled(),
-				'The nightly run is not turned on'
-			);
+			System.Assert.isFalse(RollupScheduler.isScheduled(), 'The nightly run is not turned on');
 		}
 	}
 
@@ -467,10 +431,7 @@ private class RollupControllerTest {
 					);
 				}
 			}
-			System.Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Rollup_Definition__c WHERE Id = :rollup.Id]
-			);
+			System.Assert.areEqual(1, [SELECT COUNT() FROM Rollup_Definition__c WHERE Id = :rollup.Id]);
 		}
 	}
 

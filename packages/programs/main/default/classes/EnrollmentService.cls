@@ -19,11 +19,7 @@ public with sharing class EnrollmentService {
 	public static final String STAGE_WAITLISTED = 'Waitlisted';
 
 	/** The stages one person may hold only once per program at a time (R-EN2). */
-	public static final Set<String> ONE_PER_PERSON = new Set<String>{
-		STAGE_APPLIED,
-		STAGE_ENROLLED,
-		STAGE_WAITLISTED
-	};
+	public static final Set<String> ONE_PER_PERSON = new Set<String>{ STAGE_APPLIED, STAGE_ENROLLED, STAGE_WAITLISTED };
 
 	/** Every stage, in the order a person moves through them. */
 	@NamespaceAccessible
@@ -39,16 +35,10 @@ public with sharing class EnrollmentService {
 	public static final Set<String> OPEN_STAGES = new Set<String>{ STAGE_APPLIED, STAGE_ENROLLED };
 
 	/** The stages that end an enrollment, and fill in its End Date (R-EN3). */
-	private static final Set<String> ENDED_STAGES = new Set<String>{
-		STAGE_COMPLETED,
-		STAGE_WITHDRAWN
-	};
+	private static final Set<String> ENDED_STAGES = new Set<String>{ STAGE_COMPLETED, STAGE_WITHDRAWN };
 
 	/** The eligibility statuses that decide it, and fill in the Eligibility Date (R-EN6). */
-	private static final Set<String> DECIDED_ELIGIBILITY = new Set<String>{
-		'Eligible',
-		'Not Eligible'
-	};
+	private static final Set<String> DECIDED_ELIGIBILITY = new Set<String>{ 'Eligible', 'Not Eligible' };
 
 	/** Whether an enrollment at this stage is open (Applied or Enrolled). */
 	@NamespaceAccessible
@@ -87,13 +77,7 @@ public with sharing class EnrollmentService {
 		}
 
 		Set<String> taken = new Set<String>();
-		for (
-			Enrollment__c existing : EnrollmentIntegritySelector.selectOpenFor(
-				programIds,
-				contactIds,
-				accountIds
-			)
-		) {
+		for (Enrollment__c existing : EnrollmentIntegritySelector.selectOpenFor(programIds, contactIds, accountIds)) {
 			if (!checkedIds.contains(existing.Id)) {
 				taken.add(keyOf(existing));
 			}
@@ -113,9 +97,7 @@ public with sharing class EnrollmentService {
 			enrollment.addError(
 				String.format(
 					BarnHelp.text('Programs', 'Programs_Enrollment_AlreadyOpen'),
-					new List<String>{
-						programName == null ? String.valueOf(enrollment.Program__c) : programName
-					}
+					new List<String>{ programName == null ? String.valueOf(enrollment.Program__c) : programName }
 				)
 			);
 		}
@@ -129,10 +111,7 @@ public with sharing class EnrollmentService {
 	 * @param enrollments the records being saved
 	 * @param previousById the records as they were, or null on insert
 	 */
-	public static void fillStageDates(
-		List<Enrollment__c> enrollments,
-		Map<Id, Enrollment__c> previousById
-	) {
+	public static void fillStageDates(List<Enrollment__c> enrollments, Map<Id, Enrollment__c> previousById) {
 		Date today = Date.today();
 		for (Enrollment__c enrollment : enrollments) {
 			Enrollment__c previous = previousById == null ? null : previousById.get(enrollment.Id);
@@ -154,22 +133,15 @@ public with sharing class EnrollmentService {
 	 * R-EN6: an enrollment whose eligibility is decided (Eligible or Not Eligible), when created
 	 * so or changed to it, gets today as its Eligibility Date when that is empty.
 	 */
-	public static void fillEligibilityDates(
-		List<Enrollment__c> enrollments,
-		Map<Id, Enrollment__c> previousById
-	) {
+	public static void fillEligibilityDates(List<Enrollment__c> enrollments, Map<Id, Enrollment__c> previousById) {
 		Date today = Date.today();
 		for (Enrollment__c enrollment : enrollments) {
 			Enrollment__c previous = previousById == null ? null : previousById.get(enrollment.Id);
-			if (
-				previous != null &&
-				previous.Eligibility_Status__c == enrollment.Eligibility_Status__c
-			) {
+			if (previous != null && previous.Eligibility_Status__c == enrollment.Eligibility_Status__c) {
 				continue;
 			}
 			if (
-				DECIDED_ELIGIBILITY.contains(enrollment.Eligibility_Status__c) &&
-				enrollment.Eligibility_Date__c == null
+				DECIDED_ELIGIBILITY.contains(enrollment.Eligibility_Status__c) && enrollment.Eligibility_Date__c == null
 			) {
 				enrollment.Eligibility_Date__c = today;
 			}

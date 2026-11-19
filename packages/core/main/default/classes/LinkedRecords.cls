@@ -13,11 +13,7 @@
 public with sharing class LinkedRecords {
 	/** The optional modules' objects a link may name, by API name. */
 	@TestVisible
-	private static List<String> supported = new List<String>{
-		'Gift__c',
-		'Commitment__c',
-		'Grant__c'
-	};
+	private static List<String> supported = new List<String>{ 'Gift__c', 'Commitment__c', 'Grant__c' };
 
 	/** What a caller shows for one linked record. */
 	@NamespaceAccessible

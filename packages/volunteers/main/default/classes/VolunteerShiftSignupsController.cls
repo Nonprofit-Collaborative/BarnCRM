@@ -113,9 +113,7 @@ public with sharing class VolunteerShiftSignupsController {
 			throw UserErrors.message(actionFailed());
 		}
 		if (personId == null) {
-			throw UserErrors.message(
-				BarnHelp.text('Volunteers', 'Volunteers_Signups_PersonRequired')
-			);
+			throw UserErrors.message(BarnHelp.text('Volunteers', 'Volunteers_Signups_PersonRequired'));
 		}
 		Volunteer_Signup__c signup = new Volunteer_Signup__c(Volunteer_Shift__c = shiftId);
 		if (String.isNotBlank(status)) {
@@ -127,7 +125,7 @@ public with sharing class VolunteerShiftSignupsController {
 			signup.Account__c = personId;
 		}
 		try {
-			Database.insert(new List<Volunteer_Signup__c>{ signup }, true, AccessLevel.USER_MODE);
+			insert as user new List<Volunteer_Signup__c>{ signup };
 			return panelFor(shiftId);
 		} catch (Exception failure) {
 			throw ERRORS.wrap(failure, CONTEXT, shiftId);
@@ -150,13 +148,7 @@ public with sharing class VolunteerShiftSignupsController {
 				throw UserErrors.message(actionFailed());
 			}
 			Integer hoursBefore = VolunteerSignupSelector.countHoursFor(signupId);
-			Database.update(
-				new List<Volunteer_Signup__c>{
-					new Volunteer_Signup__c(Id = signupId, Status__c = wanted)
-				},
-				true,
-				AccessLevel.USER_MODE
-			);
+			update as user new List<Volunteer_Signup__c>{ new Volunteer_Signup__c(Id = signupId, Status__c = wanted) };
 			Panel panel = panelFor(signup.Volunteer_Shift__c);
 			Integer hoursAfter = VolunteerSignupSelector.countHoursFor(signupId);
 			panel.hoursWritten = hoursAfter > hoursBefore;
@@ -187,22 +179,15 @@ public with sharing class VolunteerShiftSignupsController {
 				throw UserErrors.message(actionFailed());
 			}
 			if (markNoShow == true) {
-				List<Volunteer_Signup__c> open = VolunteerSignupSelector.selectOpenForShift(
-					shiftId,
-					OPEN_STATUSES
-				);
+				List<Volunteer_Signup__c> open = VolunteerSignupSelector.selectOpenForShift(shiftId, OPEN_STATUSES);
 				for (Volunteer_Signup__c signup : open) {
 					signup.Status__c = STATUS_NO_SHOW;
 				}
-				Database.update(open, true, AccessLevel.USER_MODE);
+				update as user open;
 			}
-			Database.update(
-				new List<Volunteer_Shift__c>{
-					new Volunteer_Shift__c(Id = shiftId, Status__c = STATUS_SHIFT_COMPLETED)
-				},
-				true,
-				AccessLevel.USER_MODE
-			);
+			update as user new List<Volunteer_Shift__c>{
+				new Volunteer_Shift__c(Id = shiftId, Status__c = STATUS_SHIFT_COMPLETED)
+			};
 			return panelFor(shiftId);
 		} catch (Exception failure) {
 			Database.rollback(before);
@@ -232,10 +217,7 @@ public with sharing class VolunteerShiftSignupsController {
 		panel.shiftStarted = shift.Start_Time__c != null && shift.Start_Time__c <= Datetime.now();
 		panel.shiftClosed = shift.Status__c != null && shift.Status__c != STATUS_SHIFT_OPEN;
 
-		List<Volunteer_Signup__c> found = VolunteerSignupSelector.selectForShift(
-			shiftId,
-			MAX_SHOWN + 1
-		);
+		List<Volunteer_Signup__c> found = VolunteerSignupSelector.selectForShift(shiftId, MAX_SHOWN + 1);
 		panel.moreThanShown = found.size() > MAX_SHOWN;
 		for (Integer i = 0; i < found.size() && i < MAX_SHOWN; i++) {
 			panel.signups.add(rowFor(found[i]));
@@ -250,8 +232,7 @@ public with sharing class VolunteerShiftSignupsController {
 		panel.canClose =
 			panel.shiftStarted &&
 			!panel.shiftClosed &&
-			Volunteer_Shift__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-				.isUpdateable();
+			Volunteer_Shift__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isUpdateable();
 		panel.hasPersonAccounts = HouseholdService.isPersonAccountOrg();
 		panel.personFilterField = panel.hasPersonAccounts ? PERSON_ACCOUNT_FILTER_FIELD : null;
 		for (Schema.PicklistEntry entry : statusEntries()) {
@@ -279,10 +260,7 @@ public with sharing class VolunteerShiftSignupsController {
 
 	private static List<Schema.PicklistEntry> statusEntries() {
 		List<Schema.PicklistEntry> active = new List<Schema.PicklistEntry>();
-		for (
-			Schema.PicklistEntry entry : Volunteer_Signup__c.Status__c.getDescribe()
-				.getPicklistValues()
-		) {
+		for (Schema.PicklistEntry entry : Volunteer_Signup__c.Status__c.getDescribe().getPicklistValues()) {
 			if (entry.isActive()) {
 				active.add(entry);
 			}

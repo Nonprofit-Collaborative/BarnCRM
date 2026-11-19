@@ -1,24 +1,21 @@
 import { LightningElement } from 'lwc';
 import getSetup from '@salesforce/apex/AddressVerificationController.getSetup';
-import saveKeys from '@salesforce/apex/AddressVerificationController.saveKeys';
+import checkConnection from '@salesforce/apex/AddressVerificationController.checkConnection';
 import clearKeys from '@salesforce/apex/AddressVerificationController.clearKeys';
 import verifyWaiting from '@salesforce/apex/AddressVerificationController.verifyWaiting';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { iconFor } from 'c/barnIcons';
 
-/** Each key's box label, read when the help text has loaded. */
-function keyLabels() {
-  return {
-    smartyAuthId: helpText('AddressVerification', 'AddressVerification_Setup_SmartyAuthId'),
-    smartyAuthToken: helpText('AddressVerification', 'AddressVerification_Setup_SmartyAuthToken'),
-    googleApiKey: helpText('AddressVerification', 'AddressVerification_Setup_GoogleApiKey')
-  };
+/** Fills `{0}`, `{1}` ... in a help text, in order. */
+function fill(text, values) {
+  return values.reduce((result, value, index) => result.replace(`{${index}}`, value), text);
 }
 
 /**
- * The Address Verification Setup page (C-46). The controller returns the provider in use and
- * whether each key is entered (last four characters only); the page takes new keys, which are
- * never shown again, clears one provider's keys and starts the check of waiting addresses.
+ * The Address Verification Setup page (C-46, N-13). The controller returns the provider in use,
+ * where each provider's key goes in Setup (External Credential and principal names, never a
+ * value) and whether each is connected; the page checks a connection, forgets one, and starts the
+ * check of waiting addresses. No key passes through it.
  */
 export default class AddressVerificationSetup extends LightningElement {
   helpReady = isHelpLoaded('AddressVerification');
@@ -31,8 +28,8 @@ export default class AddressVerificationSetup extends LightningElement {
     get intro() {
       return helpText('AddressVerification', 'AddressVerification_Setup_Intro');
     },
-    get saveKeys() {
-      return helpText('AddressVerification', 'AddressVerification_Setup_SaveKeys');
+    get check() {
+      return helpText('AddressVerification', 'AddressVerification_Setup_CheckConnection');
     },
     get clear() {
       return helpText('AddressVerification', 'AddressVerification_Setup_Clear');
@@ -45,21 +42,15 @@ export default class AddressVerificationSetup extends LightningElement {
     },
     get saved() {
       return helpText('AddressVerification', 'AddressVerification_Setup_Saved');
-    },
-    get smarty() {
-      return helpText('AddressVerification', 'AddressVerification_Setup_SmartyHeading');
-    },
-    get google() {
-      return helpText('AddressVerification', 'AddressVerification_Setup_GoogleHeading');
     }
   };
 
   icons = { page: iconFor('Address_Verification_Setup') };
 
   setup;
-  typed = {};
   working = false;
   message;
+  messageVariant = 'success';
   error;
 
   connectedCallback() {
@@ -89,10 +80,9 @@ export default class AddressVerificationSetup extends LightningElement {
   }
 
   get providerText() {
-    return helpText('AddressVerification', 'AddressVerification_Setup_Provider').replace(
-      '{0}',
+    return fill(helpText('AddressVerification', 'AddressVerification_Setup_Provider'), [
       this.setup.provider
-    );
+    ]);
   }
 
   get noManageShown() {
@@ -107,39 +97,44 @@ export default class AddressVerificationSetup extends LightningElement {
     return this.locked || !this.setup.ready;
   }
 
-  get keys() {
-    const labels = keyLabels();
-    return (this.setup.keys || []).map((key) => ({
-      ...key,
-      label: labels[key.name],
-      status: key.lastFour
-        ? helpText('AddressVerification', 'AddressVerification_Setup_KeySet').replace(
-            '{0}',
-            key.lastFour
-          )
-        : helpText('AddressVerification', 'AddressVerification_Setup_KeyNotSet'),
-      value: this.typed[key.name] || ''
-    }));
+  /** Each provider's connection, with the Setup steps filled with this org's names. */
+  get credentials() {
+    return (this.setup.credentials || []).map((credential) => {
+      const id = credential.provider.toLowerCase();
+      return {
+        ...credential,
+        dataId: id,
+        statusId: `status-${id}`,
+        stepsId: `steps-${id}`,
+        checkId: `check-${id}`,
+        clearId: `clear-${id}`,
+        heading:
+          credential.provider === 'Google'
+            ? helpText('AddressVerification', 'AddressVerification_Setup_GoogleHeading')
+            : helpText('AddressVerification', 'AddressVerification_Setup_SmartyHeading'),
+        status: credential.connected
+          ? helpText('AddressVerification', 'AddressVerification_Setup_StatusConnected')
+          : helpText('AddressVerification', 'AddressVerification_Setup_StatusNotConnected'),
+        steps: fill(helpText('AddressVerification', 'AddressVerification_Setup_CredentialSteps'), [
+          credential.externalCredential,
+          credential.principal,
+          credential.parameters
+        ])
+      };
+    });
   }
 
-  get smartyKeys() {
-    return this.keys.filter((key) => key.provider === 'Smarty');
-  }
-
-  get googleKeys() {
-    return this.keys.filter((key) => key.provider === 'Google');
-  }
-
-  handleType(event) {
-    this.typed = { ...this.typed, [event.target.dataset.name]: event.target.value };
-    this.message = undefined;
-  }
-
-  handleSave() {
+  /** Checks the connection, then reloads the page so its status shows what was found. */
+  handleCheck(event) {
+    const provider = event.target.dataset.provider;
     return this.run(async () => {
-      this.setup = await saveKeys({ keys: this.typed });
-      this.typed = {};
-      return this.labels.saved;
+      const said = await checkConnection({ provider });
+      this.setup = await getSetup();
+      const connected = (this.setup.credentials || []).some(
+        (credential) => credential.provider === provider && credential.connected
+      );
+      this.messageVariant = connected ? 'success' : 'warning';
+      return said;
     });
   }
 
@@ -158,6 +153,7 @@ export default class AddressVerificationSetup extends LightningElement {
   async run(call) {
     this.error = undefined;
     this.message = undefined;
+    this.messageVariant = 'success';
     this.working = true;
     try {
       this.message = await call();

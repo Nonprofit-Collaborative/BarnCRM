@@ -17,13 +17,7 @@ private class IndicatorResultsImportTest {
 	private static Import_Template__c template() {
 		ImportTemplateService.materializeDefaults();
 		return [
-			SELECT
-				Id,
-				Target_Object__c,
-				Load_Operation__c,
-				Column_Mapping_JSON__c,
-				Default_Values_JSON__c,
-				Active__c
+			SELECT Id, Target_Object__c, Load_Operation__c, Column_Mapping_JSON__c, Default_Values_JSON__c, Active__c
 			FROM Import_Template__c
 			WHERE Template_Key__c = :TEMPLATE_KEY
 			WITH SYSTEM_MODE
@@ -74,11 +68,7 @@ private class IndicatorResultsImportTest {
 						'Result' => '25',
 						'Notes' => 'From the spring survey'
 					},
-					new Map<String, String>{
-						'Period Id' => 'a0Z000000000000AAA',
-						'Target' => '1',
-						'Result' => '2'
-					}
+					new Map<String, String>{ 'Period Id' => 'a0Z000000000000AAA', 'Target' => '1', 'Result' => '2' }
 				}
 			);
 

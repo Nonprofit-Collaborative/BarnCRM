@@ -53,10 +53,7 @@ public with sharing class RollupsEngineExtension implements RollupEngineExtensio
 	public Map<String, Set<String>> targetFieldsByObject() {
 		Map<String, Set<String>> targets = new Map<String, Set<String>>();
 		for (Rollup_Definition__c definition : RollupSelector.selectAll()) {
-			if (
-				String.isBlank(definition.Target_Object__c) ||
-				String.isBlank(definition.Target_Field__c)
-			) {
+			if (String.isBlank(definition.Target_Object__c) || String.isBlank(definition.Target_Field__c)) {
 				continue;
 			}
 			String target = definition.Target_Object__c.trim();

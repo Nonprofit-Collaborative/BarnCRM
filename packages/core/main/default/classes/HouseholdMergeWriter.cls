@@ -32,13 +32,9 @@ public without sharing class HouseholdMergeWriter {
 	 * with the platform's result rather than throwing, so the caller can roll back and say
 	 * why. Throws when there is no authorization.
 	 */
-	public static Database.MergeResult mergeInto(
-		HouseholdMergeService.MergeAuthorization authorization
-	) {
+	public static Database.MergeResult mergeInto(HouseholdMergeService.MergeAuthorization authorization) {
 		if (authorization == null) {
-			throw new HouseholdException(
-				BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorMergeFailed')
-			);
+			throw new HouseholdException(BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorMergeFailed'));
 		}
 		return Database.merge(
 			new Account(Id = authorization.survivorId),

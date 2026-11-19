@@ -15,24 +15,16 @@ private class EnrollmentRulesTest {
 	static void createTestUsers() {
 		TestUsers.adminWith(ADMIN);
 		TestUsers.standardUserWith('Staffer', new List<String>{ CORE_STAFF, 'Programs_Staff' });
-		TestUsers.standardUserWith(
-			'Reader',
-			new List<String>{ 'BarnCRM_Read_Only', 'Programs_Read_Only' }
-		);
+		TestUsers.standardUserWith('Reader', new List<String>{ 'BarnCRM_Read_Only', 'Programs_Read_Only' });
 	}
 
 	private static User staffer() {
-		return TestUsers.standardUserWith(
-			'Staffer',
-			new List<String>{ CORE_STAFF, 'Programs_Staff' }
-		);
+		return TestUsers.standardUserWith('Staffer', new List<String>{ CORE_STAFF, 'Programs_Staff' });
 	}
 
 	/** People are Contacts, with no household made for them, so the tests stay small. */
 	private static void contactMode() {
-		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-			HouseholdTestDataFactory.MODE_CONTACT
-		);
+		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 		settings.Auto_Create_Households__c = false;
 		TestDataFactory.saveSettings(settings);
 	}
@@ -72,18 +64,10 @@ private class EnrollmentRulesTest {
 				new Enrollment__c(Program__c = tutoring.Id, Account__c = business.Id),
 				false
 			);
-			Enrollment__c contactEnrollment = newEnrollment(
-				tutoring.Id,
-				people(1)[0].Id,
-				'Enrolled'
-			);
+			Enrollment__c contactEnrollment = newEnrollment(tutoring.Id, people(1)[0].Id, 'Enrolled');
 			insert contactEnrollment;
 			Database.SaveResult changed = Database.update(
-				new Enrollment__c(
-					Id = contactEnrollment.Id,
-					Contact__c = null,
-					Account__c = business.Id
-				),
+				new Enrollment__c(Id = contactEnrollment.Id, Contact__c = null, Account__c = business.Id),
 				false
 			);
 
@@ -94,10 +78,7 @@ private class EnrollmentRulesTest {
 			);
 			Assert.isFalse(changed.isSuccess(), 'Nor by changing the person.');
 
-			if (
-				!OrgShapeDetector.hasPersonAccounts() ||
-				OrgShapeDetector.creatablePersonRecordTypeId() == null
-			) {
+			if (!OrgShapeDetector.hasPersonAccounts() || OrgShapeDetector.creatablePersonRecordTypeId() == null) {
 				return; // An org without person accounts has no such person.
 			}
 			Account person = TestDataFactory.organization(new Account());
@@ -134,11 +115,7 @@ private class EnrollmentRulesTest {
 			);
 			for (Database.SaveResult result : results) {
 				Assert.isFalse(result.isSuccess(), 'A second open enrollment is refused.');
-				Assert.areEqual(
-					expected,
-					result.getErrors()[0].getMessage(),
-					'Naming the program.'
-				);
+				Assert.areEqual(expected, result.getErrors()[0].getMessage(), 'Naming the program.');
 			}
 			Assert.areEqual(200, [SELECT COUNT() FROM Enrollment__c], 'Only the first ones stay.');
 		}
@@ -203,10 +180,7 @@ private class EnrollmentRulesTest {
 			Contact other = people(1)[0];
 
 			Test.startTest();
-			Database.SaveResult second = Database.insert(
-				newEnrollment(tutoring.Id, person.Id, 'Applied'),
-				false
-			);
+			Database.SaveResult second = Database.insert(newEnrollment(tutoring.Id, person.Id, 'Applied'), false);
 			Enrollment__c undated = newEnrollment(tutoring.Id, other.Id, 'Enrolled');
 			insert undated;
 			Test.stopTest();
@@ -307,11 +281,7 @@ private class EnrollmentRulesTest {
 			Assert.areEqual(Date.today(), saved.get(screened.Id).Eligibility_Date__c, 'Decided.');
 			Assert.isNull(afterWaiting, 'Awaiting documents decides nothing.');
 			Assert.areEqual(Date.today(), saved.get(waiting.Id).Eligibility_Date__c, 'Later.');
-			Assert.areEqual(
-				typed,
-				saved.get(dated.Id).Eligibility_Date__c,
-				'A typed date is kept.'
-			);
+			Assert.areEqual(typed, saved.get(dated.Id).Eligibility_Date__c, 'A typed date is kept.');
 		}
 	}
 
@@ -324,8 +294,7 @@ private class EnrollmentRulesTest {
 			insert fresh;
 			Assert.areEqual(
 				'Not Screened',
-				[SELECT Eligibility_Status__c FROM Enrollment__c WHERE Id = :fresh.Id]
-				.Eligibility_Status__c,
+				[SELECT Eligibility_Status__c FROM Enrollment__c WHERE Id = :fresh.Id].Eligibility_Status__c,
 				'The shipped default.'
 			);
 		}
@@ -366,11 +335,7 @@ private class EnrollmentRulesTest {
 			Contact person = people(1)[0];
 			Program__c used = program('Used');
 			Program__c unused = program('Unused');
-			insert new Service__c(
-				Name = 'Meal',
-				Program__c = unused.Id,
-				Unit_Of_Measure__c = 'meals'
-			);
+			insert new Service__c(Name = 'Meal', Program__c = unused.Id, Unit_Of_Measure__c = 'meals');
 			insert newEnrollment(used.Id, person.Id, 'Enrolled');
 
 			Test.startTest();

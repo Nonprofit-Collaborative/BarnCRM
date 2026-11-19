@@ -31,10 +31,7 @@ global with sharing class GetHouseholdSummaryAction {
 		@InvocableVariable(label='Household Id' description='The household\'s record id.')
 		global String householdId;
 
-		@InvocableVariable(
-			label='Household Name'
-			description='The household\'s name, for example The Garcia Family.'
-		)
+		@InvocableVariable(label='Household Name' description='The household\'s name, for example The Garcia Family.')
 		global String name;
 
 		@InvocableVariable(
@@ -49,10 +46,7 @@ global with sharing class GetHouseholdSummaryAction {
 		)
 		global String informalGreeting;
 
-		@InvocableVariable(
-			label='Member Count'
-			description='How many people currently belong to the household.'
-		)
+		@InvocableVariable(label='Member Count' description='How many people currently belong to the household.')
 		global Integer memberCount;
 
 		@InvocableVariable(
@@ -94,10 +88,7 @@ global with sharing class GetHouseholdSummaryAction {
 		)
 		global String role;
 
-		@InvocableVariable(
-			label='Is Primary'
-			description='True for the household\'s primary member.'
-		)
+		@InvocableVariable(label='Is Primary' description='True for the household\'s primary member.')
 		global Boolean isPrimary;
 
 		@InvocableVariable(
@@ -165,9 +156,7 @@ global with sharing class GetHouseholdSummaryAction {
 		);
 		for (Integer i = 0; i < recordIds.size(); i++) {
 			Id recordId = recordIds[i];
-			Id householdId = households.containsKey(recordId)
-				? recordId
-				: householdByPerson.get(recordId);
+			Id householdId = households.containsKey(recordId) ? recordId : householdByPerson.get(recordId);
 			Account household = householdId == null ? null : households.get(householdId);
 			if (household == null) {
 				// A contact that resolves to no household is a person in none. An account id
@@ -220,26 +209,16 @@ global with sharing class GetHouseholdSummaryAction {
 		);
 	}
 
-	private static void fill(
-		Result result,
-		Account household,
-		List<HouseholdService.Person> people
-	) {
+	private static void fill(Result result, Account household, List<HouseholdService.Person> people) {
 		result.householdId = household.Id;
 		result.name = household.Name;
 		result.formalGreeting = household.Household_Formal_Greeting__c;
 		result.informalGreeting = household.Household_Informal_Greeting__c;
-		result.memberCount = household.Member_Count__c == null
-			? 0
-			: household.Member_Count__c.intValue();
+		result.memberCount = household.Member_Count__c == null ? 0 : household.Member_Count__c.intValue();
 		result.primaryContactName = household.Primary_Contact__r?.Name;
 		result.mailingAddress = oneLine(household);
 		List<Member> primaryFirst = new List<Member>();
-		for (
-			HouseholdService.Person person : people == null
-				? new List<HouseholdService.Person>()
-				: people
-		) {
+		for (HouseholdService.Person person : people == null ? new List<HouseholdService.Person>() : people) {
 			Member member = new Member();
 			member.personId = person.id;
 			member.name = fullName(person);
@@ -247,9 +226,7 @@ global with sharing class GetHouseholdSummaryAction {
 			// The membership row marks the primary member in junction mode; in contact mode
 			// the household's Primary Contact is the mark itself (ADR-0044).
 			member.isPrimary =
-				person.isPrimary == true ||
-				(person.id != null &&
-				person.id == household.Primary_Contact__c);
+				person.isPrimary == true || (person.id != null && person.id == household.Primary_Contact__c);
 			member.isDeceased = person.isDeceased == true;
 			if (member.isPrimary && !primaryFirst.isEmpty()) {
 				primaryFirst.add(0, member);
@@ -279,13 +256,8 @@ global with sharing class GetHouseholdSummaryAction {
 	}
 
 	private static String fullName(HouseholdService.Person person) {
-		String first = String.isNotBlank(person.preferredName)
-			? person.preferredName
-			: person.firstName;
-		return ((first == null ? '' : first) +
-			' ' +
-			(person.lastName == null ? '' : person.lastName))
-			.trim();
+		String first = String.isNotBlank(person.preferredName) ? person.preferredName : person.firstName;
+		return ((first == null ? '' : first) + ' ' + (person.lastName == null ? '' : person.lastName)).trim();
 	}
 
 	private static Id idOf(Request request) {

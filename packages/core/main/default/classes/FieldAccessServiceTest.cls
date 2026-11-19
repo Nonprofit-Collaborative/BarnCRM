@@ -5,16 +5,11 @@
  * BarnCRM Admin) and make their own permission sets. Setup rows and the data job cannot share a
  * transaction, so each is written in a `System.runAs` block of its own.
  */
-@IsTest(
-	testFor='ApexClass:FieldAccessService, ApexClass:FieldAccessController, ApexClass:FieldAccessRecordJob'
-)
+@IsTest(testFor='ApexClass:FieldAccessService, ApexClass:FieldAccessController, ApexClass:FieldAccessRecordJob')
 private class FieldAccessServiceTest {
-	private static final String RELATIONSHIP = Relationship__c.SObjectType.getDescribe(
-			SObjectDescribeOptions.DEFERRED
-		)
+	private static final String RELATIONSHIP = Relationship__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 		.getName();
-	private static final String DESCRIPTION = Relationship__c.Description__c.getDescribe()
-		.getName();
+	private static final String DESCRIPTION = Relationship__c.Description__c.getDescribe().getName();
 	private static final String START_DATE = Relationship__c.Start_Date__c.getDescribe().getName();
 
 	@TestSetup
@@ -45,17 +40,11 @@ private class FieldAccessServiceTest {
 	}
 
 	private static String change(List<Id> setIds, List<Map<String, Object>> items) {
-		return JSON.serialize(
-			new Map<String, Object>{ 'version' => 1, 'setIds' => setIds, 'items' => items }
-		);
+		return JSON.serialize(new Map<String, Object>{ 'version' => 1, 'setIds' => setIds, 'items' => items });
 	}
 
 	private static Map<String, Object> item(String objectName, String field, String access) {
-		return new Map<String, Object>{
-			'object' => objectName,
-			'field' => field,
-			'access' => access
-		};
+		return new Map<String, Object>{ 'object' => objectName, 'field' => field, 'access' => access };
 	}
 
 	private static FieldPermissions fieldRow(Id setId, String field) {
@@ -80,13 +69,7 @@ private class FieldAccessServiceTest {
 
 	private static Import_Batch__c accessJob() {
 		return [
-			SELECT
-				Id,
-				Status__c,
-				Rows_Updated__c,
-				Rows_Rejected__c,
-				Undo_Deadline__c,
-				Operation_JSON__c
+			SELECT Id, Status__c, Rows_Updated__c, Rows_Rejected__c, Undo_Deadline__c, Operation_JSON__c
 			FROM Import_Batch__c
 			WHERE Operation__c = :FieldAccessService.OPERATION_ACCESS
 			WITH SYSTEM_MODE
@@ -101,18 +84,12 @@ private class FieldAccessServiceTest {
 			FieldAccessService.manageProfilesOverride = false;
 			FieldAccessController.Status status = FieldAccessController.getStatus();
 			Assert.isFalse(status.canChange, 'Without the system permission nothing may change.');
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_FieldAccess_NeedsManageProfiles'),
-				status.reason
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_FieldAccess_NeedsManageProfiles'), status.reason);
 			try {
 				FieldAccessController.searchSets('Test');
 				Assert.fail('A search without the permission must be refused.');
 			} catch (AuraHandledException expected) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_FieldAccess_NeedsManageProfiles'),
-					expected.getMessage()
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_FieldAccess_NeedsManageProfiles'), expected.getMessage());
 			}
 		}
 	}
@@ -120,21 +97,12 @@ private class FieldAccessServiceTest {
 	@IsTest
 	static void searchOffersOnlySetsTheOrganizationMade() {
 		System.runAs(TestUsers.admin()) {
-			Assert.isTrue(
-				FieldAccessController.getStatus().canChange,
-				'The admin may change access.'
-			);
+			Assert.isTrue(FieldAccessController.getStatus().canChange, 'The admin may change access.');
 			PermissionSet own = newSet('FAM_Search_Own');
-			List<FieldAccessController.SetChoice> found = FieldAccessController.searchSets(
-				'FAM Search'
-			);
+			List<FieldAccessController.SetChoice> found = FieldAccessController.searchSets('FAM Search');
 			Assert.areEqual(1, found.size(), 'The set the test made is offered.');
 			Assert.areEqual(String.valueOf(own.Id), found[0].id);
-			Assert.areEqual(
-				0,
-				FieldAccessController.searchSets('F').size(),
-				'One letter searches nothing.'
-			);
+			Assert.areEqual(0, FieldAccessController.searchSets('F').size(), 'One letter searches nothing.');
 			PermissionSet profileSet = [
 				SELECT Id
 				FROM PermissionSet
@@ -146,10 +114,7 @@ private class FieldAccessServiceTest {
 				FieldAccessService.requireSets(new List<Object>{ profileSet.Id });
 				Assert.fail('A profile must never be changed.');
 			} catch (FieldAccessService.FieldAccessException expected) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_FieldAccess_SetNotAllowed'),
-					expected.getMessage()
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_FieldAccess_SetNotAllowed'), expected.getMessage());
 			}
 		}
 	}
@@ -169,25 +134,14 @@ private class FieldAccessServiceTest {
 				WITH SYSTEM_MODE
 				LIMIT 1
 			];
-			for (
-				FieldAccessController.SetChoice choice : FieldAccessController.searchSets(
-					shipped.Label
-				)
-			) {
-				Assert.areNotEqual(
-					String.valueOf(shipped.Id),
-					choice.id,
-					'A set BarnCRM ships is never offered.'
-				);
+			for (FieldAccessController.SetChoice choice : FieldAccessController.searchSets(shipped.Label)) {
+				Assert.areNotEqual(String.valueOf(shipped.Id), choice.id, 'A set BarnCRM ships is never offered.');
 			}
 			try {
 				FieldAccessService.requireSets(new List<Object>{ shipped.Id });
 				Assert.fail('A set BarnCRM ships must never be changed.');
 			} catch (FieldAccessService.FieldAccessException expected) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_FieldAccess_SetNotAllowed'),
-					expected.getMessage()
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_FieldAccess_SetNotAllowed'), expected.getMessage());
 			}
 		}
 	}
@@ -206,11 +160,7 @@ private class FieldAccessServiceTest {
 			Assert.areEqual(2, listed.objectAccess.size());
 			FieldAccessController.FieldOption offered;
 			for (FieldAccessController.FieldOption option : listed.fields) {
-				Assert.areNotEqual(
-					'Name',
-					option.name,
-					'Name cannot be restricted, so it is not offered.'
-				);
+				Assert.areNotEqual('Name', option.name, 'Name cannot be restricted, so it is not offered.');
 				if (option.name == DESCRIPTION) {
 					offered = option;
 				}
@@ -228,9 +178,7 @@ private class FieldAccessServiceTest {
 			FieldAccessController.Preview preview = FieldAccessController.preview(
 				change(
 					new List<Id>{ empty.Id },
-					new List<Map<String, Object>>{
-						item(RELATIONSHIP, DESCRIPTION, FieldAccessService.EDIT)
-					}
+					new List<Map<String, Object>>{ item(RELATIONSHIP, DESCRIPTION, FieldAccessService.EDIT) }
 				)
 			);
 			Assert.areEqual(2, preview.changed, 'The field and the object Read it needs.');
@@ -240,10 +188,7 @@ private class FieldAccessServiceTest {
 			Assert.isTrue(preview.rows[0].afterRead);
 			Assert.isFalse(preview.rows[0].afterEdit, 'Field access needs only object Read.');
 			Assert.areEqual(DESCRIPTION, preview.rows[1].fieldName);
-			Assert.isTrue(
-				preview.rows[1].afterRead && preview.rows[1].afterEdit,
-				'Edit gives Read.'
-			);
+			Assert.isTrue(preview.rows[1].afterRead && preview.rows[1].afterEdit, 'Edit gives Read.');
 			Assert.areEqual(FieldAccessService.WHY_ASKED, preview.rows[1].reason);
 			Assert.isNull(objectRow(empty.Id), 'A preview writes nothing.');
 		}
@@ -311,10 +256,7 @@ private class FieldAccessServiceTest {
 				Assert.fail('A count other than the preview must be refused.');
 			} catch (AuraHandledException expected) {
 				Assert.areEqual(
-					String.format(
-						BarnHelp.text('Core', 'Core_FieldAccess_CountChanged'),
-						new List<Object>{ 1, 5 }
-					),
+					String.format(BarnHelp.text('Core', 'Core_FieldAccess_CountChanged'), new List<Object>{ 1, 5 }),
 					expected.getMessage()
 				);
 			}
@@ -347,14 +289,8 @@ private class FieldAccessServiceTest {
 			Assert.areEqual(2, undone.changed);
 		}
 		ObjectPermissions back = objectRow(given.Id);
-		Assert.isTrue(
-			back.PermissionsRead && back.PermissionsEdit,
-			'Object access is recreated as it was.'
-		);
-		Assert.isTrue(
-			fieldRow(given.Id, DESCRIPTION).PermissionsEdit,
-			'Field access is recreated.'
-		);
+		Assert.isTrue(back.PermissionsRead && back.PermissionsEdit, 'Object access is recreated as it was.');
+		Assert.isTrue(fieldRow(given.Id, DESCRIPTION).PermissionsEdit, 'Field access is recreated.');
 	}
 
 	/** Writes the job and journal the record job would, then undoes it in a new context. */
@@ -388,9 +324,7 @@ private class FieldAccessServiceTest {
 			done = FieldAccessService.apply(
 				change(
 					new List<Id>{ given.Id },
-					new List<Map<String, Object>>{
-						item(RELATIONSHIP, DESCRIPTION, FieldAccessService.NONE)
-					}
+					new List<Map<String, Object>>{ item(RELATIONSHIP, DESCRIPTION, FieldAccessService.NONE) }
 				),
 				1
 			);
@@ -457,12 +391,7 @@ private class FieldAccessServiceTest {
 			List<Id> setIds = new List<Id>{ empty.Id };
 			String formula = Account.Is_Organization__c.getDescribe().getName();
 			assertRefused(
-				change(
-					setIds,
-					new List<Map<String, Object>>{
-						item('Account', formula, FieldAccessService.EDIT)
-					}
-				),
+				change(setIds, new List<Map<String, Object>>{ item('Account', formula, FieldAccessService.EDIT) }),
 				String.format(
 					BarnHelp.text('Core', 'Core_FieldAccess_ReadOnlyField'),
 					new List<Object>{ Account.Is_Organization__c.getDescribe().getLabel() }
@@ -479,22 +408,13 @@ private class FieldAccessServiceTest {
 				String.format(
 					BarnHelp.text('Core', 'Core_FieldAccess_Conflict'),
 					new List<Object>{
-						Relationship__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-							.getLabel()
+						Relationship__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel()
 					}
 				)
 			);
 			assertRefused(
-				change(
-					setIds,
-					new List<Map<String, Object>>{
-						item(RELATIONSHIP, 'Name', FieldAccessService.READ)
-					}
-				),
-				String.format(
-					BarnHelp.text('Core', 'Core_FieldAccess_FieldNotAllowed'),
-					new List<Object>{ 'Name' }
-				)
+				change(setIds, new List<Map<String, Object>>{ item(RELATIONSHIP, 'Name', FieldAccessService.READ) }),
+				String.format(BarnHelp.text('Core', 'Core_FieldAccess_FieldNotAllowed'), new List<Object>{ 'Name' })
 			);
 			assertRefused(
 				change(setIds, new List<Map<String, Object>>()),
@@ -502,10 +422,7 @@ private class FieldAccessServiceTest {
 			);
 			assertRefused('{"version":2}', BarnHelp.text('Core', 'Core_FieldAccess_BadDocument'));
 			assertRefused(
-				change(
-					new List<Id>(),
-					new List<Map<String, Object>>{ item(RELATIONSHIP, null, 'read') }
-				),
+				change(new List<Id>(), new List<Map<String, Object>>{ item(RELATIONSHIP, null, 'read') }),
 				BarnHelp.text('Core', 'Core_FieldAccess_NoSets')
 			);
 		}

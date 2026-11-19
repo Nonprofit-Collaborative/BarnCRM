@@ -8,10 +8,7 @@ private class GrantPipelineControllerTest {
 	@TestSetup
 	static void createTestUsers() {
 		TestUsers.adminWith(GrantTestData.ADMIN);
-		TestUsers.standardUserWith(
-			'Gpreader',
-			new List<String>{ 'BarnCRM_Read_Only', 'Funders_Read_Only' }
-		);
+		TestUsers.standardUserWith('Gpreader', new List<String>{ 'BarnCRM_Read_Only', 'Funders_Read_Only' });
 	}
 
 	private static Grant__c reread(Id grantId) {
@@ -67,11 +64,7 @@ private class GrantPipelineControllerTest {
 			Assert.areEqual(today, board.today, 'Today is sent');
 			Assert.areEqual(1, board.deadlines.size(), 'Only the prospect due within 60 days');
 			Assert.areEqual(byName.get('Soon').Id, board.deadlines[0].id, 'The one due soon');
-			Assert.areEqual(
-				'Lakeside Foundation',
-				board.deadlines[0].funderName,
-				'With its funder'
-			);
+			Assert.areEqual('Lakeside Foundation', board.deadlines[0].funderName, 'With its funder');
 			Map<String, Integer> counts = new Map<String, Integer>();
 			for (GrantPipelineController.Total total : board.stageTotals) {
 				counts.put(total.stage, total.count);
@@ -101,11 +94,7 @@ private class GrantPipelineControllerTest {
 			GrantPipelineController.Board mine = GrantPipelineController.getBoard(true);
 			Assert.areEqual(0, mine.openCount, 'The reader owns none');
 			Assert.isFalse(mine.canEdit, 'And cannot move grants');
-			Assert.areEqual(
-				3,
-				GrantPipelineController.getBoard(false).openCount,
-				'Everyone shows all'
-			);
+			Assert.areEqual(3, GrantPipelineController.getBoard(false).openCount, 'Everyone shows all');
 		}
 	}
 
@@ -118,21 +107,14 @@ private class GrantPipelineControllerTest {
 
 			Test.startTest();
 			GrantPipelineController.moveStage(applied, GrantService.STAGE_AWARDED, 4500);
-			GrantPipelineController.moveStage(
-				byName.get('Soon').Id,
-				GrantService.STAGE_WITHDRAWN,
-				99
-			);
+			GrantPipelineController.moveStage(byName.get('Soon').Id, GrantService.STAGE_WITHDRAWN, 99);
 			Test.stopTest();
 
 			Grant__c awarded = reread(applied);
 			Assert.areEqual(GrantService.STAGE_AWARDED, awarded.Stage__c, 'Moved');
 			Assert.areEqual(4500, awarded.Amount_Awarded__c, 'The amount awarded is recorded');
 			Assert.areEqual(today, awarded.Decision_Date__c, 'The decision date is stamped');
-			Assert.isNull(
-				reread(byName.get('Soon').Id).Amount_Awarded__c,
-				'An amount is recorded only on Awarded'
-			);
+			Assert.isNull(reread(byName.get('Soon').Id).Amount_Awarded__c, 'An amount is recorded only on Awarded');
 		}
 	}
 
@@ -153,12 +135,7 @@ private class GrantPipelineControllerTest {
 			Test.stopTest();
 
 			Grant__c awarded = [
-				SELECT
-					Stage__c,
-					Amount_Awarded__c,
-					Award_Start_Date__c,
-					Award_End_Date__c,
-					Restricted__c
+				SELECT Stage__c, Amount_Awarded__c, Award_Start_Date__c, Award_End_Date__c, Restricted__c
 				FROM Grant__c
 				WHERE Id = :applied
 				WITH SYSTEM_MODE
@@ -190,11 +167,7 @@ private class GrantPipelineControllerTest {
 				GrantPipelineController.moveStage(grantId, 'Nowhere', null);
 				Assert.fail('An unknown stage is refused');
 			} catch (AuraHandledException e) {
-				Assert.areEqual(
-					BarnHelp.text('Funders', 'Funders_Pipeline_ErrorStage'),
-					e.getMessage(),
-					'Says why'
-				);
+				Assert.areEqual(BarnHelp.text('Funders', 'Funders_Pipeline_ErrorStage'), e.getMessage(), 'Says why');
 			}
 		}
 		User reader = [SELECT Id FROM User WHERE LastName = 'Gpreader' WITH SYSTEM_MODE LIMIT 1];

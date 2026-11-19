@@ -44,9 +44,7 @@ public with sharing class RollupExplainController {
 				return explained;
 			}
 			Schema.SObjectType recordType = recordId.getSObjectType();
-			Map<String, Schema.SObjectField> fields = recordType.getDescribe(
-					SObjectDescribeOptions.DEFERRED
-				)
+			Map<String, Schema.SObjectField> fields = recordType.getDescribe(SObjectDescribeOptions.DEFERRED)
 				.fields.getMap();
 			List<Rollup_Definition__c> definitions = new List<Rollup_Definition__c>();
 			Set<String> columns = new Set<String>{ 'Id' };
@@ -105,26 +103,15 @@ public with sharing class RollupExplainController {
 	}
 
 	/** Whether the record meets the rollup's target conditions, so the rollup fills it. */
-	private static Boolean fills(
-		Rollup_Definition__c definition,
-		Schema.SObjectType recordType,
-		Id recordId
-	) {
-		String condition = RollupFilterParser.toWhereClause(
-			definition.Target_Filter_JSON__c,
-			recordType
-		);
+	private static Boolean fills(Rollup_Definition__c definition, Schema.SObjectType recordType, Id recordId) {
+		String condition = RollupFilterParser.toWhereClause(definition.Target_Filter_JSON__c, recordType);
 		if (String.isBlank(condition)) {
 			return true;
 		}
 		// The entity comes from describe and the clause from RollupFilterParser, which checks
 		// every name and escapes every value.
 		return Database.countQueryWithBinds(
-				'SELECT COUNT() FROM ' +
-					String.valueOf(recordType) +
-					' WHERE Id = :recordId AND (' +
-					condition +
-					')',
+				'SELECT COUNT() FROM ' + String.valueOf(recordType) + ' WHERE Id = :recordId AND (' + condition + ')',
 				new Map<String, Object>{ 'recordId' => recordId },
 				AccessLevel.USER_MODE
 			) > 0;
@@ -155,9 +142,7 @@ public with sharing class RollupExplainController {
 		Object stamped = stamp == null || !stamp.getDescribe().isAccessible()
 			? null
 			: record.get(stamp.getDescribe().getName());
-		Datetime calculatedAt = stamped instanceof Datetime
-			? (Datetime) stamped
-			: definition.Last_Calculated__c;
+		Datetime calculatedAt = stamped instanceof Datetime ? (Datetime) stamped : definition.Last_Calculated__c;
 		explanation.lastCalculated = calculatedAt == null
 			? BarnHelp.text('Rollups', 'Core_RollupEase_ExplainNever')
 			: String.format(
@@ -165,9 +150,7 @@ public with sharing class RollupExplainController {
 					new List<String>{ calculatedAt.format() }
 			  );
 		if (admin) {
-			explanation.calculatedNow = RollupBuilderController.describe(
-				RollupEngine.preview(definition, record.Id)
-			);
+			explanation.calculatedNow = RollupBuilderController.describe(RollupEngine.preview(definition, record.Id));
 		}
 		return explanation;
 	}

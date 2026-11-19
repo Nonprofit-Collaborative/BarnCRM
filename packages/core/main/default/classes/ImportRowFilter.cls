@@ -118,10 +118,7 @@ public with sharing class ImportRowFilter {
 
 	/** The reason the first matching rule gives, or null when no rule matches. */
 	@TestVisible
-	private static String skipReason(
-		List<ImportMapping.SkipRule> rules,
-		Map<String, String> cells
-	) {
+	private static String skipReason(List<ImportMapping.SkipRule> rules, Map<String, String> cells) {
 		for (ImportMapping.SkipRule rule : rules) {
 			String value = cells.get(ImportMapping.key(rule.column));
 			Boolean matches;
@@ -172,10 +169,7 @@ public with sharing class ImportRowFilter {
 			return null;
 		}
 		return EncodingUtil.convertToHex(
-				Crypto.generateDigest(
-					'MD5',
-					Blob.valueOf(KEY_DIGEST + String.join(parts, KEY_SEPARATOR))
-				)
+				Crypto.generateDigest('MD5', Blob.valueOf(KEY_DIGEST + String.join(parts, KEY_SEPARATOR)))
 			)
 			.left(16);
 	}

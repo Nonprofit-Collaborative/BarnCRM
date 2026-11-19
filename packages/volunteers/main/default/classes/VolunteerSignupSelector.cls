@@ -19,15 +19,7 @@ public with sharing class VolunteerSignupSelector {
 	/** The shift's sign-ups in the order they were made, at most `max`. */
 	public static List<Volunteer_Signup__c> selectForShift(Id shiftId, Integer max) {
 		return [
-			SELECT
-				Id,
-				Name,
-				Status__c,
-				Notes__c,
-				Contact__c,
-				Contact__r.Name,
-				Account__c,
-				Account__r.Name
+			SELECT Id, Name, Status__c, Notes__c, Contact__c, Contact__r.Name, Account__c, Account__r.Name
 			FROM Volunteer_Signup__c
 			WHERE Volunteer_Shift__c = :shiftId
 			WITH USER_MODE
@@ -41,9 +33,7 @@ public with sharing class VolunteerSignupSelector {
 		return [
 			SELECT COUNT()
 			FROM Volunteer_Signup__c
-			WHERE
-				Volunteer_Shift__c = :shiftId
-				AND Status__c != :VolunteerSignupService.STATUS_CANCELLED
+			WHERE Volunteer_Shift__c = :shiftId AND Status__c != :VolunteerSignupService.STATUS_CANCELLED
 			WITH USER_MODE
 		];
 	}

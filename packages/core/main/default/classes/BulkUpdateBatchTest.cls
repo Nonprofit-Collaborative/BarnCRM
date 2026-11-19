@@ -63,12 +63,7 @@ private class BulkUpdateBatchTest {
 	}
 
 	/** `count` contacts with the title given, numbered from `first`, with work emails. */
-	private static List<Contact> people(
-		Id organizationId,
-		Integer first,
-		Integer count,
-		String title
-	) {
+	private static List<Contact> people(Id organizationId, Integer first, Integer count, String title) {
 		List<Contact> people = new List<Contact>();
 		for (Integer index = first; index < first + count; index++) {
 			people.add(
@@ -103,11 +98,7 @@ private class BulkUpdateBatchTest {
 
 	/** The job record without a queued job: the bulk update is driven by `runNow`. */
 	private static Import_Batch__c createJob(String changesJson, Integer count) {
-		return BulkUpdateService.createJob(
-			BulkUpdateService.plan(VOLUNTEERS, changesJson),
-			count,
-			count
-		);
+		return BulkUpdateService.createJob(BulkUpdateService.plan(VOLUNTEERS, changesJson), count, count);
 	}
 
 	/** Drives the job through its own start query, chunk by chunk, then its finish. */
@@ -165,22 +156,14 @@ private class BulkUpdateBatchTest {
 
 			System.Assert.areEqual(200, [SELECT COUNT() FROM Contact WHERE Title = 'Coordinator']);
 			System.Assert.areEqual(30, [SELECT COUNT() FROM Contact WHERE Title = 'Staff']);
-			System.Assert.areEqual(
-				ImportBatchService.STATUS_COMPLETE,
-				job.Status__c,
-				job.Run_Log__c
-			);
+			System.Assert.areEqual(ImportBatchService.STATUS_COMPLETE, job.Status__c, job.Run_Log__c);
 			System.Assert.areEqual(BulkUpdateService.OPERATION_UPDATE, job.Operation__c);
 			System.Assert.areEqual(200, job.Row_Count__c, 'The count confirmed at the start');
 			System.Assert.areEqual(200, job.Rows_Updated__c, 'Every match is saved');
-			System.Assert.isNotNull(
-				job.Undo_Deadline__c,
-				'The undo window is stamped at the start'
-			);
+			System.Assert.isNotNull(job.Undo_Deadline__c, 'The undo window is stamped at the start');
 			List<Map<String, Object>> entries = journal(job.Id, ImportJournalService.PHASE_COMMIT);
 			System.Assert.areEqual(200, entries.size(), 'One entry per record saved');
-			Map<String, Object> title = (Map<String, Object>) ((Map<String, Object>) entries[0]
-					.get('fields'))
+			Map<String, Object> title = (Map<String, Object>) ((Map<String, Object>) entries[0].get('fields'))
 				.get('Title');
 			System.Assert.areEqual('Volunteer', title.get('before'), 'The value before');
 			System.Assert.areEqual('Coordinator', title.get('after'), 'The value written');
@@ -234,10 +217,7 @@ private class BulkUpdateBatchTest {
 					BulkUpdateService.start(VOLUNTEERS, SET_COORDINATOR, 199);
 					System.Assert.fail('200 match, 199 were confirmed');
 				} catch (BulkUpdateFields.BulkUpdateException refused) {
-					System.Assert.isTrue(
-						refused.getMessage().contains('199'),
-						refused.getMessage()
-					);
+					System.Assert.isTrue(refused.getMessage().contains('199'), refused.getMessage());
 				}
 			}
 			System.Assert.areEqual(0, [SELECT COUNT() FROM Import_Batch__c], 'No job is created');
@@ -290,10 +270,7 @@ private class BulkUpdateBatchTest {
 			List<Map<String, Object>> entries = journal(job.Id, ImportJournalService.PHASE_COMMIT);
 			System.Assert.areEqual(200, entries.size(), 'Each refusal is journaled');
 			System.Assert.areEqual(ImportJournalService.ACTION_FAILED, entries[0].get('action'));
-			System.Assert.isTrue(
-				String.isNotBlank((String) entries[0].get('reason')),
-				'The reason'
-			);
+			System.Assert.isTrue(String.isNotBlank((String) entries[0].get('reason')), 'The reason');
 		}
 	}
 
@@ -330,9 +307,7 @@ private class BulkUpdateBatchTest {
 					}
 				}
 			);
-			String rename = changes(
-				new Map<String, Object>{ 'field' => 'Name', 'action' => 'set', 'value' => 'Same' }
-			);
+			String rename = changes(new Map<String, Object>{ 'field' => 'Name', 'action' => 'set', 'value' => 'Same' });
 			User person = maria();
 			Import_Batch__c started;
 
@@ -358,8 +333,7 @@ private class BulkUpdateBatchTest {
 			for (Map<String, Object> entry : journal(job.Id, ImportJournalService.PHASE_COMMIT)) {
 				reasonGiven =
 					reasonGiven ||
-					BarnHelp.text('Core', 'Core_BulkUpdate_ErrorHouseholdName')
-						.equals(entry.get('reason'));
+					BarnHelp.text('Core', 'Core_BulkUpdate_ErrorHouseholdName').equals(entry.get('reason'));
 			}
 			System.Assert.isTrue(reasonGiven, 'The reason is journaled');
 		}
@@ -412,11 +386,7 @@ private class BulkUpdateBatchTest {
 			noRollupTargets();
 			ImportJournalService.maxDocumentLength = 1500;
 			String longText = changes(
-				new Map<String, Object>{
-					'field' => 'Description',
-					'action' => 'set',
-					'value' => 'x'.repeat(2000)
-				}
+				new Map<String, Object>{ 'field' => 'Description', 'action' => 'set', 'value' => 'x'.repeat(2000) }
 			);
 			Import_Batch__c job = run(maria(), longText, 200);
 
@@ -454,8 +424,7 @@ private class BulkUpdateBatchTest {
 			Contact corrected = [SELECT Id FROM Contact LIMIT 1];
 			update new Contact(Id = corrected.Id, Title = 'Treasurer');
 			System.Assert.isFalse(
-				new Map<Id, Import_Batch__c>(ImportBatchSelector.selectRecent(10))
-					.containsKey(created.Id),
+				new Map<Id, Import_Batch__c>(ImportBatchSelector.selectRecent(10)).containsKey(created.Id),
 				'The import history lists imports only'
 			);
 
@@ -470,10 +439,7 @@ private class BulkUpdateBatchTest {
 			Test.stopTest();
 
 			System.Assert.areEqual(199, [SELECT COUNT() FROM Contact WHERE Title = 'Volunteer']);
-			System.Assert.areEqual(
-				'Treasurer',
-				[SELECT Title FROM Contact WHERE Id = :corrected.Id].Title
-			);
+			System.Assert.areEqual('Treasurer', [SELECT Title FROM Contact WHERE Id = :corrected.Id].Title);
 			System.Assert.areEqual(ImportBatchService.STATUS_UNDONE, reread(created.Id).Status__c);
 			List<Map<String, Object>> kept = journal(created.Id, ImportJournalService.PHASE_UNDO);
 			System.Assert.areEqual(1, kept.size(), 'The value changed since is journaled');

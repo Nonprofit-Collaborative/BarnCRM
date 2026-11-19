@@ -129,7 +129,7 @@ public with sharing class GivingPersonErasureExtension implements PersonErasureE
 		if (updates.isEmpty()) {
 			return new List<PersonErasure.Change>();
 		}
-		Database.update(updates, true, AccessLevel.USER_MODE);
+		update as user updates;
 		return new List<PersonErasure.Change>{
 			new PersonErasure.Change(
 				PersonErasure.ENDED,
@@ -149,10 +149,7 @@ public with sharing class GivingPersonErasureExtension implements PersonErasureE
 	 * credits are counted, so the count is only of what stays: credits a person entered and
 	 * other automatic roles such as Matched Donor.
 	 */
-	private static List<PersonErasure.Change> deleteHouseholdCredits(
-		Set<Id> contacts,
-		Set<Id> accounts
-	) {
+	private static List<PersonErasure.Change> deleteHouseholdCredits(Set<Id> contacts, Set<Id> accounts) {
 		List<Soft_Credit__c> credits = [
 			SELECT Id
 			FROM Soft_Credit__c
@@ -167,7 +164,7 @@ public with sharing class GivingPersonErasureExtension implements PersonErasureE
 		if (credits.isEmpty()) {
 			return new List<PersonErasure.Change>();
 		}
-		Database.delete(credits, true, AccessLevel.USER_MODE);
+		delete as user credits;
 		return new List<PersonErasure.Change>{
 			new PersonErasure.Change(
 				PersonErasure.DELETED,
@@ -207,12 +204,8 @@ public with sharing class GivingPersonErasureExtension implements PersonErasureE
 			Tribute__c updated = new Tribute__c(Id = tribute.Id);
 			Boolean changed = false;
 			if (
-				isPerson(
-					tribute.Honoree_Contact__c,
-					tribute.Honoree_Account__c,
-					contacts,
-					accounts
-				) && tribute.Honoree_Name__c != null
+				isPerson(tribute.Honoree_Contact__c, tribute.Honoree_Account__c, contacts, accounts) &&
+				tribute.Honoree_Name__c != null
 			) {
 				updated.Honoree_Name__c = null;
 				changed = true;
@@ -229,12 +222,8 @@ public with sharing class GivingPersonErasureExtension implements PersonErasureE
 				changed = true;
 			}
 			if (
-				isPerson(
-					tribute.Gift__r?.Donor_Contact__c,
-					tribute.Gift__r?.Donor_Account__c,
-					contacts,
-					accounts
-				) && tribute.Message__c != null
+				isPerson(tribute.Gift__r?.Donor_Contact__c, tribute.Gift__r?.Donor_Account__c, contacts, accounts) &&
+				tribute.Message__c != null
 			) {
 				updated.Message__c = null;
 				changed = true;
@@ -246,7 +235,7 @@ public with sharing class GivingPersonErasureExtension implements PersonErasureE
 		if (updates.isEmpty()) {
 			return new List<PersonErasure.Change>();
 		}
-		Database.update(updates, true, AccessLevel.USER_MODE);
+		update as user updates;
 		return new List<PersonErasure.Change>{
 			new PersonErasure.Change(
 				PersonErasure.CLEARED,
@@ -268,10 +257,7 @@ public with sharing class GivingPersonErasureExtension implements PersonErasureE
 	 * donor where they are accounts (the ledger names the person contact, which Giving does not
 	 * read).
 	 */
-	private static List<PersonErasure.Change> eraseAcknowledgments(
-		Set<Id> contacts,
-		Set<Id> accounts
-	) {
+	private static List<PersonErasure.Change> eraseAcknowledgments(Set<Id> contacts, Set<Id> accounts) {
 		List<Acknowledgment__c> updates = new List<Acknowledgment__c>();
 		for (Acknowledgment__c row : [
 			SELECT Id
@@ -284,18 +270,12 @@ public with sharing class GivingPersonErasureExtension implements PersonErasureE
 			WITH SYSTEM_MODE
 			LIMIT 10000
 		]) {
-			updates.add(
-				new Acknowledgment__c(
-					Id = row.Id,
-					Recipient_Email__c = null,
-					Failure_Reason__c = null
-				)
-			);
+			updates.add(new Acknowledgment__c(Id = row.Id, Recipient_Email__c = null, Failure_Reason__c = null));
 		}
 		if (updates.isEmpty()) {
 			return new List<PersonErasure.Change>();
 		}
-		Database.update(updates, true, AccessLevel.SYSTEM_MODE);
+		update as system updates;
 		return new List<PersonErasure.Change>{
 			new PersonErasure.Change(
 				PersonErasure.CLEARED,
@@ -310,10 +290,7 @@ public with sharing class GivingPersonErasureExtension implements PersonErasureE
 	}
 
 	/** Running plans for the person, cancelled as the user; their tasks stay (R-SP8). */
-	private static List<PersonErasure.Change> cancelStewardship(
-		Set<Id> contacts,
-		Set<Id> accounts
-	) {
+	private static List<PersonErasure.Change> cancelStewardship(Set<Id> contacts, Set<Id> accounts) {
 		List<Stewardship_Plan__c> updates = new List<Stewardship_Plan__c>();
 		for (Stewardship_Plan__c plan : [
 			SELECT Id
@@ -336,7 +313,7 @@ public with sharing class GivingPersonErasureExtension implements PersonErasureE
 		if (updates.isEmpty()) {
 			return new List<PersonErasure.Change>();
 		}
-		Database.update(updates, true, AccessLevel.USER_MODE);
+		update as user updates;
 		return new List<PersonErasure.Change>{
 			new PersonErasure.Change(
 				PersonErasure.ENDED,
@@ -358,12 +335,7 @@ public with sharing class GivingPersonErasureExtension implements PersonErasureE
 		}
 	}
 
-	private static Boolean isPerson(
-		Id contactId,
-		Id accountId,
-		Set<Id> contacts,
-		Set<Id> accounts
-	) {
+	private static Boolean isPerson(Id contactId, Id accountId, Set<Id> contacts, Set<Id> accounts) {
 		return (contactId != null && contacts.contains(contactId)) ||
 			(accountId != null && accounts.contains(accountId));
 	}

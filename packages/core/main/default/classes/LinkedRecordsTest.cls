@@ -13,9 +13,7 @@ private class LinkedRecordsTest {
 	@IsTest
 	static void labelsARecordOfASupportedObject() {
 		System.runAs(TestUsers.admin()) {
-			Contact person = TestDataFactory.person(
-				new Contact(FirstName = 'Ana', LastName = 'Garcia')
-			);
+			Contact person = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Garcia'));
 			insert as user person;
 			// Contact stands in for a supported module object: the seam is the same.
 			LinkedRecords.supported = new List<String>{ 'Contact' };
@@ -63,9 +61,7 @@ private class LinkedRecordsTest {
 			LinkedRecords.supported = new List<String>{ 'Gift_Not_In_This_Org__c' };
 
 			Test.startTest();
-			Map<String, LinkedRecords.Link> links = LinkedRecords.resolve(
-				new List<String>{ person.Id }
-			);
+			Map<String, LinkedRecords.Link> links = LinkedRecords.resolve(new List<String>{ person.Id });
 			Test.stopTest();
 
 			Assert.isTrue(links.isEmpty(), 'An object that is not in the org resolves nothing');

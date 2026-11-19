@@ -26,14 +26,7 @@ private class ImportTrialRunTest {
 		Import_Batch__c batch = ImportTestDataFactory.batch(template);
 		List<Map<String, String>> values = new List<Map<String, String>>();
 		for (Integer i = 0; i < FILE_ROWS; i++) {
-			values.add(
-				ImportTestDataFactory.donorRow(
-					'Person' + i,
-					'Surname' + i,
-					'trial' + i + '@example.org',
-					null
-				)
-			);
+			values.add(ImportTestDataFactory.donorRow('Person' + i, 'Surname' + i, 'trial' + i + '@example.org', null));
 		}
 		ImportTestDataFactory.rows(batch, values);
 		drive(batch.Id, true, null, null);
@@ -46,9 +39,7 @@ private class ImportTrialRunTest {
 		Import_Batch__c stamp = new Import_Batch__c(
 			Id = batchId,
 			Is_Dry_Run__c = dryRun,
-			Status__c = dryRun
-				? ImportBatchService.STATUS_DRY_RUN
-				: ImportBatchService.STATUS_COMMITTING,
+			Status__c = dryRun ? ImportBatchService.STATUS_DRY_RUN : ImportBatchService.STATUS_COMMITTING,
 			Trial_Rows__c = trialRows
 		);
 		if (!dryRun) {
@@ -73,11 +64,7 @@ private class ImportTrialRunTest {
 	static void aTrialCommitsOnlyTheFirstRowsAndCountsOnlyThem() {
 		System.runAs(TestUsers.admin()) {
 			Import_Batch__c batch = previewed();
-			Assert.areEqual(
-				ImportBatchService.STATUS_DRY_RUN_COMPLETE,
-				batch.Status__c,
-				'Previewed first.'
-			);
+			Assert.areEqual(ImportBatchService.STATUS_DRY_RUN_COMPLETE, batch.Status__c, 'Previewed first.');
 
 			Test.startTest();
 			ImportBatchService.startTrial(batch.Id, TRIAL);
@@ -122,11 +109,7 @@ private class ImportTrialRunTest {
 
 			Import_Batch__c after = ImportBatchSelector.selectById(batch.Id);
 			Assert.areEqual(ImportBatchService.STATUS_COMPLETE, after.Status__c, 'Complete.');
-			Assert.areEqual(
-				FILE_ROWS,
-				after.Rows_Created__c,
-				'The counts now cover the whole file, trial and rest.'
-			);
+			Assert.areEqual(FILE_ROWS, after.Rows_Created__c, 'The counts now cover the whole file, trial and rest.');
 			Assert.areEqual(FILE_ROWS, [SELECT COUNT() FROM Contact], 'Nobody twice.');
 			Assert.areEqual(
 				FILE_ROWS,
@@ -139,9 +122,7 @@ private class ImportTrialRunTest {
 				'The log keeps the trial part, with its row count.'
 			);
 			Assert.isTrue(
-				after.Run_Log__c.contains(
-					'Imported the remaining ' + (FILE_ROWS - TRIAL) + ' rows.'
-				),
+				after.Run_Log__c.contains('Imported the remaining ' + (FILE_ROWS - TRIAL) + ' rows.'),
 				'And the rest, with its own row count.'
 			);
 			Assert.isNull(ImportUndoService.refusal(after), 'And can be undone as one.');
@@ -158,11 +139,7 @@ private class ImportTrialRunTest {
 				ImportBatchService.startDryRun(batch.Id);
 				Assert.fail('A preview over committed rows must be refused.');
 			} catch (ImportException e) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_Import_ErrorDryRunAfterCommit'),
-					e.getMessage(),
-					'Why.'
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_Import_ErrorDryRunAfterCommit'), e.getMessage(), 'Why.');
 			}
 		}
 	}
@@ -179,11 +156,7 @@ private class ImportTrialRunTest {
 				ImportBatchService.startTrial(draft.Id, TRIAL);
 				Assert.fail('No trial before a preview.');
 			} catch (ImportException e) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_Import_ErrorDryRunFirst'),
-					e.getMessage(),
-					'Why.'
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_Import_ErrorDryRunFirst'), e.getMessage(), 'Why.');
 			}
 
 			Import_Batch__c batch = previewed();
@@ -194,11 +167,7 @@ private class ImportTrialRunTest {
 				ImportBatchService.startCommit(batch.Id);
 				Assert.fail('The rest is refused to anyone but the trial runner.');
 			} catch (ImportException e) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_Import_ErrorRemainingOtherUser'),
-					e.getMessage(),
-					'Why.'
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_Import_ErrorRemainingOtherUser'), e.getMessage(), 'Why.');
 			}
 		}
 	}
@@ -214,11 +183,7 @@ private class ImportTrialRunTest {
 			BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
 			settings.Import_Trial_Rows__c = 5000;
 			TestDataFactory.saveSettings(settings);
-			Assert.areEqual(
-				ImportBatchService.MAX_TRIAL_ROWS,
-				ImportBatchService.trialRows(),
-				'Held at the ceiling.'
-			);
+			Assert.areEqual(ImportBatchService.MAX_TRIAL_ROWS, ImportBatchService.trialRows(), 'Held at the ceiling.');
 		}
 	}
 

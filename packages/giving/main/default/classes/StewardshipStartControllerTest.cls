@@ -50,9 +50,7 @@ private class StewardshipStartControllerTest {
 	static void startsAPlanOnAPersonAndOnAnOrganization() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Stewardship_Plan_Template__c major = planWithOneStep('Major gift thanks', true);
-			Contact person = TestDataFactory.person(
-				new Contact(FirstName = 'Ana', LastName = 'Ramirez')
-			);
+			Contact person = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Ramirez'));
 			insert person;
 			Account organization = GivingTestDataFactory.insertOrganization('Summit Foundation');
 
@@ -71,8 +69,7 @@ private class StewardshipStartControllerTest {
 			Assert.areEqual(StewardshipService.STATUS_RUNNING, onPerson.Status__c, 'Running.');
 			Assert.areEqual(
 				organization.Id,
-				[SELECT Account__c FROM Stewardship_Plan__c WHERE Id = :organizationPlan]
-				.Account__c,
+				[SELECT Account__c FROM Stewardship_Plan__c WHERE Id = :organizationPlan].Account__c,
 				'An organization is the plan Account.'
 			);
 		}
@@ -83,9 +80,7 @@ private class StewardshipStartControllerTest {
 	static void aDonorThePersonCannotSeeStartsNothing() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Stewardship_Plan_Template__c major = planWithOneStep('Major gift thanks', true);
-			Contact gone = TestDataFactory.person(
-				new Contact(FirstName = 'Ana', LastName = 'Ramirez')
-			);
+			Contact gone = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Ramirez'));
 			insert gone;
 			delete gone;
 			String refusal;
@@ -115,9 +110,7 @@ private class StewardshipStartControllerTest {
 	static void aSecondStartOnTheSameDonorSaysWhy() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Stewardship_Plan_Template__c major = planWithOneStep('Major gift thanks', true);
-			Contact person = TestDataFactory.person(
-				new Contact(FirstName = 'Ana', LastName = 'Ramirez')
-			);
+			Contact person = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Ramirez'));
 			insert person;
 			StewardshipStartController.startPlan(major.Id, person.Id);
 
@@ -130,20 +123,13 @@ private class StewardshipStartControllerTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_Stewardship_ErrorAlreadyRunning'),
-				message,
-				'Told why.'
-			);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Stewardship_ErrorAlreadyRunning'), message, 'Told why.');
 		}
 	}
 
 	@IsTest
 	static void aReaderIsToldTheyCannotStartAPlan() {
-		User reader = TestDataFactory.createUser(
-			'Jen',
-			new List<String>{ 'BarnCRM_Read_Only', 'Giving_Read_Only' }
-		);
+		User reader = TestDataFactory.createUser('Jen', new List<String>{ 'BarnCRM_Read_Only', 'Giving_Read_Only' });
 		Stewardship_Plan_Template__c major;
 		Contact person;
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
@@ -166,11 +152,7 @@ private class StewardshipStartControllerTest {
 		Test.stopTest();
 
 		Assert.isFalse(model.canStart, 'A reader is offered no Start.');
-		Assert.areEqual(
-			BarnHelp.text('Giving', 'Giving_Stewardship_StartNoPermission'),
-			message,
-			'Told why.'
-		);
+		Assert.areEqual(BarnHelp.text('Giving', 'Giving_Stewardship_StartNoPermission'), message, 'Told why.');
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Assert.areEqual(0, [SELECT COUNT() FROM Stewardship_Plan__c], 'Nothing started.');
 		}

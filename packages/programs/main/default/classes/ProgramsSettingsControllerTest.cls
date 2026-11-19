@@ -10,10 +10,7 @@ private class ProgramsSettingsControllerTest {
 	@TestSetup
 	static void createTestUsers() {
 		TestUsers.adminWith(ADMIN);
-		TestUsers.standardUserWith(
-			'Reader',
-			new List<String>{ 'BarnCRM_Read_Only', 'Programs_Read_Only' }
-		);
+		TestUsers.standardUserWith('Reader', new List<String>{ 'BarnCRM_Read_Only', 'Programs_Read_Only' });
 	}
 
 	@IsTest
@@ -32,8 +29,7 @@ private class ProgramsSettingsControllerTest {
 			Assert.isNull(settings.intakePicklists[0].defaultValue, 'Referral Source has none.');
 			for (ProgramsSettingsController.Picklist each : settings.intakePicklists) {
 				Assert.isTrue(
-					each.setupUrl.startsWith('/lightning/setup/ObjectManager/') &&
-					each.setupUrl.endsWith('/view'),
+					each.setupUrl.startsWith('/lightning/setup/ObjectManager/') && each.setupUrl.endsWith('/view'),
 					'A Setup link: ' + each.setupUrl
 				);
 			}
@@ -65,9 +61,7 @@ private class ProgramsSettingsControllerTest {
 			);
 
 			Test.startTest();
-			ProgramsSettingsController.Settings saved = ProgramsSettingsController.savePrivacy(
-				true
-			);
+			ProgramsSettingsController.Settings saved = ProgramsSettingsController.savePrivacy(true);
 			Test.stopTest();
 
 			Assert.areEqual(ProgramsSharing.PRIVATE_PRESET, saved.participantPrivacy, 'Private');

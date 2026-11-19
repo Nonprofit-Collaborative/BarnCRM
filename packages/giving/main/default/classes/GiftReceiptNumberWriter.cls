@@ -29,6 +29,6 @@ public with sharing class GiftReceiptNumberWriter {
 		if (gifts == null || gifts.isEmpty()) {
 			return;
 		}
-		Database.update(gifts, true, AccessLevel.SYSTEM_MODE);
+		update as system gifts;
 	}
 }

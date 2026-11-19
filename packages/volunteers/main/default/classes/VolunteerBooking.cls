@@ -23,13 +23,7 @@ public inherited sharing class VolunteerBooking {
 	 * the waitlist is on (the sign-up is then Waitlisted) or `overTarget` is true, as for a public
 	 * form already sent, which R-VS4 allows. A cancelled sign-up of the person is reopened.
 	 */
-	public static String book(
-		Id personId,
-		Id shiftId,
-		Integer groupSize,
-		String groupName,
-		Boolean overTarget
-	) {
+	public static String book(Id personId, Id shiftId, Integer groupSize, String groupName, Boolean overTarget) {
 		List<Volunteer_Shift__c> shifts = [
 			SELECT Id, Status__c, Start_Time__c, Volunteers_Needed__c, Volunteer_Job__r.Active__c
 			FROM Volunteer_Shift__c
@@ -48,25 +42,16 @@ public inherited sharing class VolunteerBooking {
 		) {
 			return CLOSED;
 		}
-		Integer places = groupSize == null ||
-			groupSize < 1 ||
-			groupSize > MAX_GROUP
-			? 1
-			: groupSize;
+		Integer places = groupSize == null || groupSize < 1 || groupSize > MAX_GROUP ? 1 : groupSize;
 		Boolean isAccount = personId.getSObjectType() == Account.SObjectType;
 		List<Volunteer_Signup__c> existing = [
 			SELECT Id, Status__c
 			FROM Volunteer_Signup__c
-			WHERE
-				Volunteer_Shift__c = :shiftId
-				AND (Contact__c = :personId
-				OR Account__c = :personId)
+			WHERE Volunteer_Shift__c = :shiftId AND (Contact__c = :personId OR Account__c = :personId)
 			WITH SYSTEM_MODE
 			LIMIT 1
 		];
-		if (
-			!existing.isEmpty() && existing[0].Status__c != VolunteerSignupService.STATUS_CANCELLED
-		) {
+		if (!existing.isEmpty() && existing[0].Status__c != VolunteerSignupService.STATUS_CANCELLED) {
 			return ALREADY;
 		}
 		// After the already-signed-up check: a person whose own places filled the shift is told

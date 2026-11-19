@@ -18,11 +18,7 @@ private class GiftInKindTest {
 	static void makeData() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GivingTestDataFactory.insertDefaultFund();
-			Contact donor = GivingTestDataFactory.insertHouseholdContact(
-				'The Ferreira Family',
-				'Ines',
-				'Ferreira'
-			);
+			Contact donor = GivingTestDataFactory.insertHouseholdContact('The Ferreira Family', 'Ines', 'Ferreira');
 			Gift__c gift = GivingTestDataFactory.buildGift(donor.Id, 0);
 			gift.Type__c = 'In-kind';
 			gift.Gift_Date__c = Date.newInstance(2026, 5, 4);
@@ -37,14 +33,7 @@ private class GiftInKindTest {
 
 	private static Gift__c receiptedGift() {
 		return [
-			SELECT
-				Id,
-				Amount__c,
-				Type__c,
-				Gift_Date__c,
-				In_Kind_Description__c,
-				Fair_Market_Value__c,
-				Receipt_Number__c
+			SELECT Id, Amount__c, Type__c, Gift_Date__c, In_Kind_Description__c, Fair_Market_Value__c, Receipt_Number__c
 			FROM Gift__c
 			WHERE Receipt_Number__c = :RECEIPT_NUMBER
 			WITH SYSTEM_MODE
@@ -114,14 +103,11 @@ private class GiftInKindTest {
 			Gift__c gift = receiptedGift();
 
 			Test.startTest();
-			String refusal = refusalFrom(
-				new Gift__c(Id = gift.Id, In_Kind_Description__c = 'A grand piano, actually')
-			);
+			String refusal = refusalFrom(new Gift__c(Id = gift.Id, In_Kind_Description__c = 'A grand piano, actually'));
 			Test.stopTest();
 
 			Assert.isTrue(
-				refusal != null &&
-				refusal.contains(BarnHelp.text('Giving', 'Giving_Gift_ReceiptLocked')),
+				refusal != null && refusal.contains(BarnHelp.text('Giving', 'Giving_Gift_ReceiptLocked')),
 				'A receipted in-kind gift cannot be re-described: the donor already has the words.'
 			);
 			Assert.areEqual(
@@ -146,10 +132,7 @@ private class GiftInKindTest {
 			String refusal = refusalFrom(new Gift__c(Id = gift.Id, Fair_Market_Value__c = 1200));
 			Test.stopTest();
 
-			Assert.isNull(
-				refusal,
-				'The fair market value appears on no receipt, so no receipt is contradicted by it.'
-			);
+			Assert.isNull(refusal, 'The fair market value appears on no receipt, so no receipt is contradicted by it.');
 			Assert.areEqual(
 				1200,
 				receiptedGift().Fair_Market_Value__c,
@@ -209,11 +192,7 @@ private class GiftInKindTest {
 			List<QuickGiftEntryController.FieldError> errors = input.validate();
 			Test.stopTest();
 
-			Assert.areEqual(
-				1,
-				errors.size(),
-				'The description is there, so only the value is wrong.'
-			);
+			Assert.areEqual(1, errors.size(), 'The description is there, so only the value is wrong.');
 			Assert.areEqual(
 				'fairMarketValue',
 				errors[0].field,
@@ -270,11 +249,7 @@ private class GiftInKindTest {
 				'And the description survives to the record, because the receipt will print it.'
 			);
 
-			Assert.areEqual(
-				250,
-				cashGift.Amount__c,
-				'A gift of money keeps the amount it was given.'
-			);
+			Assert.areEqual(250, cashGift.Amount__c, 'A gift of money keeps the amount it was given.');
 			Assert.isNull(
 				cashGift.In_Kind_Description__c,
 				'A gift that is not in-kind carries no in-kind description, whatever was sent.'

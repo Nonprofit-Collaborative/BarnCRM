@@ -54,11 +54,7 @@ public with sharing class GenericMergeController {
 	}
 
 	@AuraEnabled
-	public static GenericMergeService.Comparison compare(
-		String objectName,
-		Id firstId,
-		Id secondId
-	) {
+	public static GenericMergeService.Comparison compare(String objectName, Id firstId, Id secondId) {
 		try {
 			DuplicateController.requirePermission();
 			return GenericMergeService.compare(objectName, firstId, secondId);
@@ -82,10 +78,7 @@ public with sharing class GenericMergeController {
 			if (!(caught instanceof DuplicateService.DuplicateException)) {
 				ErrorLogger.log(caught, 'Merge two records');
 			}
-			throw UserErrors.wrapShowingDml(
-				caught,
-				BarnHelp.text('Core', 'Core_Duplicates_ErrorUnexpected')
-			);
+			throw UserErrors.wrapShowingDml(caught, BarnHelp.text('Core', 'Core_Duplicates_ErrorUnexpected'));
 		}
 	}
 
@@ -108,14 +101,13 @@ public with sharing class GenericMergeController {
 				FROM Merge_Journal__c
 				WHERE
 					Id = :journalId
+					AND Kind__c = :AutoMergeService.KIND_MERGE
 					AND Status__c = :AutoMergeService.MERGED
 					AND CreatedDate >= :since
 				WITH USER_MODE
 			];
 			if (journals.isEmpty()) {
-				throw new DuplicateService.DuplicateException(
-					BarnHelp.text('Core', 'Core_GenericMerge_ErrorNoUndo')
-				);
+				throw new DuplicateService.DuplicateException(BarnHelp.text('Core', 'Core_GenericMerge_ErrorNoUndo'));
 			}
 			AutoMergeService.undo(journals);
 			return currentView();
@@ -139,20 +131,16 @@ public with sharing class GenericMergeController {
 		labels.sort();
 		for (String key : labels) {
 			view.objects.add(
-				new Map<String, String>{
-					'label' => key.substringBefore('|'),
-					'value' => byLabel.get(key)
-				}
+				new Map<String, String>{ 'label' => key.substringBefore('|'), 'value' => byLabel.get(key) }
 			);
 		}
 		Datetime since = Datetime.now().addDays(-AutoMergeService.UNDO_DAYS);
 		// Merges of anything but people: auto-merge lists those.
-		String people =
-			Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() + '%';
+		String people = Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() + '%';
 		for (Merge_Journal__c journal : [
 			SELECT Id, Survivor_Id__c, Merged_Name__c, Status__c, Notes__c, CreatedDate
 			FROM Merge_Journal__c
-			WHERE CreatedDate >= :since AND (NOT Survivor_Id__c LIKE :people)
+			WHERE Kind__c = :AutoMergeService.KIND_MERGE AND CreatedDate >= :since AND (NOT Survivor_Id__c LIKE :people)
 			WITH USER_MODE
 			ORDER BY CreatedDate DESC
 			LIMIT :MAX_SHOWN

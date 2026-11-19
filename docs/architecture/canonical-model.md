@@ -863,7 +863,7 @@ the app rather than in debug logs (plan Sections 2.3 and 4.8).
 | Status | picklist(New, Acknowledged, Resolved, Ignored) | yes | Where the admin has got to with this error. |
 | Occurrences | integer, default 1 | no | How many times the same failure happened within an hour of the first, counted on this one entry (R-E7). |
 | Other Records | text(255) | no | Up to ten more records the same failure happened on, comma separated, after Record Reference (R-E7). |
-| Occurrence Key | text(64) | no | A SHA-256 hash of Context, Severity and Message, by which a repeat finds its entry (R-E7). Indexed, not unique. |
+| Occurrence Key | text(64) | no | A SHA-256 hash of Context, Severity and Message, plus for an exception its type and first stack frame of our code with its line (D-208), by which a repeat finds its entry (R-E7). Indexed, not unique. |
 
 ### Rules
 
@@ -904,7 +904,8 @@ its passes, deletes every entry, whatever its Status, created more than
 package upkeep in system mode (ADR-0021) and puts the entries in the Recycle Bin. Saving the
 setting deletes nothing (owner decision, 2026-10-13, ADMIN-26).
 **R-E7 A repeat is counted, not written again (D-200 P4).** The subscriber writes one entry
-per distinct failure: an event whose Context, Message and Severity match a New entry first
+per distinct failure: an event whose Context, Message and Severity (and, for an exception, its
+type and first stack frame of our code, line included; D-208) match a New entry first
 written within the last hour adds its count to that entry's Occurrences and names its record
 in Other Records while fewer than ten are named; repeats inside one delivery fold together
 first. An entry an administrator has acknowledged, resolved or ignored, or one first written
@@ -1043,25 +1044,31 @@ names recompute and the waiting rollups.
 
 ---
 
-## 10A. Automation Snapshot
+## 10A. Admin Journal (Automation Snapshot)
 
 ### Definition
 
-One read of the org's automation through the org connection (a Scan), or one run of
-**Deactivate Org Flows and Validation Rules** (a Deactivation), with each item's state before
-and after (C-60, plan D-184, ADR-0174 "Deactivate org automation with a snapshot and restore").
-Neutral: it names no nonprofit concept and is in Core.
+The one object where admin tools keep what they need to show progress or be undone (ADR-0227,
+N-11): one row per item, with a Kind naming the tool. Kinds:
+**Scan** (one read of the org's automation through the org connection) and **Deactivation**
+(one run of **Deactivate Org Flows and Validation Rules**, with each item's state before and
+after; C-60, plan D-184, ADR-0174 "Deactivate org automation with a snapshot and restore"),
+together called an automation snapshot and described by the rules below; **Merge** (one merge,
+Section 29A, R-DP10); **Migration** (one Migration Kit run, Section 29ZS); and **Household
+Adoption** (one adopted Account, Section 29ZQ). Every reader names its kind. Neutral: it names
+no nonprofit concept and is in Core.
 
 ### Attributes
 
 | Attribute | Type | Required | Definition |
 |---|---|---|---|
-| Name | text | computed | The snapshot's identifier, assigned automatically. |
-| Kind | choice | yes | Scan or Deactivation. |
-| Status | choice | yes | Running, Done, Partial (some items failed), Failed (nothing could be done), Restoring, Restored. |
-| Items | long text | no | The items as JSON (R-AS2). |
-| Message | long text | no | Why a whole run failed, in words. |
+| Name | text | computed | The row's identifier, assigned automatically. |
+| Kind | choice | yes | Merge, Scan, Deactivation, Migration or Household Adoption. |
+| Status | choice | yes | By kind: a snapshot is Running, Done, Partial (some items failed), Failed (nothing could be done), Restoring or Restored; a merge, a migration and an adoption as their sections say. |
+| Items | long text | no | A snapshot's items as JSON (R-AS2). |
+| Message | long text | no | Why a whole snapshot run failed, in words. |
 | Restored At | datetime | no | When a Restore of a deactivation finished. |
+| Kind's own attributes | | | A merge's (29A), a migration's (29ZS) and an adoption's (29ZQ). |
 
 ### Rules
 
@@ -1096,20 +1103,38 @@ Restoring.
 **R-AS7 Production.** In production the page shows a warning and needs the confirmation phrase
 typed; in a sandbox a plain confirmation.
 **R-AS8 Kept.** Deactivation snapshots are kept until deleted, so a restore stays possible.
+**R-AJ1 One kind per reader.** Every query of the Admin Journal names its Kind, the nightly
+retention pass included (it ages out Merge rows only, R-NJ8), so one tool never reads,
+lists, undoes or deletes another's rows.
 
 ### Salesforce implementation
 
-- **Object** `Automation_Snapshot__c`, auto number Name `ASN-{000000}`, private sharing,
-  reports on, no activities, feeds or history. Only `BarnCRM_Admin` is granted it: Read,
-  Create, Edit, Delete, View All and Modify All.
+- **Object** `Merge_Journal__c` (the API name it had as the merge journal), label Admin Journal,
+  auto number Name `AJ-{000000}`, private sharing, reports on, no activities, feeds, history or
+  search. Only `BarnCRM_Admin` is granted it: Read, Create, Edit, Delete, View All and Modify
+  All, with the adoption's own fields read-only. Until N-11 the snapshot kinds were
+  `Automation_Snapshot__c`, migration runs `Migration_Run__c` and adoptions
+  `Household_Adoption__c`; nothing was packaged, so they were removed, not migrated.
 
 | Attribute | API name | Type | Notes |
 |---|---|---|---|
-| Kind | `Kind__c` | Picklist, restricted | Scan, Deactivation. |
-| Status | `Status__c` | Picklist, restricted | Running, Done, Partial, Failed, Restoring, Restored. |
-| Items | `Items__c` | Long Text Area(131072) | JSON. |
-| Message | `Message__c` | Long Text Area(32768) | |
-| Restored At | `Restored_At__c` | DateTime | |
+| Kind | `Kind__c` | Picklist, restricted, no default | Merge, Scan, Deactivation, Migration, Household Adoption. Every writer sets it. |
+| Status | `Status__c` | Picklist, restricted, no default | Merged, Undone, Partly Undone, Undo Failed (Merge); Running, Done, Partial, Failed, Restoring, Restored (Scan, Deactivation); In Progress, Complete (Migration); Adopted, Undone, Not Restored (Household Adoption). Every writer sets it. |
+| Run Id | `Run_Id__c` | Text(36), external id | A merge's or an adoption's run; undo works on a run. |
+| Survivor Id | `Survivor_Id__c` | Text(18) | Merge: the record the merge kept. |
+| Merged Id | `Merged_Id__c` | Text(18) | Merge: the record merged away, undeleted by undo. |
+| Merged Name | `Merged_Name__c` | Text(255) | Merge: the merged-away record's name, shown while it is deleted. |
+| Changed Values | `Changed_Values__c` | Long Text(131072) | Merge: JSON of each field the rules changed on the survivor, its value before and after. |
+| Moved Records | `Moved_Records__c` | Long Text(131072) | Merge: JSON of each object and link field, with the identifiers the merge moved. |
+| Notes | `Notes__c` | Long Text(32768) | Merge: what it could not journal and what undo could not restore. Household Adoption: why an undo did not put the Account back (at most 255 characters). |
+| Items | `Items__c` | Long Text Area(131072) | Scan, Deactivation: JSON. |
+| Message | `Message__c` | Long Text Area(32768) | Scan, Deactivation. |
+| Restored At | `Restored_At__c` | DateTime | Deactivation. |
+| Kit | `Kit__c` | Text(80), external id | Migration: the Migration Kit DeveloperName. |
+| State | `State_JSON__c` | Long Text Area(32768) | Migration: JSON of tool steps done and checklist items ticked. |
+| Account ID | `Account_Id__c` | Text(18), external id, not unique, read-only to the role | Household Adoption. Text, not a lookup, so the journal adds no child relationship to Account and never keeps a household from the tidy-up (R-H12a) or a delete. |
+| Previous Record Type ID | `Previous_Record_Type_Id__c` | Text(18), read-only to the role | Household Adoption. |
+| Previous Values | `Previous_Values__c` | Long Text Area(32768), read-only to the role | Household Adoption. |
 
 - **Service:** `OrgToolingApi` (Tooling API calls through the connection), `OrgAutomationScan`
   (the scan job), `OrgAutomationDeactivation` (deactivate and restore jobs),
@@ -1417,7 +1442,7 @@ default; the two choices are stored as text (ADR-0019).
 | `Merge_Default_Rule__c` | picklist(Keep master, Not blank, Most recent, Oldest record, Most complete) | Not blank | The merge rule of every person field with no active Merge Rule row (R-DP8). |
 | `Auto_Merge_Exact_Match__c` | picklist(Name and email, Name and phone, Name, email and phone, Name and birthdate) | Name and email | What two people must share exactly before auto-merge takes them (R-DP9). |
 | `Generic_Merge_Enabled__c` | boolean | false | Whether the Merge Records area of the Duplicate Matching tab is offered (R-DP11). Off on install; nothing else changes while it is off. |
-| `Merge_Journal_Retention_Days__c` | integer | 365 | Days a Merge Journal row is kept before the nightly Record Cleanup step deletes it (architect review L-08); an older merge can no longer be undone. From 30 to 3,650; empty reads as 365, out of range as the nearest end. |
+| `Merge_Journal_Retention_Days__c` | integer | 365 | Days an Admin Journal row is kept before the nightly Record Cleanup step deletes it (architect review L-08); an older merge can no longer be undone. From 30 to 3,650; empty reads as 365, out of range as the nearest end. |
 
 ### Record retention keys
 
@@ -1793,7 +1818,8 @@ names the modules a module's package needs installed first (ADR-0125
 | Staff Tabs | `Staff_Tabs__c` | text (255) | Optional. The module's tabs for everyday work, by tab API name unprefixed, separated by semicolons (for example `Gift__c;Commitment__c`), that belong in the BarnCRM and BarnCRM Console apps (ADR-0137). A page tab whose label is not its name with spaces is written `Name:Label` (for example `Donor_Levels:Donor Level Ladder`), so the Setup Assistant names it as App Manager does; an object tab is labelled from its object. A CI test holds both to the shipped tabs. Core cannot name a module tab in its own apps, so `scripts/org/deploy-packages.sh` adds them on a source deploy, and the Setup Assistant's modules step lists them for an installed package. Empty means none. |
 | Admin Tabs | `Admin_Tabs__c` | text (255) | Optional. The same for the module's admin tools and settings pages, which belong in the BarnCRM Admin and BarnCRM Admin Console apps (for example `Rollup_Builder`). Empty means none. |
 | Requires | `Requires__c` | text (255) | Optional. The modules this module's package needs installed first, as their DeveloperNames separated by semicolons, in install order (for example `Rollups` for Giving and Volunteers, `Rollups;Giving` for Mirror). While one of them is not installed, the module's row in the Modules section and the Setup Assistant says to install it first. Empty means none. |
-| Quick Links | `Quick_Links__c` | text (255) | Optional. The module's links for the BarnCRM Home tab's Quick Links (D-200 R7), separated by semicolons, each `Target:Label:Line`. Target is a tab API name unprefixed (for example `Quick_Gift_Entry`), or an object unprefixed with `.new` (for example `Enrollment__c.new`) for its new record form, shown only to someone who can create that object. Label is the tile's title in title case; Line is its one-line description (no colon or semicolon in either). Shown while the module is installed and turned on, after Core's own links. Empty means none. |
+| Beta | `Beta__c` | checkbox (default false) | Marks a module that is in beta (D-211, N-14): the Module Manager, the Setup Assistant's modules step and the Home Modules card show a Beta badge beside its name. Ticked on every shipped module record; Core has no record and is never marked. Clearing it on a record removes that module's badge. |
+| Quick Links | `Quick_Links__c` | text (255) | Optional. The module's links for the BarnCRM Home tab's Quick Links (D-200 R7), separated by semicolons, each `Target:Label:Line`. Target is a tab API name unprefixed (for example `Quick_Gift_Entry`), or an object unprefixed with `.new` (for example `Enrollment__c.new`) for its new record form, shown only to someone who can create that object. Label is the tile's title in title case; Line is the key of its one-line description in Core's BarnHelp catalog (for example `Core_HubHome_QuickLinkEnterGiftLine`; D-208), and a value that is no key there is shown as written (no colon or semicolon in either). Shown while the module is installed and turned on, after Core's own links. Empty means none. |
 
 ### Integration App
 
@@ -3769,7 +3795,7 @@ them (R-IB8, R-IB9).
 | Rows Deleted | `Rows_Deleted__c` | Number (9, 0) |
 | Trial Rows | `Trial_Rows__c` | Number (9, 0) |
 | Retry After Row | `Retry_After_Row__c` | Number (9, 0) |
-| Migration Run | `Migration_Run__c` | Lookup(Migration Run), cleared when the run is deleted |
+| Migration Run | `Migration_Journal__c` | Lookup(Admin Journal, `Merge_Journal__c`, a row of Kind Migration; relationship `Data_Jobs`), cleared when the run is deleted. Named `Migration_Run__c` until N-11, when runs moved into the Admin Journal. |
 | Migration Step | `Migration_Step__c` | Text (80) |
 
 - **Batch tag on other objects:** `Created_By_Import_Batch__c`, a Lookup to
@@ -7008,7 +7034,7 @@ sort in package metadata, so the list opens unsorted and a click on the Next Ask
 - **Settings keys** (on `Giving_Settings__c`, Section 12): `Ask_Reminders_Enabled__c`,
   `Ask_Reminders_Last_Run__c`, `Ask_Reminders_Last_Run_Summary__c`.
 - **Nightly job:** `AskReminderSchedulable` and `AskReminderBatch`, scheduled by
-  `GivingScheduler` as the module's fourth job (`BarnCRM Giving Ask Reminders`, 03:30) and
+  `GivingScheduler` as the module's fourth job (`BarnCRM Fundraising Ask Reminders`, 03:30) and
   listed by `GivingNightlyJobProvider` for Health Check.
 - **Service:** `AskReminderService`, `AskReminderSelector`, `AskReminderWriter`.
 
@@ -7935,7 +7961,8 @@ records: the platform's duplicate rules write a Duplicate Record Set and its Dup
 Items, and the BarnCRM scan writes the same two standard objects for duplicates that were
 already in the org before anybody looked. BarnCRM adds no object for a suggestion and no
 copy of what the platform found (R-DP1); its own matching is limited to related-record values
-through match sources, and a Duplicate Reason row says which source found a pair (R-DP6).
+through match sources, and a Duplicate Dismissal row of Kind Match Reason says which source
+found a pair (R-DP6).
 
 ### Attributes
 
@@ -8015,9 +8042,11 @@ since it may be held by more than ten records the lookup did not read. A pair a 
 rule's; R-DP2 to R-DP5 apply as to any pair. The set still names an active rule for the
 object, as the platform requires (any active rule stands in, so Salesforce's own Duplicate
 Record Sets tab shows the pair under that rule), and a pass with no active rule writes no
-source pair either. The reason is kept in a Duplicate Reason row and shown on the review list
-(the rule's name is shown otherwise), read in system mode since it holds only a source's label;
-it is deleted with its suggestion when dismissed or closed by a merge. A reason row whose set
+source pair either. The reason is kept in a Duplicate Dismissal row of Kind Match Reason, keyed
+by the set (ADR-0227), and shown on the review list (the rule's
+name is shown otherwise). It is written, read and deleted in system mode, since it holds only a
+source's label and the dismissal object is creatable by administrators only; it is deleted with
+its suggestion when dismissed or closed by a merge. A reason row whose set
 is gone any other way is never read again and is harmless. A source that cannot be read is
 logged and counted as a failure.
 
@@ -8088,38 +8117,25 @@ copied or changed.
 
 ### Salesforce implementation
 
-- **Object** `Duplicate_Reason__c` (R-DP6), auto number Name, public read/write like the
-  dismissal. Written by the scan in user mode, best effort: a person who may not create it
-  still gets the suggestion, without the reason.
-
-| Attribute | API name | Type | Notes |
-|---|---|---|---|
-| Set Id | `Set_Id__c` | Text(18), unique, external id | The Duplicate Record Set the reason explains. |
-| Reason | `Reason__c` | Text(255) | What the review list shows, naming the match source. |
-
-- **Object** `Merge_Journal__c` (R-DP10), auto number Name, private: each run's rows belong to
-  the administrator who ran it, and BarnCRM Admin views and modifies all of them. Written and
-  read in user mode.
-
-| Attribute | API name | Type | Notes |
-|---|---|---|---|
-| Run Id | `Run_Id__c` | Text(36), external id | Groups one auto-merge run; undo works on a run. |
-| Survivor Id | `Survivor_Id__c` | Text(18) | The person the merge kept. |
-| Merged Id | `Merged_Id__c` | Text(18) | The person merged away, undeleted by undo. |
-| Merged Name | `Merged_Name__c` | Text(255) | The merged-away person's name, shown while they are deleted. |
-| Status | `Status__c` | picklist(Merged, Undone, Partly Undone, Undo Failed) | Where the merge stands. |
-| Changed Values | `Changed_Values__c` | Long Text(131072) | JSON: each field the rules changed on the survivor, its value before and after. |
-| Moved Records | `Moved_Records__c` | Long Text(131072) | JSON: each object and link field, with the identifiers the merge moved. |
-| Notes | `Notes__c` | Long Text(32768) | What the merge could not journal and what undo could not restore. |
+- **Merge Journal** (R-DP10): each merge is an Admin Journal row (`Merge_Journal__c`, Section
+  10A) of Kind Merge, with `Run_Id__c`, `Survivor_Id__c`, `Merged_Id__c`, `Merged_Name__c`,
+  `Status__c` (Merged, Undone, Partly Undone, Undo Failed), `Changed_Values__c`,
+  `Moved_Records__c` and `Notes__c` as declared there. Private: each run's rows belong to the
+  administrator who ran it, and BarnCRM Admin views and modifies all of them. Written and read in
+  user mode, always of Kind Merge.
 
 - **Object** `Duplicate_Dismissal__c`, with an auto number Name. Sharing is public read/write:
   a dismissal is the organization's decision, and a scan run by one administrator must pass
-  over a pair another administrator dismissed.
+  over a pair another administrator dismissed. It also holds the match reasons of R-DP6 (Kind
+  Match Reason), which until N-11 were the separate object `Duplicate_Reason__c` keyed by
+  `Set_Id__c`. Dismissal queries, the dismissal count and the All Duplicate Dismissals list view
+  leave Match Reason rows out.
 
 | Attribute | API name | Type | Notes |
 |---|---|---|---|
-| Pair Key | `Pair_Key__c` | Text(40), unique, external id | The two 18 character identifiers in ascending order, joined with a hyphen. |
-| Reason | `Reason__c` | Text(255) | Optional. |
+| Kind | `Kind__c` | Picklist, restricted, default Dismissal | Dismissal or Match Reason. |
+| Pair Key | `Pair_Key__c` | Text(40), unique, external id | A dismissal: the two 18 character identifiers in ascending order, joined with a hyphen. A match reason: the Duplicate Record Set's 18 character identifier. |
+| Reason | `Reason__c` | Text(255) | A dismissal: optional, the person's words. A match reason: what the review list shows, naming the match source. |
 
 - **Suggestions** are the standard objects `DuplicateRecordSet` and `DuplicateRecordItem`,
   read with `DuplicateRule`. They are read and written in user mode, so a reviewer is never
@@ -8183,11 +8199,22 @@ The Mirror package is the only place a standard Salesforce object such as Campai
 Opportunity may be named (plan Section 4.2), and even there only through dynamic Apex, so
 Mirror installs on an org where the object is absent and its feature says it is unavailable.
 The inbound gift API and the accounting export add nothing to the model (Section 30). Campaign
-sync (X-02) adds one attribute to Appeal and Mirror's own settings object. The Opportunity
-mirror (X-01) adds one attribute to Gift and two keys to that settings object. The Gift
+sync (X-02) adds one attribute to Appeal and one key to a settings object. The Opportunity
+mirror (X-01) adds one attribute to Gift and five keys to that settings object. The Gift
 Transaction mirror (X-07, Section 29C1) adds one attribute to Gift, one to Fund and five keys to
 that settings object, and is the only place a Nonprofit Cloud object is named, by string,
 through describe.
+
+Since release 1.27 (N-09, N-15, D-210, ADR-0228) **Mirror**
+(`packages/mirror`, depends on Core only) keeps `Mirror_Settings__c` with the Case request keys
+only, Provider Request (Section 29C2) and the Nonprofit Cloud households and relationships kits.
+**Fundraising** (`packages/giving`, never depending on Mirror) ships every attribute and list
+view this part adds to Appeal, Gift and Fund, every gift mirror key (now on `Giving_Settings__c`,
+Section 26), and the Campaign sync, Opportunity mirror, Gift Transaction mirror, inbound gift API
+and accounting export code and permission sets, naming standard and Nonprofit Cloud objects only
+in string literals. Where a section below says "shipped by Mirror" for an attribute on a
+Fundraising object, read Fundraising. No attribute or object changed; the eleven gift mirror
+keys moved from `Mirror_Settings__c` to `Giving_Settings__c` with their names and types.
 
 ---
 
@@ -8283,14 +8310,14 @@ Campaign of the gift's appeal, which is why it is an indexed external identifier
 
 ### Salesforce implementation
 
-- **Attribute on `Appeal__c`, shipped by Mirror** (in `packages/mirror`, not Giving):
+- **Attribute on `Appeal__c`, shipped by Fundraising** (`packages/giving`):
 
 | Attribute | API name | Type |
 |---|---|---|
 | Campaign ID | `Campaign_Id__c` | Text(18), unique, external ID, case sensitive |
 
-- **Custom setting:** `Mirror_Settings__c`, hierarchy, protected, Mirror's own under
-  ADR-0017.
+- **Custom setting:** `Giving_Settings__c` (Section 26), hierarchy, protected, Fundraising's
+  own under ADR-0017 (on `Mirror_Settings__c` until N-15).
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -8298,7 +8325,7 @@ Campaign of the gift's appeal, which is why it is an indexed external identifier
 
 - **Automation:** `Automation_Registry__mdt` row `Campaign_Sync` on `Appeal__c`, order 50,
   enabled by default, handler `CampaignSyncTriggerHandler`, running before insert and before
-  update. Its switch row is created by `MirrorPostInstall`, which Mirror gains for this.
+  update. Its switch row is created by `GivingPostInstall`.
 - **Service:** `CampaignSyncService` (the copy), `CampaignSyncSelector` (appeal and Campaign
   reads, Campaign by dynamic query only), `CampaignSyncBatch` (R-CS6),
   `CampaignSyncController` and the `campaignSync` page reached from the Giving section of
@@ -8466,13 +8493,13 @@ only, because a gift is never edited from its Opportunity.
 
 ### Salesforce implementation
 
-- **Attribute on `Gift__c`, shipped by Mirror** (in `packages/mirror`, not Giving):
+- **Attribute on `Gift__c`, shipped by Fundraising** (`packages/giving`):
 
 | Attribute | API name | Type |
 |---|---|---|
 | Opportunity ID | `Opportunity_Id__c` | Text(18), unique, external ID, case sensitive |
 
-- **Custom setting `Mirror_Settings__c`** (Section 29B) gains:
+- **Custom setting `Giving_Settings__c`** (Sections 26 and 29B) gains:
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -8498,7 +8525,7 @@ only, because a gift is never edited from its Opportunity.
   release, ADR-0194 D4), which also carries the custom permission
   `Use_Opportunity_Mirror`: the page's reads require it, and the console shows the page's row
   only to someone who has it (the Setting Definition's `Required_Permission__c`).
-- **List view** `Gifts_And_Opportunities` on Gift, shipped by Mirror, where Opportunity ID is
+- **List view** `Gifts_And_Opportunities` on Gift, shipped by Fundraising, where Opportunity ID is
   typed or cleared (R-OM10).
 
 ---
@@ -8514,8 +8541,8 @@ Transactions only, so an organization that records its gifts in BarnCRM turns th
 keep those features seeing its giving. A reconciliation page shows where the two sides disagree.
 
 The mirror is not an entity of its own. It is one attribute on Gift and one on Fund, held by
-Mirror because no other package may name a Nonprofit Cloud object, and five keys on Mirror
-Settings. There is no link object, for the reason Section 29C gives (ADR-0058). Every Nonprofit
+Fundraising's gift mirror classes, the only place outside Mirror that may name a Nonprofit Cloud
+object (by string only), and five keys on Giving Settings. There is no link object, for the reason Section 29C gives (ADR-0058). Every Nonprofit
 Cloud object and field is reached through describe, by name, never at compile time; the names
 used are those of `docs/architecture/reference/nonprofit-cloud-data-model.md` Sections 3.1 to
 3.3, and the types it marks as inferred are checked at run time (R-GT1).
@@ -8655,19 +8682,19 @@ range that are dated on or after the start date.
 
 ### Salesforce implementation
 
-- **Attribute on `Gift__c`, shipped by Mirror** (in `packages/mirror`):
+- **Attribute on `Gift__c`, shipped by Fundraising** (`packages/giving`):
 
 | Attribute | API name | Type |
 |---|---|---|
 | Gift Transaction ID | `Gift_Transaction_Id__c` | Text(18), unique, external ID, case sensitive |
 
-- **Attribute on `Fund__c`, shipped by Mirror**:
+- **Attribute on `Fund__c`, shipped by Fundraising**:
 
 | Attribute | API name | Type |
 |---|---|---|
 | Gift Designation ID | `Gift_Designation_Id__c` | Text(18) |
 
-- **Custom setting `Mirror_Settings__c`** (Section 29B) gains:
+- **Custom setting `Giving_Settings__c`** (Sections 26 and 29B) gains:
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -8700,15 +8727,15 @@ range that are dated on or after the start date.
   `GiftTransactionMirrorController` and the `giftTransactionMirror` page reached from the Giving
   section of BarnCRM Settings. Shared with the Opportunity mirror: `MirrorSync`,
   `MirrorSettingsWriter` (the runs' record of their last completed run),
-  `MirrorHealthCheckExtension` (the stale run finding) and `MirrorNightlyJobProvider` (the
-  nightly jobs list). Permission set: `Salesforce_Records_Sync` (retired `Gift_Transaction_Mirror`
+  `GiftMirrorHealthChecks` (the stale run finding, through `GivingHealthCheckExtension`) and
+  `GivingNightlyJobProvider` (the nightly jobs list), all in Fundraising. Permission set: `Salesforce_Records_Sync` (retired `Gift_Transaction_Mirror`
   until the next release, ADR-0194 D4), which also carries the custom
   permission `Use_Gift_Transaction_Mirror`: the page's reads require it, and the console shows
   the page's row only to someone who has it. It is offered on the Access page through an
   `Access_Add_On__mdt` row.
 - **List views** `Gifts_And_Gift_Transactions` on Gift, where Gift Transaction ID is typed or
   cleared (R-GT9), and `Funds_And_Gift_Designations` on Fund, where Gift Designation ID is typed
-  (R-GT5), both shipped by Mirror.
+  (R-GT5), both shipped by Fundraising.
 
 ---
 
@@ -8720,9 +8747,11 @@ A Case this org sent to a service provider running BarnCRM Projects, with the pr
 
 ### Rules
 
-**R-PR1 Sending.** While `Mirror_Settings__c.Case_Requests_Enabled__c` is on (shipped off) and the org has Case, a Case is posted to the provider's request API (Section 29PM18, R-PM26) through the Named Credential `Barn_Request_Provider`, which the admin creates: by the flow action Send Cases to a Service Provider, or by the nightly step for every open Case whose Type is `Case_Requests_Type__c` (default Service Provider). A Case with a Request Number is never sent again. A refusal is kept in Last Error and the Error Log, and the next run sends the Case again.
+**R-PR1 Sending.** While `Mirror_Settings__c.Case_Requests_Enabled__c` is on (shipped off) and the org has Case, a Case is posted to the provider's request API (Section 29PM18, R-PM26) through the Named Credential `Barn_Request_Provider`, which the admin creates: by the flow action Send Cases to a Service Provider, or by the hourly check (`CaseProviderRequestsHourly`, at 15 minutes past each hour, N-10) for every open Case whose Type is `Case_Requests_Type__c` (default Service Provider). A Case with a Request Number is never sent again. A refusal is kept in Last Error and the Error Log, and the next run sends the Case again.
 
-**R-PR2 Status.** The nightly step reads the status of every Provider Request with a Request Number not yet Resolved, Closed or Cancelled, 200 per call, and writes Provider Status, Provider Resolution and Last Synced. Written in system mode by the run only; users read.
+**R-PR2 Status.** The same hourly pass reads the status of every Provider Request with a Request Number not yet Resolved, Closed or Cancelled, 200 per call, and writes Provider Status, Provider Resolution and Last Synced. Written in system mode by the run only; users read.
+
+**R-PR3 Only while open (N-10).** Each hourly check first reads at most one Provider Request with a Request Number not yet Resolved, Closed or Cancelled, and at most one open Case of the chosen Type. When neither exists it does nothing: no queued job, no callout, no Error Log entry. There is one scheduled job, named `BarnCRM Mirror: Case requests hourly`; the nightly step (01:40) keeps it scheduled (a job on another cron under that name is replaced, never doubled) and the job removes itself while the setting or the step's switch is off.
 
 Case is never named at compile time or given a field: the link is the Case Id held as text (ADR-0013, ADR-0058).
 
@@ -8740,7 +8769,7 @@ Case is never named at compile time or given a field: the link is the Case Id he
 | Last Error | `Error__c` | Text(255) |
 
 - **Settings:** on `Mirror_Settings__c`, `Case_Requests_Enabled__c` (Checkbox, default false, Setting Definition `Mirror_Case_Requests`) and `Case_Requests_Type__c` (Text(80), default Service Provider, `Mirror_Case_Requests_Type`).
-- **Access:** read through Salesforce Records Sync; the Provider Requests tab in Mirror's Admin_Tabs.
+- **Access:** read through Mirror's `Provider_Requests` permission set (an Access Add-On row; N-09 moved it out of Salesforce Records Sync, which is Fundraising's); the Provider Requests tab in Mirror's Admin_Tabs.
 
 ---
 
@@ -12683,7 +12712,7 @@ government award fields (F-04) describe a government award (R-GN10).
 | Program | record identifier (text) | no | The program the grant pays for, when the Programs module is installed. A record identifier, not a reference: Funders never depends on Programs (R-GN4). |
 | Owner | reference(User) | yes | The staff member responsible (the record owner). Reminders fall back to the owner (R-GQ3). |
 | Restricted | boolean | yes (defaults false) | The funder limited the money to a purpose or a period; its received payments are entered in the restricted ledger (R-GP3). |
-| Giving Fund | record identifier (text) | no | The Giving fund the money is booked to, when the Giving module is installed. A record identifier, not a reference: Funders never depends on Giving (R-GN8). |
+| Fund | record identifier (text) | no | The Fundraising fund the money is booked to, when the Giving module is installed. A record identifier, not a reference: Funders never depends on Giving (R-GN8). |
 | Restricted Received | currency (derived) | no | Sum of the grant's Received entries (R-FE2). |
 | Restricted Spent | currency (derived) | no | Sum of its Spent entries (R-FE2). |
 | Restricted Released | currency (derived) | no | Sum of its Released entries (R-FE2). |
@@ -12810,7 +12839,7 @@ second one. The renewal history is the chain of Renewal Of links both ways, at m
 | Program | `Program_Id__c` | Text(18) |
 | Sample Data | `Sample_Data__c` | Checkbox, default false |
 | Restricted | `Restricted__c` | Checkbox, default false |
-| Giving Fund | `Fund_Id__c` | Text(18) |
+| Fund | `Fund_Id__c` | Text(18) |
 | Restricted Received | `Restricted_Received__c` | Roll-up summary: SUM of `Grant_Fund_Entry__c.Amount__c` where Type is Received |
 | Restricted Spent | `Restricted_Spent__c` | Roll-up summary: SUM of `Grant_Fund_Entry__c.Amount__c` where Type is Spent |
 | Restricted Released | `Restricted_Released__c` | Roll-up summary: SUM of `Grant_Fund_Entry__c.Amount__c` where Type is Released |
@@ -12978,7 +13007,7 @@ version number. Uploading needs edit access to the requirement.
 
 ### Definition
 
-The Funders module's org-wide settings (F-02), edited in the Funders section of BarnCRM Settings.
+The Grants module's (renamed from Funders, D-208) org-wide settings (F-02), edited in the Grants section of BarnCRM Settings. The custom setting's label is Grants Settings; its API name stays `Funders_Settings__c`.
 
 ### Attributes
 
@@ -13013,7 +13042,7 @@ searches nothing. A blank or out of range renewal lead time reads as 90.
 
 - **Setting Definitions:** `Funders_Reminder_Tasks_Enabled`, `Funders_Reminder_Emails_Enabled`,
   `Funders_Reminder_Lead_Days`, `Funders_Grant_Finder_Enabled`, `Funders_Renewal_Lead_Days`,
-  section Funders.
+  section Grants (module `Funders`).
 
 ---
 
@@ -13545,17 +13574,14 @@ stop being one.
 
 ### Salesforce implementation
 
-- **Object** `Household_Adoption__c`, auto number Name `HA-{000000}`, sharing Private, reports
-  on, no activities, feeds, history or search.
-
-| Attribute | API name | Type |
-|---|---|---|
-| Account ID | `Account_Id__c` | Text(18), External ID, not unique. Text, not a lookup, so the journal adds no child relationship to Account and never keeps a household from the tidy-up (R-H12a) or a delete. |
-| Run ID | `Run_Id__c` | Text(36), External ID, not unique |
-| Previous Record Type ID | `Previous_Record_Type_Id__c` | Text(18) |
-| Previous Values | `Previous_Values__c` | Long Text Area(32768) |
-| Status | `Status__c` | Picklist, restricted |
-| Note | `Note__c` | Text(255) |
+- **Household Adoption rows** are Admin Journal rows (`Merge_Journal__c`, Section 10A) of Kind
+  Household Adoption, written by the adoption job in system mode, with `Account_Id__c`,
+  `Run_Id__c`, `Previous_Record_Type_Id__c`, `Previous_Values__c`, `Status__c` (Adopted,
+  Undone, Not Restored) and the note in `Notes__c` (at most 255 characters), as declared there.
+  Every query here reads Kind Household Adoption only. Until N-11 (ADR-0227)
+  this was the object `Household_Adoption__c` (`HA-{000000}`,
+  note in `Note__c`), read-only to BarnCRM Admin; the role may now also edit an adoption row's
+  Status or delete it, as for a merge row, while its own fields stay read-only.
 
 - **NPSP fields read, never written** (names built at run time, read only when describe finds
   them and the user may read them): `npe01__SYSTEM_AccountType__c`, `npo02__Formal_Greeting__c`,
@@ -13637,8 +13663,8 @@ adopt.
 next check, and the new run's first step waits for the work the old step started.
 
 **R-NJ8 Record Cleanup.** A Core step at 1:20 deletes, oldest first and in system mode, the
-history rows past their retention (architect review L-08): Setting Change (R-S2), Merge Journal,
-finished imports and bulk jobs whose undo window has closed, and imports abandoned in Draft,
+history rows past their retention (architect review L-08): Setting Change (R-S2), Admin Journal
+rows of Kind Merge (no other kind, R-AJ1), finished imports and bulk jobs whose undo window has closed, and imports abandoned in Draft,
 Parsing or Dry run (never committed) once as old (journal and rows first, then the batch),
 Field Utilization Snapshot (R-FU7), Error Log entries (R-E6) and the staged rows of complete
 imports by Delete Import Rows (R-IR5), each by its key in Section 12 ("Record retention keys",
@@ -13722,14 +13748,12 @@ writes, switches off or uninstalls the product migrated from.
 
 ### Salesforce implementation
 
-- **Object** `Migration_Run__c`, auto number Name `MR-{0000}`, sharing Private, reports on, no
-  activities, feeds, history or search.
-
-| Attribute | API name | Type |
-|---|---|---|
-| Kit | `Kit__c` | Text(80), required |
-| Status | `Status__c` | Picklist, restricted: `In Progress` (default), `Complete` |
-| State | `State_JSON__c` | Long Text Area(32768) |
+- **Runs** are Admin Journal rows (`Merge_Journal__c`, Section 10A) of Kind Migration, with
+  `Kit__c` (always written), `Status__c` (`In Progress`, set when the run starts, or `Complete`)
+  and `State_JSON__c`, as declared there; every query reads Kind Migration only. Import Batch
+  points at its run through `Migration_Journal__c` (Section 16). Until N-11 (ADR-0227)
+  a run was the object `Migration_Run__c` (`MR-{0000}`), and
+  the Import Batch lookup had that name.
 
 - **Classes:** `MigrationKitService` (catalog, run state, order, verification),
   `MigrationStageBatch` (reads the source, stages rows, starts the dry run),
@@ -13801,6 +13825,14 @@ the publisher may create that is not a lookup and not encrypted, and no record o
 match. The same check runs again before a public submission is processed. Publishing sets Public
 and gives the new version its signing key.
 
+**R-FM4 A form with submissions is deleted only by a Forms administrator (N-04, D-208).** Deleting
+a form, or one of its versions, that any submission answers is refused unless the person holds
+the Manage Forms custom permission (`Forms_Manage`, in Forms Admin), with the message to close
+the form instead. A Forms administrator may delete it: the versions and drafts go with the form,
+and every submission is kept, its Form and Form Version cleared and its Form Name and Version
+Number (R-FS8) still naming what was answered. A form or version no submission answers deletes as
+before, for anyone who may delete it.
+
 ### Salesforce implementation
 
 - **Object:** `Form__c`, name field Text, label Form Name, sharing Public Read Only (Forms Admin
@@ -13813,14 +13845,17 @@ and gives the new version its signing key.
 | Definition | `Definition__c` | Long Text Area(131072) |
 | Published Version | `Published_Version__c` | Number(6, 0) |
 | Public | `Public__c` | Checkbox, default false |
-| Sample Data | `Sample_Data__c` | Checkbox, default false (release 1.25); set by the sample data loader so Remove Sample Data finds the form, its versions and its submissions (children go with it by master-detail) |
+| Sample Data | `Sample_Data__c` | Checkbox, default false (release 1.25); set by the sample data loader so Remove Sample Data finds the form, its versions and its submissions (versions and drafts go with it by master-detail; the sample file removes the submissions first) |
 
 - **Engine:** framework-free modules `formDefinition.js` (parse, check, defaults), `formRules.js`
   (conditions, visibility, answer checks, step order) and `formMapping.js` (what a submission
   writes), with Jest tests. **Controller:** `FormBuilderController` (thin: the form, the objects
   and fields a target may name from describe, save and publish, in user mode).
-- **Permission sets:** Forms Admin creates, edits, publishes and deletes forms; Forms Staff and
-  Forms Read Only read them.
+- **Automation:** `FormTrigger` and `FormVersionTrigger` run `FormDeleteGuard` (registry row
+  `Form_Delete_Guard`, always runs) before delete (R-FM4).
+- **Permission sets:** Forms Admin creates, edits, publishes and deletes forms and holds the
+  custom permission Manage Forms (`Forms_Manage`, R-FM4); Forms Staff and Forms Read Only read
+  them.
 
 ---
 
@@ -13869,8 +13904,10 @@ lost.
 
 | Attribute | Type | Required | Definition |
 |---|---|---|---|
-| Form | reference | yes | The form, master-detail. |
-| Form Version | reference | yes | The version answered. |
+| Form | reference | yes, until the form is deleted | The form filled in; cleared when a Forms administrator deletes the form (R-FM4). |
+| Form Version | reference | yes, until the version is deleted | The version answered; cleared when the version or its form is deleted (R-FM4). |
+| Form Name | text | no (set by BarnCRM) | The form's name when the submission was stored (R-FS8). |
+| Version Number | number | no (set by BarnCRM) | The number of the version answered (R-FS8). |
 | Status | picklist | yes | Received (a public submission waiting, R-FS5), Processed, Needs Review (R-FS2) or Failed (R-FS3). |
 | Source | picklist | yes (Staff) | Staff (filled in by a signed-in user through the runner) or Public (a Site or an API caller, R-FS5). |
 | Answers | long text | yes | The answers as JSON, by field key, hidden fields left out (R-FS1). |
@@ -13913,15 +13950,25 @@ caller: R-FM3 is checked again, every record uses `fillBlanks`, a `context` link
 a module's `FormAttachmentExtension` names this form for that record (else Needs Review), and a
 person matched to a person account is held for review. Otherwise R-FS1 to R-FS4 apply.
 
+**R-FS8 A submission names what it answered (N-04, D-208).** Saving a submission with a version
+and no Form Name fills Form Name from the form and Version Number from the version, so a
+submission stays identifiable after a Forms administrator deletes its form (R-FM4). A submission
+whose version is gone keeps its answers, shown by their keys, and cannot be processed again.
+
 ### Salesforce implementation
 
-- **Object:** `Form_Submission__c`, name field Auto Number `FS-{000000}`, master-detail to
-  `Form__c`, sharing controlled by parent, tab Form Submissions in the BarnCRM apps (D-188).
+- **Object:** `Form_Submission__c`, name field Auto Number `FS-{000000}`, lookup to `Form__c`
+  (until N-04, master-detail), sharing Public Read/Write (the access master-detail gave, since
+  Forms Admin and Forms Staff edit submissions and the form's sharing is Public Read Only), tab
+  Form Submissions in the BarnCRM apps (D-188). A public submission stored by the Site guest
+  user is owned by the Site's default record owner, which Salesforce assigns.
 
 | Attribute | API name | Type |
 |---|---|---|
-| Form | `Form__c` | Master-Detail(Form) |
-| Form Version | `Form_Version__c` | Lookup(Form Version), restrict delete |
+| Form | `Form__c` | Lookup(Form), set null on delete |
+| Form Version | `Form_Version__c` | Lookup(Form Version), set null on delete |
+| Form Name | `Form_Name__c` | Text(80) |
+| Version Number | `Version_Number__c` | Number(6, 0) |
 | Status | `Status__c` | Picklist (Received, Processed, Needs Review, Failed), restricted |
 | Source | `Source__c` | Picklist (Staff, Public), restricted, default Staff |
 | Answers | `Answers__c` | Long Text Area(131072) |
@@ -13935,6 +13982,8 @@ person matched to a person account is held for review. Otherwise R-FS1 to R-FS4 
   `ImportMatcher` and `ImportDuplicateRuleMatcher`, writes, outcome), `FormRunnerController` and
   `FormSubmissionController` (thin). Core: `FormAttachmentExtension`, `FormAttachmentExtensions`,
   `FormSubmissionReceipt`.
+- **Automation:** `FormSubmissionTrigger` runs `FormSubmissionNames` (registry row
+  `Form_Submission_Names`, always runs) before insert and update (R-FS8).
 - **Permission sets:** Forms Admin and Forms Staff create submissions and set Person and
   Organization; Forms Read Only reads them. Only Forms Admin deletes them. Source is read only in
   every set. `Forms_Public_Guest` (for a Site guest user) grants no object or field, only the
@@ -17024,12 +17073,16 @@ administrator can see what the processor said.
 
 ### Rules
 
-**R-PEV1 Used once.** A Stripe event takes its key on arrival, after its signature is checked; a
-PayPal event takes it only after PayPal confirms it. A second event with a key already used is
-dropped (Stripe) or marked Ignored (PayPal).
+**R-PEV1 Used once.** A Stripe event takes its key on arrival (its id, so a resend is dropped)
+and again from the copy fetched from Stripe; a PayPal event takes it only after PayPal confirms
+it. A second event with a key already used is dropped on arrival (Stripe) or marked Ignored when
+processed.
 
-**R-PEV2 Verified before use.** Only a verified event changes a payment. A PayPal event PayPal
-does not confirm is Rejected.
+**R-PEV2 Verified before use.** Only a verified event changes a payment. A Stripe event is never
+used as posted: processing fetches it back from Stripe by its id (`GET /v1/events/{id}`) through
+the `Barn_Stripe` Named Credential and uses only that copy; one Stripe does not have is Rejected,
+and a fetch that fails in transport or with a Stripe error leaves it Received for the next run
+(R-PEV4). A PayPal event PayPal does not confirm is Rejected.
 
 **R-PEV3 The guest only stores.** The receiver inserts the event and reads nothing; processing
 runs as the administrator who scheduled it.
@@ -17071,6 +17124,21 @@ The Payments module's org-wide choices, edited in the Payments section of BarnCR
 | Mode | text | yes (defaults Test) | Test or Live. Test takes no real money. |
 | Automatic Recurring Payments | checkbox | yes (defaults off) | A checkout started with an interval is a processor subscription (R-PAY6). |
 | Currency | text | yes (defaults USD) | The three-letter currency used when a module does not name one. |
+| Stripe Connected | checkbox | no (defaults off) | Set by Check Connection on the Payments Setup page: a call through the `Barn_Stripe` Named Credential succeeded. Not a setting; written by Payments only (R-PK1). |
+| PayPal Connected | checkbox | no (defaults off) | The same for PayPal's sign-in through `Barn_PayPal_Live` or `Barn_PayPal_Sandbox`. |
+| PayPal Webhook Id | text | for PayPal | The id PayPal gives the webhook, used to verify events. Not a secret; entered on the Payments Setup page. |
+| PayPal Product Id | text | no | The PayPal catalog product every PayPal subscription plan belongs to, made at the first PayPal subscription checkout and written by Payments only (R-PAY7). Not a secret, and not shown on the setup page. |
+| Webhook Token | text | no | The random token (64 hexadecimal characters) a processor's post must carry as `token=` in its address, or the receiver stores nothing. Made by BarnCRM the first time Payments Setup is opened, replaced by Regenerate Token. Not a provider secret (R-PK1). |
+| Webhook Cap Hit At | datetime | no | When the receiver last refused an event at the hourly cap; written at most once an hour, with one Warning in the Error Log, and read by Health Check. Written by Payments only. |
+
+### Rules
+
+**R-PK1 No secret is stored here.** The processors' secrets (Stripe secret key, PayPal client id
+and secret) are External Credential principal parameters (`Barn_Stripe`, `Barn_PayPal`), entered
+by an administrator in Setup and merged into callouts by Salesforce; Apex never reads them. Stripe
+needs no signing secret (R-PEV2). The four fields above it are written by Payments' Apex only and
+no Setting Definition shows them. A processor is ready when it is connected (and, for PayPal, its
+webhook id is entered).
 
 ### Salesforce implementation
 
@@ -17082,48 +17150,38 @@ The Payments module's org-wide choices, edited in the Payments section of BarnCR
 | Mode | `Mode__c` | Text(10), default "Test" |
 | Currency | `Currency__c` | Text(3), default "USD" |
 | Automatic Recurring Payments | `Recurring_Payments__c` | Checkbox, default false |
+| Stripe Connected | `Stripe_Connected__c` | Checkbox, default false |
+| PayPal Connected | `PayPal_Connected__c` | Checkbox, default false |
+| PayPal Webhook Id | `PayPal_Webhook_Id__c` | Text(64) |
+| PayPal Product Id | `PayPal_Product_Id__c` | Text(50) |
+| Webhook Token | `Webhook_Token__c` | Text(64) |
+| Webhook Cap Hit At | `Webhook_Cap_Hit_At__c` | DateTime |
 
 - **Setting Definitions:** `Payments_Processor`, `Payments_Mode`, `Payments_Currency`,
   `Payments_Recurring`, `Payments_Setup_Page`, section Payments.
+- **Credentials (no secret values shipped):** External Credential `Barn_Stripe` (Custom, named
+  principal `Barn_Stripe_Key`, parameter `SecretKey`) behind Named Credential `Barn_Stripe`
+  (`https://api.stripe.com`); External Credential `Barn_PayPal` (Custom, named principal
+  `Barn_PayPal_App`, parameters `ClientId`, `ClientSecret`) behind `Barn_PayPal_Live`
+  (`https://api-m.paypal.com`) and `Barn_PayPal_Sandbox` (`https://api-m.sandbox.paypal.com`).
+  Principal access: `Payments_Staff` and `Payments_Admin` (staff start checkouts; the processing
+  job runs as the admin who scheduled it) and `Payments_Webhook_Guest` (a public page's guest
+  starts checkouts). `Payments_Read_Only` has none.
 
 ---
 
-## 29PAY4. Payment Keys
+## 29PAY4. Payment Keys (removed)
 
-### Definition
-
-The organization's own processor keys, written on the Payments Setup page and never shown again
-(only whether each is set and its last four characters), and the PayPal catalog product the
-account's subscription plans share (R-PAY7).
-
-### Attributes
-
-| Attribute | Type | Required | Definition |
-|---|---|---|---|
-| Stripe Secret Key | text | for Stripe | `sk_test_...` or `sk_live_...` (or a restricted `rk_` key). |
-| Stripe Webhook Secret | text | for Stripe | The endpoint's signing secret, `whsec_...`. |
-| PayPal Client Id | text | for PayPal | The REST app's client id. |
-| PayPal Client Secret | text | for PayPal | The REST app's secret. |
-| PayPal Webhook Id | text | for PayPal | The id PayPal gives the webhook, used to verify events. |
-| PayPal Product Id | text | no | The PayPal catalog product every PayPal subscription plan belongs to, made at the first PayPal subscription checkout and written by Payments only (R-PAY7). Not a secret, and not shown on the setup page. |
-
-### Rules
-
-**R-PK1 Granted to no one.** No permission set grants the setting; only Payments' Apex reads it,
-and the setup page never returns a key.
+Removed in canonical model 1.67 (N-13, D-209). Its secrets moved to External Credentials and its
+two non-secret ids, with the connection flags, to Payments Settings (29PAY3, R-PK1).
 
 ### Salesforce implementation
 
-- **Object:** `Payment_Keys__c`, hierarchy custom setting, visibility Protected.
-
-| Attribute | API name | Type |
-|---|---|---|
-| Stripe Secret Key | `Stripe_Secret_Key__c` | Text(255) |
-| Stripe Webhook Secret | `Stripe_Webhook_Secret__c` | Text(255) |
-| PayPal Client Id | `PayPal_Client_Id__c` | Text(255) |
-| PayPal Client Secret | `PayPal_Client_Secret__c` | Text(255) |
-| PayPal Webhook Id | `PayPal_Webhook_Id__c` | Text(64) |
-| PayPal Product Id | `PayPal_Product_Id__c` | Text(50) |
+- Until N-13 (ADR-0229) this was the Protected
+  hierarchy custom setting `Payment_Keys__c`, with `Stripe_Secret_Key__c`,
+  `Stripe_Webhook_Secret__c`, `PayPal_Client_Id__c`, `PayPal_Client_Secret__c`,
+  `PayPal_Webhook_Id__c` and `PayPal_Product_Id__c`. Nothing was packaged, so it was removed,
+  not migrated.
 
 ---
 
@@ -18639,6 +18697,7 @@ The Address Verification module's org-wide choices (C-46, D-112; ADR-0209
 | Apply Corrections | boolean | yes (defaults false) | A verified address also takes the provider's standardized street, city, state and postal code. |
 | Re-Check After (Months) | number | yes (defaults 12) | A verified address is looked up again after this many months; 0 never. |
 | Nightly Limit | number | yes (defaults 200) | The most addresses the nightly step looks up in one night. |
+| Connected Provider | text | no | The provider whose Check Connection last succeeded (R-AV4). Not a setting; written by the setup page only. |
 
 ### Rules
 
@@ -18656,8 +18715,12 @@ blank or United States country. On save, one queued job takes up to 50; the nigh
 Unverified addresses and Verified ones older than Re-Check After, oldest first, at most Nightly
 Limit. A provider error leaves the address Unverified.
 
-**R-AV4 Keys are never shown.** The keys live in 29AV2, granted to no permission set; the setup
-page returns only whether each is set and its last four characters.
+**R-AV4 No key is stored in Salesforce data.** Each provider's key is an External Credential
+principal parameter (Smarty: `Barn_Smarty`, `AuthId` and `AuthToken`, sent as an
+`Authorization: Basic` header; Google: `Barn_Google_Address`, `ApiKey`, sent as the
+`X-Goog-Api-Key` header), entered by an administrator in Setup and merged into the callout by
+Salesforce; Apex never reads it. Connected Provider records which provider's Check Connection on
+the setup page last succeeded; lookups run only while it is the chosen provider.
 
 ### Salesforce implementation
 
@@ -18670,7 +18733,15 @@ page returns only whether each is set and its last four characters.
 | Apply Corrections | `Apply_Corrections__c` | Checkbox, default false |
 | Re-Check After (Months) | `Recheck_Months__c` | Number(3, 0), default 12 |
 | Nightly Limit | `Nightly_Limit__c` | Number(5, 0), default 200 |
+| Connected Provider | `Connected_Provider__c` | Text(20) |
 
+- **Credentials (no secret values shipped):** External Credential `Barn_Smarty` (Custom, named
+  principal `Barn_Smarty_Key`, parameters `AuthId`, `AuthToken`) behind Named Credential
+  `Barn_Smarty` (`https://us-street.api.smarty.com`); External Credential `Barn_Google_Address`
+  (Custom, named principal `Barn_Google_Address_Key`, parameter `ApiKey`) behind
+  `Barn_Google_Address` (`https://addressvalidation.googleapis.com`). Principal access:
+  `Address_Verification_Admin` (setup page, nightly step) and `Address_Verification_User`
+  (everyone whose address saves are looked up on save).
 - **Setting Definitions:** `Address_Verification_Provider`, `Address_Verification_On_Save`,
   `Address_Verification_Corrections`, `Address_Verification_Recheck`,
   `Address_Verification_Nightly_Limit`, `Address_Verification_Setup_Page`, section Addresses.
@@ -18680,30 +18751,17 @@ page returns only whether each is set and its last four characters.
 
 ---
 
-## 29AV2. Address Verification Keys
+## 29AV2. Address Verification Keys (removed)
 
-### Definition
-
-The organization's own provider keys, written on the Address Verification Setup page and never
-shown again (R-AV4).
-
-### Attributes
-
-| Attribute | Type | Required | Definition |
-|---|---|---|---|
-| Smarty Auth ID | text | for Smarty | The secret key pair's Auth ID. |
-| Smarty Auth Token | text | for Smarty | The secret key pair's Auth Token. |
-| Google API Key | text | for Google | A key with the Address Validation API enabled. |
+Removed in canonical model 1.67 (N-13, D-209). The keys are External Credential principal
+parameters (R-AV4); Connected Provider (29AV1) replaced the setting's readiness test.
 
 ### Salesforce implementation
 
-- **Object:** `Address_Verification_Keys__c`, hierarchy custom setting, visibility Protected.
-
-| Attribute | API name | Type |
-|---|---|---|
-| Smarty Auth ID | `Smarty_Auth_Id__c` | Text(255) |
-| Smarty Auth Token | `Smarty_Auth_Token__c` | Text(255) |
-| Google API Key | `Google_Api_Key__c` | Text(255) |
+- Until N-13 (ADR-0229) this was the Protected
+  hierarchy custom setting `Address_Verification_Keys__c`, with `Smarty_Auth_Id__c`,
+  `Smarty_Auth_Token__c` and `Google_Api_Key__c`. Nothing was packaged, so it was removed, not
+  migrated.
 
 ---
 
@@ -18829,6 +18887,83 @@ event (G-22e).
 | Source | `Source__c` | Picklist (Event, Course, Conference, Self Study, Other), restricted, default Other |
 | Source Record Id | `Source_Record_Id__c` | Text(18) |
 | Used | `Used__c` | Checkbox, default false |
+
+---
+
+## 29AR. Saved Report and Saved Dashboard (no object)
+
+### Definition
+
+A report or dashboard a person saved in Advanced Reporting (O-02, D-202, D-207; ADR-0231
+`0231-advanced-reporting.md`). Neither is a custom object: each is a Salesforce File owned by
+the person who saved it, whose latest version holds the definition as JSON. Dashboard templates
+use the same dashboard JSON, shipped in a static resource.
+
+### Attributes of a report definition
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| version | number | yes | Format version, 1. |
+| title | text | yes to save | The report's name. |
+| object | text | yes | The object reported on (API name, never prefixed). |
+| columns | list | no | Up to 20 of `{path, label, type, show?}`; `path` reaches through up to two lookups (`Fund__r.Name`); `show: "age"` shows a date as days since. |
+| filter | filter document | no | Conditions on the object, in Core's filter document format (Section 14). |
+| related | list | no | Up to 2 of `{object, field, label, has, filter?}`: records that have (or, `has: false`, have no) related records through `field`, optionally matching `filter`. |
+| dateRange | object | no | `{range, field, type, label?, n?, m?, from?, to?}`; `range` is one of TODAY, YESTERDAY, THIS_ and LAST_ WEEK, MONTH, QUARTER and YEAR, LAST_N_DAYS, NEXT_N_DAYS, LAST_N_MONTHS (`n`, 1 to 3650), BETWEEN_DAYS_AGO (`n` and `m`) or CUSTOM (`from`, `to`, ISO dates). |
+| groups | list | no | Up to 2 of `{field, label, type, bucket?, labelPath?, picklist?}`; `bucket` (day, week, month, quarter, year) groups a date; `labelPath` names a lookup group by its record's Name; `picklist` maps values to labels. |
+| measures | list | no | Up to 4 of `{fn, path?, label, type}`; `fn` is count, sum, avg, min, max or countDistinct. A report with measures totals; without, it lists records. |
+| summaries | list | no | Up to 3 related totals per row: `{object, field, fn, path?, label, type, filter?}`. |
+| sort | object | no | `{by, direction}`; `by` is a column path for a list, or `g1` (the first grouping) or `m0` to `m3` (a measure) for totals. |
+| limit | number | yes | Rows listed, or top groups shown: 1 to 2,000, default 200. |
+| view | object | yes | `{type, stacked}`; `type` is table, bar, column, line, donut or metric. |
+| sharing | object | no | The owner's sharing choices: `{users: [{id, name, access}], groups: [{id, name, access}]}`, `access` View or Edit. Written only by the server's Share; a save never takes it from the browser, and a load returns it apart from the definition, to the owner only. |
+
+### Attributes of a dashboard definition
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| version | number | yes | Format version, 1. |
+| title, description | text | title yes to save | Shown above the dashboard. |
+| filters | list | no | Up to 4 of `{key, kind, label, object?}`; `kind` is date or record (a record of `object`). |
+| widgets | list | yes | Up to 12 of `{key, title, size, report, bindings}`; `size` small, medium or large; `report` is a report definition; `bindings` maps a filter key to `{field, type?, related?}`, where `related: {object, field}` applies a record filter through related records (a gift's fund through its allocations). |
+| sharing | object | no | As for a report. |
+
+### Rules
+
+**R-AR1 A definition is a File.** A report is a ContentVersion with FileExtension `barnreport`,
+a dashboard `barndash`, owned by its saver. Each save is a new version of the same
+ContentDocument. Definitions are at most 1,000,000 characters.
+
+**R-AR2 Sharing is Files sharing.** The owner shares through a ContentDocumentLink to each
+person: ShareType V (Viewer) for View, C (Collaborator) for Edit. A public group is expanded to
+its active direct members when the owner shares, and those links are rewritten each time, so
+membership changes apply then. At most 500 people. Only the owner shares or deletes: every
+version has SharingOption R, so a Collaborator cannot share or unlink it from Files. A save (by
+the owner or a person with Edit) is a new version that keeps the stored sharing and never
+changes a link. Saving, sharing and deleting need the custom permission `Reporting_Save`.
+
+**R-AR3 Everything runs as the viewer.** Listing, loading, saving and running are user mode.
+Every object, field, relationship and function in a definition is checked against the viewer's
+describe before a query is built, and values are bound, never concatenated. A field the viewer
+cannot read stops the run with a message.
+
+**R-AR4 Large data volumes.** A totals report is counted first; within the aggregate query
+limits one aggregate query totals it, otherwise the browser reads the records in Id order in
+pages of 5,000 and totals them, up to 1,000,000 records, saying when totals are partial; the
+server works out the fields such a scan reads. A list export reads at most 20 columns in pages of
+2,000, needs Export Reports on every page, and stops at 100,000 rows.
+
+**R-AR5 Names are portable.** Object and field names in a definition are never prefixed; the
+server resolves them against the org's describe, so a definition moves between orgs, with or
+without a namespace.
+
+### Salesforce implementation
+
+- **Object:** none. `ContentVersion` (FileExtension `barnreport` or `barndash`, VersionData the
+  JSON) and `ContentDocumentLink` (ShareType V or C, Visibility AllUsers).
+- **Custom permission:** `Reporting_Save`.
+- **Static resource:** `BarnReporting_Templates` (four dashboard definitions, each with the
+  objects it requires).
 
 ---
 
@@ -19282,6 +19417,13 @@ mirrors the primary member).
 | 1.62 | 2026-11-13 | Home quick links from the module catalog (D-200 R7, release 1.24). `BarnCRM_Module__mdt` gains Quick Links (`Quick_Links__c`): Giving's Enter a Gift, Volunteers' Log Hours and Programs' Enroll replace the hard-coded Quick Gift Entry tile. |
 | 1.63 | 2026-11-13 | BarnCRM Logic Models app retired (D-200 R6, release 1.24; D-130 amended). No object or field added. The `BarnCRM_Logic_Models` app and its permission set visibilities go; the Logic Model record page becomes the object's org default (Large and Small); the module's catalog row has no App Name. The Logic Models tab stays in the BarnCRM apps and the App Launcher. |
 | 1.64 | 2026-11-13 | Sample data for Memberships and Scholarships (release 1.25). `Membership_Level__c`, `Membership_Term__c` and `Award_Program__c` each gain `Sample_Data__c` (Checkbox, default false), the mark the sample data loader sets so the set is counted and removed in one action; children go with their parent. No other object or rule changes. |
+| 1.65 | 2026-11-14 | Forms with submissions deletable by Forms administrators only (N-04, D-208, release 1.27; ADR-0225). Form Submission (29ZY): Form becomes Lookup(Form), set null on delete (was master-detail), sharing Public Read/Write; Form Version becomes set null on delete (was restrict); new Form Name (`Form_Name__c`, Text(80)) and Version Number (`Version_Number__c`, Number(6, 0)), rule R-FS8. Form (29ZW): rule R-FM4 and the Forms custom permission Manage Forms (`Forms_Manage`). |
+| 1.66 | 2026-11-14 | Fewer custom objects (D-208, N-11; ADR-0227). Four Core objects removed, 203 to 199 in the suite. `Merge_Journal__c` becomes the Admin Journal (Section 10A, R-AJ1) with `Kind__c` (Merge, Scan, Deactivation, Migration, Household Adoption) and takes the rows and fields of `Automation_Snapshot__c` (`Items__c`, `Message__c`, `Restored_At__c`), `Migration_Run__c` (`Kit__c`, `State_JSON__c`) and `Household_Adoption__c` (`Account_Id__c`, `Previous_Record_Type_Id__c`, `Previous_Values__c`; its note moves to `Notes__c`); `Status__c` carries every kind's values with no default. Import Batch's `Migration_Run__c` is replaced by `Migration_Journal__c`. `Duplicate_Reason__c` is removed: a match reason is a `Duplicate_Dismissal__c` row with the new `Kind__c` Match Reason, keyed by the set in `Pair_Key__c`. |
+| 1.67 | 2026-11-14 | Gift mirrors folded into Fundraising (N-15, D-210, release 1.27; ADR-0228). The Mirror for Giving package is removed: its attributes on Appeal, Gift and Fund, list views, code and permission sets ship in Fundraising (`packages/giving`, the Giving module renamed BarnCRM Fundraising). The eleven gift mirror keys (Campaign sync, Opportunity mirror and Gift Transaction mirror) move from `Mirror_Settings__c` to `Giving_Settings__c` with unchanged names and types; `Mirror_Settings__c` keeps the Case request keys only. No object added or removed. |
+| 1.68 | 2026-11-18 | Provider secrets in Named Credentials (N-13, D-209; ADR-0229, amending ADR-0220). Two objects removed, 199 to 197 in the suite: `Payment_Keys__c` (29PAY4) and `Address_Verification_Keys__c` (29AV2). `Payments_Settings__c` gains `Stripe_Connected__c`, `PayPal_Connected__c` (Checkbox) and takes `PayPal_Webhook_Id__c` (Text(64)) and `PayPal_Product_Id__c` (Text(50)); `Address_Verification_Settings__c` gains `Connected_Provider__c` (Text(20)). Removed fields: `Stripe_Secret_Key__c`, `Stripe_Webhook_Secret__c`, `PayPal_Client_Id__c`, `PayPal_Client_Secret__c`, `Smarty_Auth_Id__c`, `Smarty_Auth_Token__c`, `Google_Api_Key__c`. R-PK1, R-AV4, R-PEV1 and R-PEV2 rewritten: a Stripe event is fetched back from Stripe and only that copy is used. |
+| 1.69 | 2026-11-18 | Beta badge on every module (D-211, N-14, release 1.27). `BarnCRM_Module__mdt` gains Beta (`Beta__c`, Checkbox, default false), ticked on every shipped module record: the Module Manager, the Setup Assistant's modules step and the Home Modules card show a Beta badge beside the module name. No object added or removed. |
+| 1.70 | 2026-11-19 | Receiver token (pre-batch review M1; ADR-0229 amended). `Payments_Settings__c` gains `Webhook_Token__c` (Text(64)) and `Webhook_Cap_Hit_At__c` (DateTime): the receiver stores a post only when it carries the token in its address, and records the first refusal at the hourly cap each hour. No object added or removed. |
+| 1.71 | 2026-11-19 | Advanced Reporting (O-02, D-202, D-207, release 1.29; ADR-0231 `0231-advanced-reporting.md`). No object or field added. Section 29AR records the saved report and dashboard JSON formats and their storage as Salesforce Files (`.barnreport`, `.barndash`) shared through ContentDocumentLink, with rules R-AR1 to R-AR5. |
 
 ---
 ## 32. Entity ownership by package
@@ -19326,7 +19468,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Affiliation | Core | v0.3 | 28 |
 | Address | Core | v0.3 | 29 |
 | Duplicate Dismissal | Core | v0.5 | 29A |
-| Duplicate Reason | Core | v0.8 | 29A |
+| Duplicate Reason (Duplicate Dismissal rows of Kind Match Reason since 1.65) | Core | v0.8 | 29A |
 | Saved Query | Core | v0.7 | 29D |
 | Saved Transform | Core | v0.12 | 29X |
 | Field Utilization Snapshot | Core | not scheduled (plan Section 6.1 item 10) | 29F |
@@ -19393,9 +19535,9 @@ included; standard objects the packages extend are named by the entity that gove
 | Logic Model Link | Logic Models | 0.14 (L-01) | 29ZE |
 | Indicator | Logic Models | 0.14 (L-02) | 29ZF |
 | Indicator Period | Logic Models | 0.14 (L-02) | 29ZG |
-| Household Adoption | Core | 0.17 (X-05) | 29ZQ |
+| Household Adoption (Admin Journal rows since 1.65) | Core | 0.17 (X-05) | 29ZQ |
 | Nightly Job | Core | v1.0 (architect review RT-10) | 29ZR |
-| Migration Run | Core | 1.4 (MIG-01) | 29ZS |
+| Migration Run (Admin Journal rows since 1.65) | Core | 1.4 (MIG-01) | 29ZS |
 | Migration Kit (shipped default) | Core type; rows in the owning module | 1.4 (MIG-01) | 13 |
 | Form | Forms | release 1.1 (C-42a) | 29ZW |
 | Form Version | Forms | release 1.1 (C-42a) | 29ZX |
@@ -19465,9 +19607,9 @@ included; standard objects the packages extend are named by the entity that gove
 | Payment | Payments | 1.4 (PAY-01) | 29PAY1 |
 | Payment Event | Payments | 1.4 (PAY-01) | 29PAY2 |
 | Payments Settings | Payments | 1.4 (PAY-01) | 29PAY3 |
-| Payment Keys | Payments | 1.4 (PAY-01) | 29PAY4 |
 | Built Component | LWC Builder | 1.19 (LB-01, LB-02) | 29LB1 |
 | LWC Builder Settings | LWC Builder | 1.19 (LB-01, LB-02) | 29LB2 |
+| Saved Report and Saved Dashboard (Files, no object) | Advanced Reporting | 1.29 (O-02) | 29AR |
 | Award Program | Scholarships and Outbound Grants | 1.12 (SG-01) | 29SG1 |
 | Award Cycle | Scholarships and Outbound Grants | 1.12 (SG-01) | 29SG2 |
 | Award Application | Scholarships and Outbound Grants | 1.12 (SG-02) | 29SG3 |
@@ -19513,7 +19655,6 @@ included; standard objects the packages extend are named by the entity that gove
 | Member Certification | Memberships | 1.17 (G-22e) | 29MEM6 |
 | Continuing Credit | Memberships | 1.17 (G-22e) | 29MEM7 |
 | Address Verification Settings | Address Verification | 1.15 (C-46) | 29AV1 |
-| Address Verification Keys | Address Verification | 1.15 (C-46) | 29AV2 |
 
 **Components that are not entities (C-29, ADR-0059).** Core is the Standard Edition on its own,
 so nothing below that is nonprofit-specific ships in Core.
@@ -19535,7 +19676,7 @@ so nothing below that is nonprofit-specific ships in Core.
 | Logic Models tab, permission sets (Admin, Staff, Read Only), Logic Model Builder panel | Logic Models | Metadata and its catalog row's access maps (ADR-0154 `0154-logic-models-module.md`). No app of its own since release 1.24 (D-200 R6): the Logic Models tab joins the BarnCRM apps, and the Logic Model record page, which carries the builder panel (`logicModelBuilder`), is the object's org default |
 | Funders app, permission sets (Admin, Staff, Read Only), Grant Pipeline tab, program picker | Funders | Metadata and its catalog row's access maps (ADR-0161 `0161-funders-module.md`). Console app `BarnCRM_Funders` with the Grant Pipeline, Grants and Grant Requirements tabs and Error Log last; the Grant record page carries the program picker (`grantLinkedRecord`, kind Program) |
 | Permission sets (Admin, Staff, Read Only), Events Home tab, Repeat Event | Event Management | Metadata and its catalog row's access maps (ADR-0177 `0177-events-module.md`). App `BarnCRM_Events` (ADR-0223 module apps, left out of scratch and Developer Edition orgs); the Events Home, Event Calendar, Events, Event Speakers and Venues tabs also join BarnCRM and BarnCRM Console at deploy (D-188, ADR-0192); the Event record page, the object's org default, carries the event's tabs |
-| Grant Calendar tab, Giving Fund card, Award Schedule card | Funders | Metadata (ADR-0162 `0162-funders-restricted-funds-schedules-calendar.md`). The Grant Calendar tab (`grantCalendar`) in the Funders app after Grant Pipeline; the Grant record page carries the Giving Fund card (`grantLinkedRecord`, kind Fund) and the Award Schedule card (`grantSchedule`) |
+| Grant Calendar tab, Fund card, Award Schedule card | Funders | Metadata (ADR-0162 `0162-funders-restricted-funds-schedules-calendar.md`). The Grant Calendar tab (`grantCalendar`) in the Funders app after Grant Pipeline; the Grant record page carries the Fund card (`grantLinkedRecord`, kind Fund) and the Award Schedule card (`grantSchedule`) |
 | Permission sets (Admin, Staff, Read Only), Form Builder, Form Runner and Submission panels | Forms | Metadata and its catalog row's access maps (ADR-0175 `0175-forms-module.md`). App `BarnCRM_Forms` (ADR-0223 module apps, left out of scratch and Developer Edition orgs); the Forms and Form Submissions tabs also join BarnCRM and BarnCRM Console at deploy (D-188, ADR-0192); the Form record page (org default) carries the builder and the runner, the Form Submission page the submission panel |
 | Form attachment seam (a module attaches a form to its own record and receives submissions) | Core | `FormAttachmentExtension`, `FormAttachmentExtensions`, `FormSubmissionReceipt` (ADR-0175 `0175-forms-module.md` decision 9) |
 | Permission sets (Admin, Staff, Read Only), custom permission Manage Corporate Hub, Corporate Hub tab, acknowledgment and cycle panels, reminder notification type | Corporate Hub | Metadata and its catalog row's access maps (ADR-0196 `0196-corporate-hub-module.md`). App `BarnCRM_Corporate_Hub` (ADR-0223 module apps, left out of scratch and Developer Edition orgs); the Corporate Hub, Library Documents, Compliance Obligations and Agreements tabs also join BarnCRM and BarnCRM Console (ADR-0192) |

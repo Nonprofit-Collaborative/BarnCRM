@@ -67,16 +67,8 @@ public with sharing class VolunteerSampleDataLoader {
 			'Sort donated food by type and date, and stock the pantry shelves.',
 			'Warehouse'
 		);
-		Volunteer_Job__c desk = job(
-			JOB_DESK,
-			'Greet visitors, answer the phone and sign people in.',
-			'Main office'
-		);
-		Volunteer_Job__c garden = job(
-			JOB_GARDEN,
-			'Plant, weed and harvest the community garden beds.',
-			'Garden lot'
-		);
+		Volunteer_Job__c desk = job(JOB_DESK, 'Greet visitors, answer the phone and sign people in.', 'Main office');
+		Volunteer_Job__c garden = job(JOB_GARDEN, 'Plant, weed and harvest the community garden beds.', 'Garden lot');
 		List<Volunteer_Job__c> jobs = new List<Volunteer_Job__c>{ pantry, desk, garden };
 		Database.insert(jobs, AccessLevel.USER_MODE);
 
@@ -401,10 +393,7 @@ public with sharing class VolunteerSampleDataLoader {
 					row.Skill__r.Name,
 					String.format(
 						BarnHelp.text('Volunteers', 'Volunteers_SampleData_KeptSkillPerson'),
-						new List<Object>{
-							row.Skill__r.Name,
-							personName(row.Contact__r, row.Account__r)
-						}
+						new List<Object>{ row.Skill__r.Name, personName(row.Contact__r, row.Account__r) }
 					)
 				);
 			}
@@ -445,14 +434,7 @@ public with sharing class VolunteerSampleDataLoader {
 		private final Map<Id, String> skillNames = new Map<Id, String>();
 		private final Map<Id, Set<String>> skillReasons = new Map<Id, Set<String>>();
 
-		void addShift(
-			Id shiftId,
-			String shiftName,
-			Id jobId,
-			String jobName,
-			String person,
-			Boolean hours
-		) {
+		void addShift(Id shiftId, String shiftName, Id jobId, String jobName, String person, Boolean hours) {
 			shiftNames.put(shiftId, shiftName);
 			if (!shiftPeople.containsKey(shiftId)) {
 				shiftPeople.put(shiftId, new Map<String, Boolean>());
@@ -501,9 +483,7 @@ public with sharing class VolunteerSampleDataLoader {
 					Boolean signup = shiftSignups.get(shiftId).contains(person);
 					String what = hours && signup
 						? Label.Volunteers_SampleData_KeptHoursAndSignup
-						: hours
-								? Label.Volunteers_SampleData_KeptHours
-								: Label.Volunteers_SampleData_KeptSignup;
+						: hours ? Label.Volunteers_SampleData_KeptHours : Label.Volunteers_SampleData_KeptSignup;
 					result.add(
 						String.format(
 							BarnHelp.text('Volunteers', 'Volunteers_SampleData_KeptShift'),
@@ -581,12 +561,7 @@ public with sharing class VolunteerSampleDataLoader {
 			}
 		}
 		if (!problems.isEmpty()) {
-			ErrorLogger.logMessages(
-				problems,
-				problemIds,
-				REMOVE_CONTEXT,
-				ErrorLogger.SEVERITY_WARNING
-			);
+			ErrorLogger.logMessages(problems, problemIds, REMOVE_CONTEXT, ErrorLogger.SEVERITY_WARNING);
 		}
 		return deleted;
 	}
@@ -594,12 +569,7 @@ public with sharing class VolunteerSampleDataLoader {
 	// ------------------------------------------------------------------------- builders
 
 	private static Skill__c skill(String name, String description) {
-		return new Skill__c(
-			Name = name,
-			Description__c = description,
-			Active__c = true,
-			Sample_Data__c = true
-		);
+		return new Skill__c(Name = name, Description__c = description, Active__c = true, Sample_Data__c = true);
 	}
 
 	private static Volunteer_Job__c job(String name, String description, String location) {

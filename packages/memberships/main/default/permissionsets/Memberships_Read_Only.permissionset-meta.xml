@@ -5,6 +5,10 @@
   <description>
     Reads memberships, levels, benefits and certifications. Given to Read Only.
   </description>
+  <applicationVisibilities>
+    <application>BarnCRM_Memberships</application>
+    <visible>true</visible>
+  </applicationVisibilities>
   <classAccesses>
     <apexClass>CertificationController</apexClass>
     <enabled>true</enabled>

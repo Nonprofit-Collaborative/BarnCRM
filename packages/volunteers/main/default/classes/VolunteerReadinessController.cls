@@ -39,11 +39,7 @@ public with sharing class VolunteerReadinessController {
 	@AuraEnabled(cacheable=true)
 	public static Readiness getReadiness(Id personId) {
 		Readiness result = new Readiness();
-		if (
-			personId == null ||
-			!Schema.SObjectType.Volunteer_Requirement__c.isAccessible() ||
-			!isPerson(personId)
-		) {
+		if (personId == null || !Schema.SObjectType.Volunteer_Requirement__c.isAccessible() || !isPerson(personId)) {
 			return result;
 		}
 		result.canSee = true;
@@ -66,10 +62,7 @@ public with sharing class VolunteerReadinessController {
 
 		// Every active Type in picklist order, then any retired one this person still has.
 		List<String> types = new List<String>();
-		for (
-			Schema.PicklistEntry entry : Volunteer_Requirement__c.Type__c.getDescribe()
-				.getPicklistValues()
-		) {
+		for (Schema.PicklistEntry entry : Volunteer_Requirement__c.Type__c.getDescribe().getPicklistValues()) {
 			if (entry.isActive()) {
 				types.add(entry.getValue());
 			}
@@ -117,8 +110,7 @@ public with sharing class VolunteerReadinessController {
 			WITH USER_MODE
 			LIMIT 1
 		];
-		return !found.isEmpty() &&
-			OrgShapeDetector.personAccountRecordTypeIds().contains(found[0].RecordTypeId);
+		return !found.isEmpty() && OrgShapeDetector.personAccountRecordTypeIds().contains(found[0].RecordTypeId);
 	}
 
 	/** Active picklist values in order, value to label. */

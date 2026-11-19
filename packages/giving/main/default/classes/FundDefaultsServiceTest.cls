@@ -25,10 +25,7 @@ private class FundDefaultsServiceTest {
 			Assert.isTrue(fund.Active__c, 'It is offered on new gifts.');
 			Assert.isFalse(fund.Restricted__c, 'It is unrestricted money.');
 			Assert.isTrue(fund.Is_Default__c, 'It catches undesignated gifts.');
-			Assert.isNull(
-				fund.Accounting_Code__c,
-				'The accounting code is the organization to set.'
-			);
+			Assert.isNull(fund.Accounting_Code__c, 'The accounting code is the organization to set.');
 			Assert.areEqual(
 				String.valueOf(fund.Id),
 				Giving_Settings__c.getOrgDefaults().Default_Fund__c,
@@ -67,10 +64,7 @@ private class FundDefaultsServiceTest {
 	static void aDefaultFundAlreadySetIsLeftAlone() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			String chosen = '001000000000000AAA';
-			insert new Giving_Settings__c(
-				SetupOwnerId = UserInfo.getOrganizationId(),
-				Default_Fund__c = chosen
-			);
+			insert new Giving_Settings__c(SetupOwnerId = UserInfo.getOrganizationId(), Default_Fund__c = chosen);
 
 			Test.startTest();
 			Fund__c created = FundDefaultsService.installDefaultFundDuringInstall(null);

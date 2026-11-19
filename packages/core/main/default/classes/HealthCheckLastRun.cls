@@ -31,18 +31,43 @@ public with sharing class HealthCheckLastRun {
 		if (report == null || report.canManageSettings != true) {
 			return;
 		}
-		Integer errors = 0;
-		Integer warnings = 0;
-		Integer infos = 0;
-		for (HealthCheckService.Finding finding : report.findings) {
+		List<Integer> counts = counts(report.findings);
+		save(counts[0], counts[1], counts[2]);
+	}
+
+	/**
+	 * Adds a Run Remaining Checks result to the stored one (D-208, N-07): its findings count,
+	 * and the earlier run's Not Checked warning no longer does, since those checks have now run
+	 * (a run that stops early again brings its own).
+	 */
+	public static void addRemaining(HealthCheckService.Report remaining) {
+		if (remaining == null || remaining.canManageSettings != true) {
+			return;
+		}
+		Summary stored = read();
+		if (stored.ranAt == null) {
+			return;
+		}
+		List<Integer> counts = counts(remaining.findings);
+		save(stored.errors + counts[0], Math.max(0, stored.warnings - 1) + counts[1], stored.infos + counts[2]);
+	}
+
+	/** Errors, warnings and the rest, in that order. */
+	private static List<Integer> counts(List<HealthCheckService.Finding> findings) {
+		List<Integer> counts = new List<Integer>{ 0, 0, 0 };
+		for (HealthCheckService.Finding finding : findings) {
 			if (HealthCheckService.SEVERITY_ERROR.equals(finding.severity)) {
-				errors++;
+				counts[0]++;
 			} else if (HealthCheckService.SEVERITY_WARNING.equals(finding.severity)) {
-				warnings++;
+				counts[1]++;
 			} else {
-				infos++;
+				counts[2]++;
 			}
 		}
+		return counts;
+	}
+
+	private static void save(Integer errors, Integer warnings, Integer infos) {
 		OrgSettingsSystemWriter.save(
 			new Map<Schema.SObjectField, Object>{
 				BarnCRM_Settings__c.Health_Check_Last_Run__c => Datetime.now(),

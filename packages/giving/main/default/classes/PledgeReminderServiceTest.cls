@@ -52,9 +52,7 @@ private class PledgeReminderServiceTest {
 		PledgeReminderService.Counts counts = new PledgeReminderService.Counts();
 		// 15 days overdue: the 7 day step is 8 days old, the 14 day step is 1 day old.
 		List<PledgeReminderService.Planned> planned = PledgeReminderService.plan(
-			new List<Installment__c>{
-				PledgeReminderTestData.inMemory(today.addDays(-15), FAKE_DONOR)
-			},
+			new List<Installment__c>{ PledgeReminderTestData.inMemory(today.addDays(-15), FAKE_DONOR) },
 			ladder(),
 			today,
 			counts
@@ -71,9 +69,7 @@ private class PledgeReminderServiceTest {
 		PledgeReminderService.Counts counts = new PledgeReminderService.Counts();
 		// 200 days overdue: every step's day passed more than 14 days ago (R-PR2).
 		List<PledgeReminderService.Planned> planned = PledgeReminderService.plan(
-			new List<Installment__c>{
-				PledgeReminderTestData.inMemory(today.addDays(-200), FAKE_DONOR)
-			},
+			new List<Installment__c>{ PledgeReminderTestData.inMemory(today.addDays(-200), FAKE_DONOR) },
 			ladder(),
 			today,
 			counts
@@ -90,9 +86,7 @@ private class PledgeReminderServiceTest {
 		PledgeReminderService.Counts counts = new PledgeReminderService.Counts();
 		Assert.isTrue(
 			PledgeReminderService.plan(
-					new List<Installment__c>{
-						PledgeReminderTestData.inMemory(today.addDays(7), FAKE_DONOR)
-					},
+					new List<Installment__c>{ PledgeReminderTestData.inMemory(today.addDays(7), FAKE_DONOR) },
 					steps,
 					today,
 					counts
@@ -144,12 +138,7 @@ private class PledgeReminderServiceTest {
 	static void nothingSendsWhileTheSettingIsOff() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			AcknowledgmentService.sendPermission = true;
-			insert PledgeReminderTestData.buildStep(
-				'Overdue',
-				7,
-				'Email',
-				PledgeReminderTestData.TEMPLATE
-			);
+			insert PledgeReminderTestData.buildStep('Overdue', 7, 'Email', PledgeReminderTestData.TEMPLATE);
 			Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', 'ada@example.org');
 			Commitment__c pledge = PledgeReminderTestData.insertPledge(donor.Id, 7);
 			RecordingEmailSender sender = new RecordingEmailSender();
@@ -157,9 +146,7 @@ private class PledgeReminderServiceTest {
 
 			Assert.isFalse(PledgeReminderService.isEnabled(), 'Off by default.');
 			PledgeReminderService.Counts counts = PledgeReminderService.process(
-				new List<Installment__c>{
-					PledgeReminderTestData.installmentDue(pledge.Id, Date.today().addDays(-7))
-				}
+				new List<Installment__c>{ PledgeReminderTestData.installmentDue(pledge.Id, Date.today().addDays(-7)) }
 			);
 
 			Assert.areEqual(0, counts.emails + counts.letters + counts.errors);
@@ -169,10 +156,7 @@ private class PledgeReminderServiceTest {
 				PledgeReminderService.startRun();
 				Assert.fail('A run cannot start while reminders are off.');
 			} catch (PledgeReminderService.PledgeReminderException refused) {
-				Assert.areEqual(
-					BarnHelp.text('Giving', 'Giving_PledgeReminders_Disabled'),
-					refused.getMessage()
-				);
+				Assert.areEqual(BarnHelp.text('Giving', 'Giving_PledgeReminders_Disabled'), refused.getMessage());
 			}
 		}
 	}
@@ -186,10 +170,7 @@ private class PledgeReminderServiceTest {
 				PledgeReminderService.startRun();
 				Assert.fail('Sending needs the Send Acknowledgments permission.');
 			} catch (PledgeReminderService.PledgeReminderException refused) {
-				Assert.areEqual(
-					BarnHelp.text('Giving', 'Giving_PledgeReminders_NoPermission'),
-					refused.getMessage()
-				);
+				Assert.areEqual(BarnHelp.text('Giving', 'Giving_PledgeReminders_NoPermission'), refused.getMessage());
 			}
 		}
 	}
@@ -219,17 +200,9 @@ private class PledgeReminderServiceTest {
 			PledgeReminderService.Counts second = PledgeReminderService.process(due);
 
 			Assert.areEqual(1, first.emails);
-			Assert.areEqual(
-				0,
-				second.emails,
-				'The same step does not remind the same installment twice (R-PR4).'
-			);
+			Assert.areEqual(0, second.emails, 'The same step does not remind the same installment twice (R-PR4).');
 			Assert.areEqual(1, sender.received.size());
-			Assert.areEqual(
-				due[0].Id,
-				sender.received[0].getWhatId(),
-				'The template merges the installment.'
-			);
+			Assert.areEqual(due[0].Id, sender.received[0].getWhatId(), 'The template merges the installment.');
 			Assert.areEqual(donor.Id, sender.received[0].getTargetObjectId());
 
 			Pledge_Reminder__c logged = [
@@ -267,12 +240,7 @@ private class PledgeReminderServiceTest {
 	static void aFailedSendIsLoggedAndRetriedByTheNextRun() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			PledgeReminderTestData.enable();
-			insert PledgeReminderTestData.buildStep(
-				'Week late',
-				7,
-				'Email',
-				PledgeReminderTestData.TEMPLATE
-			);
+			insert PledgeReminderTestData.buildStep('Week late', 7, 'Email', PledgeReminderTestData.TEMPLATE);
 			Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', 'ada@example.org');
 			Commitment__c pledge = PledgeReminderTestData.insertPledge(donor.Id, 7);
 			RecordingEmailSender sender = new RecordingEmailSender();
@@ -314,9 +282,7 @@ private class PledgeReminderServiceTest {
 			PledgeReminderService.emailSender = sender;
 
 			PledgeReminderService.Counts counts = PledgeReminderService.process(
-				new List<Installment__c>{
-					PledgeReminderTestData.installmentDue(pledge.Id, Date.today().addDays(-7))
-				}
+				new List<Installment__c>{ PledgeReminderTestData.installmentDue(pledge.Id, Date.today().addDays(-7)) }
 			);
 
 			Assert.areEqual(1, counts.errors);
@@ -338,20 +304,13 @@ private class PledgeReminderServiceTest {
 	static void aSendTheWholeCallRefusesFailsEveryRowAndReleasesItsKey() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			PledgeReminderTestData.enable();
-			insert PledgeReminderTestData.buildStep(
-				'Week late',
-				7,
-				'Email',
-				PledgeReminderTestData.TEMPLATE
-			);
+			insert PledgeReminderTestData.buildStep('Week late', 7, 'Email', PledgeReminderTestData.TEMPLATE);
 			Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', 'ada@example.org');
 			Commitment__c pledge = PledgeReminderTestData.insertPledge(donor.Id, 7);
 			PledgeReminderService.emailSender = refusing();
 
 			PledgeReminderService.Counts counts = PledgeReminderService.process(
-				new List<Installment__c>{
-					PledgeReminderTestData.installmentDue(pledge.Id, Date.today().addDays(-7))
-				}
+				new List<Installment__c>{ PledgeReminderTestData.installmentDue(pledge.Id, Date.today().addDays(-7)) }
 			);
 
 			Assert.areEqual(1, counts.errors);
@@ -369,12 +328,7 @@ private class PledgeReminderServiceTest {
 	static void aSettleThatFailsStillLeavesNoRowQueued() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			PledgeReminderTestData.enable();
-			insert PledgeReminderTestData.buildStep(
-				'Week late',
-				7,
-				'Email',
-				PledgeReminderTestData.TEMPLATE
-			);
+			insert PledgeReminderTestData.buildStep('Week late', 7, 'Email', PledgeReminderTestData.TEMPLATE);
 			Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', 'ada@example.org');
 			Commitment__c pledge = PledgeReminderTestData.insertPledge(donor.Id, 7);
 			RecordingEmailSender sender = new RecordingEmailSender();
@@ -384,9 +338,7 @@ private class PledgeReminderServiceTest {
 			PledgeReminderService.emailSender = sender;
 
 			PledgeReminderService.process(
-				new List<Installment__c>{
-					PledgeReminderTestData.installmentDue(pledge.Id, Date.today().addDays(-7))
-				}
+				new List<Installment__c>{ PledgeReminderTestData.installmentDue(pledge.Id, Date.today().addDays(-7)) }
 			);
 
 			Pledge_Reminder__c row = [
@@ -394,10 +346,7 @@ private class PledgeReminderServiceTest {
 				FROM Pledge_Reminder__c
 			];
 			Assert.areEqual('Failed', row.Status__c, 'Settled again on its own, not left Queued.');
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_Acknowledgment_SendFailedUnknown'),
-				row.Failure_Reason__c
-			);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Acknowledgment_SendFailedUnknown'), row.Failure_Reason__c);
 			Assert.isNull(row.Reminder_Key__c);
 		}
 	}
@@ -431,29 +380,18 @@ private class PledgeReminderServiceTest {
 	static void aDonorWithNoEmailAddressGetsALetterInstead() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			PledgeReminderTestData.enable();
-			insert PledgeReminderTestData.buildStep(
-				'Week late',
-				7,
-				'Email',
-				PledgeReminderTestData.TEMPLATE
-			);
+			insert PledgeReminderTestData.buildStep('Week late', 7, 'Email', PledgeReminderTestData.TEMPLATE);
 			Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', null);
 			Commitment__c pledge = PledgeReminderTestData.insertPledge(donor.Id, 7);
 			RecordingEmailSender sender = new RecordingEmailSender();
 			PledgeReminderService.emailSender = sender;
 
 			PledgeReminderService.Counts counts = PledgeReminderService.process(
-				new List<Installment__c>{
-					PledgeReminderTestData.installmentDue(pledge.Id, Date.today().addDays(-7))
-				}
+				new List<Installment__c>{ PledgeReminderTestData.installmentDue(pledge.Id, Date.today().addDays(-7)) }
 			);
 
 			Assert.areEqual(0, counts.emails);
-			Assert.areEqual(
-				1,
-				counts.letters,
-				'R-PR5: no address goes by letter, like an opt-out.'
-			);
+			Assert.areEqual(1, counts.letters, 'R-PR5: no address goes by letter, like an opt-out.');
 			Assert.isTrue(sender.received.isEmpty());
 			Assert.areEqual('Letter', [SELECT Channel__c FROM Pledge_Reminder__c].Channel__c);
 		}
@@ -463,12 +401,7 @@ private class PledgeReminderServiceTest {
 	static void aDonorWhoOptedOutOfEmailGetsALetterInstead() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			PledgeReminderTestData.enable();
-			insert PledgeReminderTestData.buildStep(
-				'Week late',
-				7,
-				'Email',
-				PledgeReminderTestData.TEMPLATE
-			);
+			insert PledgeReminderTestData.buildStep('Week late', 7, 'Email', PledgeReminderTestData.TEMPLATE);
 			Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', 'ada@example.org');
 			donor.HasOptedOutOfEmail = true;
 			update donor;
@@ -477,9 +410,7 @@ private class PledgeReminderServiceTest {
 			PledgeReminderService.emailSender = sender;
 
 			PledgeReminderService.Counts counts = PledgeReminderService.process(
-				new List<Installment__c>{
-					PledgeReminderTestData.installmentDue(pledge.Id, Date.today().addDays(-7))
-				}
+				new List<Installment__c>{ PledgeReminderTestData.installmentDue(pledge.Id, Date.today().addDays(-7)) }
 			);
 
 			Assert.areEqual(0, counts.emails);
@@ -504,9 +435,7 @@ private class PledgeReminderServiceTest {
 			update donor;
 			Commitment__c pledge = PledgeReminderTestData.insertPledge(donor.Id, 7);
 			PledgeReminderService.process(
-				new List<Installment__c>{
-					PledgeReminderTestData.installmentDue(pledge.Id, Date.today().addDays(-7))
-				}
+				new List<Installment__c>{ PledgeReminderTestData.installmentDue(pledge.Id, Date.today().addDays(-7)) }
 			);
 			Assert.areEqual(
 				'Queued',
@@ -561,12 +490,7 @@ private class PledgeReminderServiceTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			PledgeReminderTestData.enable();
 			insert new List<Pledge_Reminder_Step__c>{
-				PledgeReminderTestData.buildStep(
-					'Week late',
-					7,
-					'Email',
-					PledgeReminderTestData.TEMPLATE
-				)
+				PledgeReminderTestData.buildStep('Week late', 7, 'Email', PledgeReminderTestData.TEMPLATE)
 			};
 			Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', 'ada@example.org');
 			PledgeReminderTestData.insertPledge(donor.Id, 7);
@@ -575,11 +499,7 @@ private class PledgeReminderServiceTest {
 
 			Assert.areEqual(1, counts.emails);
 			Assert.areEqual(0, counts.letters);
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Pledge_Reminder__c],
-				'A preview writes nothing.'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Pledge_Reminder__c], 'A preview writes nothing.');
 		}
 	}
 
@@ -587,12 +507,7 @@ private class PledgeReminderServiceTest {
 	static void theBatchRunsTheWholeWindowAndRecordsTheLastRun() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			PledgeReminderTestData.enable();
-			insert PledgeReminderTestData.buildStep(
-				'Week late',
-				7,
-				'Email',
-				PledgeReminderTestData.TEMPLATE
-			);
+			insert PledgeReminderTestData.buildStep('Week late', 7, 'Email', PledgeReminderTestData.TEMPLATE);
 			Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', 'ada@example.org');
 			PledgeReminderTestData.insertPledge(donor.Id, 7);
 			RecordingEmailSender sender = new RecordingEmailSender();
@@ -606,9 +521,7 @@ private class PledgeReminderServiceTest {
 			Assert.areEqual(1, [SELECT COUNT() FROM Pledge_Reminder__c WHERE Status__c = 'Sent']);
 			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 			Assert.isNotNull(settings.Pledge_Reminders_Last_Run__c);
-			Assert.isTrue(
-				settings.Pledge_Reminders_Last_Run_Summary__c.contains('1 reminder emails sent')
-			);
+			Assert.isTrue(settings.Pledge_Reminders_Last_Run_Summary__c.contains('1 reminder emails sent'));
 		}
 	}
 

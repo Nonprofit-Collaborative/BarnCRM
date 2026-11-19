@@ -153,11 +153,7 @@ public with sharing class AccessController {
 	 * @param isAssign true to give the add-on, false to take it away
 	 * @return success, or a structured error the page can show
 	 */
-	private static AccessResult changeAddOn(
-		String userId,
-		String permissionSetName,
-		Boolean isAssign
-	) {
+	private static AccessResult changeAddOn(String userId, String permissionSetName, Boolean isAssign) {
 		AccessResult result = refuseChange(userId, permissionSetName);
 		if (result != null) {
 			return result;
@@ -249,11 +245,7 @@ public with sharing class AccessController {
 	 * @param isAssign true to give the role, false to take it away
 	 * @return success, or a structured error the page can show
 	 */
-	private static AccessResult changeRole(
-		String userId,
-		String roleDeveloperName,
-		Boolean isAssign
-	) {
+	private static AccessResult changeRole(String userId, String roleDeveloperName, Boolean isAssign) {
 		AccessResult result = refuseChange(userId, roleDeveloperName);
 		if (result != null) {
 			return result;

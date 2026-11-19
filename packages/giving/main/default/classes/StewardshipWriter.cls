@@ -26,10 +26,7 @@ public without sharing class StewardshipWriter {
 	 * are kept apart rather than looked up again so that starting two hundred plans costs no
 	 * further queries.
 	 */
-	public static void startPlans(
-		List<Stewardship_Plan__c> plans,
-		List<Stewardship_Plan_Template__c> templates
-	) {
+	public static void startPlans(List<Stewardship_Plan__c> plans, List<Stewardship_Plan_Template__c> templates) {
 		if (plans == null || plans.isEmpty() || templates == null) {
 			return;
 		}
@@ -57,13 +54,7 @@ public without sharing class StewardshipWriter {
 				continue;
 			}
 			try {
-				tasks.addAll(
-					StewardshipService.tasksFor(
-						templates[i],
-						plans[i],
-						owners.get(donorOf(plans[i]))
-					)
-				);
+				tasks.addAll(StewardshipService.tasksFor(templates[i], plans[i], owners.get(donorOf(plans[i]))));
 			} catch (Exception cannotBuild) {
 				refused.add(cannotBuild);
 			}
@@ -86,10 +77,7 @@ public without sharing class StewardshipWriter {
 	 * package cannot read is simply absent from the map, and the service falls back to the person
 	 * who started the plan rather than leaving a task unowned (R-SP4).
 	 */
-	private static Map<Id, Id> ownersFor(
-		List<Stewardship_Plan__c> plans,
-		List<Database.SaveResult> saved
-	) {
+	private static Map<Id, Id> ownersFor(List<Stewardship_Plan__c> plans, List<Database.SaveResult> saved) {
 		Set<Id> contactIds = new Set<Id>();
 		Set<Id> accountIds = new Set<Id>();
 		for (Integer i = 0; i < saved.size(); i++) {

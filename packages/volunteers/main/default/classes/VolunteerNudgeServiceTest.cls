@@ -72,10 +72,7 @@ private class VolunteerNudgeServiceTest {
 			regular('Optout', 'no@example.org', true);
 			regular('Booked', 'booked@example.org', false);
 			Volunteer_Shift__c shift = shiftIn(30, 2);
-			insert VolunteersTestData.newSignup(
-				shift.Id,
-				[SELECT Id FROM Contact WHERE LastName = 'Booked'].Id
-			);
+			insert VolunteersTestData.newSignup(shift.Id, [SELECT Id FROM Contact WHERE LastName = 'Booked'].Id);
 
 			runBatch();
 			Database.QueryLocatorIterator stillDue = VolunteerNudgeSelector.dueLocator(
@@ -86,15 +83,8 @@ private class VolunteerNudgeServiceTest {
 
 			Assert.isFalse(stillDue.hasNext(), 'A stamped shift is not due a second time.');
 			Assert.areEqual(1, stub.received.size(), 'Only the free, reachable regular, once.');
-			Assert.areEqual(
-				'ana@example.org',
-				stub.received[0].getToAddresses()[0],
-				'To the Contact.'
-			);
-			Assert.isTrue(
-				stub.received[0].getSubject().contains('Food pantry sort'),
-				'The subject names the job.'
-			);
+			Assert.areEqual('ana@example.org', stub.received[0].getToAddresses()[0], 'To the Contact.');
+			Assert.isTrue(stub.received[0].getSubject().contains('Food pantry sort'), 'The subject names the job.');
 			Assert.areEqual(1, stamped(), 'The shift is stamped.');
 		}
 	}

@@ -284,9 +284,7 @@ public with sharing class AccessExplorerController {
 				return choices;
 			}
 			// The search index finds the people (D-200 P5); one read by id orders them.
-			Map<Id, SObject> found = new Map<Id, SObject>(
-				NameSearch.find(searchText, 'User(Id LIMIT 200)')[0]
-			);
+			Map<Id, SObject> found = new Map<Id, SObject>(NameSearch.find(searchText, 'User(Id LIMIT 200)')[0]);
 			for (User person : [
 				SELECT Id, Name, IsActive, Profile.Name
 				FROM User
@@ -431,10 +429,7 @@ public with sharing class AccessExplorerController {
 			for (FieldPermissions permission : [
 				SELECT ParentId, Field, PermissionsRead, PermissionsEdit
 				FROM FieldPermissions
-				WHERE
-					ParentId IN :allIds(sources, components)
-					AND SobjectType = :objectType
-					AND PermissionsRead = TRUE
+				WHERE ParentId IN :allIds(sources, components) AND SobjectType = :objectType AND PermissionsRead = TRUE
 				WITH USER_MODE
 			]) {
 				Flags given = new Flags();
@@ -617,9 +612,7 @@ public with sharing class AccessExplorerController {
 			result.sets.addAll(sortedGrants(roles.values()));
 			result.sets.addAll(sortedGrants(sets.values()));
 			result.tabAccessCheckScheduled = TabAccessScheduler.isScheduled();
-			result.tabAccessCheckNextRun = ScheduledJobSelector.nextFireTime(
-				TabAccessScheduler.JOB_NAME
-			);
+			result.tabAccessCheckNextRun = ScheduledJobSelector.nextFireTime(TabAccessScheduler.JOB_NAME);
 			return result;
 		} catch (Exception caught) {
 			throw ERRORS.wrap(caught, 'Access explorer overview');
@@ -686,9 +679,7 @@ public with sharing class AccessExplorerController {
 			countHolders(holders);
 			Map<Id, List<String>> groups = groupsHolding(holders.keySet());
 			for (Grant holder : holders.values()) {
-				holder.inGroups = groups.containsKey(holder.id)
-					? String.join(groups.get(holder.id), ', ')
-					: null;
+				holder.inGroups = groups.containsKey(holder.id) ? String.join(groups.get(holder.id), ', ') : null;
 			}
 			for (PermissionSet permissionSet : dataSets) {
 				result.dataGrants.add(holders.get(permissionSet.Id));
@@ -777,9 +768,7 @@ public with sharing class AccessExplorerController {
 			}
 		}
 		Set<Id> parentIds = byParent.keySet();
-		String everything = field == null
-			? ' OR PermissionsViewAllData = TRUE OR PermissionsModifyAllData = TRUE'
-			: '';
+		String everything = field == null ? ' OR PermissionsViewAllData = TRUE OR PermissionsModifyAllData = TRUE' : '';
 		Map<Id, Grant> grants = new Map<Id, Grant>();
 		for (
 			PermissionSet permissionSet : querySets(
@@ -845,10 +834,7 @@ public with sharing class AccessExplorerController {
 	}
 
 	/** One row per object and holder, by object label then holder. */
-	private static List<HolderRow> holderRows(
-		List<ObjectPermissions> permissions,
-		Map<Id, Grant> holders
-	) {
+	private static List<HolderRow> holderRows(List<ObjectPermissions> permissions, Map<Id, Grant> holders) {
 		Map<String, HolderRow> byKey = new Map<String, HolderRow>();
 		for (ObjectPermissions permission : permissions) {
 			Grant holder = holders.get(permission.ParentId);
@@ -927,10 +913,7 @@ public with sharing class AccessExplorerController {
 			}
 		}
 		Map<Id, PermissionSet> components = new Map<Id, PermissionSet>(
-			querySets(
-				'Id IN :componentIds',
-				new Map<String, Object>{ 'componentIds' => componentIds }
-			)
+			querySets('Id IN :componentIds', new Map<String, Object>{ 'componentIds' => componentIds })
 		);
 		Map<Id, List<PermissionSet>> bySource = new Map<Id, List<PermissionSet>>();
 		for (Id groupId : insideByGroup.keySet()) {
@@ -947,17 +930,10 @@ public with sharing class AccessExplorerController {
 
 	/** PermissionSet rows in user mode, profiles first, then groups, then sets, each by name. */
 	private static List<PermissionSet> querySets(String condition, Map<String, Object> binds) {
-		List<PermissionSet> found = Database.queryWithBinds(
-			SET_FIELDS + condition,
-			binds,
-			AccessLevel.USER_MODE
-		);
+		List<PermissionSet> found = Database.queryWithBinds(SET_FIELDS + condition, binds, AccessLevel.USER_MODE);
 		Map<String, PermissionSet> byKey = new Map<String, PermissionSet>();
 		for (PermissionSet permissionSet : found) {
-			byKey.put(
-				sortKey(kindOf(permissionSet), labelOf(permissionSet), permissionSet.Id),
-				permissionSet
-			);
+			byKey.put(sortKey(kindOf(permissionSet), labelOf(permissionSet), permissionSet.Id), permissionSet);
 		}
 		List<String> keys = new List<String>(byKey.keySet());
 		keys.sort();
@@ -968,22 +944,14 @@ public with sharing class AccessExplorerController {
 		return sorted;
 	}
 
-	private static void keep(
-		Map<Id, Map<String, Flags>> byParent,
-		Id parentId,
-		String key,
-		Flags given
-	) {
+	private static void keep(Map<Id, Map<String, Flags>> byParent, Id parentId, String key, Flags given) {
 		if (!byParent.containsKey(parentId)) {
 			byParent.put(parentId, new Map<String, Flags>());
 		}
 		byParent.get(parentId).put(key.toLowerCase(), given);
 	}
 
-	private static Set<Id> allIds(
-		List<PermissionSet> sources,
-		Map<Id, List<PermissionSet>> components
-	) {
+	private static Set<Id> allIds(List<PermissionSet> sources, Map<Id, List<PermissionSet>> components) {
 		Set<Id> ids = new Map<Id, PermissionSet>(sources).keySet().clone();
 		for (List<PermissionSet> inside : components.values()) {
 			ids.addAll(new Map<Id, PermissionSet>(inside).keySet());
@@ -1081,9 +1049,7 @@ public with sharing class AccessExplorerController {
 			return null;
 		}
 		String namespace = NamespaceUtil.prefix().removeEnd('__');
-		PermissionSetGroup owner = permissionSet.PermissionSetGroupId == null
-			? null
-			: permissionSet.PermissionSetGroup;
+		PermissionSetGroup owner = permissionSet.PermissionSetGroupId == null ? null : permissionSet.PermissionSetGroup;
 		if (owner != null) {
 			return sameNamespace(owner.NamespacePrefix, namespace) &&
 				AccessService.ROLE_DEVELOPER_NAMES.contains(owner.DeveloperName)
@@ -1164,9 +1130,7 @@ public with sharing class AccessExplorerController {
 		try {
 			return Id.valueOf(value);
 		} catch (Exception invalid) {
-			throw new AccessExplorerException(
-				BarnHelp.text('Core', 'Core_AccessExplorer_UnknownSubject')
-			);
+			throw new AccessExplorerException(BarnHelp.text('Core', 'Core_AccessExplorer_UnknownSubject'));
 		}
 	}
 
@@ -1179,9 +1143,7 @@ public with sharing class AccessExplorerController {
 			LIMIT 1
 		];
 		if (found.isEmpty()) {
-			throw new AccessExplorerException(
-				BarnHelp.text('Core', 'Core_AccessExplorer_UnknownSubject')
-			);
+			throw new AccessExplorerException(BarnHelp.text('Core', 'Core_AccessExplorer_UnknownSubject'));
 		}
 		return found[0];
 	}
@@ -1191,9 +1153,7 @@ public with sharing class AccessExplorerController {
 			? querySets('Id = :setId', new Map<String, Object>{ 'setId' => permissionSetId })
 			: new List<PermissionSet>();
 		if (found.isEmpty()) {
-			throw new AccessExplorerException(
-				BarnHelp.text('Core', 'Core_AccessExplorer_UnknownSubject')
-			);
+			throw new AccessExplorerException(BarnHelp.text('Core', 'Core_AccessExplorer_UnknownSubject'));
 		}
 		return found[0];
 	}
@@ -1214,20 +1174,14 @@ public with sharing class AccessExplorerController {
 		return described;
 	}
 
-	private static Schema.DescribeFieldResult requireField(
-		Schema.DescribeSObjectResult described,
-		String fieldName
-	) {
+	private static Schema.DescribeFieldResult requireField(Schema.DescribeSObjectResult described, String fieldName) {
 		if (String.isBlank(fieldName)) {
 			return null;
 		}
 		Schema.SObjectField token = described.fields.getMap().get(fieldName.trim());
 		if (token == null) {
 			throw new AccessExplorerException(
-				String.format(
-					BarnHelp.text('Core', 'Core_AccessExplorer_UnknownField'),
-					new List<Object>{ fieldName }
-				)
+				String.format(BarnHelp.text('Core', 'Core_AccessExplorer_UnknownField'), new List<Object>{ fieldName })
 			);
 		}
 		return token.getDescribe();
@@ -1235,9 +1189,7 @@ public with sharing class AccessExplorerController {
 
 	private static void requirePermission() {
 		if (!FeatureManagement.checkPermission(PERMISSION)) {
-			throw new AccessExplorerException(
-				BarnHelp.text('Core', 'Core_AccessExplorer_PermissionRequired')
-			);
+			throw new AccessExplorerException(BarnHelp.text('Core', 'Core_AccessExplorer_PermissionRequired'));
 		}
 	}
 }

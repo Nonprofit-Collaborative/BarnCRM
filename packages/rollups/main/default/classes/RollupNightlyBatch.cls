@@ -150,9 +150,7 @@ public without sharing class RollupNightlyBatch implements Database.Batchable<SO
 		try {
 			OrgSettingsSystemWriter.save(
 				Rollup_Settings__c.SObjectType,
-				new Map<Schema.SObjectField, Object>{
-					Rollup_Settings__c.Nightly_Covered_From__c => startedAt
-				}
+				new Map<Schema.SObjectField, Object>{ Rollup_Settings__c.Nightly_Covered_From__c => startedAt }
 			);
 		} catch (Exception notStored) {
 			// The next night then covers the same changes again, which costs time, not totals.
@@ -182,9 +180,7 @@ public without sharing class RollupNightlyBatch implements Database.Batchable<SO
 		return [
 				SELECT Id
 				FROM Setting_Change__c
-				WHERE
-					Setting_Name__c = :AutomationControl.PAUSE_SETTING_NAME
-					AND CreatedDate >= :since
+				WHERE Setting_Name__c = :AutomationControl.PAUSE_SETTING_NAME AND CreatedDate >= :since
 				WITH SYSTEM_MODE
 				LIMIT 1
 			]
@@ -199,15 +195,9 @@ public without sharing class RollupNightlyBatch implements Database.Batchable<SO
 		Plan plan = new Plan();
 		plan.since = since;
 		Map<String, Pass> bySource = new Map<String, Pass>();
-		for (
-			Rollup_Definition__c definition : definitions == null
-				? new List<Rollup_Definition__c>()
-				: definitions
-		) {
+		for (Rollup_Definition__c definition : definitions == null ? new List<Rollup_Definition__c>() : definitions) {
 			Schema.SObjectType sourceType = SettingsService.typeByName(definition.Source_Object__c);
-			List<Edge> edges = sourceType == null
-				? null
-				: edgesOf(definition, sourceType, since.date());
+			List<Edge> edges = sourceType == null ? null : edgesOf(definition, sourceType, since.date());
 			if (edges == null) {
 				plan.everywhere.add(definition);
 				continue;
@@ -222,9 +212,7 @@ public without sharing class RollupNightlyBatch implements Database.Batchable<SO
 			}
 			pass.definitions.add(definition);
 			Map<String, Schema.SObjectField> fields = RollupChanges.fieldMap(sourceType);
-			pass.fields.addAll(
-				RollupChanges.localFields(RollupChanges.readsFor(definition), fields)
-			);
+			pass.fields.addAll(RollupChanges.localFields(RollupChanges.readsFor(definition), fields));
 			List<String> membership = MEMBERSHIP_FIELDS.get(source.toLowerCase());
 			for (String field : membership == null ? new List<String>() : membership) {
 				if (fields.containsKey(field)) {
@@ -242,11 +230,7 @@ public without sharing class RollupNightlyBatch implements Database.Batchable<SO
 	 * The window edges a definition's changes since `last` can hide behind, or null when it runs
 	 * everywhere tonight.
 	 */
-	private static List<Edge> edgesOf(
-		Rollup_Definition__c definition,
-		Schema.SObjectType sourceType,
-		Date last
-	) {
+	private static List<Edge> edgesOf(Rollup_Definition__c definition, Schema.SObjectType sourceType, Date last) {
 		Date today = today();
 		if (
 			definition.Mode__c != RollupService.MODE_BOTH ||
@@ -313,9 +297,7 @@ public without sharing class RollupNightlyBatch implements Database.Batchable<SO
 			return conditions;
 		}
 		try {
-			Map<String, Object> parsed = (Map<String, Object>) JSON.deserializeUntyped(
-				filterDocument
-			);
+			Map<String, Object> parsed = (Map<String, Object>) JSON.deserializeUntyped(filterDocument);
 			for (Object condition : (List<Object>) parsed.get('conditions')) {
 				Map<String, Object> read = (Map<String, Object>) condition;
 				if (read.get('operator') != null && read.get('field') != null) {
@@ -381,15 +363,7 @@ public without sharing class RollupNightlyBatch implements Database.Batchable<SO
 	/** Marks the targets of these source records and queues them. */
 	public void execute(Database.BatchableContext context, List<SObject> records) {
 		try {
-			queue(
-				RollupChanges.forSave(
-					currentPass().source,
-					records,
-					null,
-					false,
-					currentPass().definitions
-				)
-			);
+			queue(RollupChanges.forSave(currentPass().source, records, null, false, currentPass().definitions));
 		} catch (Exception stopped) {
 			ErrorLogger.log(stopped, LOG_CONTEXT);
 			this.plan.stopped++;

@@ -68,11 +68,7 @@ public with sharing class ReceiptStatementBatch implements Database.Batchable<SO
 	 */
 	public void finish(Database.BatchableContext context) {
 		try {
-			ReceiptNumberSequence.reconcile(
-				ReceiptNumberSequence.TYPE_STATEMENT,
-				statementYear,
-				runId
-			);
+			ReceiptNumberSequence.reconcile(ReceiptNumberSequence.TYPE_STATEMENT, statementYear, runId);
 		} catch (Exception reconcileFailure) {
 			chunkErrors++;
 			ErrorLogger.log(reconcileFailure, 'ReceiptStatementBatch.reconcile', runId);
@@ -88,11 +84,7 @@ public with sharing class ReceiptStatementBatch implements Database.Batchable<SO
 			false,
 			String.format(
 				BarnHelp.text('Giving', 'Giving_JobNotice_StatementsBody'),
-				new List<Object>{
-					donorsProcessed.format(),
-					receiptsIssued.format(),
-					chunkErrors.format()
-				}
+				new List<Object>{ donorsProcessed.format(), receiptsIssued.format(), chunkErrors.format() }
 			),
 			runId
 		);
@@ -108,11 +100,7 @@ public with sharing class ReceiptStatementBatch implements Database.Batchable<SO
 		Map<Id, Account> pending = new Map<Id, Account>();
 		Map<String, Id> keyToDonor = new Map<String, Id>();
 		for (Account donor : donors) {
-			String key = ReceiptService.donorYearKey(
-				donor.Id,
-				statementYear,
-				ReceiptNumberSequence.TYPE_STATEMENT
-			);
+			String key = ReceiptService.donorYearKey(donor.Id, statementYear, ReceiptNumberSequence.TYPE_STATEMENT);
 			keyToDonor.put(key, donor.Id);
 			pending.put(donor.Id, donor);
 		}
@@ -127,9 +115,7 @@ public with sharing class ReceiptStatementBatch implements Database.Batchable<SO
 
 		Map<Id, List<Gift__c>> giftsByDonor = new Map<Id, List<Gift__c>>();
 		for (Gift__c gift : ReceiptSelector.giftsForReceipting(pending.keySet(), statementYear)) {
-			Id donorId = pending.containsKey(gift.Household__c)
-				? gift.Household__c
-				: gift.Donor_Account__c;
+			Id donorId = pending.containsKey(gift.Household__c) ? gift.Household__c : gift.Donor_Account__c;
 			if (donorId == null || !pending.containsKey(donorId)) {
 				continue;
 			}
@@ -150,9 +136,7 @@ public with sharing class ReceiptStatementBatch implements Database.Batchable<SO
 			donorOrder.size()
 		);
 
-		String templateBody = ReceiptTemplateService.activeBodyFor(
-			ReceiptNumberSequence.TYPE_STATEMENT
-		);
+		String templateBody = ReceiptTemplateService.activeBodyFor(ReceiptNumberSequence.TYPE_STATEMENT);
 		ReceiptRenderer renderer = ReceiptRendererFactory.get();
 
 		Integer issued = 0;

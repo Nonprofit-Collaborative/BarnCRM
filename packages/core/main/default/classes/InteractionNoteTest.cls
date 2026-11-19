@@ -60,16 +60,8 @@ private class InteractionNoteTest {
 				WHERE WhoId = :person.Id
 			];
 			Assert.isTrue(saved.IsClosed, 'A note is history, not a to-do (R-IN1).');
-			Assert.areEqual(
-				person.AccountId,
-				saved.AccountId,
-				'The note shows on the household (R-IN3).'
-			);
-			Assert.areEqual(
-				Date.today().addDays(-3),
-				saved.ActivityDate,
-				'The note keeps the day it happened.'
-			);
+			Assert.areEqual(person.AccountId, saved.AccountId, 'The note shows on the household (R-IN3).');
+			Assert.areEqual(Date.today().addDays(-3), saved.ActivityDate, 'The note keeps the day it happened.');
 		}
 	}
 
@@ -83,11 +75,7 @@ private class InteractionNoteTest {
 			Test.stopTest();
 
 			Task saved = [SELECT WhatId, AccountId, IsClosed FROM Task WHERE WhoId = :person.Id];
-			Assert.areEqual(
-				person.AccountId,
-				saved.WhatId,
-				'The note is on the household it was logged on.'
-			);
+			Assert.areEqual(person.AccountId, saved.WhatId, 'The note is on the household it was logged on.');
 			Assert.areEqual(person.AccountId, saved.AccountId, 'The household timeline shows it.');
 			Assert.isTrue(saved.IsClosed, 'A note is history, not a to-do (R-IN1).');
 		}

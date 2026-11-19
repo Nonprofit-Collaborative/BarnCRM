@@ -14,11 +14,7 @@ private class TributeServiceTest {
 			Gift__c gift = giftFromAna(100);
 
 			Test.startTest();
-			Tribute__c tribute = RecognitionTestData.tribute(
-				gift.Id,
-				TributeService.TYPE_IN_MEMORY_OF,
-				'Rosa Garcia'
-			);
+			Tribute__c tribute = RecognitionTestData.tribute(gift.Id, TributeService.TYPE_IN_MEMORY_OF, 'Rosa Garcia');
 			insert tribute;
 			Test.stopTest();
 
@@ -51,19 +47,11 @@ private class TributeServiceTest {
 	static void refusesASecondTributeOnOneGift() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Gift__c gift = giftFromAna(100);
-			insert RecognitionTestData.tribute(
-				gift.Id,
-				TributeService.TYPE_IN_HONOR_OF,
-				'Rosa Garcia'
-			);
+			insert RecognitionTestData.tribute(gift.Id, TributeService.TYPE_IN_HONOR_OF, 'Rosa Garcia');
 
 			Test.startTest();
 			Database.SaveResult result = Database.insert(
-				RecognitionTestData.tribute(
-					gift.Id,
-					TributeService.TYPE_IN_HONOR_OF,
-					'Luis Garcia'
-				),
+				RecognitionTestData.tribute(gift.Id, TributeService.TYPE_IN_HONOR_OF, 'Luis Garcia'),
 				false
 			);
 			Test.stopTest();
@@ -80,11 +68,7 @@ private class TributeServiceTest {
 			rosa.Deceased__c = true;
 			update rosa;
 
-			Tribute__c tribute = RecognitionTestData.tribute(
-				gift.Id,
-				TributeService.TYPE_IN_MEMORY_OF,
-				null
-			);
+			Tribute__c tribute = RecognitionTestData.tribute(gift.Id, TributeService.TYPE_IN_MEMORY_OF, null);
 			tribute.Honoree_Contact__c = rosa.Id;
 			tribute.Notification_Recipient_Contact__c = rosa.Id;
 
@@ -109,11 +93,7 @@ private class TributeServiceTest {
 			update rosa;
 			Contact ana = [SELECT Id FROM Contact WHERE FirstName = 'Ana' LIMIT 1];
 
-			Tribute__c tribute = RecognitionTestData.tribute(
-				gift.Id,
-				TributeService.TYPE_IN_MEMORY_OF,
-				null
-			);
+			Tribute__c tribute = RecognitionTestData.tribute(gift.Id, TributeService.TYPE_IN_MEMORY_OF, null);
 			tribute.Honoree_Contact__c = rosa.Id;
 			tribute.Notification_Recipient_Contact__c = ana.Id;
 
@@ -129,11 +109,7 @@ private class TributeServiceTest {
 	static void marksTheNotificationSentAndStampsTheDate() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Gift__c gift = giftFromAna(100);
-			Tribute__c tribute = RecognitionTestData.tribute(
-				gift.Id,
-				TributeService.TYPE_IN_MEMORY_OF,
-				'Rosa Garcia'
-			);
+			Tribute__c tribute = RecognitionTestData.tribute(gift.Id, TributeService.TYPE_IN_MEMORY_OF, 'Rosa Garcia');
 			tribute.Notification_Recipient_Name__c = 'The Garcia family, 14 Mill Lane';
 			insert tribute;
 
@@ -147,11 +123,7 @@ private class TributeServiceTest {
 				WHERE Id = :tribute.Id
 			];
 			System.assertEquals(true, saved.Notification_Sent__c, 'The notification has gone out');
-			System.assertEquals(
-				Date.today(),
-				saved.Notification_Sent_Date__c,
-				'And the date is kept'
-			);
+			System.assertEquals(Date.today(), saved.Notification_Sent_Date__c, 'And the date is kept');
 		}
 	}
 
@@ -159,11 +131,7 @@ private class TributeServiceTest {
 	static void keepsTheFirstSentDateWhenMarkedAgain() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Gift__c gift = giftFromAna(100);
-			Tribute__c tribute = RecognitionTestData.tribute(
-				gift.Id,
-				TributeService.TYPE_IN_HONOR_OF,
-				'Rosa Garcia'
-			);
+			Tribute__c tribute = RecognitionTestData.tribute(gift.Id, TributeService.TYPE_IN_HONOR_OF, 'Rosa Garcia');
 			tribute.Notification_Sent__c = true;
 			tribute.Notification_Sent_Date__c = Date.today().addDays(-10);
 			insert tribute;
@@ -189,11 +157,7 @@ private class TributeServiceTest {
 	static void stampsTheDateWhenTheBoxIsTickedOnTheRecord() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Gift__c gift = giftFromAna(100);
-			Tribute__c tribute = RecognitionTestData.tribute(
-				gift.Id,
-				TributeService.TYPE_IN_HONOR_OF,
-				'Rosa Garcia'
-			);
+			Tribute__c tribute = RecognitionTestData.tribute(gift.Id, TributeService.TYPE_IN_HONOR_OF, 'Rosa Garcia');
 			insert tribute;
 
 			Test.startTest();
@@ -208,11 +172,7 @@ private class TributeServiceTest {
 				FROM Tribute__c
 				WHERE Id = :tribute.Id
 			];
-			System.assertEquals(
-				Date.today(),
-				saved.Notification_Sent_Date__c,
-				'The date follows the box'
-			);
+			System.assertEquals(Date.today(), saved.Notification_Sent_Date__c, 'The date follows the box');
 		}
 	}
 
@@ -220,11 +180,7 @@ private class TributeServiceTest {
 	static void clearsTheGiftMirrorWhenTheTributeIsDeleted() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Gift__c gift = giftFromAna(100);
-			Tribute__c tribute = RecognitionTestData.tribute(
-				gift.Id,
-				TributeService.TYPE_IN_HONOR_OF,
-				'Rosa Garcia'
-			);
+			Tribute__c tribute = RecognitionTestData.tribute(gift.Id, TributeService.TYPE_IN_HONOR_OF, 'Rosa Garcia');
 			insert tribute;
 
 			Test.startTest();

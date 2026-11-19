@@ -1,9 +1,6 @@
 @IsTest(testFor='ApexClass:ImportNewFieldService, ApexClass:ImportNewFieldController')
 private class ImportNewFieldServiceTest {
-	private static final List<String> FIELD_ADMIN = new List<String>{
-		'BarnCRM_Admin',
-		'BarnCRM_Metadata_Admin'
-	};
+	private static final List<String> FIELD_ADMIN = new List<String>{ 'BarnCRM_Admin', 'BarnCRM_Metadata_Admin' };
 	private static final String SUCCESS = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns="http://soap.sforce.com/2006/04/metadata"><soapenv:Body><createMetadataResponse><result><fullName>Account.Shirt_Size__c</fullName><success>true</success></result></createMetadataResponse></soapenv:Body></soapenv:Envelope>';
 	private static final String REFUSED = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns="http://soap.sforce.com/2006/04/metadata"><soapenv:Body><createMetadataResponse><result><errors><message>Too many custom fields</message><statusCode>LIMIT_EXCEEDED</statusCode></errors><fullName>Account.Shirt_Size__c</fullName><success>false</success></result></createMetadataResponse></soapenv:Body></soapenv:Envelope>';
 	private static final String FAULT = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><soapenv:Body><soapenv:Fault><faultcode>sf:INVALID_SESSION_ID</faultcode><faultstring>INVALID_SESSION_ID: Invalid Session ID</faultstring></soapenv:Fault></soapenv:Body></soapenv:Envelope>';
@@ -86,11 +83,7 @@ private class ImportNewFieldServiceTest {
 	 * The failed job's one Error Log entry, delivered from ErrorLogger's event, names the reason,
 	 * and the poll reports it.
 	 */
-	private static void assertReported(
-		ImportNewFieldService.Outcome outcome,
-		String reason,
-		Id jobId
-	) {
+	private static void assertReported(ImportNewFieldService.Outcome outcome, String reason, Id jobId) {
 		List<Error_Log__c> logged = [
 			SELECT Message__c, Context__c
 			FROM Error_Log__c
@@ -112,11 +105,7 @@ private class ImportNewFieldServiceTest {
 			Test.stopTest();
 			Test.getEventBus().deliver();
 
-			ImportNewFieldService.Outcome outcome = ImportNewFieldService.check(
-				jobId,
-				'Account',
-				'Shirt_Size'
-			);
+			ImportNewFieldService.Outcome outcome = ImportNewFieldService.check(jobId, 'Account', 'Shirt_Size');
 			Assert.areEqual(ImportNewFieldService.FAILED, outcome.state);
 			assertReported(outcome, 'Too many custom fields', jobId);
 		}
@@ -132,11 +121,7 @@ private class ImportNewFieldServiceTest {
 			Test.stopTest();
 			Test.getEventBus().deliver();
 
-			ImportNewFieldService.Outcome outcome = ImportNewFieldService.check(
-				jobId,
-				'Account',
-				'Shirt_Size'
-			);
+			ImportNewFieldService.Outcome outcome = ImportNewFieldService.check(jobId, 'Account', 'Shirt_Size');
 			Assert.areEqual(ImportNewFieldService.FAILED, outcome.state);
 			assertReported(outcome, 'INVALID_SESSION_ID', jobId);
 		}
@@ -156,10 +141,7 @@ private class ImportNewFieldServiceTest {
 				ImportNewFieldService.start(picklist('Shirt_Size'));
 				Assert.fail('Expected a refusal');
 			} catch (ImportNewFieldService.NewFieldException e) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_ImportNewField_NoPermission'),
-					e.getMessage()
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_ImportNewField_NoPermission'), e.getMessage());
 			}
 		}
 		System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
@@ -168,10 +150,7 @@ private class ImportNewFieldServiceTest {
 				ImportNewFieldController.createField(JSON.serialize(picklist('Shirt_Size')));
 				Assert.fail('Expected a refusal');
 			} catch (AuraHandledException e) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_ImportNewField_NoPermission'),
-					e.getMessage()
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_ImportNewField_NoPermission'), e.getMessage());
 			}
 		}
 	}
@@ -186,10 +165,7 @@ private class ImportNewFieldServiceTest {
 				ImportNewFieldService.start(picklist('Shirt_Size'));
 				Assert.fail('Expected a refusal');
 			} catch (ImportNewFieldService.NewFieldException e) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_ImportNewField_NotConnected'),
-					e.getMessage()
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_ImportNewField_NotConnected'), e.getMessage());
 			}
 			Assert.isTrue(ImportNewFieldController.setUpConnection().canCreate);
 			// Refresh Fields after creating the field in Setup.
@@ -218,10 +194,7 @@ private class ImportNewFieldServiceTest {
 				ImportNewFieldService.start(picklist('Shirt_Size'));
 				Assert.fail('Expected a refusal');
 			} catch (ImportNewFieldService.NewFieldException e) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_ImportNewField_CalloutsOff'),
-					e.getMessage()
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_ImportNewField_CalloutsOff'), e.getMessage());
 			}
 			ImportNewFieldService.calloutStatusOverride = 'Enabled';
 			connection = ImportNewFieldController.getConnection();
@@ -252,10 +225,7 @@ private class ImportNewFieldServiceTest {
 				ImportNewFieldService.start(picklist(alternateEmail()));
 				Assert.fail('Expected a refusal');
 			} catch (ImportNewFieldService.NewFieldException e) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_ImportNewField_NameTaken'),
-					e.getMessage()
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_ImportNewField_NameTaken'), e.getMessage());
 			}
 		}
 	}
@@ -333,12 +303,7 @@ private class ImportNewFieldServiceTest {
 	static void grantsAccessThroughTheChosenPermissionSet() {
 		System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
 			PermissionSet chosen = permissionSet('Barn_Test_Chosen', true);
-			List<String> skipped = ImportNewFieldService.grantAccess(
-				ownObject(),
-				ownField(),
-				chosen.Id,
-				'test'
-			);
+			List<String> skipped = ImportNewFieldService.grantAccess(ownObject(), ownField(), chosen.Id, 'test');
 			ImportNewFieldService.grantAccess(ownObject(), ownField(), chosen.Id, 'test');
 
 			List<FieldPermissions> rows = fieldRows(chosen.Id);
@@ -355,12 +320,7 @@ private class ImportNewFieldServiceTest {
 	static void skipsAPermissionSetThatCannotReadTheObject() {
 		System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
 			PermissionSet chosen = permissionSet('Barn_Test_No_Read', false);
-			List<String> skipped = ImportNewFieldService.grantAccess(
-				ownObject(),
-				ownField(),
-				chosen.Id,
-				'test'
-			);
+			List<String> skipped = ImportNewFieldService.grantAccess(ownObject(), ownField(), chosen.Id, 'test');
 
 			Assert.isTrue(fieldRows(chosen.Id).isEmpty(), 'no field access without object Read');
 			Assert.areEqual(
@@ -381,9 +341,7 @@ private class ImportNewFieldServiceTest {
 			}
 			Assert.isNotNull(reported, String.join(skipped, ' | '));
 			Assert.isTrue(
-				reported.contains(
-					Schema.getGlobalDescribe().get(ownObject()).getDescribe().getLabel()
-				),
+				reported.contains(Schema.getGlobalDescribe().get(ownObject()).getDescribe().getLabel()),
 				reported
 			);
 		}

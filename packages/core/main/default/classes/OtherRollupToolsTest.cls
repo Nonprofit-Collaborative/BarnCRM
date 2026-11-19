@@ -37,10 +37,7 @@ private class OtherRollupToolsTest {
 	static void bothToolsAreNamedDlrsFirst() {
 		System.runAs(TestUsers.admin()) {
 			OtherRollupTools.overrideForTest(
-				new Set<String>{
-					OtherRollupTools.ROLLUP_HELPER_NAMESPACE,
-					OtherRollupTools.DLRS_NAMESPACE
-				}
+				new Set<String>{ OtherRollupTools.ROLLUP_HELPER_NAMESPACE, OtherRollupTools.DLRS_NAMESPACE }
 			);
 
 			List<String> notices = OtherRollupTools.notices();

@@ -4,9 +4,7 @@
  * Scanned, a stranger's code is Not Found, booth staff scan for Acme too, and someone with no
  * sponsorship is refused. Staff download only the leads (EV-28, R-SLD1, R-SLD2).
  */
-@IsTest(
-	testFor='ApexClass:EventOperationsHandler, ApexTrigger:SponsorLeadTrigger, ApexClass:EventSponsorsController'
-)
+@IsTest(testFor='ApexClass:EventOperationsHandler, ApexTrigger:SponsorLeadTrigger, ApexClass:EventSponsorsController')
 private class EventSponsorLeadsTest {
 	@TestSetup
 	static void createTestUser() {
@@ -19,11 +17,7 @@ private class EventSponsorLeadsTest {
 
 	private static Contact person(String first, String last) {
 		Contact record = TestDataFactory.person(
-			new Contact(
-				FirstName = first,
-				LastName = last,
-				Email = first.toLowerCase() + '@example.org'
-			)
+			new Contact(FirstName = first, LastName = last, Email = first.toLowerCase() + '@example.org')
 		);
 		insert as user record;
 		return record;
@@ -65,23 +59,13 @@ private class EventSponsorLeadsTest {
 				End__c = start.addHours(8)
 			);
 			insert as user event;
-			Event_Sponsor__c acme = new Event_Sponsor__c(
-				Event__c = event.Id,
-				Name = 'Acme',
-				Status__c = 'Confirmed'
-			);
+			Event_Sponsor__c acme = new Event_Sponsor__c(Event__c = event.Id, Name = 'Acme', Status__c = 'Confirmed');
 			insert as user acme;
 			Event_Attendee__c ana = attend(event, person('Ana', 'Garcia'), true);
 
-			Sponsor_Lead__c first = new Sponsor_Lead__c(
-				Event_Sponsor__c = acme.Id,
-				Badge_Code__c = ana.Id
-			);
+			Sponsor_Lead__c first = new Sponsor_Lead__c(Event_Sponsor__c = acme.Id, Badge_Code__c = ana.Id);
 			insert as user first;
-			Sponsor_Lead__c again = new Sponsor_Lead__c(
-				Event_Sponsor__c = acme.Id,
-				Badge_Code__c = ana.Id
-			);
+			Sponsor_Lead__c again = new Sponsor_Lead__c(Event_Sponsor__c = acme.Id, Badge_Code__c = ana.Id);
 			insert as user again;
 
 			Map<Id, Sponsor_Lead__c> saved = new Map<Id, Sponsor_Lead__c>(
@@ -127,10 +111,7 @@ private class EventSponsorLeadsTest {
 				scan(rosa, 'not-a-badge')
 			};
 			insert as user scans;
-			Database.SaveResult stranger = Database.insert(
-				scan(person('Lee', 'Nobody'), ana.Id),
-				false
-			);
+			Database.SaveResult stranger = Database.insert(scan(person('Lee', 'Nobody'), ana.Id), false);
 			EventSponsorsController.Leads download = EventSponsorsController.getLeads(acme.Id);
 			Test.stopTest();
 
@@ -160,24 +141,12 @@ private class EventSponsorLeadsTest {
 			Assert.isNull(hidden.Event_Attendee__c, 'No link to Ben');
 			Assert.isNull(hidden.Lead_Name__c, 'Nothing about Ben');
 			Assert.isNull(hidden.Badge_Code__c, 'Not even his code');
-			Assert.areEqual(
-				'Already Scanned',
-				saved.get(scans[2].Id).Status__c,
-				'Once per sponsor'
-			);
-			Assert.areEqual(
-				acme.Id,
-				saved.get(scans[2].Id).Event_Sponsor__c,
-				'Booth staff scan for Acme'
-			);
+			Assert.areEqual('Already Scanned', saved.get(scans[2].Id).Status__c, 'Once per sponsor');
+			Assert.areEqual(acme.Id, saved.get(scans[2].Id).Event_Sponsor__c, 'Booth staff scan for Acme');
 			Assert.areEqual('Not Found', saved.get(scans[3].Id).Status__c, 'Not a badge');
 			Assert.isFalse(stranger.isSuccess(), 'No sponsorship, no scan');
 			Assert.areEqual(1, download.rows.size(), 'Only the lead is exported');
-			Assert.areEqual(
-				7,
-				download.columns.size(),
-				'Name, email, title, company, interest, notes, date'
-			);
+			Assert.areEqual(7, download.columns.size(), 'Name, email, title, company, interest, notes, date');
 		}
 	}
 }

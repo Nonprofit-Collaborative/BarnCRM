@@ -16,10 +16,7 @@ private class VolunteerReadinessControllerTest {
 				COORDINATOR,
 				new List<String>{ VolunteersTestData.CORE_STAFF, 'Volunteers_Coordinator' }
 			);
-			TestUsers.standardUserWith(
-				STAFFER,
-				new List<String>{ VolunteersTestData.CORE_STAFF, 'Volunteers_Staff' }
-			);
+			TestUsers.standardUserWith(STAFFER, new List<String>{ VolunteersTestData.CORE_STAFF, 'Volunteers_Staff' });
 			TestUsers.standardUserWith(
 				READER,
 				new List<String>{ VolunteersTestData.CORE_STAFF, 'Volunteers_Read_Only' }
@@ -50,11 +47,7 @@ private class VolunteerReadinessControllerTest {
 			Type__c = 'Application',
 			Status__c = 'Not approved'
 		);
-		insert new Volunteer_Requirement__c(
-			Contact__c = person.Id,
-			Type__c = 'Application',
-			Status__c = 'In progress'
-		);
+		insert new Volunteer_Requirement__c(Contact__c = person.Id, Type__c = 'Application', Status__c = 'In progress');
 		insert new Volunteer_Requirement__c(
 			Contact__c = person.Id,
 			Type__c = 'Background check',
@@ -73,9 +66,7 @@ private class VolunteerReadinessControllerTest {
 		}
 
 		System.runAs(user(COORDINATOR)) {
-			VolunteerReadinessController.Readiness readiness = VolunteerReadinessController.getReadiness(
-				person.Id
-			);
+			VolunteerReadinessController.Readiness readiness = VolunteerReadinessController.getReadiness(person.Id);
 
 			Assert.isTrue(readiness.canSee, 'A coordinator sees requirements');
 			Map<String, VolunteerReadinessController.Step> steps = byType(readiness);
@@ -86,15 +77,8 @@ private class VolunteerReadinessControllerTest {
 			);
 			Assert.isFalse(steps.get('Application').isCurrent, 'In progress is not current');
 			Assert.isTrue(steps.get('Background check').isCurrent, 'A valid check is current');
-			Assert.areEqual(
-				System.today().addYears(2),
-				steps.get('Background check').expires,
-				'With its expiry'
-			);
-			Assert.isNull(
-				steps.get('Orientation').requirementId,
-				'A Type with no row is not started'
-			);
+			Assert.areEqual(System.today().addYears(2), steps.get('Background check').expires, 'With its expiry');
+			Assert.isNull(steps.get('Orientation').requirementId, 'A Type with no row is not started');
 			Assert.areEqual('Application', readiness.steps[0].type, 'Types in picklist order');
 		}
 	}
@@ -113,9 +97,7 @@ private class VolunteerReadinessControllerTest {
 				Expires__c = System.today().addDays(-1)
 			);
 
-			VolunteerReadinessController.Step orientation = byType(
-					VolunteerReadinessController.getReadiness(person.Id)
-				)
+			VolunteerReadinessController.Step orientation = byType(VolunteerReadinessController.getReadiness(person.Id))
 				.get('Orientation');
 
 			Assert.isNotNull(orientation.requirementId, 'The row is shown');
@@ -131,9 +113,7 @@ private class VolunteerReadinessControllerTest {
 		}
 		for (String lastName : new List<String>{ STAFFER, READER }) {
 			System.runAs(user(lastName)) {
-				VolunteerReadinessController.Readiness readiness = VolunteerReadinessController.getReadiness(
-					person.Id
-				);
+				VolunteerReadinessController.Readiness readiness = VolunteerReadinessController.getReadiness(person.Id);
 				Assert.isFalse(readiness.canSee, lastName + ' cannot see requirements');
 				Assert.isTrue(readiness.steps.isEmpty(), lastName + ' gets no step');
 			}
@@ -145,10 +125,7 @@ private class VolunteerReadinessControllerTest {
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
 			Account family = VolunteersTestData.household('The Rivera Family');
 
-			Assert.isFalse(
-				VolunteerReadinessController.getReadiness(family.Id).canSee,
-				'A household is not a person'
-			);
+			Assert.isFalse(VolunteerReadinessController.getReadiness(family.Id).canSee, 'A household is not a person');
 			Assert.isFalse(VolunteerReadinessController.getReadiness(null).canSee, 'No record');
 		}
 	}
@@ -166,9 +143,7 @@ private class VolunteerReadinessControllerTest {
 				Status__c = 'In progress'
 			);
 
-			VolunteerReadinessController.Readiness readiness = VolunteerReadinessController.getReadiness(
-				person.Id
-			);
+			VolunteerReadinessController.Readiness readiness = VolunteerReadinessController.getReadiness(person.Id);
 
 			Assert.isTrue(readiness.canSee, 'A person account is a person');
 			Assert.areEqual(

@@ -37,7 +37,7 @@ The person's record is kept but made anonymous, so every total stays right:
 - **Totals stay**: giving totals, counts and dates on the person and the household are kept,
   because they say nothing about who the person was.
 
-With the Giving module installed, gifts, soft credits, pledges and receipts are kept with their
+With the Fundraising module installed, gifts, soft credits, pledges and receipts are kept with their
 amounts and dates, still credited to the anonymous record, except the automatic household soft
 credits the person had as a household member, which are deleted because they are no longer in
 a household. See section 4.
@@ -60,8 +60,8 @@ and each record that changed with the fields that were emptied. It never holds a
    privacy requests (BarnCRM Settings, Access, Extra Permissions).
 2. The person erasing also needs edit access to the person and to everything the erasure changes
    (their addresses, relationships, affiliations and household memberships, a household whose
-   custom name it turns off, and with Giving their automatic household soft credits). BarnCRM
-   Admin, with Giving Admin or Giving Staff, has it.
+   custom name it turns off, and with Fundraising their automatic household soft credits). BarnCRM
+   Admin, with Fundraising Admin or Fundraising Staff Access, has it.
 3. Optional, recommended: give them the Salesforce system permission **Delete From Field
    History** (in a permission set of your own), so field history is erased too.
 4. **Erase Person** is on the person record pages BarnCRM ships. On a page of your own, add the
@@ -86,7 +86,7 @@ request as ticket PR-2041.
 
 ## 4. What Stays, and What You Still Have to Do
 
-- **Gifts and receipts (Giving).** Gifts, soft credits, pledges and their payments keep their
+- **Gifts and receipts (Fundraising).** Gifts, soft credits, pledges and their payments keep their
   amounts, dates and funds, credited to the anonymous record. The one exception: the person's
   automatic household soft credits (the ones BarnCRM gives each household member on another
   member's gift) are deleted, because the person is no longer in the household, and the

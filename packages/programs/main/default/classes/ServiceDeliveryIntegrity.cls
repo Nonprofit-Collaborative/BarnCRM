@@ -30,8 +30,7 @@ public without sharing class ServiceDeliveryIntegrity {
 
 	/** As `canChange`, and the user may also set a delivery's session (P-11). */
 	public static Boolean canChangeSession() {
-		return canChange() &&
-			Schema.SObjectType.Service_Delivery__c.fields.Session__c.isUpdateable();
+		return canChange() && Schema.SObjectType.Service_Delivery__c.fields.Session__c.isUpdateable();
 	}
 
 	/**
@@ -74,11 +73,7 @@ public without sharing class ServiceDeliveryIntegrity {
 	 * The existing delivery for each of these people on this service and day, keyed by the
 	 * person's contact or account Id, whoever logged it. The first one made wins, as in the log.
 	 */
-	public static Map<Id, Id> existingDeliveryIds(
-		Id serviceId,
-		Date deliveryDate,
-		Set<Id> personIds
-	) {
+	public static Map<Id, Id> existingDeliveryIds(Id serviceId, Date deliveryDate, Set<Id> personIds) {
 		Map<Id, Id> byPerson = new Map<Id, Id>();
 		if (serviceId == null || deliveryDate == null || personIds.isEmpty()) {
 			return byPerson;
@@ -122,6 +117,6 @@ public without sharing class ServiceDeliveryIntegrity {
 			}
 			plain.add(written);
 		}
-		Database.update(plain, true, AccessLevel.SYSTEM_MODE);
+		update as system plain;
 	}
 }

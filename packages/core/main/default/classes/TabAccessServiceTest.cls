@@ -58,17 +58,11 @@ private class TabAccessServiceTest {
 			Set<String> held = tabSetsOf(userId(PRIYA));
 			Assert.isFalse(more, 'A small org is done in one pass');
 			Assert.isTrue(held.contains(TabAccessService.FIND_TAB), 'Find and Export sees Find');
-			Assert.isTrue(
-				held.contains(TabAccessService.DATA_MANAGER_TAB),
-				'And the Data Manager hub'
-			);
+			Assert.isTrue(held.contains(TabAccessService.DATA_MANAGER_TAB), 'And the Data Manager hub');
 			Assert.isTrue(held.contains(TabAccessService.DATA_HYGIENE_TAB), 'And Org Optimizer');
 			Assert.isFalse(held.contains(TabAccessService.IMPORT_TAB), 'But not Import');
 			Assert.isFalse(held.contains(TabAccessService.BULK_UPDATE_TAB), 'Nor Bulk Update');
-			Assert.isFalse(
-				held.contains(TabAccessService.DUPLICATE_MATCHING_TAB),
-				'Nor Duplicate Matching'
-			);
+			Assert.isFalse(held.contains(TabAccessService.DUPLICATE_MATCHING_TAB), 'Nor Duplicate Matching');
 			Assert.areEqual(
 				6,
 				tabSetsOf(UserInfo.getUserId()).size(),
@@ -102,15 +96,9 @@ private class TabAccessServiceTest {
 			TabAccessService.syncNow();
 			Test.stopTest();
 
-			Assert.isTrue(
-				holdsHouseholds(userId(TEAM_MEMBER)),
-				'A Staff holder gets the Households tab set'
-			);
+			Assert.isTrue(holdsHouseholds(userId(TEAM_MEMBER)), 'A Staff holder gets the Households tab set');
 			Assert.isTrue(holdsHouseholds(UserInfo.getUserId()), 'So does the admin');
-			Assert.isFalse(
-				holdsHouseholds(userId(PRIYA)),
-				'Find and Export alone is not a BarnCRM role'
-			);
+			Assert.isFalse(holdsHouseholds(userId(PRIYA)), 'Find and Export alone is not a BarnCRM role');
 		}
 	}
 
@@ -132,24 +120,15 @@ private class TabAccessServiceTest {
 				holdsHouseholds(userId(TEAM_MEMBER)),
 				'Turning Household Upkeep on queues the sync that gives the tab'
 			);
-			Assert.isTrue(
-				tabSetsOf(userId(TEAM_MEMBER)).isEmpty(),
-				'And no tool tab comes with it'
-			);
+			Assert.isTrue(tabSetsOf(userId(TEAM_MEMBER)).isEmpty(), 'And no tool tab comes with it');
 		}
 	}
 
 	@IsTest
 	static void givesADuplicateReviewerAndAMetadataAdminDuplicateMatchingOnly() {
 		System.runAs(TestUsers.admin()) {
-			User reviewer = TestUsers.standardUserWith(
-				'Reviewer',
-				new List<String>{ 'BarnCRM_Duplicate_Review' }
-			);
-			User editor = TestUsers.standardUserWith(
-				'Editor',
-				new List<String>{ 'BarnCRM_Metadata_Admin' }
-			);
+			User reviewer = TestUsers.standardUserWith('Reviewer', new List<String>{ 'BarnCRM_Duplicate_Review' });
+			User editor = TestUsers.standardUserWith('Editor', new List<String>{ 'BarnCRM_Metadata_Admin' });
 
 			Test.startTest();
 			TabAccessService.syncNow();
@@ -212,10 +191,7 @@ private class TabAccessServiceTest {
 			Test.stopTest();
 
 			Assert.isTrue(more, 'More than two assignments do not fit in a slice of two');
-			Assert.isTrue(
-				tabSetsOf(UserInfo.getUserId()).size() <= 2,
-				'No more than the slice is given now'
-			);
+			Assert.isTrue(tabSetsOf(UserInfo.getUserId()).size() <= 2, 'No more than the slice is given now');
 		}
 	}
 
@@ -232,18 +208,8 @@ private class TabAccessServiceTest {
 			TabAccessService.coreSetPrefix = 'Not_Core_';
 
 			Test.startTest();
-			Boolean noRoom = TabAccessService.giveToHolders(
-				TabAccessService.IMPORT_TAB,
-				audience,
-				0,
-				'Test'
-			);
-			Boolean more = TabAccessService.giveToHolders(
-				TabAccessService.IMPORT_TAB,
-				audience,
-				100,
-				'Test'
-			);
+			Boolean noRoom = TabAccessService.giveToHolders(TabAccessService.IMPORT_TAB, audience, 0, 'Test');
+			Boolean more = TabAccessService.giveToHolders(TabAccessService.IMPORT_TAB, audience, 100, 'Test');
 			Boolean missing = TabAccessService.giveToHolders('No_Such_Set', audience, 100, 'Test');
 			Test.stopTest();
 
@@ -285,24 +251,9 @@ private class TabAccessServiceTest {
 			TabAccessService.coreSetPrefix = 'Not_Core_';
 
 			Test.startTest();
-			Boolean noRoom = TabAccessService.giveToGroupHolders(
-				TabAccessService.IMPORT_TAB,
-				roles,
-				0,
-				'Test'
-			);
-			Boolean more = TabAccessService.giveToGroupHolders(
-				TabAccessService.IMPORT_TAB,
-				roles,
-				100,
-				'Test'
-			);
-			Boolean again = TabAccessService.giveToGroupHolders(
-				TabAccessService.IMPORT_TAB,
-				roles,
-				100,
-				'Test'
-			);
+			Boolean noRoom = TabAccessService.giveToGroupHolders(TabAccessService.IMPORT_TAB, roles, 0, 'Test');
+			Boolean more = TabAccessService.giveToGroupHolders(TabAccessService.IMPORT_TAB, roles, 100, 'Test');
+			Boolean again = TabAccessService.giveToGroupHolders(TabAccessService.IMPORT_TAB, roles, 100, 'Test');
 			Boolean missing = TabAccessService.giveToGroupHolders('No_Such_Set', roles, 100, 'T');
 			Boolean noRoles = TabAccessService.giveToGroupHolders('Module_Set', null, 100, 'T');
 			Test.stopTest();
@@ -347,18 +298,9 @@ private class TabAccessServiceTest {
 			);
 			Test.calculatePermissionSetGroup(ownRole.Id);
 			insert new List<PermissionSetAssignment>{
-				new PermissionSetAssignment(
-					AssigneeId = gone.Id,
-					PermissionSetGroupId = coordinatorRole
-				),
-				new PermissionSetAssignment(
-					AssigneeId = grouped.Id,
-					PermissionSetGroupId = coordinatorRole
-				),
-				new PermissionSetAssignment(
-					AssigneeId = grouped.Id,
-					PermissionSetGroupId = ownRole.Id
-				)
+				new PermissionSetAssignment(AssigneeId = gone.Id, PermissionSetGroupId = coordinatorRole),
+				new PermissionSetAssignment(AssigneeId = grouped.Id, PermissionSetGroupId = coordinatorRole),
+				new PermissionSetAssignment(AssigneeId = grouped.Id, PermissionSetGroupId = ownRole.Id)
 			};
 			gone.IsActive = false;
 			update gone;
@@ -397,23 +339,13 @@ private class TabAccessServiceTest {
 				}
 			) {
 				try {
-					TabAccessService.giveToHolders(
-						coreSet,
-						new List<String>{ 'BarnCRM_Read_Only' },
-						100,
-						'Test'
-					);
+					TabAccessService.giveToHolders(coreSet, new List<String>{ 'BarnCRM_Read_Only' }, 100, 'Test');
 				} catch (IllegalArgumentException expected) {
 					refused.add(coreSet);
 				}
 			}
 			try {
-				TabAccessService.giveToGroupHolders(
-					'BarnCRM_Staff',
-					new List<String>{ 'Read_Only' },
-					100,
-					'Test'
-				);
+				TabAccessService.giveToGroupHolders('BarnCRM_Staff', new List<String>{ 'Read_Only' }, 100, 'Test');
 			} catch (IllegalArgumentException expected) {
 				refused.add('BarnCRM_Staff by role');
 			}
@@ -426,24 +358,16 @@ private class TabAccessServiceTest {
 	}
 
 	@IsTest
-	static void aJobStillOnTheOldNightlyCronIsReplacedNotDoubled() {
+	static void theCheckRunsHourlyAsOneJob() {
 		System.runAs(TestUsers.admin()) {
 			// Tests see the org's real scheduled jobs, so an org already running the check
 			// (an earlier deploy) would refuse a second job of this name before the test begins.
 			TestDataFactory.clearScheduledJobs(new List<String>{ TabAccessScheduler.JOB_NAME });
-			// What an earlier version left behind: the same job name on the nightly cron.
-			Id old = System.schedule(
-				TabAccessScheduler.JOB_NAME,
-				'0 0 1 * * ?',
-				new TabAccessScheduler()
-			);
-			ScheduledJobSelector.forget();
 
-			Id moved = TabAccessScheduler.start();
+			Id first = TabAccessScheduler.start();
 			Id again = TabAccessScheduler.start();
 
-			Assert.areNotEqual(old, moved, 'The nightly job is replaced');
-			Assert.areEqual(moved, again, 'Starting it again finds the hourly job');
+			Assert.areEqual(first, again, 'Starting it again finds the hourly job');
 			List<CronTrigger> jobs = [
 				SELECT Id, CronExpression
 				FROM CronTrigger
@@ -515,9 +439,7 @@ private class TabAccessServiceTest {
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
 			SettingsService.saveValues(
-				new Map<String, Object>{
-					'App_Navigation_Style__c' => TabAccessService.STYLE_CONSOLE
-				}
+				new Map<String, Object>{ 'App_Navigation_Style__c' => TabAccessService.STYLE_CONSOLE }
 			);
 			Test.stopTest();
 
@@ -538,15 +460,10 @@ private class TabAccessServiceTest {
 	static void eachStyleTurnsOnItsOwnTwoApps() {
 		System.runAs(TestUsers.admin()) {
 			SettingsService.saveValues(
-				new Map<String, Object>{
-					'App_Navigation_Style__c' => TabAccessService.STYLE_STANDARD
-				}
+				new Map<String, Object>{ 'App_Navigation_Style__c' => TabAccessService.STYLE_STANDARD }
 			);
 			Assert.areEqual(
-				new Set<String>{
-					TabAccessService.STANDARD_APP,
-					TabAccessService.ADMIN_STANDARD_APP
-				},
+				new Set<String>{ TabAccessService.STANDARD_APP, TabAccessService.ADMIN_STANDARD_APP },
 				TabAccessService.appSetsOn(),
 				'Standard'
 			);
@@ -572,10 +489,7 @@ private class TabAccessServiceTest {
 				'Today\'s tabs: Organizations, and no Accounts tab set'
 			);
 			Assert.isTrue(holdsHouseholds(staff), 'And Households, with its feature on');
-			Assert.isTrue(
-				accountSetsOf(userId(PRIYA)).isEmpty(),
-				'An extra permission alone is not a BarnCRM role'
-			);
+			Assert.isTrue(accountSetsOf(userId(PRIYA)).isEmpty(), 'An extra permission alone is not a BarnCRM role');
 		}
 	}
 
@@ -589,9 +503,7 @@ private class TabAccessServiceTest {
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
 			SettingsService.saveValues(
-				new Map<String, Object>{
-					'Account_Tabs__c' => TabAccessService.ACCOUNT_TABS_ACCOUNTS
-				}
+				new Map<String, Object>{ 'Account_Tabs__c' => TabAccessService.ACCOUNT_TABS_ACCOUNTS }
 			);
 			Test.stopTest();
 
@@ -614,10 +526,7 @@ private class TabAccessServiceTest {
 		System.runAs(TestUsers.admin()) {
 			TabAccessService.syncNow();
 			Assert.areEqual(
-				new Set<String>{
-					TabAccessService.ACCOUNTS_TAB,
-					TabAccessService.ORGANIZATIONS_TAB
-				},
+				new Set<String>{ TabAccessService.ACCOUNTS_TAB, TabAccessService.ORGANIZATIONS_TAB },
 				accountSetsOf(staff),
 				'Both: all three tabs'
 			);
@@ -627,9 +536,7 @@ private class TabAccessServiceTest {
 
 	private static Set<String> accountSetsOf(Id userId) {
 		Set<String> names = setsOf(userId, 'BarnCRM_%_Tab');
-		names.retainAll(
-			new Set<String>{ TabAccessService.ACCOUNTS_TAB, TabAccessService.ORGANIZATIONS_TAB }
-		);
+		names.retainAll(new Set<String>{ TabAccessService.ACCOUNTS_TAB, TabAccessService.ORGANIZATIONS_TAB });
 		return names;
 	}
 
@@ -650,8 +557,7 @@ private class TabAccessServiceTest {
 	}
 
 	private static Boolean holdsHouseholds(Id userId) {
-		return setsOf(userId, TabAccessService.HOUSEHOLDS_SET)
-			.contains(TabAccessService.HOUSEHOLDS_SET);
+		return setsOf(userId, TabAccessService.HOUSEHOLDS_SET).contains(TabAccessService.HOUSEHOLDS_SET);
 	}
 
 	private static Set<String> appSetsOf(Id userId) {

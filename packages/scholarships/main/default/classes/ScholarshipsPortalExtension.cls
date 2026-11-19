@@ -51,11 +51,7 @@ public without sharing class ScholarshipsPortalExtension implements PortalAction
 			return BarnHelp.text('Scholarships', 'Scholarships_Portal_Closed');
 		}
 		Award_Cycle__c cycle = cycles[0];
-		if (
-			cycle.Status__c != 'Open' ||
-			(cycle.Close_Date__c != null &&
-			cycle.Close_Date__c < Date.today())
-		) {
+		if (cycle.Status__c != 'Open' || (cycle.Close_Date__c != null && cycle.Close_Date__c < Date.today())) {
 			return BarnHelp.text('Scholarships', 'Scholarships_Portal_Closed');
 		}
 		Integer current = [
@@ -76,10 +72,7 @@ public without sharing class ScholarshipsPortalExtension implements PortalAction
 		try {
 			draft.Form_Link__c = ScholarshipFormAttachment.linkFor(draft.Id);
 			if (draft.Form_Link__c != null) {
-				update as system new Award_Application__c(
-					Id = draft.Id,
-					Form_Link__c = draft.Form_Link__c
-				);
+				update as system new Award_Application__c(Id = draft.Id, Form_Link__c = draft.Form_Link__c);
 			}
 		} catch (Exception notNow) {
 			ErrorLogger.log(notNow, 'ScholarshipsPortalExtension.apply', draft.Id);
@@ -122,11 +115,7 @@ public without sharing class ScholarshipsPortalExtension implements PortalAction
 		if (rows[0].Status__c != 'Offered') {
 			return BarnHelp.text('Scholarships', 'Scholarships_Award_NotOffered');
 		}
-		update as system new Award__c(
-			Id = awardId,
-			Status__c = 'Accepted',
-			Accepted_Date__c = Date.today()
-		);
+		update as system new Award__c(Id = awardId, Status__c = 'Accepted', Accepted_Date__c = Date.today());
 		return BarnHelp.text('Scholarships', 'Scholarships_Portal_Accepted');
 	}
 }

@@ -38,8 +38,7 @@ public with sharing class RollupScheduler implements Schedulable {
 
 	/** The nightly run's hour as the person reading it writes a time, for example 2:00 AM. */
 	public static String nightlyTime() {
-		return Datetime.newInstance(Date.today(), Time.newInstance(nightlyHour(), 0, 0, 0))
-			.format('h:mm a');
+		return Datetime.newInstance(Date.today(), Time.newInstance(nightlyHour(), 0, 0, 0)).format('h:mm a');
 	}
 
 	/**
@@ -122,14 +121,9 @@ public with sharing class RollupScheduler implements Schedulable {
 	 */
 	public static Id scheduleTonight() {
 		Integer hour = nightlyHour();
-		Date night = Integer.valueOf(Datetime.now().format('H')) < hour
-			? Date.today()
-			: Date.today().addDays(1);
+		Date night = Integer.valueOf(Datetime.now().format('H')) < hour ? Date.today() : Date.today().addDays(1);
 		String name = jobNameInUse + ' ' + String.valueOf(night);
-		String cron = String.join(
-			new List<Object>{ '0 0', hour, night.day(), night.month(), '?', night.year() },
-			' '
-		);
+		String cron = String.join(new List<Object>{ '0 0', hour, night.day(), night.month(), '?', night.year() }, ' ');
 		return ScheduledJobSelector.ensure(name, cron, new RollupScheduler(true));
 	}
 

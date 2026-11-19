@@ -35,9 +35,7 @@ public inherited sharing class RollupCurrency {
 
 	@NamespaceAccessible
 	public static Boolean isMultiCurrency() {
-		return multiCurrencyOverride != null
-			? multiCurrencyOverride
-			: UserInfo.isMultiCurrencyOrganization();
+		return multiCurrencyOverride != null ? multiCurrencyOverride : UserInfo.isMultiCurrencyOrganization();
 	}
 
 	/** True when the attribute at the end of this path, from this entity, holds money. */
@@ -45,24 +43,18 @@ public inherited sharing class RollupCurrency {
 		Schema.SObjectType current = SettingsService.typeByName(sourceObject);
 		List<String> parts = String.isBlank(path) ? new List<String>() : path.split('\\.');
 		for (Integer i = 0; i < parts.size() && current != null; i++) {
-			Map<String, Schema.SObjectField> fields = current.getDescribe(
-					SObjectDescribeOptions.DEFERRED
-				)
+			Map<String, Schema.SObjectField> fields = current.getDescribe(SObjectDescribeOptions.DEFERRED)
 				.fields.getMap();
 			if (i == parts.size() - 1) {
 				Schema.SObjectField field = fields.get(parts[i].toLowerCase());
-				return field != null &&
-					field.getDescribe().getType() == Schema.DisplayType.CURRENCY;
+				return field != null && field.getDescribe().getType() == Schema.DisplayType.CURRENCY;
 			}
 			current = parentTypeOf(fields.values(), parts[i]);
 		}
 		return false;
 	}
 
-	private static Schema.SObjectType parentTypeOf(
-		List<Schema.SObjectField> fields,
-		String relationshipName
-	) {
+	private static Schema.SObjectType parentTypeOf(List<Schema.SObjectField> fields, String relationshipName) {
 		for (Schema.SObjectField field : fields) {
 			Schema.DescribeFieldResult describe = field.getDescribe();
 			if (

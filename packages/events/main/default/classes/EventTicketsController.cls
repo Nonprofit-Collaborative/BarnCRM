@@ -126,18 +126,11 @@ public with sharing class EventTicketsController {
 			return result;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getTickets', eventId);
-			throw UserErrors.wrapShowingDml(
-				e,
-				BarnHelp.text('Events', 'Events_Tickets_LoadFailed')
-			);
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Tickets_LoadFailed'));
 		}
 	}
 
-	private static void labels(
-		Tickets result,
-		Map<String, Schema.SObjectField> fields,
-		String objectName
-	) {
+	private static void labels(Tickets result, Map<String, Schema.SObjectField> fields, String objectName) {
 		for (String name : fields.keySet()) {
 			Schema.DescribeFieldResult field = fields.get(name).getDescribe();
 			if (field.isCustom() || field.getName() == 'Name') {

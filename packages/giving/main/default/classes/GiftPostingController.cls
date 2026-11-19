@@ -56,9 +56,7 @@ public with sharing class GiftPostingController {
 			? new List<Gift__c>()
 			: GiftPostingSelector.selectForPosting(new Set<Id>{ giftId });
 		if (found.isEmpty()) {
-			throw new GiftPostingService.GiftPostingException(
-				BarnHelp.text('Giving', 'Giving_Posting_NotPosted')
-			);
+			throw new GiftPostingService.GiftPostingException(BarnHelp.text('Giving', 'Giving_Posting_NotPosted'));
 		}
 		Gift__c gift = found[0];
 		state.inBooks = GiftPostingLock.isInBooks(gift);
@@ -67,8 +65,7 @@ public with sharing class GiftPostingController {
 		state.postedBy = gift.Accounting_Posted_By__r?.Name;
 		state.closedThrough = GiftPostingLock.closedThrough();
 		state.inClosedPeriod =
-			state.inBooks &&
-			GiftPostingLock.isInClosedPeriod(gift.Gift_Date__c, state.closedThrough);
+			state.inBooks && GiftPostingLock.isInClosedPeriod(gift.Gift_Date__c, state.closedThrough);
 		state.canUnpost = state.posted && GiftPostingService.canPost();
 		return state;
 	}

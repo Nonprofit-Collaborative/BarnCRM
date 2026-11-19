@@ -83,26 +83,10 @@ public with sharing class OrganizationAddress {
 			return null;
 		}
 		List<String> missing = new List<String>();
-		addIfBlank(
-			missing,
-			candidate.Organization_Street__c,
-			System.Label.Core_OrganizationAddress_Street
-		);
-		addIfBlank(
-			missing,
-			candidate.Organization_City__c,
-			System.Label.Core_OrganizationAddress_City
-		);
-		addIfBlank(
-			missing,
-			candidate.Organization_State__c,
-			System.Label.Core_OrganizationAddress_State
-		);
-		addIfBlank(
-			missing,
-			candidate.Organization_Postal_Code__c,
-			System.Label.Core_OrganizationAddress_PostalCode
-		);
+		addIfBlank(missing, candidate.Organization_Street__c, System.Label.Core_OrganizationAddress_Street);
+		addIfBlank(missing, candidate.Organization_City__c, System.Label.Core_OrganizationAddress_City);
+		addIfBlank(missing, candidate.Organization_State__c, System.Label.Core_OrganizationAddress_State);
+		addIfBlank(missing, candidate.Organization_Postal_Code__c, System.Label.Core_OrganizationAddress_PostalCode);
 		if (missing.isEmpty()) {
 			return null;
 		}

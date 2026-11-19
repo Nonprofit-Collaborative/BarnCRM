@@ -101,9 +101,7 @@ public with sharing class HubBoardController {
 				ORDER BY Due_Date__c NULLS LAST
 				LIMIT 100
 			]) {
-				view.actionItems.add(
-					line(item.Id, item.Name, item.Assigned_To__r?.Name, item.Due_Date__c)
-				);
+				view.actionItems.add(line(item.Id, item.Name, item.Assigned_To__r?.Name, item.Due_Date__c));
 			}
 			if (view.canManage) {
 				for (Hub_Document__c document : [
@@ -130,13 +128,7 @@ public with sharing class HubBoardController {
 			view.meeting = HubBoard.meeting(meetingId);
 			view.canManage = HubPolicy.canManage();
 			for (Meeting_Attendee__c row : [
-				SELECT
-					Id,
-					Person__r.Name,
-					Attendance__c,
-					Voting__c,
-					Packet_Read_On__c,
-					Minutes_Approved_On__c
+				SELECT Id, Person__r.Name, Attendance__c, Voting__c, Packet_Read_On__c, Minutes_Approved_On__c
 				FROM Meeting_Attendee__c
 				WHERE Meeting__c = :meetingId
 				WITH USER_MODE
@@ -154,14 +146,7 @@ public with sharing class HubBoardController {
 				view.attendees.add(line);
 			}
 			for (Board_Motion__c motion : [
-				SELECT
-					Id,
-					Name,
-					Status__c,
-					Votes_For__c,
-					Votes_Against__c,
-					Abstentions__c,
-					Closed_Without_Quorum__c
+				SELECT Id, Name, Status__c, Votes_For__c, Votes_Against__c, Abstentions__c, Closed_Without_Quorum__c
 				FROM Board_Motion__c
 				WHERE Meeting__c = :meetingId
 				WITH USER_MODE
@@ -178,9 +163,7 @@ public with sharing class HubBoardController {
 				view.motions.add(line);
 			}
 			for (Meeting_Action_Item__c item : HubBoard.carriedItems(view.meeting)) {
-				view.carried.add(
-					line(item.Id, item.Name, item.Assigned_To__r?.Name, item.Due_Date__c)
-				);
+				view.carried.add(line(item.Id, item.Name, item.Assigned_To__r?.Name, item.Due_Date__c));
 			}
 			for (Integer i = 1; i <= 3; i++) {
 				Datetime slot = (Datetime) view.meeting.get('Poll_Time_' + i + '__c');

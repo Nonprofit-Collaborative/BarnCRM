@@ -93,8 +93,8 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Title of the Mirror module finding.</shortDescription>
-        <value>The Gift Transaction Mirror Is in the Mirror Module</value>
+        <shortDescription>Title of the Fundraising gift mirror finding.</shortDescription>
+        <value>The Gift Transaction Mirror Is in the Fundraising Module</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_CountOrMore</fullName>

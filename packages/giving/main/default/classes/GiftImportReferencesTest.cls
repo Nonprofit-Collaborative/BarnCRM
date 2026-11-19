@@ -29,11 +29,7 @@ private class GiftImportReferencesTest {
 	static void aFundIsFoundByNameCodeOrIdAndMayBeClosed() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Fund__c general = GivingTestDataFactory.insertDefaultFund();
-			Fund__c closed = new Fund__c(
-				Name = 'Old Roof',
-				Accounting_Code__c = 'R-99',
-				Active__c = false
-			);
+			Fund__c closed = new Fund__c(Name = 'Old Roof', Accounting_Code__c = 'R-99', Active__c = false);
 			insert closed;
 			List<GiftImportRow> rows = new List<GiftImportRow>{
 				fundRow('general'),
@@ -45,11 +41,7 @@ private class GiftImportReferencesTest {
 			GiftImportReferences.resolve(rows);
 
 			Assert.areEqual(general.Id, rows[0].singleFund.fundId, 'By name, any capitals.');
-			Assert.areEqual(
-				closed.Id,
-				rows[1].singleFund.fundId,
-				'By accounting code, though closed.'
-			);
+			Assert.areEqual(closed.Id, rows[1].singleFund.fundId, 'By accounting code, though closed.');
 			Assert.areEqual(closed.Id, rows[2].singleFund.fundId, 'By identifier.');
 			Assert.isTrue(rows[3].error.contains('Nowhere'), 'A fund that is not there is named.');
 		}
@@ -63,18 +55,14 @@ private class GiftImportReferencesTest {
 				new Fund__c(Name = 'Scholarships', Active__c = true, Accounting_Code__c = 'S-1'),
 				new Fund__c(Name = 'Scholarships', Active__c = true, Accounting_Code__c = 'S-2')
 			};
-			List<GiftImportRow> rows = new List<GiftImportRow>{
-				fundRow('Scholarships'),
-				fundRow('S-2')
-			};
+			List<GiftImportRow> rows = new List<GiftImportRow>{ fundRow('Scholarships'), fundRow('S-2') };
 
 			GiftImportReferences.resolve(rows);
 
 			Assert.isTrue(
 				rows[0]
 					.error.startsWith(
-						BarnHelp.text('Giving', 'Giving_Import_ErrorFundAmbiguous')
-							.substringBefore('{0}')
+						BarnHelp.text('Giving', 'Giving_Import_ErrorFundAmbiguous').substringBefore('{0}')
 					),
 				'The name is ambiguous: ' + rows[0].error
 			);
@@ -89,20 +77,14 @@ private class GiftImportReferencesTest {
 			Appeal__c spring = GivingTestDataFactory.buildAppeal('Spring Appeal');
 			insert spring;
 			List<GiftImportRow> rows = new List<GiftImportRow>{
-				row(
-					new Map<String, String>{ 'Appeal' => 'spring appeal' },
-					new Map<String, String>()
-				),
+				row(new Map<String, String>{ 'Appeal' => 'spring appeal' }, new Map<String, String>()),
 				row(new Map<String, String>{ 'Appeal' => 'Autumn' }, new Map<String, String>())
 			};
 
 			GiftImportReferences.resolve(rows);
 
 			Assert.areEqual(spring.Id, rows[0].appealId, 'Found.');
-			Assert.isTrue(
-				rows[1].error.contains('Autumn'),
-				'An appeal that is not there is named.'
-			);
+			Assert.isTrue(rows[1].error.contains('Autumn'), 'An appeal that is not there is named.');
 		}
 	}
 
@@ -111,16 +93,10 @@ private class GiftImportReferencesTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GivingTestDataFactory.insertDefaultFund();
 			Brand__c thrift = new Brand__c(Name = 'Barn Thrift');
-			insert new List<Brand__c>{
-				thrift,
-				new Brand__c(Name = 'Chapter'),
-				new Brand__c(Name = 'Chapter')
-			};
+			insert new List<Brand__c>{ thrift, new Brand__c(Name = 'Chapter'), new Brand__c(Name = 'Chapter') };
 			List<GiftImportRow> rows = new List<GiftImportRow>();
 			for (String word : new List<String>{ 'barn thrift', thrift.Id, 'Chapter', 'Nowhere' }) {
-				rows.add(
-					row(new Map<String, String>{ 'Brand' => word }, new Map<String, String>())
-				);
+				rows.add(row(new Map<String, String>{ 'Brand' => word }, new Map<String, String>()));
 			}
 
 			GiftImportReferences.resolve(rows);

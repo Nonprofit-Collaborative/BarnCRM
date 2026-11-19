@@ -76,11 +76,7 @@ public with sharing class RollupConflicts {
 		return found;
 	}
 
-	private void compare(
-		Rollup_Definition__c one,
-		Rollup_Definition__c two,
-		Map<Id, List<String>> found
-	) {
+	private void compare(Rollup_Definition__c one, Rollup_Definition__c two, Map<Id, List<String>> found) {
 		if (one.Active__c != true && two.Active__c != true) {
 			return;
 		}
@@ -90,18 +86,8 @@ public with sharing class RollupConflicts {
 		}
 		if (sameField(one, two) && overlaps(target, one, two)) {
 			if (one.Active__c == true && two.Active__c == true) {
-				add(
-					found,
-					one,
-					BarnHelp.text('Rollups', 'Core_RollupEase_ConflictOverwrites'),
-					two
-				);
-				add(
-					found,
-					two,
-					BarnHelp.text('Rollups', 'Core_RollupEase_ConflictOverwrites'),
-					one
-				);
+				add(found, one, BarnHelp.text('Rollups', 'Core_RollupEase_ConflictOverwrites'), two);
+				add(found, two, BarnHelp.text('Rollups', 'Core_RollupEase_ConflictOverwrites'), one);
 			} else if (one.Active__c == true) {
 				add(found, two, BarnHelp.text('Rollups', 'Core_RollupEase_ConflictBlocked'), one);
 			} else {
@@ -116,16 +102,11 @@ public with sharing class RollupConflicts {
 	}
 
 	private static Boolean sameField(Rollup_Definition__c one, Rollup_Definition__c two) {
-		return String.isNotBlank(one.Target_Field__c) &&
-			one.Target_Field__c.equalsIgnoreCase(two.Target_Field__c);
+		return String.isNotBlank(one.Target_Field__c) && one.Target_Field__c.equalsIgnoreCase(two.Target_Field__c);
 	}
 
 	/** The save's own overlap test (R-R8), within the query budget. */
-	private Boolean overlaps(
-		Schema.SObjectType target,
-		Rollup_Definition__c one,
-		Rollup_Definition__c two
-	) {
+	private Boolean overlaps(Schema.SObjectType target, Rollup_Definition__c one, Rollup_Definition__c two) {
 		String mine;
 		String theirs;
 		try {
@@ -144,13 +125,7 @@ public with sharing class RollupConflicts {
 		// The entity comes from describe and both clauses from RollupFilterParser, which checks
 		// every name and escapes every value.
 		return Database.countQueryWithBinds(
-				'SELECT COUNT() FROM ' +
-					String.valueOf(target) +
-					' WHERE (' +
-					mine +
-					') AND (' +
-					theirs +
-					') LIMIT 1',
+				'SELECT COUNT() FROM ' + String.valueOf(target) + ' WHERE (' + mine + ') AND (' + theirs + ') LIMIT 1',
 				new Map<String, Object>(),
 				AccessLevel.USER_MODE
 			) > 0;
@@ -176,8 +151,7 @@ public with sharing class RollupConflicts {
 	}
 
 	private static Boolean same(String one, String two) {
-		return (String.isBlank(one) && String.isBlank(two)) ||
-			(one != null && one.equalsIgnoreCase(two));
+		return (String.isBlank(one) && String.isBlank(two)) || (one != null && one.equalsIgnoreCase(two));
 	}
 
 	private static void add(

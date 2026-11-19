@@ -252,12 +252,7 @@ public with sharing class MergeSettlement implements Queueable {
 	 * Publishes the survivors in events of up to 200 identifiers per list, delivered after
 	 * commit. Logs them as a warning only when the platform refuses the publish.
 	 */
-	private static void publish(
-		Set<Id> householdIds,
-		Set<Id> ownerIds,
-		Set<Id> personIds,
-		Set<Id> survivors
-	) {
+	private static void publish(Set<Id> householdIds, Set<Id> ownerIds, Set<Id> personIds, Set<Id> survivors) {
 		List<Id> households = new List<Id>(householdIds);
 		List<Id> owners = new List<Id>(ownerIds);
 		List<Id> people = new List<Id>(personIds);

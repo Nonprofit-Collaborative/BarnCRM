@@ -7,6 +7,7 @@ import applyJunctionMembership from '@salesforce/apex/HealthCheckController.appl
 import enableAutomaticHouseholds from '@salesforce/apex/HealthCheckController.enableAutomaticHouseholds';
 import applyFix from '@salesforce/apex/HealthCheckController.applyFix';
 import getLastRun from '@salesforce/apex/HealthCheckController.getLastRun';
+import runRemaining from '@salesforce/apex/HealthCheckController.runRemaining';
 import { EnclosingTabId, getTabInfo, openSubtab } from 'lightning/platformWorkspaceApi';
 
 jest.mock('@salesforce/apex/HealthCheckController.getReport', () => ({ default: jest.fn() }), {
@@ -31,6 +32,9 @@ jest.mock(
   { virtual: true }
 );
 jest.mock('@salesforce/apex/HealthCheckController.applyFix', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/HealthCheckController.runRemaining', () => ({ default: jest.fn() }), {
   virtual: true
 });
 
@@ -588,6 +592,102 @@ describe('c-health-check-panel', () => {
 
     const error = element.shadowRoot.querySelector('[data-id="error"]');
     expect(error.message).toBe('Health Check could not read your org.');
+  });
+
+  describe('Run Remaining Checks (D-208)', () => {
+    const notChecked = {
+      key: 'not_checked',
+      title: 'Not Checked, Run Again',
+      detail: '2 checks did not run this time.',
+      severity: 'Warning',
+      category: 'Settings'
+    };
+
+    function stoppedEarly() {
+      const report = agentforceReport();
+      return {
+        ...report,
+        findings: report.findings.concat([notChecked]),
+        skippedChecks: ['skew', 'Giving']
+      };
+    }
+
+    it('is not offered when every check ran', async () => {
+      getReport.mockResolvedValue(agentforceReport({ skippedChecks: [] }));
+      const element = createPanel();
+      await flush();
+
+      expect(element.shadowRoot.querySelector('[data-id="run-remaining"]')).toBeNull();
+    });
+
+    it('runs only the skipped checks and merges what they find into the same report', async () => {
+      getReport.mockResolvedValue(stoppedEarly());
+      runRemaining.mockResolvedValue({
+        findings: [
+          {
+            key: 'owner_skew',
+            title: 'One User Owns Too Many Accounts',
+            detail: 'Ana owns 12,000.',
+            severity: 'Warning',
+            category: 'Settings'
+          }
+        ],
+        skippedChecks: []
+      });
+      const element = createPanel();
+      await flush();
+      expect(element.shadowRoot.querySelectorAll('[data-id="finding"]').length).toBe(7);
+
+      const button = element.shadowRoot.querySelector('[data-id="run-remaining"]');
+      // The Jest stub of BarnHelp answers with the key; the catalog says Run Remaining Checks.
+      expect(button.label).toBe('c.Core_HealthCheck_RunRemaining');
+      button.click();
+      await flush();
+
+      expect(runRemaining).toHaveBeenCalledWith({ checkKeys: ['skew', 'Giving'] });
+      expect(getReport).toHaveBeenCalledTimes(1);
+      const titles = Array.from(
+        element.shadowRoot.querySelectorAll('[data-id="finding-title"]')
+      ).map((title) => title.textContent.trim());
+      expect(titles).toContain('One User Owns Too Many Accounts');
+      expect(titles).not.toContain('Not Checked, Run Again');
+      expect(titles.length).toBe(7);
+      expect(element.shadowRoot.querySelector('[data-id="org-shape-summary"]')).not.toBeNull();
+      expect(element.shadowRoot.querySelector('[data-id="run-remaining"]')).toBeNull();
+    });
+
+    it('offers it again when the remaining run stops early too', async () => {
+      getReport.mockResolvedValue(stoppedEarly());
+      runRemaining.mockResolvedValue({ findings: [notChecked], skippedChecks: ['Giving'] });
+      const element = createPanel();
+      await flush();
+
+      element.shadowRoot.querySelector('[data-id="run-remaining"]').click();
+      await flush();
+
+      expect(element.shadowRoot.querySelectorAll('[data-id="finding"]').length).toBe(7);
+      element.shadowRoot.querySelector('[data-id="run-remaining"]').click();
+      await flush();
+      expect(runRemaining).toHaveBeenLastCalledWith({ checkKeys: ['Giving'] });
+    });
+
+    it('keeps the report and shows the message when the remaining run fails', async () => {
+      getReport.mockResolvedValue(stoppedEarly());
+      runRemaining.mockRejectedValue({
+        body: { message: 'Health Check could not read your org.' }
+      });
+      const element = createPanel();
+      await flush();
+
+      element.shadowRoot.querySelector('[data-id="run-remaining"]').click();
+      await flush();
+
+      expect(element.shadowRoot.querySelector('[data-id="error"]').message).toBe(
+        'Health Check could not read your org.'
+      );
+      expect(element.shadowRoot.querySelectorAll('[data-id="finding"]').length).toBe(7);
+      expect(element.shadowRoot.querySelector('[data-id="run-remaining"]')).not.toBeNull();
+    });
   });
 
   describe('with the last result first, as on BarnCRM Home (ADMIN-7)', () => {

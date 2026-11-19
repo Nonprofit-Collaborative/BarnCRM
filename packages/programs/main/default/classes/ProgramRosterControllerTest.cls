@@ -10,16 +10,11 @@ private class ProgramRosterControllerTest {
 	@TestSetup
 	static void createTestUsers() {
 		TestUsers.adminWith(ADMIN);
-		TestUsers.standardUserWith(
-			'Reader',
-			new List<String>{ 'BarnCRM_Read_Only', 'Programs_Read_Only' }
-		);
+		TestUsers.standardUserWith('Reader', new List<String>{ 'BarnCRM_Read_Only', 'Programs_Read_Only' });
 	}
 
 	private static void contactMode() {
-		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-			HouseholdTestDataFactory.MODE_CONTACT
-		);
+		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 		settings.Auto_Create_Households__c = false;
 		TestDataFactory.saveSettings(settings);
 	}
@@ -54,22 +49,12 @@ private class ProgramRosterControllerTest {
 			Contact ben = person('Okafor');
 			insert new List<Enrollment__c>{
 				new Enrollment__c(Program__c = tutoring.Id, Contact__c = ana.Id),
-				new Enrollment__c(
-					Program__c = tutoring.Id,
-					Contact__c = ben.Id,
-					Stage__c = 'Completed'
-				)
+				new Enrollment__c(Program__c = tutoring.Id, Contact__c = ben.Id, Stage__c = 'Completed')
 			};
 
 			Test.startTest();
-			ProgramRosterController.Roster open = ProgramRosterController.getRoster(
-				tutoring.Id,
-				false
-			);
-			ProgramRosterController.Roster all = ProgramRosterController.getRoster(
-				tutoring.Id,
-				true
-			);
+			ProgramRosterController.Roster open = ProgramRosterController.getRoster(tutoring.Id, false);
+			ProgramRosterController.Roster all = ProgramRosterController.getRoster(tutoring.Id, true);
 			Test.stopTest();
 
 			Assert.areEqual('Tutoring', open.programName, 'The program is named.');
@@ -105,11 +90,7 @@ private class ProgramRosterControllerTest {
 			);
 			Test.stopTest();
 
-			Assert.areEqual(
-				'Applied',
-				enrolled.enrollments[0].stage,
-				'Enrolled at the stage chosen.'
-			);
+			Assert.areEqual('Applied', enrolled.enrollments[0].stage, 'Enrolled at the stage chosen.');
 			Assert.isTrue(withdrawn.enrollments.isEmpty(), 'An ended enrollment leaves the list.');
 			Assert.areEqual(
 				Date.today(),
@@ -202,10 +183,7 @@ private class ProgramRosterControllerTest {
 			new List<String>{ 'BarnCRM_Read_Only', 'Programs_Read_Only' }
 		)) {
 			Test.startTest();
-			ProgramRosterController.Roster roster = ProgramRosterController.getRoster(
-				tutoring.Id,
-				false
-			);
+			ProgramRosterController.Roster roster = ProgramRosterController.getRoster(tutoring.Id, false);
 			Test.stopTest();
 
 			Assert.isFalse(roster.canAdd, 'Read Only adds no one.');

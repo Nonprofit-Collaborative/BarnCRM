@@ -130,7 +130,7 @@ Total time: about five minutes, plus the conversion's own run.
 Household Model, name setting, greetings and primary contact as they were, and it removes the
 household member records the conversion added. Type the number to confirm. A household that has
 gained another member since, or that you can no longer edit, is not put back; the reason is on
-its Household Adoption record. Remove that member and undo again.
+its Admin Journal record (Kind Household Adoption). Remove that member and undo again.
 
 ## The Drift Report
 

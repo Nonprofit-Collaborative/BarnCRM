@@ -131,11 +131,7 @@ private class NpcHouseholdSourceTest {
 					'Roles' => 'Cousin;Daughter',
 					'IsActive' => true
 				},
-				new Map<String, Object>{
-					'AccountId' => lee,
-					'ContactId' => bo,
-					'IsActive' => false
-				}
+				new Map<String, Object>{ 'AccountId' => lee, 'ContactId' => bo, 'IsActive' => false }
 			}
 		);
 		List<NpspHouseholdSource.Member> lees = members.get(lee);
@@ -158,10 +154,7 @@ private class NpcHouseholdSourceTest {
 				'BarnCRM households are never candidates'
 			);
 			Assert.areEqual(
-				new List<String>{
-					HouseholdSelector.MODEL_CONVERTED,
-					HouseholdSelector.MODEL_NATIVE
-				},
+				new List<String>{ HouseholdSelector.MODEL_CONVERTED, HouseholdSelector.MODEL_NATIVE },
 				binds.get('keptModels'),
 				'Converted and Nonprofit Cloud households are left as they are'
 			);
@@ -179,26 +172,16 @@ private class NpcHouseholdSourceTest {
 			Assert.isTrue(source.read(new Set<Id>()).isEmpty(), 'an empty set asks for none');
 			Assert.isTrue(source.memberCounts(null).isEmpty(), 'no counts for no accounts');
 			Assert.isTrue(source.memberCounts(new Set<Id>()).isEmpty(), 'an empty set counts none');
-			Assert.areEqual(
-				0,
-				source.verify('somethingElse').source,
-				'only the households step is checked'
-			);
+			Assert.areEqual(0, source.verify('somethingElse').source, 'only the households step is checked');
 			Assert.areEqual(0, source.verify('somethingElse').done, 'and nothing is done there');
 			if (!source.available()) {
 				Assert.isTrue(
 					source.memberCounts(new Set<Id>{ plain.Id }).isEmpty(),
 					'without the native objects nothing is counted'
 				);
-				Assert.isNull(
-					source.read(new Set<Id>{ plain.Id })[0].primaryContactId,
-					'no primary'
-				);
+				Assert.isNull(source.read(new Set<Id>{ plain.Id })[0].primaryContactId, 'no primary');
 			}
-			Assert.isFalse(
-				NpcHouseholdSource.readable('not_a_real_object__c'),
-				'unknown is unreadable'
-			);
+			Assert.isFalse(NpcHouseholdSource.readable('not_a_real_object__c'), 'unknown is unreadable');
 		}
 	}
 
@@ -221,11 +204,7 @@ private class NpcHouseholdSourceTest {
 					'IsActive' => false,
 					'EndDate' => ended
 				},
-				new Map<String, Object>{
-					'AccountId' => kim,
-					'ContactId' => ann,
-					'Roles' => 'Other'
-				}
+				new Map<String, Object>{ 'AccountId' => kim, 'ContactId' => ann, 'Roles' => 'Other' }
 			}
 		);
 
@@ -238,6 +217,114 @@ private class NpcHouseholdSourceTest {
 		Assert.isNull(NpcHouseholdSource.members(new List<Map<String, Object>>()).get(lee), 'none');
 	}
 
+	/** Stands in for the membership object: a type that has both an AccountId and a ContactId field. */
+	private static Schema.SObjectType lookupsToAccountAndContact() {
+		return NamespaceUtil.globalDescribe().get('case'); // detection-only: describe key, may be absent
+	}
+
+	@IsTest
+	static void whereTheNativeObjectsExistTheConditionSelectsUnconvertedGroupedAccounts() {
+		System.runAs(TestUsers.admin()) {
+			NpcHouseholdSource.availableForTest = true;
+			NpcHouseholdSource source = new NpcHouseholdSource();
+
+			String condition = source.condition();
+
+			Assert.isTrue(source.available(), 'the native objects are there');
+			Assert.isTrue(condition.startsWith(NpcHouseholdSource.grouped(true)), 'only accounts with a native group');
+			Assert.isTrue(condition.contains('RecordTypeId != :barnHousehold'), 'never a BarnCRM household');
+			Assert.isTrue(condition.contains('NOT IN :keptModels'), 'never one an administrator keeps');
+		}
+	}
+
+	@IsTest
+	static void membersTheUserCannotJoinAreLoggedAndHouseholdsAreStillRead() {
+		System.runAs(TestUsers.admin()) {
+			NpcHouseholdSource.availableForTest = true;
+			// A type with neither Account nor Contact lookup: no member query can be built.
+			NpcHouseholdSource.memberTypeForTest = Account.SObjectType;
+			NpcHouseholdSource.nativeRowsForTest = new List<Map<String, Object>>{
+				new Map<String, Object>{
+					'AccountId' => Id.valueOf('001000000000001'),
+					'ContactId' => Id.valueOf('003000000000001')
+				}
+			};
+			Account plain = TestDataFactory.organization(new Account(Name = 'Npc Source Unjoinable'));
+			insert plain;
+
+			Test.startTest();
+			List<NpspHouseholdSource.Household> read = new NpcHouseholdSource().read(new Set<Id>{ plain.Id });
+			Test.stopTest();
+
+			Assert.areEqual(1, read.size(), 'the household is still read');
+			Assert.isTrue(read[0].members.isEmpty(), 'without members');
+			Assert.isNull(read[0].primaryContactId, 'and without a primary');
+			Assert.areEqual(
+				1,
+				[SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'NpcHouseholdSource' WITH SYSTEM_MODE],
+				'the administrator is told'
+			);
+		}
+	}
+
+	@IsTest
+	static void nativeMembershipRowsAreJoinedToTheirHouseholdsWithThePrimaryMember() {
+		System.runAs(TestUsers.admin()) {
+			Account lee = TestDataFactory.organization(new Account(Name = 'Npc Source Lee'));
+			Account solo = TestDataFactory.organization(new Account(Name = 'Npc Source Solo'));
+			insert new List<Account>{ lee, solo };
+			Id sam = Id.valueOf('003000000000001');
+			Id ann = Id.valueOf('003000000000002');
+			NpcHouseholdSource.availableForTest = true;
+			NpcHouseholdSource.memberTypeForTest = lookupsToAccountAndContact();
+			if (NpcHouseholdSource.memberTypeForTest == null) {
+				return; // an org without the stand-in type cannot show the join
+			}
+			NpcHouseholdSource.nativeRowsForTest = new List<Map<String, Object>>{
+				new Map<String, Object>{ 'AccountId' => lee.Id, 'ContactId' => ann, 'IsActive' => true },
+				new Map<String, Object>{
+					'AccountId' => lee.Id,
+					'ContactId' => sam,
+					'IsPrimaryMember' => true,
+					'IsActive' => true
+				}
+			};
+
+			Map<Id, NpspHouseholdSource.Household> byAccount = new Map<Id, NpspHouseholdSource.Household>();
+			for (
+				NpspHouseholdSource.Household household : new NpcHouseholdSource().read(new Set<Id>{ lee.Id, solo.Id })
+			) {
+				byAccount.put(household.accountId, household);
+			}
+
+			Assert.areEqual(2, byAccount.get(lee.Id).members.size(), 'both members are joined');
+			Assert.areEqual(sam, byAccount.get(lee.Id).primaryContactId, 'the marked member is the primary');
+			Assert.isTrue(byAccount.get(solo.Id).members.isEmpty(), 'an account with no rows has no members');
+			Assert.isNull(byAccount.get(solo.Id).primaryContactId, 'and no primary');
+		}
+	}
+
+	@IsTest
+	static void nativeMemberCountsAreReadPerAccount() {
+		System.runAs(TestUsers.admin()) {
+			Account lee = TestDataFactory.organization(new Account(Name = 'Npc Source Counted Lee'));
+			insert lee;
+			NpcHouseholdSource.availableForTest = true;
+			NpcHouseholdSource.memberTypeForTest = lookupsToAccountAndContact();
+			if (NpcHouseholdSource.memberTypeForTest == null) {
+				return; // an org without the stand-in type cannot show the counts
+			}
+			NpcHouseholdSource.nativeRowsForTest = new List<Map<String, Object>>{
+				new Map<String, Object>{ 'AccountId' => lee.Id, 'n' => 3 }
+			};
+
+			Map<Id, Integer> counts = new NpcHouseholdSource().memberCounts(new Set<Id>{ lee.Id });
+
+			Assert.areEqual(1, counts.size(), 'one account counted');
+			Assert.areEqual(3, counts.get(lee.Id), 'its native members');
+		}
+	}
+
 	@IsTest
 	static void driftShowsOnlyTheFirstFewNamesButCountsAll() {
 		System.runAs(TestUsers.admin()) {
@@ -245,10 +332,7 @@ private class NpcHouseholdSourceTest {
 			for (Integer i = 0; i < 3; i++) {
 				back.add(
 					TestDataFactory.household(
-						new Account(
-							Name = 'Drift Back ' + i,
-							Household_Model__c = HouseholdSelector.MODEL_CONVERTED
-						)
+						new Account(Name = 'Drift Back ' + i, Household_Model__c = HouseholdSelector.MODEL_CONVERTED)
 					)
 				);
 			}
@@ -269,16 +353,10 @@ private class NpcHouseholdSourceTest {
 			Account settled = HouseholdTestDataFactory.newHousehold('Drift Settled');
 			settled.Household_Model__c = HouseholdSelector.MODEL_CONVERTED;
 			Account pinnedNoGroup = TestDataFactory.household(
-				new Account(
-					Name = 'Drift Pinned',
-					Household_Model__c = HouseholdSelector.MODEL_NATIVE
-				)
+				new Account(Name = 'Drift Pinned', Household_Model__c = HouseholdSelector.MODEL_NATIVE)
 			);
 			Account convertedBack = TestDataFactory.household(
-				new Account(
-					Name = 'Drift Converted Back',
-					Household_Model__c = HouseholdSelector.MODEL_CONVERTED
-				)
+				new Account(Name = 'Drift Converted Back', Household_Model__c = HouseholdSelector.MODEL_CONVERTED)
 			);
 			Account waiting = TestDataFactory.organization(new Account(Name = 'Drift Waiting'));
 			Database.insert(

@@ -28,9 +28,7 @@ private class GiftImportRowTest {
 	static void aRowWithNoGiftColumnsCarriesNoGift() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GiftImportRow row = read(
-				new Map<String, Map<String, String>>{
-					'Contact1' => new Map<String, String>{ 'LastName' => 'Ramirez' }
-				}
+				new Map<String, Map<String, String>>{ 'Contact1' => new Map<String, String>{ 'LastName' => 'Ramirez' } }
 			);
 			Assert.isFalse(row.carriesGift, 'A donor list row is not a gift.');
 			Assert.isNull(row.error, 'And is not refused for it.');
@@ -88,10 +86,7 @@ private class GiftImportRowTest {
 				refusals.get('no amount'),
 				'Amount required.'
 			);
-			Assert.isTrue(
-				refusals.get('bad amount').contains('ten'),
-				'Names the unreadable amount.'
-			);
+			Assert.isTrue(refusals.get('bad amount').contains('ten'), 'Names the unreadable amount.');
 			Assert.areEqual(
 				BarnHelp.text('Giving', 'Giving_Import_ErrorAmountNotPositive'),
 				refusals.get('zero'),
@@ -118,17 +113,11 @@ private class GiftImportRowTest {
 			Map<String, Map<String, String>> unknownType = gift('10', '2026-03-15');
 			unknownType.get('Gift').put('Type__c', 'barter');
 			String typeError = read(unknownType).error;
-			Assert.isTrue(
-				typeError.contains('barter') && typeError.contains('Card'),
-				'Names the choices.'
-			);
+			Assert.isTrue(typeError.contains('barter') && typeError.contains('Card'), 'Names the choices.');
 
 			Map<String, Map<String, String>> badDonor = gift('10', '2026-03-15');
 			badDonor.get('Gift').put('Donor', 'Neighbor');
-			Assert.isTrue(
-				read(badDonor).error.contains('Neighbor'),
-				'A donor choice is one of three.'
-			);
+			Assert.isTrue(read(badDonor).error.contains('Neighbor'), 'A donor choice is one of three.');
 		}
 	}
 
@@ -136,9 +125,7 @@ private class GiftImportRowTest {
 	static void aFundOrACreditWithoutAGiftIsRefused() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GiftImportRow row = read(
-				new Map<String, Map<String, String>>{
-					'Allocation' => new Map<String, String>{ 'Fund' => 'General' }
-				}
+				new Map<String, Map<String, String>>{ 'Allocation' => new Map<String, String>{ 'Fund' => 'General' } }
 			);
 			Assert.areEqual(
 				BarnHelp.text('Giving', 'Giving_Import_ErrorPartsWithoutGift'),
@@ -160,10 +147,7 @@ private class GiftImportRowTest {
 
 			Assert.isNull(row.error, 'Not refused.');
 			Assert.isFalse(row.values.containsKey(Gift__c.Status__c), 'Status is always Received.');
-			Assert.isFalse(
-				row.values.containsKey(Gift__c.Receipt_Number__c),
-				'The sequence numbers.'
-			);
+			Assert.isFalse(row.values.containsKey(Gift__c.Receipt_Number__c), 'The sequence numbers.');
 			Assert.areEqual(3, row.notLoaded.size(), 'And the run log names all three.');
 		}
 	}
@@ -223,11 +207,7 @@ private class GiftImportRowTest {
 
 			entities.put(
 				'Allocation',
-				new Map<String, String>{
-					'Fund1' => 'General',
-					'Amount1' => '60',
-					'Amount2' => '40'
-				}
+				new Map<String, String>{ 'Fund1' => 'General', 'Amount1' => '60', 'Amount2' => '40' }
 			);
 			Assert.isTrue(read(entities).error.contains('2'), 'A part with no fund is named.');
 		}
@@ -242,10 +222,7 @@ private class GiftImportRowTest {
 			Assert.isTrue((Decimal) row.values.get(Gift__c.Fair_Market_Value__c) == 8, 'A number.');
 
 			entities.get('Gift').put('Fair_Market_Value__c', 'eight');
-			Assert.isTrue(
-				read(entities).error.contains('eight'),
-				'An unreadable number is refused.'
-			);
+			Assert.isTrue(read(entities).error.contains('eight'), 'An unreadable number is refused.');
 		}
 	}
 }

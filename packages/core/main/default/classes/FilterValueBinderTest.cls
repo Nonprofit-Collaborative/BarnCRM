@@ -38,11 +38,7 @@ private class FilterValueBinderTest {
 				'Nothing typed is in the clause'
 			);
 			System.Assert.areEqual('O\'Brien', bound.binds.get('fb0'), 'Text is bound as typed');
-			System.Assert.areEqual(
-				Date.newInstance(2026, 1, 1),
-				bound.binds.get('fb1'),
-				'A date is a Date'
-			);
+			System.Assert.areEqual(Date.newInstance(2026, 1, 1), bound.binds.get('fb1'), 'A date is a Date');
 			System.Assert.areEqual(true, bound.binds.get('fb2'), 'A checkbox is a Boolean');
 			System.Assert.areEqual(
 				'Role__c = \'O\\\'Brien\' AND Start_Date__c >= 2026-01-01 AND Is_Primary__c = true',

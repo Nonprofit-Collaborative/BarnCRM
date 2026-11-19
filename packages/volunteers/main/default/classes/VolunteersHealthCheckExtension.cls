@@ -232,9 +232,7 @@ public with sharing class VolunteersHealthCheckExtension implements HealthCheckE
 	 * own finding, with its restore fix, so it is not reported twice here.
 	 */
 	private static HealthCheckService.Finding rollupsOff() {
-		Set<String> keys = VolunteerHealthCheckSelector.shippedRollupKeys(
-			ShiftScheduleService.MODULE_NAME
-		);
+		Set<String> keys = VolunteerHealthCheckSelector.shippedRollupKeys(ShiftScheduleService.MODULE_NAME);
 		if (keys.isEmpty()) {
 			return null;
 		}
@@ -279,10 +277,7 @@ public with sharing class VolunteersHealthCheckExtension implements HealthCheckE
 
 	private static String counted(Integer howMany) {
 		return howMany > countCap
-			? String.format(
-					Label.Core_HealthCheck_OrphansMoreThan,
-					new List<Object>{ countCap.format() }
-			  )
+			? String.format(Label.Core_HealthCheck_OrphansMoreThan, new List<Object>{ countCap.format() })
 			: howMany.format();
 	}
 

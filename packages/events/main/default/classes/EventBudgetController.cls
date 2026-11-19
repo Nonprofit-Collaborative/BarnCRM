@@ -111,14 +111,7 @@ public with sharing class EventBudgetController {
 				result.expenses.add(row);
 			}
 			for (Event_Funding__c line : [
-				SELECT
-					Id,
-					Name,
-					toLabel(Type__c),
-					Account__r.Name,
-					Event_Sponsor__r.Name,
-					Expected__c,
-					Received__c
+				SELECT Id, Name, toLabel(Type__c), Account__r.Name, Event_Sponsor__r.Name, Expected__c, Received__c
 				FROM Event_Funding__c
 				WHERE Event__c = :eventId
 				WITH USER_MODE

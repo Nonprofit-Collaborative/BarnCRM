@@ -26,10 +26,7 @@ public with sharing class AddressDeleteHandler extends TriggerHandler {
 
 	public override void beforeDelete() {
 		Map<Id, SObject> deleting = oldRecordsById();
-		if (
-			deleting == null ||
-			KEEP.equalsIgnoreCase(SettingsService.getSettings().Address_Delete_Behavior__c)
-		) {
+		if (deleting == null || KEEP.equalsIgnoreCase(SettingsService.getSettings().Address_Delete_Behavior__c)) {
 			return;
 		}
 		try {
@@ -117,10 +114,7 @@ public with sharing class AddressDeleteHandler extends TriggerHandler {
 			Database.undelete(addresses, AccessLevel.SYSTEM_MODE);
 			for (Address__c address : addresses) {
 				String mark = address.Deleted_With__c;
-				address.put(
-					NamespaceUtil.qualify(mark.substringBefore(':')),
-					Id.valueOf(mark.substringAfter(':'))
-				);
+				address.put(NamespaceUtil.qualify(mark.substringBefore(':')), Id.valueOf(mark.substringAfter(':')));
 				address.Deleted_With__c = null;
 			}
 			Database.update(addresses, AccessLevel.SYSTEM_MODE);

@@ -24,9 +24,7 @@ private class ImportEntityProcessorsTest {
 	static void aClassThatIsNotInTheOrgIsNoProcessorAndNoError() {
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
-			ImportEntityProcessor found = ImportEntityProcessors.resolve(
-				'NoSuchImportProcessorFu3'
-			);
+			ImportEntityProcessor found = ImportEntityProcessors.resolve('NoSuchImportProcessorFu3');
 			Test.stopTest();
 
 			Assert.isNull(found, 'A package that is not installed contributes nothing');

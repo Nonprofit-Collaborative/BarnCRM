@@ -6,6 +6,10 @@
     Sets up membership levels, benefits and certifications, and sees and changes every membership
     and member certification. Given to BarnCRM Admin holders.
   </description>
+  <applicationVisibilities>
+    <application>BarnCRM_Memberships</application>
+    <visible>true</visible>
+  </applicationVisibilities>
   <classAccesses>
     <apexClass>CertificationController</apexClass>
     <enabled>true</enabled>

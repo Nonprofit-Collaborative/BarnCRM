@@ -102,10 +102,7 @@ private class EventEmailServiceTest {
 			EventEmailService.emailSender = stub;
 
 			Test.startTest();
-			Integer sent = EventEmailService.run(
-				EventEmailService.PHASE_REMIND,
-				due(EventEmailService.PHASE_REMIND)
-			);
+			Integer sent = EventEmailService.run(EventEmailService.PHASE_REMIND, due(EventEmailService.PHASE_REMIND));
 			Test.stopTest();
 
 			Assert.areEqual(0, sent, 'Nothing went');
@@ -139,8 +136,7 @@ private class EventEmailServiceTest {
 			Assert.areEqual(1, marked, 'One no-show');
 			Assert.areEqual(
 				'No-Show',
-				[SELECT Status__c FROM Event_Attendee__c WHERE Id = :max.Id WITH USER_MODE]
-				.Status__c,
+				[SELECT Status__c FROM Event_Attendee__c WHERE Id = :max.Id WITH USER_MODE].Status__c,
 				'Max did not come'
 			);
 		}
@@ -154,10 +150,7 @@ private class EventEmailServiceTest {
 
 			Test.startTest();
 			Id job = EventEmailBatch.startMorning();
-			Integer sent = EventEmailService.run(
-				EventEmailService.PHASE_REMIND,
-				new List<Event_Attendee__c>{ jane }
-			);
+			Integer sent = EventEmailService.run(EventEmailService.PHASE_REMIND, new List<Event_Attendee__c>{ jane });
 			List<NightlyStep> steps = new EventsNightlyJobProvider().nightlySteps();
 			Test.stopTest();
 

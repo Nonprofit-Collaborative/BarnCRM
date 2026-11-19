@@ -97,10 +97,7 @@ public with sharing class ImportJournalService {
 		for (String field : afterByField.keySet()) {
 			fields.put(
 				field,
-				new Map<String, Object>{
-					'before' => beforeByField.get(field),
-					'after' => afterByField.get(field)
-				}
+				new Map<String, Object>{ 'before' => beforeByField.get(field), 'after' => afterByField.get(field) }
 			);
 		}
 		return new Map<String, Object>{
@@ -114,12 +111,7 @@ public with sharing class ImportJournalService {
 
 	/** A record an undo kept, and why. */
 	@NamespaceAccessible
-	public static Map<String, Object> kept(
-		String objectName,
-		Id recordId,
-		String label,
-		String reason
-	) {
+	public static Map<String, Object> kept(String objectName, Id recordId, String label, String reason) {
 		return new Map<String, Object>{
 			'action' => ACTION_KEPT,
 			'object' => objectName,
@@ -153,12 +145,7 @@ public with sharing class ImportJournalService {
 
 	/** A value an undo did not put back, and why. */
 	@NamespaceAccessible
-	public static Map<String, Object> notRestored(
-		String objectName,
-		Id recordId,
-		String field,
-		String reason
-	) {
+	public static Map<String, Object> notRestored(String objectName, Id recordId, String field, String reason) {
 		return new Map<String, Object>{
 			'action' => ACTION_NOT_RESTORED,
 			'object' => objectName,
@@ -184,9 +171,7 @@ public with sharing class ImportJournalService {
 		try {
 			List<Import_Journal__c> pages = new List<Import_Journal__c>();
 			Integer paged = 0;
-			String written = PHASE_UNDO.equals(phase) || PHASE_CREATED.equals(phase)
-				? phase
-				: PHASE_COMMIT;
+			String written = PHASE_UNDO.equals(phase) || PHASE_CREATED.equals(phase) ? phase : PHASE_COMMIT;
 			Integer cap = written == PHASE_CREATED ? maxCreatedPerPage : maxEntriesPerPage;
 			for (List<Map<String, Object>> page : paginate(entries, batchId, cap)) {
 				paged += page.size();
@@ -217,9 +202,7 @@ public with sharing class ImportJournalService {
 			return result;
 		}
 		try {
-			Map<String, Object> parsed = (Map<String, Object>) JSON.deserializeUntyped(
-				page.Entries_JSON__c
-			);
+			Map<String, Object> parsed = (Map<String, Object>) JSON.deserializeUntyped(page.Entries_JSON__c);
 			for (Object entry : (List<Object>) parsed.get('entries')) {
 				result.add((Map<String, Object>) entry);
 			}
@@ -264,10 +247,7 @@ public with sharing class ImportJournalService {
 				after = page;
 				for (Map<String, Object> entry : entries(page)) {
 					String objectName = (String) entry.get('object');
-					counts.put(
-						objectName,
-						(counts.containsKey(objectName) ? counts.get(objectName) : 0) + 1
-					);
+					counts.put(objectName, (counts.containsKey(objectName) ? counts.get(objectName) : 0) + 1);
 				}
 			}
 			read += window.size();
@@ -294,12 +274,7 @@ public with sharing class ImportJournalService {
 	 * the job they fell.
 	 */
 	@NamespaceAccessible
-	public static List<Map<String, Object>> firstWithAction(
-		Id batchId,
-		String phase,
-		String action,
-		Integer howMany
-	) {
+	public static List<Map<String, Object>> firstWithAction(Id batchId, String phase, String action, Integer howMany) {
 		List<Map<String, Object>> kept = new List<Map<String, Object>>();
 		if (howMany != null && howMany > 0) {
 			walk(batchId, phase, action, kept, howMany);
@@ -312,13 +287,7 @@ public with sharing class ImportJournalService {
 	 * given, stopping once it has them. Reads a few pages at a time, so a long journal never
 	 * holds the heap, and parses only a page whose text names the action.
 	 */
-	private static Integer walk(
-		Id batchId,
-		String phase,
-		String action,
-		List<Map<String, Object>> kept,
-		Integer keep
-	) {
+	private static Integer walk(Id batchId, String phase, String action, List<Map<String, Object>> kept, Integer keep) {
 		Integer total = 0;
 		if (batchId == null || action == null) {
 			return total;
@@ -439,9 +408,7 @@ public with sharing class ImportJournalService {
 	}
 
 	private static String document(List<Map<String, Object>> entries) {
-		return JSON.serialize(
-			new Map<String, Object>{ 'version' => DOCUMENT_VERSION, 'entries' => entries }
-		);
+		return JSON.serialize(new Map<String, Object>{ 'version' => DOCUMENT_VERSION, 'entries' => entries });
 	}
 
 	private static String shorten(String value) {

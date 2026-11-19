@@ -57,9 +57,7 @@ public class AccountKindsTestData {
 		// Written as the system writes it: the Settings save refuses No record type where a
 		// candidate exists, which is exactly the org this test may be running in.
 		OrgSettingsSystemWriter.save(
-			new Map<Schema.SObjectField, Object>{
-				BarnCRM_Settings__c.Organization_Record_Type__c => usable
-			}
+			new Map<Schema.SObjectField, Object>{ BarnCRM_Settings__c.Organization_Record_Type__c => usable }
 		);
 	}
 }

@@ -32,11 +32,7 @@ private class GiftControllerTest {
 			System.assertEquals(250, summary.allocatedAmount, 'The gift is fully allocated.');
 			System.assertEquals(100, summary.reversedAmount, 'One hundred has gone back.');
 			System.assertEquals(150, summary.remainingAmount, 'One hundred and fifty is left.');
-			System.assertEquals(
-				false,
-				summary.fullyReversed,
-				'The gift is not fully refunded yet.'
-			);
+			System.assertEquals(false, summary.fullyReversed, 'The gift is not fully refunded yet.');
 			System.assertEquals(1, summary.allocations.size(), 'With its one allocation.');
 			System.assertEquals(true, summary.canRefund, 'An administrator may record a refund.');
 		}
@@ -48,10 +44,7 @@ private class GiftControllerTest {
 	 */
 	@IsTest
 	static void aReaderIsToldTheyCannotRecordARefund() {
-		User reader = TestDataFactory.createUser(
-			'Jen',
-			new List<String>{ 'BarnCRM_Read_Only', 'Giving_Read_Only' }
-		);
+		User reader = TestDataFactory.createUser('Jen', new List<String>{ 'BarnCRM_Read_Only', 'Giving_Read_Only' });
 		Gift__c gift;
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			gift = insertGift(250);
@@ -137,10 +130,7 @@ private class GiftControllerTest {
 			}
 			Test.stopTest();
 
-			System.assert(
-				String.isNotBlank(message),
-				'The screen gets a sentence, not a stack trace: ' + message
-			);
+			System.assert(String.isNotBlank(message), 'The screen gets a sentence, not a stack trace: ' + message);
 		}
 	}
 

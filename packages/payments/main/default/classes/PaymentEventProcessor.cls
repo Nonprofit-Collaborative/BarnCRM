@@ -1,11 +1,12 @@
 /**
  * Processes received processor events (ADR-0201 `0201-payments-module.md`, decision 6; R-PEV2,
- * R-PEV3). Scheduled from Health Check by an administrator, it runs as them, in user mode.
+ * R-PEV3). Scheduled from Health Check by an administrator, it runs as them, in user mode; their
+ * Payments Admin permission set gives the principal access its Named Credential callouts need.
  *
  * Four scheduled jobs, at :00, :15, :30 and :45. Each enqueues `Abandon`, which cancels abandoned
  * checkouts (R-PAY3), and `Run` when events wait. `Run` reads up to PER_RUN events with every callout first
- * (PayPal verification and capture), then writes them all, since Salesforce allows no callout
- * after a write; it enqueues itself again while more wait.
+ * (fetching each Stripe event back from Stripe; PayPal verification and capture), then writes them
+ * all, since Salesforce allows no callout after a write; it enqueues itself again while more wait.
  */
 public with sharing class PaymentEventProcessor implements Schedulable {
 	public static final String JOB_NAME = 'BarnCRM Payments Processing';
@@ -29,11 +30,7 @@ public with sharing class PaymentEventProcessor implements Schedulable {
 	/** Schedules the four jobs as the running user; those already scheduled are kept. */
 	public static void schedule() {
 		for (Integer minute : MINUTES) {
-			ScheduledJobSelector.ensure(
-				jobName(minute),
-				'0 ' + minute + ' * * * ?',
-				new PaymentEventProcessor()
-			);
+			ScheduledJobSelector.ensure(jobName(minute), '0 ' + minute + ' * * * ?', new PaymentEventProcessor());
 		}
 	}
 
@@ -110,11 +107,7 @@ public with sharing class PaymentEventProcessor implements Schedulable {
 						new PaymentService.Outcome(event)
 							.nothing(
 								'Failed',
-								BarnHelp.text(
-									'Payments',
-									'Payments_Event_Failed',
-									new List<Object>{ e.getMessage() }
-								)
+								BarnHelp.text('Payments', 'Payments_Event_Failed', new List<Object>{ e.getMessage() })
 							)
 					);
 				}
@@ -146,11 +139,7 @@ public with sharing class PaymentEventProcessor implements Schedulable {
 				new Payment_Event__c(
 					Id = outcome.event.Id,
 					Status__c = 'Failed',
-					Message__c = BarnHelp.text(
-							'Payments',
-							'Payments_Event_Failed',
-							new List<Object>{ e.getMessage() }
-						)
+					Message__c = BarnHelp.text('Payments', 'Payments_Event_Failed', new List<Object>{ e.getMessage() })
 						.abbreviate(255)
 				)
 			);

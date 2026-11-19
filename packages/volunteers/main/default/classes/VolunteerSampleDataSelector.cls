@@ -86,9 +86,7 @@ public with sharing class VolunteerSampleDataSelector {
 			[
 				SELECT Id
 				FROM Volunteer_Signup__c
-				WHERE
-					Volunteer_Shift__r.Volunteer_Job__r.Sample_Data__c = TRUE
-					AND Contact__r.Sample_Data__c = TRUE
+				WHERE Volunteer_Shift__r.Volunteer_Job__r.Sample_Data__c = TRUE AND Contact__r.Sample_Data__c = TRUE
 				WITH USER_MODE
 				LIMIT :cap
 			]
@@ -114,10 +112,7 @@ public with sharing class VolunteerSampleDataSelector {
 					AND Id NOT IN (
 						SELECT Volunteer_Shift__c
 						FROM Volunteer_Hours__c
-						WHERE
-							Volunteer_Shift__c != NULL
-							AND (Contact__c = NULL
-							OR Contact__r.Sample_Data__c = FALSE)
+						WHERE Volunteer_Shift__c != NULL AND (Contact__c = NULL OR Contact__r.Sample_Data__c = FALSE)
 					)
 				WITH USER_MODE
 				LIMIT :cap
@@ -252,10 +247,7 @@ public with sharing class VolunteerSampleDataSelector {
 		return [
 			SELECT Skill__c, Skill__r.Name, Contact__r.Name, Account__r.Name
 			FROM Volunteer_Skill__c
-			WHERE
-				Skill__r.Sample_Data__c = TRUE
-				AND (Contact__c = NULL
-				OR Contact__r.Sample_Data__c = FALSE)
+			WHERE Skill__r.Sample_Data__c = TRUE AND (Contact__c = NULL OR Contact__r.Sample_Data__c = FALSE)
 			WITH USER_MODE
 			ORDER BY Skill__r.Name, Id
 			LIMIT :cap
@@ -285,9 +277,7 @@ public with sharing class VolunteerSampleDataSelector {
 			[
 				SELECT COUNT()
 				FROM Volunteer_Signup__c
-				WHERE
-					Volunteer_Shift__r.Volunteer_Job__r.Sample_Data__c = TRUE
-					AND Contact__r.Sample_Data__c = TRUE
+				WHERE Volunteer_Shift__r.Volunteer_Job__r.Sample_Data__c = TRUE AND Contact__r.Sample_Data__c = TRUE
 				WITH USER_MODE
 			],
 			[

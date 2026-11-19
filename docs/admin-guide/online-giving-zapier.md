@@ -4,7 +4,7 @@
 
 Many organizations take donations on another giving tool: Givebutter, Donorbox, Zeffy, Classy
 and similar. This page gives Zapier recipes that copy each new donation from such a tool into
-BarnCRM as a Giving gift, for the right person, recorded once however many times it is sent.
+BarnCRM as a Fundraising gift, for the right person, recorded once however many times it is sent.
 
 BarnCRM does not connect to these tools itself, and BarnCRM holds no Zapier account: you use
 your own. If you take payments through **your own Stripe or PayPal account**, you do not need
@@ -12,7 +12,7 @@ Zapier: the Payments module receives them directly (see [Payments](payments.md))
 
 ## Before You Start
 
-- **Giving** must be installed (Nonprofit Edition). Recipe B also needs **Mirror**.
+- **Fundraising** must be installed (Nonprofit Edition). Both recipes need nothing else.
 - A Zapier account of your own that can use the Salesforce app. Zapier lists Salesforce as a
   premium app; check Zapier's current plans for what your account includes.
 - A Salesforce user for Zapier to sign in as, made as in
@@ -22,7 +22,7 @@ Zapier: the Payments module receives them directly (see [Payments](payments.md))
 - Your giving tool's Zapier app, with a trigger for a new donation (named **New Donation**,
   **New Transaction** or similar by each tool).
 
-## Recipe A: Zapier's Salesforce Actions (Giving Only)
+## Recipe A: Zapier's Salesforce Actions (Fundraising Only)
 
 One Zap per giving tool. Every step is in Zapier.
 
@@ -48,12 +48,12 @@ One Zap per giving tool. Every step is in Zapier.
 | Appeal | Optional: the id of the appeal this campaign belongs to |
 
 Because the search looks for the External Id first and **External Id** is unique, a donation
-Zapier sends twice finds the gift it made the first time and makes no second one. Giving puts
+Zapier sends twice finds the gift it made the first time and makes no second one. Fundraising puts
 the whole gift in your default fund, as for a gift entered by hand.
 
-## Recipe B: Mirror's Inbound Gift API (Fund Codes and Email Matching)
+## Recipe B: Fundraising's Inbound Gift API (Fund Codes and Email Matching)
 
-If Mirror is installed, a developer can point a **Webhooks by Zapier** step, or any tool that
+With Fundraising installed, a developer can point a **Webhooks by Zapier** step, or any tool that
 can make an authenticated web request, at the Inbound Gift API. It matches the donor by email
 the way the importer does, names a fund by its accounting code, and refuses a resend that
 changes the amount. Send `externalId` as `tool:id`, `amount`, `paymentMethod` `Card`,
@@ -69,7 +69,7 @@ exception: the Payments module records their refunds itself.
 ## Tools That Write NPSP Opportunities
 
 Some tools only know NPSP and write Opportunities. With Mirror's Opportunity Mirror turned on,
-those Opportunities become Giving gifts (see [Opportunity Mirror](opportunity-mirror.md)), so
+those Opportunities become Fundraising gifts (see [Opportunity Mirror](opportunity-mirror.md)), so
 such a tool can stay as it is.
 
 ## Common Mistakes

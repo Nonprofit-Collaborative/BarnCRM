@@ -14,12 +14,7 @@ public class AcknowledgmentTestData {
 	}
 
 	/** A rule, ready to insert. Pass nulls for the criteria this rule does not care about. */
-	public static Acknowledgment_Rule__c buildRule(
-		String name,
-		Integer order,
-		String channel,
-		String template
-	) {
+	public static Acknowledgment_Rule__c buildRule(String name, Integer order, String channel, String template) {
 		return new Acknowledgment_Rule__c(
 			Name = name,
 			Order__c = order,

@@ -86,7 +86,12 @@ CAPS = {
     # 2,267,169 measured, plus about 0.1%. Raised again 2026-11-13 for release 1.25 sample data
     # (CoreSampleData's loader support: whenSetting steps, the find value, one-query preload of
     # the module files): 2,269,708 measured, plus about 0.1%.
-    "core": 2_272_000,
+    # Raised 2026-11-14 for the release 1.27 Core fixes (D-208: OrgDate for org-wide date
+    # rules, the Error Log key's exception type and frame, the match key fill's end-of-run mark
+    # and warning, Run Remaining Checks): 2,274,807 measured, plus about 0.1%.
+    # Batch O trim (O-01, D-207): 2,275,872 measured 2026-11-19 (upgrade-only code out, the
+    # feature list fill in, DML statements); kept, since size plus 2% would raise it.
+    "core": 2_277_000,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured
@@ -129,7 +134,12 @@ CAPS = {
     # donors crossing a recency cutoff; 676,573 measured, raised by the 2,283 added plus 2%.
     # Lowered for D-200 S1 and S6 (release 1.23: the access sync became Core's catalog data and
     # the Nightly Jobs page Core's nightly card): 667,059 measured, plus about 0.5%.
-    "giving": 670_400,
+    # N-15 (release 1.27, D-210, ADR-0228): Mirror for Giving folded in
+    # (the gift mirrors, Campaign sync, the inbound gift API, the accounting export and the gift
+    # kits; its post-install, nightly provider and Health Check extension merged into this
+    # package's own). 669,576 here and 196,129 there before (capped 670,400 and 199,900);
+    # 864,050 measured together, plus about 0.5%.
+    "giving": 868_400,
     # 2026-11-05: Log Hours, Create Shifts Now, Volunteer Letters (modules-14, 15, 20), Home.
     # Batch C landing 2026-11-07: 187,048 measured with the shift nudge (V-10b), plus 1.5%.
     # Batch C wave 2 landing: 189,775 measured (VolunteersEventExtension EV-08), plus about 2%.
@@ -187,7 +197,8 @@ CAPS = {
     # measured, plus about 1%.
     # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
     # catalog data): 115,433 measured with S2, plus about 2%.
-    "funders": 117_800,
+    # Lowered at the batch O trim (O-01, D-207): 113,738 measured 2026-11-19, plus about 2%.
+    "funders": 116_100,
     # Forms engine and builder (C-42a, D-157): submit service, server rules, thin controllers.
     # Batch C landing 2026-11-07: 42,867 measured (C-42a), plus about 2.5%.
     # C-42b public forms (guest intake, allowlist, processor, Health Check, REST): 70,142
@@ -202,7 +213,9 @@ CAPS = {
     # measured with every review branch merged; 93,000 still leaves about 2%.
     # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
     # catalog data): 88,989 measured, plus about 2%.
-    "forms": 90_800,
+    # Release 1.27 N-04 (D-208: only a Forms administrator deletes a form with submissions, which
+    # are kept and named): FormDeleteGuard and FormSubmissionNames, 94,315 measured, plus about 2%.
+    "forms": 96_200,
     # New 2026-11-06 for Contact Point Sync (C-45, ADR-0176 contact point sync module):
     # 43,980 measured with the page and backfill, plus about 2 percent.
     # C-45e (D-186): 45,798 measured with person accounts and household-move sync, plus about 2%.
@@ -236,7 +249,8 @@ CAPS = {
     # measured, plus about 1%.
     # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
     # catalog data): 227,251 measured with S2, plus about 1.5%.
-    "events": 231_000,
+    # Lowered at the batch O trim (O-01, D-207): 224,739 measured 2026-11-19, plus about 2%.
+    "events": 229_300,
     # Portal Builder (PB-01, ADR-0185 portal builder): sign-in, sessions, template checks and the
     # person-scoped portal API. 49,205 measured at first build (the API is the security boundary,
     # so every check stays in Apex), plus about 2%.
@@ -281,7 +295,13 @@ CAPS = {
     # 2026-11-12; raised by the 759 added, plus about 2%.
     # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
     # catalog data): 69,664 measured, plus about 2%.
-    "payments": 71_100,
+    # Named Credentials (N-13, D-209, ADR-0229): Stripe events fetched back from
+    # Stripe, Check Connection for both processors and the Health Check credential test, in place
+    # of the HMAC check and the key fields, 73,461 measured 2026-11-18, plus about 2%.
+    # Pre-batch review M1: the receiver's address token (made, compared in constant time,
+    # regenerated), the hourly cap Warning and its Health Check finding, 75,619 measured
+    # 2026-11-19; raised by 800.
+    "payments": 75_700,
     # LWC Builder (LB-01 to LB-06, ADR-0203 lwc builder module): the builder and renderer
     # controller, the App Builder picklist, access sync and post-install, 17,322 measured, plus
     # about 2%. LB-07 (D-196) charts by two groupings and three totals: 19,741 measured, plus
@@ -344,7 +364,21 @@ CAPS = {
     # 2026-11-11, plus about 2 percent.
     # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
     # catalog data): 22,528 measured, plus about 2%.
-    "addressverification": 23_000,
+    # Named Credentials (N-13, D-209, ADR-0229): Check Connection, the setup
+    # page's credential list and stopping a run at the first credential failure, 24,072 measured
+    # 2026-11-18, plus about 2%.
+    # Pre-batch review M2: no lookup is queued for a saver without principal access, and the
+    # missing access is logged once a day, 25,364 measured 2026-11-19; raised by 850.
+    "addressverification": 25_400,
+    # Advanced Reporting (O-02, D-202, D-207, ADR-NEXT advanced reporting): one query service
+    # (allow-listed by describe, user mode, binds only, aggregates and keyset pages), the library
+    # of saved reports and dashboards as Files with their sharing, and post-install, 28,060
+    # measured 2026-11-19, plus about 2%.
+    # Review fixes (release 1.29): restricted Files sharing, sharing kept out of saves, the save
+    # permission on share and delete, the server-side export check, scan fields worked out on the
+    # server with the multi-currency refusal, checked lookup names: 30,239 measured 2026-11-19,
+    # raised by 2,200 (what the fixes added).
+    "reporting": 30_900,
     # Mirror: the NPSP gifts migration kit's extension (MIG-05), 187,295 measured, then the
     # Nonprofit Cloud gifts kit's (MIG-04), 195,957 measured, then the Nonprofit Cloud
     # relationships kit's (MIG-02), about 200,500 combined, plus about 1%.
@@ -359,7 +393,12 @@ CAPS = {
     # provider (D-201: CaseProviderRequests and its flow action): 221,790 measured,
     # plus about 2%. Lowered for the shared gift mirror base (D-200 S5, release 1.23:
     # MirrorRunBatch, MirrorSync.Result and storeLinks): 221,165 measured, plus about 2%.
-    "mirror": 225_600,
+    # N-09 (release 1.27, ADR-0228): the gift mirrors, Campaign sync, the
+    # inbound gift API, the accounting export and the gift migration kits moved out (since N-15
+    # into the giving package, above). Mirror keeps the Case bridge, now hourly (N-10:
+    # CaseProviderRequestsHourly and the guard), the Nonprofit Cloud household and relationships
+    # kits and the drift finding: 31,483 measured, plus about 2%.
+    "mirror": 32_100,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}
 

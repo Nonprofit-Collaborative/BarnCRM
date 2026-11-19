@@ -34,10 +34,7 @@ private class UserErrorsTest {
 			Test.stopTest();
 
 			Assert.areEqual(Label.Core_UnexpectedError, shown.getMessage(), 'Label, not raw text');
-			Assert.isFalse(
-				shown.getMessage().contains('REQUIRED_FIELD_MISSING'),
-				'No platform code'
-			);
+			Assert.isFalse(shown.getMessage().contains('REQUIRED_FIELD_MISSING'), 'No platform code');
 			Integer logged = [
 				SELECT COUNT()
 				FROM Error_Log__c
@@ -71,12 +68,7 @@ private class UserErrorsTest {
 		System.runAs(TestUsers.admin()) {
 			Exception known = new ImportException('Pick a file first.');
 
-			AuraHandledException shown = UserErrors.wrap(
-				known,
-				true,
-				'UserErrorsTest.shown',
-				FALLBACK
-			);
+			AuraHandledException shown = UserErrors.wrap(known, true, 'UserErrorsTest.shown', FALLBACK);
 
 			Assert.areEqual('Pick a file first.', shown.getMessage(), 'Own message');
 			Assert.areEqual(0, [SELECT COUNT() FROM Error_Log__c], 'Nothing logged');
@@ -90,13 +82,7 @@ private class UserErrorsTest {
 			Id recordId = FakeIds.of(Contact.SObjectType, 1);
 
 			Test.startTest();
-			AuraHandledException shown = UserErrors.wrap(
-				other,
-				false,
-				'UserErrorsTest.other',
-				recordId,
-				FALLBACK
-			);
+			AuraHandledException shown = UserErrors.wrap(other, false, 'UserErrorsTest.other', recordId, FALLBACK);
 			Test.stopTest();
 
 			Assert.areEqual(FALLBACK, shown.getMessage(), 'Fallback label');
@@ -106,11 +92,7 @@ private class UserErrorsTest {
 				WHERE Context__c = 'UserErrorsTest.other'
 			];
 			Assert.areEqual(1, logged.size(), 'Logged once');
-			Assert.areEqual(
-				String.valueOf(recordId),
-				logged[0].Record_Reference__c,
-				'With its record'
-			);
+			Assert.areEqual(String.valueOf(recordId), logged[0].Record_Reference__c, 'With its record');
 		}
 	}
 
@@ -122,8 +104,7 @@ private class UserErrorsTest {
 
 			String known = screen.wrap(new ImportException('Pick a file first.')).getMessage();
 			AuraHandledException passed = screen.wrap(worded);
-			String viaStatic = UserErrors.wrap(new ImportException('Again.'), 'X', FALLBACK)
-				.getMessage();
+			String viaStatic = UserErrors.wrap(new ImportException('Again.'), 'X', FALLBACK).getMessage();
 
 			Assert.areEqual('Pick a file first.', known, 'A BarnCRM message is shown');
 			Assert.areEqual(worded, passed, 'A worded exception is passed on as it is');
@@ -144,8 +125,7 @@ private class UserErrorsTest {
 
 			Test.startTest();
 			String plain = screen.wrap(new NullPointerException()).getMessage();
-			String withRecord = screen.wrap(new NullPointerException(), 'Other', recordId)
-				.getMessage();
+			String withRecord = screen.wrap(new NullPointerException(), 'Other', recordId).getMessage();
 			Test.stopTest();
 
 			String expected = BarnHelp.text('Core', 'Core_Find_UnexpectedError');
@@ -179,9 +159,7 @@ private class UserErrorsTest {
 				.showingDml()
 				.wrap(failure)
 				.getMessage();
-			String hidden = new UserErrors.Screen('UserErrorsTest.dml', null, FALLBACK)
-				.wrap(failure)
-				.getMessage();
+			String hidden = new UserErrors.Screen('UserErrorsTest.dml', null, FALLBACK).wrap(failure).getMessage();
 
 			Assert.areEqual(failure.getDmlMessage(0), shown, 'The row message');
 			Assert.areEqual(FALLBACK, hidden, 'Otherwise the fallback');

@@ -88,23 +88,12 @@ public with sharing class ErrorDigestService {
 		// Two reads spend up to the cap in query rows each; keep a margin for the rest.
 		Integer room = (Limits.getLimitQueryRows() - Limits.getQueryRows() - QUERY_ROW_MARGIN) / 2;
 		if (room < ENTRIES_LISTED) {
-			return notSent(
-				outcome,
-				System.Label.Core_ErrorDigest_NoRoom,
-				lastSummary,
-				runAt,
-				coveredUntil
-			);
+			return notSent(outcome, System.Label.Core_ErrorDigest_NoRoom, lastSummary, runAt, coveredUntil);
 		}
 		Integer cap = Math.min(entryCap, room);
 
 		Datetime windowStart = coveredUntil == null ? runAt.addDays(-periodDays) : coveredUntil;
-		ErrorDigestSelector.Window window = ErrorDigestSelector.newEntries(
-			windowStart,
-			runAt,
-			ENTRIES_LISTED,
-			cap
-		);
+		ErrorDigestSelector.Window window = ErrorDigestSelector.newEntries(windowStart, runAt, ENTRIES_LISTED, cap);
 		outcome.entries = window.total;
 		// The weekly admin summary (C-54): only in a weekly digest, and only when switched on.
 		AdminDigestSummary.Summary summary = includeSummary(settings, periodDays)
@@ -133,10 +122,7 @@ public with sharing class ErrorDigestService {
 		outcome.sent = true;
 		outcome.summary = String.format(
 			System.Label.Core_ErrorDigest_SummarySent,
-			new List<Object>{
-				counted(window.total, window.capped),
-				String.valueOf(outcome.recipients)
-			}
+			new List<Object>{ counted(window.total, window.capped), String.valueOf(outcome.recipients) }
 		);
 		return finish(outcome, runAt, runAt);
 	}
@@ -185,10 +171,7 @@ public with sharing class ErrorDigestService {
 		Datetime runAt,
 		Datetime coveredUntil
 	) {
-		outcome.summary = String.format(
-			System.Label.Core_ErrorDigest_SummaryNotSent,
-			new List<Object>{ reason }
-		);
+		outcome.summary = String.format(System.Label.Core_ErrorDigest_SummaryNotSent, new List<Object>{ reason });
 		if (!outcome.summary.equals(lastSummary)) {
 			ErrorLogger.logMessage(outcome.summary, LOG_CONTEXT, ErrorLogger.SEVERITY_ERROR);
 		}
@@ -249,10 +232,7 @@ public with sharing class ErrorDigestService {
 		String base = URL.getOrgDomainUrl().toExternalForm();
 		if (window.total == 0) {
 			List<String> only = new List<String>{
-				String.format(
-					System.Label.Core_AdminDigest_NoNewErrors,
-					new List<Object>{ windowStart.format() }
-				),
+				String.format(System.Label.Core_AdminDigest_NoNewErrors, new List<Object>{ windowStart.format() }),
 				''
 			};
 			only.addAll(AdminDigestSummary.lines(summary, base));
@@ -267,12 +247,7 @@ public with sharing class ErrorDigestService {
 			''
 		};
 		if (window.capped) {
-			lines.add(
-				String.format(
-					System.Label.Core_ErrorDigest_Capped,
-					new List<Object>{ String.valueOf(cap) }
-				)
-			);
+			lines.add(String.format(System.Label.Core_ErrorDigest_Capped, new List<Object>{ String.valueOf(cap) }));
 			lines.add('');
 		}
 		lines.add(System.Label.Core_ErrorDigest_BySource);
@@ -286,11 +261,7 @@ public with sharing class ErrorDigestService {
 			lines.add(
 				'  ' +
 					String.join(
-						new List<String>{
-							entry.Name,
-							orNoSource(entry.Context__c),
-							String.valueOf(entry.Severity__c)
-						},
+						new List<String>{ entry.Name, orNoSource(entry.Context__c), String.valueOf(entry.Severity__c) },
 						', '
 					) +
 					': ' +
@@ -302,10 +273,7 @@ public with sharing class ErrorDigestService {
 		Integer unlisted = window.rows - window.newest.size();
 		if (unlisted > 0) {
 			lines.add(
-				String.format(
-					System.Label.Core_ErrorDigest_More,
-					new List<Object>{ counted(unlisted, window.capped) }
-				)
+				String.format(System.Label.Core_ErrorDigest_More, new List<Object>{ counted(unlisted, window.capped) })
 			);
 		}
 		lines.add('');
@@ -315,9 +283,7 @@ public with sharing class ErrorDigestService {
 				new List<Object>{ base + ErrorLogCountSelector.listViewUrl() }
 			)
 		);
-		lines.add(
-			String.format(System.Label.Core_ErrorDigest_StillNew, new List<Object>{ stillNew(cap) })
-		);
+		lines.add(String.format(System.Label.Core_ErrorDigest_StillNew, new List<Object>{ stillNew(cap) }));
 		lines.add('');
 		lines.addAll(AdminDigestSummary.lines(summary, base));
 		lines.add(System.Label.Core_ErrorDigest_Footer);
@@ -362,8 +328,6 @@ public with sharing class ErrorDigestService {
 			// An org set to send system email only refuses the whole call.
 			firstFailure = refused.getMessage();
 		}
-		return String.isBlank(firstFailure)
-			? System.Label.Core_ErrorDigest_UnknownFailure
-			: firstFailure.left(150);
+		return String.isBlank(firstFailure) ? System.Label.Core_ErrorDigest_UnknownFailure : firstFailure.left(150);
 	}
 }

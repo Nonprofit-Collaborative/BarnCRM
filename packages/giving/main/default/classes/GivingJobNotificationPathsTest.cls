@@ -7,9 +7,7 @@
  * Asserts on `JobNotifier.sentNotices()`, because a sent notification cannot be read back. These
  * tests have not been executed: no org in this environment.
  */
-@IsTest(
-	testFor='ApexClass:DonorLevelBatch, ApexClass:AcknowledgmentBatch, ApexClass:ReceiptStatementBatch'
-)
+@IsTest(testFor='ApexClass:DonorLevelBatch, ApexClass:AcknowledgmentBatch, ApexClass:ReceiptStatementBatch')
 private class GivingJobNotificationPathsTest {
 	private static final Integer YEAR = 2025;
 
@@ -60,9 +58,7 @@ private class GivingJobNotificationPathsTest {
 
 			new AcknowledgmentBatch(run.Id).finish(null);
 
-			JobNotifier.Notice notice = onlyNotice(
-				title(System.Label.Giving_JobNotice_Acknowledgments)
-			);
+			JobNotifier.Notice notice = onlyNotice(title(System.Label.Giving_JobNotice_Acknowledgments));
 			Assert.areEqual(run.Id, notice.targetId, 'Opening the run');
 		}
 	}
@@ -79,11 +75,9 @@ private class GivingJobNotificationPathsTest {
 
 			new DonorLevelBatch(DonorLevelBatch.CONTACTS).finish(null);
 
-			JobNotifier.Notice notice = onlyNotice(
-				title(System.Label.Giving_JobNotice_DonorLevels)
-			);
+			JobNotifier.Notice notice = onlyNotice(title(System.Label.Giving_JobNotice_DonorLevels));
 			Assert.isNull(notice.targetId, 'No record');
-			Assert.areEqual('Giving', notice.section, 'Opening the Giving section');
+			Assert.areEqual(SettingSections.GIVING, notice.section, 'Opening the Fundraising section');
 		}
 	}
 

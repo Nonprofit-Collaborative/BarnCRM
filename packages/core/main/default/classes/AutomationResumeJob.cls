@@ -64,11 +64,7 @@ public with sharing class AutomationResumeJob implements Schedulable {
 	@TestVisible
 	private static Id schedule(Datetime pauseEnds, Datetime runAt) {
 		cancel();
-		return ScheduledJobSelector.schedule(
-			JOB_NAME,
-			cronFor(runAt),
-			new AutomationResumeJob(pauseEnds)
-		);
+		return ScheduledJobSelector.schedule(JOB_NAME, cronFor(runAt), new AutomationResumeJob(pauseEnds));
 	}
 
 	/** Cancels the scheduled resume, if there is one. */

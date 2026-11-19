@@ -37,17 +37,10 @@ private class ProjectHealthTest {
 			new ProjectHealth().execute(null);
 			Test.stopTest();
 
-			Assert.areEqual(
-				'On Track',
-				read(onTrack.Id).Health__c,
-				'One day late is under the 7 days'
-			);
+			Assert.areEqual('On Track', read(onTrack.Id).Health__c, 'One day late is under the 7 days');
 			Project__c risky = read(lateTask.Id);
 			Assert.areEqual('At Risk', risky.Health__c, 'Seven days late');
-			Assert.isTrue(
-				risky.Health_Reasons__c.contains('Data mapping'),
-				'The late task is named'
-			);
+			Assert.isTrue(risky.Health_Reasons__c.contains('Data mapping'), 'The late task is named');
 			Assert.areEqual('At Risk', read(lateMilestone.Id).Health__c, 'A late milestone');
 			Assert.areEqual('Off Track', read(pastTarget.Id).Health__c, 'Past its target date');
 			Assert.isNull(read(planned.Id).Health__c, 'Only an Active project has a health');
@@ -80,12 +73,7 @@ private class ProjectHealthTest {
 			List<Project__c> projects = new List<Project__c>();
 			for (Integer i = 0; i < 200; i++) {
 				projects.add(
-					new Project__c(
-						Name = 'P' + i,
-						Type__c = 'Internal',
-						Status__c = 'Active',
-						Is_Template__c = i == 0
-					)
+					new Project__c(Name = 'P' + i, Type__c = 'Internal', Status__c = 'Active', Is_Template__c = i == 0)
 				);
 			}
 			insert projects;
@@ -129,11 +117,7 @@ private class ProjectHealthTest {
 			Test.startTest();
 			ProjectsController.refreshHealth(project.Id);
 			Test.stopTest();
-			Assert.areEqual(
-				'At Risk',
-				read(project.Id).Health__c,
-				'Staff can refresh a shared project'
-			);
+			Assert.areEqual('At Risk', read(project.Id).Health__c, 'Staff can refresh a shared project');
 		}
 	}
 }

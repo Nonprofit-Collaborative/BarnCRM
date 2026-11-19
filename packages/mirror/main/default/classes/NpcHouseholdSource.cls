@@ -33,6 +33,9 @@ public with sharing class NpcHouseholdSource extends NpspHouseholdSource impleme
 
 	/** True when the org has the native group and membership objects and the user may read them. */
 	public override Boolean available() {
+		if (availableForTest != null) {
+			return availableForTest;
+		}
 		return readable(GROUP_OBJECT) && readable(MEMBER_OBJECT);
 	}
 
@@ -48,10 +51,7 @@ public with sharing class NpcHouseholdSource extends NpspHouseholdSource impleme
 	public override Map<String, Object> binds() {
 		return new Map<String, Object>{
 			'barnHousehold' => HouseholdService.householdRecordTypeId(),
-			'keptModels' => new List<String>{
-				HouseholdSelector.MODEL_CONVERTED,
-				HouseholdSelector.MODEL_NATIVE
-			}
+			'keptModels' => new List<String>{ HouseholdSelector.MODEL_CONVERTED, HouseholdSelector.MODEL_NATIVE }
 		};
 	}
 
@@ -74,18 +74,13 @@ public with sharing class NpcHouseholdSource extends NpspHouseholdSource impleme
 					ErrorLogger.SEVERITY_WARNING
 				);
 			} else {
-				List<Map<String, Object>> rows = new List<Map<String, Object>>();
-				for (
-					SObject row : Database.queryWithBinds(
+				members = members(
+					nativeRows(
 						memberQuery +
 						' FROM AccountContactRelation WHERE AccountId IN :accountIds ORDER BY Id', // detection-only: text
-						new Map<String, Object>{ 'accountIds' => accountIds },
-						AccessLevel.USER_MODE
+						accountIds
 					)
-				) {
-					rows.add(row.getPopulatedFieldsAsMap());
-				}
-				members = members(rows);
+				);
 			}
 		}
 		for (Account account : [
@@ -123,12 +118,13 @@ public with sharing class NpcHouseholdSource extends NpspHouseholdSource impleme
 	/** The membership fields the running user can read, lower case. */
 	private static Set<String> readableMemberFields() {
 		Set<String> result = new Set<String>();
-		Schema.SObjectType type = NamespaceUtil.globalDescribe().get(MEMBER_OBJECT);
+		Schema.SObjectType type = memberTypeForTest != null
+			? memberTypeForTest
+			: NamespaceUtil.globalDescribe().get(MEMBER_OBJECT);
 		if (type == null) {
 			return result;
 		}
-		Map<String, Schema.SObjectField> fields = type.getDescribe(SObjectDescribeOptions.DEFERRED)
-			.fields.getMap();
+		Map<String, Schema.SObjectField> fields = type.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap();
 		for (String field : new List<String>{ 'AccountId', 'ContactId' }) {
 			addIfReadable(result, fields, field);
 		}
@@ -138,11 +134,7 @@ public with sharing class NpcHouseholdSource extends NpspHouseholdSource impleme
 		return result;
 	}
 
-	private static void addIfReadable(
-		Set<String> result,
-		Map<String, Schema.SObjectField> fields,
-		String field
-	) {
+	private static void addIfReadable(Set<String> result, Map<String, Schema.SObjectField> fields, String field) {
 		Schema.SObjectField found = fields.get(field.toLowerCase());
 		if (found != null && found.getDescribe().isAccessible()) {
 			result.add(field.toLowerCase());
@@ -177,9 +169,7 @@ public with sharing class NpcHouseholdSource extends NpspHouseholdSource impleme
 		if (!readable.contains('isactive')) {
 			return '';
 		}
-		return readable.contains('enddate')
-			? ' AND (IsActive = true OR EndDate != null)'
-			: ' AND IsActive = true';
+		return readable.contains('enddate') ? ' AND (IsActive = true OR EndDate != null)' : ' AND IsActive = true';
 	}
 
 	/** Native roles to Household Member roles (ADR-0217 conversion decision 4). */
@@ -199,9 +189,7 @@ public with sharing class NpcHouseholdSource extends NpspHouseholdSource impleme
 	 * row's roles that maps.
 	 */
 	@TestVisible
-	private static Map<Id, List<NpspHouseholdSource.Member>> members(
-		List<Map<String, Object>> rows
-	) {
+	private static Map<Id, List<NpspHouseholdSource.Member>> members(List<Map<String, Object>> rows) {
 		Map<Id, List<NpspHouseholdSource.Member>> result = new Map<Id, List<NpspHouseholdSource.Member>>();
 		for (Map<String, Object> row : rows) {
 			Id account = (Id) row.get('AccountId');
@@ -237,18 +225,43 @@ public with sharing class NpcHouseholdSource extends NpspHouseholdSource impleme
 			return counts;
 		}
 		for (
-			SObject row : Database.queryWithBinds(
+			Map<String, Object> row : nativeRows(
 				'SELECT AccountId, COUNT(Id) n FROM AccountContactRelation' + // detection-only: text
 					' WHERE AccountId IN :accountIds' +
 					memberFilter(readableMemberFields()) +
 					' GROUP BY AccountId',
-				new Map<String, Object>{ 'accountIds' => accountIds },
-				AccessLevel.USER_MODE
+				accountIds
 			)
 		) {
 			counts.put((Id) row.get('AccountId'), (Integer) row.get('n'));
 		}
 		return counts;
+	}
+
+	/** Test seams: the native objects present, the membership object's type, and the rows a query returns. */
+	@TestVisible
+	private static Boolean availableForTest;
+	@TestVisible
+	private static Schema.SObjectType memberTypeForTest;
+	@TestVisible
+	private static List<Map<String, Object>> nativeRowsForTest;
+
+	/** The rows of one native query, read in the running user's access, as maps of populated fields. */
+	private static List<Map<String, Object>> nativeRows(String soql, Set<Id> accountIds) {
+		if (nativeRowsForTest != null) {
+			return nativeRowsForTest;
+		}
+		List<Map<String, Object>> rows = new List<Map<String, Object>>();
+		for (
+			SObject row : Database.queryWithBinds(
+				soql,
+				new Map<String, Object>{ 'accountIds' => accountIds },
+				AccessLevel.USER_MODE
+			)
+		) {
+			rows.add(row.getPopulatedFieldsAsMap());
+		}
+		return rows;
 	}
 
 	/** Nonprofit Cloud never creates BarnCRM-style households, so upkeep has nothing to wait for. */
@@ -321,9 +334,7 @@ public with sharing class NpcHouseholdSource extends NpspHouseholdSource impleme
 	public static Drift drift(Integer shown) {
 		Drift result = new Drift();
 		Map<String, Object> binds = drift(new Map<String, Object>());
-		List<String> queries = new List<String>{
-			'RecordTypeId != :household AND Household_Model__c = :converted'
-		};
+		List<String> queries = new List<String>{ 'RecordTypeId != :household AND Household_Model__c = :converted' };
 		if (groupedForTest != null || readable(GROUP_OBJECT)) {
 			queries.add(
 				'RecordTypeId = :household AND (Household_Model__c = null OR ' +
@@ -335,10 +346,7 @@ public with sharing class NpcHouseholdSource extends NpspHouseholdSource impleme
 		for (String condition : queries) {
 			for (
 				SObject account : Database.queryWithBinds(
-					'SELECT Name FROM Account WHERE ' +
-						condition +
-						' ORDER BY Name LIMIT ' +
-						DRIFT_MOST,
+					'SELECT Name FROM Account WHERE ' + condition + ' ORDER BY Name LIMIT ' + DRIFT_MOST,
 					binds,
 					AccessLevel.USER_MODE
 				)

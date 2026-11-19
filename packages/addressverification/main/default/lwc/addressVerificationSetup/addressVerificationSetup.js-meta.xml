@@ -2,8 +2,8 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
   <apiVersion>67.0</apiVersion>
   <description>
-    The Address Verification Setup page: the provider in use, whether each key is entered, Save
-    Keys, Clear and Verify Waiting Addresses.
+    The Address Verification Setup page: the provider in use, whether each is connected, its
+    credential steps, Check Connection, Disconnect and Verify Waiting Addresses.
   </description>
   <isExposed>true</isExposed>
   <masterLabel>Address Verification Setup</masterLabel>

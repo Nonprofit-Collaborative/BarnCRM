@@ -11,10 +11,7 @@ private class RollupNpspTest {
 	@TestSetup
 	static void createTestUser() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			TestDataFactory.createUser(
-				'Maria',
-				new List<String>{ 'BarnCRM_Admin', 'Rollup_Builder_Admin' }
-			);
+			TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin', 'Rollup_Builder_Admin' });
 		}
 	}
 
@@ -23,11 +20,7 @@ private class RollupNpspTest {
 	}
 
 	/** An active NPSP rollup of child organizations into their parent, with these values. */
-	private static Map<String, Object> npsp(
-		String key,
-		String operation,
-		Map<String, Object> extra
-	) {
+	private static Map<String, Object> npsp(String key, String operation, Map<String, Object> extra) {
 		Map<String, Object> values = new Map<String, Object>{
 			'DeveloperName' => key,
 			'MasterLabel' => key.replace('_', ' '),
@@ -52,10 +45,7 @@ private class RollupNpspTest {
 		};
 	}
 
-	private static RollupDlrs.Definition only(
-		Map<String, Object> rollup,
-		List<Map<String, Object>> rules
-	) {
+	private static RollupDlrs.Definition only(Map<String, Object> rollup, List<Map<String, Object>> rules) {
 		List<RollupDlrs.Definition> read = RollupNpsp.toDefinitions(
 			new List<Map<String, Object>>{ rollup },
 			rules == null ? new List<Map<String, Object>>() : rules
@@ -98,10 +88,7 @@ private class RollupNpspTest {
 				'Time bound, then each rule, joined by AND'
 			);
 			Assert.isNotNull(
-				RollupDlrsCriteria.toFilter(
-					read.relationshipCriteria,
-					new List<Map<String, Object>>()
-				),
+				RollupDlrsCriteria.toFilter(read.relationshipCriteria, new List<Map<String, Object>>()),
 				'The DLRS criteria reader holds it'
 			);
 		}
@@ -152,11 +139,7 @@ private class RollupNpspTest {
 				new List<Map<String, Object>>{
 					npsp('Streak', 'Donor_Streak', null),
 					npsp('Fiscal', 'Sum', new Map<String, Object>{ 'Use_Fiscal_Year' => true }),
-					npsp(
-						'Elsewhere',
-						'Sum',
-						new Map<String, Object>{ 'Amount_Object' => 'Contact' }
-					),
+					npsp('Elsewhere', 'Sum', new Map<String, Object>{ 'Amount_Object' => 'Contact' }),
 					npsp(
 						'Old',
 						'Sum',
@@ -168,11 +151,7 @@ private class RollupNpspTest {
 					),
 					npsp('Operator', 'Sum', new Map<String, Object>{ 'Filter_Group' => 'G1' }),
 					npsp('Record_Type', 'Sum', new Map<String, Object>{ 'Filter_Group' => 'G2' }),
-					npsp(
-						'No_Lookup',
-						'Count',
-						new Map<String, Object>{ 'Summary_Object' => 'User' }
-					)
+					npsp('No_Lookup', 'Count', new Map<String, Object>{ 'Summary_Object' => 'User' })
 				},
 				new List<Map<String, Object>>{
 					rule('Name', 'Does_Not_Contain', 'x'),
@@ -207,9 +186,7 @@ private class RollupNpspTest {
 			Assert.isTrue(RollupDlrs.hasActive(true), 'NPSP has one');
 			Assert.isFalse(RollupDlrs.hasActive(false), 'DLRS has none');
 			Assert.isTrue(RollupDlrsImport.getCandidates(null).isEmpty(), 'Not offered as DLRS');
-			List<RollupDlrsImport.Candidate> candidates = RollupDlrsImport.getCandidates(
-				RollupDlrsImport.TOOL_NPSP
-			);
+			List<RollupDlrsImport.Candidate> candidates = RollupDlrsImport.getCandidates(RollupDlrsImport.TOOL_NPSP);
 			Assert.areEqual(1, candidates.size(), 'Offered as NPSP');
 			Assert.isTrue(candidates[0].importable, String.valueOf(candidates[0].reasons));
 
@@ -217,11 +194,7 @@ private class RollupNpspTest {
 				new List<String>{ 'Child_Count' },
 				RollupDlrsImport.TOOL_NPSP
 			);
-			Assert.areEqual(
-				RollupDlrsImport.CREATED,
-				rows[0].outcome,
-				'Copied, with no refusal: ' + rows[0].reason
-			);
+			Assert.areEqual(RollupDlrsImport.CREATED, rows[0].outcome, 'Copied, with no refusal: ' + rows[0].reason);
 			Rollup_Definition__c copy = [
 				SELECT Definition_Key__c, Active__c
 				FROM Rollup_Definition__c

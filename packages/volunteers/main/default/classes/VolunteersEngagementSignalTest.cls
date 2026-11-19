@@ -33,10 +33,7 @@ private class VolunteersEngagementSignalTest {
 					'VolunteersEngagementSignal'
 				)
 				.newInstance();
-			Map<Id, Decimal> totals = signal.totals(
-				new Set<Id>{ ana.Id },
-				Date.today().addMonths(-12)
-			);
+			Map<Id, Decimal> totals = signal.totals(new Set<Id>{ ana.Id }, Date.today().addMonths(-12));
 			Test.stopTest();
 
 			Assert.areEqual('Hours', signal.key(), 'The Hours part');

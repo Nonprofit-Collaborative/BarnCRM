@@ -6,7 +6,7 @@
 have been lately, across four parts:
 
 - **Gifts:** the amount they gave in the window (Received gifts where they are the donor).
-  Needs Giving.
+  Needs Fundraising.
 - **Hours:** the volunteer hours they worked in the window (Approved hours). Needs Volunteers.
 - **Events:** the events they attended in the window (attendees marked Attended). Needs Event
   Management.
@@ -18,7 +18,7 @@ each night and shows it on the person page as a meter, with the day it was score
 plain number field, **Engagement Score**, so Find, list views and reports can sort and filter
 by it.
 
-Giving's [Donor Scoring](donor-scoring.md) still rates gifts alone (recency, frequency and
+Fundraising's [Donor Scoring](donor-scoring.md) still rates gifts alone (recency, frequency and
 amount). Engagement Score is the broader number and does not replace it.
 
 ## How to Turn It On

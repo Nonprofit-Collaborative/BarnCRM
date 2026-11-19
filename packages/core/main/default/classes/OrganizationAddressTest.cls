@@ -93,10 +93,7 @@ private class OrganizationAddressTest {
 				new BarnCRM_Settings__c(Organization_City__c = 'Springfield')
 			);
 			List<String> stateAndZip = OrganizationAddress.lines(
-				new BarnCRM_Settings__c(
-					Organization_State__c = 'IL',
-					Organization_Postal_Code__c = '62701'
-				)
+				new BarnCRM_Settings__c(Organization_State__c = 'IL', Organization_Postal_Code__c = '62701')
 			);
 			Test.stopTest();
 
@@ -122,11 +119,7 @@ private class OrganizationAddressTest {
 			Test.stopTest();
 
 			Assert.areEqual(4, lines.size(), 'The saved address prints as four lines');
-			Assert.areEqual(
-				'14 Bridge Street, Suite 3, Springfield, IL 62701, USA',
-				line,
-				'And as one line'
-			);
+			Assert.areEqual('14 Bridge Street, Suite 3, Springfield, IL 62701, USA', line, 'And as one line');
 			Assert.areEqual(6, parts.size(), 'One entry per part');
 			Assert.areEqual('Springfield', parts.get('Organization_City__c'), 'Keyed by field');
 		}
@@ -161,9 +154,7 @@ private class OrganizationAddressTest {
 	static void streetCityStateAndZipAreRequiredOnceAnyPartIsFilled() {
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
-			String refusal = OrganizationAddress.refusal(
-				new BarnCRM_Settings__c(Organization_City__c = 'Springfield')
-			);
+			String refusal = OrganizationAddress.refusal(new BarnCRM_Settings__c(Organization_City__c = 'Springfield'));
 			Test.stopTest();
 
 			String missing =
@@ -188,10 +179,7 @@ private class OrganizationAddressTest {
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
 			String refusal = OrganizationAddress.refusal(
-				new BarnCRM_Settings__c(
-					Organization_Street_2__c = 'Suite 3',
-					Organization_Country__c = 'USA'
-				)
+				new BarnCRM_Settings__c(Organization_Street_2__c = 'Suite 3', Organization_Country__c = 'USA')
 			);
 			Test.stopTest();
 

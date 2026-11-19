@@ -11,12 +11,7 @@ private class RollupSchedulerTest {
 		TestUsers.adminWith('Rollup_Builder_Admin');
 	}
 
-	private static Rollup_Definition__c childCount(
-		String key,
-		String targetField,
-		String mode,
-		Boolean active
-	) {
+	private static Rollup_Definition__c childCount(String key, String targetField, String mode, Boolean active) {
 		return new Rollup_Definition__c(
 			Name = key,
 			Definition_Key__c = key,
@@ -48,20 +43,10 @@ private class RollupSchedulerTest {
 			insert parent;
 			insert organization('Child', parent.Id);
 			insert new List<Rollup_Definition__c>{
-				childCount(
-					'Core_Scheduled',
-					'NumberOfEmployees',
-					RollupService.MODE_SCHEDULED,
-					true
-				),
+				childCount('Core_Scheduled', 'NumberOfEmployees', RollupService.MODE_SCHEDULED, true),
 				childCount('Core_Both', 'Member_Count__c', RollupService.MODE_BOTH, true),
 				childCount('Core_Real_Time', 'AnnualRevenue', RollupService.MODE_REAL_TIME, true),
-				childCount(
-					'Core_Inactive',
-					'NumberOfEmployees',
-					RollupService.MODE_SCHEDULED,
-					false
-				)
+				childCount('Core_Inactive', 'NumberOfEmployees', RollupService.MODE_SCHEDULED, false)
 			};
 
 			Test.startTest();
@@ -137,12 +122,7 @@ private class RollupSchedulerTest {
 			insert new List<Rollup_Definition__c>{
 				childCount('Core_Real_Time', 'AnnualRevenue', RollupService.MODE_REAL_TIME, true),
 				childCount('Core_Both', 'Member_Count__c', RollupService.MODE_BOTH, true),
-				childCount(
-					'Core_Inactive',
-					'NumberOfEmployees',
-					RollupService.MODE_SCHEDULED,
-					false
-				)
+				childCount('Core_Inactive', 'NumberOfEmployees', RollupService.MODE_SCHEDULED, false)
 			};
 			User maria = TestDataFactory.createUser(
 				'Maria',
@@ -225,11 +205,7 @@ private class RollupSchedulerTest {
 			Id second = RollupScheduler.start();
 			Test.stopTest();
 
-			System.Assert.areEqual(
-				first,
-				second,
-				'The same job, so a second click changes nothing'
-			);
+			System.Assert.areEqual(first, second, 'The same job, so a second click changes nothing');
 		}
 	}
 

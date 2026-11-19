@@ -1,8 +1,8 @@
-# Giving: Asks
+# Fundraising: Asks
 
 Scripts for the Ask Pipeline: stages, the board, moving and closing asks, and the gift or pledge a won ask can produce. Setup detail: [Ask Pipeline](../admin-guide/ask-pipeline.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core and Giving deployed and sample data loaded. Work in the **BarnCRM Fundraising** app. A default fund must be set (script T-GIFT-01 in [Giving: gifts, funds and batches](giving-gifts-funds-batches.md)). Sample data adds 11 asks: seven open across every default stage (one past its target date, one for an organization), one declined, one withdrawn and two won as pledges.
+Before you start: an org from [Before you test](before-you-test.md), with Core and Fundraising deployed and sample data loaded. Work in the **BarnCRM Fundraising** app. A default fund must be set (script T-GIFT-01 in [Fundraising: gifts, funds and batches](giving-gifts-funds-batches.md)). Sample data adds 11 asks: seven open across every default stage (one past its target date, one for an organization), one declined, one withdrawn and two won as pledges.
 
 ## T-ASK-01: Stages in Settings
 
@@ -12,7 +12,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Giving**, and find **Ask stages**. | It shows the default `Identified;Qualified;Cultivating;Ask Planned;Asked`. |
+| 1 | Open **BarnCRM Settings**, **Fundraising**, and find **Ask stages**. | It shows the default `Identified;Qualified;Cultivating;Ask Planned;Asked`. |
 | 2 | Open the **Ask Pipeline** tab in the **BarnCRM Fundraising** app. | Five columns in that order, each with a count of 0. Page title **Ask Pipeline**. |
 | 3 | Set **Ask stages** to `Prospect;Cultivating;Asked` and save. Reload **Ask Pipeline**. | Three columns: **Prospect**, **Cultivating**, **Asked**. |
 | 4 | Open the **Asks** tab, click **New**, choose **Donor Contact** `Luis Garcia`, set **Stage** to `Maybe`, save. | Refused: the stage is not in the list. |
@@ -104,8 +104,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 ## T-ASK-07: A Read Only User
 
-**Purpose:** confirm Giving Read Only sees the board and cannot change it.
-**Prerequisites:** a user with **Giving Read Only** only; open asks exist.
+**Purpose:** confirm Fundraising Read Only sees the board and cannot change it.
+**Prerequisites:** a user with **Fundraising Read Only** only; open asks exist.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -116,7 +116,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 ## T-ASK-08: Open Asks Set the Donor's Next Ask Date
 
 **Purpose:** confirm the earliest open ask's Target Date lands on the donor, moves with the asks, takes a closed last ask's own Next Ask Date, and is cleared only when the asks had set it.
-**Prerequisites:** a user with **Giving Staff**; a person with no Next Ask Date and no asks; **Next Ask Date** on the Contact page layout.
+**Prerequisites:** a user with **Fundraising Staff Access**; a person with no Next Ask Date and no asks; **Next Ask Date** on the Contact page layout.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -133,7 +133,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 ## T-ASK-11: A Person Account Is One Donor
 
 **Purpose:** confirm that in a person account org an ask saved on the contact behind a person account is saved on the account, so the person is one donor.
-**Prerequisites:** a person account org (not barn-sales); a user with Giving Staff; a person account, Eli.
+**Prerequisites:** a person account org (not barn-sales); a user with Fundraising Staff Access; a person account, Eli.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -147,7 +147,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 ## T-ASK-12: Reopen Ask From the Ask Page
 
 **Purpose:** confirm the Reopen Ask action on an ask's page reopens a closed ask of any age, and says so on an open one (people-giving-19).
-**Prerequisites:** a user with Giving Staff; one closed ask (Outcome Declined) and one open ask.
+**Prerequisites:** a user with Fundraising Staff Access; one closed ask (Outcome Declined) and one open ask.
 
 | Step | Action | Expected result |
 |---|---|---|

@@ -14,10 +14,7 @@ private class AskReminderTest {
 		TestUsers.adminWith('Giving_Admin');
 		// Created here, in its own transaction, because a user is setup data and each test then
 		// inserts donors owned by it without a mixed DML error.
-		TestUsers.onRunningProfileWith(
-			OWNER_LAST_NAME,
-			new List<String>{ TestUsers.CORE_ADMIN, 'Giving_Staff' }
-		);
+		TestUsers.onRunningProfileWith(OWNER_LAST_NAME, new List<String>{ TestUsers.CORE_ADMIN, 'Giving_Staff' });
 	}
 
 	private static User owner() {
@@ -119,11 +116,7 @@ private class AskReminderTest {
 			Assert.isTrue(forPerson[0].Subject.contains('Donor'), 'It names the donor.');
 
 			List<Task> forOrganization = remindersFor(organization.Id);
-			Assert.areEqual(
-				1,
-				forOrganization.size(),
-				'An organization three days overdue is reminded.'
-			);
+			Assert.areEqual(1, forOrganization.size(), 'An organization three days overdue is reminded.');
 			Assert.areEqual(
 				today.addDays(-3),
 				forOrganization[0].ActivityDate,
@@ -132,8 +125,7 @@ private class AskReminderTest {
 
 			Assert.areEqual(
 				today,
-				[SELECT Ask_Reminder_For_Date__c FROM Contact WHERE Id = :person.Id]
-				.Ask_Reminder_For_Date__c,
+				[SELECT Ask_Reminder_For_Date__c FROM Contact WHERE Id = :person.Id].Ask_Reminder_For_Date__c,
 				'The donor is stamped with the date it was reminded for.'
 			);
 			Assert.areNotEqual(
@@ -153,11 +145,7 @@ private class AskReminderTest {
 			runAgain();
 			runAgain();
 
-			Assert.areEqual(
-				1,
-				remindersFor(person.Id).size(),
-				'A date reminds once however many times the job runs.'
-			);
+			Assert.areEqual(1, remindersFor(person.Id).size(), 'A date reminds once however many times the job runs.');
 		}
 	}
 
@@ -188,11 +176,7 @@ private class AskReminderTest {
 			update person;
 			runAgain();
 
-			Assert.areEqual(
-				2,
-				remindersFor(person.Id).size(),
-				'Moving the date to another arrived date asks again.'
-			);
+			Assert.areEqual(2, remindersFor(person.Id).size(), 'Moving the date to another arrived date asks again.');
 		}
 	}
 
@@ -201,14 +185,8 @@ private class AskReminderTest {
 		User owner = owner();
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Contact future = donorContact(owner.Id, System.today().addDays(1));
-			Contact stale = donorContact(
-				owner.Id,
-				System.today().addDays(-AskReminderService.CATCH_UP_DAYS - 1)
-			);
-			Contact edge = donorContact(
-				owner.Id,
-				System.today().addDays(-AskReminderService.CATCH_UP_DAYS)
-			);
+			Contact stale = donorContact(owner.Id, System.today().addDays(-AskReminderService.CATCH_UP_DAYS - 1));
+			Contact edge = donorContact(owner.Id, System.today().addDays(-AskReminderService.CATCH_UP_DAYS));
 			Contact noDate = donorContact(owner.Id, null);
 			runBothPasses();
 
@@ -218,11 +196,7 @@ private class AskReminderTest {
 				remindersFor(stale.Id).size(),
 				'A date older than the catch up window is not turned into a task.'
 			);
-			Assert.areEqual(
-				1,
-				remindersFor(edge.Id).size(),
-				'The last day of the window is still caught up.'
-			);
+			Assert.areEqual(1, remindersFor(edge.Id).size(), 'The last day of the window is still caught up.');
 			Assert.areEqual(0, remindersFor(noDate.Id).size(), 'No date, no reminder.');
 		}
 	}
@@ -243,11 +217,7 @@ private class AskReminderTest {
 			new AskReminderSchedulable().execute(null);
 			Test.stopTest();
 
-			Assert.areEqual(
-				0,
-				remindersFor(person.Id).size(),
-				'Off means the nightly job creates nothing.'
-			);
+			Assert.areEqual(0, remindersFor(person.Id).size(), 'Off means the nightly job creates nothing.');
 		}
 	}
 
@@ -351,8 +321,7 @@ private class AskReminderTest {
 			Assert.areEqual(1, outcome.failed, 'The donor is counted as not reminded.');
 			Assert.areEqual(
 				null,
-				[SELECT Ask_Reminder_For_Date__c FROM Contact WHERE Id = :person.Id]
-				.Ask_Reminder_For_Date__c,
+				[SELECT Ask_Reminder_For_Date__c FROM Contact WHERE Id = :person.Id].Ask_Reminder_For_Date__c,
 				'An unreminded donor is left unstamped so the next night tries again.'
 			);
 			Assert.isTrue(
@@ -374,19 +343,10 @@ private class AskReminderTest {
 				new Contact(Next_Ask_Date__c = today, Ask_Reminder_For_Date__c = today.addDays(-5))
 			);
 			Assert.isTrue(AskReminderService.isDue(arrived, today));
-			Assert.isFalse(
-				AskReminderService.isDue(stamped, today),
-				'Already reminded for this date.'
-			);
-			Assert.isTrue(
-				AskReminderService.isDue(restamped, today),
-				'Reminded for an older date.'
-			);
+			Assert.isFalse(AskReminderService.isDue(stamped, today), 'Already reminded for this date.');
+			Assert.isTrue(AskReminderService.isDue(restamped, today), 'Reminded for an older date.');
 			Assert.isFalse(AskReminderService.isDue(TestDataFactory.person(new Contact()), today));
-			Assert.areEqual(
-				0,
-				AskReminderService.remindersFor(null, today, new List<SObject>()).size()
-			);
+			Assert.areEqual(0, AskReminderService.remindersFor(null, today, new List<SObject>()).size());
 		}
 	}
 
@@ -394,10 +354,7 @@ private class AskReminderTest {
 	static void aWriteWithMismatchedListsDoesNothing() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Assert.areEqual(0, AskReminderWriter.save(new List<Task>(), new List<SObject>()));
-			Assert.areEqual(
-				0,
-				AskReminderWriter.save(new List<Task>{ new Task() }, new List<SObject>())
-			);
+			Assert.areEqual(0, AskReminderWriter.save(new List<Task>{ new Task() }, new List<SObject>()));
 		}
 	}
 
@@ -405,10 +362,7 @@ private class AskReminderTest {
 	static void staffEditTheDatesButNotTheReminderStamp() {
 		User staff = TestUsers.standardUserWith('AskStaff', new List<String>{ 'Giving_Staff' });
 		System.runAs(staff) {
-			Assert.isTrue(
-				Contact.Next_Ask_Date__c.getDescribe().isUpdateable(),
-				'Staff set the next ask.'
-			);
+			Assert.isTrue(Contact.Next_Ask_Date__c.getDescribe().isUpdateable(), 'Staff set the next ask.');
 			Assert.isTrue(Account.Last_Touch_Date__c.getDescribe().isUpdateable());
 			Assert.isFalse(
 				Contact.Ask_Reminder_For_Date__c.getDescribe().isUpdateable(),

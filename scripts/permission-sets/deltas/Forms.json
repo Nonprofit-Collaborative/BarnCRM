@@ -1,10 +1,16 @@
 {
   "Admin": {
     "label": "Forms Admin",
-    "description": ["Builds, publishes and deletes forms, fills them in and works their submissions."],
+    "description": [
+      "Builds, publishes and deletes forms, a form with submissions included (Manage Forms),",
+      "fills them in and works their submissions."
+    ],
     "add": {
       "classAccesses": {
         "FormBuilderController": {"enabled": "true"}
+      },
+      "customPermissions": {
+        "Forms_Manage": {"enabled": "true"}
       },
       "fieldPermissions": {
         "Form__c.Sample_Data__c": {"editable": "true", "readable": "true"},

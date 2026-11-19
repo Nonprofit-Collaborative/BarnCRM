@@ -37,9 +37,7 @@ private class EventsHomeControllerTest {
 
 			Test.startTest();
 			EventsHomeController.Home upcoming = EventsHomeController.getEvents('upcoming');
-			EventsHomeController.Home past = EventsHomeController.getEvents(
-				EventsHomeController.VIEW_PAST
-			);
+			EventsHomeController.Home past = EventsHomeController.getEvents(EventsHomeController.VIEW_PAST);
 			Test.stopTest();
 
 			Assert.areEqual(2, upcoming.events.size(), 'Two events are still to come');
@@ -82,11 +80,7 @@ private class EventsHomeControllerTest {
 			Assert.areEqual(2, copies.size(), 'Both point at the first event');
 			Assert.areEqual('Draft', copies[0].Status__c, 'Each starts as a draft');
 			Assert.areEqual(start.addDays(28).addHours(2), copies[0].End__c, 'Same length');
-			Assert.areEqual(
-				start.addDays(27),
-				copies[0].Registration_Closes__c,
-				'Registration window moved with it'
-			);
+			Assert.areEqual(start.addDays(27), copies[0].Registration_Closes__c, 'Registration window moved with it');
 			List<Ticket_Type__c> tickets = [
 				SELECT Name, Price__c, Sales_End__c
 				FROM Ticket_Type__c
@@ -123,10 +117,7 @@ private class EventsHomeControllerTest {
 			Boolean refusedEarlier = false;
 			Boolean refusedMany = false;
 			try {
-				EventsHomeController.repeatEvent(
-					first.Id,
-					new List<Datetime>{ start.addDays(7), start.addDays(-7) }
-				);
+				EventsHomeController.repeatEvent(first.Id, new List<Datetime>{ start.addDays(7), start.addDays(-7) });
 			} catch (AuraHandledException e) {
 				refusedEarlier = true;
 			}
@@ -149,25 +140,16 @@ private class EventsHomeControllerTest {
 
 	@IsTest
 	static void aReaderCannotRepeat() {
-		User reader = TestUsers.standardUserWith(
-			'Reader',
-			new List<String>{ 'BarnCRM_Read_Only', 'Events_Read_Only' }
-		);
+		User reader = TestUsers.standardUserWith('Reader', new List<String>{ 'BarnCRM_Read_Only', 'Events_Read_Only' });
 		System.runAs(reader) {
 			Boolean refused = false;
 			try {
-				EventsHomeController.repeatEvent(
-					null,
-					new List<Datetime>{ Datetime.now().addDays(1) }
-				);
+				EventsHomeController.repeatEvent(null, new List<Datetime>{ Datetime.now().addDays(1) });
 			} catch (AuraHandledException e) {
 				refused = true;
 			}
 			Assert.isTrue(refused, 'Read Only cannot create events');
-			Assert.isFalse(
-				EventsHomeController.getEvents('upcoming').canCreate,
-				'Read Only is offered no New Event'
-			);
+			Assert.isFalse(EventsHomeController.getEvents('upcoming').canCreate, 'Read Only is offered no New Event');
 		}
 	}
 }

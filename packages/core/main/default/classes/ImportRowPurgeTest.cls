@@ -16,24 +16,15 @@ private class ImportRowPurgeTest {
 	}
 
 	private static Import_Template__c template() {
-		return ImportTestDataFactory.template(
-			ImportTestDataFactory.donorMapping(),
-			ImportTemplateService.RULE_EMAIL
-		);
+		return ImportTestDataFactory.template(ImportTestDataFactory.donorMapping(), ImportTemplateService.RULE_EMAIL);
 	}
 
 	/** A batch with `ROWS` rows in the given status, its last pass completed the days ago given. */
-	private static Import_Batch__c batchOf(
-		Import_Template__c template,
-		String status,
-		Integer daysAgo
-	) {
+	private static Import_Batch__c batchOf(Import_Template__c template, String status, Integer daysAgo) {
 		Import_Batch__c batch = ImportTestDataFactory.batch(template);
 		List<Map<String, String>> values = new List<Map<String, String>>();
 		for (Integer i = 0; i < ROWS; i++) {
-			values.add(
-				ImportTestDataFactory.donorRow('Ana', 'Row' + i, 'row' + i + '@example.org', null)
-			);
+			values.add(ImportTestDataFactory.donorRow('Ana', 'Row' + i, 'row' + i + '@example.org', null));
 		}
 		ImportTestDataFactory.rows(batch, values);
 		update new Import_Batch__c(
@@ -64,9 +55,7 @@ private class ImportRowPurgeTest {
 	/** Runs the cleanup's start and execute in this transaction, as the job would. */
 	private static void runNow() {
 		RecordRetentionBatch.chain = false;
-		RecordRetentionBatch purge = new RecordRetentionBatch(
-			RecordRetentionBatch.IMPORT_ROW_CHOICE
-		);
+		RecordRetentionBatch purge = new RecordRetentionBatch(RecordRetentionBatch.IMPORT_ROW_CHOICE);
 		List<SObject> scope = new List<SObject>();
 		Database.QueryLocatorIterator found = purge.start(null).iterator();
 		while (found.hasNext()) {
@@ -115,16 +104,8 @@ private class ImportRowPurgeTest {
 			Import_Template__c template = template();
 			Import_Batch__c done = batchOf(template, ImportBatchService.STATUS_COMPLETE, 0);
 			Import_Batch__c undone = batchOf(template, ImportBatchService.STATUS_UNDONE, 0);
-			Import_Batch__c preview = batchOf(
-				template,
-				ImportBatchService.STATUS_DRY_RUN_COMPLETE,
-				10
-			);
-			Import_Batch__c oldPreview = batchOf(
-				template,
-				ImportBatchService.STATUS_DRY_RUN_COMPLETE,
-				31
-			);
+			Import_Batch__c preview = batchOf(template, ImportBatchService.STATUS_DRY_RUN_COMPLETE, 10);
+			Import_Batch__c oldPreview = batchOf(template, ImportBatchService.STATUS_DRY_RUN_COMPLETE, 31);
 			Import_Batch__c trial = batchOf(template, ImportBatchService.STATUS_TRIAL_COMPLETE, 50);
 			Import_Batch__c retrying = batchOf(template, ImportBatchService.STATUS_RETRYING, 50);
 			deleteRows(ImportBatchService.ROWS_ONCE_COMPLETE);
@@ -174,11 +155,7 @@ private class ImportRowPurgeTest {
 			};
 			for (String choice : expected.keySet()) {
 				deleteRows(choice);
-				Assert.areEqual(
-					expected.get(choice),
-					ImportBatchService.rowRetentionDays(),
-					choice
-				);
+				Assert.areEqual(expected.get(choice), ImportBatchService.rowRetentionDays(), choice);
 			}
 			deleteRows(null);
 			Assert.areEqual(30, ImportBatchService.rowRetentionDays(), 'Blank reads as 30 days.');
@@ -204,15 +181,9 @@ private class ImportRowPurgeTest {
 				Undo_Deadline__c = Datetime.now().addDays(30)
 			);
 			Contact created = TestDataFactory.person(
-				new Contact(
-					FirstName = 'Ana',
-					LastName = 'Ramirez',
-					Created_By_Import_Batch__c = batch.Id
-				)
+				new Contact(FirstName = 'Ana', LastName = 'Ramirez', Created_By_Import_Batch__c = batch.Id)
 			);
-			Contact updated = TestDataFactory.person(
-				new Contact(LastName = 'Okafor', MailingCity = 'Portland')
-			);
+			Contact updated = TestDataFactory.person(new Contact(LastName = 'Okafor', MailingCity = 'Portland'));
 			insert new List<Contact>{ created, updated };
 			created = [SELECT Id, AccountId FROM Contact WHERE Id = :created.Id];
 			update new Account(Id = created.AccountId, Created_By_Import_Batch__c = batch.Id);
@@ -241,11 +212,7 @@ private class ImportRowPurgeTest {
 			Test.stopTest();
 
 			Assert.areEqual(0, [SELECT COUNT() FROM Contact WHERE Id = :created.Id], 'Deleted.');
-			Assert.areEqual(
-				'Salem',
-				[SELECT MailingCity FROM Contact WHERE Id = :updated.Id].MailingCity,
-				'Put back.'
-			);
+			Assert.areEqual('Salem', [SELECT MailingCity FROM Contact WHERE Id = :updated.Id].MailingCity, 'Put back.');
 			Assert.areEqual(
 				ImportBatchService.STATUS_UNDONE,
 				[SELECT Status__c FROM Import_Batch__c WHERE Id = :batch.Id].Status__c,
@@ -257,11 +224,7 @@ private class ImportRowPurgeTest {
 	@IsTest
 	static void aBatchWhoseRowsWereRemovedCannotRunAgain() {
 		System.runAs(TestUsers.admin()) {
-			Import_Batch__c batch = batchOf(
-				template(),
-				ImportBatchService.STATUS_DRY_RUN_COMPLETE,
-				100
-			);
+			Import_Batch__c batch = batchOf(template(), ImportBatchService.STATUS_DRY_RUN_COMPLETE, 100);
 			delete [SELECT Id FROM Import_Row__c WHERE Import_Batch__c = :batch.Id];
 
 			String refused;
@@ -291,9 +254,7 @@ private class ImportRowPurgeTest {
 
 			Test.startTest();
 			RecordRetentionBatch.chain = false;
-			RecordRetentionBatch purge = new RecordRetentionBatch(
-				RecordRetentionBatch.IMPORT_ROW_CHOICE
-			);
+			RecordRetentionBatch purge = new RecordRetentionBatch(RecordRetentionBatch.IMPORT_ROW_CHOICE);
 			purge.execute(null, rows);
 			purge.finish(null);
 			Test.stopTest();

@@ -72,7 +72,7 @@ Still in the Receipts section:
 
 Also in the Receipts section, **Receipt Letters and Year End Statements** opens the Receipt
 Letters page (the **Receipt Letters** tab), which has two tabs. It opens as its own page rather than inside the settings console,
-which is how every page the Giving module adds behaves. On the **Receipt Templates** tab,
+which is how every page the Fundraising module adds behaves. On the **Receipt Templates** tab,
 BarnCRM ships one letter of each kind:
 
 - **Per gift receipt**, for a single gift.
@@ -96,25 +96,21 @@ one of its kind off. Only one letter of each kind is in use at a time. Whether a
 switch or a restore worked stays on the page as a notice above the tabs until your next
 action, so you never miss it.
 
-If you edited a letter before this editor existed and gave it your own header, the next time
-you open it check the top: the old shipped letterhead is removed for you, but a header you
-wrote yourself is not, and your name would then print twice. Delete it and save.
-
 **You cannot delete the tax sentences by deleting them from the template.** BarnCRM adds
 them to every document regardless of what the letter says. That is deliberate: those
 sentences are what makes the document a valid receipt.
 
 ### 5. Give People Access
 
-On the Access page, **Giving Staff** and **Giving Admin** can issue, void and reissue
-receipts and start a run. Everyone with any Giving permission set can read receipts and open
+On the Access page, **Fundraising Staff Access** and **Fundraising Admin** can issue, void and reissue
+receipts and start a run. Everyone with any Fundraising permission set can read receipts and open
 the stored files. **Nobody can edit or delete an issued receipt or its file**, including
 BarnCRM Admin. That is not an oversight, and there is no switch for it.
 
 **Who can open a receipt PDF, exactly.** The file is attached to the **Receipt** record, and
 for a single gift receipt to the **Gift** as well. It is not attached to the donor's household
 or contact record. So a person can open a receipt PDF if, and only if, they hold one of the
-three Giving permission sets: Giving Admin, Giving Staff or Giving Read Only. Somebody with
+three Fundraising permission sets: Fundraising Admin, Fundraising Staff Access or Fundraising Read Only. Somebody with
 only a Core role, for example Team Member, can open the donor and
 cannot open the donor's receipts or year-end statement. That is deliberate: a year-end
 statement is a donor's whole giving history plus your tax identification number, and it should
@@ -126,8 +122,7 @@ receipt, then the file on it.
 **Editing the letters needs the BarnCRM Admin role.** Writing the letter every donor
 receives is configuration, so saving a letter, switching one on, and restoring the shipped
 letters all need the Manage BarnCRM Settings permission, exactly like every other page in
-BarnCRM Settings. Issuing receipts does not: that is day to day work and needs only Giving
-Staff.
+BarnCRM Settings. Issuing receipts does not: that is day to day work and needs only Fundraising Staff Access.
 
 ## A Five-Minute Walkthrough
 
@@ -196,7 +191,7 @@ already carries a number that no receipt matches, see "Lifting the receipt lock"
 [Gifts](gifts.md): clearing the number there puts the gift back in reach of Issue receipt.
 **Looking for a receipt in the Files list on a donor's household.** It is not there, and it
 is not missing. A receipt PDF lives on the Receipt record, and on the Gift for a single gift
-receipt, so that reading it takes a Giving permission set rather than read access to a contact.
+receipt, so that reading it takes a Fundraising permission set rather than read access to a contact.
 Open the donor, then the **Receipts** related list.
 
 **Deleting a receipt's file to "cancel" it.** Voiding is the way to cancel a receipt, and it

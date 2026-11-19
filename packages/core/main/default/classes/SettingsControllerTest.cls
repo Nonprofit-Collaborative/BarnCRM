@@ -11,20 +11,12 @@ private class SettingsControllerTest {
 	@TestSetup
 	static void makeData() {
 		System.runAs(TestUsers.admin()) {
-			PermissionSet permissionSet = SettingsTestPermissions.build(
-				'C03_Settings_Console_Test'
-			);
+			PermissionSet permissionSet = SettingsTestPermissions.build('C03_Settings_Console_Test');
 			User maria = SettingsTestPermissions.buildStandardUser('Maria', 'Alvarez', 'mariac');
 			insert maria;
 			insert new List<PermissionSetAssignment>{
-				new PermissionSetAssignment(
-					AssigneeId = UserInfo.getUserId(),
-					PermissionSetId = permissionSet.Id
-				),
-				new PermissionSetAssignment(
-					AssigneeId = maria.Id,
-					PermissionSetId = permissionSet.Id
-				)
+				new PermissionSetAssignment(AssigneeId = UserInfo.getUserId(), PermissionSetId = permissionSet.Id),
+				new PermissionSetAssignment(AssigneeId = maria.Id, PermissionSetId = permissionSet.Id)
 			};
 		}
 	}
@@ -199,10 +191,7 @@ private class SettingsControllerTest {
 
 			Assert.isTrue(withAccess.contains('Health_Check_Optimizer_Link'), 'Health links out');
 			Assert.isTrue(withAccess.contains('Error_Log_Optimizer_Link'), 'Error Log links out');
-			Assert.isFalse(
-				withAccess.contains('Health_Check'),
-				'The report itself is in Org Optimizer'
-			);
+			Assert.isFalse(withAccess.contains('Health_Check'), 'The report itself is in Org Optimizer');
 			Assert.isTrue(
 				withoutAccess.contains('Health_Check'),
 				'Someone who cannot open Org Optimizer keeps the report in Settings'
@@ -256,11 +245,7 @@ private class SettingsControllerTest {
 			);
 			// The rows arrive Households first; the console lists sections as
 			// SettingSections.all() does, so it opens on General.
-			Assert.areEqual(
-				SettingSections.GENERAL,
-				model.sections[0].name,
-				'The console opens on General'
-			);
+			Assert.areEqual(SettingSections.GENERAL, model.sections[0].name, 'The console opens on General');
 			Assert.areEqual(
 				SettingSections.PEOPLE_AND_HOUSEHOLDS,
 				model.sections[1].name,
@@ -286,9 +271,7 @@ private class SettingsControllerTest {
 				'The row that names the old page says the page it is on'
 			);
 			Assert.isTrue(
-				byName.get(SettingSections.PEOPLE_AND_HOUSEHOLDS)
-					.settings[0]
-					.helpUrl.endsWith('household-naming.md'),
+				byName.get(SettingSections.PEOPLE_AND_HOUSEHOLDS).settings[0].helpUrl.endsWith('household-naming.md'),
 				'Learn more points at the admin guide page for that setting'
 			);
 			Assert.areEqual(
@@ -355,11 +338,7 @@ private class SettingsControllerTest {
 				}
 			}
 			Assert.areEqual('Core', moduleByKey.get(TEXT_KEY), 'A row naming Core is Core');
-			Assert.areEqual(
-				'Core',
-				moduleByKey.get(CHECKBOX_KEY),
-				'A row naming no module is Core'
-			);
+			Assert.areEqual('Core', moduleByKey.get(CHECKBOX_KEY), 'A row naming no module is Core');
 		}
 	}
 
@@ -372,23 +351,13 @@ private class SettingsControllerTest {
 			Test.startTest();
 			List<SettingsController.Option> fresh = coexistenceOptions();
 			SettingsService.saveValues(
-				new Map<String, Object>{
-					'Coexistence_Mode__c' => CoexistenceService.MODE_NONPROFIT_CLOUD
-				}
+				new Map<String, Object>{ 'Coexistence_Mode__c' => CoexistenceService.MODE_NONPROFIT_CLOUD }
 			);
 			List<SettingsController.Option> saved = coexistenceOptions();
 			Test.stopTest();
 
-			Assert.areEqual(
-				1,
-				fresh.size(),
-				'An org without Nonprofit Cloud is offered Standalone only'
-			);
-			Assert.areEqual(
-				CoexistenceService.MODE_STANDALONE,
-				fresh[0].value,
-				'Standalone is always there'
-			);
+			Assert.areEqual(1, fresh.size(), 'An org without Nonprofit Cloud is offered Standalone only');
+			Assert.areEqual(CoexistenceService.MODE_STANDALONE, fresh[0].value, 'Standalone is always there');
 			Assert.areEqual(
 				2,
 				saved.size(),
@@ -398,9 +367,7 @@ private class SettingsControllerTest {
 	}
 
 	private static List<SettingsController.Option> coexistenceOptions() {
-		for (
-			SettingsController.SectionModel section : SettingsController.getConsoleModel().sections
-		) {
+		for (SettingsController.SectionModel section : SettingsController.getConsoleModel().sections) {
 			for (SettingsController.SettingModel setting : section.settings) {
 				if (setting.key == 'Coexistence_Mode__c') {
 					return setting.options;
@@ -416,18 +383,12 @@ private class SettingsControllerTest {
 			stubDefinitions();
 
 			Test.startTest();
-			List<SettingsController.SearchHit> byDescription = SettingsController.search(
-				'greetings'
-			);
+			List<SettingsController.SearchHit> byDescription = SettingsController.search('greetings');
 			List<SettingsController.SearchHit> bySection = SettingsController.search('households');
 			List<SettingsController.SearchHit> nothing = SettingsController.search('   ');
 			Test.stopTest();
 
-			Assert.areEqual(
-				1,
-				byDescription.size(),
-				'Searching the description finds the naming setting'
-			);
+			Assert.areEqual(1, byDescription.size(), 'Searching the description finds the naming setting');
 			Assert.areEqual(
 				SettingSections.PEOPLE_AND_HOUSEHOLDS,
 				byDescription[0].section,
@@ -507,10 +468,7 @@ private class SettingsControllerTest {
 				}
 			}
 			Assert.isFalse(shown.contains('Module_Page'), 'Not shown without the permission.');
-			Assert.isTrue(
-				shown.contains('Held_Page'),
-				'Shown to one who holds it, named unprefixed.'
-			);
+			Assert.isTrue(shown.contains('Held_Page'), 'Shown to one who holds it, named unprefixed.');
 			Assert.isTrue(hits.isEmpty(), 'Nor found by search.');
 		}
 	}
@@ -552,9 +510,7 @@ private class SettingsControllerTest {
 	}
 
 	private static String membershipValueShown() {
-		for (
-			SettingsController.SectionModel section : SettingsController.getConsoleModel().sections
-		) {
+		for (SettingsController.SectionModel section : SettingsController.getConsoleModel().sections) {
 			for (SettingsController.SettingModel setting : section.settings) {
 				if (setting.key == CoexistenceService.KEY_MEMBERSHIP_MODE) {
 					return setting.value;
@@ -766,10 +722,7 @@ private class SettingsControllerTest {
 			}
 			Test.stopTest();
 
-			Assert.isTrue(
-				saved,
-				'Maria is on the Standard User profile and holds only the permission, and she saves'
-			);
+			Assert.isTrue(saved, 'Maria is on the Standard User profile and holds only the permission, and she saves');
 		}
 	}
 
@@ -788,9 +741,7 @@ private class SettingsControllerTest {
 				SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
 				Assert.isFalse(model.canEdit, 'David may read the settings but not change them');
 				try {
-					SettingsController.saveSettings(
-						new Map<String, Object>{ TEXT_KEY => 'The {LastName} Clan' }
-					);
+					SettingsController.saveSettings(new Map<String, Object>{ TEXT_KEY => 'The {LastName} Clan' });
 				} catch (AuraHandledException e) {
 					refused = true;
 				}
@@ -807,9 +758,7 @@ private class SettingsControllerTest {
 			stubDefinitions();
 
 			Test.startTest();
-			SettingsController.ConsoleModel model = SettingsController.saveSettings(
-				new Map<String, Object>()
-			);
+			SettingsController.ConsoleModel model = SettingsController.saveSettings(new Map<String, Object>());
 			Test.stopTest();
 
 			Assert.isNotNull(model, 'An empty save still returns the page');
@@ -930,9 +879,7 @@ private class SettingsControllerTest {
 					Sort_Order__c = 1
 				)
 			};
-			Account account = TestDataFactory.organization(
-				new Account(Name = 'Riverside Test Trust')
-			);
+			Account account = TestDataFactory.organization(new Account(Name = 'Riverside Test Trust'));
 			insert account;
 			// A well formed Account Id that no record has (the local `account` shadows the Account type).
 			String gone = String.valueOf(account.Id).left(3) + '000000000001';
@@ -952,11 +899,7 @@ private class SettingsControllerTest {
 			Test.stopTest();
 
 			Assert.areEqual(1, changes.size(), 'The change is listed');
-			Assert.areEqual(
-				'Riverside Test Trust',
-				changes[0].newValue,
-				'The record reads by name'
-			);
+			Assert.areEqual('Riverside Test Trust', changes[0].newValue, 'The record reads by name');
 			Assert.areEqual(
 				System.Label.Core_Settings_RecordUnavailable,
 				changes[0].oldValue,
@@ -997,11 +940,7 @@ private class SettingsControllerTest {
 				changes[0].oldValue,
 				'No record type reads as its label'
 			);
-			Assert.areEqual(
-				'Not_A_Real_Type',
-				changes[0].newValue,
-				'A value no record type names reads as stored'
-			);
+			Assert.areEqual('Not_A_Real_Type', changes[0].newValue, 'A value no record type names reads as stored');
 		}
 	}
 
@@ -1044,11 +983,7 @@ private class SettingsControllerTest {
 				'The new edition reads as the edition picker names it'
 			);
 			Assert.areEqual('On its own', changes[1].oldValue, 'A choice reads as its label');
-			Assert.areEqual(
-				'Retired',
-				changes[1].newValue,
-				'A value no choice names reads as stored'
-			);
+			Assert.areEqual('Retired', changes[1].newValue, 'A value no choice names reads as stored');
 		}
 	}
 
@@ -1078,15 +1013,9 @@ private class SettingsControllerTest {
 				changes[0].settingName,
 				'The row reads as a label, not the stored name'
 			);
+			Assert.areEqual(System.Label.Core_Settings_NoFeaturesOn, changes[0].oldValue, 'None reads as No features');
 			Assert.areEqual(
-				System.Label.Core_Settings_NoFeaturesOn,
-				changes[0].oldValue,
-				'None reads as No features'
-			);
-			Assert.areEqual(
-				System.Label.Core_DataManager_Title +
-					', ' +
-					System.Label.Core_SettingsGroup_Households,
+				System.Label.Core_DataManager_Title + ', ' + System.Label.Core_SettingsGroup_Households,
 				changes[0].newValue,
 				'Each key reads as its feature name'
 			);
@@ -1171,17 +1100,9 @@ private class SettingsControllerTest {
 					'No candidate: Core\'s own record type where active, then No record type'
 				);
 				Assert.areEqual(AccountKinds.NO_RECORD_TYPE, last.value, 'Stored as Master');
-				Assert.areEqual(
-					System.Label.Core_Settings_NoRecordType,
-					last.label,
-					'Shown by name'
-				);
+				Assert.areEqual(System.Label.Core_Settings_NoRecordType, last.label, 'Shown by name');
 			} else {
-				Assert.areEqual(
-					choices,
-					row.options.size(),
-					'The candidates only: No record type would not work here'
-				);
+				Assert.areEqual(choices, row.options.size(), 'The candidates only: No record type would not work here');
 				Assert.areNotEqual(AccountKinds.NO_RECORD_TYPE, last.value, 'Never offered');
 			}
 			Assert.areEqual(
@@ -1315,11 +1236,7 @@ private class SettingsControllerTest {
 
 			SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
 
-			SettingsController.SettingModel fiscal = rowWithKey(
-				model,
-				'General',
-				'FiscalYearStartMonth'
-			);
+			SettingsController.SettingModel fiscal = rowWithKey(model, 'General', 'FiscalYearStartMonth');
 			Assert.isNotNull(fiscal, 'General shows the fiscal year start from Setup');
 			Assert.areEqual('SetupValue', fiscal.dataType, 'Shown read only, never edited here');
 			Assert.areEqual(FiscalYearSelector.monthName(7), fiscal.value, 'The org month by name');
@@ -1329,11 +1246,7 @@ private class SettingsControllerTest {
 			Assert.areEqual('Name', organization[0].key, 'Organization name heads its section');
 			Assert.areEqual('SetupValue', organization[0].dataType, 'Read only, from Setup');
 			Assert.areEqual('Barn Rescue', organization[0].value, 'The name Setup holds');
-			Assert.areEqual(
-				'Organization_Legal_Name__c',
-				organization[1].key,
-				'The legal name sits directly below it'
-			);
+			Assert.areEqual('Organization_Legal_Name__c', organization[1].key, 'The legal name sits directly below it');
 		}
 	}
 
@@ -1388,10 +1301,7 @@ private class SettingsControllerTest {
 
 			Test.startTest();
 			String shown;
-			for (
-				SettingsController.SectionModel section : SettingsController.getConsoleModel()
-					.sections
-			) {
+			for (SettingsController.SectionModel section : SettingsController.getConsoleModel().sections) {
 				for (SettingsController.SettingModel setting : section.settings) {
 					if (setting.key == 'Contact_Address_Change_Behavior__c') {
 						shown = setting.value;
@@ -1470,10 +1380,7 @@ private class SettingsControllerTest {
 			SettingsController.emailAllowedOverride = true;
 			Map<String, Boolean> checks = SettingsController.getSetupChecks();
 
-			Assert.isTrue(
-				checks.containsKey(SettingsController.CHECK_EMAIL),
-				'The email check answers'
-			);
+			Assert.isTrue(checks.containsKey(SettingsController.CHECK_EMAIL), 'The email check answers');
 
 			SettingsController.emailAllowedOverride = null;
 			Assert.isNotNull(
@@ -1539,16 +1446,11 @@ private class SettingsControllerTest {
 				valueByKey.get('Name'),
 				'A value from Setup is read from Setup, never given a default of BarnCRM'
 			);
-			Assert.isNull(
-				BarnCRM_Settings__c.getOrgDefaults().Id,
-				'Opening the page saved nothing'
-			);
+			Assert.isNull(BarnCRM_Settings__c.getOrgDefaults().Id, 'Opening the page saved nothing');
 		}
 	}
 
-	private static Map<String, SettingsController.SettingModel> rowsByKey(
-		SettingsController.ConsoleModel model
-	) {
+	private static Map<String, SettingsController.SettingModel> rowsByKey(SettingsController.ConsoleModel model) {
 		Map<String, SettingsController.SettingModel> rows = new Map<String, SettingsController.SettingModel>();
 		for (SettingsController.SectionModel section : model.sections) {
 			for (SettingsController.SettingModel setting : section.settings) {
@@ -1568,19 +1470,11 @@ private class SettingsControllerTest {
 				effectiveDefaultRow('Test_Auto_Create', CHECKBOX_KEY, 'Checkbox')
 			};
 			OrgShapeDetector.overrideShape = new OrgShapeDetector.OrgShape();
-			Map<String, SettingsController.SettingModel> before = rowsByKey(
-				SettingsController.getConsoleModel()
-			);
+			Map<String, SettingsController.SettingModel> before = rowsByKey(SettingsController.getConsoleModel());
 			Assert.isTrue(before.get('Coexistence_Mode__c').unsavedDefault, 'Mode not saved');
-			Assert.isTrue(
-				before.get('Household_Membership_Mode__c').unsavedDefault,
-				'Membership not saved'
-			);
+			Assert.isTrue(before.get('Household_Membership_Mode__c').unsavedDefault, 'Membership not saved');
 			Assert.isTrue(before.get('Error_Digest_Frequency__c').unsavedDefault, 'Not saved');
-			Assert.isFalse(
-				before.get(CHECKBOX_KEY).unsavedDefault,
-				'A checkbox is never an unsaved default'
-			);
+			Assert.isFalse(before.get(CHECKBOX_KEY).unsavedDefault, 'A checkbox is never an unsaved default');
 			Assert.isFalse(
 				before.get('Household_Membership_Mode__c').detectionMayChange,
 				'Without Person Accounts detection keeps the simple way, so it may be kept'
@@ -1595,8 +1489,7 @@ private class SettingsControllerTest {
 				SettingsController.saveSettings(
 					new Map<String, Object>{
 						'Coexistence_Mode__c' => before.get('Coexistence_Mode__c').value,
-						'Household_Membership_Mode__c' => before.get('Household_Membership_Mode__c')
-							.value
+						'Household_Membership_Mode__c' => before.get('Household_Membership_Mode__c').value
 					}
 				)
 			);
@@ -1635,14 +1528,10 @@ private class SettingsControllerTest {
 			OrgShapeDetector.overrideShape = shape;
 
 			Test.startTest();
-			Map<String, SettingsController.SettingModel> rows = rowsByKey(
-				SettingsController.getConsoleModel()
-			);
+			Map<String, SettingsController.SettingModel> rows = rowsByKey(SettingsController.getConsoleModel());
 			Test.stopTest();
 
-			SettingsController.SettingModel membership = rows.get(
-				CoexistenceService.KEY_MEMBERSHIP_MODE
-			);
+			SettingsController.SettingModel membership = rows.get(CoexistenceService.KEY_MEMBERSHIP_MODE);
 			Assert.areEqual(CoexistenceService.MEMBERSHIP_CONTACT, membership.value, 'Shown');
 			Assert.isTrue(membership.unsavedDefault, 'Still a default nobody saved');
 			Assert.isTrue(
@@ -1683,20 +1572,12 @@ private class SettingsControllerTest {
 				CoexistenceService.membershipModeChosen(),
 				'The console save writes only the mode, as choosing it by hand does'
 			);
-			Assert.areEqual(
-				1,
-				SettingsController.getRecentChanges(10).size(),
-				'One change, one history row'
-			);
+			Assert.areEqual(1, SettingsController.getRecentChanges(10).size(), 'One change, one history row');
 		}
 	}
 
 	private static Setting_Definition__mdt optimizerRow() {
-		Setting_Definition__mdt row = effectiveDefaultRow(
-			'Test_Unused_Login',
-			'Unused_Login_Days__c',
-			'Number'
-		);
+		Setting_Definition__mdt row = effectiveDefaultRow('Test_Unused_Login', 'Unused_Login_Days__c', 'Number');
 		row.Section__c = SettingSections.ORG_OPTIMIZER;
 		return row;
 	}
@@ -1732,9 +1613,7 @@ private class SettingsControllerTest {
 				'{"Name":"Barn Rescue Inc"}',
 				Organization.class
 			);
-			Map<String, SettingsController.SettingModel> blank = rowsByKey(
-				SettingsController.getConsoleModel()
-			);
+			Map<String, SettingsController.SettingModel> blank = rowsByKey(SettingsController.getConsoleModel());
 
 			SettingsController.SettingModel name = blank.get('Organization_Legal_Name__c');
 			Assert.isTrue(String.isBlank(name.value), 'Nothing is filled in for the admin');
@@ -1762,11 +1641,7 @@ private class SettingsControllerTest {
 		}
 	}
 
-	private static Setting_Definition__mdt effectiveDefaultRow(
-		String developerName,
-		String key,
-		String dataType
-	) {
+	private static Setting_Definition__mdt effectiveDefaultRow(String developerName, String key, String dataType) {
 		return new Setting_Definition__mdt(
 			DeveloperName = developerName,
 			MasterLabel = developerName,

@@ -5,10 +5,7 @@
  */
 @IsTest(testFor='ApexClass:OrgAutomationScan, ApexClass:OrgToolingApi')
 private class OrgAutomationScanTest {
-	private static final List<String> CONNECTION_ADMIN = new List<String>{
-		'BarnCRM_Admin',
-		'BarnCRM_Metadata_Admin'
-	};
+	private static final List<String> CONNECTION_ADMIN = new List<String>{ 'BarnCRM_Admin', 'BarnCRM_Metadata_Admin' };
 	private static final String RULE_ID = '03d000000000001AAA';
 	private static final String OTHER_RULE_ID = '03d000000000002AAA';
 
@@ -24,9 +21,7 @@ private class OrgAutomationScanTest {
 			HttpResponse response = new HttpResponse();
 			response.setStatusCode(status);
 			if (status != 200) {
-				response.setBody(
-					'[{"message":"Session expired or invalid","errorCode":"INVALID_SESSION_ID"}]'
-				);
+				response.setBody('[{"message":"Session expired or invalid","errorCode":"INVALID_SESSION_ID"}]');
 				return response;
 			}
 			String query = EncodingUtil.urlDecode(request.getEndpoint(), 'UTF-8');
@@ -91,12 +86,8 @@ private class OrgAutomationScanTest {
 			OrgAutomationController.startScan();
 			Test.stopTest();
 
-			Automation_Snapshot__c scan = OrgAutomationScan.latest();
-			Assert.areEqual(
-				OrgAutomationScan.STATUS_DONE,
-				scan.Status__c,
-				'Scan: ' + scan.Message__c
-			);
+			Merge_Journal__c scan = OrgAutomationScan.latest();
+			Assert.areEqual(OrgAutomationScan.STATUS_DONE, scan.Status__c, 'Scan: ' + scan.Message__c);
 
 			Map<String, OrgAutomationInventory.Row> rows = new Map<String, OrgAutomationInventory.Row>();
 			OrgAutomationInventory.Result result = OrgAutomationController.getInventory();
@@ -109,11 +100,7 @@ private class OrgAutomationScanTest {
 			OrgAutomationInventory.Row own = rows.get('ValidationRule|' + RULE_ID);
 			Assert.areEqual(OrgAutomationInventory.OWNER_ORG, own.owner);
 			Assert.areEqual(OrgAutomationInventory.STATUS_ACTIVE, own.status);
-			Assert.areEqual(
-				OrgAutomationInventory.COVERED_YES,
-				own.covered,
-				'It refers to the setting.'
-			);
+			Assert.areEqual(OrgAutomationInventory.COVERED_YES, own.covered, 'It refers to the setting.');
 			Assert.isTrue(own.canDeactivate);
 
 			OrgAutomationInventory.Row managed = rows.get('ValidationRule|' + OTHER_RULE_ID);
@@ -132,16 +119,12 @@ private class OrgAutomationScanTest {
 	static void aSecondScanReplacesTheFirst() {
 		System.runAs(TestUsers.withPermissionSets(CONNECTION_ADMIN)) {
 			connected();
-			insert new Automation_Snapshot__c(Kind__c = 'Scan', Status__c = 'Done');
+			insert new Merge_Journal__c(Kind__c = 'Scan', Status__c = 'Done');
 			Test.setMock(HttpCalloutMock.class, new ToolingMock(200));
 			Test.startTest();
 			OrgAutomationScan.start();
 			Test.stopTest();
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Automation_Snapshot__c WHERE Kind__c = 'Scan'],
-				'One scan is kept.'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Merge_Journal__c WHERE Kind__c = 'Scan'], 'One scan is kept.');
 		}
 	}
 
@@ -153,7 +136,7 @@ private class OrgAutomationScanTest {
 			Test.startTest();
 			OrgAutomationScan.start();
 			Test.stopTest();
-			Automation_Snapshot__c scan = OrgAutomationScan.latest();
+			Merge_Journal__c scan = OrgAutomationScan.latest();
 			Assert.areEqual(OrgAutomationScan.STATUS_FAILED, scan.Status__c);
 			Assert.isTrue(scan.Message__c.contains('Session expired or invalid'), scan.Message__c);
 		}
@@ -171,10 +154,7 @@ private class OrgAutomationScanTest {
 					refused = caught.getMessage();
 				}
 			}
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_AutomationInventory_NoConnectionPermission'),
-				refused
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_AutomationInventory_NoConnectionPermission'), refused);
 		}
 		System.runAs(TestUsers.withPermissionSets(CONNECTION_ADMIN)) {
 			ImportNewFieldService.systemPermissionOverride = true;
@@ -185,10 +165,7 @@ private class OrgAutomationScanTest {
 			} catch (AuraHandledException caught) {
 				refused = caught.getMessage();
 			}
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_AutomationInventory_ConnectionNeeded'),
-				refused
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_AutomationInventory_ConnectionNeeded'), refused);
 		}
 	}
 }

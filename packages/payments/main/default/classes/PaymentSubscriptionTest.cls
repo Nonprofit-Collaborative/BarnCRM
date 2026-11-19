@@ -7,9 +7,7 @@
  * PayPal payers at one amount and interval share one plan and one product, each with their own
  * subscription, and a plan or product PayPal refuses is replaced (R-PAY7, D-198).
  */
-@IsTest(
-	testFor='ApexClass:PaymentService, ApexClass:PaymentsApi, ApexClass:PaymentStripe, ApexClass:PaymentPayPal'
-)
+@IsTest(testFor='ApexClass:PaymentService, ApexClass:PaymentsApi, ApexClass:PaymentStripe, ApexClass:PaymentPayPal')
 private class PaymentSubscriptionTest {
 	private static final String LISTENER = 'PaymentSubscriptionTest.Listener';
 	/** The plan key of `checkout()`: Test mode, 20.00 USD, every 3 months (R-PAY7). */
@@ -113,14 +111,14 @@ private class PaymentSubscriptionTest {
 		System.runAs(PaymentsTestData.admin()) {
 			PaymentsTestData.connect(PaymentService.STRIPE);
 			PaymentsTestData.Processors mock = PaymentsTestData.processors()
-				.answer('stripe.com', 200, '{"id":"cs_1","url":"https://checkout.stripe.com/c/1"}');
+				.answer('checkout/sessions', 200, '{"id":"cs_1","url":"https://checkout.stripe.com/c/1"}');
 			PaymentsApi api = new PaymentsApi();
 
 			Test.startTest();
 			api.call('startCheckout', checkout());
 			Test.stopTest();
 
-			String sent = mock.last('stripe.com').getBody();
+			String sent = mock.last('checkout/sessions').getBody();
 			Assert.isTrue(sent.contains('mode=payment'), 'One payment, as before: ' + sent);
 			Assert.isFalse(sent.contains('recurring'), sent);
 			Assert.isFalse(
@@ -136,14 +134,14 @@ private class PaymentSubscriptionTest {
 			PaymentsTestData.connect(PaymentService.STRIPE);
 			recurringOn();
 			PaymentsTestData.Processors mock = PaymentsTestData.processors()
-				.answer('stripe.com', 200, '{"id":"cs_1","url":"https://checkout.stripe.com/c/1"}');
+				.answer('checkout/sessions', 200, '{"id":"cs_1","url":"https://checkout.stripe.com/c/1"}');
 			PaymentsApi api = new PaymentsApi();
 
 			Test.startTest();
 			api.call('startCheckout', checkout());
 			Test.stopTest();
 
-			String sent = mock.last('stripe.com').getBody();
+			String sent = mock.last('checkout/sessions').getBody();
 			Assert.isTrue(
 				(Boolean) api.call('isReady', new Map<String, Object>{ 'recurring' => true }),
 				'Ready once on'
@@ -152,10 +150,7 @@ private class PaymentSubscriptionTest {
 			Assert.isTrue(sent.contains('%5Brecurring%5D%5Binterval%5D=month'), sent);
 			Assert.isTrue(sent.contains('%5Brecurring%5D%5Binterval_count%5D=3'), sent);
 			Assert.isTrue(sent.contains('subscription_data%5Bmetadata%5D'), sent);
-			Assert.isFalse(
-				sent.contains('payment_intent_data'),
-				'Not allowed in subscription mode'
-			);
+			Assert.isFalse(sent.contains('payment_intent_data'), 'Not allowed in subscription mode');
 		}
 	}
 
@@ -190,7 +185,7 @@ private class PaymentSubscriptionTest {
 			// R-PAY7: the plan and product are remembered for the next payer.
 			Assert.areEqual(PLAN_KEY, payment.Plan_Key__c, 'Mode, currency, amount, interval');
 			Assert.areEqual('P-1', payment.Plan_Id__c, 'The plan it uses');
-			Assert.areEqual('PROD-1', Payment_Keys__c.getOrgDefaults().PayPal_Product_Id__c);
+			Assert.areEqual('PROD-1', Payments_Settings__c.getOrgDefaults().PayPal_Product_Id__c);
 			Assert.areEqual(
 				'plan-' + PLAN_KEY + '-PROD-1',
 				mock.last('billing/plans').getHeader('PayPal-Request-Id'),
@@ -211,9 +206,9 @@ private class PaymentSubscriptionTest {
 
 	/** PayPal's shared product and the plan a first payer's subscription already uses. */
 	private static void remembered(String product, String plan) {
-		Payment_Keys__c keys = Payment_Keys__c.getOrgDefaults();
-		keys.PayPal_Product_Id__c = product;
-		update as system keys;
+		Payments_Settings__c stored = Payments_Settings__c.getOrgDefaults();
+		stored.PayPal_Product_Id__c = product;
+		update as system stored;
 		if (plan != null) {
 			Payment__c earlier = first(PaymentService.PAYPAL, 'I-0');
 			earlier.Plan_Key__c = PLAN_KEY;
@@ -230,13 +225,7 @@ private class PaymentSubscriptionTest {
 			Description__c = 'Monthly gift',
 			Reference__c = ref
 		);
-		PaymentPayPal.startCheckout(
-			payment,
-			'https://example.org/thanks',
-			'https://example.org/sorry',
-			'month',
-			3
-		);
+		PaymentPayPal.startCheckout(payment, 'https://example.org/thanks', 'https://example.org/sorry', 'month', 3);
 		return payment;
 	}
 
@@ -303,9 +292,7 @@ private class PaymentSubscriptionTest {
 			List<String> payers = new List<String>();
 			for (HttpRequest request : mock.requests) {
 				if (request.getEndpoint().contains('billing/subscriptions')) {
-					payers.add(
-						request.getBody().substringAfter('"custom_id":"').substringBefore('"')
-					);
+					payers.add(request.getBody().substringAfter('"custom_id":"').substringBefore('"'));
 				}
 			}
 			Assert.areEqual(
@@ -364,7 +351,7 @@ private class PaymentSubscriptionTest {
 			Assert.areEqual('P-1', payment.Plan_Id__c, 'A plan on the new product');
 			Assert.areEqual(1, calls(mock, 'catalogs/products'), 'One new product');
 			Assert.areEqual(2, calls(mock, 'billing/plans'), 'Refused once, then made');
-			Assert.areEqual('PROD-1', Payment_Keys__c.getOrgDefaults().PayPal_Product_Id__c);
+			Assert.areEqual('PROD-1', Payments_Settings__c.getOrgDefaults().PayPal_Product_Id__c);
 		}
 	}
 
@@ -416,11 +403,7 @@ private class PaymentSubscriptionTest {
 			Assert.areEqual(25.00, all[1].Amount__c, 'At the charged amount');
 			Assert.areEqual('in_2', all[1].Processor_Payment_Id__c, 'The invoice stands in');
 			Assert.areEqual(LISTENER, all[1].Listener__c, 'Copied from the first');
-			Assert.areEqual(
-				new List<String>{ 'Pending>Paid', 'Pending>Paid' },
-				told,
-				'Each payment told once'
-			);
+			Assert.areEqual(new List<String>{ 'Pending>Paid', 'Pending>Paid' }, told, 'Each payment told once');
 			Assert.areEqual(
 				new List<String>{
 					PaymentService.CHARGE_SUCCEEDED,
@@ -492,11 +475,7 @@ private class PaymentSubscriptionTest {
 		System.runAs(PaymentsTestData.admin()) {
 			PaymentsTestData.connect(PaymentService.STRIPE);
 			PaymentsTestData.Processors mock = PaymentsTestData.processors()
-				.answer(
-					'checkout/sessions',
-					200,
-					'{"id":"cs_s","url":"https://checkout.stripe.com/c/s"}'
-				);
+				.answer('checkout/sessions', 200, '{"id":"cs_s","url":"https://checkout.stripe.com/c/s"}');
 			PaymentsApi api = new PaymentsApi();
 			Map<String, Object> args = new Map<String, Object>{
 				'subscriptionId' => 'sub_1',
@@ -549,10 +528,7 @@ private class PaymentSubscriptionTest {
 							'id' => 'S-' + i,
 							'billing_agreement_id' => 'I-1',
 							'custom' => payment.Reference__c,
-							'amount' => new Map<String, Object>{
-								'total' => '20.00',
-								'currency' => 'USD'
-							}
+							'amount' => new Map<String, Object>{ 'total' => '20.00', 'currency' => 'USD' }
 						}
 					),
 					headers
@@ -599,11 +575,7 @@ private class PaymentSubscriptionTest {
 			payment.Status__c = PaymentService.PAID;
 			update payment;
 			for (Integer i = 0; i < 20; i++) {
-				stripe(
-					'evt_b' + i,
-					'invoice.paid',
-					invoice('in_b' + i, payment.Reference__c, 2000)
-				);
+				stripe('evt_b' + i, 'invoice.paid', invoice('in_b' + i, payment.Reference__c, 2000));
 			}
 
 			Test.startTest();

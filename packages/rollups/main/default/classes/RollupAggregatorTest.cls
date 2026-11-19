@@ -30,10 +30,7 @@ private class RollupAggregatorTest {
 		RollupAggregator.Tally three = new RollupAggregator.Tally();
 		three.total = 100;
 		three.counted = 3;
-		Assert.isTrue(
-			((Decimal) three.result('AVG', null)).setScale(2) == 33.33,
-			'Divided, not truncated'
-		);
+		Assert.isTrue(((Decimal) three.result('AVG', null)).setScale(2) == 33.33, 'Divided, not truncated');
 	}
 
 	/** Five amounts, read in no particular order, each its own row (ADR-0136). */
@@ -74,25 +71,13 @@ private class RollupAggregatorTest {
 		List<Object> orders = new List<Object>{ 1, 3, 2, null };
 		List<String> values = new List<String>{ 'b', 'a', 'a', 'c' };
 		for (Integer i = 0; i < orders.size(); i++) {
-			RollupAggregator.Listed entry = new RollupAggregator.Listed(
-				orders[i],
-				'row' + i,
-				values[i]
-			);
+			RollupAggregator.Listed entry = new RollupAggregator.Listed(orders[i], 'row' + i, values[i]);
 			entry.descending = true;
 			everyValue.add(entry, false);
 			firstTwo.add(entry, true);
 		}
-		Assert.areEqual(
-			'a, a, b, c',
-			everyValue.result('TEXT_LIST', ', '),
-			'Highest first, a blank order last'
-		);
-		Assert.areEqual(
-			'a; b',
-			firstTwo.result('TEXT_LIST_DISTINCT', '; '),
-			'The first two different values'
-		);
+		Assert.areEqual('a, a, b, c', everyValue.result('TEXT_LIST', ', '), 'Highest first, a blank order last');
+		Assert.areEqual('a; b', firstTwo.result('TEXT_LIST_DISTINCT', '; '), 'The first two different values');
 	}
 
 	@IsTest

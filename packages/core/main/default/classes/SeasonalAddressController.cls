@@ -79,9 +79,7 @@ public with sharing class SeasonalAddressController {
 
 	private static void requirePermission() {
 		if (!canManage()) {
-			throw new SeasonalAddressException(
-				BarnHelp.text('Core', 'Core_SeasonalAddress_PermissionRequired')
-			);
+			throw new SeasonalAddressException(BarnHelp.text('Core', 'Core_SeasonalAddress_PermissionRequired'));
 		}
 	}
 }

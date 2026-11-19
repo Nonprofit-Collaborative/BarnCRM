@@ -210,9 +210,7 @@ public with sharing class VolunteersHomeController {
 			WITH USER_MODE
 			LIMIT 1
 		];
-		return views.isEmpty()
-			? Schema.SObjectType.Volunteer_Shift__c.getLabelPlural()
-			: views[0].Name;
+		return views.isEmpty() ? Schema.SObjectType.Volunteer_Shift__c.getLabelPlural() : views[0].Name;
 	}
 
 	@TestVisible

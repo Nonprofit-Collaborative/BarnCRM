@@ -18,11 +18,7 @@ public with sharing class TerritoryRunBatch implements Database.Batchable<SObjec
 	public static final String KIND_PEOPLE = 'People';
 	public static final String KIND_HOUSEHOLDS = 'Households';
 	public static final String KIND_ORGANIZATIONS = 'Organizations';
-	public static final List<String> ALL_KINDS = new List<String>{
-		KIND_PEOPLE,
-		KIND_HOUSEHOLDS,
-		KIND_ORGANIZATIONS
-	};
+	public static final List<String> ALL_KINDS = new List<String>{ KIND_PEOPLE, KIND_HOUSEHOLDS, KIND_ORGANIZATIONS };
 	public static final String MODE_PREVIEW = 'Preview';
 	public static final String MODE_ASSIGN = 'Assign';
 	public static final String STATUS_QUEUED = 'Queued';
@@ -128,11 +124,7 @@ public with sharing class TerritoryRunBatch implements Database.Batchable<SObjec
 			run.Data_Job_Id__c = job.Id;
 			Database.update(run, AccessLevel.SYSTEM_MODE);
 		}
-		AsyncStarter.batch(
-			new TerritoryRunBatch(kinds, 0, totals),
-			chunkFor(kinds[0]),
-			'TerritoryRunBatch'
-		);
+		AsyncStarter.batch(new TerritoryRunBatch(kinds, 0, totals), chunkFor(kinds[0]), 'TerritoryRunBatch');
 		return run.Id;
 	}
 
@@ -237,11 +229,7 @@ public with sharing class TerritoryRunBatch implements Database.Batchable<SObjec
 			}
 			if (rules.size() > MAX_RULES) {
 				throw new TerritoryException(
-					BarnHelp.text(
-						'Territory',
-						'Territory_Error_TooManyRules',
-						new List<Object>{ kind, MAX_RULES }
-					)
+					BarnHelp.text('Territory', 'Territory_Error_TooManyRules', new List<Object>{ kind, MAX_RULES })
 				);
 			}
 			for (Territory_Rule__c rule : rules) {
@@ -317,9 +305,7 @@ public with sharing class TerritoryRunBatch implements Database.Batchable<SObjec
 			query += ' WHERE Id = NULL';
 		} else {
 			if (totals.onlyUnassigned) {
-				clause = String.isBlank(clause)
-					? 'Territory__c = NULL'
-					: clause + ' AND Territory__c = NULL';
+				clause = String.isBlank(clause) ? 'Territory__c = NULL' : clause + ' AND Territory__c = NULL';
 			}
 			query = withClause(query, clause);
 		}
@@ -353,9 +339,7 @@ public with sharing class TerritoryRunBatch implements Database.Batchable<SObjec
 				totals.changes++;
 				totals.movedIn.put(
 					territoryId,
-					(totals.movedIn.containsKey(territoryId)
-						? totals.movedIn.get(territoryId)
-						: 0) + 1
+					(totals.movedIn.containsKey(territoryId) ? totals.movedIn.get(territoryId) : 0) + 1
 				);
 				if (totals.sample.size() < SAMPLE_SIZE) {
 					totals.sample.add(
@@ -369,9 +353,7 @@ public with sharing class TerritoryRunBatch implements Database.Batchable<SObjec
 					);
 				}
 				changed.add(change);
-				before.add(
-					new Map<String, Object>{ 'Territory__c' => current, 'OwnerId' => oldOwner }
-				);
+				before.add(new Map<String, Object>{ 'Territory__c' => current, 'OwnerId' => oldOwner });
 			}
 			if (totals.mode == MODE_ASSIGN && !changed.isEmpty()) {
 				save(objectName, changed, before);
@@ -393,11 +375,7 @@ public with sharing class TerritoryRunBatch implements Database.Batchable<SObjec
 			}
 			QueryCompiler.Compiled compiled;
 			try {
-				compiled = QueryCompiler.compileSelection(
-					rule.queryJson,
-					new Set<String>{ 'Id' },
-					left
-				);
+				compiled = QueryCompiler.compileSelection(rule.queryJson, new Set<String>{ 'Id' }, left);
 			} catch (QueryCompiler.QueryCompilerException refused) {
 				throw new QueryCompiler.QueryCompilerException(
 					BarnHelp.text(
@@ -426,22 +404,12 @@ public with sharing class TerritoryRunBatch implements Database.Batchable<SObjec
 			SObject change = changed[i];
 			if (!results[i].isSuccess()) {
 				totals.failed++;
-				journal.add(
-					ImportJournalService.failed(
-						objectName,
-						change.Id,
-						results[i].getErrors()[0].getMessage()
-					)
-				);
+				journal.add(ImportJournalService.failed(objectName, change.Id, results[i].getErrors()[0].getMessage()));
 				continue;
 			}
 			totals.saved++;
-			Map<String, Object> was = new Map<String, Object>{
-				territoryField => before[i].get('Territory__c')
-			};
-			Map<String, Object> now = new Map<String, Object>{
-				territoryField => change.get('Territory__c')
-			};
+			Map<String, Object> was = new Map<String, Object>{ territoryField => before[i].get('Territory__c') };
+			Map<String, Object> now = new Map<String, Object>{ territoryField => change.get('Territory__c') };
 			if (change.get('OwnerId') != null) {
 				was.put('OwnerId', before[i].get('OwnerId'));
 				now.put('OwnerId', change.get('OwnerId'));
@@ -496,9 +464,7 @@ public with sharing class TerritoryRunBatch implements Database.Batchable<SObjec
 			byTerritory.add(
 				new Map<String, Object>{
 					'id' => territoryId,
-					'name' => territories.containsKey(territoryId)
-						? territories.get(territoryId).Name
-						: null,
+					'name' => territories.containsKey(territoryId) ? territories.get(territoryId).Name : null,
 					'changes' => moved,
 					'noRoom' => pool.noRoom
 				}
@@ -513,9 +479,7 @@ public with sharing class TerritoryRunBatch implements Database.Batchable<SObjec
 				owners.add((Id) entry.get('owner'));
 			}
 		}
-		Map<Id, User> users = new Map<Id, User>(
-			[SELECT Id, Name FROM User WHERE Id IN :owners WITH SYSTEM_MODE]
-		);
+		Map<Id, User> users = new Map<Id, User>([SELECT Id, Name FROM User WHERE Id IN :owners WITH SYSTEM_MODE]);
 		for (Map<String, Object> entry : totals.sample) {
 			entry.put('fromName', nameOf(territories, entry.get('from')));
 			entry.put('toName', nameOf(territories, entry.get('to')));
@@ -536,10 +500,7 @@ public with sharing class TerritoryRunBatch implements Database.Batchable<SObjec
 				Message__c = message,
 				Completed_At__c = Datetime.now(),
 				Summary_JSON__c = JSON.serialize(
-						new Map<String, Object>{
-							'territories' => byTerritory,
-							'sample' => totals.sample
-						}
+						new Map<String, Object>{ 'territories' => byTerritory, 'sample' => totals.sample }
 					)
 					.left(131072)
 			),
@@ -569,20 +530,14 @@ public with sharing class TerritoryRunBatch implements Database.Batchable<SObjec
 			BarnHelp.text(
 				'Territory',
 				'Territory_Log_Finished',
-				new List<Object>{
-					totals.checked.format(),
-					totals.saved.format(),
-					totals.failed.format()
-				}
+				new List<Object>{ totals.checked.format(), totals.saved.format(), totals.failed.format() }
 			)
 		);
 		if (totals.journalIncomplete) {
 			lines.add(BarnHelp.text('Core', 'Core_BulkUpdate_LogJournalIncomplete'));
 		}
 		job.Run_Log__c = String.join(lines, '\n').right(32768);
-		job.Status__c = failed
-			? ImportBatchService.STATUS_FAILED
-			: ImportBatchService.STATUS_COMPLETE;
+		job.Status__c = failed ? ImportBatchService.STATUS_FAILED : ImportBatchService.STATUS_COMPLETE;
 		job.Completed_At__c = Datetime.now();
 		job.Row_Count__c = totals.checked;
 		job.Rows_Updated__c = totals.saved;
@@ -632,16 +587,12 @@ public with sharing class TerritoryRunBatch implements Database.Batchable<SObjec
 			WITH SYSTEM_MODE
 		]) {
 			TerritoryRouting.Pool pool = new TerritoryRouting.Pool();
-			pool.routing = String.isBlank(territory.Routing__c)
-				? TerritoryRouting.KEEP_OWNER
-				: territory.Routing__c;
+			pool.routing = String.isBlank(territory.Routing__c) ? TerritoryRouting.KEEP_OWNER : territory.Routing__c;
 			pool.territoryOwner = territory.Owner_User__c;
 			pool.next = territory.Next_Member__c == null ? 0 : territory.Next_Member__c.intValue();
 			for (Territory_Member__c member : territory.Members__r) {
 				pool.users.add(member.User__c);
-				pool.capacities.add(
-					member.Capacity__c == null ? null : member.Capacity__c.intValue()
-				);
+				pool.capacities.add(member.Capacity__c == null ? null : member.Capacity__c.intValue());
 			}
 			pools.put(territory.Id, pool);
 			if (pool.needsCounts()) {
@@ -673,10 +624,7 @@ public with sharing class TerritoryRunBatch implements Database.Batchable<SObjec
 		return pools;
 	}
 
-	private static void addCounts(
-		Map<Id, TerritoryRouting.Pool> pools,
-		List<AggregateResult> rows
-	) {
+	private static void addCounts(Map<Id, TerritoryRouting.Pool> pools, List<AggregateResult> rows) {
 		for (AggregateResult row : rows) {
 			TerritoryRouting.Pool pool = pools.get((Id) row.get('Territory__c'));
 			Id owner = (Id) row.get('OwnerId');

@@ -17,11 +17,7 @@ private class TerritoryRunBatchTest {
 	}
 
 	private static Territory__c territory(String name, Integer priority, String routing) {
-		Territory__c made = new Territory__c(
-			Name = name,
-			Priority__c = priority,
-			Routing__c = routing
-		);
+		Territory__c made = new Territory__c(Name = name, Priority__c = priority, Routing__c = routing);
 		insert as user made;
 		return made;
 	}
@@ -37,14 +33,7 @@ private class TerritoryRunBatchTest {
 
 	private static Territory_Run__c runOf(Id runId) {
 		return [
-			SELECT
-				Status__c,
-				Checked__c,
-				Changes__c,
-				Failed__c,
-				Summary_JSON__c,
-				Data_Job_Id__c,
-				Message__c
+			SELECT Status__c, Checked__c, Changes__c, Failed__c, Summary_JSON__c, Data_Job_Id__c, Message__c
 			FROM Territory_Run__c
 			WHERE Id = :runId
 			WITH SYSTEM_MODE
@@ -64,11 +53,7 @@ private class TerritoryRunBatchTest {
 			};
 
 			Test.startTest();
-			Id runId = TerritoryRunBatch.launch(
-				TerritoryRunBatch.MODE_PREVIEW,
-				false,
-				TerritoryRunBatch.kindsToRun()
-			);
+			Id runId = TerritoryRunBatch.launch(TerritoryRunBatch.MODE_PREVIEW, false, TerritoryRunBatch.kindsToRun());
 			Test.stopTest();
 
 			Territory_Run__c run = runOf(runId);
@@ -102,11 +87,7 @@ private class TerritoryRunBatchTest {
 			};
 
 			Test.startTest();
-			Id runId = TerritoryRunBatch.launch(
-				TerritoryRunBatch.MODE_ASSIGN,
-				true,
-				TerritoryRunBatch.kindsToRun()
-			);
+			Id runId = TerritoryRunBatch.launch(TerritoryRunBatch.MODE_ASSIGN, true, TerritoryRunBatch.kindsToRun());
 			Test.stopTest();
 
 			Territory_Run__c run = runOf(runId);
@@ -183,11 +164,7 @@ private class TerritoryRunBatchTest {
 			);
 
 			Test.startTest();
-			Id runId = TerritoryRunBatch.launch(
-				TerritoryRunBatch.MODE_PREVIEW,
-				false,
-				TerritoryRunBatch.kindsToRun()
-			);
+			Id runId = TerritoryRunBatch.launch(TerritoryRunBatch.MODE_PREVIEW, false, TerritoryRunBatch.kindsToRun());
 			Test.stopTest();
 
 			Territory_Run__c run = runOf(runId);
@@ -204,10 +181,7 @@ private class TerritoryRunBatchTest {
 	static void aKindWithFewRulesReadsFullChunks() {
 		System.runAs(TestUsers.adminWith('Territory_Admin')) {
 			rule(territory('North', 10, TerritoryRouting.KEEP_OWNER), lastNameIs('Alvarez'));
-			Assert.areEqual(
-				TerritoryRunBatch.CHUNK,
-				TerritoryRunBatch.chunkFor(TerritoryRunBatch.KIND_PEOPLE)
-			);
+			Assert.areEqual(TerritoryRunBatch.CHUNK, TerritoryRunBatch.chunkFor(TerritoryRunBatch.KIND_PEOPLE));
 		}
 	}
 
@@ -222,9 +196,7 @@ private class TerritoryRunBatchTest {
 				Capacity__c = 5,
 				Active__c = true
 			);
-			insert as user TestDataFactory.person(
-				new Contact(LastName = 'Alvarez', Territory__c = north.Id)
-			);
+			insert as user TestDataFactory.person(new Contact(LastName = 'Alvarez', Territory__c = north.Id));
 
 			TerritoryRouting.Pool pool = TerritoryRunBatch.loadPools().get(north.Id);
 

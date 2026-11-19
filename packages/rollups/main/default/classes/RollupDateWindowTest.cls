@@ -25,11 +25,7 @@ private class RollupDateWindowTest {
 				thisYear.startInclusive,
 				'September 2026 is inside the fiscal year that started in July 2026'
 			);
-			System.Assert.areEqual(
-				Date.newInstance(2027, 7, 1),
-				thisYear.endExclusive,
-				'A window is one year long'
-			);
+			System.Assert.areEqual(Date.newInstance(2027, 7, 1), thisYear.endExclusive, 'A window is one year long');
 			System.Assert.areEqual(
 				Date.newInstance(2025, 7, 1),
 				lastYear.startInclusive,
@@ -99,8 +95,7 @@ private class RollupDateWindowTest {
 				'same month the reports read, with no BarnCRM setting in between.'
 			);
 			System.Assert.areEqual(
-				[SELECT FiscalYearStartMonth FROM Organization WITH SYSTEM_MODE LIMIT 1]
-				.FiscalYearStartMonth,
+				[SELECT FiscalYearStartMonth FROM Organization WITH SYSTEM_MODE LIMIT 1].FiscalYearStartMonth,
 				RollupDateWindow.fiscalYearStartMonth(),
 				'Read from the org, not from a stored copy'
 			);
@@ -122,11 +117,7 @@ private class RollupDateWindowTest {
 				RollupDateWindow.toWhereClause(false, 0, 'Gift_Date__c'),
 				'Only a fiscal aware rollup is bounded'
 			);
-			System.Assert.areEqual(
-				'',
-				RollupDateWindow.toWhereClause(null, null, null),
-				'Nor is an unset one'
-			);
+			System.Assert.areEqual('', RollupDateWindow.toWhereClause(null, null, null), 'Nor is an unset one');
 		}
 	}
 
@@ -135,9 +126,7 @@ private class RollupDateWindowTest {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			try {
 				RollupDateWindow.toWhereClause(true, 0, null);
-				System.Assert.fail(
-					'A window with nothing to measure would silently count every year'
-				);
+				System.Assert.fail('A window with nothing to measure would silently count every year');
 			} catch (RollupDateWindow.RollupDateWindowException expected) {
 				System.Assert.isNotNull(expected.getMessage(), 'The message names the problem');
 			}

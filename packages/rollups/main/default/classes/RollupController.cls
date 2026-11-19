@@ -160,11 +160,7 @@ public with sharing class RollupController {
 		return switchOn(definitionId, true, true);
 	}
 
-	private static RollupPageView switchOn(
-		Id definitionId,
-		Boolean active,
-		Boolean dlrsOffConfirmed
-	) {
+	private static RollupPageView switchOn(Id definitionId, Boolean active, Boolean dlrsOffConfirmed) {
 		try {
 			requirePermission();
 			Rollup_Definition__c definition = require(definitionId);
@@ -174,23 +170,14 @@ public with sharing class RollupController {
 				throw new RollupService.RollupServiceException(blocker);
 			}
 			if (active == true && dlrsOffConfirmed != true) {
-				String conflict = RollupDlrs.conflict(
-					definition.Target_Object__c,
-					definition.Target_Field__c
-				);
+				String conflict = RollupDlrs.conflict(definition.Target_Object__c, definition.Target_Field__c);
 				if (conflict != null) {
 					throw new RollupService.RollupServiceException(conflict);
 				}
 			}
-			RollupWriter.saveAsUser(
-				new Rollup_Definition__c(Id = definition.Id, Active__c = active == true)
-			);
+			RollupWriter.saveAsUser(new Rollup_Definition__c(Id = definition.Id, Active__c = active == true));
 			if (dlrsOffConfirmed == true) {
-				RollupDlrs.recordSwitchOff(
-					definition.Name,
-					definition.Target_Object__c,
-					definition.Target_Field__c
-				);
+				RollupDlrs.recordSwitchOff(definition.Name, definition.Target_Object__c, definition.Target_Field__c);
 			}
 			return currentPage();
 		} catch (Exception caught) {
@@ -209,10 +196,7 @@ public with sharing class RollupController {
 					BarnHelp.text('Rollups', 'Core_Rollups_ErrorInvalidMode')
 				);
 			}
-			if (
-				RollupService.MODE_REAL_TIME.equals(mode) &&
-				RollupDateWindow.movesWithTheDate(definition)
-			) {
+			if (RollupService.MODE_REAL_TIME.equals(mode) && RollupDateWindow.movesWithTheDate(definition)) {
 				throw new RollupService.RollupServiceException(
 					BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorInstantMovesWithDate')
 				);
@@ -252,9 +236,7 @@ public with sharing class RollupController {
 				);
 			}
 			refuseWhileAFullRunIsGoing();
-			Rollup_Definition__c sharer = clearValues == true
-				? RollupConflicts.sharerOf(definition)
-				: null;
+			Rollup_Definition__c sharer = clearValues == true ? RollupConflicts.sharerOf(definition) : null;
 			if (sharer != null) {
 				throw new RollupService.RollupServiceException(
 					String.format(
@@ -344,11 +326,7 @@ public with sharing class RollupController {
 		try {
 			requirePermission();
 			Set<Schema.SObjectType> targets = new Set<Schema.SObjectType>();
-			for (
-				Rollup_Definition__c definition : RollupSelector.selectActiveForModes(
-					RollupService.everyMode()
-				)
-			) {
+			for (Rollup_Definition__c definition : RollupSelector.selectActiveForModes(RollupService.everyMode())) {
 				Schema.SObjectType target = SettingsService.typeByName(definition.Target_Object__c);
 				if (target != null) {
 					targets.add(target);
@@ -362,10 +340,7 @@ public with sharing class RollupController {
 					AccessLevel.USER_MODE
 				);
 			}
-			Integer minutes = Math.max(
-				1,
-				(Integer) Math.ceil(records / (Decimal) RECORDS_PER_MINUTE)
-			);
+			Integer minutes = Math.max(1, (Integer) Math.ceil(records / (Decimal) RECORDS_PER_MINUTE));
 			Datetime moment = estimatedAt == null ? Datetime.now() : estimatedAt;
 			Integer weekday = Integer.valueOf(moment.format('u'));
 			Integer hour = Integer.valueOf(moment.format('H'));
@@ -396,17 +371,10 @@ public with sharing class RollupController {
 			refuseWhileTurnedOff();
 			List<String> nightly = new List<String>{ RollupScheduler.nightlyTime() };
 			if (RollupScheduler.isScheduled()) {
-				return BarnHelp.text(
-					'Rollups',
-					'Core_RollupBuilder_TonightAlreadyScheduled',
-					nightly
-				);
+				return BarnHelp.text('Rollups', 'Core_RollupBuilder_TonightAlreadyScheduled', nightly);
 			}
 			RollupScheduler.scheduleTonight();
-			return String.format(
-				BarnHelp.text('Rollups', 'Core_RollupBuilder_TonightScheduled'),
-				nightly
-			);
+			return String.format(BarnHelp.text('Rollups', 'Core_RollupBuilder_TonightScheduled'), nightly);
 		} catch (Exception caught) {
 			throw ERRORS.wrap(caught, 'Recalculate all rollups tonight');
 		}
@@ -451,17 +419,11 @@ public with sharing class RollupController {
 				view.statusLevel = state.level;
 				view.status = state.text;
 			}
-			view.conflicts = conflicts.containsKey(definition.Id)
-				? conflicts.get(definition.Id)
-				: new List<String>();
+			view.conflicts = conflicts.containsKey(definition.Id) ? conflicts.get(definition.Id) : new List<String>();
 			String aggregate = definition.Aggregate__c == null ? '' : definition.Aggregate__c;
-			view.aggregateLabel = aggregateLabels.containsKey(aggregate)
-				? aggregateLabels.get(aggregate)
-				: aggregate;
+			view.aggregateLabel = aggregateLabels.containsKey(aggregate) ? aggregateLabels.get(aggregate) : aggregate;
 			if (aggregate.startsWith('TEXT_LIST')) {
-				String delimiter = String.isBlank(definition.Delimiter__c)
-					? 'Comma'
-					: definition.Delimiter__c;
+				String delimiter = String.isBlank(definition.Delimiter__c) ? 'Comma' : definition.Delimiter__c;
 				view.delimiterLabel = delimiterLabels.get(delimiter);
 			}
 			page.rollups.add(view);
@@ -498,10 +460,7 @@ public with sharing class RollupController {
 		view.lastCalculated = definition.Last_Calculated__c;
 		view.filterJson = definition.Filter_JSON__c;
 		view.targetFilterJson = definition.Target_Filter_JSON__c;
-		view.otherToolConflict = RollupDlrs.conflict(
-			definition.Target_Object__c,
-			definition.Target_Field__c
-		);
+		view.otherToolConflict = RollupDlrs.conflict(definition.Target_Object__c, definition.Target_Field__c);
 		return view;
 	}
 
@@ -540,9 +499,7 @@ public with sharing class RollupController {
 	 */
 	private static void refuseWhileTurnedOff() {
 		if (RollupService.isTurnedOff()) {
-			throw new RollupService.RollupServiceException(
-				BarnHelp.text('Rollups', 'Core_Rollups_ErrorTurnedOff')
-			);
+			throw new RollupService.RollupServiceException(BarnHelp.text('Rollups', 'Core_Rollups_ErrorTurnedOff'));
 		}
 	}
 
@@ -561,9 +518,7 @@ public with sharing class RollupController {
 
 	private static void requirePermission() {
 		if (!canManage()) {
-			throw new RollupService.RollupServiceException(
-				BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission')
-			);
+			throw new RollupService.RollupServiceException(BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'));
 		}
 	}
 }

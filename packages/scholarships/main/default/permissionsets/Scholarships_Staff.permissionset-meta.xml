@@ -7,6 +7,10 @@
     Grants: programs, cycles, applications, reviews, awards, disbursements and requirements, without
     delete or Manage Scholarships. Given to the Team Member and Fundraising Staff roles.
   </description>
+  <applicationVisibilities>
+    <application>BarnCRM_Scholarships</application>
+    <visible>true</visible>
+  </applicationVisibilities>
   <classAccesses>
     <apexClass>ScholarshipsController</apexClass>
     <enabled>true</enabled>

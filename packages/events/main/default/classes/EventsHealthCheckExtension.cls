@@ -79,11 +79,7 @@ public with sharing class EventsHealthCheckExtension implements HealthCheckExten
 				new HealthCheckService.Finding(
 					NO_HOST,
 					BarnHelp.text('Events', 'Events_Health_PublicNoHostTitle'),
-					BarnHelp.text(
-						'Events',
-						'Events_Health_PublicNoHostDetail',
-						new List<Object>{ published }
-					),
+					BarnHelp.text('Events', 'Events_Health_PublicNoHostDetail', new List<Object>{ published }),
 					HealthCheckService.SEVERITY_WARNING,
 					HealthCheckService.CATEGORY_SETTINGS
 				)
@@ -93,11 +89,7 @@ public with sharing class EventsHealthCheckExtension implements HealthCheckExten
 				new HealthCheckService.Finding(
 					NO_FORM,
 					BarnHelp.text('Events', 'Events_Health_PublicNoFormTitle'),
-					BarnHelp.text(
-						'Events',
-						'Events_Health_PublicNoFormDetail',
-						new List<Object>{ withoutForm }
-					),
+					BarnHelp.text('Events', 'Events_Health_PublicNoFormDetail', new List<Object>{ withoutForm }),
 					HealthCheckService.SEVERITY_INFO,
 					HealthCheckService.CATEGORY_SETTINGS
 				)

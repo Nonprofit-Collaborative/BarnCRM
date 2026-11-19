@@ -133,18 +133,9 @@ public with sharing class SetupChangeController {
 	 * `maxRows` is held between 1 and the export cap.
 	 */
 	@AuraEnabled
-	public static Result getChanges(
-		String fromDate,
-		String toDate,
-		String section,
-		String search,
-		Integer maxRows
-	) {
+	public static Result getChanges(String fromDate, String toDate, String section, String search, Integer maxRows) {
 		requirePermission();
-		Scan run = new Scan(
-			maxRows == null ? PAGE_ROWS : Math.max(1, Math.min(maxRows, EXPORT_ROWS)),
-			wordsOf(search)
-		);
+		Scan run = new Scan(maxRows == null ? PAGE_ROWS : Math.max(1, Math.min(maxRows, EXPORT_ROWS)), wordsOf(search));
 		// Blank dates read as no limit; the far ends keep one query shape for both cases.
 		Datetime fromAt = startOfDay(fromDate, 0);
 		fromAt = fromAt == null ? Datetime.newInstanceGmt(1900, 1, 1) : fromAt;
@@ -154,14 +145,7 @@ public with sharing class SetupChangeController {
 		// SOQL for loops read 200 rows at a time, so a long scan never holds every row at once.
 		if (String.isBlank(section)) {
 			for (List<Setup_Change__c> chunk : [
-				SELECT
-					Id,
-					Changed_At__c,
-					Changed_By__c,
-					Delegate_User__c,
-					Section__c,
-					Action__c,
-					Display__c
+				SELECT Id, Changed_At__c, Changed_By__c, Delegate_User__c, Section__c, Action__c, Display__c
 				FROM Setup_Change__c
 				WHERE Changed_At__c >= :fromAt AND Changed_At__c < :toAt
 				WITH USER_MODE
@@ -174,14 +158,7 @@ public with sharing class SetupChangeController {
 			}
 		} else {
 			for (List<Setup_Change__c> chunk : [
-				SELECT
-					Id,
-					Changed_At__c,
-					Changed_By__c,
-					Delegate_User__c,
-					Section__c,
-					Action__c,
-					Display__c
+				SELECT Id, Changed_At__c, Changed_By__c, Delegate_User__c, Section__c, Action__c, Display__c
 				FROM Setup_Change__c
 				WHERE Changed_At__c >= :fromAt AND Changed_At__c < :toAt AND Section__c = :section
 				WITH USER_MODE
@@ -257,10 +234,7 @@ public with sharing class SetupChangeController {
 			parsed = Date.valueOf(day.trim());
 		} catch (Exception badDate) {
 			throw UserErrors.message(
-				String.format(
-					BarnHelp.text('Core', 'Core_SetupChanges_ErrorBadDate'),
-					new List<String>{ day }
-				)
+				String.format(BarnHelp.text('Core', 'Core_SetupChanges_ErrorBadDate'), new List<String>{ day })
 			);
 		}
 		return Datetime.newInstance(parsed.addDays(plusDays), Time.newInstance(0, 0, 0, 0));

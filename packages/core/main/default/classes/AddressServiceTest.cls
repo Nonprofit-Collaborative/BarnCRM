@@ -35,26 +35,17 @@ private class AddressServiceTest {
 				FROM Address__c
 				WHERE Account__c = :garcia.Id
 			];
-			Assert.areEqual(
-				1,
-				addresses.size(),
-				'The household should keep the address it was created with.'
-			);
+			Assert.areEqual(1, addresses.size(), 'The household should keep the address it was created with.');
 			Assert.areEqual('Home', addresses[0].Type__c, 'A household address is a home address.');
 			Assert.areEqual(HOME_STREET, addresses[0].Street__c, 'The street should be kept.');
-			Assert.isTrue(
-				addresses[0].Is_Default__c,
-				'The only address on file is the one in use.'
-			);
+			Assert.isTrue(addresses[0].Is_Default__c, 'The only address on file is the one in use.');
 		}
 	}
 
 	@IsTest
 	static void capturesWorkAddressWhenOrganizationIsCreatedWithOne() {
 		System.runAs(TestUsers.admin()) {
-			Account funder = AddressTestDataFactory.newOrganization(
-				'Springfield Community Foundation'
-			);
+			Account funder = AddressTestDataFactory.newOrganization('Springfield Community Foundation');
 			funder.BillingStreet = '55 Foundation Way';
 			funder.BillingCity = HOME_CITY;
 
@@ -68,15 +59,8 @@ private class AddressServiceTest {
 				WHERE Account__c = :funder.Id
 			];
 			Assert.areEqual(1, addresses.size(), 'The organization should keep its address.');
-			Assert.areEqual(
-				'Work',
-				addresses[0].Type__c,
-				'An organization address is a work address.'
-			);
-			Assert.isTrue(
-				addresses[0].Is_Default__c,
-				'The only address on file is the one in use.'
-			);
+			Assert.areEqual('Work', addresses[0].Type__c, 'An organization address is a work address.');
+			Assert.isTrue(addresses[0].Is_Default__c, 'The only address on file is the one in use.');
 		}
 	}
 
@@ -153,11 +137,7 @@ private class AddressServiceTest {
 				FROM Address__c
 			];
 			Assert.areEqual(1, addresses.size(), 'One address should have been created.');
-			Assert.areEqual(
-				garcia.Id,
-				addresses[0].Account__c,
-				'The default behavior moves the household.'
-			);
+			Assert.areEqual(garcia.Id, addresses[0].Account__c, 'The default behavior moves the household.');
 			Assert.areEqual(HOME_STREET, addresses[0].Street__c, 'The street should be kept.');
 		}
 	}
@@ -230,11 +210,7 @@ private class AddressServiceTest {
 			.Id;
 
 			Test.startTest();
-			update new Contact(
-				Id = members[0].Id,
-				MailingStreet = WINTER_STREET,
-				MailingCity = WINTER_CITY
-			);
+			update new Contact(Id = members[0].Id, MailingStreet = WINTER_STREET, MailingCity = WINTER_CITY);
 			Test.stopTest();
 
 			Address__c oldAddress = [
@@ -242,11 +218,7 @@ private class AddressServiceTest {
 				FROM Address__c
 				WHERE Id = :oldDefaultId
 			];
-			Assert.areEqual(
-				HOME_STREET,
-				oldAddress.Street__c,
-				'The old address is not overwritten'
-			);
+			Assert.areEqual(HOME_STREET, oldAddress.Street__c, 'The old address is not overwritten');
 			Assert.isFalse(oldAddress.Is_Default__c, 'It is no longer the one in use');
 			Address__c inUse = [
 				SELECT Street__c, Type__c
@@ -345,17 +317,9 @@ private class AddressServiceTest {
 			Assert.areEqual(1, personal.size(), 'Ana should have an address of her own.');
 			Assert.areEqual(WINTER_STREET, personal[0].Street__c, 'It should hold the new street.');
 			Account household = [SELECT BillingStreet FROM Account WHERE Id = :garcia.Id];
-			Assert.areEqual(
-				HOME_STREET,
-				household.BillingStreet,
-				'The rest of the household should not have moved.'
-			);
+			Assert.areEqual(HOME_STREET, household.BillingStreet, 'The rest of the household should not have moved.');
 			Contact luis = [SELECT MailingStreet FROM Contact WHERE Id = :members[1].Id];
-			Assert.areNotEqual(
-				WINTER_STREET,
-				luis.MailingStreet,
-				'Only Ana moved, so Luis should be where he was.'
-			);
+			Assert.areNotEqual(WINTER_STREET, luis.MailingStreet, 'Only Ana moved, so Luis should be where he was.');
 		}
 	}
 
@@ -388,17 +352,9 @@ private class AddressServiceTest {
 				WHERE Account__c = :garcia.Id AND Is_Default__c = TRUE
 			];
 			Assert.areEqual(1, defaults.size(), 'A household has one address in use at a time.');
-			Assert.areEqual(
-				WINTER_STREET,
-				defaults[0].Street__c,
-				'The new address should be in use.'
-			);
+			Assert.areEqual(WINTER_STREET, defaults[0].Street__c, 'The new address should be in use.');
 			Account moved = [SELECT BillingCity FROM Account WHERE Id = :garcia.Id];
-			Assert.areEqual(
-				WINTER_CITY,
-				moved.BillingCity,
-				'The standard fields follow the default.'
-			);
+			Assert.areEqual(WINTER_CITY, moved.BillingCity, 'The standard fields follow the default.');
 		}
 	}
 
@@ -430,11 +386,7 @@ private class AddressServiceTest {
 			Assert.areEqual(1, remaining.size(), 'The home address should still be on file.');
 			Assert.isTrue(remaining[0].Is_Default__c, 'It should have been promoted.');
 			Account household = [SELECT BillingCity FROM Account WHERE Id = :garcia.Id];
-			Assert.areEqual(
-				HOME_CITY,
-				household.BillingCity,
-				'The standard fields follow the promotion.'
-			);
+			Assert.areEqual(HOME_CITY, household.BillingCity, 'The standard fields follow the promotion.');
 		}
 	}
 
@@ -449,10 +401,7 @@ private class AddressServiceTest {
 			Test.startTest();
 			insert ana;
 			Integer queriesAfterCapture = Limits.getQueries();
-			Assert.isTrue(
-				queriesAfterCapture < Limits.getLimitQueries(),
-				'The capture must not run away.'
-			);
+			Assert.isTrue(queriesAfterCapture < Limits.getLimitQueries(), 'The capture must not run away.');
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -474,9 +423,7 @@ private class AddressServiceTest {
 			try {
 				AddressService.captureFromStandardFields(new List<Account>{ garcia }, null);
 				AddressService.syncDefaultToStandardFields(
-					new List<Address__c>{
-						new Address__c(Account__c = garcia.Id, Is_Default__c = true)
-					}
+					new List<Address__c>{ new Address__c(Account__c = garcia.Id, Is_Default__c = true) }
 				);
 			} finally {
 				AddressService.isPropagating = false;
@@ -524,9 +471,7 @@ private class AddressServiceTest {
 			Database.insert(households, AccessLevel.SYSTEM_MODE);
 			List<Contact> people = new List<Contact>();
 			for (Integer i = 0; i < 200; i++) {
-				people.add(
-					AddressTestDataFactory.newContact('Person', 'Number ' + i, households[i].Id)
-				);
+				people.add(AddressTestDataFactory.newContact('Person', 'Number ' + i, households[i].Id));
 			}
 			insert people;
 			for (Integer i = 0; i < 200; i++) {
@@ -601,18 +546,12 @@ private class AddressServiceTest {
 		System.runAs(TestUsers.admin()) {
 			Account nativeHousehold = AddressTestDataFactory.newHousehold('Native Household');
 			Database.insert(nativeHousehold, AccessLevel.SYSTEM_MODE);
-			Contact member = AddressTestDataFactory.newContact(
-				'Maria',
-				'Garcia',
-				nativeHousehold.Id
-			);
+			Contact member = AddressTestDataFactory.newContact('Maria', 'Garcia', nativeHousehold.Id);
 			insert member;
 			OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
 			shape.hasNativeHouseholdGroups = true;
 			OrgShapeDetector.overrideShape = shape;
-			HouseholdSelector.accountsWithNativeDependentsOverride = new Set<Id>{
-				nativeHousehold.Id
-			};
+			HouseholdSelector.accountsWithNativeDependentsOverride = new Set<Id>{ nativeHousehold.Id };
 			Address__c address = new Address__c(
 				Account__c = nativeHousehold.Id,
 				Type__c = 'Home',
@@ -691,11 +630,8 @@ private class AddressServiceTest {
 	@IsTest
 	static void anAddressThatIsNotSeasonalIsNeverSeasonallyActive() {
 		System.runAs(TestUsers.admin()) {
-			Date today = Date.today();
-			Assert.isFalse(
-				AddressService.isSeasonalActiveOn(null, today),
-				'Nothing is not active.'
-			);
+			Date today = OrgDate.today();
+			Assert.isFalse(AddressService.isSeasonalActiveOn(null, today), 'Nothing is not active.');
 			Assert.isFalse(
 				AddressService.isSeasonalActiveOn(new Address__c(Type__c = 'Home'), today),
 				'A home address is not a seasonal one.'
@@ -714,21 +650,9 @@ private class AddressServiceTest {
 	static void selectorReturnsNothingWhenAskedForNothing() {
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
-			Assert.areEqual(
-				0,
-				AddressSelector.selectByOwnerIds(null).size(),
-				'No owners, no addresses.'
-			);
-			Assert.areEqual(
-				0,
-				AddressSelector.selectByOwnerIds(new Set<Id>()).size(),
-				'No owners, no addresses.'
-			);
-			Assert.areEqual(
-				0,
-				AddressSelector.selectDefaultsByOwnerIds(null, null).size(),
-				'No owners, no defaults.'
-			);
+			Assert.areEqual(0, AddressSelector.selectByOwnerIds(null).size(), 'No owners, no addresses.');
+			Assert.areEqual(0, AddressSelector.selectByOwnerIds(new Set<Id>()).size(), 'No owners, no addresses.');
+			Assert.areEqual(0, AddressSelector.selectDefaultsByOwnerIds(null, null).size(), 'No owners, no defaults.');
 			Assert.areEqual(
 				0,
 				AddressSelector.selectStoredValues(Contact.SObjectType, null, null).size(),
@@ -772,30 +696,20 @@ private class AddressServiceTest {
 			);
 			Contact cleared = new Contact(Id = held.Id, MailingStreet = null);
 			Contact unknown = new Contact(
-				Id = Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-						.getKeyPrefix() + '000000000000AAA',
+				Id = Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() +
+					'000000000000AAA',
 				MailingStreet = HOME_STREET
 			);
 
 			Test.startTest();
-			List<SObject> written = AddressService.withChanges(
-				new List<SObject>{ same, recased, cleared, unknown }
-			);
+			List<SObject> written = AddressService.withChanges(new List<SObject>{ same, recased, cleared, unknown });
 			Test.stopTest();
 
-			Assert.areEqual(
-				3,
-				written.size(),
-				'Only the copy that matches what is stored is left out.'
-			);
+			Assert.areEqual(3, written.size(), 'Only the copy that matches what is stored is left out.');
 			Assert.isTrue(written[0] === recased, 'A change of case is a change.');
 			Assert.isTrue(written[1] === cleared, 'Clearing a value is a change.');
 			Assert.isTrue(written[2] === unknown, 'A record that is not found is still written.');
-			Assert.areEqual(
-				0,
-				AddressService.withChanges(null).size(),
-				'Nothing, nothing written.'
-			);
+			Assert.areEqual(0, AddressService.withChanges(null).size(), 'Nothing, nothing written.');
 		}
 	}
 
@@ -955,10 +869,7 @@ private class AddressServiceTest {
 			insert home;
 
 			Test.startTest();
-			Database.SaveResult result = Database.update(
-				new Address__c(Id = home.Id, Is_Default__c = false),
-				false
-			);
+			Database.SaveResult result = Database.update(new Address__c(Id = home.Id, Is_Default__c = false), false);
 			Test.stopTest();
 
 			Assert.isFalse(result.isSuccess(), 'The household would have no address in use');
@@ -1096,10 +1007,7 @@ private class AddressServiceTest {
 			accountId,
 			AddressService.ownerIdOf(new Address__c(Account__c = accountId, Contact__c = contactId))
 		);
-		Assert.areEqual(
-			contactId,
-			AddressService.ownerIdOf(new Address__c(Contact__c = contactId))
-		);
+		Assert.areEqual(contactId, AddressService.ownerIdOf(new Address__c(Contact__c = contactId)));
 		Assert.isNull(AddressService.ownerIdOf(new Address__c()));
 	}
 }

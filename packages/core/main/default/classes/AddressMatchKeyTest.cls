@@ -23,11 +23,7 @@ private class AddressMatchKeyTest {
 			insert home;
 			Assert.areEqual('02139|77', keyOf(home.Id), 'Postal code and house number');
 
-			update new Address__c(
-				Id = home.Id,
-				Street__c = 'North Main St.',
-				Postal_Code__c = '02140'
-			);
+			update new Address__c(Id = home.Id, Street__c = 'North Main St.', Postal_Code__c = '02140');
 			Assert.areEqual('02140|main', keyOf(home.Id), 'A shortened word is skipped');
 
 			update new Address__c(Id = home.Id, Street__c = null);
@@ -50,10 +46,7 @@ private class AddressMatchKeyTest {
 				new AddressMatchKeyHandler.FilledCheck().run(),
 				'Not filled yet: Health Check offers the fill'
 			);
-			Assert.isFalse(
-				SettingsService.getSettings().Match_Keys_Filled__c == true,
-				'Not marked while one is left'
-			);
+			Assert.isFalse(SettingsService.getSettings().Match_Keys_Filled__c == true, 'Not marked while one is left');
 
 			Test.startTest();
 			Assert.isNotNull(AddressMatchKeyBatch.run(), 'The fill starts');
@@ -63,6 +56,86 @@ private class AddressMatchKeyTest {
 			SettingsService.clearCaches();
 			Assert.isTrue(SettingsService.getSettings().Match_Keys_Filled__c, 'Marked filled');
 			Assert.isNull(new AddressMatchKeyHandler.FilledCheck().run(), 'Nothing to offer');
+		}
+	}
+
+	/**
+	 * An address whose save fails keeps no key. After a fill has run it is marked filled with
+	 * the rest, so the next fill does not try it again, and one Warning says how many (N-06).
+	 */
+	@IsTest
+	static void aFillThatLeavesSomeUnsavedMarksThemFilledAndWarns() {
+		System.runAs(TestUsers.admin()) {
+			AddressMatchKeyBatch.unfilledForTest = true;
+
+			Test.startTest();
+			new AddressMatchKeyBatch().finish(null);
+			Test.stopTest();
+
+			SettingsService.clearCaches();
+			Assert.isTrue(
+				SettingsService.getSettings().Match_Keys_Filled__c,
+				'Marked filled, so no later run selects them again'
+			);
+			Assert.isNull(new AddressMatchKeyHandler.FilledCheck().run(), 'Not offered again');
+			List<Error_Log__c> warnings = [
+				SELECT Message__c, Severity__c
+				FROM Error_Log__c
+				WHERE Context__c = 'AddressMatchKeyBatch'
+			];
+			Assert.areEqual(1, warnings.size(), 'One warning for the run');
+			Assert.areEqual(ErrorLogger.SEVERITY_WARNING, warnings[0].Severity__c);
+			Assert.isTrue(
+				warnings[0].Message__c.contains('1 addresses'),
+				'It says how many: ' + warnings[0].Message__c
+			);
+		}
+	}
+
+	@IsTest
+	static void aFillWithNothingLeftDoesNotWarn() {
+		System.runAs(TestUsers.admin()) {
+			AddressMatchKeyBatch.unfilledForTest = false;
+
+			Test.startTest();
+			new AddressMatchKeyBatch().finish(null);
+			Test.stopTest();
+
+			SettingsService.clearCaches();
+			Assert.isTrue(SettingsService.getSettings().Match_Keys_Filled__c, 'Marked filled');
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'AddressMatchKeyBatch'],
+				'Nothing to warn about'
+			);
+		}
+	}
+
+	@IsTest
+	static void aStreetOfOnlySpacesIsMarkedNotLeftToFill() {
+		// runs-as: deploying user (pure function over two strings, no DML or SOQL)
+		Assert.areEqual(
+			AddressMatchKeyHandler.NO_KEY,
+			AddressMatchKeyHandler.keyFor('   ', '02139'),
+			'Selected by the fill, so it must not stay null'
+		);
+		Assert.areEqual(AddressMatchKeyHandler.NO_KEY, AddressMatchKeyHandler.keyFor('1 Elm', ' '));
+		Assert.isNull(AddressMatchKeyHandler.keyFor(null, '02139'), 'No street, no key');
+		Assert.isNull(AddressMatchKeyHandler.keyFor('', '02139'), 'Empty is no street');
+	}
+
+	@IsTest
+	static void anEditGivesAnAddressItsKeyAfterTheMark() {
+		System.runAs(TestUsers.admin()) {
+			SettingsService.saveBookkeeping(new Map<String, Object>{ 'Match_Keys_Filled__c' => true });
+			Contact person = insertPerson('Cleo', 'Marsh');
+			Address__c home = new Address__c(Contact__c = person.Id, Postal_Code__c = '02139');
+			insert home;
+			Assert.isNull(keyOf(home.Id), 'No street yet');
+
+			update new Address__c(Id = home.Id, Street__c = '5 Oak Lane');
+
+			Assert.areEqual('02139|5', keyOf(home.Id), 'The edit gives it its key');
 		}
 	}
 
@@ -102,29 +175,15 @@ private class AddressMatchKeyTest {
 	@IsTest
 	static void onceFilledMatchingReadsAddressesByKey() {
 		System.runAs(TestUsers.admin()) {
-			SettingsService.saveBookkeeping(
-				new Map<String, Object>{ 'Match_Keys_Filled__c' => true }
-			);
+			SettingsService.saveBookkeeping(new Map<String, Object>{ 'Match_Keys_Filled__c' => true });
 			MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{ addressSource() };
 			Contact first = insertPerson('Ana', 'Ruiz');
 			Contact second = insertPerson('Anna', 'Ruiz-Lopez');
 			Contact other = insertPerson('Ben', 'Okafor');
 			insert new List<Address__c>{
-				new Address__c(
-					Contact__c = first.Id,
-					Street__c = '12 North Main Street',
-					Postal_Code__c = '02139'
-				),
-				new Address__c(
-					Contact__c = second.Id,
-					Street__c = '12 n. MAIN st',
-					Postal_Code__c = '02139-4307'
-				),
-				new Address__c(
-					Contact__c = other.Id,
-					Street__c = '99 Elm Road',
-					Postal_Code__c = '02139'
-				)
+				new Address__c(Contact__c = first.Id, Street__c = '12 North Main Street', Postal_Code__c = '02139'),
+				new Address__c(Contact__c = second.Id, Street__c = '12 n. MAIN st', Postal_Code__c = '02139-4307'),
+				new Address__c(Contact__c = other.Id, Street__c = '99 Elm Road', Postal_Code__c = '02139')
 			};
 			MatchSourceService.Source source = MatchSourceService.usableSources()[0];
 			Assert.isTrue(AddressMatchKeyHandler.usable(source), 'The keys are used');
@@ -160,9 +219,7 @@ private class AddressMatchKeyTest {
 	// ------------------------------------------------------------------ helpers
 
 	private static Contact insertPerson(String firstName, String lastName) {
-		Contact person = TestDataFactory.person(
-			new Contact(FirstName = firstName, LastName = lastName)
-		);
+		Contact person = TestDataFactory.person(new Contact(FirstName = firstName, LastName = lastName));
 		TestDataFactory.pastDuplicateRules(person);
 		insert person;
 		return person;
@@ -178,15 +235,10 @@ private class AddressMatchKeyTest {
 			'MasterLabel' => 'Address_Person',
 			NamespaceUtil.qualify('Object_Name__c') => NamespaceUtil.qualify('Address__c'),
 			NamespaceUtil.qualify('Value_Field__c') => NamespaceUtil.qualify('Street__c'),
-			NamespaceUtil.qualify('Postal_Code_Field__c') => NamespaceUtil.qualify(
-				'Postal_Code__c'
-			),
+			NamespaceUtil.qualify('Postal_Code_Field__c') => NamespaceUtil.qualify('Postal_Code__c'),
 			NamespaceUtil.qualify('Parent_Field__c') => NamespaceUtil.qualify('Contact__c'),
 			NamespaceUtil.qualify('Normalization__c') => MatchSourceService.ADDRESS
 		};
-		return (Match_Source__mdt) JSON.deserialize(
-			JSON.serialize(fields),
-			Match_Source__mdt.class
-		);
+		return (Match_Source__mdt) JSON.deserialize(JSON.serialize(fields), Match_Source__mdt.class);
 	}
 }

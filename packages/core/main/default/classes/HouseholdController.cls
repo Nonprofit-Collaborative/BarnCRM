@@ -56,34 +56,21 @@ public with sharing class HouseholdController {
 	 * read from or written to the org's own households. R-H14.
 	 */
 	@AuraEnabled(cacheable=true)
-	public static List<HouseholdPreview> preview(
-		String namePattern,
-		String formalPattern,
-		String informalPattern
-	) {
+	public static List<HouseholdPreview> preview(String namePattern, String formalPattern, String informalPattern) {
 		try {
 			BarnCRM_Settings__c settings = SettingsService.getSettings();
-			Boolean includeDeceased =
-				settings != null &&
-				settings.Include_Deceased_In_Name__c == true;
+			Boolean includeDeceased = settings != null && settings.Include_Deceased_In_Name__c == true;
 			List<HouseholdPreview> result = new List<HouseholdPreview>();
 			for (List<HouseholdService.Person> members : sampleHouseholds()) {
 				HouseholdPreview row = new HouseholdPreview();
 				row.members = describe(members);
-				row.name = HouseholdNamingService.computeName(
-					members,
-					namePattern,
-					includeDeceased
-				);
+				row.name = HouseholdNamingService.computeName(members, namePattern, includeDeceased);
 				row.formalGreeting = HouseholdNamingService.computeFormalGreeting(
 					members,
 					formalPattern,
 					includeDeceased
 				);
-				row.informalGreeting = HouseholdNamingService.computeInformalGreeting(
-					members,
-					informalPattern
-				);
+				row.informalGreeting = HouseholdNamingService.computeInformalGreeting(members, informalPattern);
 				result.add(row);
 			}
 			return result;
@@ -104,12 +91,8 @@ public with sharing class HouseholdController {
 			NamingSettings result = new NamingSettings();
 			result.namePattern = settings == null ? null : settings.Household_Name_Pattern__c;
 			result.formalPattern = settings == null ? null : settings.Formal_Greeting_Pattern__c;
-			result.informalPattern = settings == null
-				? null
-				: settings.Informal_Greeting_Pattern__c;
-			result.includeDeceasedInName =
-				settings != null &&
-				settings.Include_Deceased_In_Name__c == true;
+			result.informalPattern = settings == null ? null : settings.Informal_Greeting_Pattern__c;
+			result.includeDeceasedInName = settings != null && settings.Include_Deceased_In_Name__c == true;
 			result.canEdit = canManageSettings();
 			return result;
 		} catch (Exception e) {
@@ -127,16 +110,10 @@ public with sharing class HouseholdController {
 	public static String recomputeAll() {
 		try {
 			if (!canManageSettings()) {
-				throw new HouseholdException(
-					BarnHelp.text('Core', 'Core_Households_ErrorNoSettingsPermission')
-				);
+				throw new HouseholdException(BarnHelp.text('Core', 'Core_Households_ErrorNoSettingsPermission'));
 			}
 			return String.valueOf(
-				AsyncStarter.batch(
-					new HouseholdNamingBatch(),
-					200,
-					Label.Core_Households_ErrorContextNaming
-				)
+				AsyncStarter.batch(new HouseholdNamingBatch(), 200, Label.Core_Households_ErrorContextNaming)
 			);
 		} catch (Exception e) {
 			throw HouseholdException.forScreen(e, Label.Core_Households_ErrorContextNaming, null);
@@ -149,18 +126,14 @@ public with sharing class HouseholdController {
 	 */
 	@AuraEnabled(cacheable=true)
 	public static String getMembershipMode() {
-		return HouseholdService.isJunctionMode()
-			? HouseholdService.MODE_JUNCTION
-			: HouseholdService.SOURCE_CONTACT;
+		return HouseholdService.isJunctionMode() ? HouseholdService.MODE_JUNCTION : HouseholdService.SOURCE_CONTACT;
 	}
 
 	@AuraEnabled(cacheable=true)
 	public static List<MemberView> getMembers(Id householdId) {
 		try {
 			if (householdId == null || householdId.getSObjectType() != Account.SObjectType) {
-				throw new HouseholdException(
-					BarnHelp.text('Core', 'Core_Households_ErrorNotAHousehold')
-				);
+				throw new HouseholdException(BarnHelp.text('Core', 'Core_Households_ErrorNotAHousehold'));
 			}
 			List<MemberView> result = new List<MemberView>();
 			// What a screen shows is read with the running user's own access (ADR-0021),
@@ -184,11 +157,7 @@ public with sharing class HouseholdController {
 			}
 			return result;
 		} catch (Exception e) {
-			throw HouseholdException.forScreen(
-				e,
-				Label.Core_Households_ErrorContextMembership,
-				householdId
-			);
+			throw HouseholdException.forScreen(e, Label.Core_Households_ErrorContextMembership, householdId);
 		}
 	}
 
@@ -202,11 +171,7 @@ public with sharing class HouseholdController {
 		try {
 			HouseholdService.moveContact(contactId, targetHouseholdId, sourceHouseholdId);
 		} catch (Exception e) {
-			throw HouseholdException.forScreen(
-				e,
-				Label.Core_Households_ErrorContextMembership,
-				contactId
-			);
+			throw HouseholdException.forScreen(e, Label.Core_Households_ErrorContextMembership, contactId);
 		}
 	}
 

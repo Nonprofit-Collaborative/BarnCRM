@@ -51,10 +51,7 @@ public inherited sharing class EnrollmentCapacity extends TriggerHandler {
 	 * Before save: of the enrollments that become Enrolled in a program (new, moved to Enrolled or
 	 * moved to another program), those that do not fit are saved as Waitlisted, in the order given.
 	 */
-	public static void waitlistWhatDoesNotFit(
-		List<Enrollment__c> enrollments,
-		Map<Id, Enrollment__c> previousById
-	) {
+	public static void waitlistWhatDoesNotFit(List<Enrollment__c> enrollments, Map<Id, Enrollment__c> previousById) {
 		if (!waitlistEnabled()) {
 			return;
 		}
@@ -82,12 +79,7 @@ public inherited sharing class EnrollmentCapacity extends TriggerHandler {
 		}
 		// The fits come back in the candidates' order, so one pass matches them by identity: two new
 		// enrollments can be equal field for field.
-		List<SObject> fits = WaitlistQueue.fitting(
-			freePlaces(programIds, ownIds),
-			candidates,
-			PROGRAM,
-			null
-		);
+		List<SObject> fits = WaitlistQueue.fitting(freePlaces(programIds, ownIds), candidates, PROGRAM, null);
 		Integer next = 0;
 		for (Enrollment__c candidate : candidates) {
 			if (next < fits.size() && fits[next] === candidate) {
@@ -99,15 +91,10 @@ public inherited sharing class EnrollmentCapacity extends TriggerHandler {
 	}
 
 	/** After update or delete: the programs an Enrolled enrollment left. */
-	public static Set<Id> freedPrograms(
-		List<Enrollment__c> enrollments,
-		Map<Id, Enrollment__c> previousById
-	) {
+	public static Set<Id> freedPrograms(List<Enrollment__c> enrollments, Map<Id, Enrollment__c> previousById) {
 		Set<Id> freed = new Set<Id>();
 		for (Enrollment__c enrollment : enrollments) {
-			Enrollment__c previous = previousById == null
-				? enrollment
-				: previousById.get(enrollment.Id);
+			Enrollment__c previous = previousById == null ? enrollment : previousById.get(enrollment.Id);
 			Boolean deleted = previousById == null;
 			if (
 				previous.Stage__c == EnrollmentService.STAGE_ENROLLED &&
@@ -142,9 +129,7 @@ public inherited sharing class EnrollmentCapacity extends TriggerHandler {
 		];
 		List<Enrollment__c> promoted = new List<Enrollment__c>();
 		for (SObject fit : WaitlistQueue.fitting(free, waiting, PROGRAM, null)) {
-			promoted.add(
-				new Enrollment__c(Id = fit.Id, Stage__c = EnrollmentService.STAGE_ENROLLED)
-			);
+			promoted.add(new Enrollment__c(Id = fit.Id, Stage__c = EnrollmentService.STAGE_ENROLLED));
 		}
 		if (promoted.isEmpty()) {
 			return;
@@ -178,10 +163,7 @@ public inherited sharing class EnrollmentCapacity extends TriggerHandler {
 		for (AggregateResult row : [
 			SELECT Program__c programId, COUNT(Id) taken
 			FROM Enrollment__c
-			WHERE
-				Program__c IN :limited
-				AND Stage__c = :EnrollmentService.STAGE_ENROLLED
-				AND Id NOT IN :leaveOut
+			WHERE Program__c IN :limited AND Stage__c = :EnrollmentService.STAGE_ENROLLED AND Id NOT IN :leaveOut
 			WITH SYSTEM_MODE
 			GROUP BY Program__c
 		]) {

@@ -27,15 +27,9 @@ private class SeasonalAddressControllerTest {
 			SeasonalAddressController.SwapView view = SeasonalAddressController.getSwap();
 			Test.stopTest();
 
-			Assert.isNull(
-				view.lastRun,
-				'An org that has never run the swap must be shown as never having run it.'
-			);
+			Assert.isNull(view.lastRun, 'An org that has never run the swap must be shown as never having run it.');
 			Assert.isFalse(view.scheduled, 'Nothing schedules the job on install.');
-			Assert.isFalse(
-				view.stale,
-				'An org that has not switched the job on has not missed a run.'
-			);
+			Assert.isFalse(view.stale, 'An org that has not switched the job on has not missed a run.');
 		}
 	}
 
@@ -68,9 +62,7 @@ private class SeasonalAddressControllerTest {
 	static void theViewOfAScheduledSwapCostsTwoQueries() {
 		System.runAs(TestUsers.admin()) {
 			OrgSettingsSystemWriter.save(
-				new Map<Schema.SObjectField, Object>{
-					BarnCRM_Settings__c.Seasonal_Addresses_Enabled__c => true
-				}
+				new Map<Schema.SObjectField, Object>{ BarnCRM_Settings__c.Seasonal_Addresses_Enabled__c => true }
 			);
 			SettingsService.clearCaches();
 			SeasonalAddressScheduler.start();

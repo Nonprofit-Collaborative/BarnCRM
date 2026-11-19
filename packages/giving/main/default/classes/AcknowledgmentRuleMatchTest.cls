@@ -36,18 +36,11 @@ private class AcknowledgmentRuleMatchTest {
 	 */
 	private static Id fakeContactId(Integer sequence) {
 		String suffix = String.valueOf(sequence).leftPad(12, '0');
-		return Id.valueOf(
-			Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() + suffix
-		);
+		return Id.valueOf(Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() + suffix);
 	}
 
 	private static Gift__c giftOf(Decimal amount) {
-		return new Gift__c(
-			Amount__c = amount,
-			Status__c = 'Received',
-			Type__c = 'Check',
-			Donor_Contact__c = null
-		);
+		return new Gift__c(Amount__c = amount, Status__c = 'Received', Type__c = 'Check', Donor_Contact__c = null);
 	}
 
 	@IsTest
@@ -134,8 +127,7 @@ private class AcknowledgmentRuleMatchTest {
 			Assert.areEqual(
 				'Anything',
 				AcknowledgmentRuleService.matchFor(check, rules, new Set<String>()).ruleName,
-				'A check does not match a rule that names Stock, and falls through to the rule with ' +
-				'no type on it.'
+				'A check does not match a rule that names Stock, and falls through to the rule with ' + 'no type on it.'
 			);
 			Assert.areEqual(
 				'Stock gifts',
@@ -223,11 +215,7 @@ private class AcknowledgmentRuleMatchTest {
 	@IsTest
 	static void anEarlierGiftIsFoundForEitherKindOfDonor() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Contact person = AcknowledgmentTestData.insertDonor(
-				'Ada',
-				'Fitzgerald',
-				'ada@example.org'
-			);
+			Contact person = AcknowledgmentTestData.insertDonor('Ada', 'Fitzgerald', 'ada@example.org');
 			Account organization = GivingTestDataFactory.insertOrganization('Riverside Trust');
 			GivingTestDataFactory.insertDefaultFund();
 
@@ -235,10 +223,7 @@ private class AcknowledgmentRuleMatchTest {
 			insert earlier;
 
 			Gift__c second = GivingTestDataFactory.buildGift(person.Id, 200);
-			Gift__c firstFromOrganization = GivingTestDataFactory.buildAccountGift(
-				organization.Id,
-				500
-			);
+			Gift__c firstFromOrganization = GivingTestDataFactory.buildAccountGift(organization.Id, 500);
 
 			Test.startTest();
 			Set<String> answered = AcknowledgmentRuleService.donorsWithEarlierGifts(

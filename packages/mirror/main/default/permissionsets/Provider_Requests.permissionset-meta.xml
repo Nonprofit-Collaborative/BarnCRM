@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+  <hasActivationRequired>false</hasActivationRequired>
+  <label>Provider Requests</label>
+  <description>
+    Reads Provider Requests: the Cases sent to a service provider and the status it sends back.
+    Case itself needs its own access in Setup.
+  </description>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Provider_Request__c.Case_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Provider_Request__c.Error__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Provider_Request__c.Request_Number__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Provider_Request__c.Resolution__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Provider_Request__c.Status__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Provider_Request__c.Synced__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <objectPermissions>
+    <allowCreate>false</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Provider_Request__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <tabSettings>
+    <tab>Provider_Request__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+</PermissionSet>

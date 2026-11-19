@@ -42,19 +42,13 @@ private class ArchiveByQueryTest {
 			TestDataFactory.person(new Contact(LastName = 'Staff Person', Title = 'Staff'))
 		};
 		for (Integer index = 0; index < volunteers; index++) {
-			people.add(
-				TestDataFactory.person(
-					new Contact(LastName = 'Archived ' + index, Title = 'Volunteer')
-				)
-			);
+			people.add(TestDataFactory.person(new Contact(LastName = 'Archived ' + index, Title = 'Volunteer')));
 		}
 		insert people;
 	}
 
 	private static User deleter() {
-		return TestUsers.withPermissionSets(
-			new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Bulk_Delete' }
-		);
+		return TestUsers.withPermissionSets(new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Bulk_Delete' });
 	}
 
 	private static Import_Batch__c reread(Id jobId) {
@@ -83,11 +77,7 @@ private class ArchiveByQueryTest {
 			System.runAs(deleter()) {
 				job = BulkDeleteService.startArchive(VOLUNTEERS, 3, null);
 				System.Assert.isNotNull(job.Job_Id__c, 'The export is the job until the delete');
-				System.Assert.areEqual(
-					4,
-					[SELECT COUNT() FROM Contact],
-					'Nothing is deleted before the file is saved'
-				);
+				System.Assert.areEqual(4, [SELECT COUNT() FROM Contact], 'Nothing is deleted before the file is saved');
 			}
 			Test.stopTest();
 
@@ -109,14 +99,8 @@ private class ArchiveByQueryTest {
 			System.Assert.areEqual('Id', heading[0], 'Id first');
 			System.Assert.isTrue(heading.contains('LastName'), 'Headed by API name: ' + lines[0]);
 			System.Assert.isTrue(heading.contains('Title'), 'Every readable field, not the query');
-			System.Assert.isFalse(
-				file.VersionData.toString().contains('Staff Person'),
-				'Only the matching records'
-			);
-			System.Assert.isTrue(
-				job.Run_Log__c.contains(file.Title),
-				'The run log names the file: ' + job.Run_Log__c
-			);
+			System.Assert.isFalse(file.VersionData.toString().contains('Staff Person'), 'Only the matching records');
+			System.Assert.isTrue(job.Run_Log__c.contains(file.Title), 'The run log names the file: ' + job.Run_Log__c);
 			System.Assert.isTrue(
 				job.Operation_JSON__c.contains('"notChangedAfter"'),
 				'The delete keeps only records not changed since the file started'
@@ -175,20 +159,14 @@ private class ArchiveByQueryTest {
 			}
 			System.Assert.isTrue(
 				job.Run_Log__c.contains(
-					String.format(
-						BarnHelp.text('Core', 'Core_Archive_LogEmptied'),
-						new List<Object>{ '3', '0' }
-					)
+					String.format(BarnHelp.text('Core', 'Core_Archive_LogEmptied'), new List<Object>{ '3', '0' })
 				),
 				job.Run_Log__c
 			);
 			System.runAs(deleter()) {
 				BulkDeleteService.UndoPreview undo = BulkDeleteService.undoPreview(job.Id);
 				System.Assert.isFalse(undo.allowed, 'Nothing left to undelete');
-				System.Assert.areEqual(
-					BarnHelp.text('Core', 'Core_Archive_UndoEmptied'),
-					undo.reason
-				);
+				System.Assert.areEqual(BarnHelp.text('Core', 'Core_Archive_UndoEmptied'), undo.reason);
 			}
 		}
 	}

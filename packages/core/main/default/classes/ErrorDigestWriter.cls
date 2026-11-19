@@ -20,9 +20,7 @@ public without sharing class ErrorDigestWriter {
 		OrgSettingsSystemWriter.save(
 			new Map<Schema.SObjectField, Object>{
 				BarnCRM_Settings__c.Error_Digest_Last_Run__c => ranAt,
-				BarnCRM_Settings__c.Error_Digest_Last_Run_Summary__c => summary == null
-					? null
-					: summary.left(255),
+				BarnCRM_Settings__c.Error_Digest_Last_Run_Summary__c => summary == null ? null : summary.left(255),
 				BarnCRM_Settings__c.Error_Digest_Covered_Until__c => coveredUntil
 			}
 		);

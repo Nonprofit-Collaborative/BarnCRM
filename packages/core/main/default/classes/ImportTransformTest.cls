@@ -57,11 +57,7 @@ private class ImportTransformTest {
 		};
 	}
 
-	private static ImportRowProcessor.Outcome run(
-		Import_Template__c template,
-		Import_Batch__c batch,
-		Boolean dryRun
-	) {
+	private static ImportRowProcessor.Outcome run(Import_Template__c template, Import_Batch__c batch, Boolean dryRun) {
 		ImportBatchService.beginPass(batch.Id);
 		return ImportRowProcessor.process(
 			ImportBatchSelector.selectById(batch.Id),
@@ -80,11 +76,7 @@ private class ImportTransformTest {
 				for (Integer i = 0; i < ALREADY_THERE; i++) {
 					existing.add(
 						TestDataFactory.person(
-							new Contact(
-								FirstName = 'Ana',
-								LastName = 'Old',
-								Email = 'person' + i + '@example.org'
-							)
+							new Contact(FirstName = 'Ana', LastName = 'Old', Email = 'person' + i + '@example.org')
 						)
 					);
 				}
@@ -107,17 +99,9 @@ private class ImportTransformTest {
 				ImportRowProcessor.Outcome committed = run(template, batch, false);
 				Test.stopTest();
 
-				Assert.areEqual(
-					MANY - ALREADY_THERE,
-					preview.created,
-					'Changed emails match the ten.'
-				);
+				Assert.areEqual(MANY - ALREADY_THERE, preview.created, 'Changed emails match the ten.');
 				Assert.areEqual(ALREADY_THERE, contactsAfterPreview, 'The dry run writes nothing.');
-				Assert.areEqual(
-					MANY - ALREADY_THERE,
-					committed.created,
-					'The commit decides alike.'
-				);
+				Assert.areEqual(MANY - ALREADY_THERE, committed.created, 'The commit decides alike.');
 				Assert.areEqual(MANY, [SELECT COUNT() FROM Contact], 'Nobody was created twice.');
 				Contact made = [
 					SELECT Email, LastName, Birthdate
@@ -126,11 +110,7 @@ private class ImportTransformTest {
 					LIMIT 1
 				];
 				Assert.areEqual('person150@example.org', made.Email);
-				Assert.areEqual(
-					'Rivera-Lopez',
-					made.LastName,
-					'The surname is capitalized per word.'
-				);
+				Assert.areEqual('Rivera-Lopez', made.LastName, 'The surname is capitalized per word.');
 				Assert.areEqual(Date.newInstance(1980, 12, 31), made.Birthdate, 'Read day first.');
 			}
 
@@ -163,10 +143,7 @@ private class ImportTransformTest {
 
 				Assert.isNotNull(refusal, 'A replace with nothing to find is refused.');
 				Assert.isTrue(refusal.contains('Surname'), 'The column is named: ' + refusal);
-				Assert.isTrue(
-					refusal.contains(BarnHelp.text('Core', 'Core_Transform_ErrorNeedsText')),
-					refusal
-				);
+				Assert.isTrue(refusal.contains(BarnHelp.text('Core', 'Core_Transform_ErrorNeedsText')), refusal);
 			}
 
 		}
@@ -257,15 +234,9 @@ private class ImportTransformTest {
 			Assert.areEqual(5, good.samples.size(), 'Only the first rows are shown.');
 			Assert.areEqual('ana', good.samples[0].before);
 			Assert.areEqual('Ana M', good.samples[0].after);
-			Assert.areEqual(
-				2,
-				good.samples[0].rowNumber,
-				'Counted as the file counts, header first.'
-			);
+			Assert.areEqual(2, good.samples[0].rowNumber, 'Counted as the file counts, header first.');
 			Assert.isTrue(good.problems.isEmpty());
-			Assert.isTrue(
-				broken.problems.contains(BarnHelp.text('Core', 'Core_Transform_ErrorNeedsValue'))
-			);
+			Assert.isTrue(broken.problems.contains(BarnHelp.text('Core', 'Core_Transform_ErrorNeedsValue')));
 		}
 	}
 
@@ -302,16 +273,10 @@ private class ImportTransformTest {
 			ImportTestDataFactory.rows(batch, values);
 
 			Test.startTest();
-			List<ImportController.ChangedValue> changed = ImportController.getChangedValues(
-				batch.Id
-			);
+			List<ImportController.ChangedValue> changed = ImportController.getChangedValues(batch.Id);
 			Test.stopTest();
 
-			Assert.areEqual(
-				10,
-				changed.size(),
-				'Email and surname of five rows; the date did not change.'
-			);
+			Assert.areEqual(10, changed.size(), 'Email and surname of five rows; the date did not change.');
 			Assert.areEqual(2, changed[0].rowNumber);
 			Assert.areEqual('E-mail', changed[0].column);
 			Assert.areEqual('PERSON0 AT Example.org', changed[0].before, 'As staged, trimmed.');

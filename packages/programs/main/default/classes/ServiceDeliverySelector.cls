@@ -14,11 +14,7 @@ public with sharing class ServiceDeliverySelector {
 	}
 
 	/** The deliveries of this service on this day, oldest first, at most `howMany`. */
-	public static List<Service_Delivery__c> selectDeliveriesOn(
-		Id serviceId,
-		Date deliveryDate,
-		Integer howMany
-	) {
+	public static List<Service_Delivery__c> selectDeliveriesOn(Id serviceId, Date deliveryDate, Integer howMany) {
 		return [
 			SELECT
 				Id,
@@ -52,18 +48,11 @@ public with sharing class ServiceDeliverySelector {
 	}
 
 	/** These people's enrollments in these programs, newest start first. */
-	public static List<Enrollment__c> selectEnrollmentsFor(
-		Set<Id> programIds,
-		Set<Id> contactIds,
-		Set<Id> accountIds
-	) {
+	public static List<Enrollment__c> selectEnrollmentsFor(Set<Id> programIds, Set<Id> contactIds, Set<Id> accountIds) {
 		return [
 			SELECT Id, Program__c, Contact__c, Account__c, Stage__c
 			FROM Enrollment__c
-			WHERE
-				Program__c IN :programIds
-				AND (Contact__c IN :contactIds
-				OR Account__c IN :accountIds)
+			WHERE Program__c IN :programIds AND (Contact__c IN :contactIds OR Account__c IN :accountIds)
 			WITH USER_MODE
 			ORDER BY Start_Date__c DESC NULLS LAST, Name DESC
 			LIMIT 10000

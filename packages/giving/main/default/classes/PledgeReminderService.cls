@@ -78,17 +78,13 @@ public with sharing class PledgeReminderService {
 
 	public static void requireEnabled() {
 		if (!isEnabled()) {
-			throw new PledgeReminderException(
-				BarnHelp.text('Giving', 'Giving_PledgeReminders_Disabled')
-			);
+			throw new PledgeReminderException(BarnHelp.text('Giving', 'Giving_PledgeReminders_Disabled'));
 		}
 	}
 
 	public static void requireSendPermission() {
 		if (!AcknowledgmentService.canSend()) {
-			throw new PledgeReminderException(
-				BarnHelp.text('Giving', 'Giving_PledgeReminders_NoPermission')
-			);
+			throw new PledgeReminderException(BarnHelp.text('Giving', 'Giving_PledgeReminders_NoPermission'));
 		}
 	}
 
@@ -145,9 +141,7 @@ public with sharing class PledgeReminderService {
 			Planned item = new Planned();
 			item.installment = installment;
 			item.step = chosen;
-			item.channel = CHANNEL_LETTER.equals(chosen.Channel__c)
-				? CHANNEL_LETTER
-				: CHANNEL_EMAIL;
+			item.channel = CHANNEL_LETTER.equals(chosen.Channel__c) ? CHANNEL_LETTER : CHANNEL_EMAIL;
 			item.recipientId = recipientContactIdFor(installment);
 			planned.add(item);
 		}
@@ -248,16 +242,10 @@ public with sharing class PledgeReminderService {
 		requireEnabled();
 		requireSendPermission();
 		try {
-			return AsyncStarter.batch(
-				new PledgeReminderBatch(),
-				PledgeReminderBatch.SCOPE,
-				'PledgeReminderService'
-			);
+			return AsyncStarter.batch(new PledgeReminderBatch(), PledgeReminderBatch.SCOPE, 'PledgeReminderService');
 		} catch (Exception queueFailure) {
 			ErrorLogger.log(queueFailure, CONTEXT_START);
-			throw new PledgeReminderException(
-				BarnHelp.text('Giving', 'Giving_Stewardship_ErrorActionFailed')
-			);
+			throw new PledgeReminderException(BarnHelp.text('Giving', 'Giving_Stewardship_ErrorActionFailed'));
 		}
 	}
 
@@ -353,9 +341,7 @@ public with sharing class PledgeReminderService {
 
 		Set<String> templateNames = new Set<String>();
 		for (Planned item : planned) {
-			if (
-				CHANNEL_EMAIL.equals(item.channel) && String.isNotBlank(item.step.Email_Template__c)
-			) {
+			if (CHANNEL_EMAIL.equals(item.channel) && String.isNotBlank(item.step.Email_Template__c)) {
 				templateNames.add(item.step.Email_Template__c.trim());
 			}
 		}
@@ -374,9 +360,7 @@ public with sharing class PledgeReminderService {
 				counts.letters++;
 				continue;
 			}
-			Id templateId = String.isBlank(row.Template__c)
-				? null
-				: templateIds.get(row.Template__c.trim());
+			Id templateId = String.isBlank(row.Template__c) ? null : templateIds.get(row.Template__c.trim());
 			if (templateId == null) {
 				row.Status__c = STATUS_FAILED;
 				row.Failure_Reason__c = String.format(
@@ -433,11 +417,7 @@ public with sharing class PledgeReminderService {
 	 * Marks each sent row Sent and each failed row Failed with its reason and its key released,
 	 * so the next run tries it again while the step is still recent.
 	 */
-	private static void settle(
-		List<Pledge_Reminder__c> messageRows,
-		List<EmailSendOutcome> outcomes,
-		Counts counts
-	) {
+	private static void settle(List<Pledge_Reminder__c> messageRows, List<EmailSendOutcome> outcomes, Counts counts) {
 		List<Pledge_Reminder__c> settled = new List<Pledge_Reminder__c>();
 		List<String> failures = new List<String>();
 		for (Integer index = 0; index < messageRows.size(); index++) {
@@ -484,9 +464,7 @@ public with sharing class PledgeReminderService {
 					Status__c = row.Status__c,
 					Sent_On__c = row.Sent_On__c,
 					Reminder_Key__c = row.Reminder_Key__c,
-					Failure_Reason__c = sent
-						? null
-						: BarnHelp.text('Giving', 'Giving_Acknowledgment_SendFailedUnknown')
+					Failure_Reason__c = sent ? null : BarnHelp.text('Giving', 'Giving_Acknowledgment_SendFailedUnknown')
 				)
 			);
 		}
@@ -494,11 +472,7 @@ public with sharing class PledgeReminderService {
 		List<Database.SaveResult> results = PledgeReminderWriter.settleEach(plain);
 		for (Integer index = 0; index < results.size(); index++) {
 			if (!results[index].isSuccess()) {
-				stillQueued.add(
-					String.valueOf(plain[index].Id) +
-						': ' +
-						results[index].getErrors()[0].getMessage()
-				);
+				stillQueued.add(String.valueOf(plain[index].Id) + ': ' + results[index].getErrors()[0].getMessage());
 			}
 		}
 		if (!stillQueued.isEmpty()) {
@@ -570,19 +544,13 @@ public with sharing class PledgeReminderService {
 		List<String> lines = new List<String>{ String.join(HEADERS, ',') };
 		for (Pledge_Reminder__c letter : letters) {
 			Installment__c installment = letter.Installment__r;
-			Contact person = letter.Commitment__r == null
-				? null
-				: letter.Commitment__r.Donor_Contact__r;
-			Account organization = letter.Commitment__r == null
-				? null
-				: letter.Commitment__r.Donor_Account__r;
+			Contact person = letter.Commitment__r == null ? null : letter.Commitment__r.Donor_Contact__r;
+			Account organization = letter.Commitment__r == null ? null : letter.Commitment__r.Donor_Account__r;
 			Decimal owed = installment == null
 				? null
 				: (installment.Expected_Amount__c == null ? 0 : installment.Expected_Amount__c) -
 				  (installment.Paid_Amount__c == null ? 0 : installment.Paid_Amount__c);
-			String donorName = person != null
-				? person.Name
-				: (organization == null ? '' : organization.Name);
+			String donorName = person != null ? person.Name : (organization == null ? '' : organization.Name);
 			lines.add(
 				String.join(
 					new List<String>{
@@ -590,22 +558,14 @@ public with sharing class PledgeReminderService {
 						cell(installment == null ? '' : String.valueOf(installment.Sequence__c)),
 						cell(installment == null ? '' : String.valueOf(installment.Due_Date__c)),
 						cell(owed == null ? '' : String.valueOf(owed)),
-						cell(
-							letter.Days_Overdue__c == null
-								? ''
-								: String.valueOf(letter.Days_Overdue__c)
-						),
+						cell(letter.Days_Overdue__c == null ? '' : String.valueOf(letter.Days_Overdue__c)),
 						cell(letter.Step_Name__c),
 						cell(donorName),
 						cell(greetingOf(person, organization, donorName)),
 						cell(person != null ? person.MailingStreet : organization?.BillingStreet),
 						cell(person != null ? person.MailingCity : organization?.BillingCity),
 						cell(person != null ? person.MailingState : organization?.BillingState),
-						cell(
-							person != null
-								? person.MailingPostalCode
-								: organization?.BillingPostalCode
-						),
+						cell(person != null ? person.MailingPostalCode : organization?.BillingPostalCode),
 						cell(person != null ? person.MailingCountry : organization?.BillingCountry)
 					},
 					','
@@ -617,9 +577,7 @@ public with sharing class PledgeReminderService {
 
 	/** How the letter opens: the household's agreed greeting, the first name, or the name. */
 	private static String greetingOf(Contact person, Account organization, String donorName) {
-		if (
-			organization != null && String.isNotBlank(organization.Household_Informal_Greeting__c)
-		) {
+		if (organization != null && String.isNotBlank(organization.Household_Informal_Greeting__c)) {
 			return organization.Household_Informal_Greeting__c;
 		}
 		if (person != null && String.isNotBlank(person.FirstName)) {
@@ -660,10 +618,7 @@ public with sharing class PledgeReminderService {
 		if (installment.Commitment__r.Donor_Contact__c != null) {
 			return installment.Commitment__r.Donor_Contact__c;
 		}
-		if (
-			installment.Commitment__r.Donor_Account__c != null &&
-			installment.Commitment__r.Donor_Account__r != null
-		) {
+		if (installment.Commitment__r.Donor_Account__c != null && installment.Commitment__r.Donor_Account__r != null) {
 			return installment.Commitment__r.Donor_Account__r.Primary_Contact__c;
 		}
 		return null;

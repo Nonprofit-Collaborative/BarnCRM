@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Pair_Key__c</fullName>
-  <description>The two record identifiers this dismissal is about, in ascending order and joined with a hyphen. Unique, so a pair is dismissed once however often the scan runs.</description>
+  <description>A dismissal: the two record identifiers it is about, in ascending order and joined with a hyphen. A match reason: the 18 character identifier of the duplicate record set it explains. Unique, so a pair is dismissed once however often the scan runs, and a suggestion has one reason.</description>
   <externalId>true</externalId>
-  <inlineHelpText>The two records that are not duplicates of each other.</inlineHelpText>
+  <inlineHelpText>The two records that are not duplicates of each other, or the suggestion a match reason explains.</inlineHelpText>
   <label>Pair Key</label>
   <length>40</length>
   <required>true</required>

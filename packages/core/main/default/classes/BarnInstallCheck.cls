@@ -51,11 +51,7 @@ global with sharing class BarnInstallCheck {
 	global static List<String> finishSetup(String packageKey) {
 		requireSetupAccess();
 		List<String> done = ModuleSetups.finish(new List<String>{ packageKey });
-		SettingsService.logChange(
-			System.Label.Core_ModuleSetup_FinishButton,
-			'',
-			String.join(done, ', ')
-		);
+		SettingsService.logChange(System.Label.Core_ModuleSetup_FinishButton, '', String.join(done, ', '));
 		return done;
 	}
 

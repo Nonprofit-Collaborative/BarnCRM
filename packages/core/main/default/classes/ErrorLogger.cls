@@ -133,9 +133,7 @@ public with sharing class ErrorLogger {
 		if (String.isBlank(message)) {
 			return;
 		}
-		ErrorLogWriter.write(
-			new List<Error_Log__c>{ buildEntry(message, null, context, severity, recordId) }
-		);
+		ErrorLogWriter.write(new List<Error_Log__c>{ buildEntry(message, null, context, severity, recordId) });
 	}
 
 	@NamespaceAccessible
@@ -158,12 +156,7 @@ public with sharing class ErrorLogger {
 	 * leaves that entry without a record.
 	 */
 	@NamespaceAccessible
-	public static void logMessages(
-		List<String> messages,
-		List<Id> recordIds,
-		String context,
-		String severity
-	) {
+	public static void logMessages(List<String> messages, List<Id> recordIds, String context, String severity) {
 		if (messages == null || messages.isEmpty()) {
 			return;
 		}
@@ -218,10 +211,7 @@ public with sharing class ErrorLogger {
 		);
 		if (recordId != null) {
 			entry.Record_Reference__c = String.valueOf(recordId);
-			entry.Object_Name__c = truncate(
-				String.valueOf(recordId.getSObjectType()),
-				MAX_OBJECT_NAME
-			);
+			entry.Object_Name__c = truncate(String.valueOf(recordId.getSObjectType()), MAX_OBJECT_NAME);
 		}
 		return entry;
 	}
@@ -236,19 +226,11 @@ public with sharing class ErrorLogger {
 	private static String friendlyMessage(String context) {
 		return String.isBlank(context)
 			? BarnHelp.text('Core', 'Core_ErrorLog_UnexpectedFailure')
-			: String.format(
-					Label.Core_ErrorLog_UnexpectedFailureIn,
-					new List<Object>{ context.trim() }
-			  );
+			: String.format(Label.Core_ErrorLog_UnexpectedFailureIn, new List<Object>{ context.trim() });
 	}
 
 	private static String technicalDetail(Exception thrown) {
-		String detail =
-			thrown.getTypeName() +
-			': ' +
-			thrown.getMessage() +
-			'\n' +
-			thrown.getStackTraceString();
+		String detail = thrown.getTypeName() + ': ' + thrown.getMessage() + '\n' + thrown.getStackTraceString();
 		Exception cause = thrown.getCause();
 		if (cause != null) {
 			detail += '\nCaused by ' + cause.getTypeName() + ': ' + cause.getMessage();

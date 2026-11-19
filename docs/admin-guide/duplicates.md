@@ -24,7 +24,9 @@ BarnCRM addresses are read by their **Match Key**, a field BarnCRM fills on ever
 postal code and house number, so a large org's scan does not search every street. Addresses
 saved before version 1.22 get their key when you choose **Fill Match Keys** on Health Check's
 **Match Keys Not Filled** finding; until it finishes, matching on addresses works as before,
-only slower.
+only slower. An address the job could not save is named in the Error Log with the reason, and
+is read by address again once you fix it and save it (see
+[Health Check](health-check.md)).
 
 The scan also compares **people's names**, ignoring case, spacing and punctuation, so "Jonathan
 Smith" and "Jonathon Smith" are noticed. A similar name is never enough on its own, and the
@@ -385,7 +387,7 @@ choose to save anyway.
    roles deliberately do not, so staff ask an admin to merge two people. Merging two
    households needs no Delete permission (see
    [Household merge and split](household-merge-split.md)). This is Salesforce's own merge, and it keeps
-   the activities and files of both (and, with Giving, their gifts). BarnCRM then adds the
+   the activities and files of both (and, with Fundraising, their gifts). BarnCRM then adds the
    kept person to any household the other one belonged to, and recalculates their totals
    straight away. A household the other person leaves empty is kept, not deleted, because
    records can still point at it: merge it into the kept person's household with **Merge Households** (step 6).
@@ -494,7 +496,7 @@ naming the kept records and the reason. Open each record named and correct it by
 appears a minute or so after either is given. Scanning, dismissing and merging from it need
 the Manage BarnCRM Settings permission, which the BarnCRM Admin permission set grants, and
 access to duplicate record sets, which the BarnCRM Duplicate Review permission set grants.
-Duplicates are no longer in **Org Optimizer**.
+Duplicates are not part of **Org Optimizer**.
 
 **The panel says suggestions need access to duplicate record sets.** The person
 viewing it does not have BarnCRM Duplicate Review, or has a license that cannot have it.
@@ -508,7 +510,7 @@ suggestions. The details are in the **Error Log**, under the context "Duplicate 
 cause and scan again: pairs already found are not suggested twice.
 
 **After merging two people, an empty household is left.** That is on purpose. Records made
-while the other person lived there (with Giving, their gifts) still name that household. Until you merge it, Health Check
+while the other person lived there (with Fundraising, their gifts) still name that household. Until you merge it, Health Check
 lists it under **Households have nobody in them**. Merge it into the kept person's household
 from this panel or with **Merge or Split** on the household's page.
 

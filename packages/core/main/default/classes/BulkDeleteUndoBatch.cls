@@ -151,11 +151,7 @@ public with sharing class BulkDeleteUndoBatch implements Database.Batchable<SObj
 		List<Account> binned = [
 			SELECT Id
 			FROM Account
-			WHERE
-				Id IN :households
-				AND IsDeleted = TRUE
-				AND RecordTypeId = :householdType
-				AND SystemModstamp >= :since
+			WHERE Id IN :households AND IsDeleted = TRUE AND RecordTypeId = :householdType AND SystemModstamp >= :since
 			WITH SYSTEM_MODE
 			ALL ROWS
 		];
@@ -168,9 +164,7 @@ public with sharing class BulkDeleteUndoBatch implements Database.Batchable<SObj
 		String objectName = type.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
 		Map<Id, SObject> found = new Map<Id, SObject>(
 			Database.queryWithBinds(
-				'SELECT Id, IsDeleted FROM ' +
-					String.escapeSingleQuotes(objectName) +
-					' WHERE Id IN :ids ALL ROWS',
+				'SELECT Id, IsDeleted FROM ' + String.escapeSingleQuotes(objectName) + ' WHERE Id IN :ids ALL ROWS',
 				new Map<String, Object>{ 'ids' => ids },
 				AccessLevel.SYSTEM_MODE
 			)
@@ -197,11 +191,7 @@ public with sharing class BulkDeleteUndoBatch implements Database.Batchable<SObj
 		if (toUndelete.isEmpty()) {
 			return;
 		}
-		List<Database.UndeleteResult> results = Database.undelete(
-			toUndelete,
-			false,
-			AccessLevel.USER_MODE
-		);
+		List<Database.UndeleteResult> results = Database.undelete(toUndelete, false, AccessLevel.USER_MODE);
 		for (Integer i = 0; i < results.size(); i++) {
 			if (results[i].isSuccess()) {
 				restored++;
@@ -223,9 +213,7 @@ public with sharing class BulkDeleteUndoBatch implements Database.Batchable<SObj
 					objectName,
 					toUndelete[i],
 					null,
-					emptied
-						? BarnHelp.text('Core', 'Core_BulkDelete_UndoPurged')
-						: String.join(parts, ' ')
+					emptied ? BarnHelp.text('Core', 'Core_BulkDelete_UndoPurged') : String.join(parts, ' ')
 				)
 			);
 		}
@@ -269,11 +257,8 @@ public with sharing class BulkDeleteUndoBatch implements Database.Batchable<SObj
 			if (journalIncomplete) {
 				line += '\n' + BarnHelp.text('Core', 'Core_BulkUpdate_LogJournalIncomplete');
 			}
-			job.Run_Log__c = (String.isBlank(job.Run_Log__c) ? line : job.Run_Log__c + '\n' + line)
-				.right(32768);
-			job.Status__c = failed
-				? ImportBatchService.STATUS_UNDO_FAILED
-				: ImportBatchService.STATUS_UNDONE;
+			job.Run_Log__c = (String.isBlank(job.Run_Log__c) ? line : job.Run_Log__c + '\n' + line).right(32768);
+			job.Status__c = failed ? ImportBatchService.STATUS_UNDO_FAILED : ImportBatchService.STATUS_UNDONE;
 			Database.update(job, AccessLevel.SYSTEM_MODE);
 			JobNotifier.aboutRecord(
 				UserInfo.getUserId(),
@@ -281,12 +266,7 @@ public with sharing class BulkDeleteUndoBatch implements Database.Batchable<SObj
 				failed,
 				String.format(
 					System.Label.Core_JobNotice_BulkDeleteUndoBody,
-					new List<Object>{
-						restored.format(),
-						purged.format(),
-						alreadyBack.format(),
-						refused.format()
-					}
+					new List<Object>{ restored.format(), purged.format(), alreadyBack.format(), refused.format() }
 				),
 				jobId
 			);

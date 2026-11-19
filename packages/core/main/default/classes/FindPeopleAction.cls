@@ -102,10 +102,7 @@ global with sharing class FindPeopleAction {
 		List<String> terms = new List<String>();
 		for (Request request : requests == null ? new List<Request>() : requests) {
 			Result result = new Result();
-			String term = request == null ||
-				request.searchText == null
-				? ''
-				: request.searchText.trim();
+			String term = request == null || request.searchText == null ? '' : request.searchText.trim();
 			if (term.length() < 2) {
 				result.errorMessage = BarnHelp.text('Core', 'Core_AgentActions_SearchTooShort');
 				term = null;
@@ -142,12 +139,8 @@ global with sharing class FindPeopleAction {
 		}
 		List<Contact> found = findContacts(nameTerms, emails);
 		Map<Id, Id> personIdByContact = personIdsOf(found);
-		Map<Id, Id> householdByPerson = HouseholdService.getHouseholdIdsFor(
-			new Set<Id>(personIdByContact.values())
-		);
-		Map<Id, String> householdNames = visibleHouseholdNames(
-			new Set<Id>(householdByPerson.values())
-		);
+		Map<Id, Id> householdByPerson = HouseholdService.getHouseholdIdsFor(new Set<Id>(personIdByContact.values()));
+		Map<Id, String> householdNames = visibleHouseholdNames(new Set<Id>(householdByPerson.values()));
 		for (Integer i = 0; i < terms.size(); i++) {
 			if (terms[i] == null) {
 				continue;
@@ -162,8 +155,7 @@ global with sharing class FindPeopleAction {
 				if (!matches(record, terms[i]) || !seen.add(personId)) {
 					continue;
 				}
-				results[i]
-					.matches.add(toMatch(record, personId, householdByPerson, householdNames));
+				results[i].matches.add(toMatch(record, personId, householdByPerson, householdNames));
 			}
 		}
 	}
@@ -200,10 +192,7 @@ global with sharing class FindPeopleAction {
 				several.add('(' + nameTerms[i] + ')');
 			}
 			for (
-				SObject record : NameSearch.find(
-					String.join(several, ' OR '),
-					'Contact(Id LIMIT ' + MAX_ROWS + ')'
-				)[0]
+				SObject record : NameSearch.find(String.join(several, ' OR '), 'Contact(Id LIMIT ' + MAX_ROWS + ')')[0]
 			) {
 				result.add(record.Id);
 			}

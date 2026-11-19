@@ -32,10 +32,7 @@ public with sharing class AcknowledgmentBatch implements Database.Batchable<SObj
 
 	public void execute(Database.BatchableContext context, List<Gift__c> scope) {
 		try {
-			AcknowledgmentService.SendCounts counts = AcknowledgmentService.sendEmails(
-				scope,
-				runId
-			);
+			AcknowledgmentService.SendCounts counts = AcknowledgmentService.sendEmails(scope, runId);
 			processed += counts.processed;
 			sent += counts.sent;
 			errors += counts.errors;

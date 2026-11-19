@@ -79,11 +79,7 @@ private class GiftAllocationTriggerHandlerTest {
 			Test.startTest();
 			insert new List<Gift_Allocation__c>{
 				new Gift_Allocation__c(Gift__c = gift.Id, Fund__c = general.Id, Percent__c = 33.33),
-				new Gift_Allocation__c(
-					Gift__c = gift.Id,
-					Fund__c = scholarship.Id,
-					Percent__c = 33.33
-				),
+				new Gift_Allocation__c(Gift__c = gift.Id, Fund__c = scholarship.Id, Percent__c = 33.33),
 				new Gift_Allocation__c(Gift__c = gift.Id, Fund__c = building.Id, Percent__c = 33.34)
 			};
 			Test.stopTest();

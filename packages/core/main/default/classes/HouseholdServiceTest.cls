@@ -29,11 +29,7 @@ private class HouseholdServiceTest {
 				WHERE Id = :maria.Id
 			];
 			Assert.isNotNull(saved.AccountId, 'Maria was given a household');
-			Assert.areEqual(
-				'The Garcia Family',
-				saved.Account.Name,
-				'The household is named from her surname'
-			);
+			Assert.areEqual('The Garcia Family', saved.Account.Name, 'The household is named from her surname');
 			Assert.areEqual(1, saved.Account.Member_Count__c, 'The household counts one member');
 		}
 	}
@@ -219,11 +215,7 @@ private class HouseholdServiceTest {
 				WHERE Contact__c = :john.Id AND End_Date__c = NULL
 			];
 			Assert.areEqual(1, memberships.size(), 'John has one membership row');
-			Assert.areEqual(
-				household.Id,
-				memberships[0].Household__c,
-				'It is in the household his record names'
-			);
+			Assert.areEqual(household.Id, memberships[0].Household__c, 'It is in the household his record names');
 			Assert.isFalse(
 				memberships[0].Is_Primary__c,
 				'He joins as an ordinary member: who is primary stays a decision (R-H10)'
@@ -244,9 +236,7 @@ private class HouseholdServiceTest {
 	static void aPersonSavedAgainstAnOrganizationInJunctionModeDoesNotJoinIt() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
-			Account employer = TestDataFactory.organization(
-				new Account(Name = 'Riverside Library')
-			);
+			Account employer = TestDataFactory.organization(new Account(Name = 'Riverside Library'));
 			insert employer;
 
 			Test.startTest();
@@ -430,9 +420,7 @@ private class HouseholdServiceTest {
 			HouseholdService.seedMissingPrimaryContacts(
 				new Map<Id, Id>{ mariaHousehold => maria.Id, leeHousehold => maria.Id }
 			);
-			HouseholdService.seedMissingPrimaryContacts(
-				new Map<Id, Id>{ mariaHousehold => lee.Id }
-			);
+			HouseholdService.seedMissingPrimaryContacts(new Map<Id, Id>{ mariaHousehold => lee.Id });
 			Test.stopTest();
 
 			Map<Id, Account> after = new Map<Id, Account>(
@@ -470,14 +458,10 @@ private class HouseholdServiceTest {
 			}
 			Test.stopTest();
 
-			Assert.isNotNull(
-				message,
-				'The save of the person fails rather than quietly succeeding'
-			);
+			Assert.isNotNull(message, 'The save of the person fails rather than quietly succeeding');
 			Assert.isTrue(
 				message.startsWith(
-					BarnHelp.text('Core', 'Core_Households_ErrorCreateFailedForPerson')
-						.substringBefore('{0}')
+					BarnHelp.text('Core', 'Core_Households_ErrorCreateFailedForPerson').substringBefore('{0}')
 				),
 				'The failure says the household could not be created: ' + message
 			);
@@ -518,14 +502,10 @@ private class HouseholdServiceTest {
 			}
 			Test.stopTest();
 
-			Assert.isNotNull(
-				message,
-				'The save of the person fails rather than quietly succeeding'
-			);
+			Assert.isNotNull(message, 'The save of the person fails rather than quietly succeeding');
 			Assert.isTrue(
 				message.startsWith(
-					BarnHelp.text('Core', 'Core_Households_ErrorCreateFailedForPerson')
-						.substringBefore('{0}')
+					BarnHelp.text('Core', 'Core_Households_ErrorCreateFailedForPerson').substringBefore('{0}')
 				),
 				'The failure says the household could not be created: ' + message
 			);
@@ -545,9 +525,7 @@ private class HouseholdServiceTest {
 	@IsTest
 	static void noHouseholdIsCreatedWhenTheSettingIsOff() {
 		System.runAs(TestUsers.admin()) {
-			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-				HouseholdTestDataFactory.MODE_CONTACT
-			);
+			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			settings.Auto_Create_Households__c = false;
 			HouseholdTestDataFactory.save(settings);
 
@@ -591,9 +569,7 @@ private class HouseholdServiceTest {
 	@IsTest
 	static void anEmptyHouseholdIsKeptWhenTheSettingIsOff() {
 		System.runAs(TestUsers.admin()) {
-			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-				HouseholdTestDataFactory.MODE_CONTACT
-			);
+			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			settings.Delete_Empty_Households__c = false;
 			HouseholdTestDataFactory.save(settings);
 			Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
@@ -632,29 +608,16 @@ private class HouseholdServiceTest {
 				Contact__c = john.Id,
 				Role__c = 'Head',
 				Is_Primary__c = true,
-				Start_Date__c = Date.today()
+				Start_Date__c = OrgDate.today()
 			);
 
 			Test.startTest();
-			Map<Id, List<HouseholdService.Person>> members = HouseholdService.getMembers(
-				new Set<Id>{ household.Id }
-			);
+			Map<Id, List<HouseholdService.Person>> members = HouseholdService.getMembers(new Set<Id>{ household.Id });
 			Test.stopTest();
 
-			Assert.areEqual(
-				1,
-				members.get(household.Id).size(),
-				'The junction row is the membership'
-			);
-			Assert.areEqual(
-				'Head',
-				members.get(household.Id)[0].role,
-				'The role comes from the junction row'
-			);
-			Assert.isTrue(
-				members.get(household.Id)[0].isPrimary,
-				'The primary flag comes from the junction row'
-			);
+			Assert.areEqual(1, members.get(household.Id).size(), 'The junction row is the membership');
+			Assert.areEqual('Head', members.get(household.Id)[0].role, 'The role comes from the junction row');
+			Assert.isTrue(members.get(household.Id)[0].isPrimary, 'The primary flag comes from the junction row');
 		}
 	}
 
@@ -678,7 +641,7 @@ private class HouseholdServiceTest {
 			insert new Household_Member__c(
 				Household__c = households[0].Id,
 				Contact__c = john.Id,
-				Start_Date__c = Date.today()
+				Start_Date__c = OrgDate.today()
 			);
 
 			Test.startTest();
@@ -696,21 +659,15 @@ private class HouseholdServiceTest {
 			);
 			Assert.areEqual(
 				1,
-				HouseholdService.getMembers(new Set<Id>{ households[1].Id })
-					.get(households[1].Id)
-					.size(),
+				HouseholdService.getMembers(new Set<Id>{ households[1].Id }).get(households[1].Id).size(),
 				'John belongs to the household he moved to'
 			);
 			Assert.areEqual(
 				0,
-				HouseholdService.getMembers(new Set<Id>{ households[0].Id })
-					.get(households[0].Id)
-					.size(),
+				HouseholdService.getMembers(new Set<Id>{ households[0].Id }).get(households[0].Id).size(),
 				'A membership ended today is over today, not tomorrow'
 			);
-			HouseholdService.recalculateMemberCounts(
-				new Set<Id>{ households[0].Id, households[1].Id }
-			);
+			HouseholdService.recalculateMemberCounts(new Set<Id>{ households[0].Id, households[1].Id });
 			Assert.areEqual(
 				0,
 				[SELECT Member_Count__c FROM Account WHERE Id = :households[0].Id].Member_Count__c,
@@ -753,9 +710,7 @@ private class HouseholdServiceTest {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
 			insert maria;
-			Account organization = TestDataFactory.organization(
-				new Account(Name = 'Riverside Community Trust')
-			);
+			Account organization = TestDataFactory.organization(new Account(Name = 'Riverside Community Trust'));
 			insert organization;
 			String message = '';
 
@@ -785,11 +740,7 @@ private class HouseholdServiceTest {
 			insert TestDataFactory.organization(new Account(Name = 'Riverside Community Trust'));
 			Test.stopTest();
 
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Household_Member__c],
-				'No membership was created'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Household_Member__c], 'No membership was created');
 		}
 	}
 
@@ -811,11 +762,7 @@ private class HouseholdServiceTest {
 				WHERE Account__c = :person.Id
 			];
 			Assert.areEqual(1, memberships.size(), 'The person was joined to a household');
-			Assert.areEqual(
-				'Head',
-				memberships[0].Role__c,
-				'They are the head of their own household'
-			);
+			Assert.areEqual('Head', memberships[0].Role__c, 'They are the head of their own household');
 			Assert.isTrue(memberships[0].Is_Primary__c, 'They are the primary member');
 			Assert.isNotNull(memberships[0].Household__c, 'A household was created for them');
 		}
@@ -829,20 +776,10 @@ private class HouseholdServiceTest {
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
 			insert new List<Contact>{
 				TestDataFactory.person(
-					new Contact(
-						Salutation = 'Mr.',
-						FirstName = 'John',
-						LastName = 'Smith',
-						AccountId = household.Id
-					)
+					new Contact(Salutation = 'Mr.', FirstName = 'John', LastName = 'Smith', AccountId = household.Id)
 				),
 				TestDataFactory.person(
-					new Contact(
-						Salutation = 'Mrs.',
-						FirstName = 'Jane',
-						LastName = 'Smith',
-						AccountId = household.Id
-					)
+					new Contact(Salutation = 'Mrs.', FirstName = 'Jane', LastName = 'Smith', AccountId = household.Id)
 				)
 			};
 			update new Account(Id = household.Id, Member_Count__c = 99);
@@ -867,25 +804,17 @@ private class HouseholdServiceTest {
 			insert maria;
 			Id household = [SELECT AccountId FROM Contact WHERE Id = :maria.Id].AccountId;
 			Contact atWork = HouseholdTestDataFactory.newContact('Mr.', 'Tom', 'Rivera');
-			Account organization = TestDataFactory.organization(
-				new Account(Name = 'Riverside Community Trust')
-			);
+			Account organization = TestDataFactory.organization(new Account(Name = 'Riverside Community Trust'));
 			insert organization;
 			atWork.AccountId = organization.Id;
 			insert atWork;
 
 			Test.startTest();
-			Map<Id, Id> households = HouseholdService.getHouseholdIdsFor(
-				new Set<Id>{ maria.Id, atWork.Id }
-			);
+			Map<Id, Id> households = HouseholdService.getHouseholdIdsFor(new Set<Id>{ maria.Id, atWork.Id });
 			Test.stopTest();
 
 			Assert.areEqual(household, households.get(maria.Id), 'Maria belongs to her household');
-			Assert.areEqual(
-				null,
-				households.get(atWork.Id),
-				'A person attached to an organization has no household'
-			);
+			Assert.areEqual(null, households.get(atWork.Id), 'A person attached to an organization has no household');
 		}
 	}
 
@@ -906,24 +835,22 @@ private class HouseholdServiceTest {
 					Household__c = households[0].Id,
 					Contact__c = john.Id,
 					Is_Primary__c = true,
-					Start_Date__c = Date.today()
+					Start_Date__c = OrgDate.today()
 				),
 				new Household_Member__c(
 					Household__c = households[1].Id,
 					Contact__c = john.Id,
-					Start_Date__c = Date.today()
+					Start_Date__c = OrgDate.today()
 				),
 				new Household_Member__c(
 					Household__c = households[1].Id,
 					Contact__c = maria.Id,
-					Start_Date__c = Date.today()
+					Start_Date__c = OrgDate.today()
 				)
 			};
 
 			Test.startTest();
-			Map<Id, Id> answered = HouseholdService.getHouseholdIdsFor(
-				new Set<Id>{ john.Id, maria.Id }
-			);
+			Map<Id, Id> answered = HouseholdService.getHouseholdIdsFor(new Set<Id>{ john.Id, maria.Id });
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -958,12 +885,12 @@ private class HouseholdServiceTest {
 				new Household_Member__c(
 					Household__c = households[0].Id,
 					Contact__c = john.Id,
-					Start_Date__c = Date.today()
+					Start_Date__c = OrgDate.today()
 				),
 				new Household_Member__c(
 					Household__c = households[1].Id,
 					Contact__c = john.Id,
-					Start_Date__c = Date.today().addYears(-3)
+					Start_Date__c = OrgDate.today().addYears(-3)
 				)
 			};
 
@@ -971,11 +898,7 @@ private class HouseholdServiceTest {
 			Id answered = HouseholdService.getHouseholdIdsFor(new Set<Id>{ john.Id }).get(john.Id);
 			Test.stopTest();
 
-			Assert.areEqual(
-				households[1].Id,
-				answered,
-				'The household he joined three years ago is his household'
-			);
+			Assert.areEqual(households[1].Id, answered, 'The household he joined three years ago is his household');
 		}
 	}
 
@@ -997,13 +920,13 @@ private class HouseholdServiceTest {
 				new Household_Member__c(
 					Household__c = households[0].Id,
 					Contact__c = john.Id,
-					Start_Date__c = Date.today().addYears(-3)
+					Start_Date__c = OrgDate.today().addYears(-3)
 				),
 				new Household_Member__c(
 					Household__c = households[1].Id,
 					Contact__c = john.Id,
 					Is_Primary__c = true,
-					Start_Date__c = Date.today()
+					Start_Date__c = OrgDate.today()
 				)
 			};
 
@@ -1011,11 +934,7 @@ private class HouseholdServiceTest {
 			Id answered = HouseholdService.getHouseholdIdsFor(new Set<Id>{ john.Id }).get(john.Id);
 			Test.stopTest();
 
-			Assert.areEqual(
-				households[1].Id,
-				answered,
-				'The household he is primary in is his household'
-			);
+			Assert.areEqual(households[1].Id, answered, 'The household he is primary in is his household');
 		}
 	}
 
@@ -1033,11 +952,7 @@ private class HouseholdServiceTest {
 			Integer afterSecond = Limits.getQueries();
 			Test.stopTest();
 
-			Assert.areEqual(
-				afterFirst,
-				afterSecond,
-				'The second question was answered from memory'
-			);
+			Assert.areEqual(afterFirst, afterSecond, 'The second question was answered from memory');
 		}
 	}
 
@@ -1048,26 +963,15 @@ private class HouseholdServiceTest {
 			Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
 			Contact john = TestDataFactory.person(
-				new Contact(
-					Salutation = 'Mr.',
-					FirstName = 'John',
-					LastName = 'Smith',
-					AccountId = household.Id
-				)
+				new Contact(Salutation = 'Mr.', FirstName = 'John', LastName = 'Smith', AccountId = household.Id)
 			);
 			insert john;
 
 			Test.startTest();
-			Map<Id, Set<Id>> members = HouseholdService.getMemberPersonIds(
-				new Set<Id>{ household.Id }
-			);
+			Map<Id, Set<Id>> members = HouseholdService.getMemberPersonIds(new Set<Id>{ household.Id });
 			Test.stopTest();
 
-			Assert.areEqual(
-				1,
-				members.get(household.Id).size(),
-				'One person belongs to the household'
-			);
+			Assert.areEqual(1, members.get(household.Id).size(), 'One person belongs to the household');
 			Assert.isTrue(members.get(household.Id).contains(john.Id), 'That person is John');
 		}
 	}
@@ -1083,19 +987,14 @@ private class HouseholdServiceTest {
 			insert new Household_Member__c(
 				Household__c = household.Id,
 				Contact__c = john.Id,
-				Start_Date__c = Date.today()
+				Start_Date__c = OrgDate.today()
 			);
 
 			Test.startTest();
-			Map<Id, Set<Id>> members = HouseholdService.getMemberPersonIds(
-				new Set<Id>{ household.Id }
-			);
+			Map<Id, Set<Id>> members = HouseholdService.getMemberPersonIds(new Set<Id>{ household.Id });
 			Test.stopTest();
 
-			Assert.isTrue(
-				members.get(household.Id).contains(john.Id),
-				'The junction row is the member'
-			);
+			Assert.isTrue(members.get(household.Id).contains(john.Id), 'The junction row is the member');
 		}
 	}
 
@@ -1134,7 +1033,7 @@ private class HouseholdServiceTest {
 				Account__c = person.Id,
 				Role__c = 'Head',
 				Is_Primary__c = true,
-				Start_Date__c = Date.today()
+				Start_Date__c = OrgDate.today()
 			);
 
 			Test.startTest();
@@ -1147,11 +1046,7 @@ private class HouseholdServiceTest {
 				WHERE Account__c = :person.Id AND End_Date__c = NULL
 			];
 			Assert.areEqual(1, current.size(), 'Maria has one current membership');
-			Assert.areEqual(
-				households[1].Id,
-				current[0].Household__c,
-				'It is the household she moved to'
-			);
+			Assert.areEqual(households[1].Id, current[0].Household__c, 'It is the household she moved to');
 			Assert.areEqual(null, current[0].Contact__c, 'She is not recorded as a contact');
 			Assert.areEqual('Head', current[0].Role__c, 'Her role came with her');
 			Assert.isTrue(current[0].Is_Primary__c, 'So did the primary flag');
@@ -1191,17 +1086,10 @@ private class HouseholdServiceTest {
 	static void anOrganizationNeverGetsAMemberCount() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-			Account organization = TestDataFactory.organization(
-				new Account(Name = 'Riverside Community Trust')
-			);
+			Account organization = TestDataFactory.organization(new Account(Name = 'Riverside Community Trust'));
 			insert organization;
 			insert TestDataFactory.person(
-				new Contact(
-					Salutation = 'Mr.',
-					FirstName = 'Tom',
-					LastName = 'Rivera',
-					AccountId = organization.Id
-				)
+				new Contact(Salutation = 'Mr.', FirstName = 'Tom', LastName = 'Rivera', AccountId = organization.Id)
 			);
 
 			Test.startTest();
@@ -1234,10 +1122,7 @@ private class HouseholdServiceTest {
 				WHERE LastName = 'Garcia'
 				LIMIT 1
 			];
-			Assert.isNotNull(
-				saved.AccountId,
-				'The household was created for a user with no packaged access'
-			);
+			Assert.isNotNull(saved.AccountId, 'The household was created for a user with no packaged access');
 			Assert.areEqual('The Garcia Family', saved.Account.Name, 'And it was named');
 			Assert.areEqual(1, saved.Account.Member_Count__c, 'And counted');
 		}
@@ -1281,8 +1166,7 @@ private class HouseholdServiceTest {
 			update new Contact(Id = john.Id, Deceased__c = true);
 			Id householdId = [SELECT AccountId FROM Contact WHERE Id = :john.Id].AccountId;
 			Assert.isTrue(
-				HouseholdService.getMembers(new Set<Id>{ householdId }).get(householdId)[0]
-					.isDeceased,
+				HouseholdService.getMembers(new Set<Id>{ householdId }).get(householdId)[0].isDeceased,
 				'Upkeep sees the whole record, which is how the greetings stay right'
 			);
 
@@ -1295,10 +1179,7 @@ private class HouseholdServiceTest {
 
 			Assert.areEqual(1, shown.size(), 'The panel still lists John');
 			Assert.areEqual('John Smith', shown[0].name, 'By the name this user can read');
-			Assert.isFalse(
-				shown[0].isDeceased,
-				'A user with no access to the deceased field is not told that he died'
-			);
+			Assert.isFalse(shown[0].isDeceased, 'A user with no access to the deceased field is not told that he died');
 		}
 	}
 
@@ -1349,7 +1230,7 @@ private class HouseholdServiceTest {
 						Household__c = household.Id,
 						Account__c = person.Id,
 						Role__c = 'Head',
-						Start_Date__c = Date.today()
+						Start_Date__c = OrgDate.today()
 					);
 				} catch (Exception e) {
 					failure = e.getMessage();
@@ -1397,11 +1278,10 @@ private class HouseholdServiceTest {
 				Household__c = household.Id,
 				Account__c = person.Id,
 				Role__c = 'Head',
-				Start_Date__c = Date.today()
+				Start_Date__c = OrgDate.today()
 			);
 			Assert.isTrue(
-				HouseholdService.getMembers(new Set<Id>{ household.Id }).get(household.Id)[0]
-					.isDeceased,
+				HouseholdService.getMembers(new Set<Id>{ household.Id }).get(household.Id)[0].isDeceased,
 				'Upkeep sees the whole record, which is how the greetings stay right'
 			);
 
@@ -1434,10 +1314,7 @@ private class HouseholdServiceTest {
 			Id target = [SELECT AccountId FROM Contact WHERE Id = :amara.Id].AccountId;
 
 			Test.startTest();
-			Set<Id> affected = HouseholdService.moveMembers(
-				new Set<Id>{ maria.Id, wei.Id },
-				target
-			);
+			Set<Id> affected = HouseholdService.moveMembers(new Set<Id>{ maria.Id, wei.Id }, target);
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -1503,13 +1380,13 @@ private class HouseholdServiceTest {
 					Account__c = people[0].Id,
 					Role__c = 'Head',
 					Is_Primary__c = true,
-					Start_Date__c = Date.today()
+					Start_Date__c = OrgDate.today()
 				),
 				new Household_Member__c(
 					Household__c = households[0].Id,
 					Account__c = people[1].Id,
 					Role__c = 'Spouse or Partner',
-					Start_Date__c = Date.today()
+					Start_Date__c = OrgDate.today()
 				)
 			};
 
@@ -1531,11 +1408,7 @@ private class HouseholdServiceTest {
 				WHERE Household__c = :households[1].Id AND End_Date__c = NULL
 				ORDER BY Role__c
 			];
-			Assert.areEqual(
-				2,
-				current.size(),
-				'Both people are current members of the new household'
-			);
+			Assert.areEqual(2, current.size(), 'Both people are current members of the new household');
 			Assert.areEqual('Head', current[0].Role__c, 'Maria is still the Head');
 			Assert.isTrue(current[0].Is_Primary__c, 'And still the primary member');
 			Assert.areEqual(null, current[0].Contact__c, 'Neither is recorded as a contact');
@@ -1563,22 +1436,19 @@ private class HouseholdServiceTest {
 					Contact__c = people[0].Id,
 					Role__c = 'Head',
 					Is_Primary__c = true,
-					Start_Date__c = Date.today()
+					Start_Date__c = OrgDate.today()
 				),
 				new Household_Member__c(
 					Household__c = households[1].Id,
 					Contact__c = people[1].Id,
 					Role__c = 'Head',
 					Is_Primary__c = true,
-					Start_Date__c = Date.today()
+					Start_Date__c = OrgDate.today()
 				)
 			};
 
 			Test.startTest();
-			HouseholdService.moveMembers(
-				new Set<Id>{ people[0].Id, people[1].Id },
-				households[2].Id
-			);
+			HouseholdService.moveMembers(new Set<Id>{ people[0].Id, people[1].Id }, households[2].Id);
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -1586,10 +1456,7 @@ private class HouseholdServiceTest {
 				[
 					SELECT COUNT()
 					FROM Household_Member__c
-					WHERE
-						Household__c = :households[2].Id
-						AND End_Date__c = NULL
-						AND Is_Primary__c = TRUE
+					WHERE Household__c = :households[2].Id AND End_Date__c = NULL AND Is_Primary__c = TRUE
 				],
 				'Two people who were each primary do not both arrive primary (R-M3)'
 			);
@@ -1625,14 +1492,14 @@ private class HouseholdServiceTest {
 					Contact__c = people[0].Id,
 					Role__c = 'Head',
 					Is_Primary__c = true,
-					Start_Date__c = Date.today()
+					Start_Date__c = OrgDate.today()
 				),
 				new Household_Member__c(
 					Household__c = households[1].Id,
 					Contact__c = people[1].Id,
 					Role__c = 'Head',
 					Is_Primary__c = true,
-					Start_Date__c = Date.today()
+					Start_Date__c = OrgDate.today()
 				)
 			};
 
@@ -1643,21 +1510,10 @@ private class HouseholdServiceTest {
 			List<Household_Member__c> primaries = [
 				SELECT Contact__c
 				FROM Household_Member__c
-				WHERE
-					Household__c = :households[1].Id
-					AND End_Date__c = NULL
-					AND Is_Primary__c = TRUE
+				WHERE Household__c = :households[1].Id AND End_Date__c = NULL AND Is_Primary__c = TRUE
 			];
-			Assert.areEqual(
-				1,
-				primaries.size(),
-				'The household still has exactly one primary (R-M3)'
-			);
-			Assert.areEqual(
-				people[1].Id,
-				primaries[0].Contact__c,
-				'It is the person who was already there'
-			);
+			Assert.areEqual(1, primaries.size(), 'The household still has exactly one primary (R-M3)');
+			Assert.areEqual(people[1].Id, primaries[0].Contact__c, 'It is the person who was already there');
 		}
 	}
 
@@ -1681,8 +1537,7 @@ private class HouseholdServiceTest {
 
 			Assert.areEqual(
 				null,
-				[SELECT Primary_Contact__c FROM Account WHERE Id = :household.Id]
-				.Primary_Contact__c,
+				[SELECT Primary_Contact__c FROM Account WHERE Id = :household.Id].Primary_Contact__c,
 				'The reference to the person who left was cleared (R-H10)'
 			);
 		}
@@ -1704,13 +1559,13 @@ private class HouseholdServiceTest {
 					Contact__c = john.Id,
 					Role__c = 'Head',
 					Is_Primary__c = true,
-					Start_Date__c = Date.today()
+					Start_Date__c = OrgDate.today()
 				),
 				new Household_Member__c(
 					Household__c = household.Id,
 					Contact__c = jane.Id,
 					Role__c = 'Spouse or Partner',
-					Start_Date__c = Date.today()
+					Start_Date__c = OrgDate.today()
 				)
 			};
 			update new Account(Id = household.Id, Primary_Contact__c = john.Id);
@@ -1721,8 +1576,7 @@ private class HouseholdServiceTest {
 
 			Assert.areEqual(
 				null,
-				[SELECT Primary_Contact__c FROM Account WHERE Id = :household.Id]
-				.Primary_Contact__c,
+				[SELECT Primary_Contact__c FROM Account WHERE Id = :household.Id].Primary_Contact__c,
 				'The reference to the person who left was cleared (R-H10)'
 			);
 		}
@@ -1780,8 +1634,7 @@ private class HouseholdServiceTest {
 
 			Assert.areEqual(
 				jane.Id,
-				[SELECT Primary_Contact__c FROM Account WHERE Id = :household.Id]
-				.Primary_Contact__c,
+				[SELECT Primary_Contact__c FROM Account WHERE Id = :household.Id].Primary_Contact__c,
 				'The primary contact who is still a member is untouched'
 			);
 		}
@@ -1791,9 +1644,7 @@ private class HouseholdServiceTest {
 	static void anOrganizationKeepsItsPrimaryContactWhenSomebodyLeaves() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-			Account organization = TestDataFactory.organization(
-				new Account(Name = 'Riverside Shelter')
-			);
+			Account organization = TestDataFactory.organization(new Account(Name = 'Riverside Shelter'));
 			Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
 			Database.insert(new List<Account>{ organization, household }, AccessLevel.SYSTEM_MODE);
 			Contact staff = HouseholdTestDataFactory.newContact('Ms.', 'Ada', 'Nkosi');
@@ -1807,8 +1658,7 @@ private class HouseholdServiceTest {
 
 			Assert.areEqual(
 				staff.Id,
-				[SELECT Primary_Contact__c FROM Account WHERE Id = :organization.Id]
-				.Primary_Contact__c,
+				[SELECT Primary_Contact__c FROM Account WHERE Id = :organization.Id].Primary_Contact__c,
 				'An organization shares the field but not the rule (R-O3), so it is left alone'
 			);
 		}
@@ -1845,9 +1695,7 @@ private class HouseholdServiceTest {
 			);
 			Assert.areEqual(
 				2,
-				HouseholdService.getMembers(new Set<Id>{ households[0].Id })
-					.get(households[0].Id)
-					.size(),
+				HouseholdService.getMembers(new Set<Id>{ households[0].Id }).get(households[0].Id).size(),
 				'The Smiths are members of their household'
 			);
 			Assert.areEqual(
@@ -1866,9 +1714,7 @@ private class HouseholdServiceTest {
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
 			Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
 			insert john;
-			Map<Id, Set<Id>> joining = new Map<Id, Set<Id>>{
-				household.Id => new Set<Id>{ john.Id }
-			};
+			Map<Id, Set<Id>> joining = new Map<Id, Set<Id>>{ household.Id => new Set<Id>{ john.Id } };
 
 			Test.startTest();
 			HouseholdService.addMembers(joining);
@@ -1895,9 +1741,7 @@ private class HouseholdServiceTest {
 			insert john;
 
 			Test.startTest();
-			Set<Id> affected = HouseholdService.addMembers(
-				new Map<Id, Set<Id>>{ second.Id => new Set<Id>{ john.Id } }
-			);
+			Set<Id> affected = HouseholdService.addMembers(new Map<Id, Set<Id>>{ second.Id => new Set<Id>{ john.Id } });
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -1921,9 +1765,7 @@ private class HouseholdServiceTest {
 	static void joiningAnOrganizationIsRefused() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-			Account organization = TestDataFactory.organization(
-				new Account(Name = 'Riverside Trust')
-			);
+			Account organization = TestDataFactory.organization(new Account(Name = 'Riverside Trust'));
 			insert organization;
 			Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
 			insert john;
@@ -1931,9 +1773,7 @@ private class HouseholdServiceTest {
 			String message = '';
 			Test.startTest();
 			try {
-				HouseholdService.addMembers(
-					new Map<Id, Set<Id>>{ organization.Id => new Set<Id>{ john.Id } }
-				);
+				HouseholdService.addMembers(new Map<Id, Set<Id>>{ organization.Id => new Set<Id>{ john.Id } });
 			} catch (HouseholdException e) {
 				message = e.getMessage();
 			}
@@ -2041,11 +1881,7 @@ private class HouseholdServiceTest {
 			Id maria = FakeIds.of(Contact.SObjectType, 1);
 			Id wei = FakeIds.of(Contact.SObjectType, 2);
 			Id ana = FakeIds.of(Contact.SObjectType, 3);
-			Map<Id, Id> leftHouseholdByContact = new Map<Id, Id>{
-				maria => left,
-				wei => left,
-				ana => acme
-			};
+			Map<Id, Id> leftHouseholdByContact = new Map<Id, Id>{ maria => left, wei => left, ana => acme };
 			Set<Id> households = new Set<Id>{ left, joined, other };
 			List<HouseholdSelector.NativeMembership> rows = new List<HouseholdSelector.NativeMembership>{
 				// Left behind by the move, nothing recorded on it: removed.
@@ -2101,9 +1937,7 @@ private class HouseholdServiceTest {
 	@IsTest
 	static void withRealContactRelationsAMoveOffAnOrganizationKeepsThatLink() {
 		System.runAs(TestUsers.admin()) {
-			if (
-				!contactRelationsOn('withRealContactRelationsAMoveOffAnOrganizationKeepsThatLink')
-			) {
+			if (!contactRelationsOn('withRealContactRelationsAMoveOffAnOrganizationKeepsThatLink')) {
 				return;
 			}
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
@@ -2144,7 +1978,7 @@ private class HouseholdServiceTest {
 				new Map<String, Object>{ 'accountId' => fromHousehold, 'contactId' => maria.Id },
 				AccessLevel.SYSTEM_MODE
 			);
-			relation[0].put('StartDate', Date.today().addYears(-3));
+			relation[0].put('StartDate', OrgDate.today().addYears(-3));
 			update relation;
 
 			Test.startTest();
@@ -2162,10 +1996,7 @@ private class HouseholdServiceTest {
 	/** Whether this org relates contacts to several accounts, with a debug line either way. */
 	private static Boolean contactRelationsOn(String testName) {
 		Boolean isOn = Schema.getGlobalDescribe().containsKey(CONTACT_RELATION);
-		System.debug(
-			LoggingLevel.INFO,
-			testName + (isOn ? ': ran, relations are on' : ': skipped, relations are off')
-		);
+		System.debug(LoggingLevel.INFO, testName + (isOn ? ': ran, relations are on' : ': skipped, relations are off'));
 		return isOn;
 	}
 
@@ -2200,10 +2031,7 @@ private class HouseholdServiceTest {
 			OrgShapeDetector.reset();
 			// The object described and counted empty: native households are ruled out.
 			OrgShapeSelector.nativeHouseholdGroupCountOverride = 0;
-			HouseholdSelector.nativeMembershipAccountsOverride = new Set<Id>{
-				fromHousehold,
-				toHousehold
-			};
+			HouseholdSelector.nativeMembershipAccountsOverride = new Set<Id>{ fromHousehold, toHousehold };
 
 			Test.startTest();
 			HouseholdService.moveContact(maria.Id, toHousehold);
@@ -2238,10 +2066,7 @@ private class HouseholdServiceTest {
 			Id fromHousehold = [SELECT AccountId FROM Contact WHERE Id = :maria.Id].AccountId;
 			Id toHousehold = [SELECT AccountId FROM Contact WHERE Id = :wei.Id].AccountId;
 			OrgShapeDetector.reset();
-			HouseholdSelector.nativeMembershipAccountsOverride = new Set<Id>{
-				fromHousehold,
-				toHousehold
-			};
+			HouseholdSelector.nativeMembershipAccountsOverride = new Set<Id>{ fromHousehold, toHousehold };
 
 			Test.startTest();
 			HouseholdService.moveContact(maria.Id, toHousehold);
@@ -2298,10 +2123,7 @@ private class HouseholdServiceTest {
 				HouseholdSelector.getAccountsWithNativeDependents(ids).isEmpty(),
 				'No native households: a relation row is not a dependent'
 			);
-			Assert.isTrue(
-				HouseholdSelector.nativeHouseholdAccountsAmong(ids).isEmpty(),
-				'And not a native household'
-			);
+			Assert.isTrue(HouseholdSelector.nativeHouseholdAccountsAmong(ids).isEmpty(), 'And not a native household');
 
 			OrgShapeDetector.reset();
 			OrgShapeSelector.nativeHouseholdGroupCountOverride = 2;
@@ -2371,21 +2193,14 @@ private class HouseholdServiceTest {
 	static void aContactAlreadyLinkedToANativeHouseholdGetsNoNewHouseholdInJunctionMode() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
-			Account native = TestDataFactory.organization(
-				new Account(Name = 'Native household account')
-			);
+			Account native = TestDataFactory.organization(new Account(Name = 'Native household account'));
 			insert native;
 			OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
 			shape.hasNativeHouseholdGroups = true;
 			OrgShapeDetector.overrideShape = shape;
 			HouseholdSelector.accountsWithNativeDependentsOverride = new Set<Id>{ native.Id };
 			Contact maria = TestDataFactory.person(
-				new Contact(
-					Salutation = 'Ms.',
-					FirstName = 'Maria',
-					LastName = 'Garcia',
-					AccountId = native.Id
-				)
+				new Contact(Salutation = 'Ms.', FirstName = 'Maria', LastName = 'Garcia', AccountId = native.Id)
 			);
 
 			Test.startTest();
@@ -2443,14 +2258,10 @@ private class HouseholdServiceTest {
 			Database.insert(new List<Account>{ person, household }, AccessLevel.SYSTEM_MODE);
 			Contact behind = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
 			insert behind;
-			PersonRecordSelector.accountBehindContactOverride = new Map<Id, Id>{
-				behind.Id => person.Id
-			};
+			PersonRecordSelector.accountBehindContactOverride = new Map<Id, Id>{ behind.Id => person.Id };
 
 			Test.startTest();
-			HouseholdService.addMembers(
-				new Map<Id, Set<Id>>{ household.Id => new Set<Id>{ behind.Id } }
-			);
+			HouseholdService.addMembers(new Map<Id, Set<Id>>{ household.Id => new Set<Id>{ behind.Id } });
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -2492,10 +2303,7 @@ private class HouseholdServiceTest {
 			Integer after = Limits.getQueries();
 			Test.stopTest();
 
-			Assert.isTrue(
-				result.isEmpty(),
-				'No accounts are treated as native when the org has none'
-			);
+			Assert.isTrue(result.isEmpty(), 'No accounts are treated as native when the org has none');
 			Assert.areEqual(before, after, 'The short circuit runs no query at all');
 		}
 	}
@@ -2536,10 +2344,7 @@ private class HouseholdServiceTest {
 				Integer seen = current.get(row.Household__c);
 				current.put(row.Household__c, seen == null ? 1 : seen + 1);
 			}
-			Assert.isFalse(
-				current.containsKey(first.Id),
-				'Ana left the household she was moved out of'
-			);
+			Assert.isFalse(current.containsKey(first.Id), 'Ana left the household she was moved out of');
 			Assert.areEqual(1, current.get(second.Id), 'Ana is still in her other household');
 			Assert.areEqual(1, current.get(target.Id), 'Ana joined the household she was moved to');
 			Map<Id, Account> counts = new Map<Id, Account>(
@@ -2550,11 +2355,7 @@ private class HouseholdServiceTest {
 				]
 			);
 			Assert.areEqual(1, counts.get(first.Id).Member_Count__c, 'Maria is left in the first');
-			Assert.areEqual(
-				1,
-				counts.get(second.Id).Member_Count__c,
-				'The second still counts Ana'
-			);
+			Assert.areEqual(1, counts.get(second.Id).Member_Count__c, 'The second still counts Ana');
 			Assert.areEqual(1, counts.get(target.Id).Member_Count__c, 'The target counts Ana');
 		}
 	}
@@ -2613,9 +2414,7 @@ private class HouseholdServiceTest {
 			insert maria;
 
 			Test.startTest();
-			Set<Id> result = HouseholdSelector.householdsWithAnyContact(
-				new Set<Id>{ occupied.Id, empty.Id }
-			);
+			Set<Id> result = HouseholdSelector.householdsWithAnyContact(new Set<Id>{ occupied.Id, empty.Id });
 			Test.stopTest();
 
 			Assert.areEqual(new Set<Id>{ occupied.Id }, result, 'Only the occupied household');
@@ -2645,12 +2444,7 @@ private class HouseholdServiceTest {
 			Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
 			insert TestDataFactory.person(
-				new Contact(
-					Salutation = 'Mr.',
-					FirstName = 'John',
-					LastName = 'Smith',
-					AccountId = household.Id
-				)
+				new Contact(Salutation = 'Mr.', FirstName = 'John', LastName = 'Smith', AccountId = household.Id)
 			);
 			Set<Id> householdIds = new Set<Id>{ household.Id };
 			// A first pass settles the household and fills every per-transaction cache, so
@@ -2685,7 +2479,7 @@ private class HouseholdServiceTest {
 				Contact__c = john.Id,
 				Role__c = 'Head',
 				Is_Primary__c = true,
-				Start_Date__c = Date.today()
+				Start_Date__c = OrgDate.today()
 			);
 			Set<Id> householdIds = new Set<Id>{ household.Id };
 			HouseholdService.afterMembershipChange(householdIds, false);
@@ -2696,11 +2490,7 @@ private class HouseholdServiceTest {
 			Integer used = Limits.getQueries() - before;
 			Test.stopTest();
 
-			Assert.areEqual(
-				3,
-				used,
-				'One read of the households, one of the membership rows, one of the contacts'
-			);
+			Assert.areEqual(3, used, 'One read of the households, one of the membership rows, one of the contacts');
 		}
 	}
 
@@ -2728,7 +2518,7 @@ private class HouseholdServiceTest {
 						Contact__c = people[i].Id,
 						Role__c = 'Head',
 						Is_Primary__c = true,
-						Start_Date__c = Date.today()
+						Start_Date__c = OrgDate.today()
 					)
 				);
 			}
@@ -2753,11 +2543,7 @@ private class HouseholdServiceTest {
 					household.Name.startsWith('The Bulk');
 				settled += right ? 1 : 0;
 			}
-			Assert.areEqual(
-				200,
-				settled,
-				'Every household was counted, named and given its primary'
-			);
+			Assert.areEqual(200, settled, 'Every household was counted, named and given its primary');
 		}
 	}
 
@@ -2784,10 +2570,7 @@ private class HouseholdServiceTest {
 			Test.startTest();
 			held.putAll(HouseholdService.removeMembershipsWithoutUpkeep(new Set<Id>{ maria.Id }));
 			held.putAll(HouseholdService.removeMembershipsWithoutUpkeep(new Set<Id>{ wei.Id }));
-			List<Household_Member__c> firstChunk = HouseholdService.takeDeparting(
-				held,
-				new List<Contact>{ maria }
-			);
+			List<Household_Member__c> firstChunk = HouseholdService.takeDeparting(held, new List<Contact>{ maria });
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -2797,11 +2580,7 @@ private class HouseholdServiceTest {
 			);
 			Assert.isTrue(held.containsKey(wei.Id), 'The later chunk is still held for its own');
 			Assert.isFalse(held.containsKey(maria.Id), 'What was handed over is no longer held');
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Household_Member__c],
-				'Both people\'s rows were removed'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Household_Member__c], 'Both people\'s rows were removed');
 		}
 	}
 }

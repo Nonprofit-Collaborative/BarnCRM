@@ -37,15 +37,7 @@ public with sharing class LwcBuilderController {
 		try {
 			List<Map<String, Object>> rows = new List<Map<String, Object>>();
 			for (Built_Component__c row : [
-				SELECT
-					Id,
-					Name,
-					Key__c,
-					Description__c,
-					Object_Name__c,
-					Active__c,
-					Version__c,
-					Definition__c
+				SELECT Id, Name, Key__c, Description__c, Object_Name__c, Active__c, Version__c, Definition__c
 				FROM Built_Component__c
 				WITH USER_MODE
 				ORDER BY Name
@@ -82,21 +74,13 @@ public with sharing class LwcBuilderController {
 				throw refusal(BarnHelp.text('LwcBuilder', 'LwcBuilder_Error_Key'));
 			}
 			if (String.isNotBlank(objectName) && NamespaceUtil.objectType(objectName) == null) {
-				throw refusal(
-					BarnHelp.text(
-						'LwcBuilder',
-						'LwcBuilder_Error_Object',
-						new List<Object>{ objectName }
-					)
-				);
+				throw refusal(BarnHelp.text('LwcBuilder', 'LwcBuilder_Error_Object', new List<Object>{ objectName }));
 			}
 			String body = JSON.serialize(checkedDefinition(input.get('definition')));
 			if (body.length() > MAX_DEFINITION) {
 				throw refusal(BarnHelp.text('LwcBuilder', 'LwcBuilder_Error_TooLarge'));
 			}
-			Id recordId = String.isBlank(text(input.get('id')))
-				? null
-				: Id.valueOf(text(input.get('id')));
+			Id recordId = String.isBlank(text(input.get('id'))) ? null : Id.valueOf(text(input.get('id')));
 			Decimal version = 0;
 			if (recordId != null) {
 				for (Built_Component__c existing : [
@@ -122,13 +106,7 @@ public with sharing class LwcBuilderController {
 				upsert as user row;
 			} catch (DmlException e) {
 				if (e.getDmlType(0) == StatusCode.DUPLICATE_VALUE) {
-					throw refusal(
-						BarnHelp.text(
-							'LwcBuilder',
-							'LwcBuilder_Error_KeyUsed',
-							new List<Object>{ key }
-						)
-					);
+					throw refusal(BarnHelp.text('LwcBuilder', 'LwcBuilder_Error_KeyUsed', new List<Object>{ key }));
 				}
 				throw e;
 			}
@@ -153,15 +131,7 @@ public with sharing class LwcBuilderController {
 				return result;
 			}
 			for (Built_Component__c row : [
-				SELECT
-					Id,
-					Name,
-					Key__c,
-					Description__c,
-					Object_Name__c,
-					Active__c,
-					Version__c,
-					Definition__c
+				SELECT Id, Name, Key__c, Description__c, Object_Name__c, Active__c, Version__c, Definition__c
 				FROM Built_Component__c
 				WHERE Key__c = :componentKey AND Active__c = TRUE
 				WITH USER_MODE
@@ -204,22 +174,11 @@ public with sharing class LwcBuilderController {
 		try {
 			Map<String, Object> request = asMap(parse(requestJson));
 			String objectName = text(request.get('object'));
-			Schema.SObjectType type = isKey(objectName)
-				? NamespaceUtil.objectType(objectName)
-				: null;
+			Schema.SObjectType type = isKey(objectName) ? NamespaceUtil.objectType(objectName) : null;
 			if (type == null) {
-				throw refusal(
-					BarnHelp.text(
-						'LwcBuilder',
-						'LwcBuilder_Error_Object',
-						new List<Object>{ objectName }
-					)
-				);
+				throw refusal(BarnHelp.text('LwcBuilder', 'LwcBuilder_Error_Object', new List<Object>{ objectName }));
 			}
-			Map<String, Schema.SObjectField> fields = type.getDescribe(
-					SObjectDescribeOptions.DEFERRED
-				)
-				.fields.getMap();
+			Map<String, Schema.SObjectField> fields = type.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap();
 			List<Object> asked = request.get('fields') instanceof List<Object>
 				? (List<Object>) request.get('fields')
 				: new List<Object>();
@@ -227,11 +186,7 @@ public with sharing class LwcBuilderController {
 			Set<String> selected = new Set<String>{ 'Id' };
 			for (Object item : asked) {
 				Schema.DescribeFieldResult field = describe(fields, text(item), objectName);
-				if (
-					columns.size() < MAX_COLUMNS &&
-					field.isAccessible() &&
-					selected.add(field.getName())
-				) {
+				if (columns.size() < MAX_COLUMNS && field.isAccessible() && selected.add(field.getName())) {
 					columns.add(
 						new Map<String, Object>{
 							'fieldName' => field.getName(),
@@ -248,24 +203,16 @@ public with sharing class LwcBuilderController {
 			if (String.isNotBlank(parentField)) {
 				String parentId = text(request.get('recordId'));
 				binds.put('parentId', String.isBlank(parentId) ? null : parentId);
-				conditions.add(
-					describe(fields, parentField, objectName).getName() + ' = :parentId'
-				);
+				conditions.add(describe(fields, parentField, objectName).getName() + ' = :parentId');
 			}
 			String filterField = text(request.get('filterField'));
 			if (String.isNotBlank(filterField)) {
 				Schema.DescribeFieldResult filter = describe(fields, filterField, objectName);
 				binds.put('filterValue', typed(filter, text(request.get('filterValue'))));
-				String operator = text(request.get('filterOperator')) == 'notEquals'
-					? ' != '
-					: ' = ';
+				String operator = text(request.get('filterOperator')) == 'notEquals' ? ' != ' : ' = ';
 				conditions.add(filter.getName() + operator + ':filterValue');
 			}
-			String query =
-				'SELECT ' +
-				String.join(new List<String>(selected), ', ') +
-				' FROM ' +
-				String.valueOf(type);
+			String query = 'SELECT ' + String.join(new List<String>(selected), ', ') + ' FROM ' + String.valueOf(type);
 			if (!conditions.isEmpty()) {
 				query += ' WHERE ' + String.join(conditions, ' AND ');
 			}
@@ -307,13 +254,7 @@ public with sharing class LwcBuilderController {
 				  )
 				: new List<SObject>();
 			if (found.isEmpty()) {
-				throw refusal(
-					BarnHelp.text(
-						'LwcBuilder',
-						'LwcBuilder_Chart_NoReport',
-						new List<Object>{ reportName }
-					)
-				);
+				throw refusal(BarnHelp.text('LwcBuilder', 'LwcBuilder_Chart_NoReport', new List<Object>{ reportName }));
 			}
 			String title = (String) found[0].get('Name');
 			Reports.ReportResults results = Reports.ReportManager.runReport(found[0].Id, false);
@@ -325,22 +266,13 @@ public with sharing class LwcBuilderController {
 				groups.isEmpty() ||
 				metadata.getAggregates().isEmpty()
 			) {
-				throw refusal(
-					BarnHelp.text(
-						'LwcBuilder',
-						'LwcBuilder_Chart_NotChartable',
-						new List<Object>{ title }
-					)
-				);
+				throw refusal(BarnHelp.text('LwcBuilder', 'LwcBuilder_Chart_NotChartable', new List<Object>{ title }));
 			}
 			List<String> measures = new List<String>();
 			for (String aggregate : metadata.getAggregates()) {
 				if (measures.size() < MAX_MEASURES) {
 					measures.add(
-						results.getReportExtendedMetadata()
-							.getAggregateColumnInfo()
-							.get(aggregate)
-							.getLabel()
+						results.getReportExtendedMetadata().getAggregateColumnInfo().get(aggregate).getLabel()
 					);
 				}
 			}
@@ -348,8 +280,7 @@ public with sharing class LwcBuilderController {
 			// report's second row grouping. Series are named in the order they first appear.
 			Map<String, Reports.ReportFact> facts = results.getFactMap();
 			List<String> series = new List<String>();
-			List<Reports.GroupingValue> across = metadata.getReportFormat() ==
-				Reports.ReportFormat.MATRIX
+			List<Reports.GroupingValue> across = metadata.getReportFormat() == Reports.ReportFormat.MATRIX
 				? results.getGroupingsAcross().getGroupings()
 				: null;
 			Map<String, List<Object>> cellsByKey = new Map<String, List<Object>>();
@@ -376,27 +307,17 @@ public with sharing class LwcBuilderController {
 	/** Report groupings as plain maps `{key, label, children}`, with one level of children. */
 	private static List<Map<String, Object>> plainGroupings(List<Reports.GroupingValue> values) {
 		List<Map<String, Object>> result = new List<Map<String, Object>>();
-		for (
-			Reports.GroupingValue value : values == null
-				? new List<Reports.GroupingValue>()
-				: values
-		) {
+		for (Reports.GroupingValue value : values == null ? new List<Reports.GroupingValue>() : values) {
 			List<Map<String, Object>> children = new List<Map<String, Object>>();
 			for (
 				Reports.GroupingValue child : value.getGroupings() == null
 					? new List<Reports.GroupingValue>()
 					: value.getGroupings()
 			) {
-				children.add(
-					new Map<String, Object>{ 'key' => child.getKey(), 'label' => child.getLabel() }
-				);
+				children.add(new Map<String, Object>{ 'key' => child.getKey(), 'label' => child.getLabel() });
 			}
 			result.add(
-				new Map<String, Object>{
-					'key' => value.getKey(),
-					'label' => value.getLabel(),
-					'children' => children
-				}
+				new Map<String, Object>{ 'key' => value.getKey(), 'label' => value.getLabel(), 'children' => children }
 			);
 		}
 		return result;
@@ -416,9 +337,7 @@ public with sharing class LwcBuilderController {
 		List<String> series
 	) {
 		List<Map<String, Object>> columns = new List<Map<String, Object>>();
-		for (
-			Map<String, Object> column : across == null ? new List<Map<String, Object>>() : across
-		) {
+		for (Map<String, Object> column : across == null ? new List<Map<String, Object>>() : across) {
 			if (columns.size() < MAX_SERIES) {
 				columns.add(column);
 				series.add((String) column.get('label'));
@@ -430,9 +349,7 @@ public with sharing class LwcBuilderController {
 				break;
 			}
 			List<Object> cells = new List<Object>();
-			List<Map<String, Object>> children = (List<Map<String, Object>>) grouping.get(
-				'children'
-			);
+			List<Map<String, Object>> children = (List<Map<String, Object>>) grouping.get('children');
 			if (!columns.isEmpty()) {
 				for (Map<String, Object> column : columns) {
 					cells.add(cellFor(cellsByKey, grouping.get('key') + '!' + column.get('key')));
@@ -468,15 +385,10 @@ public with sharing class LwcBuilderController {
 	@TestVisible
 	private static List<Object> cell(Reports.ReportFact fact, Integer measures) {
 		List<Object> values = new List<Object>();
-		List<Reports.SummaryValue> summaries = fact == null
-			? new List<Reports.SummaryValue>()
-			: fact.getAggregates();
+		List<Reports.SummaryValue> summaries = fact == null ? new List<Reports.SummaryValue>() : fact.getAggregates();
 		for (Integer m = 0; m < measures && m < summaries.size(); m++) {
 			values.add(
-				new Map<String, Object>{
-					'value' => summaries[m].getValue(),
-					'label' => summaries[m].getLabel()
-				}
+				new Map<String, Object>{ 'value' => summaries[m].getValue(), 'label' => summaries[m].getLabel() }
 			);
 		}
 		return values;
@@ -502,10 +414,7 @@ public with sharing class LwcBuilderController {
 	private static Map<String, Object> checkedDefinition(Object definition) {
 		Object parsed = definition instanceof String ? parse((String) definition) : definition;
 		Map<String, Object> document = asMap(parsed);
-		if (
-			document.get('schemaVersion') != SCHEMA_VERSION ||
-			!(document.get('sections') instanceof List<Object>)
-		) {
+		if (document.get('schemaVersion') != SCHEMA_VERSION || !(document.get('sections') instanceof List<Object>)) {
 			throw refusal(BarnHelp.text('LwcBuilder', 'LwcBuilder_Error_Definition'));
 		}
 		return document;
@@ -518,13 +427,7 @@ public with sharing class LwcBuilderController {
 	) {
 		Schema.SObjectField field = isKey(name) ? fields.get(name.toLowerCase()) : null;
 		if (field == null) {
-			throw refusal(
-				BarnHelp.text(
-					'LwcBuilder',
-					'LwcBuilder_Error_Field',
-					new List<Object>{ name, objectName }
-				)
-			);
+			throw refusal(BarnHelp.text('LwcBuilder', 'LwcBuilder_Error_Field', new List<Object>{ name, objectName }));
 		}
 		return field.getDescribe();
 	}
@@ -551,11 +454,7 @@ public with sharing class LwcBuilderController {
 			}
 		} catch (TypeException e) {
 			throw refusal(
-				BarnHelp.text(
-					'LwcBuilder',
-					'LwcBuilder_Error_FilterValue',
-					new List<Object>{ value, field.getLabel() }
-				)
+				BarnHelp.text('LwcBuilder', 'LwcBuilder_Error_FilterValue', new List<Object>{ value, field.getLabel() })
 			);
 		}
 	}
@@ -582,9 +481,7 @@ public with sharing class LwcBuilderController {
 	}
 
 	private static Map<String, Object> asMap(Object value) {
-		return value instanceof Map<String, Object>
-			? (Map<String, Object>) value
-			: new Map<String, Object>();
+		return value instanceof Map<String, Object> ? (Map<String, Object>) value : new Map<String, Object>();
 	}
 
 	private static String text(Object value) {

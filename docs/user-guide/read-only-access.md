@@ -5,8 +5,8 @@ anything. This page lists what you can see with it, what you cannot do, and what
 when you try.
 
 Before you start: your admin gives the **Read Only** role on the Access page. With the
-Volunteers module, the role brings **Volunteers Read Only** automatically. With the Giving
-module, your admin gives **Giving Read Only** separately, if you should see gifts. See
+Volunteers module, the role brings **Volunteers Read Only** automatically. With the Fundraising
+module, your admin gives **Fundraising Read Only** separately, if you should see gifts. See
 [Access](../admin-guide/access.md).
 
 ## What You Can and Cannot Do
@@ -33,7 +33,7 @@ the App Launcher.
 If your admin gives you **BarnCRM Find and Export**, you can build, run, save and export Find
 queries over everything you can read. You still cannot change records.
 
-### Giving (with Giving Read Only)
+### Fundraising (with Fundraising Read Only)
 
 | Area | You can | You cannot |
 |---|---|---|
@@ -42,7 +42,7 @@ queries over everything you can read. You still cannot change records.
 | Receipts, receipt runs, acknowledgments, acknowledgment runs and rules | Read them | Issue receipts or send acknowledgments |
 | Stewardship plans and templates, donor levels | Read them | Change them |
 | Quick Gift Entry | Nothing: the tab is not given | Enter gifts |
-| Giving reports and dashboards | Run them and view dashboards | Create or change reports and dashboards |
+| Fundraising reports and dashboards | Run them and view dashboards | Create or change reports and dashboards |
 
 The gift panels on a record still load, so you can read them; their actions are not for you.
 A commitment's **Payment Schedule** card shows no **Pause**, **Resume**, **Mark Complete** or
@@ -79,11 +79,11 @@ not offered, or say you do not have access.
   shown to you.
 - On the **Find** tab without the add-on: "Find needs the Find and Export Records permission.
   Ask your administrator to assign you the BarnCRM Find and Export permission set."
-- On a gift batch (Giving): "You can see this batch but not change or post it. Ask your
-  administrator for the Giving Staff permission set, or for edit access to this batch."
-- Issuing a receipt (Giving): "You do not have permission to issue receipts. Ask your
+- On a gift batch (Fundraising): "You can see this batch but not change or post it. Ask your
+  administrator for the Fundraising Staff Access permission set, or for edit access to this batch."
+- Issuing a receipt (Fundraising): "You do not have permission to issue receipts. Ask your
   administrator for the Fundraising Staff role."
-- Sending thank yous (Giving): "Sending thank yous needs the Send Acknowledgments permission.
+- Sending thank yous (Fundraising): "Sending thank yous needs the Send Acknowledgments permission.
   ..."
 - Approving hours (Volunteers): "You need the Manage Volunteers permission to approve, reject
   or reopen volunteer hours. Ask your BarnCRM administrator."
@@ -94,7 +94,7 @@ None of these change anything. Nothing is saved when an action is refused.
 
 - Problem: the **Add** buttons on the cards are shown, but saving fails. The cards show the
   buttons to everyone; your role does not allow the save. This is expected.
-- Problem: you see no gifts. You have no Giving permission set. Ask your admin for **Giving
+- Problem: you see no gifts. You have no Fundraising permission set. Ask your admin for **Fundraising
   Read Only**.
 - Problem: the **Volunteer Hours** list is empty. Hours entries are private to the person
   who entered them and to coordinators. Totals on each person still show.

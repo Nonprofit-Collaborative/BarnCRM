@@ -6,12 +6,9 @@
  */
 @IsTest(testFor='ApexClass:AccessExplorerController')
 private class AccessExplorerControllerTest {
-	private static final String RELATIONSHIP = Relationship__c.SObjectType.getDescribe(
-			SObjectDescribeOptions.DEFERRED
-		)
+	private static final String RELATIONSHIP = Relationship__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 		.getName();
-	private static final String DESCRIPTION = Relationship__c.Description__c.getDescribe()
-		.getName();
+	private static final String DESCRIPTION = Relationship__c.Description__c.getDescribe().getName();
 	private static final String SET_LABEL = 'Access Explorer Test Set';
 
 	@TestSetup
@@ -38,10 +35,7 @@ private class AccessExplorerControllerTest {
 	}
 
 	private static PermissionSet testSet() {
-		PermissionSet created = new PermissionSet(
-			Name = 'Access_Explorer_Test_Set',
-			Label = SET_LABEL
-		);
+		PermissionSet created = new PermissionSet(Name = 'Access_Explorer_Test_Set', Label = SET_LABEL);
 		insert as system created;
 		insert as system new ObjectPermissions(
 			ParentId = created.Id,
@@ -58,10 +52,7 @@ private class AccessExplorerControllerTest {
 		return created;
 	}
 
-	private static AccessExplorerController.Row rowNamed(
-		List<AccessExplorerController.Row> rows,
-		String name
-	) {
+	private static AccessExplorerController.Row rowNamed(List<AccessExplorerController.Row> rows, String name) {
 		for (AccessExplorerController.Row row : rows) {
 			if (row.name == name) {
 				return row;
@@ -70,10 +61,7 @@ private class AccessExplorerControllerTest {
 		return null;
 	}
 
-	private static AccessExplorerController.Grant grantWithId(
-		List<AccessExplorerController.Grant> grants,
-		Id grantId
-	) {
+	private static AccessExplorerController.Grant grantWithId(List<AccessExplorerController.Grant> grants, Id grantId) {
 		for (AccessExplorerController.Grant grant : grants) {
 			if (grant.id == grantId) {
 				return grant;
@@ -104,11 +92,7 @@ private class AccessExplorerControllerTest {
 			}
 			Assert.isTrue(kinds.contains(AccessExplorerController.KIND_PROFILE), 'The profile.');
 			Assert.isTrue(kinds.contains(AccessExplorerController.KIND_SET), 'The direct set.');
-			Assert.areEqual(
-				AccessExplorerController.KIND_PROFILE,
-				access.sources[0].kind,
-				'The profile comes first.'
-			);
+			Assert.areEqual(AccessExplorerController.KIND_PROFILE, access.sources[0].kind, 'The profile comes first.');
 			Assert.isNotNull(role, 'Team Member is listed as a group.');
 			Assert.areEqual('Team Member', role.label, 'A group by its label.');
 			Assert.isTrue(role.through.contains('BarnCRM Staff'), 'Its sets: ' + role.through);
@@ -118,10 +102,7 @@ private class AccessExplorerControllerTest {
 			Assert.isTrue(row.read, 'Read.');
 			Assert.isTrue(row.edit, 'Edit, from BarnCRM Staff.');
 			Assert.isTrue(row.grantedBy.contains(SET_LABEL), row.grantedBy);
-			Assert.isTrue(
-				row.grantedBy.contains('Team Member (through BarnCRM Staff'),
-				row.grantedBy
-			);
+			Assert.isTrue(row.grantedBy.contains('Team Member (through BarnCRM Staff'), row.grantedBy);
 		}
 	}
 
@@ -168,18 +149,8 @@ private class AccessExplorerControllerTest {
 				access = AccessExplorerController.getObjectAccess(RELATIONSHIP, null);
 				field = AccessExplorerController.getObjectAccess(RELATIONSHIP, DESCRIPTION);
 				name = AccessExplorerController.getObjectAccess(RELATIONSHIP, 'Name');
-				first = AccessExplorerController.getPeopleWithAccess(
-					RELATIONSHIP,
-					DESCRIPTION,
-					null,
-					null
-				);
-				second = AccessExplorerController.getPeopleWithAccess(
-					RELATIONSHIP,
-					DESCRIPTION,
-					patName,
-					person.Id
-				);
+				first = AccessExplorerController.getPeopleWithAccess(RELATIONSHIP, DESCRIPTION, null, null);
+				second = AccessExplorerController.getPeopleWithAccess(RELATIONSHIP, DESCRIPTION, patName, person.Id);
 			}
 
 			AccessExplorerController.Grant grant = grantWithId(access.grants, created.Id);
@@ -251,8 +222,7 @@ private class AccessExplorerControllerTest {
 			Boolean profileWithAllData = false;
 			AccessExplorerController.Grant apexSet;
 			for (AccessExplorerController.Grant grant : report.dataGrants) {
-				profileWithAllData |=
-					grant.kind == AccessExplorerController.KIND_PROFILE && grant.modifyAllData;
+				profileWithAllData |= grant.kind == AccessExplorerController.KIND_PROFILE && grant.modifyAllData;
 				if (grant.id == created.Id) {
 					apexSet = grant;
 				}
@@ -316,8 +286,7 @@ private class AccessExplorerControllerTest {
 			AccessExplorerController.Grant bulkUpdate;
 			for (AccessExplorerController.Grant row : overview.sets) {
 				Assert.isTrue(
-					row.kind == AccessExplorerController.KIND_GROUP ||
-					row.name.startsWith('BarnCRM_'),
+					row.kind == AccessExplorerController.KIND_GROUP || row.name.startsWith('BarnCRM_'),
 					'Only BarnCRM sets and roles: ' + row.name
 				);
 				if (row.kind == AccessExplorerController.KIND_GROUP) {
@@ -342,11 +311,7 @@ private class AccessExplorerControllerTest {
 				'An add-on is named as an extra permission (admin-9).'
 			);
 			Assert.isTrue(admin.activePeople >= 1, 'Maria holds it.');
-			Assert.areEqual(
-				AccessExplorerController.KIND_GROUP,
-				overview.sets[0].kind,
-				'Roles come first.'
-			);
+			Assert.areEqual(AccessExplorerController.KIND_GROUP, overview.sets[0].kind, 'Roles come first.');
 			Assert.areEqual(
 				TabAccessScheduler.isScheduled(),
 				overview.tabAccessCheckScheduled,
@@ -364,17 +329,12 @@ private class AccessExplorerControllerTest {
 			System.runAs(maria()) {
 				link = AccessExplorerController.getOpenLink();
 				access = AccessExplorerController.getObjectAccess(RELATIONSHIP, null);
-				seesAll = [SELECT PermissionsViewAllUsers FROM UserPermissionAccess LIMIT 1]
-				.PermissionsViewAllUsers;
+				seesAll = [SELECT PermissionsViewAllUsers FROM UserPermissionAccess LIMIT 1].PermissionsViewAllUsers;
 			}
 			Assert.areEqual(NamespaceUtil.stateKey('section'), link.stateKey, 'The state key.');
 			Assert.areEqual('accessExplorer', link.section, 'The section.');
 			Assert.areEqual(
-				'/lightning/n/' +
-					NamespaceUtil.qualify('Data_Hygiene') +
-					'?' +
-					link.stateKey +
-					'=accessExplorer',
+				'/lightning/n/' + NamespaceUtil.qualify('Data_Hygiene') + '?' + link.stateKey + '=accessExplorer',
 				link.url,
 				'Org Optimizer, opened on Access Explorer.'
 			);
@@ -397,28 +357,12 @@ private class AccessExplorerControllerTest {
 				messages.add(refusal('access', 'not an id', null));
 				messages.add(refusal('access', UserInfo.getOrganizationId(), null));
 			}
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_AccessExplorer_PermissionRequired'),
-				messages[0],
-				''
-			);
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_AccessExplorer_PermissionRequired'),
-				messages[1],
-				''
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_AccessExplorer_PermissionRequired'), messages[0], '');
+			Assert.areEqual(BarnHelp.text('Core', 'Core_AccessExplorer_PermissionRequired'), messages[1], '');
 			Assert.isTrue(messages[2].contains('No_Such_Object__c'), messages[2]);
 			Assert.isTrue(messages[3].contains('No_Such_Field__c'), messages[3]);
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_AccessExplorer_UnknownSubject'),
-				messages[4],
-				''
-			);
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_AccessExplorer_UnknownSubject'),
-				messages[5],
-				''
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_AccessExplorer_UnknownSubject'), messages[4], '');
+			Assert.areEqual(BarnHelp.text('Core', 'Core_AccessExplorer_UnknownSubject'), messages[5], '');
 		}
 	}
 

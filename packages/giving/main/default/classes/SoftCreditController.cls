@@ -66,13 +66,7 @@ public with sharing class SoftCreditController {
 	 * alone for ever after (R-SC6).
 	 */
 	@AuraEnabled
-	public static SoftCreditPanel addCredit(
-		Id giftId,
-		Id personId,
-		String role,
-		String customRole,
-		Decimal amount
-	) {
+	public static SoftCreditPanel addCredit(Id giftId, Id personId, String role, String customRole, Decimal amount) {
 		if (giftId == null) {
 			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_SoftCredit_GiftRequired'));
 		}
@@ -92,7 +86,7 @@ public with sharing class SoftCreditController {
 			} else {
 				credit.Account__c = personId;
 			}
-			Database.insert(new List<Soft_Credit__c>{ credit }, true, AccessLevel.USER_MODE);
+			insert as user new List<Soft_Credit__c>{ credit };
 			return panelFor(giftId);
 		} catch (Exception failure) {
 			throw ERRORS.wrap(failure, CONTEXT, giftId);
@@ -110,22 +104,16 @@ public with sharing class SoftCreditController {
 			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_SoftCredits_ActionFailed'));
 		}
 		try {
-			List<Soft_Credit__c> found = SoftCreditSelector.selectByIds(
-				new Set<Id>{ softCreditId }
-			);
+			List<Soft_Credit__c> found = SoftCreditSelector.selectByIds(new Set<Id>{ softCreditId });
 			if (found.isEmpty()) {
-				throw UserErrors.message(
-					BarnHelp.text('Giving', 'Giving_SoftCredits_ActionFailed')
-				);
+				throw UserErrors.message(BarnHelp.text('Giving', 'Giving_SoftCredits_ActionFailed'));
 			}
 			Soft_Credit__c credit = found[0];
 			if (credit.Is_Automatic__c == true) {
-				throw UserErrors.message(
-					BarnHelp.text('Giving', 'Giving_SoftCredits_AutomaticHelp')
-				);
+				throw UserErrors.message(BarnHelp.text('Giving', 'Giving_SoftCredits_AutomaticHelp'));
 			}
 			Id giftId = credit.Gift__c;
-			Database.delete(new List<Soft_Credit__c>{ credit }, true, AccessLevel.USER_MODE);
+			delete as user new List<Soft_Credit__c>{ credit };
 			return panelFor(giftId);
 		} catch (AuraHandledException refused) {
 			throw refused;
@@ -136,9 +124,7 @@ public with sharing class SoftCreditController {
 
 	private static SoftCreditPanel panelFor(Id giftId) {
 		SoftCreditPanel panel = new SoftCreditPanel();
-		Schema.DescribeSObjectResult describe = Soft_Credit__c.SObjectType.getDescribe(
-			SObjectDescribeOptions.DEFERRED
-		);
+		Schema.DescribeSObjectResult describe = Soft_Credit__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED);
 		panel.canAdd = describe.isCreateable();
 		panel.canRemove = describe.isDeletable();
 		for (Soft_Credit__c credit : SoftCreditSelector.selectForGifts(new Set<Id>{ giftId })) {

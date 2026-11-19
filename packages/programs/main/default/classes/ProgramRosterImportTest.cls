@@ -19,19 +19,11 @@ private class ProgramRosterImportTest {
 	@TestSetup
 	static void makeData() {
 		System.runAs(TestUsers.adminWith(ADMIN)) {
-			TestDataFactory.createUser(
-				IMPORTER,
-				new List<String>{ 'BarnCRM_Admin', 'Programs_Staff' }
-			);
-			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-				HouseholdTestDataFactory.MODE_CONTACT
-			);
+			TestDataFactory.createUser(IMPORTER, new List<String>{ 'BarnCRM_Admin', 'Programs_Staff' });
+			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			settings.Auto_Create_Households__c = false;
 			TestDataFactory.saveSettings(settings);
-			insert new List<Program__c>{
-				new Program__c(Name = 'Food Pantry'),
-				new Program__c(Name = 'Tutoring')
-			};
+			insert new List<Program__c>{ new Program__c(Name = 'Food Pantry'), new Program__c(Name = 'Tutoring') };
 		}
 	}
 
@@ -80,9 +72,7 @@ private class ProgramRosterImportTest {
 				records.add(person);
 			} else {
 				records.add(
-					TestDataFactory.person(
-						new Contact(FirstName = 'Ros', LastName = 'Ter' + i, Email = email)
-					)
+					TestDataFactory.person(new Contact(FirstName = 'Ros', LastName = 'Ter' + i, Email = email))
 				);
 			}
 		}
@@ -106,10 +96,7 @@ private class ProgramRosterImportTest {
 	private static Import_Batch__c lastBatch;
 
 	/** Loads the rows with the shipped template as one chunk, committing. */
-	private static ImportRowProcessor.Outcome load(
-		Import_Template__c shipped,
-		List<Map<String, String>> values
-	) {
+	private static ImportRowProcessor.Outcome load(Import_Template__c shipped, List<Map<String, String>> values) {
 		Import_Batch__c batch = ImportTestDataFactory.batch(shipped);
 		ImportTestDataFactory.rows(batch, values);
 		ImportBatchService.beginPass(batch.Id);
@@ -148,16 +135,11 @@ private class ProgramRosterImportTest {
 			Assert.areEqual('Enrollment__c', shipped.Target_Object__c, 'Loads enrollments.');
 			Assert.areEqual(ImportObjectSchema.OPERATION_INSERT, shipped.Load_Operation__c);
 			Assert.isTrue(shipped.Active__c, 'Offered.');
-			ImportMapping mapping = ImportMapping.parse(
-				shipped.Column_Mapping_JSON__c,
-				shipped.Default_Values_JSON__c
-			);
+			ImportMapping mapping = ImportMapping.parse(shipped.Column_Mapping_JSON__c, shipped.Default_Values_JSON__c);
 			Assert.isTrue(mapping.loadsSeveralObjects(), 'Several objects in one upload (C-49c).');
 			Assert.isNull(ImportObjectSchema.severalObjectsProblem(mapping), 'A valid upload.');
 			Assert.isTrue(
-				shipped.Column_Mapping_JSON__c.contains(
-					accountsHoldPeople(shipped) ? 'PersonEmail' : '"Email"'
-				),
+				shipped.Column_Mapping_JSON__c.contains(accountsHoldPeople(shipped) ? 'PersonEmail' : '"Email"'),
 				'The person is found by email.'
 			);
 			Assert.areEqual(
@@ -213,11 +195,7 @@ private class ProgramRosterImportTest {
 			Assert.areEqual(Date.newInstance(2026, 8, 25), each.Intake_Date__c, 'Intake read.');
 			Assert.areEqual('School', each.Referral_Source__c, 'Referral read.');
 			Assert.areEqual('Eligible', each.Eligibility_Status__c, 'Eligibility read.');
-			Assert.areEqual(
-				Date.newInstance(2026, 8, 28),
-				each.Eligibility_Date__c,
-				'Typed date kept.'
-			);
+			Assert.areEqual(Date.newInstance(2026, 8, 28), each.Eligibility_Date__c, 'Typed date kept.');
 			Assert.isTrue(each.Contact__c != null || each.Account__c != null, 'A person found.');
 		}
 		Assert.areEqual(MANY / 2, pantry, 'Half to each program.');

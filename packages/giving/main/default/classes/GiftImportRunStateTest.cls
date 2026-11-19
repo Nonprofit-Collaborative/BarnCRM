@@ -11,18 +11,11 @@ private class GiftImportRunStateTest {
 	}
 
 	private static User maria() {
-		return TestDataFactory.createUser(
-			'Maria',
-			new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
-		);
+		return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' });
 	}
 
 	/** Runs each row as a chunk of its own, the state carried between them as the batch does. */
-	private static List<Import_Row__c> runInChunks(
-		Import_Batch__c batch,
-		Import_Template__c template,
-		Boolean dryRun
-	) {
+	private static List<Import_Row__c> runInChunks(Import_Batch__c batch, Import_Template__c template, Boolean dryRun) {
 		ImportEntityProcessors.carriedState = null;
 		for (Import_Row__c row : ImportTestDataFactory.reload(batch.Id)) {
 			ImportRowProcessor.process(
@@ -47,9 +40,7 @@ private class GiftImportRunStateTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			TestDataFactory.defaultSettings();
 			insert new Fund__c(Name = 'General', Active__c = true, Is_Default__c = true);
-			insert TestDataFactory.person(
-				new Contact(LastName = 'Ramirez', Email = 'ana@example.org')
-			);
+			insert TestDataFactory.person(new Contact(LastName = 'Ramirez', Email = 'ana@example.org'));
 			ImportMapping mapping = new ImportMapping();
 			for (
 				String target : new List<String>{
@@ -71,15 +62,7 @@ private class GiftImportRunStateTest {
 			List<Map<String, String>> rows = new List<Map<String, String>>();
 			// A repeat in chunks 2 and 4 finds the key chunk 1 stored, under the same check; chunks
 			// 3 and 5 are new gifts. A repeat asks less than a new gift, so like is compared with like.
-			for (
-				String externalId : new List<String>{
-					'order-0',
-					'order-0',
-					'order-1',
-					'ORDER-0',
-					'order-2'
-				}
-			) {
+			for (String externalId : new List<String>{ 'order-0', 'order-0', 'order-1', 'ORDER-0', 'order-2' }) {
 				rows.add(
 					new Map<String, String>{
 						'Contact1.Email' => 'ana@example.org',
@@ -145,9 +128,7 @@ private class GiftImportRunStateTest {
 			TestDataFactory.defaultSettings();
 			insert new Fund__c(Name = 'General', Active__c = true, Is_Default__c = true);
 			// Ana is already here, so each row's status is its gift's alone.
-			insert TestDataFactory.person(
-				new Contact(LastName = 'Ramirez', Email = 'ana@example.org')
-			);
+			insert TestDataFactory.person(new Contact(LastName = 'Ramirez', Email = 'ana@example.org'));
 			ImportMapping mapping = new ImportMapping();
 			for (
 				String target : new List<String>{
@@ -192,11 +173,7 @@ private class GiftImportRunStateTest {
 				Test.stopTest();
 			}
 
-			Assert.areEqual(
-				ImportRowProcessor.STATUS_CREATED,
-				dryRun[0].Status__c,
-				'Would be new.'
-			);
+			Assert.areEqual(ImportRowProcessor.STATUS_CREATED, dryRun[0].Status__c, 'Would be new.');
 			Assert.areEqual(
 				ImportRowProcessor.STATUS_MATCHED,
 				dryRun[1].Status__c,
@@ -221,8 +198,7 @@ private class GiftImportRunStateTest {
 			Assert.isTrue(state.claimedInstallments.isEmpty(), 'No payments.');
 			Assert.isNull(state.settings, 'No matching values.');
 
-			String prefix = Installment__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-				.getKeyPrefix();
+			String prefix = Installment__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix();
 			state.claimedInstallments.add(Id.valueOf(prefix + '000000000001'));
 			state.carry();
 
@@ -252,10 +228,7 @@ private class GiftImportRunStateTest {
 			GiftImportRunState again = GiftImportRunState.carried();
 			Assert.areEqual(state.settings, again.settings, 'And kept by a full read too.');
 			ImportEntityProcessors.carriedState = 'not a state';
-			Assert.isNull(
-				GiftImportRunState.carriedSettings(),
-				'A state it did not write has none.'
-			);
+			Assert.isNull(GiftImportRunState.carriedSettings(), 'A state it did not write has none.');
 		}
 	}
 }

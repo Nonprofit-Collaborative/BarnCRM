@@ -13,21 +13,9 @@ private class DonorLevelControllerTest {
 	static void makeData() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			insert new List<Donor_Level__c>{
-				new Donor_Level__c(
-					Name = 'Friend',
-					Minimum_Amount__c = 100,
-					Maximum_Amount__c = 1000
-				),
-				new Donor_Level__c(
-					Name = 'Sustainer',
-					Minimum_Amount__c = 1000,
-					Maximum_Amount__c = 5000
-				),
-				new Donor_Level__c(
-					Name = 'Retired Circle',
-					Minimum_Amount__c = 50000,
-					Active__c = false
-				)
+				new Donor_Level__c(Name = 'Friend', Minimum_Amount__c = 100, Maximum_Amount__c = 1000),
+				new Donor_Level__c(Name = 'Sustainer', Minimum_Amount__c = 1000, Maximum_Amount__c = 5000),
+				new Donor_Level__c(Name = 'Retired Circle', Minimum_Amount__c = 50000, Active__c = false)
 			};
 			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 			settings.SetupOwnerId = UserInfo.getOrganizationId();
@@ -47,12 +35,8 @@ private class DonorLevelControllerTest {
 	static void theLadderComesBackLowestFirstWithItsDonorCounts() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			insert new List<Account>{
-				TestDataFactory.organization(
-					new Account(Name = 'The Nolan Family', Total_Giving__c = 2500)
-				),
-				TestDataFactory.organization(
-					new Account(Name = 'The Garcia Family', Total_Giving__c = 1200)
-				)
+				TestDataFactory.organization(new Account(Name = 'The Nolan Family', Total_Giving__c = 2500)),
+				TestDataFactory.organization(new Account(Name = 'The Garcia Family', Total_Giving__c = 1200))
 			};
 			insert TestDataFactory.person(new Contact(LastName = 'Reyes', Total_Giving__c = 300));
 
@@ -73,26 +57,18 @@ private class DonorLevelControllerTest {
 				'One contact has given 300, which is a Friend, and accounts and contacts are counted ' +
 				'together because both carry levels (R-DL3).'
 			);
-			Assert.areEqual(
-				2,
-				model.rungs[1].donorCount,
-				'Two households have totals inside the Sustainer band.'
-			);
+			Assert.areEqual(2, model.rungs[1].donorCount, 'Two households have totals inside the Sustainer band.');
 			Assert.areEqual(
 				0,
 				model.rungs[2].donorCount,
-				'A retired rung holds nobody here, and it is still shown so nobody wonders where it ' +
-				'went.'
+				'A retired rung holds nobody here, and it is still shown so nobody wonders where it ' + 'went.'
 			);
 			Assert.areEqual(
 				'Total Giving',
 				model.sourceFieldLabel,
 				'Maria reads the label of the total, never its API name (plan Section 2.3).'
 			);
-			Assert.isTrue(
-				model.canRecalculate,
-				'This user was granted Manage BarnCRM Settings in setup.'
-			);
+			Assert.isTrue(model.canRecalculate, 'This user was granted Manage BarnCRM Settings in setup.');
 		}
 	}
 
@@ -108,19 +84,14 @@ private class DonorLevelControllerTest {
 				model.rungs[2].minimumAmount,
 				'The retired rung still reports the amount it starts at.'
 			);
-			Assert.isFalse(
-				model.rungs[2].active,
-				'The page has to be able to show it as inactive.'
-			);
+			Assert.isFalse(model.rungs[2].active, 'The page has to be able to show it as inactive.');
 		}
 	}
 
 	@IsTest
 	static void recalculationStartsAJobAndCanBeSeenToHaveRun() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			insert TestDataFactory.organization(
-				new Account(Name = 'The Okafor Family', Total_Giving__c = 4000)
-			);
+			insert TestDataFactory.organization(new Account(Name = 'The Okafor Family', Total_Giving__c = 4000));
 
 			Test.startTest();
 			Id jobId = DonorLevelController.recalculate();

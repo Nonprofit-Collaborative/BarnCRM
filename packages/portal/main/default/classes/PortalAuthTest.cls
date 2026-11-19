@@ -96,18 +96,10 @@ private class PortalAuthTest {
 				LIMIT 1
 			];
 			Assert.areEqual('Active', stored.Stage__c, 'The session is active');
-			Assert.areEqual(
-				PortalTokens.hash((String) result.get('session')),
-				stored.Token_Hash__c,
-				'Only the hash'
-			);
+			Assert.areEqual(PortalTokens.hash((String) result.get('session')), stored.Token_Hash__c, 'Only the hash');
 			Assert.isNull(stored.Code_Hash__c, 'The code is forgotten once used');
 			Assert.isNotNull(session.personId(), 'The session names the person');
-			Assert.areEqual(
-				'code_invalid',
-				refusal(new Verify(challenge, code)),
-				'A code works once'
-			);
+			Assert.areEqual('code_invalid', refusal(new Verify(challenge, code)), 'A code works once');
 		}
 	}
 
@@ -126,11 +118,7 @@ private class PortalAuthTest {
 			Assert.areEqual(43, unknown.length(), 'A challenge like any other');
 			Assert.areEqual(43, notInvited.length(), 'Even for a person not invited');
 			Assert.areEqual(0, sessions(), 'No code was sent');
-			Assert.areEqual(
-				'code_invalid',
-				refusal(new Verify(unknown, '123456')),
-				'It matches nothing'
-			);
+			Assert.areEqual('code_invalid', refusal(new Verify(unknown, '123456')), 'It matches nothing');
 		}
 	}
 
@@ -177,11 +165,7 @@ private class PortalAuthTest {
 			Test.stopTest();
 
 			Assert.areEqual('code_invalid', answers[0], 'A wrong code is refused');
-			Assert.areEqual(
-				'code_invalid',
-				answers[3],
-				'Once locked out, the right code fails too'
-			);
+			Assert.areEqual('code_invalid', answers[3], 'Once locked out, the right code fails too');
 			Portal_Access__c access = [SELECT Locked_Until__c FROM Portal_Access__c LIMIT 1];
 			Assert.isNotNull(access.Locked_Until__c, 'The person is locked out');
 			Assert.areEqual(1, sessions(), 'No code is sent while locked');
@@ -224,13 +208,7 @@ private class PortalAuthTest {
 			Test.stopTest();
 
 			Assert.areEqual(
-				new List<String>{
-					'code_invalid',
-					'code_invalid',
-					'code_expired',
-					'code_invalid',
-					'locked'
-				},
+				new List<String>{ 'code_invalid', 'code_invalid', 'code_expired', 'code_invalid', 'locked' },
 				answers,
 				'Not on file, expired and wrong, expired and right, locked and wrong, locked and right'
 			);
@@ -267,10 +245,7 @@ private class PortalAuthTest {
 
 			Test.startTest();
 			String challenge = PortalAuth.start(PortalTestData.KEY, EMAIL);
-			Map<String, Object> enrol = PortalAuth.verifyCode(
-				challenge,
-				PortalAuth.lastCodeForTest
-			);
+			Map<String, Object> enrol = PortalAuth.verifyCode(challenge, PortalAuth.lastCodeForTest);
 			String secret = (String) enrol.get('secret');
 			Map<String, Object> first = PortalAuth.verifySecondFactor(
 				challenge,
@@ -278,9 +253,7 @@ private class PortalAuthTest {
 			);
 			String again = PortalAuth.start(PortalTestData.KEY, EMAIL);
 			Map<String, Object> asked = PortalAuth.verifyCode(again, PortalAuth.lastCodeForTest);
-			String replayed = refusal(
-				new SecondFactor(again, PortalTokens.authenticatorCode(secret, step))
-			);
+			String replayed = refusal(new SecondFactor(again, PortalTokens.authenticatorCode(secret, step)));
 			Map<String, Object> second = PortalAuth.verifySecondFactor(
 				again,
 				PortalTokens.authenticatorCode(secret, step + 1)
@@ -293,16 +266,12 @@ private class PortalAuthTest {
 			Assert.areEqual(step + 1, lastStep.longValue(), 'The last step used is kept');
 
 			Assert.areEqual('enroll', enrol.get('status'), 'Enrolment first');
-			Assert.isTrue(
-				((String) enrol.get('uri')).startsWith('otpauth://totp/'),
-				'For an authenticator app'
-			);
+			Assert.isTrue(((String) enrol.get('uri')).startsWith('otpauth://totp/'), 'For an authenticator app');
 			Assert.areEqual('signedIn', first.get('status'), 'Signed in after enrolling');
 			Assert.areEqual('secondFactor', asked.get('status'), 'Asked for the code next time');
 			Assert.areEqual('signedIn', second.get('status'), 'And signed in with it');
 			Assert.isTrue(
-				[SELECT Second_Factor_Enrolled__c FROM Portal_Access__c LIMIT 1]
-				.Second_Factor_Enrolled__c,
+				[SELECT Second_Factor_Enrolled__c FROM Portal_Access__c LIMIT 1].Second_Factor_Enrolled__c,
 				'Enrolled'
 			);
 		}
@@ -313,10 +282,7 @@ private class PortalAuthTest {
 		System.runAs(TestUsers.adminWith('Portal_Admin')) {
 			PortalTestData.enable();
 			Portal__c portal = PortalTestData.portal('Invited', 'Off');
-			Portal_Access__c access = PortalTestData.access(
-				portal,
-				PortalTestData.person('Zzportal', EMAIL)
-			);
+			Portal_Access__c access = PortalTestData.access(portal, PortalTestData.person('Zzportal', EMAIL));
 			String suspended = PortalTestData.signIn(EMAIL);
 			String idle = PortalTestData.signIn(EMAIL);
 			String signedOut = PortalTestData.signIn(EMAIL);

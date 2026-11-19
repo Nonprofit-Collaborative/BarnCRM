@@ -50,13 +50,7 @@ private class PaymentPayPalTest {
 
 			Test.startTest();
 			try {
-				PaymentPayPal.startCheckout(
-					payment,
-					'https://example.org/ok',
-					'https://example.org/no',
-					null,
-					1
-				);
+				PaymentPayPal.startCheckout(payment, 'https://example.org/ok', 'https://example.org/no', null, 1);
 				Assert.fail('Refused');
 			} catch (PaymentsApi.PaymentException e) {
 				Assert.isTrue(String.isNotBlank(e.getMessage()), 'Said plainly');
@@ -64,10 +58,7 @@ private class PaymentPayPalTest {
 			Test.stopTest();
 
 			Assert.isNull(payment.Checkout_Id__c, 'No order recorded');
-			Assert.isTrue(
-				[SELECT COUNT() FROM Error_Log__c WITH SYSTEM_MODE] > 0,
-				'PayPal answer logged'
-			);
+			Assert.isTrue([SELECT COUNT() FROM Error_Log__c WITH SYSTEM_MODE] > 0, 'PayPal answer logged');
 		}
 	}
 
@@ -88,13 +79,7 @@ private class PaymentPayPalTest {
 			Payment__c payment = draft('JPY', 1500);
 
 			Test.startTest();
-			PaymentPayPal.startCheckout(
-				payment,
-				'https://example.org/ok',
-				'https://example.org/no',
-				null,
-				1
-			);
+			PaymentPayPal.startCheckout(payment, 'https://example.org/ok', 'https://example.org/no', null, 1);
 			Test.stopTest();
 
 			Assert.areEqual('ORDERJ', payment.Checkout_Id__c, 'The order');
@@ -137,9 +122,9 @@ private class PaymentPayPalTest {
 	static void withoutAWebhookIdEveryEventIsRejected() {
 		System.runAs(PaymentsTestData.admin()) {
 			PaymentsTestData.connect(PaymentService.PAYPAL);
-			Payment_Keys__c keys = Payment_Keys__c.getOrgDefaults();
-			keys.PayPal_Webhook_Id__c = null;
-			update keys;
+			Payments_Settings__c stored = Payments_Settings__c.getOrgDefaults();
+			stored.PayPal_Webhook_Id__c = null;
+			update stored;
 			verifying();
 
 			Test.startTest();
@@ -217,12 +202,8 @@ private class PaymentPayPalTest {
 			};
 
 			Test.startTest();
-			PaymentService.Outcome one = PaymentPayPal.read(
-				received('WH-R1', 'PAYMENT.CAPTURE.REFUNDED', withTotal)
-			);
-			PaymentService.Outcome two = PaymentPayPal.read(
-				received('WH-R2', 'PAYMENT.CAPTURE.REFUNDED', amountOnly)
-			);
+			PaymentService.Outcome one = PaymentPayPal.read(received('WH-R1', 'PAYMENT.CAPTURE.REFUNDED', withTotal));
+			PaymentService.Outcome two = PaymentPayPal.read(received('WH-R2', 'PAYMENT.CAPTURE.REFUNDED', amountOnly));
 			PaymentService.Outcome three = PaymentPayPal.read(
 				received('WH-R3', 'PAYMENT.CAPTURE.REFUNDED', notANumber)
 			);
@@ -237,9 +218,7 @@ private class PaymentPayPalTest {
 	}
 
 	private static String capture(String status) {
-		return '{"purchase_units":[{"payments":{"captures":[{"id":"CAPX","status":"' +
-			status +
-			'"}]}}]}';
+		return '{"purchase_units":[{"payments":{"captures":[{"id":"CAPX","status":"' + status + '"}]}}]}';
 	}
 
 	private static PaymentService.Outcome approved(String letter) {
@@ -249,9 +228,7 @@ private class PaymentPayPalTest {
 				'CHECKOUT.ORDER.APPROVED',
 				new Map<String, Object>{
 					'id' => 'ORD' + letter,
-					'purchase_units' => new List<Object>{
-						new Map<String, Object>{ 'custom_id' => 'refORD' + letter }
-					}
+					'purchase_units' => new List<Object>{ new Map<String, Object>{ 'custom_id' => 'refORD' + letter } }
 				}
 			)
 		);
@@ -313,9 +290,7 @@ private class PaymentPayPalTest {
 
 			Test.startTest();
 			try {
-				PaymentPayPal.read(
-					received('WH-S', 'PAYMENT.CAPTURE.COMPLETED', resourceWithId('C'))
-				);
+				PaymentPayPal.read(received('WH-S', 'PAYMENT.CAPTURE.COMPLETED', resourceWithId('C')));
 				Assert.fail('No token, no read');
 			} catch (CalloutException e) {
 				Assert.isTrue(e.getMessage().contains('401'), e.getMessage());

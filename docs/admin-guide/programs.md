@@ -25,7 +25,7 @@ everyone with a Programs permission set (the default), or only the people who ne
 ## Before You Install
 
 - Programs is offered in the **Nonprofit Edition** only (see [Editions](editions.md)).
-- It needs BarnCRM Core and nothing else: not Giving, not Rollup Builder.
+- It needs BarnCRM Core and nothing else: not Fundraising, not Rollup Builder.
 - If the Program Management Module (PMM) is installed in your org, BarnCRM lists it on the
   **Integrations** page as an alternative. Use one or the other for the same programs, not both.
   To move PMM's records into BarnCRM, use the PMM migration kit ([Moving From PMM](#moving-from-pmm)).
@@ -109,7 +109,7 @@ group, a housing program), so you choose:
 
 | Preset | Who sees enrollments and service deliveries |
 |---|---|
-| **Shared** (the default) | Everyone with a Programs permission set, as before this setting existed. |
+| **Shared** (the default) | Everyone with a Programs permission set. |
 | **Private** | The person who created the record (its owner), the people above them in the role hierarchy, and Programs Admin. |
 
 Choose one under **Participant Privacy** and click **Save** on the bar that appears at the

@@ -140,22 +140,15 @@ public with sharing class GiftBatchController {
 		try {
 			Gift_Batch__c batch = GiftBatchSelector.selectForUpdate(batchId);
 			if (batch == null) {
-				throw new GiftBatchException(
-					BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorBatchMissing')
-				);
+				throw new GiftBatchException(BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorBatchMissing'));
 			}
 			if (GiftBatchService.STATUS_POSTED.equals(batch.Status__c)) {
-				throw new GiftBatchException(
-					BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorEditAfterCreate')
-				);
+				throw new GiftBatchException(BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorEditAfterCreate'));
 			}
 			if (!GiftBatchSelector.canEdit(batchId)) {
-				throw new GiftBatchException(
-					BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorNoAccess')
-				);
+				throw new GiftBatchException(BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorNoAccess'));
 			}
-			Set<Id> existing = new Map<Id, Gift_Batch_Row__c>(GiftBatchSelector.selectRows(batchId))
-				.keySet();
+			Set<Id> existing = new Map<Id, Gift_Batch_Row__c>(GiftBatchSelector.selectRows(batchId)).keySet();
 			upsertLines(batchId, lines, existing);
 			deleteLines(removedLineIds, existing);
 			return view(batchId);
@@ -180,9 +173,7 @@ public with sharing class GiftBatchController {
 		try {
 			Gift_Batch__c batch = batchId == null ? null : GiftBatchSelector.selectById(batchId);
 			if (batch == null) {
-				throw new GiftBatchException(
-					BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorBatchMissing')
-				);
+				throw new GiftBatchException(BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorBatchMissing'));
 			}
 			List<GiftEntryPayments.Request> requests = new List<GiftEntryPayments.Request>();
 			for (Line line : lines == null ? new List<Line>() : lines) {
@@ -233,9 +224,7 @@ public with sharing class GiftBatchController {
 				Donor_Account__c = asId(line.donorAccountId, Account.SObjectType),
 				Amount__c = line.amount,
 				Gift_Date__c = line.giftDate,
-				Payment_Method__c = methods.contains(line.paymentMethod)
-					? line.paymentMethod
-					: null,
+				Payment_Method__c = methods.contains(line.paymentMethod) ? line.paymentMethod : null,
 				Payment_Reference__c = line.paymentReference,
 				Fund__c = asId(line.fundId, Fund__c.SObjectType),
 				Appeal__c = asId(line.appealId, Appeal__c.SObjectType),
@@ -249,16 +238,14 @@ public with sharing class GiftBatchController {
 				row.Id = rowId;
 				updates.add(row);
 			} else {
-				throw new GiftBatchException(
-					BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorLineMissing')
-				);
+				throw new GiftBatchException(BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorLineMissing'));
 			}
 		}
 		if (!updates.isEmpty()) {
-			Database.update(updates, true, AccessLevel.USER_MODE);
+			update as user updates;
 		}
 		if (!inserts.isEmpty()) {
-			Database.insert(inserts, true, AccessLevel.USER_MODE);
+			insert as user inserts;
 		}
 	}
 
@@ -272,16 +259,14 @@ public with sharing class GiftBatchController {
 			}
 		}
 		if (!doomed.isEmpty()) {
-			Database.delete(doomed, true, AccessLevel.USER_MODE);
+			delete as user doomed;
 		}
 	}
 
 	private static BatchView view(Id batchId) {
 		Gift_Batch__c batch = batchId == null ? null : GiftBatchSelector.selectById(batchId);
 		if (batch == null) {
-			throw new GiftBatchException(
-				BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorBatchMissing')
-			);
+			throw new GiftBatchException(BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorBatchMissing'));
 		}
 		List<Gift_Batch_Row__c> rows = GiftBatchSelector.selectRows(batchId);
 		BatchView result = new BatchView();
@@ -300,10 +285,7 @@ public with sharing class GiftBatchController {
 
 	private static List<Option> paymentMethodOptions() {
 		List<Option> options = new List<Option>();
-		for (
-			Schema.PicklistEntry entry : Gift_Batch_Row__c.Payment_Method__c.getDescribe()
-				.getPicklistValues()
-		) {
+		for (Schema.PicklistEntry entry : Gift_Batch_Row__c.Payment_Method__c.getDescribe().getPicklistValues()) {
 			if (entry.isActive()) {
 				options.add(new Option(entry.getLabel(), entry.getValue()));
 			}

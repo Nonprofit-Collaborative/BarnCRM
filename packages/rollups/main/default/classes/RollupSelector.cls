@@ -113,10 +113,7 @@ public with sharing class RollupSelector {
 	}
 
 	/** The active definitions whose target entity is this one, for a merge of its records. */
-	public static List<Rollup_Definition__c> selectActiveForTarget(
-		String targetObject,
-		Set<String> modes
-	) {
+	public static List<Rollup_Definition__c> selectActiveForTarget(String targetObject, Set<String> modes) {
 		if (String.isBlank(targetObject) || modes == null || modes.isEmpty()) {
 			return new List<Rollup_Definition__c>();
 		}
@@ -154,11 +151,7 @@ public with sharing class RollupSelector {
 	public static List<Rollup_Definition__c> selectActiveForModes(Set<String> modes) {
 		List<Rollup_Definition__c> matching = new List<Rollup_Definition__c>();
 		for (Rollup_Definition__c definition : selectAll()) {
-			if (
-				definition.Active__c == true &&
-				modes != null &&
-				modes.contains(definition.Mode__c)
-			) {
+			if (definition.Active__c == true && modes != null && modes.contains(definition.Mode__c)) {
 				matching.add(definition);
 			}
 		}

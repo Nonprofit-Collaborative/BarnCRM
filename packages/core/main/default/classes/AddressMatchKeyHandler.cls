@@ -27,10 +27,17 @@ public with sharing class AddressMatchKeyHandler extends TriggerHandler {
 		}
 	}
 
-	/** The key an address with this street and postal code holds, or null when either is blank. */
+	/**
+	 * The key an address with this street and postal code holds, or null when either is
+	 * missing. One that is only spaces gets NO_KEY: the fill selects it (it is not null), and a
+	 * null key would leave it to be selected again on every run (D-208, N-06).
+	 */
 	public static String keyFor(String street, String postal) {
-		if (String.isBlank(street) || String.isBlank(postal)) {
+		if (String.isEmpty(street) || String.isEmpty(postal)) {
 			return null;
+		}
+		if (String.isBlank(street) || String.isBlank(postal)) {
+			return NO_KEY;
 		}
 		String key = MatchSourceService.matchKey(MatchSourceService.address(street, postal));
 		return key == null ? NO_KEY : key;
@@ -39,9 +46,7 @@ public with sharing class AddressMatchKeyHandler extends TriggerHandler {
 	/** Health Check: Match Keys Not Filled, with a button that fills them (D-200 P6). */
 	public class FilledCheck implements HealthCheckService.Check {
 		public HealthCheckService.Finding run() {
-			List<String> scope = HealthCheckService.fixScope(
-				HealthCheckService.FIX_KEY_FILL_MATCH_KEYS
-			);
+			List<String> scope = HealthCheckService.fixScope(HealthCheckService.FIX_KEY_FILL_MATCH_KEYS);
 			if (scope.isEmpty()) {
 				return null;
 			}
@@ -54,8 +59,7 @@ public with sharing class AddressMatchKeyHandler extends TriggerHandler {
 				)
 				.withFix(
 					BarnHelp.text('Core', 'Core_HealthCheck_MatchKeysFix'),
-					HealthCheckService.FIX_ACTION_PREFIX +
-					HealthCheckService.FIX_KEY_FILL_MATCH_KEYS
+					HealthCheckService.FIX_ACTION_PREFIX + HealthCheckService.FIX_KEY_FILL_MATCH_KEYS
 				)
 				.withScope(scope);
 		}
@@ -87,9 +91,7 @@ public with sharing class AddressMatchKeyHandler extends TriggerHandler {
 	 * address has been given its key.
 	 */
 	public static Boolean usable(MatchSourceService.Source source) {
-		Schema.DescribeSObjectResult described = Address__c.SObjectType.getDescribe(
-			SObjectDescribeOptions.DEFERRED
-		);
+		Schema.DescribeSObjectResult described = Address__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED);
 		return source.normalization == MatchSourceService.ADDRESS &&
 			source.objectName == described.getName() &&
 			source.valueField == Address__c.Street__c.getDescribe().getName() &&

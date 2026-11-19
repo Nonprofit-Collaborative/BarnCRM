@@ -23,9 +23,7 @@ public with sharing class InstallmentTriggerHandler extends TriggerHandler {
 		for (Installment__c installment : installments) {
 			Integer gifts = giftCounts.get(installment.Id);
 			Boolean paid =
-				(gifts != null && gifts > 0) ||
-				(installment.Paid_Amount__c != null &&
-				installment.Paid_Amount__c != 0);
+				(gifts != null && gifts > 0) || (installment.Paid_Amount__c != null && installment.Paid_Amount__c != 0);
 			if (paid) {
 				installment.addError(BarnHelp.text('Giving', 'Giving_Installment_DeleteBlocked'));
 			}

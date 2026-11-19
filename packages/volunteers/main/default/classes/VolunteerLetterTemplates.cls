@@ -53,7 +53,7 @@ public with sharing class VolunteerLetterTemplates {
 					)
 				);
 			}
-			Database.insert(created, true, AccessLevel.SYSTEM_MODE);
+			insert as system created;
 			return created;
 		} catch (Exception failed) {
 			ErrorLogger.log(failed, INSTALL_CONTEXT);

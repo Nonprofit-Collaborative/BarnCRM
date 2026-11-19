@@ -55,11 +55,7 @@ private class PersonMatcherTest {
 			Test.startTest();
 			Id found = PersonMatcher.find(person('Luis', 'Ramirez', 'FAMILY@example.org'));
 			Test.stopTest();
-			Assert.areEqual(
-				contactId('Luis'),
-				found,
-				'A shared email is narrowed to the person of that first name.'
-			);
+			Assert.areEqual(contactId('Luis'), found, 'A shared email is narrowed to the person of that first name.');
 		}
 	}
 

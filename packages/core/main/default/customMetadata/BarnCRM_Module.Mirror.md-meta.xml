@@ -4,7 +4,7 @@
   <protected>false</protected>
   <values>
     <field>Editions__c</field>
-    <value xsi:type="xsd:string">Nonprofit</value>
+    <value xsi:type="xsd:string">Standard;Nonprofit</value>
   </values>
   <values>
     <field>Package_Folder__c</field>
@@ -20,14 +20,18 @@
   </values>
   <values>
     <field>Admin_Tabs__c</field>
-    <value xsi:type="xsd:string">Campaign_Sync;Opportunity_Mirror;Gift_Transaction_Mirror;Accounting_Export;Provider_Request__c</value>
+    <value xsi:type="xsd:string">Provider_Request__c</value>
   </values>
   <values>
     <field>Requires__c</field>
-    <value xsi:type="xsd:string">Rollups;Giving</value>
+    <value xsi:nil="true" />
   </values>
   <values>
     <field>Extensions__c</field>
     <value xsi:type="xsd:string">NightlyStepProvider: MirrorNightlyJobProvider</value>
+  </values>
+  <values>
+    <field>Beta__c</field>
+    <value xsi:type="xsd:boolean">true</value>
   </values>
 </CustomMetadata>

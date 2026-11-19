@@ -223,22 +223,13 @@ public with sharing class PortalTemplate {
 			if (page.kind != KIND_CATALOG) {
 				throw new TemplateException(at + 'personScope is for catalog pages');
 			}
-			page.scope = parseScope(
-				asMap(raw.get('personScope'), 'personScope'),
-				page,
-				fieldMap,
-				at
-			);
+			page.scope = parseScope(asMap(raw.get('personScope'), 'personScope'), page, fieldMap, at);
 		}
 		return page;
 	}
 
 	/** Each calendar entry names a field already on the page; title and a date start are needed. */
-	private static Map<String, String> parseCalendar(
-		Map<String, Object> raw,
-		PageSpec page,
-		String at
-	) {
+	private static Map<String, String> parseCalendar(Map<String, Object> raw, PageSpec page, String at) {
 		Map<String, String> calendar = new Map<String, String>();
 		for (String part : new List<String>{ 'title', 'start', 'end', 'location' }) {
 			String path = asText(raw.get(part));
@@ -251,9 +242,7 @@ public with sharing class PortalTemplate {
 				(spec.describe.getType() == Schema.DisplayType.DATE ||
 				spec.describe.getType() == Schema.DisplayType.DATETIME);
 			if (spec == null || ((part == 'start' || part == 'end') && !isTime)) {
-				throw new TemplateException(
-					at + 'calendar ' + part + ' must be a field on the page'
-				);
+				throw new TemplateException(at + 'calendar ' + part + ' must be a field on the page');
 			}
 			calendar.put(part, spec.path);
 		}
@@ -291,8 +280,7 @@ public with sharing class PortalTemplate {
 			throw new TemplateException(scopeAt + 'field must be a lookup or Id');
 		}
 		scope.objectType = customObject(asText(raw.get('object')), scopeAt);
-		Map<String, Schema.SObjectField> scopeFields = scope.objectType.getDescribe()
-			.fields.getMap();
+		Map<String, Schema.SObjectField> scopeFields = scope.objectType.getDescribe().fields.getMap();
 		scope.personField = asText(raw.get('personField'));
 		if (!isPersonLink(scope.personField, scope.objectType, scopeFields)) {
 			throw new TemplateException(scopeAt + 'personField must be a lookup to Contact');
@@ -308,14 +296,10 @@ public with sharing class PortalTemplate {
 			}
 		}
 		if (!fits) {
-			throw new TemplateException(
-				scopeAt + 'valueField must be a lookup to what field names'
-			);
+			throw new TemplateException(scopeAt + 'valueField must be a lookup to what field names');
 		}
 		for (Object rawCondition : asList(raw.get('where'))) {
-			scope.conditions.add(
-				parseCondition(asMap(rawCondition, 'where test'), scopeFields, scopeAt)
-			);
+			scope.conditions.add(parseCondition(asMap(rawCondition, 'where test'), scopeFields, scopeAt));
 		}
 		return scope;
 	}
@@ -340,9 +324,7 @@ public with sharing class PortalTemplate {
 	}
 
 	private static Schema.SObjectType customObject(String name, String at) {
-		Schema.SObjectType type = String.isBlank(name)
-			? null
-			: NamespaceUtil.globalDescribe().get(name.toLowerCase());
+		Schema.SObjectType type = String.isBlank(name) ? null : NamespaceUtil.globalDescribe().get(name.toLowerCase());
 		if (
 			type == null ||
 			!type.getDescribe().isCustom() ||
@@ -371,9 +353,7 @@ public with sharing class PortalTemplate {
 		if (spec.describe == null) {
 			throw new TemplateException(at + spec.path + ' is not a field here');
 		}
-		spec.label = String.isBlank(asText(raw.get('label')))
-			? spec.describe.getLabel()
-			: asText(raw.get('label'));
+		spec.label = String.isBlank(asText(raw.get('label'))) ? spec.describe.getLabel() : asText(raw.get('label'));
 		if (spec.edit) {
 			Boolean editable =
 				page.kind != KIND_CATALOG &&
@@ -389,9 +369,7 @@ public with sharing class PortalTemplate {
 		}
 		spec.scan = raw.get('scan') == true;
 		if (spec.scan && !(spec.edit && spec.describe.getType() == Schema.DisplayType.STRING)) {
-			throw new TemplateException(
-				at + spec.path + ' can be scanned only as an edited text field'
-			);
+			throw new TemplateException(at + spec.path + ' can be scanned only as an edited text field');
 		}
 		return spec;
 	}
@@ -432,18 +410,13 @@ public with sharing class PortalTemplate {
 			for (Schema.SObjectField field : fieldMap.values()) {
 				Schema.DescribeFieldResult describe = field.getDescribe();
 				String name = describe.getRelationshipName();
-				if (
-					name != null &&
-					describe.getReferenceTo().size() == 1 &&
-					!byName.containsKey(name.toLowerCase())
-				) {
+				if (name != null && describe.getReferenceTo().size() == 1 && !byName.containsKey(name.toLowerCase())) {
 					byName.put(name.toLowerCase(), describe);
 				}
 			}
 			LOOKUPS.put(objectType, byName);
 		}
-		Schema.DescribeFieldResult link = LOOKUPS.get(objectType)
-			.get(path.substringBefore('.').toLowerCase());
+		Schema.DescribeFieldResult link = LOOKUPS.get(objectType).get(path.substringBefore('.').toLowerCase());
 		if (link == null) {
 			return null;
 		}
@@ -466,8 +439,7 @@ public with sharing class PortalTemplate {
 		if (condition.field == null || !fieldMap.containsKey(condition.field.toLowerCase())) {
 			throw new TemplateException(at + 'a where test names no field of the object');
 		}
-		Schema.DescribeFieldResult described = fieldMap.get(condition.field.toLowerCase())
-			.getDescribe();
+		Schema.DescribeFieldResult described = fieldMap.get(condition.field.toLowerCase()).getDescribe();
 		condition.field = described.getName();
 		condition.fieldType = described.getType();
 		if (!OPS.contains(condition.op)) {
@@ -482,9 +454,7 @@ public with sharing class PortalTemplate {
 			value instanceof Integer ||
 			value instanceof Long;
 		if (!plain) {
-			throw new TemplateException(
-				at + 'a where value must be text, a number or true or false'
-			);
+			throw new TemplateException(at + 'a where value must be text, a number or true or false');
 		}
 		if (value != null && condition.op != 'isBlank' && condition.op != 'isNotBlank') {
 			try {
@@ -566,8 +536,7 @@ public with sharing class PortalTemplate {
 			throw new TemplateException(at + 'orderBy must be a field, then ASC or DESC');
 		}
 		page.orderBy =
-			fieldMap.get(field.toLowerCase()).getDescribe().getName() +
-			(direction == '' ? '' : ' ' + direction);
+			fieldMap.get(field.toLowerCase()).getDescribe().getName() + (direction == '' ? '' : ' ' + direction);
 	}
 
 	private static void parseActions(PageSpec page, List<Object> actions, String at) {

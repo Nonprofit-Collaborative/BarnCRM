@@ -6,6 +6,10 @@
     Everything in Scholarships and Outbound Grants, delete, and Manage Scholarships (decide
     awards, assign reviewers, mark disbursements paid). Given to BarnCRM Admin holders.
   </description>
+  <applicationVisibilities>
+    <application>BarnCRM_Scholarships</application>
+    <visible>true</visible>
+  </applicationVisibilities>
   <classAccesses>
     <apexClass>ScholarshipsController</apexClass>
     <enabled>true</enabled>

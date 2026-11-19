@@ -47,9 +47,7 @@ private class GivingPortalPaymentsTest {
 	}
 
 	private static Contact donor(String email) {
-		Contact person = TestDataFactory.person(
-			new Contact(FirstName = 'Pat', LastName = 'Zzpledge', Email = email)
-		);
+		Contact person = TestDataFactory.person(new Contact(FirstName = 'Pat', LastName = 'Zzpledge', Email = email));
 		insert as user person;
 		return person;
 	}
@@ -96,8 +94,7 @@ private class GivingPortalPaymentsTest {
 			Commitment__c record = recurringGift(person.Id, 'sub_1');
 
 			Test.startTest();
-			String message = new GivingPortalPayments()
-				.run(GivingPortalPayments.UPDATE_CARD, person.Id, record.Id);
+			String message = new GivingPortalPayments().run(GivingPortalPayments.UPDATE_CARD, person.Id, record.Id);
 			Test.stopTest();
 
 			Assert.areEqual(BarnHelp.text('Giving', 'Giving_UpdateCard_Sent'), message);
@@ -108,10 +105,7 @@ private class GivingPortalPaymentsTest {
 				sender.received[0].getPlainTextBody().contains('https://card.example.com/1'),
 				'With the processor page'
 			);
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_UpdateCard_EmailSubject'),
-				sender.received[0].getSubject()
-			);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_UpdateCard_EmailSubject'), sender.received[0].getSubject());
 		}
 	}
 
@@ -165,10 +159,7 @@ private class GivingPortalPaymentsTest {
 			Assert.areEqual('month', payments.asked.get('interval'), 'Quarterly');
 			Assert.areEqual(3, payments.asked.get('intervalCount'));
 			Assert.isTrue((Decimal) payments.asked.get('amount') == 20, 'The gift amount');
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_AutoPay_EmailSubject'),
-				sender.received[0].getSubject()
-			);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_AutoPay_EmailSubject'), sender.received[0].getSubject());
 		}
 	}
 
@@ -183,8 +174,7 @@ private class GivingPortalPaymentsTest {
 			Commitment__c record = pledge(person.Id);
 
 			Test.startTest();
-			String message = new GivingPortalPayments()
-				.run(GivingPortalPayments.PAY_ONLINE, person.Id, record.Id);
+			String message = new GivingPortalPayments().run(GivingPortalPayments.PAY_ONLINE, person.Id, record.Id);
 			Test.stopTest();
 
 			Assert.areEqual(BarnHelp.text('Giving', 'Giving_PayOnline_Sent'), message);
@@ -196,9 +186,7 @@ private class GivingPortalPaymentsTest {
 				sender.received[0].getPlainTextBody().contains('https://checkout.example.com/9'),
 				'With the checkout link'
 			);
-			Assert.isTrue(
-				new GivingPortalPayments().actionNames().contains(GivingPortalPayments.PAY_ONLINE)
-			);
+			Assert.isTrue(new GivingPortalPayments().actionNames().contains(GivingPortalPayments.PAY_ONLINE));
 		}
 	}
 
@@ -217,8 +205,7 @@ private class GivingPortalPaymentsTest {
 			};
 			for (List<Id> attempt : attempts) {
 				try {
-					new GivingPortalPayments()
-						.run(GivingPortalPayments.PAY_ONLINE, attempt[0], attempt[1]);
+					new GivingPortalPayments().run(GivingPortalPayments.PAY_ONLINE, attempt[0], attempt[1]);
 				} catch (GivingPortalPayments.PortalPaymentException expected) {
 					refused.add(expected.getMessage());
 				}

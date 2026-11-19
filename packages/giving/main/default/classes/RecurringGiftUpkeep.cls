@@ -40,10 +40,7 @@ public without sharing class RecurringGiftUpkeep {
 			for (Commitment__c row : [
 				SELECT Id, Donor_Contact__r.Email
 				FROM Commitment__c
-				WHERE
-					Type__c = 'Recurring'
-					AND Status__c IN :OPEN
-					AND Donor_Contact__r.Email IN :emails
+				WHERE Type__c = 'Recurring' AND Status__c IN :OPEN AND Donor_Contact__r.Email IN :emails
 				WITH SYSTEM_MODE
 				LIMIT 2000
 			]) {
@@ -74,14 +71,8 @@ public without sharing class RecurringGiftUpkeep {
 		List<Recurring_Gift_Event__c> fresh = new List<Recurring_Gift_Event__c>();
 		Set<Id> commitmentIds = new Set<Id>();
 		for (Recurring_Gift_Event__c event : events) {
-			Recurring_Gift_Event__c old = before == null
-				? null
-				: (Recurring_Gift_Event__c) before.get(event.Id);
-			if (
-				event.Commitment__c != null &&
-				(old == null ||
-				old.Commitment__c != event.Commitment__c)
-			) {
+			Recurring_Gift_Event__c old = before == null ? null : (Recurring_Gift_Event__c) before.get(event.Id);
+			if (event.Commitment__c != null && (old == null || old.Commitment__c != event.Commitment__c)) {
 				fresh.add(event);
 				commitmentIds.add(event.Commitment__c);
 			}
@@ -92,12 +83,7 @@ public without sharing class RecurringGiftUpkeep {
 		fresh.sort(new OldestFirst());
 		Map<Id, Commitment__c> commitments = new Map<Id, Commitment__c>(
 			[
-				SELECT
-					Id,
-					Failed_Charges__c,
-					Last_Failed_Charge__c,
-					Card_Expires__c,
-					Processor_Cancelled__c
+				SELECT Id, Failed_Charges__c, Last_Failed_Charge__c, Card_Expires__c, Processor_Cancelled__c
 				FROM Commitment__c
 				WHERE Id IN :commitmentIds
 				WITH SYSTEM_MODE

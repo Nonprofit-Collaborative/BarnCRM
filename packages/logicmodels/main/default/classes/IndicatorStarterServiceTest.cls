@@ -19,29 +19,15 @@ private class IndicatorStarterServiceTest {
 	/** Periods named Session, by start date, for the indicator chosen. */
 	private static void useTestStarters() {
 		IndicatorStarterService.starters = new List<IndicatorStarterService.Starter>{
-			new IndicatorStarterService.Starter(
-					'sessions',
-					'Indicator_Period__c',
-					'Start_Date__c',
-					'count'
-				)
+			new IndicatorStarterService.Starter('sessions', 'Indicator_Period__c', 'Start_Date__c', 'count')
 				.filtered(
 					new List<Object>{
-						new Map<String, Object>{
-							'field' => 'Name',
-							'operator' => 'equals',
-							'value' => 'Session'
-						}
+						new Map<String, Object>{ 'field' => 'Name', 'operator' => 'equals', 'value' => 'Session' }
 					}
 				)
 				.asking('Indicator__c', 'Indicator__c', true),
 			new IndicatorStarterService.Starter('missing', 'No_Such_Object__c', 'Date__c', 'count'),
-			new IndicatorStarterService.Starter(
-					'targets',
-					'Indicator_Period__c',
-					'Start_Date__c',
-					'sum'
-				)
+			new IndicatorStarterService.Starter('targets', 'Indicator_Period__c', 'Start_Date__c', 'sum')
 				.measuring('Target_Value__c')
 				.asking('No_Such_Object__c', 'Notes__c', false)
 		};
@@ -98,12 +84,8 @@ private class IndicatorStarterServiceTest {
 
 			Test.startTest();
 			List<Map<String, Object>> offered = LogicModelBuilderController.getSourceStarters();
-			List<Map<String, String>> choices = LogicModelBuilderController.getStarterChoices(
-				'sessions'
-			);
-			List<Map<String, String>> none = LogicModelBuilderController.getStarterChoices(
-				'targets'
-			);
+			List<Map<String, String>> choices = LogicModelBuilderController.getStarterChoices('sessions');
+			List<Map<String, String>> none = LogicModelBuilderController.getStarterChoices('targets');
 			Test.stopTest();
 
 			Assert.areEqual(2, offered.size(), 'The starter on a missing object is left out');
@@ -153,10 +135,7 @@ private class IndicatorStarterServiceTest {
 			];
 			Assert.areEqual('Computed', indicator.Source__c, 'Computed');
 			Assert.areEqual(query.Id, indicator.Source_Query__c, 'From the new query');
-			Assert.isTrue(
-				indicator.Source_Definition__c.contains('Start_Date__c'),
-				'By the starter date field'
-			);
+			Assert.isTrue(indicator.Source_Definition__c.contains('Start_Date__c'), 'By the starter date field');
 			Assert.isNotNull(model.get('indicators'), 'The model comes back');
 		}
 	}
@@ -168,10 +147,7 @@ private class IndicatorStarterServiceTest {
 			Fixture fixture = new Fixture();
 
 			Test.startTest();
-			LogicModelBuilderController.saveStarterSource(
-				fixture.modelId,
-				fixture.starter('targets', null)
-			);
+			LogicModelBuilderController.saveStarterSource(fixture.modelId, fixture.starter('targets', null));
 			Test.stopTest();
 
 			Indicator__c indicator = [
@@ -181,10 +157,7 @@ private class IndicatorStarterServiceTest {
 				WITH SYSTEM_MODE
 			];
 			Assert.isTrue(indicator.Source_Definition__c.contains('sum'), 'A sum');
-			Assert.isTrue(
-				indicator.Source_Definition__c.contains('Target_Value__c'),
-				'Of the starter field'
-			);
+			Assert.isTrue(indicator.Source_Definition__c.contains('Target_Value__c'), 'Of the starter field');
 		}
 	}
 
@@ -209,11 +182,7 @@ private class IndicatorStarterServiceTest {
 			Assert.areEqual(choose, notAnId, 'Not a record identifier');
 			Assert.areEqual(gone, unknown, 'Not a starter');
 			Assert.areEqual(gone, unavailable, 'Its object is not here');
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Saved_Query__c WITH SYSTEM_MODE],
-				'No query written'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Saved_Query__c WITH SYSTEM_MODE], 'No query written');
 		}
 	}
 

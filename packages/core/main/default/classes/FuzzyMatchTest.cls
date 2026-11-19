@@ -12,10 +12,7 @@ private class FuzzyMatchTest {
 	private static final Double VERY_CLOSE = 0.9;
 
 	private static void assertNear(Decimal expected, Double actual) {
-		Assert.isTrue(
-			Math.abs(expected.doubleValue() - actual) < TOLERANCE,
-			expected + ' expected, ' + actual
-		);
+		Assert.isTrue(Math.abs(expected.doubleValue() - actual) < TOLERANCE, expected + ' expected, ' + actual);
 	}
 
 	@IsTest
@@ -86,10 +83,7 @@ private class FuzzyMatchTest {
 			candidates.add('Candidate Header ' + i);
 		}
 		Integer cpuBefore = Limits.getCpuTime();
-		Assert.areEqual(
-			'Candidate Header 250',
-			FuzzyMatch.bestMatch('candidate_header_250', candidates, VERY_CLOSE)
-		);
+		Assert.areEqual('Candidate Header 250', FuzzyMatch.bestMatch('candidate_header_250', candidates, VERY_CLOSE));
 		Assert.isTrue(Limits.getCpuTime() - cpuBefore < 5000, '300 candidates score quickly.');
 	}
 }

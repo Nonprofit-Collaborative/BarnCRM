@@ -70,11 +70,7 @@ private class ErrorLoggerTest {
 				entry.Technical_Detail__c.contains('The pattern refers to a field'),
 				'And carries the words the exception itself used.'
 			);
-			Assert.areEqual(
-				ErrorLogger.SEVERITY_ERROR,
-				entry.Severity__c,
-				'Severity defaults to Error.'
-			);
+			Assert.areEqual(ErrorLogger.SEVERITY_ERROR, entry.Severity__c, 'Severity defaults to Error.');
 			Assert.areEqual(ErrorLogger.STATUS_NEW, entry.Status__c, 'And status to New.');
 			Assert.areEqual(UserInfo.getUserId(), entry.User__c, 'The person working is recorded.');
 			Assert.isNotNull(entry.Timestamp__c, 'So is the time.');
@@ -86,10 +82,7 @@ private class ErrorLoggerTest {
 	@IsTest
 	static void anExceptionAboutARecordPointsAtThatRecord() {
 		System.runAs(TestUsers.admin()) {
-			Error_Log__c existing = TestDataFactory.insertErrorLogs(
-				1,
-				ErrorLogger.STATUS_RESOLVED
-			)[0];
+			Error_Log__c existing = TestDataFactory.insertErrorLogs(1, ErrorLogger.STATUS_RESOLVED)[0];
 
 			Test.startTest();
 			ErrorLogger.log(thrownException(), 'Household naming', existing.Id);
@@ -106,11 +99,7 @@ private class ErrorLoggerTest {
 				logged[0].Record_Reference__c,
 				'Maria can open the record from the entry.'
 			);
-			Assert.areEqual(
-				'Error_Log__c',
-				logged[0].Object_Name__c,
-				'And can group entries by what they affect.'
-			);
+			Assert.areEqual('Error_Log__c', logged[0].Object_Name__c, 'And can group entries by what they affect.');
 		}
 	}
 
@@ -128,11 +117,7 @@ private class ErrorLoggerTest {
 			Integer statementsAfter = Limits.getPublishImmediateDML();
 			Test.stopTest();
 
-			Assert.areEqual(
-				1,
-				statementsAfter - statementsBefore,
-				'Logging is done in one statement.'
-			);
+			Assert.areEqual(1, statementsAfter - statementsBefore, 'Logging is done in one statement.');
 			Assert.areEqual(
 				200,
 				[SELECT COUNT() FROM Error_Log__c WHERE Severity__c = 'Warning'],
@@ -156,20 +141,11 @@ private class ErrorLoggerTest {
 
 			Test.startTest();
 			Integer statementsBefore = Limits.getPublishImmediateDML();
-			ErrorLogger.logMessages(
-				messages,
-				recordIds,
-				'Appeal copy',
-				ErrorLogger.SEVERITY_WARNING
-			);
+			ErrorLogger.logMessages(messages, recordIds, 'Appeal copy', ErrorLogger.SEVERITY_WARNING);
 			Integer statementsAfter = Limits.getPublishImmediateDML();
 			Test.stopTest();
 
-			Assert.areEqual(
-				1,
-				statementsAfter - statementsBefore,
-				'Logging is done in one statement.'
-			);
+			Assert.areEqual(1, statementsAfter - statementsBefore, 'Logging is done in one statement.');
 			Assert.areEqual(
 				201,
 				[SELECT COUNT() FROM Error_Log__c WHERE Severity__c = 'Warning'],
@@ -190,11 +166,7 @@ private class ErrorLoggerTest {
 	@IsTest
 	static void aListOfExceptionsIsLoggedTogether() {
 		System.runAs(TestUsers.admin()) {
-			List<Exception> failures = new List<Exception>{
-				thrownException(),
-				null,
-				thrownException()
-			};
+			List<Exception> failures = new List<Exception>{ thrownException(), null, thrownException() };
 
 			Test.startTest();
 			Integer statementsBefore = Limits.getPublishImmediateDML();
@@ -214,11 +186,7 @@ private class ErrorLoggerTest {
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
 			ErrorLogger.logMessage('The fund on this gift no longer exists.', null, 'Catastrophic');
-			ErrorLogger.logMessage(
-				'Nothing to worry about.',
-				'Health check',
-				ErrorLogger.SEVERITY_INFO
-			);
+			ErrorLogger.logMessage('Nothing to worry about.', 'Health check', ErrorLogger.SEVERITY_INFO);
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -312,11 +280,7 @@ private class ErrorLoggerTest {
 				survived[0].Message__c,
 				'With the message intact.'
 			);
-			Assert.areEqual(
-				ErrorLogger.SEVERITY_ERROR,
-				survived[0].Severity__c,
-				'And its severity.'
-			);
+			Assert.areEqual(ErrorLogger.SEVERITY_ERROR, survived[0].Severity__c, 'And its severity.');
 			Assert.areEqual(ErrorLogger.STATUS_NEW, survived[0].Status__c, 'Waiting to be read.');
 			Assert.areEqual(david.Id, survived[0].User__c, 'Naming David, who was working.');
 			Assert.isNotNull(survived[0].Timestamp__c, 'And when.');
@@ -350,10 +314,7 @@ private class ErrorLoggerTest {
 	@IsTest
 	static void anEntryNamesThePublisherNotTheUserThePayloadClaims() {
 		System.runAs(TestUsers.admin()) {
-			User someoneElse = TestUsers.minimumAccessUserWith(
-				'Okafor',
-				new List<String>{ 'BarnCRM_Read_Only' }
-			);
+			User someoneElse = TestUsers.minimumAccessUserWith('Okafor', new List<String>{ 'BarnCRM_Read_Only' });
 			Error_Log_Event__e forged = (Error_Log_Event__e) JSON.deserialize(
 				JSON.serialize(
 					new Map<String, Object>{
@@ -435,24 +396,16 @@ private class ErrorLoggerTest {
 			Assert.areEqual(5, recent.size(), 'The tile shows five.');
 			Assert.areEqual(5, defaulted.size(), 'Asking for none also shows five.');
 			Assert.areEqual(5, capped.size(), 'So does asking for a nonsense number.');
-			Assert.isTrue(
-				recent[0].Timestamp__c >= recent[4].Timestamp__c,
-				'The most recent is first.'
-			);
+			Assert.isTrue(recent[0].Timestamp__c >= recent[4].Timestamp__c, 'The most recent is first.');
 		}
 	}
 
 	@IsTest
 	static void anEntryCanBeReadBackById() {
 		System.runAs(TestUsers.admin()) {
-			List<Error_Log__c> existing = TestDataFactory.insertErrorLogs(
-				2,
-				ErrorLogger.STATUS_NEW
-			);
+			List<Error_Log__c> existing = TestDataFactory.insertErrorLogs(2, ErrorLogger.STATUS_NEW);
 
-			List<Error_Log__c> found = ErrorLogSelector.selectByIds(
-				new Set<Id>{ existing[0].Id, existing[1].Id }
-			);
+			List<Error_Log__c> found = ErrorLogSelector.selectByIds(new Set<Id>{ existing[0].Id, existing[1].Id });
 
 			Assert.areEqual(2, found.size(), 'Both entries come back.');
 			Assert.areEqual(
@@ -460,11 +413,7 @@ private class ErrorLoggerTest {
 				ErrorLogSelector.selectByIds(new Set<Id>()).size(),
 				'Asking for nothing queries nothing.'
 			);
-			Assert.areEqual(
-				0,
-				ErrorLogSelector.selectByIds(null).size(),
-				'Asking for null queries nothing.'
-			);
+			Assert.areEqual(0, ErrorLogSelector.selectByIds(null).size(), 'Asking for null queries nothing.');
 		}
 	}
 
@@ -482,10 +431,7 @@ private class ErrorLoggerTest {
 				}
 			);
 		}
-		return (Database.SaveResult) JSON.deserialize(
-			JSON.serialize(result),
-			Database.SaveResult.class
-		);
+		return (Database.SaveResult) JSON.deserialize(JSON.serialize(result), Database.SaveResult.class);
 	}
 
 	@IsTest
@@ -501,12 +447,7 @@ private class ErrorLoggerTest {
 
 			Test.startTest();
 			Integer statementsBefore = Limits.getPublishImmediateDML();
-			ErrorLogger.logFailures(
-				results,
-				recordIds,
-				'Partial save',
-				ErrorLogger.SEVERITY_WARNING
-			);
+			ErrorLogger.logFailures(results, recordIds, 'Partial save', ErrorLogger.SEVERITY_WARNING);
 			ErrorLogger.logFailures(null, null, 'Partial save', ErrorLogger.SEVERITY_WARNING);
 			Integer statementsAfter = Limits.getPublishImmediateDML();
 			Test.stopTest();
@@ -517,9 +458,7 @@ private class ErrorLoggerTest {
 				[
 					SELECT COUNT()
 					FROM Error_Log__c
-					WHERE
-						Context__c = 'Partial save'
-						AND Record_Reference__c = :String.valueOf(aboutMe)
+					WHERE Context__c = 'Partial save' AND Record_Reference__c = :String.valueOf(aboutMe)
 				],
 				'Each failed row is recorded about its own record, and no row that saved is.'
 			);
@@ -576,18 +515,14 @@ private class ErrorLoggerTest {
 			}
 			List<Error_Log_Event__e> events = new List<Error_Log_Event__e>();
 			for (Integer i = 0; i < 2000; i++) {
-				events.add(
-					event('The household is missing.', userIds[Math.mod(i, userIds.size())])
-				);
+				events.add(event('The household is missing.', userIds[Math.mod(i, userIds.size())]));
 			}
 			events.add(event('A different failure.', null));
 
 			Test.startTest();
 			ErrorLogEventHandler.handle(events);
 			// A later delivery of the same failure adds to the entry already written.
-			ErrorLogEventHandler.handle(
-				new List<Error_Log_Event__e>{ event('The household is missing.', null) }
-			);
+			ErrorLogEventHandler.handle(new List<Error_Log_Event__e>{ event('The household is missing.', null) });
 			Test.stopTest();
 
 			List<Error_Log__c> written = [
@@ -633,6 +568,87 @@ private class ErrorLoggerTest {
 				'An acknowledged entry, or one first written over an hour ago, is not added to.'
 			);
 		}
+	}
+
+	private static Error_Log_Event__e failure(String detail) {
+		Error_Log_Event__e failure = event('Something went wrong saving the household.', null);
+		failure.Technical_Detail__c = detail;
+		return failure;
+	}
+
+	@IsTest
+	static void theSameMessageFromDifferentFailuresIsTwoEntries() {
+		String nullAtTwelve =
+			'System.NullPointerException: Attempt to de-reference a null object\n' +
+			'Class.HouseholdService.save: line 12, column 1\n' +
+			'Class.HouseholdController.save: line 40, column 1';
+		String nullAtThirty = nullAtTwelve.replace('line 12', 'line 30');
+		String queryAtTwelve = nullAtTwelve.replace('System.NullPointerException', 'System.QueryException');
+		System.runAs(TestUsers.admin()) {
+			Test.startTest();
+			ErrorLogEventHandler.handle(
+				new List<Error_Log_Event__e>{
+					failure(nullAtTwelve),
+					failure(nullAtTwelve),
+					failure(nullAtThirty),
+					failure(queryAtTwelve)
+				}
+			);
+			ErrorLogEventHandler.handle(new List<Error_Log_Event__e>{ failure(nullAtTwelve) });
+			Test.stopTest();
+
+			List<Error_Log__c> written = [
+				SELECT Occurrences__c
+				FROM Error_Log__c
+				ORDER BY Occurrences__c DESC
+			];
+			Assert.areEqual(3, written.size(), 'A different type or line is a different entry.');
+			Assert.areEqual(3, written[0].Occurrences__c, 'The same failure is still counted.');
+			Assert.areEqual(1, written[1].Occurrences__c);
+			Assert.areEqual(1, written[2].Occurrences__c);
+		}
+	}
+
+	@IsTest
+	static void theKeyReadsTheTypeAndFirstFrameFromTechnicalDetail() {
+		// runs-as: deploying user (pure parsing of a string, no DML or SOQL)
+		String detail =
+			'System.DmlException: Insert failed: a: b\n' +
+			'AnonymousBlock: line 1, column 1\n' +
+			'Class.barn.AddressService.save: line 939, column 1\n' +
+			'Caused by System.QueryException: x';
+
+		Assert.areEqual('System.DmlException', ErrorLogEventHandler.exceptionType(detail));
+		Assert.areEqual(
+			'Class.barn.AddressService.save: line 939',
+			ErrorLogEventHandler.topFrame(detail),
+			'The first frame of Apex code, kept to its line'
+		);
+		Assert.areEqual('', ErrorLogEventHandler.exceptionType('Plain words, no type'));
+		Assert.areEqual('', ErrorLogEventHandler.exceptionType('Two words: not a type'));
+		Assert.areEqual('', ErrorLogEventHandler.topFrame('No stack here'));
+		Assert.areEqual('', ErrorLogEventHandler.topFrame(null));
+	}
+
+	@IsTest
+	static void aMessageWithoutAnExceptionKeepsItsEarlierKey() {
+		// runs-as: deploying user (pure hashing of an in-memory record, no DML or SOQL)
+		Error_Log__c entry = new Error_Log__c(
+			Context__c = 'Bulk load',
+			Severity__c = 'Warning',
+			Message__c = 'Refused.'
+		);
+		String before = EncodingUtil.convertToHex(
+			Crypto.generateDigest('SHA-256', Blob.valueOf('Bulk load\nWarning\nRefused.'))
+		);
+
+		Assert.areEqual(
+			before,
+			ErrorLogEventHandler.keyOf(entry),
+			'An entry written before the change still finds its repeats'
+		);
+		entry.Technical_Detail__c = 'System.NullPointerException: x\nClass.A.b: line 1, column 1';
+		Assert.areNotEqual(before, ErrorLogEventHandler.keyOf(entry), 'An exception adds its parts');
 	}
 
 	@IsTest

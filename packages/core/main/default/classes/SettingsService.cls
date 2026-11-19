@@ -217,9 +217,7 @@ public with sharing class SettingsService {
 	 * only. Lower-case field names.
 	 */
 	private static final String COEXISTENCE_FIELD = 'coexistence_mode__c';
-	private static final Set<String> SHOWN_AS_STORED = new Set<String>{
-		'household_membership_mode__c'
-	};
+	private static final Set<String> SHOWN_AS_STORED = new Set<String>{ 'household_membership_mode__c' };
 	/**
 	 * Text settings that show the org's My Domain address while blank, as `object.field` in
 	 * lower case: the address is known only at run time, so no declared default can hold it.
@@ -250,8 +248,7 @@ public with sharing class SettingsService {
 		Schema.SObjectType type = settingsType(settingsObject);
 		Schema.SObjectField field = fieldFor(type, key);
 		Object stored = orgDefault(type).get(field);
-		Boolean blank =
-			stored == null || (stored instanceof String && String.isBlank((String) stored));
+		Boolean blank = stored == null || (stored instanceof String && String.isBlank((String) stored));
 		Boolean fillable =
 			PICKLIST.equalsIgnoreCase(dataType) ||
 			PICKLIST_FROM_FIELD.equalsIgnoreCase(dataType) ||
@@ -267,11 +264,7 @@ public with sharing class SettingsService {
 		if (isCoreSettings(type) && SHOWN_AS_STORED.contains(name)) {
 			return stored;
 		}
-		if (
-			SHOWN_AS_MY_DOMAIN.contains(
-				type.getDescribe().getLocalName().toLowerCase() + '.' + name
-			)
-		) {
+		if (SHOWN_AS_MY_DOMAIN.contains(type.getDescribe().getLocalName().toLowerCase() + '.' + name)) {
 			return Url.getOrgDomainUrl().toExternalForm();
 		}
 		Object declared = type.newSObject(null, true).get(field);
@@ -355,9 +348,7 @@ public with sharing class SettingsService {
 			}
 			Object oldValue = record.get(token);
 			// A blank stored value is shown as the declared default, so that value saves as is.
-			Object shownValue = oldValue != null
-				? oldValue
-				: type.newSObject(null, true).get(token);
+			Object shownValue = oldValue != null ? oldValue : type.newSObject(null, true).get(token);
 			Object newValue = checkedValue(values.get(key), field, definition, shownValue);
 			String oldText = asText(oldValue);
 			String newText = asText(newValue);
@@ -416,10 +407,7 @@ public with sharing class SettingsService {
 	 * it hands over every change and the engine picks its own (ADR-0125 decision 4, ADR-0136).
 	 * A failure is logged and the saved setting stands.
 	 */
-	private static void notifyRollupEngine(
-		String objectName,
-		Map<Schema.SObjectField, Object> changed
-	) {
+	private static void notifyRollupEngine(String objectName, Map<Schema.SObjectField, Object> changed) {
 		RollupEngineExtension engine = RollupEngineExtensions.find();
 		if (engine == null) {
 			return;
@@ -500,10 +488,7 @@ public with sharing class SettingsService {
 	 * The error digest goes only to active users of the org (R-E5), so an address that is not
 	 * one is refused here, where every write of the setting passes, with the addresses named.
 	 */
-	private static void refuseIfDigestRecipientsAreNotUsers(
-		Schema.SObjectField token,
-		String newText
-	) {
+	private static void refuseIfDigestRecipientsAreNotUsers(Schema.SObjectField token, String newText) {
 		if (token != BarnCRM_Settings__c.Error_Digest_Recipients__c) {
 			return;
 		}
@@ -524,9 +509,7 @@ public with sharing class SettingsService {
 			AccountKinds.NO_RECORD_TYPE.equalsIgnoreCase(newText) &&
 			!AccountKinds.noRecordTypeAllowed()
 		) {
-			throw new SettingsException(
-				BarnHelp.text('Core', 'Core_Settings_NoRecordTypeNotAllowed')
-			);
+			throw new SettingsException(BarnHelp.text('Core', 'Core_Settings_NoRecordTypeNotAllowed'));
 		}
 	}
 
@@ -553,10 +536,7 @@ public with sharing class SettingsService {
 				? definition.MasterLabel
 				: field.getLabel();
 			throw new SettingsException(
-				String.format(
-					System.Label.Core_Format_Pair,
-					new List<Object>{ name, refused.getMessage() }
-				)
+				String.format(System.Label.Core_Format_Pair, new List<Object>{ name, refused.getMessage() })
 			);
 		}
 	}
@@ -565,11 +545,7 @@ public with sharing class SettingsService {
 	 * A picklist row may only be set to one of the choices it ships, so a direct call to the
 	 * controller cannot store a value the console would never offer.
 	 */
-	private static void checkAllowedValue(
-		Setting_Definition__mdt definition,
-		Object newValue,
-		Object oldValue
-	) {
+	private static void checkAllowedValue(Setting_Definition__mdt definition, Object newValue, Object oldValue) {
 		if (definition == null || newValue == null) {
 			return;
 		}
@@ -650,11 +626,7 @@ public with sharing class SettingsService {
 	 * stored (kept, so a section still saves after the org retires it). While the org does not
 	 * have the field, the row is a text box and any text saves.
 	 */
-	private static void checkFieldPicklist(
-		Setting_Definition__mdt definition,
-		String candidate,
-		String stored
-	) {
+	private static void checkFieldPicklist(Setting_Definition__mdt definition, String candidate, String stored) {
 		List<Schema.PicklistEntry> active = activeFieldValues(definition);
 		// Exact case: the readers compare the stored value case-sensitively.
 		if (active == null || (candidate != null && candidate.equals(stored))) {
@@ -754,9 +726,7 @@ public with sharing class SettingsService {
 		}
 		for (String name : candidate.split(',')) {
 			if (String.isNotBlank(name) && !known.contains(name.trim())) {
-				throw new SettingsException(
-					BarnHelp.text('Core', 'Core_Settings_InvalidValueError')
-				);
+				throw new SettingsException(BarnHelp.text('Core', 'Core_Settings_InvalidValueError'));
 			}
 		}
 	}
@@ -769,9 +739,7 @@ public with sharing class SettingsService {
 		}
 		for (String name : candidate.split(',')) {
 			if (String.isNotBlank(name) && !known.contains(name.trim().toLowerCase())) {
-				throw new SettingsException(
-					BarnHelp.text('Core', 'Core_Settings_InvalidValueError')
-				);
+				throw new SettingsException(BarnHelp.text('Core', 'Core_Settings_InvalidValueError'));
 			}
 		}
 	}
@@ -785,11 +753,7 @@ public with sharing class SettingsService {
 		if (type == null) {
 			return byLabel.values();
 		}
-		for (
-			Schema.SObjectField token : type.getDescribe(SObjectDescribeOptions.DEFERRED)
-				.fields.getMap()
-				.values()
-		) {
+		for (Schema.SObjectField token : type.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap().values()) {
 			Schema.DescribeFieldResult field = token.getDescribe();
 			if ((field.isCustom() || field.isNameField()) && field.isAccessible()) {
 				byLabel.put(field.getLabel() + '|' + field.getName(), field);
@@ -815,10 +779,7 @@ public with sharing class SettingsService {
 		if (type == null) {
 			return chosen;
 		}
-		for (
-			Schema.RecordTypeInfo info : type.getDescribe(SObjectDescribeOptions.DEFERRED)
-				.getRecordTypeInfos()
-		) {
+		for (Schema.RecordTypeInfo info : type.getDescribe(SObjectDescribeOptions.DEFERRED).getRecordTypeInfos()) {
 			if (info.isActive() && !info.isMaster()) {
 				chosen.add(info);
 			}
@@ -862,11 +823,7 @@ public with sharing class SettingsService {
 	 */
 	private static SObject blanksKeptBlank(Schema.SObjectType type, SObject saved) {
 		SObject blanks = type.newSObject(saved.Id);
-		for (
-			Schema.SObjectField field : type.getDescribe(SObjectDescribeOptions.DEFERRED)
-				.fields.getMap()
-				.values()
-		) {
+		for (Schema.SObjectField field : type.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap().values()) {
 			Schema.DescribeFieldResult describe = field.getDescribe();
 			Boolean blank = saved.get(field) == null;
 			if (describe.isCustom() && describe.getType() != Schema.DisplayType.BOOLEAN && blank) {
@@ -883,9 +840,7 @@ public with sharing class SettingsService {
 	 */
 	@NamespaceAccessible
 	public static BarnCRM_Settings__c firstSaveRecord() {
-		return withShippedDefaults(
-			new BarnCRM_Settings__c(SetupOwnerId = UserInfo.getOrganizationId())
-		);
+		return withShippedDefaults(new BarnCRM_Settings__c(SetupOwnerId = UserInfo.getOrganizationId()));
 	}
 
 	/**
@@ -953,10 +908,7 @@ public with sharing class SettingsService {
 	 */
 	private static Schema.SObjectType settingsType(String settingsObject) {
 		String name = objectName(settingsObject);
-		if (
-			!CORE_SETTINGS_OBJECT.equalsIgnoreCase(name) &&
-			!registeredObjects().contains(name.toLowerCase())
-		) {
+		if (!CORE_SETTINGS_OBJECT.equalsIgnoreCase(name) && !registeredObjects().contains(name.toLowerCase())) {
 			throw new SettingsException(BarnHelp.text('Core', 'Core_Settings_UnknownKeyError'));
 		}
 		Schema.SObjectType type = typeByName(name);
@@ -1018,8 +970,7 @@ public with sharing class SettingsService {
 	private static Map<String, Setting_Definition__mdt> definitionsByKey(String objectName) {
 		Map<String, Setting_Definition__mdt> rows = new Map<String, Setting_Definition__mdt>();
 		for (Setting_Definition__mdt definition : SettingDefinitionSelector.getAll()) {
-			Boolean sameObject = objectName(definition.Settings_Object__c)
-				.equalsIgnoreCase(objectName);
+			Boolean sameObject = objectName(definition.Settings_Object__c).equalsIgnoreCase(objectName);
 			if (sameObject && String.isNotBlank(definition.Setting_Key__c)) {
 				rows.put(definition.Setting_Key__c.trim().toLowerCase(), definition);
 			}
@@ -1028,9 +979,7 @@ public with sharing class SettingsService {
 	}
 
 	private static Schema.SObjectField fieldFor(Schema.SObjectType type, String key) {
-		Schema.SObjectField token = String.isBlank(key)
-			? null
-			: fieldsByLocalName(type).get(key.trim().toLowerCase());
+		Schema.SObjectField token = String.isBlank(key) ? null : fieldsByLocalName(type).get(key.trim().toLowerCase());
 		if (token == null) {
 			throw new SettingsException(BarnHelp.text('Core', 'Core_Settings_UnknownKeyError'));
 		}
@@ -1056,9 +1005,7 @@ public with sharing class SettingsService {
 		Schema.DisplayType kind = field.getType();
 		String text = raw == null ? null : String.valueOf(raw).trim();
 		if (kind == Schema.DisplayType.BOOLEAN) {
-			return raw instanceof Boolean
-				? (Boolean) raw
-				: (String.isBlank(text) ? false : Boolean.valueOf(text));
+			return raw instanceof Boolean ? (Boolean) raw : (String.isBlank(text) ? false : Boolean.valueOf(text));
 		}
 		Object typed = alreadyTyped(kind, raw);
 		if (typed != null) {
@@ -1167,11 +1114,7 @@ public with sharing class SettingsService {
 	public static final String MEMBERSHIP_MODE_DEFAULT = 'Contact';
 
 	@TestVisible
-	private static final Set<String> COEXISTENCE_MODES = new Set<String>{
-		'Standalone',
-		'NPSP',
-		'NonprofitCloud'
-	};
+	private static final Set<String> COEXISTENCE_MODES = new Set<String>{ 'Standalone', 'NPSP', 'NonprofitCloud' };
 	@TestVisible
 	private static final Set<String> MEMBERSHIP_MODES = new Set<String>{ 'Contact', 'Junction' };
 
@@ -1199,10 +1142,6 @@ public with sharing class SettingsService {
 
 	@NamespaceAccessible
 	public static String householdMembershipMode() {
-		return storedOrDefault(
-			getSettings().Household_Membership_Mode__c,
-			MEMBERSHIP_MODES,
-			MEMBERSHIP_MODE_DEFAULT
-		);
+		return storedOrDefault(getSettings().Household_Membership_Mode__c, MEMBERSHIP_MODES, MEMBERSHIP_MODE_DEFAULT);
 	}
 }

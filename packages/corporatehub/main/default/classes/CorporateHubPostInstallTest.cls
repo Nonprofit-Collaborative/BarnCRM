@@ -22,11 +22,7 @@ private class CorporateHubPostInstallTest {
 	static void theInstallerGetsTheAdminSetOnceAndTheRolesTheirSets() {
 		System.runAs(TestUsers.admin()) {
 			Id fresh = TestDataFactory.createUser('Installer', new List<String>()).Id;
-			Id alreadyHolding = TestDataFactory.createUser(
-					'Holder',
-					new List<String>{ 'Corporate_Hub_Admin' }
-				)
-				.Id;
+			Id alreadyHolding = TestDataFactory.createUser('Holder', new List<String>{ 'Corporate_Hub_Admin' }).Id;
 			User member = TestUsers.standardUser('Member');
 			insert new PermissionSetAssignment(
 				AssigneeId = member.Id,
@@ -41,11 +37,7 @@ private class CorporateHubPostInstallTest {
 
 			Assert.areEqual(1, setsHeldBy(fresh, 'Corporate_Hub_Admin'), 'The installer holds it');
 			Assert.areEqual(1, setsHeldBy(alreadyHolding, 'Corporate_Hub_Admin'), 'Never twice');
-			Assert.areEqual(
-				1,
-				setsHeldBy(member.Id, 'Corporate_Hub_Staff'),
-				'Team Member holds Staff'
-			);
+			Assert.areEqual(1, setsHeldBy(member.Id, 'Corporate_Hub_Staff'), 'Team Member holds Staff');
 			Assert.areEqual(
 				0,
 				[
@@ -96,11 +88,7 @@ private class CorporateHubPostInstallTest {
 			new CorporateHubPostInstall().runSetup(null);
 			Test.stopTest();
 
-			Assert.areEqual(
-				1,
-				setsHeldBy(reader.Id, 'Corporate_Hub_Read_Only'),
-				'Read Only holds it'
-			);
+			Assert.areEqual(1, setsHeldBy(reader.Id, 'Corporate_Hub_Read_Only'), 'Read Only holds it');
 		}
 	}
 }

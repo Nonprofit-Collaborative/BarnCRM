@@ -3,7 +3,8 @@
   <hasActivationRequired>false</hasActivationRequired>
   <label>Forms Admin</label>
   <description>
-    Builds, publishes and deletes forms, fills them in and works their submissions.
+    Builds, publishes and deletes forms, a form with submissions included (Manage Forms),
+    fills them in and works their submissions.
   </description>
   <applicationVisibilities>
     <application>BarnCRM_Forms</application>
@@ -25,6 +26,10 @@
     <apexClass>FormSubmissionController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <customPermissions>
+    <enabled>true</enabled>
+    <name>Forms_Manage</name>
+  </customPermissions>
   <fieldPermissions>
     <editable>true</editable>
     <field>Form__c.Sample_Data__c</field>
@@ -61,8 +66,18 @@
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
+    <editable>false</editable>
+    <field>Form_Submission__c.Form_Name__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
     <editable>true</editable>
     <field>Form_Submission__c.Form_Version__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Form_Submission__c.Form__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -88,6 +103,11 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Form_Submission__c.Source__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Form_Submission__c.Version_Number__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>

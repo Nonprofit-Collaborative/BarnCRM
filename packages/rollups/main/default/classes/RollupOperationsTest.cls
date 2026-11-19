@@ -47,12 +47,7 @@ private class RollupOperationsTest {
 			new Map<String, Object>{
 				'version' => 1,
 				'conditions' => new List<Object>{
-					new Map<String, Object>{
-						'id' => 1,
-						'field' => field,
-						'operator' => operator,
-						'value' => value
-					}
+					new Map<String, Object>{ 'id' => 1, 'field' => field, 'operator' => operator, 'value' => value }
 				}
 			}
 		);
@@ -121,12 +116,7 @@ private class RollupOperationsTest {
 	private static Map<Id, Account> reread(List<Account> organizations) {
 		return new Map<Id, Account>(
 			[
-				SELECT
-					Id,
-					Sample_Data__c,
-					Exclude_From_Greetings__c,
-					Preferred_Name__c,
-					Sample_Data_Key__c
+				SELECT Id, Sample_Data__c, Exclude_From_Greetings__c, Preferred_Name__c, Sample_Data_Key__c
 				FROM Account
 				WHERE Id IN :organizations
 				WITH SYSTEM_MODE
@@ -144,16 +134,8 @@ private class RollupOperationsTest {
 				organization.Exclude_From_Greetings__c,
 				context + ': None is checked only where nobody is on the Board'
 			);
-			Assert.areEqual(
-				'Role 0',
-				organization.Preferred_Name__c,
-				context + ': the eldest person\'s title'
-			);
-			Assert.areEqual(
-				'P19',
-				organization.Sample_Data_Key__c,
-				context + ': the youngest person\'s name'
-			);
+			Assert.areEqual('Role 0', organization.Preferred_Name__c, context + ': the eldest person\'s title');
+			Assert.areEqual('P19', organization.Sample_Data_Key__c, context + ': the youngest person\'s name');
 		}
 	}
 
@@ -183,12 +165,7 @@ private class RollupOperationsTest {
 			Date born = Date.newInstance(1990, 1, 1);
 			List<Contact> staff = new List<Contact>{
 				TestDataFactory.person(
-					new Contact(
-						LastName = 'Ames',
-						Title = 'Role 1',
-						Birthdate = born,
-						AccountId = leaving.Id
-					)
+					new Contact(LastName = 'Ames', Title = 'Role 1', Birthdate = born, AccountId = leaving.Id)
 				),
 				TestDataFactory.person(
 					new Contact(
@@ -212,17 +189,9 @@ private class RollupOperationsTest {
 			Test.stopTest();
 
 			Assert.isFalse(afterMove.get(leaving.Id).Sample_Data__c, 'Role 1 moved out');
-			Assert.areEqual(
-				'Role 2',
-				afterMove.get(leaving.Id).Preferred_Name__c,
-				'Baker is now the eldest'
-			);
+			Assert.areEqual('Role 2', afterMove.get(leaving.Id).Preferred_Name__c, 'Baker is now the eldest');
 			Assert.isTrue(afterMove.get(joining.Id).Sample_Data__c, 'And moved in');
-			Assert.areEqual(
-				'Ames',
-				afterMove.get(joining.Id).Sample_Data_Key__c,
-				'Ames is the youngest'
-			);
+			Assert.areEqual('Ames', afterMove.get(joining.Id).Sample_Data_Key__c, 'Ames is the youngest');
 
 			Account emptied = reread(organizations).get(leaving.Id);
 			Assert.isFalse(emptied.Sample_Data__c, 'Any of nobody is unchecked');
@@ -274,25 +243,13 @@ private class RollupOperationsTest {
 			Date sameDay = Date.newInstance(1990, 5, 5);
 			insert new List<Contact>{
 				TestDataFactory.person(
-					new Contact(
-						LastName = 'Alpha',
-						Birthdate = sameDay,
-						AccountId = organizations[0].Id
-					)
+					new Contact(LastName = 'Alpha', Birthdate = sameDay, AccountId = organizations[0].Id)
 				),
 				TestDataFactory.person(
-					new Contact(
-						LastName = 'Beta',
-						Birthdate = sameDay,
-						AccountId = organizations[0].Id
-					)
+					new Contact(LastName = 'Beta', Birthdate = sameDay, AccountId = organizations[0].Id)
 				),
 				TestDataFactory.person(
-					new Contact(
-						LastName = 'Gamma',
-						Birthdate = sameDay,
-						AccountId = organizations[0].Id
-					)
+					new Contact(LastName = 'Gamma', Birthdate = sameDay, AccountId = organizations[0].Id)
 				)
 			};
 			Rollup_Definition__c first = definition(
@@ -312,10 +269,7 @@ private class RollupOperationsTest {
 			String lowest = [SELECT LastName FROM Contact ORDER BY Id LIMIT 1].LastName;
 
 			Test.startTest();
-			RollupEngine.recalculate(
-				new Set<Id>{ organizations[0].Id },
-				new List<Rollup_Definition__c>{ first, last }
-			);
+			RollupEngine.recalculate(new Set<Id>{ organizations[0].Id }, new List<Rollup_Definition__c>{ first, last });
 			Test.stopTest();
 
 			Account stored = reread(organizations).get(organizations[0].Id);
@@ -351,10 +305,7 @@ private class RollupOperationsTest {
 				RollupService.MODE_SCHEDULED
 			);
 			name.Order_By_Field__c = 'Birthdate';
-			List<Rollup_Definition__c> definitions = new List<Rollup_Definition__c>{
-				birthday,
-				name
-			};
+			List<Rollup_Definition__c> definitions = new List<Rollup_Definition__c>{ birthday, name };
 			Set<Id> ids = new Set<Id>{ organizations[0].Id };
 
 			Test.startTest();
@@ -379,10 +330,7 @@ private class RollupOperationsTest {
 	@IsTest
 	static void eachOperationFillsOnlyTheTypesItSuits() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			Assert.isNull(
-				RollupPlanner.targetTypeProblem('ANY', Schema.DisplayType.BOOLEAN),
-				'Any into a checkbox'
-			);
+			Assert.isNull(RollupPlanner.targetTypeProblem('ANY', Schema.DisplayType.BOOLEAN), 'Any into a checkbox');
 			Assert.areEqual(
 				BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetNeedsCheckbox'),
 				RollupPlanner.targetTypeProblem('NONE', Schema.DisplayType.DOUBLE),
@@ -402,10 +350,7 @@ private class RollupOperationsTest {
 				RollupPlanner.targetTypeProblem('COUNT_DISTINCT', Schema.DisplayType.STRING),
 				'Count distinct into text'
 			);
-			Assert.isNull(
-				RollupPlanner.targetTypeProblem('LAST', Schema.DisplayType.STRING),
-				'Last into text'
-			);
+			Assert.isNull(RollupPlanner.targetTypeProblem('LAST', Schema.DisplayType.STRING), 'Last into text');
 			Assert.areEqual(
 				BarnHelp.text('Rollups', 'Core_Rollups_ErrorTextTarget'),
 				RollupPlanner.targetTypeProblem('SUM', Schema.DisplayType.STRING),
@@ -433,9 +378,7 @@ private class RollupOperationsTest {
 	static void aPicklistIsFilledWithItsOwnValueAndOneItLacksIsLeftOut() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			List<Account> organizations = organizations(1);
-			Contact person = TestDataFactory.person(
-				new Contact(LastName = 'child', AccountId = organizations[0].Id)
-			);
+			Contact person = TestDataFactory.person(new Contact(LastName = 'child', AccountId = organizations[0].Id));
 			insert person;
 			Rollup_Definition__c role = definition(
 				'LAST',
@@ -450,8 +393,7 @@ private class RollupOperationsTest {
 			Test.startTest();
 			RollupPlanner.Plan plan = RollupPlanner.plan(Account.SObjectType, definitions);
 			RollupEngine.recalculate(ids, definitions);
-			String matched = [SELECT Household_Role__c FROM Account WHERE Id IN :ids]
-			.Household_Role__c;
+			String matched = [SELECT Household_Role__c FROM Account WHERE Id IN :ids].Household_Role__c;
 			person.LastName = 'Nobody';
 			update person;
 			RollupEngine.Result refused = RollupEngine.recalculate(ids, definitions);
@@ -476,12 +418,7 @@ private class RollupOperationsTest {
 	@IsTest
 	static void anIncompatibleTargetIsRefusedAloneAndAnyNeedsNoSourceField() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			Rollup_Definition__c anyIntoNumber = definition(
-				'ANY',
-				null,
-				'NumberOfEmployees',
-				RollupService.MODE_BOTH
-			);
+			Rollup_Definition__c anyIntoNumber = definition('ANY', null, 'NumberOfEmployees', RollupService.MODE_BOTH);
 			Rollup_Definition__c firstWithNothing = definition(
 				'FIRST',
 				null,
@@ -489,28 +426,15 @@ private class RollupOperationsTest {
 				RollupService.MODE_BOTH
 			);
 			firstWithNothing.Order_By_Field__c = 'Birthdate';
-			Rollup_Definition__c anyone = definition(
-				'ANY',
-				null,
-				'Sample_Data__c',
-				RollupService.MODE_BOTH
-			);
+			Rollup_Definition__c anyone = definition('ANY', null, 'Sample_Data__c', RollupService.MODE_BOTH);
 
 			RollupPlanner.Plan plan = RollupPlanner.plan(
 				Account.SObjectType,
 				new List<Rollup_Definition__c>{ anyIntoNumber, firstWithNothing, anyone }
 			);
 
-			Assert.areEqual(
-				2,
-				plan.refused.size(),
-				'Any into a number, and First with nothing to read'
-			);
-			Assert.areEqual(
-				1,
-				plan.definitions.size(),
-				'Any into a checkbox needs no source field'
-			);
+			Assert.areEqual(2, plan.refused.size(), 'Any into a number, and First with nothing to read');
+			Assert.areEqual(1, plan.definitions.size(), 'Any into a checkbox needs no source field');
 			Assert.isNull(plan.queries[0].measures[0].field, 'And reads none');
 			Assert.isFalse(plan.queries[0].measures[0].asText, 'A checkbox is not text');
 		}

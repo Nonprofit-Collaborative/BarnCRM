@@ -5,17 +5,11 @@
 @IsTest(testFor='ApexClass:HealthCheckGivingSelector')
 private class HealthCheckGivingSelectorTest {
 	private static User jen() {
-		return TestDataFactory.createUser(
-			'Jen',
-			new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
-		);
+		return TestDataFactory.createUser('Jen', new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' });
 	}
 
 	private static User david() {
-		return TestDataFactory.createUser(
-			'David',
-			new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' }
-		);
+		return TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' });
 	}
 
 	private static Date lastClosedDay() {
@@ -41,11 +35,7 @@ private class HealthCheckGivingSelectorTest {
 	static void makeData() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GivingTestDataFactory.insertDefaultFund();
-			Contact ana = GivingTestDataFactory.insertHouseholdContact(
-				'The Nolan Family',
-				'Ana',
-				'Nolan'
-			);
+			Contact ana = GivingTestDataFactory.insertHouseholdContact('The Nolan Family', 'Ana', 'Nolan');
 
 			Gift__c received = GivingTestDataFactory.buildGift(ana.Id, 10);
 			received.Status__c = 'Received';
@@ -84,11 +74,7 @@ private class HealthCheckGivingSelectorTest {
 	 */
 	private static void addAnAlreadyPostedGift(User jen) {
 		System.runAs(jen) {
-			Contact owned = GivingTestDataFactory.insertHouseholdContact(
-				'The Diaz Family',
-				'Priya',
-				'Diaz'
-			);
+			Contact owned = GivingTestDataFactory.insertHouseholdContact('The Diaz Family', 'Priya', 'Diaz');
 			Gift__c alreadyPosted = GivingTestDataFactory.buildGift(owned.Id, 80);
 			alreadyPosted.Status__c = 'Received';
 			alreadyPosted.Gift_Date__c = lastClosedDay();
@@ -105,10 +91,7 @@ private class HealthCheckGivingSelectorTest {
 			GivingTestDataFactory.closeBooksThrough(lastClosedDay());
 
 			System.runAs(jen) {
-				Integer count = HealthCheckGivingSelector.countUnpostedInClosedPeriod(
-					lastClosedDay(),
-					1001
-				);
+				Integer count = HealthCheckGivingSelector.countUnpostedInClosedPeriod(lastClosedDay(), 1001);
 
 				System.assertEquals(
 					3,
@@ -132,9 +115,7 @@ private class HealthCheckGivingSelectorTest {
 			// nothing but Id, Name and Gift_Date__c crosses the sharing boundary), so the three
 			// qualifying gifts are identified here, as the running test user who owns them, before
 			// entering Jen's context to call the selector.
-			Set<Id> expectedIds = new Map<Id, Gift__c>(
-					[SELECT Id FROM Gift__c WHERE Amount__c IN (10, 20, 30)]
-				)
+			Set<Id> expectedIds = new Map<Id, Gift__c>([SELECT Id FROM Gift__c WHERE Amount__c IN (10, 20, 30)])
 				.keySet();
 
 			List<Gift__c> linked;
@@ -145,8 +126,7 @@ private class HealthCheckGivingSelectorTest {
 			System.assertEquals(
 				expectedIds,
 				new Map<Id, Gift__c>(linked).keySet(),
-				'Only the three qualifying gifts (10 Received, 20 Refunded, 30 Written off) are ' +
-				'named.'
+				'Only the three qualifying gifts (10 Received, 20 Refunded, 30 Written off) are ' + 'named.'
 			);
 		}
 	}
@@ -164,14 +144,8 @@ private class HealthCheckGivingSelectorTest {
 			GivingTestDataFactory.closeBooksThrough(lastClosedDay());
 
 			System.runAs(david()) {
-				Integer count = HealthCheckGivingSelector.countUnpostedInClosedPeriod(
-					lastClosedDay(),
-					1001
-				);
-				List<Gift__c> linked = HealthCheckGivingSelector.unpostedInClosedPeriod(
-					lastClosedDay(),
-					10
-				);
+				Integer count = HealthCheckGivingSelector.countUnpostedInClosedPeriod(lastClosedDay(), 1001);
+				List<Gift__c> linked = HealthCheckGivingSelector.unpostedInClosedPeriod(lastClosedDay(), 10);
 
 				System.assertEquals(
 					0,

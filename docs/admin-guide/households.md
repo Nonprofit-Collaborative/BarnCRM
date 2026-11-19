@@ -49,10 +49,8 @@ tab to everyone with a BarnCRM role (Admin, Staff or Read Only), through the per
 create households with **New Household** on BarnCRM Home, not the standard **New** button.
 The permission set shows the tab and nothing else, and gives no record type. BarnCRM keeps it
 in step like the tool tab sets, so do not assign it by hand: the nightly run removes it from
-anyone without a BarnCRM role, who should be given a role on the Access page instead. Upgrading
-an org that already ran BarnCRM removes the Household record type from the three role
-permission sets (Salesforce drops a record type a permission set no longer names); accounts
-that are households stay households.
+anyone without a BarnCRM role, who should be given a role on the Access page instead. The
+three role permission sets give no Household record type either.
 
 BarnCRM does not add an Organization record type. Organizations are the accounts of the
 record type you choose in **Record type for organizations** on **General** (see
@@ -131,7 +129,7 @@ choose the flexible way of belonging to a household. It is the only mode that ca
 person who is stored as an account, and BarnCRM selects it for you when it is installed
 and notices your org is shaped that way. It does that only when nobody has chosen a way of
 belonging yet: if you chose the simple way on purpose, because your org has Person Accounts
-switched on but stores everyone as a contact, an install or upgrade leaves your choice
+switched on but stores everyone as a contact, an install leaves your choice
 alone, and Health Check warns you if people stored as accounts appear later.
 
 In the flexible way, a new person stored as an account gets a household of their own when
@@ -147,10 +145,7 @@ given a second household. A contact saved against an organization is not joined 
 Automatic creation is the same setting and the same behavior as anywhere else. When "create
 a household automatically" is on, saving a new person creates their household and the
 membership record that joins them to it, whether that person is a contact or an account.
-There used to be a second setting here, "create households for people stored as accounts",
-and it has been removed: it shipped off, so an org that took the recommended setup got no
-households at all and was told nothing about it. One setting now answers the question for
-everybody.
+One setting answers the question for everybody.
 
 If you are one of the orgs that groups people another way and does not want a household
 appearing for each person, turn "create a household automatically" off. Health Check will
@@ -161,8 +156,8 @@ the same Members panel. A household is still its own record, never a person.
 
 ## Common Mistakes
 
-**"The Households tab shows only a few households."**
-It no longer does: the Households and Organizations tabs open the standard Account list page
+**"Where is the full list of households?"**
+The Households and Organizations tabs open the standard Account list page
 (a small BarnCRM page redirects, replacing itself in the browser history) with the packaged
 **Households** and **Organizations** list views and the list view menu, which also holds
 **My Households** and **My Organizations**. Build more lists in Salesforce as usual.
@@ -229,7 +224,7 @@ it done for you next time.
 
 If the setting is on, check what is credited to the household first. A household that still
 has gifts or other records credited to it, such as volunteer hours, is never deleted, even
-when nobody belongs to it any more (with Giving, its gifts and pledges; with Volunteers, its
+when nobody belongs to it any more (with Fundraising, its gifts and pledges; with Volunteers, its
 volunteer hours): a gift stays with the household it was given from, and deleting the
 household would leave those records with no household at all. This is the ordinary outcome
 when someone with a giving or volunteering history moves out on their own, so it is not
@@ -262,7 +257,7 @@ place to change it.
 
 **"I moved someone and their history stayed behind."**
 That is deliberate. Moving a person moves the person, not the history of the household
-they left (with Giving, that includes the household's gifts). Use merge on the household record page when you want to combine two
+they left (with Fundraising, that includes the household's gifts). Use merge on the household record page when you want to combine two
 households and their history. A household left with nobody in it but with gifts or other
 records credited to it, such as volunteer hours, is kept, even when "Delete a household once
 it is empty" is on, so that history always has a household to belong to.

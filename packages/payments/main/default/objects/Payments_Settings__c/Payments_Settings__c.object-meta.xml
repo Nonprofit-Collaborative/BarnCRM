@@ -3,8 +3,9 @@
   <customSettingsType>Hierarchy</customSettingsType>
   <description>
     The Payments module's org-wide settings (processor, mode, default currency), edited in the
-    BarnCRM Settings console (canonical model 29PAY3). ADR-0017 gives each package its own
-    settings object.
+    BarnCRM Settings console (canonical model 29PAY3), and the non-secret connection state the
+    Payments Setup page writes (R-PK1). ADR-0017 gives each package its own settings object. No
+    secret is stored here: they are External Credential principal parameters.
   </description>
   <enableFeeds>false</enableFeeds>
   <label>Payments Settings</label>

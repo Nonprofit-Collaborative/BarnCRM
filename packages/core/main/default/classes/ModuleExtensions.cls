@@ -46,9 +46,7 @@ public with sharing class ModuleExtensions {
 	@NamespaceAccessible
 	public static Map<String, Object> byModule(Type seam) {
 		String name = seamName(seam);
-		Map<String, Object> stubbed = stubs.containsKey(name)
-			? stubs.get(name)
-			: new Map<String, Object>();
+		Map<String, Object> stubbed = stubs.containsKey(name) ? stubs.get(name) : new Map<String, Object>();
 		Map<String, Object> found = new Map<String, Object>();
 		if (!stubsOnly.contains(name)) {
 			for (BarnCRM_Module__mdt row : catalog()) {
@@ -121,10 +119,7 @@ public with sharing class ModuleExtensions {
 	public static List<String> modulesWithAccess() {
 		List<String> keys = new List<String>();
 		for (BarnCRM_Module__mdt row : catalog()) {
-			if (
-				String.isNotBlank(row.Access_By_Permission_Set__c) ||
-				String.isNotBlank(row.Access_By_Role__c)
-			) {
+			if (String.isNotBlank(row.Access_By_Permission_Set__c) || String.isNotBlank(row.Access_By_Role__c)) {
 				keys.add(row.DeveloperName);
 			}
 		}
@@ -187,12 +182,7 @@ public with sharing class ModuleExtensions {
 			rows = new List<BarnCRM_Module__mdt>();
 			try {
 				rows = [
-					SELECT
-						DeveloperName,
-						Sort_Order__c,
-						Extensions__c,
-						Access_By_Permission_Set__c,
-						Access_By_Role__c
+					SELECT DeveloperName, Sort_Order__c, Extensions__c, Access_By_Permission_Set__c, Access_By_Role__c
 					FROM BarnCRM_Module__mdt
 					WITH SYSTEM_MODE
 					ORDER BY Sort_Order__c ASC NULLS LAST, DeveloperName ASC

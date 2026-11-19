@@ -40,9 +40,7 @@ public class RelationshipTestDataFactory {
 		List<Contact> people = new List<Contact>();
 		for (Integer i = 0; i < howMany; i++) {
 			people.add(
-				(Contact) TestDataFactory.pastDuplicateRules(
-					new Contact(FirstName = 'Person' + i, LastName = lastName)
-				)
+				(Contact) TestDataFactory.pastDuplicateRules(new Contact(FirstName = 'Person' + i, LastName = lastName))
 			);
 		}
 		insert people;
@@ -56,11 +54,7 @@ public class RelationshipTestDataFactory {
 	public static List<Account> peopleAsAccounts(Integer howMany, String lastName) {
 		List<Account> people = new List<Account>();
 		for (Integer i = 0; i < howMany; i++) {
-			people.add(
-				(Account) TestDataFactory.pastDuplicateRules(
-					new Account(Name = 'Person' + i + ' ' + lastName)
-				)
-			);
+			people.add((Account) TestDataFactory.pastDuplicateRules(new Account(Name = 'Person' + i + ' ' + lastName)));
 		}
 		insert people;
 		return people;
@@ -70,11 +64,7 @@ public class RelationshipTestDataFactory {
 	public static List<Account> organizations(Integer howMany, String prefix) {
 		List<Account> orgs = new List<Account>();
 		for (Integer i = 0; i < howMany; i++) {
-			orgs.add(
-				(Account) TestDataFactory.pastDuplicateRules(
-					AccountKindsTestData.organization(prefix + ' ' + i)
-				)
-			);
+			orgs.add((Account) TestDataFactory.pastDuplicateRules(AccountKindsTestData.organization(prefix + ' ' + i)));
 		}
 		insert orgs;
 		return orgs;

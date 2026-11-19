@@ -99,13 +99,7 @@ public with sharing class HouseholdSelector {
 			this(id, accountId, contactId, isDirect, false);
 		}
 
-		public NativeMembership(
-			Id id,
-			Id accountId,
-			Id contactId,
-			Boolean isDirect,
-			Boolean hasDetails
-		) {
+		public NativeMembership(Id id, Id accountId, Id contactId, Boolean isDirect, Boolean hasDetails) {
 			this.id = id;
 			this.accountId = accountId;
 			this.contactId = contactId;
@@ -197,20 +191,14 @@ public with sharing class HouseholdSelector {
 	 * afterwards, which is why everything built from these records reads its values from
 	 * the record's own populated values rather than naming the field.
 	 */
-	private static List<SObject> readableRecords(
-		List<SObject> records,
-		Schema.DescribeSObjectResult describe
-	) {
+	private static List<SObject> readableRecords(List<SObject> records, Schema.DescribeSObjectResult describe) {
 		if (records == null || records.isEmpty() || !describe.isAccessible()) {
 			return new List<SObject>();
 		}
 		return Security.stripInaccessible(AccessType.READABLE, records).getRecords();
 	}
 
-	private static List<Contact> readable(
-		List<Contact> records,
-		Schema.DescribeSObjectResult describe
-	) {
+	private static List<Contact> readable(List<Contact> records, Schema.DescribeSObjectResult describe) {
 		return (List<Contact>) readableRecords(records, describe);
 	}
 
@@ -332,12 +320,7 @@ public with sharing class HouseholdSelector {
 		if (accountIds == null || accountIds.isEmpty()) {
 			return dependent;
 		}
-		addNativeDependents(
-			dependent,
-			NATIVE_HOUSEHOLD_GROUP,
-			NATIVE_HOUSEHOLD_GROUP_QUERY,
-			accountIds
-		);
+		addNativeDependents(dependent, NATIVE_HOUSEHOLD_GROUP, NATIVE_HOUSEHOLD_GROUP_QUERY, accountIds);
 		if (
 			OrgShapeDetector.hasNativeHouseholdGroups() == false &&
 			OrgShapeSelector.nativeHouseholdGroupObjectDescribed()
@@ -369,10 +352,7 @@ public with sharing class HouseholdSelector {
 	 * removal that follows is not elevated: it runs as that person.
 	 */
 	@NamespaceAccessible
-	public static List<NativeMembership> nativeMembershipRows(
-		Set<Id> accountIds,
-		Set<Id> contactIds
-	) {
+	public static List<NativeMembership> nativeMembershipRows(Set<Id> accountIds, Set<Id> contactIds) {
 		if (nativeMembershipRowsOverride != null) {
 			return nativeMembershipRowsOverride;
 		}
@@ -403,9 +383,7 @@ public with sharing class HouseholdSelector {
 					(Id) row.get(ACCOUNT_FIELD),
 					(Id) row.get('ContactId'),
 					(Boolean) row.get('IsDirect'),
-					row.get('Roles') != null ||
-						row.get('StartDate') != null ||
-						row.get('EndDate') != null
+					row.get('Roles') != null || row.get('StartDate') != null || row.get('EndDate') != null
 				)
 			);
 		}
@@ -443,9 +421,7 @@ public with sharing class HouseholdSelector {
 		}
 		Set<Id> undecided = new Set<Id>(accountIds);
 		undecided.removeAll(models.keySet());
-		Set<Id> natives = undecided.isEmpty()
-			? new Set<Id>()
-			: new Set<Id>(getAccountsWithNativeDependents(undecided));
+		Set<Id> natives = undecided.isEmpty() ? new Set<Id>() : new Set<Id>(getAccountsWithNativeDependents(undecided));
 		natives.removeAll(models.keySet());
 		for (Id accountId : models.keySet()) {
 			if (models.get(accountId) == MODEL_NATIVE) {
@@ -511,12 +487,7 @@ public with sharing class HouseholdSelector {
 		if (OrgShapeDetector.detect().hasNativeHouseholdGroups != true) {
 			return grouped;
 		}
-		addNativeDependents(
-			grouped,
-			NATIVE_HOUSEHOLD_GROUP,
-			NATIVE_HOUSEHOLD_GROUP_QUERY,
-			accountIds
-		);
+		addNativeDependents(grouped, NATIVE_HOUSEHOLD_GROUP, NATIVE_HOUSEHOLD_GROUP_QUERY, accountIds);
 		return grouped;
 	}
 
@@ -584,12 +555,7 @@ public with sharing class HouseholdSelector {
 	 * so in the log, while deleting on a probe that never ran destroys the native household
 	 * this guard was added to protect.
 	 */
-	private static void addNativeDependents(
-		Set<Id> dependent,
-		String objectName,
-		String query,
-		Set<Id> accountIds
-	) {
+	private static void addNativeDependents(Set<Id> dependent, String objectName, String query, Set<Id> accountIds) {
 		if (!objectDescribed(objectName)) {
 			return;
 		}
@@ -692,17 +658,9 @@ public with sharing class HouseholdSelector {
 		if (householdIds == null || householdIds.isEmpty()) {
 			return new List<Household_Member__c>();
 		}
-		Date today = Date.today();
+		Date today = OrgDate.today();
 		return [
-			SELECT
-				Id,
-				Household__c,
-				Contact__c,
-				Account__c,
-				Role__c,
-				Is_Primary__c,
-				Start_Date__c,
-				End_Date__c
+			SELECT Id, Household__c, Contact__c, Account__c, Role__c, Is_Primary__c, Start_Date__c, End_Date__c
 			FROM Household_Member__c
 			WHERE Household__c IN :householdIds AND (End_Date__c = NULL OR End_Date__c > :today)
 			WITH SYSTEM_MODE
@@ -716,17 +674,9 @@ public with sharing class HouseholdSelector {
 		if (personIds == null || personIds.isEmpty()) {
 			return new List<Household_Member__c>();
 		}
-		Date today = Date.today();
+		Date today = OrgDate.today();
 		return [
-			SELECT
-				Id,
-				Household__c,
-				Contact__c,
-				Account__c,
-				Role__c,
-				Is_Primary__c,
-				Start_Date__c,
-				End_Date__c
+			SELECT Id, Household__c, Contact__c, Account__c, Role__c, Is_Primary__c, Start_Date__c, End_Date__c
 			FROM Household_Member__c
 			WHERE
 				(Contact__c IN :personIds
@@ -753,15 +703,7 @@ public with sharing class HouseholdSelector {
 			return new List<Household_Member__c>();
 		}
 		return [
-			SELECT
-				Id,
-				Household__c,
-				Contact__c,
-				Account__c,
-				Role__c,
-				Is_Primary__c,
-				Start_Date__c,
-				End_Date__c
+			SELECT Id, Household__c, Contact__c, Account__c, Role__c, Is_Primary__c, Start_Date__c, End_Date__c
 			FROM Household_Member__c
 			WHERE Contact__c IN :personIds OR Account__c IN :personIds
 			WITH SYSTEM_MODE

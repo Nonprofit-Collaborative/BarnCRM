@@ -3,7 +3,7 @@
 ## 1. What It Does
 
 **Find** answers "show me exactly these records" without a report type, Setup or a query
-language. You pick one kind of record (Households, Contacts, Gifts with the Giving module, or any
+language. You pick one kind of record (Households, Contacts, Gifts with the Fundraising module, or any
 other kind of record you can see), choose the columns, add conditions such as "Status is one of
 Received, Pledged" or "Gift Date is in the last 90 days", choose a sort order and how many
 rows to show, and press **Run**. The results appear in a table, 25 rows at a time: press

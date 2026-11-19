@@ -26,9 +26,7 @@ private class VolunteerRecognitionTest {
 	private static void recognition(Boolean enabled) {
 		OrgSettingsSystemWriter.save(
 			Volunteer_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{
-				Volunteer_Settings__c.Recognition_Enabled__c => enabled
-			}
+			new Map<Schema.SObjectField, Object>{ Volunteer_Settings__c.Recognition_Enabled__c => enabled }
 		);
 		SettingsService.clearCaches();
 	}
@@ -58,21 +56,14 @@ private class VolunteerRecognitionTest {
 
 			Assert.areEqual(2, first, 'One milestone, one anniversary.');
 			Assert.areEqual(0, second, 'Never twice.');
-			Assert.areEqual(
-				50,
-				people().get('Fifty').Last_Hour_Milestone__c,
-				'The highest reached is stamped.'
-			);
+			Assert.areEqual(50, people().get('Fifty').Last_Hour_Milestone__c, 'The highest reached is stamped.');
 			Task milestone = [
 				SELECT Subject, ActivityDate, Status
 				FROM Task
 				WHERE WhoId = :before.get('Fifty').Id
 				WITH SYSTEM_MODE
 			];
-			Assert.isTrue(
-				milestone.Subject.contains('50'),
-				'Names the milestone: ' + milestone.Subject
-			);
+			Assert.isTrue(milestone.Subject.contains('50'), 'Names the milestone: ' + milestone.Subject);
 			Assert.areEqual(Date.today(), milestone.ActivityDate, 'Due today.');
 			Assert.areEqual(
 				1,
@@ -106,11 +97,7 @@ private class VolunteerRecognitionTest {
 
 			Assert.areEqual(450, step.minute, 'Half past seven in the morning.');
 			Assert.areEqual(Label.Volunteers_NightlyJobs_RecognitionName, step.label, 'Its label.');
-			Assert.areEqual(
-				2,
-				[SELECT COUNT() FROM Task WITH SYSTEM_MODE],
-				'The batch made the tasks.'
-			);
+			Assert.areEqual(2, [SELECT COUNT() FROM Task WITH SYSTEM_MODE], 'The batch made the tasks.');
 		}
 	}
 }

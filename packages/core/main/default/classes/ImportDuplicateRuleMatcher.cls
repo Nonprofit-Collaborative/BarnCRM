@@ -66,37 +66,21 @@ public with sharing class ImportDuplicateRuleMatcher {
 	 * @param recordTypeId the record type the probe is of, or null
 	 */
 	@NamespaceAccessible
-	public static SObject probe(
-		Schema.SObjectType type,
-		Map<String, String> values,
-		Id recordTypeId
-	) {
-		SObject result = recordTypeId == null
-			? type.newSObject()
-			: type.newSObject(recordTypeId, false);
+	public static SObject probe(Schema.SObjectType type, Map<String, String> values, Id recordTypeId) {
+		SObject result = recordTypeId == null ? type.newSObject() : type.newSObject(recordTypeId, false);
 		if (values == null) {
 			return result;
 		}
-		Map<String, Schema.SObjectField> fields = type.getDescribe(SObjectDescribeOptions.DEFERRED)
-			.fields.getMap();
+		Map<String, Schema.SObjectField> fields = type.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap();
 		for (String fieldName : values.keySet()) {
-			Schema.SObjectField field = fieldName == null
-				? null
-				: fields.get(fieldName.toLowerCase());
+			Schema.SObjectField field = fieldName == null ? null : fields.get(fieldName.toLowerCase());
 			String value = values.get(fieldName);
 			if (field == null || String.isBlank(value)) {
 				continue;
 			}
 			Schema.DescribeFieldResult described = field.getDescribe();
-			if (
-				described.isAccessible() &&
-				described.isCreateable() &&
-				COMPARED_TYPES.contains(described.getType())
-			) {
-				result.put(
-					field,
-					value.abbreviate(described.getLength() > 0 ? described.getLength() : 255)
-				);
+			if (described.isAccessible() && described.isCreateable() && COMPARED_TYPES.contains(described.getType())) {
+				result.put(field, value.abbreviate(described.getLength() > 0 ? described.getLength() : 255));
 			}
 		}
 		return result;
@@ -123,9 +107,7 @@ public with sharing class ImportDuplicateRuleMatcher {
 		if (active == false) {
 			return null;
 		}
-		List<List<Id>> matchedIds = isStubbed()
-			? stubbed(probes)
-			: asked(probes, type, active == true);
+		List<List<Id>> matchedIds = isStubbed() ? stubbed(probes) : asked(probes, type, active == true);
 		if (matchedIds == null) {
 			// A rule is active, or the rules could not be read: either way it was not asked.
 			lastAskFailed = true;
@@ -219,9 +201,7 @@ public with sharing class ImportDuplicateRuleMatcher {
 		Map<Id, String> result = new Map<Id, String>();
 		if (
 			ids.isEmpty() ||
-			!type.getDescribe(SObjectDescribeOptions.DEFERRED)
-				.fields.getMap()
-				.containsKey(LAST_NAME.toLowerCase())
+			!type.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap().containsKey(LAST_NAME.toLowerCase())
 		) {
 			return result;
 		}
@@ -234,10 +214,7 @@ public with sharing class ImportDuplicateRuleMatcher {
 				AccessLevel.USER_MODE
 			)
 		) {
-			result.put(
-				record.Id,
-				nameKey((String) record.get(FIRST_NAME), (String) record.get(LAST_NAME))
-			);
+			result.put(record.Id, nameKey((String) record.get(FIRST_NAME), (String) record.get(LAST_NAME)));
 		}
 		return result;
 	}
@@ -318,8 +295,7 @@ public with sharing class ImportDuplicateRuleMatcher {
 			return false;
 		}
 		Id recordTypeId = (Id) probe.getPopulatedFieldsAsMap().get('RecordTypeId');
-		return recordTypeId != null &&
-			OrgShapeDetector.detect().personAccountRecordTypeIds.contains(recordTypeId);
+		return recordTypeId != null && OrgShapeDetector.detect().personAccountRecordTypeIds.contains(recordTypeId);
 	}
 
 	/**
@@ -327,24 +303,16 @@ public with sharing class ImportDuplicateRuleMatcher {
 	 * failure is logged only when a rule was known to be active, since otherwise it is the
 	 * platform saying there is none.
 	 */
-	private static List<List<Id>> asked(
-		List<SObject> probes,
-		Schema.SObjectType type,
-		Boolean ruleKnownActive
-	) {
+	private static List<List<Id>> asked(List<SObject> probes, Schema.SObjectType type, Boolean ruleKnownActive) {
 		List<List<Id>> result = new List<List<Id>>();
 		try {
 			for (Integer start = 0; start < probes.size(); start += MAX_RECORDS_PER_CALL) {
 				List<SObject> slice = new List<SObject>();
-				for (
-					Integer i = start; i < probes.size() && i < start + MAX_RECORDS_PER_CALL; i++
-				) {
+				for (Integer i = start; i < probes.size() && i < start + MAX_RECORDS_PER_CALL; i++) {
 					slice.add(probes[i]);
 				}
 				calls++;
-				List<Datacloud.FindDuplicatesResult> found = Datacloud.FindDuplicates.findDuplicates(
-					slice
-				);
+				List<Datacloud.FindDuplicatesResult> found = Datacloud.FindDuplicates.findDuplicates(slice);
 				for (Integer i = 0; i < slice.size(); i++) {
 					result.add(i < found.size() ? idsOf(found[i], type) : new List<Id>());
 				}
@@ -404,9 +372,7 @@ public with sharing class ImportDuplicateRuleMatcher {
 			}
 		}
 		for (Object value : given.values()) {
-			if (
-				value instanceof String && stubMatches.containsKey(((String) value).toLowerCase())
-			) {
+			if (value instanceof String && stubMatches.containsKey(((String) value).toLowerCase())) {
 				return stubMatches.get(((String) value).toLowerCase());
 			}
 		}
@@ -414,11 +380,7 @@ public with sharing class ImportDuplicateRuleMatcher {
 	}
 
 	/** The matched records the user can see, of an allowed record type, read in user mode. */
-	private static Map<Id, SObject> visible(
-		Schema.SObjectType type,
-		Set<Id> ids,
-		Set<Id> allowedRecordTypes
-	) {
+	private static Map<Id, SObject> visible(Schema.SObjectType type, Set<Id> ids, Set<Id> allowedRecordTypes) {
 		Map<Id, SObject> result = new Map<Id, SObject>();
 		if (ids.isEmpty()) {
 			return result;
@@ -440,11 +402,7 @@ public with sharing class ImportDuplicateRuleMatcher {
 	 * contact half of a person account; a contact import never takes one of those as its person.
 	 */
 	@TestVisible
-	private static String visibleQuery(
-		Schema.SObjectType type,
-		Boolean byType,
-		Boolean personAccountOrg
-	) {
+	private static String visibleQuery(Schema.SObjectType type, Boolean byType, Boolean personAccountOrg) {
 		return 'SELECT Id, CreatedDate, LastModifiedDate FROM ' +
 			type.getDescribe().getName() +
 			' WHERE Id IN :ids' +

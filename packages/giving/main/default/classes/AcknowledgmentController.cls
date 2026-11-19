@@ -184,22 +184,17 @@ public with sharing class AcknowledgmentController {
 			List<Acknowledgment_Rule__c> rules = new List<Acknowledgment_Rule__c>();
 			Integer position = 0;
 			for (Id ruleId : ruleIds == null ? new List<Id>() : ruleIds) {
-				if (
-					ruleId == null ||
-					ruleId.getSObjectType() != Acknowledgment_Rule__c.SObjectType
-				) {
+				if (ruleId == null || ruleId.getSObjectType() != Acknowledgment_Rule__c.SObjectType) {
 					continue;
 				}
 				position++;
-				rules.add(
-					new Acknowledgment_Rule__c(Id = ruleId, Order__c = position * ORDER_STEP)
-				);
+				rules.add(new Acknowledgment_Rule__c(Id = ruleId, Order__c = position * ORDER_STEP));
 				if (rules.size() == MAX_RULES) {
 					break;
 				}
 			}
 			if (!rules.isEmpty()) {
-				Database.update(rules, true, AccessLevel.USER_MODE);
+				update as user rules;
 			}
 			return currentView();
 		} catch (Exception failure) {
@@ -237,15 +232,10 @@ public with sharing class AcknowledgmentController {
 	 * be worse than a page with no counts on it.
 	 */
 	private static void countQueue(PageView view) {
-		List<Gift__c> queued = AcknowledgmentSelector.queuedGifts(
-			AcknowledgmentSelector.QUEUE_LIMIT
-		);
+		List<Gift__c> queued = AcknowledgmentSelector.queuedGifts(AcknowledgmentSelector.QUEUE_LIMIT);
 		view.queueCapped = queued.size() == AcknowledgmentSelector.QUEUE_LIMIT;
 		List<Acknowledgment_Rule__c> rules = AcknowledgmentSelector.activeRules();
-		Set<String> earlierDonors = AcknowledgmentRuleService.donorsWithEarlierGifts(
-			queued,
-			new Set<Id>()
-		);
+		Set<String> earlierDonors = AcknowledgmentRuleService.donorsWithEarlierGifts(queued, new Set<Id>());
 
 		Set<Id> optedOut = AcknowledgmentService.optedOutOfEmail(queued);
 
@@ -255,11 +245,7 @@ public with sharing class AcknowledgmentController {
 		Integer unreachable = 0;
 		Integer lettersInstead = 0;
 		for (Gift__c gift : queued) {
-			AcknowledgmentRuleService.RuleMatch match = AcknowledgmentRuleService.matchFor(
-				gift,
-				rules,
-				earlierDonors
-			);
+			AcknowledgmentRuleService.RuleMatch match = AcknowledgmentRuleService.matchFor(gift, rules, earlierDonors);
 			if (match == null) {
 				unmatched++;
 			} else if (AcknowledgmentRuleService.CHANNEL_LETTER.equals(match.channel)) {
@@ -296,9 +282,7 @@ public with sharing class AcknowledgmentController {
 			view.order = rule.Order__c;
 			view.channel = rule.Channel__c;
 			view.template = rule.Email_Template__c;
-			String developerName = String.isBlank(rule.Email_Template__c)
-				? null
-				: rule.Email_Template__c.trim();
+			String developerName = String.isBlank(rule.Email_Template__c) ? null : rule.Email_Template__c.trim();
 			view.templateFound = developerName == null || templateNames.containsKey(developerName);
 			view.templateLabel = developerName == null ? null : templateNames.get(developerName);
 			view.minimumAmount = rule.Minimum_Amount__c;
@@ -326,9 +310,7 @@ public with sharing class AcknowledgmentController {
 			view.sent = intOf(run.Acknowledgments_Sent__c);
 			view.errors = intOf(run.Errors__c);
 			view.mergeFileId = run.Merge_File_Document_Id__c;
-			view.waitingToBeMarkedSent = AcknowledgmentRunService.STATUS_READY_TO_MERGE.equals(
-				run.Status__c
-			);
+			view.waitingToBeMarkedSent = AcknowledgmentRunService.STATUS_READY_TO_MERGE.equals(run.Status__c);
 			views.add(view);
 		}
 		return views;

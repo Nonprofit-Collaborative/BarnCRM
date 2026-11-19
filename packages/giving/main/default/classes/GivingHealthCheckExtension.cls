@@ -1,11 +1,12 @@
 /**
  * The class Core finds by name (in `HealthCheckExtensions.EXTENSION_CLASSES`) and calls to add
- * Giving's findings to the one Health Check report (G-20 follow-up, ADR-0053, ADR-0057).
+ * Fundraising's findings to the one Health Check report (G-20 follow-up, ADR-0053, ADR-0057).
  *
  * `@NamespaceAccessible` for the same reason `GiftImportProcessor` is: Core resolves it with
  * `Type.forName` under ADR-0017, so it must be a public type with a public no-argument
  * constructor. The class itself does nothing but hand off to `HealthCheckGivingChecks`, which
- * is where the actual questions and their answers live.
+ * is where the actual questions and their answers live, and to `GiftMirrorHealthChecks` for the
+ * stalled gift mirror runs (ADR-0228).
  */
 @NamespaceAccessible
 public with sharing class GivingHealthCheckExtension implements HealthCheckExtension {
@@ -15,6 +16,8 @@ public with sharing class GivingHealthCheckExtension implements HealthCheckExten
 	}
 
 	public List<HealthCheckService.Finding> findings() {
-		return HealthCheckGivingChecks.findings();
+		List<HealthCheckService.Finding> found = HealthCheckGivingChecks.findings();
+		found.addAll(GiftMirrorHealthChecks.findings());
+		return found;
 	}
 }

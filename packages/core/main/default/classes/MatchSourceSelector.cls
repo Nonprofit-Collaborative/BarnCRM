@@ -126,18 +126,10 @@ public with sharing class MatchSourceSelector {
 		Integer cap = Math.min(maxRows, rowsLeft);
 		if (cap <= 0 || queriesLeft <= 0) {
 			cappedLookups++;
-			warnOnce(
-				name,
-				BarnHelp.text('Core', 'Core_MatchSource_BudgetSpent'),
-				new List<Object>{ name }
-			);
+			warnOnce(name, BarnHelp.text('Core', 'Core_MatchSource_BudgetSpent'), new List<Object>{ name });
 			return new List<SObject>();
 		}
-		List<SObject> rows = Database.queryWithBinds(
-			query + ' LIMIT ' + cap,
-			binds,
-			AccessLevel.USER_MODE
-		);
+		List<SObject> rows = Database.queryWithBinds(query + ' LIMIT ' + cap, binds, AccessLevel.USER_MODE);
 		if (rows.size() >= cap) {
 			cappedLookups++;
 			warnOnce(
@@ -151,11 +143,7 @@ public with sharing class MatchSourceSelector {
 
 	private static void warnOnce(String name, String format, List<Object> values) {
 		if (cappedLogged.add(name)) {
-			ErrorLogger.logMessage(
-				String.format(format, values),
-				LOG_CONTEXT,
-				ErrorLogger.SEVERITY_WARNING
-			);
+			ErrorLogger.logMessage(String.format(format, values), LOG_CONTEXT, ErrorLogger.SEVERITY_WARNING);
 		}
 	}
 

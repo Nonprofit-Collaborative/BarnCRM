@@ -77,16 +77,8 @@ private class SampleDataControllerTest {
 			Test.stopTest();
 
 			SampleDataLoader.Counts status = SampleDataController.getStatus();
-			System.assertEquals(
-				2,
-				status.householdCount,
-				'stage one should have inserted households'
-			);
-			System.assertEquals(
-				1,
-				status.organizationCount,
-				'stage one should have inserted the organization'
-			);
+			System.assertEquals(2, status.householdCount, 'stage one should have inserted households');
+			System.assertEquals(1, status.organizationCount, 'stage one should have inserted the organization');
 		}
 	}
 
@@ -203,11 +195,7 @@ private class SampleDataControllerTest {
 					'the component should receive the already-loaded label text'
 				);
 			}
-			System.assertEquals(
-				true,
-				threw,
-				'a second load should reach the component as an error'
-			);
+			System.assertEquals(true, threw, 'a second load should reach the component as an error');
 		}
 	}
 }

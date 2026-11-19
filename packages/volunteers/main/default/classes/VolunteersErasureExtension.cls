@@ -66,10 +66,7 @@ public with sharing class VolunteersErasureExtension implements PersonErasureExt
 		List<Volunteer_Hours__c> hours = VolunteerErasureSelector.hoursOf(contacts, accounts);
 		List<Volunteer_Signup__c> signups = VolunteerErasureSelector.signupsOf(contacts, accounts);
 		List<Volunteer_Skill__c> skills = VolunteerErasureSelector.skillsOf(contacts, accounts);
-		List<Volunteer_Requirement__c> requirements = VolunteerErasureSelector.requirementsOf(
-			contacts,
-			accounts
-		);
+		List<Volunteer_Requirement__c> requirements = VolunteerErasureSelector.requirementsOf(contacts, accounts);
 		List<Id> letters = generatedLetters(personId);
 		if (
 			!(hours.isEmpty() &&
@@ -151,12 +148,7 @@ public with sharing class VolunteersErasureExtension implements PersonErasureExt
 		}
 		new LetterRemover().remove(documentIds);
 		return new List<PersonErasure.Change>{
-			new PersonErasure.Change(
-				PersonErasure.DELETED,
-				Label.Volunteers_Erase_LettersLabel,
-				documentIds,
-				null
-			)
+			new PersonErasure.Change(PersonErasure.DELETED, Label.Volunteers_Erase_LettersLabel, documentIds, null)
 		};
 	}
 
@@ -167,7 +159,7 @@ public with sharing class VolunteersErasureExtension implements PersonErasureExt
 			for (Id documentId : documentIds) {
 				documents.add(new ContentDocument(Id = documentId));
 			}
-			Database.delete(documents, true, AccessLevel.SYSTEM_MODE);
+			delete as system documents;
 		}
 	}
 
@@ -200,7 +192,7 @@ public with sharing class VolunteersErasureExtension implements PersonErasureExt
 			}
 		}
 		if (!cleared.isEmpty()) {
-			Database.update(cleared, true, AccessLevel.USER_MODE);
+			update as user cleared;
 			changes.add(
 				new PersonErasure.Change(
 					PersonErasure.CLEARED,
@@ -217,9 +209,7 @@ public with sharing class VolunteersErasureExtension implements PersonErasureExt
 					PersonErasure.CLEARED,
 					objectLabel,
 					withReason,
-					new List<String>{
-						Volunteer_Hours__c.Rejection_Reason__c.getDescribe().getLabel()
-					}
+					new List<String>{ Volunteer_Hours__c.Rejection_Reason__c.getDescribe().getLabel() }
 				)
 			);
 		}
@@ -268,7 +258,7 @@ public with sharing class VolunteersErasureExtension implements PersonErasureExt
 		if (updates.isEmpty()) {
 			return changes;
 		}
-		Database.update(updates, true, AccessLevel.USER_MODE);
+		update as user updates;
 		if (!cancelled.isEmpty()) {
 			changes.add(
 				new PersonErasure.Change(
@@ -297,14 +287,9 @@ public with sharing class VolunteersErasureExtension implements PersonErasureExt
 		if (rows.isEmpty()) {
 			return new List<PersonErasure.Change>();
 		}
-		Database.delete(rows, true, AccessLevel.USER_MODE);
+		delete as user rows;
 		return new List<PersonErasure.Change>{
-			new PersonErasure.Change(
-				PersonErasure.DELETED,
-				labelOf(rows.getSObjectType()),
-				idsOf(rows),
-				null
-			)
+			new PersonErasure.Change(PersonErasure.DELETED, labelOf(rows.getSObjectType()), idsOf(rows), null)
 		};
 	}
 

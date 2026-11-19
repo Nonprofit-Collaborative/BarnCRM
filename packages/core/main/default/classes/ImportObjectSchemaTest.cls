@@ -58,9 +58,7 @@ private class ImportObjectSchemaTest {
 	@IsTest
 	static void aTypoInTheFieldPartOfAnObjectHeadingIsStillGuessed() {
 		System.runAs(TestUsers.admin()) {
-			List<ImportMapping.Column> columns = suggestedForContact(
-				new List<String>{ 'Contact.Frist Name' }
-			);
+			List<ImportMapping.Column> columns = suggestedForContact(new List<String>{ 'Contact.Frist Name' });
 
 			Assert.areEqual('Record.FirstName', columns[0].target);
 			Assert.isTrue(columns[0].guessed == true, 'Flagged as a guess.');
@@ -96,9 +94,7 @@ private class ImportObjectSchemaTest {
 	private static ImportMapping mapping(List<String> attributes) {
 		ImportMapping result = new ImportMapping();
 		for (String attribute : attributes) {
-			result.columns.add(
-				new ImportMapping.Column(attribute, ImportMapping.ENTITY_RECORD + '.' + attribute)
-			);
+			result.columns.add(new ImportMapping.Column(attribute, ImportMapping.ENTITY_RECORD + '.' + attribute));
 		}
 		return result;
 	}
@@ -122,22 +118,15 @@ private class ImportObjectSchemaTest {
 			}
 			Test.stopTest();
 
-			String affiliation = Affiliation__c.SObjectType.getDescribe(
-					SObjectDescribeOptions.DEFERRED
-				)
+			String affiliation = Affiliation__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 				.getName()
 				.toLowerCase();
-			Assert.isTrue(
-				offered.contains(affiliation),
-				'An object of the org the user may write.'
-			);
+			Assert.isTrue(offered.contains(affiliation), 'An object of the org the user may write.');
 			Assert.isTrue(offered.contains('contact'), 'People, for updates.');
 			Assert.isFalse(offered.contains('user'), 'Never a setup object.');
 			Assert.isFalse(
 				offered.contains(
-					Import_Batch__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-						.getName()
-						.toLowerCase()
+					Import_Batch__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName().toLowerCase()
 				),
 				'Never the package bookkeeping.'
 			);
@@ -151,16 +140,9 @@ private class ImportObjectSchemaTest {
 			Import_Template__c load = template('Affiliation__c', 'upsert by external id', null);
 			load.Lookup_Not_Found__c = ImportObjectSchema.LOOKUP_LEAVE_EMPTY;
 
-			Assert.isFalse(
-				ImportObjectSchema.loadsOneObject(people),
-				'No object, a people mapping.'
-			);
+			Assert.isFalse(ImportObjectSchema.loadsOneObject(people), 'No object, a people mapping.');
 			Assert.isTrue(ImportObjectSchema.loadsOneObject(load), 'An object, a one-object load.');
-			Assert.areEqual(
-				Affiliation__c.SObjectType,
-				ImportObjectSchema.typeOf(load),
-				'Its type.'
-			);
+			Assert.areEqual(Affiliation__c.SObjectType, ImportObjectSchema.typeOf(load), 'Its type.');
 			Assert.isNull(ImportObjectSchema.typeNamed('No_Such_Object__c'), 'An unknown name.');
 			Assert.isNull(ImportObjectSchema.typeNamed(' '), 'A blank name.');
 			Assert.areEqual(
@@ -176,10 +158,7 @@ private class ImportObjectSchemaTest {
 			Assert.isTrue(ImportObjectSchema.leavesLookupEmpty(load), 'Leave it empty.');
 			Assert.isFalse(ImportObjectSchema.leavesLookupEmpty(people), 'Reject is the default.');
 			Assert.areEqual(
-				new List<String>{
-					ImportObjectSchema.OPERATION_UPDATE,
-					ImportObjectSchema.OPERATION_UPDATE_BY_FIELD
-				},
+				new List<String>{ ImportObjectSchema.OPERATION_UPDATE, ImportObjectSchema.OPERATION_UPDATE_BY_FIELD },
 				ImportObjectSchema.operationsFor(Contact.SObjectType),
 				'People load by the two updates only.'
 			);
@@ -200,10 +179,7 @@ private class ImportObjectSchemaTest {
 			Test.startTest();
 			System.runAs(admin()) {
 				keys = ImportObjectSchema.keyFields(Duplicate_Dismissal__c.SObjectType);
-				pairKey = ImportObjectSchema.keyField(
-					Duplicate_Dismissal__c.SObjectType,
-					' pair_key__c '
-				);
+				pairKey = ImportObjectSchema.keyField(Duplicate_Dismissal__c.SObjectType, ' pair_key__c ');
 				role = ImportObjectSchema.keyField(Affiliation__c.SObjectType, 'Role__c');
 			}
 			Test.stopTest();
@@ -229,11 +205,7 @@ private class ImportObjectSchemaTest {
 			Test.stopTest();
 
 			Set<String> offered = values(fields);
-			Assert.areEqual(
-				ImportObjectSchema.ID_ATTRIBUTE,
-				fields[0].value,
-				'The record ID first.'
-			);
+			Assert.areEqual(ImportObjectSchema.ID_ATTRIBUTE, fields[0].value, 'The record ID first.');
 			Assert.isTrue(offered.contains('role__c'), 'A text field.');
 			Assert.isTrue(offered.contains('start_date__c'), 'A date.');
 			Assert.isTrue(offered.contains('contact__c'), 'A lookup.');
@@ -250,10 +222,7 @@ private class ImportObjectSchemaTest {
 			List<ImportMapping.Target> polymorphic;
 			Test.startTest();
 			System.runAs(admin()) {
-				byContact = ImportObjectSchema.parentFields(
-					Affiliation__c.SObjectType,
-					'Contact__c'
-				);
+				byContact = ImportObjectSchema.parentFields(Affiliation__c.SObjectType, 'Contact__c');
 				polymorphic = ImportObjectSchema.parentFields(Task.SObjectType, 'WhoId');
 			}
 			Test.stopTest();
@@ -266,15 +235,8 @@ private class ImportObjectSchemaTest {
 				ImportObjectSchema.parentOf(Affiliation__c.SObjectType, 'contact__c'),
 				'The parent, ignoring case.'
 			);
-			Assert.isNull(
-				ImportObjectSchema.parentOf(Affiliation__c.SObjectType, 'Role__c'),
-				'Not a lookup.'
-			);
-			Assert.areEqual(
-				'Name',
-				ImportObjectSchema.parentField(Account.SObjectType, 'name'),
-				'The name field.'
-			);
+			Assert.isNull(ImportObjectSchema.parentOf(Affiliation__c.SObjectType, 'Role__c'), 'Not a lookup.');
+			Assert.areEqual('Name', ImportObjectSchema.parentField(Account.SObjectType, 'name'), 'The name field.');
 			Assert.isNull(
 				ImportObjectSchema.parentField(Account.SObjectType, 'Anniversary__c'),
 				'A field that is not text, an email or a phone.'
@@ -290,14 +252,7 @@ private class ImportObjectSchemaTest {
 			System.runAs(admin()) {
 				suggested = ImportObjectSchema.suggestMapping(
 					Affiliation__c.SObjectType,
-					new List<String>{
-						'Role',
-						'Start Date',
-						'Contact__c',
-						'Record ID',
-						'Mystery',
-						'role'
-					}
+					new List<String>{ 'Role', 'Start Date', 'Contact__c', 'Record ID', 'Mystery', 'role' }
 				);
 			}
 			Test.stopTest();
@@ -310,11 +265,7 @@ private class ImportObjectSchemaTest {
 			Assert.isTrue(targets[1].endsWithIgnoreCase('Start_Date__c'), 'Ignoring spaces.');
 			Assert.isTrue(targets[2].endsWithIgnoreCase('Contact__c'), 'By API name.');
 			Assert.areEqual(ImportObjectSchema.ID_ATTRIBUTE, targets[3], 'The record ID.');
-			Assert.areEqual(
-				ImportMapping.TARGET_IGNORE,
-				suggested.columns[4].target,
-				'Not guessed.'
-			);
+			Assert.areEqual(ImportMapping.TARGET_IGNORE, suggested.columns[4].target, 'Not guessed.');
 			Assert.areEqual(
 				ImportMapping.TARGET_IGNORE,
 				suggested.columns[5].target,
@@ -347,13 +298,11 @@ private class ImportObjectSchemaTest {
 			Test.stopTest();
 
 			Assert.isTrue(
-				ImportMapping.attributeOf(suggested.columns[0].target)
-					.endsWithIgnoreCase('Role__c'),
+				ImportMapping.attributeOf(suggested.columns[0].target).endsWithIgnoreCase('Role__c'),
 				'Object and field label (C-49a).'
 			);
 			Assert.isTrue(
-				ImportMapping.attributeOf(suggested.columns[1].target)
-					.endsWithIgnoreCase('Start_Date__c'),
+				ImportMapping.attributeOf(suggested.columns[1].target).endsWithIgnoreCase('Start_Date__c'),
 				'Field, then the plural label in parentheses.'
 			);
 			Assert.areEqual(
@@ -406,10 +355,7 @@ private class ImportObjectSchemaTest {
 			);
 			Assert.isTrue(columns[2].target.endsWithIgnoreCase('Start_Date__c'), 'Exact.');
 			Assert.isNull(columns[2].guessed, 'An exact heading is not flagged.');
-			Assert.isTrue(
-				columns[3].target.endsWithIgnoreCase('Organization__c'),
-				'Orgnization is Organization.'
-			);
+			Assert.isTrue(columns[3].target.endsWithIgnoreCase('Organization__c'), 'Orgnization is Organization.');
 			Assert.isTrue(columns[3].guessed, 'Flagged.');
 			for (Integer i = 4; i < columns.size(); i++) {
 				Assert.areEqual(
@@ -434,9 +380,7 @@ private class ImportObjectSchemaTest {
 
 	@IsTest
 	static void aNearSpellingOfASheetNameIsAFlaggedGuess() {
-		ImportObjectSchema.detectionObjectsForTest = new List<Schema.SObjectType>{
-			Affiliation__c.SObjectType
-		};
+		ImportObjectSchema.detectionObjectsForTest = new List<Schema.SObjectType>{ Affiliation__c.SObjectType };
 		System.runAs(TestUsers.admin()) {
 			ImportObjectSchema.Detection guessed;
 			ImportObjectSchema.Detection exact;
@@ -471,9 +415,7 @@ private class ImportObjectSchemaTest {
 	static void theObjectIsSuggestedFromHeadingsThenSheetThenFileName() {
 		// Detection chooses among this one object, so its names are unique by construction
 		// whatever else the org has (Nonprofit Cloud adds many objects).
-		ImportObjectSchema.detectionObjectsForTest = new List<Schema.SObjectType>{
-			Affiliation__c.SObjectType
-		};
+		ImportObjectSchema.detectionObjectsForTest = new List<Schema.SObjectType>{ Affiliation__c.SObjectType };
 		System.runAs(TestUsers.admin()) {
 			ImportObjectSchema.Detection found;
 			ImportObjectSchema.Detection byFile;
@@ -531,26 +473,14 @@ private class ImportObjectSchemaTest {
 					'bookkeeping',
 					ImportObjectSchema.refusal(template('Import_Batch__c', null, null), withKey)
 				);
-				refusals.put(
-					'insertPeople',
-					ImportObjectSchema.refusal(template('Contact', null, null), withKey)
-				);
+				refusals.put('insertPeople', ImportObjectSchema.refusal(template('Contact', null, null), withKey));
 				refusals.put(
 					'nothing',
 					ImportObjectSchema.refusal(template(dismissal, null, null), new ImportMapping())
 				);
-				refusals.put(
-					'noId',
-					ImportObjectSchema.refusal(template(dismissal, byId, null), withKey)
-				);
-				refusals.put(
-					'noKey',
-					ImportObjectSchema.refusal(template(dismissal, byKey, null), withKey)
-				);
-				refusals.put(
-					'badKey',
-					ImportObjectSchema.refusal(template(dismissal, byKey, 'Reason__c'), withKey)
-				);
+				refusals.put('noId', ImportObjectSchema.refusal(template(dismissal, byId, null), withKey));
+				refusals.put('noKey', ImportObjectSchema.refusal(template(dismissal, byKey, null), withKey));
+				refusals.put('badKey', ImportObjectSchema.refusal(template(dismissal, byKey, 'Reason__c'), withKey));
 				refusals.put(
 					'keyUnmapped',
 					ImportObjectSchema.refusal(
@@ -560,19 +490,13 @@ private class ImportObjectSchemaTest {
 				);
 				refusals.put(
 					'keyForEveryRow',
-					ImportObjectSchema.refusal(
-						template(dismissal, byKey, 'Pair_Key__c'),
-						keyForEveryRow
-					)
+					ImportObjectSchema.refusal(template(dismissal, byKey, 'Pair_Key__c'), keyForEveryRow)
 				);
 				refusals.put(
 					'idForEveryRow',
 					ImportObjectSchema.refusal(template(dismissal, byId, null), idForEveryRow)
 				);
-				refusals.put(
-					'good',
-					ImportObjectSchema.refusal(template(dismissal, byKey, 'Pair_Key__c'), withKey)
-				);
+				refusals.put('good', ImportObjectSchema.refusal(template(dismissal, byKey, 'Pair_Key__c'), withKey));
 				refusals.put(
 					'updatePeople',
 					ImportObjectSchema.refusal(
@@ -583,44 +507,26 @@ private class ImportObjectSchemaTest {
 			}
 			Test.stopTest();
 
-			Assert.isNotNull(
-				refusals.get('bookkeeping'),
-				'The package bookkeeping is never loaded.'
-			);
+			Assert.isNotNull(refusals.get('bookkeeping'), 'The package bookkeeping is never loaded.');
 			Assert.areEqual(
 				String.format(
 					BarnHelp.text('Core', 'Core_Import_ErrorPeopleUpdateOnly'),
 					new List<String>{
-						Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-							.getLabelPlural()
+						Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural()
 					}
 				),
 				refusals.get('insertPeople'),
 				'People are inserted by a people mapping.'
 			);
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Import_ErrorNothingMapped'),
-				refusals.get('nothing'),
-				'Empty.'
-			);
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Import_ErrorIdColumnMissing'),
-				refusals.get('noId'),
-				'No ID.'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Import_ErrorNothingMapped'), refusals.get('nothing'), 'Empty.');
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Import_ErrorIdColumnMissing'), refusals.get('noId'), 'No ID.');
 			Assert.areEqual(
 				BarnHelp.text('Core', 'Core_Import_ErrorKeyFieldRequired'),
 				refusals.get('noKey'),
 				'No key.'
 			);
-			Assert.isTrue(
-				refusals.get('badKey').contains('Reason__c'),
-				'A field that is not an external ID is named.'
-			);
-			Assert.isTrue(
-				refusals.get('keyUnmapped').contains('Pair Key'),
-				'The key column is named by its label.'
-			);
+			Assert.isTrue(refusals.get('badKey').contains('Reason__c'), 'A field that is not an external ID is named.');
+			Assert.isTrue(refusals.get('keyUnmapped').contains('Pair Key'), 'The key column is named by its label.');
 			Assert.isTrue(
 				refusals.get('keyForEveryRow').contains('Pair Key'),
 				'The key cannot be a value for every row.'
@@ -656,9 +562,7 @@ private class ImportObjectSchemaTest {
 			Assert.isFalse(
 				values(offered)
 					.contains(
-						Duplicate_Dismissal__c.SObjectType.getDescribe(
-								SObjectDescribeOptions.DEFERRED
-							)
+						Duplicate_Dismissal__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 							.getName()
 							.toLowerCase()
 					),
@@ -699,11 +603,7 @@ private class ImportObjectSchemaTest {
 			Assert.areEqual(false, no, 'Zero is not.');
 			Assert.areEqual(1234.50, (Decimal) amount, 'Separators and sign dropped.');
 			Assert.areEqual(1200, (Integer) count, 'A whole number.');
-			Assert.areEqual(
-				Datetime.newInstanceGmt(2026, 10, 12, 9, 30, 0),
-				stamp,
-				'A date and time in ISO 8601.'
-			);
+			Assert.areEqual(Datetime.newInstanceGmt(2026, 10, 12, 9, 30, 0), stamp, 'A date and time in ISO 8601.');
 			Assert.isTrue(maybe.contains('maybe'), 'Neither yes nor no is named.');
 			Assert.isNotNull(letters, 'Letters in a number.');
 			Assert.isNotNull(badDate, 'A date that cannot be read.');
@@ -717,11 +617,7 @@ private class ImportObjectSchemaTest {
 		System.runAs(TestUsers.admin()) {
 			Schema.DescribeFieldResult opens = BusinessHours.MondayStartTime.getDescribe();
 
-			Assert.areEqual(
-				Time.newInstance(9, 30, 0, 0),
-				ImportObjectSchema.typed('9:30', opens),
-				'h:mm.'
-			);
+			Assert.areEqual(Time.newInstance(9, 30, 0, 0), ImportObjectSchema.typed('9:30', opens), 'h:mm.');
 			Assert.isNotNull(ImportObjectSchema.unreadable('25:00', opens), 'Past midnight.');
 			Assert.isNotNull(ImportObjectSchema.unreadable('noon', opens), 'Not a time.');
 		}

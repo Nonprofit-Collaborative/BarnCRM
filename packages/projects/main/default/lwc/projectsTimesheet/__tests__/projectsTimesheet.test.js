@@ -6,6 +6,12 @@ import saveWeek from '@salesforce/apex/ProjectTimesheetController.saveWeek';
 import submitWeek from '@salesforce/apex/ProjectTimesheetController.submitWeek';
 import recallWeek from '@salesforce/apex/ProjectTimesheetController.recallWeek';
 import addExpense from '@salesforce/apex/ProjectTimesheetController.addExpense';
+import { localIsoDate } from 'c/findCsv';
+import { addDays, mondayOf } from 'c/projectsTimesheetModel';
+
+// The page opens on the current week, so the fixture entries sit on this week's Monday and Tuesday.
+const MONDAY = mondayOf(localIsoDate());
+const TUESDAY = addDays(MONDAY, 1);
 
 jest.mock('@salesforce/apex/ProjectTimesheetController.getWeek', () => ({ default: jest.fn() }), {
   virtual: true
@@ -51,7 +57,7 @@ const entry = (id, date, hours, status) => ({
 const WEEK = (status = 'Open') => ({
   enabled: true,
   expensesEnabled: true,
-  entries: [entry('e1', '2026-11-09', 4, status), entry('e2', '2026-11-10', 3, status)],
+  entries: [entry('e1', MONDAY, 4, status), entry('e2', TUESDAY, 3, status)],
   expenses: [],
   projects: [{ id: 'a01000000000001AAA', name: 'Rollout' }]
 });
@@ -101,7 +107,7 @@ describe('c-projects-timesheet', () => {
     find(element, 'save').click();
     await flush();
     expect(saveWeek).toHaveBeenCalledWith({
-      cells: [expect.objectContaining({ id: 'e1', hours: 5, workDate: '2026-11-09' })]
+      cells: [expect.objectContaining({ id: 'e1', hours: 5, workDate: MONDAY })]
     });
     find(element, 'submit').click();
     await flush();

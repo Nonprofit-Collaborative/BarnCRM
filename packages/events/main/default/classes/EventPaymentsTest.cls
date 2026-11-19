@@ -44,9 +44,7 @@ private class EventPaymentsTest {
 	private static FakePayments online(Boolean turnedOn) {
 		OrgSettingsSystemWriter.save(
 			Events_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{
-				Events_Settings__c.Online_Payments__c => turnedOn
-			}
+			new Map<Schema.SObjectField, Object>{ Events_Settings__c.Online_Payments__c => turnedOn }
 		);
 		SettingsService.clearCaches();
 		FakePayments fake = new FakePayments();
@@ -64,12 +62,7 @@ private class EventPaymentsTest {
 			End__c = start.addHours(4)
 		);
 		insert as user event;
-		insert as user new Ticket_Type__c(
-			Event__c = event.Id,
-			Name = 'General',
-			Price__c = price,
-			Active__c = true
-		);
+		insert as user new Ticket_Type__c(Event__c = event.Id, Name = 'General', Price__c = price, Active__c = true);
 		Contact jane = TestDataFactory.person(
 			new Contact(FirstName = 'Jane', LastName = 'Payer', Email = 'jane@example.org')
 		);
@@ -216,13 +209,10 @@ private class EventPaymentsTest {
 			Assert.isTrue(EventCheckoutJob.markFailed(waiting), 'A saved mark is reported');
 			Assert.areEqual(EventPayments.FAILED, reload(waiting).Payment_Status__c, 'Failed');
 			Id gone = Id.valueOf(
-				Event_Registration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-					.getKeyPrefix() + '000000000001'
+				Event_Registration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() +
+				'000000000001'
 			);
-			Assert.isFalse(
-				EventCheckoutJob.markFailed(gone),
-				'A mark that did not save is reported'
-			);
+			Assert.isFalse(EventCheckoutJob.markFailed(gone), 'A mark that did not save is reported');
 		}
 	}
 
@@ -243,10 +233,7 @@ private class EventPaymentsTest {
 		System.runAs(staff()) {
 			online(true);
 			Id waiting = register(EventRegistrationService.SOURCE_FORM, 25);
-			update as system new Event_Registration__c(
-				Id = waiting,
-				Payment_Key__c = UserInfo.getOrganizationId()
-			);
+			update as system new Event_Registration__c(Id = waiting, Payment_Key__c = UserInfo.getOrganizationId());
 			Callable listener = new EventPaymentListener();
 
 			Test.startTest();
@@ -278,14 +265,8 @@ private class EventPaymentsTest {
 			Id byStaff = register(EventRegistrationService.SOURCE_STAFF, 25);
 			Id stale = register(EventRegistrationService.SOURCE_FORM, 25);
 			update as system new List<Event_Registration__c>{
-				new Event_Registration__c(
-					Id = waiting,
-					Payment_Key__c = UserInfo.getOrganizationId()
-				),
-				new Event_Registration__c(
-					Id = byStaff,
-					Payment_Key__c = UserInfo.getOrganizationId()
-				),
+				new Event_Registration__c(Id = waiting, Payment_Key__c = UserInfo.getOrganizationId()),
+				new Event_Registration__c(Id = byStaff, Payment_Key__c = UserInfo.getOrganizationId()),
 				new Event_Registration__c(Id = stale, Payment_Key__c = UserInfo.getUserId())
 			};
 			Callable listener = new EventPaymentListener();
@@ -353,17 +334,9 @@ private class EventPaymentsTest {
 			PortalActionExtension portal = new EventsPortalExtension();
 
 			Test.startTest();
-			String none = portal.run(
-				EventsPortalExtension.SEND_LINK,
-				registration.Contact__c,
-				waiting
-			);
+			String none = portal.run(EventsPortalExtension.SEND_LINK, registration.Contact__c, waiting);
 			update as system new Event_Registration__c(Id = waiting, Payment_Link__c = LINK);
-			String sent = portal.run(
-				EventsPortalExtension.SEND_LINK,
-				registration.Contact__c,
-				waiting
-			);
+			String sent = portal.run(EventsPortalExtension.SEND_LINK, registration.Contact__c, waiting);
 			Boolean refused = false;
 			try {
 				portal.run(EventsPortalExtension.SEND_LINK, UserInfo.getUserId(), waiting);
@@ -372,11 +345,7 @@ private class EventPaymentsTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Events', 'Events_Portal_NoPaymentLink'),
-				none,
-				'No link'
-			);
+			Assert.areEqual(BarnHelp.text('Events', 'Events_Portal_NoPaymentLink'), none, 'No link');
 			Assert.areEqual(BarnHelp.text('Events', 'Events_Portal_PaymentLinkSent'), sent, 'Sent');
 			Assert.isTrue(refused, 'Another person is refused');
 		}

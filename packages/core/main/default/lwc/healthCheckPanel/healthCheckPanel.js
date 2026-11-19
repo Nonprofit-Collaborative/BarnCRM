@@ -11,6 +11,7 @@ import applyRecommendedMode from '@salesforce/apex/HealthCheckController.applyRe
 import applyJunctionMembership from '@salesforce/apex/HealthCheckController.applyJunctionMembership';
 import enableAutomaticHouseholds from '@salesforce/apex/HealthCheckController.enableAutomaticHouseholds';
 import applyFix from '@salesforce/apex/HealthCheckController.applyFix';
+import runRemaining from '@salesforce/apex/HealthCheckController.runRemaining';
 
 import CATEGORY_ACCESS from '@salesforce/label/c.Core_Access_PageTitle';
 import CATEGORY_LICENSES from '@salesforce/label/c.Core_HealthCheck_CategoryLicenses';
@@ -46,6 +47,9 @@ const SEVERITY_DISPLAY = {
 };
 
 const CATEGORY_ORDER = ['OrgShape', 'Licenses', 'Access', 'Settings'];
+
+/** The finding a run that stopped early adds, naming the checks it left. */
+const NOT_CHECKED = 'not_checked';
 
 /**
  * Health Check: what BarnCRM found in this org and what to do about it (feature C-11).
@@ -91,6 +95,9 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
       return helpText('Core', 'Core_HealthCheck_Intro');
     },
     rerun: RERUN,
+    get runRemaining() {
+      return helpText('Core', 'Core_HealthCheck_RunRemaining');
+    },
     useRecommended: USE_RECOMMENDED,
     orgShapeCard: ORG_SHAPE_CARD,
     get readOnly() {
@@ -287,6 +294,41 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
 
   handleRerun() {
     this.load();
+  }
+
+  /** The checks the report on screen left because it stopped early to stay inside the limits. */
+  get skippedChecks() {
+    return (this.report && this.report.skippedChecks) || [];
+  }
+
+  /** Run Remaining Checks shows only when the report on screen left some checks (D-208). */
+  get showRunRemaining() {
+    return this.hasReport && !this.loading && this.skippedChecks.length > 0;
+  }
+
+  /**
+   * Run only the checks the report left, and merge what they find into the same report: the
+   * earlier Not Checked finding goes, and a run that has to stop early again brings its own.
+   */
+  async handleRunRemaining() {
+    const shown = this.report;
+    const checkKeys = this.skippedChecks;
+    this.loading = true;
+    this.errorMessage = undefined;
+    this.fixOutcome = undefined;
+    try {
+      const remaining = await runRemaining({ checkKeys });
+      const kept = (shown.findings || []).filter((finding) => finding.key !== NOT_CHECKED);
+      this.report = {
+        ...shown,
+        findings: kept.concat((remaining && remaining.findings) || []),
+        skippedChecks: (remaining && remaining.skippedChecks) || []
+      };
+    } catch (error) {
+      this.errorMessage = messageFrom(error, helpText('Core', 'Core_HealthCheck_LoadFailed'));
+    } finally {
+      this.loading = false;
+    }
   }
 
   handleUseRecommended() {

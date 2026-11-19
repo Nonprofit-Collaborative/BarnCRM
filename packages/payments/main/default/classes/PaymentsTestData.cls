@@ -1,35 +1,38 @@
 /**
- * Payments test data: the admin, test keys, a processor stand-in that answers by address and
- * keeps each request, payments and events, and a Stripe signature made the way Stripe makes it.
+ * Payments test data: the admin, both processors connected, a processor stand-in that answers by
+ * address and keeps each request (and, like Stripe, answers `GET /v1/events/{id}` with the stored
+ * event of that id), payments and events.
  */
 @IsTest
 public class PaymentsTestData {
 	public static final String ADMIN = 'Payments_Admin';
-	public static final String STRIPE_SECRET = 'whsec_barn_test_secret';
 
 	public static User admin() {
 		return TestUsers.adminWith(ADMIN);
 	}
 
-	/** Every key entered, in Test mode, with the processor given. */
+	/**
+	 * Both processors connected (as Check Connection leaves them), in Test mode, with the
+	 * processor given, and a processor stand-in in place for any event fetch.
+	 */
 	public static void connect(String processor) {
 		Payments_Settings__c settings = Payments_Settings__c.getOrgDefaults();
 		settings.SetupOwnerId = UserInfo.getOrganizationId();
 		settings.Processor__c = processor;
 		settings.Mode__c = PaymentService.TEST;
 		settings.Currency__c = 'USD';
+		settings.Stripe_Connected__c = true;
+		settings.PayPal_Connected__c = true;
+		settings.PayPal_Webhook_Id__c = 'WH-1';
 		upsert settings;
-		Payment_Keys__c keys = Payment_Keys__c.getOrgDefaults();
-		keys.SetupOwnerId = UserInfo.getOrganizationId();
-		keys.Stripe_Secret_Key__c = 'sk_test_barn';
-		keys.Stripe_Webhook_Secret__c = STRIPE_SECRET;
-		keys.PayPal_Client_Id__c = 'client';
-		keys.PayPal_Client_Secret__c = 'secret';
-		keys.PayPal_Webhook_Id__c = 'WH-1';
-		upsert keys;
+		processors();
 	}
 
-	/** Answers each request by the first address part it contains; keeps every request. */
+	/**
+	 * Answers each request by the first address part it contains; keeps every request. A Stripe
+	 * event fetch no part matches is answered as Stripe would: the stored event with that id, or
+	 * 404 when there is none.
+	 */
 	public class Processors implements HttpCalloutMock {
 		public Map<String, String> bodies = new Map<String, String>();
 		public Map<String, Integer> codes = new Map<String, Integer>();
@@ -50,7 +53,16 @@ public class PaymentsTestData {
 				if (request.getEndpoint().contains(part)) {
 					response.setStatusCode(codes.get(part));
 					response.setBody(bodies.get(part));
-					break;
+					return response;
+				}
+			}
+			if (request.getEndpoint().startsWith(PaymentStripe.ENDPOINT + 'events/')) {
+				String stored = storedStripeEvent(
+					EncodingUtil.urlDecode(request.getEndpoint().substringAfterLast('/events/'), 'UTF-8')
+				);
+				if (stored != null) {
+					response.setStatusCode(200);
+					response.setBody(stored);
 				}
 			}
 			return response;
@@ -65,6 +77,21 @@ public class PaymentsTestData {
 			}
 			return found;
 		}
+	}
+
+	/** The payload of the stored Stripe event with this id, as Stripe would return it. */
+	private static String storedStripeEvent(String eventId) {
+		for (Payment_Event__c stored : [
+			SELECT Payload__c
+			FROM Payment_Event__c
+			WHERE Processor__c = :PaymentService.STRIPE
+			WITH SYSTEM_MODE
+		]) {
+			if (PaymentStripe.text(PaymentStripe.parse(stored.Payload__c).get('id')) == eventId) {
+				return stored.Payload__c;
+			}
+		}
+		return null;
 	}
 
 	public static Processors processors() {
@@ -89,12 +116,7 @@ public class PaymentsTestData {
 		return payment;
 	}
 
-	public static Payment_Event__c event(
-		String processor,
-		String key,
-		String payload,
-		String headers
-	) {
+	public static Payment_Event__c event(String processor, String key, String payload, String headers) {
 		Payment_Event__c event = new Payment_Event__c(
 			Processor__c = processor,
 			Status__c = 'Received',
@@ -120,9 +142,7 @@ public class PaymentsTestData {
 
 	/** A PayPal event body. */
 	public static String payPalEvent(String id, String type, Map<String, Object> resource) {
-		return JSON.serialize(
-			new Map<String, Object>{ 'id' => id, 'event_type' => type, 'resource' => resource }
-		);
+		return JSON.serialize(new Map<String, Object>{ 'id' => id, 'event_type' => type, 'resource' => resource });
 	}
 
 	public static String payPalHeaders() {
@@ -131,20 +151,6 @@ public class PaymentsTestData {
 			headers.put(name, 'value-' + name);
 		}
 		return JSON.serialize(headers);
-	}
-
-	/** The Stripe-Signature header for this body at this time. */
-	public static String stripeSignature(String body, Long seconds) {
-		return 't=' +
-			seconds +
-			',v1=' +
-			EncodingUtil.convertToHex(
-				Crypto.generateMac(
-					'hmacSHA256',
-					Blob.valueOf(seconds + '.' + body),
-					Blob.valueOf(STRIPE_SECRET)
-				)
-			);
 	}
 
 	public static Payment__c reread(Id paymentId) {

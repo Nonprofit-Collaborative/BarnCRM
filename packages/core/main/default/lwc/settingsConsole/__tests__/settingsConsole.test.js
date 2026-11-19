@@ -638,16 +638,7 @@ describe('c-settings-console', () => {
     expect(notes.section).toBe('General');
   });
 
-  // The module property stays declared, because an org whose pages place this component cannot
-  // take an upgrade that removes it, but it no longer filters anything.
-  it('keeps the page property module declared and ignores its value', async () => {
-    // Jest runs from the repository root (jest.config.js).
-    const meta = require('fs').readFileSync(
-      'packages/core/main/default/lwc/settingsConsole/settingsConsole.js-meta.xml',
-      'utf8'
-    );
-    expect(meta).toMatch(/<property name="module" type="String"/);
-
+  it('shows every module section', async () => {
     const row = (key, section, module) => ({
       key,
       label: key,
@@ -669,7 +660,6 @@ describe('c-settings-console', () => {
       ]
     });
     const element = createElement('c-settings-console', { is: SettingsConsole });
-    element.module = 'Rollups';
     document.body.appendChild(element);
     await settle();
 
@@ -1756,7 +1746,7 @@ describe('c-settings-console', () => {
 
   describe('Section list groups (UX PR 6)', () => {
     it('groups sections with icons, puts unknown ones in More and Error Log last', async () => {
-      const names = ['General', 'Error Log', 'Giving', 'Kennels', 'Access', 'Import'];
+      const names = ['General', 'Error Log', 'Fundraising', 'Kennels', 'Access', 'Import'];
       getConsoleModel.mockResolvedValue({
         canEdit: true,
         sections: names.map((name) => ({ name, settings: [] }))
@@ -1780,7 +1770,7 @@ describe('c-settings-console', () => {
       expect(items.map((item) => item.name)).toEqual([
         'General',
         'Import',
-        'Giving',
+        'Fundraising',
         'Kennels',
         'Access',
         'Error Log'

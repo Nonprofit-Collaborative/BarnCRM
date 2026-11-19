@@ -42,9 +42,7 @@ public with sharing class GiftBatchService {
 		public Id appealId;
 
 		public Resolved(Gift_Batch__c batch, Gift_Batch_Row__c row) {
-			this.giftDate = row.Gift_Date__c != null
-				? row.Gift_Date__c
-				: batch.Default_Gift_Date__c;
+			this.giftDate = row.Gift_Date__c != null ? row.Gift_Date__c : batch.Default_Gift_Date__c;
 			this.paymentMethod = String.isNotBlank(row.Payment_Method__c)
 				? row.Payment_Method__c
 				: batch.Default_Payment_Method__c;
@@ -67,10 +65,7 @@ public with sharing class GiftBatchService {
 	 * person fixing a batch wants the list (R-GR1 to R-GR3). Line numbers are positions in the
 	 * order the lines were entered, which is the order the grid shows.
 	 */
-	public static List<LineProblem> validateRows(
-		Gift_Batch__c batch,
-		List<Gift_Batch_Row__c> rows
-	) {
+	public static List<LineProblem> validateRows(Gift_Batch__c batch, List<Gift_Batch_Row__c> rows) {
 		List<LineProblem> problems = new List<LineProblem>();
 		for (Integer index = 0; index < rows.size(); index++) {
 			Gift_Batch_Row__c row = rows[index];
@@ -78,48 +73,22 @@ public with sharing class GiftBatchService {
 			Boolean hasContact = row.Donor_Contact__c != null;
 			Boolean hasAccount = row.Donor_Account__c != null;
 			if (hasContact && hasAccount) {
-				problems.add(
-					new LineProblem(
-						row.Id,
-						line,
-						BarnHelp.text('Giving', 'Giving_GiftEntry_ErrorOneDonor')
-					)
-				);
+				problems.add(new LineProblem(row.Id, line, BarnHelp.text('Giving', 'Giving_GiftEntry_ErrorOneDonor')));
 			} else if (!hasContact && !hasAccount) {
 				problems.add(
-					new LineProblem(
-						row.Id,
-						line,
-						BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorRowDonorMissing')
-					)
+					new LineProblem(row.Id, line, BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorRowDonorMissing'))
 				);
 			}
 			if (row.Amount__c == null || row.Amount__c <= 0) {
-				problems.add(
-					new LineProblem(
-						row.Id,
-						line,
-						BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorRowAmount')
-					)
-				);
+				problems.add(new LineProblem(row.Id, line, BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorRowAmount')));
 			}
 			Resolved values = new Resolved(batch, row);
 			if (values.giftDate == null) {
-				problems.add(
-					new LineProblem(
-						row.Id,
-						line,
-						BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorRowDate')
-					)
-				);
+				problems.add(new LineProblem(row.Id, line, BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorRowDate')));
 			}
 			if (String.isBlank(values.paymentMethod)) {
 				problems.add(
-					new LineProblem(
-						row.Id,
-						line,
-						BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorRowPaymentMethod')
-					)
+					new LineProblem(row.Id, line, BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorRowPaymentMethod'))
 				);
 			}
 		}
@@ -143,10 +112,7 @@ public with sharing class GiftBatchService {
 	 * R-GR5: for each line that names a scheduled payment its donor may still pay, that payment
 	 * with its commitment, by line. A line missing from the result named one it may not pay.
 	 */
-	public static Map<Id, Installment__c> confirmedPayments(
-		Gift_Batch__c batch,
-		List<Gift_Batch_Row__c> rows
-	) {
+	public static Map<Id, Installment__c> confirmedPayments(Gift_Batch__c batch, List<Gift_Batch_Row__c> rows) {
 		List<GiftEntryPayments.Request> requests = new List<GiftEntryPayments.Request>();
 		Map<String, Id> chosen = new Map<String, Id>();
 		for (Gift_Batch_Row__c row : rows) {
@@ -188,9 +154,7 @@ public with sharing class GiftBatchService {
 		PostOutcome outcome = new PostOutcome();
 		Savepoint before = Database.setSavepoint();
 		try {
-			Gift_Batch__c batch = batchId == null
-				? null
-				: GiftBatchSelector.selectForUpdate(batchId);
+			Gift_Batch__c batch = batchId == null ? null : GiftBatchSelector.selectForUpdate(batchId);
 			List<Gift_Batch_Row__c> rows = batch == null
 				? new List<Gift_Batch_Row__c>()
 				: GiftBatchSelector.selectRows(batchId);
@@ -198,20 +162,14 @@ public with sharing class GiftBatchService {
 			if (outcome.formError == null) {
 				outcome.lineProblems = validateRows(batch, rows);
 				if (!outcome.lineProblems.isEmpty()) {
-					outcome.formError = BarnHelp.text(
-						'Giving',
-						'Giving_GiftBatch_ErrorRowsIncomplete'
-					);
+					outcome.formError = BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorRowsIncomplete');
 				}
 			}
 			if (outcome.formError == null) {
 				outcome.lineProblems = createGifts(batch, rows);
 				if (!outcome.lineProblems.isEmpty()) {
 					Database.rollback(before);
-					outcome.formError = BarnHelp.text(
-						'Giving',
-						'Giving_GiftBatch_ErrorCreateFailed'
-					);
+					outcome.formError = BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorCreateFailed');
 					return outcome;
 				}
 				GiftBatchWriter.markPosted(batch.Id);
@@ -264,10 +222,7 @@ public with sharing class GiftBatchService {
 	 * R-GB6: one ordinary gift per line, inserted in user mode. Every line the platform refuses is
 	 * reported with its own message rather than only the first, and the caller rolls back.
 	 */
-	private static List<LineProblem> createGifts(
-		Gift_Batch__c batch,
-		List<Gift_Batch_Row__c> rows
-	) {
+	private static List<LineProblem> createGifts(Gift_Batch__c batch, List<Gift_Batch_Row__c> rows) {
 		List<Gift__c> gifts = new List<Gift__c>();
 		List<Resolved> resolved = new List<Resolved>();
 		// validateRows refused any line naming a payment it may not pay; read again here so each
@@ -297,13 +252,7 @@ public with sharing class GiftBatchService {
 		List<Database.SaveResult> results = Database.insert(gifts, false, AccessLevel.USER_MODE);
 		for (Integer index = 0; index < results.size(); index++) {
 			if (!results[index].isSuccess()) {
-				problems.add(
-					new LineProblem(
-						rows[index].Id,
-						index + 1,
-						results[index].getErrors()[0].getMessage()
-					)
-				);
+				problems.add(new LineProblem(rows[index].Id, index + 1, results[index].getErrors()[0].getMessage()));
 			}
 		}
 		if (!problems.isEmpty()) {

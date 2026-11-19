@@ -31,13 +31,7 @@ public with sharing class VolunteersEventExtension implements EventVolunteerExte
 				Name,
 				Active__c,
 				(
-					SELECT
-						Id,
-						Start_Time__c,
-						End_Time__c,
-						Volunteers_Needed__c,
-						Slots_Filled__c,
-						Status__c
+					SELECT Id, Start_Time__c, End_Time__c, Volunteers_Needed__c, Slots_Filled__c, Status__c
 					FROM Shifts__r
 					ORDER BY Start_Time__c ASC
 					LIMIT 100
@@ -57,9 +51,7 @@ public with sharing class VolunteersEventExtension implements EventVolunteerExte
 				row.id = shift.Id;
 				row.startTime = shift.Start_Time__c;
 				row.endTime = shift.End_Time__c;
-				row.needed = shift.Volunteers_Needed__c == null
-					? null
-					: shift.Volunteers_Needed__c.intValue();
+				row.needed = shift.Volunteers_Needed__c == null ? null : shift.Volunteers_Needed__c.intValue();
 				row.filled = shift.Slots_Filled__c == null ? 0 : shift.Slots_Filled__c.intValue();
 				row.status = shift.Status__c;
 				job.shifts.add(row);

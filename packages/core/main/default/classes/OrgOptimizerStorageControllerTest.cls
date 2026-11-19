@@ -28,17 +28,9 @@ private class OrgOptimizerStorageControllerTest {
 			Test.stopTest();
 
 			Assert.areEqual(2, storage.limits.size(), 'Only the limits the org reports are shown.');
-			Assert.areEqual(
-				'DataStorageMB',
-				storage.limits[0].name,
-				'In the order the page shows them.'
-			);
+			Assert.areEqual('DataStorageMB', storage.limits[0].name, 'In the order the page shows them.');
 			Assert.areEqual(75, storage.limits[0].percent, 'Used over allowed, as a percentage.');
-			Assert.areEqual(
-				0,
-				storage.limits[1].percent,
-				'A limit of zero reads as 0%, not an error.'
-			);
+			Assert.areEqual(0, storage.limits[1].percent, 'A limit of zero reads as 0%, not an error.');
 
 			OrgOptimizerStorageController.OwnObject errorLog;
 			for (OrgOptimizerStorageController.OwnObject own : storage.ownObjects) {

@@ -42,21 +42,9 @@ public with sharing class DonorScoreService {
 
 	public static Cutoffs cutoffs() {
 		Cutoffs found = new Cutoffs();
-		found.recency = DonorScoreMath.cutoffs(
-			text(KEY_RECENCY),
-			DonorScoreMath.DEFAULT_RECENCY_DAYS,
-			true
-		);
-		found.frequency = DonorScoreMath.cutoffs(
-			text(KEY_FREQUENCY),
-			DonorScoreMath.DEFAULT_FREQUENCY_GIFTS,
-			false
-		);
-		found.monetary = DonorScoreMath.cutoffs(
-			text(KEY_MONETARY),
-			DonorScoreMath.DEFAULT_MONETARY_AMOUNTS,
-			false
-		);
+		found.recency = DonorScoreMath.cutoffs(text(KEY_RECENCY), DonorScoreMath.DEFAULT_RECENCY_DAYS, true);
+		found.frequency = DonorScoreMath.cutoffs(text(KEY_FREQUENCY), DonorScoreMath.DEFAULT_FREQUENCY_GIFTS, false);
+		found.monetary = DonorScoreMath.cutoffs(text(KEY_MONETARY), DonorScoreMath.DEFAULT_MONETARY_AMOUNTS, false);
 		return found;
 	}
 
@@ -148,11 +136,7 @@ public with sharing class DonorScoreService {
 			return cachedFieldNames.get(key);
 		}
 		Map<String, String> byLocalName = new Map<String, String>();
-		for (
-			Schema.SObjectField token : type.getDescribe(SObjectDescribeOptions.DEFERRED)
-				.fields.getMap()
-				.values()
-		) {
+		for (Schema.SObjectField token : type.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap().values()) {
 			Schema.DescribeFieldResult field = token.getDescribe();
 			byLocalName.put(field.getLocalName(), field.getName());
 		}

@@ -12,10 +12,7 @@ public with sharing class GrantPaymentService {
 	public static final String STATUS_CANCELLED = 'Cancelled';
 
 	/** The statuses that make a payment part of the schedule: anything but Cancelled. */
-	public static final List<String> LIVE_STATUSES = new List<String>{
-		STATUS_EXPECTED,
-		STATUS_RECEIVED
-	};
+	public static final List<String> LIVE_STATUSES = new List<String>{ STATUS_EXPECTED, STATUS_RECEIVED };
 
 	/** The most payments one schedule may hold: monthly for ten years. */
 	public static final Integer MAX_PAYMENTS = 120;
@@ -37,10 +34,7 @@ public with sharing class GrantPaymentService {
 	 * @param payments the payments being saved
 	 * @param oldById their saved versions, null on insert
 	 */
-	public static void fillReceivedDates(
-		List<Grant_Payment__c> payments,
-		Map<Id, Grant_Payment__c> oldById
-	) {
+	public static void fillReceivedDates(List<Grant_Payment__c> payments, Map<Id, Grant_Payment__c> oldById) {
 		Date today = Date.today();
 		for (Grant_Payment__c payment : payments) {
 			Grant_Payment__c old = oldById == null ? null : oldById.get(payment.Id);
@@ -133,10 +127,7 @@ public with sharing class GrantPaymentService {
 		}
 		Database.insert(payments, AccessLevel.USER_MODE);
 		if (String.isNotBlank(frequency)) {
-			Database.update(
-				new Grant__c(Id = grantId, Payment_Frequency__c = frequency),
-				AccessLevel.USER_MODE
-			);
+			Database.update(new Grant__c(Id = grantId, Payment_Frequency__c = frequency), AccessLevel.USER_MODE);
 		}
 	}
 
@@ -174,9 +165,7 @@ public with sharing class GrantPaymentService {
 				}
 				continue;
 			}
-			Date entryDate = payment.Received_Date__c == null
-				? Date.today()
-				: payment.Received_Date__c;
+			Date entryDate = payment.Received_Date__c == null ? Date.today() : payment.Received_Date__c;
 			if (entry == null && restricted.contains(payment.Grant__c)) {
 				toUpsert.add(
 					new Grant_Fund_Entry__c(
@@ -188,11 +177,7 @@ public with sharing class GrantPaymentService {
 						Description__c = payment.Name
 					)
 				);
-			} else if (
-				entry != null &&
-				(entry.Amount__c != payment.Amount__c ||
-				entry.Entry_Date__c != entryDate)
-			) {
+			} else if (entry != null && (entry.Amount__c != payment.Amount__c || entry.Entry_Date__c != entryDate)) {
 				entry.Amount__c = payment.Amount__c;
 				entry.Entry_Date__c = entryDate;
 				toUpsert.add(entry);
@@ -273,11 +258,7 @@ public with sharing class GrantPaymentService {
 		if (rows.isEmpty() || rows[0].Status__c != STATUS_RECEIVED) {
 			return false;
 		}
-		update as user new Grant_Payment__c(
-			Id = paymentId,
-			Status__c = status,
-			Received_Date__c = receivedDate
-		);
+		update as user new Grant_Payment__c(Id = paymentId, Status__c = status, Received_Date__c = receivedDate);
 		// System mode as in syncLedger: the entry's Payment field is set by BarnCRM only.
 		List<Grant_Fund_Entry__c> entries = [
 			SELECT Id

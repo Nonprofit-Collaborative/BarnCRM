@@ -22,11 +22,7 @@ public with sharing class PersonErasureController {
 
 	/** Erases the person, once the typed name matches. */
 	@AuraEnabled
-	public static PersonErasure.Result erase(
-		Id personId,
-		String typedName,
-		String requestReference
-	) {
+	public static PersonErasure.Result erase(Id personId, String typedName, String requestReference) {
 		try {
 			return PersonErasure.erase(personId, typedName, requestReference);
 		} catch (Exception failed) {

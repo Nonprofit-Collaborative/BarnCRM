@@ -1,4 +1,4 @@
-# Grants and Funders
+# Grants
 
 This page covers tracking grants in BarnCRM: the requests you send to foundations, companies and
 government funders, how far along each one is, the deadlines coming up, and the reports an award
@@ -7,7 +7,7 @@ requires.
 **Before you start:** open the **BarnCRM Grants** app from the App Launcher. Fundraising Staff,
 Team Members add grants and move them through the stages, but cannot delete a
 grant. Admins can also delete one. Read Only users can look but change nothing. If you need more
-access, ask your admin (see the [Funders admin guide](../admin-guide/funders.md#roles-and-permission-sets)).
+access, ask your admin (see the [Grants admin guide](../admin-guide/funders.md#roles-and-permission-sets)).
 
 A funder is always an organization record: the foundation, company or agency you are asking. Its
 program officer is a contact at that organization.
@@ -99,9 +99,9 @@ you. Click **Print** to print the month without the app's header and navigation.
 ## To Show the Board Where the Money Comes From
 
 1. Open the **BarnCRM Grants** app. It opens on the **Board Dashboard**, its home: tiles for
-   this fiscal year's revenue and awards, then a tile for each Funders tab.
+   this fiscal year's revenue and awards, then a tile for each Grants tab.
 2. Read the three parts, all for this fiscal year:
-   - **Revenue Mix**: grants awarded by funding source and, if you use Giving, gifts to funds,
+   - **Revenue Mix**: grants awarded by funding source and, if you use Fundraising, gifts to funds,
      each with its amount and share as a bar.
    - **Concentration**: the five organizations giving the most, with a warning when one gives
      more than 25 percent or the five together more than half.
@@ -112,7 +112,7 @@ You should see: amounts in your currency and shares as percents, or `Nothing to 
 fiscal year yet.` To print it for a board packet, click **Print**. If a line says
 **Not set**, those grants have no **Funding Source**; fill it in on each grant.
 
-If your organization also enters a grant's payments as Giving gifts, that money is counted twice:
+If your organization also enters a grant's payments as Fundraising gifts, that money is counted twice:
 once in the grant lines and once in the gifts line, and in that funder's share. Ask your
 administrator which one your organization records awards in.
 
@@ -226,9 +226,9 @@ Released** and **Restricted Balance** change at once.
 A balance below zero means more was spent than came in so far, which is normal for a
 reimbursement grant.
 
-## To Name the Giving Fund
+## To Name the Fund
 
-With Giving installed, choose the fund the money is booked to on the grant's **Giving Fund**
+With Fundraising installed, choose the fund the money is booked to on the grant's **Fund**
 card and click **Save**.
 
 You should see: `Saved.` and the fund's name on the card.

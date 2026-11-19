@@ -11,11 +11,7 @@ private class GiftStatusRulesTest {
 	static void makeData() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GivingTestDataFactory.insertDefaultFund();
-			Contact ana = GivingTestDataFactory.insertHouseholdContact(
-				'The Nolan Family',
-				'Ana',
-				'Nolan'
-			);
+			Contact ana = GivingTestDataFactory.insertHouseholdContact('The Nolan Family', 'Ana', 'Nolan');
 			Gift__c received = GivingTestDataFactory.buildGift(ana.Id, 100);
 			Gift__c pending = GivingTestDataFactory.buildGift(ana.Id, 40);
 			pending.Status__c = 'Pending';
@@ -98,18 +94,9 @@ private class GiftStatusRulesTest {
 			String toWrittenOff = refusalOf(pending.Id, 'Written off');
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_Gift_CancelOnlyPending'),
-				receivedRefusal
-			);
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_Gift_CancelledOnlyToPending'),
-				toReceived
-			);
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_Gift_CancelledOnlyToPending'),
-				toWrittenOff
-			);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Gift_CancelOnlyPending'), receivedRefusal);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Gift_CancelledOnlyToPending'), toReceived);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Gift_CancelledOnlyToPending'), toWrittenOff);
 			Assert.areEqual('Received', giftOf(100).Status__c);
 			Assert.areEqual('Cancelled', giftOf(40).Status__c);
 		}
@@ -184,11 +171,7 @@ private class GiftStatusRulesTest {
 			Commitment__c pledge = pledge();
 			Installment__c first = firstInstallment(pledge.Id);
 			Gift__c pending = giftOf(40);
-			update new Gift__c(
-				Id = pending.Id,
-				Commitment__c = pledge.Id,
-				Installment__c = first.Id
-			);
+			update new Gift__c(Id = pending.Id, Commitment__c = pledge.Id, Installment__c = first.Id);
 
 			Test.startTest();
 			update new Gift__c(Id = pending.Id, Status__c = 'Cancelled');
@@ -263,10 +246,7 @@ private class GiftStatusRulesTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Commitment__c pledge = pledge();
 			Installment__c first = firstInstallment(pledge.Id);
-			Gift__c cancelled = GivingTestDataFactory.buildGift(
-				[SELECT Id FROM Contact LIMIT 1].Id,
-				55
-			);
+			Gift__c cancelled = GivingTestDataFactory.buildGift([SELECT Id FROM Contact LIMIT 1].Id, 55);
 			cancelled.Status__c = 'Cancelled';
 			cancelled.Commitment__c = pledge.Id;
 			cancelled.Installment__c = first.Id;
@@ -279,10 +259,7 @@ private class GiftStatusRulesTest {
 				[SELECT Installment__c FROM Gift__c WHERE Id = :cancelled.Id].Installment__c,
 				'A cancelled gift pays no installment'
 			);
-			Assert.areEqual(
-				'Scheduled',
-				[SELECT Status__c FROM Installment__c WHERE Id = :first.Id].Status__c
-			);
+			Assert.areEqual('Scheduled', [SELECT Status__c FROM Installment__c WHERE Id = :first.Id].Status__c);
 		}
 	}
 }

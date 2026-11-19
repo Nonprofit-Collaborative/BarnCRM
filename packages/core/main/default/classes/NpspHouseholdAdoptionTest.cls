@@ -76,15 +76,9 @@ private class NpspHouseholdAdoptionTest {
 		f.smith = TestDataFactory.organization(new Account(Name = PREFIX + 'Smith Household'));
 		f.jones = TestDataFactory.organization(new Account(Name = PREFIX + 'Jones Household'));
 		insert new List<Account>{ f.smith, f.jones };
-		f.ann = TestDataFactory.person(
-			new Contact(FirstName = 'Ann', LastName = 'Smith', AccountId = f.smith.Id)
-		);
-		f.bob = TestDataFactory.person(
-			new Contact(FirstName = 'Bob', LastName = 'Smith', AccountId = f.smith.Id)
-		);
-		f.cara = TestDataFactory.person(
-			new Contact(FirstName = 'Cara', LastName = 'Jones', AccountId = f.jones.Id)
-		);
+		f.ann = TestDataFactory.person(new Contact(FirstName = 'Ann', LastName = 'Smith', AccountId = f.smith.Id));
+		f.bob = TestDataFactory.person(new Contact(FirstName = 'Bob', LastName = 'Smith', AccountId = f.smith.Id));
+		f.cara = TestDataFactory.person(new Contact(FirstName = 'Cara', LastName = 'Jones', AccountId = f.jones.Id));
 		insert new List<Contact>{ f.ann, f.bob, f.cara };
 		f.source.add(f.smith, 'Ms. Ann Smith and Mr. Bob Smith', 'Ann and Bob', f.ann.Id, true);
 		f.source.add(f.jones, 'Ms. Cara Jones', 'Cara', f.ann.Id, false);
@@ -148,10 +142,7 @@ private class NpspHouseholdAdoptionTest {
 					WITH SYSTEM_MODE
 				][0]
 				.get('total');
-			Assert.isTrue(
-				failures != null && failures >= 2,
-				'Both failures are written to the Error Log'
-			);
+			Assert.isTrue(failures != null && failures >= 2, 'Both failures are written to the Error Log');
 		}
 	}
 
@@ -159,9 +150,7 @@ private class NpspHouseholdAdoptionTest {
 	static void previewCountsAndSamplesCandidates() {
 		System.runAs(TestUsers.admin()) {
 			Fixture f = fixture();
-			NpspHouseholdAdoptionService.Status status = NpspHouseholdAdoptionController.getStatus(
-				null
-			);
+			NpspHouseholdAdoptionService.Status status = NpspHouseholdAdoptionController.getStatus(null);
 			Assert.isTrue(status.available, 'the fake source has households');
 			Assert.areEqual(2, status.candidateCount, 'both households are candidates');
 			Assert.isFalse(status.moreThanLimit, 'two is under the run limit');
@@ -208,13 +197,14 @@ private class NpspHouseholdAdoptionTest {
 			Assert.areEqual(household, jones.RecordTypeId, 'Joneses adopted too');
 			Assert.areNotEqual(f.ann.Id, jones.Primary_Contact__c, 'Ann is not a Jones');
 
-			List<Household_Adoption__c> journal = [
+			List<Merge_Journal__c> journal = [
 				SELECT Account_Id__c, Run_Id__c, Status__c, Previous_Record_Type_Id__c
-				FROM Household_Adoption__c
+				FROM Merge_Journal__c
+				WHERE Kind__c = 'Household Adoption'
 				WITH SYSTEM_MODE
 			];
 			Assert.areEqual(2, journal.size(), 'one row per adopted account');
-			for (Household_Adoption__c row : journal) {
+			for (Merge_Journal__c row : journal) {
 				Assert.areEqual(runId, row.Run_Id__c, 'the run started');
 				Assert.areEqual('Adopted', row.Status__c, 'adopted');
 				if (row.Account_Id__c == String.valueOf(f.smith.Id)) {
@@ -276,17 +266,10 @@ private class NpspHouseholdAdoptionTest {
 			Id expectedType = was.RecordTypeId;
 			if (expectedType == null) {
 				Account probe = TestDataFactory.household(
-					new Account(
-						Name = PREFIX + 'Probe',
-						RecordTypeId = HouseholdService.householdRecordTypeId()
-					)
+					new Account(Name = PREFIX + 'Probe', RecordTypeId = HouseholdService.householdRecordTypeId())
 				);
 				Database.insert(probe, true, AccessLevel.SYSTEM_MODE);
-				Database.update(
-					new Account(Id = probe.Id, RecordTypeId = null),
-					true,
-					AccessLevel.SYSTEM_MODE
-				);
+				Database.update(new Account(Id = probe.Id, RecordTypeId = null), true, AccessLevel.SYSTEM_MODE);
 				expectedType = [
 					SELECT RecordTypeId
 					FROM Account
@@ -304,22 +287,19 @@ private class NpspHouseholdAdoptionTest {
 				Assert.isNull(smith.Primary_Contact__c, 'primary put back to blank');
 			}
 
-			Map<String, Household_Adoption__c> rows = new Map<String, Household_Adoption__c>();
-			for (Household_Adoption__c row : [
-				SELECT Account_Id__c, Status__c, Note__c
-				FROM Household_Adoption__c
+			Map<String, Merge_Journal__c> rows = new Map<String, Merge_Journal__c>();
+			for (Merge_Journal__c row : [
+				SELECT Account_Id__c, Status__c, Notes__c
+				FROM Merge_Journal__c
+				WHERE Kind__c = 'Household Adoption'
 				WITH SYSTEM_MODE
 			]) {
 				rows.put(row.Account_Id__c, row);
 			}
 			Assert.areEqual('Undone', rows.get(String.valueOf(f.smith.Id)).Status__c, 'undone');
-			Household_Adoption__c gone = rows.get(String.valueOf(f.jones.Id));
+			Merge_Journal__c gone = rows.get(String.valueOf(f.jones.Id));
 			Assert.areEqual('Not Restored', gone.Status__c, 'deleted account not restored');
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_NpspAdoption_NoteGone'),
-				gone.Note__c,
-				'says why'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_NpspAdoption_NoteGone'), gone.Notes__c, 'says why');
 		}
 	}
 
@@ -328,53 +308,31 @@ private class NpspHouseholdAdoptionTest {
 		System.runAs(TestUsers.admin()) {
 			fixture();
 			assertRefused(
-				String.format(
-					BarnHelp.text('Core', 'Core_NpspAdoption_ErrorCountChanged'),
-					new List<Object>{ 2, 1 }
-				),
+				String.format(BarnHelp.text('Core', 'Core_NpspAdoption_ErrorCountChanged'), new List<Object>{ 2, 1 }),
 				1,
 				'count grew'
 			);
 			assertRefused(
-				String.format(
-					BarnHelp.text('Core', 'Core_NpspAdoption_ErrorCountChanged'),
-					new List<Object>{ 2, 0 }
-				),
+				String.format(BarnHelp.text('Core', 'Core_NpspAdoption_ErrorCountChanged'), new List<Object>{ 2, 0 }),
 				null,
 				'unconfirmed'
 			);
 
 			NpspHouseholdAdoptionService.runningOverride = true;
-			assertRefused(
-				BarnHelp.text('Core', 'Core_NpspAdoption_ErrorRunning'),
-				2,
-				'a run is in progress'
-			);
+			assertRefused(BarnHelp.text('Core', 'Core_NpspAdoption_ErrorRunning'), 2, 'a run is in progress');
 			NpspHouseholdAdoptionService.runningOverride = null;
 
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
-			assertRefused(
-				BarnHelp.text('Core', 'Core_NpspAdoption_ErrorJunctionMode'),
-				2,
-				'junction mode'
-			);
+			assertRefused(BarnHelp.text('Core', 'Core_NpspAdoption_ErrorJunctionMode'), 2, 'junction mode');
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 
 			NpspHouseholdAdoptionService.permissionOverride = false;
-			assertRefused(
-				BarnHelp.text('Core', 'Core_NpspAdoption_ErrorNoPermission'),
-				2,
-				'no permission'
-			);
+			assertRefused(BarnHelp.text('Core', 'Core_NpspAdoption_ErrorNoPermission'), 2, 'no permission');
 			try {
 				NpspHouseholdAdoptionController.getStatus(null);
 				Assert.fail('status needs the permission too');
 			} catch (AuraHandledException e) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_NpspAdoption_ErrorNoPermission'),
-					e.getMessage(),
-					'why'
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_NpspAdoption_ErrorNoPermission'), e.getMessage(), 'why');
 			}
 			NpspHouseholdAdoptionService.permissionOverride = null;
 
@@ -382,19 +340,11 @@ private class NpspHouseholdAdoptionTest {
 				NpspHouseholdAdoptionController.undo('no-such-run', 1);
 				Assert.fail('nothing to undo');
 			} catch (AuraHandledException e) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_NpspAdoption_ErrorNothingToUndo'),
-					e.getMessage(),
-					'why'
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_NpspAdoption_ErrorNothingToUndo'), e.getMessage(), 'why');
 			}
 
 			NpspHouseholdSource.instance = new FakeSource();
-			assertRefused(
-				BarnHelp.text('Core', 'Core_NpspAdoption_ErrorNothingToAdopt'),
-				2,
-				'nothing to adopt'
-			);
+			assertRefused(BarnHelp.text('Core', 'Core_NpspAdoption_ErrorNothingToAdopt'), 2, 'nothing to adopt');
 		}
 	}
 
@@ -407,7 +357,12 @@ private class NpspHouseholdAdoptionTest {
 		}
 		Assert.areEqual(
 			0,
-			[SELECT COUNT() FROM Household_Adoption__c WITH SYSTEM_MODE],
+			[
+				SELECT COUNT()
+				FROM Merge_Journal__c
+				WHERE Kind__c = 'Household Adoption'
+				WITH SYSTEM_MODE
+			],
 			'nothing adopted: ' + why
 		);
 	}
@@ -435,7 +390,12 @@ private class NpspHouseholdAdoptionTest {
 			if (!source.available()) {
 				Assert.areEqual(
 					0,
-					[SELECT COUNT() FROM Household_Adoption__c WITH SYSTEM_MODE],
+					[
+						SELECT COUNT()
+						FROM Merge_Journal__c
+						WHERE Kind__c = 'Household Adoption'
+						WITH SYSTEM_MODE
+					],
 					'an org without NPSP adopts nothing'
 				);
 			}

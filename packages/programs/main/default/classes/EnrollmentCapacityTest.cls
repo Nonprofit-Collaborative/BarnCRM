@@ -15,26 +15,18 @@ private class EnrollmentCapacityTest {
 	}
 
 	private static void setUp(Boolean waitlist) {
-		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-			HouseholdTestDataFactory.MODE_CONTACT
-		);
+		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 		settings.Auto_Create_Households__c = false;
 		TestDataFactory.saveSettings(settings);
 		OrgSettingsSystemWriter.save(
 			Programs_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{
-				Programs_Settings__c.Waitlist_Enabled__c => waitlist
-			}
+			new Map<Schema.SObjectField, Object>{ Programs_Settings__c.Waitlist_Enabled__c => waitlist }
 		);
 		SettingsService.clearCaches();
 	}
 
 	private static Program__c program(Integer capacity) {
-		Program__c record = new Program__c(
-			Name = 'Tutoring',
-			Status__c = 'Active',
-			Capacity__c = capacity
-		);
+		Program__c record = new Program__c(Name = 'Tutoring', Status__c = 'Active', Capacity__c = capacity);
 		insert record;
 		return record;
 	}
@@ -47,13 +39,7 @@ private class EnrollmentCapacityTest {
 		insert people;
 		List<Enrollment__c> records = new List<Enrollment__c>();
 		for (Contact person : people) {
-			records.add(
-				new Enrollment__c(
-					Program__c = programId,
-					Contact__c = person.Id,
-					Stage__c = 'Enrolled'
-				)
-			);
+			records.add(new Enrollment__c(Program__c = programId, Contact__c = person.Id, Stage__c = 'Enrolled'));
 		}
 		insert records;
 		return records;
@@ -84,11 +70,7 @@ private class EnrollmentCapacityTest {
 			enroll(full.Id, 3);
 			Test.stopTest();
 
-			Assert.areEqual(
-				3,
-				countAt('Enrolled'),
-				'Nothing is waitlisted while the setting is off.'
-			);
+			Assert.areEqual(3, countAt('Enrolled'), 'Nothing is waitlisted while the setting is off.');
 		}
 	}
 
@@ -106,28 +88,14 @@ private class EnrollmentCapacityTest {
 			Assert.areEqual('Enrolled', byId.get(saved[0].Id).Stage__c, 'The first fits.');
 			Assert.areEqual('Enrolled', byId.get(saved[1].Id).Stage__c, 'The second fits.');
 			for (Integer i = 2; i < 5; i++) {
-				Assert.areEqual(
-					'Waitlisted',
-					byId.get(saved[i].Id).Stage__c,
-					'Past Capacity, in order.'
-				);
-				Assert.isNull(
-					byId.get(saved[i].Id).Start_Date__c,
-					'A waitlisted person has not started.'
-				);
+				Assert.areEqual('Waitlisted', byId.get(saved[i].Id).Stage__c, 'Past Capacity, in order.');
+				Assert.isNull(byId.get(saved[i].Id).Start_Date__c, 'A waitlisted person has not started.');
 			}
 			Database.SaveResult again = Database.insert(
-				new Enrollment__c(
-					Program__c = tutoring.Id,
-					Contact__c = saved[4].Contact__c,
-					Stage__c = 'Applied'
-				),
+				new Enrollment__c(Program__c = tutoring.Id, Contact__c = saved[4].Contact__c, Stage__c = 'Applied'),
 				false
 			);
-			Assert.isFalse(
-				again.isSuccess(),
-				'Waitlisted is open: one open enrollment per person (R-EN2).'
-			);
+			Assert.isFalse(again.isSuccess(), 'Waitlisted is open: one open enrollment per person (R-EN2).');
 		}
 	}
 
@@ -144,26 +112,10 @@ private class EnrollmentCapacityTest {
 			delete new Enrollment__c(Id = saved[1].Id);
 			Test.stopTest();
 
-			Assert.areEqual(
-				'Enrolled',
-				afterWithdraw.get(saved[1].Id).Stage__c,
-				'The oldest waiting moves up.'
-			);
-			Assert.areEqual(
-				Date.today(),
-				afterWithdraw.get(saved[1].Id).Start_Date__c,
-				'R-EN3 fills the Start Date.'
-			);
-			Assert.areEqual(
-				'Waitlisted',
-				afterWithdraw.get(saved[2].Id).Stage__c,
-				'One place, one moved.'
-			);
-			Assert.areEqual(
-				'Enrolled',
-				stored().get(saved[2].Id).Stage__c,
-				'A deleted enrollment frees its place.'
-			);
+			Assert.areEqual('Enrolled', afterWithdraw.get(saved[1].Id).Stage__c, 'The oldest waiting moves up.');
+			Assert.areEqual(Date.today(), afterWithdraw.get(saved[1].Id).Start_Date__c, 'R-EN3 fills the Start Date.');
+			Assert.areEqual('Waitlisted', afterWithdraw.get(saved[2].Id).Stage__c, 'One place, one moved.');
+			Assert.areEqual('Enrolled', stored().get(saved[2].Id).Stage__c, 'A deleted enrollment frees its place.');
 		}
 	}
 

@@ -32,12 +32,7 @@
 public without sharing class RollupLargeParentBatch implements Database.Batchable<SObject>, Database.Stateful {
 	public static final String CLASS_NAME = 'RollupLargeParentBatch';
 	private static final String LOG_CONTEXT = CLASS_NAME;
-	private static final Set<String> RUNNING = new Set<String>{
-		'Holding',
-		'Queued',
-		'Preparing',
-		'Processing'
-	};
+	private static final Set<String> RUNNING = new Set<String>{ 'Holding', 'Queued', 'Preparing', 'Processing' };
 
 	/** How long the entries a run holds wait before the queue may try them again. */
 	@TestVisible
@@ -119,16 +114,12 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
 	 * run of its own (R-RQ6).
 	 */
 	public static Integer largeParentRows() {
-		return largeParentRowsForTest != null
-			? largeParentRowsForTest
-			: Limits.getLimitQueryRows() * 2 / 5;
+		return largeParentRowsForTest != null ? largeParentRowsForTest : Limits.getLimitQueryRows() * 2 / 5;
 	}
 
 	/** The source rows one queue run may expect to read across its whole slice. */
 	public static Integer sliceRowBudget() {
-		return sliceRowBudgetForTest != null
-			? sliceRowBudgetForTest
-			: Limits.getLimitQueryRows() * 3 / 5;
+		return sliceRowBudgetForTest != null ? sliceRowBudgetForTest : Limits.getLimitQueryRows() * 3 / 5;
 	}
 
 	/** Test seam: stands in for `sliceRowBudget`; null reads the platform's limit. */
@@ -146,9 +137,7 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
 	 * stopping the run (`RollupAggregator.limitQueryRows`, R-RQ6).
 	 */
 	public static Integer queueRowCeiling() {
-		return queueRowCeilingForTest != null
-			? queueRowCeilingForTest
-			: Limits.getLimitQueryRows() * 4 / 5;
+		return queueRowCeilingForTest != null ? queueRowCeilingForTest : Limits.getLimitQueryRows() * 4 / 5;
 	}
 
 	/** Test seam: stands in for `queueRowCeiling`; null reads the platform's limit. */
@@ -219,9 +208,7 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
 	 * @return the API names of the fields
 	 */
 	public static Set<String> storedCountFields(Schema.SObjectType targetType) {
-		Map<String, Schema.SObjectField> fieldMap = targetType.getDescribe(
-				SObjectDescribeOptions.DEFERRED
-			)
+		Map<String, Schema.SObjectField> fieldMap = targetType.getDescribe(SObjectDescribeOptions.DEFERRED)
 			.fields.getMap();
 		Set<String> countFields = new Set<String>();
 		for (
@@ -258,10 +245,7 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
 			if (locked.isEmpty()) {
 				try {
 					if (competingLockForTest) {
-						Database.insert(
-							new Rollup_Run_Lock__c(SetupOwnerId = org),
-							AccessLevel.SYSTEM_MODE
-						);
+						Database.insert(new Rollup_Run_Lock__c(SetupOwnerId = org), AccessLevel.SYSTEM_MODE);
 					}
 					Rollup_Run_Lock__c created = new Rollup_Run_Lock__c(SetupOwnerId = org);
 					Database.insert(created, AccessLevel.SYSTEM_MODE);
@@ -392,8 +376,7 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
 		List<Rollup_Queue__c> held = new List<Rollup_Queue__c>();
 		List<Rollup_Queue__c> changes = new List<Rollup_Queue__c>();
 		for (Rollup_Queue__c entry : entries) {
-			Integer attempts =
-				(entry.Attempts__c == null ? 0 : entry.Attempts__c.intValue()) + (charge ? 1 : 0);
+			Integer attempts = (entry.Attempts__c == null ? 0 : entry.Attempts__c.intValue()) + (charge ? 1 : 0);
 			Rollup_Queue__c change = new Rollup_Queue__c(
 				Id = entry.Id,
 				Attempts__c = attempts,
@@ -416,12 +399,7 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
 	private static void renew(List<Rollup_Queue__c> entries) {
 		List<Rollup_Queue__c> changes = new List<Rollup_Queue__c>();
 		for (Rollup_Queue__c entry : entries) {
-			changes.add(
-				new Rollup_Queue__c(
-					Id = entry.Id,
-					Next_Attempt__c = Datetime.now().addMinutes(LEASE_MINUTES)
-				)
-			);
+			changes.add(new Rollup_Queue__c(Id = entry.Id, Next_Attempt__c = Datetime.now().addMinutes(LEASE_MINUTES)));
 		}
 		Database.update(changes, false, AccessLevel.SYSTEM_MODE);
 	}
@@ -466,10 +444,7 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
 			Target target = byName.get(name);
 			target.entries.add(entry);
 			target.parentIds.addAll(RollupQueue.idsOf(entry));
-			target.attempts = Math.max(
-				target.attempts,
-				entry.Attempts__c == null ? 0 : entry.Attempts__c.intValue()
-			);
+			target.attempts = Math.max(target.attempts, entry.Attempts__c == null ? 0 : entry.Attempts__c.intValue());
 			List<Id> named = RollupQueue.definitionIdsOf(entry);
 			if (named.isEmpty()) {
 				target.definitionIds = null;
@@ -501,17 +476,11 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
 	/** The source rows of the current query, by Id only. */
 	public Database.QueryLocator start(Database.BatchableContext context) {
 		try {
-			return RollupAggregator.sourceRows(
-				currentPlan(),
-				this.queryIndex,
-				currentTarget().parentIds
-			);
+			return RollupAggregator.sourceRows(currentPlan(), this.queryIndex, currentTarget().parentIds);
 		} catch (Exception refused) {
 			ErrorLogger.log(refused, LOG_CONTEXT);
 			currentTarget().stoppedReason = refused.getMessage();
-			return Database.getQueryLocator(
-				[SELECT Id FROM Rollup_Queue__c WHERE Id = NULL WITH SYSTEM_MODE]
-			);
+			return Database.getQueryLocator([SELECT Id FROM Rollup_Queue__c WHERE Id = NULL WITH SYSTEM_MODE]);
 		}
 	}
 
@@ -598,18 +567,9 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
 			Database.update(released, false, AccessLevel.SYSTEM_MODE);
 			return;
 		}
-		RollupEngine.Result result = RollupEngine.writeCalculated(
-			plan,
-			target.parentIds,
-			this.answer
-		);
+		RollupEngine.Result result = RollupEngine.writeCalculated(plan, target.parentIds, this.answer);
 		if (!result.failed.isEmpty()) {
-			RollupQueue.retryLater(
-				target.name,
-				result.failed,
-				target.attempts,
-				target.definitionIds
-			);
+			RollupQueue.retryLater(target.name, result.failed, target.attempts, target.definitionIds);
 		}
 		Database.delete(target.entries, false, AccessLevel.SYSTEM_MODE);
 	}

@@ -316,12 +316,7 @@ public with sharing class HealthCheckService {
 		@NamespaceAccessible
 		public Link(SObject record) {
 			this.label = String.valueOf(record.get('Name'));
-			this.url =
-				'/lightning/r/' +
-				record.getSObjectType().getDescribe().getName() +
-				'/' +
-				record.Id +
-				'/view';
+			this.url = '/lightning/r/' + record.getSObjectType().getDescribe().getName() + '/' + record.Id + '/view';
 		}
 	}
 
@@ -360,9 +355,16 @@ public with sharing class HealthCheckService {
 		/** After a fix: what it created or scheduled, and what it left out. Null otherwise. */
 		@AuraEnabled
 		public String fixOutcome;
+		/**
+		 * The keys of the checks this run left because it stopped early to stay inside the
+		 * limits, for Run Remaining Checks; empty when every check ran (D-208, N-07).
+		 */
+		@AuraEnabled
+		public List<String> skippedChecks;
 
 		public Report() {
 			this.findings = new List<Finding>();
+			this.skippedChecks = new List<String>();
 			this.modeNeedsAttention = false;
 			this.canManageSettings = false;
 			this.settingsTabApiName = NamespaceUtil.qualify(SETTINGS_TAB);
@@ -402,16 +404,12 @@ public with sharing class HealthCheckService {
 	private class OrgAccessCounts implements AccessCounts {
 		public Integer administrators() {
 			return UserAccessSelector.countActiveAssignees(new Set<String>{ GROUP_ADMIN }) +
-				UserAccessSelector.countActiveDirectAssignees(
-					new Set<String>{ PERMISSION_SET_ADMIN }
-				);
+				UserAccessSelector.countActiveDirectAssignees(new Set<String>{ PERMISSION_SET_ADMIN });
 		}
 
 		public Integer usersWithoutAccess() {
 			Set<Id> assigned = UserAccessSelector.getAssignedUserIds(BARNCRM_GROUPS);
-			assigned.addAll(
-				UserAccessSelector.getPermissionSetAssigneeIds(BARNCRM_PERMISSION_SETS)
-			);
+			assigned.addAll(UserAccessSelector.getPermissionSetAssigneeIds(BARNCRM_PERMISSION_SETS));
 			return UserAccessSelector.countActiveStandardUsersExcluding(assigned);
 		}
 	}
@@ -439,10 +437,27 @@ public with sharing class HealthCheckService {
 	 */
 	@NamespaceAccessible
 	public static List<Finding> run() {
+		return run(null);
+	}
+
+	/**
+	 * The keys of the checks the last run in this transaction left because it stopped early to
+	 * stay inside the limits; empty when every check ran.
+	 */
+	private static List<String> lastSkipped = new List<String>();
+
+	/**
+	 * The same, running only the checks whose keys are given (null for all of them): how
+	 * Run Remaining Checks runs just the checks an earlier run left (D-208, N-07).
+	 */
+	private static List<Finding> run(Set<String> only) {
 		List<Finding> findings = new List<Finding>();
 		List<String> skipped = new List<String>();
 
 		for (CheckStep step : steps()) {
+			if (only != null && !only.contains(step.key)) {
+				continue;
+			}
 			if (!skipped.isEmpty() || nearLimits()) {
 				skipped.add(step.key);
 				continue;
@@ -457,10 +472,11 @@ public with sharing class HealthCheckService {
 			}
 		}
 
-		findings.addAll(extensionFindings(skipped));
+		findings.addAll(extensionFindings(skipped, only));
 		if (!skipped.isEmpty()) {
 			findings.add(notChecked(skipped));
 		}
+		lastSkipped = skipped;
 
 		return findings;
 	}
@@ -503,70 +519,31 @@ public with sharing class HealthCheckService {
 			'coexistence_mode' => BarnHelp.text('Core', 'Core_HealthCheck_Step_CoexistenceMode'),
 			'membership_mode' => BarnHelp.text('Core', 'Core_HealthCheck_Step_MembershipMode'),
 			'membership_data' => BarnHelp.text('Core', 'Core_HealthCheck_Step_MembershipData'),
-			'household_creation' => BarnHelp.text(
-				'Core',
-				'Core_HealthCheck_Step_HouseholdCreation'
-			),
-			'npsp_upkeep_overlap' => BarnHelp.text(
-				'Core',
-				'Core_HealthCheck_Step_NpspUpkeepOverlap'
-			),
+			'household_creation' => BarnHelp.text('Core', 'Core_HealthCheck_Step_HouseholdCreation'),
+			'npsp_upkeep_overlap' => BarnHelp.text('Core', 'Core_HealthCheck_Step_NpspUpkeepOverlap'),
 			'native_households' => BarnHelp.text('Core', 'Core_HealthCheck_Step_NativeHouseholds'),
-			'native_household_collision' => BarnHelp.text(
-				'Core',
-				'Core_HealthCheck_Step_NativeHouseholdCollision'
-			),
+			'native_household_collision' => BarnHelp.text('Core', 'Core_HealthCheck_Step_NativeHouseholdCollision'),
 			'mirror_module' => BarnHelp.text('Core', 'Core_HealthCheck_Step_MirrorModule'),
 			'brand_visibility' => BarnHelp.text('Core', 'Core_HealthCheck_Step_BrandVisibility'),
 			'multi_currency' => BarnHelp.text('Core', 'Core_HealthCheck_Step_MultiCurrency'),
 			'admin_role' => BarnHelp.text('Core', 'Core_HealthCheck_Step_AdminRole'),
-			'users_without_access' => BarnHelp.text(
-				'Core',
-				'Core_HealthCheck_Step_UsersWithoutAccess'
-			),
-			'access_checks_need_admin' => BarnHelp.text(
-				'Core',
-				'Core_HealthCheck_Step_AccessChecks'
-			),
+			'users_without_access' => BarnHelp.text('Core', 'Core_HealthCheck_Step_UsersWithoutAccess'),
+			'access_checks_need_admin' => BarnHelp.text('Core', 'Core_HealthCheck_Step_AccessChecks'),
 			'automation' => BarnHelp.text('Core', 'Core_HealthCheck_Step_Automation'),
 			'field_history' => BarnHelp.text('Core', 'Core_HealthCheck_Step_FieldHistory'),
 			'fiscal_year' => BarnHelp.text('Core', 'Core_HealthCheck_Step_FiscalYear'),
-			'organization_record_type' => BarnHelp.text(
-				'Core',
-				'Core_HealthCheck_Step_OrganizationRecordType'
-			),
+			'organization_record_type' => BarnHelp.text('Core', 'Core_HealthCheck_Step_OrganizationRecordType'),
 			'error_log' => BarnHelp.text('Core', 'Core_HealthCheck_Step_ErrorLog'),
 			'error_digest' => BarnHelp.text('Core', 'Core_HealthCheck_Step_ErrorDigest'),
-			'people_without_household' => BarnHelp.text(
-				'Core',
-				'Core_HealthCheck_Step_PeopleWithoutHousehold'
-			),
-			'households_without_members' => BarnHelp.text(
-				'Core',
-				'Core_HealthCheck_Step_HouseholdsWithoutMembers'
-			),
-			'household_ownership_skew' => BarnHelp.text(
-				'Core',
-				'Core_HealthCheck_Step_HouseholdOwnershipSkew'
-			),
-			'relationships_without_person' => BarnHelp.text(
-				'Core',
-				'Core_HealthCheck_Step_RelationshipsWithoutPerson'
-			),
-			'affiliations_without_person' => BarnHelp.text(
-				'Core',
-				'Core_HealthCheck_Step_AffiliationsWithoutPerson'
-			),
-			'automation_switches' => BarnHelp.text(
-				'Core',
-				'Core_HealthCheck_Step_AutomationSwitches'
-			),
+			'people_without_household' => BarnHelp.text('Core', 'Core_HealthCheck_Step_PeopleWithoutHousehold'),
+			'households_without_members' => BarnHelp.text('Core', 'Core_HealthCheck_Step_HouseholdsWithoutMembers'),
+			'household_ownership_skew' => BarnHelp.text('Core', 'Core_HealthCheck_Step_HouseholdOwnershipSkew'),
+			'relationships_without_person' => BarnHelp.text('Core', 'Core_HealthCheck_Step_RelationshipsWithoutPerson'),
+			'affiliations_without_person' => BarnHelp.text('Core', 'Core_HealthCheck_Step_AffiliationsWithoutPerson'),
+			'automation_switches' => BarnHelp.text('Core', 'Core_HealthCheck_Step_AutomationSwitches'),
 			'import_templates' => BarnHelp.text('Core', 'Core_HealthCheck_Step_ImportTemplates'),
 			'nightly_jobs' => BarnHelp.text('Core', 'Core_HealthCheck_Step_NightlyJobs'),
-			'jobs_inactive_owner' => BarnHelp.text(
-				'Core',
-				'Core_HealthCheck_Step_JobsInactiveOwner'
-			),
+			'jobs_inactive_owner' => BarnHelp.text('Core', 'Core_HealthCheck_Step_JobsInactiveOwner'),
 			'module_setup' => BarnHelp.text('Core', 'Core_HealthCheck_Step_ModuleSetup'),
 			'match_keys' => BarnHelp.text('Core', 'Core_HealthCheck_Step_MatchKeys')
 		};
@@ -596,10 +573,13 @@ public with sharing class HealthCheckService {
 	 * stands, and the failure is written to the Error Log rather than shown as this package's
 	 * own answer.
 	 */
-	private static List<Finding> extensionFindings(List<String> skipped) {
+	private static List<Finding> extensionFindings(List<String> skipped, Set<String> only) {
 		List<Finding> all = new List<Finding>();
 		Map<String, HealthCheckExtension> byKey = HealthCheckExtensions.findAll();
 		for (String key : byKey.keySet()) {
+			if (only != null && !only.contains(key)) {
+				continue;
+			}
 			if (!skipped.isEmpty() || nearLimits()) {
 				skipped.add(key);
 				continue;
@@ -631,54 +611,21 @@ public with sharing class HealthCheckService {
 		}
 
 		steps.add(new CheckStep('org_shape', new HealthCheckOrgShapeChecks.OrgShapeCheck()));
+		steps.add(new CheckStep('coexistence_mode', new HealthCheckOrgShapeChecks.CoexistenceModeCheck()));
+		steps.add(new CheckStep('membership_mode', new HealthCheckOrgShapeChecks.MembershipModeCheck()));
+		steps.add(new CheckStep('membership_data', new HealthCheckOrgShapeChecks.MembershipDataCheck()));
+		steps.add(new CheckStep('household_creation', new HealthCheckOrgShapeChecks.HouseholdCreationCheck()));
+		steps.add(new CheckStep('npsp_upkeep_overlap', new HealthCheckOrgShapeChecks.NpspUpkeepOverlapCheck()));
+		steps.add(new CheckStep('native_households', new HealthCheckOrgShapeChecks.NativeHouseholdsCheck()));
 		steps.add(
-			new CheckStep('coexistence_mode', new HealthCheckOrgShapeChecks.CoexistenceModeCheck())
+			new CheckStep('native_household_collision', new HealthCheckOrgShapeChecks.NativeHouseholdCollisionCheck())
 		);
-		steps.add(
-			new CheckStep('membership_mode', new HealthCheckOrgShapeChecks.MembershipModeCheck())
-		);
-		steps.add(
-			new CheckStep('membership_data', new HealthCheckOrgShapeChecks.MembershipDataCheck())
-		);
-		steps.add(
-			new CheckStep(
-				'household_creation',
-				new HealthCheckOrgShapeChecks.HouseholdCreationCheck()
-			)
-		);
-		steps.add(
-			new CheckStep(
-				'npsp_upkeep_overlap',
-				new HealthCheckOrgShapeChecks.NpspUpkeepOverlapCheck()
-			)
-		);
-		steps.add(
-			new CheckStep(
-				'native_households',
-				new HealthCheckOrgShapeChecks.NativeHouseholdsCheck()
-			)
-		);
-		steps.add(
-			new CheckStep(
-				'native_household_collision',
-				new HealthCheckOrgShapeChecks.NativeHouseholdCollisionCheck()
-			)
-		);
-		steps.add(
-			new CheckStep('mirror_module', new HealthCheckOrgShapeChecks.MirrorModuleCheck())
-		);
+		steps.add(new CheckStep('mirror_module', new HealthCheckOrgShapeChecks.MirrorModuleCheck()));
 		steps.add(new CheckStep('brand_visibility', new BrandShareJob.VisibilityCheck()));
-		steps.add(
-			new CheckStep('multi_currency', new HealthCheckOrgShapeChecks.MultiCurrencyCheck())
-		);
+		steps.add(new CheckStep('multi_currency', new HealthCheckOrgShapeChecks.MultiCurrencyCheck()));
 
 		if (canManageSettings()) {
-			steps.add(
-				new CheckStep(
-					'admin_role',
-					new HealthCheckAccessChecks.NoAdminCheck(accessCounts())
-				)
-			);
+			steps.add(new CheckStep('admin_role', new HealthCheckAccessChecks.NoAdminCheck(accessCounts())));
 			steps.add(
 				new CheckStep(
 					'users_without_access',
@@ -686,34 +633,21 @@ public with sharing class HealthCheckService {
 				)
 			);
 		} else {
-			steps.add(
-				new CheckStep(
-					'access_checks_need_admin',
-					new HealthCheckAccessChecks.NeedsAdminCheck()
-				)
-			);
+			steps.add(new CheckStep('access_checks_need_admin', new HealthCheckAccessChecks.NeedsAdminCheck()));
 		}
 
 		steps.add(new CheckStep('automation', new HealthCheckSettingsChecks.AutomationCheck()));
 		steps.add(new CheckStep('field_history', new FieldHistoryService.HealthCheck()));
 		steps.add(new CheckStep('fiscal_year', new HealthCheckSettingsChecks.FiscalYearCheck()));
 		steps.add(
-			new CheckStep(
-				'organization_record_type',
-				new HealthCheckSettingsChecks.OrganizationRecordTypeCheck()
-			)
+			new CheckStep('organization_record_type', new HealthCheckSettingsChecks.OrganizationRecordTypeCheck())
 		);
 
 		if (canManageSettings()) {
 			steps.add(new CheckStep('error_log', new HealthCheckSettingsChecks.ErrorLogCheck()));
+			steps.add(new CheckStep('error_digest', new HealthCheckSettingsChecks.ErrorDigestCheck()));
 			steps.add(
-				new CheckStep('error_digest', new HealthCheckSettingsChecks.ErrorDigestCheck())
-			);
-			steps.add(
-				new CheckStep(
-					'people_without_household',
-					new HealthCheckHouseholdChecks.PeopleWithoutHouseholdCheck()
-				)
+				new CheckStep('people_without_household', new HealthCheckHouseholdChecks.PeopleWithoutHouseholdCheck())
 			);
 			steps.add(
 				new CheckStep(
@@ -721,12 +655,7 @@ public with sharing class HealthCheckService {
 					new HealthCheckHouseholdChecks.HouseholdsWithoutMembersCheck()
 				)
 			);
-			steps.add(
-				new CheckStep(
-					'household_ownership_skew',
-					new HealthCheckSkew.HouseholdOwnershipCheck()
-				)
-			);
+			steps.add(new CheckStep('household_ownership_skew', new HealthCheckSkew.HouseholdOwnershipCheck()));
 			steps.add(
 				new CheckStep(
 					'relationships_without_person',
@@ -739,27 +668,10 @@ public with sharing class HealthCheckService {
 					new HealthCheckHouseholdChecks.AffiliationsWithoutPersonCheck()
 				)
 			);
-			steps.add(
-				new CheckStep(
-					'automation_switches',
-					new HealthCheckSettingsChecks.AutomationSwitchesCheck()
-				)
-			);
-			steps.add(
-				new CheckStep(
-					'import_templates',
-					new HealthCheckSettingsChecks.ImportTemplatesCheck()
-				)
-			);
-			steps.add(
-				new CheckStep('nightly_jobs', new HealthCheckSettingsChecks.NightlyJobsCheck())
-			);
-			steps.add(
-				new CheckStep(
-					'jobs_inactive_owner',
-					new HealthCheckSettingsChecks.InactiveOwnerJobsCheck()
-				)
-			);
+			steps.add(new CheckStep('automation_switches', new HealthCheckSettingsChecks.AutomationSwitchesCheck()));
+			steps.add(new CheckStep('import_templates', new HealthCheckSettingsChecks.ImportTemplatesCheck()));
+			steps.add(new CheckStep('nightly_jobs', new HealthCheckSettingsChecks.NightlyJobsCheck()));
+			steps.add(new CheckStep('jobs_inactive_owner', new HealthCheckSettingsChecks.InactiveOwnerJobsCheck()));
 			// A package copied in by hand, whose setup never ran (FS1).
 			steps.add(new CheckStep('module_setup', new ModuleSetups.SetupCheck()));
 			steps.add(new CheckStep('match_keys', new AddressMatchKeyHandler.FilledCheck()));
@@ -785,6 +697,7 @@ public with sharing class HealthCheckService {
 	public static Report buildReport() {
 		Report report = new Report();
 		report.findings = run();
+		report.skippedChecks = lastSkipped;
 		report.canManageSettings = canManageSettings();
 
 		try {
@@ -801,8 +714,7 @@ public with sharing class HealthCheckService {
 			report.currentModeLabel = modeLabel(report.currentMode);
 			report.modeNeedsAttention =
 				String.isBlank(report.currentMode) ||
-				(report.recommendedMode != null &&
-				!report.recommendedMode.equals(report.currentMode));
+				(report.recommendedMode != null && !report.recommendedMode.equals(report.currentMode));
 		} catch (Exception e) {
 			logQuietly(e);
 		}
@@ -813,6 +725,28 @@ public with sharing class HealthCheckService {
 			logQuietly(e);
 		}
 
+		return report;
+	}
+
+	/**
+	 * Only the checks an earlier run left (D-208, N-07): their findings, and the keys of any it
+	 * had to leave again. The panel merges these into the report it already shows, so the org
+	 * shape and modes are not read again. The stored last result gains these findings in place
+	 * of the earlier Not Checked warning.
+	 */
+	public static Report buildRemainingReport(List<String> keys) {
+		Report report = new Report();
+		report.canManageSettings = canManageSettings();
+		if (keys == null || keys.isEmpty()) {
+			return report;
+		}
+		report.findings = run(new Set<String>(keys));
+		report.skippedChecks = lastSkipped;
+		try {
+			HealthCheckLastRun.addRemaining(report);
+		} catch (Exception e) {
+			logQuietly(e);
+		}
 		return report;
 	}
 

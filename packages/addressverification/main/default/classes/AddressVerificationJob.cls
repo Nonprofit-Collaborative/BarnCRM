@@ -25,7 +25,7 @@ public with sharing class AddressVerificationJob implements Database.Batchable<S
 		}
 	}
 
-	/** Starts the batch now, unless the module is off, the keys are missing or the limit is 0. */
+	/** Starts the batch now, unless the module is off, the provider is not connected or the limit is 0. */
 	public static Id startBatch() {
 		if (!AddressVerifier.isOn() || !AddressVerifier.isReady() || limitTonight() <= 0) {
 			return null;

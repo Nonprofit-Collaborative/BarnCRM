@@ -81,8 +81,7 @@ public with sharing class HealthCheckSettingsChecks {
 				)
 				?.withFix(
 					System.Label.Core_HealthCheck_SwitchesMissingFix,
-					HealthCheckService.FIX_ACTION_PREFIX +
-					HealthCheckService.FIX_KEY_RESTORE_AUTOMATION_SWITCHES
+					HealthCheckService.FIX_ACTION_PREFIX + HealthCheckService.FIX_KEY_RESTORE_AUTOMATION_SWITCHES
 				);
 		}
 	}
@@ -100,8 +99,7 @@ public with sharing class HealthCheckSettingsChecks {
 				)
 				?.withFix(
 					System.Label.Core_HealthCheck_TemplatesMissingFix,
-					HealthCheckService.FIX_ACTION_PREFIX +
-					HealthCheckService.FIX_KEY_RESTORE_IMPORT_TEMPLATES
+					HealthCheckService.FIX_ACTION_PREFIX + HealthCheckService.FIX_KEY_RESTORE_IMPORT_TEMPLATES
 				);
 		}
 	}
@@ -136,8 +134,7 @@ public with sharing class HealthCheckSettingsChecks {
 				)
 				.withFix(
 					System.Label.Core_HealthCheck_InactiveOwnerJobsFix,
-					HealthCheckService.FIX_ACTION_PREFIX +
-					HealthCheckService.FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS
+					HealthCheckService.FIX_ACTION_PREFIX + HealthCheckService.FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS
 				)
 				.withScope(stopped);
 		}
@@ -150,9 +147,7 @@ public with sharing class HealthCheckSettingsChecks {
 	 * the one place an administrator is told.
 	 */
 	private static HealthCheckService.Finding nightlyJobsFinding() {
-		List<String> waiting = HealthCheckService.fixScope(
-			HealthCheckService.FIX_KEY_SCHEDULE_NIGHTLY_JOBS
-		);
+		List<String> waiting = HealthCheckService.fixScope(HealthCheckService.FIX_KEY_SCHEDULE_NIGHTLY_JOBS);
 		if (waiting.isEmpty()) {
 			return null;
 		}
@@ -168,8 +163,7 @@ public with sharing class HealthCheckSettingsChecks {
 			)
 			.withFix(
 				System.Label.Core_HealthCheck_NightlyJobsFix,
-				HealthCheckService.FIX_ACTION_PREFIX +
-				HealthCheckService.FIX_KEY_SCHEDULE_NIGHTLY_JOBS
+				HealthCheckService.FIX_ACTION_PREFIX + HealthCheckService.FIX_KEY_SCHEDULE_NIGHTLY_JOBS
 			)
 			.withScope(waiting);
 	}
@@ -193,10 +187,7 @@ public with sharing class HealthCheckSettingsChecks {
 		if (missingNames == null || missingNames.isEmpty()) {
 			return null;
 		}
-		List<Object> values = new List<Object>{
-			String.valueOf(missingNames.size()),
-			String.join(missingNames, ', ')
-		};
+		List<Object> values = new List<Object>{ String.valueOf(missingNames.size()), String.join(missingNames, ', ') };
 		return new HealthCheckService.Finding(
 				key,
 				HealthCheckService.forCount(missingNames.size(), titleOne, title, values),
@@ -235,15 +226,10 @@ public with sharing class HealthCheckSettingsChecks {
 					? System.Label.Core_HealthCheck_PausedNoResumeTitle
 					: System.Label.Core_HealthCheck_AutomationPausedTitle,
 				detail,
-				withoutResume
-					? HealthCheckService.SEVERITY_WARNING
-					: HealthCheckService.SEVERITY_INFO,
+				withoutResume ? HealthCheckService.SEVERITY_WARNING : HealthCheckService.SEVERITY_INFO,
 				HealthCheckService.CATEGORY_SETTINGS
 			)
-			.withFix(
-				System.Label.Core_HealthCheck_AutomationFix,
-				HealthCheckService.SECTION_AUTOMATION
-			);
+			.withFix(System.Label.Core_HealthCheck_AutomationFix, HealthCheckService.SECTION_AUTOMATION);
 	}
 
 	/**
@@ -261,9 +247,7 @@ public with sharing class HealthCheckSettingsChecks {
 			System.Label.Core_HealthCheck_CustomFiscalYearTitle,
 			String.format(
 				BarnHelp.text('Core', 'Core_HealthCheck_CustomFiscalYearDetail'),
-				new List<Object>{
-					FiscalYearSelector.monthName(FiscalYearSelector.fiscalYearStartMonth())
-				}
+				new List<Object>{ FiscalYearSelector.monthName(FiscalYearSelector.fiscalYearStartMonth()) }
 			),
 			HealthCheckService.SEVERITY_INFO,
 			HealthCheckService.CATEGORY_SETTINGS
@@ -285,10 +269,7 @@ public with sharing class HealthCheckSettingsChecks {
 		}
 
 		String counted = newErrors > errorLogCap
-			? String.format(
-					System.Label.Core_HealthCheck_CountOrMore,
-					new List<Object>{ errorLogCap.format() }
-			  )
+			? String.format(System.Label.Core_HealthCheck_CountOrMore, new List<Object>{ errorLogCap.format() })
 			: newErrors.format();
 		List<Object> count = new List<Object>{ counted };
 		return new HealthCheckService.Finding(

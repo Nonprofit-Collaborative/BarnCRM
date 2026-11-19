@@ -21,12 +21,7 @@ private class ImportProcessorBatchTest {
 		List<Map<String, String>> values = new List<Map<String, String>>();
 		for (Integer i = 0; i < howManyRows; i++) {
 			values.add(
-				ImportTestDataFactory.donorRow(
-					'Person' + i,
-					'Surname' + i,
-					'person' + i + '@example.org',
-					null
-				)
+				ImportTestDataFactory.donorRow('Person' + i, 'Surname' + i, 'person' + i + '@example.org', null)
 			);
 		}
 		ImportTestDataFactory.rows(batch, values);
@@ -144,12 +139,7 @@ private class ImportProcessorBatchTest {
 			ImportTestDataFactory.rows(
 				batch,
 				new List<Map<String, String>>{
-					ImportTestDataFactory.donorRow(
-						'Ana',
-						'Ramirez',
-						'ana@example.org',
-						'Rose City'
-					),
+					ImportTestDataFactory.donorRow('Ana', 'Ramirez', 'ana@example.org', 'Rose City'),
 					ImportTestDataFactory.donorRow('Ben', 'Okafor', 'ben@example.org', null),
 					ImportTestDataFactory.donorRow('Ana', 'Ramirez', 'ana@example.org', 'Rose City')
 				}
@@ -162,19 +152,11 @@ private class ImportProcessorBatchTest {
 
 			Assert.areEqual(2, dryRun.Rows_Created__c, 'Ana is created once, not once a chunk.');
 			Assert.areEqual(1, dryRun.Rows_Matched__c, 'Her second row matches her (R-IB12).');
-			Assert.areEqual(
-				dryRun.Rows_Created__c,
-				committed.Rows_Created__c,
-				'As the commit did.'
-			);
+			Assert.areEqual(dryRun.Rows_Created__c, committed.Rows_Created__c, 'As the commit did.');
 			Assert.areEqual(dryRun.Rows_Matched__c, committed.Rows_Matched__c, 'And matched.');
 			Assert.areEqual(dryRun.Rows_Updated__c, committed.Rows_Updated__c, 'And updated.');
 			Assert.areEqual(2, [SELECT COUNT() FROM Contact], 'Two people exist.');
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Account WHERE Name = 'Rose City'],
-				'One organization.'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Account WHERE Name = 'Rose City'], 'One organization.');
 		}
 	}
 
@@ -264,15 +246,9 @@ private class ImportProcessorBatchTest {
 			mapping.columns.add(new ImportMapping.Column('Last Name', 'Contact1.LastName'));
 			mapping.columns.add(new ImportMapping.Column('Zip', 'Household.BillingPostalCode'));
 			Import_Batch__c batch = ImportTestDataFactory.batch(
-				ImportTestDataFactory.template(
-					mapping.serialize(),
-					ImportTemplateService.RULE_NAME_POSTAL
-				)
+				ImportTestDataFactory.template(mapping.serialize(), ImportTemplateService.RULE_NAME_POSTAL)
 			);
-			Map<String, String> ramirez = new Map<String, String>{
-				'Last Name' => 'Ramirez',
-				'Zip' => '97201'
-			};
+			Map<String, String> ramirez = new Map<String, String>{ 'Last Name' => 'Ramirez', 'Zip' => '97201' };
 			ImportTestDataFactory.rows(batch, new List<Map<String, String>>{ ramirez, ramirez });
 
 			Test.startTest();
@@ -298,10 +274,7 @@ private class ImportProcessorBatchTest {
 	static void twelveRowsOfOneNewDonorInOneChunkCreateOnePerson() {
 		System.runAs(TestUsers.admin()) {
 			Import_Batch__c batch = ImportTestDataFactory.batch(
-				ImportTestDataFactory.template(
-					ImportTestDataFactory.donorMapping(),
-					ImportTemplateService.RULE_EMAIL
-				)
+				ImportTestDataFactory.template(ImportTestDataFactory.donorMapping(), ImportTemplateService.RULE_EMAIL)
 			);
 			List<Map<String, String>> rows = new List<Map<String, String>>();
 			for (Integer month = 0; month < 12; month++) {
@@ -326,17 +299,9 @@ private class ImportProcessorBatchTest {
 			}
 			Assert.areEqual(1, anas.size(), 'Every one of her rows names the same Ana.');
 			Assert.areEqual(1, households.size(), 'In one household.');
-			Assert.areEqual(
-				2,
-				committed.Rows_Created__c,
-				'Her first row and Ben created somebody.'
-			);
+			Assert.areEqual(2, committed.Rows_Created__c, 'Her first row and Ben created somebody.');
 			Assert.areEqual(11, committed.Rows_Matched__c, 'Her other eleven matched her.');
-			Assert.areEqual(
-				committed.Rows_Created__c,
-				dryRun.Rows_Created__c,
-				'As the dry run said.'
-			);
+			Assert.areEqual(committed.Rows_Created__c, dryRun.Rows_Created__c, 'As the dry run said.');
 			Assert.areEqual(committed.Rows_Matched__c, dryRun.Rows_Matched__c, 'Both counts.');
 		}
 	}
@@ -356,24 +321,15 @@ private class ImportProcessorBatchTest {
 				mapping.columns.add(new ImportMapping.Column(target, target));
 			}
 			Import_Batch__c batch = ImportTestDataFactory.batch(
-				ImportTestDataFactory.template(
-					mapping.serialize(),
-					ImportTemplateService.RULE_EMAIL
-				)
+				ImportTestDataFactory.template(mapping.serialize(), ImportTemplateService.RULE_EMAIL)
 			);
 			// Ana is the second person on the first row and the first person on the second. The
 			// commit saves first people before second people, so the second row creates her.
 			ImportTestDataFactory.rows(
 				batch,
 				new List<Map<String, String>>{
-					new Map<String, String>{
-						'Contact2.Email' => 'ana@example.org',
-						'Contact2.LastName' => 'Ramirez'
-					},
-					new Map<String, String>{
-						'Contact1.Email' => 'ana@example.org',
-						'Contact1.LastName' => 'Ramirez'
-					}
+					new Map<String, String>{ 'Contact2.Email' => 'ana@example.org', 'Contact2.LastName' => 'Ramirez' },
+					new Map<String, String>{ 'Contact1.Email' => 'ana@example.org', 'Contact1.LastName' => 'Ramirez' }
 				}
 			);
 
@@ -429,14 +385,10 @@ private class ImportProcessorBatchTest {
 		for (String target : couple.keySet()) {
 			mapping.columns.add(new ImportMapping.Column(target, target));
 		}
-		Import_Batch__c batch = ImportTestDataFactory.batch(
-			ImportTestDataFactory.template(mapping.serialize(), rule)
-		);
+		Import_Batch__c batch = ImportTestDataFactory.batch(ImportTestDataFactory.template(mapping.serialize(), rule));
 		ImportTestDataFactory.rows(
 			batch,
-			johnRowFirst
-				? new List<Map<String, String>>{ john, couple }
-				: new List<Map<String, String>>{ couple }
+			johnRowFirst ? new List<Map<String, String>>{ john, couple } : new List<Map<String, String>>{ couple }
 		);
 		if (johnExists) {
 			insert TestDataFactory.person(
@@ -475,12 +427,7 @@ private class ImportProcessorBatchTest {
 	@IsTest
 	static void aCoupleWithOneSurnameAndPostalCodeIsTwoPeople() {
 		System.runAs(TestUsers.admin()) {
-			aCoupleSharingAKeyIsTwoPeople(
-				ImportTemplateService.RULE_NAME_POSTAL,
-				false,
-				false,
-				200
-			);
+			aCoupleSharingAKeyIsTwoPeople(ImportTemplateService.RULE_NAME_POSTAL, false, false, 200);
 		}
 	}
 
@@ -535,9 +482,7 @@ private class ImportProcessorBatchTest {
 		for (String target : couple.keySet()) {
 			mapping.columns.add(new ImportMapping.Column(target, target));
 		}
-		Import_Batch__c batch = ImportTestDataFactory.batch(
-			ImportTestDataFactory.template(mapping.serialize(), rule)
-		);
+		Import_Batch__c batch = ImportTestDataFactory.batch(ImportTestDataFactory.template(mapping.serialize(), rule));
 		ImportTestDataFactory.rows(batch, new List<Map<String, String>>{ couple });
 		return batch;
 	}
@@ -597,11 +542,7 @@ private class ImportProcessorBatchTest {
 
 			Import_Row__c row = ImportTestDataFactory.reload(batch.Id)[0];
 			Assert.areEqual(ImportRowProcessor.STATUS_REJECTED, row.Status__c, 'Not guessed at.');
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Import_ErrorTwoPeopleOneKey'),
-				row.Error_Message__c,
-				'Why.'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Import_ErrorTwoPeopleOneKey'), row.Error_Message__c, 'Why.');
 			Assert.areEqual(1, dryRun.Rows_Rejected__c, 'The dry run says so first.');
 			Assert.areEqual(0, [SELECT COUNT() FROM Contact], 'Nobody is created.');
 		}
@@ -611,20 +552,11 @@ private class ImportProcessorBatchTest {
 	static void rowsSharingAPersonWhoCouldNotBeSavedAreRejectedWithTheReason() {
 		System.runAs(TestUsers.admin()) {
 			ImportMapping mapping = new ImportMapping();
-			for (
-				String target : new List<String>{
-					'Contact1.Email',
-					'Contact1.LastName',
-					'Contact1.ReportsToId'
-				}
-			) {
+			for (String target : new List<String>{ 'Contact1.Email', 'Contact1.LastName', 'Contact1.ReportsToId' }) {
 				mapping.columns.add(new ImportMapping.Column(target, target));
 			}
 			Import_Batch__c batch = ImportTestDataFactory.batch(
-				ImportTestDataFactory.template(
-					mapping.serialize(),
-					ImportTemplateService.RULE_EMAIL
-				)
+				ImportTestDataFactory.template(mapping.serialize(), ImportTemplateService.RULE_EMAIL)
 			);
 			// Only the first row reports to an account, which a contact cannot, so only the row
 			// that creates Ana fails to save; the two after it name her and share that failure. (A
@@ -650,8 +582,7 @@ private class ImportProcessorBatchTest {
 			List<Import_Row__c> loaded = ImportTestDataFactory.reload(batch.Id);
 			Assert.areEqual(0, [SELECT COUNT() FROM Contact], 'Ana could not be saved.');
 			Assert.areEqual(ImportRowProcessor.STATUS_REJECTED, loaded[0].Status__c, 'Her row.');
-			String prefix = BarnHelp.text('Core', 'Core_Import_ErrorSamePersonNotSaved')
-				.substringBefore('{0}');
+			String prefix = BarnHelp.text('Core', 'Core_Import_ErrorSamePersonNotSaved').substringBefore('{0}');
 			for (Integer index = 1; index < 3; index++) {
 				Assert.areEqual(
 					ImportRowProcessor.STATUS_REJECTED,
@@ -688,11 +619,7 @@ private class ImportProcessorBatchTest {
 			return new List<Schema.SObjectType>();
 		}
 
-		public Map<Id, String> reasonsToKeep(
-			Id batchId,
-			Schema.SObjectType type,
-			Set<Id> recordIds
-		) {
+		public Map<Id, String> reasonsToKeep(Id batchId, Schema.SObjectType type, Set<Id> recordIds) {
 			return new Map<Id, String>();
 		}
 	}
@@ -701,13 +628,7 @@ private class ImportProcessorBatchTest {
 	static void theProcessorStateIsCarriedFromChunkToChunk() {
 		System.runAs(TestUsers.admin()) {
 			ImportMapping mapping = new ImportMapping();
-			for (
-				String target : new List<String>{
-					'Contact1.Email',
-					'Contact1.LastName',
-					'Gift.Amount__c'
-				}
-			) {
+			for (String target : new List<String>{ 'Contact1.Email', 'Contact1.LastName', 'Gift.Amount__c' }) {
 				mapping.columns.add(new ImportMapping.Column(target, target));
 			}
 			Import_Template__c template = ImportTestDataFactory.template(
@@ -778,11 +699,7 @@ private class ImportProcessorBatchTest {
 			return new List<Schema.SObjectType>();
 		}
 
-		public Map<Id, String> reasonsToKeep(
-			Id batchId,
-			Schema.SObjectType type,
-			Set<Id> recordIds
-		) {
+		public Map<Id, String> reasonsToKeep(Id batchId, Schema.SObjectType type, Set<Id> recordIds) {
 			return new Map<Id, String>();
 		}
 	}
@@ -793,20 +710,11 @@ private class ImportProcessorBatchTest {
 	static void theCommitIsHandedTheSettingsItsDryRunRecorded() {
 		System.runAs(TestUsers.admin()) {
 			ImportMapping mapping = new ImportMapping();
-			for (
-				String target : new List<String>{
-					'Contact1.Email',
-					'Contact1.LastName',
-					'Gift.Amount__c'
-				}
-			) {
+			for (String target : new List<String>{ 'Contact1.Email', 'Contact1.LastName', 'Gift.Amount__c' }) {
 				mapping.columns.add(new ImportMapping.Column(target, target));
 			}
 			Import_Batch__c batch = ImportTestDataFactory.batch(
-				ImportTestDataFactory.template(
-					mapping.serialize(),
-					ImportTemplateService.RULE_EMAIL
-				)
+				ImportTestDataFactory.template(mapping.serialize(), ImportTemplateService.RULE_EMAIL)
 			);
 			ImportTestDataFactory.rows(
 				batch,
@@ -935,9 +843,7 @@ private class ImportProcessorBatchTest {
 			Integer read = 0;
 			Test.startTest();
 			System.runAs(limited) {
-				Database.QueryLocatorIterator rows = new ImportProcessorBatch(batch.Id, true)
-					.start(null)
-					.iterator();
+				Database.QueryLocatorIterator rows = new ImportProcessorBatch(batch.Id, true).start(null).iterator();
 				while (rows.hasNext()) {
 					rows.next();
 					read++;
@@ -945,11 +851,7 @@ private class ImportProcessorBatchTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				200,
-				read,
-				'Every staged row is read, not only those the user may see.'
-			);
+			Assert.areEqual(200, read, 'Every staged row is read, not only those the user may see.');
 		}
 	}
 
@@ -983,10 +885,7 @@ private class ImportProcessorBatchTest {
 				log.countMatches('Note number '),
 				'Notes past the cap are left out.'
 			);
-			Assert.isTrue(
-				log.contains(BarnHelp.text('Core', 'Core_Import_LogNotesCut')),
-				'And the run log says so.'
-			);
+			Assert.isTrue(log.contains(BarnHelp.text('Core', 'Core_Import_LogNotesCut')), 'And the run log says so.');
 		}
 	}
 }

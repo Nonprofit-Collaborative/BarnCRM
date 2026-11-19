@@ -55,7 +55,8 @@ public class TestUsers {
 		'Territory_Admin',
 		'Memberships_Admin',
 		'Projects_Admin',
-		'Address_Verification_Admin'
+		'Address_Verification_Admin',
+		'Reporting_Admin'
 	};
 
 	/**
@@ -238,10 +239,7 @@ public class TestUsers {
 			ORDER BY CreatedDate ASC, Id ASC
 			LIMIT 1
 		];
-		Assert.isFalse(
-			found.isEmpty(),
-			'No user named ' + lastName + ' was built in this class\'s @TestSetup.'
-		);
+		Assert.isFalse(found.isEmpty(), 'No user named ' + lastName + ' was built in this class\'s @TestSetup.');
 		return found[0];
 	}
 
@@ -282,10 +280,7 @@ public class TestUsers {
 				);
 			}
 			insert as system grants;
-			insert as system new PermissionSetAssignment(
-				AssigneeId = person.Id,
-				PermissionSetId = readAll.Id
-			);
+			insert as system new PermissionSetAssignment(AssigneeId = person.Id, PermissionSetId = readAll.Id);
 		}
 		return person;
 	}
@@ -548,10 +543,7 @@ public class TestUsers {
 			insert as system grants;
 			cachedFieldAccessSetId = fieldAccess.Id;
 		}
-		insert as system new PermissionSetAssignment(
-			AssigneeId = person.Id,
-			PermissionSetId = cachedFieldAccessSetId
-		);
+		insert as system new PermissionSetAssignment(AssigneeId = person.Id, PermissionSetId = cachedFieldAccessSetId);
 	}
 
 	private static User insertWith(User person, List<String> names, Boolean withFieldAccess) {
@@ -563,10 +555,7 @@ public class TestUsers {
 			List<PermissionSetAssignment> assignments = new List<PermissionSetAssignment>();
 			for (PermissionSet permissionSet : packaged) {
 				assignments.add(
-					new PermissionSetAssignment(
-						AssigneeId = person.Id,
-						PermissionSetId = permissionSet.Id
-					)
+					new PermissionSetAssignment(AssigneeId = person.Id, PermissionSetId = permissionSet.Id)
 				);
 			}
 			insert as system assignments;

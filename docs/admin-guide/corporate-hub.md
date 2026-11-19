@@ -257,9 +257,9 @@ board's limit. The owner of the board gets a bell reminder once for each current
 ends within **Days before to remind** (the nightly Corporate Hub step).
 
 The **Board** panel on the board's page shows the current seats, terms ending soon, the skills
-matrix with the wanted skills nobody holds, open action items and, when BarnCRM Giving is
+matrix with the wanted skills nobody holds, open action items and, when BarnCRM Fundraising is
 installed, the share of current members who gave this fiscal year (read from Giving This Year;
-Corporate Hub never requires Giving). Age range and gender are optional on each seat and appear
+Corporate Hub never requires Fundraising). Age range and gender are optional on each seat and appear
 only with **Show board demographics** on (off by default); collect them only if your board has
 agreed to.
 
@@ -316,7 +316,7 @@ Rating.
 The **Board Governance** dashboard (folder BarnCRM Corporate Hub) shows the current roster, terms
 ending in the next 90 days, attendance this year and open board disclosures. Giving
 participation is on each board's panel, not the dashboard, so the dashboard never depends on
-Giving.
+Fundraising.
 
 The dashboard runs as one specified user, the admin who installed or deployed the package, so
 everyone who opens it sees what that user can see. Share the folder only with people who are

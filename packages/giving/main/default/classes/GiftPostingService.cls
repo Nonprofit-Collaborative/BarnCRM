@@ -61,13 +61,7 @@ public with sharing class GiftPostingService {
 		List<Gift__c> marks = new List<Gift__c>();
 		for (Gift__c gift : GiftPostingSelector.selectForPosting(giftIds)) {
 			if (GiftPostingLock.isInBooks(gift) && !GiftPostingLock.isPosted(gift)) {
-				marks.add(
-					new Gift__c(
-						Id = gift.Id,
-						Accounting_Posted_At__c = now,
-						Accounting_Posted_By__c = userId
-					)
-				);
+				marks.add(new Gift__c(Id = gift.Id, Accounting_Posted_At__c = now, Accounting_Posted_By__c = userId));
 			}
 		}
 		save(marks);
@@ -83,9 +77,7 @@ public with sharing class GiftPostingService {
 	public static void unpost(Id giftId, String reason) {
 		requirePermission();
 		if (String.isBlank(reason)) {
-			throw new GiftPostingException(
-				BarnHelp.text('Giving', 'Giving_Posting_ReasonRequired')
-			);
+			throw new GiftPostingException(BarnHelp.text('Giving', 'Giving_Posting_ReasonRequired'));
 		}
 		List<Gift__c> found = giftId == null
 			? new List<Gift__c>()
@@ -95,11 +87,7 @@ public with sharing class GiftPostingService {
 		}
 		save(
 			new List<Gift__c>{
-				new Gift__c(
-					Id = giftId,
-					Accounting_Posted_At__c = null,
-					Accounting_Posted_By__c = null
-				)
+				new Gift__c(Id = giftId, Accounting_Posted_At__c = null, Accounting_Posted_By__c = null)
 			}
 		);
 		ErrorLogger.logMessages(

@@ -86,9 +86,7 @@ public with sharing class GivingSampleData implements SampleDataModule {
 		}
 		StaticResource resource = new GivingSampleDataSelector().getSampleDataResource();
 		if (resource == null) {
-			throw new SampleDataException(
-				BarnHelp.text('Giving', 'Giving_SampleData_ResourceMissing')
-			);
+			throw new SampleDataException(BarnHelp.text('Giving', 'Giving_SampleData_ResourceMissing'));
 		}
 		return resource.Body.toString();
 	}
@@ -119,9 +117,7 @@ public with sharing class GivingSampleData implements SampleDataModule {
 		}
 
 		public void runStage(Integer stage) {
-			GivingSampleDataSet data = GivingSampleDataSet.parse(
-				GivingSampleData.getSampleDataJson()
-			);
+			GivingSampleDataSet data = GivingSampleDataSet.parse(GivingSampleData.getSampleDataJson());
 			if (stage == 0) {
 				referenceIdsByKey = GivingSampleDataLoader.loadReferenceData(data);
 				return;

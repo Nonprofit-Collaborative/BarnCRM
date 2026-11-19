@@ -69,13 +69,8 @@ public with sharing class SampleDataConnections {
 	 * so it carries no flag of its own, and without this the remove action would leave half
 	 * of every connection behind.
 	 */
-	private static Integer stampMirrors(
-		List<Relationship__c> inserted,
-		SampleDataSelector selector
-	) {
-		List<Id> mirrorIds = selector.getMirrorRelationshipIds(
-			new Map<Id, Relationship__c>(inserted).keySet()
-		);
+	private static Integer stampMirrors(List<Relationship__c> inserted, SampleDataSelector selector) {
+		List<Id> mirrorIds = selector.getMirrorRelationshipIds(new Map<Id, Relationship__c>(inserted).keySet());
 		if (mirrorIds.isEmpty()) {
 			return 0;
 		}

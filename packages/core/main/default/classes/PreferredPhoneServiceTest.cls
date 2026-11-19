@@ -136,10 +136,7 @@ private class PreferredPhoneServiceTest {
 			Test.stopTest();
 
 			Assert.areEqual(
-				String.format(
-					BarnHelp.text('Core', 'Core_Phones_PreferredEmpty'),
-					new List<String>{ 'Other' }
-				),
+				String.format(BarnHelp.text('Core', 'Core_Phones_PreferredEmpty'), new List<String>{ 'Other' }),
 				message,
 				'The save was refused with the message that names the empty number'
 			);
@@ -190,10 +187,7 @@ private class PreferredPhoneServiceTest {
 
 			Assert.areEqual(1, maria.getErrors().size(), 'Refused: ' + maria.getErrors());
 			Assert.areEqual(
-				String.format(
-					BarnHelp.text('Core', 'Core_Phones_PreferredEmpty'),
-					new List<String>{ shown }
-				),
+				String.format(BarnHelp.text('Core', 'Core_Phones_PreferredEmpty'), new List<String>{ shown }),
 				maria.getErrors()[0].getMessage(),
 				'Names the choice by its label'
 			);
@@ -268,9 +262,7 @@ private class PreferredPhoneServiceTest {
 	static void switchingThePreferredPhoneRowOffStopsTheCopy() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-			TestDataFactory.insertAutomationSettings(
-				new Map<String, Boolean>{ PHONE_ROW => false }
-			);
+			TestDataFactory.insertAutomationSettings(new Map<String, Boolean>{ PHONE_ROW => false });
 			List<Contact> people = manyWhoPreferMobile(5);
 
 			Test.startTest();

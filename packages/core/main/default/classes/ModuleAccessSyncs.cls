@@ -76,35 +76,19 @@ public with sharing class ModuleAccessSyncs {
 		}
 		Map<String, List<String>> bySet = ModuleExtensions.setsByPermissionSet(moduleKey);
 		Map<String, List<String>> byRole = ModuleExtensions.setsByRole(moduleKey);
-		Integer slice = Math.min(
-			MOST_PER_SET,
-			ROWS_PER_PASS / Math.max(1, bySet.size() + byRole.size())
-		);
+		Integer slice = Math.min(MOST_PER_SET, ROWS_PER_PASS / Math.max(1, bySet.size() + byRole.size()));
 		String context = moduleKey + 'AccessSync';
 		Boolean more = false;
 		for (String setName : bySet.keySet()) {
-			Boolean left = TabAccessService.giveToHolders(
-				setName,
-				bySet.get(setName),
-				slice,
-				context
-			);
+			Boolean left = TabAccessService.giveToHolders(setName, bySet.get(setName), slice, context);
 			more = more || left;
 		}
 		for (String setName : byRole.keySet()) {
-			Boolean left = TabAccessService.giveToGroupHolders(
-				setName,
-				byRole.get(setName),
-				slice,
-				context
-			);
+			Boolean left = TabAccessService.giveToGroupHolders(setName, byRole.get(setName), slice, context);
 			more = more || left;
 		}
 		try {
-			ModuleAccessStep step = (ModuleAccessStep) ModuleExtensions.forModule(
-				ModuleAccessStep.class,
-				moduleKey
-			);
+			ModuleAccessStep step = (ModuleAccessStep) ModuleExtensions.forModule(ModuleAccessStep.class, moduleKey);
 			if (step != null) {
 				step.afterSync();
 			}
@@ -154,21 +138,14 @@ public with sharing class ModuleAccessSyncs {
 					continue;
 				}
 				Database.SaveResult saved = Database.insert(
-					new PermissionSetAssignment(
-						AssigneeId = installerId,
-						PermissionSetId = permissionSet.Id
-					),
+					new PermissionSetAssignment(AssigneeId = installerId, PermissionSetId = permissionSet.Id),
 					false,
 					AccessLevel.SYSTEM_MODE
 				);
 				// A duplicate means another job gave it a moment before: what was wanted.
 				for (Database.Error error : saved.getErrors()) {
 					if (error.getStatusCode() != StatusCode.DUPLICATE_VALUE) {
-						ErrorLogger.logMessage(
-							error.getMessage(),
-							context,
-							ErrorLogger.SEVERITY_WARNING
-						);
+						ErrorLogger.logMessage(error.getMessage(), context, ErrorLogger.SEVERITY_WARNING);
 					}
 				}
 			} catch (Exception e) {

@@ -25,9 +25,7 @@ private class OrgOptimizerSetupControllerTest {
 		'flowsNoDescription'
 	};
 
-	private static Map<String, OrgOptimizerSetupController.Finding> byKey(
-		OrgOptimizerSetupController.Result result
-	) {
+	private static Map<String, OrgOptimizerSetupController.Finding> byKey(OrgOptimizerSetupController.Result result) {
 		Map<String, OrgOptimizerSetupController.Finding> findings = new Map<String, OrgOptimizerSetupController.Finding>();
 		for (OrgOptimizerSetupController.Finding finding : result.findings) {
 			findings.put(finding.key, finding);
@@ -54,10 +52,7 @@ private class OrgOptimizerSetupControllerTest {
 				OrgOptimizerSetupController.Finding finding = findings.get(key);
 				Assert.isNotNull(finding, 'Every check is reported: ' + key);
 				Assert.isTrue(finding.setupUrl.startsWith('/lightning/'), 'With its Setup page.');
-				Assert.isTrue(
-					finding.failed || finding.count >= 0,
-					'Either a count or "could not check": ' + key
-				);
+				Assert.isTrue(finding.failed || finding.count >= 0, 'Either a count or "could not check": ' + key);
 				Assert.isTrue(finding.examples.size() <= 5, 'At most five examples.');
 			}
 			OrgOptimizerSetupController.Finding sets = findings.get('unassignedPermissionSets');
@@ -111,10 +106,7 @@ private class OrgOptimizerSetupControllerTest {
 				'The unused setup checks keep their heading.'
 			);
 			Assert.isFalse(findings.get('apexOldApi').failed, 'Apex classes are readable.');
-			Assert.isTrue(
-				findings.get('apexOldApi').count > 0,
-				'Classes are on versions below 80.'
-			);
+			Assert.isTrue(findings.get('apexOldApi').count > 0, 'Classes are on versions below 80.');
 		}
 	}
 
@@ -148,11 +140,7 @@ private class OrgOptimizerSetupControllerTest {
 			settings.Unused_Report_Days__c = 5000;
 			HouseholdTestDataFactory.save(settings);
 			Assert.areEqual(30, OrgOptimizerSetupController.loginDays(), 'Below 30 reads as 30.');
-			Assert.areEqual(
-				1095,
-				OrgOptimizerSetupController.reportDays(),
-				'Above 1095 reads as 1095.'
-			);
+			Assert.areEqual(1095, OrgOptimizerSetupController.reportDays(), 'Above 1095 reads as 1095.');
 			settings.Unused_Login_Days__c = 120;
 			settings.Unused_Report_Days__c = 200;
 			HouseholdTestDataFactory.save(settings);

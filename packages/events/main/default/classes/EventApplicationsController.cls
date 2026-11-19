@@ -150,17 +150,11 @@ public with sharing class EventApplicationsController {
 					'Abstract__c'
 				}
 			) {
-				result.fieldLabels.put(
-					name,
-					NamespaceUtil.field(fields, name).getDescribe().getLabel()
-				);
+				result.fieldLabels.put(name, NamespaceUtil.field(fields, name).getDescribe().getLabel());
 			}
 			Map<String, Schema.SObjectField> reviewFields = Schema.SObjectType.Speaker_Review__c.fields.getMap();
 			for (String name : new List<String>{ 'Score__c', 'Notes__c', 'Reviewer__c' }) {
-				result.fieldLabels.put(
-					name,
-					NamespaceUtil.field(reviewFields, name).getDescribe().getLabel()
-				);
+				result.fieldLabels.put(name, NamespaceUtil.field(reviewFields, name).getDescribe().getLabel());
 			}
 			result.fieldLabels.put(
 				'Weighted_Average__c',
@@ -266,10 +260,7 @@ public with sharing class EventApplicationsController {
 			return result;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getApplications', eventId);
-			throw UserErrors.wrapShowingDml(
-				e,
-				BarnHelp.text('Events', 'Events_Applications_LoadFailed')
-			);
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Applications_LoadFailed'));
 		}
 	}
 
@@ -288,12 +279,7 @@ public with sharing class EventApplicationsController {
 	 * @param criteriaScoresJson each criterion's score by label, when it has
 	 */
 	@AuraEnabled
-	public static void saveReview(
-		Id applicationId,
-		Integer score,
-		String notes,
-		String criteriaScoresJson
-	) {
+	public static void saveReview(Id applicationId, Integer score, String notes, String criteriaScoresJson) {
 		try {
 			Speaker_Application__c application = load(applicationId);
 			if (!UNDECIDED.contains(application.Status__c)) {
@@ -306,9 +292,7 @@ public with sharing class EventApplicationsController {
 			Map<String, Object> scores = null;
 			if (criteria.isEmpty()) {
 				if (score == null || score < 1 || score > 5) {
-					throw UserErrors.message(
-						BarnHelp.text('Events', 'Events_Applications_ScoreRange')
-					);
+					throw UserErrors.message(BarnHelp.text('Events', 'Events_Applications_ScoreRange'));
 				}
 				weighted = score;
 			} else {
@@ -318,38 +302,27 @@ public with sharing class EventApplicationsController {
 						: (Map<String, Object>) JSON.deserializeUntyped(criteriaScoresJson);
 					weighted = EventProposalReview.weightedScore(criteria, scores);
 				} catch (Exception refused) {
-					throw UserErrors.message(
-						BarnHelp.text('Events', 'Events_Applications_ScoreEach')
-					);
+					throw UserErrors.message(BarnHelp.text('Events', 'Events_Applications_ScoreEach'));
 				}
 				score = weighted.round(System.RoundingMode.HALF_UP).intValue();
 			}
 			List<Speaker_Review__c> mine = [
 				SELECT Id
 				FROM Speaker_Review__c
-				WHERE
-					Speaker_Application__c = :applicationId
-					AND Reviewer__c = :UserInfo.getUserId()
+				WHERE Speaker_Application__c = :applicationId AND Reviewer__c = :UserInfo.getUserId()
 				WITH USER_MODE
 				LIMIT 1
 			];
 			Speaker_Review__c review = mine.isEmpty()
-				? new Speaker_Review__c(
-						Speaker_Application__c = applicationId,
-						Reviewer__c = UserInfo.getUserId()
-				  )
+				? new Speaker_Review__c(Speaker_Application__c = applicationId, Reviewer__c = UserInfo.getUserId())
 				: mine[0];
 			review.Score__c = score;
 			review.Weighted_Score__c = weighted;
 			review.Criteria_Scores__c = scores == null ? null : JSON.serialize(scores);
 			review.Notes__c = notes;
-			Database.upsert(review, true, AccessLevel.USER_MODE);
+			upsert as user review;
 			if (application.Status__c == 'Submitted') {
-				Database.update(
-					new Speaker_Application__c(Id = applicationId, Status__c = 'In Review'),
-					true,
-					AccessLevel.USER_MODE
-				);
+				update as user new Speaker_Application__c(Id = applicationId, Status__c = 'In Review');
 			}
 		} catch (AuraHandledException refused) {
 			throw refused;
@@ -387,10 +360,7 @@ public with sharing class EventApplicationsController {
 			result.status = decision;
 			result.notice = NOTICE_NONE;
 			// A fresh record carries only what changes: the event is not editable on an application.
-			Speaker_Application__c change = new Speaker_Application__c(
-				Id = applicationId,
-				Status__c = decision
-			);
+			Speaker_Application__c change = new Speaker_Application__c(Id = applicationId, Status__c = decision);
 			if (decision == ACCEPTED) {
 				result.speakerId = speakerFor(application.Event__c, application.Contact__c);
 				change.Event_Speaker__c = result.speakerId;
@@ -399,7 +369,7 @@ public with sharing class EventApplicationsController {
 					speakerFor(application.Event__c, presenter);
 				}
 			}
-			Database.update(change, true, AccessLevel.USER_MODE);
+			update as user change;
 			if (notify == true) {
 				result.notice = sendNotice(application, decision);
 				stampNotice(application, result.notice);
@@ -434,7 +404,7 @@ public with sharing class EventApplicationsController {
 			return existing[0].Id;
 		}
 		Event_Speaker__c speaker = new Event_Speaker__c(Event__c = eventId, Contact__c = contactId);
-		Database.insert(speaker, true, AccessLevel.USER_MODE);
+		insert as user speaker;
 		return speaker.Id;
 	}
 
@@ -472,7 +442,7 @@ public with sharing class EventApplicationsController {
 		} else {
 			change.Notice_Result__c = noticeText(notice).left(255);
 		}
-		Database.update(change, true, AccessLevel.USER_MODE);
+		update as user change;
 	}
 
 	/** The sentence for a notice that did not go out. */
@@ -491,13 +461,7 @@ public with sharing class EventApplicationsController {
 
 	private static Speaker_Application__c load(Id applicationId) {
 		List<Speaker_Application__c> found = [
-			SELECT
-				Id,
-				Event__c,
-				Event__r.Review_Criteria__c,
-				Contact__c,
-				Status__c,
-				Event_Speaker__c
+			SELECT Id, Event__c, Event__r.Review_Criteria__c, Contact__c, Status__c, Event_Speaker__c
 			FROM Speaker_Application__c
 			WHERE Id = :applicationId
 			WITH USER_MODE

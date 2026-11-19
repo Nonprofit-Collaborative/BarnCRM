@@ -34,17 +34,14 @@ public with sharing class ProgramsErasureExtension implements PersonErasureExten
 				ids.add(note.Id);
 			}
 			try {
-				Database.delete(notes, true, AccessLevel.USER_MODE);
+				delete as user notes;
 			} catch (Exception refused) {
-				throw new PersonErasure.ErasureException(
-					BarnHelp.text('Programs', 'Programs_Erase_NeedProgramsAdmin')
-				);
+				throw new PersonErasure.ErasureException(BarnHelp.text('Programs', 'Programs_Erase_NeedProgramsAdmin'));
 			}
 			changes.add(
 				new PersonErasure.Change(
 					PersonErasure.DELETED,
-					Case_Note__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-						.getLabelPlural(),
+					Case_Note__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural(),
 					ids,
 					null
 				)
@@ -57,17 +54,14 @@ public with sharing class ProgramsErasureExtension implements PersonErasureExten
 				referralIds.add(referral.Id);
 			}
 			try {
-				Database.delete(referrals, true, AccessLevel.USER_MODE);
+				delete as user referrals;
 			} catch (Exception refused) {
-				throw new PersonErasure.ErasureException(
-					BarnHelp.text('Programs', 'Programs_Erase_NeedProgramsAdmin')
-				);
+				throw new PersonErasure.ErasureException(BarnHelp.text('Programs', 'Programs_Erase_NeedProgramsAdmin'));
 			}
 			changes.add(
 				new PersonErasure.Change(
 					PersonErasure.DELETED,
-					Referral__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-						.getLabelPlural(),
+					Referral__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural(),
 					referralIds,
 					null
 				)
@@ -81,17 +75,14 @@ public with sharing class ProgramsErasureExtension implements PersonErasureExten
 				goalIds.add(goal.Id);
 			}
 			try {
-				Database.delete(goals, true, AccessLevel.USER_MODE);
+				delete as user goals;
 			} catch (Exception refused) {
-				throw new PersonErasure.ErasureException(
-					BarnHelp.text('Programs', 'Programs_Erase_NeedProgramsAdmin')
-				);
+				throw new PersonErasure.ErasureException(BarnHelp.text('Programs', 'Programs_Erase_NeedProgramsAdmin'));
 			}
 			changes.add(
 				new PersonErasure.Change(
 					PersonErasure.DELETED,
-					Goal__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-						.getLabelPlural(),
+					Goal__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural(),
 					goalIds,
 					null
 				)
@@ -102,8 +93,7 @@ public with sharing class ProgramsErasureExtension implements PersonErasureExten
 			changes.add(
 				new PersonErasure.Change(
 					PersonErasure.KEPT,
-					Enrollment__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-						.getLabelPlural(),
+					Enrollment__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural(),
 					enrollments,
 					BarnHelp.text('Programs', 'Programs_Erase_EnrollmentsKept')
 				)

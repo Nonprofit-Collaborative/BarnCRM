@@ -63,10 +63,7 @@ private class AccessControllerTest {
 	private static User insertAdminRoleOnly() {
 		PermissionSetGroup adminGroup = TestDataFactory.prepareRoleGroup(AccessService.ADMIN_ROLE);
 		User maria = insertUser('Maria', 'Alvarez');
-		insert new PermissionSetAssignment(
-			AssigneeId = maria.Id,
-			PermissionSetGroupId = adminGroup.Id
-		);
+		insert new PermissionSetAssignment(AssigneeId = maria.Id, PermissionSetGroupId = adminGroup.Id);
 		return maria;
 	}
 
@@ -93,12 +90,7 @@ private class AccessControllerTest {
 				overview.canChangeAccess,
 				'BarnCRM Admin does not carry Assign Permission Sets, so the page disables changes.'
 			);
-			for (
-				AccessController.AccessResult refused : new List<AccessController.AccessResult>{
-					assigned,
-					removed
-				}
-			) {
+			for (AccessController.AccessResult refused : new List<AccessController.AccessResult>{ assigned, removed }) {
 				Assert.isFalse(refused.success, 'Refused up front.');
 				Assert.areEqual(
 					AccessController.ERROR_NO_PERMISSION,
@@ -116,9 +108,7 @@ private class AccessControllerTest {
 				[
 					SELECT COUNT()
 					FROM PermissionSetAssignment
-					WHERE
-						AssigneeId = :david.Id
-						AND PermissionSetGroup.DeveloperName = :PROGRAM_ROLE
+					WHERE AssigneeId = :david.Id AND PermissionSetGroup.DeveloperName = :PROGRAM_ROLE
 				],
 				'David gets no role.'
 			);
@@ -145,10 +135,7 @@ private class AccessControllerTest {
 			// never left empty and silent.
 			Assert.isFalse(result.success, 'David may not read who holds each role.');
 			Assert.areEqual(AccessController.ERROR_NO_PERMISSION, result.errorCode);
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Access_ErrorRolesNotVisible'),
-				result.message
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Access_ErrorRolesNotVisible'), result.message);
 			Assert.isNotNull(result.roles, 'The page always gets a list, even an empty one.');
 			Assert.isTrue(result.assignments.isEmpty(), 'No role holders are returned to him.');
 			Assert.isTrue(result.addOnAssignments.isEmpty(), 'Nor add-on holders.');
@@ -169,19 +156,12 @@ private class AccessControllerTest {
 			Test.stopTest();
 
 			Assert.isTrue(result.success, 'Maria should be able to open the Access page.');
-			Assert.isTrue(
-				result.canManage,
-				'Maria holds the BarnCRM Admin role, so she may change roles.'
-			);
+			Assert.isTrue(result.canManage, 'Maria holds the BarnCRM Admin role, so she may change roles.');
 			Assert.isNotNull(result.roles, 'The page needs the list of roles.');
 			Assert.isNotNull(result.assignments, 'The page needs to know who holds each role.');
 			// The result was built inside System.runAs(maria), so it carries Maria's id, not
 			// the id of the user running the test.
-			Assert.areEqual(
-				maria.Id,
-				result.currentUserId,
-				'The page needs to know who is looking at it.'
-			);
+			Assert.areEqual(maria.Id, result.currentUserId, 'The page needs to know who is looking at it.');
 		}
 	}
 
@@ -224,11 +204,7 @@ private class AccessControllerTest {
 			Test.stopTest();
 
 			Assert.isFalse(result.success, 'A value that is not a person should be refused.');
-			Assert.areEqual(
-				AccessController.ERROR_INVALID_INPUT,
-				result.errorCode,
-				'The refusal should say why.'
-			);
+			Assert.areEqual(AccessController.ERROR_INVALID_INPUT, result.errorCode, 'The refusal should say why.');
 		}
 	}
 
@@ -245,11 +221,7 @@ private class AccessControllerTest {
 			Test.stopTest();
 
 			Assert.isFalse(result.success, 'Choosing nobody and no role should be refused.');
-			Assert.areEqual(
-				AccessController.ERROR_INVALID_INPUT,
-				result.errorCode,
-				'The refusal should say why.'
-			);
+			Assert.areEqual(AccessController.ERROR_INVALID_INPUT, result.errorCode, 'The refusal should say why.');
 		}
 	}
 
@@ -269,19 +241,14 @@ private class AccessControllerTest {
 			}
 			Test.stopTest();
 
-			Assert.isTrue(
-				assigned.success,
-				'Maria should be able to give David the Team Member role.'
-			);
+			Assert.isTrue(assigned.success, 'Maria should be able to give David the Team Member role.');
 			Assert.isTrue(removed.success, 'Maria should be able to take the role away again.');
 			Assert.areEqual(
 				0,
 				[
 					SELECT COUNT()
 					FROM PermissionSetAssignment
-					WHERE
-						AssigneeId = :david.Id
-						AND PermissionSetGroup.DeveloperName = :PROGRAM_ROLE
+					WHERE AssigneeId = :david.Id AND PermissionSetGroup.DeveloperName = :PROGRAM_ROLE
 				],
 				'David should not hold the role after Maria removes it.'
 			);
@@ -301,11 +268,7 @@ private class AccessControllerTest {
 			Test.stopTest();
 
 			Assert.isFalse(result.success, 'A role BarnCRM does not ship should be refused.');
-			Assert.areEqual(
-				AccessController.ERROR_FAILED,
-				result.errorCode,
-				'The page needs a code it can branch on.'
-			);
+			Assert.areEqual(AccessController.ERROR_FAILED, result.errorCode, 'The page needs a code it can branch on.');
 			Assert.areEqual(
 				BarnHelp.text('Core', 'Core_Access_ErrorRoleNotFound'),
 				result.message,
@@ -332,10 +295,7 @@ private class AccessControllerTest {
 			for (AccessService.UserSummary summary : result.users) {
 				foundIds.add(summary.userId);
 			}
-			Assert.isTrue(
-				foundIds.contains(david.Id),
-				'Maria should find David in the search box.'
-			);
+			Assert.isTrue(foundIds.contains(david.Id), 'Maria should find David in the search box.');
 		}
 	}
 
@@ -372,11 +332,7 @@ private class AccessControllerTest {
 			Test.stopTest();
 
 			Assert.isTrue(result.success, 'An empty search box is not an error.');
-			Assert.areEqual(
-				0,
-				result.users.size(),
-				'An empty search box should not list the whole org.'
-			);
+			Assert.areEqual(0, result.users.size(), 'An empty search box should not list the whole org.');
 		}
 	}
 

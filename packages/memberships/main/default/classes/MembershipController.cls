@@ -34,11 +34,7 @@ public with sharing class MembershipController {
 			result.levelId = term.Level__c;
 			result.canRenew =
 				Schema.SObjectType.Membership_Term__c.isCreateable() &&
-				new Set<String>{
-						MembershipService.CURRENT,
-						MembershipService.GRACE,
-						MembershipService.LAPSED
-					}
+				new Set<String>{ MembershipService.CURRENT, MembershipService.GRACE, MembershipService.LAPSED }
 					.contains(term.Status__c);
 			result.hasEmail = term.Contact__r?.Email != null;
 			result.paymentsReady = MembershipPayments.ready();
@@ -51,11 +47,7 @@ public with sharing class MembershipController {
 				LIMIT 200
 			]) {
 				result.levels.add(
-					new Map<String, Object>{
-						'value' => level.Id,
-						'label' => level.Name,
-						'dues' => level.Dues__c
-					}
+					new Map<String, Object>{ 'value' => level.Id, 'label' => level.Name, 'dues' => level.Dues__c }
 				);
 			}
 			return result;
@@ -70,8 +62,7 @@ public with sharing class MembershipController {
 		try {
 			MembershipService.Renewal renewal = new MembershipService.Renewal(termId);
 			renewal.levelId = levelId;
-			return MembershipService.renew(new List<MembershipService.Renewal>{ renewal }, false)[0]
-				.Id;
+			return MembershipService.renew(new List<MembershipService.Renewal>{ renewal }, false)[0].Id;
 		} catch (Exception e) {
 			throw UserErrors.wrap(e, 'MembershipController.renew', true);
 		}

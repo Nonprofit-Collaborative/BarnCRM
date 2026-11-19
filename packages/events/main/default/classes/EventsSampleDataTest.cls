@@ -171,11 +171,7 @@ private class EventsSampleDataTest {
 				],
 				'Three levels'
 			);
-			Assert.areEqual(
-				4,
-				[SELECT COUNT() FROM Sponsor_Deliverable__c WITH SYSTEM_MODE],
-				'Four deliverables'
-			);
+			Assert.areEqual(4, [SELECT COUNT() FROM Sponsor_Deliverable__c WITH SYSTEM_MODE], 'Four deliverables');
 			Speaker_Application__c application = [
 				SELECT Review_Count__c, Average_Score__c
 				FROM Speaker_Application__c
@@ -275,11 +271,7 @@ private class EventsSampleDataTest {
 		];
 		Assert.areEqual(2, keynote.Rating_Count__c, 'The keynote has two ratings');
 		Assert.areEqual('Main Hall', keynote.Room__c, 'The room names the session');
-		Assert.areEqual(
-			2,
-			[SELECT COUNT() FROM Event_Survey_Response__c WITH SYSTEM_MODE],
-			'Two survey responses'
-		);
+		Assert.areEqual(2, [SELECT COUNT() FROM Event_Survey_Response__c WITH SYSTEM_MODE], 'Two survey responses');
 		Assert.areEqual(
 			2,
 			[
@@ -290,11 +282,7 @@ private class EventsSampleDataTest {
 			],
 			'One booked and one open appointment'
 		);
-		Assert.areEqual(
-			2,
-			[SELECT COUNT() FROM Agenda_Item__c WITH SYSTEM_MODE],
-			'Two personal agenda picks'
-		);
+		Assert.areEqual(2, [SELECT COUNT() FROM Agenda_Item__c WITH SYSTEM_MODE], 'Two personal agenda picks');
 	}
 
 	@IsTest

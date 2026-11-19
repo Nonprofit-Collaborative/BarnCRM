@@ -19,8 +19,8 @@
   <deploymentStatus>Deployed</deploymentStatus>
   <description>
     One filled-in form: the answers, the version they answer, the person and organization matched
-    or created, and what was written. Kept even when nothing could be written (canonical model
-    29ZY).
+    or created, and what was written. Kept even when nothing could be written, and when a Forms
+    administrator deletes its form (canonical model 29ZY, R-FM4).
   </description>
   <enableActivities>false</enableActivities>
   <enableBulkApi>true</enableBulkApi>
@@ -38,6 +38,6 @@
     <type>AutoNumber</type>
   </nameField>
   <pluralLabel>Form Submissions</pluralLabel>
-  <sharingModel>ControlledByParent</sharingModel>
+  <sharingModel>ReadWrite</sharingModel>
   <visibility>Public</visibility>
 </CustomObject>

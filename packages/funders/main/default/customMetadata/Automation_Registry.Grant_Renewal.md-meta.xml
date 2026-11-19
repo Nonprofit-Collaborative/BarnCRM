@@ -24,7 +24,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">For an Awarded grant marked Renewable with an Award End Date, keeps one open Renewal requirement due before the award ends (the renewal days setting in Funders), and moves it when the end date moves. Grants not marked Renewable are never touched. Switch it off while you import past grants.</value>
+        <value xsi:type="xsd:string">For an Awarded grant marked Renewable with an Award End Date, keeps one open Renewal requirement due before the award ends (the renewal days setting in Grants), and moves it when the end date moves. Grants not marked Renewable are never touched. Switch it off while you import past grants.</value>
     </values>
     <values>
         <field>Module__c</field>

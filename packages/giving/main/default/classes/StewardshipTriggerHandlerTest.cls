@@ -39,9 +39,7 @@ private class StewardshipTriggerHandlerTest {
 	}
 
 	private static Contact donor() {
-		Contact person = TestDataFactory.person(
-			new Contact(FirstName = 'Ana', LastName = 'Ramirez')
-		);
+		Contact person = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Ramirez'));
 		insert person;
 		return person;
 	}
@@ -111,10 +109,7 @@ private class StewardshipTriggerHandlerTest {
 				[SELECT COUNT() FROM Stewardship_Plan__c],
 				'There is nobody to steward, so nothing starts.'
 			);
-			Assert.isNotNull(
-				saved,
-				'And the save was attempted rather than blocked by stewardship.'
-			);
+			Assert.isNotNull(saved, 'And the save was attempted rather than blocked by stewardship.');
 		}
 	}
 

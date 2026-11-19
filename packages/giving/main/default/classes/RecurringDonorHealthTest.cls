@@ -16,9 +16,7 @@ private class RecurringDonorHealthTest {
 	}
 
 	private static Contact donor(String email) {
-		Contact person = TestDataFactory.person(
-			new Contact(FirstName = 'Rae', LastName = 'Sustainer', Email = email)
-		);
+		Contact person = TestDataFactory.person(new Contact(FirstName = 'Rae', LastName = 'Sustainer', Email = email));
 		insert person;
 		return person;
 	}
@@ -75,11 +73,7 @@ private class RecurringDonorHealthTest {
 			Test.stopTest();
 
 			Commitment__c after = health(gift.Id);
-			Assert.areEqual(
-				2,
-				after.Failed_Charges__c,
-				'Both failed charges count, matched by id and by email.'
-			);
+			Assert.areEqual(2, after.Failed_Charges__c, 'Both failed charges count, matched by id and by email.');
 			Assert.areEqual(
 				failedOn,
 				after.Last_Failed_Charge__c,
@@ -102,41 +96,19 @@ private class RecurringDonorHealthTest {
 	static void aSuccessfulChargeClearsFailuresAndCancellation() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Commitment__c gift = recurring(donor('rae@example.org').Id, 'sub_9');
-			insert new Recurring_Gift_Event__c(
-				Event_Type__c = 'Cancelled',
-				Subscription_Id__c = 'sub_9'
-			);
-			insert new Recurring_Gift_Event__c(
-				Event_Type__c = 'Charge Failed',
-				Subscription_Id__c = 'sub_9'
-			);
-			Assert.areEqual(
-				Date.today(),
-				health(gift.Id).Processor_Cancelled__c,
-				'A cancellation is dated.'
-			);
+			insert new Recurring_Gift_Event__c(Event_Type__c = 'Cancelled', Subscription_Id__c = 'sub_9');
+			insert new Recurring_Gift_Event__c(Event_Type__c = 'Charge Failed', Subscription_Id__c = 'sub_9');
+			Assert.areEqual(Date.today(), health(gift.Id).Processor_Cancelled__c, 'A cancellation is dated.');
 
 			Test.startTest();
-			insert new Recurring_Gift_Event__c(
-				Event_Type__c = 'Charge Succeeded',
-				Subscription_Id__c = 'sub_9'
-			);
-			insert new Recurring_Gift_Event__c(
-				Event_Type__c = 'Card Updated',
-				Subscription_Id__c = 'sub_9'
-			);
+			insert new Recurring_Gift_Event__c(Event_Type__c = 'Charge Succeeded', Subscription_Id__c = 'sub_9');
+			insert new Recurring_Gift_Event__c(Event_Type__c = 'Card Updated', Subscription_Id__c = 'sub_9');
 			Test.stopTest();
 
 			Commitment__c after = health(gift.Id);
 			Assert.areEqual(0, after.Failed_Charges__c, 'A successful charge resets the failures.');
-			Assert.isNull(
-				after.Processor_Cancelled__c,
-				'A successful charge clears the cancellation.'
-			);
-			Assert.isNull(
-				after.Card_Expires__c,
-				'An updated card with no date leaves nothing expiring.'
-			);
+			Assert.isNull(after.Processor_Cancelled__c, 'A successful charge clears the cancellation.');
+			Assert.isNull(after.Card_Expires__c, 'An updated card with no date leaves nothing expiring.');
 		}
 	}
 
@@ -156,10 +128,7 @@ private class RecurringDonorHealthTest {
 				FROM Recurring_Gift_Event__c
 				WHERE Id = :event.Id
 			];
-			Assert.isNull(
-				saved.Commitment__c,
-				'Two open recurring gifts for one email match neither.'
-			);
+			Assert.isNull(saved.Commitment__c, 'Two open recurring gifts for one email match neither.');
 			Assert.areEqual('Unmatched', saved.Match_Status__c, 'The event waits as Unmatched.');
 
 			Test.startTest();
@@ -169,8 +138,7 @@ private class RecurringDonorHealthTest {
 			Assert.areEqual(1, health(first.Id).Failed_Charges__c, 'Linking the event applies it.');
 			Assert.areEqual(
 				'Matched',
-				[SELECT Match_Status__c FROM Recurring_Gift_Event__c WHERE Id = :event.Id]
-				.Match_Status__c,
+				[SELECT Match_Status__c FROM Recurring_Gift_Event__c WHERE Id = :event.Id].Match_Status__c,
 				'A linked event is Matched.'
 			);
 		}
@@ -195,11 +163,7 @@ private class RecurringDonorHealthTest {
 			insert events;
 			Test.stopTest();
 
-			Assert.areEqual(
-				200,
-				health(gift.Id).Failed_Charges__c,
-				'Every failure in the batch counts once.'
-			);
+			Assert.areEqual(200, health(gift.Id).Failed_Charges__c, 'Every failure in the batch counts once.');
 		}
 	}
 
@@ -208,14 +172,8 @@ private class RecurringDonorHealthTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Commitment__c failing = recurring(donor('page@example.org').Id, 'sub_page');
 			recurring(donor('fine@example.org').Id, 'sub_fine');
-			insert new Recurring_Gift_Event__c(
-				Event_Type__c = 'Charge Failed',
-				Subscription_Id__c = 'sub_page'
-			);
-			insert new Recurring_Gift_Event__c(
-				Event_Type__c = 'Charge Failed',
-				Subscription_Id__c = 'sub_unknown'
-			);
+			insert new Recurring_Gift_Event__c(Event_Type__c = 'Charge Failed', Subscription_Id__c = 'sub_page');
+			insert new Recurring_Gift_Event__c(Event_Type__c = 'Charge Failed', Subscription_Id__c = 'sub_unknown');
 
 			Test.startTest();
 			RecurringHealthController.HealthPage page = RecurringHealthController.getPage();
@@ -231,11 +189,7 @@ private class RecurringDonorHealthTest {
 			Assert.areEqual(60, page.expiryDays, 'The expiry window defaults to 60 days.');
 			Task followUp = [SELECT WhatId, OwnerId FROM Task WHERE Id = :taskId];
 			Assert.areEqual(failing.Id, followUp.WhatId, 'The task is about the gift.');
-			Assert.areEqual(
-				UserInfo.getUserId(),
-				followUp.OwnerId,
-				'The task is the person\'s own.'
-			);
+			Assert.areEqual(UserInfo.getUserId(), followUp.OwnerId, 'The task is the person\'s own.');
 		}
 	}
 }

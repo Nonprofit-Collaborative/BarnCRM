@@ -1,4 +1,5 @@
 import { LightningElement, api } from 'lwc';
+import BETA from '@salesforce/label/c.Core_ModuleManager_Beta';
 import PRESENT from '@salesforce/label/c.Core_SetupAssistant_ModulePresent';
 import ABSENT from '@salesforce/label/c.Core_Integrations_NotInstalled';
 import LEARN_MORE from '@salesforce/label/c.Core_SetupAssistant_ModuleLearnMore';
@@ -29,6 +30,7 @@ export default class SetupStepModules extends LightningElement {
   @api modules = [];
 
   labels = {
+    beta: BETA,
     learnMore: LEARN_MORE,
     get managerNotice() {
       return helpText('Core', 'Core_SetupAssistant_ModuleManagerNotice');

@@ -44,11 +44,7 @@ public with sharing class BarnHelp {
 	@NamespaceAccessible
 	public static String text(String packageName, String key, List<Object> args) {
 		String value = text(packageName, key);
-		return String.isBlank(value) ||
-			args == null ||
-			args.isEmpty()
-			? value
-			: String.format(value, args);
+		return String.isBlank(value) || args == null || args.isEmpty() ? value : String.format(value, args);
 	}
 
 	private static Map<String, String> texts(String packageName) {
@@ -74,9 +70,7 @@ public with sharing class BarnHelp {
 
 	private static Map<String, String> load(String packageName) {
 		String base = 'BarnHelp_' + packageName;
-		List<String> languages = languageCandidates(
-			languageForTest != null ? languageForTest : UserInfo.getLanguage()
-		);
+		List<String> languages = languageCandidates(languageForTest != null ? languageForTest : UserInfo.getLanguage());
 		Set<String> names = new Set<String>{ base };
 		for (String language : languages) {
 			names.add(base + '_' + language);
@@ -131,9 +125,7 @@ public with sharing class BarnHelp {
 		}
 		try {
 			Object parsed = JSON.deserializeUntyped(body);
-			return parsed instanceof Map<String, Object>
-				? (Map<String, Object>) parsed
-				: new Map<String, Object>();
+			return parsed instanceof Map<String, Object> ? (Map<String, Object>) parsed : new Map<String, Object>();
 		} catch (JSONException e) {
 			return new Map<String, Object>();
 		}

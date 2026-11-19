@@ -110,9 +110,7 @@ public with sharing class AutomationControlController {
 		try {
 			requirePermission();
 			if (String.isBlank(automationName)) {
-				throw new AutomationControl.AutomationControlException(
-					Label.Core_Automation_NameRequired
-				);
+				throw new AutomationControl.AutomationControlException(Label.Core_Automation_NameRequired);
 			}
 			AutomationControl.setEnabled(automationName, enabled == true);
 			return currentPage();
@@ -253,9 +251,7 @@ public with sharing class AutomationControlController {
 
 	private static void requirePermission() {
 		if (!canManage()) {
-			throw new AutomationControl.AutomationControlException(
-				Label.Core_Automation_NoPermission
-			);
+			throw new AutomationControl.AutomationControlException(Label.Core_Automation_NoPermission);
 		}
 	}
 }

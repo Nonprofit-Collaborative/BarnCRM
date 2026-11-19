@@ -105,14 +105,7 @@ public with sharing class EventSeatingController {
 			result.canEdit = Schema.SObjectType.Event_Attendee__c.isUpdateable();
 			result.canAddTable = Schema.SObjectType.Event_Table__c.isCreateable();
 			for (Event_Table__c row : [
-				SELECT
-					Id,
-					Name,
-					Capacity__c,
-					Host__c,
-					Host__r.Name,
-					Event_Sponsor__c,
-					Event_Sponsor__r.Name
+				SELECT Id, Name, Capacity__c, Host__c, Host__r.Name, Event_Sponsor__c, Event_Sponsor__r.Name
 				FROM Event_Table__c
 				WHERE Event__c = :eventId
 				WITH USER_MODE
@@ -174,10 +167,7 @@ public with sharing class EventSeatingController {
 			return result;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getSeating', eventId);
-			throw UserErrors.wrapShowingDml(
-				e,
-				BarnHelp.text('Events', 'Events_Seating_LoadFailed')
-			);
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Seating_LoadFailed'));
 		}
 	}
 
@@ -196,9 +186,7 @@ public with sharing class EventSeatingController {
 			throw UserErrors.message(BarnHelp.text('Events', 'Events_Shared_NotSaved'));
 		}
 		if (String.isBlank(input.name) || input.capacity == null || input.capacity < 1) {
-			throw UserErrors.message(
-				BarnHelp.text('Events', 'Events_Seating_TableNeedsNameAndSeats')
-			);
+			throw UserErrors.message(BarnHelp.text('Events', 'Events_Seating_TableNeedsNameAndSeats'));
 		}
 		try {
 			Event_Table__c table = new Event_Table__c(
@@ -209,10 +197,10 @@ public with sharing class EventSeatingController {
 			);
 			if (String.isBlank(input.id)) {
 				table.Event__c = input.eventId;
-				Database.insert(table, true, AccessLevel.USER_MODE);
+				insert as user table;
 			} else {
 				table.Id = input.id;
-				Database.update(table, true, AccessLevel.USER_MODE);
+				update as user table;
 			}
 			return table.Id;
 		} catch (DmlException e) {
@@ -231,7 +219,7 @@ public with sharing class EventSeatingController {
 	@AuraEnabled
 	public static void deleteTable(Id tableId) {
 		try {
-			Database.delete(new Event_Table__c(Id = tableId), true, AccessLevel.USER_MODE);
+			delete as user new Event_Table__c(Id = tableId);
 		} catch (DmlException e) {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {
@@ -269,10 +257,7 @@ public with sharing class EventSeatingController {
 				[
 					SELECT Id
 					FROM Event_Attendee__c
-					WHERE
-						Id IN :attendeeIds
-						AND Event_Registration__r.Event__c = :eventId
-						AND Status__c IN :SEATABLE
+					WHERE Id IN :attendeeIds AND Event_Registration__r.Event__c = :eventId AND Status__c IN :SEATABLE
 					WITH USER_MODE
 				]
 			);
@@ -296,7 +281,7 @@ public with sharing class EventSeatingController {
 					)
 				);
 			}
-			Database.update(changes, true, AccessLevel.USER_MODE);
+			update as user changes;
 			return changes.size();
 		} catch (AuraHandledException refused) {
 			throw refused;
@@ -318,14 +303,10 @@ public with sharing class EventSeatingController {
 	@AuraEnabled
 	public static void saveNeeds(Id attendeeId, String dietary, String access) {
 		try {
-			Database.update(
-				new Event_Attendee__c(
-					Id = attendeeId,
-					Dietary_Needs__c = String.isBlank(dietary) ? null : dietary.trim(),
-					Access_Needs__c = String.isBlank(access) ? null : access.trim()
-				),
-				true,
-				AccessLevel.USER_MODE
+			update as user new Event_Attendee__c(
+				Id = attendeeId,
+				Dietary_Needs__c = String.isBlank(dietary) ? null : dietary.trim(),
+				Access_Needs__c = String.isBlank(access) ? null : access.trim()
 			);
 		} catch (DmlException e) {
 			throw UserErrors.message(e.getDmlMessage(0));

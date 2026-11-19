@@ -23,8 +23,7 @@ private class OrgShapeDetectorTest {
 	@IsTest
 	static void personTypeRecordTypesAreEmptyAndDoNotThrowWithoutPersonAccounts() {
 		System.runAs(TestUsers.admin()) {
-			Boolean hasPersonAccounts = Schema.SObjectType.Account.fields.getMap()
-				.containsKey(PERSON_ACCOUNT_FIELD);
+			Boolean hasPersonAccounts = Schema.SObjectType.Account.fields.getMap().containsKey(PERSON_ACCOUNT_FIELD);
 
 			Set<Id> personTypes = OrgShapeSelector.personTypeRecordTypeIds();
 
@@ -48,11 +47,7 @@ private class OrgShapeDetectorTest {
 			Test.stopTest();
 
 			System.assertNotEquals(null, shape, 'Detection should always return a shape.');
-			System.assertNotEquals(
-				null,
-				shape.hasNpsp,
-				'hasNpsp should be answered, not left null.'
-			);
+			System.assertNotEquals(null, shape.hasNpsp, 'hasNpsp should be answered, not left null.');
 			System.assertNotEquals(
 				null,
 				shape.hasPersonAccounts,
@@ -68,11 +63,7 @@ private class OrgShapeDetectorTest {
 				shape.hasSalesCloudObjects,
 				'hasSalesCloudObjects should be answered, not left null.'
 			);
-			System.assertNotEquals(
-				null,
-				shape.isMultiCurrency,
-				'isMultiCurrency should be answered, not left null.'
-			);
+			System.assertNotEquals(null, shape.isMultiCurrency, 'isMultiCurrency should be answered, not left null.');
 			System.assertEquals(
 				null,
 				shape.platformEncryptionPossible,
@@ -199,11 +190,7 @@ private class OrgShapeDetectorTest {
 
 			OrgShapeDetector.OrgShape shape = OrgShapeDetector.detect();
 
-			System.assertEquals(
-				7,
-				shape.nativeHouseholdGroupCount,
-				'A counted org reports the number it counted.'
-			);
+			System.assertEquals(7, shape.nativeHouseholdGroupCount, 'A counted org reports the number it counted.');
 			System.assertEquals(
 				true,
 				shape.hasNativeHouseholdGroups,
@@ -341,11 +328,7 @@ private class OrgShapeDetectorTest {
 			OrgShapeDetector.overrideShape = shapeWith(true, true, true);
 			OrgShapeDetector.reset();
 
-			System.assertNotEquals(
-				null,
-				OrgShapeDetector.detect(),
-				'After a reset, detection reads the org again.'
-			);
+			System.assertNotEquals(null, OrgShapeDetector.detect(), 'After a reset, detection reads the org again.');
 		}
 	}
 
@@ -361,10 +344,7 @@ private class OrgShapeDetectorTest {
 			shape.personAccountRecordTypeIds = new Set<Id>{ Id.valueOf('012000000000999') };
 			OrgShapeDetector.overrideShape = shape;
 
-			Assert.isNull(
-				OrgShapeDetector.creatablePersonRecordTypeId(),
-				'No person type the user can create with.'
-			);
+			Assert.isNull(OrgShapeDetector.creatablePersonRecordTypeId(), 'No person type the user can create with.');
 
 			shape.personAccountRecordTypeIds = new Set<Id>();
 			Assert.isNull(
@@ -380,9 +360,7 @@ private class OrgShapeDetectorTest {
 		System.runAs(TestUsers.admin()) {
 			Id available;
 			for (
-				Schema.RecordTypeInfo info : Account.SObjectType.getDescribe(
-						SObjectDescribeOptions.DEFERRED
-					)
+				Schema.RecordTypeInfo info : Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 					.getRecordTypeInfos()
 			) {
 				if (info.isAvailable() && !info.isMaster()) {
@@ -395,17 +373,10 @@ private class OrgShapeDetectorTest {
 				return;
 			}
 			OrgShapeDetector.OrgShape shape = shapeWith(false, true, false);
-			shape.personAccountRecordTypeIds = new Set<Id>{
-				Id.valueOf('012000000000999'),
-				available
-			};
+			shape.personAccountRecordTypeIds = new Set<Id>{ Id.valueOf('012000000000999'), available };
 			OrgShapeDetector.overrideShape = shape;
 
-			Assert.areEqual(
-				available,
-				OrgShapeDetector.creatablePersonRecordTypeId(),
-				'The type the user is given.'
-			);
+			Assert.areEqual(available, OrgShapeDetector.creatablePersonRecordTypeId(), 'The type the user is given.');
 		}
 	}
 
@@ -421,10 +392,7 @@ private class OrgShapeDetectorTest {
 				);
 				return;
 			}
-			Assert.isTrue(
-				OrgShapeDetector.detect().personAccountRecordTypeIds.contains(chosen),
-				'A person type.'
-			);
+			Assert.isTrue(OrgShapeDetector.detect().personAccountRecordTypeIds.contains(chosen), 'A person type.');
 			Assert.isTrue(
 				Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 					.getRecordTypeInfosById()
@@ -452,10 +420,7 @@ private class OrgShapeDetectorTest {
 				OrgShapeDetector.personAccountRecordTypeIds(),
 				'The shape\'s person types'
 			);
-			Assert.isFalse(
-				OrgShapeDetector.hasNativeHouseholdGroups(),
-				'The shape says no native households'
-			);
+			Assert.isFalse(OrgShapeDetector.hasNativeHouseholdGroups(), 'The shape says no native households');
 		}
 	}
 
@@ -484,19 +449,13 @@ private class OrgShapeDetectorTest {
 			OrgShapeDetector.reset();
 			OrgShapeSelector.nativeHouseholdGroupCountOverride = 0;
 			Assert.isFalse(OrgShapeDetector.hasNativeHouseholdGroups(), 'None found is no');
-			Assert.isFalse(
-				OrgShapeSelector.anyNativeHouseholdGroup(),
-				'The one-row probe answers no'
-			);
+			Assert.isFalse(OrgShapeSelector.anyNativeHouseholdGroup(), 'The one-row probe answers no');
 
 			OrgShapeDetector.reset();
 			OrgShapeSelector.nativeHouseholdGroupCountOverride = null;
 			OrgShapeSelector.failNativeHouseholdGroupProbe = true;
 			Assert.isNull(OrgShapeSelector.anyNativeHouseholdGroup(), 'A failed probe cannot tell');
-			Assert.isTrue(
-				OrgShapeDetector.hasNativeHouseholdGroups(),
-				'Unknown is assumed to be yes (ADR-0036)'
-			);
+			Assert.isTrue(OrgShapeDetector.hasNativeHouseholdGroups(), 'Unknown is assumed to be yes (ADR-0036)');
 		}
 	}
 
@@ -507,19 +466,14 @@ private class OrgShapeDetectorTest {
 			OrgShapeSelector.nativeHouseholdGroupCountOverride = 2;
 			Assert.isTrue(OrgShapeDetector.hasNativeHouseholdGroups(), 'Found');
 			OrgShapeSelector.nativeHouseholdGroupCountOverride = 0;
-			Assert.isTrue(
-				OrgShapeDetector.hasNativeHouseholdGroups(),
-				'The answer is cached for the transaction'
-			);
+			Assert.isTrue(OrgShapeDetector.hasNativeHouseholdGroups(), 'The answer is cached for the transaction');
 			OrgShapeDetector.reset();
 			Assert.isFalse(OrgShapeDetector.hasNativeHouseholdGroups(), 'A reset asks again');
 		}
 	}
 
 	private static Boolean noneAvailable(Set<Id> recordTypeIds) {
-		Map<Id, Schema.RecordTypeInfo> infos = Account.SObjectType.getDescribe(
-				SObjectDescribeOptions.DEFERRED
-			)
+		Map<Id, Schema.RecordTypeInfo> infos = Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 			.getRecordTypeInfosById();
 		for (Id recordTypeId : recordTypeIds) {
 			if (infos.containsKey(recordTypeId) && infos.get(recordTypeId).isAvailable()) {
@@ -552,10 +506,7 @@ private class OrgShapeDetectorTest {
 			Assert.isTrue(OrgShapeDetector.personRecordTypeIds().contains(typeId));
 
 			OrgShapeDetector.overrideShape = shapeWith(false, false, false);
-			Assert.isTrue(
-				OrgShapeDetector.personRecordTypeIds().isEmpty(),
-				'Never null, empty without person types.'
-			);
+			Assert.isTrue(OrgShapeDetector.personRecordTypeIds().isEmpty(), 'Never null, empty without person types.');
 		}
 	}
 }

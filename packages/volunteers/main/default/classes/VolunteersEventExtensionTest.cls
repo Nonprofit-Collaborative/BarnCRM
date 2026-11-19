@@ -20,11 +20,7 @@ private class VolunteersEventExtensionTest {
 	static void coreFindsTheExtensionByNameAndKeepsTheEventKey() {
 		System.runAs(coordinator()) {
 			Assert.isTrue(EventVolunteerExtensions.isAvailable(), 'Volunteers is installed');
-			Id jobId = EventVolunteerExtensions.createJob(
-				EVENT_KEY,
-				'Registration Desk',
-				'Greet people'
-			);
+			Id jobId = EventVolunteerExtensions.createJob(EVENT_KEY, 'Registration Desk', 'Greet people');
 			Volunteer_Job__c job = [
 				SELECT Name, Event_Key__c, Active__c, Description__c
 				FROM Volunteer_Job__c
@@ -52,10 +48,7 @@ private class VolunteersEventExtensionTest {
 			Assert.areEqual('AV Help', jobs[0].name);
 			Assert.areEqual('Registration Desk', jobs[1].name);
 			Assert.areEqual(2, jobs[1].shifts.size());
-			Assert.isTrue(
-				jobs[1].shifts[0].startTime < jobs[1].shifts[1].startTime,
-				'In time order'
-			);
+			Assert.isTrue(jobs[1].shifts[0].startTime < jobs[1].shifts[1].startTime, 'In time order');
 			Assert.areEqual(1, jobs[1].shifts[0].needed, 'A shift with no number needs one person');
 			Assert.areEqual(3, jobs[1].shifts[1].needed);
 			Assert.areEqual('Open', jobs[1].shifts[0].status);
@@ -80,10 +73,7 @@ private class VolunteersEventExtensionTest {
 				EventVolunteerExtensions.createShift(desk, start.addHours(2), start, 2);
 				Assert.fail('The shift rule still applies');
 			} catch (DmlException refused) {
-				Assert.areEqual(
-					0,
-					[SELECT COUNT() FROM Volunteer_Shift__c WHERE Volunteer_Job__c = :desk]
-				);
+				Assert.areEqual(0, [SELECT COUNT() FROM Volunteer_Shift__c WHERE Volunteer_Job__c = :desk]);
 			}
 		}
 	}

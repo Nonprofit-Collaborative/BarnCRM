@@ -219,9 +219,7 @@ public with sharing class TabAccessService {
 					more = true;
 					break;
 				}
-				toInsert.add(
-					new PermissionSetAssignment(AssigneeId = userId, PermissionSetId = tabSetId)
-				);
+				toInsert.add(new PermissionSetAssignment(AssigneeId = userId, PermissionSetId = tabSetId));
 			}
 			for (Id userId : held.keySet()) {
 				if (wanted.contains(userId)) {
@@ -255,12 +253,7 @@ public with sharing class TabAccessService {
 	 * transaction's 50,000 query rows: see the ADR's note on the ceiling.
 	 */
 	@NamespaceAccessible
-	public static Boolean giveToHolders(
-		String setName,
-		List<String> audience,
-		Integer budget,
-		String context
-	) {
+	public static Boolean giveToHolders(String setName, List<String> audience, Integer budget, String context) {
 		refuseCoreSet(setName);
 		if (audience == null || audience.isEmpty()) {
 			return false;
@@ -284,12 +277,7 @@ public with sharing class TabAccessService {
 	 * Only the groups this product ships count. Returns true when more is left.
 	 */
 	@NamespaceAccessible
-	public static Boolean giveToGroupHolders(
-		String setName,
-		List<String> groupNames,
-		Integer budget,
-		String context
-	) {
+	public static Boolean giveToGroupHolders(String setName, List<String> groupNames, Integer budget, String context) {
 		refuseCoreSet(setName);
 		if (groupNames == null || groupNames.isEmpty()) {
 			return false;
@@ -317,9 +305,7 @@ public with sharing class TabAccessService {
 
 	private static void refuseCoreSet(String setName) {
 		if (String.isBlank(setName) || setName.startsWithIgnoreCase(coreSetPrefix)) {
-			throw new IllegalArgumentException(
-				'A module sync gives a module\'s own set, never Core\'s: ' + setName
-			);
+			throw new IllegalArgumentException('A module sync gives a module\'s own set, never Core\'s: ' + setName);
 		}
 	}
 
@@ -363,11 +349,7 @@ public with sharing class TabAccessService {
 		List<List<String>> refusedErrors = new List<List<String>>();
 		Integer refusedInserts = 0;
 		if (!toInsert.isEmpty()) {
-			List<Database.SaveResult> saved = Database.insert(
-				toInsert,
-				false,
-				AccessLevel.SYSTEM_MODE
-			);
+			List<Database.SaveResult> saved = Database.insert(toInsert, false, AccessLevel.SYSTEM_MODE);
 			for (Integer i = 0; i < saved.size(); i++) {
 				Database.SaveResult result = saved[i];
 				if (result.isSuccess() || isDuplicate(result.getErrors())) {
@@ -379,11 +361,7 @@ public with sharing class TabAccessService {
 			}
 		}
 		if (!toDelete.isEmpty()) {
-			List<Database.DeleteResult> deleted = Database.delete(
-				toDelete,
-				false,
-				AccessLevel.SYSTEM_MODE
-			);
+			List<Database.DeleteResult> deleted = Database.delete(toDelete, false, AccessLevel.SYSTEM_MODE);
 			for (Integer i = 0; i < deleted.size(); i++) {
 				if (!deleted[i].isSuccess()) {
 					refused.add(toDelete[i]);
@@ -392,11 +370,7 @@ public with sharing class TabAccessService {
 			}
 		}
 		if (!refused.isEmpty()) {
-			ErrorLogger.logMessages(
-				refusalMessages(refused, refusedErrors),
-				context,
-				ErrorLogger.SEVERITY_WARNING
-			);
+			ErrorLogger.logMessages(refusalMessages(refused, refusedErrors), context, ErrorLogger.SEVERITY_WARNING);
 		}
 		return refusedInserts;
 	}
@@ -406,10 +380,7 @@ public with sharing class TabAccessService {
 	 * says which assignment to look at rather than only what the platform answered.
 	 */
 	@TestVisible
-	private static List<String> refusalMessages(
-		List<PermissionSetAssignment> refused,
-		List<List<String>> errors
-	) {
+	private static List<String> refusalMessages(List<PermissionSetAssignment> refused, List<List<String>> errors) {
 		Set<Id> setIds = new Set<Id>();
 		for (PermissionSetAssignment assignment : refused) {
 			setIds.add(assignment.PermissionSetId);
@@ -506,11 +477,7 @@ public with sharing class TabAccessService {
 	}
 
 	/** The active people holding any of the sets, directly or through a group. */
-	private static Set<Id> holdersOf(
-		List<String> sourceNames,
-		Map<String, Id> setIds,
-		Map<Id, Set<Id>> groupIdsBySet
-	) {
+	private static Set<Id> holdersOf(List<String> sourceNames, Map<String, Id> setIds, Map<Id, Set<Id>> groupIdsBySet) {
 		Set<Id> sourceIds = new Set<Id>();
 		Set<Id> groupIds = new Set<Id>();
 		for (String name : sourceNames) {
@@ -527,10 +494,7 @@ public with sharing class TabAccessService {
 		for (PermissionSetAssignment row : [
 			SELECT AssigneeId
 			FROM PermissionSetAssignment
-			WHERE
-				(PermissionSetId IN :sourceIds
-				OR PermissionSetGroupId IN :groupIds)
-				AND Assignee.IsActive = TRUE
+			WHERE (PermissionSetId IN :sourceIds OR PermissionSetGroupId IN :groupIds) AND Assignee.IsActive = TRUE
 			WITH SYSTEM_MODE
 		]) {
 			people.add(row.AssigneeId);

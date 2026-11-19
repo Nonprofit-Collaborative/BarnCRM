@@ -7,8 +7,7 @@
 @IsTest(testFor='ApexClass:GiftImportProcessor')
 private class GiftImportUndoPersonAccountsTest {
 	private static Boolean personAccountsOrg() {
-		return OrgShapeDetector.hasPersonAccounts() == true &&
-			OrgShapeDetector.creatablePersonRecordTypeId() != null;
+		return OrgShapeDetector.hasPersonAccounts() == true && OrgShapeDetector.creatablePersonRecordTypeId() != null;
 	}
 
 	@TestSetup

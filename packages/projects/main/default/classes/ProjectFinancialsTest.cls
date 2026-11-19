@@ -3,9 +3,7 @@
  * invoiced and the stored months; cost only for Projects Admin; nothing while off. Change
  * requests (PM-12, R-PM20) move the budget the project is measured against, health included.
  */
-@IsTest(
-	testFor='ApexClass:ProjectFinancials, ApexClass:ProjectBillingController, ApexClass:ProjectHealth'
-)
+@IsTest(testFor='ApexClass:ProjectFinancials, ApexClass:ProjectBillingController, ApexClass:ProjectHealth')
 private class ProjectFinancialsTest {
 	@TestSetup
 	static void setup() {
@@ -94,8 +92,7 @@ private class ProjectFinancialsTest {
 				WHERE Id = :project.Id
 			];
 			Assert.isFalse(
-				checked.Health_Reasons__c != null &&
-				checked.Health_Reasons__c.contains('logged against'),
+				checked.Health_Reasons__c != null && checked.Health_Reasons__c.contains('logged against'),
 				'12 of 20 hours is not over budget'
 			);
 		}
@@ -106,11 +103,7 @@ private class ProjectFinancialsTest {
 		System.runAs(ProjectsTestData.admin()) {
 			Project__c project = ProjectsTestData.project('Active', 10);
 			Database.SaveResult result = Database.insert(
-				new Project_Change_Request__c(
-					Project__c = project.Id,
-					Name = 'Extra',
-					Hours__c = 1
-				),
+				new Project_Change_Request__c(Project__c = project.Id, Name = 'Extra', Hours__c = 1),
 				false
 			);
 			Assert.isFalse(result.isSuccess(), 'Track change requests is off by default');

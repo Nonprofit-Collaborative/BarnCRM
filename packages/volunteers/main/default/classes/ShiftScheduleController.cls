@@ -75,9 +75,7 @@ public with sharing class ShiftScheduleController {
 	}
 
 	private static Preview previewOf(Id scheduleId) {
-		Shift_Schedule__c schedule = scheduleId == null
-			? null
-			: ShiftScheduleSelector.scheduleForPreview(scheduleId);
+		Shift_Schedule__c schedule = scheduleId == null ? null : ShiftScheduleSelector.scheduleForPreview(scheduleId);
 		if (schedule == null) {
 			throw UserErrors.message(loadFailed());
 		}
@@ -95,10 +93,7 @@ public with sharing class ShiftScheduleController {
 		}
 		Date runDay = ShiftScheduleService.today();
 		Date horizon = runDay.addDays(7 * VolunteerSettings.shiftHorizonWeeks());
-		Date untilDay = schedule.End_Date__c != null &&
-			schedule.End_Date__c < horizon
-			? schedule.End_Date__c
-			: horizon;
+		Date untilDay = schedule.End_Date__c != null && schedule.End_Date__c < horizon ? schedule.End_Date__c : horizon;
 		preview.through = untilDay;
 		Date fromDay = later(runDay, schedule.Start_Date__c);
 		if (schedule.Created_Through__c != null) {
@@ -118,10 +113,7 @@ public with sharing class ShiftScheduleController {
 		}
 		Datetime now = ShiftScheduleService.now();
 		for (Date day : ShiftScheduleService.shiftDays(schedule, fromDay, untilDay)) {
-			if (
-				!taken.contains(day) &&
-				ShiftScheduleService.toOrgDatetime(day, schedule.Start_Time__c) >= now
-			) {
+			if (!taken.contains(day) && ShiftScheduleService.toOrgDatetime(day, schedule.Start_Time__c) >= now) {
 				preview.missing++;
 			}
 		}

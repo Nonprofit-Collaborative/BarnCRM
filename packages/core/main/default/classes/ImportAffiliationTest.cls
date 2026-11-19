@@ -120,23 +120,13 @@ private class ImportAffiliationTest {
 				)
 			);
 			Contact ben = TestDataFactory.person(
-				new Contact(
-					FirstName = 'Ben',
-					LastName = 'Okafor',
-					Email = 'ben@example.org',
-					MailingCity = 'Portland'
-				)
+				new Contact(FirstName = 'Ben', LastName = 'Okafor', Email = 'ben@example.org', MailingCity = 'Portland')
 			);
 			insert new List<Contact>{ ana, ben };
 			insert new Affiliation__c(Contact__c = ana.Id, Organization__c = employer.Id);
 			given(
 				new List<Map<String, String>>{
-					ImportTestDataFactory.donorRow(
-						'Ana',
-						'Ramirez',
-						'ana@example.org',
-						'Rose City'
-					),
+					ImportTestDataFactory.donorRow('Ana', 'Ramirez', 'ana@example.org', 'Rose City'),
 					ImportTestDataFactory.donorRow('Ben', 'Okafor', 'ben@example.org', 'Rose City'),
 					ImportTestDataFactory.donorRow('Ben', 'Okafor', 'ben@example.org', 'Rose City')
 				}

@@ -3,8 +3,17 @@
   <hasActivationRequired>false</hasActivationRequired>
   <label>Payments Staff</label>
   <description>
-    Sees every payment and its status. Changes nothing: status comes from the processor.
+    Sees every payment and its status. Changes nothing: status comes from the processor. Has
+    principal access to the Stripe and PayPal credentials, so checkouts it starts can call them.
   </description>
+  <externalCredentialPrincipalAccesses>
+    <enabled>true</enabled>
+    <externalCredentialPrincipal>Barn_PayPal-Barn_PayPal_App</externalCredentialPrincipal>
+  </externalCredentialPrincipalAccesses>
+  <externalCredentialPrincipalAccesses>
+    <enabled>true</enabled>
+    <externalCredentialPrincipal>Barn_Stripe-Barn_Stripe_Key</externalCredentialPrincipal>
+  </externalCredentialPrincipalAccesses>
   <fieldPermissions>
     <editable>false</editable>
     <field>Payment__c.Amount_Refunded__c</field>

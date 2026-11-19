@@ -1,9 +1,8 @@
 /**
- * The class Core finds by name (registered in its catalog row) to add Mirror's steps to the
- * one nightly run (ADR-0166 nightly-job-dispatcher): the nightly run of the Opportunity mirror
- * and of the Gift Transaction mirror (X-07), and the Case requests run (D-201, while Send Cases
- * to a service provider is on). Each mirror step is in tonight's run only while that
- * mirror's direction is chosen and its object exists, and its page switches it on and off.
+ * The class Core finds by name (registered in its catalog row) to add Mirror's step to the one
+ * nightly run (ADR-0166 nightly-job-dispatcher): the Case requests step (D-201, while Send Cases to
+ * a service provider is on), whose work keeps the hourly check scheduled (N-10). The gift mirrors'
+ * steps are BarnCRM Fundraising's (`GivingNightlyJobProvider`).
  *
  * `@NamespaceAccessible` for the reason `MirrorHealthCheckExtension` is: Core resolves it with
  * `Type.forName` under ADR-0017.
@@ -16,10 +15,6 @@ public with sharing class MirrorNightlyJobProvider implements NightlyStepProvide
 	}
 
 	public List<NightlyStep> nightlySteps() {
-		return new List<NightlyStep>{
-			OpportunityMirrorSchedulable.step(),
-			GiftTransactionMirrorSchedulable.step(),
-			CaseProviderRequests.step()
-		};
+		return new List<NightlyStep>{ CaseProviderRequests.step() };
 	}
 }

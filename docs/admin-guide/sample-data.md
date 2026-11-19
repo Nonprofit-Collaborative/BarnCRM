@@ -26,9 +26,9 @@ What loads, exactly:
 | Seasonal addresses | 2 | Winter addresses (1 December to 31 March) for the Patel household in Naples, Florida and the Ortiz household in Tucson, Arizona ([Addresses](addresses.md)) |
 | Interaction notes | 3 | Completed meetings logged on Maria Whitfield, Priya Nguyen and Susan Patel, as **Log an Interaction** records them ([Interaction notes](interaction-notes.md)) |
 
-### With Giving Installed
+### With Fundraising Installed
 
-With the **Giving** package installed, the same action also loads:
+With the **Fundraising** package installed, the same action also loads:
 
 | Records | How many | What is in them |
 |---|---|---|
@@ -59,7 +59,7 @@ has to stay removable.
 
 ### With Volunteers Installed
 
-With the **Volunteers** package installed, the same action also loads, after Giving if it is
+With the **Volunteers** package installed, the same action also loads, after Fundraising if it is
 there:
 
 | Records | How many | What is in them |
@@ -109,7 +109,7 @@ a sample enrollment that has a case note (whoever wrote it, even a note you cann
 Warning in the [Error Log](error-log.md) names each kept record by kind: "Sample data removal
 kept some Programs sample records, because records of your own point at them: Programs (Food
 pantry). Move or delete your records, then remove sample data again." The same Warning covers
-any module whose sample set ships as a data file (Programs, Logic Models, Funders and Events).
+any module whose sample set ships as a data file (Programs, Logic Models, Grants and Events).
 
 ### With Logic Models Installed
 
@@ -132,9 +132,9 @@ has a long term outcome with no indicator yet, so it lists that one reminder. Re
 the two sample models with their parts, arrows, evidence, indicators and periods; your own
 models are never touched.
 
-### With Funders Installed
+### With Grants Installed
 
-With the **Funders** package installed, the same action also loads, after Programs if it is
+With the **Grants** package installed, the same action also loads, after Programs if it is
 there:
 
 | Records | How many | What is in them |
@@ -146,11 +146,11 @@ there:
 | Grant budget lines | 2 | On the same award: Tutor stipends (30,000 requested, 28,000 awarded), which the Spent entry is on, and Books and supplies (10,000 requested, 7,000 awarded). |
 
 Removal deletes the sample grants with their requirements, payments and entries; your own grants are never touched. Nothing is loaded for
-Funders when the core sample organizations are not there.
+Grants when the core sample organizations are not there.
 
 ### With Event Management Installed
 
-With the **Event Management** package installed, the same action also loads, after Funders if it
+With the **Event Management** package installed, the same action also loads, after Grants if it
 is there, for the sample people (and the sample organizations, for sponsors):
 
 | Records | How many | What is in them |
@@ -177,14 +177,14 @@ core sample people are not there.
    type "sample" in the settings search box.
 3. Read the warning, then select **Load Sample Data**.
 4. Confirm in the dialog. Loading runs in the background; the card shows progress and
-   updates automatically until it finishes. With Giving installed there are several
+   updates automatically until it finishes. With Fundraising installed there are several
    thousand records to write, so allow a few minutes rather than one. The load runs as
    background batch jobs (Setup > Apex Jobs lists them as SampleDataStageBatch), one step
    at a time, so it finishes in any org, Developer Edition, trial and scratch orgs included.
    If a step stops on an error, the load stops there: the card shows what did load, the
    error is in the [Error Log](error-log.md), and **Remove Sample Data** clears it for
    another try.
-5. With Giving installed: when it says **Loaded**, give the totals a few minutes. Giving
+5. With Fundraising installed: when it says **Loaded**, give the totals a few minutes. Giving
    totals (total giving, this year, largest gift, fund and appeal totals) are shipped in
    **Both** mode, so they are worked out in the background queue as the gifts are saved, and
    a bulk load like this one catches up within minutes. If a total is still empty after that,
@@ -214,7 +214,7 @@ household records, names, greetings, member counts, and Members panel.
 
 1. Open **BarnCRM Settings**, go to **Sample Data**, and select **Load Sample Data**.
    Confirm the dialog. Wait for the card to show **Loaded**, with counts for households,
-   contacts, organizations, connections, affiliations, and, with Giving installed, gifts.
+   contacts, organizations, connections, affiliations, and, with Fundraising installed, gifts.
 2. Open the **Households** tab. Use the list view search to find "Garcia" and open
    **The Garcia Family**.
 3. On the household record, check the formal and informal greeting fields. They read
@@ -224,22 +224,22 @@ household records, names, greetings, member counts, and Members panel.
    member count as the people are added, even while **Households** is off, so the
    sample set always arrives fully named. Your own households are only kept up to date
    while Households is on.
-4. Still on the Garcia household, look at the **Gifts** related list (Giving installed).
+4. Still on the Garcia household, look at the **Gifts** related list (Fundraising installed).
    The family has given in each of the last three years, which is what a renewing donor
    looks like in the retention report.
 5. Still on **Households**, search for "Staff Household". This is the sample data's own
    staff family: Maria, David, Priya, Tom, Jen, and Sam appear here as contacts, so you
    can find a familiar name while you are learning the app.
-6. With Giving installed, open the **Gifts** tab and sort by amount. Open the largest gift and look at its
+6. With Fundraising installed, open the **Gifts** tab and sort by amount. Open the largest gift and look at its
    allocations: most gifts sit in one fund, some are split across two. Then filter the list
    view by **Status** equals Refunded to find the refunded gift, and open it: its own amount
    is unchanged and a linked negative gift reverses it, which is how a refund is recorded
    here and why the donor's total reads as zero for that gift rather than twice over.
-7. With Giving installed, open the **Commitments** tab, sort by **Status**, and open an Active monthly commitment.
+7. With Fundraising installed, open the **Commitments** tab, sort by **Status**, and open an Active monthly commitment.
    Its installments are generated from the schedule and the ones a gift has paid are marked
    Paid. One monthly donor in the set has three installments marked Overdue: that is the
    lapsed recurring donor a fundraiser would want to call this week.
-8. With Giving installed, open the **Giving Overview** dashboard. If the numbers are empty, go to **BarnCRM
+8. With Fundraising installed, open the **Giving Overview** dashboard. If the numbers are empty, go to **BarnCRM
    Settings > Rollups** and select **Recalculate**: the totals are worked out by the rollup
    run rather than as each gift is saved.
 9. Return to **BarnCRM Settings**, **Sample Data**, and select **Remove Sample Data**.
@@ -276,11 +276,11 @@ household records, names, greetings, member counts, and Members panel.
   profile and permission sets do not give it to you, **Load Sample Data** refuses with a
   message naming it. Give it to yourself in Setup, or choose another one in that setting.
 - **Installing a module after loading sample data.** A load brings in the sample data of the
-  modules installed at the time, so a module installed afterwards (Giving or Volunteers, for
+  modules installed at the time, so a module installed afterwards (Fundraising or Volunteers, for
   example) has none, and **Load Sample Data** refuses with the message that sample data is
   already loaded. Select **Remove Sample Data**, wait for **Not loaded**, then **Load sample
   data** again: the new load includes every module installed now.
-- **Assuming removal is instant.** Removal deletes several thousand records with Giving
+- **Assuming removal is instant.** Removal deletes several thousand records with Fundraising
   installed and takes a minute or two; wait for the card to confirm **Not loaded** before
   assuming it is done. If it stops part way, a notification says so and the Error Log says
   why; deal with what it names, then select **Remove Sample Data** again to finish it.
@@ -289,11 +289,11 @@ household records, names, greetings, member counts, and Members panel.
   a required field your org added that refused a sample record). Fix or relax what it names,
   then finish: after a stopped removal, select **Remove Sample Data** again; after a stopped
   load, remove what loaded, then load again.
-- **Expecting the giving totals to appear straight away (with Giving).** The gifts are all there the
+- **Expecting the giving totals to appear straight away (with Fundraising).** The gifts are all there the
   moment the load finishes, but the totals on households, people, funds and appeals are
   worked out in the background queue, which catches up within minutes. If they are still
   empty after that, Recalculate from **BarnCRM Settings > Rollups**, or wait for tonight.
-- **Reporting on sample gifts as if the dates were fixed (with Giving).** Gift dates are counted back
+- **Reporting on sample gifts as if the dates were fixed (with Fundraising).** Gift dates are counted back
   from the day you loaded the set, so two orgs loaded on different days hold different
   dates. That is deliberate: it keeps "this year" full whenever you load.
 - **Expecting sample person accounts in an org that stores people as accounts.** The sample people
@@ -305,7 +305,7 @@ household records, names, greetings, member counts, and Members panel.
   a real person on a sample job stay, and so does a sample shift a real person is signed up
   for or has hours on, with that sign-up, and that job. A real person given a sample skill
   keeps it, and so does a job of your own that asks for one, so that skill stays too. Removal
-  keeps only those sample records and removes everything else, Core's and Giving's sample data
+  keeps only those sample records and removes everything else, Core's and Fundraising's sample data
   included. The Error Log then holds one Warning naming each one kept and why, for example
   "Sample data removal kept the sample shift Front desk: 13 Oct 2026 because Rita Real has
   hours and a sign-up on it." Move those hours, sign-ups and skills to a job, shift or skill
@@ -329,7 +329,7 @@ household records, names, greetings, member counts, and Members panel.
 |---|---|
 | Sample Data checkbox on households, contacts, and organizations | `Sample_Data__c` on Account and Contact |
 | Sample Data checkbox on connections and affiliations | `Sample_Data__c` on `Relationship__c` and `Affiliation__c` |
-| Sample Data checkbox on gifts, funds, appeals, commitments and asks (with Giving) | `Sample_Data__c` on `Gift__c`, `Fund__c`, `Appeal__c`, `Commitment__c` and `Ask__c` |
+| Sample Data checkbox on gifts, funds, appeals, commitments and asks (with Fundraising) | `Sample_Data__c` on `Gift__c`, `Fund__c`, `Appeal__c`, `Commitment__c` and `Ask__c` |
 | Sample Data checkbox on saved Find queries | `Sample_Data__c` on `Saved_Query__c`; the seasonal addresses are found through their sample household, and the interaction notes go with the sample people they are logged on |
 | Sample Data checkbox on event venues (with Event Management) | `Sample_Data__c` on `Event_Venue__c`; its rooms go with it |
 | Sample Data checkbox on volunteer jobs and skills (with Volunteers) | `Sample_Data__c` on `Volunteer_Job__c` and `Skill__c`; shifts, schedules, sign-ups and hours are found through their job |

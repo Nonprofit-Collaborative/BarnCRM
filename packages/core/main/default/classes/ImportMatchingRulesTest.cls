@@ -78,23 +78,13 @@ private class ImportMatchingRulesTest {
 		Import_Batch__c committed = run(batch.Id, false);
 		Assert.areEqual(dryRun.Rows_Created__c, committed.Rows_Created__c, 'Created as previewed.');
 		Assert.areEqual(dryRun.Rows_Matched__c, committed.Rows_Matched__c, 'Matched as previewed.');
-		Assert.areEqual(
-			dryRun.Rows_Rejected__c,
-			committed.Rows_Rejected__c,
-			'Rejected as previewed.'
-		);
+		Assert.areEqual(dryRun.Rows_Rejected__c, committed.Rows_Rejected__c, 'Rejected as previewed.');
 		return committed;
 	}
 
 	private static List<Import_Row__c> rowsOf(Id batchId) {
 		return [
-			SELECT
-				Id,
-				Status__c,
-				Error_Message__c,
-				Several_Matches__c,
-				Contact_1__c,
-				Organization__c
+			SELECT Id, Status__c, Error_Message__c, Several_Matches__c, Contact_1__c, Organization__c
 			FROM Import_Row__c
 			WHERE Import_Batch__c = :batchId
 			WITH SYSTEM_MODE
@@ -137,11 +127,7 @@ private class ImportMatchingRulesTest {
 			Test.stopTest();
 
 			Import_Row__c row = rowsOf(batch.Id)[0];
-			Assert.areEqual(
-				ImportRowProcessor.STATUS_REJECTED,
-				row.Status__c,
-				'Two Janes: rejected.'
-			);
+			Assert.areEqual(ImportRowProcessor.STATUS_REJECTED, row.Status__c, 'Two Janes: rejected.');
 			Assert.isTrue(row.Several_Matches__c, 'Ticked.');
 		}
 	}
@@ -153,9 +139,7 @@ private class ImportMatchingRulesTest {
 			insert john;
 			Contact jane = smith('Jane');
 			insert jane;
-			Import_Batch__c batch = ImportTestDataFactory.batch(
-				template(ImportTemplateService.SEVERAL_MOST_RECENT)
-			);
+			Import_Batch__c batch = ImportTestDataFactory.batch(template(ImportTemplateService.SEVERAL_MOST_RECENT));
 			ImportTestDataFactory.rows(batch, new List<Map<String, String>>{ smithRow('') });
 
 			Test.startTest();
@@ -168,9 +152,7 @@ private class ImportMatchingRulesTest {
 			Assert.areEqual(jane.Id, row.Contact_1__c, 'The most recently changed, Jane.');
 			Assert.isTrue(row.Several_Matches__c, 'Still ticked, so it can be checked.');
 			Assert.isTrue(
-				committed.Run_Log__c.contains(
-					BarnHelp.text('Core', 'Core_Import_LogSeveralMatchesUsedRecent')
-				),
+				committed.Run_Log__c.contains(BarnHelp.text('Core', 'Core_Import_LogSeveralMatchesUsedRecent')),
 				'The run log says so.'
 			);
 			Assert.areEqual(2, [SELECT COUNT() FROM Contact], 'Nobody added.');
@@ -182,12 +164,8 @@ private class ImportMatchingRulesTest {
 		System.runAs(TestUsers.admin()) {
 			Id organizationType = organizationRecordTypeId();
 			insert new List<Account>{
-				TestDataFactory.organization(
-					new Account(Name = 'First Baptist', RecordTypeId = organizationType)
-				),
-				TestDataFactory.organization(
-					new Account(Name = 'First Baptist', RecordTypeId = organizationType)
-				)
+				TestDataFactory.organization(new Account(Name = 'First Baptist', RecordTypeId = organizationType)),
+				TestDataFactory.organization(new Account(Name = 'First Baptist', RecordTypeId = organizationType))
 			};
 			Import_Batch__c batch = ImportTestDataFactory.batch(template(null));
 			Map<String, String> values = smithRow('Ana');
@@ -266,11 +244,7 @@ private class ImportMatchingRulesTest {
 			Test.stopTest();
 
 			Import_Template__c saved = ImportTemplateSelector.selectById(template.Id);
-			Assert.areEqual(
-				ImportTemplateService.RULE_EMAIL,
-				saved.Matching_Rule__c,
-				'Person rule.'
-			);
+			Assert.areEqual(ImportTemplateService.RULE_EMAIL, saved.Matching_Rule__c, 'Person rule.');
 			Assert.isNull(saved.Person_Match_Field__c, 'No field without the External ID rule.');
 			Assert.areEqual(
 				ImportTemplateService.ORGANIZATION_RULE_NAME,
@@ -314,11 +288,7 @@ private class ImportMatchingRulesTest {
 			Test.stopTest();
 
 			Assert.areEqual(1, found.size(), 'Only the real value was looked up.');
-			Assert.areEqual(
-				template.Id,
-				found.get(template.Template_Key__c.toLowerCase()),
-				'Found by its value.'
-			);
+			Assert.areEqual(template.Id, found.get(template.Template_Key__c.toLowerCase()), 'Found by its value.');
 		}
 	}
 
@@ -330,20 +300,12 @@ private class ImportMatchingRulesTest {
 			for (Integer i = 0; i < 200; i++) {
 				couples.add(
 					TestDataFactory.person(
-						new Contact(
-							FirstName = 'John',
-							LastName = 'Smith' + i,
-							MailingPostalCode = '12345'
-						)
+						new Contact(FirstName = 'John', LastName = 'Smith' + i, MailingPostalCode = '12345')
 					)
 				);
 				couples.add(
 					TestDataFactory.person(
-						new Contact(
-							FirstName = 'Jane',
-							LastName = 'Smith' + i,
-							MailingPostalCode = '12345'
-						)
+						new Contact(FirstName = 'Jane', LastName = 'Smith' + i, MailingPostalCode = '12345')
 					)
 				);
 				values.add(
@@ -383,20 +345,12 @@ private class ImportMatchingRulesTest {
 			for (Integer i = 0; i < 200; i++) {
 				couples.add(
 					TestDataFactory.person(
-						new Contact(
-							FirstName = 'John',
-							LastName = 'Smith' + i,
-							MailingPostalCode = '12345'
-						)
+						new Contact(FirstName = 'John', LastName = 'Smith' + i, MailingPostalCode = '12345')
 					)
 				);
 				couples.add(
 					TestDataFactory.person(
-						new Contact(
-							FirstName = 'Jane',
-							LastName = 'Smith' + i,
-							MailingPostalCode = '12345'
-						)
+						new Contact(FirstName = 'Jane', LastName = 'Smith' + i, MailingPostalCode = '12345')
 					)
 				);
 				values.add(
@@ -407,9 +361,7 @@ private class ImportMatchingRulesTest {
 				);
 			}
 			insert couples;
-			Import_Batch__c batch = ImportTestDataFactory.batch(
-				template(ImportTemplateService.SEVERAL_MOST_RECENT)
-			);
+			Import_Batch__c batch = ImportTestDataFactory.batch(template(ImportTemplateService.SEVERAL_MOST_RECENT));
 			ImportTestDataFactory.rows(batch, values);
 
 			Test.startTest();

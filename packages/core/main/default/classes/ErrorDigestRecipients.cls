@@ -31,9 +31,7 @@ public with sharing class ErrorDigestRecipients {
 			);
 		}
 		List<String> listed = addresses(configured);
-		Map<String, User> byAddress = ErrorDigestSelector.activeUsersByEmail(
-			new Set<String>(listed)
-		);
+		Map<String, User> byAddress = ErrorDigestSelector.activeUsersByEmail(new Set<String>(listed));
 		List<User> found = new List<User>();
 		for (String address : listed) {
 			User person = byAddress.get(address);
@@ -54,9 +52,7 @@ public with sharing class ErrorDigestRecipients {
 			return null;
 		}
 		List<String> listed = addresses(configured);
-		Map<String, User> byAddress = ErrorDigestSelector.activeUsersByEmail(
-			new Set<String>(listed)
-		);
+		Map<String, User> byAddress = ErrorDigestSelector.activeUsersByEmail(new Set<String>(listed));
 		List<String> unknown = new List<String>();
 		for (String address : listed) {
 			if (!byAddress.containsKey(address)) {

@@ -59,3 +59,11 @@ was written.
 
 The status becomes **Processed** and **Records Written** lists what was written. If the
 message says something else is wrong, such as a field you cannot change, ask your BarnCRM admin.
+
+## When a Form Is Closed or Deleted
+
+A form no longer in use is usually **Closed**: nobody can fill it in, and everything stays. Only
+a Forms administrator can delete a form that has submissions; if you try, BarnCRM says to close
+it instead. When an administrator deletes one, its submissions stay: each still shows the
+**Form Name** and **Version Number** it answered, and its answers by question key. Such a
+submission can no longer be processed again.

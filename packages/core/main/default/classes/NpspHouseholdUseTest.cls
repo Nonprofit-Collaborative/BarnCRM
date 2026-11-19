@@ -3,9 +3,7 @@
  * detection, the refused turn-on, first-run setup leaving it out, and the Features row. No test
  * org has NPSP, so the tests replace `NpspHouseholdSource.instance` with stand-ins.
  */
-@IsTest(
-	testFor='ApexClass:NpspHouseholdSource, ApexClass:FeatureSwitchService, ApexClass:FeatureController'
-)
+@IsTest(testFor='ApexClass:NpspHouseholdSource, ApexClass:FeatureSwitchService, ApexClass:FeatureController')
 private class NpspHouseholdUseTest {
 	private static final String NPSP_NAME = 'Garcia Household (NPSP stand-in)';
 
@@ -137,19 +135,13 @@ private class NpspHouseholdUseTest {
 			}
 			Test.stopTest();
 
-			Assert.isNotNull(
-				refused,
-				'Household Upkeep is refused while NPSP households are in use'
-			);
+			Assert.isNotNull(refused, 'Household Upkeep is refused while NPSP households are in use');
 			Assert.areEqual(
 				BarnHelp.text('Core', 'Core_Feature_HouseholdUpkeep_NpspBlocked'),
 				refused.getMessage(),
 				'The refusal says why'
 			);
-			Assert.isFalse(
-				FeatureSwitchService.isOn(FeatureSwitchService.HOUSEHOLD_UPKEEP),
-				'It stays off'
-			);
+			Assert.isFalse(FeatureSwitchService.isOn(FeatureSwitchService.HOUSEHOLD_UPKEEP), 'It stays off');
 		}
 	}
 
@@ -161,10 +153,7 @@ private class NpspHouseholdUseTest {
 
 			Test.startTest();
 			FeatureSwitchService.finishFirstRun(
-				new Set<String>{
-					FeatureSwitchService.RELATIONSHIPS,
-					FeatureSwitchService.HOUSEHOLD_UPKEEP
-				}
+				new Set<String>{ FeatureSwitchService.RELATIONSHIPS, FeatureSwitchService.HOUSEHOLD_UPKEEP }
 			);
 			Test.stopTest();
 

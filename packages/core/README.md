@@ -22,9 +22,7 @@ object references: those live only in the Mirror module, behind dynamic Apex.
   **No Platform Cache.** Settings and the shipped custom metadata are read through the
   platform's own caches (`getOrgDefaults()` and custom metadata `getAll()`), which cost no
   query and are refreshed when a save commits, plus a per-transaction static cache that every
-  write clears. Core ships no cache partition and needs no cache allocation (ADR-0094). A
-  `BarnCRMSettings` partition created for an earlier version is no longer used and can be
-  deleted.
+  write clears. Core ships no cache partition and needs no cache allocation (ADR-0094).
 - **Trigger framework**: one trigger per object, bypassable handlers, a pause-all switch.
 - **Error Log** (`Error_Log__c`): every caught exception with context, user, record, and a
   plain-language message, published as a platform event so the entry survives the rollback it
@@ -167,7 +165,7 @@ install must never fail because of a bootstrap step, so every failure goes to th
 instead.
 
 Core creates no Rollup Definitions: the engine is the BarnCRM Rollup Builder module, and
-its `RollupsPostInstall` creates the shipped ones (ADR-0029, ADR-0125). Giving makes the
+its `RollupsPostInstall` creates the shipped ones (ADR-0029, ADR-0125). Fundraising makes the
 same call from `GivingPostInstall` for its own.
 
 Once package versions exist, `sfdx-project.json` names it for the Core package directory:

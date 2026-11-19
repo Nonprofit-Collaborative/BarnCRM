@@ -72,10 +72,7 @@ public with sharing class EngagementScore {
 	 * an installed signal cannot answer.
 	 */
 	public Map<Id, Integer> scores(List<Contact> people, Date today) {
-		Map<String, Map<Id, Decimal>> totalsByPart = signalTotals(
-			new Map<Id, Contact>(people).keySet(),
-			since(today)
-		);
+		Map<String, Map<Id, Decimal>> totalsByPart = signalTotals(new Map<Id, Contact>(people).keySet(), since(today));
 		Decimal activityWeight = weights.get(ACTIVITY);
 		Map<Id, Integer> scored = new Map<Id, Integer>();
 		for (Contact person : people) {
@@ -83,16 +80,12 @@ public with sharing class EngagementScore {
 			Decimal possible = activityWeight;
 			for (String part : totalsByPart.keySet()) {
 				Decimal total = totalsByPart.get(part).get(person.Id);
-				earned +=
-					weights.get(part) *
-					Math.min(1, (total == null ? 0 : total) / targets.get(part));
+				earned += weights.get(part) * Math.min(1, (total == null ? 0 : total) / targets.get(part));
 				possible += weights.get(part);
 			}
 			scored.put(
 				person.Id,
-				possible == 0
-					? 0
-					: (earned * 100 / possible).round(System.RoundingMode.HALF_UP).intValue()
+				possible == 0 ? 0 : (earned * 100 / possible).round(System.RoundingMode.HALF_UP).intValue()
 			);
 		}
 		return scored;

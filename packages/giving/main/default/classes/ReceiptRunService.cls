@@ -65,12 +65,7 @@ public with sharing class ReceiptRunService {
 	}
 
 	/** Counts written as the run goes, so a run that is still going shows real progress (R-RR3). */
-	public static void recordProgress(
-		Id runId,
-		Integer donorsProcessed,
-		Integer receiptsIssued,
-		Integer errors
-	) {
+	public static void recordProgress(Id runId, Integer donorsProcessed, Integer receiptsIssued, Integer errors) {
 		ReceiptWriter.updateRun(
 			new Receipt_Run__c(
 				Id = runId,
@@ -85,12 +80,7 @@ public with sharing class ReceiptRunService {
 	 * Closes a run. A run with any failed chunk ends Completed with errors, never Completed: the
 	 * distinction is the whole reason the count is kept (R-RR1).
 	 */
-	public static void finish(
-		Id runId,
-		Integer donorsProcessed,
-		Integer receiptsIssued,
-		Integer errors
-	) {
+	public static void finish(Id runId, Integer donorsProcessed, Integer receiptsIssued, Integer errors) {
 		ReceiptWriter.updateRun(
 			new Receipt_Run__c(
 				Id = runId,

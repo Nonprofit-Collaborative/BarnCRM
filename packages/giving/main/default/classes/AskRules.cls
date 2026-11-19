@@ -116,9 +116,7 @@ public with sharing class AskRules {
 			: PersonRecordSelector.getAccountsBehindPersonContacts(contactIds);
 		for (SObject record : records) {
 			Ask__c ask = (Ask__c) record;
-			Id accountId = ask.Donor_Account__c == null
-				? accountByContact.get(ask.Donor_Contact__c)
-				: null;
+			Id accountId = ask.Donor_Account__c == null ? accountByContact.get(ask.Donor_Contact__c) : null;
 			if (accountId != null) {
 				ask.Donor_Account__c = accountId;
 				ask.Donor_Contact__c = null;

@@ -53,11 +53,7 @@ private class AffiliationDomainTest {
 
 			Test.startTest();
 			Database.SaveResult result = Database.insert(
-				new Affiliation__c(
-					Person_Account__c = people[0].Id,
-					Organization__c = people[0].Id,
-					Role__c = 'Self'
-				),
+				new Affiliation__c(Person_Account__c = people[0].Id, Organization__c = people[0].Id, Role__c = 'Self'),
 				false
 			);
 			Test.stopTest();
@@ -81,10 +77,7 @@ private class AffiliationDomainTest {
 			);
 			Test.stopTest();
 
-			Assert.isFalse(
-				result.isSuccess(),
-				'The same open ended role twice is the mistake to catch'
-			);
+			Assert.isFalse(result.isSuccess(), 'The same open ended role twice is the mistake to catch');
 			Assert.isTrue(
 				result.getErrors()[0].getMessage().contains('AF-'),
 				'And the message names the record to open'
@@ -98,29 +91,18 @@ private class AffiliationDomainTest {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
 			List<Account> orgs = RelationshipTestDataFactory.organizations(1, 'Union Foundation');
-			Affiliation__c earlier = RelationshipTestDataFactory.affiliation(
-				people[0],
-				orgs[0],
-				'Board member'
-			);
+			Affiliation__c earlier = RelationshipTestDataFactory.affiliation(people[0], orgs[0], 'Board member');
 			earlier.Start_Date__c = Date.newInstance(2019, 1, 1);
 			earlier.End_Date__c = Date.newInstance(2022, 12, 31);
 			insert earlier;
-			Affiliation__c later = RelationshipTestDataFactory.affiliation(
-				people[0],
-				orgs[0],
-				'Board member'
-			);
+			Affiliation__c later = RelationshipTestDataFactory.affiliation(people[0], orgs[0], 'Board member');
 			later.Start_Date__c = Date.newInstance(2025, 1, 1);
 
 			Test.startTest();
 			Database.SaveResult result = Database.insert(later, false);
 			Test.stopTest();
 
-			Assert.isTrue(
-				result.isSuccess(),
-				'Two terms on the same board is a fact, not an error'
-			);
+			Assert.isTrue(result.isSuccess(), 'Two terms on the same board is a fact, not an error');
 		}
 	}
 
@@ -149,11 +131,7 @@ private class AffiliationDomainTest {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
 			List<Account> orgs = RelationshipTestDataFactory.organizations(1, 'Union Foundation');
-			Affiliation__c ended = RelationshipTestDataFactory.affiliation(
-				people[0],
-				orgs[0],
-				'Officer'
-			);
+			Affiliation__c ended = RelationshipTestDataFactory.affiliation(people[0], orgs[0], 'Officer');
 			ended.Is_Primary__c = true;
 			ended.End_Date__c = Date.today().addDays(-1);
 
@@ -163,10 +141,7 @@ private class AffiliationDomainTest {
 
 			Affiliation__c reloaded = RelationshipTestDataFactory.allAffiliations()[0];
 			Assert.areEqual('Former', reloaded.Status__c, 'The dates decide the status');
-			Assert.isFalse(
-				reloaded.Is_Primary__c,
-				'And a former affiliation is never the primary one'
-			);
+			Assert.isFalse(reloaded.Is_Primary__c, 'And a former affiliation is never the primary one');
 		}
 	}
 
@@ -180,16 +155,8 @@ private class AffiliationDomainTest {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
 			List<Account> orgs = RelationshipTestDataFactory.organizations(1, 'Union Foundation');
-			Affiliation__c first = RelationshipTestDataFactory.affiliation(
-				people[0],
-				orgs[0],
-				'Board member'
-			);
-			Affiliation__c second = RelationshipTestDataFactory.affiliation(
-				people[0],
-				orgs[0],
-				'Board member'
-			);
+			Affiliation__c first = RelationshipTestDataFactory.affiliation(people[0], orgs[0], 'Board member');
+			Affiliation__c second = RelationshipTestDataFactory.affiliation(people[0], orgs[0], 'Board member');
 			AutomationControl.bypass(AffiliationService.VALIDATION_AUTOMATION_NAME);
 			insert new List<Affiliation__c>{ first, second };
 			AutomationControl.clearBypass(AffiliationService.VALIDATION_AUTOMATION_NAME);
@@ -230,10 +197,7 @@ private class AffiliationDomainTest {
 			Test.stopTest();
 
 			Assert.isFalse(result.isSuccess(), 'The overlap is refused');
-			Assert.isTrue(
-				result.getErrors()[0].getMessage().contains('AF-'),
-				'The message names the record to open'
-			);
+			Assert.isTrue(result.getErrors()[0].getMessage().contains('AF-'), 'The message names the record to open');
 		}
 	}
 
@@ -248,11 +212,7 @@ private class AffiliationDomainTest {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
 			List<Account> orgs = RelationshipTestDataFactory.organizations(1, 'Union Foundation');
-			Affiliation__c hidden = RelationshipTestDataFactory.affiliation(
-				people[0],
-				orgs[0],
-				'Board member'
-			);
+			Affiliation__c hidden = RelationshipTestDataFactory.affiliation(people[0], orgs[0], 'Board member');
 			insert hidden;
 			Assert.areEqual(
 				1,
@@ -270,11 +230,7 @@ private class AffiliationDomainTest {
 
 			Assert.isFalse(result.isSuccess(), 'A hidden overlap is still refused');
 			String message = result.getErrors()[0].getMessage();
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Affiliation_OverlapHidden'),
-				message,
-				'The generic message'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Affiliation_OverlapHidden'), message, 'The generic message');
 			Assert.isFalse(message.contains('AF-'), 'No record number');
 			Assert.isFalse(message.contains('Garcia'), 'No name');
 			Assert.isFalse(message.contains('Union Foundation'), 'No organization');
@@ -290,12 +246,8 @@ private class AffiliationDomainTest {
 			List<Affiliation__c> existing = new List<Affiliation__c>();
 			List<Affiliation__c> incoming = new List<Affiliation__c>();
 			for (Contact person : people) {
-				existing.add(
-					RelationshipTestDataFactory.affiliation(person, orgs[0], 'Board member')
-				);
-				incoming.add(
-					RelationshipTestDataFactory.affiliation(person, orgs[0], 'Board member')
-				);
+				existing.add(RelationshipTestDataFactory.affiliation(person, orgs[0], 'Board member'));
+				incoming.add(RelationshipTestDataFactory.affiliation(person, orgs[0], 'Board member'));
 			}
 			insert existing;
 			Set<Id> hiddenIds = new Set<Id>();

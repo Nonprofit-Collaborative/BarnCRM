@@ -60,9 +60,7 @@ public with sharing class UserAccessSelector {
 		return [
 			SELECT COUNT()
 			FROM PermissionSetAssignment
-			WHERE
-				PermissionSetGroup.DeveloperName IN :groupDeveloperNames
-				AND Assignee.IsActive = TRUE
+			WHERE PermissionSetGroup.DeveloperName IN :groupDeveloperNames AND Assignee.IsActive = TRUE
 			WITH USER_MODE
 		];
 	}
@@ -78,10 +76,7 @@ public with sharing class UserAccessSelector {
 		return [
 			SELECT COUNT()
 			FROM PermissionSetAssignment
-			WHERE
-				PermissionSet.Name IN :permissionSetNames
-				AND PermissionSetGroupId = NULL
-				AND Assignee.IsActive = TRUE
+			WHERE PermissionSet.Name IN :permissionSetNames AND PermissionSetGroupId = NULL AND Assignee.IsActive = TRUE
 			WITH USER_MODE
 		];
 	}

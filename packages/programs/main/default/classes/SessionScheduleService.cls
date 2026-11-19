@@ -48,8 +48,7 @@ public with sharing class SessionScheduleService {
 	/** How far ahead an active schedule keeps sessions: Weeks Ahead to Create Sessions, 1 to 26. */
 	public static Integer horizonWeeks() {
 		if (horizonWeeks == null) {
-			horizonWeeks = SettingsService.number(SETTINGS_OBJECT, 'Session_Horizon_Weeks__c')
-				.intValue();
+			horizonWeeks = SettingsService.number(SETTINGS_OBJECT, 'Session_Horizon_Weeks__c').intValue();
 		}
 		return horizonWeeks;
 	}
@@ -57,10 +56,7 @@ public with sharing class SessionScheduleService {
 	/** The last day a run fills: the horizon, or End Date when sooner. */
 	public static Date lastDay(Session_Schedule__c schedule) {
 		Date horizon = today().addDays(7 * horizonWeeks());
-		return schedule.End_Date__c != null &&
-			schedule.End_Date__c < horizon
-			? schedule.End_Date__c
-			: horizon;
+		return schedule.End_Date__c != null && schedule.End_Date__c < horizon ? schedule.End_Date__c : horizon;
 	}
 
 	/**
@@ -82,9 +78,7 @@ public with sharing class SessionScheduleService {
 			for (Date day : planned.get(schedule.Id)) {
 				created.add(newSession(schedule, day));
 			}
-			bookkeeping.add(
-				new Session_Schedule__c(Id = schedule.Id, Created_Through__c = lastDay(schedule))
-			);
+			bookkeeping.add(new Session_Schedule__c(Id = schedule.Id, Created_Through__c = lastDay(schedule)));
 		}
 		if (!created.isEmpty()) {
 			insert as user created;
@@ -114,11 +108,7 @@ public with sharing class SessionScheduleService {
 		if (fromDays.isEmpty()) {
 			return missing;
 		}
-		List<Session__c> existing = SessionScheduleSelector.sessionsFrom(
-			fromDays.keySet(),
-			serviceIds,
-			today()
-		);
+		List<Session__c> existing = SessionScheduleSelector.sessionsFrom(fromDays.keySet(), serviceIds, today());
 		// Days a schedule earlier in this run claims for its service and cohort, so two schedules
 		// for the same group never both create one (R-SS2).
 		Set<String> claimed = new Set<String>();
@@ -155,11 +145,7 @@ public with sharing class SessionScheduleService {
 	 * weeks between the Monday of Start Date's week and the Monday of its own divide by Repeat
 	 * Every.
 	 */
-	public static List<Date> sessionDays(
-		Session_Schedule__c schedule,
-		Date fromDay,
-		Date untilDay
-	) {
+	public static List<Date> sessionDays(Session_Schedule__c schedule, Date fromDay, Date untilDay) {
 		List<Date> days = new List<Date>();
 		Set<Integer> chosen = new Set<Integer>();
 		for (String part : (schedule.Weekdays__c == null ? '' : schedule.Weekdays__c).split(';')) {
@@ -177,10 +163,7 @@ public with sharing class SessionScheduleService {
 			: schedule.Every_N_Weeks__c.intValue();
 		Date firstMonday = mondayOf(schedule.Start_Date__c);
 		Date day = fromDay < schedule.Start_Date__c ? schedule.Start_Date__c : fromDay;
-		Date endDay = schedule.End_Date__c != null &&
-			schedule.End_Date__c < untilDay
-			? schedule.End_Date__c
-			: untilDay;
+		Date endDay = schedule.End_Date__c != null && schedule.End_Date__c < untilDay ? schedule.End_Date__c : untilDay;
 		while (day <= endDay) {
 			Integer weeks = firstMonday.daysBetween(mondayOf(day)) / 7;
 			if (chosen.contains(weekdayIndex(day)) && Math.mod(weeks, everyN) == 0) {

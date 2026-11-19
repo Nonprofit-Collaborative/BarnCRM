@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+  <hasActivationRequired>false</hasActivationRequired>
+  <label>Advanced Reporting Read Only</label>
+  <description>
+    Opens Advanced Reporting to run the dashboard templates and the reports and dashboards
+    shared with the person, with their own access; cannot save. Given to Read Only holders.
+  </description>
+  <classAccesses>
+    <apexClass>QueryFieldCatalog</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>ReportingLibrary</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>ReportingQueryService</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <tabSettings>
+    <tab>Advanced_Reporting</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+</PermissionSet>

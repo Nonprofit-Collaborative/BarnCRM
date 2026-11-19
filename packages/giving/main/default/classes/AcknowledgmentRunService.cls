@@ -67,10 +67,7 @@ public with sharing class AcknowledgmentRunService {
 		try {
 			List<Gift__c> queued = AcknowledgmentSelector.queuedGifts(LETTER_LIMIT);
 			List<Acknowledgment_Rule__c> rules = AcknowledgmentSelector.activeRules();
-			Set<String> earlierDonors = AcknowledgmentRuleService.donorsWithEarlierGifts(
-				queued,
-				new Set<Id>()
-			);
+			Set<String> earlierDonors = AcknowledgmentRuleService.donorsWithEarlierGifts(queued, new Set<Id>());
 
 			// An email gift whose donor opted out of email is thanked by letter (R-AK13).
 			Set<Id> optedOut = AcknowledgmentService.optedOutOfEmail(queued);
@@ -88,8 +85,7 @@ public with sharing class AcknowledgmentRunService {
 				}
 				if (
 					AcknowledgmentRuleService.CHANNEL_LETTER.equals(match.channel) ||
-					(AcknowledgmentRuleService.CHANNEL_EMAIL.equals(match.channel) &&
-					optedOut.contains(gift.Id))
+					(AcknowledgmentRuleService.CHANNEL_EMAIL.equals(match.channel) && optedOut.contains(gift.Id))
 				) {
 					letters.add(gift);
 					matches.add(match);
@@ -160,9 +156,7 @@ public with sharing class AcknowledgmentRunService {
 			run.Finished__c = System.now();
 			AcknowledgmentWriter.updateRun(run);
 			ErrorLogger.log(failure, CONTEXT_LETTER, run.Id);
-			throw new AcknowledgmentRunException(
-				BarnHelp.text('Giving', 'Giving_Acknowledgment_LetterRunFailed')
-			);
+			throw new AcknowledgmentRunException(BarnHelp.text('Giving', 'Giving_Acknowledgment_LetterRunFailed'));
 		}
 	}
 
@@ -176,14 +170,10 @@ public with sharing class AcknowledgmentRunService {
 		AcknowledgmentService.requireSendPermission();
 		Acknowledgment_Run__c run = AcknowledgmentSelector.runById(runId);
 		if (run == null) {
-			throw new AcknowledgmentRunException(
-				BarnHelp.text('Giving', 'Giving_Acknowledgment_RunNotFound')
-			);
+			throw new AcknowledgmentRunException(BarnHelp.text('Giving', 'Giving_Acknowledgment_RunNotFound'));
 		}
 		if (!STATUS_READY_TO_MERGE.equals(run.Status__c)) {
-			throw new AcknowledgmentRunException(
-				BarnHelp.text('Giving', 'Giving_Acknowledgment_RunNotWaiting')
-			);
+			throw new AcknowledgmentRunException(BarnHelp.text('Giving', 'Giving_Acknowledgment_RunNotWaiting'));
 		}
 
 		List<Acknowledgment__c> rows = AcknowledgmentSelector.forRun(runId);
@@ -214,12 +204,7 @@ public with sharing class AcknowledgmentRunService {
 	}
 
 	/** Counts written as an email run goes, so a run that is still going shows real progress. */
-	public static void recordProgress(
-		Id runId,
-		Integer processed,
-		Integer sent,
-		Integer errorCount
-	) {
+	public static void recordProgress(Id runId, Integer processed, Integer sent, Integer errorCount) {
 		AcknowledgmentWriter.updateRun(
 			new Acknowledgment_Run__c(
 				Id = runId,

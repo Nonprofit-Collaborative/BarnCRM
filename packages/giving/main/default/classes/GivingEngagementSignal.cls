@@ -28,10 +28,7 @@ public without sharing class GivingEngagementSignal implements EngagementSignalE
 		for (AggregateResult row : [
 			SELECT Donor_Contact__c person, SUM(Amount__c) total
 			FROM Gift__c
-			WHERE
-				Donor_Contact__c IN :contactIds
-				AND Status__c = 'Received'
-				AND Gift_Date__c >= :since
+			WHERE Donor_Contact__c IN :contactIds AND Status__c = 'Received' AND Gift_Date__c >= :since
 			WITH SYSTEM_MODE
 			GROUP BY Donor_Contact__c
 		]) {

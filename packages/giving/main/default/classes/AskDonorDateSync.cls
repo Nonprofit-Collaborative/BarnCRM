@@ -70,9 +70,7 @@ public without sharing class AskDonorDateSync {
 
 	/** An ask this save closed carries its own Next Ask Date to its donors when it is ahead. */
 	private static void noteAskAgain(Ask__c ask, Ask__c old, Map<Id, Date> askAgain) {
-		Boolean closedNow =
-			old.Outcome__c == AskRules.OUTCOME_OPEN &&
-			ask.Outcome__c != AskRules.OUTCOME_OPEN;
+		Boolean closedNow = old.Outcome__c == AskRules.OUTCOME_OPEN && ask.Outcome__c != AskRules.OUTCOME_OPEN;
 		if (!closedNow || ask.Next_Ask_Date__c == null || ask.Next_Ask_Date__c <= Date.today()) {
 			return;
 		}
@@ -121,11 +119,7 @@ public without sharing class AskDonorDateSync {
 		for (AggregateResult row : [
 			SELECT Donor_Contact__c donor, MIN(Target_Date__c) earliest
 			FROM Ask__c
-			WHERE
-				Donor_Contact__c IN :donorIds
-				AND Outcome__c = :open
-				AND Target_Date__c != NULL
-				AND Id NOT IN :askIds
+			WHERE Donor_Contact__c IN :donorIds AND Outcome__c = :open AND Target_Date__c != NULL AND Id NOT IN :askIds
 			WITH SYSTEM_MODE
 			GROUP BY Donor_Contact__c
 		]) {
@@ -134,11 +128,7 @@ public without sharing class AskDonorDateSync {
 		for (AggregateResult row : [
 			SELECT Donor_Account__c donor, MIN(Target_Date__c) earliest
 			FROM Ask__c
-			WHERE
-				Donor_Account__c IN :donorIds
-				AND Outcome__c = :open
-				AND Target_Date__c != NULL
-				AND Id NOT IN :askIds
+			WHERE Donor_Account__c IN :donorIds AND Outcome__c = :open AND Target_Date__c != NULL AND Id NOT IN :askIds
 			WITH SYSTEM_MODE
 			GROUP BY Donor_Account__c
 		]) {
@@ -156,12 +146,8 @@ public without sharing class AskDonorDateSync {
 	) {
 		// Contacts first, then Accounts: one update takes the two types as two chunks.
 		List<SObject> current = new List<SObject>();
-		current.addAll(
-			[SELECT Id, Next_Ask_Date__c FROM Contact WHERE Id IN :donorIds WITH SYSTEM_MODE]
-		);
-		current.addAll(
-			[SELECT Id, Next_Ask_Date__c FROM Account WHERE Id IN :donorIds WITH SYSTEM_MODE]
-		);
+		current.addAll([SELECT Id, Next_Ask_Date__c FROM Contact WHERE Id IN :donorIds WITH SYSTEM_MODE]);
+		current.addAll([SELECT Id, Next_Ask_Date__c FROM Account WHERE Id IN :donorIds WITH SYSTEM_MODE]);
 		List<SObject> changed = new List<SObject>();
 		for (SObject donor : current) {
 			Date held = (Date) donor.get('Next_Ask_Date__c');

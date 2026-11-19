@@ -8,8 +8,8 @@ duplicate review, Org Optimizer, Health Check, settings and the rest of BarnCRM 
 
 | Edition | For | What BarnCRM shows |
 |---|---|---|
-| **Standard Edition** | Any Salesforce org: businesses, clubs, associations, any organization | The core suite and the modules every edition offers: BarnCRM Rollup Builder, BarnCRM Forms, BarnCRM Contact Point Sync, BarnCRM Event Management and BarnCRM Portal Builder. No nonprofit modules are listed or offered anywhere. |
-| **Nonprofit Edition** | Nonprofits, or any organization that wants the nonprofit tools | The core suite, BarnCRM Rollup Builder, BarnCRM Forms, BarnCRM Contact Point Sync, BarnCRM Event Management, BarnCRM Portal Builder, and the nonprofit modules: BarnCRM Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Logic Models, BarnCRM Funders and BarnCRM Mirror. |
+| **Standard Edition** | Any Salesforce org: businesses, clubs, associations, any organization | The core suite and the modules every edition offers: BarnCRM Rollup Builder, BarnCRM Forms, BarnCRM Contact Point Sync, BarnCRM Event Management, BarnCRM Portal Builder and BarnCRM Mirror (it needs only Core). No nonprofit modules are listed or offered anywhere. |
+| **Nonprofit Edition** | Nonprofits, or any organization that wants the nonprofit tools | The core suite, BarnCRM Rollup Builder, BarnCRM Forms, BarnCRM Contact Point Sync, BarnCRM Event Management, BarnCRM Portal Builder, BarnCRM Mirror, and the nonprofit modules: BarnCRM Fundraising, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Logic Models and BarnCRM Grants. |
 
 The edition decides what BarnCRM shows and offers. It never installs, removes or changes
 anything: every module is a separate package that you install yourself through Salesforce's
@@ -39,8 +39,8 @@ These are the places that depend on the edition.
 | Setup Assistant, module step | Core, BarnCRM Rollup Builder, plus any module that is already installed | Core, BarnCRM Rollup Builder and all five nonprofit modules, each Present or Not installed with its Install link |
 | BarnCRM Settings, Modules ([Module Manager](module-manager.md)) | The same list as the module step, Installed with an app link, or Not installed with Install | The same list as the module step, Installed with an app link, or Not installed with Install |
 | BarnCRM home page, Modules card | The same list | The same list |
-| Health Check, "The Gift Transaction Mirror Is in the Mirror Module" (Nonprofit Cloud orgs only) | Not shown | Shown when BarnCRM Mirror is not installed |
-| Setup Assistant, first step | Edition shown read-only | Edition shown read-only, with the BarnCRM Giving install link while it is not installed |
+| Health Check, "The Gift Transaction Mirror Is in the Fundraising Module" (Nonprofit Cloud orgs only) | Not shown | Shown when BarnCRM Fundraising is not installed |
+| Setup Assistant, first step | Edition shown read-only | Edition shown read-only, with the BarnCRM Fundraising install link while it is not installed |
 
 Before anyone has chosen an edition, BarnCRM shows what the Standard Edition shows.
 
@@ -88,7 +88,7 @@ already selected, so that you choose the features too.
 
 ## Common Mistakes
 
-- **Expecting the Nonprofit Edition to install BarnCRM Giving.** It only offers it. Install it from
+- **Expecting the Nonprofit Edition to install BarnCRM Fundraising.** It only offers it. Install it from
   the Setup Assistant's first step or from the Module Manager.
 - **Switching to the Standard Edition to remove a module.** An installed module stays installed
   and keeps working. Turn it off or uninstall it in the Module Manager.

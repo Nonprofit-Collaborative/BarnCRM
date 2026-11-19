@@ -2,7 +2,7 @@
 
 Sometimes money goes back: a card is charged twice, a donor asks for a gift back, or a check bounces. BarnCRM never edits or deletes the original gift. It records a second gift for a negative amount, linked to the original, with your reason on it, so totals correct themselves and anyone can see what happened.
 
-Before you start: you need the **Fundraising Staff** role (the **Giving Staff** permission set). With **Giving Read Only** you can see refunds but not record one.
+Before you start: you need the **Fundraising Staff** role (the **Fundraising Staff Access** permission set). With **Fundraising Read Only** you can see refunds but not record one.
 
 ## To Refund Part or All of a Gift
 

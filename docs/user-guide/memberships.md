@@ -7,7 +7,8 @@ the levels (see [Memberships](../admin-guide/memberships.md) in the Admin Guide)
 
 ## To Add a Member
 
-1. Open the **BarnCRM** (or **BarnCRM Console**) app and the **Memberships** tab, then click **New**.
+1. Open the **BarnCRM Memberships** app (or **BarnCRM** or **BarnCRM Console**) and the
+   **Memberships** tab, then click **New**.
 2. Choose the **Level**, and the **Contact** (a person's own membership), the **Household or
    Organization**, or both (an organization member and the person you deal with).
 3. Leave **Status** Current, or choose **Pending** for a member who will pay online.

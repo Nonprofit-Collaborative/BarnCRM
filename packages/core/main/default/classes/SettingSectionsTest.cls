@@ -13,14 +13,13 @@ private class SettingSectionsTest {
 			List<String> sections = SettingSections.all();
 			Test.stopTest();
 
-			Assert.areEqual(
-				32,
-				sections.size(),
-				'Thirty-two section names are agreed across the suite'
+			Assert.areEqual(33, sections.size(), 'Thirty-three section names are agreed across the suite');
+			Assert.isTrue(
+				SettingSections.isKnown(SettingSections.REPORTING),
+				'Advanced Reporting is a section the Advanced Reporting module ships a row into'
 			);
 			Assert.isTrue(
-				SettingSections.isKnown(SettingSections.FORMS) &&
-				SettingSections.isKnown(SettingSections.LOGIC_MODELS),
+				SettingSections.isKnown(SettingSections.FORMS) && SettingSections.isKnown(SettingSections.LOGIC_MODELS),
 				'Forms and Logic Models ship a row each that announces the module (C-72)'
 			);
 			Assert.isTrue(
@@ -29,7 +28,7 @@ private class SettingSectionsTest {
 			);
 			Assert.isTrue(
 				SettingSections.isKnown(SettingSections.FUNDERS),
-				'Funders is a section the Funders module ships rows into'
+				'Grants is a section the Grants module ships rows into'
 			);
 			Assert.isTrue(
 				SettingSections.isKnown(SettingSections.INTEGRATIONS),
@@ -100,10 +99,7 @@ private class SettingSectionsTest {
 			String fromPeople = SettingSections.pageFor(SettingSections.PEOPLE);
 			Test.stopTest();
 
-			Assert.isTrue(
-				sections.contains(SettingSections.PEOPLE_AND_HOUSEHOLDS),
-				'People and Households is a page'
-			);
+			Assert.isTrue(sections.contains(SettingSections.PEOPLE_AND_HOUSEHOLDS), 'People and Households is a page');
 			Assert.isFalse(sections.contains('Households'), 'Households is no longer a page');
 			Assert.isFalse(sections.contains('Relationships'), 'Relationships is no longer a page');
 			Assert.areEqual(
@@ -111,14 +107,7 @@ private class SettingSectionsTest {
 				sections[sections.indexOf(SettingSections.PEOPLE_AND_HOUSEHOLDS) - 1],
 				'People and Households is where Households was, after Organization'
 			);
-			for (
-				String page : new List<String>{
-					fromHouseholds,
-					fromRelationships,
-					fromNaming,
-					fromPeople
-				}
-			) {
+			for (String page : new List<String>{ fromHouseholds, fromRelationships, fromNaming, fromPeople }) {
 				Assert.areEqual(
 					SettingSections.PEOPLE_AND_HOUSEHOLDS,
 					page,

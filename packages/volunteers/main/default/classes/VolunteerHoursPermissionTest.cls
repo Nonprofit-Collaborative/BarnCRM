@@ -70,9 +70,7 @@ private class VolunteerHoursPermissionTest {
 		pauseAutomation();
 		System.runAs(user(STAFFER)) {
 			paused = updateError(new Volunteer_Hours__c(Id = hours.Id, Status__c = 'Approved'));
-			reason = updateError(
-				new Volunteer_Hours__c(Id = hours.Id, Rejection_Reason__c = 'Not me')
-			);
+			reason = updateError(new Volunteer_Hours__c(Id = hours.Id, Rejection_Reason__c = 'Not me'));
 		}
 		Test.stopTest();
 
@@ -81,14 +79,8 @@ private class VolunteerHoursPermissionTest {
 			running,
 			'With automation running the hours rules refuse it.'
 		);
-		Assert.isTrue(
-			paused.contains('Manage Volunteers'),
-			'Paused, the validation rule still refuses it: ' + paused
-		);
-		Assert.isTrue(
-			reason.contains('Manage Volunteers'),
-			'And a rejection reason typed by hand: ' + reason
-		);
+		Assert.isTrue(paused.contains('Manage Volunteers'), 'Paused, the validation rule still refuses it: ' + paused);
+		Assert.isTrue(reason.contains('Manage Volunteers'), 'And a rejection reason typed by hand: ' + reason);
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
 			Assert.areEqual(
 				'Submitted',
@@ -172,11 +164,7 @@ private class VolunteerHoursPermissionTest {
 				[SELECT COUNT() FROM Volunteer_Hours__c WHERE Status__c = 'Approved'],
 				'The approved entries remain; the submitted ones are deleted.'
 			);
-			Assert.areEqual(
-				approvedCount,
-				[SELECT COUNT() FROM Volunteer_Hours__c],
-				'Nothing else.'
-			);
+			Assert.areEqual(approvedCount, [SELECT COUNT() FROM Volunteer_Hours__c], 'Nothing else.');
 		}
 		Assert.areEqual(
 			'VolunteerHoursDeleteGuardHandler',

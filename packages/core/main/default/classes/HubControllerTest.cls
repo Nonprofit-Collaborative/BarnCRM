@@ -24,10 +24,7 @@ private class HubControllerTest {
 	@IsTest
 	static void newHouseholdCreatesAnEmptyHouseholdForStaff() {
 		System.runAs(TestUsers.admin()) {
-			User staff = TestUsers.minimumAccessUserWith(
-				'Hubstaff',
-				new List<String>{ 'BarnCRM_Staff' }
-			);
+			User staff = TestUsers.minimumAccessUserWith('Hubstaff', new List<String>{ 'BarnCRM_Staff' });
 			Boolean offered;
 			Id householdId;
 
@@ -45,11 +42,7 @@ private class HubControllerTest {
 				WHERE Id = :householdId
 				WITH SYSTEM_MODE
 			];
-			Assert.areEqual(
-				HouseholdService.householdRecordTypeId(),
-				household.RecordTypeId,
-				'A household'
-			);
+			Assert.areEqual(HouseholdService.householdRecordTypeId(), household.RecordTypeId, 'A household');
 			Assert.areEqual(Label.Core_Households_NamePlaceholder, household.Name, 'Placeholder');
 			Assert.areEqual(0, household.Member_Count__c, 'Nobody in it yet');
 		}
@@ -76,16 +69,8 @@ private class HubControllerTest {
 			Test.stopTest();
 
 			Assert.isFalse(offered, 'No button');
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Households_ErrorCreateNoAccess'),
-				message,
-				'Refused'
-			);
-			Assert.areEqual(
-				before,
-				[SELECT COUNT() FROM Account WITH SYSTEM_MODE],
-				'Nothing was created'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Households_ErrorCreateNoAccess'), message, 'Refused');
+			Assert.areEqual(before, [SELECT COUNT() FROM Account WITH SYSTEM_MODE], 'Nothing was created');
 		}
 	}
 
@@ -197,11 +182,7 @@ private class HubControllerTest {
 			Test.stopTest();
 
 			Assert.isTrue(model.canCreatePerson, 'The admin can create people');
-			Assert.areEqual(
-				2,
-				model.quickLinks.size(),
-				'Only the module that is here: ' + model.quickLinks
-			);
+			Assert.areEqual(2, model.quickLinks.size(), 'Only the module that is here: ' + model.quickLinks);
 			Assert.areEqual('Some_Tab', model.quickLinks[0].tab, 'A tab link keeps its name');
 			Assert.areEqual('Do It', model.quickLinks[0].label, 'With its label');
 			Assert.areEqual('One line.', model.quickLinks[0].line, 'And its line');
@@ -214,16 +195,51 @@ private class HubControllerTest {
 		}
 	}
 
+	/** The words of a shipped quick link live in Core's BarnHelp catalog (D-208, N-08). */
+	@IsTest
+	static void aQuickLinkLineIsReadFromBarnHelp() {
+		System.runAs(TestUsers.admin()) {
+			HubController.visibleTabsOverride = new Set<String>{ 'Some_Tab' };
+			HubController.QuickLink link = HubController.quickLink(
+				'Some_Tab:Enter a Gift:Core_HubHome_QuickLinkEnterGiftLine'
+			);
+
+			Assert.areEqual(
+				BarnHelp.text('Core', 'Core_HubHome_QuickLinkEnterGiftLine'),
+				link.line,
+				'The catalog names the key; the tile shows its words'
+			);
+			Assert.areEqual('Record a gift in a few keystrokes.', link.line, 'The same words');
+
+			Integer shipped = 0;
+			for (BarnCRM_Module__mdt row : BarnCRM_Module__mdt.getAll().values()) {
+				String quickLinks = row.Quick_Links__c == null ? '' : row.Quick_Links__c;
+				for (String entry : quickLinks.split(';')) {
+					List<String> parts = entry.split(':', 3);
+					if (parts.size() > 2) {
+						shipped++;
+						String key = parts[2].trim();
+						Assert.isTrue(
+							key.startsWith('Core_HubHome_QuickLink'),
+							'Every shipped line is a BarnHelp key, never words: ' + entry
+						);
+						HubController.QuickLink shown = HubController.quickLink('Some_Tab:Title:' + key);
+						Assert.areNotEqual(key, shown.line, 'And the key resolves: ' + key);
+						Assert.isTrue(String.isNotBlank(shown.line), 'To words: ' + key);
+					}
+				}
+			}
+			Assert.isTrue(shipped > 0, 'The shipped catalog has quick links with lines');
+		}
+	}
+
 	@IsTest
 	static void aBlankOrUncreatableEntryIsNoLink() {
 		System.runAs(TestUsers.admin()) {
 			Assert.isNull(HubController.quickLink(''), 'Blank');
 			Assert.isNull(HubController.quickLink('Only_A_Target'), 'No label');
 			Assert.isNull(HubController.quickLink('No_Such_Object__c.new:New'), 'No such object');
-			Assert.isNull(
-				HubController.quickLink('No_Such_Tab_Anywhere:Open'),
-				'A tab the person cannot see'
-			);
+			Assert.isNull(HubController.quickLink('No_Such_Tab_Anywhere:Open'), 'A tab the person cannot see');
 		}
 	}
 
@@ -276,11 +292,7 @@ private class HubControllerTest {
 			);
 			Assert.isFalse(model.seasonalAddressStale, 'A run two hours ago is not stale');
 			Assert.isTrue(model.rollupsInstalled, 'The Rollup Builder module answers');
-			Assert.areEqual(
-				STUB_LAST_CALCULATED,
-				model.rollupsLastCalculated,
-				'When the rollups last completed'
-			);
+			Assert.areEqual(STUB_LAST_CALCULATED, model.rollupsLastCalculated, 'When the rollups last completed');
 			Assert.isTrue(model.rollupsStale, 'and whether that is too long ago');
 		}
 	}
@@ -301,14 +313,7 @@ private class HubControllerTest {
 		}
 	}
 
-	private static final Datetime STUB_LAST_CALCULATED = Datetime.newInstanceGmt(
-		2026,
-		10,
-		1,
-		2,
-		0,
-		0
-	);
+	private static final Datetime STUB_LAST_CALCULATED = Datetime.newInstanceGmt(2026, 10, 1, 2, 0, 0);
 
 	/** Stands in for the Rollup Builder module's engine, which Core cannot name. */
 	private class StubEngine implements RollupEngineExtension {

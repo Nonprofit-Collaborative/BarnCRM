@@ -85,10 +85,7 @@ public with sharing class VolunteerSuggestionController {
 			Set<Id> required = VolunteerSuggestionSelector.requiredSkillIds(shift.Volunteer_Job__c);
 			result.requiredSkillIds = new List<Id>(required);
 
-			List<Contact> people = VolunteerSuggestionSelector.selectCandidates(
-				shiftId,
-				MAX_CANDIDATES + 1
-			);
+			List<Contact> people = VolunteerSuggestionSelector.selectCandidates(shiftId, MAX_CANDIDATES + 1);
 			result.moreThanConsidered = people.size() > MAX_CANDIDATES;
 			while (people.size() > MAX_CANDIDATES) {
 				people.remove(people.size() - 1);
@@ -129,10 +126,7 @@ public with sharing class VolunteerSuggestionController {
 		if (accountByContact.isEmpty()) {
 			return;
 		}
-		Set<Id> booked = VolunteerSuggestionSelector.bookedAccountIds(
-			shiftId,
-			new Set<Id>(accountByContact.values())
-		);
+		Set<Id> booked = VolunteerSuggestionSelector.bookedAccountIds(shiftId, new Set<Id>(accountByContact.values()));
 		List<Candidate> kept = new List<Candidate>();
 		for (Candidate candidate : result.candidates) {
 			Id accountId = accountByContact.get(candidate.personId);
@@ -151,12 +145,7 @@ public with sharing class VolunteerSuggestionController {
 	@TestVisible
 	private static Map<Id, Id> accountsBehindForTest;
 
-	private static void addFacts(
-		Suggestions result,
-		List<Contact> people,
-		Volunteer_Shift__c shift,
-		Set<Id> required
-	) {
+	private static void addFacts(Suggestions result, List<Contact> people, Volunteer_Shift__c shift, Set<Id> required) {
 		if (people.isEmpty()) {
 			return;
 		}
@@ -165,9 +154,7 @@ public with sharing class VolunteerSuggestionController {
 			Candidate candidate = new Candidate();
 			candidate.personId = person.Id;
 			candidate.name = person.Name;
-			candidate.hoursTotal = person.Volunteer_Hours_Total__c == null
-				? 0
-				: person.Volunteer_Hours_Total__c;
+			candidate.hoursTotal = person.Volunteer_Hours_Total__c == null ? 0 : person.Volunteer_Hours_Total__c;
 			if (String.isNotBlank(person.Availability_Days__c)) {
 				candidate.availableDays = person.Availability_Days__c.split(';');
 			}
@@ -177,9 +164,7 @@ public with sharing class VolunteerSuggestionController {
 		Set<Id> ids = byId.keySet();
 
 		if (!required.isEmpty()) {
-			for (
-				Volunteer_Skill__c row : VolunteerSuggestionSelector.selectSkillRows(ids, required)
-			) {
+			for (Volunteer_Skill__c row : VolunteerSuggestionSelector.selectSkillRows(ids, required)) {
 				Candidate candidate = byId.get(row.Contact__c);
 				if (row.Type__c == 'Interest') {
 					candidate.interestIds.add(row.Skill__c);
@@ -188,10 +173,7 @@ public with sharing class VolunteerSuggestionController {
 				}
 			}
 		}
-		Map<Id, Decimal> onJob = VolunteerSuggestionSelector.approvedHoursOnJob(
-			ids,
-			shift.Volunteer_Job__c
-		);
+		Map<Id, Decimal> onJob = VolunteerSuggestionSelector.approvedHoursOnJob(ids, shift.Volunteer_Job__c);
 		for (Id personId : onJob.keySet()) {
 			byId.get(personId).hoursOnJob = onJob.get(personId);
 		}
@@ -199,10 +181,7 @@ public with sharing class VolunteerSuggestionController {
 	}
 
 	/** A person with any latest-of-its-Type step not current is `open`; all current is `cleared`. */
-	private static void addOnboarding(
-		Map<Id, Candidate> byId,
-		List<Volunteer_Requirement__c> steps
-	) {
+	private static void addOnboarding(Map<Id, Candidate> byId, List<Volunteer_Requirement__c> steps) {
 		Set<String> seen = new Set<String>();
 		for (Volunteer_Requirement__c step : steps) {
 			if (!seen.add(step.Contact__c + '|' + step.Type__c)) {

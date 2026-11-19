@@ -74,7 +74,8 @@ active and its BarnCRM copy not yet made. T-MIG-06 needs an org with NPSP.
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As the test user, in the Developer Console run `MigrationController.getKit('DLRS_Rollups');` | Fails: "You need Manage BarnCRM Settings to run a migration." |
-| 2 | As the test user, run `MigrationController.setToolStep('DLRS_Rollups', 'copy', true);` | Fails with the same message. No Migration Run record is created. |
+| 2 | As the test user, run `MigrationController.setToolStep('DLRS_Rollups', 'copy', true);` | Fails with the same message. No migration run is created (no `Merge_Journal__c` row of Kind **Migration**; runs are Admin Journal rows since N-11). |
+| 3 | As an admin, open a kit, mark a tool step done, then query `SELECT Kind__c, Kit__c, Status__c FROM Merge_Journal__c WHERE Kind__c = 'Migration'` and, after an import step starts, `SELECT Migration_Journal__c FROM Import_Batch__c WHERE Migration_Step__c != null`. | One row of Kind **Migration** for the kit, Status **In Progress**; the import's data job points at that row. The kit page shows the same steps and status as before. |
 
 **Cleanup:** None.
 
@@ -111,8 +112,8 @@ active and its BarnCRM copy not yet made. T-MIG-06 needs an org with NPSP.
 
 ## T-MIG-08: NPSP Gifts and Soft Credits Copies Won Opportunities Once
 
-**Purpose:** confirm the NPSP Gifts and Soft Credits kit (Mirror) makes one gift per won Opportunity with its donor, method, funds, tribute and soft credits, and never duplicates.
-**Prerequisites:** the NPSP org of T-MIG-07 with Giving and Mirror deployed and T-GIFT-22 done (fund **Building Fund** exists); admin user with **Salesforce Records Sync**; **Opportunity mirror direction** Off; **Send gift acknowledgments** off. In NPSP: a Campaign **Spring Appeal**; a won Opportunity of 300 for Ana on that Campaign, paid by one Check payment with number 1201, allocated 200 to Building Fund and 100 to General Fund, tribute type Memorial for "Grace", with Ben as a contact role **Solicitor** and Ana's colleague Cara as **Soft Credit** with a partial soft credit of 50; a won Opportunity of 500 for **Test Org** with Ana as its primary contact; an open (not won) Opportunity.
+**Purpose:** confirm the NPSP Gifts and Soft Credits kit (Fundraising) makes one gift per won Opportunity with its donor, method, funds, tribute and soft credits, and never duplicates.
+**Prerequisites:** the NPSP org of T-MIG-07 with Fundraising deployed and T-GIFT-22 done (fund **Building Fund** exists); admin user with **Salesforce Records Sync**; **Opportunity mirror direction** Off; **Send gift acknowledgments** off. In NPSP: a Campaign **Spring Appeal**; a won Opportunity of 300 for Ana on that Campaign, paid by one Check payment with number 1201, allocated 200 to Building Fund and 100 to General Fund, tribute type Memorial for "Grace", with Ben as a contact role **Solicitor** and Ana's colleague Cara as **Soft Credit** with a partial soft credit of 50; a won Opportunity of 500 for **Test Org** with Ana as its primary contact; an open (not won) Opportunity.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -127,8 +128,8 @@ active and its BarnCRM copy not yet made. T-MIG-06 needs an org with NPSP.
 
 ## T-MIG-09: Nonprofit Cloud Gifts and Soft Credits Copies Paid Gift Transactions Once
 
-**Purpose:** confirm the Nonprofit Cloud Gifts and Soft Credits kit (Mirror) copies designations, commitments, paid gift transactions and soft credits with the right donors, and that neither a rerun nor the Gift Transaction mirror duplicates a gift.
-**Prerequisites:** an org with Nonprofit Cloud Fundraising (person accounts on) and Core, Giving and Mirror deployed; admin user with **Salesforce Records Sync** and the Giving admin permission set; Gift Transaction mirror **Off**; **Send gift acknowledgments** off; a fund **General Fund** in BarnCRM. In Nonprofit Cloud: a Campaign **Spring Appeal**; gift designations **General Fund** and **Building Fund**; person account Ana with a recurring gift commitment of 25 every month; a paid gift transaction of 300 from Ana on Spring Appeal, designated 200 Building Fund and 100 General Fund, with a memorial tribute for "Grace" and a soft credit to person account Ben (role Solicitor, no amount); a paid gift transaction of 500 from business account **Test Org**; an unpaid gift transaction.
+**Purpose:** confirm the Nonprofit Cloud Gifts and Soft Credits kit (Fundraising) copies designations, commitments, paid gift transactions and soft credits with the right donors, and that neither a rerun nor the Gift Transaction mirror duplicates a gift.
+**Prerequisites:** an org with Nonprofit Cloud Fundraising (person accounts on) and Core, Rollup Builder and Fundraising deployed; admin user with **Salesforce Records Sync** and the Fundraising admin permission set; Gift Transaction mirror **Off**; **Send gift acknowledgments** off; a fund **General Fund** in BarnCRM. In Nonprofit Cloud: a Campaign **Spring Appeal**; gift designations **General Fund** and **Building Fund**; person account Ana with a recurring gift commitment of 25 every month; a paid gift transaction of 300 from Ana on Spring Appeal, designated 200 Building Fund and 100 General Fund, with a memorial tribute for "Grace" and a soft credit to person account Ben (role Solicitor, no amount); a paid gift transaction of 500 from business account **Test Org**; an unpaid gift transaction.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -143,7 +144,7 @@ active and its BarnCRM copy not yet made. T-MIG-06 needs an org with NPSP.
 ## T-MIG-10: Nonprofit Cloud Relationships and Affiliations Copies Each Pair Once and Skips Households
 
 **Purpose:** confirm the Nonprofit Cloud Relationships and Affiliations kit (Mirror) copies relationships once per pair of people and affiliations with organizations only.
-**Prerequisites:** an org with Nonprofit Cloud (person accounts on) and Core and Mirror deployed; admin user with **Salesforce Records Sync**. In Nonprofit Cloud: person accounts Ana and Ben related as Wife and Husband; Ana linked to business account **Test Org** with roles Employee and Board Member; Ana a member of a household account that has a Party Relationship Group of type Household.
+**Prerequisites:** an org with Nonprofit Cloud (person accounts on) and Core and Mirror deployed (no Fundraising needed); admin user with **BarnCRM Admin**. In Nonprofit Cloud: person accounts Ana and Ben related as Wife and Husband; Ana linked to business account **Test Org** with roles Employee and Board Member; Ana a member of a household account that has a Party Relationship Group of type Household.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -168,7 +169,7 @@ active and its BarnCRM copy not yet made. T-MIG-06 needs an org with NPSP.
 | 5 | Open Lee Household's Party Relationship Group and account contact relations. | Unchanged: same rows, same values, same last modified dates. |
 | 6 | Run step 1 again. | "Every Nonprofit Cloud household you can see is already a BarnCRM household or marked to stay in Nonprofit Cloud." |
 | 7 | Open **Health**. | No **Household Model Disagrees With Nonprofit Cloud** warning. Then set Cho Household's Household Model to **Automatic** and refresh: the warning names Cho Household. Set it back to **Converted**. |
-| 8 | Add a household member to Cho Household by hand, then click **Undo This Conversion**, type **2** and confirm. | **Last conversion**: 1 undone, 1 not put back. Lee Household has its old record type, its earlier Household Model (blank or **Automatic**), and no BarnCRM members; Cho Household is still a Household and its Household Adoption record says it has other members. No Nonprofit Cloud record changed. |
+| 8 | Add a household member to Cho Household by hand, then click **Undo This Conversion**, type **2** and confirm. | **Last conversion**: 1 undone, 1 not put back. Lee Household has its old record type, its earlier Household Model (blank or **Automatic**), and no BarnCRM members; Cho Household is still a Household and its Admin Journal record (Kind **Household Adoption**) says in Notes that it has other members. No Nonprofit Cloud record changed. |
 | 9 | As a staff user without **Manage BarnCRM Settings**, open BarnCRM Settings, **General**. | **Convert Nonprofit Cloud Households** is not shown. |
 
 **Cleanup:** remove Cho Household's hand-added member and undo again, then delete the test records.

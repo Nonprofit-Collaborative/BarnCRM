@@ -39,10 +39,7 @@ private class PmmMigrationKitTest {
 					WHERE Template_Key__c = :step.templateKey
 					WITH SYSTEM_MODE
 				];
-				Assert.isTrue(
-					template.Target_Object__c.endsWith('__c'),
-					key + ' loads one Programs object'
-				);
+				Assert.isTrue(template.Target_Object__c.endsWith('__c'), key + ' loads one Programs object');
 				ImportMapping mapping = ImportMapping.parse(template.Column_Mapping_JSON__c);
 				for (ImportMapping.Column column : mapping.getColumns()) {
 					String heading = column.getSource();

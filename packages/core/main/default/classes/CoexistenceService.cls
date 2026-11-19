@@ -18,11 +18,7 @@ public with sharing class CoexistenceService {
 	public static final String KEY_COEXISTENCE_MODE = 'Coexistence_Mode__c';
 	public static final String KEY_MEMBERSHIP_MODE = 'Household_Membership_Mode__c';
 
-	private static final Set<String> VALID_MODES = new Set<String>{
-		MODE_STANDALONE,
-		MODE_NPSP,
-		MODE_NONPROFIT_CLOUD
-	};
+	private static final Set<String> VALID_MODES = new Set<String>{ MODE_STANDALONE, MODE_NPSP, MODE_NONPROFIT_CLOUD };
 
 	/**
 	 * The mode this org is running in, or null when nobody has confirmed one yet.
@@ -79,10 +75,7 @@ public with sharing class CoexistenceService {
 	public static void setMode(String mode) {
 		if (String.isBlank(mode) || !VALID_MODES.contains(mode)) {
 			throw new CoexistenceException(
-				String.format(
-					BarnHelp.text('Core', 'Core_CoexistenceMode_InvalidMode'),
-					new List<Object>{ mode }
-				)
+				String.format(BarnHelp.text('Core', 'Core_CoexistenceMode_InvalidMode'), new List<Object>{ mode })
 			);
 		}
 		save(withMembership(mode));
@@ -101,10 +94,7 @@ public with sharing class CoexistenceService {
 		if ((shape != null && shape.hasNpsp == true) || MODE_NPSP.equals(current)) {
 			modes.add(MODE_NPSP);
 		}
-		if (
-			(shape != null && shape.hasIndustriesNonprofit == true) ||
-			MODE_NONPROFIT_CLOUD.equals(current)
-		) {
+		if ((shape != null && shape.hasIndustriesNonprofit == true) || MODE_NONPROFIT_CLOUD.equals(current)) {
 			modes.add(MODE_NONPROFIT_CLOUD);
 		}
 		return modes;
@@ -236,7 +226,7 @@ public with sharing class CoexistenceService {
 
 	/** People who belong to a household today through a membership record. */
 	public static Integer countPeopleWithMembershipRecords() {
-		Date today = Date.today();
+		Date today = OrgDate.today();
 		return [
 			SELECT COUNT()
 			FROM Household_Member__c
@@ -301,9 +291,7 @@ public with sharing class CoexistenceService {
 	@NamespaceAccessible
 	public static void applyMode(String mode) {
 		if (!BarnCRMPermissions.canManageSettings()) {
-			throw new CoexistenceException(
-				BarnHelp.text('Core', 'Core_HealthCheck_PermissionRequired')
-			);
+			throw new CoexistenceException(BarnHelp.text('Core', 'Core_HealthCheck_PermissionRequired'));
 		}
 		setMode(mode);
 	}

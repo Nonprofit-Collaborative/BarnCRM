@@ -7,5 +7,10 @@
   <columns>CREATEDBY_USER</columns>
   <columns>CREATED_DATE</columns>
   <filterScope>Everything</filterScope>
+  <filters>
+    <field>Kind__c</field>
+    <operation>equals</operation>
+    <value>Dismissal</value>
+  </filters>
   <label>All Duplicate Dismissals</label>
 </ListView>

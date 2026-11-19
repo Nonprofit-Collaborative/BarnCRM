@@ -16,16 +16,11 @@ private class ServiceDeliveryLogControllerTest {
 		TestUsers.adminWith(ADMIN);
 		TestUsers.standardUserWith('Writer', STAFF);
 		TestUsers.standardUserWith('Colleague', STAFF);
-		TestUsers.standardUserWith(
-			'Reader',
-			new List<String>{ 'BarnCRM_Read_Only', 'Programs_Read_Only' }
-		);
+		TestUsers.standardUserWith('Reader', new List<String>{ 'BarnCRM_Read_Only', 'Programs_Read_Only' });
 	}
 
 	private static void contactMode() {
-		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-			HouseholdTestDataFactory.MODE_CONTACT
-		);
+		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 		settings.Auto_Create_Households__c = false;
 		TestDataFactory.saveSettings(settings);
 	}
@@ -37,19 +32,12 @@ private class ServiceDeliveryLogControllerTest {
 	}
 
 	private static Service__c serviceIn(Program__c program, String name) {
-		Service__c service = new Service__c(
-			Program__c = program.Id,
-			Name = name,
-			Unit_Of_Measure__c = 'hours'
-		);
+		Service__c service = new Service__c(Program__c = program.Id, Name = name, Unit_Of_Measure__c = 'hours');
 		insert service;
 		return service;
 	}
 
-	private static ServiceDeliveryLogController.Row rowOf(
-		ServiceDeliveryLogController.Log log,
-		Id person
-	) {
+	private static ServiceDeliveryLogController.Row rowOf(ServiceDeliveryLogController.Log log, Id person) {
 		for (ServiceDeliveryLogController.Row row : log.rows) {
 			if (row.key == person) {
 				return row;
@@ -85,19 +73,11 @@ private class ServiceDeliveryLogControllerTest {
 			Contact ben = person('Okafor');
 			insert new List<Enrollment__c>{
 				new Enrollment__c(Program__c = tutoring.Id, Contact__c = ana.Id),
-				new Enrollment__c(
-					Program__c = tutoring.Id,
-					Contact__c = ben.Id,
-					Stage__c = 'Completed'
-				)
+				new Enrollment__c(Program__c = tutoring.Id, Contact__c = ben.Id, Stage__c = 'Completed')
 			};
 
 			Test.startTest();
-			ServiceDeliveryLogController.Log log = ServiceDeliveryLogController.getLog(
-				tutoring.Id,
-				null,
-				null
-			);
+			ServiceDeliveryLogController.Log log = ServiceDeliveryLogController.getLog(tutoring.Id, null, null);
 			Test.stopTest();
 
 			Assert.areEqual(2, log.services.size(), 'Both active services are offered.');
@@ -126,11 +106,7 @@ private class ServiceDeliveryLogControllerTest {
 				new Enrollment__c(Program__c = tutoring.Id, Contact__c = ben.Id)
 			};
 			Date day = Date.today().addDays(-1);
-			ServiceDeliveryLogController.Log log = ServiceDeliveryLogController.getLog(
-				tutoring.Id,
-				hour.Id,
-				day
-			);
+			ServiceDeliveryLogController.Log log = ServiceDeliveryLogController.getLog(tutoring.Id, hour.Id, day);
 
 			Test.startTest();
 			ServiceDeliveryLogController.Log first = ServiceDeliveryLogController.save(
@@ -147,9 +123,7 @@ private class ServiceDeliveryLogControllerTest {
 				tutoring.Id,
 				hour.Id,
 				day,
-				new List<ServiceDeliveryLogController.Entry>{
-					entryFor(rowOf(first, ben.Id), 'Excused Absence', 5)
-				}
+				new List<ServiceDeliveryLogController.Entry>{ entryFor(rowOf(first, ben.Id), 'Excused Absence', 5) }
 			);
 			Test.stopTest();
 
@@ -232,10 +206,7 @@ private class ServiceDeliveryLogControllerTest {
 		Assert.areEqual(3, rows[0].Quantity__c, 'The existing row was changed.');
 		Assert.areEqual(1, after.saved, 'One saved.');
 		ServiceDeliveryLogController.Row row = rowOf(after, ana.Id);
-		Assert.isTrue(
-			row == null || row.deliveryId == null,
-			'The hidden row is still not shown to the colleague.'
-		);
+		Assert.isTrue(row == null || row.deliveryId == null, 'The hidden row is still not shown to the colleague.');
 	}
 
 	@IsTest
@@ -249,11 +220,7 @@ private class ServiceDeliveryLogControllerTest {
 			insert new Service_Delivery__c(Service__c = bag.Id, Contact__c = cal.Id);
 
 			Test.startTest();
-			ServiceDeliveryLogController.Log log = ServiceDeliveryLogController.getLog(
-				pantry.Id,
-				bag.Id,
-				Date.today()
-			);
+			ServiceDeliveryLogController.Log log = ServiceDeliveryLogController.getLog(pantry.Id, bag.Id, Date.today());
 			Test.stopTest();
 
 			Assert.areEqual(1, log.rows.size(), 'The walk-in is shown.');
@@ -269,11 +236,7 @@ private class ServiceDeliveryLogControllerTest {
 			insert empty;
 
 			Test.startTest();
-			ServiceDeliveryLogController.Log log = ServiceDeliveryLogController.getLog(
-				empty.Id,
-				null,
-				null
-			);
+			ServiceDeliveryLogController.Log log = ServiceDeliveryLogController.getLog(empty.Id, null, null);
 			Test.stopTest();
 
 			Assert.isNull(log.serviceId, 'No service.');
@@ -292,11 +255,7 @@ private class ServiceDeliveryLogControllerTest {
 			new List<String>{ 'BarnCRM_Read_Only', 'Programs_Read_Only' }
 		)) {
 			Test.startTest();
-			ServiceDeliveryLogController.Log log = ServiceDeliveryLogController.getLog(
-				tutoring.Id,
-				null,
-				null
-			);
+			ServiceDeliveryLogController.Log log = ServiceDeliveryLogController.getLog(tutoring.Id, null, null);
 			Test.stopTest();
 
 			Assert.isFalse(log.canEdit, 'Read only.');
@@ -348,27 +307,11 @@ private class ServiceDeliveryLogControllerTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Programs', 'Programs_Fail_Log'),
-				messages[0],
-				'Unknown attendance.'
-			);
+			Assert.areEqual(BarnHelp.text('Programs', 'Programs_Fail_Log'), messages[0], 'Unknown attendance.');
 			Assert.isNotNull(messages[1], 'A negative quantity is refused.');
-			Assert.areNotEqual(
-				BarnHelp.text('Programs', 'Programs_Fail_Log'),
-				messages[1],
-				'In the rule own words.'
-			);
-			Assert.areEqual(
-				BarnHelp.text('Programs', 'Programs_Fail_Log'),
-				messages[2],
-				'No program.'
-			);
-			Assert.areEqual(
-				BarnHelp.text('Programs', 'Programs_Fail_Log'),
-				messages[3],
-				'No service or day.'
-			);
+			Assert.areNotEqual(BarnHelp.text('Programs', 'Programs_Fail_Log'), messages[1], 'In the rule own words.');
+			Assert.areEqual(BarnHelp.text('Programs', 'Programs_Fail_Log'), messages[2], 'No program.');
+			Assert.areEqual(BarnHelp.text('Programs', 'Programs_Fail_Log'), messages[3], 'No service or day.');
 			Assert.areEqual(0, [SELECT COUNT() FROM Service_Delivery__c], 'Nothing was saved.');
 		}
 	}

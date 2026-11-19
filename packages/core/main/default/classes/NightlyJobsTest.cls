@@ -41,18 +41,8 @@ private class NightlyJobsTest {
 
 	/** Every module provider replaced: the first gives `steps`, the second throws. */
 	private static void modulesGive(List<NightlyStep> steps) {
-		ModuleExtensions.stubForTest(
-			NightlyStepProvider.class,
-			'Example_A',
-			new FakeProvider(steps),
-			true
-		);
-		ModuleExtensions.stubForTest(
-			NightlyStepProvider.class,
-			'Example_B',
-			new BrokenProvider(),
-			true
-		);
+		ModuleExtensions.stubForTest(NightlyStepProvider.class, 'Example_A', new FakeProvider(steps), true);
+		ModuleExtensions.stubForTest(NightlyStepProvider.class, 'Example_B', new BrokenProvider(), true);
 		NightlyJobs.forget();
 	}
 
@@ -118,11 +108,7 @@ private class NightlyJobsTest {
 			Assert.isTrue(NightlyJobs.isScheduled(), 'Switching on scheduled the run');
 			Assert.isFalse(NightlyJobs.isSwitchedOn(OLD_A, true), 'Saved off beats shipped on');
 			Assert.isTrue(NightlyJobs.isScheduled(), 'The run stays for the other steps');
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Nightly_Job__c WHERE Name = :OLD_A],
-				'One row per step'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Nightly_Job__c WHERE Name = :OLD_A], 'One row per step');
 		}
 	}
 
@@ -130,10 +116,8 @@ private class NightlyJobsTest {
 	static void aStepIsInTonightsRunOnlyWhileItsSettingAndItsSwitchAllowIt() {
 		System.runAs(TestUsers.admin()) {
 			NightlyStep always = new NightlyStep(OLD_B, 'B', 1, 0, new CountingWork());
-			NightlyStep inactive = new NightlyStep(OLD_B, 'B', 1, 0, new CountingWork())
-				.activeWhen(false);
-			NightlyStep switchedOff = new NightlyStep(OLD_A, 'A', 1, 0, new CountingWork())
-				.withSwitch(false);
+			NightlyStep inactive = new NightlyStep(OLD_B, 'B', 1, 0, new CountingWork()).activeWhen(false);
+			NightlyStep switchedOff = new NightlyStep(OLD_A, 'A', 1, 0, new CountingWork()).withSwitch(false);
 
 			Assert.isTrue(NightlyJobs.isOn(always), 'No switch, no setting against it: it runs');
 			Assert.isFalse(NightlyJobs.isOn(inactive), 'A setting that has it off');
@@ -157,10 +141,7 @@ private class NightlyJobsTest {
 			Test.stopTest();
 			ScheduledJobSelector.forget();
 
-			Assert.isTrue(
-				missing.contains(System.Label.Core_NightlyJobs_Title),
-				'Named: ' + missing
-			);
+			Assert.isTrue(missing.contains(System.Label.Core_NightlyJobs_Title), 'Named: ' + missing);
 			Assert.areEqual(missing, scheduled, 'The fix schedules what was named');
 			Assert.isTrue(NightlyJobs.unscheduledLabels().isEmpty(), 'Nothing is missing after');
 		}

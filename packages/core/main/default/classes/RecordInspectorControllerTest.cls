@@ -31,9 +31,7 @@ private class RecordInspectorControllerTest {
 			Error_Log__c entry = TestDataFactory.insertErrorLogs(1, ErrorLogger.STATUS_NEW)[0];
 
 			Test.startTest();
-			RecordInspectorController.Inspection inspection = RecordInspectorController.inspect(
-				entry.Id
-			);
+			RecordInspectorController.Inspection inspection = RecordInspectorController.inspect(entry.Id);
 			Test.stopTest();
 
 			Assert.areEqual('Error_Log__c', inspection.objectApiName);
@@ -75,9 +73,7 @@ private class RecordInspectorControllerTest {
 			entry.Technical_Detail__c = 'x'.repeat(RecordInspectorController.VALUE_LIMIT + 500);
 			update entry;
 
-			RecordInspectorController.Inspection inspection = RecordInspectorController.inspect(
-				entry.Id
-			);
+			RecordInspectorController.Inspection inspection = RecordInspectorController.inspect(entry.Id);
 
 			RecordInspectorController.FieldRow detail = find(inspection, 'Technical_Detail__c');
 			Assert.isTrue(detail.truncated, 'The row says it was cut.');
@@ -92,9 +88,7 @@ private class RecordInspectorControllerTest {
 			Error_Log__c entry = TestDataFactory.insertErrorLogs(1, ErrorLogger.STATUS_NEW)[0];
 			RecordInspectorController.fieldLimit = 5;
 
-			RecordInspectorController.Inspection inspection = RecordInspectorController.inspect(
-				entry.Id
-			);
+			RecordInspectorController.Inspection inspection = RecordInspectorController.inspect(entry.Id);
 
 			Assert.isTrue(inspection.fieldsCut, 'The result says it is partial.');
 			Assert.areEqual(5, inspection.fields.size());

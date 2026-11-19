@@ -66,14 +66,7 @@ public with sharing class RelationshipSelector {
 			return typeMappingOverride;
 		}
 		return [
-			SELECT
-				DeveloperName,
-				MasterLabel,
-				Type__c,
-				Reciprocal_Type__c,
-				Is_Gendered__c,
-				Is_Shipped__c,
-				Active__c
+			SELECT DeveloperName, MasterLabel, Type__c, Reciprocal_Type__c, Is_Gendered__c, Is_Shipped__c, Active__c
 			FROM Relationship_Type__mdt
 			WHERE Active__c = TRUE
 			WITH SYSTEM_MODE

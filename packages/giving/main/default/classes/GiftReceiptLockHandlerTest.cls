@@ -19,11 +19,7 @@ private class GiftReceiptLockHandlerTest {
 	static void makeData() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GivingTestDataFactory.insertDefaultFund();
-			Contact donor = GivingTestDataFactory.insertHouseholdContact(
-				'The Nolan Family',
-				'Ana',
-				'Nolan'
-			);
+			Contact donor = GivingTestDataFactory.insertHouseholdContact('The Nolan Family', 'Ana', 'Nolan');
 			GivingTestDataFactory.insertHouseholdContact('The Okafor Family', 'Ben', 'Okafor');
 			Gift__c gift = GivingTestDataFactory.buildGift(donor.Id, 250);
 			gift.Gift_Date__c = Date.newInstance(2026, 3, 1);
@@ -36,13 +32,7 @@ private class GiftReceiptLockHandlerTest {
 
 	private static Gift__c receiptedGift() {
 		return [
-			SELECT
-				Id,
-				Amount__c,
-				Gift_Date__c,
-				Donor_Contact__c,
-				Donor_Account__c,
-				Receipt_Number__c
+			SELECT Id, Amount__c, Gift_Date__c, Donor_Contact__c, Donor_Account__c, Receipt_Number__c
 			FROM Gift__c
 			WHERE Receipt_Number__c = :RECEIPT_NUMBER
 			WITH SYSTEM_MODE
@@ -61,10 +51,7 @@ private class GiftReceiptLockHandlerTest {
 	 * administrator grant in the same set.
 	 */
 	private static User userHoldingTheOverride() {
-		User maria = TestDataFactory.createUser(
-			'Maria',
-			new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
-		);
+		User maria = TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' });
 		grantInSetup(maria, true);
 		return maria;
 	}
@@ -89,15 +76,9 @@ private class GiftReceiptLockHandlerTest {
 				PermissionsEdit = true
 			);
 			if (withOverride) {
-				insert new SetupEntityAccess(
-					ParentId = granted.Id,
-					SetupEntityId = overridePermissionId()
-				);
+				insert new SetupEntityAccess(ParentId = granted.Id, SetupEntityId = overridePermissionId());
 			}
-			insert new PermissionSetAssignment(
-				AssigneeId = person.Id,
-				PermissionSetId = granted.Id
-			);
+			insert new PermissionSetAssignment(AssigneeId = person.Id, PermissionSetId = granted.Id);
 		}
 	}
 
@@ -164,10 +145,7 @@ private class GiftReceiptLockHandlerTest {
 			Gift__c amountChange = new Gift__c(Id = gift.Id, Amount__c = 300);
 			String amountRefusal = refusalFrom(amountChange);
 
-			Gift__c dateChange = new Gift__c(
-				Id = gift.Id,
-				Gift_Date__c = Date.newInstance(2026, 4, 1)
-			);
+			Gift__c dateChange = new Gift__c(Id = gift.Id, Gift_Date__c = Date.newInstance(2026, 4, 1));
 			String dateRefusal = refusalFrom(dateChange);
 
 			Gift__c donorChange = new Gift__c(Id = gift.Id, Donor_Contact__c = otherPerson);
@@ -178,18 +156,15 @@ private class GiftReceiptLockHandlerTest {
 			Test.stopTest();
 
 			Assert.isTrue(
-				amountRefusal != null &&
-				amountRefusal.contains(BarnHelp.text('Giving', 'Giving_Gift_ReceiptLocked')),
+				amountRefusal != null && amountRefusal.contains(BarnHelp.text('Giving', 'Giving_Gift_ReceiptLocked')),
 				'Changing the amount contradicts the document the donor holds.'
 			);
 			Assert.isTrue(
-				dateRefusal != null &&
-				dateRefusal.contains(BarnHelp.text('Giving', 'Giving_Gift_ReceiptLocked')),
+				dateRefusal != null && dateRefusal.contains(BarnHelp.text('Giving', 'Giving_Gift_ReceiptLocked')),
 				'So does changing the date the receipt states.'
 			);
 			Assert.isTrue(
-				donorRefusal != null &&
-				donorRefusal.contains(BarnHelp.text('Giving', 'Giving_Gift_ReceiptLocked')),
+				donorRefusal != null && donorRefusal.contains(BarnHelp.text('Giving', 'Giving_Gift_ReceiptLocked')),
 				'So does moving the gift to another donor.'
 			);
 			Assert.isTrue(
@@ -199,16 +174,8 @@ private class GiftReceiptLockHandlerTest {
 			);
 
 			Gift__c unchanged = receiptedGift();
-			Assert.areEqual(
-				250,
-				unchanged.Amount__c,
-				'Nothing was saved: the amount is as receipted.'
-			);
-			Assert.areEqual(
-				Date.newInstance(2026, 3, 1),
-				unchanged.Gift_Date__c,
-				'And so is the date.'
-			);
+			Assert.areEqual(250, unchanged.Amount__c, 'Nothing was saved: the amount is as receipted.');
+			Assert.areEqual(Date.newInstance(2026, 3, 1), unchanged.Gift_Date__c, 'And so is the date.');
 			Assert.areEqual(
 				RECEIPT_NUMBER,
 				unchanged.Receipt_Number__c,
@@ -232,8 +199,7 @@ private class GiftReceiptLockHandlerTest {
 			Test.stopTest();
 
 			Assert.isTrue(
-				refusal != null &&
-				refusal.contains(BarnHelp.text('Giving', 'Giving_Gift_ReceiptedGiftNotDeletable')),
+				refusal != null && refusal.contains(BarnHelp.text('Giving', 'Giving_Gift_ReceiptedGiftNotDeletable')),
 				'A receipted gift is corrected by a refund or a reissue, never deleted.'
 			);
 			Assert.areEqual(
@@ -256,8 +222,7 @@ private class GiftReceiptLockHandlerTest {
 			Test.stopTest();
 
 			Assert.isTrue(
-				refusal != null &&
-				refusal.contains(BarnHelp.text('Giving', 'Giving_Gift_ReceiptLocked')),
+				refusal != null && refusal.contains(BarnHelp.text('Giving', 'Giving_Gift_ReceiptLocked')),
 				'The pause stops BarnCRM filling things in, never stops it refusing something.'
 			);
 			Assert.areEqual(
@@ -308,21 +273,13 @@ private class GiftReceiptLockHandlerTest {
 				'Filed where an auditor looking for overrides will find it.'
 			);
 			Assert.areEqual(maria.Id, logged[0].User__c, 'Naming the person who made the change.');
-			Assert.isTrue(
-				logged[0].Message__c.contains(String.valueOf(gift.Id)),
-				'The entry names the gift.'
-			);
-			Assert.isTrue(
-				logged[0].Message__c.contains(RECEIPT_NUMBER),
-				'And the receipt the donor is holding.'
-			);
+			Assert.isTrue(logged[0].Message__c.contains(String.valueOf(gift.Id)), 'The entry names the gift.');
+			Assert.isTrue(logged[0].Message__c.contains(RECEIPT_NUMBER), 'And the receipt the donor is holding.');
 			Assert.isTrue(
 				logged[0].Message__c.contains(Gift__c.Amount__c.getDescribe().getLabel()) &&
 					logged[0].Message__c.contains(Gift__c.Gift_Date__c.getDescribe().getLabel()) &&
-					logged[0]
-						.Message__c.contains(Gift__c.Donor_Contact__c.getDescribe().getLabel()),
-				'And each value that moved, so the change can be reconstructed: ' +
-				logged[0].Message__c
+					logged[0].Message__c.contains(Gift__c.Donor_Contact__c.getDescribe().getLabel()),
+				'And each value that moved, so the change can be reconstructed: ' + logged[0].Message__c
 			);
 		}
 	}
@@ -357,8 +314,7 @@ private class GiftReceiptLockHandlerTest {
 				'At Warning, which is what the Error Log page filters on.'
 			);
 			Assert.isTrue(
-				logged[0]
-					.Message__c.contains(BarnHelp.text('Giving', 'Giving_Gift_OverrideDeleted')),
+				logged[0].Message__c.contains(BarnHelp.text('Giving', 'Giving_Gift_OverrideDeleted')),
 				'Saying what was done, not just that something was: ' + logged[0].Message__c
 			);
 		}
@@ -382,9 +338,7 @@ private class GiftReceiptLockHandlerTest {
 			System.runAs(maria) {
 				try {
 					delete original;
-					Assert.fail(
-						'The reversal refusal is not the receipt lock, so it still applies.'
-					);
+					Assert.fail('The reversal refusal is not the receipt lock, so it still applies.');
 				} catch (DmlException expected) {
 					refusal = expected.getDmlMessage(0);
 				}
@@ -392,8 +346,7 @@ private class GiftReceiptLockHandlerTest {
 			Test.stopTest();
 
 			Assert.isTrue(
-				refusal != null &&
-				refusal.contains(BarnHelp.text('Giving', 'Giving_Gift_ReversedGiftNotDeletable')),
+				refusal != null && refusal.contains(BarnHelp.text('Giving', 'Giving_Gift_ReversedGiftNotDeletable')),
 				'Refused for the reason R-G3 gives, not the receipt one: ' + refusal
 			);
 			Assert.areEqual(
@@ -414,10 +367,7 @@ private class GiftReceiptLockHandlerTest {
 	 * David, who enters the gifts and has no business inventing receipt numbers.
 	 */
 	private static User fundraiser() {
-		return TestDataFactory.createUser(
-			'David',
-			new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' }
-		);
+		return TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' });
 	}
 
 	@IsTest
@@ -440,9 +390,7 @@ private class GiftReceiptLockHandlerTest {
 			String refusal;
 			Test.startTest();
 			System.runAs(david) {
-				refusal = refusalFrom(
-					new Gift__c(Id = plain.Id, Receipt_Number__c = 'R-2026-000777')
-				);
+				refusal = refusalFrom(new Gift__c(Id = plain.Id, Receipt_Number__c = 'R-2026-000777'));
 			}
 			Test.stopTest();
 
@@ -453,9 +401,7 @@ private class GiftReceiptLockHandlerTest {
 			);
 			Assert.isTrue(
 				refusal != null &&
-				refusal.contains(
-					BarnHelp.text('Giving', 'Giving_Gift_ReceiptNumberNotIssuedByHand')
-				),
+				refusal.contains(BarnHelp.text('Giving', 'Giving_Gift_ReceiptNumberNotIssuedByHand')),
 				'And the refusal does not depend on that: a number typed onto a gift is refused ' +
 					'whoever was granted the field, because it came from no sequence: ' +
 					refusal
@@ -499,9 +445,7 @@ private class GiftReceiptLockHandlerTest {
 
 			Assert.isTrue(
 				refusal != null &&
-				refusal.contains(
-					BarnHelp.text('Giving', 'Giving_Gift_ReceiptNumberNotIssuedByHand')
-				),
+				refusal.contains(BarnHelp.text('Giving', 'Giving_Gift_ReceiptNumberNotIssuedByHand')),
 				'Creating the gift with the number in place is the same tamper as typing it on ' +
 					'afterwards, so it is refused the same way: ' +
 					refusal
@@ -526,9 +470,7 @@ private class GiftReceiptLockHandlerTest {
 
 			Test.startTest();
 			System.runAs(david) {
-				GiftService.recordReceiptNumbers(
-					new Map<Id, String>{ plain.Id => 'R-2026-000501' }
-				);
+				GiftService.recordReceiptNumbers(new Map<Id, String>{ plain.Id => 'R-2026-000501' });
 			}
 			Test.stopTest();
 
@@ -623,8 +565,7 @@ private class GiftReceiptLockHandlerTest {
 			Assert.areEqual(1, logged.size(), 'And the recovery was recorded, once.');
 			Assert.isTrue(
 				logged[0].Message__c.contains(RECEIPT_NUMBER),
-				'Naming the number that was on the gift, which is what an auditor asks about: ' +
-				logged[0].Message__c
+				'Naming the number that was on the gift, which is what an auditor asks about: ' + logged[0].Message__c
 			);
 		}
 	}

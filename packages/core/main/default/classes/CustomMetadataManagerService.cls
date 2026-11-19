@@ -190,14 +190,8 @@ public with sharing class CustomMetadataManagerService {
 		mergeRules.type = Merge_Rule__mdt.SObjectType;
 		mergeRules.label = System.Label.Core_DuplicateManagement_MergeRules;
 		mergeRules.help = BarnHelp.text('Core', 'Core_DuplicateManagement_MergeRulesHelp');
-		mergeRules.fields = new List<Schema.SObjectField>{
-			Merge_Rule__mdt.Field_Name__c,
-			Merge_Rule__mdt.Rule__c
-		};
-		mergeRules.required = new Set<Schema.SObjectField>{
-			Merge_Rule__mdt.Field_Name__c,
-			Merge_Rule__mdt.Rule__c
-		};
+		mergeRules.fields = new List<Schema.SObjectField>{ Merge_Rule__mdt.Field_Name__c, Merge_Rule__mdt.Rule__c };
+		mergeRules.required = new Set<Schema.SObjectField>{ Merge_Rule__mdt.Field_Name__c, Merge_Rule__mdt.Rule__c };
 		mergeRules.archiveField = Merge_Rule__mdt.Active__c;
 		mergeRules.uniqueField = Merge_Rule__mdt.Field_Name__c;
 		mergeRules.choicesFrom = new Map<Schema.SObjectField, Schema.SObjectField>{
@@ -302,9 +296,7 @@ public with sharing class CustomMetadataManagerService {
 		}
 		Boolean active = existing == null || isActive(editable, existing);
 		Map<String, Object> values = validated(editable, rows, input, existing, active);
-		String developerName = existing != null
-			? existing.developerName
-			: newDeveloperName(input.label, rows);
+		String developerName = existing != null ? existing.developerName : newDeveloperName(input.label, rows);
 		return enqueue(editable, developerName, input.label.trim(), values, existing);
 	}
 
@@ -331,11 +323,7 @@ public with sharing class CustomMetadataManagerService {
 				return setShippedArchived(editable, found, archived != true);
 			}
 		}
-		CustomMetadataManagerSelector.StoredRow existing = changeableRow(
-			editable,
-			rows,
-			developerName
-		);
+		CustomMetadataManagerSelector.StoredRow existing = changeableRow(editable, rows, developerName);
 		RowInput input = new RowInput();
 		input.developerName = existing.developerName;
 		input.label = existing.label;
@@ -367,13 +355,7 @@ public with sharing class CustomMetadataManagerService {
 		}
 		values.put(editable.archiveField.getDescribe().getLocalName(), active);
 		values.put(SHIPPED_FIELD, true);
-		return enqueue(
-			editable,
-			NamespaceUtil.qualify(shipped.developerName),
-			shipped.label,
-			values,
-			shipped
-		);
+		return enqueue(editable, NamespaceUtil.qualify(shipped.developerName), shipped.label, values, shipped);
 	}
 
 	/**
@@ -406,9 +388,7 @@ public with sharing class CustomMetadataManagerService {
 		names.sort();
 		String joined = String.join(names, ',');
 		if (joined.length() > editable.shippedOffSetting.getDescribe().getLength()) {
-			throw new CustomMetadataManagerException(
-				BarnHelp.text('Core', 'Core_CmdtManager_SaveError')
-			);
+			throw new CustomMetadataManagerException(BarnHelp.text('Core', 'Core_CmdtManager_SaveError'));
 		}
 		SettingsService.saveSystemValue(key, joined);
 	}
@@ -437,14 +417,10 @@ public with sharing class CustomMetadataManagerService {
 		Boolean active
 	) {
 		if (input == null || String.isBlank(input.label)) {
-			throw new CustomMetadataManagerException(
-				BarnHelp.text('Core', 'Core_CmdtManager_NameRequired')
-			);
+			throw new CustomMetadataManagerException(BarnHelp.text('Core', 'Core_CmdtManager_NameRequired'));
 		}
 		if (input.label.trim().length() > NAME_LIMIT) {
-			throw new CustomMetadataManagerException(
-				BarnHelp.text('Core', 'Core_CmdtManager_NameTooLong')
-			);
+			throw new CustomMetadataManagerException(BarnHelp.text('Core', 'Core_CmdtManager_NameTooLong'));
 		}
 		Map<String, String> given = input.values == null ? new Map<String, String>() : input.values;
 		Map<String, Object> values = new Map<String, Object>();
@@ -485,11 +461,7 @@ public with sharing class CustomMetadataManagerService {
 		return values;
 	}
 
-	private static void requireChoice(
-		String value,
-		Schema.SObjectField picklist,
-		Schema.SObjectType owner
-	) {
+	private static void requireChoice(String value, Schema.SObjectField picklist, Schema.SObjectType owner) {
 		for (Choice choice : choicesOf(picklist)) {
 			// Exact case: the reciprocal is written into a restricted picklist as it is here.
 			if (choice.value.equals(value)) {
@@ -547,11 +519,7 @@ public with sharing class CustomMetadataManagerService {
 		Map<String, Object> values
 	) {
 		Metadata.CustomMetadata record = new Metadata.CustomMetadata();
-		record.fullName =
-			NamespaceUtil.prefix() +
-			nameOf(editable).removeEnd('__mdt') +
-			'.' +
-			developerName;
+		record.fullName = NamespaceUtil.prefix() + nameOf(editable).removeEnd('__mdt') + '.' + developerName;
 		record.label = label;
 		record.protected_x = false;
 		List<String> names = new List<String>(values.keySet());
@@ -594,9 +562,7 @@ public with sharing class CustomMetadataManagerService {
 			return deployer.deploy(container, callback);
 		} catch (Exception refused) {
 			ErrorLogger.log(refused, CustomMetadataDeployCallback.ERROR_CONTEXT);
-			throw new CustomMetadataManagerException(
-				BarnHelp.text('Core', 'Core_CmdtManager_DeployRefused')
-			);
+			throw new CustomMetadataManagerException(BarnHelp.text('Core', 'Core_CmdtManager_DeployRefused'));
 		}
 	}
 
@@ -610,10 +576,7 @@ public with sharing class CustomMetadataManagerService {
 	 * first.
 	 */
 	@TestVisible
-	private static String newDeveloperName(
-		String label,
-		List<CustomMetadataManagerSelector.StoredRow> rows
-	) {
+	private static String newDeveloperName(String label, List<CustomMetadataManagerSelector.StoredRow> rows) {
 		String body = label.trim().replaceAll('[^A-Za-z0-9]+', '_').removeStart('_').removeEnd('_');
 		if (String.isBlank(body)) {
 			body = 'Row';
@@ -647,9 +610,7 @@ public with sharing class CustomMetadataManagerService {
 	private static EditableType editableType(String typeName) {
 		EditableType editable = String.isBlank(typeName) ? null : registry().get(typeName);
 		if (editable == null || !isFeatureOn(editable)) {
-			throw new CustomMetadataManagerException(
-				BarnHelp.text('Core', 'Core_CmdtManager_UnknownType')
-			);
+			throw new CustomMetadataManagerException(BarnHelp.text('Core', 'Core_CmdtManager_UnknownType'));
 		}
 		return editable;
 	}
@@ -662,10 +623,7 @@ public with sharing class CustomMetadataManagerService {
 		CustomMetadataManagerSelector.StoredRow row = rowNamed(rows, developerName);
 		if (isShipped(row)) {
 			throw new CustomMetadataManagerException(
-				String.format(
-					BarnHelp.text('Core', 'Core_CmdtManager_ShippedReadOnly'),
-					new List<Object>{ row.label }
-				)
+				String.format(BarnHelp.text('Core', 'Core_CmdtManager_ShippedReadOnly'), new List<Object>{ row.label })
 			);
 		}
 		return row;
@@ -680,9 +638,7 @@ public with sharing class CustomMetadataManagerService {
 				return row;
 			}
 		}
-		throw new CustomMetadataManagerException(
-			BarnHelp.text('Core', 'Core_CmdtManager_RecordNotFound')
-		);
+		throw new CustomMetadataManagerException(BarnHelp.text('Core', 'Core_CmdtManager_RecordNotFound'));
 	}
 
 	private static List<CustomMetadataManagerSelector.StoredRow> rowsOf(EditableType editable) {
@@ -699,10 +655,7 @@ public with sharing class CustomMetadataManagerService {
 		return isTrue(row.values.get(SHIPPED_FIELD));
 	}
 
-	private static Boolean isActive(
-		EditableType editable,
-		CustomMetadataManagerSelector.StoredRow row
-	) {
+	private static Boolean isActive(EditableType editable, CustomMetadataManagerSelector.StoredRow row) {
 		if (!isTrue(row.values.get(editable.archiveField.getDescribe().getLocalName()))) {
 			return false;
 		}

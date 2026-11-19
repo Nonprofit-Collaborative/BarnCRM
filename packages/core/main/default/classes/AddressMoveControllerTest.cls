@@ -19,15 +19,9 @@ private class AddressMoveControllerTest {
 	@IsTest
 	static void theCardIsHiddenWhileAddressesIsOff() {
 		System.runAs(TestUsers.admin()) {
-			SettingsService.saveSystemValue(
-				'Features_Turned_On__c',
-				FeatureSwitchService.RELATIONSHIPS
-			);
+			SettingsService.saveSystemValue('Features_Turned_On__c', FeatureSwitchService.RELATIONSHIPS);
 			Boolean whileOff = AddressMoveController.isFeatureOn();
-			SettingsService.saveSystemValue(
-				'Features_Turned_On__c',
-				FeatureSwitchService.ADDRESSES
-			);
+			SettingsService.saveSystemValue('Features_Turned_On__c', FeatureSwitchService.ADDRESSES);
 			Boolean whileOn = AddressMoveController.isFeatureOn();
 
 			Assert.isFalse(whileOff, 'The card is hidden while the feature is off');
@@ -42,15 +36,10 @@ private class AddressMoveControllerTest {
 			Database.insert(garcia, AccessLevel.SYSTEM_MODE);
 
 			Test.startTest();
-			AddressMoveController.CardContext context = AddressMoveController.getCardContext(
-				garcia.Id
-			);
+			AddressMoveController.CardContext context = AddressMoveController.getCardContext(garcia.Id);
 			Test.stopTest();
 
-			Assert.isTrue(
-				context.isHousehold,
-				'A household card offers Update Everyone\'s Address.'
-			);
+			Assert.isTrue(context.isHousehold, 'A household card offers Update Everyone\'s Address.');
 			Assert.isTrue(context.households.isEmpty(), 'There is no household to pick.');
 		}
 	}
@@ -66,17 +55,11 @@ private class AddressMoveControllerTest {
 			insert ana;
 			insert new List<Household_Member__c>{
 				new Household_Member__c(Household__c = garcia.Id, Contact__c = ana.Id),
-				new Household_Member__c(
-					Household__c = nowak.Id,
-					Contact__c = ana.Id,
-					Is_Primary__c = true
-				)
+				new Household_Member__c(Household__c = nowak.Id, Contact__c = ana.Id, Is_Primary__c = true)
 			};
 
 			Test.startTest();
-			AddressMoveController.CardContext context = AddressMoveController.getCardContext(
-				ana.Id
-			);
+			AddressMoveController.CardContext context = AddressMoveController.getCardContext(ana.Id);
 			Test.stopTest();
 
 			Assert.isFalse(context.isHousehold, 'Ana is a person.');
@@ -98,9 +81,7 @@ private class AddressMoveControllerTest {
 			insert ownAddress(ana.Id);
 
 			Test.startTest();
-			AddressMoveController.MovePreview preview = AddressMoveController.getMovePreview(
-				garcia.Id
-			);
+			AddressMoveController.MovePreview preview = AddressMoveController.getMovePreview(garcia.Id);
 			AddressMoveController.updateEveryonesAddress(garcia.Id, new List<Id>{ ana.Id });
 			Test.stopTest();
 
@@ -137,9 +118,7 @@ private class AddressMoveControllerTest {
 			insert andresOwn;
 
 			Test.startTest();
-			AddressMoveController.MovePreview preview = AddressMoveController.getMovePreview(
-				ortiz.Id
-			);
+			AddressMoveController.MovePreview preview = AddressMoveController.getMovePreview(ortiz.Id);
 			AddressMoveController.useForWholeHousehold(andresOwn.Id, ortiz.Id);
 			Test.stopTest();
 
@@ -213,20 +192,13 @@ private class AddressMoveControllerTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Address_MoveNoPrimary'),
-				message,
-				'As it is.'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Address_MoveNoPrimary'), message, 'As it is.');
 		}
 	}
 
 	@IsTest
 	static void aUserWhoMayNotEditIsToldInPlainWordsAndNothingChanges() {
-		User reader = TestUsers.peopleReaderWith(
-			'MoveCardReader',
-			new List<String>{ 'BarnCRM_Read_Only' }
-		);
+		User reader = TestUsers.peopleReaderWith('MoveCardReader', new List<String>{ 'BarnCRM_Read_Only' });
 		Account garcia;
 		Contact luis;
 		Address__c anasOwn;
@@ -280,10 +252,7 @@ private class AddressMoveControllerTest {
 		System.runAs(TestUsers.admin()) {
 			Assert.isTrue(AddressMoveController.getCardFields().isEmpty(), 'None chosen yet.');
 
-			SettingsService.saveSystemValue(
-				'Address_Card_Fields__c',
-				'Verification_Status__c,Latest_Verified_Date__c'
-			);
+			SettingsService.saveSystemValue('Address_Card_Fields__c', 'Verification_Status__c,Latest_Verified_Date__c');
 			List<AddressMoveController.CardField> fields = AddressMoveController.getCardFields();
 
 			Assert.areEqual(2, fields.size(), 'Both chosen fields are shown.');
@@ -316,23 +285,13 @@ private class AddressMoveControllerTest {
 			Contact second = AddressTestDataFactory.newContact('Sam', 'Ruiz', ruiz.Id);
 			Database.DMLOptions allowDuplicates = new Database.DMLOptions();
 			allowDuplicates.DuplicateRuleHeader.AllowSave = true;
-			Database.insert(
-				new List<Contact>{ first, second },
-				allowDuplicates,
-				AccessLevel.USER_MODE
-			);
+			Database.insert(new List<Contact>{ first, second }, allowDuplicates, AccessLevel.USER_MODE);
 
-			AddressMoveController.MovePreview preview = AddressMoveController.getMovePreview(
-				ruiz.Id
-			);
+			AddressMoveController.MovePreview preview = AddressMoveController.getMovePreview(ruiz.Id);
 
 			Assert.areEqual(2, preview.moving.size(), 'Both take the address.');
 			for (AddressMoveController.Choice choice : preview.moving) {
-				Assert.areEqual(
-					'Sam Ruiz',
-					choice.name,
-					'Left as the name when nothing separates them.'
-				);
+				Assert.areEqual('Sam Ruiz', choice.name, 'Left as the name when nothing separates them.');
 			}
 		}
 	}
@@ -344,12 +303,7 @@ private class AddressMoveControllerTest {
 	}
 
 	private static Address__c ownAddress(Id contactId) {
-		return new Address__c(
-			Contact__c = contactId,
-			Type__c = 'Home',
-			Street__c = OWN_STREET,
-			Is_Default__c = true
-		);
+		return new Address__c(Contact__c = contactId, Type__c = 'Home', Street__c = OWN_STREET, Is_Default__c = true);
 	}
 
 	private static String mailingStreetOf(Id contactId) {

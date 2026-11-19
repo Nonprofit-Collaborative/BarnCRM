@@ -67,9 +67,7 @@ private class BulkUpdateTransformTest {
 	/** `count` contacts titled Volunteer, each with its own last name. */
 	private static List<Contact> makeVolunteers(Integer count) {
 		DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
-		Account organization = TestDataFactory.organization(
-			new Account(Name = 'Springfield Food Bank')
-		);
+		Account organization = TestDataFactory.organization(new Account(Name = 'Springfield Food Bank'));
 		insert organization;
 		List<Contact> people = new List<Contact>();
 		for (Integer index = 0; index < count; index++) {
@@ -128,23 +126,14 @@ private class BulkUpdateTransformTest {
 				200
 			);
 
-			System.Assert.areEqual(
-				ImportBatchService.STATUS_COMPLETE,
-				job.Status__c,
-				job.Run_Log__c
-			);
+			System.Assert.areEqual(ImportBatchService.STATUS_COMPLETE, job.Status__c, job.Run_Log__c);
 			System.Assert.areEqual(200, job.Rows_Updated__c, 'Every record is changed');
 			for (Contact person : [SELECT LastName, Title FROM Contact]) {
-				System.Assert.areEqual(
-					'Coordinator: ' + person.LastName,
-					person.Title,
-					'Its own name'
-				);
+				System.Assert.areEqual('Coordinator: ' + person.LastName, person.Title, 'Its own name');
 			}
 			List<Map<String, Object>> entries = journal(job.Id);
 			System.Assert.areEqual(200, entries.size(), 'One entry per record saved');
-			Map<String, Object> title = (Map<String, Object>) ((Map<String, Object>) entries[0]
-					.get('fields'))
+			Map<String, Object> title = (Map<String, Object>) ((Map<String, Object>) entries[0].get('fields'))
 				.get('Title');
 			System.Assert.areEqual('Volunteer', title.get('before'), 'The value before');
 		}
@@ -157,30 +146,18 @@ private class BulkUpdateTransformTest {
 			Map<String, Object> mapValues = step(DataTransform.OP_MAP);
 			mapValues.put(
 				'pairs',
-				new List<Object>{
-					new Map<String, Object>{ 'text' => 'volunteer', 'value' => 'Helper, Events' }
-				}
+				new List<Object>{ new Map<String, Object>{ 'text' => 'volunteer', 'value' => 'Helper, Events' } }
 			);
 			Map<String, Object> keepPart = step(DataTransform.OP_PART);
 			keepPart.putAll(new Map<String, Object>{ 'separator' => ',', 'position' => 2 });
 			Map<String, Object> ifThen = step(DataTransform.OP_IF_THEN);
-			ifThen.putAll(
-				new Map<String, Object>{
-					'test' => 'equals',
-					'text' => 'events',
-					'value' => 'Event lead'
-				}
-			);
+			ifThen.putAll(new Map<String, Object>{ 'test' => 'equals', 'text' => 'events', 'value' => 'Event lead' });
 			Import_Batch__c job = run(
 				transform('Title', new List<Map<String, Object>>{ mapValues, keepPart, ifThen }),
 				200
 			);
 
-			System.Assert.areEqual(
-				ImportBatchService.STATUS_COMPLETE,
-				job.Status__c,
-				job.Run_Log__c
-			);
+			System.Assert.areEqual(ImportBatchService.STATUS_COMPLETE, job.Status__c, job.Run_Log__c);
 			System.Assert.areEqual(200, job.Rows_Updated__c, 'Every record is changed');
 			System.Assert.areEqual(
 				200,
@@ -201,11 +178,7 @@ private class BulkUpdateTransformTest {
 
 			System.Assert.areEqual(200, job.Rows_Updated__c, 'Compared exactly, not with ==');
 			System.Assert.areEqual(0, job.Rows_Matched__c, 'None reads as unchanged');
-			System.Assert.areEqual(
-				200,
-				[SELECT COUNT() FROM Contact WHERE Title = 'VOLUNTEER'],
-				'Saved'
-			);
+			System.Assert.areEqual(200, [SELECT COUNT() FROM Contact WHERE Title = 'VOLUNTEER'], 'Saved');
 		}
 	}
 
@@ -216,10 +189,7 @@ private class BulkUpdateTransformTest {
 			Contact tooLong = people[7];
 			update new Contact(Id = tooLong.Id, Description = 'x'.repeat(200));
 			Import_Batch__c job = run(
-				transform(
-					'Title',
-					new List<Map<String, Object>>{ append(new List<String>{ 'Description' }, ' ') }
-				),
+				transform('Title', new List<Map<String, Object>>{ append(new List<String>{ 'Description' }, ' ') }),
 				200
 			);
 
@@ -247,9 +217,7 @@ private class BulkUpdateTransformTest {
 				VOLUNTEERS,
 				transform(
 					'Title',
-					new List<Map<String, Object>>{
-						append(new List<String>{ 'LastName', 'Description' }, ' ')
-					}
+					new List<Map<String, Object>>{ append(new List<String>{ 'LastName', 'Description' }, ' ') }
 				)
 			);
 
@@ -276,16 +244,8 @@ private class BulkUpdateTransformTest {
 				transform('Title', new List<Map<String, Object>>()),
 				transform('Title', new List<Map<String, Object>>{ step(DataTransform.OP_REPLACE) }),
 				transform('Title', new List<Map<String, Object>>{ step('evaluate') }),
-				transform(
-					'AccountId',
-					new List<Map<String, Object>>{ step(DataTransform.OP_TRIM) }
-				),
-				transform(
-					'Title',
-					new List<Map<String, Object>>{
-						append(new List<String>{ 'No_Such_Field__c' }, ' ')
-					}
-				)
+				transform('AccountId', new List<Map<String, Object>>{ step(DataTransform.OP_TRIM) }),
+				transform('Title', new List<Map<String, Object>>{ append(new List<String>{ 'No_Such_Field__c' }, ' ') })
 			};
 			for (String changesJson : refused) {
 				try {
@@ -312,9 +272,7 @@ private class BulkUpdateTransformTest {
 					}
 				)
 			);
-			BulkUpdateService.Plan again = BulkUpdateService.planFromDefinition(
-				checked.definition(10)
-			);
+			BulkUpdateService.Plan again = BulkUpdateService.planFromDefinition(checked.definition(10));
 
 			BulkUpdateService.Change change = again.changes[0];
 			System.Assert.areEqual(BulkUpdateService.ACTION_TRANSFORM, change.action);
@@ -345,10 +303,7 @@ private class BulkUpdateTransformTest {
 				(Decimal) BulkUpdateFields.fromText(revenue, '$1,250.50') == 1250.5,
 				'Symbols and separators are dropped'
 			);
-			System.Assert.areEqual(
-				Date.newInstance(2025, 12, 31),
-				BulkUpdateFields.fromText(birthdate, '2025-12-31')
-			);
+			System.Assert.areEqual(Date.newInstance(2025, 12, 31), BulkUpdateFields.fromText(birthdate, '2025-12-31'));
 			System.Assert.areEqual(true, BulkUpdateFields.fromText(optOut, 'Yes'));
 			System.Assert.areEqual(false, BulkUpdateFields.fromText(optOut, ''));
 			System.Assert.areEqual(false, BulkUpdateFields.fromText(optOut, 'false'));
@@ -366,10 +321,7 @@ private class BulkUpdateTransformTest {
 				}
 			) {
 				try {
-					BulkUpdateFields.fromText(
-						(Schema.DescribeFieldResult) refused[0],
-						(String) refused[1]
-					);
+					BulkUpdateFields.fromText((Schema.DescribeFieldResult) refused[0], (String) refused[1]);
 					System.Assert.fail('Refused: ' + refused[1]);
 				} catch (BulkUpdateFields.BulkUpdateException expected) {
 					System.Assert.isTrue(String.isNotBlank(expected.getMessage()));
@@ -385,10 +337,7 @@ private class BulkUpdateTransformTest {
 	 */
 	@IsTest
 	static void aStoredValueRoundTripsThroughTextOutsideGmt() {
-		User pacific = TestDataFactory.createUserOnTheRunningUsersProfile(
-			'Pacific',
-			new List<String>()
-		);
+		User pacific = TestDataFactory.createUserOnTheRunningUsersProfile('Pacific', new List<String>());
 		pacific.TimeZoneSidKey = 'America/Los_Angeles';
 		System.runAs(new User(Id = UserInfo.getUserId())) {
 			update pacific;
@@ -419,10 +368,7 @@ private class BulkUpdateTransformTest {
 				BulkUpdateFields.toText(revenue, Decimal.valueOf('10000000.5')),
 				'A number without exponent'
 			);
-			System.Assert.areEqual(
-				12,
-				BulkUpdateFields.fromText(employees, BulkUpdateFields.toText(employees, 12))
-			);
+			System.Assert.areEqual(12, BulkUpdateFields.fromText(employees, BulkUpdateFields.toText(employees, 12)));
 			System.Assert.isNull(BulkUpdateFields.toText(birthdate, null), 'Null stays null');
 		}
 	}
@@ -437,10 +383,7 @@ private class BulkUpdateTransformTest {
 			update people;
 
 			Import_Batch__c job = run(
-				transform(
-					'Birthdate',
-					new List<Map<String, Object>>{ step(DataTransform.OP_TRIM) }
-				),
+				transform('Birthdate', new List<Map<String, Object>>{ step(DataTransform.OP_TRIM) }),
 				200
 			);
 

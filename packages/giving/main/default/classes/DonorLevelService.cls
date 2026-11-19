@@ -102,10 +102,7 @@ public with sharing class DonorLevelService {
 
 	/** These rungs with their bounds in the corporate currency, by each rung's currency. */
 	@TestVisible
-	private static List<Donor_Level__c> inCorporate(
-		List<Donor_Level__c> rungs,
-		Map<Id, String> isoById
-	) {
+	private static List<Donor_Level__c> inCorporate(List<Donor_Level__c> rungs, Map<Id, String> isoById) {
 		for (Donor_Level__c rung : rungs) {
 			String iso = isoById.get(rung.Id);
 			if (iso != null) {
@@ -125,10 +122,7 @@ public with sharing class DonorLevelService {
 		Set<Id> ids = new Set<Id>();
 		for (SObject record : records) {
 			// A record in a save already carries it.
-			if (
-				record.Id != null &&
-				!record.getPopulatedFieldsAsMap().containsKey(RollupCurrency.ISO_FIELD)
-			) {
+			if (record.Id != null && !record.getPopulatedFieldsAsMap().containsKey(RollupCurrency.ISO_FIELD)) {
 				ids.add(record.Id);
 			}
 		}
@@ -198,12 +192,7 @@ public with sharing class DonorLevelService {
 
 	/** The same, the record's total being in this currency (null: as the rungs are). */
 	@TestVisible
-	private static Boolean assign(
-		SObject record,
-		List<Donor_Level__c> rungs,
-		String source,
-		String isoCode
-	) {
+	private static Boolean assign(SObject record, List<Donor_Level__c> rungs, String source, String isoCode) {
 		if (record == null) {
 			return false;
 		}
@@ -263,11 +252,7 @@ public with sharing class DonorLevelService {
 			return cachedFieldNames.get(key);
 		}
 		Map<String, String> byLocalName = new Map<String, String>();
-		for (
-			Schema.SObjectField token : type.getDescribe(SObjectDescribeOptions.DEFERRED)
-				.fields.getMap()
-				.values()
-		) {
+		for (Schema.SObjectField token : type.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap().values()) {
 			Schema.DescribeFieldResult field = token.getDescribe();
 			byLocalName.put(field.getLocalName(), field.getName());
 		}

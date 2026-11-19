@@ -95,9 +95,7 @@ public with sharing class RollupPlanner {
 		Schema.DisplayType.TEXTAREA
 	};
 
-	private static final Pattern FIELD_PATH = Pattern.compile(
-		'^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)*$'
-	);
+	private static final Pattern FIELD_PATH = Pattern.compile('^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)*$');
 
 	/** One pass over one target entity. Lists indexed by definition share their index. */
 	public class Plan {
@@ -156,9 +154,7 @@ public with sharing class RollupPlanner {
 		if (String.isBlank(aggregate) || !ROW_LIMITED.contains(aggregate.toUpperCase())) {
 			return BarnHelp.text('Rollups', 'Core_Rollups_ErrorRowLimitAggregate');
 		}
-		return String.isBlank(orderBy)
-			? BarnHelp.text('Rollups', 'Core_Rollups_ErrorRowLimitNeedsOrder')
-			: null;
+		return String.isBlank(orderBy) ? BarnHelp.text('Rollups', 'Core_Rollups_ErrorRowLimitNeedsOrder') : null;
 	}
 
 	/**
@@ -214,16 +210,12 @@ public with sharing class RollupPlanner {
 		while (last > first && isWhitespace(typed.substring(last - 1, last))) {
 			last--;
 		}
-		return tokens(typed.substring(0, first)) +
-			typed.substring(first, last) +
-			tokens(typed.substring(last));
+		return tokens(typed.substring(0, first)) + typed.substring(first, last) + tokens(typed.substring(last));
 	}
 
 	/** What the delimiter writes: SP(), TB() and BR() read back; a value stored without tokens as it is. */
 	public static String decodeDelimiter(String stored) {
-		return stored == null
-			? null
-			: stored.replace('BR()', '\n').replace('SP()', ' ').replace('TB()', '\t');
+		return stored == null ? null : stored.replace('BR()', '\n').replace('SP()', ' ').replace('TB()', '\t');
 	}
 
 	private static Boolean isWhitespace(String character) {
@@ -256,14 +248,10 @@ public with sharing class RollupPlanner {
 				: BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetNeedsCheckbox');
 		}
 		if (operation == 'TEXT_LIST' || operation == 'TEXT_LIST_DISTINCT') {
-			return TEXT_TYPES.contains(type)
-				? null
-				: BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetNeedsText');
+			return TEXT_TYPES.contains(type) ? null : BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetNeedsText');
 		}
 		if (operation == 'COUNT_DISTINCT') {
-			return NUMBER_TYPES.contains(type)
-				? null
-				: BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetNeedsNumber');
+			return NUMBER_TYPES.contains(type) ? null : BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetNeedsNumber');
 		}
 		if (type == Schema.DisplayType.BOOLEAN) {
 			return BarnHelp.text('Rollups', 'Core_Rollups_ErrorCheckboxTarget');
@@ -281,9 +269,7 @@ public with sharing class RollupPlanner {
 				? null
 				: BarnHelp.text('Rollups', 'Core_Rollups_ErrorPicklistTarget');
 		}
-		return NUMBER_AND_DATE_TYPES.contains(type)
-			? null
-			: BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetType');
+		return NUMBER_AND_DATE_TYPES.contains(type) ? null : BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetType');
 	}
 
 	/**
@@ -302,10 +288,7 @@ public with sharing class RollupPlanner {
 			definition.Order_By_Field__c
 		);
 		if (optionProblem == null) {
-			optionProblem = delimiterProblem(
-				definition.Delimiter__c,
-				definition.Custom_Delimiter__c
-			);
+			optionProblem = delimiterProblem(definition.Delimiter__c, definition.Custom_Delimiter__c);
 		}
 		if (optionProblem != null) {
 			return optionProblem;
@@ -343,9 +326,7 @@ public with sharing class RollupPlanner {
 			return result;
 		}
 		String targetName = String.valueOf(targetType);
-		Map<String, Schema.SObjectField> targetFieldMap = targetType.getDescribe(
-				SObjectDescribeOptions.DEFERRED
-			)
+		Map<String, Schema.SObjectField> targetFieldMap = targetType.getDescribe(SObjectDescribeOptions.DEFERRED)
 			.fields.getMap();
 		Map<String, SourceQuery> queryByKey = new Map<String, SourceQuery>();
 		for (Rollup_Definition__c definition : definitions) {
@@ -354,18 +335,14 @@ public with sharing class RollupPlanner {
 			}
 			try {
 				Schema.SObjectField targetField = writableTarget(definition, targetFieldMap);
-				String targetFilter = RollupFilterParser.toWhereClause(
-					definition.Target_Filter_JSON__c,
-					targetType
-				);
+				String targetFilter = RollupFilterParser.toWhereClause(definition.Target_Filter_JSON__c, targetType);
 				List<SourceQuery> planned = queriesFor(definition);
 				Integer index = result.definitions.size();
 				result.definitions.add(definition);
 				result.targetFields.add(targetField);
 				result.targetFilters.add(targetFilter);
 				Schema.DisplayType fieldType = targetField.getDescribe().getType();
-				Boolean asText =
-					TEXT_TYPES.contains(fieldType) || fieldType == Schema.DisplayType.PICKLIST;
+				Boolean asText = TEXT_TYPES.contains(fieldType) || fieldType == Schema.DisplayType.PICKLIST;
 				for (SourceQuery query : planned) {
 					query.measures[0].definitionIndex = index;
 					query.measures[0].asText = asText;
@@ -391,9 +368,7 @@ public with sharing class RollupPlanner {
 			? null
 			: targetFieldMap.get(definition.Target_Field__c.toLowerCase());
 		if (field == null || !engineCanWrite(field.getDescribe())) {
-			throw new RollupPlanException(
-				BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetNotWritable')
-			);
+			throw new RollupPlanException(BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetNotWritable'));
 		}
 		String problem = targetTypeProblem(definition.Aggregate__c, field.getDescribe().getType());
 		if (problem != null) {
@@ -426,26 +401,18 @@ public with sharing class RollupPlanner {
 
 	/** One query per path alternative, each carrying this definition's one measure. */
 	private static List<SourceQuery> queriesFor(Rollup_Definition__c definition) {
-		String aggregate = String.isBlank(definition.Aggregate__c)
-			? ''
-			: definition.Aggregate__c.toUpperCase();
+		String aggregate = String.isBlank(definition.Aggregate__c) ? '' : definition.Aggregate__c.toUpperCase();
 		String kind = KIND_BY_AGGREGATE.get(aggregate);
 		if (kind == null) {
 			throw new RollupPlanException(System.Label.Core_Rollups_ErrorInvalidOperator);
 		}
 		if (SettingsService.typeByName(definition.Source_Object__c) == null) {
-			throw new RollupPlanException(
-				BarnHelp.text('Rollups', 'Core_Rollups_ErrorUnknownObject')
-			);
+			throw new RollupPlanException(BarnHelp.text('Rollups', 'Core_Rollups_ErrorUnknownObject'));
 		}
 		if (!READS_NO_FIELD.contains(aggregate) && String.isBlank(definition.Source_Field__c)) {
-			throw new RollupPlanException(
-				BarnHelp.text('Rollups', 'Core_Rollups_ErrorSourceFieldNeeded')
-			);
+			throw new RollupPlanException(BarnHelp.text('Rollups', 'Core_Rollups_ErrorSourceFieldNeeded'));
 		}
-		String field = READS_NO_FIELD.contains(aggregate)
-			? null
-			: checkedPath(definition.Source_Field__c);
+		String field = READS_NO_FIELD.contains(aggregate) ? null : checkedPath(definition.Source_Field__c);
 		Decimal rowLimit = rowLimitOf(definition);
 		String limitProblem = rowLimitProblem(aggregate, rowLimit, definition.Order_By_Field__c);
 		if (limitProblem != null) {
@@ -464,9 +431,7 @@ public with sharing class RollupPlanner {
 
 		List<SourceQuery> queries = new List<SourceQuery>();
 		List<String> earlier = new List<String>();
-		for (
-			RollupPath.Branch branch : RollupPath.parse(definition.Relationship_Path__c).branches
-		) {
+		for (RollupPath.Branch branch : RollupPath.parse(definition.Relationship_Path__c).branches) {
 			SourceQuery query = new SourceQuery();
 			query.sourceObject = definition.Source_Object__c;
 			query.token = tokenOf(branch);
@@ -480,8 +445,7 @@ public with sharing class RollupPlanner {
 			query.descending = kind == KIND_LISTED ? isDescending(definition) : aggregate == 'LAST';
 			// Read only when the caller queried it, so such a caller calculates as before.
 			query.includeDeleted =
-				definition.isSet(Rollup_Definition__c.Include_Deleted__c) &&
-				definition.Include_Deleted__c == true;
+				definition.isSet(Rollup_Definition__c.Include_Deleted__c) && definition.Include_Deleted__c == true;
 			Measure measure = new Measure();
 			measure.aggregate = aggregate;
 			measure.field = field;
@@ -541,9 +505,7 @@ public with sharing class RollupPlanner {
 			: definition.Source_Field__c;
 		String windowClause = RollupDateWindow.toWhereClause(
 			definition.Fiscal_Year_Aware__c,
-			definition.Fiscal_Year_Offset__c == null
-				? 0
-				: definition.Fiscal_Year_Offset__c.intValue(),
+			definition.Fiscal_Year_Offset__c == null ? 0 : definition.Fiscal_Year_Offset__c.intValue(),
 			definition.Fiscal_Year_Aware__c == true ? checkedPath(dateField) : dateField
 		);
 		if (String.isNotBlank(windowClause)) {
@@ -561,11 +523,7 @@ public with sharing class RollupPlanner {
 	}
 
 	/** Folds a single-measure query into an existing one that reads the same rows. */
-	private static void foldInto(
-		SourceQuery query,
-		Map<String, SourceQuery> queryByKey,
-		List<SourceQuery> queries
-	) {
+	private static void foldInto(SourceQuery query, Map<String, SourceQuery> queryByKey, List<SourceQuery> queries) {
 		String key = String.join(
 				new List<String>{
 					query.sourceObject,

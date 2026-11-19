@@ -168,8 +168,7 @@ public with sharing class SampleDataFile implements SampleDataModule {
 
 		@NamespaceAccessible
 		public void runStage(Integer stage) {
-			Map<String, Object> step = (Map<String, Object>) find(resourceName)
-				.listOf('steps')[stage];
+			Map<String, Object> step = (Map<String, Object>) find(resourceName).listOf('steps')[stage];
 			idsByKey.putAll(insertStep(step, idsByKey));
 		}
 
@@ -188,8 +187,7 @@ public with sharing class SampleDataFile implements SampleDataModule {
 	@TestVisible
 	private static Boolean settingAllows(Map<String, Object> step) {
 		Map<String, Object> setting = (Map<String, Object>) step.get('whenSetting');
-		return setting == null ||
-			SettingsService.flag((String) setting.get('object'), (String) setting.get('field'));
+		return setting == null || SettingsService.flag((String) setting.get('object'), (String) setting.get('field'));
 	}
 
 	/** Inserts one step's records and returns their keys mapped to the Ids they were given. */
@@ -202,7 +200,7 @@ public with sharing class SampleDataFile implements SampleDataModule {
 		}
 		List<SObject> rows = new List<SObject>();
 		List<String> keys = new List<String>();
-		Date today = Date.today();
+		Date today = OrgDate.today();
 		for (Object entry : (List<Object>) step.get('records')) {
 			SObject row = buildRow(type, (Map<String, Object>) entry, idsByKey, today);
 			if (row != null) {
@@ -275,24 +273,15 @@ public with sharing class SampleDataFile implements SampleDataModule {
 		if (field.getType() == Schema.DisplayType.TIME) {
 			return clock;
 		}
-		Date day = today.addDays(toInteger(spec.get('days')))
-			.addMonths(toInteger(spec.get('months')));
+		Date day = today.addDays(toInteger(spec.get('days'))).addMonths(toInteger(spec.get('months')));
 		return field.getType() == Schema.DisplayType.DATETIME
-			? (Object) Datetime.newInstance(
-					day,
-					clock == null ? Time.newInstance(0, 0, 0, 0) : clock
-			  )
+			? (Object) Datetime.newInstance(day, clock == null ? Time.newInstance(0, 0, 0, 0) : clock)
 			: (Object) day;
 	}
 
 	/** A JSON number put in a number field as a Decimal, which every number field takes. */
 	private static Object literal(Schema.DescribeFieldResult field, Object raw) {
-		if (
-			raw instanceof Integer ||
-			raw instanceof Long ||
-			raw instanceof Decimal ||
-			raw instanceof Double
-		) {
+		if (raw instanceof Integer || raw instanceof Long || raw instanceof Decimal || raw instanceof Double) {
 			Decimal value = Decimal.valueOf(String.valueOf(raw));
 			if (field.getType() == Schema.DisplayType.INTEGER) {
 				return value.intValue();
@@ -325,11 +314,7 @@ public with sharing class SampleDataFile implements SampleDataModule {
 			return null;
 		}
 		List<SObject> rows = Database.queryWithBinds(
-			'SELECT Id FROM ' +
-				objectName +
-				' WHERE ' +
-				condition +
-				' ORDER BY CreatedDate DESC, Id DESC LIMIT 1',
+			'SELECT Id FROM ' + objectName + ' WHERE ' + condition + ' ORDER BY CreatedDate DESC, Id DESC LIMIT 1',
 			new Map<String, Object>(),
 			AccessLevel.USER_MODE
 		);
@@ -400,11 +385,7 @@ public with sharing class SampleDataFile implements SampleDataModule {
 				if (ids.isEmpty()) {
 					continue;
 				}
-				List<Database.DeleteResult> results = Database.delete(
-					ids,
-					false,
-					AccessLevel.USER_MODE
-				);
+				List<Database.DeleteResult> results = Database.delete(ids, false, AccessLevel.USER_MODE);
 				for (Integer index = 0; index < results.size(); index++) {
 					if (!results[index].isSuccess()) {
 						kept.put(ids[index], (String) ((Map<String, Object>) entry).get('object'));
@@ -449,12 +430,7 @@ public with sharing class SampleDataFile implements SampleDataModule {
 			) {
 				names.add((String) row.get('Name'));
 			}
-			parts.add(
-				NamespaceUtil.describe(objectName).getLabelPlural() +
-					' (' +
-					String.join(names, ', ') +
-					')'
-			);
+			parts.add(NamespaceUtil.describe(objectName).getLabelPlural() + ' (' + String.join(names, ', ') + ')');
 		}
 		String message = String.format(
 			BarnHelp.text('Core', 'Core_SampleData_Kept'),
@@ -511,11 +487,7 @@ public with sharing class SampleDataFile implements SampleDataModule {
 
 	/** Whether the object is in the org and the person can read it (and delete from it). */
 	private static Boolean readable(Map<String, Object> entry, Boolean toDelete) {
-		Schema.DescribeSObjectResult described = NamespaceUtil.describe(
-			(String) entry.get('object')
-		);
-		return described != null &&
-			described.isAccessible() &&
-			(!toDelete || described.isDeletable());
+		Schema.DescribeSObjectResult described = NamespaceUtil.describe((String) entry.get('object'));
+		return described != null && described.isAccessible() && (!toDelete || described.isDeletable());
 	}
 }

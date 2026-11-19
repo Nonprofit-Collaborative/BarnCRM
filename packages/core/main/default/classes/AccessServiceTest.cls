@@ -43,11 +43,7 @@ private class AccessServiceTest {
 	 * @return the inserted user
 	 */
 	private static User insertUser(String firstName, String lastName) {
-		User person = buildUser(
-			firstName,
-			lastName,
-			String.valueOf(Math.abs(Crypto.getRandomLong()))
-		);
+		User person = buildUser(firstName, lastName, String.valueOf(Math.abs(Crypto.getRandomLong())));
 		insert person;
 		return person;
 	}
@@ -154,10 +150,7 @@ private class AccessServiceTest {
 			for (AccessService.UserSummary summary : found) {
 				foundIds.add(summary.userId);
 			}
-			Assert.isTrue(
-				foundIds.contains(david.Id),
-				'Maria should find David by typing the start of his name.'
-			);
+			Assert.isTrue(foundIds.contains(david.Id), 'Maria should find David by typing the start of his name.');
 		}
 	}
 
@@ -218,20 +211,14 @@ private class AccessServiceTest {
 				message,
 				'Maria should be told the person is not there or is no longer active.'
 			);
-			Assert.areEqual(
-				0,
-				countAssignments(david.Id, PROGRAM_ROLE),
-				'A deactivated person should hold no role.'
-			);
+			Assert.areEqual(0, countAssignments(david.Id, PROGRAM_ROLE), 'A deactivated person should hold no role.');
 		}
 	}
 
 	@IsTest
 	static void removeRoleRefusesToRemoveTheLastBarnCrmAdmin() {
 		System.runAs(TestUsers.admin()) {
-			PermissionSetGroup adminGroup = TestDataFactory.prepareRoleGroup(
-				AccessService.ADMIN_ROLE
-			);
+			PermissionSetGroup adminGroup = TestDataFactory.prepareRoleGroup(AccessService.ADMIN_ROLE);
 			User maria = insertUser('Maria', 'Alvarez');
 			// A real org already has other holders of the role (assignments are visible to
 			// tests), so Maria is the last one only once the others are cleared. The delete
@@ -305,10 +292,7 @@ private class AccessServiceTest {
 					}
 				}
 			}
-			Assert.isTrue(
-				davidIsListed,
-				'David should appear under Team Member on the Access page.'
-			);
+			Assert.isTrue(davidIsListed, 'David should appear under Team Member on the Access page.');
 		}
 	}
 
@@ -328,8 +312,7 @@ private class AccessServiceTest {
 				WHERE Id = :priya.ProfileId
 			];
 			Assert.isFalse(
-				priyaProfile.PermissionsModifyAllData ||
-				priyaProfile.PermissionsAssignPermissionSets,
+				priyaProfile.PermissionsModifyAllData || priyaProfile.PermissionsAssignPermissionSets,
 				'Priya must be built from a profile that cannot assign permission sets, or this ' +
 					'test proves nothing. Profile used: ' +
 					priyaProfile.Name
@@ -345,10 +328,7 @@ private class AccessServiceTest {
 			}
 			Test.stopTest();
 
-			Assert.isTrue(
-				refused,
-				'A person without the Manage BarnCRM Settings permission should be refused.'
-			);
+			Assert.isTrue(refused, 'A person without the Manage BarnCRM Settings permission should be refused.');
 			Assert.areEqual(
 				0,
 				countAssignments(david.Id, PROGRAM_ROLE),
@@ -369,13 +349,7 @@ private class AccessServiceTest {
 			TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
 			List<User> staff = new List<User>();
 			for (Integer i = 0; i < 5; i++) {
-				staff.add(
-					buildUser(
-						'Staff' + i,
-						'Bulk',
-						String.valueOf(Math.abs(Crypto.getRandomLong())) + i
-					)
-				);
+				staff.add(buildUser('Staff' + i, 'Bulk', String.valueOf(Math.abs(Crypto.getRandomLong())) + i));
 			}
 			insert staff;
 			Set<Id> staffIds = new Map<Id, User>(staff).keySet();
@@ -393,11 +367,7 @@ private class AccessServiceTest {
 				WHERE AssigneeId IN :staffIds AND PermissionSetGroup.DeveloperName = :PROGRAM_ROLE
 			];
 			Assert.areEqual(5, assigned, 'All five people should have been given the role.');
-			Assert.areEqual(
-				1,
-				dmlUsed,
-				'Five assignments should cost one DML statement, not five.'
-			);
+			Assert.areEqual(1, dmlUsed, 'Five assignments should cost one DML statement, not five.');
 		}
 	}
 
@@ -409,11 +379,8 @@ private class AccessServiceTest {
 			// the assertion holds on every org shape.
 			// The prefixes come from the describe rather than being typed out, so nothing here
 			// is a hard-coded Id and the test still works if a prefix ever changes.
-			String userPrefix = Schema.User.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-				.getKeyPrefix();
-			String groupPrefix = Schema.PermissionSetGroup.SObjectType.getDescribe(
-					SObjectDescribeOptions.DEFERRED
-				)
+			String userPrefix = Schema.User.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix();
+			String groupPrefix = Schema.PermissionSetGroup.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 				.getKeyPrefix();
 			Set<Id> people = new Set<Id>();
 			for (Integer i = 0; i < 200; i++) {
@@ -423,11 +390,7 @@ private class AccessServiceTest {
 			Set<Id> alreadyAssigned = new Set<Id>{ Id.valueOf(userPrefix + '000000001000') };
 
 			Test.startTest();
-			List<PermissionSetAssignment> rows = AccessService.buildAssignments(
-				people,
-				alreadyAssigned,
-				groupId
-			);
+			List<PermissionSetAssignment> rows = AccessService.buildAssignments(people, alreadyAssigned, groupId);
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -438,11 +401,7 @@ private class AccessServiceTest {
 			Set<Id> assignees = new Set<Id>();
 			for (PermissionSetAssignment row : rows) {
 				assignees.add(row.AssigneeId);
-				Assert.areEqual(
-					groupId,
-					row.PermissionSetGroupId,
-					'Every row is for the chosen role.'
-				);
+				Assert.areEqual(groupId, row.PermissionSetGroupId, 'Every row is for the chosen role.');
 			}
 			Assert.areEqual(199, assignees.size(), 'Every row is for a different person.');
 		}
@@ -455,13 +414,7 @@ private class AccessServiceTest {
 			TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
 			List<User> staff = new List<User>();
 			for (Integer i = 0; i < 5; i++) {
-				staff.add(
-					buildUser(
-						'Staff' + i,
-						'Bulk',
-						String.valueOf(Math.abs(Crypto.getRandomLong())) + i
-					)
-				);
+				staff.add(buildUser('Staff' + i, 'Bulk', String.valueOf(Math.abs(Crypto.getRandomLong())) + i));
 			}
 			insert staff;
 			Set<Id> staffIds = new Map<Id, User>(staff).keySet();
@@ -510,11 +463,7 @@ private class AccessServiceTest {
 	 * @param labelName the label holding the row's sentence
 	 * @return the row
 	 */
-	private static Access_Add_On__mdt addOnRow(
-		String namespace,
-		String permissionSetName,
-		String labelName
-	) {
+	private static Access_Add_On__mdt addOnRow(String namespace, String permissionSetName, String labelName) {
 		String own = NamespaceUtil.prefix().removeEnd('__');
 		Map<String, Object> fields = new Map<String, Object>{
 			'DeveloperName' => permissionSetName,
@@ -522,10 +471,7 @@ private class AccessServiceTest {
 			'Permission_Set__c' => permissionSetName,
 			'Description_Label__c' => labelName
 		};
-		return (Access_Add_On__mdt) JSON.deserialize(
-			JSON.serialize(fields),
-			Access_Add_On__mdt.class
-		);
+		return (Access_Add_On__mdt) JSON.deserialize(JSON.serialize(fields), Access_Add_On__mdt.class);
 	}
 
 	/** A Core set no role card or Core add-on lists, standing in for a module's set. */
@@ -552,10 +498,7 @@ private class AccessServiceTest {
 				}
 			}
 			Integer heldAfterAssign = countAddOn(david.Id, MODULE_SET);
-			List<String> removeFailures = AccessService.removeAddOn(
-				new Set<Id>{ david.Id },
-				MODULE_SET
-			);
+			List<String> removeFailures = AccessService.removeAddOn(new Set<Id>{ david.Id }, MODULE_SET);
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -566,22 +509,13 @@ private class AccessServiceTest {
 			AccessService.AddOn moduleAddOn = addOns[addOns.size() - 1];
 			Assert.areEqual(MODULE_SET, moduleAddOn.developerName, 'It should come after Core.');
 			Assert.areEqual(
-				System.Label.get(
-					NamespaceUtil.prefix().removeEnd('__'),
-					'Core_Section_Connections'
-				),
+				System.Label.get(NamespaceUtil.prefix().removeEnd('__'), 'Core_Section_Connections'),
 				moduleAddOn.description,
 				'Its sentence should be the label its row names.'
 			);
-			Assert.isFalse(
-				moduleAddOn.isDestructive,
-				'A module add-on is not marked as removing data.'
-			);
+			Assert.isFalse(moduleAddOn.isDestructive, 'A module add-on is not marked as removing data.');
 			Assert.isNull(moduleAddOn.warning, 'So it carries no warning.');
-			Assert.isTrue(
-				failures.isEmpty(),
-				'Giving David the module add-on should not be refused.'
-			);
+			Assert.isTrue(failures.isEmpty(), 'Giving David the module add-on should not be refused.');
 			Assert.areEqual(1, heldAfterAssign, 'David should hold it once.');
 			Assert.isTrue(listed, 'David should be listed on its card.');
 			Assert.isTrue(removeFailures.isEmpty(), 'Removing it should not be refused.');
@@ -618,10 +552,7 @@ private class AccessServiceTest {
 				addOns.size(),
 				'Only the row in the package namespace that names a new set should be added.'
 			);
-			Assert.isFalse(
-				byName.containsKey('BarnCRM_Staff'),
-				'A row from another namespace should never be listed.'
-			);
+			Assert.isFalse(byName.containsKey('BarnCRM_Staff'), 'A row from another namespace should never be listed.');
 			Assert.areEqual(
 				BarnHelp.text('Core', 'Core_Access_AddOnBulkUpdate'),
 				byName.get(BULK_UPDATE).description,
@@ -658,10 +589,7 @@ private class AccessServiceTest {
 					continue;
 				}
 				AccessService.AddOn addOn = byName.get(row.Permission_Set__c);
-				Assert.isNotNull(
-					addOn,
-					row.Permission_Set__c + ' should be listed: its row names a set this org has.'
-				);
+				Assert.isNotNull(addOn, row.Permission_Set__c + ' should be listed: its row names a set this org has.');
 				Assert.isTrue(
 					String.isNotBlank(addOn.description),
 					row.Permission_Set__c + ' should say what it grants: its row names a label.'
@@ -755,13 +683,7 @@ private class AccessServiceTest {
 		System.runAs(TestUsers.admin()) {
 			List<User> staff = new List<User>();
 			for (Integer i = 0; i < 5; i++) {
-				staff.add(
-					buildUser(
-						'Staff' + i,
-						'AddOn',
-						String.valueOf(Math.abs(Crypto.getRandomLong())) + i
-					)
-				);
+				staff.add(buildUser('Staff' + i, 'AddOn', String.valueOf(Math.abs(Crypto.getRandomLong())) + i));
 			}
 			insert staff;
 			Set<Id> staffIds = new Map<Id, User>(staff).keySet();
@@ -856,11 +778,7 @@ private class AccessServiceTest {
 				assignMessage,
 				'Priya, without Manage BarnCRM Settings, should be refused by the service itself.'
 			);
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Access_ErrorNoPermission'),
-				removeMessage,
-				'Nor remove.'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Access_ErrorNoPermission'), removeMessage, 'Nor remove.');
 			Assert.areEqual(0, countAddOn(david.Id, BULK_UPDATE), 'Nothing should be assigned.');
 		}
 	}
@@ -931,8 +849,7 @@ private class AccessServiceTest {
 
 			Assert.areEqual(1, failures.size(), 'The refused person should be reported.');
 			Assert.isTrue(
-				failures[0]
-					.startsWith('BarnCRM Bulk Update could not be removed from David Okafor.'),
+				failures[0].startsWith('BarnCRM Bulk Update could not be removed from David Okafor.'),
 				'The message should name the permission and the person: ' + failures[0]
 			);
 		}
@@ -948,11 +865,7 @@ private class AccessServiceTest {
 				[
 					SELECT Id, Name
 					FROM User
-					WHERE
-						Id IN :new List<Id>{
-							insertUser('David', 'Okafor').Id,
-							insertUser('Priya', 'Nair').Id
-						}
+					WHERE Id IN :new List<Id>{ insertUser('David', 'Okafor').Id, insertUser('Priya', 'Nair').Id }
 				]
 			);
 			User david;

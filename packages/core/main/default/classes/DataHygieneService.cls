@@ -101,10 +101,7 @@ public with sharing class DataHygieneService {
 			result.canOpenInFind = true;
 			// A household that is also a Nonprofit Cloud household keeps its members there, so
 			// it reads as empty here, and deleting it would delete its native group (ADR-0036).
-			if (
-				key == HOUSEHOLDS_WITHOUT_MEMBERS &&
-				OrgShapeDetector.detect().hasNativeHouseholdGroups == true
-			) {
+			if (key == HOUSEHOLDS_WITHOUT_MEMBERS && OrgShapeDetector.detect().hasNativeHouseholdGroups == true) {
 				result.note = BarnHelp.text('Core', 'Core_DataHygiene_NativeHouseholdsListed');
 			}
 			result.countLabel = countLabel(result.count);
@@ -132,9 +129,7 @@ public with sharing class DataHygieneService {
 	public static String queryDocument(String key) {
 		Map<String, Object> document;
 		if (key == PEOPLE_WITHOUT_HOUSEHOLD) {
-			document = HouseholdService.isJunctionMode()
-				? contactsWithoutMembership()
-				: contactsWithoutAccount();
+			document = HouseholdService.isJunctionMode() ? contactsWithoutMembership() : contactsWithoutAccount();
 		} else if (key == HOUSEHOLDS_WITHOUT_MEMBERS) {
 			document = householdsWithoutMembers();
 		} else if (key == MEMBERSHIPS_WITHOUT_PERSON) {
@@ -161,11 +156,7 @@ public with sharing class DataHygieneService {
 
 	/** The name "Open in Find" saves the check's query under. */
 	public static String savedQueryName(String key) {
-		return String.format(
-				System.Label.Core_DataHygiene_SavedQueryName,
-				new List<Object>{ title(key) }
-			)
-			.left(80);
+		return String.format(System.Label.Core_DataHygiene_SavedQueryName, new List<Object>{ title(key) }).left(80);
 	}
 
 	/**
@@ -175,10 +166,7 @@ public with sharing class DataHygieneService {
 	public static Integer count(String document) {
 		QueryCompiler.Compiled compiled = QueryCompiler.compile(document);
 		QueryCompiler.QueryDocument parsed = QueryCompiler.parse(document);
-		FilterValueBinder bound = RollupFilterParser.toBoundClause(
-			parsed.filter,
-			compiled.objectName
-		);
+		FilterValueBinder bound = RollupFilterParser.toBoundClause(parsed.filter, compiled.objectName);
 		Map<String, Object> binds = new Map<String, Object>(bound.binds);
 		binds.put(CAP_BIND, COUNT_CAP + 1);
 		String soql =
@@ -193,10 +181,7 @@ public with sharing class DataHygieneService {
 	/** "1,234", or "More than 2,000" past the cap. */
 	public static String countLabel(Integer count) {
 		return count > COUNT_CAP
-			? String.format(
-					System.Label.Core_HealthCheck_OrphansMoreThan,
-					new List<Object>{ COUNT_CAP.format() }
-			  )
+			? String.format(System.Label.Core_HealthCheck_OrphansMoreThan, new List<Object>{ COUNT_CAP.format() })
 			: count.format();
 	}
 
@@ -219,9 +204,7 @@ public with sharing class DataHygieneService {
 	 */
 	private static Map<String, Object> contactsWithoutMembership() {
 		String accountType = parent(Contact.AccountId, 'RecordTypeId');
-		List<Object> conditions = new List<Object>{
-			condition(1, name(Contact.AccountId), 'is null', null)
-		};
+		List<Object> conditions = new List<Object>{ condition(1, name(Contact.AccountId), 'is null', null) };
 		List<String> notExcluded = new List<String>();
 		Set<Id> excluded = new Set<Id>(OrgShapeDetector.personRecordTypeIds());
 		Id householdType = HouseholdService.householdRecordTypeId();
@@ -242,12 +225,7 @@ public with sharing class DataHygieneService {
 			'version' => 1,
 			'conditions' => new List<Object>{
 				condition(1, name(Household_Member__c.End_Date__c), 'is null', null),
-				condition(
-					2,
-					name(Household_Member__c.End_Date__c),
-					'greater than',
-					String.valueOf(Date.today())
-				)
+				condition(2, name(Household_Member__c.End_Date__c), 'greater than', String.valueOf(OrgDate.today()))
 			},
 			'logic' => '1 OR 2'
 		};
@@ -255,10 +233,7 @@ public with sharing class DataHygieneService {
 			'related',
 			new List<Object>{
 				new Map<String, Object>{
-					'object' => Household_Member__c.SObjectType.getDescribe(
-							SObjectDescribeOptions.DEFERRED
-						)
-						.getName(),
+					'object' => Household_Member__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName(),
 					'field' => name(Household_Member__c.Contact__c),
 					'has' => false,
 					'filter' => current
@@ -364,12 +339,7 @@ public with sharing class DataHygieneService {
 			addressColumns(),
 			new List<Object>{
 				condition(1, name(Address__c.Is_Default__c), 'equals', true),
-				condition(
-					2,
-					name(Address__c.Status__c),
-					'equals',
-					AddressService.STATUS_UNDELIVERABLE
-				)
+				condition(2, name(Address__c.Status__c), 'equals', AddressService.STATUS_UNDELIVERABLE)
 			},
 			null
 		);
@@ -464,10 +434,7 @@ public with sharing class DataHygieneService {
 		List<Object> conditions,
 		String logic
 	) {
-		Map<String, Object> filter = new Map<String, Object>{
-			'version' => 1,
-			'conditions' => conditions
-		};
+		Map<String, Object> filter = new Map<String, Object>{ 'version' => 1, 'conditions' => conditions };
 		if (logic != null) {
 			filter.put('logic', logic);
 		}
@@ -476,24 +443,13 @@ public with sharing class DataHygieneService {
 			'object' => objectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName(),
 			'fields' => fields,
 			'filter' => filter,
-			'orderBy' => new List<Object>{
-				new Map<String, Object>{ 'field' => 'CreatedDate', 'direction' => 'ASC' }
-			},
+			'orderBy' => new List<Object>{ new Map<String, Object>{ 'field' => 'CreatedDate', 'direction' => 'ASC' } },
 			'limit' => ROWS_SHOWN
 		};
 	}
 
-	private static Map<String, Object> condition(
-		Integer id,
-		String field,
-		String operator,
-		Object value
-	) {
-		Map<String, Object> written = new Map<String, Object>{
-			'id' => id,
-			'field' => field,
-			'operator' => operator
-		};
+	private static Map<String, Object> condition(Integer id, String field, String operator, Object value) {
+		Map<String, Object> written = new Map<String, Object>{ 'id' => id, 'field' => field, 'operator' => operator };
 		if (value != null) {
 			written.put('value', value);
 		}
@@ -549,27 +505,12 @@ public with sharing class DataHygieneService {
 				: BarnHelp.text('Core', 'Core_DataHygiene_PeopleContactDetail');
 		}
 		return new Map<String, String>{
-				HOUSEHOLDS_WITHOUT_MEMBERS => BarnHelp.text(
-					'Core',
-					'Core_DataHygiene_HouseholdsDetail'
-				),
-				MEMBERSHIPS_WITHOUT_PERSON => BarnHelp.text(
-					'Core',
-					'Core_DataHygiene_MembershipsDetail'
-				),
-				ADDRESSES_WITHOUT_OWNER => BarnHelp.text(
-					'Core',
-					'Core_DataHygiene_OwnerlessDetail'
-				),
-				DEFAULT_ADDRESSES_INCOMPLETE => BarnHelp.text(
-					'Core',
-					'Core_DataHygiene_IncompleteDetail'
-				),
+				HOUSEHOLDS_WITHOUT_MEMBERS => BarnHelp.text('Core', 'Core_DataHygiene_HouseholdsDetail'),
+				MEMBERSHIPS_WITHOUT_PERSON => BarnHelp.text('Core', 'Core_DataHygiene_MembershipsDetail'),
+				ADDRESSES_WITHOUT_OWNER => BarnHelp.text('Core', 'Core_DataHygiene_OwnerlessDetail'),
+				DEFAULT_ADDRESSES_INCOMPLETE => BarnHelp.text('Core', 'Core_DataHygiene_IncompleteDetail'),
 				DEFAULT_ADDRESSES_FAILED => BarnHelp.text('Core', 'Core_DataHygiene_FailedDetail'),
-				DEFAULT_ADDRESSES_UNDELIVERABLE => BarnHelp.text(
-					'Core',
-					'Core_DataHygiene_UndeliverableDetail'
-				),
+				DEFAULT_ADDRESSES_UNDELIVERABLE => BarnHelp.text('Core', 'Core_DataHygiene_UndeliverableDetail'),
 				PEOPLE_UNREACHABLE => BarnHelp.text('Core', 'Core_DataHygiene_UnreachableDetail'),
 				DECEASED_STILL_EMAILED => BarnHelp.text('Core', 'Core_DataHygiene_DeceasedDetail'),
 				PEOPLE_NOT_UPDATED => BarnHelp.text('Core', 'Core_DataHygiene_NotUpdatedDetail')

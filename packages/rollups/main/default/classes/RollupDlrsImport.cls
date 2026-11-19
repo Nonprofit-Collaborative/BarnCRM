@@ -202,20 +202,14 @@ public with sharing class RollupDlrsImport {
 		try {
 			requirePermission();
 			if (dlrsOffConfirmed != true) {
-				throw refusal(
-					BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsActivateNeedsConfirm')
-				);
+				throw refusal(BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsActivateNeedsConfirm'));
 			}
 			Rollup_Definition__c definition = require(definitionId);
 			RollupBuilderController.Draft draft = RollupBuilderController.toDraft(definition);
 			draft.active = true;
 			Rollup_Definition__c record = RollupBuilderController.checkedRecord(draft, true);
 			RollupWriter.saveAsUser(record);
-			RollupDlrs.recordSwitchOff(
-				definition.Name,
-				definition.Target_Object__c,
-				definition.Target_Field__c
-			);
+			RollupDlrs.recordSwitchOff(definition.Name, definition.Target_Object__c, definition.Target_Field__c);
 			ImportRow row = new ImportRow();
 			row.key = definition.Definition_Key__c;
 			row.name = definition.Name;
@@ -272,9 +266,7 @@ public with sharing class RollupDlrsImport {
 			BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsImportedFrom'),
 			new List<String>{ dlrs.key, RollupDlrs.toolOf(dlrs) }
 		);
-		draft.description = (String.isBlank(dlrs.description)
-				? imported
-				: imported + ' ' + dlrs.description)
+		draft.description = (String.isBlank(dlrs.description) ? imported : imported + ' ' + dlrs.description)
 			.left(1000);
 		draft.targetObject = dlrs.parentObject;
 		draft.targetField = dlrs.aggregateResultField;
@@ -309,17 +301,8 @@ public with sharing class RollupDlrsImport {
 			!'Id'.equalsIgnoreCase(dlrs.fieldToAggregate);
 		if (countsAField) {
 			// DLRS counts the records with the field filled; BarnCRM counts records, so filter.
-			required.add(
-				new Map<String, Object>{
-					'field' => dlrs.fieldToAggregate,
-					'operator' => 'is not null'
-				}
-			);
-			note(
-				candidate,
-				BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteCountField'),
-				dlrs.fieldToAggregate
-			);
+			required.add(new Map<String, Object>{ 'field' => dlrs.fieldToAggregate, 'operator' => 'is not null' });
+			note(candidate, BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteCountField'), dlrs.fieldToAggregate);
 		} else if (aggregate != 'COUNT') {
 			draft.sourceField = dlrs.fieldToAggregate;
 		}
@@ -343,26 +326,16 @@ public with sharing class RollupDlrsImport {
 	/** Realtime and the modes run by code become Both; Scheduled stays nightly. */
 	private static void mapMode(RollupDlrs.Definition dlrs, Candidate candidate) {
 		String mode = normalized(dlrs.calculationMode);
-		candidate.draft.mode = mode == 'scheduled'
-			? RollupService.MODE_SCHEDULED
-			: RollupService.MODE_BOTH;
+		candidate.draft.mode = mode == 'scheduled' ? RollupService.MODE_SCHEDULED : RollupService.MODE_BOTH;
 		if (mode == 'developer' || mode == 'process builder') {
-			note(
-				candidate,
-				BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteCalledByCode'),
-				dlrs.calculationMode
-			);
+			note(candidate, BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteCalledByCode'), dlrs.calculationMode);
 		}
 		if (
 			candidate.draft.mode == RollupService.MODE_BOTH &&
 			String.isNotBlank(dlrs.childObject) &&
 			!RollupService.hasInstantUpdates(dlrs.childObject)
 		) {
-			note(
-				candidate,
-				BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteNightly'),
-				dlrs.childObject
-			);
+			note(candidate, BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteNightly'), dlrs.childObject);
 		}
 	}
 
@@ -371,21 +344,13 @@ public with sharing class RollupDlrsImport {
 	 * First is BarnCRM's Last and the other way round; a text list or row limit keeps the
 	 * direction. BarnCRM always puts blanks last, so NULLS FIRST stays in DLRS.
 	 */
-	private static void mapOrder(
-		RollupDlrs.Definition dlrs,
-		String aggregate,
-		Candidate candidate
-	) {
+	private static void mapOrder(RollupDlrs.Definition dlrs, String aggregate, Candidate candidate) {
 		RollupBuilderController.Draft draft = candidate.draft;
 		Boolean limited = dlrs.rowLimit != null && dlrs.rowLimit > 0;
 		if (String.isBlank(dlrs.fieldToOrderBy)) {
 			if (ORDERED.contains(aggregate)) {
 				draft.orderByField = dlrs.fieldToAggregate;
-				note(
-					candidate,
-					BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteNoOrder'),
-					dlrs.fieldToAggregate
-				);
+				note(candidate, BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteNoOrder'), dlrs.fieldToAggregate);
 			}
 			return;
 		}
@@ -409,11 +374,7 @@ public with sharing class RollupDlrsImport {
 			}
 		}
 		if (!readable || blanksFirst == true) {
-			reason(
-				candidate,
-				BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsReasonOrder'),
-				dlrs.fieldToOrderBy
-			);
+			reason(candidate, BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsReasonOrder'), dlrs.fieldToOrderBy);
 			return;
 		}
 		draft.orderByField = words[0];
@@ -431,18 +392,12 @@ public with sharing class RollupDlrsImport {
 	}
 
 	/** A row limit on a sum, average, minimum, maximum or text list; dropped from First. */
-	private static void mapRowLimit(
-		RollupDlrs.Definition dlrs,
-		String aggregate,
-		Candidate candidate
-	) {
+	private static void mapRowLimit(RollupDlrs.Definition dlrs, String aggregate, Candidate candidate) {
 		if (dlrs.rowLimit == null || dlrs.rowLimit <= 0) {
 			return;
 		}
 		if (aggregate == 'FIRST') {
-			candidate.notes.add(
-				BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteRowLimitFirst')
-			);
+			candidate.notes.add(BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteRowLimitFirst'));
 		} else if (RollupPlanner.ROW_LIMITED.contains(aggregate)) {
 			candidate.draft.rowLimit = dlrs.rowLimit;
 		} else {
@@ -469,11 +424,7 @@ public with sharing class RollupDlrsImport {
 		if (DELIMITER_BY_TEXT.containsKey(text)) {
 			draft.delimiter = DELIMITER_BY_TEXT.get(text);
 		} else if (text.contains('\n') || text.length() > CUSTOM_DELIMITER_LENGTH) {
-			reason(
-				candidate,
-				BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsReasonDelimiter'),
-				raw
-			);
+			reason(candidate, BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsReasonDelimiter'), raw);
 		} else {
 			draft.delimiter = RollupPlanner.CUSTOM_DELIMITER;
 			draft.customDelimiter = text;
@@ -513,9 +464,7 @@ public with sharing class RollupDlrsImport {
 			candidate.existingId = earlier.Id;
 			candidate.draft.recordId = earlier.Id;
 			if (earlier.Active__c == true) {
-				candidate.reasons.add(
-					BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsReasonAlreadyOn')
-				);
+				candidate.reasons.add(BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsReasonAlreadyOn'));
 			}
 		}
 		for (Rollup_Definition__c other : existing) {
@@ -527,11 +476,7 @@ public with sharing class RollupDlrsImport {
 				other.Target_Field__c != null &&
 				other.Target_Field__c.equalsIgnoreCase(dlrs.aggregateResultField)
 			) {
-				reason(
-					candidate,
-					BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsReasonFilled'),
-					other.Name
-				);
+				reason(candidate, BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsReasonFilled'), other.Name);
 			}
 		}
 		if (candidate.reasons.isEmpty()) {
@@ -634,9 +579,7 @@ public with sharing class RollupDlrsImport {
 		if (targetType == null || String.isBlank(definition.Target_Field__c)) {
 			throw refusal(BarnHelp.text('Rollups', 'Core_Rollups_ErrorUnknownObject'));
 		}
-		Map<String, Schema.SObjectField> fields = targetType.getDescribe(
-				SObjectDescribeOptions.DEFERRED
-			)
+		Map<String, Schema.SObjectField> fields = targetType.getDescribe(SObjectDescribeOptions.DEFERRED)
 			.fields.getMap();
 		Schema.SObjectField target = fields.get(definition.Target_Field__c.toLowerCase());
 		if (target == null) {
@@ -650,24 +593,12 @@ public with sharing class RollupDlrsImport {
 			(nameField == null ? '' : ', ' + nameField) +
 			' FROM ' +
 			String.valueOf(targetType);
-		String recent = fields.containsKey('lastmodifieddate')
-			? ' ORDER BY LastModifiedDate DESC'
-			: '';
+		String recent = fields.containsKey('lastmodifieddate') ? ' ORDER BY LastModifiedDate DESC' : '';
 		List<SObject> records = new List<SObject>();
 		if (target.getDescribe().isFilterable()) {
-			String filled =
-				query +
-				' WHERE ' +
-				String.valueOf(target) +
-				' != null' +
-				recent +
-				' LIMIT :size';
+			String filled = query + ' WHERE ' + String.valueOf(target) + ' != null' + recent + ' LIMIT :size';
 			records.addAll(
-				Database.queryWithBinds(
-					filled,
-					new Map<String, Object>{ 'size' => SAMPLE_SIZE },
-					AccessLevel.USER_MODE
-				)
+				Database.queryWithBinds(filled, new Map<String, Object>{ 'size' => SAMPLE_SIZE }, AccessLevel.USER_MODE)
 			);
 		}
 		if (records.size() < SAMPLE_SIZE) {
@@ -751,12 +682,7 @@ public with sharing class RollupDlrsImport {
 	}
 
 	private static Decimal asNumber(Object value) {
-		if (
-			value instanceof Decimal ||
-			value instanceof Integer ||
-			value instanceof Long ||
-			value instanceof Double
-		) {
+		if (value instanceof Decimal || value instanceof Integer || value instanceof Long || value instanceof Double) {
 			return Decimal.valueOf(String.valueOf(value));
 		}
 		return null;
@@ -769,15 +695,11 @@ public with sharing class RollupDlrsImport {
 	}
 
 	private static void reason(Candidate candidate, String template, String value) {
-		candidate.reasons.add(
-			String.format(template, new List<String>{ value == null ? '' : value })
-		);
+		candidate.reasons.add(String.format(template, new List<String>{ value == null ? '' : value }));
 	}
 
 	private static void note(Candidate candidate, String template, String value) {
-		candidate.notes.add(
-			String.format(template, new List<String>{ value == null ? '' : value })
-		);
+		candidate.notes.add(String.format(template, new List<String>{ value == null ? '' : value }));
 	}
 
 	private static Rollup_Definition__c require(Id definitionId) {

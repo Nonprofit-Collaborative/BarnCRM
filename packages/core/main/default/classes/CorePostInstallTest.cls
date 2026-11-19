@@ -118,10 +118,19 @@ private class CorePostInstallTest {
 			Test.startTest();
 			upgrade(handler, installer);
 			Boolean onAfterUpgrade = FeatureSwitchService.isOn(FeatureSwitchService.DATA_MANAGER);
+			String storedAfterUpgrade = SettingsService.getSettings().Features_Turned_On__c;
+			// A list with a value is never changed (ADR-0230), so the new install starts from
+			// a fresh org's blank list, not from the upgraded one.
+			forgetSavedSettings();
 			install(handler, installer);
 			Test.stopTest();
 
 			Assert.isTrue(onAfterUpgrade, 'An upgraded org keeps every feature it used');
+			Assert.areEqual(
+				FeatureSwitchService.all().size(),
+				storedAfterUpgrade.split(',').size(),
+				'The upgrade stored every feature key, so a blank list never reads as on'
+			);
 			Assert.areEqual(
 				FeatureSwitchService.NONE_ON,
 				SettingsService.getSettings().Features_Turned_On__c,
@@ -170,15 +179,8 @@ private class CorePostInstallTest {
 			SettingsService.saveSystemValue('Suite__c', null);
 			new CorePostInstall().onInstall(new InstallBy(null, null, false));
 
-			Assert.areEqual(
-				ModuleDetectionService.SUITE_NONPROFIT,
-				afterUpgrade,
-				'The edition chosen is kept'
-			);
-			Assert.isNull(
-				ModuleDetectionService.chosenSuite(),
-				'A new install leaves the edition to first-run setup'
-			);
+			Assert.areEqual(ModuleDetectionService.SUITE_NONPROFIT, afterUpgrade, 'The edition chosen is kept');
+			Assert.isNull(ModuleDetectionService.chosenSuite(), 'A new install leaves the edition to first-run setup');
 		}
 	}
 
@@ -227,11 +229,7 @@ private class CorePostInstallTest {
 				],
 				'Installing again or upgrading never makes a second schedule'
 			);
-			Assert.areEqual(
-				rowsBefore,
-				[SELECT COUNT() FROM Nightly_Job__c],
-				'No step switch was written or changed'
-			);
+			Assert.areEqual(rowsBefore, [SELECT COUNT() FROM Nightly_Job__c], 'No step switch was written or changed');
 		}
 	}
 
@@ -272,10 +270,7 @@ private class CorePostInstallTest {
 				SettingsService.getSettings().Features_Turned_On__c,
 				'A fresh org waits for first-run setup, as after a package install'
 			);
-			Assert.isTrue(
-				[SELECT COUNT() FROM Automation_Setting__c] > 0,
-				'The Automation page lists its switches'
-			);
+			Assert.isTrue([SELECT COUNT() FROM Automation_Setting__c] > 0, 'The Automation page lists its switches');
 		}
 	}
 
@@ -289,9 +284,16 @@ private class CorePostInstallTest {
 			CorePostInstall.runAsSourceDeploy();
 
 			SettingsService.clearCaches();
-			Assert.isNull(
-				SettingsService.getSettings().Features_Turned_On__c,
+			String stored = SettingsService.getSettings().Features_Turned_On__c;
+			Assert.areNotEqual(
+				FeatureSwitchService.NONE_ON,
+				stored,
 				'An org already in use is never marked as a new install'
+			);
+			Assert.areEqual(
+				FeatureSwitchService.all().size(),
+				stored.split(',').size(),
+				'Its blank list is filled with every feature key (ADR-0230)'
 			);
 			Assert.isTrue(
 				FeatureSwitchService.isOn(FeatureSwitchService.DATA_MANAGER),
@@ -308,10 +310,7 @@ private class CorePostInstallTest {
 	@IsTest
 	static void anOrgHoldingAHouseholdCountsAsSetUpEvenWithoutSettings() {
 		System.runAs(TestUsers.admin()) {
-			Database.insert(
-				HouseholdTestDataFactory.newHousehold('The Garcia Family'),
-				AccessLevel.SYSTEM_MODE
-			);
+			Database.insert(HouseholdTestDataFactory.newHousehold('The Garcia Family'), AccessLevel.SYSTEM_MODE);
 			forgetSavedSettings();
 
 			Assert.isTrue(
@@ -327,17 +326,13 @@ private class CorePostInstallTest {
 	 * written below the console's save, which would schedule the nightly run itself.
 	 */
 	private static void orgWithSeasonalState(Boolean switchedOn, Boolean oldJobScheduled) {
-		SettingsService.saveBookkeeping(
-			new Map<String, Object>{ 'Seasonal_Addresses_Enabled__c' => false }
-		);
+		SettingsService.saveBookkeeping(new Map<String, Object>{ 'Seasonal_Addresses_Enabled__c' => false });
 		TestDataFactory.clearScheduledJobs(
 			new List<String>{ SeasonalAddressScheduler.JOB_NAME, NightlyJobs.jobName() }
 		);
 		ScheduledJobSelector.forget();
 		OrgSettingsSystemWriter.save(
-			new Map<Schema.SObjectField, Object>{
-				BarnCRM_Settings__c.Seasonal_Addresses_Enabled__c => switchedOn
-			}
+			new Map<Schema.SObjectField, Object>{ BarnCRM_Settings__c.Seasonal_Addresses_Enabled__c => switchedOn }
 		);
 		SettingsService.clearCaches();
 		if (oldJobScheduled) {
@@ -374,11 +369,7 @@ private class CorePostInstallTest {
 			Test.stopTest();
 
 			Assert.areEqual(1, swapJobs(), 'The swap is scheduled once, however often this runs');
-			Assert.areEqual(
-				before + 1,
-				allApexJobs(),
-				'And it is the only job the seasonal step added'
-			);
+			Assert.areEqual(before + 1, allApexJobs(), 'And it is the only job the seasonal step added');
 		}
 	}
 
@@ -392,11 +383,7 @@ private class CorePostInstallTest {
 			CorePostInstall.runAsSourceDeploy();
 			Test.stopTest();
 
-			Assert.areEqual(
-				0,
-				swapJobs(),
-				'An org that has not turned the swap on does not get it'
-			);
+			Assert.areEqual(0, swapJobs(), 'An org that has not turned the swap on does not get it');
 			Assert.areEqual(before, allApexJobs(), 'No job was added');
 			SettingsService.clearCaches();
 			Assert.isFalse(SeasonalAddressScheduler.isEnabled(), 'And the switch stays off');
@@ -555,11 +542,7 @@ private class CorePostInstallTest {
 				countRoleAssignments(UserInfo.getUserId()),
 				'An install with no context should assign no role.'
 			);
-			Assert.areEqual(
-				0,
-				countRetryJobs(),
-				'An install with no context should queue nothing.'
-			);
+			Assert.areEqual(0, countRetryJobs(), 'An install with no context should queue nothing.');
 		}
 	}
 
@@ -605,11 +588,7 @@ private class CorePostInstallTest {
 
 			Test.startTest();
 			job.execute(null);
-			Assert.areEqual(
-				1,
-				countRetryJobs(),
-				'The first of several attempts should queue exactly one more.'
-			);
+			Assert.areEqual(1, countRetryJobs(), 'The first of several attempts should queue exactly one more.');
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -645,11 +624,7 @@ private class CorePostInstallTest {
 				FROM Error_Log__c
 				WHERE Context__c = :RETRY_CONTEXT
 			];
-			Assert.areEqual(
-				1,
-				logged.size(),
-				'Giving up quietly still means leaving Maria a note in the Error Log.'
-			);
+			Assert.areEqual(1, logged.size(), 'Giving up quietly still means leaving Maria a note in the Error Log.');
 			Assert.isTrue(
 				logged[0].Technical_Detail__c.contains('BarnCRM Admin role'),
 				'The note names the role that was never handed out, so Maria knows what to finish.'
@@ -666,11 +641,7 @@ private class CorePostInstallTest {
 			job.execute(null);
 			Test.stopTest();
 
-			Assert.areEqual(
-				0,
-				countRetryJobs(),
-				'With nobody to assign, the job should do nothing.'
-			);
+			Assert.areEqual(0, countRetryJobs(), 'With nobody to assign, the job should do nothing.');
 		}
 	}
 
@@ -714,11 +685,7 @@ private class CorePostInstallTest {
 				'Every shipped template is here after the install: ' + byKey.keySet()
 			);
 			Assert.isTrue(byKey.containsKey('generic_contact_list'), 'Core\'s own included.');
-			Assert.areEqual(
-				shippedTemplateKeys().size(),
-				byKey.size(),
-				'One each, and nothing else.'
-			);
+			Assert.areEqual(shippedTemplateKeys().size(), byKey.size(), 'One each, and nothing else.');
 		}
 	}
 
@@ -760,11 +727,7 @@ private class CorePostInstallTest {
 			Assert.areEqual(edited.Id, kept.Id, 'The same record.');
 			Assert.areEqual('Our contact list', kept.Name, 'Its name as the admin left it.');
 			Assert.isFalse(kept.Active__c, 'Still switched off.');
-			Assert.areEqual(
-				'{"version":1,"columns":[]}',
-				kept.Column_Mapping_JSON__c,
-				'And its mapping untouched.'
-			);
+			Assert.areEqual('{"version":1,"columns":[]}', kept.Column_Mapping_JSON__c, 'And its mapping untouched.');
 		}
 	}
 
@@ -790,10 +753,7 @@ private class CorePostInstallTest {
 			Id installer = newInstaller();
 			// The defect this covers: nothing created the switch rows, so the Automation page was
 			// empty on every org until somebody pressed a Health Check fix (C-21).
-			Automation_Registry__mdt lock = TestDataFactory.registryEntry(
-				'Test_Receipt_Lock',
-				true
-			);
+			Automation_Registry__mdt lock = TestDataFactory.registryEntry('Test_Receipt_Lock', true);
 			lock.Always_Runs__c = true;
 			AutomationRegistrySelector.registryOverride = new List<Automation_Registry__mdt>{
 				TestDataFactory.registryEntry('Test_Household_Naming', true),
@@ -807,10 +767,7 @@ private class CorePostInstallTest {
 
 			Map<String, Automation_Setting__c> byName = switchesByName();
 			Assert.areEqual(2, byName.size(), 'The install creates one switch per automation.');
-			Assert.isTrue(
-				byName.get('Test_Household_Naming').Enabled__c,
-				'Each set to its shipped default.'
-			);
+			Assert.isTrue(byName.get('Test_Household_Naming').Enabled__c, 'Each set to its shipped default.');
 			Assert.isTrue(
 				byName.get('Test_Receipt_Lock').Always_Runs__c,
 				'And an automation that always runs is listed as one (ADR-0024).'
@@ -831,9 +788,7 @@ private class CorePostInstallTest {
 			// Maria switches household naming off.
 			update new Automation_Setting__c(Id = afterInstall.Id, Enabled__c = false);
 			// The upgrade ships a second automation.
-			AutomationRegistrySelector.registryOverride.add(
-				TestDataFactory.registryEntry('Test_Address_Sync', true)
-			);
+			AutomationRegistrySelector.registryOverride.add(TestDataFactory.registryEntry('Test_Address_Sync', true));
 
 			Test.startTest();
 			upgrade(handler, installer);
@@ -860,9 +815,7 @@ private class CorePostInstallTest {
 			// A registry label longer than the switch's Name allows: the insert throws.
 			Automation_Registry__mdt tooLong = TestDataFactory.registryEntry('Test_Too_Long', true);
 			tooLong.MasterLabel = 'x'.repeat(100);
-			AutomationRegistrySelector.registryOverride = new List<Automation_Registry__mdt>{
-				tooLong
-			};
+			AutomationRegistrySelector.registryOverride = new List<Automation_Registry__mdt>{ tooLong };
 			CorePostInstall handler = new CorePostInstall();
 
 			Test.startTest();
@@ -876,11 +829,7 @@ private class CorePostInstallTest {
 				[SELECT COUNT() FROM Error_Log__c WHERE Context__c = :SWITCH_CONTEXT],
 				'The failure is in the Error Log, under the step that failed.'
 			);
-			Assert.areEqual(
-				1,
-				countPermissionSetAssignments(installer),
-				'And the rest of the install still ran.'
-			);
+			Assert.areEqual(1, countPermissionSetAssignments(installer), 'And the rest of the install still ran.');
 		}
 	}
 
@@ -1058,10 +1007,7 @@ private class CorePostInstallTest {
 		return [
 			SELECT COUNT()
 			FROM PermissionSetAssignment
-			WHERE
-				AssigneeId = :userId
-				AND PermissionSetGroupId = NULL
-				AND PermissionSet.Name = :permissionSetName
+			WHERE AssigneeId = :userId AND PermissionSetGroupId = NULL AND PermissionSet.Name = :permissionSetName
 		];
 	}
 
@@ -1115,10 +1061,7 @@ private class CorePostInstallTest {
 	@IsTest
 	static void finishSetupGivesAdminOnlyToThePersonRunningIt() {
 		System.runAs(TestUsers.admin()) {
-			User someoneElse = TestUsers.minimumAccessUserWith(
-				'Okafor',
-				new List<String>{ 'BarnCRM_Read_Only' }
-			);
+			User someoneElse = TestUsers.minimumAccessUserWith('Okafor', new List<String>{ 'BarnCRM_Read_Only' });
 			AccessService.assignPermissionSetsOverride = true;
 
 			Assert.isTrue(

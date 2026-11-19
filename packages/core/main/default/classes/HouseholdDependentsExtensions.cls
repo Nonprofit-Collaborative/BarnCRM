@@ -88,9 +88,7 @@ public with sharing class HouseholdDependentsExtensions {
 			return (HouseholdDependentsExtension) candidate;
 		}
 		ErrorLogger.log(
-			new System.TypeException(
-				className + ' does not implement HouseholdDependentsExtension'
-			),
+			new System.TypeException(className + ' does not implement HouseholdDependentsExtension'),
 			'HouseholdDependentsExtensions.resolve'
 		);
 		return new EveryHouseholdDependent();

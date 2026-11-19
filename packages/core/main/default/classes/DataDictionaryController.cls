@@ -114,9 +114,7 @@ public with sharing class DataDictionaryController {
 		try {
 			requirePermission();
 			Map<String, Option> byKey = new Map<String, Option>();
-			for (
-				Schema.DescribeSObjectResult described : FieldUtilizationService.offeredObjects()
-			) {
+			for (Schema.DescribeSObjectResult described : FieldUtilizationService.offeredObjects()) {
 				Option option = new Option();
 				option.value = described.getName();
 				// Trimmed: some platform objects carry spaces around their label (QA-F6).
@@ -221,9 +219,7 @@ public with sharing class DataDictionaryController {
 		try {
 			requirePermission();
 			Schema.DescribeSObjectResult described = requireObject(objectName);
-			AutomationInventoryService.Result found = AutomationInventoryService.forObject(
-				described
-			);
+			AutomationInventoryService.Result found = AutomationInventoryService.forObject(described);
 			AutomationInventory result = new AutomationInventory();
 			result.objectName = described.getName();
 			result.objectLabel = described.getLabel();
@@ -329,9 +325,7 @@ public with sharing class DataDictionaryController {
 
 	private static void requirePermission() {
 		if (!FeatureManagement.checkPermission(PERMISSION)) {
-			throw new DataDictionaryException(
-				BarnHelp.text('Core', 'Core_DataDictionary_PermissionRequired')
-			);
+			throw new DataDictionaryException(BarnHelp.text('Core', 'Core_DataDictionary_PermissionRequired'));
 		}
 	}
 }

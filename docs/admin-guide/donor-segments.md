@@ -25,7 +25,7 @@ Three things to know first:
 ## Who Can Use It
 
 Donor segments are Find queries, so they need the **BarnCRM Find and Export** permission set
-(BarnCRM Admin includes it), plus Giving Staff, Giving Admin or Giving Read Only for the
+(BarnCRM Admin includes it), plus Fundraising Staff Access, Fundraising Admin or Fundraising Read Only for the
 page itself. Without Find the page says so and shows nothing.
 
 ## The Starter Templates

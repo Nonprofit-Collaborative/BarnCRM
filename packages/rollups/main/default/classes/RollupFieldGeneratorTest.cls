@@ -12,10 +12,7 @@ private class RollupFieldGeneratorTest {
 	}
 
 	private static User maria() {
-		return TestDataFactory.createUser(
-			'Maria',
-			new List<String>{ 'BarnCRM_Admin', 'Rollup_Builder_Admin' }
-		);
+		return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin', 'Rollup_Builder_Admin' });
 	}
 
 	private static String refusal(String objectApiName, String fieldLabel, String kind) {
@@ -38,13 +35,8 @@ private class RollupFieldGeneratorTest {
 			}
 
 			System.Assert.areEqual('Rollup_Test_Tally__c', field.apiName);
-			System.Assert.areEqual(
-				'objects/Account/fields/Rollup_Test_Tally__c.field-meta.xml',
-				field.fieldPath
-			);
-			System.Assert.isTrue(
-				field.fieldXml.contains('<fullName>Rollup_Test_Tally__c</fullName>')
-			);
+			System.Assert.areEqual('objects/Account/fields/Rollup_Test_Tally__c.field-meta.xml', field.fieldPath);
+			System.Assert.isTrue(field.fieldXml.contains('<fullName>Rollup_Test_Tally__c</fullName>'));
 			System.Assert.isTrue(field.fieldXml.contains('<label>Rollup Test Tally</label>'));
 			System.Assert.isTrue(field.fieldXml.contains('<type>Number</type>'));
 			System.Assert.isTrue(field.fieldXml.contains('<scale>0</scale>'));
@@ -52,30 +44,18 @@ private class RollupFieldGeneratorTest {
 			System.Assert.areEqual(
 				String.format(
 					BarnHelp.text('Rollups', 'Core_RollupEase_FieldStepType'),
-					new List<String>{
-						Label.Core_ImportNewField_TypeNumber,
-						'Rollup Test Tally',
-						'Rollup_Test_Tally'
-					}
+					new List<String>{ Label.Core_ImportNewField_TypeNumber, 'Rollup Test Tally', 'Rollup_Test_Tally' }
 				),
 				field.steps[1]
 			);
-			System.Assert.areEqual(
-				'BarnRollupField_Account_Rollup_Test_Tally__c.zip',
-				field.fileName
-			);
+			System.Assert.areEqual('BarnRollupField_Account_Rollup_Test_Tally__c.zip', field.fileName);
 
-			Compression.ZipReader deploy = new Compression.ZipReader(
-				EncodingUtil.base64Decode(field.deployPackage)
-			);
+			Compression.ZipReader deploy = new Compression.ZipReader(EncodingUtil.base64Decode(field.deployPackage));
 			Set<String> entries = new Set<String>();
 			for (Compression.ZipEntry entry : deploy.getEntries()) {
 				entries.add(entry.getName());
 			}
-			System.Assert.areEqual(
-				new Set<String>{ 'package.xml', 'objects/Account.object' },
-				entries
-			);
+			System.Assert.areEqual(new Set<String>{ 'package.xml', 'objects/Account.object' }, entries);
 			System.Assert.isTrue(
 				deploy.extract(deploy.getEntry('package.xml'))
 					.toString()
@@ -91,25 +71,13 @@ private class RollupFieldGeneratorTest {
 	@IsTest
 	static void eachTypeWritesTheElementsSetupNeeds() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+			System.Assert.isTrue(RollupFieldGenerator.bodyOf('Total', 'CURRENCY').contains('<scale>2</scale>'));
+			System.Assert.isTrue(RollupFieldGenerator.bodyOf('First', 'DATE').contains('<type>Date</type>'));
+			System.Assert.isTrue(RollupFieldGenerator.bodyOf('Last', 'DATETIME').contains('<type>DateTime</type>'));
+			System.Assert.isTrue(RollupFieldGenerator.bodyOf('Name', 'TEXT').contains('<length>255</length>'));
+			System.Assert.isTrue(RollupFieldGenerator.bodyOf('List', 'LONGTEXT').contains('<type>LongTextArea</type>'));
 			System.Assert.isTrue(
-				RollupFieldGenerator.bodyOf('Total', 'CURRENCY').contains('<scale>2</scale>')
-			);
-			System.Assert.isTrue(
-				RollupFieldGenerator.bodyOf('First', 'DATE').contains('<type>Date</type>')
-			);
-			System.Assert.isTrue(
-				RollupFieldGenerator.bodyOf('Last', 'DATETIME').contains('<type>DateTime</type>')
-			);
-			System.Assert.isTrue(
-				RollupFieldGenerator.bodyOf('Name', 'TEXT').contains('<length>255</length>')
-			);
-			System.Assert.isTrue(
-				RollupFieldGenerator.bodyOf('List', 'LONGTEXT')
-					.contains('<type>LongTextArea</type>')
-			);
-			System.Assert.isTrue(
-				RollupFieldGenerator.bodyOf('Has', 'CHECKBOX')
-					.contains('<defaultValue>false</defaultValue>')
+				RollupFieldGenerator.bodyOf('Has', 'CHECKBOX').contains('<defaultValue>false</defaultValue>')
 			);
 			System.Assert.isTrue(
 				RollupFieldGenerator.bodyOf('Gifts & <Pledges>', 'NUMBER')
@@ -123,10 +91,7 @@ private class RollupFieldGeneratorTest {
 	@IsTest
 	static void theFieldNameFollowsSetupRules() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			System.Assert.areEqual(
-				'Total_giving_FY',
-				RollupFieldGenerator.nameFor('  Total giving (FY)!')
-			);
+			System.Assert.areEqual('Total_giving_FY', RollupFieldGenerator.nameFor('  Total giving (FY)!'));
 			System.Assert.areEqual('X2025_Gifts', RollupFieldGenerator.nameFor('2025 Gifts'));
 			System.Assert.areEqual('', RollupFieldGenerator.nameFor('!!!'));
 			System.Assert.areEqual(
@@ -171,10 +136,7 @@ private class RollupFieldGeneratorTest {
 			System.runAs(david) {
 				message = refusal('Account', 'Rollup Test Tally', 'NUMBER');
 			}
-			System.Assert.areEqual(
-				BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'),
-				message
-			);
+			System.Assert.areEqual(BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'), message);
 		}
 	}
 }

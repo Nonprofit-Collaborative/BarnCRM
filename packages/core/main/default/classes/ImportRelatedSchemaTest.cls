@@ -52,10 +52,7 @@ private class ImportRelatedSchemaTest {
 	}
 
 	private static String refused() {
-		return ImportObjectSchema.refusal(
-			template,
-			ImportMapping.parse(template.Column_Mapping_JSON__c)
-		);
+		return ImportObjectSchema.refusal(template, ImportMapping.parse(template.Column_Mapping_JSON__c));
 	}
 
 	private static Set<String> optionValues() {
@@ -70,11 +67,7 @@ private class ImportRelatedSchemaTest {
 	static void theRelatedEntityIsReadApartFromTheRecord() {
 		// runs-as: deploying user (reads a mapping document only, no records or describe)
 		ImportMapping parsed = mapping();
-		Assert.areEqual(
-			new Set<String>{ 'name' },
-			parsed.recordAttributes(),
-			'Record columns alone.'
-		);
+		Assert.areEqual(new Set<String>{ 'name' }, parsed.recordAttributes(), 'Record columns alone.');
 		Assert.areEqual(
 			new Set<String>{ 'contact__c', 'role__c' },
 			parsed.attributesOf(ImportMapping.ENTITY_RELATED),
@@ -97,10 +90,7 @@ private class ImportRelatedSchemaTest {
 					offered.contains('Affiliation__c.Organization__c'),
 					'Affiliations, by their organization field: ' + offered
 				);
-				Assert.isFalse(
-					offered.contains('Affiliation__c.Contact__c'),
-					'Never by a field pointing elsewhere.'
-				);
+				Assert.isFalse(offered.contains('Affiliation__c.Contact__c'), 'Never by a field pointing elsewhere.');
 				for (String value : offered) {
 					Assert.isFalse(value.startsWithIgnoreCase('Household_Member__c.'), value);
 					Assert.isFalse(value.startsWithIgnoreCase('Contact.'), 'People: ' + value);
@@ -131,10 +121,7 @@ private class ImportRelatedSchemaTest {
 				} catch (ImportException e) {
 					Assert.isTrue(
 						e.getMessage()
-							.contains(
-								Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-									.getLabel()
-							),
+							.contains(Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel()),
 						'Naming the object: ' + e.getMessage()
 					);
 				}

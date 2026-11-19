@@ -41,17 +41,8 @@ public with sharing class NightlyRun implements Schedulable {
 	private static final Integer MAX_QUEUE_DELAY = 10;
 
 	private static final String CONTEXT = 'NightlyRun';
-	private static final List<String> UNFINISHED = new List<String>{
-		'Holding',
-		'Queued',
-		'Preparing',
-		'Processing'
-	};
-	private static final List<String> ASYNC_TYPES = new List<String>{
-		'BatchApex',
-		'Queueable',
-		'Future'
-	};
+	private static final List<String> UNFINISHED = new List<String>{ 'Holding', 'Queued', 'Preparing', 'Processing' };
+	private static final List<String> ASYNC_TYPES = new List<String>{ 'BatchApex', 'Queueable', 'Future' };
 
 	/** False in a test that drives the links itself: the next link is only recorded. */
 	@TestVisible
@@ -124,8 +115,7 @@ public with sharing class NightlyRun implements Schedulable {
 				unfinishedStep = row.Last_Started__c;
 				row.Last_Outcome__c = NightlyJobs.GAVE_UP;
 				row.Last_Finished__c = now;
-				row.Last_Message__c = BarnHelp.text('Core', 'Core_NightlyJobs_Superseded')
-					.left(255);
+				row.Last_Message__c = BarnHelp.text('Core', 'Core_NightlyJobs_Superseded').left(255);
 				changed.add(row);
 			}
 		}
@@ -182,8 +172,7 @@ public with sharing class NightlyRun implements Schedulable {
 
 	/** True when a newer run has started since this one: this one stops quietly. */
 	private Boolean superseded() {
-		Nightly_Job__c run = NightlyJobs.rows()
-			.get(ScheduledJobSelector.nameKey(NightlyJobs.JOB_NAME));
+		Nightly_Job__c run = NightlyJobs.rows().get(ScheduledJobSelector.nameKey(NightlyJobs.JOB_NAME));
 		return run == null ||
 			run.Last_Started__c == null ||
 			runStarted == null ||
@@ -295,10 +284,7 @@ public with sharing class NightlyRun implements Schedulable {
 
 	/** The step's time of day on the night this run started, in the run's time zone. */
 	private Datetime dueAt(Integer minute) {
-		return Datetime.newInstance(
-			runStarted.date(),
-			Time.newInstance(minute / 60, Math.mod(minute, 60), 0, 0)
-		);
+		return Datetime.newInstance(runStarted.date(), Time.newInstance(minute / 60, Math.mod(minute, 60), 0, 0));
 	}
 
 	// -------------------------------------------------------------------------------------
@@ -363,9 +349,7 @@ public with sharing class NightlyRun implements Schedulable {
 
 	/** `value` without its milliseconds: a job's CreatedDate is kept to the second. */
 	private static Datetime toSecond(Datetime value) {
-		return value == null
-			? null
-			: Datetime.newInstance(value.getTime() - Math.mod(value.getTime(), 1000));
+		return value == null ? null : Datetime.newInstance(value.getTime() - Math.mod(value.getTime(), 1000));
 	}
 
 	// -------------------------------------------------------------------------------------
@@ -410,10 +394,6 @@ public with sharing class NightlyRun implements Schedulable {
 		}
 		Datetime at = due > Datetime.now().addMinutes(1) ? due : Datetime.now().addMinutes(1);
 		ScheduledJobSelector.stopNamed(NightlyJobs.CONTINUE_JOB_NAME);
-		ScheduledJobSelector.schedule(
-			NightlyJobs.CONTINUE_JOB_NAME,
-			at.format('s m H d M \'?\' yyyy'),
-			this
-		);
+		ScheduledJobSelector.schedule(NightlyJobs.CONTINUE_JOB_NAME, at.format('s m H d M \'?\' yyyy'), this);
 	}
 }

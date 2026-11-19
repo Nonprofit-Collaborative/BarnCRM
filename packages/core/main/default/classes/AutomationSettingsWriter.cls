@@ -42,9 +42,7 @@ public without sharing class AutomationSettingsWriter {
 		OrgSettingsSystemWriter.saveOver(
 			BarnCRM_Settings__c.SObjectType,
 			stored,
-			new Map<Schema.SObjectField, Object>{
-				BarnCRM_Settings__c.Automation_Paused_Until__c => pausedUntil
-			}
+			new Map<Schema.SObjectField, Object>{ BarnCRM_Settings__c.Automation_Paused_Until__c => pausedUntil }
 		);
 	}
 
@@ -70,7 +68,7 @@ public without sharing class AutomationSettingsWriter {
 	 * owner is this org, a Profile or a User; only the two checkboxes are set.
 	 */
 	public static void saveControl(BarnCRM_Automation_Control__c row) {
-		Database.upsert(row, true, AccessLevel.SYSTEM_MODE);
+		upsert as system row;
 	}
 
 	/** Deletes one profile or user BarnCRM Automation Control row, after the same checks. */

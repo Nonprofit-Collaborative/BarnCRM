@@ -27,9 +27,7 @@ private class HubControllerFailureTest {
 	@IsTest
 	static void aChecklistThatCannotBeReadGivesThePageAReadableMessage() {
 		System.runAs(TestUsers.admin()) {
-			SetupAssistantExtensions.overrides = new List<SetupAssistantExtension>{
-				new BrokenModule()
-			};
+			SetupAssistantExtensions.overrides = new List<SetupAssistantExtension>{ new BrokenModule() };
 			String message;
 			HubController.HomeModel model;
 
@@ -53,9 +51,7 @@ private class HubControllerFailureTest {
 	@IsTest
 	static void aRepeatCallAfterTheFaultIsFixedBuildsThePage() {
 		System.runAs(TestUsers.admin()) {
-			SetupAssistantExtensions.overrides = new List<SetupAssistantExtension>{
-				new BrokenModule()
-			};
+			SetupAssistantExtensions.overrides = new List<SetupAssistantExtension>{ new BrokenModule() };
 			try {
 				HubController.getHomeModel();
 				Assert.fail('The broken module should have stopped the page');
@@ -66,11 +62,7 @@ private class HubControllerFailureTest {
 			SetupAssistantTestExtension.useNone();
 			HubController.HomeModel model = HubController.getHomeModel();
 
-			Assert.areEqual(
-				8,
-				model.stepsTotal,
-				'Once the module is gone Core\'s eight steps show'
-			);
+			Assert.areEqual(8, model.stepsTotal, 'Once the module is gone Core\'s eight steps show');
 		}
 	}
 }

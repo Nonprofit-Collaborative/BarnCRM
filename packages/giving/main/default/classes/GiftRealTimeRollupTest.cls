@@ -38,9 +38,7 @@ private class GiftRealTimeRollupTest {
 			for (Automation_Registry__mdt entry : [
 				SELECT Object_Name__c, Enabled_By_Default__c
 				FROM Automation_Registry__mdt
-				WHERE
-					Handler_Class__c = 'RollupTriggerHandler'
-					AND Object_Name__c IN :GIVING_SOURCES
+				WHERE Handler_Class__c = 'RollupTriggerHandler' AND Object_Name__c IN :GIVING_SOURCES
 			]) {
 				Assert.isTrue(
 					entry.Enabled_By_Default__c,
@@ -115,32 +113,19 @@ private class GiftRealTimeRollupTest {
 	static void aSavedSoftCreditUpdatesThePersonCredited() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Contact ana = [SELECT Id FROM Contact LIMIT 1];
-			Contact bea = GivingTestDataFactory.insertHouseholdContact(
-				'The Lindqvist Family',
-				'Bea',
-				'Lindqvist'
-			);
+			Contact bea = GivingTestDataFactory.insertHouseholdContact('The Lindqvist Family', 'Bea', 'Lindqvist');
 			Gift__c gift = GivingTestDataFactory.buildGift(ana.Id, 500);
 			insert gift;
 			GivingRollupTestData.nextSave();
 
 			Test.startTest();
-			insert new Soft_Credit__c(
-				Gift__c = gift.Id,
-				Contact__c = bea.Id,
-				Role__c = 'Solicitor',
-				Amount__c = 500
-			);
+			insert new Soft_Credit__c(Gift__c = gift.Id, Contact__c = bea.Id, Role__c = 'Solicitor', Amount__c = 500);
 			Test.stopTest();
 
 			Contact credited = GivingRollupTestData.person(bea.Id);
 			GivingTestDataFactory.assertRollupWrote(credited.Total_Soft_Credits__c);
 			Assert.areEqual(500, credited.Total_Soft_Credits__c, 'Bea is recognized for the gift');
-			Assert.areEqual(
-				0,
-				GivingRollupTestData.valueOf(credited.Total_Giving__c),
-				'Recognition is never giving'
-			);
+			Assert.areEqual(0, GivingRollupTestData.valueOf(credited.Total_Giving__c), 'Recognition is never giving');
 		}
 	}
 

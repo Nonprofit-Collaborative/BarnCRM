@@ -19,15 +19,7 @@ public with sharing class EventEmailScheduler implements Schedulable {
 
 	/** The job as a step of the nightly run (ADR-0166), before the working day. */
 	public static NightlyStep step() {
-		return new NightlyStep(
-				JOB_NAME,
-				System.Label.Events_NightlyJobs_EmailsName,
-				7,
-				30,
-				new EventEmailScheduler()
-			)
-			.activeWhen(
-				EventEmailService.nextActive(null) != null || EventsSettings.onlinePayments()
-			);
+		return new NightlyStep(JOB_NAME, System.Label.Events_NightlyJobs_EmailsName, 7, 30, new EventEmailScheduler())
+			.activeWhen(EventEmailService.nextActive(null) != null || EventsSettings.onlinePayments());
 	}
 }

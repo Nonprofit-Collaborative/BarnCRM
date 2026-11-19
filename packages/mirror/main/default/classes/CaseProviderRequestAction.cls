@@ -1,7 +1,7 @@
 /**
  * The Send Cases to a Service Provider flow action (D-201; ADR-0221
  * `0221-projects-requests-and-issues.md` decision 7): a record-triggered flow on Case sends a
- * Case at once instead of waiting for the nightly run. The work is `CaseProviderRequests`.
+ * Case at once instead of waiting for the hourly check. The work is `CaseProviderRequests`.
  *
  * `global` because a Flow in a subscriber org calls it (ADR-0017, ADR-0051). It takes Case Ids,
  * never a Case, so Mirror names no standard object at compile time (ADR-0013).

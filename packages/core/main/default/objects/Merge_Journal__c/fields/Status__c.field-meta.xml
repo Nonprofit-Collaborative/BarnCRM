@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Status__c</fullName>
-  <description>Where the merge stands: Merged, Undone, Partly Undone (some values or related records could not be put back) or Undo Failed.</description>
+  <description>Where the row stands, by kind. Merge: Merged, Undone, Partly Undone (some values or related records could not be put back) or Undo Failed. Scan and Deactivation: Running, Done, Partial, Failed, Restoring or Restored. Migration: In Progress or Complete. Household Adoption: Adopted, Undone or Not Restored. Every writer sets it.</description>
   <externalId>false</externalId>
   <label>Status</label>
   <required>false</required>
@@ -13,7 +13,7 @@
       <sorted>false</sorted>
       <value>
         <fullName>Merged</fullName>
-        <default>true</default>
+        <default>false</default>
         <label>Merged</label>
       </value>
       <value>
@@ -30,6 +30,56 @@
         <fullName>Undo Failed</fullName>
         <default>false</default>
         <label>Undo Failed</label>
+      </value>
+      <value>
+        <fullName>Running</fullName>
+        <default>false</default>
+        <label>Running</label>
+      </value>
+      <value>
+        <fullName>Done</fullName>
+        <default>false</default>
+        <label>Done</label>
+      </value>
+      <value>
+        <fullName>Partial</fullName>
+        <default>false</default>
+        <label>Partial</label>
+      </value>
+      <value>
+        <fullName>Failed</fullName>
+        <default>false</default>
+        <label>Failed</label>
+      </value>
+      <value>
+        <fullName>Restoring</fullName>
+        <default>false</default>
+        <label>Restoring</label>
+      </value>
+      <value>
+        <fullName>Restored</fullName>
+        <default>false</default>
+        <label>Restored</label>
+      </value>
+      <value>
+        <fullName>In Progress</fullName>
+        <default>false</default>
+        <label>In Progress</label>
+      </value>
+      <value>
+        <fullName>Complete</fullName>
+        <default>false</default>
+        <label>Complete</label>
+      </value>
+      <value>
+        <fullName>Adopted</fullName>
+        <default>false</default>
+        <label>Adopted</label>
+      </value>
+      <value>
+        <fullName>Not Restored</fullName>
+        <default>false</default>
+        <label>Not Restored</label>
       </value>
     </valueSetDefinition>
   </valueSet>

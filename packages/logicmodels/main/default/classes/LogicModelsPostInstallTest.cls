@@ -23,11 +23,7 @@ private class LogicModelsPostInstallTest {
 	static void theInstallerGetsLogicModelsAdminOnceAndTheRolesTheirSets() {
 		System.runAs(TestUsers.admin()) {
 			Id fresh = TestDataFactory.createUser('Installer', new List<String>()).Id;
-			Id alreadyHolding = TestDataFactory.createUser(
-					'Holder',
-					new List<String>{ 'Logic_Models_Admin' }
-				)
-				.Id;
+			Id alreadyHolding = TestDataFactory.createUser('Holder', new List<String>{ 'Logic_Models_Admin' }).Id;
 			User member = TestUsers.standardUser('Member');
 			insert new PermissionSetAssignment(
 				AssigneeId = member.Id,

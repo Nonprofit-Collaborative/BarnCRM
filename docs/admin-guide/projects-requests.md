@@ -128,7 +128,8 @@ that org's Error Log; send again later).
 
 ## Sending Your Cases to a Service Provider (BarnCRM Mirror)
 
-An org that uses Salesforce Cases and has **BarnCRM Mirror** installed can send a Case to a
+An org that uses Salesforce Cases and has **BarnCRM Mirror** installed (it needs only BarnCRM
+Core, no nonprofit module) can send a Case to a
 provider org running BarnCRM Projects, and follow its status on its Provider Requests tab: set
 up a Request Connection for it as above, then see
 [Cases Sent to a Service Provider](mirror-case-requests.md) for its side.

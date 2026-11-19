@@ -18,7 +18,7 @@ own Stripe or PayPal checkout page and recorded on the registration (see Paid Re
 ### Before You Install
 
 - Event Management is offered in both editions (see [Editions](editions.md)).
-- It needs BarnCRM Core and nothing else. Nothing here needs Volunteers, Giving, Funders or
+- It needs BarnCRM Core and nothing else. Nothing here needs Volunteers, Fundraising, Grants or
   Programs.
 
 ### Installing
@@ -287,8 +287,8 @@ adds up the amounts of **Committed** and **Confirmed** sponsors.
 | Declined | Said no; not counted. |
 
 BarnCRM takes no payments: the amount is what the sponsor has agreed to give. To tie a sponsorship
-to the money, paste the record identifier of the Giving gift or commitment, or the Funders award,
-into **Linked Record** on the sponsor (**Edit**). When Giving or Funders is installed and you can
+to the money, paste the record identifier of the Fundraising gift or commitment, or the Grants award,
+into **Linked Record** on the sponsor (**Edit**). When Fundraising or Grants is installed and you can
 read that record, its name shows under the sponsor; otherwise nothing shows. Sponsorship needs
 neither module. Removing a level leaves its sponsors with no level, keeping their amounts and
 checklists.
@@ -367,7 +367,7 @@ reads **Failed** and the **Error Log** says why; fix the cause and use **Send Pa
 BarnCRM issues no refunds and stores no card details: refund in your Stripe or PayPal dashboard
 and the refund is recorded here. Cancelling a paid registration does not refund it. Payment Status,
 Amount Paid, Payment Key and Payment Link are set only by BarnCRM. Health Check warns when **Take
-payment online** is on and Payments is not installed or its keys are missing; until it is ready,
+payment online** is on and Payments is not installed or its processor is not connected; until it is ready,
 form registrations are confirmed at once as before.
 
 ### Public Event Page

@@ -145,9 +145,7 @@ public with sharing class EventSurveyController {
 					}
 				}
 				if (chosen == null) {
-					throw new System.IllegalArgumentException(
-						BarnHelp.text('Events', 'Events_Survey_NotPublic')
-					);
+					throw new System.IllegalArgumentException(BarnHelp.text('Events', 'Events_Survey_NotPublic'));
 				}
 			}
 			update as user new Event__c(Id = eventId, Survey_Form_Key__c = chosen);

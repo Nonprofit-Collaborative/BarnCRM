@@ -35,10 +35,7 @@ public with sharing class FunderReportTemplates {
 				WITH SYSTEM_MODE
 				ORDER BY DeveloperName
 			]) {
-				if (
-					keys.contains(shipped.DeveloperName.toLowerCase()) ||
-					String.isBlank(shipped.Body__c)
-				) {
+				if (keys.contains(shipped.DeveloperName.toLowerCase()) || String.isBlank(shipped.Body__c)) {
 					continue;
 				}
 				created.add(
@@ -50,7 +47,7 @@ public with sharing class FunderReportTemplates {
 					)
 				);
 			}
-			Database.insert(created, true, AccessLevel.SYSTEM_MODE);
+			insert as system created;
 			return created;
 		} catch (Exception failed) {
 			ErrorLogger.log(failed, INSTALL_CONTEXT);

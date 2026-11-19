@@ -66,10 +66,7 @@ private class CommitmentDonorDeleteGuardTest {
 			String refusal = deleteRefusal(new Contact(Id = ana().Id));
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_Commitment_DonorDeleteBlocked'),
-				refusal
-			);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Commitment_DonorDeleteBlocked'), refusal);
 			Assert.areEqual(
 				ana().Id,
 				[SELECT Donor_Contact__c FROM Commitment__c WHERE Id = :pledge.Id].Donor_Contact__c,
@@ -90,10 +87,7 @@ private class CommitmentDonorDeleteGuardTest {
 			String onceCancelled = deleteRefusal(new Contact(Id = ana().Id));
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_Commitment_DonorDeleteBlocked'),
-				whileActive
-			);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Commitment_DonorDeleteBlocked'), whileActive);
 			Assert.isNull(onceCancelled, 'A cancelled pledge does not hold Ana.');
 		}
 	}
@@ -108,10 +102,7 @@ private class CommitmentDonorDeleteGuardTest {
 			String refusal = deleteRefusal(new Account(Id = ana().AccountId));
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_Commitment_DonorDeleteBlocked'),
-				refusal
-			);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Commitment_DonorDeleteBlocked'), refusal);
 		}
 	}
 
@@ -125,10 +116,7 @@ private class CommitmentDonorDeleteGuardTest {
 			String refusal = deleteRefusal(riverside);
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_Commitment_DonorDeleteBlocked'),
-				refusal
-			);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Commitment_DonorDeleteBlocked'), refusal);
 		}
 	}
 
@@ -138,11 +126,7 @@ private class CommitmentDonorDeleteGuardTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			List<Contact> people = new List<Contact>();
 			for (Integer i = 0; i < 199; i++) {
-				people.add(
-					TestDataFactory.person(
-						new Contact(FirstName = 'Donor' + i, LastName = 'Nobody')
-					)
-				);
+				people.add(TestDataFactory.person(new Contact(FirstName = 'Donor' + i, LastName = 'Nobody')));
 			}
 			insert people;
 			pledgeFrom(people[0].Id, null, 'Cancelled');
@@ -190,11 +174,7 @@ private class CommitmentDonorDeleteGuardTest {
 	static void erasingTheDonorOfAnActivePledgeStillWorks() {
 		System.runAs(eraser()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-			Contact jordan = GivingTestDataFactory.insertHouseholdContact(
-				'The Lee Family',
-				'Jordan',
-				'Lee'
-			);
+			Contact jordan = GivingTestDataFactory.insertHouseholdContact('The Lee Family', 'Jordan', 'Lee');
 			Commitment__c pledge = pledgeFrom(jordan.Id, null, 'Active');
 
 			Test.startTest();

@@ -33,14 +33,8 @@ public with sharing class AffiliationDomain {
 			return;
 		}
 		for (Affiliation__c record : records) {
-			Affiliation__c previous = previousById == null
-				? null
-				: (Affiliation__c) previousById.get(record.Id);
-			record.Status__c = ConnectionStatus.settle(
-				record.Status__c,
-				record.End_Date__c,
-				previous?.End_Date__c
-			);
+			Affiliation__c previous = previousById == null ? null : (Affiliation__c) previousById.get(record.Id);
+			record.Status__c = ConnectionStatus.settle(record.Status__c, record.End_Date__c, previous?.End_Date__c);
 			if (record.Status__c == ConnectionStatus.FORMER) {
 				record.Is_Primary__c = false;
 			}
@@ -71,12 +65,7 @@ public with sharing class AffiliationDomain {
 				continue;
 			}
 			if (
-				PersonReference.isSamePerson(
-					record.Contact__c,
-					record.Person_Account__c,
-					null,
-					record.Organization__c
-				)
+				PersonReference.isSamePerson(record.Contact__c, record.Person_Account__c, null, record.Organization__c)
 			) {
 				record.addError(Label.Core_Affiliation_SelfAffiliation);
 				continue;
@@ -92,10 +81,7 @@ public with sharing class AffiliationDomain {
 	 * One query for the whole save: every affiliation these people already have, matched
 	 * against the ones being saved and against each other.
 	 */
-	private static void rejectOverlaps(
-		List<Affiliation__c> records,
-		Map<Id, SObject> previousById
-	) {
+	private static void rejectOverlaps(List<Affiliation__c> records, Map<Id, SObject> previousById) {
 		Set<Id> personIds = new Set<Id>();
 		Set<Id> beingSaved = new Set<Id>();
 		for (Affiliation__c record : records) {
@@ -147,11 +133,7 @@ public with sharing class AffiliationDomain {
 	}
 
 	/** True for an edit that changed neither the person, the organization, the role nor a date. */
-	private static Boolean overlapInputsUnchanged(
-		Affiliation__c record,
-		String key,
-		Map<Id, SObject> previousById
-	) {
+	private static Boolean overlapInputsUnchanged(Affiliation__c record, String key, Map<Id, SObject> previousById) {
 		if (previousById == null || record.Id == null) {
 			return false;
 		}
@@ -162,11 +144,7 @@ public with sharing class AffiliationDomain {
 			record.End_Date__c == previous.End_Date__c;
 	}
 
-	private static void addTo(
-		Map<String, List<Affiliation__c>> grouped,
-		String key,
-		Affiliation__c record
-	) {
+	private static void addTo(Map<String, List<Affiliation__c>> grouped, String key, Affiliation__c record) {
 		if (key == null) {
 			return;
 		}
@@ -176,10 +154,7 @@ public with sharing class AffiliationDomain {
 		grouped.get(key).add(record);
 	}
 
-	private static Affiliation__c firstOverlap(
-		List<Affiliation__c> candidates,
-		Affiliation__c record
-	) {
+	private static Affiliation__c firstOverlap(List<Affiliation__c> candidates, Affiliation__c record) {
 		if (candidates == null) {
 			return null;
 		}

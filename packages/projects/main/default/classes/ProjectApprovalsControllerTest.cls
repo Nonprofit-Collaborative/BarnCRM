@@ -67,11 +67,7 @@ private class ProjectApprovalsControllerTest {
 
 			ProjectApprovalsController.Queue queue = ProjectApprovalsController.getQueue();
 			Assert.isTrue(queue.enabled, 'On');
-			Assert.areEqual(
-				200,
-				queue.entries.size(),
-				'Only the owner\'s project, not the admin\'s'
-			);
+			Assert.areEqual(200, queue.entries.size(), 'Only the owner\'s project, not the admin\'s');
 			Assert.areEqual(0, queue.expenses.size(), 'The expense is on the other project');
 
 			List<Id> ids = new List<Id>();
@@ -95,18 +91,13 @@ private class ProjectApprovalsControllerTest {
 			);
 			Assert.areEqual(
 				200,
-				[SELECT Actual_Hours__c FROM Project__c WHERE Id = :mine.Id WITH SYSTEM_MODE]
-				.Actual_Hours__c,
+				[SELECT Actual_Hours__c FROM Project__c WHERE Id = :mine.Id WITH SYSTEM_MODE].Actual_Hours__c,
 				'Approved hours count'
 			);
 		}
 		System.runAs(ProjectsTestData.admin()) {
 			ProjectApprovalsController.Queue all = ProjectApprovalsController.getQueue();
-			Assert.areEqual(
-				1,
-				all.entries.size(),
-				'Admin sees the other project\'s Submitted entry'
-			);
+			Assert.areEqual(1, all.entries.size(), 'Admin sees the other project\'s Submitted entry');
 			Assert.areEqual(1, all.expenses.size(), 'and its expense');
 		}
 	}
@@ -168,10 +159,7 @@ private class ProjectApprovalsControllerTest {
 				ProjectApprovalsController.decide(new List<Id>(), true, null);
 				Assert.fail('Refused while off');
 			} catch (AuraHandledException refused) {
-				Assert.isTrue(
-					refused.getMessage().contains('Approve time and expenses'),
-					refused.getMessage()
-				);
+				Assert.isTrue(refused.getMessage().contains('Approve time and expenses'), refused.getMessage());
 			}
 			turnOn();
 			Project__c project = ProjectsTestData.project('Active', null);

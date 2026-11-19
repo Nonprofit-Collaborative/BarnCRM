@@ -28,11 +28,7 @@ private class HealthCheckControllerTest {
 				HealthCheckService.Report report = HealthCheckController.getReport();
 				Test.stopTest();
 
-				System.assertNotEquals(
-					null,
-					report,
-					'The report is readable without any permission.'
-				);
+				System.assertNotEquals(null, report, 'The report is readable without any permission.');
 				System.assertNotEquals(null, report.findings, 'It carries its findings.');
 				System.assertEquals(
 					CoexistenceService.MODE_NPSP,
@@ -64,10 +60,7 @@ private class HealthCheckControllerTest {
 					refused = true;
 				}
 
-				System.assert(
-					refused,
-					'Without the permission, the fix is refused rather than applied.'
-				);
+				System.assert(refused, 'Without the permission, the fix is refused rather than applied.');
 				System.assertEquals(
 					null,
 					CoexistenceService.getCurrentMode(),
@@ -252,11 +245,7 @@ private class HealthCheckControllerTest {
 
 				Assert.isTrue(refused, 'The recommendation moves membership, which is refused.');
 				SettingsService.clearCaches();
-				Assert.areEqual(
-					before,
-					CoexistenceService.getCurrentMode(),
-					'The mode is as it was.'
-				);
+				Assert.areEqual(before, CoexistenceService.getCurrentMode(), 'The mode is as it was.');
 				Assert.areEqual(
 					CoexistenceService.MEMBERSHIP_CONTACT,
 					CoexistenceService.getMembershipMode(),
@@ -270,9 +259,7 @@ private class HealthCheckControllerTest {
 	static void aFixThatCannotSaveIsRefusedAndLoggedForEachButton() {
 		System.runAs(TestUsers.admin()) {
 			User maria = HealthCheckTestHelper.mariaWithManageSettings();
-			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-				HouseholdTestDataFactory.MODE_CONTACT
-			);
+			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			settings.Auto_Create_Households__c = false;
 			HouseholdTestDataFactory.save(settings);
 

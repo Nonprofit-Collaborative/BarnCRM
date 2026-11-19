@@ -42,4 +42,8 @@
     <field>Access_By_Role__c</field>
     <value xsi:type="xsd:string">Forms_Staff=Program_Staff,Fundraising_Staff;Forms_Read_Only=Read_Only</value>
   </values>
+  <values>
+    <field>Beta__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
 </CustomMetadata>

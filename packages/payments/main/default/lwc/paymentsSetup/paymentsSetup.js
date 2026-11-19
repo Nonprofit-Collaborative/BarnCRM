@@ -2,25 +2,23 @@ import { LightningElement } from 'lwc';
 import getSetup from '@salesforce/apex/PaymentsSetupController.getSetup';
 import saveKeys from '@salesforce/apex/PaymentsSetupController.saveKeys';
 import clearKeys from '@salesforce/apex/PaymentsSetupController.clearKeys';
+import checkConnection from '@salesforce/apex/PaymentsSetupController.checkConnection';
 import scheduleProcessing from '@salesforce/apex/PaymentsSetupController.scheduleProcessing';
+import regenerateToken from '@salesforce/apex/PaymentsSetupController.regenerateToken';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { iconFor } from 'c/barnIcons';
 
-/** Each key's box label, read when the help text has loaded. */
-function keyLabels() {
-  return {
-    stripeSecretKey: helpText('Payments', 'Payments_Setup_StripeSecretKey'),
-    stripeWebhookSecret: helpText('Payments', 'Payments_Setup_StripeWebhookSecret'),
-    payPalClientId: helpText('Payments', 'Payments_Setup_PayPalClientId'),
-    payPalClientSecret: helpText('Payments', 'Payments_Setup_PayPalClientSecret'),
-    payPalWebhookId: helpText('Payments', 'Payments_Setup_PayPalWebhookId')
-  };
+/** Fills `{0}`, `{1}` ... in a help text, in order. */
+function fill(text, values) {
+  return values.reduce((result, value, index) => result.replace(`{${index}}`, value), text);
 }
 
 /**
- * The Payments Setup page (PAY-01). The controller returns the receiver addresses and whether
- * each key is entered (last four characters only); the page takes new keys, which are never
- * shown again, and clears one processor's keys.
+ * The Payments Setup page (PAY-01, N-13). The controller returns the receiver addresses, where
+ * each processor's secrets go in Setup (External Credential and principal names, never a value),
+ * whether each processor is connected, and the PayPal webhook id by its last four characters. The
+ * page checks a connection, forgets one, and saves the webhook id; no secret passes through it.
  */
 export default class PaymentsSetup extends LightningElement {
   helpReady = isHelpLoaded('Payments');
@@ -35,6 +33,9 @@ export default class PaymentsSetup extends LightningElement {
     },
     get clear() {
       return helpText('Payments', 'Payments_Setup_Clear');
+    },
+    get check() {
+      return helpText('Payments', 'Payments_Setup_CheckConnection');
     },
     get intro() {
       return helpText('Payments', 'Payments_Setup_Intro');
@@ -65,6 +66,9 @@ export default class PaymentsSetup extends LightningElement {
     },
     get schedule() {
       return helpText('Payments', 'Payments_Setup_Schedule');
+    },
+    get regenerate() {
+      return helpText('Payments', 'Payments_Setup_RegenerateToken');
     }
   };
 
@@ -73,7 +77,7 @@ export default class PaymentsSetup extends LightningElement {
   setup;
   typed = {};
   working = false;
-  savedShown = false;
+  notice;
   error;
 
   connectedCallback() {
@@ -103,9 +107,10 @@ export default class PaymentsSetup extends LightningElement {
   }
 
   get modeText() {
-    return helpText('Payments', 'Payments_Setup_Mode')
-      .replace('{0}', this.setup.mode)
-      .replace('{1}', this.setup.processor);
+    return fill(helpText('Payments', 'Payments_Setup_Mode'), [
+      this.setup.mode,
+      this.setup.processor
+    ]);
   }
 
   get receivers() {
@@ -124,37 +129,56 @@ export default class PaymentsSetup extends LightningElement {
     return this.working || !this.loaded || !this.setup.canManage;
   }
 
-  get keys() {
-    const labels = keyLabels();
-    return (this.setup.keys || []).map((key) => ({
-      ...key,
-      label: labels[key.name],
-      status: key.lastFour
-        ? helpText('Payments', 'Payments_Setup_KeySet').replace('{0}', key.lastFour)
-        : helpText('Payments', 'Payments_Setup_KeyNotSet'),
-      value: this.typed[key.name] || ''
-    }));
+  /** Each processor's connection, with the Setup steps filled with this org's names. */
+  get credentials() {
+    return (this.setup.credentials || []).map((credential) => {
+      const id = credential.processor.toLowerCase();
+      return {
+        ...credential,
+        dataId: id,
+        statusId: `status-${id}`,
+        stepsId: `steps-${id}`,
+        checkId: `check-${id}`,
+        clearId: `clear-${id}`,
+        isPayPal: credential.processor === 'PayPal',
+        status: credential.connected
+          ? helpText('Payments', 'Payments_Setup_StatusConnected')
+          : helpText('Payments', 'Payments_Setup_StatusNotConnected'),
+        steps: fill(helpText('Payments', 'Payments_Setup_CredentialSteps'), [
+          credential.externalCredential,
+          credential.principal,
+          credential.parameters,
+          credential.namedCredentials
+        ])
+      };
+    });
   }
 
-  get stripeKeys() {
-    return this.keys.filter((key) => key.processor === 'Stripe');
-  }
-
+  /** The PayPal webhook id: not a secret, but shown by its last four characters only. */
   get payPalKeys() {
-    return this.keys.filter((key) => key.processor === 'PayPal');
-  }
-
-  handleType(event) {
-    this.typed = { ...this.typed, [event.target.dataset.name]: event.target.value };
-    this.savedShown = false;
-  }
-
-  handleSave() {
-    return this.run(() => saveKeys({ keys: this.typed }));
+    return (this.setup.keys || [])
+      .filter((key) => key.processor === 'PayPal')
+      .map((key) => ({
+        ...key,
+        label: helpText('Payments', 'Payments_Setup_PayPalWebhookId'),
+        status: key.lastFour
+          ? fill(helpText('Payments', 'Payments_Setup_KeySet'), [key.lastFour])
+          : helpText('Payments', 'Payments_Setup_KeyNotSet'),
+        value: this.typed[key.name] || ''
+      }));
   }
 
   get scheduled() {
     return this.setup.scheduled === true;
+  }
+
+  handleType(event) {
+    this.typed = { ...this.typed, [event.target.dataset.name]: event.target.value };
+    this.notice = undefined;
+  }
+
+  handleSave() {
+    return this.run(() => saveKeys({ keys: this.typed }));
   }
 
   /** Scheduling stays the admin's click, never automatic (D-195). */
@@ -162,18 +186,41 @@ export default class PaymentsSetup extends LightningElement {
     return this.run(() => scheduleProcessing());
   }
 
+  /** Replacing the token breaks the addresses already given, so it asks first. */
+  async handleRegenerate() {
+    const confirmed = await BarnConfirmModal.open({
+      size: 'small',
+      label: helpText('Payments', 'Payments_Setup_RegenerateTitle'),
+      message: helpText('Payments', 'Payments_Setup_RegenerateConfirm'),
+      confirmLabel: this.labels.regenerate,
+      confirmVariant: 'destructive',
+      cancelLabel: helpText('Payments', 'Payments_Setup_Cancel')
+    });
+    if (!confirmed) {
+      return undefined;
+    }
+    return this.run(() => regenerateToken());
+  }
+
   handleClear(event) {
     return this.run(() => clearKeys({ processor: event.target.dataset.processor }));
   }
 
+  handleCheck(event) {
+    return this.run(() => checkConnection({ processor: event.target.dataset.processor }));
+  }
+
   async run(call) {
     this.error = undefined;
-    this.savedShown = false;
+    this.notice = undefined;
     this.working = true;
     try {
-      this.setup = await call();
+      const setup = await call();
+      this.setup = setup;
       this.typed = {};
-      this.savedShown = true;
+      this.notice = setup.checkMessage
+        ? { variant: setup.checkOk ? 'success' : 'warning', message: setup.checkMessage }
+        : { variant: 'success', message: this.labels.saved };
     } catch (failure) {
       this.error = this.messageOf(failure);
     } finally {

@@ -281,7 +281,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 8 | As the staff user, edit the account from step 6 and try to change its record type. | **Household** is not offered (Change Record Type shows no choice, or is not offered). |
 | 9 | As the staff user, open the household from step 7. On **Members** select **Add Member**, add `Zztest` `Rt`, then open the household's **Addresses** card. | Before the add the panel shows **No Members Yet**; the **Add Member** dialog opens and the new person shows as a tile. **Addresses** shows **No Addresses Yet** with **Add Address**. Nothing asks for a record type. |
 | 10 | As admin, in Setup, open the staff user's permission set assignments, then the **BarnCRM Auto: Households Tab** permission set's record type settings. | **BarnCRM Auto: Households Tab** is assigned; it grants no record type. |
-| 11 | In an org that already ran BarnCRM before this change, deploy it, then as admin open **BarnCRM Staff** and its record type settings. | **Household** is no longer listed; staff can still open and edit existing households. |
+| 11 | As admin, open the **BarnCRM Staff** permission set and its record type settings. | **Household** is not listed; staff can still open and edit households. |
 
 **Cleanup:** none (Households cannot be turned off).
 
@@ -297,29 +297,12 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 3 | Open the **Organizations** tab. | Accounts of the chosen record type are listed; households and person accounts are not. |
 | 4 | Open one of those organizations. | The **Affiliations** panel and the website show; no **Name and Greetings**, no **Members**, no **Erase Person**. |
 | 5 | Import a file with one person and the organization `Zztest Rt Org`. | `Zztest Rt Org` is created with the chosen record type (or none, for **No record type**) and appears on the **Organizations** tab. |
-| 6 | In an org with a second business record type, choose it in the setting and save. | Saved, and listed in **Recent Changes**. The **Organizations** tab now lists accounts of that record type instead. Open one: **Is Organization** is checked, and the **Affiliations** panel and website show, with Giving and Volunteers the organization sections too; an account of the first record type now shows **Is Organization** unchecked. |
+| 6 | In an org with a second business record type, choose it in the setting and save. | Saved, and listed in **Recent Changes**. The **Organizations** tab now lists accounts of that record type instead. Open one: **Is Organization** is checked, and the **Affiliations** panel and website show, with Fundraising and Volunteers the organization sections too; an account of the first record type now shows **Is Organization** unchecked. |
 | 7 | With that record type still chosen, import a file with one person and the organization `Zztest Rt Org 2`, give an organization an address in its billing fields, and load sample data in a sandbox without it. | `Zztest Rt Org 2` is created with that record type; the organization with the billing address gets a first address of type **Work**; sample data's organizations get that record type and the sample data count lists them. |
 | 8 | As a user whose profile and permission sets do not give that record type, import a file with two people: one at `Zztest Rt Org 2` (now in Salesforce) and one at the new organization `Zztest Rt Org 3`. | The first row loads, linked to `Zztest Rt Org 2`. The second is rejected with **This row's organization is not in Salesforce yet, and you cannot use the ... record type**, naming it by its label; the run log says no new organization was created for the same reason. `Zztest Rt Org 3` is not created. |
 | 9 | In the Platform-only org, choose **BarnCRM Organization** and save. Give it to your profile in Setup (Record Type Settings), then import a file with one person and the organization `Zztest Rt Org 4`. | Saved. `Zztest Rt Org 4` is created as **BarnCRM Organization** and is on the **Organizations** tab. Run **Health Check**: no **You Cannot Use the Record Type for Organizations**. |
 
 **Cleanup:** set the setting back to its first value (and take **BarnCRM Organization** off your profile); delete `Zztest Rt Org`, `Zztest Rt Org 4` and the imported people.
-
-## T-HH-20: An Org Already Running BarnCRM Keeps Its Organizations
-
-**Purpose:** after BarnCRM stops shipping its Organization record type, an org that ran an earlier version keeps its organizations once **Record type for organizations** is set.
-**Prerequisites:** admin; an org deployed before this change, with organizations and households (for example a test org with sample data).
-
-| Step | Action | Expected result |
-|---|---|---|
-| 1 | Before the deploy, open the **Organizations** tab and note how many records it lists. | A count to compare. |
-| 2 | Deploy this version. Open **BarnCRM Settings**, **General**. | **Record type for organizations** shows a record type, never blank. **No record type** is offered only when the org has no Account record type besides Household and person account ones. |
-| 3 | Set **Record type for organizations** to the record type your organizations use and save. | Saved, and listed in **Recent Changes**. |
-| 4 | Open the **Organizations** tab and the **Households** tab. | The Organizations tab lists the same records as in step 1; the Households tab lists the same records as before. |
-| 5 | As a staff user, open a household and an organization. | The same sections and panels as before (T-HH-13): the organization shows **Is Organization** checked, with the **Affiliations** panel. |
-| 6 | If step 3 kept **Organization**: before giving it to your profile, run **Health Check**, then load sample data. Then give **Organization** to your profile (Setup, Profiles, Record Type Settings) and run Health Check again. | Before: Health Check warns **You Cannot Use the Record Type for Organizations**, naming Organization, and **Load Sample Data** refuses with a message naming it. After: no such warning. |
-| 7 | If step 3 chose another record type: move any accounts still on **Organization** to it, then in Setup, Object Manager, Account, Record Types, deactivate **Organization**. Reopen **BarnCRM Settings**, **General**. | **Record type for organizations** still shows your choice, and Organization is no longer among its choices. The Organizations tab lists the same records as in step 1. |
-
-**Cleanup:** none.
 
 ## T-HH-21: Adopt NPSP Households
 
@@ -337,6 +320,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 7 | Edit one member's first name and save. Refresh the household. | BarnCRM does not rename it (Custom Name). NPSP does not rename it either; if NPSP does, record it as a defect with the NPSP version. |
 | 8 | Select **Undo This Adoption**, type N and select **Undo**. | **Last adoption** shows N undone. The couple's household has its NPSP record type again, Custom Name unticked, BarnCRM greetings and Primary Contact blank as before. |
 | 9 | As a user without **Manage BarnCRM Settings**, open **BarnCRM Settings**, **General**. | No **Adopt NPSP Households** section. |
+| 10 | After step 8, query `SELECT Kind__c, Status__c, Account_Id__c FROM Merge_Journal__c WHERE Kind__c = 'Household Adoption'` (N-11: adoption records are Admin Journal rows). | N rows, each Status **Undone** (or **Not Restored** with the reason in Notes). In an org that also has an auto-merge run, **Last adoption** still counts only adoption rows. |
 
 **Cleanup:** none after step 8.
 
@@ -358,17 +342,31 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 ## T-HH-23: Engagement Score
 
 **Purpose:** Confirm the engagement score is off until turned on, scores people nightly from the weights and targets, leaves out parts whose module is missing, and shows the meter ([Engagement Score](../admin-guide/engagement-score.md)).
-**Prerequisites:** admin; the nightly run scheduled; a person Ana with a task logged today. For step 4: Giving installed and a Received gift of 500 from Ana dated this month. A staff user (see [Test users](before-you-test.md#test-users)).
+**Prerequisites:** admin; the nightly run scheduled; a person Ana with a task logged today. For step 4: Fundraising installed and a Received gift of 500 from Ana dated this month. A staff user (see [Test users](before-you-test.md#test-users)).
 **Smoke:** no
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open Ana. In **BarnCRM Settings**, **People and Households**, **People**, look at the three engagement settings. | No **Engagement Score** meter on Ana. **Turn on engagement score** is off; the weights read `Gifts 40, Hours 25, Events 20, Activity 15` and the targets `Gifts 1000, Hours 40, Events 4, Activity 90, Months 12`. On **General**, the **Nightly Jobs** panel lists **Engagement Score** at 2:30 as Off. |
 | 2 | Turn on **Turn on engagement score** and save. | The **Nightly Jobs** panel shows **Engagement Score** On. Open Ana: the Engagement Score card says **Not scored yet** (no meter). |
-| 3 | In an org with no Giving, Volunteers or Event Management, wait for the nightly run (or run the step from the Developer Console: `Database.executeBatch(new EngagementScoreJob(), 200);`). Open Ana. | Ana's meter reads 100 (only Activity can be measured, and her activity is today) with today's date under **Scored On**. A person with no activity reads 0. |
-| 4 | With Giving installed, rescore. Open Ana. | Ana reads 64: Gifts 0.5 x 40 plus Activity 1 x 15, over 40 + 15. |
+| 3 | In an org with no Fundraising, Volunteers or Event Management, wait for the nightly run (or run the step from the Developer Console: `Database.executeBatch(new EngagementScoreJob(), 200);`). Open Ana. | Ana's meter reads 100 (only Activity can be measured, and her activity is today) with today's date under **Scored On**. A person with no activity reads 0. |
+| 4 | With Fundraising installed, rescore. Open Ana. | Ana reads 64: Gifts 0.5 x 40 plus Activity 1 x 15, over 40 + 15. |
 | 5 | Set the weights to `Gifts 0, Activity 10` and rescore. | Ana reads 100: Gifts weighs nothing, so the score is Activity alone. |
 | 6 | Log in as the staff user and open Ana. Try to edit **Engagement Score**. | The meter shows the same score; the field cannot be edited. |
 | 7 | As admin, turn the setting off and save. Open Ana. | No meter. The panel shows the step Off; tonight's run records it Skipped. |
 
 **Cleanup:** put the weights back to the default line; leave the setting off.
+
+## T-HH-24: Date Rules Use the Organization's Date
+
+**Purpose:** Confirm membership and address date rules read today in the organization's time zone, not the tester's (D-208, [Household Members](../admin-guide/household-members.md#what-it-does)).
+**Prerequisites:** admin in a test org nobody else is using; a household with two members, each with a membership record (flexible way of belonging); note the org's **Default Time Zone** (Setup, **Company Information**) and your own time zone (**Settings**, **Personal Information**) to put back afterwards.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Set the org's **Default Time Zone** to `(GMT+14:00) Line Islands Time (Pacific/Kiritimati)` and your own time zone to `(GMT-10:00) Hawaii-Aleutian Standard Time (Pacific/Honolulu)`. | Saved. The org's date is now always one day after your own. |
+| 2 | Open one member's membership record and set **End Date** to the org's date (your own tomorrow). Save, then open the household. | The person no longer shows as a current member: the membership ended today, org-wide. |
+| 3 | On the household's **Addresses** card add a new address with **Primary** ticked, a different place from the current one. | The old address reads **Former** with **End Date** the org's date, and the new one has **Start Date** the org's date (your own tomorrow), not your own date. |
+
+**Cleanup:** put the org's Default Time Zone and your own time zone back; end-date or delete the test membership and address as you left them.

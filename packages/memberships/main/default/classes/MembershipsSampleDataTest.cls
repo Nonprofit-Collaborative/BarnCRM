@@ -110,11 +110,7 @@ private class MembershipsSampleDataTest {
 				],
 				'Five levels'
 			);
-			Assert.areEqual(
-				11,
-				[SELECT COUNT() FROM Membership_Benefit__c WITH SYSTEM_MODE],
-				'Eleven benefits'
-			);
+			Assert.areEqual(11, [SELECT COUNT() FROM Membership_Benefit__c WITH SYSTEM_MODE], 'Eleven benefits');
 			Assert.areEqual(1, terms('Renewed'), 'One earlier term was renewed');
 			Assert.areEqual(1, terms('Grace'), 'One member is in grace');
 			Assert.areEqual(2, terms('Lapsed'), 'Two have lapsed');
@@ -191,16 +187,8 @@ private class MembershipsSampleDataTest {
 					WITH SYSTEM_MODE
 				]
 			);
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Membership_Term__c WITH SYSTEM_MODE],
-				'The real membership stays'
-			);
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Membership_Level__c WITH SYSTEM_MODE],
-				'The real level stays'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Membership_Term__c WITH SYSTEM_MODE], 'The real membership stays');
+			Assert.areEqual(1, [SELECT COUNT() FROM Membership_Level__c WITH SYSTEM_MODE], 'The real level stays');
 			Assert.areEqual(
 				0,
 				[SELECT COUNT() FROM Membership_Benefit__c WITH SYSTEM_MODE],
@@ -221,11 +209,7 @@ private class MembershipsSampleDataTest {
 				[SELECT COUNT() FROM Membership_Term__c WITH SYSTEM_MODE],
 				'No sample people or organizations, no memberships'
 			);
-			Assert.areEqual(
-				5,
-				[SELECT COUNT() FROM Membership_Level__c WITH SYSTEM_MODE],
-				'The levels still load'
-			);
+			Assert.areEqual(5, [SELECT COUNT() FROM Membership_Level__c WITH SYSTEM_MODE], 'The levels still load');
 		}
 	}
 }

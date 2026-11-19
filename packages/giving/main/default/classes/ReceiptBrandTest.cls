@@ -23,10 +23,7 @@ private class ReceiptBrandTest {
 		giving.Receipt_Numbering_Scope__c = scope;
 		upsert giving;
 		SettingsService.clearCaches();
-		Legal_Entity__c entity = new Legal_Entity__c(
-			Name = 'Barn Thrift LLC',
-			Tax_Id__c = '98-7654321'
-		);
+		Legal_Entity__c entity = new Legal_Entity__c(Name = 'Barn Thrift LLC', Tax_Id__c = '98-7654321');
 		insert entity;
 		Brand__c thrift = new Brand__c(
 			Name = 'Barn Thrift',
@@ -39,11 +36,7 @@ private class ReceiptBrandTest {
 	}
 
 	private static Gift__c gift(Id brandId) {
-		Contact donor = GivingTestDataFactory.insertHouseholdContact(
-			'The Lin Family',
-			'Wei',
-			'Lin'
-		);
+		Contact donor = GivingTestDataFactory.insertHouseholdContact('The Lin Family', 'Wei', 'Lin');
 		Gift__c record = ReceiptTestDataFactory.plainCashGift(donor.Id, 75, GIFT_DATE);
 		record.Brand__c = brandId;
 		insert record;
@@ -62,10 +55,7 @@ private class ReceiptBrandTest {
 			Test.stopTest();
 
 			String html = renderer.renderedHtml[renderer.renderedHtml.size() - 1];
-			Assert.isTrue(
-				receipt.Receipt_Number__c.startsWith('BT-2026-'),
-				'The brand series and prefix'
-			);
+			Assert.isTrue(receipt.Receipt_Number__c.startsWith('BT-2026-'), 'The brand series and prefix');
 			Assert.isTrue(html.contains('Barn Thrift LLC'), 'The legal entity receipts it');
 			Assert.isTrue(html.contains('98-7654321'), 'The entity tax ID');
 			Assert.isTrue(html.contains('Store Manager'), 'The brand signature');
@@ -102,11 +92,7 @@ private class ReceiptBrandTest {
 			Brand__c thrift = brandsOn('Organization');
 			Appeal__c appeal = new Appeal__c(Name = 'Spring Sale', Brand__c = thrift.Id);
 			insert appeal;
-			Contact donor = GivingTestDataFactory.insertHouseholdContact(
-				'The Ng Family',
-				'Kim',
-				'Ng'
-			);
+			Contact donor = GivingTestDataFactory.insertHouseholdContact('The Ng Family', 'Kim', 'Ng');
 			List<Gift__c> gifts = new List<Gift__c>();
 			for (Integer i = 0; i < 50; i++) {
 				Gift__c record = ReceiptTestDataFactory.plainCashGift(donor.Id, 10, GIFT_DATE);
@@ -143,10 +129,7 @@ private class ReceiptBrandTest {
 			);
 			Test.stopTest();
 
-			Assert.isFalse(
-				senders.containsKey(plain.Id),
-				'A gift with no brand keeps the From Address'
-			);
+			Assert.isFalse(senders.containsKey(plain.Id), 'A gift with no brand keeps the From Address');
 			Assert.areEqual(
 				setUp.isEmpty() ? null : setUp[0].Id,
 				senders.get(branded.Id),

@@ -30,10 +30,7 @@ private class OrgMetadataApiTest {
 				'MatchingRule',
 				new List<String>{
 					OrgMetadataApi.element('fullName', 'Contact.BarnCRM_People_Match') +
-					OrgMetadataApi.wrap(
-						'matchingRuleItems',
-						OrgMetadataApi.element('fieldName', 'A&B')
-					)
+					OrgMetadataApi.wrap('matchingRuleItems', OrgMetadataApi.element('fieldName', 'A&B'))
 				}
 			);
 			Test.stopTest();

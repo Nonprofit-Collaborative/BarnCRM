@@ -8,17 +8,11 @@
 )
 private class GiftAllocationControllerTest {
 	private static User david() {
-		return TestDataFactory.createUser(
-			'David',
-			new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' }
-		);
+		return TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' });
 	}
 
 	private static User jen() {
-		return TestDataFactory.createUser(
-			'Jen',
-			new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
-		);
+		return TestDataFactory.createUser('Jen', new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' });
 	}
 
 	@TestSetup
@@ -41,11 +35,7 @@ private class GiftAllocationControllerTest {
 	}
 
 	private static Gift__c gift(Decimal amount) {
-		Contact ana = GivingTestDataFactory.insertHouseholdContact(
-			'The Nolan Family',
-			'Ana',
-			'Nolan'
-		);
+		Contact ana = GivingTestDataFactory.insertHouseholdContact('The Nolan Family', 'Ana', 'Nolan');
 		Gift__c gift = GivingTestDataFactory.buildGift(ana.Id, amount);
 		insert gift;
 		return gift;
@@ -77,9 +67,7 @@ private class GiftAllocationControllerTest {
 			System.runAs(david()) {
 				Gift__c saved = gift(200);
 
-				GiftAllocationController.AllocationState state = GiftAllocationController.getState(
-					saved.Id
-				);
+				GiftAllocationController.AllocationState state = GiftAllocationController.getState(saved.Id);
 
 				Assert.areEqual(200, state.giftAmount);
 				Assert.areEqual(1, state.rows.size(), 'The default allocation');
@@ -103,10 +91,7 @@ private class GiftAllocationControllerTest {
 				Test.startTest();
 				GiftAllocationController.AllocationState state = GiftAllocationController.save(
 					saved.Id,
-					new List<GiftAllocationController.AllocationInput>{
-						input(building, 100),
-						input(general, 100)
-					}
+					new List<GiftAllocationController.AllocationInput>{ input(building, 100), input(general, 100) }
 				);
 				Test.stopTest();
 
@@ -231,10 +216,7 @@ private class GiftAllocationControllerTest {
 				Id general = defaultFund();
 				List<List<GiftAllocationController.AllocationInput>> splits = new List<List<GiftAllocationController.AllocationInput>>{
 					new List<GiftAllocationController.AllocationInput>{ input(null, 100) },
-					new List<GiftAllocationController.AllocationInput>{
-						input(general, 50),
-						input(general, 50)
-					},
+					new List<GiftAllocationController.AllocationInput>{ input(general, 50), input(general, 50) },
 					new List<GiftAllocationController.AllocationInput>{ input(general, 0) },
 					new List<GiftAllocationController.AllocationInput>()
 				};
@@ -263,28 +245,18 @@ private class GiftAllocationControllerTest {
 				Gift__c saved = gift(250);
 				GiftPostingService.markPosted(new Set<Id>{ saved.Id });
 
-				GiftAllocationController.AllocationState state = GiftAllocationController.getState(
-					saved.Id
-				);
+				GiftAllocationController.AllocationState state = GiftAllocationController.getState(saved.Id);
 				Assert.isFalse(state.canEdit, 'Posted');
-				Assert.areEqual(
-					BarnHelp.text('Giving', 'Giving_Posting_AllocationLocked'),
-					state.lockedMessage
-				);
+				Assert.areEqual(BarnHelp.text('Giving', 'Giving_Posting_AllocationLocked'), state.lockedMessage);
 
 				try {
 					GiftAllocationController.save(
 						saved.Id,
-						new List<GiftAllocationController.AllocationInput>{
-							input(fundNamed('Building Fund'), 250)
-						}
+						new List<GiftAllocationController.AllocationInput>{ input(fundNamed('Building Fund'), 250) }
 					);
 					Assert.fail('The lock refuses it');
 				} catch (AuraHandledException refused) {
-					Assert.areEqual(
-						BarnHelp.text('Giving', 'Giving_Posting_AllocationLocked'),
-						refused.getMessage()
-					);
+					Assert.areEqual(BarnHelp.text('Giving', 'Giving_Posting_AllocationLocked'), refused.getMessage());
 				}
 				Assert.areEqual(250, amountsByFund(saved.Id).get(defaultFund()), 'Unchanged');
 			}
@@ -298,10 +270,7 @@ private class GiftAllocationControllerTest {
 				GiftAllocationController.getState(null);
 				Assert.fail('No gift');
 			} catch (AuraHandledException refused) {
-				Assert.areEqual(
-					BarnHelp.text('Giving', 'Giving_Gift_OriginalNotFound'),
-					refused.getMessage()
-				);
+				Assert.areEqual(BarnHelp.text('Giving', 'Giving_Gift_OriginalNotFound'), refused.getMessage());
 			}
 		}
 	}

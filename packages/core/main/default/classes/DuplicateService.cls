@@ -19,6 +19,9 @@ public with sharing class DuplicateService {
 	public static final Integer MAX_RECORDS_PER_CALL = 50;
 
 	private static final String SEPARATOR = '-';
+	/** Duplicate Dismissal kinds: a person's dismissal, or the scan's reason for a suggestion. */
+	public static final String KIND_DISMISSAL = 'Dismissal';
+	public static final String KIND_MATCH_REASON = 'Match Reason';
 	private static final String CONTEXT_MATCH = 'Duplicate scan: asking the platform for matches';
 	private static final String CONTEXT_WRITE = 'Duplicate scan: recording a suggestion';
 
@@ -142,22 +145,14 @@ public with sharing class DuplicateService {
 			if (stubFails) {
 				throw new DuplicateException('Matcher failure simulated in a test.');
 			}
-			List<Datacloud.FindDuplicatesResult> results = Datacloud.FindDuplicatesByIds.findDuplicatesByIds(
-				recordIds
-			);
+			List<Datacloud.FindDuplicatesResult> results = Datacloud.FindDuplicatesByIds.findDuplicatesByIds(recordIds);
 			for (Integer index = 0; index < results.size() && index < recordIds.size(); index++) {
-				for (
-					Datacloud.DuplicateResult duplicateResult : results[index].getDuplicateResults()
-				) {
+				for (Datacloud.DuplicateResult duplicateResult : results[index].getDuplicateResults()) {
 					String ruleName = duplicateResult.getDuplicateRule();
 					for (Datacloud.MatchResult matchResult : duplicateResult.getMatchResults()) {
 						for (Datacloud.MatchRecord matched : matchResult.getMatchRecords()) {
 							SObject record = matched.getRecord();
-							if (
-								record != null &&
-								record.Id != null &&
-								record.Id.getSObjectType() == sourceType
-							) {
+							if (record != null && record.Id != null && record.Id.getSObjectType() == sourceType) {
 								found.add(new Pair(recordIds[index], record.Id, ruleName));
 							}
 						}
@@ -304,9 +299,7 @@ public with sharing class DuplicateService {
 		if (first == null || second == null) {
 			return false;
 		}
-		if (
-			sameValue(MatchSourceService.phone(first.Phone), MatchSourceService.phone(second.Phone))
-		) {
+		if (sameValue(MatchSourceService.phone(first.Phone), MatchSourceService.phone(second.Phone))) {
 			return true;
 		}
 		Boolean samePostal = sameValue(
@@ -317,15 +310,11 @@ public with sharing class DuplicateService {
 			MatchSourceService.street(first.BillingStreet),
 			MatchSourceService.street(second.BillingStreet)
 		);
-		Boolean sameCity = sameValue(
-			FuzzyMatch.normalize(first.BillingCity),
-			FuzzyMatch.normalize(second.BillingCity)
-		);
+		Boolean sameCity = sameValue(FuzzyMatch.normalize(first.BillingCity), FuzzyMatch.normalize(second.BillingCity));
 		if (sameStreet && (samePostal || sameCity)) {
 			return true;
 		}
-		return samePostal &&
-			sameValue(FuzzyMatch.normalize(first.Name), FuzzyMatch.normalize(second.Name));
+		return samePostal && sameValue(FuzzyMatch.normalize(first.Name), FuzzyMatch.normalize(second.Name));
 	}
 
 	/** Both filled in and exactly equal; a blank never matches a blank. */
@@ -381,16 +370,10 @@ public with sharing class DuplicateService {
 			List<DuplicateRecordItem> items = new List<DuplicateRecordItem>();
 			for (Integer index = 0; index < writable.size(); index++) {
 				items.add(
-					new DuplicateRecordItem(
-						DuplicateRecordSetId = sets[index].Id,
-						RecordId = writable[index].left
-					)
+					new DuplicateRecordItem(DuplicateRecordSetId = sets[index].Id, RecordId = writable[index].left)
 				);
 				items.add(
-					new DuplicateRecordItem(
-						DuplicateRecordSetId = sets[index].Id,
-						RecordId = writable[index].right
-					)
+					new DuplicateRecordItem(DuplicateRecordSetId = sets[index].Id, RecordId = writable[index].right)
 				);
 			}
 			Database.insert(items, AccessLevel.USER_MODE);
@@ -405,31 +388,42 @@ public with sharing class DuplicateService {
 	}
 
 	/**
-	 * A reason for each set a match source found (R-DP6). The reason only explains a
-	 * suggestion, so one the user may not write is left out rather than failing the pair.
+	 * A reason for each set a match source found (R-DP6): a Duplicate Dismissal row of Kind
+	 * Match Reason, keyed by the set. Best effort: a reason only explains a suggestion, so one
+	 * that cannot be written never fails the pair.
+	 *
+	 * System mode on purpose (ADR-0227): reasons share the dismissal
+	 * object, which only administrators may create, and the person whose scan wrote the
+	 * suggestion (in user mode, above) must still get its reason, as they did when reasons
+	 * had their own object. Nothing typed by a person reaches it: the text is the match
+	 * source's label and the key is the set just written; nothing else is elevated.
 	 */
 	private static void writeReasons(List<DuplicateRecordSet> sets, List<Pair> pairs) {
-		List<Duplicate_Reason__c> reasons = new List<Duplicate_Reason__c>();
+		List<Duplicate_Dismissal__c> reasons = new List<Duplicate_Dismissal__c>();
 		for (Integer index = 0; index < pairs.size(); index++) {
 			if (String.isNotBlank(pairs[index].reason)) {
 				reasons.add(
-					new Duplicate_Reason__c(
-						Set_Id__c = sets[index].Id,
+					new Duplicate_Dismissal__c(
+						Kind__c = KIND_MATCH_REASON,
+						Pair_Key__c = String.valueOf(sets[index].Id),
 						Reason__c = pairs[index].reason.left(255)
 					)
 				);
 			}
 		}
-		if (!reasons.isEmpty() && Schema.SObjectType.Duplicate_Reason__c.isCreateable()) {
-			Database.insert(reasons, false, AccessLevel.USER_MODE);
+		if (!reasons.isEmpty()) {
+			Database.insert(reasons, false, AccessLevel.SYSTEM_MODE);
 		}
 	}
 
-	/** Takes away the reasons of suggestions that are gone; best effort, like writing them. */
+	/**
+	 * Takes away the reasons of suggestions that are gone; best effort, like writing them, and
+	 * in system mode for the same reason: only Match Reason rows of these sets are read.
+	 */
 	private static void deleteReasons(Set<Id> setIds) {
-		List<Duplicate_Reason__c> reasons = DuplicateSelector.reasonRows(setIds);
-		if (!reasons.isEmpty() && Schema.SObjectType.Duplicate_Reason__c.isDeletable()) {
-			Database.delete(reasons, false, AccessLevel.USER_MODE);
+		List<Duplicate_Dismissal__c> reasons = DuplicateSelector.reasonRows(setIds);
+		if (!reasons.isEmpty()) {
+			Database.delete(reasons, false, AccessLevel.SYSTEM_MODE);
 		}
 	}
 
@@ -496,19 +490,15 @@ public with sharing class DuplicateService {
 		List<Duplicate_Dismissal__c> dismissals = new List<Duplicate_Dismissal__c>();
 		String cleanReason = String.isBlank(reason) ? null : reason.trim().left(255);
 		for (String key : keys) {
-			dismissals.add(new Duplicate_Dismissal__c(Pair_Key__c = key, Reason__c = cleanReason));
+			dismissals.add(
+				new Duplicate_Dismissal__c(Kind__c = KIND_DISMISSAL, Pair_Key__c = key, Reason__c = cleanReason)
+			);
 		}
 		Integer written = 0;
 		Savepoint beforeWrite = Database.setSavepoint();
 		try {
 			if (!dismissals.isEmpty()) {
-				for (
-					Database.SaveResult saved : Database.insert(
-						dismissals,
-						false,
-						AccessLevel.USER_MODE
-					)
-				) {
+				for (Database.SaveResult saved : Database.insert(dismissals, false, AccessLevel.USER_MODE)) {
 					if (saved.isSuccess()) {
 						written++;
 					} else {
@@ -552,9 +542,7 @@ public with sharing class DuplicateService {
 		if (duplicateRecordSetId == null) {
 			return;
 		}
-		List<DuplicateRecordSet> sets = DuplicateSelector.setsByIds(
-			new Set<Id>{ duplicateRecordSetId }
-		);
+		List<DuplicateRecordSet> sets = DuplicateSelector.setsByIds(new Set<Id>{ duplicateRecordSetId });
 		if (!sets.isEmpty()) {
 			Database.delete(sets, AccessLevel.USER_MODE);
 		}
@@ -568,29 +556,19 @@ public with sharing class DuplicateService {
 	 */
 	public static DuplicateRecordSet requireSet(Id duplicateRecordSetId) {
 		if (duplicateRecordSetId == null) {
-			throw new DuplicateException(
-				BarnHelp.text('Core', 'Core_Duplicates_ErrorNoSuggestion')
-			);
+			throw new DuplicateException(BarnHelp.text('Core', 'Core_Duplicates_ErrorNoSuggestion'));
 		}
-		List<DuplicateRecordSet> sets = DuplicateSelector.setsByIds(
-			new Set<Id>{ duplicateRecordSetId }
-		);
+		List<DuplicateRecordSet> sets = DuplicateSelector.setsByIds(new Set<Id>{ duplicateRecordSetId });
 		if (sets.isEmpty()) {
-			throw new DuplicateException(
-				BarnHelp.text('Core', 'Core_Duplicates_ErrorNoSuggestion')
-			);
+			throw new DuplicateException(BarnHelp.text('Core', 'Core_Duplicates_ErrorNoSuggestion'));
 		}
 		if (sets[0].DuplicateRecordItems.size() < 2) {
-			throw new DuplicateException(
-				BarnHelp.text('Core', 'Core_Duplicates_ErrorNotReviewable')
-			);
+			throw new DuplicateException(BarnHelp.text('Core', 'Core_Duplicates_ErrorNotReviewable'));
 		}
 		for (DuplicateRecordItem item : sets[0].DuplicateRecordItems) {
 			Schema.SObjectType itemType = item.RecordId.getSObjectType();
 			if (itemType != Contact.SObjectType && itemType != Account.SObjectType) {
-				throw new DuplicateException(
-					BarnHelp.text('Core', 'Core_Duplicates_ErrorNotReviewable')
-				);
+				throw new DuplicateException(BarnHelp.text('Core', 'Core_Duplicates_ErrorNotReviewable'));
 			}
 		}
 		return sets[0];

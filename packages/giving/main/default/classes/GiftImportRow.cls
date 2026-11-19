@@ -68,9 +68,7 @@ public with sharing class GiftImportRow {
 		'shares' => 'Stock'
 	};
 
-	private static final Pattern ISO_DATE = Pattern.compile(
-		'^(\\d{4})-(\\d{1,2})-(\\d{1,2})(?:[ T].*)?$'
-	);
+	private static final Pattern ISO_DATE = Pattern.compile('^(\\d{4})-(\\d{1,2})-(\\d{1,2})(?:[ T].*)?$');
 
 	/** One part of a split, or the single fund of a gift that is not split. */
 	public class Part {
@@ -174,11 +172,7 @@ public with sharing class GiftImportRow {
 
 	private void read() {
 		Boolean namesGift = names(ENTITY_GIFT);
-		carriesGift =
-			namesGift ||
-			names(ENTITY_ALLOCATION) ||
-			names(ENTITY_SOFT_CREDIT) ||
-			names(ENTITY_TRIBUTE);
+		carriesGift = namesGift || names(ENTITY_ALLOCATION) || names(ENTITY_SOFT_CREDIT) || names(ENTITY_TRIBUTE);
 		if (!carriesGift) {
 			return;
 		}
@@ -198,9 +192,7 @@ public with sharing class GiftImportRow {
 			readGiftValues();
 			if (values.get(Gift__c.Type__c) == null) {
 				// The gift's type is required, and a guessed one would be wrong on a receipt.
-				throw new GiftImportException(
-					BarnHelp.text('Giving', 'Giving_Import_ErrorTypeMissing')
-				);
+				throw new GiftImportException(BarnHelp.text('Giving', 'Giving_Import_ErrorTypeMissing'));
 			}
 			readAllocations();
 		} catch (GiftImportException unreadable) {
@@ -228,22 +220,15 @@ public with sharing class GiftImportRow {
 		Decimal parsed = parseAmount(text);
 		if (parsed == null) {
 			throw new GiftImportException(
-				String.format(
-					BarnHelp.text('Giving', 'Giving_Import_ErrorAmountUnreadable'),
-					new List<String>{ text }
-				)
+				String.format(BarnHelp.text('Giving', 'Giving_Import_ErrorAmountUnreadable'), new List<String>{ text })
 			);
 		}
 		readableAmount = parsed;
 		if (inKind && parsed != 0) {
-			throw new GiftImportException(
-				BarnHelp.text('Giving', 'Giving_Import_ErrorInKindAmount')
-			);
+			throw new GiftImportException(BarnHelp.text('Giving', 'Giving_Import_ErrorInKindAmount'));
 		}
 		if (!inKind && parsed <= 0) {
-			throw new GiftImportException(
-				BarnHelp.text('Giving', 'Giving_Import_ErrorAmountNotPositive')
-			);
+			throw new GiftImportException(BarnHelp.text('Giving', 'Giving_Import_ErrorAmountNotPositive'));
 		}
 		amount = parsed;
 	}
@@ -264,17 +249,12 @@ public with sharing class GiftImportRow {
 	private void readDate() {
 		String text = value(ENTITY_GIFT, 'Gift_Date__c');
 		if (text == null) {
-			throw new GiftImportException(
-				BarnHelp.text('Giving', 'Giving_Import_ErrorDateMissing')
-			);
+			throw new GiftImportException(BarnHelp.text('Giving', 'Giving_Import_ErrorDateMissing'));
 		}
 		giftDate = parseDate(text);
 		if (giftDate == null) {
 			throw new GiftImportException(
-				String.format(
-					BarnHelp.text('Giving', 'Giving_Import_ErrorDateUnreadable'),
-					new List<String>{ text }
-				)
+				String.format(BarnHelp.text('Giving', 'Giving_Import_ErrorDateUnreadable'), new List<String>{ text })
 			);
 		}
 	}
@@ -284,19 +264,14 @@ public with sharing class GiftImportRow {
 		if (text == null) {
 			return;
 		}
-		for (
-			String choice : new List<String>{ DONOR_CONTACT_1, DONOR_ORGANIZATION, DONOR_HOUSEHOLD }
-		) {
+		for (String choice : new List<String>{ DONOR_CONTACT_1, DONOR_ORGANIZATION, DONOR_HOUSEHOLD }) {
 			if (choice.equalsIgnoreCase(text.deleteWhitespace())) {
 				donorChoice = choice;
 				return;
 			}
 		}
 		throw new GiftImportException(
-			String.format(
-				BarnHelp.text('Giving', 'Giving_Import_ErrorDonorChoice'),
-				new List<String>{ text }
-			)
+			String.format(BarnHelp.text('Giving', 'Giving_Import_ErrorDonorChoice'), new List<String>{ text })
 		);
 	}
 
@@ -351,12 +326,8 @@ public with sharing class GiftImportRow {
 			String partAmount = value(ENTITY_ALLOCATION, ATTRIBUTE_AMOUNT + index);
 			String partPercent = value(ENTITY_ALLOCATION, ATTRIBUTE_PERCENT + index);
 			if (index == 1) {
-				partAmount = partAmount == null
-					? value(ENTITY_ALLOCATION, ATTRIBUTE_AMOUNT)
-					: partAmount;
-				partPercent = partPercent == null
-					? value(ENTITY_ALLOCATION, ATTRIBUTE_PERCENT)
-					: partPercent;
+				partAmount = partAmount == null ? value(ENTITY_ALLOCATION, ATTRIBUTE_AMOUNT) : partAmount;
+				partPercent = partPercent == null ? value(ENTITY_ALLOCATION, ATTRIBUTE_PERCENT) : partPercent;
 			}
 			if (fund == null && partAmount == null && partPercent == null) {
 				continue;
@@ -364,12 +335,8 @@ public with sharing class GiftImportRow {
 			Part part = new Part();
 			part.index = index;
 			part.fund = fund;
-			part.amount = partAmount == null
-				? null
-				: requireAmount(partAmount, ATTRIBUTE_AMOUNT + index);
-			part.percent = partPercent == null
-				? null
-				: requireAmount(partPercent, ATTRIBUTE_PERCENT + index);
+			part.amount = partAmount == null ? null : requireAmount(partAmount, ATTRIBUTE_AMOUNT + index);
+			part.percent = partPercent == null ? null : requireAmount(partPercent, ATTRIBUTE_PERCENT + index);
 			byIndex.put(index, part);
 		}
 		String single = value(ENTITY_ALLOCATION, ATTRIBUTE_FUND);
@@ -425,10 +392,7 @@ public with sharing class GiftImportRow {
 			throw new GiftImportException(
 				String.format(
 					BarnHelp.text('Giving', 'Giving_Import_ErrorSplitAmountsDiffer'),
-					new List<String>{
-						amountTotal.setScale(2).format(),
-						amount.setScale(2).format()
-					}
+					new List<String>{ amountTotal.setScale(2).format(), amount.setScale(2).format() }
 				)
 			);
 		}
@@ -468,8 +432,7 @@ public with sharing class GiftImportRow {
 			return null;
 		}
 		String cleaned = text.trim();
-		Boolean negative =
-			cleaned.startsWith('-') || (cleaned.startsWith('(') && cleaned.endsWith(')'));
+		Boolean negative = cleaned.startsWith('-') || (cleaned.startsWith('(') && cleaned.endsWith(')'));
 		cleaned = cleaned.replaceAll('[^0-9.]', '');
 		if (String.isBlank(cleaned) || cleaned.countMatches('.') > 1) {
 			return null;
@@ -518,9 +481,7 @@ public with sharing class GiftImportRow {
 				continue;
 			}
 			accepted.add(entry.getValue());
-			if (
-				entry.getValue().equalsIgnoreCase(text) || entry.getLabel().equalsIgnoreCase(text)
-			) {
+			if (entry.getValue().equalsIgnoreCase(text) || entry.getLabel().equalsIgnoreCase(text)) {
 				return entry.getValue();
 			}
 		}

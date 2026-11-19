@@ -8,9 +8,7 @@
  * gives them, never with a namespace written out. Every test that reads describe or records runs
  * as a minimal-profile user holding only BarnCRM Admin.
  */
-@IsTest(
-	testFor='ApexClass:ImportObjectSchema, ApexClass:ImportTemplateService, ApexClass:ImportController'
-)
+@IsTest(testFor='ApexClass:ImportObjectSchema, ApexClass:ImportTemplateService, ApexClass:ImportController')
 private class ImportSeveralObjectsSchemaTest {
 	private static final String ACCOUNT_NAME = String.valueOf(Account.SObjectType);
 	private static final String CONTACT_NAME = String.valueOf(Contact.SObjectType);
@@ -33,16 +31,8 @@ private class ImportSeveralObjectsSchemaTest {
 	private static ImportMapping mapping() {
 		ImportMapping mapping = new ImportMapping();
 		mapping.objects = new List<ImportMapping.ObjectStep>{
-			new ImportMapping.ObjectStep(
-				AFFILIATION_NAME,
-				ImportObjectSchema.OPERATION_INSERT,
-				null
-			),
-			new ImportMapping.ObjectStep(
-				ACCOUNT_NAME,
-				ImportObjectSchema.OPERATION_UPDATE_BY_FIELD,
-				'Name'
-			)
+			new ImportMapping.ObjectStep(AFFILIATION_NAME, ImportObjectSchema.OPERATION_INSERT, null),
+			new ImportMapping.ObjectStep(ACCOUNT_NAME, ImportObjectSchema.OPERATION_UPDATE_BY_FIELD, 'Name')
 		};
 		mapping.columns.add(new ImportMapping.Column('Org', ACCOUNT_NAME + '.Name'));
 		mapping.columns.add(new ImportMapping.Column('Role', AFFILIATION_NAME + '.Role__c'));
@@ -57,10 +47,7 @@ private class ImportSeveralObjectsSchemaTest {
 	}
 
 	private static String refused(Import_Template__c template) {
-		return ImportObjectSchema.refusal(
-			template,
-			ImportMapping.parse(template.Column_Mapping_JSON__c)
-		);
+		return ImportObjectSchema.refusal(template, ImportMapping.parse(template.Column_Mapping_JSON__c));
 	}
 
 	private static String labelOf(Schema.SObjectType type) {
@@ -129,10 +116,7 @@ private class ImportSeveralObjectsSchemaTest {
 				ImportMapping legacy = new ImportMapping();
 				legacy.columns.add(new ImportMapping.Column('Org', 'Record.Name'));
 				legacy.columns.add(new ImportMapping.Column('Role', 'Related.Role__c'));
-				Import_Template__c template = ImportTestDataFactory.template(
-					legacy.serialize(),
-					null
-				);
+				Import_Template__c template = ImportTestDataFactory.template(legacy.serialize(), null);
 				template.Target_Object__c = 'Account';
 				template.Load_Operation__c = ImportObjectSchema.OPERATION_UPDATE_BY_FIELD;
 				template.Load_Match_Field__c = 'Name';
@@ -171,11 +155,7 @@ private class ImportSeveralObjectsSchemaTest {
 			System.runAs(admin()) {
 				ImportMapping twice = mapping();
 				twice.objects.add(
-					new ImportMapping.ObjectStep(
-						ACCOUNT_NAME,
-						ImportObjectSchema.OPERATION_UPDATE,
-						null
-					)
+					new ImportMapping.ObjectStep(ACCOUNT_NAME, ImportObjectSchema.OPERATION_UPDATE, null)
 				);
 				ImportMapping deletes = mapping();
 				deletes.objects[0].operation = ImportObjectSchema.OPERATION_DELETE;
@@ -249,19 +229,13 @@ private class ImportSeveralObjectsSchemaTest {
 
 				Assert.isTrue(view.severalObjects, 'Several objects.');
 				// R-IT20: the Target Object is the first object listed, whatever the load order.
-				Assert.areEqual(
-					AFFILIATION_NAME,
-					view.targetObject,
-					'The first listed is the target.'
-				);
+				Assert.areEqual(AFFILIATION_NAME, view.targetObject, 'The first listed is the target.');
 				Assert.areEqual(
 					labelOf(Account.SObjectType) + ', ' + labelOf(Affiliation__c.SObjectType),
 					view.targetObjectLabel,
 					'What it loads, in load order.'
 				);
-				List<ImportController.SeveralObjectView> objects = ImportController.getSeveralObjects(
-					view.id
-				);
+				List<ImportController.SeveralObjectView> objects = ImportController.getSeveralObjects(view.id);
 				Assert.areEqual(2, objects.size(), 'Both, before any column is mapped.');
 				Assert.areEqual(ACCOUNT_NAME, objects[0].objectName, 'The parent first.');
 				Assert.areEqual(
@@ -269,10 +243,7 @@ private class ImportSeveralObjectsSchemaTest {
 					objects[0].operation,
 					'Organizations start on an update.'
 				);
-				Assert.isFalse(
-					objects[0].operations.contains(ImportObjectSchema.OPERATION_DELETE),
-					'Never a delete.'
-				);
+				Assert.isFalse(objects[0].operations.contains(ImportObjectSchema.OPERATION_DELETE), 'Never a delete.');
 				Assert.areEqual(1, objects[1].links.size(), 'The child says how it links.');
 				Assert.isFalse(objects[1].fields.isEmpty(), 'Its fields are offered.');
 				Assert.isTrue(
@@ -313,11 +284,7 @@ private class ImportSeveralObjectsSchemaTest {
 					)
 				);
 
-				Assert.areEqual(
-					ACCOUNT_NAME + '.Name',
-					suggested.columns[0].target,
-					'Its own object.'
-				);
+				Assert.areEqual(ACCOUNT_NAME + '.Name', suggested.columns[0].target, 'Its own object.');
 				Assert.areEqual(
 					AFFILIATION_NAME + '.' + String.valueOf(Affiliation__c.Role__c),
 					suggested.columns[1].target,

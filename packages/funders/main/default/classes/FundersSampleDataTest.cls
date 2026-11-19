@@ -20,9 +20,7 @@ private class FundersSampleDataTest {
 	/** The seven of Core's sample organizations the file names. */
 	private static void sampleOrganizations() {
 		List<Account> organizations = new List<Account>();
-		for (
-			String key : new List<String>{ 'O022', 'O014', 'O001', 'O006', 'O016', 'O003', 'O018' }
-		) {
+		for (String key : new List<String>{ 'O022', 'O014', 'O001', 'O006', 'O016', 'O003', 'O018' }) {
 			Account organization = (Account) TestDataFactory.pastDuplicateRules(
 				AccountKindsTestData.organization('Sample Org ' + key)
 			);
@@ -147,11 +145,7 @@ private class FundersSampleDataTest {
 			loadEverything();
 			Test.stopTest();
 
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Grant__c],
-				'No sample organizations, no grants'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Grant__c], 'No sample organizations, no grants');
 			Assert.isFalse(SampleDataFile.find(FILE).hasSampleRecords());
 		}
 	}

@@ -114,16 +114,8 @@ private class RollupTextListsTest {
 		Map<Id, Account> stored = reread(organizations);
 		for (Account organization : organizations) {
 			Account result = stored.get(organization.Id);
-			Assert.areEqual(
-				4,
-				result.NumberOfEmployees,
-				context + ': four titles, blanks not counted'
-			);
-			Assert.areEqual(
-				String.join(names, '; '),
-				result.Description,
-				context + ': every name, alphabetically'
-			);
+			Assert.areEqual(4, result.NumberOfEmployees, context + ': four titles, blanks not counted');
+			Assert.areEqual(String.join(names, '; '), result.Description, context + ': every name, alphabetically');
 			Assert.areEqual(
 				'Role 0, Role 1, Role 2, Role 3',
 				result.Preferred_Name__c,
@@ -156,15 +148,9 @@ private class RollupTextListsTest {
 			Account leaving = organizations[0];
 			Account joining = organizations[1];
 			List<Contact> staff = new List<Contact>{
-				TestDataFactory.person(
-					new Contact(LastName = 'Ames', Title = 'Role 1', AccountId = leaving.Id)
-				),
-				TestDataFactory.person(
-					new Contact(LastName = 'Baker', Title = 'Role 2', AccountId = leaving.Id)
-				),
-				TestDataFactory.person(
-					new Contact(LastName = 'Cole', Title = 'Role 2', AccountId = leaving.Id)
-				)
+				TestDataFactory.person(new Contact(LastName = 'Ames', Title = 'Role 1', AccountId = leaving.Id)),
+				TestDataFactory.person(new Contact(LastName = 'Baker', Title = 'Role 2', AccountId = leaving.Id)),
+				TestDataFactory.person(new Contact(LastName = 'Cole', Title = 'Role 2', AccountId = leaving.Id))
 			};
 			insert staff;
 
@@ -178,11 +164,7 @@ private class RollupTextListsTest {
 			Test.stopTest();
 
 			Assert.areEqual('Baker; Cole', afterMove.get(leaving.Id).Description, 'Ames moved out');
-			Assert.areEqual(
-				'Role 2',
-				afterMove.get(leaving.Id).Preferred_Name__c,
-				'Role 2 listed once'
-			);
+			Assert.areEqual('Role 2', afterMove.get(leaving.Id).Preferred_Name__c, 'Role 2 listed once');
 			Assert.areEqual(1, afterMove.get(leaving.Id).NumberOfEmployees, 'One title left');
 			Assert.areEqual('Ames', afterMove.get(joining.Id).Description, 'Ames moved in');
 			Account emptied = reread(organizations).get(leaving.Id);
@@ -227,21 +209,11 @@ private class RollupTextListsTest {
 			List<Account> organizations = organizations(1);
 			insert new List<Contact>{
 				TestDataFactory.person(
-					new Contact(
-						LastName = 'A',
-						Title = 'Chair, Board',
-						AccountId = organizations[0].Id
-					)
+					new Contact(LastName = 'A', Title = 'Chair, Board', AccountId = organizations[0].Id)
 				),
+				TestDataFactory.person(new Contact(LastName = 'B', Title = null, AccountId = organizations[0].Id)),
 				TestDataFactory.person(
-					new Contact(LastName = 'B', Title = null, AccountId = organizations[0].Id)
-				),
-				TestDataFactory.person(
-					new Contact(
-						LastName = 'C',
-						Title = 'Treasurer',
-						AccountId = organizations[0].Id
-					)
+					new Contact(LastName = 'C', Title = 'Treasurer', AccountId = organizations[0].Id)
 				)
 			};
 
@@ -250,12 +222,7 @@ private class RollupTextListsTest {
 				new Set<Id>{ organizations[0].Id },
 				new List<Rollup_Definition__c>{
 					definition('TEXT_LIST', 'Title', 'Description', RollupService.MODE_SCHEDULED),
-					definition(
-						'COUNT_DISTINCT',
-						'Title',
-						'NumberOfEmployees',
-						RollupService.MODE_SCHEDULED
-					)
+					definition('COUNT_DISTINCT', 'Title', 'NumberOfEmployees', RollupService.MODE_SCHEDULED)
 				}
 			);
 			Test.stopTest();
@@ -275,23 +242,12 @@ private class RollupTextListsTest {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			List<Account> organizations = organizations(1);
 			insert new List<Contact>{
-				TestDataFactory.person(
-					new Contact(LastName = 'Aaaaaaaaaa', AccountId = organizations[0].Id)
-				),
-				TestDataFactory.person(
-					new Contact(LastName = 'Bbbbbbbbbb', AccountId = organizations[0].Id)
-				),
-				TestDataFactory.person(
-					new Contact(LastName = 'Cccccccccc', AccountId = organizations[0].Id)
-				)
+				TestDataFactory.person(new Contact(LastName = 'Aaaaaaaaaa', AccountId = organizations[0].Id)),
+				TestDataFactory.person(new Contact(LastName = 'Bbbbbbbbbb', AccountId = organizations[0].Id)),
+				TestDataFactory.person(new Contact(LastName = 'Cccccccccc', AccountId = organizations[0].Id))
 			};
 			List<Rollup_Definition__c> definitions = new List<Rollup_Definition__c>{
-				definition(
-					'TEXT_LIST',
-					'LastName',
-					'Sample_Data_Key__c',
-					RollupService.MODE_SCHEDULED
-				)
+				definition('TEXT_LIST', 'LastName', 'Sample_Data_Key__c', RollupService.MODE_SCHEDULED)
 			};
 			Set<Id> ids = new Set<Id>{ organizations[0].Id };
 
@@ -342,20 +298,10 @@ private class RollupTextListsTest {
 					)
 				),
 				TestDataFactory.person(
-					new Contact(
-						LastName = 'Z',
-						Title = 'Silver',
-						Birthdate = start,
-						AccountId = organizationId
-					)
+					new Contact(LastName = 'Z', Title = 'Silver', Birthdate = start, AccountId = organizationId)
 				),
 				TestDataFactory.person(
-					new Contact(
-						LastName = 'V',
-						Title = 'Bronze',
-						Birthdate = null,
-						AccountId = organizationId
-					)
+					new Contact(LastName = 'V', Title = 'Bronze', Birthdate = null, AccountId = organizationId)
 				)
 			};
 			Rollup_Definition__c ordered = definition(
@@ -372,12 +318,7 @@ private class RollupTextListsTest {
 				new Set<Id>{ organizationId },
 				new List<Rollup_Definition__c>{
 					ordered,
-					definition(
-						'COUNT_DISTINCT',
-						'Title',
-						'NumberOfEmployees',
-						RollupService.MODE_SCHEDULED
-					)
+					definition('COUNT_DISTINCT', 'Title', 'NumberOfEmployees', RollupService.MODE_SCHEDULED)
 				}
 			);
 			Test.stopTest();
@@ -396,28 +337,15 @@ private class RollupTextListsTest {
 	static void aValueSharedByTwoHouseholdMembersIsCountedOnce() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			Account household = TestDataFactory.household(
-				new Account(
-					Name = 'Rivera Household',
-					RecordTypeId = HouseholdService.householdRecordTypeId()
-				)
+				new Account(Name = 'Rivera Household', RecordTypeId = HouseholdService.householdRecordTypeId())
 			);
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
 			insert new List<Contact>{
 				TestDataFactory.person(
-					new Contact(
-						LastName = 'Rivera',
-						FirstName = 'Ana',
-						Title = 'Gold',
-						AccountId = household.Id
-					)
+					new Contact(LastName = 'Rivera', FirstName = 'Ana', Title = 'Gold', AccountId = household.Id)
 				),
 				TestDataFactory.person(
-					new Contact(
-						LastName = 'Rivera',
-						FirstName = 'Luis',
-						Title = 'Gold',
-						AccountId = household.Id
-					)
+					new Contact(LastName = 'Rivera', FirstName = 'Luis', Title = 'Gold', AccountId = household.Id)
 				)
 			};
 			Rollup_Definition__c titles = definition(
@@ -436,10 +364,7 @@ private class RollupTextListsTest {
 			distinct.Relationship_Path__c = '{Household}';
 
 			Test.startTest();
-			RollupEngine.recalculate(
-				new Set<Id>{ household.Id },
-				new List<Rollup_Definition__c>{ titles, distinct }
-			);
+			RollupEngine.recalculate(new Set<Id>{ household.Id }, new List<Rollup_Definition__c>{ titles, distinct });
 			Test.stopTest();
 
 			Account stored = [
@@ -476,12 +401,7 @@ private class RollupTextListsTest {
 	@IsTest
 	static void aPipeAndACustomDelimiterJoinTheValues() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			Rollup_Definition__c custom = definition(
-				'TEXT_LIST',
-				'LastName',
-				'Description',
-				RollupService.MODE_BOTH
-			);
+			Rollup_Definition__c custom = definition('TEXT_LIST', 'LastName', 'Description', RollupService.MODE_BOTH);
 			custom.Delimiter__c = 'Custom';
 			custom.Custom_Delimiter__c = ' / ';
 
@@ -524,12 +444,7 @@ private class RollupTextListsTest {
 				new Set<Id>{ organizationId },
 				new List<Rollup_Definition__c>{
 					withDeleted,
-					definition(
-						'TEXT_LIST',
-						'LastName',
-						'Preferred_Name__c',
-						RollupService.MODE_SCHEDULED
-					)
+					definition('TEXT_LIST', 'LastName', 'Preferred_Name__c', RollupService.MODE_SCHEDULED)
 				}
 			);
 			Test.stopTest();
@@ -543,13 +458,7 @@ private class RollupTextListsTest {
 				new List<Rollup_Definition__c>{ withDeleted }
 			);
 			RollupAggregator.Answer answer = new RollupAggregator.Answer();
-			RollupAggregator.calculateRows(
-				plan,
-				0,
-				new Set<Id>{ organizationId },
-				new Set<Id>{ people[0].Id },
-				answer
-			);
+			RollupAggregator.calculateRows(plan, 0, new Set<Id>{ organizationId }, new Set<Id>{ people[0].Id }, answer);
 			Assert.isTrue(
 				answer.failed.contains(0),
 				'The large parent route leaves it out rather than miss the deleted rows'

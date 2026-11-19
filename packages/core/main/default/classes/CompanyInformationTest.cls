@@ -6,10 +6,7 @@ private class CompanyInformationTest {
 	}
 
 	private static void companyIs(String json) {
-		CompanyInformation.companyOverride = (Organization) System.JSON.deserialize(
-			json,
-			Organization.class
-		);
+		CompanyInformation.companyOverride = (Organization) System.JSON.deserialize(json, Organization.class);
 	}
 
 	@IsTest
@@ -24,11 +21,7 @@ private class CompanyInformationTest {
 
 			Assert.areEqual('Barn Rescue Inc', CompanyInformation.name(), 'Trimmed');
 			Assert.areEqual('12 Mill Road', parts.get('Organization_Street__c'), 'First line');
-			Assert.areEqual(
-				'Unit 4, Back Barn',
-				parts.get('Organization_Street_2__c'),
-				'The other lines'
-			);
+			Assert.areEqual('Unit 4, Back Barn', parts.get('Organization_Street_2__c'), 'The other lines');
 			Assert.areEqual('Springfield', parts.get('Organization_City__c'), 'City');
 			Assert.areEqual('IL', parts.get('Organization_State__c'), 'State');
 			Assert.areEqual('62701', parts.get('Organization_Postal_Code__c'), 'Postal code');

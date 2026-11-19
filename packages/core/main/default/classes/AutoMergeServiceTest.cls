@@ -21,9 +21,7 @@ private class AutoMergeServiceTest {
 	}
 
 	private static Contact person(String firstName, String email) {
-		return TestDataFactory.person(
-			new Contact(FirstName = firstName, LastName = 'Automerge', Email = email)
-		);
+		return TestDataFactory.person(new Contact(FirstName = firstName, LastName = 'Automerge', Email = email));
 	}
 
 	/** The person's live membership rows (empty outside junction mode). */
@@ -53,28 +51,17 @@ private class AutoMergeServiceTest {
 	}
 
 	private static Boolean isDeleted(Id contactId) {
-		return [SELECT IsDeleted FROM Contact WHERE Id = :contactId WITH SYSTEM_MODE ALL ROWS]
-		.IsDeleted;
+		return [SELECT IsDeleted FROM Contact WHERE Id = :contactId WITH SYSTEM_MODE ALL ROWS].IsDeleted;
 	}
 
 	@IsTest
 	static void exactNeedsTheSameNameAndTheRulesValue() {
 		System.runAs(TestUsers.admin()) {
 			Contact a = TestDataFactory.person(
-				new Contact(
-					FirstName = 'Ann',
-					LastName = 'Lee',
-					Email = 'ann@example.org',
-					Phone = '555-010-2000'
-				)
+				new Contact(FirstName = 'Ann', LastName = 'Lee', Email = 'ann@example.org', Phone = '555-010-2000')
 			);
 			Contact b = TestDataFactory.person(
-				new Contact(
-					FirstName = 'ann ',
-					LastName = 'LEE',
-					Email = 'ANN@example.org',
-					Phone = '(555) 010 2000'
-				)
+				new Contact(FirstName = 'ann ', LastName = 'LEE', Email = 'ANN@example.org', Phone = '(555) 010 2000')
 			);
 			Assert.isTrue(AutoMergeService.isExact(a, b, AutoMergeService.NAME_AND_EMAIL));
 			Assert.isTrue(AutoMergeService.isExact(a, b, AutoMergeService.NAME_AND_PHONE));
@@ -92,9 +79,7 @@ private class AutoMergeServiceTest {
 				AutoMergeService.isExact(a, b, AutoMergeService.NAME_AND_PHONE),
 				'Differing birthdates are never exact.'
 			);
-			Contact noFirst = TestDataFactory.person(
-				new Contact(LastName = 'Lee', Email = 'ann@example.org')
-			);
+			Contact noFirst = TestDataFactory.person(new Contact(LastName = 'Lee', Email = 'ann@example.org'));
 			Assert.isFalse(
 				AutoMergeService.isExact(noFirst, noFirst.clone(), AutoMergeService.NAME_AND_EMAIL),
 				'A first name is needed.'
@@ -152,11 +137,7 @@ private class AutoMergeServiceTest {
 			Contact other = person('Lou', 'LOU@example.org');
 			other.Title = 'Treasurer';
 			insertPerson(other);
-			Address__c work = new Address__c(
-				Contact__c = other.Id,
-				Type__c = 'Work',
-				Street__c = '9 Side St'
-			);
+			Address__c work = new Address__c(Contact__c = other.Id, Type__c = 'Work', Street__c = '9 Side St');
 			Database.insert(work, AccessLevel.SYSTEM_MODE);
 			AutoMergeService.pairsForTest = new List<List<Id>>{ new List<Id>{ kept.Id, other.Id } };
 			Set<Id> keptMemberships = membershipIds(kept.Id);
@@ -179,19 +160,13 @@ private class AutoMergeServiceTest {
 			Assert.areEqual(AutoMergeService.MERGED, journal.Status__c);
 			Assert.areEqual('run-1', journal.Run_Id__c);
 			Assert.isTrue(journal.Changed_Values__c.contains('Title'), journal.Changed_Values__c);
-			Assert.isTrue(
-				journal.Moved_Records__c.contains(String.valueOf(work.Id)),
-				journal.Moved_Records__c
-			);
+			Assert.isTrue(journal.Moved_Records__c.contains(String.valueOf(work.Id)), journal.Moved_Records__c);
 
 			Test.startTest();
 			AutoMergeService.undo(new List<Merge_Journal__c>{ journal });
 			Test.stopTest();
 
-			Assert.isFalse(
-				isDeleted(other.Id),
-				'Undo restores the same record from the Recycle Bin.'
-			);
+			Assert.isFalse(isDeleted(other.Id), 'Undo restores the same record from the Recycle Bin.');
 			Assert.isNull(
 				[SELECT Title FROM Contact WHERE Id = :kept.Id WITH SYSTEM_MODE].Title,
 				'The value goes back.'
@@ -219,8 +194,7 @@ private class AutoMergeServiceTest {
 	@IsTest
 	static void duplicateRecordItemsAreNotJournaledAsMovedRecords() {
 		System.runAs(TestUsers.admin()) {
-			Id ruleId = DuplicateSelector.activeRuleIdByObject(new Set<String>{ 'Contact' })
-				.get('Contact');
+			Id ruleId = DuplicateSelector.activeRuleIdByObject(new Set<String>{ 'Contact' }).get('Contact');
 			if (ruleId == null) {
 				return;
 			}
@@ -228,10 +202,7 @@ private class AutoMergeServiceTest {
 			Contact other = insertPerson(person('Mia', 'MIA@example.org'));
 			DuplicateRecordSet suggestion = new DuplicateRecordSet(DuplicateRuleId = ruleId);
 			insert suggestion;
-			insert new DuplicateRecordItem(
-				DuplicateRecordSetId = suggestion.Id,
-				RecordId = other.Id
-			);
+			insert new DuplicateRecordItem(DuplicateRecordSetId = suggestion.Id, RecordId = other.Id);
 			AutoMergeService.pairsForTest = new List<List<Id>>{ new List<Id>{ kept.Id, other.Id } };
 
 			AutoMergeService.mergeAll(AutoMergeService.candidates(), 'run-dri');
@@ -251,11 +222,7 @@ private class AutoMergeServiceTest {
 			Contact other = person('Max', 'max@example.org');
 			other.Title = 'Chair';
 			insertPerson(other);
-			Address__c work = new Address__c(
-				Contact__c = other.Id,
-				Type__c = 'Work',
-				Street__c = '1 Gone Rd'
-			);
+			Address__c work = new Address__c(Contact__c = other.Id, Type__c = 'Work', Street__c = '1 Gone Rd');
 			Database.insert(work, AccessLevel.SYSTEM_MODE);
 			AutoMergeService.pairsForTest = new List<List<Id>>{ new List<Id>{ kept.Id, other.Id } };
 			AutoMergeService.mergeAll(AutoMergeService.candidates(), 'run-2');
@@ -316,10 +283,7 @@ private class AutoMergeServiceTest {
 			kept = insertPerson(person('Ray', 'ray@example.org'));
 			other = insertPerson(person('Ray', 'ray@example.org'));
 		}
-		System.runAs(TestUsers.standardUserWith(
-			'Automergeless',
-			new List<String>{ 'BarnCRM_Read_Only' }
-		)) {
+		System.runAs(TestUsers.standardUserWith('Automergeless', new List<String>{ 'BarnCRM_Read_Only' })) {
 			AutoMergeService.pairsForTest = new List<List<Id>>{ new List<Id>{ kept.Id, other.Id } };
 			List<AutoMergeService.Candidate> found = AutoMergeService.candidates();
 			Integer merged = AutoMergeService.mergeAll(found, 'run-4');

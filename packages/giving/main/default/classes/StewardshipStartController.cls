@@ -34,9 +34,7 @@ public with sharing class StewardshipStartController {
 			StartModel model = new StartModel();
 			model.canStart = canStart();
 			model.plans = new List<PlanOption>();
-			for (
-				Stewardship_Plan_Template__c template : StewardshipSelector.selectManualTemplates()
-			) {
+			for (Stewardship_Plan_Template__c template : StewardshipSelector.selectManualTemplates()) {
 				PlanOption option = new PlanOption();
 				option.label = template.Name;
 				option.value = template.Id;
@@ -57,9 +55,7 @@ public with sharing class StewardshipStartController {
 	@AuraEnabled
 	public static Id startPlan(Id templateId, Id donorId) {
 		if (!canStart()) {
-			throw UserErrors.message(
-				BarnHelp.text('Giving', 'Giving_Stewardship_StartNoPermission')
-			);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_Stewardship_StartNoPermission'));
 		}
 		if (donorId == null) {
 			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_Stewardship_ErrorOneDonor'));
@@ -68,24 +64,15 @@ public with sharing class StewardshipStartController {
 		// The start runs in system mode, so the person must be able to see the donor first
 		// (2026-10-28 security review, G-L3). Anything but a person is read as an account.
 		if (!canSee(donorId, isPerson)) {
-			throw UserErrors.message(
-				BarnHelp.text('Giving', 'Giving_Stewardship_ErrorDonorNotVisible')
-			);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_Stewardship_ErrorDonorNotVisible'));
 		}
 		try {
-			return StewardshipService.start(
-					templateId,
-					isPerson ? donorId : null,
-					isPerson ? null : donorId
-				)
-				.Id;
+			return StewardshipService.start(templateId, isPerson ? donorId : null, isPerson ? null : donorId).Id;
 		} catch (StewardshipService.StewardshipException refused) {
 			throw UserErrors.message(refused.getMessage());
 		} catch (Exception failure) {
 			ErrorLogger.log(failure, CONTEXT, donorId);
-			throw UserErrors.message(
-				BarnHelp.text('Giving', 'Giving_Stewardship_ErrorActionFailed')
-			);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_Stewardship_ErrorActionFailed'));
 		}
 	}
 

@@ -44,7 +44,7 @@ usual reason to touch it, leaves every check running.
 
 To let your team see and manage relationships, make sure they have one of the packaged
 access levels (BarnCRM Admin or Team Member, or Fundraising Staff
-with Giving) on the **Access** page
+with Fundraising) on the **Access** page
 in BarnCRM Settings. Read Only users see relationships and cannot change them: the
 Relationships card shows them no **Add Relationship** button and no row menu. A line's menu
 offers **Edit** to people who can edit relationships, **End It** to people who can also edit
@@ -171,8 +171,6 @@ back on and the next save on a relationship brings its other side back into step
 also stop the mirroring for one relationship only, without changing the setting for everyone:
 clear **Keep both sides in step** on that one record.
 
-**Nothing mirrors and you never touched the setting.** In releases before v0.3 the setting
-could be stored as off without anyone switching it off, if BarnCRM Settings had been saved
-for some other reason. Open BarnCRM Settings, People and Households, Relationships box, and check that **Keep both
+**Nothing mirrors.** Open BarnCRM Settings, People and Households, Relationships box, and check that **Keep both
 sides of a relationship in step** is on. Relationships entered while it was off stayed one
 sided: re-save one and its other side is written.

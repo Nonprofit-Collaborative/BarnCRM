@@ -90,9 +90,7 @@ public with sharing class FundersBoardController {
 			' AND Decision_Date__c = THIS_FISCAL_YEAR AND Amount_Awarded__c > 0';
 
 		Map<String, String> sourceLabels = new Map<String, String>();
-		for (
-			Schema.PicklistEntry entry : Schema.SObjectType.Grant__c.fields.Funding_Source__c.getPicklistValues()
-		) {
+		for (Schema.PicklistEntry entry : Schema.SObjectType.Grant__c.fields.Funding_Source__c.getPicklistValues()) {
 			sourceLabels.put(entry.getValue(), entry.getLabel());
 		}
 		for (
@@ -170,9 +168,7 @@ public with sharing class FundersBoardController {
 					AccessLevel.USER_MODE
 				)
 			) {
-				board.givingByAccount.add(
-					new Slice(account.Id, (String) account.get('Name'), account.get(giving))
-				);
+				board.givingByAccount.add(new Slice(account.Id, (String) account.get('Name'), account.get(giving)));
 			}
 		}
 	}
@@ -185,15 +181,9 @@ public with sharing class FundersBoardController {
 	 */
 	@TestVisible
 	private static void restrictedFunds(Board board) {
-		Map<String, Object> binds = new Map<String, Object>{
-			'restrictedLimit' => RESTRICTED_LIMIT
-		};
+		Map<String, Object> binds = new Map<String, Object>{ 'restrictedLimit' => RESTRICTED_LIMIT };
 		Schema.SObjectType fund = fundObject();
-		if (
-			board.givingAvailable &&
-			readable(fund, 'Restricted__c') &&
-			readable(fund, 'Active__c')
-		) {
+		if (board.givingAvailable && readable(fund, 'Restricted__c') && readable(fund, 'Active__c')) {
 			String raised = NamespaceUtil.qualify('Total_Raised_This_Year__c');
 			for (
 				SObject row : Database.queryWithBinds(
@@ -210,15 +200,12 @@ public with sharing class FundersBoardController {
 					AccessLevel.USER_MODE
 				)
 			) {
-				board.restrictedFunds.add(
-					new Slice(row.Id, (String) row.get('Name'), row.get(raised))
-				);
+				board.restrictedFunds.add(new Slice(row.Id, (String) row.get('Name'), row.get(raised)));
 			}
 		}
 
 		if (
-			readable(Grant__c.SObjectType, 'Restricted__c') &&
-			readable(Grant__c.SObjectType, 'Restricted_Balance__c')
+			readable(Grant__c.SObjectType, 'Restricted__c') && readable(Grant__c.SObjectType, 'Restricted_Balance__c')
 		) {
 			board.ledgerAvailable = true;
 			String balance = NamespaceUtil.qualify('Restricted_Balance__c');
@@ -235,9 +222,7 @@ public with sharing class FundersBoardController {
 					AccessLevel.USER_MODE
 				)
 			) {
-				board.restrictedGrants.add(
-					new Slice(row.Id, (String) row.get('Name'), row.get(balance))
-				);
+				board.restrictedGrants.add(new Slice(row.Id, (String) row.get('Name'), row.get(balance)));
 			}
 		}
 	}

@@ -124,9 +124,7 @@ public with sharing class FundTriggerHandler extends TriggerHandler {
 		try {
 			SettingsService.saveValues(
 				'Giving_Settings__c',
-				new Map<String, Object>{
-					'Default_Fund__c' => fundId == null ? null : String.valueOf(fundId)
-				}
+				new Map<String, Object>{ 'Default_Fund__c' => fundId == null ? null : String.valueOf(fundId) }
 			);
 		} catch (Exception settingsError) {
 			ErrorLogger.log(settingsError, 'FundTriggerHandler.writeSettingsKey');

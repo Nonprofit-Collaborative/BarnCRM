@@ -25,11 +25,7 @@ private class TerritoryNightlyJobProviderTest {
 		System.runAs(TestUsers.adminWith('Territory_Admin')) {
 			Test.startTest();
 			new TerritoryNightlyJobProvider.Assign().execute(null);
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Territory_Run__c WITH SYSTEM_MODE],
-				'No rule, no run'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Territory_Run__c WITH SYSTEM_MODE], 'No rule, no run');
 			Territory__c north = new Territory__c(
 				Name = 'North',
 				Priority__c = 1,

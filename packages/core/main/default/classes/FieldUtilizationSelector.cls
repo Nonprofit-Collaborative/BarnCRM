@@ -24,13 +24,7 @@ public with sharing class FieldUtilizationSelector {
 	/** The object's rows from one save. */
 	public static List<Field_Utilization_Snapshot__c> rowsAt(String objectName, Datetime takenAt) {
 		return [
-			SELECT
-				Field_Name__c,
-				Field_Label__c,
-				Record_Type__c,
-				Filled_Count__c,
-				Record_Count__c,
-				Sampled__c
+			SELECT Field_Name__c, Field_Label__c, Record_Type__c, Filled_Count__c, Record_Count__c, Sampled__c
 			FROM Field_Utilization_Snapshot__c
 			WHERE Object_Name__c = :objectName AND Taken_At__c = :takenAt
 			WITH USER_MODE

@@ -29,7 +29,7 @@ Three things to hold on to, because they are the questions people ask first:
 
 Everything is in the app. You never open Setup.
 
-Open **BarnCRM Settings**, choose the **Giving** section, and open **Stewardship Plans**.
+Open **BarnCRM Settings**, choose the **Fundraising** section, and open **Stewardship Plans**.
 The page lists every plan you have written down, how many steps each one lays out, how many
 copies of it are running right now, and whether it is switched on.
 
@@ -77,12 +77,12 @@ Stewardship Plan**. The window lists every plan that is turned on, whatever star
 shows the description of the one chosen. Choose **Start Plan**. The plan is laid out at once
 and appears in the donor's **Stewardship Plans** list. A plan already running on that donor
 does not start a second time, and the window says so. Starting a plan needs create access to
-stewardship plans (Giving Staff or Giving Admin); a Giving Read Only user is told so and
+stewardship plans (Fundraising Staff Access or Fundraising Admin); a Fundraising Read Only user is told so and
 offered no **Start Plan**.
 
 ## A Five-Minute Walkthrough
 
-1. Open **BarnCRM Settings**, **Giving**, **Stewardship Plans**, and choose **New Plan**.
+1. Open **BarnCRM Settings**, **Fundraising**, **Stewardship Plans**, and choose **New Plan**.
    Call it "First gift welcome", started by **First gift**, no
    smallest gift. Leave **On** unchecked and save.
 2. Choose the plan in the list, then add three steps:

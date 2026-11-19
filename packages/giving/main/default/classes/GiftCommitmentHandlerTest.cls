@@ -14,9 +14,7 @@ private class GiftCommitmentHandlerTest {
 	}
 
 	private static Contact donor() {
-		Contact person = TestDataFactory.person(
-			new Contact(FirstName = 'Sarah', LastName = 'Nguyen')
-		);
+		Contact person = TestDataFactory.person(new Contact(FirstName = 'Sarah', LastName = 'Nguyen'));
 		insert person;
 		return person;
 	}
@@ -101,8 +99,7 @@ private class GiftCommitmentHandlerTest {
 
 			Test.startTest();
 			Id partial = GiftService.refund(gift.Id, 40, 'Part of it back');
-			String afterPartial = [SELECT Status__c FROM Installment__c WHERE Id = :first.Id]
-			.Status__c;
+			String afterPartial = [SELECT Status__c FROM Installment__c WHERE Id = :first.Id].Status__c;
 			GiftService.refund(gift.Id, 60, 'The rest back');
 			Test.stopTest();
 
@@ -187,19 +184,14 @@ private class GiftCommitmentHandlerTest {
 				byId.get(schedule[0].Id).Status__c,
 				'The payment the gift left goes back to Scheduled.'
 			);
-			Assert.areEqual(
-				'Paid',
-				byId.get(schedule[1].Id).Status__c,
-				'The payment the gift moved to is now paid.'
-			);
+			Assert.areEqual('Paid', byId.get(schedule[1].Id).Status__c, 'The payment the gift moved to is now paid.');
 		}
 	}
 
 	private static String statusOf(Id recordId) {
 		return recordId.getSObjectType() == Commitment__c.SObjectType
 			? [SELECT Status__c FROM Commitment__c WHERE Id = :recordId WITH SYSTEM_MODE].Status__c
-			: [SELECT Status__c FROM Installment__c WHERE Id = :recordId WITH SYSTEM_MODE]
-			  .Status__c;
+			: [SELECT Status__c FROM Installment__c WHERE Id = :recordId WITH SYSTEM_MODE].Status__c;
 	}
 
 	@IsTest

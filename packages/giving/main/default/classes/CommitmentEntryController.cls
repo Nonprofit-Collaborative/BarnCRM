@@ -86,10 +86,7 @@ public with sharing class CommitmentEntryController {
 		Defaults defaults = new Defaults();
 		defaults.canCreate = Schema.SObjectType.Commitment__c.isCreateable();
 		defaults.hasPersonAccounts = OrgShapeDetector.hasPersonAccounts();
-		for (
-			Schema.PicklistEntry entry : Commitment__c.Frequency__c.getDescribe()
-				.getPicklistValues()
-		) {
+		for (Schema.PicklistEntry entry : Commitment__c.Frequency__c.getDescribe().getPicklistValues()) {
 			if (entry.isActive()) {
 				defaults.frequencies.add(new Option(entry.getLabel(), entry.getValue()));
 				if (entry.isDefaultValue()) {
@@ -106,9 +103,7 @@ public with sharing class CommitmentEntryController {
 			defaults.donorKind = 'person';
 		} else if (context.getSObjectType() == Account.SObjectType) {
 			defaults.donorId = context;
-			defaults.donorKind = isPersonAccount(context, defaults.hasPersonAccounts)
-				? 'person'
-				: 'organization';
+			defaults.donorKind = isPersonAccount(context, defaults.hasPersonAccounts) ? 'person' : 'organization';
 		}
 		return defaults;
 	}
@@ -147,7 +142,7 @@ public with sharing class CommitmentEntryController {
 		}
 		try {
 			Commitment__c commitment = draftOrNull(input);
-			Database.insert(commitment, true, AccessLevel.USER_MODE);
+			insert as user commitment;
 			result.commitmentId = commitment.Id;
 			result.success = true;
 		} catch (DmlException refused) {
@@ -183,12 +178,7 @@ public with sharing class CommitmentEntryController {
 		) {
 			return BarnHelp.text('Giving', 'Giving_CommitmentNew_ErrorLastDate');
 		}
-		return CommitmentEntry.pledgeProblem(
-			input.total,
-			paymentsFor(input),
-			input.frequency,
-			input.startDate
-		);
+		return CommitmentEntry.pledgeProblem(input.total, paymentsFor(input), input.frequency, input.startDate);
 	}
 
 	/** The unsaved commitment the entries describe, or null while they are incomplete. */
@@ -201,10 +191,7 @@ public with sharing class CommitmentEntryController {
 		Id appealId = asId(input.appealId);
 		Id fundId = asId(input.fundId);
 		if (isRecurring(input)) {
-			if (
-				CommitmentEntry.recurringProblem(input.amount, input.frequency, input.startDate) !=
-				null
-			) {
+			if (CommitmentEntry.recurringProblem(input.amount, input.frequency, input.startDate) != null) {
 				return null;
 			}
 			return CommitmentEntry.recurring(
@@ -218,14 +205,7 @@ public with sharing class CommitmentEntryController {
 			);
 		}
 		Integer payments = paymentsFor(input);
-		if (
-			CommitmentEntry.pledgeProblem(
-				input.total,
-				payments,
-				input.frequency,
-				input.startDate
-			) != null
-		) {
+		if (CommitmentEntry.pledgeProblem(input.total, payments, input.frequency, input.startDate) != null) {
 			return null;
 		}
 		return CommitmentEntry.pledge(
@@ -245,11 +225,7 @@ public with sharing class CommitmentEntryController {
 		if (input.payments != null) {
 			return input.payments;
 		}
-		return CommitmentEntry.paymentsThrough(
-			input.frequency,
-			input.startDate,
-			input.lastPaymentDate
-		);
+		return CommitmentEntry.paymentsThrough(input.frequency, input.startDate, input.lastPaymentDate);
 	}
 
 	private static Boolean isRecurring(EntryInput input) {
@@ -262,9 +238,7 @@ public with sharing class CommitmentEntryController {
 	 * on; either way the donor is saved on Donor Account.
 	 */
 	private static Boolean isPersonAccount(Id accountId, Boolean hasPersonAccounts) {
-		Set<Id> personTypes = hasPersonAccounts
-			? OrgShapeDetector.personAccountRecordTypeIds()
-			: new Set<Id>();
+		Set<Id> personTypes = hasPersonAccounts ? OrgShapeDetector.personAccountRecordTypeIds() : new Set<Id>();
 		if (personTypes.isEmpty()) {
 			return false;
 		}

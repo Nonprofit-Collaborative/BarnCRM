@@ -16,10 +16,7 @@ private class JobNotifierTest {
 
 	/** Saves the org's settings with notifications on or off. */
 	private static void notifications(Boolean turnedOn) {
-		insert new BarnCRM_Settings__c(
-			SetupOwnerId = UserInfo.getOrganizationId(),
-			Job_Notifications__c = turnedOn
-		);
+		insert new BarnCRM_Settings__c(SetupOwnerId = UserInfo.getOrganizationId(), Job_Notifications__c = turnedOn);
 		SettingsService.clearCaches();
 	}
 
@@ -38,10 +35,7 @@ private class JobNotifierTest {
 			Assert.areEqual(record.Id, notice.targetId, 'Opening the record');
 			Assert.isNull(notice.section, 'And no settings page');
 			Assert.areEqual(
-				String.format(
-					System.Label.Core_JobNotice_Finished,
-					new List<Object>{ 'Bulk update' }
-				),
+				String.format(System.Label.Core_JobNotice_Finished, new List<Object>{ 'Bulk update' }),
 				notice.title,
 				'Saying what finished'
 			);
@@ -65,10 +59,7 @@ private class JobNotifierTest {
 			Assert.areEqual(1, JobNotifier.sent.size(), 'One notification');
 			JobNotifier.Notice notice = JobNotifier.sent[0];
 			Assert.areEqual(
-				String.format(
-					System.Label.Core_JobNotice_Stopped,
-					new List<Object>{ 'Rollup recalculation' }
-				),
+				String.format(System.Label.Core_JobNotice_Stopped, new List<Object>{ 'Rollup recalculation' }),
 				notice.title,
 				'Saying it did not finish'
 			);
@@ -98,13 +89,7 @@ private class JobNotifierTest {
 		System.runAs(TestUsers.admin()) {
 			SettingsService.clearCaches();
 
-			JobNotifier.aboutSettings(
-				UserInfo.getUserId(),
-				'Import',
-				false,
-				'Body',
-				JobNotifier.SECTION_GENERAL
-			);
+			JobNotifier.aboutSettings(UserInfo.getUserId(), 'Import', false, 'Body', JobNotifier.SECTION_GENERAL);
 
 			Assert.areEqual(1, JobNotifier.sent.size(), 'On by default (ADR-0035)');
 		}
@@ -115,13 +100,7 @@ private class JobNotifierTest {
 		System.runAs(TestUsers.admin()) {
 			notifications(false);
 
-			JobNotifier.aboutSettings(
-				UserInfo.getUserId(),
-				'Import',
-				false,
-				'Body',
-				JobNotifier.SECTION_GENERAL
-			);
+			JobNotifier.aboutSettings(UserInfo.getUserId(), 'Import', false, 'Body', JobNotifier.SECTION_GENERAL);
 
 			Assert.areEqual(0, JobNotifier.sent.size(), 'Turned off, nothing is sent');
 		}
@@ -144,13 +123,7 @@ private class JobNotifierTest {
 			notifications(true);
 			JobNotifier.typeName = 'No_Such_Notification_Type';
 
-			JobNotifier.aboutSettings(
-				UserInfo.getUserId(),
-				'Import',
-				false,
-				'Body',
-				JobNotifier.SECTION_GENERAL
-			);
+			JobNotifier.aboutSettings(UserInfo.getUserId(), 'Import', false, 'Body', JobNotifier.SECTION_GENERAL);
 
 			Assert.areEqual(0, JobNotifier.sent.size(), 'Nothing to send with');
 			Assert.areEqual(
@@ -168,13 +141,7 @@ private class JobNotifierTest {
 			JobNotifier.refuseNextSend = true;
 
 			Test.startTest();
-			JobNotifier.aboutSettings(
-				UserInfo.getUserId(),
-				'Import',
-				false,
-				'Body',
-				JobNotifier.SECTION_GENERAL
-			);
+			JobNotifier.aboutSettings(UserInfo.getUserId(), 'Import', false, 'Body', JobNotifier.SECTION_GENERAL);
 			Test.stopTest();
 
 			Assert.areEqual(1, JobNotifier.sent.size(), 'The send was tried');
@@ -193,14 +160,7 @@ private class JobNotifierTest {
 			Id target = UserInfo.getUserId();
 			Test.startTest();
 			JobNotifier.ownType('No_Such_Type', null, 'Title', 'Body', target, 'Own type test');
-			JobNotifier.ownType(
-				'No_Such_Type',
-				new Set<String>(),
-				'Title',
-				'Body',
-				target,
-				'Own type test'
-			);
+			JobNotifier.ownType('No_Such_Type', new Set<String>(), 'Title', 'Body', target, 'Own type test');
 			JobNotifier.ownType(
 				'No_Such_Type',
 				new Set<String>{ String.valueOf(target) },

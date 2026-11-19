@@ -58,7 +58,10 @@ import sys
 # AR-01b (release 1.19, D-172): 834 module messages moved to the help catalogs; lowered to the
 # merged total, 2,427. TARGET follows plan AR-01's expected suite of about 2,400.
 # W10: Programs_NightlyJobs_SchedulesName moved to the Programs help catalog; lowered to 2,426.
-BUDGET = 2426
+# N-09: raised by 1 for Mirror_Access_AddOnProviderRequests, the Access page sentence of the
+# Provider Requests set Mirror ships now that Salesforce Records Sync is Fundraising's
+# (an Access Add-On row names its sentence as a label, which AccessService reads by name).
+BUDGET = 2427
 TARGET = 2400
 LABEL_FILES = "packages/*/main/default/labels/*.labels-meta.xml"
 

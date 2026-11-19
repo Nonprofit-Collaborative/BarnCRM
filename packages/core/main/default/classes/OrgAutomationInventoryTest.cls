@@ -16,9 +16,7 @@ private class OrgAutomationInventoryTest {
 		return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
 	}
 
-	private static Map<String, OrgAutomationInventory.Row> byKey(
-		OrgAutomationInventory.Result result
-	) {
+	private static Map<String, OrgAutomationInventory.Row> byKey(OrgAutomationInventory.Result result) {
 		Map<String, OrgAutomationInventory.Row> found = new Map<String, OrgAutomationInventory.Row>();
 		for (OrgAutomationInventory.Row row : result.rows) {
 			found.put(row.key, row);
@@ -168,10 +166,7 @@ private class OrgAutomationInventoryTest {
 					refused = caught.getMessage();
 				}
 			}
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_AutomationInventory_NoPermission'),
-				refused
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_AutomationInventory_NoPermission'), refused);
 		}
 	}
 }

@@ -25,9 +25,7 @@ private class TriggerDispatcherPartialSaveTest {
 	private static List<Contact> people(List<String> lastNames) {
 		List<Contact> result = new List<Contact>();
 		for (String lastName : lastNames) {
-			result.add(
-				TestDataFactory.person(new Contact(FirstName = 'Test', LastName = lastName))
-			);
+			result.add(TestDataFactory.person(new Contact(FirstName = 'Test', LastName = lastName)));
 		}
 		return result;
 	}
@@ -52,9 +50,7 @@ private class TriggerDispatcherPartialSaveTest {
 		System.runAs(TestUsers.admin()) {
 			registerFailingHandler(false);
 			TestFailingHandler.failIn = 'before';
-			List<Contact> batch = people(
-				new List<String>{ 'Avery', 'Blake', 'Refuse Casey', 'Drew', 'Emery' }
-			);
+			List<Contact> batch = people(new List<String>{ 'Avery', 'Blake', 'Refuse Casey', 'Drew', 'Emery' });
 
 			Test.startTest();
 			List<Database.SaveResult> results = Database.insert(batch, false);
@@ -91,9 +87,7 @@ private class TriggerDispatcherPartialSaveTest {
 				[
 					SELECT COUNT()
 					FROM Error_Log__c
-					WHERE
-						Context__c = 'Trigger dispatch: Contact'
-						AND Severity__c = :ErrorLogger.SEVERITY_WARNING
+					WHERE Context__c = 'Trigger dispatch: Contact' AND Severity__c = :ErrorLogger.SEVERITY_WARNING
 					WITH SYSTEM_MODE
 				],
 				'The refused record is logged by its row.'
@@ -106,9 +100,7 @@ private class TriggerDispatcherPartialSaveTest {
 		System.runAs(TestUsers.admin()) {
 			registerFailingHandler(false);
 			TestFailingHandler.failIn = 'after';
-			List<Contact> batch = people(
-				new List<String>{ 'Avery', 'Refuse Blake', 'Casey', 'Drew', 'Refuse Emery' }
-			);
+			List<Contact> batch = people(new List<String>{ 'Avery', 'Refuse Blake', 'Casey', 'Drew', 'Refuse Emery' });
 
 			Test.startTest();
 			List<Database.SaveResult> results = Database.insert(batch, false);
@@ -144,9 +136,7 @@ private class TriggerDispatcherPartialSaveTest {
 		System.runAs(TestUsers.admin()) {
 			registerFailingHandler(false);
 			TestFailingHandler.failIn = 'before';
-			List<Contact> batch = people(
-				new List<String>{ 'Avery', 'Blake', 'Casey', 'Refuse Drew' }
-			);
+			List<Contact> batch = people(new List<String>{ 'Avery', 'Blake', 'Casey', 'Refuse Drew' });
 			DmlException refused;
 
 			Test.startTest();
@@ -179,11 +169,7 @@ private class TriggerDispatcherPartialSaveTest {
 				failures(results),
 				'An integrity rule that could not be checked lets no record through.'
 			);
-			Assert.areEqual(
-				1,
-				TestFailingHandler.attempts,
-				'A failing always-run rule is not run again to narrow it.'
-			);
+			Assert.areEqual(1, TestFailingHandler.attempts, 'A failing always-run rule is not run again to narrow it.');
 		}
 	}
 
@@ -214,17 +200,10 @@ private class TriggerDispatcherPartialSaveTest {
 			TestFailingHandler.failIn = 'after';
 
 			Test.startTest();
-			List<Database.SaveResult> results = Database.insert(
-				people(new List<String>{ 'Refuse Avery' }),
-				false
-			);
+			List<Database.SaveResult> results = Database.insert(people(new List<String>{ 'Refuse Avery' }), false);
 			Test.stopTest();
 
-			Assert.areEqual(
-				1,
-				failures(results),
-				'The one record is refused, in an after context.'
-			);
+			Assert.areEqual(1, failures(results), 'The one record is refused, in an after context.');
 			Assert.areEqual(
 				2,
 				TestFailingHandler.attempts,

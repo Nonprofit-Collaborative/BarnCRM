@@ -25,10 +25,7 @@ private class HubPolicyTest {
 	}
 
 	private static User staffer() {
-		return TestUsers.standardUserWith(
-			'Sam',
-			new List<String>{ 'BarnCRM_Staff', 'Corporate_Hub_Staff' }
-		);
+		return TestUsers.standardUserWith('Sam', new List<String>{ 'BarnCRM_Staff', 'Corporate_Hub_Staff' });
 	}
 
 	private static List<Policy_Acknowledgment__c> requests(Id documentId) {
@@ -59,11 +56,7 @@ private class HubPolicyTest {
 		System.runAs(sam) {
 			List<Policy_Acknowledgment__c> mine = HubPolicy.myRequests();
 			Assert.areEqual(1, mine.size(), 'Sam sees his own request');
-			Assert.areEqual(
-				Date.today().addDays(30),
-				mine[0].Due_Date__c,
-				'Due in the shipped 30 days'
-			);
+			Assert.areEqual(Date.today().addDays(30), mine[0].Due_Date__c, 'Due in the shipped 30 days');
 			HubPolicy.acknowledge(mine[0].Id);
 			Assert.areEqual(0, HubPolicy.myRequests().size(), 'Nothing left to read');
 			try {
@@ -147,20 +140,12 @@ private class HubPolicyTest {
 
 			HubPolicy.markReviewed(document.Id);
 			Hub_Document__c reviewed = HubPolicy.document(document.Id);
-			Assert.areEqual(
-				Date.today().addMonths(24),
-				reviewed.Review_Date__c,
-				'Next review in 24 months'
-			);
+			Assert.areEqual(Date.today().addMonths(24), reviewed.Review_Date__c, 'Next review in 24 months');
 
 			HubPolicy.retire(document.Id);
 			Assert.areEqual('Retired', HubPolicy.document(document.Id).Status__c, 'Retired');
 			for (Policy_Acknowledgment__c row : requests(document.Id)) {
-				Assert.areEqual(
-					HubPolicy.SUPERSEDED,
-					row.Status__c,
-					'A retired policy asks no one'
-				);
+				Assert.areEqual(HubPolicy.SUPERSEDED, row.Status__c, 'A retired policy asks no one');
 			}
 		}
 	}
@@ -168,16 +153,9 @@ private class HubPolicyTest {
 	@IsTest
 	static void aPublicGroupNarrowsWhoIsAsked() {
 		User sam = staffer();
-		User outsider = TestUsers.standardUserWith(
-			'Riley',
-			new List<String>{ 'Corporate_Hub_Staff' }
-		);
+		User outsider = TestUsers.standardUserWith('Riley', new List<String>{ 'Corporate_Hub_Staff' });
 		System.runAs(TestUsers.adminWith(ADMIN_SET)) {
-			Group board = new Group(
-				Name = 'Hub Test Board',
-				DeveloperName = 'Hub_Test_Board',
-				Type = 'Regular'
-			);
+			Group board = new Group(Name = 'Hub Test Board', DeveloperName = 'Hub_Test_Board', Type = 'Regular');
 			insert board;
 			insert new GroupMember(GroupId = board.Id, UserOrGroupId = sam.Id);
 		}

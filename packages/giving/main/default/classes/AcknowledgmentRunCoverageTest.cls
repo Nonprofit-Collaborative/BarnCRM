@@ -37,12 +37,7 @@ private class AcknowledgmentRunCoverageTest {
 	}
 
 	private static void letterRule() {
-		insert AcknowledgmentTestData.buildRule(
-			'Letters',
-			100,
-			AcknowledgmentRuleService.CHANNEL_LETTER,
-			null
-		);
+		insert AcknowledgmentTestData.buildRule('Letters', 100, AcknowledgmentRuleService.CHANNEL_LETTER, null);
 	}
 
 	private static List<Gift__c> giftsFor(Contact donor, Integer howMany) {
@@ -108,18 +103,10 @@ private class AcknowledgmentRunCoverageTest {
 			batch.finish(null);
 			Test.stopTest();
 
-			Assert.areEqual(
-				TWO_HUNDRED,
-				midway.Gifts_Processed__c,
-				'Progress is saved after each chunk'
-			);
+			Assert.areEqual(TWO_HUNDRED, midway.Gifts_Processed__c, 'Progress is saved after each chunk');
 			Assert.areEqual(TWO_HUNDRED, sender.received.size(), 'Every gift got its message');
 			Acknowledgment_Run__c done = reload(run.Id);
-			Assert.areEqual(
-				AcknowledgmentRunService.STATUS_COMPLETED,
-				done.Status__c,
-				'The run completed'
-			);
+			Assert.areEqual(AcknowledgmentRunService.STATUS_COMPLETED, done.Status__c, 'The run completed');
 			Assert.areEqual(TWO_HUNDRED, done.Acknowledgments_Sent__c, 'All 200 were sent');
 			Assert.areEqual(0, done.Errors__c, 'With no errors');
 			Assert.isNotNull(done.Finished__c, 'And a finish time');
@@ -178,9 +165,7 @@ private class AcknowledgmentRunCoverageTest {
 					} else if (attempt == 1) {
 						AcknowledgmentRunService.runLetterMerge();
 					} else {
-						AcknowledgmentRunService.markLetterRunSent(
-							FakeIds.of(Acknowledgment_Run__c.SObjectType, 1)
-						);
+						AcknowledgmentRunService.markLetterRunSent(FakeIds.of(Acknowledgment_Run__c.SObjectType, 1));
 					}
 				} catch (AcknowledgmentService.AcknowledgmentException expected) {
 					Assert.areEqual(
@@ -191,11 +176,7 @@ private class AcknowledgmentRunCoverageTest {
 				}
 			}
 			Assert.areEqual(3, refused, 'Each of the three entry points names the permission');
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Acknowledgment_Run__c],
-				'And no run was recorded'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Acknowledgment_Run__c], 'And no run was recorded');
 		}
 	}
 
@@ -209,11 +190,7 @@ private class AcknowledgmentRunCoverageTest {
 			started = AcknowledgmentRunService.startEmailRun();
 			Test.stopTest();
 
-			Assert.areEqual(
-				AcknowledgmentRunService.STATUS_RUNNING,
-				started.Status__c,
-				'It starts running'
-			);
+			Assert.areEqual(AcknowledgmentRunService.STATUS_RUNNING, started.Status__c, 'It starts running');
 			Assert.isNotNull(started.Async_Job_Id__c, 'With the job that does the sending');
 			Acknowledgment_Run__c done = reload(started.Id);
 			Assert.areEqual(
@@ -234,11 +211,7 @@ private class AcknowledgmentRunCoverageTest {
 			Acknowledgment_Run__c run = AcknowledgmentRunService.runLetterMerge();
 			Test.stopTest();
 
-			Assert.areEqual(
-				AcknowledgmentRunService.STATUS_COMPLETED,
-				run.Status__c,
-				'Nothing to merge'
-			);
+			Assert.areEqual(AcknowledgmentRunService.STATUS_COMPLETED, run.Status__c, 'Nothing to merge');
 			Assert.isNull(run.Merge_File_Document_Id__c, 'So there is no file');
 		}
 	}
@@ -265,11 +238,7 @@ private class AcknowledgmentRunCoverageTest {
 
 			Acknowledgment_Run__c settled = AcknowledgmentRunService.markLetterRunSent(run.Id);
 
-			Assert.areEqual(
-				AcknowledgmentRunService.STATUS_COMPLETED,
-				settled.Status__c,
-				'Marked sent'
-			);
+			Assert.areEqual(AcknowledgmentRunService.STATUS_COMPLETED, settled.Status__c, 'Marked sent');
 			Assert.areEqual(
 				TWO_HUNDRED,
 				[
@@ -334,9 +303,7 @@ private class AcknowledgmentRunCoverageTest {
 			String notWaiting;
 
 			try {
-				AcknowledgmentRunService.markLetterRunSent(
-					FakeIds.of(Acknowledgment_Run__c.SObjectType, 7)
-				);
+				AcknowledgmentRunService.markLetterRunSent(FakeIds.of(Acknowledgment_Run__c.SObjectType, 7));
 			} catch (AcknowledgmentRunService.AcknowledgmentRunException refused) {
 				missing = refused.getMessage();
 			}
@@ -346,11 +313,7 @@ private class AcknowledgmentRunCoverageTest {
 				notWaiting = refused.getMessage();
 			}
 
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_Acknowledgment_RunNotFound'),
-				missing,
-				'No such run'
-			);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Acknowledgment_RunNotFound'), missing, 'No such run');
 			Assert.areEqual(
 				BarnHelp.text('Giving', 'Giving_Acknowledgment_RunNotWaiting'),
 				notWaiting,
@@ -369,11 +332,7 @@ private class AcknowledgmentRunCoverageTest {
 			Assert.areEqual(10, progress.Gifts_Processed__c, 'Processed so far');
 			Assert.areEqual(8, progress.Acknowledgments_Sent__c, 'Sent so far');
 			Assert.areEqual(2, progress.Errors__c, 'Errors so far');
-			Assert.areEqual(
-				AcknowledgmentRunService.STATUS_RUNNING,
-				progress.Status__c,
-				'Still running'
-			);
+			Assert.areEqual(AcknowledgmentRunService.STATUS_RUNNING, progress.Status__c, 'Still running');
 
 			AcknowledgmentRunService.finish(run.Id, 10, 10, 0);
 			Assert.areEqual(
@@ -427,9 +386,7 @@ private class AcknowledgmentRunCoverageTest {
 			AcknowledgmentTestData.enable();
 
 			Test.startTest();
-			AcknowledgmentController.PageView switchedOn = AcknowledgmentController.setSchedule(
-				true
-			);
+			AcknowledgmentController.PageView switchedOn = AcknowledgmentController.setSchedule(true);
 			AcknowledgmentController.PageView again = AcknowledgmentController.setSchedule(true);
 			Assert.isTrue(switchedOn.scheduled, 'The nightly job is scheduled');
 			Assert.isNotNull(switchedOn.nextRunAt, 'With a next run to show');
@@ -444,9 +401,7 @@ private class AcknowledgmentRunCoverageTest {
 				'And only one nightly run'
 			);
 			AcknowledgmentController.PageView off = AcknowledgmentController.setSchedule(false);
-			AcknowledgmentController.PageView offAgain = AcknowledgmentController.setSchedule(
-				false
-			);
+			AcknowledgmentController.PageView offAgain = AcknowledgmentController.setSchedule(false);
 			Test.stopTest();
 
 			Assert.isFalse(off.scheduled, 'Switched off');
@@ -463,21 +418,13 @@ private class AcknowledgmentRunCoverageTest {
 			Test.startTest();
 			new AcknowledgmentScheduler().execute(null);
 			Test.stopTest();
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Acknowledgment_Run__c],
-				'Switched on: a run starts'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Acknowledgment_Run__c], 'Switched on: a run starts');
 
 			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 			settings.Acknowledgments_Enabled__c = false;
 			upsert settings;
 			new AcknowledgmentScheduler().execute(null);
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Acknowledgment_Run__c],
-				'Switched off: nothing new'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Acknowledgment_Run__c], 'Switched off: nothing new');
 		}
 	}
 
@@ -491,11 +438,7 @@ private class AcknowledgmentRunCoverageTest {
 			new AcknowledgmentScheduler().execute(null);
 			Test.stopTest();
 
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Acknowledgment_Run__c],
-				'Nothing started and nothing thrown'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Acknowledgment_Run__c], 'Nothing started and nothing thrown');
 		}
 	}
 
@@ -511,9 +454,7 @@ private class AcknowledgmentRunCoverageTest {
 				messages.add(refused.getMessage());
 			}
 			try {
-				AcknowledgmentController.markLettersSent(
-					FakeIds.of(Acknowledgment_Run__c.SObjectType, 1)
-				);
+				AcknowledgmentController.markLettersSent(FakeIds.of(Acknowledgment_Run__c.SObjectType, 1));
 			} catch (AuraHandledException refused) {
 				messages.add(refused.getMessage());
 			}

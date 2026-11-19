@@ -3,6 +3,7 @@ import { NavigationMixin } from 'lightning/navigation';
 import getSettingsLink from '@salesforce/apex/SettingsController.getSettingsLink';
 import getState from '@salesforce/apex/ModuleManagerController.getState';
 import HEADING from '@salesforce/label/c.Core_HubModules_Title';
+import BETA from '@salesforce/label/c.Core_ModuleManager_Beta';
 import LINK from '@salesforce/label/c.Core_HubModules_ManagerLink';
 // Every module on this card is installed, so the badge says only On or Off: "Installed and off"
 // read as "Installed" at a glance (owner QA, 2026-11-05).
@@ -33,8 +34,8 @@ function logoUrl(name) {
 
 // A module with no logo shows its main tab's icon, so the icon here matches the tab (D-170):
 // Portal Builder its Portals tab, Contact Point Sync its page tab, Payments its Payments tab,
-// Memberships its Memberships tab, Project Management its Projects Home tab, Address Verification its setup page tab.
-// Others keep the apps icon.
+// Memberships its Memberships tab, Project Management its Projects Home tab, Address Verification its setup page tab,
+// Advanced Reporting its Advanced Reporting tab. Others keep the apps icon.
 const FALLBACK_TABS = {
   Portal: 'Portal__c',
   ContactPoints: 'Contact_Point_Sync',
@@ -45,7 +46,8 @@ const FALLBACK_TABS = {
   Territory: 'Territory_Management',
   Memberships: 'Membership_Term__c',
   Projects: 'Projects_Home',
-  AddressVerification: 'Address_Verification_Setup'
+  AddressVerification: 'Address_Verification_Setup',
+  Reporting: 'Advanced_Reporting'
 };
 const DEFAULT_ICON = 'standard:apps';
 
@@ -61,7 +63,7 @@ function fallbackIcon(name) {
 export default class HubModules extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded('Core');
 
-  labels = { heading: HEADING, link: LINK, openApp: OPEN_APP };
+  labels = { heading: HEADING, link: LINK, openApp: OPEN_APP, beta: BETA };
 
   rows = [];
   errorMessage;
@@ -80,6 +82,7 @@ export default class HubModules extends NavigationMixin(LightningElement) {
         .map((module) => ({
           name: module.name,
           displayName: module.label || module.name,
+          beta: module.beta === true,
           appUrl: module.appUrl,
           logoUrl: logoUrl(module.name),
           fallbackIcon: fallbackIcon(module.name),

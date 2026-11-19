@@ -73,10 +73,10 @@ Checked 2026-11-12 (D-200, N12). Every callout site, its endpoint and how it is 
 
 | Site (`setEndpoint`) | Endpoint | Allowed by | Credential |
 |---|---|---|---|
-| `PaymentStripe.cls:96` | `https://api.stripe.com/v1/` | Remote Site `Barn_Stripe_Api` | Stripe secret key, `Authorization: Bearer` header |
-| `PaymentPayPal.cls:462`, `:482` | PayPal live or sandbox API | Remote Sites `Barn_PayPal_Api`, `Barn_PayPal_Sandbox_Api` | OAuth client credentials (client id and secret, Basic header) for a short-lived token |
-| `AddressVerifier.cls:242` | `https://us-street.api.smarty.com/street-address` | Remote Site `Barn_Smarty_Api` | Smarty auth id and token in the query string (Smarty's only server-side scheme) |
-| `AddressVerifier.cls:301` | `https://addressvalidation.googleapis.com/v1:validateAddress` | Remote Site `Barn_Google_Address_Api` | Google API key in the query string |
+| `PaymentStripe.cls:106` | `callout:Barn_Stripe/v1/` (`https://api.stripe.com`) | Named Credential `Barn_Stripe` over External Credential `Barn_Stripe` | Stripe secret key, merged by Salesforce into `Authorization: Bearer {!$Credential...}`; Apex never reads it |
+| `PaymentPayPal.cls:468`, `:501` | `callout:Barn_PayPal_Live` or `callout:Barn_PayPal_Sandbox` | Named Credentials over External Credential `Barn_PayPal` | Client id and secret merged into the sign-in call's Basic header for a short-lived token |
+| `AddressVerifier.cls:296` | `callout:Barn_Smarty/street-address` | Named Credential `Barn_Smarty` over External Credential `Barn_Smarty` | Smarty auth id and token merged into an `Authorization: Basic` header, never the query string |
+| `AddressVerifier.cls:362` | `callout:Barn_Google_Address/v1:validateAddress` | Named Credential `Barn_Google_Address` over External Credential `Barn_Google_Address` | Google API key merged into the `X-Goog-Api-Key` header |
 | `GrantFinder.cls:66` | `https://api.grants.gov/v1/api/search2` | Remote Site `BarnCRM_Grants_Gov` | None (public API) |
 | `ImportNewFieldService.cls:350` | `callout:Barn_Org_Connection` (the org's own Metadata API) | Named credential over External Credential `Barn_Org_Connection` | The admin's own OAuth principal |
 | `OrgMetadataApi.cls:31`, `OrgToolingApi.cls:69` | The org's own Metadata and Tooling APIs | Same org | The running admin's session id (`UserInfo.getSessionId`), see below |
@@ -95,14 +95,16 @@ Checked 2026-11-12 (D-200, N12). Every callout site, its endpoint and how it is 
 |---|---|---|---|
 | `FormPublicRest` (forms) | `/barncrm/forms/v1/*` | An integration user (Portal Builder, off-platform pages) | Class access through a Forms permission set; the form's `ticket`; honeypot `trap` |
 | `PortalApi` (portal) | `/barncrm/portal/v1/*` | The portal's integration user | Class access; every route but sign-in needs the `X-Barn-Portal-Session` token |
-| `PaymentWebhookRest` (payments) | `/barncrm/payments/v1/*` | Stripe and PayPal, as the Site guest user (`Payments_Webhook_Guest`) | Stripe: `Stripe-Signature` HMAC verified with the webhook secret before anything is stored; PayPal: verified by a call back to PayPal. Stores one Payment Event in system mode, nothing else |
+| `PaymentWebhookRest` (payments) | `/barncrm/payments/v1/*` | Stripe and PayPal, as the Site guest user (`Payments_Webhook_Guest`) | Refused while the processor is not connected or without an event id (Stripe: `evt_...`); only types Payments uses are stored. Stripe: the processing job fetches the event back from Stripe through the Named Credential and uses only that copy (unknown id: Rejected); PayPal: verified by a call back to PayPal. Stores one Payment Event in system mode, nothing else; the guest makes no callout here |
 | `InboundGiftResource` (mirror) | `/v1/gifts` | An integration user | Class access in the Inbound Gifts set, user-mode CRUD (open item below) |
 
 **Guest Sites.** BarnCRM ships no Site. `FormsSites` and `PaymentSites` only read the org's
 active Salesforce Sites (system mode, Experience Cloud left out, ADR-0009) for Health Check and
 the public links. The guest permission sets (`Forms_Public_Guest`, `Payments_Webhook_Guest`)
-grant class access to the public page or webhook and no object access; Health Check's fix
-assigns them to a chosen Site's guest user only.
+grant class access to the public page or webhook and no object access; `Payments_Webhook_Guest`
+also gives principal access to the Stripe and PayPal External Credentials (never their values),
+so a public page on the Site can start a checkout. Health Check's fix assigns them to a chosen
+Site's guest user only.
 
 ### 7. LWC rendering
 
@@ -114,14 +116,14 @@ assigns them to a chosen Site's guest user only.
 
 ### 8. Secrets and debug output
 
-- [ ] No passwords, keys or tokens in source or custom metadata. Provider secrets live only
-  in the two Protected hierarchy custom settings, org defaults only: `Payment_Keys__c`
-  (`Stripe_Secret_Key__c`, `Stripe_Webhook_Secret__c`, `PayPal_Client_Secret__c`, plus the
-  PayPal client id) and `Address_Verification_Keys__c` (`Google_Api_Key__c`,
-  `Smarty_Auth_Token__c`). In a managed package a Protected setting is unreadable to the
-  subscriber's Apex and API; only the packages' own setup pages write them, and those pages
-  never send a stored secret back to the browser (at most its last four characters). Why not Named Credentials: see the
-  ADR on provider secrets (ADR-0220, `0220-provider-secrets-protected-settings.md`).
+- [ ] No passwords, keys or tokens in source, custom metadata or custom settings. Provider
+  secrets live only as External Credential principal parameters, entered by an admin in Setup:
+  `Barn_Stripe` (`SecretKey`), `Barn_PayPal` (`ClientId`, `ClientSecret`), `Barn_Smarty`
+  (`AuthId`, `AuthToken`) and `Barn_Google_Address` (`ApiKey`), shipped with no value. Apex
+  sends them only as `{!$Credential...}` merge fields in a header of a Named Credential callout,
+  so no Apex, user or API can read one; the setup pages show names and steps, never a value.
+  Readiness is a non-secret flag set by Check Connection. See the ADR on provider secrets in
+  Named Credentials (ADR-0229, amending ADR-0220).
 - [ ] `System.debug` only as the last resort when logging itself fails, with the exception
   message and no record contents. No `console.*` in LWC.
 
@@ -139,7 +141,7 @@ Closed since the v0.11 pass:
 | Item | What was done |
 | ---- | ------------- |
 | `Error_Log_Event__e` readable by Staff and Read Only | Kept (2026-10-13). The org refuses Create on a platform event without Read ("Permission Create Error_Log_Event__e depends on permission(s): Read Error_Log_Event__e"), and publishing needs Create, so every packaged set that publishes holds both |
-| Any BarnCRM user could publish `Merge_Settlement_Ready__e` (review C-M1, 2026-10-28) | Fixed (#654): Read Only holds neither Read nor Create on it, and the subscriber settles only records the event's `CreatedById` may edit |
+| Any BarnCRM user could publish `Merge_Settlement_Ready__e` (review C-M1, 2026-10-28) | Fixed (#654): Read Only holds no Create on it (Read matches Staff since D-209, as Read alone publishes nothing), and the subscriber settles only records the event's `CreatedById` may edit |
 | Error Log entries attributed from a payload field (C-L1) | Fixed (#654): `User__c` comes from the event's `CreatedById` |
 | Finish Setup could grant BarnCRM Admin in system mode (C-L2) | Fixed (#654): outside an install, only to the running user, and only with Assign Permission Sets or Manage Users (ADR-0121) |
 | Inner queued job with no sharing keyword (C-L4) | Fixed (#654): `TabAccessService.Job` is `with sharing`, and `check-apex-access-modes.py` flags any Core inner async job without a keyword |

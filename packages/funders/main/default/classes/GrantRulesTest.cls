@@ -24,11 +24,7 @@ private class GrantRulesTest {
 	static void stageDatesAreStampedAndATypedDateIsKept() {
 		System.runAs(TestUsers.adminWith(GrantTestData.ADMIN)) {
 			Account funder = GrantTestData.funder('Lakeside Foundation');
-			Grant__c grant = GrantTestData.grant(
-				'Literacy',
-				funder.Id,
-				GrantService.STAGE_PROSPECT
-			);
+			Grant__c grant = GrantTestData.grant('Literacy', funder.Id, GrantService.STAGE_PROSPECT);
 			Grant__c typed = GrantTestData.grant('Arts', funder.Id, GrantService.STAGE_APPLIED);
 			typed.Submitted_Date__c = Date.today().addDays(-10);
 			insert new List<Grant__c>{ grant, typed };
@@ -46,11 +42,7 @@ private class GrantRulesTest {
 			Grant__c awarded = reread(grant.Id);
 			Assert.areEqual(today, awarded.Decision_Date__c, 'Awarded stamps the decision date');
 			Assert.areEqual(today, awarded.Submitted_Date__c, 'The submitted date stays');
-			Assert.areEqual(
-				today.addDays(-10),
-				reread(typed.Id).Submitted_Date__c,
-				'A typed date is kept'
-			);
+			Assert.areEqual(today.addDays(-10), reread(typed.Id).Submitted_Date__c, 'A typed date is kept');
 		}
 	}
 
@@ -58,11 +50,7 @@ private class GrantRulesTest {
 	static void textThatIsNotARecordIdIsRefused() {
 		System.runAs(TestUsers.adminWith(GrantTestData.ADMIN)) {
 			Account funder = GrantTestData.funder('Lakeside Foundation');
-			Grant__c grant = GrantTestData.grant(
-				'Literacy',
-				funder.Id,
-				GrantService.STAGE_PROSPECT
-			);
+			Grant__c grant = GrantTestData.grant('Literacy', funder.Id, GrantService.STAGE_PROSPECT);
 			grant.Program_Id__c = 'tutoring';
 
 			Test.startTest();
@@ -70,10 +58,7 @@ private class GrantRulesTest {
 			Test.stopTest();
 
 			Assert.isFalse(saved.isSuccess(), 'Not a record identifier');
-			Assert.areEqual(
-				BarnHelp.text('Funders', 'Funders_Grant_BadProgram'),
-				saved.getErrors()[0].getMessage()
-			);
+			Assert.areEqual(BarnHelp.text('Funders', 'Funders_Grant_BadProgram'), saved.getErrors()[0].getMessage());
 		}
 	}
 
@@ -82,11 +67,7 @@ private class GrantRulesTest {
 		System.runAs(TestUsers.adminWithInstalledModules()) {
 			Account funder = GrantTestData.funder('Lakeside Foundation');
 			Schema.SObjectType programType = NamespaceUtil.packagedObjectType('Program__c');
-			Grant__c wrongKind = GrantTestData.grant(
-				'Arts',
-				funder.Id,
-				GrantService.STAGE_PROSPECT
-			);
+			Grant__c wrongKind = GrantTestData.grant('Arts', funder.Id, GrantService.STAGE_PROSPECT);
 			wrongKind.Program_Id__c = funder.Id;
 
 			Test.startTest();
@@ -103,11 +84,7 @@ private class GrantRulesTest {
 			SObject program = programType.newSObject();
 			program.put('Name', 'Tutoring');
 			insert program;
-			Grant__c grant = GrantTestData.grant(
-				'Literacy',
-				funder.Id,
-				GrantService.STAGE_PROSPECT
-			);
+			Grant__c grant = GrantTestData.grant('Literacy', funder.Id, GrantService.STAGE_PROSPECT);
 			grant.Program_Id__c = String.valueOf(program.Id).left(15);
 			insert grant;
 			Assert.areEqual(
@@ -125,11 +102,7 @@ private class GrantRulesTest {
 	static void setProgramNamesAndClearsTheProgram() {
 		System.runAs(TestUsers.adminWithInstalledModules()) {
 			Account funder = GrantTestData.funder('Lakeside Foundation');
-			Grant__c grant = GrantTestData.grant(
-				'Literacy',
-				funder.Id,
-				GrantService.STAGE_PROSPECT
-			);
+			Grant__c grant = GrantTestData.grant('Literacy', funder.Id, GrantService.STAGE_PROSPECT);
 			insert grant;
 
 			Test.startTest();
@@ -162,10 +135,7 @@ private class GrantRulesTest {
 			backwards.Award_End_Date__c = Date.today().addDays(-1);
 
 			Test.startTest();
-			List<Database.SaveResult> saved = Database.insert(
-				new List<Grant__c>{ negative, backwards },
-				false
-			);
+			List<Database.SaveResult> saved = Database.insert(new List<Grant__c>{ negative, backwards }, false);
 			Test.stopTest();
 
 			Assert.isFalse(saved[0].isSuccess(), 'A negative amount is refused');

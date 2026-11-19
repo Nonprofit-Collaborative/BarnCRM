@@ -12,7 +12,8 @@ BarnCRM Mirror sends each Case to the provider's request API and keeps what come
 resolve it, when it was last synced, and the last error if a send failed. Nothing is written to
 the Case itself, so Mirror adds no fields to Case.
 
-It is off until you turn it on, and it needs the provider to set your org up first.
+It is off until you turn it on, and it needs the provider to set your org up first. Mirror needs
+only BarnCRM Core: no nonprofit module (Fundraising or any other) is required for Case requests.
 
 ## Before You Start
 
@@ -35,20 +36,27 @@ The provider, in their org (see [Requests From Another Organization](projects-re
    Domain address (`https://<their My Domain>`), using that External Credential.
 3. Give the External Credential's principal to the users who send Cases (a permission set with
    External Credential Principal Access), including the administrator who scheduled BarnCRM
-   Nightly Jobs.
+   Nightly Jobs (the hourly check runs as that person).
 4. In Setup, **Case**, **Type**: add a value **Service Provider** (or choose another in step 5).
 5. In **BarnCRM Settings**: turn on **Send Cases to a service provider**, and set **Case type to
    send** if you chose another Type.
-6. Make sure [BarnCRM Nightly Jobs](nightly-jobs.md) is scheduled.
+6. Make sure [BarnCRM Nightly Jobs](nightly-jobs.md) is scheduled. The next nightly run (or
+   **Run Now** on the **Cases Sent to a Service Provider** step) schedules the hourly check.
+7. Give the people who follow Cases the **Provider Requests** extra permission on the
+   [Access page](access.md) (permission set `Provider_Requests`): read on the Provider
+   Requests tab.
 
 The secret stays in Salesforce's credential store. BarnCRM keeps no secret in its settings.
 
 ## How Cases Go
 
-- **Every night** at 1:40 AM, every open Case of the chosen Type that the provider has not yet
-  accepted is sent, oldest first, up to 1,000 a night; Cases already accepted are left out
-  first, so they never crowd out new ones. A job sends what Salesforce's callout limits allow
-  and leaves the rest for the next job.
+- **Every hour**, at 15 minutes past, BarnCRM first checks whether there is anything to do: an
+  open Case of the chosen Type, or a Provider Request not yet Resolved, Closed or Cancelled.
+  When there is none it stops there, with no callout and nothing in the Error Log. Otherwise
+  every open Case of the chosen Type that the provider has not yet accepted is sent, oldest
+  first, up to 1,000 a pass; Cases already accepted are left out first, so they never crowd out
+  new ones. A job sends what Salesforce's callout limits allow and leaves the rest for the next
+  job.
 - **At once**, if you want it: build a record-triggered flow on Case (after save, for example
   when Type equals Service Provider) that calls the action **Send Cases to a Service Provider**
   with the Case's Id. It sends in the background.
@@ -62,8 +70,16 @@ again.
 
 Open the **Provider Requests** tab: one row per Case sent, named by Case Number, with the
 provider's **Request Number**, **Provider Status**, **Provider Resolution** and **Last Synced**.
-Each night BarnCRM asks the provider for the status of every request not yet Resolved, Closed or
-Cancelled. Reports can use the Provider Requests object.
+Each hour, in the same pass, BarnCRM asks the provider for the status of every request not yet
+Resolved, Closed or Cancelled. Reports can use the Provider Requests object.
+
+## The Hourly Check
+
+There is one scheduled job, **BarnCRM Mirror: Case requests hourly**. On the
+[Nightly Jobs](nightly-jobs.md) card, the **Cases Sent to a Service Provider** step shows
+whether it is scheduled; **Run Now** checks at once and schedules it, and switching the step off
+stops the hourly check (the job removes itself at its next run). Turning **Send Cases to a
+service provider** off also removes it. Scheduling again never makes a second job.
 
 ## Common Mistakes
 
@@ -77,5 +93,8 @@ Cancelled. Reports can use the Provider Requests object.
   than a request. Only that Case is affected; the next run sends it again.
 - **429 in the Error Log.** More new Cases in an hour than the provider's Hourly Limit. The next
   run sends the rest.
-- **Nothing is sent.** Check the setting, the Case Type value, and that Nightly Jobs is
+- **Nothing is sent.** Check the setting, the Case Type value, that Nightly Jobs is
+  scheduled, and that the step's summary on the Nightly Jobs card says the hourly check is
   scheduled.
+- **Someone cannot see the Provider Requests tab.** Give them the Provider Requests extra
+  permission; Salesforce Records Sync does not include it.

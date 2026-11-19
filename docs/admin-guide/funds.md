@@ -12,7 +12,7 @@ fund reporting stays complete even when David is entering checks quickly at an e
 
 ## How to Turn It On
 
-Funds arrive with the Giving module. There is nothing to install separately.
+Funds arrive with the Fundraising module. There is nothing to install separately.
 
 A new org arrives with one fund, **General Fund**: active, unrestricted, with no accounting
 code, and already the default, so the first gift has somewhere to go. It is created only when
@@ -26,7 +26,7 @@ at any time.
    or three. You can add more at any time.
 3. To change which fund catches undesignated gifts, tick **Is Default** on that fund. Only one
    fund can be the default: ticking it on a second fund clears it on the first.
-4. Open **BarnCRM Settings**, choose **Giving**, and confirm **Default fund** shows the
+4. Open **BarnCRM Settings**, choose **Fundraising**, and confirm **Default fund** shows the
    fund you just marked. Setting it in either place keeps the other in step.
 
 No Salesforce Setup step is needed.
@@ -61,7 +61,7 @@ You are David, and you are setting up funds before your first gift entry session
 ## Common Mistakes
 
 - **No fund is marked as the default.** A gift entered without a designation then fails to
-  save with "No default fund is set. Open BarnCRM Settings, choose Giving, and pick the
+  save with "No default fund is set. Open BarnCRM Settings, choose Fundraising, and pick the
   fund that undesignated gifts should go to." Fix it by ticking **Is Default** on one fund.
 - **Deleting a fund that has gifts.** BarnCRM blocks it, because deleting a fund would
   make historical allocations meaningless. Untick **Active** instead: the fund stops being

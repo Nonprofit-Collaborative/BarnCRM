@@ -86,17 +86,13 @@ public with sharing class RecordInspectorController {
 	public static Inspection inspect(String recordId) {
 		try {
 			if (!BarnCRMPermissions.canManageSettings()) {
-				throw new RecordInspectorException(
-					BarnHelp.text('Core', 'Core_RecordInspector_ErrorNoPermission')
-				);
+				throw new RecordInspectorException(BarnHelp.text('Core', 'Core_RecordInspector_ErrorNoPermission'));
 			}
 			Id parsed = parse(recordId);
 			Schema.DescribeSObjectResult described = parsed.getSObjectType()
 				.getDescribe(SObjectDescribeOptions.DEFERRED);
 			if (!described.isAccessible()) {
-				throw new RecordInspectorException(
-					BarnHelp.text('Core', 'Core_RecordInspector_ErrorNotFound')
-				);
+				throw new RecordInspectorException(BarnHelp.text('Core', 'Core_RecordInspector_ErrorNotFound'));
 			}
 			Inspection result = new Inspection();
 			result.recordId = parsed;
@@ -110,9 +106,7 @@ public with sharing class RecordInspectorController {
 			}
 			SObject record = read(described.getName(), parsed, readable);
 			if (record == null) {
-				throw new RecordInspectorException(
-					BarnHelp.text('Core', 'Core_RecordInspector_ErrorNotFound')
-				);
+				throw new RecordInspectorException(BarnHelp.text('Core', 'Core_RecordInspector_ErrorNotFound'));
 			}
 			for (Schema.DescribeFieldResult field : readable) {
 				FieldRow fieldRow = row(field, record);
@@ -132,9 +126,7 @@ public with sharing class RecordInspectorController {
 		try {
 			return Id.valueOf(recordId);
 		} catch (Exception notAnId) {
-			throw new RecordInspectorException(
-				BarnHelp.text('Core', 'Core_RecordInspector_ErrorNotFound')
-			);
+			throw new RecordInspectorException(BarnHelp.text('Core', 'Core_RecordInspector_ErrorNotFound'));
 		}
 	}
 
@@ -143,9 +135,7 @@ public with sharing class RecordInspectorController {
 	 * address, a location) and binary fields are skipped; an address's parts are fields of
 	 * their own.
 	 */
-	private static List<Schema.DescribeFieldResult> readableFields(
-		Schema.DescribeSObjectResult described
-	) {
+	private static List<Schema.DescribeFieldResult> readableFields(Schema.DescribeSObjectResult described) {
 		List<Schema.DescribeFieldResult> found = new List<Schema.DescribeFieldResult>();
 		for (Schema.SObjectField token : described.fields.getMap().values()) {
 			Schema.DescribeFieldResult field = token.getDescribe();
@@ -162,10 +152,7 @@ public with sharing class RecordInspectorController {
 		return found;
 	}
 
-	private static List<Schema.DescribeFieldResult> trim(
-		List<Schema.DescribeFieldResult> fields,
-		Integer keep
-	) {
+	private static List<Schema.DescribeFieldResult> trim(List<Schema.DescribeFieldResult> fields, Integer keep) {
 		List<Schema.DescribeFieldResult> kept = new List<Schema.DescribeFieldResult>();
 		for (Integer i = 0; i < keep; i++) {
 			kept.add(fields[i]);
@@ -173,21 +160,13 @@ public with sharing class RecordInspectorController {
 		return kept;
 	}
 
-	private static SObject read(
-		String objectName,
-		Id recordId,
-		List<Schema.DescribeFieldResult> fields
-	) {
+	private static SObject read(String objectName, Id recordId, List<Schema.DescribeFieldResult> fields) {
 		List<String> names = new List<String>();
 		for (Schema.DescribeFieldResult field : fields) {
 			names.add(field.getName());
 		}
 		List<SObject> found = Database.queryWithBinds(
-			'SELECT ' +
-				String.join(names, ', ') +
-				' FROM ' +
-				objectName +
-				' WHERE Id = :recordId LIMIT 1',
+			'SELECT ' + String.join(names, ', ') + ' FROM ' + objectName + ' WHERE Id = :recordId LIMIT 1',
 			new Map<String, Object>{ 'recordId' => recordId },
 			AccessLevel.USER_MODE
 		);

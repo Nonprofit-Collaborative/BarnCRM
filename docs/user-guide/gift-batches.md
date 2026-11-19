@@ -2,7 +2,7 @@
 
 A gift batch is how you type a stack of checks in one sitting. You start with the total from the deposit slip (the control total), type one line per check, and choose **Create Gifts** when the lines add up. That turns every line into an ordinary gift in one go.
 
-Before you start: open the **BarnCRM Fundraising** app, **Gift Batches** tab. You need the **Fundraising Staff** role (the **Giving Staff** permission set). For a single gift, [Quick Gift Entry](gifts.md) is quicker.
+Before you start: open the **BarnCRM Fundraising** app, **Gift Batches** tab. You need the **Fundraising Staff** role (the **Fundraising Staff Access** permission set). For a single gift, [Quick Gift Entry](gifts.md) is quicker.
 
 ## To Start a Batch
 
@@ -64,7 +64,7 @@ You should see: every batch whose gifts are not created yet. Open one and carry 
 - "The books are closed through ..." on a line. That line is dated in a closed accounting period. Date it later and try again; the failed attempt created nothing.
 - "No gifts were created. The batch is still here as you left it." Nothing was lost. Try again; if it repeats, ask your admin to check the Error Log.
 - "Choose one donor: a person or an organization, not both." on a line. Clear one of the two donor values on that line.
-- "You can see this batch but not change it or create its gifts." You have read access only. Ask your admin for the Giving Staff permission set, or ask the batch's owner for edit access.
+- "You can see this batch but not change it or create its gifts." You have read access only. Ask your admin for the Fundraising Staff Access permission set, or ask the batch's owner for edit access.
 - "Batches are easier on a computer." On a phone the grid scrolls sideways. It still works.
 - Two people typing the same batch overwrite each other, because each save sends the whole grid. Type a batch on one screen at a time, or split the stack into two batches.
 

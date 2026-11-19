@@ -14,27 +14,12 @@ private class ProjectsControllerTest {
 	static void theBoardAndHomeReturnWhatTheyDraw() {
 		System.runAs(ProjectsTestData.admin()) {
 			Project__c project = ProjectsTestData.project('Active', null);
-			Project_Phase__c phase = new Project_Phase__c(
-				Project__c = project.Id,
-				Name = 'Build',
-				Sort_Order__c = 10
-			);
+			Project_Phase__c phase = new Project_Phase__c(Project__c = project.Id, Name = 'Build', Sort_Order__c = 10);
 			insert phase;
-			Project_Task__c task = ProjectsTestData.task(
-				project.Id,
-				'Configure',
-				Date.today().addDays(3),
-				false
-			);
+			Project_Task__c task = ProjectsTestData.task(project.Id, 'Configure', Date.today().addDays(3), false);
 
 			Test.startTest();
-			Id added = ProjectsController.addTask(
-				project.Id,
-				phase.Id,
-				'Go-Live',
-				Date.today().addDays(5),
-				true
-			);
+			Id added = ProjectsController.addTask(project.Id, phase.Id, 'Go-Live', Date.today().addDays(5), true);
 			ProjectsController.setTaskStatus(task.Id, 'Done');
 			ProjectsController.Board board = ProjectsController.getBoard(project.Id);
 			ProjectsController.Home home = ProjectsController.getHome();
@@ -56,11 +41,7 @@ private class ProjectsControllerTest {
 			Assert.isNotNull(added, 'Add Task');
 			Assert.isTrue(home.canManage, 'Admin manages');
 			Assert.areEqual(2, home.templates.size(), 'The two shipped templates');
-			Assert.areEqual(
-				0,
-				home.myTasks.size(),
-				'Assigned task is done; the added one has no owner'
-			);
+			Assert.areEqual(0, home.myTasks.size(), 'Assigned task is done; the added one has no owner');
 			Assert.isFalse(home.firstRun, 'A project exists, so there is no first-run panel.');
 		}
 	}
@@ -79,12 +60,7 @@ private class ProjectsControllerTest {
 	static void logTimeDraftAndTheAtRiskCard() {
 		System.runAs(ProjectsTestData.admin()) {
 			Project__c project = ProjectsTestData.project('Active', 10);
-			Project_Task__c finished = ProjectsTestData.task(
-				project.Id,
-				'Interviews',
-				Date.today(),
-				false
-			);
+			Project_Task__c finished = ProjectsTestData.task(project.Id, 'Interviews', Date.today(), false);
 			ProjectsTestData.task(project.Id, 'Design sign-off', Date.today().addDays(7), true);
 			Project_Task__c blocked = ProjectsTestData.task(
 				project.Id,
@@ -119,10 +95,7 @@ private class ProjectsControllerTest {
 			Assert.areEqual(33, draft.Percent_Complete__c, 'One of three tasks');
 			Assert.areEqual(4, draft.Actual_Hours__c, 'The logged hours');
 			Assert.isTrue(draft.Accomplishments__c.contains('Interviews'), 'Done since the start');
-			Assert.isTrue(
-				draft.Next_Steps__c.contains('Design sign-off'),
-				'Due in the next 14 days'
-			);
+			Assert.isTrue(draft.Next_Steps__c.contains('Design sign-off'), 'Due in the next 14 days');
 			Assert.isTrue(draft.Risks__c.contains('Data cleanup'), 'Blocked and late');
 			Assert.isNotNull(draft.Summary__c, 'A summary line');
 			Assert.areEqual(1, atRisk.size(), 'On the at-risk card, only mine');
@@ -145,25 +118,10 @@ private class ProjectsControllerTest {
 			);
 
 			Test.startTest();
-			List<ProjectReporting.Utilization> people = ProjectsController.getUtilization(
-				monday,
-				monday.addDays(6)
-			);
-			List<Map<String, Object>> first = ProjectsController.exportBillable(
-				Date.today(),
-				Date.today(),
-				false
-			);
-			List<Map<String, Object>> second = ProjectsController.exportBillable(
-				Date.today(),
-				Date.today(),
-				false
-			);
-			List<Map<String, Object>> again = ProjectsController.exportBillable(
-				Date.today(),
-				Date.today(),
-				true
-			);
+			List<ProjectReporting.Utilization> people = ProjectsController.getUtilization(monday, monday.addDays(6));
+			List<Map<String, Object>> first = ProjectsController.exportBillable(Date.today(), Date.today(), false);
+			List<Map<String, Object>> second = ProjectsController.exportBillable(Date.today(), Date.today(), false);
+			List<Map<String, Object>> again = ProjectsController.exportBillable(Date.today(), Date.today(), true);
 			Test.stopTest();
 
 			Assert.areEqual(1, people.size(), 'One person');
@@ -200,20 +158,13 @@ private class ProjectsControllerTest {
 				ProjectsController.getUtilization(Date.today(), Date.today().addDays(-1));
 				Assert.fail('A backwards range is refused');
 			} catch (AuraHandledException expected) {
-				Assert.areEqual(
-					BarnHelp.text('Projects', 'Projects_Range_Invalid'),
-					expected.getMessage(),
-					'In words'
-				);
+				Assert.areEqual(BarnHelp.text('Projects', 'Projects_Range_Invalid'), expected.getMessage(), 'In words');
 			}
 			try {
 				ProjectsController.logTime(project.Id, null, Date.today(), 0, false, null);
 				Assert.fail('Zero hours are refused');
 			} catch (AuraHandledException expected) {
-				Assert.isTrue(
-					expected.getMessage().contains('24'),
-					'The validation rule message (R-PM6)'
-				);
+				Assert.isTrue(expected.getMessage().contains('24'), 'The validation rule message (R-PM6)');
 			}
 		}
 	}

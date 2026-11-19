@@ -4,7 +4,7 @@
   <deploymentStatus>Deployed</deploymentStatus>
   <description>
     One request for a gift a fundraiser is working toward: the donor, the stage, the ask amount,
-    the target date, who is responsible, and how it ended. The Giving module's own solicitation
+    the target date, who is responsible, and how it ended. The Fundraising module's own solicitation
     pipeline (canonical model Section 25R).
   </description>
   <enableActivities>true</enableActivities>

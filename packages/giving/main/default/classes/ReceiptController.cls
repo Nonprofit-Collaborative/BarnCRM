@@ -259,7 +259,7 @@ public with sharing class ReceiptController {
 			view.id = template.Id;
 			view.name = template.Name;
 			view.type = template.Type__c;
-			view.body = ReceiptTemplateService.letterOf(template.Body__c);
+			view.body = template.Body__c;
 			view.active = template.Active__c;
 			views.add(view);
 		}

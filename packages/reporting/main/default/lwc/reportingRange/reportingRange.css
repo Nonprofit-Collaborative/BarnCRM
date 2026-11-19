@@ -1,0 +1,23 @@
+.range {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+  align-items: flex-end;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.part {
+  flex: 1 1 10rem;
+  min-width: 0;
+}
+
+.part_range {
+  flex-basis: 12rem;
+}
+
+.part_number {
+  flex: 0 1 7rem;
+}

@@ -1,8 +1,8 @@
 # Mirror
 
-Scripts for Campaign sync, the Opportunity mirror, the accounting export, the Inbound Gift API, the Record Inbound Gift action and the Gift Transaction mirror. Setup detail: [Campaign Sync](../admin-guide/campaign-sync.md), [Opportunity Mirror](../admin-guide/opportunity-mirror.md), [Accounting Export](../admin-guide/accounting-export.md), [Inbound Gift API](../admin-guide/inbound-gift-api.md), [Gift Transaction Mirror](../admin-guide/gift-transaction-mirror.md).
+Scripts for the gift mirrors and for Mirror. **BarnCRM Fundraising** holds Campaign sync, the Opportunity mirror, the accounting export, the Inbound Gift API, the Record Inbound Gift action and the Gift Transaction mirror (T-MIR-01 to T-MIR-15, T-MIR-19). **BarnCRM Mirror**, which needs only Core, holds Cases sent to a service provider (T-MIR-16 to T-MIR-18). Setup detail: [Cases Sent to a Service Provider](../admin-guide/mirror-case-requests.md), [Campaign Sync](../admin-guide/campaign-sync.md), [Opportunity Mirror](../admin-guide/opportunity-mirror.md), [Accounting Export](../admin-guide/accounting-export.md), [Inbound Gift API](../admin-guide/inbound-gift-api.md), [Gift Transaction Mirror](../admin-guide/gift-transaction-mirror.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core, Giving and Mirror deployed and sample data loaded unless a script says otherwise. Campaign sync and the Opportunity mirror need Opportunity and Campaign, so use the Person Accounts (or `sales-cloud`) shape, not platform-only: see [Create a test org](before-you-test.md#create-a-test-org). The Gift Transaction mirror needs Nonprofit Cloud fundraising for T-MIR-15; T-MIR-14 runs in any org. Each Mirror feature has its own permission set (**Campaign Sync**, **Opportunity Mirror**, **Accounting Export**, **Inbound Gift API**, **Record Inbound Gift Action**, **Gift Transaction Mirror**). No role includes them, and the admin user does not have them until a script gives them: open **BarnCRM Settings**, **Access**, find the person, and use **Extra Permissions**, **Give Permission**.
+Before you start: an org from [Before you test](before-you-test.md), with Core, Rollup Builder and Fundraising deployed (and Mirror for T-MIR-16 to T-MIR-18) and sample data loaded unless a script says otherwise. Campaign sync and the Opportunity mirror need Opportunity and Campaign, so use the Person Accounts (or `sales-cloud`) shape, not platform-only: see [Create a test org](before-you-test.md#create-a-test-org). The Gift Transaction mirror needs Nonprofit Cloud fundraising for T-MIR-15; T-MIR-14 runs in any org. Each Mirror feature has its own permission set (**Campaign Sync**, **Opportunity Mirror**, **Accounting Export**, **Inbound Gift API**, **Record Inbound Gift Action**, **Gift Transaction Mirror**). No role includes them, and the admin user does not have them until a script gives them: open **BarnCRM Settings**, **Access**, find the person, and use **Extra Permissions**, **Give Permission**.
 
 ## T-MIR-01: Switch on Campaign Sync and Sync All Appeals
 
@@ -12,8 +12,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Giving**, and open **Campaign Sync**. | The **Campaign Sync** card says `Campaign sync is off. Switch on Copy appeals to Campaigns in the Giving section of BarnCRM Settings, then come back to sync your appeals.` No **Sync All Appeals** button shows. |
-| 2 | In **Giving**, tick **Copy appeals to campaigns** and save. | The setting saves. |
+| 1 | Open **BarnCRM Settings**, **Fundraising**, and open **Campaign Sync**. | The **Campaign Sync** card says `Campaign sync is off. Switch on Copy appeals to Campaigns in the Giving section of BarnCRM Settings, then come back to sync your appeals.` No **Sync All Appeals** button shows. |
+| 2 | In **Fundraising**, tick **Copy appeals to campaigns** and save. | The setting saves. |
 | 3 | Open **Campaign Sync** again. | `Campaign sync is on. Saving an appeal creates or updates its Campaign.` and `0 of 7 appeals have a Campaign.` **Sync All Appeals** is enabled. |
 | 4 | Click **Sync All Appeals**. | `Sync all appeals is running in the background. Reload this page in a minute to see new counts. Anything that could not be copied is in the Error Log.` |
 | 5 | Wait a minute and reload the page. | `7 of 7 appeals have a Campaign.` |
@@ -48,7 +48,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 |---|---|---|
 | 1 | As read-only, open the App Launcher and search `Campaign Sync`. | No **Campaign Sync** item is found. |
 | 2 | As staff, open the **Campaign Sync** tab from the App Launcher. | The card shows `You cannot create and edit Campaigns, so appeals you save get no Campaign...` and `Only someone with the Manage BarnCRM Settings permission can sync all appeals.` **Sync All Appeals** is disabled. |
-| 3 | As admin, in **BarnCRM Settings**, **Giving**, untick **Copy appeals to campaigns** and save. | The setting saves. |
+| 3 | As admin, in **BarnCRM Settings**, **Fundraising**, untick **Copy appeals to campaigns** and save. | The setting saves. |
 | 4 | Change the **Goal** of `Giving Tuesday` to 9,000 and save. Reload its Campaign. | Expected Revenue is still 7,500. Every Campaign is still there. |
 | 5 | Tick **Copy appeals to campaigns** again and save `Giving Tuesday` once more. | The Campaign's Expected Revenue is 9,000. |
 
@@ -63,7 +63,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the App Launcher and the **Opportunity Mirror** tab. | `The Opportunity mirror is off. Choose a direction in BarnCRM Settings, Giving, Opportunity mirror direction.` |
-| 2 | In **BarnCRM Settings**, **Giving**, set **Opportunity mirror direction** to **Gifts to Opportunities** and save. | The setting saves. |
+| 2 | In **BarnCRM Settings**, **Fundraising**, set **Opportunity mirror direction** to **Gifts to Opportunities** and save. | The setting saves. |
 | 3 | Reopen **Opportunity Mirror**. | `Direction: Gifts to Opportunities. Every gift in the totals gets a matching Opportunity.`, `The nightly run is not scheduled.` and `No run has completed yet.` |
 | 4 | Click **Run Now**. | `The run has started. Its summary is written to the Error Log when it ends.` |
 | 5 | Wait a minute and reload. | The last run line reads `Last completed run: started <time>. Opportunity mirror run, Gifts to Opportunities: <n> Opportunities created, 0 updated, ...` |
@@ -96,7 +96,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **Giving**, set **Opportunity mirror direction** to **Opportunities to Gifts**, leave **Opportunity mirror start date** empty, save, and open **Opportunity Mirror**. | `Direction: Opportunities to Gifts, but no start date is set, so no Opportunity becomes a gift. Set Opportunity mirror start date in BarnCRM Settings.` |
+| 1 | In **Fundraising**, set **Opportunity mirror direction** to **Opportunities to Gifts**, leave **Opportunity mirror start date** empty, save, and open **Opportunity Mirror**. | `Direction: Opportunities to Gifts, but no start date is set, so no Opportunity becomes a gift. Set Opportunity mirror start date in BarnCRM Settings.` |
 | 2 | Set **Opportunity mirror start date** to today and save. Reopen the page. | `Direction: Opportunities to Gifts. Won Opportunities closed on or after <today> become gifts.` |
 | 3 | Create a won Opportunity of 60, closed today, with Luis Garcia's account and Luis as primary contact. Click **Run Now** and wait a minute. | A gift of 60 appears on Luis Garcia's record. In **Gifts and Their Opportunities** its **Opportunity ID** names that Opportunity. |
 | 4 | Create a won Opportunity of 80 closed last month and click **Run Now**. | No gift of 80 is made. |
@@ -164,7 +164,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 1 | As read-only, search the App Launcher for `Accounting Export`. | No **Accounting Export** item is found. |
 | 2 | As staff, do the same. | No **Accounting Export** item is found. |
 | 3 | As admin, give staff **Accounting Export**. As staff, open the tab and download last month. | A file downloads, holding only the gifts staff can see. **Mark These Gifts Posted** shows, because the set includes Post Gifts. |
-| 4 | As admin, create a user with no BarnCRM role and give them only **Accounting Export**; make them the owner of one of last month's gifts. As that user, open the tab and download last month. | A file downloads holding that gift, with its date, fund, accounting code, amount and donor name: no Giving set is needed beside Accounting Export. |
+| 4 | As admin, create a user with no BarnCRM role and give them only **Accounting Export**; make them the owner of one of last month's gifts. As that user, open the tab and download last month. | A file downloads holding that gift, with its date, fund, accounting code, amount and donor name: no Fundraising set is needed beside Accounting Export. |
 
 **Cleanup:** remove **Accounting Export** from staff and deactivate the user from step 4.
 
@@ -224,8 +224,8 @@ If step 1 answers `donor_not_found`, the API user cannot see contacts: see [Inbo
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As admin, give yourself the **Salesforce Records Sync** permission set, then open **BarnCRM Settings**, **Giving**. | **Gift Transaction mirror direction** shows **Off**, **Gift Transaction mirror paid status** shows `Paid`, and **Gift Transaction mirror start date** is empty with `Not set` under it. |
-| 2 | Open **Gift Transaction Mirror** from **Giving**. | `This org has no Nonprofit Cloud Gift Transactions you can use, so there is nothing to mirror. ...` No run buttons and no **Reconciliation** section. |
+| 1 | As admin, give yourself the **Salesforce Records Sync** permission set, then open **BarnCRM Settings**, **Fundraising**. | **Gift Transaction mirror direction** shows **Off**, **Gift Transaction mirror paid status** shows `Paid`, and **Gift Transaction mirror start date** is empty with `Not set` under it. |
+| 2 | Open **Gift Transaction Mirror** from **Fundraising**. | `This org has no Nonprofit Cloud Gift Transactions you can use, so there is nothing to mirror. ...` No run buttons and no **Reconciliation** section. |
 | 3 | Set the direction to **Gifts to Gift Transactions**, the start date to today, and save. Record a gift of 25 from Luis Garcia on **Quick Gift Entry**. | The gift saves as usual. The page still says the mirror is not available, and the **Error Log** has no Gift Transaction mirror entry. |
 | 4 | On the **Gifts** tab, choose **Gifts and Their Gift Transactions**, type `abc` into a gift's **Gift Transaction ID** and save. | Saved: without Gift Transactions nothing is checked. Clear the value again. |
 | 5 | As staff, search the App Launcher for `Gift Transaction Mirror`. | No **Gift Transaction Mirror** item is found. |
@@ -239,7 +239,7 @@ If step 1 answers `donor_not_found`, the API user cannot see contacts: see [Inbo
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **Giving**, set **Gift Transaction mirror paid status** to a value that is not a Status of your Gift Transactions, the start date to the first of this month, the direction to **Gifts to Gift Transactions**, and save. Open **Gift Transaction Mirror**. | `The Gift Transaction mirror paid status, <value>, is not one of the active Status values ...` **Run Now** is disabled. |
+| 1 | In **Fundraising**, set **Gift Transaction mirror paid status** to a value that is not a Status of your Gift Transactions, the start date to the first of this month, the direction to **Gifts to Gift Transactions**, and save. Open **Gift Transaction Mirror**. | `The Gift Transaction mirror paid status, <value>, is not one of the active Status values ...` **Run Now** is disabled. |
 | 2 | Set the paid status back to your paid value (`Paid` in a standard org; in an org with Nonprofit Cloud it is a dropdown of the active Status values, and a saved value Setup has since retired still shows in it) and reopen the page. | `Direction: Gifts to Gift Transactions. Received gifts dated on or after <date> get a matching Gift Transaction with status <value>.` |
 | 3 | On the **Funds** tab, choose **Funds and Their Gift Designations** and paste a Gift Designation's record ID into the default fund's **Gift Designation ID**. | Saved. |
 | 4 | Record a gift of 100 from Luis Garcia on **Quick Gift Entry**, dated today. On the page click **Run Now**, wait a minute and reload. | `Last completed run: started <time>. Gift Transaction mirror run: <n> Gift Transactions created, ...` with at least one designation written. The gift's **Gift Transaction ID** is filled in; that Gift Transaction has Original Amount 100, Transaction Date today and one designation of 100. |
@@ -256,7 +256,7 @@ If step 1 answers `donor_not_found`, the API user cannot see contacts: see [Inbo
 **Prerequisites:** a provider org with Project Management, T-PM-33's Request Connection naming
 this org's id, and the client credentials it gave; in this org, the `Barn_Request_Provider`
 Named Credential set up as in the admin guide, a Case Type value Service Provider, Nightly Jobs
-scheduled.
+scheduled, and the **Provider Requests** extra permission on your user.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -265,6 +265,63 @@ scheduled.
 | 3 | Run it again. | Still one request at the provider; the row's Last Synced moves on. |
 | 4 | At the provider, resolve the request with a resolution. Run it again. | Provider Status Resolved and the resolution on the row. |
 | 5 | At the provider, untick Active on the connection. Create another Case and run it again. | Its row shows Last Error "The service provider refused the Case (403)..."; the Error Log has a Warning. |
-| 6 | Build a record-triggered flow on Case calling **Send Cases to a Service Provider**, reactivate the connection, create a Case. | The row appears within a minute, without waiting for the night. |
+| 6 | Build a record-triggered flow on Case calling **Send Cases to a Service Provider**, reactivate the connection, create a Case. | The row appears within a minute, without waiting for the hourly check. |
 
 **Cleanup:** delete the Cases, the flow and the Provider Requests; turn the setting off.
+
+## T-MIR-17: Mirror Installs With Core Alone
+
+**Purpose:** confirm Mirror needs no nonprofit module (N-09) and holds no gift feature: the gift
+mirrors are part of Fundraising (N-15, D-210).
+**Prerequisites:** a fresh scratch org (Person Accounts or `sales-cloud` shape, so Case exists)
+with Core only, made with `scripts/org/create-scratch-org.sh`.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Deploy Mirror alone: `sf project deploy start --source-dir packages/mirror --target-org <alias>`. | The deploy succeeds; Fundraising and Rollup Builder are not in the org. |
+| 2 | Open **BarnCRM Settings**, **Modules** with the Standard Edition chosen. | **BarnCRM Mirror** is listed (offered in both editions) and says **Installed**. **BarnCRM Fundraising** is not listed. |
+| 3 | Open **Access**, **Extra Permissions**, and give yourself **Provider Requests**. | The card reads "See the Provider Requests tab..."; the **Provider Requests** tab opens with no rows. |
+| 4 | Open **General**, **Nightly Jobs**. | No Opportunity mirror or Gift Transaction mirror step is listed (those are Fundraising's). |
+| 5 | Choose the Nonprofit Edition and open **Modules** again. | **BarnCRM Fundraising** is listed under **Nonprofit Modules**, **Not installed**, and its row says "Install these first: ..." naming Rollup Builder only, never Mirror. |
+
+**Cleanup:** delete the scratch org.
+
+## T-MIR-18: Hourly Case Check Only While Cases Are Open
+
+**Purpose:** confirm the Case check is one hourly job that does nothing while no request or
+Case is open (N-10).
+**Prerequisites:** the org and setup of T-MIR-16, its cleanup done (no open Case of Type Service
+Provider, no open Provider Request); **Send Cases to a service provider** on.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **General**, **Nightly Jobs**, and click **Run Now** on **Cases Sent to a Service Provider**. | The step's line reads "Checks every hour at a quarter past, only while a request or a Case of the chosen Type is open..." |
+| 2 | In Setup, **Scheduled Jobs**. | One job **BarnCRM Mirror: Case requests hourly**, next run at 15 minutes past the hour. |
+| 3 | Click **Run Now** again. | Still one such job. |
+| 4 | After the next quarter past the hour, open **Setup**, **Apex Jobs**, and the Error Log. | No CaseProviderRequests job ran and no Error Log entry was written for it. |
+| 5 | Create a Case of Type Service Provider and wait past the next quarter past the hour. | A Provider Request for the Case, with a Request Number, appears without anyone running anything. |
+| 6 | At the provider, resolve the request, and wait past the next quarter past the hour. | Provider Status Resolved on the row. |
+| 7 | Switch the step off on the **Nightly Jobs** card and wait past the next quarter past the hour. | The **BarnCRM Mirror: Case requests hourly** job is gone from Scheduled Jobs. |
+
+**Cleanup:** switch the step back on, delete the Case and its Provider Request, and turn the
+setting off.
+
+## T-MIR-19: Fundraising Gift Mirrors Without Mirror
+
+**Purpose:** confirm the gift mirrors install with Fundraising alone, with their settings on
+Fundraising's own settings object (N-15, D-210).
+**Prerequisites:** a fresh scratch org (Person Accounts or `sales-cloud` shape, so Campaign and
+Opportunity exist) made with `scripts/org/create-scratch-org.sh`, with Core, Rollup Builder and
+Fundraising deployed by `scripts/org/deploy-packages.sh` and Mirror not deployed; admin user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Modules** with the Nonprofit Edition chosen. | **BarnCRM Fundraising** says **Installed**. **BarnCRM Mirror** says **Not installed**. |
+| 2 | Open **Fundraising**, **Gift Mirrors and Exports**. | **Copy appeals to campaigns**, **Opportunity mirror direction**, **Gift Transaction mirror direction** and **Gift Transaction mirror paid status** show their defaults (off, Off, Off, `Paid`). |
+| 3 | Tick **Copy appeals to campaigns** and save. | The save succeeds. Recent changes lists it. |
+| 4 | Open **Access**, **Extra Permissions**. | **Salesforce Records Sync**, **Accounting Export** and **Inbound Gifts** are offered with the Fundraising sets. |
+| 5 | Give yourself **Salesforce Records Sync** and open **Campaign Sync** from the App Launcher. | The page opens and offers **Sync All Appeals**. |
+| 6 | Open **General**, **Nightly Jobs**. | The Opportunity mirror and Gift Transaction mirror steps are listed with Fundraising's other jobs. |
+| 7 | Open **Health**, run the check. | No finding says the gift mirrors need another module. |
+
+**Cleanup:** delete the scratch org.

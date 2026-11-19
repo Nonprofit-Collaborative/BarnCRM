@@ -20,9 +20,6 @@ public with sharing class GrantDatesHandler extends TriggerHandler {
 	}
 
 	public override void beforeUpdate() {
-		GrantService.fillStageDates(
-			(List<Grant__c>) newRecords(),
-			(Map<Id, Grant__c>) oldRecordsById()
-		);
+		GrantService.fillStageDates((List<Grant__c>) newRecords(), (Map<Id, Grant__c>) oldRecordsById());
 	}
 }

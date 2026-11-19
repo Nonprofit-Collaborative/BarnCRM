@@ -105,9 +105,7 @@ public with sharing class DonorSegmentTemplates {
 			(objectName != PEOPLE &&
 			objectName != ORGANIZATIONS)
 		) {
-			throw new DonorSegmentService.SegmentException(
-				BarnHelp.text('Giving', 'Giving_Segments_ErrorTemplate')
-			);
+			throw new DonorSegmentService.SegmentException(BarnHelp.text('Giving', 'Giving_Segments_ErrorTemplate'));
 		}
 		Boolean people = objectName == PEOPLE;
 		List<String> fields = new List<String>();
@@ -147,9 +145,7 @@ public with sharing class DonorSegmentTemplates {
 		List<String> parts = new List<String>();
 		for (String part : path.split('\\.')) {
 			String lower = part.toLowerCase();
-			parts.add(
-				lower.endsWith('__c') || lower.endsWith('__r') ? NamespaceUtil.qualify(part) : part
-			);
+			parts.add(lower.endsWith('__c') || lower.endsWith('__r') ? NamespaceUtil.qualify(part) : part);
 		}
 		return String.join(parts, '.');
 	}

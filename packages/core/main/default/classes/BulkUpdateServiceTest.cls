@@ -44,9 +44,7 @@ private class BulkUpdateServiceTest {
 
 	/** `volunteers` contacts titled Volunteer and `staff` titled Staff, with work emails. */
 	private static void makePeople(Integer volunteers, Integer staff) {
-		Account organization = TestDataFactory.organization(
-			new Account(Name = 'Springfield Food Bank')
-		);
+		Account organization = TestDataFactory.organization(new Account(Name = 'Springfield Food Bank'));
 		insert organization;
 		List<Contact> people = new List<Contact>();
 		for (Integer index = 0; index < volunteers + staff; index++) {
@@ -83,16 +81,8 @@ private class BulkUpdateServiceTest {
 			}
 			Test.stopTest();
 			System.Assert.areEqual(200, preview.count, 'Only matching records are counted');
-			System.Assert.areEqual(
-				BulkUpdateService.MAX_RUN_LIMIT,
-				BulkUpdateService.runLimit(),
-				'The default'
-			);
-			System.Assert.areEqual(
-				BulkUpdateService.SAMPLE_SIZE,
-				preview.sample.size(),
-				'Five shown'
-			);
+			System.Assert.areEqual(BulkUpdateService.MAX_RUN_LIMIT, BulkUpdateService.runLimit(), 'The default');
+			System.Assert.areEqual(BulkUpdateService.SAMPLE_SIZE, preview.sample.size(), 'Five shown');
 			BulkUpdateService.FieldChange shown = preview.sample[0].changes[0];
 			System.Assert.areEqual('Volunteer', shown.before, 'The value before');
 			System.Assert.areEqual('Coordinator', shown.after, 'The value after');
@@ -255,11 +245,7 @@ private class BulkUpdateServiceTest {
 				System.Assert.areEqual('Contact', again.objectName, 'The object');
 				System.Assert.areEqual(2, again.changes.size(), 'Both changes');
 				System.Assert.areEqual('Coordinator', again.changes[0].value, 'The value to set');
-				System.Assert.areEqual(
-					'Work_Email__c',
-					again.changes[1].source.getName(),
-					'The copied field'
-				);
+				System.Assert.areEqual('Work_Email__c', again.changes[1].source.getName(), 'The copied field');
 			}
 
 		}

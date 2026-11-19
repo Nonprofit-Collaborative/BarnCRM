@@ -13,10 +13,7 @@ public class ScholarshipsTestData {
 	}
 
 	public static Award_Cycle__c cycle(String rubric, String rules) {
-		Award_Program__c program = new Award_Program__c(
-			Name = 'Test Scholarship',
-			Type__c = 'Scholarship'
-		);
+		Award_Program__c program = new Award_Program__c(Name = 'Test Scholarship', Type__c = 'Scholarship');
 		insert program;
 		Award_Cycle__c cycle = new Award_Cycle__c(
 			Name = '2027',
@@ -34,10 +31,7 @@ public class ScholarshipsTestData {
 	}
 
 	public static Contact person(String lastName) {
-		Contact person = new Contact(
-			LastName = lastName,
-			Email = lastName.toLowerCase() + '@example.org'
-		);
+		Contact person = new Contact(LastName = lastName, Email = lastName.toLowerCase() + '@example.org');
 		insert person;
 		return person;
 	}

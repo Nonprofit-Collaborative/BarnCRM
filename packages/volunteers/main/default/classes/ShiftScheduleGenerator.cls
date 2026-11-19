@@ -37,10 +37,7 @@ public with sharing class ShiftScheduleGenerator implements Queueable {
 			if (scheduleIds.size() <= ShiftScheduleBatch.chunkSize()) {
 				ShiftScheduleService.run(scheduleIds);
 			} else {
-				Database.executeBatch(
-					new ShiftScheduleBatch(scheduleIds),
-					ShiftScheduleBatch.chunkSize()
-				);
+				Database.executeBatch(new ShiftScheduleBatch(scheduleIds), ShiftScheduleBatch.chunkSize());
 			}
 		} catch (Exception runFailure) {
 			// The nightly run tries these schedules again.

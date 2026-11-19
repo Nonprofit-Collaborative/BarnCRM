@@ -12,10 +12,7 @@ private class ImportBatchServiceTest {
 	}
 
 	private static Import_Template__c newTemplate() {
-		return ImportTestDataFactory.template(
-			ImportTestDataFactory.donorMapping(),
-			ImportTemplateService.RULE_EMAIL
-		);
+		return ImportTestDataFactory.template(ImportTestDataFactory.donorMapping(), ImportTemplateService.RULE_EMAIL);
 	}
 
 	@IsTest
@@ -27,27 +24,12 @@ private class ImportBatchServiceTest {
 			Import_Template__c template = newTemplate();
 
 			Test.startTest();
-			Import_Batch__c batch = ImportBatchService.create(
-				template.Id,
-				null,
-				'donors.csv',
-				null,
-				null,
-				null,
-				false
-			);
+			Import_Batch__c batch = ImportBatchService.create(template.Id, null, 'donors.csv', null, null, null, false);
 			Test.stopTest();
 
 			Assert.areEqual(50, batch.Chunk_Size__c, 'The batch takes the chunk size the org set.');
-			Assert.areEqual(
-				ImportBatchService.STATUS_DRAFT,
-				batch.Status__c,
-				'It starts as a draft.'
-			);
-			Assert.isTrue(
-				batch.Is_Dry_Run__c,
-				'And as a dry run, because nothing has been committed.'
-			);
+			Assert.areEqual(ImportBatchService.STATUS_DRAFT, batch.Status__c, 'It starts as a draft.');
+			Assert.isTrue(batch.Is_Dry_Run__c, 'And as a dry run, because nothing has been committed.');
 		}
 	}
 
@@ -111,9 +93,7 @@ private class ImportBatchServiceTest {
 			try {
 				ImportBatchService.stageRows(
 					batch.Id,
-					new List<Map<String, Object>>{
-						new Map<String, Object>{ 'Email' => 'a@b.org' }
-					},
+					new List<Map<String, Object>>{ new Map<String, Object>{ 'Email' => 'a@b.org' } },
 					2
 				);
 			} catch (ImportException e) {
@@ -121,11 +101,7 @@ private class ImportBatchServiceTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Import_ErrorStagingClosed'),
-				refused,
-				'Refused, and why.'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Import_ErrorStagingClosed'), refused, 'Refused, and why.');
 			Import_Batch__c after = ImportBatchSelector.selectById(batch.Id);
 			Assert.areEqual(ImportBatchService.STATUS_COMPLETE, after.Status__c, 'Unchanged.');
 			Assert.areEqual(0, ImportTestDataFactory.reload(batch.Id).size(), 'Nothing staged.');
@@ -152,18 +128,11 @@ private class ImportBatchServiceTest {
 			Test.stopTest();
 
 			Assert.areEqual(
-				String.format(
-					BarnHelp.text('Core', 'Core_Import_ErrorRowTooLong'),
-					new List<String>{ '3' }
-				),
+				String.format(BarnHelp.text('Core', 'Core_Import_ErrorRowTooLong'), new List<String>{ '3' }),
 				refused,
 				'The second row of the page is file row three.'
 			);
-			Assert.areEqual(
-				0,
-				ImportTestDataFactory.reload(batch.Id).size(),
-				'No row of the page was staged.'
-			);
+			Assert.areEqual(0, ImportTestDataFactory.reload(batch.Id).size(), 'No row of the page was staged.');
 		}
 	}
 
@@ -187,11 +156,7 @@ private class ImportBatchServiceTest {
 				ImportBatchService.startDryRun(batch.Id);
 				Assert.fail('A file with no rows cannot be dry run.');
 			} catch (ImportException e) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_Import_ErrorNoRows'),
-					e.getMessage(),
-					'Said plainly.'
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_Import_ErrorNoRows'), e.getMessage(), 'Said plainly.');
 			}
 			Test.stopTest();
 		}
@@ -230,9 +195,7 @@ private class ImportBatchServiceTest {
 			for (Import_Batch__c batch : batches) {
 				try {
 					ImportBatchService.startDryRun(batch.Id);
-					Assert.fail(
-						'R-IB1: no dry run over a batch in status ' + batch.Status__c + '.'
-					);
+					Assert.fail('R-IB1: no dry run over a batch in status ' + batch.Status__c + '.');
 				} catch (ImportException e) {
 					Assert.areEqual(
 						BarnHelp.text('Core', 'Core_Import_ErrorDryRunAfterCommit'),
@@ -291,14 +254,7 @@ private class ImportBatchServiceTest {
 			Import_Batch__c batch = ImportTestDataFactory.batch(template);
 			List<Map<String, String>> values = new List<Map<String, String>>();
 			for (Integer i = 0; i < 200; i++) {
-				values.add(
-					ImportTestDataFactory.donorRow(
-						'Ana' + i,
-						'Ramirez',
-						'ana' + i + '@example.org',
-						null
-					)
-				);
+				values.add(ImportTestDataFactory.donorRow('Ana' + i, 'Ramirez', 'ana' + i + '@example.org', null));
 			}
 			ImportTestDataFactory.rows(batch, values);
 
@@ -307,24 +263,17 @@ private class ImportBatchServiceTest {
 			Test.stopTest();
 
 			String snapshot = ImportBatchSelector.selectTemplateSnapshot(batch.Id);
-			Assert.isTrue(
-				snapshot.contains('Contact1.MailingCity'),
-				'The dry run recorded the template it ran with.'
-			);
+			Assert.isTrue(snapshot.contains('Contact1.MailingCity'), 'The dry run recorded the template it ran with.');
 			// Edited after the preview: City no longer loaded, and a different rule.
 			ImportMapping edited = new ImportMapping();
 			edited.columns.add(new ImportMapping.Column('First Name', 'Contact1.FirstName'));
 			edited.columns.add(new ImportMapping.Column('Last Name', 'Contact1.LastName'));
 			edited.columns.add(new ImportMapping.Column('Email', 'Contact1.Email'));
 			template.Column_Mapping_JSON__c = edited.serialize();
-			template.Matching_Rule__c = ImportTemplateService.normalizedRule(
-				ImportTemplateService.RULE_NAME_POSTAL
-			);
+			template.Matching_Rule__c = ImportTemplateService.normalizedRule(ImportTemplateService.RULE_NAME_POSTAL);
 			update template;
 
-			Import_Template__c ran = ImportBatchService.templateFor(
-				ImportBatchSelector.selectById(batch.Id)
-			);
+			Import_Template__c ran = ImportBatchService.templateFor(ImportBatchSelector.selectById(batch.Id));
 			Assert.isTrue(
 				ran.Column_Mapping_JSON__c.contains('Contact1.MailingCity'),
 				'The commit reads the recorded mapping, not the edited one.'
@@ -395,14 +344,7 @@ private class ImportBatchServiceTest {
 			Import_Batch__c batch = ImportTestDataFactory.batch(newTemplate());
 			List<Map<String, String>> values = new List<Map<String, String>>();
 			for (Integer i = 0; i < 50; i++) {
-				values.add(
-					ImportTestDataFactory.donorRow(
-						'Ana' + i,
-						'Ramirez',
-						'ana' + i + '@example.org',
-						null
-					)
-				);
+				values.add(ImportTestDataFactory.donorRow('Ana' + i, 'Ramirez', 'ana' + i + '@example.org', null));
 			}
 			List<Import_Row__c> rows = ImportTestDataFactory.rows(batch, values);
 			Contact stale = TestDataFactory.person(new Contact(LastName = 'Stale'));
@@ -433,25 +375,13 @@ private class ImportBatchServiceTest {
 					AccessLevel.SYSTEM_MODE
 				)
 			) {
-				Assert.areEqual(
-					ImportRowProcessor.STATUS_CREATED,
-					after.Status__c,
-					'Worked out again.'
-				);
+				Assert.areEqual(ImportRowProcessor.STATUS_CREATED, after.Status__c, 'Worked out again.');
 				Assert.isNull(after.Error_Message__c, 'The old reason is cleared.');
 				Assert.areNotEqual(stale.Id, after.Contact_1__c, 'The person is resolved again.');
 				Assert.isNull(after.Gift_Id__c, 'A stale gift is never reported.');
-				Assert.areNotEqual(
-					'0123456789abcdef',
-					after.get('Person_1_Key__c'),
-					'Nor a stale key.'
-				);
+				Assert.areNotEqual('0123456789abcdef', after.get('Person_1_Key__c'), 'Nor a stale key.');
 			}
-			Assert.areEqual(
-				1,
-				ImportBatchSelector.selectById(batch.Id).Pass_Number__c,
-				'The first pass.'
-			);
+			Assert.areEqual(1, ImportBatchSelector.selectById(batch.Id).Pass_Number__c, 'The first pass.');
 		}
 	}
 
@@ -500,10 +430,7 @@ private class ImportBatchServiceTest {
 				}
 			);
 			// Left in Dry run by a job the platform aborted: no job is running for it.
-			update new Import_Batch__c(
-				Id = batch.Id,
-				Status__c = ImportBatchService.STATUS_DRY_RUN
-			);
+			update new Import_Batch__c(Id = batch.Id, Status__c = ImportBatchService.STATUS_DRY_RUN);
 			ImportBatchService.jobRunningForTest = false;
 			Import_Batch__c stuck = ImportBatchSelector.selectById(batch.Id);
 			Assert.areEqual(
@@ -534,10 +461,7 @@ private class ImportBatchServiceTest {
 					ImportTestDataFactory.donorRow('Ana', 'Ramirez', 'ana@example.org', null)
 				}
 			);
-			update new Import_Batch__c(
-				Id = batch.Id,
-				Status__c = ImportBatchService.STATUS_DRY_RUN_COMPLETE
-			);
+			update new Import_Batch__c(Id = batch.Id, Status__c = ImportBatchService.STATUS_DRY_RUN_COMPLETE);
 
 			Test.startTest();
 			ImportBatchService.startCommit(batch.Id);
@@ -562,15 +486,7 @@ private class ImportBatchServiceTest {
 			Import_Template__c template = newTemplate();
 
 			Test.startTest();
-			Import_Batch__c batch = ImportBatchService.create(
-				template.Id,
-				null,
-				'gifts.csv',
-				3,
-				250.5,
-				null,
-				false
-			);
+			Import_Batch__c batch = ImportBatchService.create(template.Id, null, 'gifts.csv', 3, 250.5, null, false);
 			try {
 				ImportBatchService.create(template.Id, null, 'gifts.csv', -1, null, null, false);
 				Assert.fail('A negative number of rows makes no sense.');
@@ -605,24 +521,14 @@ private class ImportBatchServiceTest {
 			update batch;
 
 			Test.startTest();
-			Import_Batch__c after = ImportBatchService.finish(
-				batch.Id,
-				true,
-				false,
-				null,
-				75.00,
-				null
-			);
+			Import_Batch__c after = ImportBatchService.finish(batch.Id, true, false, null, 75.00, null);
 			Test.stopTest();
 
 			Assert.isTrue(after.File_Amount__c == 75, 'The amount the run read is kept.');
 			Assert.isTrue(ImportBatchService.controlTotalsAgree(after), 'Both totals agree.');
 			Assert.isTrue(
 				after.Run_Log__c.contains(
-					String.format(
-						BarnHelp.text('Core', 'Core_Import_LogControlCountAgrees'),
-						new List<String>{ '2' }
-					)
+					String.format(BarnHelp.text('Core', 'Core_Import_LogControlCountAgrees'), new List<String>{ '2' })
 				),
 				'The run log says the count matched.'
 			);
@@ -642,21 +548,12 @@ private class ImportBatchServiceTest {
 			batch.Expected_Count__c = 2;
 			batch.Expected_Amount__c = 100;
 			update batch;
-			Import_Batch__c after = ImportBatchService.finish(
-				batch.Id,
-				true,
-				false,
-				null,
-				80,
-				null
-			);
+			Import_Batch__c after = ImportBatchService.finish(batch.Id, true, false, null, 80, null);
 
 			Test.startTest();
 			try {
 				ImportBatchService.startCommit(batch.Id);
-				Assert.fail(
-					'R-IB10: a commit waits for a dry run that matches the control totals.'
-				);
+				Assert.fail('R-IB10: a commit waits for a dry run that matches the control totals.');
 			} catch (ImportException e) {
 				Assert.areEqual(
 					BarnHelp.text('Core', 'Core_Import_ErrorControlTotalsDiffer'),
@@ -687,14 +584,7 @@ private class ImportBatchServiceTest {
 			update batch;
 
 			Test.startTest();
-			Import_Batch__c after = ImportBatchService.finish(
-				batch.Id,
-				true,
-				false,
-				null,
-				null,
-				null
-			);
+			Import_Batch__c after = ImportBatchService.finish(batch.Id, true, false, null, null, null);
 			Test.stopTest();
 
 			Assert.isFalse(
@@ -702,9 +592,7 @@ private class ImportBatchServiceTest {
 				'Without a module that reads gift amounts the amount cannot be checked.'
 			);
 			Assert.isTrue(
-				after.Run_Log__c.contains(
-					BarnHelp.text('Core', 'Core_Import_LogControlAmountUnread')
-				),
+				after.Run_Log__c.contains(BarnHelp.text('Core', 'Core_Import_LogControlAmountUnread')),
 				'And the run log says why.'
 			);
 		}
@@ -761,32 +649,19 @@ private class ImportBatchServiceTest {
 			);
 
 			Test.startTest();
-			Import_Batch__c after = ImportBatchService.finish(
-				batch.Id,
-				false,
-				false,
-				null,
-				null,
-				null
-			);
+			Import_Batch__c after = ImportBatchService.finish(batch.Id, false, false, null, null, null);
 			Test.stopTest();
 
 			Assert.areEqual(ImportBatchService.STATUS_COMPLETE, after.Status__c, 'It completed.');
-			Assert.areEqual(
-				UserInfo.getUserId(),
-				after.Committed_By__c,
-				'The committer is recorded.'
-			);
+			Assert.areEqual(UserInfo.getUserId(), after.Committed_By__c, 'The committer is recorded.');
 			Assert.isNotNull(after.Undo_Deadline__c, 'And the undo window is open (R-IB6).');
 			Assert.isTrue(
-				after.Undo_Deadline__c >
-				Datetime.now().addDays(ImportBatchService.UNDO_WINDOW_DAYS - 1),
+				after.Undo_Deadline__c > Datetime.now().addDays(ImportBatchService.UNDO_WINDOW_DAYS - 1),
 				'With no setting the window is the shipped thirty days.'
 			);
 			Assert.areEqual(
-				Date.today(),
-				[SELECT Last_Import_Date__c FROM Import_Template__c WHERE Id = :template.Id]
-				.Last_Import_Date__c,
+				OrgDate.today(),
+				[SELECT Last_Import_Date__c FROM Import_Template__c WHERE Id = :template.Id].Last_Import_Date__c,
 				'The template records that its feed was loaded today.'
 			);
 		}
@@ -801,14 +676,7 @@ private class ImportBatchServiceTest {
 			Import_Batch__c batch = ImportTestDataFactory.batch(newTemplate());
 
 			Test.startTest();
-			Import_Batch__c after = ImportBatchService.finish(
-				batch.Id,
-				false,
-				false,
-				null,
-				null,
-				null
-			);
+			Import_Batch__c after = ImportBatchService.finish(batch.Id, false, false, null, null, null);
 			Test.stopTest();
 
 			Assert.isTrue(
@@ -832,11 +700,7 @@ private class ImportBatchServiceTest {
 			);
 			settings.Import_Undo_Retention_Days__c = 900;
 			TestDataFactory.saveSettings(settings);
-			Assert.areEqual(
-				365,
-				ImportBatchService.undoWindowDays(),
-				'Over a year is held at a year.'
-			);
+			Assert.areEqual(365, ImportBatchService.undoWindowDays(), 'Over a year is held at a year.');
 		}
 	}
 
@@ -861,10 +725,7 @@ private class ImportBatchServiceTest {
 			);
 			Test.stopTest();
 			Assert.areEqual(ImportBatchService.STATUS_FAILED, after.Status__c, 'Marked as failed.');
-			Assert.isTrue(
-				after.Run_Log__c.contains('Chunk 1 failed'),
-				'With the reason in the log.'
-			);
+			Assert.isTrue(after.Run_Log__c.contains('Chunk 1 failed'), 'With the reason in the log.');
 			Assert.isNotNull(
 				after.Undo_Deadline__c,
 				'The chunks that ran did write, so a failed commit can be undone too (R-IB7).'
@@ -883,11 +744,7 @@ private class ImportBatchServiceTest {
 				ImportBatchService.startDryRun(batchId);
 				Assert.fail('A deleted batch cannot be run.');
 			} catch (ImportException e) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_Import_ErrorBatchGone'),
-					e.getMessage(),
-					'Said plainly.'
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_Import_ErrorBatchGone'), e.getMessage(), 'Said plainly.');
 			}
 			Test.stopTest();
 		}

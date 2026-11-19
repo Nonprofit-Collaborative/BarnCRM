@@ -20,11 +20,7 @@ private class HouseholdNamingServiceTest {
 				NAME_PATTERN,
 				false
 			);
-			Assert.areEqual(
-				'The Smith Family',
-				name,
-				'Two people called Smith are the Smith family'
-			);
+			Assert.areEqual('The Smith Family', name, 'Two people called Smith are the Smith family');
 		}
 	}
 
@@ -50,11 +46,7 @@ private class HouseholdNamingServiceTest {
 				NAME_PATTERN,
 				false
 			);
-			Assert.areEqual(
-				'Garcia and Lee Household',
-				name,
-				'Two surnames are listed, not patterned'
-			);
+			Assert.areEqual('Garcia and Lee Household', name, 'Two surnames are listed, not patterned');
 		}
 	}
 
@@ -335,11 +327,7 @@ private class HouseholdNamingServiceTest {
 		System.runAs(TestUsers.admin()) {
 			Assert.areEqual(
 				'The Smith Family',
-				HouseholdNamingService.computeName(
-					HouseholdTestDataFactory.smithCouple(),
-					null,
-					false
-				),
+				HouseholdNamingService.computeName(HouseholdTestDataFactory.smithCouple(), null, false),
 				'A missing pattern does not produce a blank name'
 			);
 		}
@@ -350,11 +338,7 @@ private class HouseholdNamingServiceTest {
 		System.runAs(TestUsers.admin()) {
 			Assert.areEqual(
 				null,
-				HouseholdNamingService.computeName(
-					new List<HouseholdService.Person>(),
-					NAME_PATTERN,
-					false
-				),
+				HouseholdNamingService.computeName(new List<HouseholdService.Person>(), NAME_PATTERN, false),
 				'No members means no computed name'
 			);
 		}
@@ -399,42 +383,23 @@ private class HouseholdNamingServiceTest {
 				FROM Account
 				WHERE Id = :household.Id
 			];
-			Assert.areEqual(
-				'The Smith Family',
-				saved.Name,
-				'The household is renamed from its members'
-			);
-			Assert.areEqual(
-				'Mr. and Mrs. John Smith',
-				saved.Household_Formal_Greeting__c,
-				'Formal greeting'
-			);
-			Assert.areEqual(
-				'John and Jane',
-				saved.Household_Informal_Greeting__c,
-				'Informal greeting'
-			);
+			Assert.areEqual('The Smith Family', saved.Name, 'The household is renamed from its members');
+			Assert.areEqual('Mr. and Mrs. John Smith', saved.Household_Formal_Greeting__c, 'Formal greeting');
+			Assert.areEqual('John and Jane', saved.Household_Informal_Greeting__c, 'Informal greeting');
 		}
 	}
 
 	@IsTest
 	static void aHouseholdLeftEmptyKeepsItsLastNameAndGreetings() {
 		System.runAs(TestUsers.admin()) {
-			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-				HouseholdTestDataFactory.MODE_CONTACT
-			);
+			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			settings.Delete_Empty_Households__c = false;
 			HouseholdTestDataFactory.save(settings);
 			Account household = HouseholdTestDataFactory.newHousehold('Placeholder');
 			Account elsewhere = HouseholdTestDataFactory.newHousehold('Elsewhere');
 			Database.insert(new List<Account>{ household, elsewhere }, AccessLevel.SYSTEM_MODE);
 			Contact john = TestDataFactory.person(
-				new Contact(
-					Salutation = 'Mr.',
-					FirstName = 'John',
-					LastName = 'Smith',
-					AccountId = household.Id
-				)
+				new Contact(Salutation = 'Mr.', FirstName = 'John', LastName = 'Smith', AccountId = household.Id)
 			);
 			insert john;
 			Account named = [
@@ -450,20 +415,12 @@ private class HouseholdNamingServiceTest {
 			Test.stopTest();
 
 			Account kept = [
-				SELECT
-					Name,
-					Member_Count__c,
-					Household_Formal_Greeting__c,
-					Household_Informal_Greeting__c
+				SELECT Name, Member_Count__c, Household_Formal_Greeting__c, Household_Informal_Greeting__c
 				FROM Account
 				WHERE Id = :household.Id
 			];
 			Assert.areEqual(0, kept.Member_Count__c, 'Nobody is left in it');
-			Assert.areEqual(
-				named.Name,
-				kept.Name,
-				'Still says which family it was, not the placeholder name'
-			);
+			Assert.areEqual(named.Name, kept.Name, 'Still says which family it was, not the placeholder name');
 			Assert.areEqual(
 				named.Household_Formal_Greeting__c,
 				kept.Household_Formal_Greeting__c,
@@ -481,9 +438,7 @@ private class HouseholdNamingServiceTest {
 	@IsTest
 	static void aJunctionHouseholdWhoseLastMembershipEndsKeepsItsNameAndGreetings() {
 		System.runAs(TestUsers.admin()) {
-			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-				HouseholdTestDataFactory.MODE_JUNCTION
-			);
+			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
 			settings.Auto_Create_Households__c = false;
 			settings.Delete_Empty_Households__c = false;
 			HouseholdTestDataFactory.save(settings);
@@ -508,16 +463,12 @@ private class HouseholdNamingServiceTest {
 			Assert.areEqual('The Smith Family', named.Name, 'Named from its member first');
 
 			Test.startTest();
-			update new Household_Member__c(Id = member.Id, End_Date__c = Date.today());
+			update new Household_Member__c(Id = member.Id, End_Date__c = OrgDate.today());
 			HouseholdNamingService.applyNaming(new Set<Id>{ household.Id });
 			Test.stopTest();
 
 			Account kept = [
-				SELECT
-					Name,
-					Member_Count__c,
-					Household_Formal_Greeting__c,
-					Household_Informal_Greeting__c
+				SELECT Name, Member_Count__c, Household_Formal_Greeting__c, Household_Informal_Greeting__c
 				FROM Account
 				WHERE Id = :household.Id
 			];
@@ -540,18 +491,11 @@ private class HouseholdNamingServiceTest {
 	static void customNameStopsEveryRecomputation() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-			Account household = HouseholdTestDataFactory.newHousehold(
-				'The Reverend and Mrs. Smith'
-			);
+			Account household = HouseholdTestDataFactory.newHousehold('The Reverend and Mrs. Smith');
 			household.Custom_Name__c = true;
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
 			insert TestDataFactory.person(
-				new Contact(
-					Salutation = 'Mr.',
-					FirstName = 'John',
-					LastName = 'Smith',
-					AccountId = household.Id
-				)
+				new Contact(Salutation = 'Mr.', FirstName = 'John', LastName = 'Smith', AccountId = household.Id)
 			);
 
 			Test.startTest();
@@ -571,9 +515,7 @@ private class HouseholdNamingServiceTest {
 	static void upkeepFillsBlankGreetingsOnACustomNamedHousehold() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-			Account household = HouseholdTestDataFactory.newHousehold(
-				'The Reverend and Mrs. Smith'
-			);
+			Account household = HouseholdTestDataFactory.newHousehold('The Reverend and Mrs. Smith');
 			household.Custom_Name__c = true;
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
 
@@ -620,11 +562,7 @@ private class HouseholdNamingServiceTest {
 				one.Household_Formal_Greeting__c,
 				'A typed formal greeting is never replaced'
 			);
-			Assert.areEqual(
-				'John',
-				one.Household_Informal_Greeting__c,
-				'Only the blank one filled'
-			);
+			Assert.areEqual('John', one.Household_Informal_Greeting__c, 'Only the blank one filled');
 
 			Account both = wordingOf(bothTyped.Id);
 			Assert.areEqual('The Smith Clan', both.Name, 'Custom name kept');
@@ -690,11 +628,7 @@ private class HouseholdNamingServiceTest {
 					household.Household_Formal_Greeting__c,
 					'Typed formal greeting kept'
 				);
-				Assert.areEqual(
-					'John',
-					household.Household_Informal_Greeting__c,
-					'Blank informal greeting filled'
-				);
+				Assert.areEqual('John', household.Household_Informal_Greeting__c, 'Blank informal greeting filled');
 			}
 		}
 	}
@@ -775,11 +709,7 @@ private class HouseholdNamingServiceTest {
 				saved.Household_Formal_Greeting__c,
 				'The greeting is worded in the org language, not the saver language.'
 			);
-			Assert.areEqual(
-				'John und Jane',
-				saved.Household_Informal_Greeting__c,
-				'So is the informal greeting.'
-			);
+			Assert.areEqual('John und Jane', saved.Household_Informal_Greeting__c, 'So is the informal greeting.');
 		}
 	}
 
@@ -854,11 +784,7 @@ private class HouseholdNamingServiceTest {
 					.replace('{0}', String.join(kept, Label.Core_Households_ListSeparator + ' ')) +
 				' ' +
 				Label.Core_Households_NameSuffix;
-			Assert.areEqual(
-				expected,
-				name,
-				'As many surnames as fit are named and the rest counted, within the field'
-			);
+			Assert.areEqual(expected, name, 'As many surnames as fit are named and the rest counted, within the field');
 			Assert.isTrue(name.length() <= 255, 'The name fits Account Name: ' + name.length());
 		}
 	}
@@ -871,30 +797,16 @@ private class HouseholdNamingServiceTest {
 				person.lastName = 'Fitzgerald';
 				members.add(person);
 			}
-			String name = HouseholdNamingService.computeName(
-				members,
-				'{FirstName} {LastName}',
-				false
-			);
-			String formal = HouseholdNamingService.computeFormalGreeting(
-				members,
-				FORMAL_PATTERN,
-				false
-			);
-			String informal = HouseholdNamingService.computeInformalGreeting(
-				members,
-				'{FirstName} {LastName}'
-			);
+			String name = HouseholdNamingService.computeName(members, '{FirstName} {LastName}', false);
+			String formal = HouseholdNamingService.computeFormalGreeting(members, FORMAL_PATTERN, false);
+			String informal = HouseholdNamingService.computeInformalGreeting(members, '{FirstName} {LastName}');
 
 			for (String value : new List<String>{ name, formal, informal }) {
 				Assert.isTrue(value.length() <= 255, 'Fits its field: ' + value);
 				Assert.isTrue(value.endsWith(othersEnding()), 'Counts who is left out: ' + value);
 			}
 			Assert.isTrue(name.startsWith('First01 Fitzgerald, First02 Fitzgerald'), name);
-			Assert.isTrue(
-				formal.startsWith('Mr. First01 Fitzgerald, Mr. First02 Fitzgerald'),
-				formal
-			);
+			Assert.isTrue(formal.startsWith('Mr. First01 Fitzgerald, Mr. First02 Fitzgerald'), formal);
 		}
 	}
 
@@ -908,15 +820,9 @@ private class HouseholdNamingServiceTest {
 			};
 			String name = HouseholdNamingService.computeName(members, NAME_PATTERN, false);
 
-			String kept =
-				'A'.repeat(80) +
-				Label.Core_Households_ListSeparator +
-				' ' +
-				'B'.repeat(80);
+			String kept = 'A'.repeat(80) + Label.Core_Households_ListSeparator + ' ' + 'B'.repeat(80);
 			Assert.areEqual(
-				Label.Core_Households_ListAndOneOther.replace('{0}', kept) +
-					' ' +
-					Label.Core_Households_NameSuffix,
+				Label.Core_Households_ListAndOneOther.replace('{0}', kept) + ' ' + Label.Core_Households_NameSuffix,
 				name,
 				'A single person left out is counted in the singular'
 			);
@@ -928,9 +834,7 @@ private class HouseholdNamingServiceTest {
 		System.runAs(TestUsers.admin()) {
 			String pattern = 'The {LastName} Family' + ' wordy'.repeat(60);
 			String name = HouseholdNamingService.computeName(
-				new List<HouseholdService.Person>{
-					HouseholdTestDataFactory.person('Ms.', 'Maria', 'Garcia', 'Head')
-				},
+				new List<HouseholdService.Person>{ HouseholdTestDataFactory.person('Ms.', 'Maria', 'Garcia', 'Head') },
 				pattern,
 				false
 			);
@@ -970,11 +874,7 @@ private class HouseholdNamingServiceTest {
 			Test.stopTest();
 
 			Account saved = [
-				SELECT
-					Name,
-					Member_Count__c,
-					Household_Formal_Greeting__c,
-					Household_Informal_Greeting__c
+				SELECT Name, Member_Count__c, Household_Formal_Greeting__c, Household_Informal_Greeting__c
 				FROM Account
 				WHERE Id = :householdId
 			];

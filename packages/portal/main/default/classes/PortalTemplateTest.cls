@@ -38,16 +38,8 @@ private class PortalTemplateTest {
 			Assert.areEqual(Affiliation__c.SObjectType, roles.objectType, 'The related object');
 			Assert.areEqual('Contact__c', roles.personField, 'Filtered by the person');
 			Assert.isTrue(roles.canUpdate && !roles.canCreate, 'Update only');
-			Assert.areEqual(
-				'Say Thanks',
-				roles.extensionLabels.get('Test.Thanks'),
-				'The module action'
-			);
-			Assert.areEqual(
-				'Organization',
-				roles.field('Organization__r.Name').label,
-				'Label from the template'
-			);
+			Assert.areEqual('Say Thanks', roles.extensionLabels.get('Test.Thanks'), 'The module action');
+			Assert.areEqual('Organization', roles.field('Organization__r.Name').label, 'Label from the template');
 			Assert.areEqual('Role__c ASC', roles.orderBy, 'Ordered');
 			Assert.areEqual(1, roles.conditions.size(), 'One fixed test');
 			Assert.isNull(template.page('nope'), 'An unknown page is absent');
@@ -78,11 +70,9 @@ private class PortalTemplateTest {
 			rolesPage(catalogWithoutTests).remove('where');
 			rolesPage(catalogWithoutTests).put('actions', new List<Object>());
 			Map<String, Object> unknownField = sample();
-			((List<Object>) rolesPage(unknownField).get('fields'))
-				.add(new Map<String, Object>{ 'field' => 'Nope__c' });
+			((List<Object>) rolesPage(unknownField).get('fields')).add(new Map<String, Object>{ 'field' => 'Nope__c' });
 			Map<String, Object> unknownOp = sample();
-			((Map<String, Object>) ((List<Object>) rolesPage(unknownOp).get('where'))[0])
-				.put('op', 'like');
+			((Map<String, Object>) ((List<Object>) rolesPage(unknownOp).get('where'))[0]).put('op', 'like');
 			Map<String, Object> oldVersion = sample();
 			oldVersion.put('schemaVersion', 2);
 			Map<String, Object> createOnPerson = sample();
@@ -116,9 +106,7 @@ private class PortalTemplateTest {
 		rolesPage(template)
 			.put(
 				'where',
-				new List<Object>{
-					new Map<String, Object>{ 'field' => field, 'op' => op, 'value' => value }
-				}
+				new List<Object>{ new Map<String, Object>{ 'field' => field, 'op' => op, 'value' => value } }
 			);
 		return template;
 	}
@@ -180,10 +168,7 @@ private class PortalTemplateTest {
 	static void reachesThePersonThroughOneParentForReadingOnly() {
 		System.runAs(TestUsers.adminWith('Portal_Admin')) {
 			Map<String, Object> editPage = viaParentPage(VIA_PARENT);
-			editPage.put(
-				'fields',
-				new List<Object>{ new Map<String, Object>{ 'field' => 'Name', 'edit' => true } }
-			);
+			editPage.put('fields', new List<Object>{ new Map<String, Object>{ 'field' => 'Name', 'edit' => true } });
 			Map<String, Object> writePage = viaParentPage(VIA_PARENT);
 			writePage.put('actions', new List<Object>{ 'update' });
 
@@ -193,12 +178,8 @@ private class PortalTemplateTest {
 			);
 			String editRefusal = refusal(viaParentTemplate(editPage));
 			String updateRefusal = refusal(viaParentTemplate(writePage));
-			String notContact = refusal(
-				viaParentTemplate(viaParentPage('Reciprocal_Relationship__r.Name'))
-			);
-			String twoHops = refusal(
-				viaParentTemplate(viaParentPage('Reciprocal_Relationship__r.Contact__r.Id'))
-			);
+			String notContact = refusal(viaParentTemplate(viaParentPage('Reciprocal_Relationship__r.Name')));
+			String twoHops = refusal(viaParentTemplate(viaParentPage('Reciprocal_Relationship__r.Contact__r.Id')));
 			Test.stopTest();
 
 			Assert.isTrue(template.page('kin').personViaParent, 'Reached through the parent');
@@ -235,38 +216,23 @@ private class PortalTemplateTest {
 		System.runAs(TestUsers.adminWith('Portal_Admin')) {
 			Map<String, Object> template = sample();
 			((List<Object>) template.get('pages'))
-				.add(
-					PortalTestData.scopedPage(
-						PortalTestData.scope('Organization__c', 'Organization__c')
-					)
-				);
-			((Map<String, Object>) ((List<Object>) rolesPage(template).get('fields'))[1])
-				.put('scan', true);
+				.add(PortalTestData.scopedPage(PortalTestData.scope('Organization__c', 'Organization__c')));
+			((Map<String, Object>) ((List<Object>) rolesPage(template).get('fields'))[1]).put('scan', true);
 			Map<String, Object> relatedScoped = sample();
-			rolesPage(relatedScoped)
-				.put('personScope', PortalTestData.scope('Organization__c', 'Organization__c'));
-			Map<String, Object> notPerson = PortalTestData.scope(
-				'Organization__c',
-				'Organization__c'
-			);
+			rolesPage(relatedScoped).put('personScope', PortalTestData.scope('Organization__c', 'Organization__c'));
+			Map<String, Object> notPerson = PortalTestData.scope('Organization__c', 'Organization__c');
 			notPerson.put('personField', 'Organization__c');
 			Map<String, Object> badCalendar = PortalTestData.scopedPage(
 				PortalTestData.scope('Organization__c', 'Organization__c')
 			);
-			badCalendar.put(
-				'calendar',
-				new Map<String, Object>{ 'title' => 'Role__c', 'start' => 'Role__c' }
-			);
+			badCalendar.put('calendar', new Map<String, Object>{ 'title' => 'Role__c', 'start' => 'Role__c' });
 			Map<String, Object> scanStatus = sample();
-			((Map<String, Object>) ((List<Object>) rolesPage(scanStatus).get('fields'))[2])
-				.put('scan', true);
+			((Map<String, Object>) ((List<Object>) rolesPage(scanStatus).get('fields'))[2]).put('scan', true);
 
 			Test.startTest();
 			PortalTemplate parsed = PortalTemplate.parse(JSON.serialize(template));
 			String hop = pageRefusal(
-				PortalTestData.scopedPage(
-					PortalTestData.scope('Contact__r.AccountId', 'Contact__r.AccountId')
-				)
+				PortalTestData.scopedPage(PortalTestData.scope('Contact__r.AccountId', 'Contact__r.AccountId'))
 			);
 			String notCatalog = refusal(relatedScoped);
 			String notLookup = pageRefusal(
@@ -282,11 +248,7 @@ private class PortalTemplateTest {
 
 			PortalTemplate.PageSpec page = parsed.page('colleagues');
 			Assert.areEqual('Organization__c', page.scope.field, 'Scoped by organization');
-			Assert.areEqual(
-				Affiliation__c.SObjectType,
-				page.scope.objectType,
-				'Through affiliations'
-			);
+			Assert.areEqual(Affiliation__c.SObjectType, page.scope.objectType, 'Through affiliations');
 			Assert.areEqual(1, page.scope.conditions.size(), 'With the scope\'s own test');
 			Assert.areEqual('Start_Date__c', page.calendar.get('start'), 'Calendar start');
 			Assert.isTrue(page.download, 'Download CSV');

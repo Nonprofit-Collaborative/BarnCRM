@@ -13,30 +13,20 @@ private class VolunteersErasureExtensionTest {
 	static void makeUsers() {
 		TestUsers.adminWith(VolunteersTestData.ADMIN);
 		TestUsers.withPermissionSets(
-			new List<String>{
-				TestUsers.CORE_ADMIN,
-				VolunteersTestData.ADMIN,
-				'BarnCRM_Erase_People'
-			}
+			new List<String>{ TestUsers.CORE_ADMIN, VolunteersTestData.ADMIN, 'BarnCRM_Erase_People' }
 		);
 	}
 
 	private static User eraser() {
 		return TestUsers.withPermissionSets(
-			new List<String>{
-				TestUsers.CORE_ADMIN,
-				VolunteersTestData.ADMIN,
-				'BarnCRM_Erase_People'
-			}
+			new List<String>{ TestUsers.CORE_ADMIN, VolunteersTestData.ADMIN, 'BarnCRM_Erase_People' }
 		);
 	}
 
 	/** How many Deleted changes name the requirements, through the getters Core exposes. */
 	private static Integer deletedLists(PersonErasure.Result result) {
 		Integer found = 0;
-		String label = Volunteer_Requirement__c.SObjectType.getDescribe(
-				SObjectDescribeOptions.DEFERRED
-			)
+		String label = Volunteer_Requirement__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 			.getLabelPlural();
 		for (PersonErasure.Change change : result.getChanges()) {
 			if (change.getAction() == PersonErasure.DELETED && change.getObjectLabel() == label) {
@@ -129,11 +119,7 @@ private class VolunteersErasureExtensionTest {
 
 			PersonErasure.Result preview = PersonErasure.preview(jordan.Id);
 
-			Assert.areEqual(
-				1,
-				deletedLists(preview),
-				'The preview says the requirement would be deleted'
-			);
+			Assert.areEqual(1, deletedLists(preview), 'The preview says the requirement would be deleted');
 			Assert.areEqual(
 				1,
 				[SELECT COUNT() FROM Volunteer_Requirement__c WHERE Contact__c = :jordan.Id],
@@ -150,11 +136,7 @@ private class VolunteersErasureExtensionTest {
 
 			PersonErasure.erase(jordan.Id, 'Ana Lee', null);
 
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Erasure__c WHERE Contact__c = :jordan.Id],
-				'Erased as before'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Erasure__c WHERE Contact__c = :jordan.Id], 'Erased as before');
 		}
 	}
 
@@ -171,11 +153,7 @@ private class VolunteersErasureExtensionTest {
 				Status__c = 'In progress'
 			);
 
-			PersonErasure.erase(
-				person.Id,
-				[SELECT Name FROM Account WHERE Id = :person.Id].Name,
-				null
-			);
+			PersonErasure.erase(person.Id, [SELECT Name FROM Account WHERE Id = :person.Id].Name, null);
 
 			Assert.areEqual(
 				0,
@@ -238,8 +216,7 @@ private class VolunteersErasureExtensionTest {
 			);
 			Assert.areEqual(
 				502,
-				[SELECT Volunteer_Hours_Total__c FROM Contact WHERE Id = :jordan.Id]
-				.Volunteer_Hours_Total__c,
+				[SELECT Volunteer_Hours_Total__c FROM Contact WHERE Id = :jordan.Id].Volunteer_Hours_Total__c,
 				'The total is kept, so it still matches the hours kept'
 			);
 			Assert.areEqual(
@@ -258,8 +235,7 @@ private class VolunteersErasureExtensionTest {
 				'The result says their notes were emptied'
 			);
 			Assert.isFalse(
-				[SELECT Details__c FROM Erasure__c WHERE Contact__c = :jordan.Id]
-					.Details__c.contains('diagnosis'),
+				[SELECT Details__c FROM Erasure__c WHERE Contact__c = :jordan.Id].Details__c.contains('diagnosis'),
 				'The Erasure record never holds what a note said'
 			);
 		}
@@ -271,16 +247,8 @@ private class VolunteersErasureExtensionTest {
 			VolunteersTestData.contactModeWithoutAutomaticHouseholds();
 			Contact jordan = person('Lee');
 			Volunteer_Job__c pantry = VolunteersTestData.job('Pantry');
-			Volunteer_Shift__c past = VolunteersTestData.newShift(
-				pantry.Id,
-				Datetime.now().addDays(-7),
-				3
-			);
-			Volunteer_Shift__c coming = VolunteersTestData.newShift(
-				pantry.Id,
-				Datetime.now().addDays(7),
-				3
-			);
+			Volunteer_Shift__c past = VolunteersTestData.newShift(pantry.Id, Datetime.now().addDays(-7), 3);
+			Volunteer_Shift__c coming = VolunteersTestData.newShift(pantry.Id, Datetime.now().addDays(7), 3);
 			insert new List<Volunteer_Shift__c>{ past, coming };
 			Volunteer_Signup__c worked = VolunteersTestData.newSignup(past.Id, jordan.Id);
 			worked.Status__c = 'No show';
@@ -320,11 +288,7 @@ private class VolunteersErasureExtensionTest {
 			insert spanish;
 			insert new List<Volunteer_Skill__c>{
 				new Volunteer_Skill__c(Contact__c = jordan.Id, Skill__c = spanish.Id),
-				new Volunteer_Skill__c(
-					Contact__c = jordan.Id,
-					Skill__c = spanish.Id,
-					Type__c = 'Interest'
-				),
+				new Volunteer_Skill__c(Contact__c = jordan.Id, Skill__c = spanish.Id, Type__c = 'Interest'),
 				new Volunteer_Skill__c(Contact__c = sam.Id, Skill__c = spanish.Id)
 			};
 
@@ -361,11 +325,7 @@ private class VolunteersErasureExtensionTest {
 			entry.Notes__c = 'Prefers mornings';
 			insert entry;
 
-			PersonErasure.erase(
-				person.Id,
-				[SELECT Name FROM Account WHERE Id = :person.Id].Name,
-				null
-			);
+			PersonErasure.erase(person.Id, [SELECT Name FROM Account WHERE Id = :person.Id].Name, null);
 
 			Volunteer_Hours__c after = [
 				SELECT Account__c, Notes__c
@@ -406,8 +366,7 @@ private class VolunteersErasureExtensionTest {
 	}
 
 	private static Id documentOf(Id versionId) {
-		return [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :versionId]
-		.ContentDocumentId;
+		return [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :versionId].ContentDocumentId;
 	}
 
 	@IsTest
@@ -451,11 +410,7 @@ private class VolunteersErasureExtensionTest {
 			List<Object> listedIds = (List<Object>) listed[0].get('recordIds');
 			Assert.areEqual(1, listedIds.size(), 'Only the generated letter');
 			Assert.areEqual(String.valueOf(letter), String.valueOf(listedIds[0]));
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM ContentDocument WHERE Id = :letter],
-				'The preview deleted nothing'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM ContentDocument WHERE Id = :letter], 'The preview deleted nothing');
 
 			Test.startTest();
 			PersonErasure.erase(jordan.Id, 'Ana Lee', null);
@@ -514,17 +469,12 @@ private class VolunteersErasureExtensionTest {
 			PersonErasure.Result preview = PersonErasure.preview(person.Id);
 			Assert.areEqual(
 				1,
-				changesLabelled(preview, Label.Volunteers_Erase_LettersLabel, PersonErasure.DELETED)
-					.size(),
+				changesLabelled(preview, Label.Volunteers_Erase_LettersLabel, PersonErasure.DELETED).size(),
 				'The preview lists the letter on the person account as Deleted'
 			);
 
 			Test.startTest();
-			PersonErasure.erase(
-				person.Id,
-				[SELECT Name FROM Account WHERE Id = :person.Id].Name,
-				null
-			);
+			PersonErasure.erase(person.Id, [SELECT Name FROM Account WHERE Id = :person.Id].Name, null);
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -560,15 +510,11 @@ private class VolunteersErasureExtensionTest {
 			for (
 				Map<String, Object> cleared : changesLabelled(
 					preview,
-					Volunteer_Hours__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-						.getLabelPlural(),
+					Volunteer_Hours__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural(),
 					PersonErasure.CLEARED
 				)
 			) {
-				if (
-					JSON.serialize(cleared)
-						.contains(Volunteer_Hours__c.Rejection_Reason__c.getDescribe().getLabel())
-				) {
+				if (JSON.serialize(cleared).contains(Volunteer_Hours__c.Rejection_Reason__c.getDescribe().getLabel())) {
 					listed = true;
 				}
 			}

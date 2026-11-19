@@ -19,9 +19,7 @@ private class DataTransformDigitsTest {
 			LIMIT 1
 		];
 		System.assertEquals(1, resources.size(), 'The shared fixture is deployed with Core.');
-		Map<String, Object> fixture = (Map<String, Object>) JSON.deserializeUntyped(
-			resources[0].Body.toString()
-		);
+		Map<String, Object> fixture = (Map<String, Object>) JSON.deserializeUntyped(resources[0].Body.toString());
 		return (List<Object>) fixture.get('cases');
 	}
 
@@ -44,19 +42,11 @@ private class DataTransformDigitsTest {
 				String country = (String) fixtureCase.get('country');
 				String input = (String) fixtureCase.get('input');
 				String expected = (String) fixtureCase.get('expected');
-				System.assertEquals(
-					expected,
-					DataTransform.formatDigits(input, pattern, country),
-					name
-				);
+				System.assertEquals(expected, DataTransform.formatDigits(input, pattern, country), name);
 				// The step run as the engine runs it gives the same value.
 				System.assertEquals(
 					expected,
-					DataTransform.apply(
-						new List<DataTransform.Step>{ digits(pattern, country) },
-						input,
-						null
-					),
+					DataTransform.apply(new List<DataTransform.Step>{ digits(pattern, country) }, input, null),
 					name + ' through apply'
 				);
 			}
@@ -71,11 +61,7 @@ private class DataTransformDigitsTest {
 				DataTransform.problemWith(digits('(###) ###-####', '1')),
 				'Pattern and country code.'
 			);
-			System.assertEquals(
-				null,
-				DataTransform.problemWith(digits('###-###-####', null)),
-				'No country code.'
-			);
+			System.assertEquals(null, DataTransform.problemWith(digits('###-###-####', null)), 'No country code.');
 		}
 	}
 
@@ -98,11 +84,7 @@ private class DataTransformDigitsTest {
 					JSON.serialize(step)
 				);
 			}
-			System.assertEquals(
-				1,
-				DataTransform.problems(bad).size(),
-				'One sentence however many steps share it.'
-			);
+			System.assertEquals(1, DataTransform.problems(bad).size(), 'One sentence however many steps share it.');
 		}
 	}
 
@@ -111,11 +93,7 @@ private class DataTransformDigitsTest {
 		System.runAs(TestUsers.admin()) {
 			System.assertEquals(
 				'5551234567',
-				DataTransform.apply(
-					new List<DataTransform.Step>{ digits('no places', '') },
-					'5551234567',
-					null
-				),
+				DataTransform.apply(new List<DataTransform.Step>{ digits('no places', '') }, '5551234567', null),
 				'A step that fails the check changes nothing.'
 			);
 		}
@@ -128,10 +106,7 @@ private class DataTransformDigitsTest {
 				'[{"op":"trim"},{"op":"digits","pattern":"(###) ###-####","country":"1"}]'
 			);
 			System.assertEquals(2, steps.size());
-			System.assertEquals(
-				'(555) 123-4567',
-				DataTransform.apply(steps, ' 1-555-123-4567 ', null)
-			);
+			System.assertEquals('(555) 123-4567', DataTransform.apply(steps, ' 1-555-123-4567 ', null));
 			System.assertEquals(3, DataTransform.DOCUMENT_VERSION, 'Digits is a version 3 step.');
 		}
 	}

@@ -4,7 +4,7 @@ A commitment is a promise to give. A **Pledge** is a fixed total paid over time;
 
 The words BarnCRM uses: **commitment** for the record, whichever kind it is; **pledge** and **recurring gift** for its two kinds; **scheduled payment** for each payment it expects.
 
-Before you start: open the **BarnCRM Fundraising** app, **Commitments** tab. You need the **Fundraising Staff** role (the **Giving Staff** permission set).
+Before you start: open the **BarnCRM Fundraising** app, **Commitments** tab. You need the **Fundraising Staff** role (the **Fundraising Staff Access** permission set).
 
 ## To Record a Pledge
 

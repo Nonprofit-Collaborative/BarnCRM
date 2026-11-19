@@ -4,9 +4,7 @@
  * admin and worked out at once, the refusals, a computed result never typed over, and what staff
  * and readers may do.
  */
-@IsTest(
-	testFor='ApexClass:IndicatorSourceService, ApexClass:LogicModelBuilderController, ApexClass:LogicModelService'
-)
+@IsTest(testFor='ApexClass:IndicatorSourceService, ApexClass:LogicModelBuilderController, ApexClass:LogicModelService')
 private class IndicatorSourceServiceTest {
 	private static final String ADMIN = 'Logic_Models_Admin';
 	private static final String SESSIONS =
@@ -16,14 +14,8 @@ private class IndicatorSourceServiceTest {
 	@TestSetup
 	static void createTestUsers() {
 		TestUsers.adminWith(ADMIN);
-		TestUsers.standardUserWith(
-			'Staff',
-			new List<String>{ 'BarnCRM_Staff', 'Logic_Models_Staff' }
-		);
-		TestUsers.standardUserWith(
-			'Reader',
-			new List<String>{ 'BarnCRM_Read_Only', 'Logic_Models_Read_Only' }
-		);
+		TestUsers.standardUserWith('Staff', new List<String>{ 'BarnCRM_Staff', 'Logic_Models_Staff' });
+		TestUsers.standardUserWith('Reader', new List<String>{ 'BarnCRM_Read_Only', 'Logic_Models_Read_Only' });
 	}
 
 	private static User person(String lastName) {
@@ -127,9 +119,7 @@ private class IndicatorSourceServiceTest {
 
 			Test.startTest();
 			List<Map<String, String>> queries = LogicModelBuilderController.getSourceQueries();
-			Map<String, Object> fields = LogicModelBuilderController.getSourceFields(
-				fixture.queryId
-			);
+			Map<String, Object> fields = LogicModelBuilderController.getSourceFields(fixture.queryId);
 			Test.stopTest();
 
 			Assert.areEqual(1, queries.size(), 'The saved query');
@@ -143,10 +133,7 @@ private class IndicatorSourceServiceTest {
 				JSON.serialize(fields.get('numberFields')).contains('Target_Value__c'),
 				'Target can be summed'
 			);
-			Assert.isFalse(
-				JSON.serialize(fields.get('numberFields')).contains('"Name"'),
-				'Name is not a number'
-			);
+			Assert.isFalse(JSON.serialize(fields.get('numberFields')).contains('"Name"'), 'Name is not a number');
 			Assert.isTrue(
 				JSON.serialize(fields.get('uniqueFields')).contains('Indicator__c'),
 				'The indicator can be counted once'
@@ -190,10 +177,7 @@ private class IndicatorSourceServiceTest {
 			);
 			Assert.areEqual(1, resultOf(fixture.periodId), 'The computed result stays');
 
-			model = LogicModelBuilderController.saveSource(
-				fixture.modelId,
-				fixture.source('Import', null, null, null)
-			);
+			model = LogicModelBuilderController.saveSource(fixture.modelId, fixture.source('Import', null, null, null));
 			indicator = indicatorOf(model, fixture.indicatorId);
 			Assert.areEqual('Import', indicator.get('source'), 'Imported now');
 			Assert.isNull(indicator.get('queryId'), 'The query is cleared');
@@ -207,28 +191,13 @@ private class IndicatorSourceServiceTest {
 
 			Test.startTest();
 			String notDate = refusal(fixture, fixture.source('Computed', 'Name', 'count', null));
-			String notNumber = refusal(
-				fixture,
-				fixture.source('Computed', 'Start_Date__c', 'sum', 'Name')
-			);
-			String notCountable = refusal(
-				fixture,
-				fixture.source('Computed', 'Start_Date__c', 'unique', 'Notes__c')
-			);
-			String noSuchField = refusal(
-				fixture,
-				fixture.source('Computed', 'Missing__c', 'count', null)
-			);
+			String notNumber = refusal(fixture, fixture.source('Computed', 'Start_Date__c', 'sum', 'Name'));
+			String notCountable = refusal(fixture, fixture.source('Computed', 'Start_Date__c', 'unique', 'Notes__c'));
+			String noSuchField = refusal(fixture, fixture.source('Computed', 'Missing__c', 'count', null));
 			String badSource = refusal(fixture, fixture.source('Guessed', null, null, null));
-			String badFunction = refusal(
-				fixture,
-				fixture.source('Computed', 'Start_Date__c', 'average', null)
-			);
+			String badFunction = refusal(fixture, fixture.source('Computed', 'Start_Date__c', 'average', null));
 			delete as user new Saved_Query__c(Id = fixture.queryId);
-			String noQuery = refusal(
-				fixture,
-				fixture.source('Computed', 'Start_Date__c', 'count', null)
-			);
+			String noQuery = refusal(fixture, fixture.source('Computed', 'Start_Date__c', 'count', null));
 			String notComputed;
 			try {
 				LogicModelBuilderController.refreshResults(fixture.modelId, fixture.indicatorId);
@@ -239,31 +208,16 @@ private class IndicatorSourceServiceTest {
 
 			Assert.isTrue(notDate.contains('Period'), 'Name is not a date: ' + notDate);
 			Assert.isTrue(notNumber.contains('Period'), 'Name is not a number: ' + notNumber);
-			Assert.isTrue(
-				notCountable.contains('Notes'),
-				'Notes is not groupable: ' + notCountable
-			);
+			Assert.isTrue(notCountable.contains('Notes'), 'Notes is not groupable: ' + notCountable);
 			Assert.isNotNull(noSuchField, 'An unknown field is refused');
-			Assert.areEqual(
-				BarnHelp.text('LogicModels', 'LogicModels_Source_Invalid'),
-				badSource,
-				'Unknown source'
-			);
+			Assert.areEqual(BarnHelp.text('LogicModels', 'LogicModels_Source_Invalid'), badSource, 'Unknown source');
 			Assert.areEqual(
 				BarnHelp.text('LogicModels', 'LogicModels_Source_Invalid'),
 				badFunction,
 				'Unknown function'
 			);
-			Assert.areEqual(
-				BarnHelp.text('LogicModels', 'LogicModels_Source_QueryMissing'),
-				noQuery,
-				'Deleted query'
-			);
-			Assert.areEqual(
-				BarnHelp.text('LogicModels', 'LogicModels_Source_NotComputed'),
-				notComputed,
-				'Typed in'
-			);
+			Assert.areEqual(BarnHelp.text('LogicModels', 'LogicModels_Source_QueryMissing'), noQuery, 'Deleted query');
+			Assert.areEqual(BarnHelp.text('LogicModels', 'LogicModels_Source_NotComputed'), notComputed, 'Typed in');
 			Assert.areEqual(50, resultOf(fixture.periodId), 'Nothing changed');
 		}
 	}

@@ -96,9 +96,7 @@ last run and cannot change either.
 There is nothing to do in Setup. Scheduling Apex is normally a Setup task, and BarnCRM
 does not ask you to do that: the **Turn on seasonal addresses** switch is the supported way to
 schedule the swap. The Module Manager switches whole modules on and off; the seasonal swap
-belongs to Core, which is always on, so it is scheduled here. If your organization already
-ran the nightly swap before this switch existed, the upgrade turns the switch on for you and
-the job carries on as it was.
+belongs to Core, which is always on, so it is scheduled here.
 
 Two things to know about the schedule.
 
@@ -112,7 +110,7 @@ Two things to know about the schedule.
 
 To let your team see and manage addresses, make sure they have one of the packaged access
 levels (BarnCRM Admin or Team Member, or Fundraising Staff with
-Giving) on the **Access** page in
+Fundraising) on the **Access** page in
 BarnCRM Settings. Read Only users can see addresses and cannot change them: the Addresses
 card shows them no **Add Address** or **Set as Primary** button.
 
@@ -225,6 +223,11 @@ these dates and the status itself, so a person whose access to addresses does no
 three fields (for example access from a profile, without a BarnCRM permission set) still saves
 addresses, and their moves are still recorded.
 
+**Today is your organization's date.** Every BarnCRM date rule (a move's dates, the seasonal
+swap, whether a membership has ended) reads today in your organization's default time zone
+(Setup, **Company Information**), not in the time zone of the person saving. So two colleagues
+in different time zones always get the same answer, even late in the evening.
+
 **These are not moves, and end nothing:** **Set as Primary** on an address already on the card
 (a household with a home and a work address can switch between them), the nightly seasonal swap,
 the address put in use when a primary is deleted, and a merge. A seasonal address is never
@@ -243,8 +246,8 @@ ends; after a primary is deleted, a **Former** address is chosen only when nothi
 left. Choosing **Set as Primary** on a **Former** address makes it **Current** again and clears
 its end date.
 
-**Addresses you already have are not rewritten.** An address saved before statuses existed has
-no status, and BarnCRM reads that as **Current**; it is filled in the next time the address is
+**Addresses you already have are not rewritten.** An address with no status (one loaded
+without it, for example) is read as **Current**; it is filled in the next time the address is
 saved. Nothing records which old address a household actually left, so BarnCRM does not guess:
 mark old addresses **Former** from the card when you know.
 

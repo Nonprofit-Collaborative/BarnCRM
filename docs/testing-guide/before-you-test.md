@@ -105,7 +105,7 @@ Do these in order.
    match a real person, and never choose a real record in a merge, move, erase or relationship
    step.
 7. **Scripts to skip** (record Skipped, "Core-only real-org sandbox"): every script on the
-   Giving, Mirror, Volunteers and Rollup Builder pages; T-SA-02 (needs a fresh org) and T-SA-07
+   Fundraising (gift mirrors included), Mirror, Volunteers and Rollup Builder pages; T-SA-02 (needs a fresh org) and T-SA-07
    to T-SA-09 (sample data); T-HH-14 (needs a person account); and the whole smoke list from
    item 16 on. Run smoke items 1 to 15 ([Smoke list](README.md#smoke-list-every-build-about-one-hour)).
    On the full list, skip any other step that names sample data or a module; do not change real
@@ -118,8 +118,8 @@ Do these in order.
 
 ## Deploy the Modules
 
-`create-scratch-org.sh` deploys Core only. To deploy every module (Rollup Builder, Giving,
-Volunteers, Mirror) on top:
+`create-scratch-org.sh` deploys Core only. To deploy every module (Rollup Builder, Fundraising,
+Volunteers, Mirror and the rest) on top:
 
 ```bash
 scripts/org/deploy-packages.sh <alias>
@@ -128,7 +128,7 @@ scripts/org/deploy-packages.sh <alias>
 Then give your login user the module admin permission sets:
 
 ```bash
-sf org assign permset --target-org <alias> --name Rollup_Builder_Admin --name Giving_Admin --name Volunteers_Admin --name Salesforce_Records_Sync --name Accounting_Export --name Inbound_Gifts
+sf org assign permset --target-org <alias> --name Rollup_Builder_Admin --name Giving_Admin --name Volunteers_Admin --name Salesforce_Records_Sync --name Accounting_Export --name Inbound_Gifts --name Provider_Requests
 ```
 
 To test Core alone (the Standard Edition with nothing else installed), skip this step and use a
@@ -146,11 +146,11 @@ scripts/org/seed-sample-data.sh <alias>
 
 It loads 200 households, their contacts, 25 organizations, connections and affiliations, and,
 with the modules deployed, gifts, funds, appeals, commitments and volunteer records. It waits
-until every background job has finished, which takes a few minutes with Giving installed.
+until every background job has finished, which takes a few minutes with Fundraising installed.
 Loading twice is refused; remove the set first (script T-SA-07 in
 [Setup Assistant](setup-assistant.md) covers removal through the app).
 
-Then, with Giving installed, open **BarnCRM Settings**, **Rollups**, and select
+Then, with Fundraising installed, open **BarnCRM Settings**, **Rollups**, and select
 **Recalculate**, so giving totals are filled in before you test them.
 
 Sample data detail and the names in it (for example **The Garcia Family** and the **Staff
@@ -164,8 +164,8 @@ Run each script as the user its **Prerequisites** line names. Your login user is
 | User | Role in the app | Permission sets it ends up with |
 |---|---|---|
 | admin | Your login user (System Administrator) | BarnCRM Admin and every Core set (from the create script), plus the module sets above |
-| staff | **Team Member** role, plus the **Giving Staff** extra permission (or the **Fundraising Staff** role instead) | BarnCRM Staff, Giving Staff, Volunteers Staff (follows the role) |
-| read-only | **Read Only** role, plus the **Giving Read Only** extra permission | BarnCRM Read Only, Giving Read Only, Volunteers Read Only (follows the role) |
+| staff | **Team Member** role, plus the **Fundraising Staff Access** extra permission (or the **Fundraising Staff** role instead) | BarnCRM Staff, Fundraising Staff Access, Volunteers Staff (follows the role) |
+| read-only | **Read Only** role, plus the **Fundraising Read Only** extra permission | BarnCRM Read Only, Fundraising Read Only, Volunteers Read Only (follows the role) |
 
 In a real-org sandbox, skip this section: the testers are the two System Administrators, who
 run the scripts as themselves ([Core-only real-org sandbox](#core-only-real-org-sandbox)).
@@ -189,7 +189,7 @@ Steps:
 
 2. Give the roles in the app, which also tests the Access page: open **BarnCRM Settings**,
    **Access**, find each user in **Find a person**, choose the role, and select **Give Access**.
-   Add the Giving set under the extra permissions on the same page. The Volunteers and Rollup
+   Add the Fundraising set under the extra permissions on the same page. The Volunteers and Rollup
    Builder sets are not listed there: they follow the role, given automatically when the role
    is given on this page (and by the hourly access check). See
    [Access](../admin-guide/access.md).
@@ -229,7 +229,7 @@ duplicates), use one of these:
 ## Edition Modes
 
 BarnCRM has two editions: the **Standard Edition** (Core, no nonprofit modules offered) and the
-**Nonprofit Edition** (Core plus Giving and the other nonprofit modules). The edition is chosen
+**Nonprofit Edition** (Core plus Fundraising and the other nonprofit modules). The edition is chosen
 once, in the first-run setup window, and decides what BarnCRM shows and offers; it never
 installs or removes anything. See [Editions](../admin-guide/editions.md).
 

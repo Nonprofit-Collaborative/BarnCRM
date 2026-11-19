@@ -50,10 +50,7 @@ private class JobNotificationPathsTest {
 	}
 
 	private static void notifications(Boolean turnedOn) {
-		insert new BarnCRM_Settings__c(
-			SetupOwnerId = UserInfo.getOrganizationId(),
-			Job_Notifications__c = turnedOn
-		);
+		insert new BarnCRM_Settings__c(SetupOwnerId = UserInfo.getOrganizationId(), Job_Notifications__c = turnedOn);
 		SettingsService.clearCaches();
 	}
 
@@ -109,10 +106,7 @@ private class JobNotificationPathsTest {
 			ImportBatchService.finish(previewed.Id, true, true, new List<String>(), null, null);
 			assertOneAboutRecord(
 				previewed.Id,
-				title(
-					System.Label.Core_JobNotice_Stopped,
-					System.Label.Core_JobNotice_ImportPreview
-				)
+				title(System.Label.Core_JobNotice_Stopped, System.Label.Core_JobNotice_ImportPreview)
 			);
 		}
 	}
@@ -135,10 +129,7 @@ private class JobNotificationPathsTest {
 			ImportUndoService.finish(updated.Id, 0, 3, true, 0);
 			assertOneAboutRecord(
 				updated.Id,
-				title(
-					System.Label.Core_JobNotice_Stopped,
-					System.Label.Core_JobNotice_BulkUpdateUndo
-				)
+				title(System.Label.Core_JobNotice_Stopped, System.Label.Core_JobNotice_BulkUpdateUndo)
 			);
 		}
 	}
@@ -152,9 +143,7 @@ private class JobNotificationPathsTest {
 			ImportUndoService.finish(updated.Id, 0, 2, false, 0);
 			ImportUndoService.finish(imported.Id, 0, 2, false, 0);
 
-			Map<Id, Import_Batch__c> logs = new Map<Id, Import_Batch__c>(
-				[SELECT Run_Log__c FROM Import_Batch__c]
-			);
+			Map<Id, Import_Batch__c> logs = new Map<Id, Import_Batch__c>([SELECT Run_Log__c FROM Import_Batch__c]);
 			String updateLog = logs.get(updated.Id).Run_Log__c;
 			String importLog = logs.get(imported.Id).Run_Log__c;
 			Assert.isTrue(updateLog.contains('2 values put back'), 'Says what was put back');
@@ -196,10 +185,7 @@ private class JobNotificationPathsTest {
 			new BulkDeleteUndoBatch(deleted.Id, 0).finish(null);
 			assertOneAboutRecord(
 				deleted.Id,
-				title(
-					System.Label.Core_JobNotice_Stopped,
-					System.Label.Core_JobNotice_BulkDeleteUndo
-				)
+				title(System.Label.Core_JobNotice_Stopped, System.Label.Core_JobNotice_BulkDeleteUndo)
 			);
 		}
 	}
@@ -250,10 +236,7 @@ private class JobNotificationPathsTest {
 
 			assertOneAboutSection(
 				JobNotifier.SECTION_ADDRESSES,
-				title(
-					System.Label.Core_JobNotice_Finished,
-					System.Label.Core_HealthCheck_JobSeasonalAddresses
-				)
+				title(System.Label.Core_JobNotice_Finished, System.Label.Core_HealthCheck_JobSeasonalAddresses)
 			);
 		}
 	}
@@ -267,10 +250,7 @@ private class JobNotificationPathsTest {
 
 			assertOneAboutSection(
 				SettingSections.DUPLICATE_MATCHING,
-				title(
-					System.Label.Core_JobNotice_Finished,
-					System.Label.Core_JobNotice_DuplicateScan
-				)
+				title(System.Label.Core_JobNotice_Finished, System.Label.Core_JobNotice_DuplicateScan)
 			);
 		}
 	}
@@ -284,10 +264,7 @@ private class JobNotificationPathsTest {
 
 			assertOneAboutSection(
 				SettingSections.HOUSEHOLD_NAMES,
-				title(
-					System.Label.Core_JobNotice_Finished,
-					System.Label.Core_JobNotice_HouseholdNaming
-				)
+				title(System.Label.Core_JobNotice_Finished, System.Label.Core_JobNotice_HouseholdNaming)
 			);
 		}
 	}

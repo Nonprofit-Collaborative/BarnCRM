@@ -24,10 +24,7 @@ public with sharing class GiftPostingLockHandler extends TriggerHandler {
 	}
 
 	public override void beforeUpdate() {
-		GiftPostingLock.enforceOnUpdate(
-			(List<Gift__c>) newRecords(),
-			(Map<Id, Gift__c>) oldRecordsById()
-		);
+		GiftPostingLock.enforceOnUpdate((List<Gift__c>) newRecords(), (Map<Id, Gift__c>) oldRecordsById());
 	}
 
 	public override void beforeDelete() {

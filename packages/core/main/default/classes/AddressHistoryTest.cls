@@ -41,10 +41,10 @@ private class AddressHistoryTest {
 			Address__c old = addressAt(garcia.Id, HOME_STREET);
 			Assert.isFalse(old.Is_Default__c, 'The old address is no longer the primary.');
 			Assert.areEqual('Former', old.Status__c, 'The old address is Former.');
-			Assert.areEqual(Date.today(), old.End_Date__c, 'It ended today.');
+			Assert.areEqual(OrgDate.today(), old.End_Date__c, 'It ended today.');
 			Address__c now = addressAt(garcia.Id, NEW_STREET);
 			Assert.areEqual('Current', now.Status__c, 'The new address is Current.');
-			Assert.areEqual(Date.today(), now.Start_Date__c, 'It started today.');
+			Assert.areEqual(OrgDate.today(), now.Start_Date__c, 'It started today.');
 			Assert.isNull(now.End_Date__c, 'It has not ended.');
 		}
 	}
@@ -150,10 +150,10 @@ private class AddressHistoryTest {
 
 			Address__c now = addressAt(garcia.Id, NEW_STREET);
 			Assert.isTrue(now.Is_Default__c, 'Everyone in the household moves together.');
-			Assert.areEqual(Date.today(), now.Start_Date__c, 'The new address started today.');
+			Assert.areEqual(OrgDate.today(), now.Start_Date__c, 'The new address started today.');
 			Address__c old = addressAt(garcia.Id, HOME_STREET);
 			Assert.areEqual('Former', old.Status__c, 'The old household address is Former.');
-			Assert.areEqual(Date.today(), old.End_Date__c, 'It ended today.');
+			Assert.areEqual(OrgDate.today(), old.End_Date__c, 'It ended today.');
 		}
 	}
 
@@ -178,9 +178,9 @@ private class AddressHistoryTest {
 
 			Address__c old = addressAt(garcia.Id, HOME_STREET);
 			Assert.areEqual('Former', old.Status__c, 'The household left its old address.');
-			Assert.areEqual(Date.today(), old.End_Date__c, 'It ended today.');
+			Assert.areEqual(OrgDate.today(), old.End_Date__c, 'It ended today.');
 			Assert.areEqual(
-				Date.today(),
+				OrgDate.today(),
 				addressAt(garcia.Id, NEW_STREET).Start_Date__c,
 				'The household started at Ana\'s address today.'
 			);
@@ -211,9 +211,7 @@ private class AddressHistoryTest {
 			insert anasOwn;
 
 			Test.startTest();
-			AddressService.updateEveryonesAddress(
-				new Map<Id, Set<Id>>{ garcia.Id => new Set<Id>{ ana.Id } }
-			);
+			AddressService.updateEveryonesAddress(new Map<Id, Set<Id>>{ garcia.Id => new Set<Id>{ ana.Id } });
 			Test.stopTest();
 
 			Address__c ended = [
@@ -223,7 +221,7 @@ private class AddressHistoryTest {
 			];
 			Assert.isFalse(ended.Is_Default__c, 'Ana takes the household address.');
 			Assert.areEqual('Former', ended.Status__c, 'Ana left her own address.');
-			Assert.areEqual(Date.today(), ended.End_Date__c, 'It ended today.');
+			Assert.areEqual(OrgDate.today(), ended.End_Date__c, 'It ended today.');
 			Address__c home = addressAt(garcia.Id, HOME_STREET);
 			Assert.areEqual('Current', home.Status__c, 'The household did not move.');
 			Assert.isNull(home.End_Date__c, 'Nothing ended for the household.');
@@ -236,7 +234,7 @@ private class AddressHistoryTest {
 			Account garcia = householdAtHome('The Garcia Family');
 			Database.insert(garcia, AccessLevel.SYSTEM_MODE);
 			Address__c home = addressAt(garcia.Id, HOME_STREET);
-			Date given = Date.today().addDays(-3);
+			Date given = OrgDate.today().addDays(-3);
 			update new Address__c(Id = home.Id, Status__c = 'Undeliverable', End_Date__c = given);
 
 			Test.startTest();
@@ -314,7 +312,7 @@ private class AddressHistoryTest {
 			Assert.isNull(winter.End_Date__c, 'The winter address did not end.');
 			Address__c home = addressAt(garcia.Id, HOME_STREET);
 			Assert.areEqual('Former', home.Status__c, 'The home they left is Former.');
-			Assert.areEqual(Date.today(), home.End_Date__c, 'It ended today.');
+			Assert.areEqual(OrgDate.today(), home.End_Date__c, 'It ended today.');
 		}
 	}
 
@@ -336,11 +334,7 @@ private class AddressHistoryTest {
 			Assert.isTrue(back.Is_Default__c, 'They moved back.');
 			Assert.areEqual('Current', back.Status__c, 'The primary is never Former.');
 			Assert.isNull(back.End_Date__c, 'Its end date is cleared.');
-			Assert.areEqual(
-				'Current',
-				addressAt(garcia.Id, NEW_STREET).Status__c,
-				'Set as Primary ends nothing.'
-			);
+			Assert.areEqual('Current', addressAt(garcia.Id, NEW_STREET).Status__c, 'Set as Primary ends nothing.');
 		}
 	}
 
@@ -434,10 +428,7 @@ private class AddressHistoryTest {
 		System.runAs(rita) {
 			seen = [SELECT Status__c FROM Address__c WHERE Id = :home.Id WITH USER_MODE];
 			try {
-				Database.update(
-					new Address__c(Id = home.Id, Status__c = 'Undeliverable'),
-					AccessLevel.USER_MODE
-				);
+				Database.update(new Address__c(Id = home.Id, Status__c = 'Undeliverable'), AccessLevel.USER_MODE);
 			} catch (Exception expected) {
 				refused = true;
 			}
@@ -469,7 +460,7 @@ private class AddressHistoryTest {
 		Date moveDay;
 		System.runAs(pat) {
 			// Today in Pat's time zone, the day BarnCRM stamps on the move Pat makes.
-			moveDay = Date.today();
+			moveDay = OrgDate.today();
 			canReadStatus = Schema.SObjectType.Address__c.fields.Status__c.isAccessible();
 			Database.insert(garcia, AccessLevel.SYSTEM_MODE);
 			Address__c moved = newPrimary(garcia.Id, NEW_STREET);
@@ -517,7 +508,7 @@ private class AddressHistoryTest {
 		Test.startTest();
 		Date moveDay;
 		System.runAs(pat) {
-			moveDay = Date.today();
+			moveDay = OrgDate.today();
 			update new Contact(Id = luis.Id, MailingStreet = NEW_STREET, MailingCity = 'Tucson');
 		}
 		Test.stopTest();
@@ -541,9 +532,7 @@ private class AddressHistoryTest {
 			Database.insert(households, AccessLevel.SYSTEM_MODE);
 			List<Contact> people = new List<Contact>();
 			for (Integer index = 0; index < 200; index++) {
-				people.add(
-					AddressTestDataFactory.newContact('Pat', 'Family' + index, households[index].Id)
-				);
+				people.add(AddressTestDataFactory.newContact('Pat', 'Family' + index, households[index].Id));
 			}
 			insert people;
 			for (Contact person : people) {
@@ -591,7 +580,7 @@ private class AddressHistoryTest {
 		System.runAs(TestUsers.admin()) {
 			Account garcia = householdAtHome('The Garcia Family');
 			Database.insert(garcia, AccessLevel.SYSTEM_MODE);
-			Date given = Date.today().addDays(-10);
+			Date given = OrgDate.today().addDays(-10);
 			Address__c moved = newPrimary(garcia.Id, NEW_STREET);
 			moved.Start_Date__c = given;
 
@@ -599,16 +588,8 @@ private class AddressHistoryTest {
 			insert moved;
 			Test.stopTest();
 
-			Assert.areEqual(
-				given,
-				addressAt(garcia.Id, NEW_STREET).Start_Date__c,
-				'The start date given stays.'
-			);
-			Assert.areEqual(
-				'Former',
-				addressAt(garcia.Id, HOME_STREET).Status__c,
-				'It is still a move.'
-			);
+			Assert.areEqual(given, addressAt(garcia.Id, NEW_STREET).Start_Date__c, 'The start date given stays.');
+			Assert.areEqual('Former', addressAt(garcia.Id, HOME_STREET).Status__c, 'It is still a move.');
 		}
 	}
 
@@ -664,9 +645,7 @@ private class AddressHistoryTest {
 	 * the new fields. Written in its own context, apart from the records the test saves.
 	 */
 	private static void withoutHistoryFieldAccess(String permissionSetName) {
-		String objectName = Address__c.SObjectType
-			.getDescribe(SObjectDescribeOptions.DEFERRED)
-			.getName();
+		String objectName = Address__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
 		List<String> fields = new List<String>();
 		for (
 			Schema.SObjectField token : new List<Schema.SObjectField>{

@@ -80,9 +80,7 @@ public with sharing class ServicePlanService {
 		Map<String, Object> plan = new Map<String, Object>{
 			'enrollmentId' => enrollment.Id,
 			'programName' => enrollment.Program__r?.Name,
-			'personName' => enrollment.Contact__r != null
-				? enrollment.Contact__r.Name
-				: enrollment.Account__r?.Name,
+			'personName' => enrollment.Contact__r != null ? enrollment.Contact__r.Name : enrollment.Account__r?.Name,
 			'canEdit' => canEdit(enrollmentId),
 			'canAddNote' => Schema.SObjectType.Case_Note__c.isCreateable(),
 			'outcomesAvailable' => outcomeType() != null,
@@ -104,14 +102,7 @@ public with sharing class ServicePlanService {
 				Closed_Date__c,
 				Outcome_Id__c,
 				(
-					SELECT
-						Id,
-						Name,
-						Status__c,
-						Assigned_To__c,
-						Assigned_To__r.Name,
-						Target_Date__c,
-						Completed_Date__c
+					SELECT Id, Name, Status__c, Assigned_To__c, Assigned_To__r.Name, Target_Date__c, Completed_Date__c
 					FROM Steps__r
 					ORDER BY Target_Date__c NULLS LAST, CreatedDate
 				)
@@ -150,9 +141,7 @@ public with sharing class ServicePlanService {
 				}
 			);
 		}
-		List<Map<String, Object>> noteRows = notes == null
-			? new List<Map<String, Object>>()
-			: notes;
+		List<Map<String, Object>> noteRows = notes == null ? new List<Map<String, Object>>() : notes;
 		List<Map<String, Object>> latest = new List<Map<String, Object>>();
 		for (Integer i = 0; i < noteRows.size() && i < NOTES_PER_GOAL; i++) {
 			latest.add(noteRows[i]);
@@ -212,9 +201,7 @@ public with sharing class ServicePlanService {
 
 	/** Whether the user may add and change goals here: object access and edit on the enrollment. */
 	private static Boolean canEdit(Id enrollmentId) {
-		if (
-			!Schema.SObjectType.Goal__c.isCreateable() || !Schema.SObjectType.Goal__c.isUpdateable()
-		) {
+		if (!Schema.SObjectType.Goal__c.isCreateable() || !Schema.SObjectType.Goal__c.isUpdateable()) {
 			return false;
 		}
 		List<UserRecordAccess> access = [
@@ -230,12 +217,7 @@ public with sharing class ServicePlanService {
 		List<Map<String, String>> result = new List<Map<String, String>>();
 		for (Schema.PicklistEntry entry : field.getPicklistValues()) {
 			if (entry.isActive()) {
-				result.add(
-					new Map<String, String>{
-						'value' => entry.getValue(),
-						'label' => entry.getLabel()
-					}
-				);
+				result.add(new Map<String, String>{ 'value' => entry.getValue(), 'label' => entry.getLabel() });
 			}
 		}
 		return result;
@@ -319,9 +301,7 @@ public with sharing class ServicePlanService {
 					new List<Object>{ (String) row.get('Name'), modelName }
 				)
 			};
-			Object scope = parent == null
-				? null
-				: parent.get(NamespaceUtil.qualify('Program_Id__c'));
+			Object scope = parent == null ? null : parent.get(NamespaceUtil.qualify('Program_Id__c'));
 			if (scope == null) {
 				organization.add(option);
 			} else {
@@ -351,11 +331,7 @@ public with sharing class ServicePlanService {
 			type.getDescribe(SObjectDescribeOptions.DEFERRED).getName() +
 			' WHERE Id IN :ids';
 		for (
-			SObject row : Database.queryWithBinds(
-				soql,
-				new Map<String, Object>{ 'ids' => ids },
-				AccessLevel.USER_MODE
-			)
+			SObject row : Database.queryWithBinds(soql, new Map<String, Object>{ 'ids' => ids }, AccessLevel.USER_MODE)
 		) {
 			names.put((String) row.Id, (String) row.get('Name'));
 			names.put(String.valueOf(row.Id).left(15), (String) row.get('Name'));
@@ -479,11 +455,7 @@ public with sharing class ServicePlanService {
 		if (nextReview != null && nextReview < Date.today()) {
 			throw new PlanException(BarnHelp.text('Programs', 'Programs_Plan_NextReviewPast'));
 		}
-		update as user new Goal__c(
-			Id = goalId,
-			Last_Review_Date__c = Date.today(),
-			Next_Review_Date__c = nextReview
-		);
+		update as user new Goal__c(Id = goalId, Last_Review_Date__c = Date.today(), Next_Review_Date__c = nextReview);
 		return enrollmentId;
 	}
 

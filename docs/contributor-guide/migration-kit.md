@@ -24,8 +24,8 @@ listed package:
 - every custom object, with its fields, except formula fields, auto-number fields, and objects
   that hold no records (custom metadata types, platform events);
 - the package's fields on Account and Contact, and their record types;
-- a field added to another package's object (Mirror's fields on `Gift__c` and `Appeal__c`)
-  joins that object's entry.
+- a field added to another package's object joins that object's entry (none ships today:
+  the gift mirror fields on `Gift__c` and `Appeal__c` are Fundraising's own, ADR-0228).
 
 Each object records its kind (`custom`, `standard`, or `setting` for a hierarchy custom
 setting), its fields, its lookups and their targets, whether its Name is typed or
@@ -78,7 +78,7 @@ package's protected setting is not writable from outside the package.
 ## Household adoption and conversion journals
 
 `Account.Household_Model__c` (MIG-02b) is a packaged Account field, so it carries over in
-place like any other. The `Household_Adoption__c` journal (NPSP adoption, ADR-0155, and the
+place like any other. The household adoption journal (Admin Journal `Merge_Journal__c` rows of Kind Household Adoption; NPSP adoption, ADR-0155, and the
 Nonprofit Cloud household conversion, ADR-0217 `0217-npc-household-conversion.md`) is copied
 as an ordinary object, but the Household Member Ids a conversion writes inside its
 `Previous_Values__c` JSON are not whole-value Ids, so they are not translated. After a move,

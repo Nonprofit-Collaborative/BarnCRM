@@ -40,9 +40,7 @@ private class ModuleManagerServiceTest {
 	private static List<Contact> people(Integer howMany, String batch) {
 		List<Contact> rows = new List<Contact>();
 		for (Integer i = 0; i < howMany; i++) {
-			rows.add(
-				TestDataFactory.person(new Contact(FirstName = batch, LastName = 'Volunteer ' + i))
-			);
+			rows.add(TestDataFactory.person(new Contact(FirstName = batch, LastName = 'Volunteer ' + i)));
 		}
 		return rows;
 	}
@@ -89,15 +87,8 @@ private class ModuleManagerServiceTest {
 			insert people(200, 'Off');
 			Test.stopTest();
 
-			Assert.areEqual(
-				0,
-				TestRegisteredHandler.runCount,
-				'Nothing of the module ran for 200 people'
-			);
-			Assert.isFalse(
-				AutomationControl.isEnabled('Volunteer_Test'),
-				'Its automation reads as off'
-			);
+			Assert.areEqual(0, TestRegisteredHandler.runCount, 'Nothing of the module ran for 200 people');
+			Assert.isFalse(AutomationControl.isEnabled('Volunteer_Test'), 'Its automation reads as off');
 		}
 	}
 
@@ -124,11 +115,7 @@ private class ModuleManagerServiceTest {
 				],
 				'Turning on creates the switch row a module needs'
 			);
-			Assert.areEqual(
-				ModuleManagerService.STATUS_ON,
-				row(MODULE).status,
-				'And it reads as on'
-			);
+			Assert.areEqual(ModuleManagerService.STATUS_ON, row(MODULE).status, 'And it reads as on');
 		}
 	}
 
@@ -169,10 +156,7 @@ private class ModuleManagerServiceTest {
 			TurnOnEngine engine = new TurnOnEngine();
 			RollupEngineExtensions.extensionOverride = engine;
 			ModuleExtensions.catalogOverride = new List<BarnCRM_Module__mdt>{
-				new BarnCRM_Module__mdt(
-					DeveloperName = MODULE,
-					Access_By_Role__c = 'Volunteers_Staff=Program_Staff'
-				)
+				new BarnCRM_Module__mdt(DeveloperName = MODULE, Access_By_Role__c = 'Volunteers_Staff=Program_Staff')
 			};
 			ModuleManagerService.turnOff(MODULE);
 
@@ -222,10 +206,7 @@ private class ModuleManagerServiceTest {
 				try {
 					ModuleManagerService.turnOff(name);
 				} catch (ModuleManagerService.ModuleManagerException e) {
-					Assert.areEqual(
-						BarnHelp.text('Core', 'Core_ModuleManager_UnknownModuleError'),
-						e.getMessage()
-					);
+					Assert.areEqual(BarnHelp.text('Core', 'Core_ModuleManager_UnknownModuleError'), e.getMessage());
 					refused++;
 				}
 			}
@@ -247,22 +228,15 @@ private class ModuleManagerServiceTest {
 			Integer stored = [SELECT COUNT() FROM Error_Log__c];
 
 			Test.startTest();
-			List<ModuleManagerService.RecordCount> report = ModuleManagerService.uninstallReport(
-				MODULE
-			);
+			List<ModuleManagerService.RecordCount> report = ModuleManagerService.uninstallReport(MODULE);
 			ModuleManagerService.countCap = 150;
-			List<ModuleManagerService.RecordCount> capped = ModuleManagerService.uninstallReport(
-				MODULE
-			);
+			List<ModuleManagerService.RecordCount> capped = ModuleManagerService.uninstallReport(MODULE);
 			Test.stopTest();
 
 			Assert.areEqual(1, report.size(), 'An object this org does not have is left out');
 			Assert.areEqual(stored, report[0].count, 'Every record is counted');
 			Assert.isFalse(report[0].capped, 'Under the cap the count is exact');
-			Assert.isNotNull(
-				report[0].objectLabel,
-				'The kind of record is named as Maria knows it'
-			);
+			Assert.isNotNull(report[0].objectLabel, 'The kind of record is named as Maria knows it');
 			Assert.areEqual(150, capped[0].count, 'A count stops at the cap');
 			Assert.isTrue(capped[0].capped, 'And says it stopped');
 		}
@@ -281,9 +255,7 @@ private class ModuleManagerServiceTest {
 			// Together the counts would need 400 rows; the transaction may read only 300.
 			ModuleManagerService.rowLimit = 300;
 			ModuleManagerService.rowMargin = 0;
-			List<ModuleManagerService.RecordCount> report = ModuleManagerService.uninstallReport(
-				MODULE
-			);
+			List<ModuleManagerService.RecordCount> report = ModuleManagerService.uninstallReport(MODULE);
 			Integer rowsRead = Limits.getQueryRows();
 			Test.stopTest();
 
@@ -302,9 +274,7 @@ private class ModuleManagerServiceTest {
 	static void givesThePersonWhoTurnedItOnTheModuleAdminSet() {
 		System.runAs(TestUsers.admin()) {
 			volunteersInstalled();
-			ModuleManagerService.adminPermissionSets = new Map<String, String>{
-				MODULE => 'BarnCRM_Read_Only'
-			};
+			ModuleManagerService.adminPermissionSets = new Map<String, String>{ MODULE => 'BarnCRM_Read_Only' };
 
 			Test.startTest();
 			Boolean first = ModuleManagerService.grantAdminAccess(MODULE);
@@ -317,9 +287,7 @@ private class ModuleManagerServiceTest {
 				[
 					SELECT COUNT()
 					FROM PermissionSetAssignment
-					WHERE
-						AssigneeId = :UserInfo.getUserId()
-						AND PermissionSet.Name = 'BarnCRM_Read_Only'
+					WHERE AssigneeId = :UserInfo.getUserId() AND PermissionSet.Name = 'BarnCRM_Read_Only'
 				],
 				'Held once'
 			);

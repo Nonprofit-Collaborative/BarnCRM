@@ -12,10 +12,7 @@ private class ImportJournalServiceTest {
 	private static Import_Batch__c newBatch() {
 		TestDataFactory.defaultSettings();
 		return ImportTestDataFactory.batch(
-			ImportTestDataFactory.template(
-				ImportTestDataFactory.donorMapping(),
-				ImportTemplateService.RULE_EMAIL
-			)
+			ImportTestDataFactory.template(ImportTestDataFactory.donorMapping(), ImportTemplateService.RULE_EMAIL)
 		);
 	}
 
@@ -42,18 +39,11 @@ private class ImportJournalServiceTest {
 			Test.stopTest();
 
 			Assert.isTrue(written, 'The page was written.');
-			List<Import_Journal__c> pages = ImportJournalService.pages(
-				batch.Id,
-				ImportJournalService.PHASE_COMMIT,
-				10
-			);
+			List<Import_Journal__c> pages = ImportJournalService.pages(batch.Id, ImportJournalService.PHASE_COMMIT, 10);
 			Assert.areEqual(1, pages.size(), 'Two entries fit one page (R-IJ1).');
 			Assert.areEqual(2, pages[0].Entry_Count__c, 'The page counts its entries.');
 			Map<String, Object> entry = ImportJournalService.entries(pages[0])[0];
-			Map<String, Object> email = (Map<String, Object>) ((Map<String, Object>) entry.get(
-					'fields'
-				))
-				.get('Email');
+			Map<String, Object> email = (Map<String, Object>) ((Map<String, Object>) entry.get('fields')).get('Email');
 			Assert.areEqual('old@example.org', email.get('before'), 'The value before is kept.');
 			Assert.areEqual('new@example.org', email.get('after'), 'And the value written.');
 			Assert.areEqual(
@@ -72,21 +62,14 @@ private class ImportJournalServiceTest {
 			for (Integer i = 0; i < 4; i++) {
 				entries.add(anUpdate(i + 2));
 			}
-			Integer onePage = JSON.serialize(
-					new Map<String, Object>{ 'version' => 1, 'entries' => entries }
-				)
-				.length();
+			Integer onePage = JSON.serialize(new Map<String, Object>{ 'version' => 1, 'entries' => entries }).length();
 			ImportJournalService.maxDocumentLength = onePage / 2;
 
 			Test.startTest();
 			ImportJournalService.write(batch.Id, ImportJournalService.PHASE_COMMIT, entries);
 			Test.stopTest();
 
-			List<Import_Journal__c> pages = ImportJournalService.pages(
-				batch.Id,
-				ImportJournalService.PHASE_COMMIT,
-				10
-			);
+			List<Import_Journal__c> pages = ImportJournalService.pages(batch.Id, ImportJournalService.PHASE_COMMIT, 10);
 			Assert.isTrue(pages.size() > 1, 'The entries were spread over more than one page.');
 			Assert.areEqual(
 				4,
@@ -105,10 +88,7 @@ private class ImportJournalServiceTest {
 			((Map<String, Object>) large.get('fields'))
 				.put(
 					'Description',
-					new Map<String, Object>{
-						'before' => 'x'.repeat(4000),
-						'after' => 'y'.repeat(4000)
-					}
+					new Map<String, Object>{ 'before' => 'x'.repeat(4000), 'after' => 'y'.repeat(4000) }
 				);
 			ImportJournalService.maxDocumentLength = 2000;
 			Test.startTest();
@@ -155,11 +135,7 @@ private class ImportJournalServiceTest {
 		System.runAs(TestUsers.admin()) {
 			Import_Batch__c batch = newBatch();
 			Assert.isTrue(
-				ImportJournalService.write(
-					batch.Id,
-					ImportJournalService.PHASE_UNDO,
-					new List<Map<String, Object>>()
-				),
+				ImportJournalService.write(batch.Id, ImportJournalService.PHASE_UNDO, new List<Map<String, Object>>()),
 				'An empty chunk is not a failure.'
 			);
 			Assert.areEqual(0, [SELECT COUNT() FROM Import_Journal__c], 'And writes no page.');
@@ -183,11 +159,7 @@ private class ImportJournalServiceTest {
 			);
 			Assert.areEqual(ImportJournalService.ACTION_KEPT, kept.get('action'), 'A kept record.');
 			Assert.areEqual('Somebody else lives here.', kept.get('reason'), 'With its reason.');
-			Assert.areEqual(
-				'Email',
-				notRestored.get('field'),
-				'A value left alone names its field.'
-			);
+			Assert.areEqual('Email', notRestored.get('field'), 'A value left alone names its field.');
 		}
 	}
 
@@ -206,14 +178,11 @@ private class ImportJournalServiceTest {
 				entries.add(anUpdate(row));
 			}
 			Id someone =
-				Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() +
-				'000000000001AAA';
+				Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() + '000000000001AAA';
 			for (Integer index = 0; index < 30; index++) {
 				entries.add(ImportJournalService.failed('Contact', someone, 'Refused ' + index));
 			}
-			Assert.isTrue(
-				ImportJournalService.write(batch.Id, ImportJournalService.PHASE_COMMIT, entries)
-			);
+			Assert.isTrue(ImportJournalService.write(batch.Id, ImportJournalService.PHASE_COMMIT, entries));
 
 			Test.startTest();
 			List<Map<String, Object>> first = ImportJournalService.firstWithAction(
@@ -252,9 +221,7 @@ private class ImportJournalServiceTest {
 			for (Integer row = 0; row < 100; row++) {
 				entries.add(anUpdate(row));
 			}
-			Assert.isTrue(
-				ImportJournalService.write(batch.Id, ImportJournalService.PHASE_COMMIT, entries)
-			);
+			Assert.isTrue(ImportJournalService.write(batch.Id, ImportJournalService.PHASE_COMMIT, entries));
 			Datetime sameMoment = Datetime.now().addDays(-1);
 			for (Import_Journal__c page : [SELECT Id FROM Import_Journal__c]) {
 				Test.setCreatedDate(page.Id, sameMoment);

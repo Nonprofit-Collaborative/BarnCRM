@@ -4,7 +4,7 @@ Scripts for the Import wizard: templates, preview, commit, rejected rows, row ru
 
 Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data: create the Zztest fixture first and, in `import-test-1.csv` row 4, use `Harper`, `Zztest`, `harper.zztest1@example.org` so the row matches Harper Zztest (without that match T-IMP-01 would show 4 created, 0 matched). Import only the test files here, never a real list. The **Data Manager** feature must be on (BarnCRM Settings, **General**, see [Data Manager](../admin-guide/data-manager.md)). These scripts assume people are stored as contacts.
 
-The **Super Importer** tab opens from the **Data Manager** tab: select the **Super Importer** tile. Save the test files below as UTF-8 CSV files with exactly these headings (the shipped **Generic contact list** template recognizes them; a new install calls it **People and Organizations List**, and an org installed before 2026-10-28 keeps **Generic contact list**, so read either name below as the one your org shows). For a migration-style file, the samples in [`docs/admin-guide/samples`](../admin-guide/samples) load through the Giving module's templates and are tested with Giving.
+The **Super Importer** tab opens from the **Data Manager** tab: select the **Super Importer** tile. Save the test files below as UTF-8 CSV files with exactly these headings (the shipped **Generic contact list** template recognizes them; a new install calls it **People and Organizations List**, and an org installed before 2026-10-28 keeps **Generic contact list**, so read either name below as the one your org shows). For a migration-style file, the samples in [`docs/admin-guide/samples`](../admin-guide/samples) load through the Fundraising module's templates and are tested with Fundraising.
 
 `import-test-1.csv` (5 rows: 3 new people, 1 existing sample person, 1 row with no last name):
 
@@ -227,13 +227,13 @@ Jana,Stone,jana.stone@example.org,77 Match Lane,Springfield,IL,62702
 ## T-IMP-12: What Are You Importing?
 
 **Purpose:** confirm each card on the first step opens what it should, the Gifts and Delete cards show only where they apply, and the line under a template says what it creates.
-**Prerequisites:** admin (see [Test users](before-you-test.md#test-users)); a Core-only org for step 2 and an org with Giving installed for step 3; for step 5, a second admin without **Bulk Delete Records** and one with it (see [Super Transformer and Bulk Delete](bulk-update-and-delete.md)).
+**Prerequisites:** admin (see [Test users](before-you-test.md#test-users)); a Core-only org for step 2 and an org with Fundraising installed for step 3; for step 5, a second admin without **Bulk Delete Records** and one with it (see [Super Transformer and Bulk Delete](bulk-update-and-delete.md)).
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the Super Importer tab. | **What Are You Importing?** with an icon card for **People and Organizations**, **One Kind of Record**, **Several Kinds of Record in One File** and **Your Templates** (and **Gifts** and **Delete the Records a File Lists** where steps 3 and 5 say). Each card says what it creates. None is chosen and **Next** is not shown. |
 | 2 | In a Core-only org, look at the cards. | There is no **Gifts** card. |
-| 3 | In an org with Giving installed, look at the cards, then choose **Gifts**. | A **Gifts** card shows. It is marked as chosen and the cards stay on screen. Its **Template** picker lists only gift templates (for example **Generic Gift List**), the first is chosen, and **Next** is enabled. |
+| 3 | In an org with Fundraising installed, look at the cards, then choose **Gifts**. | A **Gifts** card shows. It is marked as chosen and the cards stay on screen. Its **Template** picker lists only gift templates (for example **Generic Gift List**), the first is chosen, and **Next** is enabled. |
 | 3a | Tab to the cards and press the arrow keys. | The choice moves from card to card like radio buttons, and what shows below follows the chosen card. |
 | 4 | Choose **People and Organizations**. | The **Template** picker lists only people templates and the first is chosen for you. The line under it says what it creates. **Next** is enabled. |
 | 5 | Log in as an admin without **Bulk Delete Records** and open the Super Importer tab. Then log in as one with it. | The first sees no **Delete the Records a File Lists** card. The second sees it, with a warning icon. |
@@ -292,8 +292,6 @@ Nell,Ashby,nell.ashby@example.org,555-0303,Omar,Ashby,omar.ashby@example.org,555
 | 2 | Open the **Template** picker. | It also lists **Organization List** and **Couples and Households**. Choosing **Organization List** shows "This file can create: organizations."; choosing **Couples and Households** shows "This file can create: people, a second person per row, households." |
 | 3 | Choose **Organization List**, select **Next**, upload `import-test-orgs.csv`, select **Next** through the column check, then **Preview**. Import. | The preview shows **would create** 3 and **would be rejected** 0. After the import, the three organizations exist with the street, city, state, postal code and country in the billing address, plus phone and website, and no new people or households. |
 | 4 | Select **Import Another File**, choose **People and Organizations**, then **Couples and Households**, upload `import-test-couples.csv`, preview and import. | The preview shows **would create** 2 (one per row) and **would be rejected** 0. After the import, **Tolliver Household** holds Mira and Dean Tolliver and **Ashby Household** holds Nell and Omar Ashby: one household with two members per row. |
-| 5 | In an org installed before 2026-10-28 that has **Generic contact list**, open the Super Importer tab after the upgrade and choose **People and Organizations**. | The first template is still named **Generic contact list** (never renamed), and **Organization List** and **Couples and Households** are listed as well. |
-
 **Cleanup:** undo both imports from **Recent Imports** (see T-IMP-03).
 
 ## T-IMP-15: Several Sheets and Example Values
@@ -369,8 +367,6 @@ Zzsev Nowhere,Volunteer,<contact record ID>,Zzsev Title
 | 9 | Set **Account** to update by **Account Name** and **Contact** to **Update by record ID**, then preview and commit. | Row 1 updates the account and the contact's Title and creates an affiliation linked to both, with no column for either link. Row 2 is rejected with a reason starting "Account:"; its contact is not updated again and its affiliation is not created, since both point at the account. A contact with an account keeps it; one with none gets `Zzsev Org A`. |
 | 9a | Make `Test several retry` with **Relationship** (on **Create new records**) and **Affiliation**, and load a one-row file whose relationship is valid (two test contacts, a Type and a Status) and whose affiliation role is over 255 characters. Note the relationship count, then download the exceptions file, shorten the role, keep the **Row** column, and retry it. | The first commit creates the relationship and rejects the row with a reason starting "Affiliation:". The retry creates the affiliation only: the relationship count is unchanged. |
 | 10 | Undo all three imports from **Recent Imports**. | The affiliations and the relationship are deleted once each, and the phones and the contact's Title go back to what they were. |
-| 11 | Open a one-object template saved with **Related records** before this change, if the org has one, and preview a file. | It still shows **Related records** under a parent key and loads both as before. |
-
 **Cleanup:** deactivate the test templates and delete the test accounts.
 
 ## T-IMP-18: Create a New Field From a Column
@@ -495,8 +491,6 @@ ana.rowe@example.org,Rivergate Library,Volunteer,true,2026-03-01
 | 4 | Import `import-test-relationships.csv` again. | **would be rejected** 2 with "already has this relationship"; no new records. |
 | 5 | Choose **Affiliations**, upload `import-test-affiliations.csv`, preview and import. | 3 created. Cy shows **Harbor Youth Club** as **Primary Affiliation**. Ana has two rows flagged primary and shows **Rivergate Library**, the last one in the file, as primary; her Harbor Youth Club affiliation is not primary. |
 | 6 | Import `import-test-affiliations.csv` again. | 3 rejected with "already has an affiliation ... covering those dates"; nothing changes. |
-| 7 | In an org installed before this release, open the Super Importer tab after the upgrade. | **Relationships** and **Affiliations** are added; existing templates are unchanged. |
-
 **Cleanup:** undo both imports from **Recent Imports** (see T-IMP-03); delete the test contacts and organization.
 
 ## T-IMP-23: Reorder Value Changes

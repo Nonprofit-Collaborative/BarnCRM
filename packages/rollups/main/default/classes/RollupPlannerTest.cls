@@ -9,11 +9,7 @@ private class RollupPlannerTest {
 		TestUsers.adminWith('Rollup_Builder_Admin');
 	}
 
-	private static Rollup_Definition__c fromChildren(
-		String aggregate,
-		String sourceField,
-		String targetField
-	) {
+	private static Rollup_Definition__c fromChildren(String aggregate, String sourceField, String targetField) {
 		return new Rollup_Definition__c(
 			Name = aggregate + ' ' + targetField,
 			Source_Object__c = 'Account',
@@ -52,42 +48,23 @@ private class RollupPlannerTest {
 	@IsTest
 	static void eachBrokenDefinitionIsRefusedAlone() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			Rollup_Definition__c unordered = fromChildren(
-				'FIRST',
-				'NumberOfEmployees',
-				'AnnualRevenue'
-			);
+			Rollup_Definition__c unordered = fromChildren('FIRST', 'NumberOfEmployees', 'AnnualRevenue');
 			Rollup_Definition__c checkbox = fromChildren('COUNT', null, 'Custom_Name__c');
 			Rollup_Definition__c text = fromChildren('MAX', 'Name', 'Description');
 			Rollup_Definition__c missing = fromChildren('COUNT', null, 'No_Such_Field__c');
 			Rollup_Definition__c midToken = fromChildren('COUNT', null, 'Member_Count__c');
 			midToken.Relationship_Path__c = '{Household} > ParentId';
-			Rollup_Definition__c injected = fromChildren(
-				'SUM',
-				'Amount) FROM User --',
-				'Member_Count__c'
-			);
+			Rollup_Definition__c injected = fromChildren('SUM', 'Amount) FROM User --', 'Member_Count__c');
 			Rollup_Definition__c otherTarget = fromChildren('COUNT', null, 'Member_Count__c');
 			otherTarget.Target_Object__c = 'Contact';
 
 			RollupPlanner.Plan plan = RollupPlanner.plan(
 				Account.SObjectType,
-				new List<Rollup_Definition__c>{
-					unordered,
-					checkbox,
-					text,
-					missing,
-					midToken,
-					injected,
-					otherTarget
-				}
+				new List<Rollup_Definition__c>{ unordered, checkbox, text, missing, midToken, injected, otherTarget }
 			);
 
 			Assert.areEqual(6, plan.refused.size(), 'Every broken one, each on its own');
-			Assert.isTrue(
-				plan.definitions.isEmpty(),
-				'Another entity\'s definition is not this pass'
-			);
+			Assert.isTrue(plan.definitions.isEmpty(), 'Another entity\'s definition is not this pass');
 		}
 	}
 
@@ -111,11 +88,7 @@ private class RollupPlannerTest {
 
 			Assert.areEqual(2, plan.queries.size(), 'One query per alternative');
 			Assert.areEqual(RollupPath.TOKEN_HOUSEHOLD, plan.queries[0].token, 'Resolved by token');
-			Assert.areEqual(
-				'ReportsToId',
-				plan.queries[0].keyExpression,
-				'Read off the source row'
-			);
+			Assert.areEqual('ReportsToId', plan.queries[0].keyExpression, 'Read off the source row');
 			Assert.areEqual(
 				new List<String>{ 'ReportsToId' },
 				plan.queries[1].earlierKeys,
@@ -150,9 +123,7 @@ private class RollupPlannerTest {
 
 			RollupPlanner.Plan plan = RollupPlanner.plan(
 				Account.SObjectType,
-				new List<Rollup_Definition__c>{
-					fromChildren('MAX', 'Anniversary__c', 'Emptied_By_Deletion__c')
-				}
+				new List<Rollup_Definition__c>{ fromChildren('MAX', 'Anniversary__c', 'Emptied_By_Deletion__c') }
 			);
 
 			Assert.isTrue(plan.refused.isEmpty(), 'Not refused for the saving user\'s access');
@@ -165,9 +136,7 @@ private class RollupPlannerTest {
 	static void formulaAutoNumberAndSystemTargetsAreStillRefused() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			Assert.isFalse(
-				RollupPlanner.engineCanWrite(
-					Field_Utilization_Snapshot__c.Fill_Rate__c.getDescribe()
-				),
+				RollupPlanner.engineCanWrite(Field_Utilization_Snapshot__c.Fill_Rate__c.getDescribe()),
 				'A formula is calculated by the platform'
 			);
 			Assert.isFalse(
@@ -199,9 +168,7 @@ private class RollupPlannerTest {
 			);
 			RollupPlanner.Plan systemPlan = RollupPlanner.plan(
 				Account.SObjectType,
-				new List<Rollup_Definition__c>{
-					fromChildren('MAX', 'Anniversary__c', 'LastModifiedDate')
-				}
+				new List<Rollup_Definition__c>{ fromChildren('MAX', 'Anniversary__c', 'LastModifiedDate') }
 			);
 
 			Assert.areEqual(1, formulaPlan.refused.size(), 'A formula target is refused');
@@ -229,26 +196,15 @@ private class RollupPlannerTest {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			Account parent = TestDataFactory.organization(new Account(Name = 'Parent'));
 			insert parent;
-			List<Account> children = new List<Account>{
-				TestDataFactory.organization(new Account(Name = 'Kid blank'))
-			};
+			List<Account> children = new List<Account>{ TestDataFactory.organization(new Account(Name = 'Kid blank')) };
 			for (Integer size : new List<Integer>{ 10, 50, 30, 40 }) {
-				children.add(
-					TestDataFactory.organization(
-						new Account(Name = 'Kid ' + size, NumberOfEmployees = size)
-					)
-				);
+				children.add(TestDataFactory.organization(new Account(Name = 'Kid ' + size, NumberOfEmployees = size)));
 			}
 			for (Account child : children) {
 				child.ParentId = parent.Id;
 			}
 			insert children;
-			Rollup_Definition__c largestTwo = ordered(
-				'SUM',
-				'NumberOfEmployees',
-				'NumberOfEmployees',
-				'Descending'
-			);
+			Rollup_Definition__c largestTwo = ordered('SUM', 'NumberOfEmployees', 'NumberOfEmployees', 'Descending');
 			largestTwo.Row_Limit__c = 2;
 
 			RollupPlanner.Plan plan = RollupPlanner.plan(
@@ -259,17 +215,11 @@ private class RollupPlannerTest {
 					ordered('FIRST', 'Name', 'Site', 'Descending')
 				}
 			);
-			RollupAggregator.Answer answer = RollupAggregator.calculate(
-				plan,
-				new Set<Id>{ parent.Id }
-			);
+			RollupAggregator.Answer answer = RollupAggregator.calculate(plan, new Set<Id>{ parent.Id });
 
 			Assert.areEqual(2, plan.queries.size(), 'The limited sum shares the list rows');
 			Assert.areEqual(RollupPlanner.KIND_LISTED, plan.queries[0].kind, 'Read as rows');
-			Assert.isTrue(
-				(Decimal) answer.tallies.get(0).get(parent.Id).result('SUM', null) == 90,
-				'The two largest'
-			);
+			Assert.isTrue((Decimal) answer.tallies.get(0).get(parent.Id).result('SUM', null) == 90, 'The two largest');
 			Assert.areEqual(
 				'Kid 50, Kid 40, Kid 30, Kid 10, Kid blank',
 				answer.tallies.get(1).get(parent.Id).result('TEXT_LIST', ', '),
@@ -302,16 +252,11 @@ private class RollupPlannerTest {
 				RollupPlanner.rowLimitProblem('TEXT_LIST', 3, null),
 				'A limit needs an order'
 			);
-			Rollup_Definition__c unordered = fromChildren(
-				'SUM',
-				'NumberOfEmployees',
-				'AnnualRevenue'
-			);
+			Rollup_Definition__c unordered = fromChildren('SUM', 'NumberOfEmployees', 'AnnualRevenue');
 			unordered.Row_Limit__c = 2;
 			Assert.areEqual(
 				1,
-				RollupPlanner.plan(Account.SObjectType, new List<Rollup_Definition__c>{ unordered })
-					.refused.size(),
+				RollupPlanner.plan(Account.SObjectType, new List<Rollup_Definition__c>{ unordered }).refused.size(),
 				'The planner refuses it too'
 			);
 		}

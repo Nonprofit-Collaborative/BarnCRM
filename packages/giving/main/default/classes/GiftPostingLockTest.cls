@@ -22,11 +22,7 @@ private class GiftPostingLockTest {
 	static void makeData() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GivingTestDataFactory.insertDefaultFund();
-			Contact ana = GivingTestDataFactory.insertHouseholdContact(
-				'The Nolan Family',
-				'Ana',
-				'Nolan'
-			);
+			Contact ana = GivingTestDataFactory.insertHouseholdContact('The Nolan Family', 'Ana', 'Nolan');
 			GivingTestDataFactory.insertHouseholdContact('The Okafor Family', 'Ben', 'Okafor');
 			Gift__c closedMonth = GivingTestDataFactory.buildGift(ana.Id, 250);
 			closedMonth.Gift_Date__c = inClosedPeriod();
@@ -123,10 +119,7 @@ private class GiftPostingLockTest {
 			pledged.Status__c = 'Pending';
 
 			Test.startTest();
-			List<Database.SaveResult> results = Database.insert(
-				new List<Gift__c>{ late, today, pledged },
-				false
-			);
+			List<Database.SaveResult> results = Database.insert(new List<Gift__c>{ late, today, pledged }, false);
 			Test.stopTest();
 
 			Assert.isFalse(results[0].isSuccess(), 'A gift dated in a closed month is refused.');
@@ -165,9 +158,7 @@ private class GiftPostingLockTest {
 			for (Gift__c attempt : attempts) {
 				refusals.add(refusalOf(attempt));
 			}
-			String acknowledged = refusalOf(
-				new Gift__c(Id = gift.Id, Acknowledgment_Status__c = 'Acknowledged')
-			);
+			String acknowledged = refusalOf(new Gift__c(Id = gift.Id, Acknowledgment_Status__c = 'Acknowledged'));
 			Test.stopTest();
 
 			for (Integer index = 0; index < refusals.size(); index++) {
@@ -206,9 +197,7 @@ private class GiftPostingLockTest {
 			GivingTestDataFactory.closeBooksThrough(lastClosedDay());
 
 			Test.startTest();
-			String movedBack = refusalOf(
-				new Gift__c(Id = giftOf(40).Id, Gift_Date__c = inClosedPeriod())
-			);
+			String movedBack = refusalOf(new Gift__c(Id = giftOf(40).Id, Gift_Date__c = inClosedPeriod()));
 			String received = refusalOf(new Gift__c(Id = giftOf(75).Id, Status__c = 'Received'));
 			Test.stopTest();
 
@@ -216,11 +205,7 @@ private class GiftPostingLockTest {
 				BarnHelp.text('Giving', 'Giving_Posting_ClosedPeriodNewGift'),
 				new List<String>{ lastClosedDay().format() }
 			);
-			Assert.areEqual(
-				expected,
-				movedBack,
-				'Dating a gift back into a closed month is adding it.'
-			);
+			Assert.areEqual(expected, movedBack, 'Dating a gift back into a closed month is adding it.');
 			Assert.areEqual(expected, received, 'So is a Pending gift there becoming Received.');
 		}
 	}
@@ -250,9 +235,7 @@ private class GiftPostingLockTest {
 			insert building;
 
 			Test.startTest();
-			String moved = refusalOf(
-				new Gift_Allocation__c(Id = existing.Id, Fund__c = building.Id)
-			);
+			String moved = refusalOf(new Gift_Allocation__c(Id = existing.Id, Fund__c = building.Id));
 			String removed = deleteRefusal(new Gift_Allocation__c(Id = existing.Id));
 			Database.SaveResult added = Database.insert(
 				GivingTestDataFactory.buildAllocation(gift.Id, building.Id, 10),
@@ -260,20 +243,11 @@ private class GiftPostingLockTest {
 			);
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_Posting_AllocationLocked'),
-				moved,
-				'No fund changes.'
-			);
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_Posting_AllocationLocked'),
-				removed,
-				'None is taken away.'
-			);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Posting_AllocationLocked'), moved, 'No fund changes.');
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Posting_AllocationLocked'), removed, 'None is taken away.');
 			Assert.isFalse(added.isSuccess(), 'None is added.');
 			Assert.isTrue(
-				messagesOf(added.getErrors())
-					.contains(BarnHelp.text('Giving', 'Giving_Posting_AllocationLocked')),
+				messagesOf(added.getErrors()).contains(BarnHelp.text('Giving', 'Giving_Posting_AllocationLocked')),
 				'Refused by the lock: ' + messagesOf(added.getErrors())
 			);
 		}
@@ -302,8 +276,7 @@ private class GiftPostingLockTest {
 
 			Assert.isFalse(result.isSuccess(), 'Restoring is adding a fund to the books.');
 			Assert.isTrue(
-				messagesOf(result.getErrors())
-					.contains(BarnHelp.text('Giving', 'Giving_Posting_AllocationLocked')),
+				messagesOf(result.getErrors()).contains(BarnHelp.text('Giving', 'Giving_Posting_AllocationLocked')),
 				'Refused by the lock, pause or no pause: ' + messagesOf(result.getErrors())
 			);
 		}
@@ -381,9 +354,7 @@ private class GiftPostingLockTest {
 	@IsTest
 	static void theOrganizationDonorOfALockedGiftIsNotDeleted() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Account riverside = TestDataFactory.organization(
-				new Account(Name = 'Riverside Foundation')
-			);
+			Account riverside = TestDataFactory.organization(new Account(Name = 'Riverside Foundation'));
 			insert riverside;
 			Gift__c grant = GivingTestDataFactory.buildGift(null, 500);
 			grant.Donor_Account__c = riverside.Id;
@@ -404,8 +375,7 @@ private class GiftPostingLockTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			// Ana's gift names only her, not her household; deleting the household would delete her
 			// with no Contact trigger and blank the gift's donor.
-			Id household = [SELECT AccountId FROM Contact WHERE LastName = 'Nolan' LIMIT 1]
-			.AccountId;
+			Id household = [SELECT AccountId FROM Contact WHERE LastName = 'Nolan' LIMIT 1].AccountId;
 			GivingTestDataFactory.closeBooksThrough(lastClosedDay());
 
 			Test.startTest();
@@ -468,9 +438,7 @@ private class GiftPostingLockTest {
 			Test.startTest();
 			String amount = refusalOf(new Gift__c(Id = gift.Id, Amount__c = 45));
 			String deleted = deleteRefusal(new Gift__c(Id = gift.Id));
-			String appeal = refusalOf(
-				new Gift__c(Id = gift.Id, Acknowledgment_Status__c = 'Do not acknowledge')
-			);
+			String appeal = refusalOf(new Gift__c(Id = gift.Id, Acknowledgment_Status__c = 'Do not acknowledge'));
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -478,11 +446,7 @@ private class GiftPostingLockTest {
 				amount,
 				'The amount is posted.'
 			);
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_Posting_PostedGiftLocked'),
-				deleted,
-				'So is the gift.'
-			);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Posting_PostedGiftLocked'), deleted, 'So is the gift.');
 			Assert.isNull(appeal, 'What the books do not hold stays editable.');
 		}
 	}
@@ -496,25 +460,15 @@ private class GiftPostingLockTest {
 			alreadyPosted.Accounting_Posted_At__c = System.now();
 
 			Test.startTest();
-			String typed = refusalOf(
-				new Gift__c(Id = gift.Id, Accounting_Posted_At__c = System.now())
-			);
+			String typed = refusalOf(new Gift__c(Id = gift.Id, Accounting_Posted_At__c = System.now()));
 			Database.SaveResult created = Database.insert(alreadyPosted, false);
 			markPosted(gift.Id);
 			String cleared = refusalOf(new Gift__c(Id = gift.Id, Accounting_Posted_At__c = null));
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_Posting_FieldsWrittenByPosting'),
-				typed,
-				'Not by hand.'
-			);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Posting_FieldsWrittenByPosting'), typed, 'Not by hand.');
 			Assert.isFalse(created.isSuccess(), 'Nor on a new gift.');
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_Posting_FieldsWrittenByPosting'),
-				cleared,
-				'Nor cleared.'
-			);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Posting_FieldsWrittenByPosting'), cleared, 'Nor cleared.');
 			Assert.isNotNull(giftOf(40).Accounting_Posted_At__c, 'The door itself works.');
 		}
 	}
@@ -539,11 +493,7 @@ private class GiftPostingLockTest {
 				FROM Gift__c
 				WHERE Id = :refundId
 			];
-			Assert.areEqual(
-				Date.today(),
-				refund.Gift_Date__c,
-				'The refund lands in an open month.'
-			);
+			Assert.areEqual(Date.today(), refund.Gift_Date__c, 'The refund lands in an open month.');
 			Assert.isNull(refund.Accounting_Posted_At__c, 'And waits for the next export.');
 			Gift__c original = giftOf(250);
 			Assert.areEqual('Refunded', original.Status__c, 'The original moved within the books.');
@@ -598,11 +548,7 @@ private class GiftPostingLockTest {
 			String refusal = refusalOf(new Gift__c(Id = giftOf(250).Id, Status__c = 'Cancelled'));
 			Test.stopTest();
 
-			Assert.areEqual(
-				closedGiftMessage(),
-				refusal,
-				'Cancelling would take it out of the books.'
-			);
+			Assert.areEqual(closedGiftMessage(), refusal, 'Cancelling would take it out of the books.');
 			Assert.areEqual('Received', giftOf(250).Status__c);
 		}
 	}
@@ -626,10 +572,7 @@ private class GiftPostingLockTest {
 	// -------------------------------------------------------------------------------------
 
 	private static User maria() {
-		User maria = TestDataFactory.createUser(
-			'Maria',
-			new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
-		);
+		User maria = TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' });
 		System.runAs(new User(Id = UserInfo.getUserId())) {
 			PermissionSet granted = new PermissionSet(
 				Name = 'Posting_Lock_Override_Test',
@@ -739,11 +682,7 @@ private class GiftPostingLockTest {
 			Test.stopTest();
 
 			Assert.isNotNull(refused, 'The amount the books hold is not changed.');
-			Assert.areEqual(
-				250,
-				giftOf(250).Gift_Allocations__r[0].Amount__c,
-				'Its allocation is as it was.'
-			);
+			Assert.areEqual(250, giftOf(250).Gift_Allocations__r[0].Amount__c, 'Its allocation is as it was.');
 		}
 	}
 

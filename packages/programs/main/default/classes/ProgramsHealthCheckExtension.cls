@@ -26,10 +26,7 @@ public with sharing class ProgramsHealthCheckExtension implements HealthCheckExt
 	/** The Nonprofit Cloud Program Management objects, looked up by name only. */
 	private static final String NPC_PROGRAM = 'Program'; // detection-only: describe key, reported only
 	private static final String NPC_ENROLLMENT = 'ProgramEnrollment'; // detection-only: describe key, reported only
-	private static final List<String> NPC_PROGRAM_OBJECTS = new List<String>{
-		NPC_PROGRAM,
-		NPC_ENROLLMENT
-	};
+	private static final List<String> NPC_PROGRAM_OBJECTS = new List<String>{ NPC_PROGRAM, NPC_ENROLLMENT };
 
 	/** Test seam: stands in for the org's answer to whether those objects are here. */
 	@TestVisible
@@ -113,10 +110,7 @@ public with sharing class ProgramsHealthCheckExtension implements HealthCheckExt
 		}
 		Integer howMany = open.size();
 		String counted = howMany > countCap
-			? String.format(
-					Label.Core_HealthCheck_OrphansMoreThan,
-					new List<Object>{ countCap.format() }
-			  )
+			? String.format(Label.Core_HealthCheck_OrphansMoreThan, new List<Object>{ countCap.format() })
 			: howMany.format();
 		List<HealthCheckService.Link> links = new List<HealthCheckService.Link>();
 		for (Integer i = 0; i < howMany && i < LINKS_SHOWN; i++) {
@@ -126,10 +120,7 @@ public with sharing class ProgramsHealthCheckExtension implements HealthCheckExt
 				KEY,
 				howMany == 1
 					? Label.Programs_HealthCheck_OpenAfterEndTitleOne
-					: String.format(
-							Label.Programs_HealthCheck_OpenAfterEndTitle,
-							new List<Object>{ counted }
-					  ),
+					: String.format(Label.Programs_HealthCheck_OpenAfterEndTitle, new List<Object>{ counted }),
 				BarnHelp.text('Programs', 'Programs_HealthCheck_OpenAfterEndDetail'),
 				HealthCheckService.SEVERITY_INFO,
 				HealthCheckService.CATEGORY_SETTINGS

@@ -22,11 +22,7 @@ public with sharing class ImportTemplateService {
 	@NamespaceAccessible
 	public static final String RULE_EXTERNAL_ID = 'External ID';
 
-	private static final Set<String> RULES = new Set<String>{
-		RULE_EMAIL,
-		RULE_NAME_POSTAL,
-		RULE_EXTERNAL_ID
-	};
+	private static final Set<String> RULES = new Set<String>{ RULE_EMAIL, RULE_NAME_POSTAL, RULE_EXTERNAL_ID };
 
 	/** The organization rules (R-IT2); an empty value means Name exact. */
 	@NamespaceAccessible
@@ -103,10 +99,7 @@ public with sharing class ImportTemplateService {
 	 * template loads as one-object templates do.
 	 */
 	@NamespaceAccessible
-	public static Import_Template__c createSeveralObjectsTemplate(
-		String name,
-		List<String> objectNames
-	) {
+	public static Import_Template__c createSeveralObjectsTemplate(String name, List<String> objectNames) {
 		if (String.isBlank(name)) {
 			throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorObjectTemplateName'));
 		}
@@ -120,9 +113,7 @@ public with sharing class ImportTemplateService {
 			Schema.DescribeSObjectResult described = loadableObject(objectName);
 			Import_Template__c each = newObjectTemplate(name, described);
 			template = template == null ? each : template;
-			mapping.objects.add(
-				new ImportMapping.ObjectStep(described.getName(), each.Load_Operation__c, null)
-			);
+			mapping.objects.add(new ImportMapping.ObjectStep(described.getName(), each.Load_Operation__c, null));
 		}
 		String problem = ImportObjectSchema.severalObjectsProblem(mapping);
 		if (problem != null) {
@@ -157,12 +148,8 @@ public with sharing class ImportTemplateService {
 	}
 
 	/** A new, unsaved template that loads this object, on Insert when the user may create. */
-	private static Import_Template__c newObjectTemplate(
-		String name,
-		Schema.DescribeSObjectResult described
-	) {
-		Boolean creates =
-			described.isCreateable() && !ImportObjectSchema.updatesOnly(described.getSObjectType());
+	private static Import_Template__c newObjectTemplate(String name, Schema.DescribeSObjectResult described) {
+		Boolean creates = described.isCreateable() && !ImportObjectSchema.updatesOnly(described.getSObjectType());
 		return new Import_Template__c(
 			Name = name.trim().abbreviate(80),
 			Template_Key__c = 'object_' +
@@ -177,9 +164,7 @@ public with sharing class ImportTemplateService {
 			Is_Recurring__c = false,
 			Active__c = true,
 			Target_Object__c = described.getName(),
-			Load_Operation__c = creates
-				? ImportObjectSchema.OPERATION_INSERT
-				: ImportObjectSchema.OPERATION_UPDATE,
+			Load_Operation__c = creates ? ImportObjectSchema.OPERATION_INSERT : ImportObjectSchema.OPERATION_UPDATE,
 			Lookup_Not_Found__c = ImportObjectSchema.LOOKUP_REJECT,
 			Several_Matches__c = SEVERAL_REJECT
 		);
@@ -294,11 +279,7 @@ public with sharing class ImportTemplateService {
 	 * clears them when blank. Refused, with the reason, under Insert, which has no parent key,
 	 * and for an object a load may not create or a field that does not point at the object.
 	 */
-	private static void setRelated(
-		Import_Template__c template,
-		Schema.SObjectType type,
-		String chosen
-	) {
+	private static void setRelated(Import_Template__c template, Schema.SObjectType type, String chosen) {
 		template.Related_Object__c = null;
 		template.Related_Parent_Field__c = null;
 		if (String.isBlank(chosen)) {
@@ -312,11 +293,7 @@ public with sharing class ImportTemplateService {
 		if (refused != null) {
 			throw new ImportException(refused);
 		}
-		String field = ImportObjectSchema.relatedParentField(
-			type,
-			related,
-			chosen.substringAfter('.')
-		);
+		String field = ImportObjectSchema.relatedParentField(type, related, chosen.substringAfter('.'));
 		if (field == null) {
 			throw new ImportException(
 				String.format(
@@ -374,8 +351,7 @@ public with sharing class ImportTemplateService {
 	/** True when a row matching several records takes the most recently changed (R-IT9). */
 	@NamespaceAccessible
 	public static Boolean usesMostRecent(Import_Template__c template) {
-		return template != null &&
-			SEVERAL_MOST_RECENT.equals(normalizedSeveralMatches(template.Several_Matches__c));
+		return template != null && SEVERAL_MOST_RECENT.equals(normalizedSeveralMatches(template.Several_Matches__c));
 	}
 
 	/**
@@ -442,10 +418,7 @@ public with sharing class ImportTemplateService {
 			}
 		}
 		List<Import_Template__c> renamed = new List<Import_Template__c>();
-		for (
-			Import_Template__c template : ImportTemplateSelector.selectByKeys(labelByKey.keySet())
-				.values()
-		) {
+		for (Import_Template__c template : ImportTemplateSelector.selectByKeys(labelByKey.keySet()).values()) {
 			String shipped = labelByKey.get(template.Template_Key__c);
 			if (
 				template.Is_Package_Default__c == true &&
@@ -485,9 +458,7 @@ public with sharing class ImportTemplateService {
 		List<Import_Template__c> realigned = new List<Import_Template__c>();
 		for (Import_Template__c template : ImportTemplateSelector.selectByKeys(keys).values()) {
 			if (template.Is_Package_Default__c == true && template.Person_Mode__c != personMode) {
-				realigned.add(
-					new Import_Template__c(Id = template.Id, Person_Mode__c = personMode)
-				);
+				realigned.add(new Import_Template__c(Id = template.Id, Person_Mode__c = personMode));
 			}
 		}
 		if (!realigned.isEmpty()) {
@@ -588,12 +559,7 @@ public with sharing class ImportTemplateService {
 			problem = oneObjectFieldProblem(type, row);
 		}
 		if (problem != null) {
-			String message =
-				'The shipped import template ' +
-				row.MasterLabel +
-				' was not added: ' +
-				problem +
-				'.';
+			String message = 'The shipped import template ' + row.MasterLabel + ' was not added: ' + problem + '.';
 			if (logSkips && loggedSkips.add(row.DeveloperName)) {
 				ErrorLogger.logMessage(message, SKIP_CONTEXT, severity);
 			}
@@ -605,10 +571,7 @@ public with sharing class ImportTemplateService {
 		Boolean needsField =
 			operation == ImportObjectSchema.OPERATION_UPSERT ||
 			operation == ImportObjectSchema.OPERATION_UPDATE_BY_FIELD;
-		Schema.SObjectField matchToken = ImportObjectSchema.fieldNamed(
-			type,
-			row.Load_Match_Field__c
-		);
+		Schema.SObjectField matchToken = ImportObjectSchema.fieldNamed(type, row.Load_Match_Field__c);
 		return new Import_Template__c(
 			Name = row.MasterLabel,
 			Description__c = row.Description__c,
@@ -622,29 +585,17 @@ public with sharing class ImportTemplateService {
 			Active__c = row.Default_Active__c == true,
 			Target_Object__c = type.getDescribe(SObjectDescribeOptions.DEFERRED).getName(),
 			Load_Operation__c = operation,
-			Load_Match_Field__c = needsField && matchToken != null
-				? matchToken.getDescribe().getName()
-				: null,
+			Load_Match_Field__c = needsField && matchToken != null ? matchToken.getDescribe().getName() : null,
 			Lookup_Not_Found__c = ImportObjectSchema.LOOKUP_REJECT,
 			Several_Matches__c = SEVERAL_REJECT
 		);
 	}
 
 	/** Why a one-object row cannot run on this org's schema, or null when every name exists. */
-	private static String oneObjectFieldProblem(
-		Schema.SObjectType type,
-		Import_Template_Default__mdt row
-	) {
-		ImportMapping mapping = ImportMapping.parse(
-			row.Column_Mapping_JSON__c,
-			row.Default_Values_JSON__c
-		);
+	private static String oneObjectFieldProblem(Schema.SObjectType type, Import_Template_Default__mdt row) {
+		ImportMapping mapping = ImportMapping.parse(row.Column_Mapping_JSON__c, row.Default_Values_JSON__c);
 		for (String attribute : mapping.recordAttributes()) {
-			if (
-				attribute != null &&
-				attribute != 'id' &&
-				ImportObjectSchema.fieldNamed(type, attribute) == null
-			) {
+			if (attribute != null && attribute != 'id' && ImportObjectSchema.fieldNamed(type, attribute) == null) {
 				return 'the field ' + attribute + ' is not on ' + row.Target_Object__c;
 			}
 		}
@@ -654,17 +605,11 @@ public with sharing class ImportTemplateService {
 			Boolean found = false;
 			if (token != null) {
 				for (Schema.SObjectType parent : token.getDescribe().getReferenceTo()) {
-					found =
-						found ||
-						ImportObjectSchema.fieldNamed(parent, lookups.get(attribute)) != null;
+					found = found || ImportObjectSchema.fieldNamed(parent, lookups.get(attribute)) != null;
 				}
 			}
 			if (!found) {
-				return 'the lookup field ' +
-					lookups.get(attribute) +
-					' for ' +
-					attribute +
-					' is not in this org';
+				return 'the lookup field ' + lookups.get(attribute) + ' for ' + attribute + ' is not in this org';
 			}
 		}
 		String operation = row.Load_Operation__c;
@@ -673,21 +618,13 @@ public with sharing class ImportTemplateService {
 			operation == ImportObjectSchema.OPERATION_UPDATE_BY_FIELD) &&
 			ImportObjectSchema.fieldNamed(type, row.Load_Match_Field__c) == null
 		) {
-			return 'its match field ' +
-				row.Load_Match_Field__c +
-				' is not on ' +
-				row.Target_Object__c;
+			return 'its match field ' + row.Load_Match_Field__c + ' is not on ' + row.Target_Object__c;
 		}
 		if (
 			operation == ImportObjectSchema.OPERATION_UPSERT &&
-			!ImportObjectSchema.fieldNamed(type, row.Load_Match_Field__c)
-				.getDescribe()
-				.isExternalId()
+			!ImportObjectSchema.fieldNamed(type, row.Load_Match_Field__c).getDescribe().isExternalId()
 		) {
-			return 'its match field ' +
-				row.Load_Match_Field__c +
-				' is not an external ID on ' +
-				row.Target_Object__c;
+			return 'its match field ' + row.Load_Match_Field__c + ' is not an external ID on ' + row.Target_Object__c;
 		}
 		return null;
 	}
@@ -716,18 +653,12 @@ public with sharing class ImportTemplateService {
 	 * Sets the mapping the administrator built in the picker on its template, for `saveUpload`,
 	 * so the same file next month needs no work. The mapping is validated before it is set.
 	 */
-	private static void applyMapping(
-		Import_Template__c template,
-		String mappingDocument,
-		String matchingRule
-	) {
+	private static void applyMapping(Import_Template__c template, String mappingDocument, String matchingRule) {
 		ImportMapping mapping = ImportMapping.parse(mappingDocument);
 		// A one-object template names no person; its own refusals are asked when its dry run
 		// starts, once its load choices are saved too (R-IT12).
 		if (!ImportObjectSchema.loadsOneObject(template) && !mapping.identifiesSomebody()) {
-			throw new ImportException(
-				BarnHelp.text('Core', 'Core_Import_ErrorMappingIdentifiesNobody')
-			);
+			throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorMappingIdentifiesNobody'));
 		}
 		// The objects of an upload of several objects are checked when the mapping is saved.
 		String severalProblem = ImportObjectSchema.severalObjectsProblem(mapping);
@@ -772,18 +703,10 @@ public with sharing class ImportTemplateService {
 			}
 		}
 		if (String.isNotBlank(behaviour) && chosen == null) {
-			throw new ImportException(
-				BarnHelp.text('Core', 'Core_Import_ErrorPaymentMatchingUnknown')
-			);
+			throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorPaymentMatchingUnknown'));
 		}
-		if (
-			(windowDays != null && (windowDays < 0 || windowDays > 999)) ||
-			(tolerance != null &&
-			tolerance < 0)
-		) {
-			throw new ImportException(
-				BarnHelp.text('Core', 'Core_Import_ErrorPaymentMatchingRange')
-			);
+		if ((windowDays != null && (windowDays < 0 || windowDays > 999)) || (tolerance != null && tolerance < 0)) {
+			throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorPaymentMatchingRange'));
 		}
 		template.Payment_Matching__c = chosen;
 		template.Match_Date_Window_Days__c = windowDays;
@@ -857,11 +780,7 @@ public with sharing class ImportTemplateService {
 	 * is kept when the mark is taken off, so ticking the box again brings it back.
 	 */
 	@NamespaceAccessible
-	public static Import_Template__c saveRecurring(
-		Id templateId,
-		Boolean isRecurring,
-		String sourceName
-	) {
+	public static Import_Template__c saveRecurring(Id templateId, Boolean isRecurring, String sourceName) {
 		Import_Template__c template = ImportTemplateSelector.selectById(templateId);
 		if (template == null) {
 			throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorTemplateGone'));
@@ -915,7 +834,7 @@ public with sharing class ImportTemplateService {
 		}
 		Import_Template__c template = new Import_Template__c(
 			Id = templateId,
-			Last_Import_Date__c = completedOn == null ? Date.today() : completedOn
+			Last_Import_Date__c = completedOn == null ? OrgDate.today() : completedOn
 		);
 		Database.update(template, AccessLevel.SYSTEM_MODE);
 	}
@@ -936,8 +855,7 @@ public with sharing class ImportTemplateService {
 	/** True when this template asks for people to be stored as person Accounts (R-IT3). */
 	@NamespaceAccessible
 	public static Boolean isPersonAccountMode(Import_Template__c template) {
-		return template != null &&
-			PERSON_MODE_PERSON_ACCOUNTS.equalsIgnoreCase(template.Person_Mode__c);
+		return template != null && PERSON_MODE_PERSON_ACCOUNTS.equalsIgnoreCase(template.Person_Mode__c);
 	}
 
 	/** A rule name the picklist accepts. Anything unrecognized falls back to the safe rule. */

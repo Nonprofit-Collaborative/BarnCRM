@@ -1,6 +1,6 @@
 # Where Used and Retire a Field
 
-**Package:** Core (the Rollup Builder, Giving, Programs and Logic Models modules add their own records when installed)
+**Package:** Core (the Rollup Builder, Fundraising, Programs and Logic Models modules add their own records when installed)
 **Feature:** C-59 (plan Section 6.0a release 0.16, decision D-156; ADR-0159)
 
 ## What It Does
@@ -10,15 +10,15 @@ field, and BarnCRM lists every BarnCRM setup record that names it, grouped by ki
 
 | Group | What is checked |
 |---|---|
-| **Saved Find Queries** | Columns, filter, sort, related-records conditions, related record columns and summary of every saved query in Find. Donor segments (Giving) are saved queries, so they are listed here. |
+| **Saved Find Queries** | Columns, filter, sort, related-records conditions, related record columns and summary of every saved query in Find. Donor segments (Fundraising) are saved queries, so they are listed here. |
 | **Super Transformer Step Lists** | The filter and every change (the field written, a field copied from, and the fields named inside steps) |
 | **Import Mappings** | Every column and default value that loads the field, the matching fields (Email, External ID and the like), the object a one-object mapping loads, and the link field of related records |
 | **Merge Rules** | The field a rule decides, including a whole address rule for any of its parts |
 | **Matching Sources** | The value, parent and postal code fields of each duplicate matching source |
 | **BarnCRM Settings** | Every setting whose value names a field: Address Card Fields, and the Household Name, Formal Greeting and Informal Greeting patterns (their {FirstName}, {LastName} and {Salutation} blanks; a blank pattern counts as its default) |
 | **Rollups** (Rollup Builder module) | The counted field, sort field, fiscal date field, both filters, the relationship path and the result field |
-| **BarnCRM Settings** (Giving module) | The Donor Level source total, on both people and organizations |
-| **Import Mappings** (Giving module) | Columns and default values that load gifts, allocations, soft credits and tributes |
+| **BarnCRM Settings** (Fundraising module) | The Donor Level source total, on both people and organizations |
+| **Import Mappings** (Fundraising module) | Columns and default values that load gifts, allocations, soft credits and tributes |
 | **Programs** (Programs module) | The enrollment fields each program's eligibility rules read; the link opens the program |
 | **Indicators** (Logic Models module) | The date field a computed indicator counts by and the field it sums or counts distinct values of; the link opens its logic model (the saved Find query it reads is listed under Saved Find Queries) |
 

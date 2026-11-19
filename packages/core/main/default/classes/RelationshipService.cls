@@ -173,9 +173,7 @@ public with sharing class RelationshipService {
 				continue;
 			}
 			eligible.add(record);
-			otherPeople.add(
-				PersonReference.idOf(record.Related_Contact__c, record.Related_Person_Account__c)
-			);
+			otherPeople.add(PersonReference.idOf(record.Related_Contact__c, record.Related_Person_Account__c));
 		}
 		if (eligible.isEmpty()) {
 			return;
@@ -185,11 +183,7 @@ public with sharing class RelationshipService {
 		// whose other sides would be the same (A to B as Colleague and as Employer contact
 		// both have B to A as Colleague) never get a duplicate mirror (R-RL4).
 		Set<String> takenKeys = new Set<String>();
-		Map<String, Relationship__c> unpairedByKey = unpairedCandidates(
-			otherPeople,
-			eligible,
-			takenKeys
-		);
+		Map<String, Relationship__c> unpairedByKey = unpairedCandidates(otherPeople, eligible, takenKeys);
 		Map<String, List<Relationship__c>> deletedByKey = fromRecycleBin
 			? deletedCandidates(otherPeople)
 			: new Map<String, List<Relationship__c>>();
@@ -204,21 +198,11 @@ public with sharing class RelationshipService {
 				continue;
 			}
 			Relationship__c partner = unpairedByKey.get(otherSideKey(record));
-			if (
-				partner != null &&
-				partner.Id != record.Id &&
-				!pairedInThisRun.contains(partner.Id)
-			) {
+			if (partner != null && partner.Id != record.Id && !pairedInThisRun.contains(partner.Id)) {
 				pairedInThisRun.add(record.Id);
 				pairedInThisRun.add(partner.Id);
-				updates.put(
-					record.Id,
-					new Relationship__c(Id = record.Id, Reciprocal_Relationship__c = partner.Id)
-				);
-				updates.put(
-					partner.Id,
-					new Relationship__c(Id = partner.Id, Reciprocal_Relationship__c = record.Id)
-				);
+				updates.put(record.Id, new Relationship__c(Id = record.Id, Reciprocal_Relationship__c = partner.Id));
+				updates.put(partner.Id, new Relationship__c(Id = partner.Id, Reciprocal_Relationship__c = record.Id));
 				continue;
 			}
 			String mirrorKey = otherSideKey(record);
@@ -237,17 +221,11 @@ public with sharing class RelationshipService {
 				toRestore.add(new Relationship__c(Id = deletedPartner.Id));
 				updates.put(
 					record.Id,
-					new Relationship__c(
-						Id = record.Id,
-						Reciprocal_Relationship__c = deletedPartner.Id
-					)
+					new Relationship__c(Id = record.Id, Reciprocal_Relationship__c = deletedPartner.Id)
 				);
 				updates.put(
 					deletedPartner.Id,
-					new Relationship__c(
-						Id = deletedPartner.Id,
-						Reciprocal_Relationship__c = record.Id
-					)
+					new Relationship__c(Id = deletedPartner.Id, Reciprocal_Relationship__c = record.Id)
 				);
 				continue;
 			}
@@ -255,13 +233,7 @@ public with sharing class RelationshipService {
 			creators.add(record);
 		}
 
-		withoutReentry(
-			toRestore,
-			new List<Relationship__c>(updates.values()),
-			toCreate,
-			creators,
-			null
-		);
+		withoutReentry(toRestore, new List<Relationship__c>(updates.values()), toCreate, creators, null);
 	}
 
 	/**
@@ -272,10 +244,7 @@ public with sharing class RelationshipService {
 	 * pairing (R-RL2). A relationship whose other side has been deleted out from under it is
 	 * given a new one rather than throwing.
 	 */
-	public static void syncReciprocals(
-		List<Relationship__c> records,
-		Map<Id, SObject> previousById
-	) {
+	public static void syncReciprocals(List<Relationship__c> records, Map<Id, SObject> previousById) {
 		if (records == null || records.isEmpty() || !isAutoReciprocalOn()) {
 			return;
 		}
@@ -304,8 +273,7 @@ public with sharing class RelationshipService {
 			// arbitrary but the same every time.
 			if (
 				changedIds.contains(record.Reciprocal_Relationship__c) &&
-				String.valueOf(record.Id)
-					.compareTo(String.valueOf(record.Reciprocal_Relationship__c)) > 0
+				String.valueOf(record.Id).compareTo(String.valueOf(record.Reciprocal_Relationship__c)) > 0
 			) {
 				continue;
 			}
@@ -485,10 +453,7 @@ public with sharing class RelationshipService {
 				List<Relationship__c> backPointers = new List<Relationship__c>();
 				for (Integer i = 0; i < inserts.size(); i++) {
 					backPointers.add(
-						new Relationship__c(
-							Id = creators[i].Id,
-							Reciprocal_Relationship__c = inserts[i].Id
-						)
+						new Relationship__c(Id = creators[i].Id, Reciprocal_Relationship__c = inserts[i].Id)
 					);
 				}
 				RelationshipUpkeepWriter.updatePairs(backPointers);
@@ -510,10 +475,7 @@ public with sharing class RelationshipService {
 			record.Is_Reciprocal_Managed__c == true &&
 			record.Reciprocal_Relationship__c == null &&
 			PersonReference.isComplete(record.Contact__c, record.Person_Account__c) &&
-			PersonReference.isComplete(
-				record.Related_Contact__c,
-				record.Related_Person_Account__c
-			) &&
+			PersonReference.isComplete(record.Related_Contact__c, record.Related_Person_Account__c) &&
 			String.isNotBlank(record.Type__c);
 	}
 
@@ -532,19 +494,12 @@ public with sharing class RelationshipService {
 		for (Relationship__c record : eligible) {
 			eligibleIds.add(record.Id);
 		}
-		for (
-			Relationship__c candidate : RelationshipUpkeepSelector.selectByFromPersonIds(
-				otherPeople
-			)
-		) {
+		for (Relationship__c candidate : RelationshipUpkeepSelector.selectByFromPersonIds(otherPeople)) {
 			String candidateKey = RelationshipDomain.keyOf(candidate);
 			if (candidateKey != null && !eligibleIds.contains(candidate.Id)) {
 				takenKeys.add(candidateKey);
 			}
-			if (
-				candidate.Reciprocal_Relationship__c != null ||
-				candidate.Is_Reciprocal_Managed__c != true
-			) {
+			if (candidate.Reciprocal_Relationship__c != null || candidate.Is_Reciprocal_Managed__c != true) {
 				continue;
 			}
 			String key = RelationshipDomain.keyOf(candidate);
@@ -562,11 +517,7 @@ public with sharing class RelationshipService {
 	 */
 	private static Map<String, List<Relationship__c>> deletedCandidates(Set<Id> otherPeople) {
 		Map<String, List<Relationship__c>> byKey = new Map<String, List<Relationship__c>>();
-		for (
-			Relationship__c candidate : RelationshipUpkeepSelector.selectDeletedByFromPersonIds(
-				otherPeople
-			)
-		) {
+		for (Relationship__c candidate : RelationshipUpkeepSelector.selectDeletedByFromPersonIds(otherPeople)) {
 			String key = RelationshipDomain.keyOf(candidate);
 			if (key == null) {
 				continue;
@@ -599,10 +550,7 @@ public with sharing class RelationshipService {
 		if (partnerIds.isEmpty()) {
 			return records;
 		}
-		Set<Id> live = new Map<Id, Relationship__c>(
-				RelationshipUpkeepSelector.selectByIds(partnerIds)
-			)
-			.keySet();
+		Set<Id> live = new Map<Id, Relationship__c>(RelationshipUpkeepSelector.selectByIds(partnerIds)).keySet();
 		List<Relationship__c> result = new List<Relationship__c>();
 		for (Relationship__c record : records) {
 			Id partnerId = record.Reciprocal_Relationship__c;
@@ -648,10 +596,7 @@ public with sharing class RelationshipService {
 	/** What the other side of this record would call itself. */
 	private static String otherSideKey(Relationship__c record) {
 		String fromKey = PersonReference.keyOf(record.Contact__c, record.Person_Account__c);
-		String toKey = PersonReference.keyOf(
-			record.Related_Contact__c,
-			record.Related_Person_Account__c
-		);
+		String toKey = PersonReference.keyOf(record.Related_Contact__c, record.Related_Person_Account__c);
 		String reciprocal = otherSideTypeOf(record);
 		if (fromKey == null || toKey == null || String.isBlank(reciprocal)) {
 			return null;
@@ -677,9 +622,7 @@ public with sharing class RelationshipService {
 			Related_Person_Account__c = record.Person_Account__c,
 			Type__c = otherSideTypeOf(record),
 			Reciprocal_Type__c = record.Type__c,
-			Status__c = String.isBlank(record.Status__c)
-				? ConnectionStatus.CURRENT
-				: record.Status__c,
+			Status__c = String.isBlank(record.Status__c) ? ConnectionStatus.CURRENT : record.Status__c,
 			Start_Date__c = record.Start_Date__c,
 			End_Date__c = record.End_Date__c,
 			Description__c = record.Description__c,
@@ -694,9 +637,7 @@ public with sharing class RelationshipService {
 	 * otherwise.
 	 */
 	private static String otherSideTypeOf(Relationship__c record) {
-		return String.isNotBlank(record.Reciprocal_Type__c)
-			? record.Reciprocal_Type__c
-			: reciprocalOf(record.Type__c);
+		return String.isNotBlank(record.Reciprocal_Type__c) ? record.Reciprocal_Type__c : reciprocalOf(record.Type__c);
 	}
 
 	/**

@@ -94,21 +94,13 @@ public with sharing class EventCalendarController {
 	public static Calendar getCalendar(Date fromDate, Date toDate, Boolean includeSessions) {
 		try {
 			if (fromDate == null || toDate == null || toDate < fromDate) {
-				throw new System.IllegalArgumentException(
-					BarnHelp.text('Events', 'Events_Calendar_BadRange')
-				);
+				throw new System.IllegalArgumentException(BarnHelp.text('Events', 'Events_Calendar_BadRange'));
 			}
 			Calendar result = new Calendar();
 			// Datetime.format uses the person's time zone, so this is their today.
 			result.today = Datetime.now().format('yyyy-MM-dd');
-			Datetime windowStart = Datetime.newInstance(
-				fromDate.addDays(-PADDING_DAYS),
-				Time.newInstance(0, 0, 0, 0)
-			);
-			Datetime windowEnd = Datetime.newInstance(
-				toDate.addDays(PADDING_DAYS + 1),
-				Time.newInstance(0, 0, 0, 0)
-			);
+			Datetime windowStart = Datetime.newInstance(fromDate.addDays(-PADDING_DAYS), Time.newInstance(0, 0, 0, 0));
+			Datetime windowEnd = Datetime.newInstance(toDate.addDays(PADDING_DAYS + 1), Time.newInstance(0, 0, 0, 0));
 			Integer eventLimit = maxEvents + 1;
 			for (Event__c event : [
 				SELECT
@@ -142,10 +134,7 @@ public with sharing class EventCalendarController {
 			throw UserErrors.message(e.getMessage());
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getCalendar');
-			throw UserErrors.wrapShowingDml(
-				e,
-				BarnHelp.text('Events', 'Events_Calendar_LoadFailed')
-			);
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Calendar_LoadFailed'));
 		}
 	}
 
@@ -165,11 +154,7 @@ public with sharing class EventCalendarController {
 				Event__r.Status__c,
 				Event__r.Format__c
 			FROM Event_Session__c
-			WHERE
-				Start__c < :windowEnd
-				AND (End__c >= :windowStart
-				OR (End__c = NULL
-				AND Start__c >= :windowStart))
+			WHERE Start__c < :windowEnd AND (End__c >= :windowStart OR (End__c = NULL AND Start__c >= :windowStart))
 			WITH USER_MODE
 			ORDER BY Start__c, Name
 			LIMIT :sessionLimit
@@ -205,9 +190,7 @@ public with sharing class EventCalendarController {
 		row.venueName = event.Venue_Name__c;
 		row.venueAddress = event.Venue_Address__c;
 		row.onlineLink = event.Online_Link__c;
-		row.description = event.Description__c == null
-			? null
-			: event.Description__c.left(DESCRIPTION_LENGTH);
+		row.description = event.Description__c == null ? null : event.Description__c.left(DESCRIPTION_LENGTH);
 		return row;
 	}
 }

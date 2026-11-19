@@ -11,10 +11,7 @@ private class RollupDefinitionTransferTest {
 	}
 
 	private static User maria() {
-		return TestDataFactory.createUser(
-			'Maria',
-			new List<String>{ 'BarnCRM_Admin', 'Rollup_Builder_Admin' }
-		);
+		return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin', 'Rollup_Builder_Admin' });
 	}
 
 	private static Rollup_Definition__c childCount(String key, String field) {
@@ -101,10 +98,7 @@ private class RollupDefinitionTransferTest {
 				FROM Rollup_Definition__c
 				WHERE Definition_Key__c = 'Custom_Children'
 			];
-			System.Assert.isTrue(
-				created.Active__c,
-				'It keeps its Active value: every check passed'
-			);
+			System.Assert.isTrue(created.Active__c, 'It keeps its Active value: every check passed');
 			System.Assert.isFalse(created.Is_Package_Default__c);
 
 			Map<String, Object> file = fileOf(text);
@@ -150,26 +144,15 @@ private class RollupDefinitionTransferTest {
 			overlapping.put('active', true);
 
 			List<RollupDefinitionTransfer.TransferRow> rows = RollupDefinitionTransfer.importDefinitions(
-				fileWith(
-					new List<Object>{ good, good, nameless, newer, shippedEntry(good), overlapping }
-				),
+				fileWith(new List<Object>{ good, good, nameless, newer, shippedEntry(good), overlapping }),
 				true
 			);
 
 			System.Assert.areEqual(RollupDefinitionTransfer.CREATED, rows[0].outcome);
-			System.Assert.areEqual(
-				BarnHelp.text('Rollups', 'Core_RollupBuilder_ImportTwice'),
-				rows[1].reason
-			);
-			System.Assert.areEqual(
-				BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorNameNeeded'),
-				rows[2].reason
-			);
+			System.Assert.areEqual(BarnHelp.text('Rollups', 'Core_RollupBuilder_ImportTwice'), rows[1].reason);
+			System.Assert.areEqual(BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorNameNeeded'), rows[2].reason);
 			System.Assert.isTrue(rows[3].reason.contains('notAnAttribute'), rows[3].reason);
-			System.Assert.areEqual(
-				BarnHelp.text('Rollups', 'Core_RollupBuilder_ImportShipped'),
-				rows[4].reason
-			);
+			System.Assert.areEqual(BarnHelp.text('Rollups', 'Core_RollupBuilder_ImportShipped'), rows[4].reason);
 			System.Assert.areEqual(
 				RollupDefinitionTransfer.REFUSED,
 				rows[5].outcome,

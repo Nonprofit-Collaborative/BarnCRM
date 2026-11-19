@@ -59,15 +59,10 @@ private class ErrorDigestRecipientsTest {
 						expected.getMessage().contains('donor@example.com'),
 						'The refusal names the address.'
 					);
-					Assert.isFalse(
-						expected.getMessage().contains('jen@'),
-						'And only the address that is wrong.'
-					);
+					Assert.isFalse(expected.getMessage().contains('jen@'), 'And only the address that is wrong.');
 				}
 				SettingsService.saveValues(
-					new Map<String, Object>{
-						'Error_Digest_Recipients__c' => 'Jen@barncrm.example.invalid'
-					}
+					new Map<String, Object>{ 'Error_Digest_Recipients__c' => 'Jen@barncrm.example.invalid' }
 				);
 				Test.stopTest();
 			}
@@ -126,24 +121,13 @@ private class ErrorDigestRecipientsTest {
 	static void theDigestStopsAtItsRecipientCap() {
 		System.runAs(TestUsers.admin()) {
 			Assert.areEqual(50, ErrorDigestRecipients.MAX_RECIPIENTS, 'Fifty people at most.');
-			User first = TestDataFactory.createUser(
-				'Capfirst',
-				new List<String>{ 'BarnCRM_Staff' }
-			);
-			User second = TestDataFactory.createUser(
-				'Capsecond',
-				new List<String>{ 'BarnCRM_Staff' }
-			);
-			User third = TestDataFactory.createUser(
-				'Capthird',
-				new List<String>{ 'BarnCRM_Staff' }
-			);
+			User first = TestDataFactory.createUser('Capfirst', new List<String>{ 'BarnCRM_Staff' });
+			User second = TestDataFactory.createUser('Capsecond', new List<String>{ 'BarnCRM_Staff' });
+			User third = TestDataFactory.createUser('Capthird', new List<String>{ 'BarnCRM_Staff' });
 			ErrorDigestRecipients.recipientCap = 2;
 
 			Test.startTest();
-			List<User> listed = ErrorDigestRecipients.resolve(
-				first.Email + ', ' + second.Email + ', ' + third.Email
-			);
+			List<User> listed = ErrorDigestRecipients.resolve(first.Email + ', ' + second.Email + ', ' + third.Email);
 			Test.stopTest();
 
 			Assert.areEqual(2, listed.size(), 'Three listed, the cap receives it.');

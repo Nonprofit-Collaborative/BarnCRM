@@ -71,11 +71,7 @@ public with sharing class SummitEventsAdapter {
 		I_END_DATE,
 		I_END_TIME
 	};
-	private static final Set<String> NOT_IMPORTED = new Set<String>{
-		'started',
-		'cancelled',
-		'canceled'
-	};
+	private static final Set<String> NOT_IMPORTED = new Set<String>{ 'started', 'cancelled', 'canceled' };
 	private static final Integer NAME_LENGTH = 80;
 	private static final String LOG_CONTEXT = 'SummitEventsAdapter';
 
@@ -217,9 +213,7 @@ public with sharing class SummitEventsAdapter {
 			Map<String, Object> row = byKey.get(key);
 			try {
 				Id eventId = eventsByInstance.get(String.valueOf(row.get('instanceId')));
-				EventRegistrationService.Result result = EventRegistrationService.register(
-					request(eventId, key, row)
-				);
+				EventRegistrationService.Result result = EventRegistrationService.register(request(eventId, key, row));
 				imported++;
 				if (row.get('contactId') == null && result.registrantId != null) {
 					writtenBack.put(String.valueOf(row.get('id')), result.registrantId);
@@ -245,26 +239,14 @@ public with sharing class SummitEventsAdapter {
 	}
 
 	private static Boolean wanted(Map<String, Object> row) {
-		String status = row.get('status') == null
-			? ''
-			: String.valueOf(row.get('status')).toLowerCase();
-		Boolean hasPerson =
-			row.get('contactId') != null || String.isNotBlank((String) row.get('lastName'));
-		return row.get('id') != null &&
-			row.get('instanceId') != null &&
-			hasPerson &&
-			!NOT_IMPORTED.contains(status);
+		String status = row.get('status') == null ? '' : String.valueOf(row.get('status')).toLowerCase();
+		Boolean hasPerson = row.get('contactId') != null || String.isNotBlank((String) row.get('lastName'));
+		return row.get('id') != null && row.get('instanceId') != null && hasPerson && !NOT_IMPORTED.contains(status);
 	}
 
-	private static EventRegistrationService.Request request(
-		Id eventId,
-		String key,
-		Map<String, Object> row
-	) {
+	private static EventRegistrationService.Request request(Id eventId, String key, Map<String, Object> row) {
 		EventPersonMatcher.PersonInput person = new EventPersonMatcher.PersonInput();
-		person.contactId = row.get('contactId') == null
-			? null
-			: String.valueOf(row.get('contactId'));
+		person.contactId = row.get('contactId') == null ? null : String.valueOf(row.get('contactId'));
 		person.firstName = (String) row.get('firstName');
 		person.lastName = (String) row.get('lastName');
 		person.email = (String) row.get('email');
@@ -282,9 +264,7 @@ public with sharing class SummitEventsAdapter {
 	/** Summit's status as an attendee status: Attended, No-Show or Registered. */
 	@TestVisible
 	private static String attendeeStatus(String summitStatus) {
-		String word = summitStatus == null
-			? ''
-			: summitStatus.toLowerCase().replaceAll('[^a-z]', '');
+		String word = summitStatus == null ? '' : summitStatus.toLowerCase().replaceAll('[^a-z]', '');
 		if (word.contains('noshow') || word.contains('notattend')) {
 			return EventRegistrationService.STATUS_NO_SHOW;
 		}
@@ -386,11 +366,7 @@ public with sharing class SummitEventsAdapter {
 		}
 		for (
 			SObject record : Database.queryWithBinds(
-				'SELECT ' +
-					String.join(fields, ', ') +
-					' FROM ' +
-					INSTANCE_OBJECT +
-					' WHERE Id IN :ids',
+				'SELECT ' + String.join(fields, ', ') + ' FROM ' + INSTANCE_OBJECT + ' WHERE Id IN :ids',
 				new Map<String, Object>{ 'ids' => instanceIds },
 				AccessLevel.SYSTEM_MODE
 			)
@@ -410,9 +386,7 @@ public with sharing class SummitEventsAdapter {
 		return new Map<String, Object>{
 			'id' => String.valueOf(fields.get('id')),
 			'title' => fields.get(I_TITLE),
-			'eventName' => parent instanceof SObject
-				? ((SObject) parent).get('Name')
-				: fields.get('name'),
+			'eventName' => parent instanceof SObject ? ((SObject) parent).get('Name') : fields.get('name'),
 			'startDate' => fields.get(I_START_DATE),
 			'startTime' => fields.get(I_START_TIME),
 			'endDate' => fields.get(I_END_DATE),
@@ -425,8 +399,7 @@ public with sharing class SummitEventsAdapter {
 		if (writtenBack.isEmpty() || !fieldsOf(REGISTRATION_OBJECT).contains(R_CONTACT)) {
 			return;
 		}
-		Schema.SObjectType registrationType = NamespaceUtil.globalDescribe()
-			.get(REGISTRATION_OBJECT);
+		Schema.SObjectType registrationType = NamespaceUtil.globalDescribe().get(REGISTRATION_OBJECT);
 		List<SObject> updates = new List<SObject>();
 		for (String registrationId : writtenBack.keySet()) {
 			SObject record = registrationType.newSObject(Id.valueOf(registrationId));

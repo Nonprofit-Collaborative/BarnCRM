@@ -17,9 +17,7 @@
 @NamespaceAccessible
 public with sharing class HouseholdNamingService {
 	/** The package namespace, or empty while it is deferred; derived, never hard-coded. */
-	private static final String LABEL_NAMESPACE = HouseholdNamingService.class
-			.getName()
-			.contains('.')
+	private static final String LABEL_NAMESPACE = HouseholdNamingService.class.getName().contains('.')
 		? HouseholdNamingService.class.getName().substringBefore('.')
 		: '';
 
@@ -59,11 +57,7 @@ public with sharing class HouseholdNamingService {
 	}
 
 	@NamespaceAccessible
-	public static String computeName(
-		List<HouseholdService.Person> members,
-		String pattern,
-		Boolean includeDeceased
-	) {
+	public static String computeName(List<HouseholdService.Person> members, String pattern, Boolean includeDeceased) {
 		List<HouseholdService.Person> eligible = new List<HouseholdService.Person>();
 		for (HouseholdService.Person person : ordered(members)) {
 			Boolean hidden = person.excludeFromName == true;
@@ -87,8 +81,7 @@ public with sharing class HouseholdNamingService {
 			);
 		}
 		String normalized = normalize(usable);
-		Boolean perPerson =
-			normalized.contains(TOKEN_FIRST_NAME) || normalized.contains(TOKEN_SALUTATION);
+		Boolean perPerson = normalized.contains(TOKEN_FIRST_NAME) || normalized.contains(TOKEN_SALUTATION);
 		if (!perPerson) {
 			return fitted(substitute(usable, eligible[0]), fieldLength(Account.Name));
 		}
@@ -105,10 +98,7 @@ public with sharing class HouseholdNamingService {
 	// ------------------------------------------------------------------ greetings
 
 	@NamespaceAccessible
-	public static String computeInformalGreeting(
-		List<HouseholdService.Person> members,
-		String pattern
-	) {
+	public static String computeInformalGreeting(List<HouseholdService.Person> members, String pattern) {
 		String usable = String.isBlank(pattern) ? DEFAULT_INFORMAL_PATTERN : pattern;
 		List<String> parts = new List<String>();
 		for (HouseholdService.Person person : greetable(members, false)) {
@@ -121,10 +111,7 @@ public with sharing class HouseholdNamingService {
 	}
 
 	@NamespaceAccessible
-	public static String computeFormalGreeting(
-		List<HouseholdService.Person> members,
-		String pattern
-	) {
+	public static String computeFormalGreeting(List<HouseholdService.Person> members, String pattern) {
 		return computeFormalGreeting(members, pattern, includeDeceasedInName());
 	}
 
@@ -152,8 +139,7 @@ public with sharing class HouseholdNamingService {
 			}
 			if (person.isDeceased == true) {
 				// One label holding the whole phrase, so a translation can put the name first.
-				part = storedLabel('Core_Households_LateName', Label.Core_Households_LateName)
-					.replace('{0}', part);
+				part = storedLabel('Core_Households_LateName', Label.Core_Households_LateName).replace('{0}', part);
 			}
 			parts.add(part);
 		}
@@ -164,10 +150,7 @@ public with sharing class HouseholdNamingService {
 	 * "Mr. and Mrs. John Smith": two living people, one surname, exactly one Mr. and one Mrs.
 	 * (named by the Mr.'s first name), and a pattern that asks for all three parts. Anything else is greeted person by person.
 	 */
-	private static String combinedSalutation(
-		List<HouseholdService.Person> eligible,
-		String pattern
-	) {
+	private static String combinedSalutation(List<HouseholdService.Person> eligible, String pattern) {
 		if (eligible.size() != 2) {
 			return null;
 		}
@@ -254,9 +237,7 @@ public with sharing class HouseholdNamingService {
 			Set<Id> namable = new Set<Id>(householdIds);
 			namable.removeAll(natives);
 			Wording wording = new Wording();
-			Map<Id, List<HouseholdService.Person>> membersByHousehold = HouseholdService.getMembers(
-				namable
-			);
+			Map<Id, List<HouseholdService.Person>> membersByHousehold = HouseholdService.getMembers(namable);
 			// R-H5 reads the primary from the mode's own source of truth: the membership rows
 			// in junction mode (getMembers has already flagged it), the field in contact mode.
 			Boolean primaryFromField = !HouseholdService.isJunctionMode();
@@ -316,12 +297,7 @@ public with sharing class HouseholdNamingService {
 		 * already carry the flag and it is null.
 		 */
 		@NamespaceAccessible
-		public Boolean apply(
-			Account household,
-			List<HouseholdService.Person> members,
-			Id primaryId,
-			Account target
-		) {
+		public Boolean apply(Account household, List<HouseholdService.Person> members, Id primaryId, Account target) {
 			if (recordTypeId != null && household.RecordTypeId != recordTypeId) {
 				return false;
 			}
@@ -337,10 +313,7 @@ public with sharing class HouseholdNamingService {
 			markPrimary(members, primaryId);
 			String name = computeName(members, namePattern, includeDeceased);
 			if (String.isBlank(name)) {
-				name = storedLabel(
-					'Core_Households_NamePlaceholder',
-					Label.Core_Households_NamePlaceholder
-				);
+				name = storedLabel('Core_Households_NamePlaceholder', Label.Core_Households_NamePlaceholder);
 			}
 			String formal = computeFormalGreeting(members, formalPattern, includeDeceased);
 			String informal = computeInformalGreeting(members, informalPattern);
@@ -497,9 +470,7 @@ public with sharing class HouseholdNamingService {
 		try {
 			if (translationsForTest != null) {
 				String key = language + '|' + name;
-				return translationsForTest.containsKey(key)
-					? translationsForTest.get(key)
-					: fallback;
+				return translationsForTest.containsKey(key) ? translationsForTest.get(key) : fallback;
 			}
 			String value = System.Label.get(LABEL_NAMESPACE, name, language);
 			return String.isBlank(value) ? fallback : value;
@@ -517,10 +488,7 @@ public with sharing class HouseholdNamingService {
 		if (parts.size() == 1) {
 			return parts[0];
 		}
-		String conjunction = storedLabel(
-			'Core_Households_Conjunction',
-			Label.Core_Households_Conjunction
-		);
+		String conjunction = storedLabel('Core_Households_Conjunction', Label.Core_Households_Conjunction);
 		if (parts.size() == 2) {
 			return parts[0] + ' ' + conjunction + ' ' + parts[1];
 		}
@@ -528,13 +496,8 @@ public with sharing class HouseholdNamingService {
 		for (Integer i = 0; i < parts.size() - 1; i++) {
 			leading.add(parts[i]);
 		}
-		String separator =
-			storedLabel('Core_Households_ListSeparator', Label.Core_Households_ListSeparator) + ' ';
-		return String.join(leading, separator) +
-			separator +
-			conjunction +
-			' ' +
-			parts[parts.size() - 1];
+		String separator = storedLabel('Core_Households_ListSeparator', Label.Core_Households_ListSeparator) + ' ';
+		return String.join(leading, separator) + separator + conjunction + ' ' + parts[parts.size() - 1];
 	}
 
 	/**
@@ -551,8 +514,7 @@ public with sharing class HouseholdNamingService {
 		if (full.length() <= maxLength) {
 			return full;
 		}
-		String separator =
-			storedLabel('Core_Households_ListSeparator', Label.Core_Households_ListSeparator) + ' ';
+		String separator = storedLabel('Core_Households_ListSeparator', Label.Core_Households_ListSeparator) + ' ';
 		String best = null;
 		String leading = parts[0];
 		for (Integer kept = 1; kept < parts.size(); kept++) {
@@ -571,10 +533,7 @@ public with sharing class HouseholdNamingService {
 
 	private static String andOthers(String leading, Integer leftOut) {
 		if (leftOut == 1) {
-			return storedLabel(
-					'Core_Households_ListAndOneOther',
-					Label.Core_Households_ListAndOneOther
-				)
+			return storedLabel('Core_Households_ListAndOneOther', Label.Core_Households_ListAndOneOther)
 				.replace('{0}', leading);
 		}
 		return storedLabel('Core_Households_ListAndOthers', Label.Core_Households_ListAndOthers)

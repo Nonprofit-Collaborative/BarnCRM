@@ -45,9 +45,7 @@ public class SetupAssistantTestExtension implements SetupAssistantExtension {
 
 	/** Runs the assistant with this module installed. */
 	public static void useThis() {
-		SetupAssistantExtensions.overrides = new List<SetupAssistantExtension>{
-			new SetupAssistantTestExtension()
-		};
+		SetupAssistantExtensions.overrides = new List<SetupAssistantExtension>{ new SetupAssistantTestExtension() };
 	}
 
 	/**

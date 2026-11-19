@@ -14,10 +14,7 @@ private class GiftImportProcessorTest {
 	@TestSetup
 	static void createTestUser() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			User maria = TestDataFactory.createUser(
-				'Maria',
-				new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
-			);
+			User maria = TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' });
 			fund('General', null, true);
 			// As Maria, who runs the imports: her profile, not the admin's, decides which
 			// record type for organizations she can use.
@@ -42,12 +39,7 @@ private class GiftImportProcessorTest {
 	}
 
 	private static Fund__c fund(String name, String code, Boolean isDefault) {
-		Fund__c fund = new Fund__c(
-			Name = name,
-			Accounting_Code__c = code,
-			Active__c = true,
-			Is_Default__c = isDefault
-		);
+		Fund__c fund = new Fund__c(Name = name, Accounting_Code__c = code, Active__c = true, Is_Default__c = isDefault);
 		insert fund;
 		return fund;
 	}
@@ -68,10 +60,7 @@ private class GiftImportProcessorTest {
 		for (String target : giftTargets) {
 			mapping.getColumns().add(new ImportMapping.Column(target, target));
 		}
-		template = ImportTestDataFactory.template(
-			mapping.serialize(),
-			ImportTemplateService.RULE_EMAIL
-		);
+		template = ImportTestDataFactory.template(mapping.serialize(), ImportTemplateService.RULE_EMAIL);
 		batch = ImportTestDataFactory.batch(template);
 		List<Map<String, String>> rows = new List<Map<String, String>>();
 		for (Integer index = 0; index < values.size(); index++) {
@@ -117,15 +106,8 @@ private class GiftImportProcessorTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Fund__c scholarships = fund('Scholarships', 'SCH-1', false);
 			given(
-				new List<String>{
-					'Gift.Amount__c',
-					'Gift.Gift_Date__c',
-					'Gift.Type__c',
-					'Allocation.Fund'
-				},
-				new List<List<String>>{
-					new List<String>{ '250.00', '2026-03-15', 'cheque', 'sch-1' }
-				}
+				new List<String>{ 'Gift.Amount__c', 'Gift.Gift_Date__c', 'Gift.Type__c', 'Allocation.Fund' },
+				new List<List<String>>{ new List<String>{ '250.00', '2026-03-15', 'cheque', 'sch-1' } }
 			);
 			ImportRowProcessor.Outcome outcome;
 
@@ -158,11 +140,7 @@ private class GiftImportProcessorTest {
 			Assert.areEqual('Received', gift.Status__c, 'Every imported gift is Received.');
 			Assert.areEqual(batch.Id, gift.Created_By_Import_Batch__c, 'Tagged for undo (R-IB3).');
 			Assert.areEqual(1, gift.Gift_Allocations__r.size(), 'One allocation, not two.');
-			Assert.areEqual(
-				scholarships.Id,
-				gift.Gift_Allocations__r[0].Fund__c,
-				'By accounting code.'
-			);
+			Assert.areEqual(scholarships.Id, gift.Gift_Allocations__r[0].Fund__c, 'By accounting code.');
 			Assert.isTrue(outcome.fileAmount == 250, 'The amount read is handed back.');
 		}
 	}
@@ -187,16 +165,8 @@ private class GiftImportProcessorTest {
 
 			Assert.areEqual(0, [SELECT COUNT() FROM Gift__c], 'A dry run writes nothing.');
 			List<Import_Row__c> after = rows();
-			Assert.areEqual(
-				ImportRowProcessor.STATUS_CREATED,
-				after[0].Status__c,
-				'Would be created.'
-			);
-			Assert.areEqual(
-				ImportRowProcessor.STATUS_REJECTED,
-				after[1].Status__c,
-				'Refused now: ' + outcome.notes
-			);
+			Assert.areEqual(ImportRowProcessor.STATUS_CREATED, after[0].Status__c, 'Would be created.');
+			Assert.areEqual(ImportRowProcessor.STATUS_REJECTED, after[1].Status__c, 'Refused now: ' + outcome.notes);
 			Assert.isTrue(
 				after[1].Error_Message__c.contains('Nowhere'),
 				'Naming the fund: ' + after[1].Error_Message__c
@@ -237,17 +207,9 @@ private class GiftImportProcessorTest {
 				after[0].Status__c,
 				'Loaded before: ' + after[0].Error_Message__c
 			);
-			Assert.areEqual(
-				String.valueOf(earlier.Id),
-				after[0].Gift_Id__c,
-				'And points at that gift.'
-			);
+			Assert.areEqual(String.valueOf(earlier.Id), after[0].Gift_Id__c, 'And points at that gift.');
 			Assert.areEqual(ImportRowProcessor.STATUS_CREATED, after[1].Status__c, 'New.');
-			Assert.areEqual(
-				after[1].Gift_Id__c,
-				after[2].Gift_Id__c,
-				'A repeat in the file shares it.'
-			);
+			Assert.areEqual(after[1].Gift_Id__c, after[2].Gift_Id__c, 'A repeat in the file shares it.');
 			Assert.areEqual(2, [SELECT COUNT() FROM Gift__c], 'One new gift, not two.');
 		}
 	}
@@ -267,14 +229,7 @@ private class GiftImportProcessorTest {
 					'Allocation.Percent2'
 				},
 				new List<List<String>>{
-					new List<String>{
-						'100',
-						'2026-03-15',
-						'Building',
-						'33.33',
-						'Scholarships',
-						'66.67'
-					}
+					new List<String>{ '100', '2026-03-15', 'Building', '33.33', 'Scholarships', '66.67' }
 				}
 			);
 
@@ -297,10 +252,7 @@ private class GiftImportProcessorTest {
 				byFund.put(allocation.Fund__c, allocation.Amount__c);
 			}
 			Assert.areEqual(2, byFund.size(), 'Two parts and no default allocation.');
-			Assert.isTrue(
-				byFund.get(building.Id) + byFund.get(scholarships.Id) == 100,
-				'Exact total.'
-			);
+			Assert.isTrue(byFund.get(building.Id) + byFund.get(scholarships.Id) == 100, 'Exact total.');
 		}
 	}
 
@@ -347,11 +299,7 @@ private class GiftImportProcessorTest {
 			}
 
 			List<Import_Row__c> after = rows();
-			Assert.areEqual(
-				ImportRowProcessor.STATUS_REJECTED,
-				after[0].Status__c,
-				'The refused one.'
-			);
+			Assert.areEqual(ImportRowProcessor.STATUS_REJECTED, after[0].Status__c, 'The refused one.');
 			Assert.isTrue(
 				after[0].Error_Message__c.contains('Refused for the test.'),
 				'With why: ' + after[0].Error_Message__c
@@ -407,11 +355,7 @@ private class GiftImportProcessorTest {
 				'The refused designation left no allocation.'
 			);
 			List<Import_Row__c> after = rows();
-			Assert.areEqual(
-				ImportRowProcessor.STATUS_REJECTED,
-				after[0].Status__c,
-				'The refused one.'
-			);
+			Assert.areEqual(ImportRowProcessor.STATUS_REJECTED, after[0].Status__c, 'The refused one.');
 			Assert.areEqual(ImportRowProcessor.STATUS_CREATED, after[1].Status__c, 'The other.');
 		}
 	}
@@ -466,10 +410,7 @@ private class GiftImportProcessorTest {
 				new List<String>{ 'Gift.Amount__c', 'Gift.Gift_Date__c' },
 				new List<List<String>>{ new List<String>{ '10', '2026-03-15' } }
 			);
-			User staff = TestDataFactory.createUser(
-				'Staff',
-				new List<String>{ 'BarnCRM_Admin', 'Giving_Staff' }
-			);
+			User staff = TestDataFactory.createUser('Staff', new List<String>{ 'BarnCRM_Admin', 'Giving_Staff' });
 			ImportRowProcessor.Outcome outcome;
 
 			System.runAs(staff) {
@@ -486,9 +427,7 @@ private class GiftImportProcessorTest {
 				'Saying which permission is missing.'
 			);
 			Assert.isTrue(
-				outcome.notes.contains(
-					BarnHelp.text('Giving', 'Giving_Import_ErrorCannotDeleteGifts')
-				),
+				outcome.notes.contains(BarnHelp.text('Giving', 'Giving_Import_ErrorCannotDeleteGifts')),
 				'And once in the run log: ' + outcome.notes
 			);
 			Assert.areEqual(0, [SELECT COUNT() FROM Gift__c], 'No gift written.');
@@ -499,12 +438,7 @@ private class GiftImportProcessorTest {
 	static void aRepeatSharesItsEarlierRowsRefusalInTheDryRunAsInTheCommit() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			given(
-				new List<String>{
-					'Gift.Amount__c',
-					'Gift.Gift_Date__c',
-					'Gift.External_Id__c',
-					'Allocation.Fund'
-				},
+				new List<String>{ 'Gift.Amount__c', 'Gift.Gift_Date__c', 'Gift.External_Id__c', 'Allocation.Fund' },
 				new List<List<String>>{
 					new List<String>{ '10', '2026-03-15', 'stripe-9', 'Nowhere' },
 					new List<String>{ '10', '2026-03-15', 'STRIPE-9', 'Nowhere' }
@@ -553,10 +487,7 @@ private class GiftImportProcessorTest {
 			mapping.getColumns().add(new ImportMapping.Column('Date', 'Gift.Gift_Date__c'));
 			mapping.getDefaults().add(new ImportMapping.Assignment('Gift.Donor', 'Organization'));
 			mapping.getDefaults().add(new ImportMapping.Assignment('Gift.Type__c', 'Check'));
-			template = ImportTestDataFactory.template(
-				mapping.serialize(),
-				ImportTemplateService.RULE_EMAIL
-			);
+			template = ImportTestDataFactory.template(mapping.serialize(), ImportTemplateService.RULE_EMAIL);
 			batch = ImportTestDataFactory.batch(template);
 			ImportTestDataFactory.rows(
 				batch,
@@ -577,18 +508,10 @@ private class GiftImportProcessorTest {
 			}
 
 			Import_Row__c row = rows()[0];
-			Assert.areEqual(
-				ImportRowProcessor.STATUS_CREATED,
-				row.Status__c,
-				'Created: ' + row.Error_Message__c
-			);
+			Assert.areEqual(ImportRowProcessor.STATUS_CREATED, row.Status__c, 'Created: ' + row.Error_Message__c);
 			Gift__c gift = [SELECT Donor_Contact__c, Donor_Account__r.Name FROM Gift__c];
 			Assert.isNull(gift.Donor_Contact__c, 'Not the contact person.');
-			Assert.areEqual(
-				'Riverside Foundation',
-				gift.Donor_Account__r.Name,
-				'The organization gave.'
-			);
+			Assert.areEqual('Riverside Foundation', gift.Donor_Account__r.Name, 'The organization gave.');
 		}
 	}
 
@@ -660,14 +583,8 @@ private class GiftImportProcessorTest {
 			Map<Id, String> keep = new GiftImportProcessor()
 				.reasonsToKeep(batch.Id, Gift__c.SObjectType, new Set<Id>(giftIds.values()));
 
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_Import_UndoKeptClosedPeriod'),
-				keep.get(giftIds.get(10))
-			);
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_Import_UndoKeptPosted'),
-				keep.get(giftIds.get(20))
-			);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Import_UndoKeptClosedPeriod'), keep.get(giftIds.get(10)));
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Import_UndoKeptPosted'), keep.get(giftIds.get(20)));
 			Assert.isFalse(keep.containsKey(giftIds.get(30)), 'An open, unposted gift can go');
 		}
 	}
@@ -676,15 +593,11 @@ private class GiftImportProcessorTest {
 	static void giftsThatCannotBeUndoneAreLoggedInOneStatement() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			// Gift ids that name no gift: deleting them fails, row by row.
-			String prefix = Gift__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-				.getKeyPrefix();
+			String prefix = Gift__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix();
 			List<GiftImportRow> gifts = new List<GiftImportRow>();
 			Set<String> giftIds = new Set<String>();
 			for (Integer i = 1; i <= 3; i++) {
-				GiftImportRow item = new GiftImportRow(
-					new Import_Row__c(),
-					new Map<String, Map<String, String>>()
-				);
+				GiftImportRow item = new GiftImportRow(new Import_Row__c(), new Map<String, Map<String, String>>());
 				item.error = 'Its allocation could not be saved.';
 				item.giftId = Id.valueOf(prefix + String.valueOf(i).leftPad(12, '0'));
 				giftIds.add(String.valueOf(item.giftId));

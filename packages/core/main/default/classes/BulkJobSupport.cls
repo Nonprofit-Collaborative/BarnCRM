@@ -14,8 +14,7 @@ public with sharing class BulkJobSupport {
 		}
 		if (stored instanceof Decimal || stored instanceof Integer || stored instanceof Double) {
 			try {
-				return Decimal.valueOf(String.valueOf(stored)) ==
-					Decimal.valueOf(String.valueOf(wanted));
+				return Decimal.valueOf(String.valueOf(stored)) == Decimal.valueOf(String.valueOf(wanted));
 			} catch (Exception notANumber) {
 				return false;
 			}

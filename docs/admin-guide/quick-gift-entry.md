@@ -9,26 +9,26 @@ your settings. It is built for a phone, so David can enter a check while he is s
 at the gala table and hand the donor a thank you on the spot.
 
 Every gift entered here is a normal gift: it counts in the giving totals, it can be
-receipted, and it appears in the Giving dashboard the next time the numbers are
+receipted, and it appears in the Fundraising dashboard the next time the numbers are
 calculated.
 
 ## How to Turn It On
 
-Nothing to install and no Setup step. Quick Gift Entry arrives with the Giving package.
+Nothing to install and no Setup step. Quick Gift Entry arrives with the Fundraising package.
 
 1. Open the **BarnCRM Fundraising** app from the app launcher (the grid of dots in the top left
-   corner). The Giving package ships this app, and Quick Gift Entry is its first tab. On a
+   corner). The Fundraising package ships this app, and Quick Gift Entry is its first tab. On a
    computer it is also in the app's utility bar at the bottom of the screen, so the form
    opens over whatever page you are on.
-2. Open **BarnCRM Settings**, then **Giving**, and check two values:
+2. Open **BarnCRM Settings**, then **Fundraising**, and check two values:
    - **Default fund**: the fund a gift is allocated to when nobody picks one. Most
      organizations choose the Annual Fund or the General Fund.
    - **Default appeal**: the appeal proposed on a new gift. Leave it empty outside of
      appeal season, or set it to the appeal you are running right now so that staff do
      not have to pick it every time.
 3. Give your fundraising staff access. In BarnCRM Settings, open **Access** and assign
-   the **Fundraising Staff** role. It includes the **Giving Staff** permission set that the
-   Giving module ships, which is where the tab and the save come from.
+   the **Fundraising Staff** role. It includes the **Fundraising Staff Access** permission set that the
+   Fundraising module ships, which is where the tab and the save come from.
 
 If you would rather have the form on a household or a person's page than on its own tab,
 open that page in the Lightning App Builder (from the page's setup gear, Edit Page), drag
@@ -125,8 +125,8 @@ nobody leaves the form to look things up. It shows:
 
 The panel only reads; it changes nothing and needs no setting. It shows only what the user
 can already see: records and fields the user cannot read are left out. If it cannot load, a
-one-line note says so and the gift can still be saved. Its wording is in the Giving help
-text (`Giving_DonorPanel_*` keys), not custom labels. Users need the Giving Staff or Giving
+one-line note says so and the gift can still be saved. Its wording is in the Fundraising help
+text (`Giving_DonorPanel_*` keys), not custom labels. Users need the Fundraising Staff Access or Fundraising
 Admin permission set, which grant the `GiftDonorPanelController` class.
 
 ## Tributes and Matching Gifts at Entry

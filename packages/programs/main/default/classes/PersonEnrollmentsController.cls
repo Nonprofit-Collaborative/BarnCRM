@@ -98,11 +98,7 @@ public with sharing class PersonEnrollmentsController {
 		Map<String, String> stageLabels = stageLabels();
 		List<Row> open = new List<Row>();
 		List<Row> ended = new List<Row>();
-		List<Enrollment__c> found = EnrollmentSelector.selectForPerson(
-			contactIds,
-			accountId,
-			MAX_SHOWN + 1
-		);
+		List<Enrollment__c> found = EnrollmentSelector.selectForPerson(contactIds, accountId, MAX_SHOWN + 1);
 		result.moreThanShown = found.size() > MAX_SHOWN;
 		for (Integer i = 0; i < found.size() && i < MAX_SHOWN; i++) {
 			Row row = toRow(found[i], stageLabels);
@@ -115,11 +111,7 @@ public with sharing class PersonEnrollmentsController {
 	}
 
 	/** The person's last service and how many they attended, in user mode (P-05). */
-	private static void fillLastService(
-		PersonEnrollments result,
-		Set<Id> contactIds,
-		Id accountId
-	) {
+	private static void fillLastService(PersonEnrollments result, Set<Id> contactIds, Id accountId) {
 		if (!Schema.SObjectType.Service_Delivery__c.isAccessible()) {
 			return;
 		}
@@ -168,15 +160,12 @@ public with sharing class PersonEnrollmentsController {
 			WITH USER_MODE
 			LIMIT 1
 		];
-		return !found.isEmpty() &&
-			OrgShapeDetector.personAccountRecordTypeIds().contains(found[0].RecordTypeId);
+		return !found.isEmpty() && OrgShapeDetector.personAccountRecordTypeIds().contains(found[0].RecordTypeId);
 	}
 
 	private static Map<String, String> stageLabels() {
 		Map<String, String> byValue = new Map<String, String>();
-		for (
-			Schema.PicklistEntry entry : Enrollment__c.Stage__c.getDescribe().getPicklistValues()
-		) {
+		for (Schema.PicklistEntry entry : Enrollment__c.Stage__c.getDescribe().getPicklistValues()) {
 			byValue.put(entry.getValue(), entry.getLabel());
 		}
 		return byValue;

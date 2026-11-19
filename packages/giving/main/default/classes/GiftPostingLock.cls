@@ -16,11 +16,7 @@ public with sharing class GiftPostingLock {
 	public static final String OVERRIDE_PERMISSION = 'Override_Posting_Lock';
 
 	/** The statuses the accounting export and the money rollups read (ADR-0022, ADR-0051). */
-	public static final Set<String> BOOK_STATUSES = new Set<String>{
-		'Received',
-		'Refunded',
-		'Written off'
-	};
+	public static final Set<String> BOOK_STATUSES = new Set<String>{ 'Received', 'Refunded', 'Written off' };
 	public static final String TYPE_IN_KIND = 'In-kind';
 
 	private static final String LOG_CONTEXT = 'Posting lock override';
@@ -170,9 +166,7 @@ public with sharing class GiftPostingLock {
 			if (isLocked(previous, closed)) {
 				List<String> moved = changesTo(LOCKED_FIELDS, previous, gift);
 				if (!isInBooks(gift)) {
-					moved.add(
-						GiftService.change(Gift__c.Status__c, previous.Status__c, gift.Status__c)
-					);
+					moved.add(GiftService.change(Gift__c.Status__c, previous.Status__c, gift.Status__c));
 				}
 				if (!moved.isEmpty()) {
 					changes.addAll(moved);
@@ -215,16 +209,12 @@ public with sharing class GiftPostingLock {
 		for (Gift__c gift : gifts) {
 			String refusal = isLocked(gift, closed)
 				? lockedMessage(gift, closed)
-				: originals.contains(gift.Id)
-						? BarnHelp.text('Giving', 'Giving_Posting_OriginalLocked')
-						: null;
+				: originals.contains(gift.Id) ? BarnHelp.text('Giving', 'Giving_Posting_OriginalLocked') : null;
 			if (refusal == null) {
 				continue;
 			}
 			if (overridden) {
-				overrides.add(
-					describe(gift.Id, BarnHelp.text('Giving', 'Giving_Gift_OverrideDeleted'))
-				);
+				overrides.add(describe(gift.Id, BarnHelp.text('Giving', 'Giving_Gift_OverrideDeleted')));
 			} else {
 				gift.addError(refusal);
 			}
@@ -263,12 +253,7 @@ public with sharing class GiftPostingLock {
 				continue;
 			}
 			if (overridden) {
-				overrides.add(
-					describe(
-						record.Id,
-						BarnHelp.text('Giving', 'Giving_Posting_OverrideDonorDeleted')
-					)
-				);
+				overrides.add(describe(record.Id, BarnHelp.text('Giving', 'Giving_Posting_OverrideDonorDeleted')));
 			} else {
 				record.addError(BarnHelp.text('Giving', 'Giving_Posting_DonorLocked'));
 			}
@@ -352,9 +337,7 @@ public with sharing class GiftPostingLock {
 			if (!locked.containsKey(allocation.Gift__c)) {
 				continue;
 			}
-			Gift_Allocation__c previous = oldAllocations == null
-				? null
-				: oldAllocations.get(allocation.Id);
+			Gift_Allocation__c previous = oldAllocations == null ? null : oldAllocations.get(allocation.Id);
 			if (previous != null && changesTo(ALLOCATION_FIELDS, previous, allocation).isEmpty()) {
 				continue;
 			}
@@ -423,11 +406,7 @@ public with sharing class GiftPostingLock {
 	 * Apex compares strings without regard to case, and a reference whose case changed is a
 	 * different reference in the books.
 	 */
-	private static List<String> changesTo(
-		List<Schema.SObjectField> fields,
-		SObject previous,
-		SObject current
-	) {
+	private static List<String> changesTo(List<Schema.SObjectField> fields, SObject previous, SObject current) {
 		List<String> changes = new List<String>();
 		for (Schema.SObjectField field : fields) {
 			Object before = previous.get(field);

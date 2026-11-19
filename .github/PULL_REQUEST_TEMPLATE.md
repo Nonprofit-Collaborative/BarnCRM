@@ -32,7 +32,7 @@
 
 - [ ] No em dashes anywhere in this change.
 - [ ] No hard-coded namespace anywhere in this change.
-- [ ] No standard-object reference outside Mirror.
+- [ ] No standard-object reference outside Mirror and Fundraising's gift mirror classes (dynamic only).
 - [ ] Every new Apex test runs inside `System.runAs(TestUsers.admin())` (or `TestUsers.adminWith(...)` in a module), or says why not with `// runs-as: deploying user (reason)`. See docs/contributor-guide/ci.md, "Tests run as a user they create".
 
 ## Org tests

@@ -7,11 +7,7 @@
  * ADR-0087 `0087-whats-new-from-packaged-release-notes.md`).
  */
 public with sharing class WhatsNewController {
-	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
-		null,
-		'Core',
-		'Core_WhatsNew_Failed'
-	);
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(null, 'Core', 'Core_WhatsNew_Failed');
 
 	// At most four parts of at most four digits: 19 characters, within Last_Seen_Version__c.
 	private static final Pattern VERSION_SHAPE = Pattern.compile('^\\d{1,4}(\\.\\d{1,4}){0,3}$');

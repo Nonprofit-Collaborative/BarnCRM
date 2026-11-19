@@ -46,7 +46,7 @@ public with sharing class TributeService {
 					)
 				);
 			}
-			Database.update(updates, true, AccessLevel.USER_MODE);
+			update as user updates;
 		}
 		return changed;
 	}

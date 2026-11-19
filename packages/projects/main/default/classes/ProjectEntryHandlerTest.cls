@@ -3,9 +3,7 @@
  * 200 at a time; an explicit status stays; with a setting off the status stays blank and the
  * hours count as before 1.20; and the Status cannot be cleared again.
  */
-@IsTest(
-	testFor='ApexClass:ProjectEntryHandler, ApexTrigger:TimeEntryTrigger, ApexTrigger:ProjectExpenseTrigger'
-)
+@IsTest(testFor='ApexClass:ProjectEntryHandler, ApexTrigger:TimeEntryTrigger, ApexTrigger:ProjectExpenseTrigger')
 private class ProjectEntryHandlerTest {
 	@TestSetup
 	static void setup() {
@@ -32,19 +30,16 @@ private class ProjectEntryHandlerTest {
 			insert cost;
 
 			Assert.isNull(
-				[SELECT Status__c FROM Time_Entry__c WHERE Id = :entry.Id WITH SYSTEM_MODE]
-				.Status__c,
+				[SELECT Status__c FROM Time_Entry__c WHERE Id = :entry.Id WITH SYSTEM_MODE].Status__c,
 				'Time stays blank'
 			);
 			Assert.isNull(
-				[SELECT Status__c FROM Project_Expense__c WHERE Id = :cost.Id WITH SYSTEM_MODE]
-				.Status__c,
+				[SELECT Status__c FROM Project_Expense__c WHERE Id = :cost.Id WITH SYSTEM_MODE].Status__c,
 				'The expense stays blank'
 			);
 			Assert.areEqual(
 				3,
-				[SELECT Actual_Hours__c FROM Project__c WHERE Id = :project.Id WITH SYSTEM_MODE]
-				.Actual_Hours__c,
+				[SELECT Actual_Hours__c FROM Project__c WHERE Id = :project.Id WITH SYSTEM_MODE].Actual_Hours__c,
 				'The hours count as they were saved'
 			);
 		}
@@ -55,10 +50,7 @@ private class ProjectEntryHandlerTest {
 		System.runAs(ProjectsTestData.admin()) {
 			SettingsService.saveValues(
 				'Projects_Settings__c',
-				new Map<String, Object>{
-					'Approvals_Enabled__c' => true,
-					'Expenses_Enabled__c' => true
-				}
+				new Map<String, Object>{ 'Approvals_Enabled__c' => true, 'Expenses_Enabled__c' => true }
 			);
 			Project__c project = ProjectsTestData.project('Active', null);
 			List<Time_Entry__c> entries = new List<Time_Entry__c>();
@@ -87,24 +79,19 @@ private class ProjectEntryHandlerTest {
 			);
 			Assert.areEqual(
 				'Open',
-				[SELECT Status__c FROM Project_Expense__c WHERE Id = :cost.Id WITH SYSTEM_MODE]
-				.Status__c,
+				[SELECT Status__c FROM Project_Expense__c WHERE Id = :cost.Id WITH SYSTEM_MODE].Status__c,
 				'The expense is Open'
 			);
 			Assert.areEqual(
 				1,
-				[SELECT Actual_Hours__c FROM Project__c WHERE Id = :project.Id WITH SYSTEM_MODE]
-				.Actual_Hours__c,
+				[SELECT Actual_Hours__c FROM Project__c WHERE Id = :project.Id WITH SYSTEM_MODE].Actual_Hours__c,
 				'Only the approved hour counts (R-PM10)'
 			);
 			try {
 				update new Time_Entry__c(Id = entries[1].Id, Status__c = null);
 				Assert.fail('A status is never cleared');
 			} catch (DmlException refused) {
-				Assert.isTrue(
-					refused.getMessage().contains('Status cannot be cleared'),
-					refused.getMessage()
-				);
+				Assert.isTrue(refused.getMessage().contains('Status cannot be cleared'), refused.getMessage());
 			}
 		}
 	}
@@ -120,8 +107,7 @@ private class ProjectEntryHandlerTest {
 			Project_Expense__c cost = expense(project.Id);
 			insert cost;
 			Assert.isNull(
-				[SELECT Status__c FROM Project_Expense__c WHERE Id = :cost.Id WITH SYSTEM_MODE]
-				.Status__c,
+				[SELECT Status__c FROM Project_Expense__c WHERE Id = :cost.Id WITH SYSTEM_MODE].Status__c,
 				'Expenses are not in the flow until Track expenses is on'
 			);
 		}

@@ -13,9 +13,7 @@ private class FindInlineEditServiceTest {
 	}
 
 	private static List<Contact> makePeople(Integer count) {
-		Account organization = TestDataFactory.organization(
-			new Account(Name = 'Springfield Food Bank')
-		);
+		Account organization = TestDataFactory.organization(new Account(Name = 'Springfield Food Bank'));
 		insert organization;
 		List<Contact> people = new List<Contact>();
 		for (Integer index = 0; index < count; index++) {
@@ -41,10 +39,7 @@ private class FindInlineEditServiceTest {
 		List<Object> rows = new List<Object>();
 		for (Integer index = 0; index < people.size(); index++) {
 			rows.add(
-				new Map<String, Object>{
-					'Id' => people[index].Id,
-					'Title' => index < keepFirst ? 'Volunteer' : title
-				}
+				new Map<String, Object>{ 'Id' => people[index].Id, 'Title' => index < keepFirst ? 'Volunteer' : title }
 			);
 		}
 		return JSON.serialize(rows);
@@ -85,11 +80,7 @@ private class FindInlineEditServiceTest {
 				FROM Import_Batch__c
 				WHERE Id = :summary.jobId
 			];
-			System.Assert.areEqual(
-				BulkUpdateService.OPERATION_UPDATE,
-				job.Operation__c,
-				'An Update job'
-			);
+			System.Assert.areEqual(BulkUpdateService.OPERATION_UPDATE, job.Operation__c, 'An Update job');
 			System.Assert.areEqual(ImportBatchService.STATUS_COMPLETE, job.Status__c, 'Complete');
 			System.Assert.areEqual(190, job.Rows_Updated__c, 'Counted on the job');
 			System.Assert.isTrue(job.Run_Log__c.startsWith('Edited in Find'), job.Run_Log__c);
@@ -137,9 +128,7 @@ private class FindInlineEditServiceTest {
 				Map<String, String> expected = new Map<String, String>{
 					JSON.serialize(tooMany) => BarnHelp.text('Core', 'Core_Find_ErrorEditTooMany'),
 					JSON.serialize(
-						new List<Object>{
-							new Map<String, Object>{ 'Id' => organization.Id, 'Title' => 'X' }
-						}
+						new List<Object>{ new Map<String, Object>{ 'Id' => organization.Id, 'Title' => 'X' } }
 					) => BarnHelp.text('Core', 'Core_Find_ErrorEditRecord'),
 					'[]' => BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoChanges')
 				};
@@ -156,10 +145,7 @@ private class FindInlineEditServiceTest {
 						'Contact',
 						JSON.serialize(
 							new List<Object>{
-								new Map<String, Object>{
-									'Id' => people[0].Id,
-									'Sample_Data_Key__c' => 'x'
-								}
+								new Map<String, Object>{ 'Id' => people[0].Id, 'Sample_Data_Key__c' => 'x' }
 							}
 						)
 					);
@@ -176,10 +162,7 @@ private class FindInlineEditServiceTest {
 	static void findAloneCannotSaveEdits() {
 		System.runAs(TestUsers.admin()) {
 			List<Contact> people = makePeople(1);
-			User david = TestDataFactory.createUser(
-				'David',
-				new List<String>{ 'BarnCRM_Find_And_Export' }
-			);
+			User david = TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Find_And_Export' });
 
 			System.runAs(david) {
 				try {

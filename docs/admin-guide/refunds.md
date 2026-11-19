@@ -51,11 +51,10 @@ the match, because the company's money is still money you are holding.
 
 ## How to Turn It On
 
-Refunds and write-offs arrive with the Giving module. There is nothing to configure.
+Refunds and write-offs arrive with the Fundraising module. There is nothing to configure.
 
-The **Refund or Write Off** action appears on the gift page for anyone with the **Giving
-Staff** or **Giving Admin** permission set. It asks which of the two you are recording, so
-there is one button rather than two that look unrelated. **Giving Read Only** users can see
+The **Refund or Write Off** action appears on the gift page for anyone with the **Fundraising Staff Access** or **Fundraising Admin** permission set. It asks which of the two you are recording, so
+there is one button rather than two that look unrelated. **Fundraising Read Only** users can see
 the result but cannot record one.
 
 ## A Five-Minute Walkthrough

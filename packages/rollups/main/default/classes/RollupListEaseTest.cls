@@ -43,12 +43,7 @@ private class RollupListEaseTest {
 			new Map<String, Object>{
 				'version' => 1,
 				'conditions' => new List<Object>{
-					new Map<String, Object>{
-						'id' => 1,
-						'field' => 'Name',
-						'operator' => 'equals',
-						'value' => value
-					}
+					new Map<String, Object>{ 'id' => 1, 'field' => 'Name', 'operator' => 'equals', 'value' => value }
 				}
 			}
 		);
@@ -104,12 +99,8 @@ private class RollupListEaseTest {
 				),
 				sentence
 			);
-			System.Assert.isTrue(
-				sentence.contains(BarnHelp.text('Rollups', 'Core_RollupEase_SentenceConditions'))
-			);
-			System.Assert.isTrue(
-				sentence.contains(BarnHelp.text('Rollups', 'Core_RollupEase_SentenceLastYear'))
-			);
+			System.Assert.isTrue(sentence.contains(BarnHelp.text('Rollups', 'Core_RollupEase_SentenceConditions')));
+			System.Assert.isTrue(sentence.contains(BarnHelp.text('Rollups', 'Core_RollupEase_SentenceLastYear')));
 			System.Assert.isTrue(
 				sentence.contains(
 					String.format(
@@ -164,18 +155,9 @@ private class RollupListEaseTest {
 				),
 				failed.text
 			);
-			System.Assert.areEqual(
-				RollupStatus.LEVEL_RUNNING,
-				RollupStatus.stateOf(active, true, 5, null).level
-			);
-			System.Assert.areEqual(
-				RollupStatus.LEVEL_WAITING,
-				RollupStatus.stateOf(active, false, 5, 0).level
-			);
-			System.Assert.areEqual(
-				RollupStatus.LEVEL_CLEAR,
-				RollupStatus.stateOf(active, false, null, null).level
-			);
+			System.Assert.areEqual(RollupStatus.LEVEL_RUNNING, RollupStatus.stateOf(active, true, 5, null).level);
+			System.Assert.areEqual(RollupStatus.LEVEL_WAITING, RollupStatus.stateOf(active, false, 5, 0).level);
+			System.Assert.areEqual(RollupStatus.LEVEL_CLEAR, RollupStatus.stateOf(active, false, null, null).level);
 		}
 	}
 
@@ -214,10 +196,7 @@ private class RollupListEaseTest {
 			);
 
 			System.Assert.areEqual(
-				String.format(
-					Label.Rollups_RollupEase_StatusWaiting,
-					new List<String>{ (7).format() }
-				),
+				String.format(Label.Rollups_RollupEase_StatusWaiting, new List<String>{ (7).format() }),
 				states.get(named.Id).text,
 				'Its own entry and the one for every rollup on Account'
 			);
@@ -239,9 +218,7 @@ private class RollupListEaseTest {
 			Rollup_Definition__c two = rollup('Two', 'member_count__c', true);
 			Rollup_Definition__c off = rollup('Off', 'Member_Count__c', false);
 
-			Map<Id, List<String>> found = RollupConflicts.of(
-				new List<Rollup_Definition__c>{ one, two, off }
-			);
+			Map<Id, List<String>> found = RollupConflicts.of(new List<Rollup_Definition__c>{ one, two, off });
 
 			System.Assert.areEqual(
 				String.format(
@@ -274,9 +251,7 @@ private class RollupListEaseTest {
 			Rollup_Definition__c copy = rollup('Copy', 'NumberOfEmployees', true);
 			copy.Target_Filter_JSON__c = nameIs('Only A');
 
-			Map<Id, List<String>> found = RollupConflicts.of(
-				new List<Rollup_Definition__c>{ forA, forB, copy }
-			);
+			Map<Id, List<String>> found = RollupConflicts.of(new List<Rollup_Definition__c>{ forA, forB, copy });
 
 			System.Assert.isFalse(found.containsKey(forB.Id), 'No record is both A and B');
 			System.Assert.areEqual(
@@ -314,9 +289,7 @@ private class RollupListEaseTest {
 				),
 				refusal
 			);
-			System.Assert.isFalse(
-				[SELECT Active__c FROM Rollup_Definition__c WHERE Id = :off.Id].Active__c
-			);
+			System.Assert.isFalse([SELECT Active__c FROM Rollup_Definition__c WHERE Id = :off.Id].Active__c);
 			RollupController.setActive(active.Id, false);
 			RollupController.setActive(off.Id, true);
 			System.Assert.isTrue(
@@ -339,10 +312,7 @@ private class RollupListEaseTest {
 			RollupController.RollupView view = RollupController.getPage().rollups[0];
 
 			System.Assert.areEqual(RollupSentence.of(saved), view.sentence);
-			System.Assert.areEqual(
-				describe(Account.SObjectType).getLabel(),
-				view.targetObjectLabel
-			);
+			System.Assert.areEqual(describe(Account.SObjectType).getLabel(), view.targetObjectLabel);
 			System.Assert.areEqual(RollupStatus.LEVEL_OFF, view.statusLevel);
 			System.Assert.isTrue(view.conflicts.isEmpty());
 		}

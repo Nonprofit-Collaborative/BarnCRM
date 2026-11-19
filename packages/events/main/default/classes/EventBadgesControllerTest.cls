@@ -26,12 +26,7 @@ private class EventBadgesControllerTest {
 				Venue_Name__c = 'Grand Hall'
 			);
 			insert as user event;
-			insert as user new Ticket_Type__c(
-				Event__c = event.Id,
-				Name = 'VIP',
-				Price__c = 100,
-				Active__c = true
-			);
+			insert as user new Ticket_Type__c(Event__c = event.Id, Name = 'VIP', Price__c = 100, Active__c = true);
 			insert as user new Event_Session__c(
 				Event__c = event.Id,
 				Name = 'Keynote',

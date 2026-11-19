@@ -14,14 +14,10 @@ private class AutoMergeControllerTest {
 		for (Integer i = 0; i < pairs; i++) {
 			String email = firstName.toLowerCase() + i + '@example.org';
 			people.add(
-				TestDataFactory.person(
-					new Contact(FirstName = firstName + i, LastName = 'Automerge', Email = email)
-				)
+				TestDataFactory.person(new Contact(FirstName = firstName + i, LastName = 'Automerge', Email = email))
 			);
 			people.add(
-				TestDataFactory.person(
-					new Contact(FirstName = firstName + i, LastName = 'Automerge', Email = email)
-				)
+				TestDataFactory.person(new Contact(FirstName = firstName + i, LastName = 'Automerge', Email = email))
 			);
 		}
 		Database.DMLOptions options = new Database.DMLOptions();
@@ -123,10 +119,7 @@ private class AutoMergeControllerTest {
 				AutoMergeController.undoRun('run-undo');
 				Assert.fail('A run undone already is refused.');
 			} catch (AuraHandledException expected) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_AutoMerge_ErrorNoUndo'),
-					expected.getMessage()
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_AutoMerge_ErrorNoUndo'), expected.getMessage());
 			}
 		}
 	}
@@ -143,10 +136,7 @@ private class AutoMergeControllerTest {
 				AutoMergeController.startRun();
 				Assert.fail('Nothing to merge is refused.');
 			} catch (AuraHandledException expected) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_AutoMerge_ErrorNothing'),
-					expected.getMessage()
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_AutoMerge_ErrorNothing'), expected.getMessage());
 			}
 		}
 	}
@@ -173,10 +163,7 @@ private class AutoMergeControllerTest {
 				ORDER BY CreatedDate DESC
 				LIMIT 1
 			];
-			Assert.isTrue(
-				summary.Message__c.contains('2 pairs merged, 1 skipped'),
-				summary.Message__c
-			);
+			Assert.isTrue(summary.Message__c.contains('2 pairs merged, 1 skipped'), summary.Message__c);
 		}
 	}
 }

@@ -126,11 +126,7 @@ private class RollupApiTest {
 			RollupService.recalculate(definition.Id);
 			Test.stopTest();
 
-			System.Assert.areEqual(
-				2,
-				totalsOn(parent.Id).NumberOfEmployees,
-				'Recalculate still covers it'
-			);
+			System.Assert.areEqual(2, totalsOn(parent.Id).NumberOfEmployees, 'Recalculate still covers it');
 		}
 	}
 

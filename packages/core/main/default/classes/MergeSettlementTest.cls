@@ -48,10 +48,7 @@ private class MergeSettlementTest {
 
 			Account saved = [SELECT Name, Member_Count__c FROM Account WHERE Id = :kept.Id];
 			Assert.areEqual(2, saved.Member_Count__c, 'Both people are counted');
-			Assert.isTrue(
-				saved.Name.contains('Lee'),
-				'The name takes in the newcomer: ' + saved.Name
-			);
+			Assert.isTrue(saved.Name.contains('Lee'), 'The name takes in the newcomer: ' + saved.Name);
 		}
 	}
 
@@ -79,11 +76,7 @@ private class MergeSettlementTest {
 			Affiliation__c first = RelationshipTestDataFactory.affiliation(kept, orgs[0], 'Staff');
 			first.Is_Primary__c = true;
 			insert first;
-			Affiliation__c second = RelationshipTestDataFactory.affiliation(
-				other,
-				orgs[1],
-				'Staff'
-			);
+			Affiliation__c second = RelationshipTestDataFactory.affiliation(other, orgs[1], 'Staff');
 			second.Is_Primary__c = true;
 			insert second;
 
@@ -97,11 +90,7 @@ private class MergeSettlementTest {
 				WHERE Contact__c = :kept.Id AND Is_Default__c = TRUE
 			];
 			Assert.areEqual(1, defaults.size(), 'One default address');
-			Assert.areEqual(
-				'Oakland',
-				defaults[0].City__c,
-				'The one in the kept person\'s mailing address'
-			);
+			Assert.areEqual('Oakland', defaults[0].City__c, 'The one in the kept person\'s mailing address');
 			Assert.areEqual(
 				2,
 				[SELECT COUNT() FROM Address__c WHERE Contact__c = :kept.Id],
@@ -181,18 +170,18 @@ private class MergeSettlementTest {
 				new Household_Member__c(
 					Household__c = kept.Id,
 					Contact__c = both.Id,
-					Start_Date__c = Date.today().addDays(-10)
+					Start_Date__c = OrgDate.today().addDays(-10)
 				),
 				new Household_Member__c(
 					Household__c = other.Id,
 					Contact__c = both.Id,
 					Is_Primary__c = true,
-					Start_Date__c = Date.today().addDays(-5)
+					Start_Date__c = OrgDate.today().addDays(-5)
 				),
 				new Household_Member__c(
 					Household__c = other.Id,
 					Contact__c = onlyOther.Id,
-					Start_Date__c = Date.today().addDays(-5)
+					Start_Date__c = OrgDate.today().addDays(-5)
 				)
 			};
 
@@ -206,11 +195,7 @@ private class MergeSettlementTest {
 				WHERE Household__c = :kept.Id AND Contact__c = :both.Id
 			];
 			Assert.areEqual(1, rows.size(), 'The person has one membership in the survivor');
-			Assert.areEqual(
-				Date.today().addDays(-5),
-				rows[0].Start_Date__c,
-				'The primary row is the one kept'
-			);
+			Assert.areEqual(OrgDate.today().addDays(-5), rows[0].Start_Date__c, 'The primary row is the one kept');
 			Assert.isTrue(rows[0].Is_Primary__c, 'Primary carries onto the kept row');
 			Assert.areEqual(
 				2,
@@ -239,7 +224,7 @@ private class MergeSettlementTest {
 							Household__c = households[i].Id,
 							Contact__c = people[i].Id,
 							Is_Primary__c = copy == 1,
-							Start_Date__c = Date.today().addDays(-copy)
+							Start_Date__c = OrgDate.today().addDays(-copy)
 						)
 					);
 				}
@@ -283,11 +268,7 @@ private class MergeSettlementTest {
 				defaultAddress(kept.Id, '2 Oak Avenue', 'Berkeley')
 			};
 			AutomationControl.clearBypass(ADDRESS_PROPAGATION);
-			insertRelationships(
-				new List<Relationship__c>{
-					RelationshipTestDataFactory.between(kept, kept, 'Friend')
-				}
-			);
+			insertRelationships(new List<Relationship__c>{ RelationshipTestDataFactory.between(kept, kept, 'Friend') });
 			Set<Id> ids = new Set<Id>{ kept.Id };
 
 			Test.startTest();
@@ -322,11 +303,7 @@ private class MergeSettlementTest {
 				],
 				'The next attempt settles the address'
 			);
-			Assert.areEqual(
-				0,
-				RelationshipTestDataFactory.allRelationships().size(),
-				'And the self relationship'
-			);
+			Assert.areEqual(0, RelationshipTestDataFactory.allRelationships().size(), 'And the self relationship');
 		}
 	}
 
@@ -382,11 +359,7 @@ private class MergeSettlementTest {
 				System.enqueueJob(new Idle());
 			}
 
-			MergeSettlement.afterMerge(
-				new Set<Id>(),
-				new Set<Id>{ survivor.Id },
-				new Set<Id>{ survivor.Id }
-			);
+			MergeSettlement.afterMerge(new Set<Id>(), new Set<Id>{ survivor.Id }, new Set<Id>{ survivor.Id });
 			Test.stopTest();
 
 			Assert.isTrue(
@@ -421,10 +394,7 @@ private class MergeSettlementTest {
 
 			Assert.areEqual(0, queuedInsideTheJob, 'The running Queueable keeps its chain');
 			Assert.areEqual(1, MergeSettlement.lastPublished.size(), 'One event names it');
-			Assert.areEqual(
-				String.valueOf(survivor.Id),
-				MergeSettlement.lastPublished[0].Owner_Ids__c
-			);
+			Assert.areEqual(String.valueOf(survivor.Id), MergeSettlement.lastPublished[0].Owner_Ids__c);
 			Assert.areEqual(0, settlementWarnings().size(), 'No warning: it will be settled');
 		}
 	}
@@ -492,10 +462,7 @@ private class MergeSettlementTest {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			Account keptHousehold = HouseholdTestDataFactory.newHousehold('The Garcia Family');
 			Account otherHousehold = HouseholdTestDataFactory.newHousehold('The Lee Family');
-			Database.insert(
-				new List<Account>{ keptHousehold, otherHousehold },
-				AccessLevel.SYSTEM_MODE
-			);
+			Database.insert(new List<Account>{ keptHousehold, otherHousehold }, AccessLevel.SYSTEM_MODE);
 			insert new List<Contact>{
 				AddressTestDataFactory.newContact('Maria', 'Garcia', keptHousehold.Id),
 				AddressTestDataFactory.newContact('Wei', 'Lee', otherHousehold.Id)
@@ -507,11 +474,7 @@ private class MergeSettlementTest {
 			Affiliation__c first = RelationshipTestDataFactory.affiliation(kept, orgs[0], 'Staff');
 			first.Is_Primary__c = true;
 			insert first;
-			Affiliation__c second = RelationshipTestDataFactory.affiliation(
-				other,
-				orgs[1],
-				'Staff'
-			);
+			Affiliation__c second = RelationshipTestDataFactory.affiliation(other, orgs[1], 'Staff');
 			second.Is_Primary__c = true;
 			insert second;
 
@@ -540,9 +503,7 @@ private class MergeSettlementTest {
 				'One primary affiliation'
 			);
 			Assert.isTrue(
-				MergeSettlement.queuedByEvents.containsAll(
-					new Set<Id>{ keptHousehold.Id, kept.Id }
-				),
+				MergeSettlement.queuedByEvents.containsAll(new Set<Id>{ keptHousehold.Id, kept.Id }),
 				'Both were settled through the event'
 			);
 			for (AsyncApexJob job : [
@@ -630,14 +591,12 @@ private class MergeSettlementTest {
 	@IsTest
 	static void manySurvivorsArePublishedTwoHundredToAnEvent() {
 		System.runAs(TestUsers.admin()) {
-			String prefix = Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-				.getKeyPrefix();
+			String prefix = Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix();
 			Set<Id> people = new Set<Id>();
 			for (Integer i = 1; i <= 450; i++) {
 				people.add(Id.valueOf(prefix + String.valueOf(i).leftPad(12, '0')));
 			}
-			String accountPrefix = Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-				.getKeyPrefix();
+			String accountPrefix = Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix();
 			Set<Id> households = new Set<Id>{ Id.valueOf(accountPrefix + '1'.leftPad(12, '0')) };
 
 			MergeSettlement.queueableForTest = true;
@@ -673,11 +632,7 @@ private class MergeSettlementTest {
 			Test.startTest();
 			MergeSettlement.queueableForTest = true;
 			MergeSettlement.publishFailureForTest = 'Event limit reached';
-			MergeSettlement.afterMerge(
-				new Set<Id>(),
-				new Set<Id>{ survivor.Id },
-				new Set<Id>{ survivor.Id }
-			);
+			MergeSettlement.afterMerge(new Set<Id>(), new Set<Id>{ survivor.Id }, new Set<Id>{ survivor.Id });
 			Test.stopTest();
 
 			List<Error_Log__c> warnings = settlementWarnings();
@@ -709,9 +664,7 @@ private class MergeSettlementTest {
 			List<Address__c> captured = [
 				SELECT Id, Person_Account__c
 				FROM Address__c
-				WHERE
-					Person_Account__c IN :new List<Id>{ kept.Id, other.Id }
-					AND Is_Default__c = TRUE
+				WHERE Person_Account__c IN :new List<Id>{ kept.Id, other.Id } AND Is_Default__c = TRUE
 			];
 			Assert.areEqual(2, captured.size(), 'Each person has a default from their mailing');
 			for (Address__c address : captured) {
@@ -775,9 +728,7 @@ private class MergeSettlementTest {
 		return (Merge_Settlement_Ready__e) JSON.deserialize(
 			JSON.serialize(
 				new Map<String, Object>{
-					'attributes' => new Map<String, Object>{
-						'type' => 'Merge_Settlement_Ready__e'
-					},
+					'attributes' => new Map<String, Object>{ 'type' => 'Merge_Settlement_Ready__e' },
 					'CreatedById' => publisherId,
 					'Owner_Ids__c' => String.valueOf(personId),
 					'Person_Ids__c' => String.valueOf(personId)
@@ -799,28 +750,23 @@ private class MergeSettlementTest {
 				WHERE ParentId = :readOnlySet AND SobjectType = 'Merge_Settlement_Ready__e'
 				WITH SYSTEM_MODE
 			];
-			for (ObjectPermissions row : granted) {
-				Assert.isFalse(row.PermissionsCreate, 'Read Only cannot publish it');
-				Assert.isFalse(row.PermissionsRead, 'Nor read it');
-			}
+			// Read matches BarnCRM Staff (D-209): Read alone publishes nothing.
+			Assert.areEqual(1, granted.size(), 'Read Only holds a row for the event');
+			Assert.isFalse(granted[0].PermissionsCreate, 'Read Only cannot publish it');
+			Assert.isTrue(granted[0].PermissionsRead, 'It may read it, as Staff may');
 		}
 	}
 
 	@IsTest
 	static void onlyRecordsThePublisherMayEditAreSettled() {
 		System.runAs(TestUsers.admin()) {
-			User reader = TestUsers.minimumAccessUserWith(
-				'Reader',
-				new List<String>{ 'BarnCRM_Read_Only' }
-			);
+			User reader = TestUsers.minimumAccessUserWith('Reader', new List<String>{ 'BarnCRM_Read_Only' });
 			Contact person = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
 			insert person;
 
 			Test.startTest();
 			Set<Id> forReader = MergeSettlement.permittedIds(deliveredEvent(reader.Id, person.Id));
-			Set<Id> forAdmin = MergeSettlement.permittedIds(
-				deliveredEvent(UserInfo.getUserId(), person.Id)
-			);
+			Set<Id> forAdmin = MergeSettlement.permittedIds(deliveredEvent(UserInfo.getUserId(), person.Id));
 			Set<Id> forNobody = MergeSettlement.permittedIds(deliveredEvent(null, person.Id));
 			Test.stopTest();
 
@@ -839,10 +785,7 @@ private class MergeSettlementTest {
 	@IsTest
 	static void anEventPublishedBySomeoneWhoCannotEditQueuesNothing() {
 		System.runAs(TestUsers.admin()) {
-			User publisher = TestUsers.minimumAccessUserWith(
-				'Publisher',
-				new List<String>{ 'BarnCRM_Read_Only' }
-			);
+			User publisher = TestUsers.minimumAccessUserWith('Publisher', new List<String>{ 'BarnCRM_Read_Only' });
 			Contact person = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
 			insert person;
 
@@ -861,8 +804,7 @@ private class MergeSettlementTest {
 			Test.stopTest();
 
 			Assert.isTrue(
-				MergeSettlement.queuedByEvents == null ||
-				!MergeSettlement.queuedByEvents.contains(person.Id),
+				MergeSettlement.queuedByEvents == null || !MergeSettlement.queuedByEvents.contains(person.Id),
 				'Nothing is settled for records the publisher cannot edit'
 			);
 		}

@@ -150,10 +150,7 @@ public with sharing class GivingSampleDataSet {
 		return rowsFor(softCredits, giftKeys);
 	}
 
-	private static List<Map<String, Object>> rowsFor(
-		List<Map<String, Object>> rows,
-		Set<String> giftKeys
-	) {
+	private static List<Map<String, Object>> rowsFor(List<Map<String, Object>> rows, Set<String> giftKeys) {
 		List<Map<String, Object>> matching = new List<Map<String, Object>>();
 		for (Map<String, Object> row : rows) {
 			if (giftKeys.contains(asString(row.get('gift')))) {
@@ -238,8 +235,6 @@ public with sharing class GivingSampleDataSet {
 	}
 
 	private static GivingSampleData.SampleDataException invalidData() {
-		return new GivingSampleData.SampleDataException(
-			BarnHelp.text('Giving', 'Giving_SampleData_ErrorInvalidData')
-		);
+		return new GivingSampleData.SampleDataException(BarnHelp.text('Giving', 'Giving_SampleData_ErrorInvalidData'));
 	}
 }

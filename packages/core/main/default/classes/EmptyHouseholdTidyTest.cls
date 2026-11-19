@@ -51,9 +51,8 @@ private class EmptyHouseholdTidyTest {
 			Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
 			Id household = deletedPersonsHousehold(maria);
 			Assert.areEqual(
-				Date.today(),
-				[SELECT Emptied_By_Deletion__c FROM Account WHERE Id = :household]
-				.Emptied_By_Deletion__c,
+				OrgDate.today(),
+				[SELECT Emptied_By_Deletion__c FROM Account WHERE Id = :household].Emptied_By_Deletion__c,
 				'The delete stamps the household it emptied'
 			);
 			purge(new List<Id>{ maria.Id });
@@ -198,8 +197,7 @@ private class EmptyHouseholdTidyTest {
 			insert new Household_Member__c(Household__c = household.Id, Contact__c = luis.Id);
 			delete luis;
 			Assert.isNotNull(
-				[SELECT Emptied_By_Deletion__c FROM Account WHERE Id = :household.Id]
-				.Emptied_By_Deletion__c,
+				[SELECT Emptied_By_Deletion__c FROM Account WHERE Id = :household.Id].Emptied_By_Deletion__c,
 				'The delete stamps the household in junction mode too'
 			);
 
@@ -240,8 +238,8 @@ private class EmptyHouseholdTidyTest {
 				new Household_Member__c(
 					Household__c = household.Id,
 					Contact__c = ana.Id,
-					Start_Date__c = Date.today().addYears(-2),
-					End_Date__c = Date.today().addYears(-1)
+					Start_Date__c = OrgDate.today().addYears(-2),
+					End_Date__c = OrgDate.today().addYears(-1)
 				)
 			};
 			delete luis;
@@ -282,10 +280,7 @@ private class EmptyHouseholdTidyTest {
 			);
 			insert home;
 			Import_Batch__c batch = ImportTestDataFactory.batch(
-				ImportTestDataFactory.template(
-					ImportTestDataFactory.donorMapping(),
-					ImportTemplateService.RULE_EMAIL
-				)
+				ImportTestDataFactory.template(ImportTestDataFactory.donorMapping(), ImportTemplateService.RULE_EMAIL)
 			);
 			insert new Import_Row__c(
 				Import_Batch__c = batch.Id,
@@ -296,10 +291,7 @@ private class EmptyHouseholdTidyTest {
 			// A membership row whose person is gone names nobody and goes with the household.
 			Contact bob = HouseholdTestDataFactory.newContact('Mr.', 'Bob', 'Stone');
 			insert bob;
-			Household_Member__c orphan = new Household_Member__c(
-				Household__c = household,
-				Contact__c = bob.Id
-			);
+			Household_Member__c orphan = new Household_Member__c(Household__c = household, Contact__c = bob.Id);
 			insert orphan;
 			delete new List<Contact>{ maria, bob };
 			Assert.isNull(
@@ -367,10 +359,7 @@ private class EmptyHouseholdTidyTest {
 			Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
 			Id household = deletedPersonsHousehold(maria);
 			purge(new List<Id>{ maria.Id });
-			EmptyHouseholdTidyBatch.relationshipsOverride = new List<String>{
-				'Contacts',
-				'No_Such_Relationship__r'
-			};
+			EmptyHouseholdTidyBatch.relationshipsOverride = new List<String>{ 'Contacts', 'No_Such_Relationship__r' };
 
 			runTidyUp();
 
@@ -425,13 +414,7 @@ private class EmptyHouseholdTidyTest {
 		Assert.isTrue(relationships.contains('Contacts'), 'Live members keep a household');
 		Assert.isFalse(relationships.contains('Shares'), 'Sharing rows do not');
 		Assert.isFalse(relationships.contains('RecordActionHistories'), 'Nor action history');
-		for (
-			String own : new List<String>{
-				'Addresses__r',
-				'Household_Members__r',
-				'Import_Rows_Household__r'
-			}
-		) {
+		for (String own : new List<String>{ 'Addresses__r', 'Household_Members__r', 'Import_Rows_Household__r' }) {
 			Assert.isFalse(relationships.contains(own), own + ' is the household\'s own');
 		}
 	}

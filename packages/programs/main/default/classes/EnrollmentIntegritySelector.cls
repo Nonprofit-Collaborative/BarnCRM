@@ -14,11 +14,7 @@ public without sharing class EnrollmentIntegritySelector {
 	 * The open enrollments (Applied, Enrolled or Waitlisted) in these programs that name one of
 	 * these people.
 	 */
-	public static List<Enrollment__c> selectOpenFor(
-		Set<Id> programIds,
-		Set<Id> contactIds,
-		Set<Id> accountIds
-	) {
+	public static List<Enrollment__c> selectOpenFor(Set<Id> programIds, Set<Id> contactIds, Set<Id> accountIds) {
 		if (programIds == null || programIds.isEmpty()) {
 			return new List<Enrollment__c>();
 		}

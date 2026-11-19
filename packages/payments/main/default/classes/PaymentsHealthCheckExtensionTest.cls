@@ -1,6 +1,6 @@
 /**
- * Payments' Health Check (ADR-0201 payments module, decision 7): it reports keys not entered, a
- * Stripe key for the other mode, no Site, a guest user without the receiver set (and gives it),
+ * Payments' Health Check (ADR-0201 payments module, decision 7): it reports a processor not
+ * connected, a Stripe credential that fails a test call or holds a key for the other mode, no Site, a guest user without the receiver set (and gives it),
  * processing not scheduled (and schedules it) and events waiting; it is quiet when Payments is
  * turned off.
  */
@@ -25,22 +25,17 @@ private class PaymentsHealthCheckExtensionTest {
 		System.runAs(PaymentsTestData.admin()) {
 			PaymentSites.testSites = new List<PaymentSites.SiteInfo>();
 			PaymentsHealthCheckExtension extension = new PaymentsHealthCheckExtension();
-			Payment_Event__c waiting = PaymentsTestData.event(
-				PaymentService.STRIPE,
-				'stripe:evt_w',
-				'{}',
-				null
-			);
+			Payment_Event__c waiting = PaymentsTestData.event(PaymentService.STRIPE, 'stripe:evt_w', '{}', null);
 			Test.setCreatedDate(waiting.Id, Datetime.now().addHours(-2));
 
 			Set<String> found = keys(extension.findings());
 			Assert.isTrue(found.contains('payments_keys_missing'), 'No keys: ' + found);
 			Assert.isTrue(found.contains('payments_no_site'), 'No Site: ' + found);
-			Assert.isTrue(
-				found.contains(PaymentsHealthCheckExtension.FIX_SCHEDULE),
-				'Not scheduled'
-			);
+			Assert.isTrue(found.contains(PaymentsHealthCheckExtension.FIX_SCHEDULE), 'Not scheduled');
 			Assert.isTrue(found.contains('payments_waiting'), 'Waiting: ' + found);
+			Assert.isFalse(found.contains('payments_cap_reached'), 'No cap hit yet: ' + found);
+			Assert.isTrue(PaymentService.noteCapHit(), 'The receiver hit its cap');
+			Assert.isTrue(keys(extension.findings()).contains('payments_cap_reached'), 'The cap hit is reported');
 
 			Test.startTest();
 			String done = extension.runFix(
@@ -51,10 +46,7 @@ private class PaymentsHealthCheckExtensionTest {
 			Assert.isNotNull(done, 'Says what it did');
 			Assert.isTrue(PaymentEventProcessor.isScheduled(), 'Scheduled');
 			PaymentsTestData.connect(PaymentService.STRIPE);
-			Assert.isFalse(
-				keys(extension.findings()).contains('payments_keys_missing'),
-				'Connected'
-			);
+			Assert.isFalse(keys(extension.findings()).contains('payments_keys_missing'), 'Connected');
 		}
 	}
 
@@ -62,21 +54,38 @@ private class PaymentsHealthCheckExtensionTest {
 	static void aStripeKeyForTheOtherModeIsReported() {
 		System.runAs(PaymentsTestData.admin()) {
 			PaymentsTestData.connect(PaymentService.STRIPE);
-			Assert.isFalse(
-				PaymentsHealthCheckExtension.stripeKeyMismatch(),
-				'A test key in Test mode'
-			);
 			Payments_Settings__c live = Payments_Settings__c.getOrgDefaults();
 			live.Mode__c = PaymentService.LIVE;
 			update live;
+			PaymentsTestData.Processors mock = PaymentsTestData.processors()
+				.answer('balance', 200, '{"object":"balance","livemode":false}');
+
+			Test.startTest();
+			Set<String> found = keys(new PaymentsHealthCheckExtension().findings());
+			Test.stopTest();
+
+			Assert.isTrue(found.contains('payments_mode_mismatch'), 'A test key in Live mode');
+			Assert.isFalse(found.contains('payments_connection_failed'), 'It answered');
 			Assert.isTrue(
-				PaymentsHealthCheckExtension.stripeKeyMismatch(),
-				'A test key in Live mode'
+				mock.last('balance').getEndpoint().startsWith(PaymentStripe.ENDPOINT),
+				'A test call through the Named Credential'
 			);
-			Assert.isTrue(
-				keys(new PaymentsHealthCheckExtension().findings())
-					.contains('payments_mode_mismatch')
-			);
+		}
+	}
+
+	@IsTest
+	static void aStripeCredentialThatStoppedWorkingIsReported() {
+		System.runAs(PaymentsTestData.admin()) {
+			PaymentsTestData.connect(PaymentService.STRIPE);
+			PaymentsTestData.processors().answer('balance', 401, '{"error":{"message":"Invalid API Key"}}');
+
+			Test.startTest();
+			Set<String> found = keys(new PaymentsHealthCheckExtension().findings());
+			Test.stopTest();
+
+			Assert.isTrue(found.contains('payments_connection_failed'), 'Reported: ' + found);
+			Assert.isFalse(found.contains('payments_keys_missing'), 'It is connected');
+			Assert.isFalse(found.contains('payments_mode_mismatch'), 'Nothing to compare');
 		}
 	}
 
@@ -91,27 +100,15 @@ private class PaymentsHealthCheckExtensionTest {
 			PaymentSites.testSites = new List<PaymentSites.SiteInfo>{ site };
 			PaymentsHealthCheckExtension extension = new PaymentsHealthCheckExtension();
 
-			Assert.isTrue(
-				keys(extension.findings()).contains(PaymentsHealthCheckExtension.FIX_GUEST),
-				'Reported'
-			);
+			Assert.isTrue(keys(extension.findings()).contains(PaymentsHealthCheckExtension.FIX_GUEST), 'Reported');
 			Assert.areEqual(
 				new List<String>{ 'Zzpay Site' },
 				extension.fixScope(PaymentsHealthCheckExtension.FIX_GUEST),
 				'Names the Site'
 			);
-			extension.runFix(
-				PaymentsHealthCheckExtension.FIX_GUEST,
-				new List<String>{ 'Zzpay Site' }
-			);
-			Assert.isFalse(
-				keys(extension.findings()).contains(PaymentsHealthCheckExtension.FIX_GUEST),
-				'Given'
-			);
-			Assert.isNotNull(
-				extension.fixLabel(PaymentsHealthCheckExtension.FIX_GUEST),
-				'Labelled'
-			);
+			extension.runFix(PaymentsHealthCheckExtension.FIX_GUEST, new List<String>{ 'Zzpay Site' });
+			Assert.isFalse(keys(extension.findings()).contains(PaymentsHealthCheckExtension.FIX_GUEST), 'Given');
+			Assert.isNotNull(extension.fixLabel(PaymentsHealthCheckExtension.FIX_GUEST), 'Labelled');
 			Assert.isNull(extension.fixLabel('other'), 'Not its key');
 			Assert.isNull(extension.runFix('other', null), 'Not its key');
 		}
@@ -131,11 +128,7 @@ private class PaymentsHealthCheckExtensionTest {
 				WHERE Status = 'Active' AND SiteType = 'Visualforce'
 				WITH SYSTEM_MODE
 			];
-			Assert.areEqual(
-				Math.min(expected, 50),
-				PaymentSites.active().size(),
-				'Every active Site'
-			);
+			Assert.areEqual(Math.min(expected, 50), PaymentSites.active().size(), 'Every active Site');
 			Assert.isTrue(PaymentSites.guestUserIds().size() <= expected, 'Their guests');
 		}
 	}

@@ -129,10 +129,7 @@ public without sharing class RollupAggregator {
 				if (aggregate == 'SUM' || aggregate == 'AVG') {
 					this.total = (this.total == null ? 0 : this.total) + toDecimal(entry.raw);
 					this.counted++;
-				} else if (
-					this.best == null ||
-					compare(entry.raw, this.best) * (aggregate == 'MIN' ? -1 : 1) > 0
-				) {
+				} else if (this.best == null || compare(entry.raw, this.best) * (aggregate == 'MIN' ? -1 : 1) > 0) {
 					this.best = entry.raw;
 				}
 			}
@@ -225,9 +222,7 @@ public without sharing class RollupAggregator {
 		Integer largestQuery = 0;
 		for (RollupPlanner.SourceQuery query : plan.queries) {
 			if (passesCeiling(Limits.getQueryRows(), largestQuery, ceiling)) {
-				throw new RowCeilingException(
-					'The next rollup query would pass the query row ceiling of ' + ceiling
-				);
+				throw new RowCeilingException('The next rollup query would pass the query row ceiling of ' + ceiling);
 			}
 			Integer rowsBefore = Limits.getQueryRows();
 			try {
@@ -403,11 +398,7 @@ public without sharing class RollupAggregator {
 	 * The source rows one query of a plan reads for these target records, for a batch to read in
 	 * chunks: only their Ids, so reading them costs no aggregate.
 	 */
-	public static Database.QueryLocator sourceRows(
-		RollupPlanner.Plan plan,
-		Integer queryIndex,
-		Set<Id> targetIds
-	) {
+	public static Database.QueryLocator sourceRows(RollupPlanner.Plan plan, Integer queryIndex, Set<Id> targetIds) {
 		RollupPlanner.SourceQuery query = plan.queries[queryIndex];
 		return Database.getQueryLocatorWithBinds(
 			'SELECT Id FROM ' + query.sourceObject + whereFor(query),
@@ -420,12 +411,7 @@ public without sharing class RollupAggregator {
 		run(query, fanout, answer, null);
 	}
 
-	private static void run(
-		RollupPlanner.SourceQuery query,
-		Fanout fanout,
-		Answer answer,
-		Set<Id> rowIds
-	) {
+	private static void run(RollupPlanner.SourceQuery query, Fanout fanout, Answer answer, Set<Id> rowIds) {
 		List<Id> keys = new List<Id>(fanout.keys);
 		for (Integer start = 0; start < keys.size(); start += keysPerQuery) {
 			Set<Id> slice = new Set<Id>();
@@ -504,11 +490,7 @@ public without sharing class RollupAggregator {
 			query.keyExpression +
 			allRows(query);
 		for (
-			AggregateResult row : (List<AggregateResult>) Database.queryWithBinds(
-				soql,
-				binds,
-				AccessLevel.SYSTEM_MODE
-			)
+			AggregateResult row : (List<AggregateResult>) Database.queryWithBinds(soql, binds, AccessLevel.SYSTEM_MODE)
 		) {
 			Set<Id> targets = fanout.targetsByKey.get((Id) row.get('k'));
 			if (targets == null) {
@@ -517,16 +499,9 @@ public without sharing class RollupAggregator {
 			for (RollupPlanner.Measure measure : query.measures) {
 				List<String> expressions = expressionsFor(measure);
 				Object first = row.get(aliasByExpression.get(expressions[0]));
-				Object second = expressions.size() > 1
-					? row.get(aliasByExpression.get(expressions[1]))
-					: null;
+				Object second = expressions.size() > 1 ? row.get(aliasByExpression.get(expressions[1])) : null;
 				for (Id targetId : targets) {
-					foldGroup(
-						tallyFor(answer, measure.definitionIndex, targetId),
-						measure,
-						first,
-						second
-					);
+					foldGroup(tallyFor(answer, measure.definitionIndex, targetId), measure, first, second);
 				}
 			}
 		}
@@ -539,14 +514,7 @@ public without sharing class RollupAggregator {
 				return new List<String>{ 'COUNT(Id)' };
 			}
 			when 'AVG' {
-				return new List<String>{
-					'SUM(' +
-					measure.field +
-					')',
-					'COUNT(' +
-					measure.field +
-					')'
-				};
+				return new List<String>{ 'SUM(' + measure.field + ')', 'COUNT(' + measure.field + ')' };
 			}
 			when else {
 				return new List<String>{ measure.aggregate + '(' + measure.field + ')' };
@@ -554,12 +522,7 @@ public without sharing class RollupAggregator {
 		}
 	}
 
-	private static void foldGroup(
-		Tally tally,
-		RollupPlanner.Measure measure,
-		Object first,
-		Object second
-	) {
+	private static void foldGroup(Tally tally, RollupPlanner.Measure measure, Object first, Object second) {
 		switch on measure.aggregate {
 			when 'SUM' {
 				if (first != null) {
@@ -624,9 +587,7 @@ public without sharing class RollupAggregator {
 				for (Id targetId : targets) {
 					Tally tally = tallyFor(answer, measure.definitionIndex, targetId);
 					Integer direction = query.descending ? 1 : -1;
-					Integer better = tally.bestOrder == null
-						? 1
-						: compare(order, tally.bestOrder) * direction;
+					Integer better = tally.bestOrder == null ? 1 : compare(order, tally.bestOrder) * direction;
 					// A tie goes to the lower record Id, whichever path alternative read it first.
 					if (better > 0 || (better == 0 && rowId.compareTo(tally.bestId) < 0)) {
 						tally.best = value;
@@ -642,17 +603,13 @@ public without sharing class RollupAggregator {
 	 * Which measured attributes are money in a multi-currency org, the currency column added to
 	 * `columns` when any is, so a row's value can be brought to the corporate currency.
 	 */
-	private static Map<String, Boolean> currencyColumns(
-		RollupPlanner.SourceQuery query,
-		Set<String> columns
-	) {
+	private static Map<String, Boolean> currencyColumns(RollupPlanner.SourceQuery query, Set<String> columns) {
 		Map<String, Boolean> isCurrencyByField = new Map<String, Boolean>();
 		for (RollupPlanner.Measure measure : query.measures) {
 			columns.add(measure.field);
 			isCurrencyByField.put(
 				measure.field,
-				RollupCurrency.isMultiCurrency() &&
-				RollupCurrency.isCurrencyPath(query.sourceObject, measure.field)
+				RollupCurrency.isMultiCurrency() && RollupCurrency.isCurrencyPath(query.sourceObject, measure.field)
 			);
 		}
 		if (isCurrencyByField.values().contains(true)) {
@@ -672,10 +629,7 @@ public without sharing class RollupAggregator {
 		Object value
 	) {
 		if (!measure.asText && isCurrencyByField.get(measure.field) && value != null) {
-			return RollupCurrency.toCorporate(
-				toDecimal(value),
-				(String) row.get(RollupCurrency.ISO_FIELD)
-			);
+			return RollupCurrency.toCorporate(toDecimal(value), (String) row.get(RollupCurrency.ISO_FIELD));
 		}
 		return value;
 	}
@@ -739,12 +693,8 @@ public without sharing class RollupAggregator {
 				if (String.isBlank(value)) {
 					continue;
 				}
-				Object order = query.orderBy == null
-					? value.toLowerCase()
-					: valueAt(row, query.orderBy);
-				Boolean distinct =
-					measure.aggregate == 'COUNT_DISTINCT' ||
-					measure.aggregate == 'TEXT_LIST_DISTINCT';
+				Object order = query.orderBy == null ? value.toLowerCase() : valueAt(row, query.orderBy);
+				Boolean distinct = measure.aggregate == 'COUNT_DISTINCT' || measure.aggregate == 'TEXT_LIST_DISTINCT';
 				Listed entry = new Listed(order, rowId, value);
 				entry.raw = asRead(row, measure, isCurrencyByField, read);
 				entry.descending = query.descending;
@@ -814,11 +764,7 @@ public without sharing class RollupAggregator {
 	}
 
 	/** The records of the target entity among these that pass a target filter (R-R8). */
-	public static Set<Id> passing(
-		Schema.SObjectType targetType,
-		String targetFilter,
-		Set<Id> targetIds
-	) {
+	public static Set<Id> passing(Schema.SObjectType targetType, String targetFilter, Set<Id> targetIds) {
 		String soql =
 			'SELECT Id FROM ' +
 			String.valueOf(targetType) +
@@ -836,11 +782,7 @@ public without sharing class RollupAggregator {
 	}
 
 	/** The target records as they are stored now, with the attributes the pass may write. */
-	public static Map<Id, SObject> stored(
-		Schema.SObjectType targetType,
-		Set<String> fieldNames,
-		Set<Id> targetIds
-	) {
+	public static Map<Id, SObject> stored(Schema.SObjectType targetType, Set<String> fieldNames, Set<Id> targetIds) {
 		Set<String> columns = new Set<String>{ 'Id' };
 		columns.addAll(fieldNames);
 		String soql =
@@ -850,11 +792,7 @@ public without sharing class RollupAggregator {
 			String.valueOf(targetType) +
 			' WHERE Id IN :targetIds';
 		return new Map<Id, SObject>(
-			Database.queryWithBinds(
-				soql,
-				new Map<String, Object>{ 'targetIds' => targetIds },
-				AccessLevel.SYSTEM_MODE
-			)
+			Database.queryWithBinds(soql, new Map<String, Object>{ 'targetIds' => targetIds }, AccessLevel.SYSTEM_MODE)
 		);
 	}
 }

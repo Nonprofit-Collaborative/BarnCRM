@@ -12,10 +12,7 @@ private class GiftPostingServiceTest {
 	}
 
 	private static User david() {
-		return TestDataFactory.createUser(
-			'David',
-			new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' }
-		);
+		return TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' });
 	}
 
 	/** The default fund is set by an administrator, not by the people in these tests. */
@@ -33,11 +30,7 @@ private class GiftPostingServiceTest {
 	 * amount, because a Decimal key read back as 250.00 is not the key 250.
 	 */
 	private static Map<Integer, Gift__c> threeGifts() {
-		Contact ana = GivingTestDataFactory.insertHouseholdContact(
-			'The Nolan Family',
-			'Ana',
-			'Nolan'
-		);
+		Contact ana = GivingTestDataFactory.insertHouseholdContact('The Nolan Family', 'Ana', 'Nolan');
 		Gift__c received = GivingTestDataFactory.buildGift(ana.Id, 250);
 		Gift__c pending = GivingTestDataFactory.buildGift(ana.Id, 75);
 		pending.Status__c = 'Pending';
@@ -71,23 +64,14 @@ private class GiftPostingServiceTest {
 				Map<Integer, Gift__c> gifts = threeGifts();
 
 				Test.startTest();
-				Integer marked = GiftPostingService.markPosted(
-					new Map<Id, Gift__c>(gifts.values()).keySet()
-				);
+				Integer marked = GiftPostingService.markPosted(new Map<Id, Gift__c>(gifts.values()).keySet());
 				Test.stopTest();
 
-				Assert.areEqual(
-					2,
-					marked,
-					'The two Received gifts are marked, the Pending one is not'
-				);
+				Assert.areEqual(2, marked, 'The two Received gifts are marked, the Pending one is not');
 				Gift__c posted = reread(gifts.get(250).Id);
 				Assert.isNotNull(posted.Accounting_Posted_At__c, 'Marked with the time');
 				Assert.areEqual(jen.Id, posted.Accounting_Posted_By__c, 'Marked with who');
-				Assert.isNull(
-					reread(gifts.get(75).Id).Accounting_Posted_At__c,
-					'A Pending gift is in no export file'
-				);
+				Assert.isNull(reread(gifts.get(75).Id).Accounting_Posted_At__c, 'A Pending gift is in no export file');
 			}
 
 		}
@@ -148,19 +132,13 @@ private class GiftPostingServiceTest {
 					GiftPostingService.markPosted(ids);
 					Assert.fail('Marking posted needs Post Gifts');
 				} catch (GiftPostingService.GiftPostingException refused) {
-					Assert.areEqual(
-						BarnHelp.text('Giving', 'Giving_Posting_NoPermission'),
-						refused.getMessage()
-					);
+					Assert.areEqual(BarnHelp.text('Giving', 'Giving_Posting_NoPermission'), refused.getMessage());
 				}
 				try {
 					GiftPostingService.unpost(gifts.get(250).Id, 'Typo');
 					Assert.fail('Unposting needs Post Gifts');
 				} catch (GiftPostingService.GiftPostingException refused) {
-					Assert.areEqual(
-						BarnHelp.text('Giving', 'Giving_Posting_NoPermission'),
-						refused.getMessage()
-					);
+					Assert.areEqual(BarnHelp.text('Giving', 'Giving_Posting_NoPermission'), refused.getMessage());
 				}
 				Assert.isNull(reread(gifts.get(250).Id).Accounting_Posted_At__c, 'Nothing marked');
 			}
@@ -177,10 +155,7 @@ private class GiftPostingServiceTest {
 			}
 			// Saved as the administrator running the test, who may edit the field: field access
 			// does not refuse it, so the refusal checked here is the lock's.
-			Gift__c typed = new Gift__c(
-				Id = gifts.get(250).Id,
-				Accounting_Posted_At__c = Datetime.now()
-			);
+			Gift__c typed = new Gift__c(Id = gifts.get(250).Id, Accounting_Posted_At__c = Datetime.now());
 			try {
 				update typed;
 				Assert.fail('The posting fields are written only by marking posted');
@@ -199,8 +174,7 @@ private class GiftPostingServiceTest {
 	static void refusesMoreThanOneClickCanMark() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GiftPostingService.postPermission = true;
-			String prefix = Gift__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-				.getKeyPrefix();
+			String prefix = Gift__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix();
 			Set<Id> tooMany = new Set<Id>();
 			for (Integer i = 0; i <= GiftPostingService.MAX_GIFTS_PER_MARK; i++) {
 				tooMany.add(Id.valueOf(prefix + String.valueOf(i).leftPad(12, '0')));
@@ -210,8 +184,7 @@ private class GiftPostingServiceTest {
 				Assert.fail('More than the cap is refused before anything is read');
 			} catch (GiftPostingService.GiftPostingException refused) {
 				Assert.isTrue(
-					refused.getMessage()
-						.contains(String.valueOf(GiftPostingService.MAX_GIFTS_PER_MARK)),
+					refused.getMessage().contains(String.valueOf(GiftPostingService.MAX_GIFTS_PER_MARK)),
 					'The message names the cap'
 				);
 			}
@@ -252,10 +225,7 @@ private class GiftPostingServiceTest {
 				'The reason is kept: ' + logs[0].Message__c
 			);
 			Assert.isTrue(
-				logs[0]
-					.Message__c.contains(
-						'posted to accounting by Jen on ' + postedAt + ', unposted'
-					),
+				logs[0].Message__c.contains('posted to accounting by Jen on ' + postedAt + ', unposted'),
 				'Who posted it and when are kept: ' + logs[0].Message__c
 			);
 			Assert.areEqual(jen.Id, logs[0].User__c, 'The log says who unposted');
@@ -272,20 +242,14 @@ private class GiftPostingServiceTest {
 					GiftPostingService.unpost(giftId, 'Never posted');
 					Assert.fail('A gift that is not posted cannot be unposted');
 				} catch (GiftPostingService.GiftPostingException refused) {
-					Assert.areEqual(
-						BarnHelp.text('Giving', 'Giving_Posting_NotPosted'),
-						refused.getMessage()
-					);
+					Assert.areEqual(BarnHelp.text('Giving', 'Giving_Posting_NotPosted'), refused.getMessage());
 				}
 				GiftPostingService.markPosted(new Set<Id>{ giftId });
 				try {
 					GiftPostingService.unpost(giftId, '   ');
 					Assert.fail('A reason is required');
 				} catch (GiftPostingService.GiftPostingException refused) {
-					Assert.areEqual(
-						BarnHelp.text('Giving', 'Giving_Posting_ReasonRequired'),
-						refused.getMessage()
-					);
+					Assert.areEqual(BarnHelp.text('Giving', 'Giving_Posting_ReasonRequired'), refused.getMessage());
 				}
 				Assert.isNotNull(reread(giftId).Accounting_Posted_At__c, 'Still posted');
 			}
@@ -333,10 +297,7 @@ private class GiftPostingServiceTest {
 
 				GiftPostingService.markPosted(new Set<Id>{ gifts.get(250).Id });
 
-				Assert.isFalse(
-					AutomationControl.isBypassed('Gift_Core_Rules'),
-					'The bypass ends with the save'
-				);
+				Assert.isFalse(AutomationControl.isBypassed('Gift_Core_Rules'), 'The bypass ends with the save');
 				Assert.isTrue(
 					AutomationControl.isBypassed('Gift_Acknowledgment'),
 					'A bypass the caller set is left as it was'

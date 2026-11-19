@@ -68,16 +68,9 @@ private class PortalTokensTest {
 			String secret = PortalTokens.newSecret();
 			Test.stopTest();
 
-			Assert.areEqual(
-				'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad',
-				hash,
-				'SHA-256 of abc'
-			);
+			Assert.areEqual('ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad', hash, 'SHA-256 of abc');
 			Assert.areEqual(43, token.length(), '256 bits as URL-safe base64');
-			Assert.isFalse(
-				token.contains('+') || token.contains('/') || token.contains('='),
-				'URL safe'
-			);
+			Assert.isFalse(token.contains('+') || token.contains('/') || token.contains('='), 'URL safe');
 			Assert.areNotEqual(token, PortalTokens.newToken(), 'Each token is new');
 			Assert.isTrue(code.length() == 6 && code.isNumeric(), 'Six digits');
 			Assert.areEqual(32, secret.length(), '160 bits as base32');
@@ -91,9 +84,7 @@ private class PortalTokensTest {
 			Assert.isFalse(PortalTokens.sameText(null, '1'), 'Nothing matches null');
 			Assert.isTrue(
 				PortalTokens.enrolmentUri('Sample Portal', 'pat@example.org', secret)
-					.startsWith(
-						'otpauth://totp/Sample%20Portal%3Apat%40example.org?secret=' + secret
-					),
+					.startsWith('otpauth://totp/Sample%20Portal%3Apat%40example.org?secret=' + secret),
 				'The address an authenticator app reads'
 			);
 		}

@@ -177,11 +177,7 @@ private class FundTriggerHandlerTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Fund__c general = GivingTestDataFactory.buildFund('General', true);
 			insert general;
-			Contact person = GivingTestDataFactory.insertHouseholdContact(
-				'The Nolan Family',
-				'Ana',
-				'Nolan'
-			);
+			Contact person = GivingTestDataFactory.insertHouseholdContact('The Nolan Family', 'Ana', 'Nolan');
 			insert GivingTestDataFactory.buildGift(person.Id, 75);
 
 			String message = '';

@@ -62,13 +62,7 @@ public with sharing class SampleDataSet {
 		List<Map<String, Object>> relationships = optionalMapList(root.get('relationships'));
 		List<Map<String, Object>> affiliations = optionalMapList(root.get('affiliations'));
 		validateConnections(relationships, affiliations);
-		return new SampleDataSet(
-			households,
-			organizations,
-			flattenMembers(households),
-			relationships,
-			affiliations
-		);
+		return new SampleDataSet(households, organizations, flattenMembers(households), relationships, affiliations);
 	}
 
 	/** The JSON body as a map, or invalid data when it is blank, unparseable, or not an object. */
@@ -101,10 +95,7 @@ public with sharing class SampleDataSet {
 				throw invalidData();
 			}
 			seenKeys.add(key);
-			if (
-				household.get('customName') == true &&
-				String.isBlank(asString(household.get('name')))
-			) {
+			if (household.get('customName') == true && String.isBlank(asString(household.get('name')))) {
 				throw invalidData();
 			}
 			for (Map<String, Object> member : asMapList(household.get('members'))) {

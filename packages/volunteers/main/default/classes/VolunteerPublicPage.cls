@@ -17,11 +17,7 @@
 public without sharing class VolunteerPublicPage implements PublicPageExtension {
 	public static final String KIND = 'volunteers';
 	private static final Integer LIST_LIMIT = 50;
-	private static final Set<String> UPCOMING = new Set<String>{
-		'Signed up',
-		'Confirmed',
-		'Waitlisted'
-	};
+	private static final Set<String> UPCOMING = new Set<String>{ 'Signed up', 'Confirmed', 'Waitlisted' };
 
 	@NamespaceAccessible
 	public VolunteerPublicPage() {
@@ -33,8 +29,7 @@ public without sharing class VolunteerPublicPage implements PublicPageExtension 
 	}
 
 	public Boolean handles(Schema.SObjectType recordType) {
-		return recordType == Volunteer_Shift__c.SObjectType ||
-			recordType == Volunteer_Signup__c.SObjectType;
+		return recordType == Volunteer_Shift__c.SObjectType || recordType == Volunteer_Signup__c.SObjectType;
 	}
 
 	public Map<String, Object> page(Id recordId) {
@@ -52,9 +47,7 @@ public without sharing class VolunteerPublicPage implements PublicPageExtension 
 			? 'None'
 			: left > 0 || VolunteerSettings.waitlistEnabled() ? 'Open' : 'Closed';
 		List<Object> facts = new List<Object>();
-		String place = String.isNotBlank(shift.Location__c)
-			? shift.Location__c
-			: shift.Volunteer_Job__r.Location__c;
+		String place = String.isNotBlank(shift.Location__c) ? shift.Location__c : shift.Volunteer_Job__r.Location__c;
 		if (String.isNotBlank(place)) {
 			facts.add(fact(BarnHelp.text('Volunteers', 'Volunteers_Public_Where'), place));
 		}
@@ -121,11 +114,7 @@ public without sharing class VolunteerPublicPage implements PublicPageExtension 
 			' ORDER BY Start_Time__c LIMIT :most';
 		return Database.queryWithBinds(
 			query,
-			new Map<String, Object>{
-				'now' => Datetime.now(),
-				'onlyIds' => onlyIds,
-				'most' => most
-			},
+			new Map<String, Object>{ 'now' => Datetime.now(), 'onlyIds' => onlyIds, 'most' => most },
 			AccessLevel.SYSTEM_MODE
 		);
 	}
@@ -133,10 +122,7 @@ public without sharing class VolunteerPublicPage implements PublicPageExtension 
 	/** R-VU10: the person's own page, for the Contact the sign-up names. */
 	private static Map<String, Object> personalPage(Id signupId) {
 		List<Volunteer_Signup__c> signups = [
-			SELECT
-				Contact__c,
-				Contact__r.Volunteer_Hours_This_Year__c,
-				Contact__r.Volunteer_Hours_Total__c
+			SELECT Contact__c, Contact__r.Volunteer_Hours_This_Year__c, Contact__r.Volunteer_Hours_Total__c
 			FROM Volunteer_Signup__c
 			WHERE Id = :signupId AND Contact__c != NULL
 			WITH SYSTEM_MODE
@@ -146,12 +132,8 @@ public without sharing class VolunteerPublicPage implements PublicPageExtension 
 		}
 		Contact person = signups[0].Contact__r;
 		Id personId = signups[0].Contact__c;
-		Decimal total = person.Volunteer_Hours_Total__c == null
-			? 0
-			: person.Volunteer_Hours_Total__c;
-		Decimal thisYear = person.Volunteer_Hours_This_Year__c == null
-			? 0
-			: person.Volunteer_Hours_This_Year__c;
+		Decimal total = person.Volunteer_Hours_Total__c == null ? 0 : person.Volunteer_Hours_Total__c;
+		Decimal thisYear = person.Volunteer_Hours_This_Year__c == null ? 0 : person.Volunteer_Hours_This_Year__c;
 		List<Object> facts = new List<Object>{
 			fact(BarnHelp.text('Volunteers', 'Volunteers_Public_HoursThisYear'), thisYear.format()),
 			fact(BarnHelp.text('Volunteers', 'Volunteers_Public_HoursTotal'), total.format())
@@ -161,12 +143,7 @@ public without sharing class VolunteerPublicPage implements PublicPageExtension 
 			facts.add(fact(BarnHelp.text('Volunteers', 'Volunteers_Public_HoursValue'), worth));
 		}
 		List<Object> sections = new List<Object>();
-		addSection(
-			sections,
-			'upcoming',
-			BarnHelp.text('Volunteers', 'Volunteers_Public_Upcoming'),
-			upcoming(personId)
-		);
+		addSection(sections, 'upcoming', BarnHelp.text('Volunteers', 'Volunteers_Public_Upcoming'), upcoming(personId));
 		addSection(
 			sections,
 			'hours',
@@ -183,9 +160,7 @@ public without sharing class VolunteerPublicPage implements PublicPageExtension 
 			'sections' => sections,
 			'registration' => formId == null ? 'None' : 'Open',
 			'formId' => formId,
-			'message' => formId == null
-				? null
-				: BarnHelp.text('Volunteers', 'Volunteers_Public_ProfileOpen'),
+			'message' => formId == null ? null : BarnHelp.text('Volunteers', 'Volunteers_Public_ProfileOpen'),
 			'offlineMessage' => null
 		};
 	}
@@ -201,10 +176,7 @@ public without sharing class VolunteerPublicPage implements PublicPageExtension 
 				Volunteer_Shift__r.Location__c,
 				Volunteer_Shift__r.Volunteer_Job__r.Name
 			FROM Volunteer_Signup__c
-			WHERE
-				Contact__c = :personId
-				AND Status__c IN :UPCOMING
-				AND Volunteer_Shift__r.Start_Time__c > :now
+			WHERE Contact__c = :personId AND Status__c IN :UPCOMING AND Volunteer_Shift__r.Start_Time__c > :now
 			WITH SYSTEM_MODE
 			ORDER BY Volunteer_Shift__r.Start_Time__c
 			LIMIT :LIST_LIMIT
@@ -236,9 +208,7 @@ public without sharing class VolunteerPublicPage implements PublicPageExtension 
 			items.add(
 				new Map<String, Object>{
 					'title' => entry.Volunteer_Job__r.Name,
-					'subtitle' => entry.Date_Worked__c == null
-						? null
-						: entry.Date_Worked__c.format(),
+					'subtitle' => entry.Date_Worked__c == null ? null : entry.Date_Worked__c.format(),
 					'text' => BarnHelp.text(
 						'Volunteers',
 						'Volunteers_Public_HoursEntry',
@@ -259,27 +229,16 @@ public without sharing class VolunteerPublicPage implements PublicPageExtension 
 		}
 		return left == 1
 			? BarnHelp.text('Volunteers', 'Volunteers_Public_PlacesLeftOne')
-			: BarnHelp.text(
-					'Volunteers',
-					'Volunteers_Public_PlacesLeft',
-					new List<Object>{ left.format() }
-			  );
+			: BarnHelp.text('Volunteers', 'Volunteers_Public_PlacesLeft', new List<Object>{ left.format() });
 	}
 
 	private static Map<String, Object> fact(String label, String value) {
 		return new Map<String, Object>{ 'label' => label, 'value' => value };
 	}
 
-	private static void addSection(
-		List<Object> sections,
-		String key,
-		String title,
-		List<Object> items
-	) {
+	private static void addSection(List<Object> sections, String key, String title, List<Object> items) {
 		if (!items.isEmpty()) {
-			sections.add(
-				new Map<String, Object>{ 'key' => key, 'title' => title, 'items' => items }
-			);
+			sections.add(new Map<String, Object>{ 'key' => key, 'title' => title, 'items' => items });
 		}
 	}
 

@@ -54,10 +54,7 @@ global with sharing class RollupInstantTrigger {
 		String base = objectApiName.replaceAll('[^A-Za-z0-9]+', '_').removeEnd('_');
 		String name = NAME_PREFIX + base;
 		if (name.length() + TEST_SUFFIX.length() > NAME_LIMIT) {
-			String hash = EncodingUtil.convertToHex(
-					Crypto.generateDigest('MD5', Blob.valueOf(objectApiName))
-				)
-				.left(6);
+			String hash = EncodingUtil.convertToHex(Crypto.generateDigest('MD5', Blob.valueOf(objectApiName))).left(6);
 			name = name.left(NAME_LIMIT - TEST_SUFFIX.length() - 7).removeEnd('_') + '_' + hash;
 		}
 		return name;
@@ -94,13 +91,7 @@ global with sharing class RollupInstantTrigger {
 		TriggerHandler.noteTriggerProgress();
 		TriggerDispatcher.run(
 			new RollupTriggerHandler(),
-			new TriggerDispatcher.Context(
-				operation,
-				newRecords,
-				newRecordsById,
-				oldRecords,
-				oldRecordsById
-			)
+			new TriggerDispatcher.Context(operation, newRecords, newRecordsById, oldRecords, oldRecordsById)
 		);
 		TriggerHandler.noteTriggerProgress();
 	}

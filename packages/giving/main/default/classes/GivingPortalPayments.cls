@@ -17,11 +17,7 @@ public with sharing class GivingPortalPayments implements PortalActionExtension,
 	private static final String CONTEXT = 'GivingPortalPayments';
 	/** A Pending checkout this recent for the commitment means its link was just sent. */
 	private static final Integer RECENT_MINUTES = 10;
-	private static final Set<String> DUE = new Set<String>{
-		'Scheduled',
-		'Partially paid',
-		'Overdue'
-	};
+	private static final Set<String> DUE = new Set<String>{ 'Scheduled', 'Partially paid', 'Overdue' };
 
 	/** Stands in for the email sender in tests. */
 	@TestVisible
@@ -135,9 +131,7 @@ public with sharing class GivingPortalPayments implements PortalActionExtension,
 			Callable payments = GivingDonations.payments();
 			// PAY-04: with Automatic Recurring Payments on, a recurring gift sets up automatic
 			// payments of its own amount, each period (Payments ignores the interval otherwise).
-			List<Object> every = commitment.Type__c == 'Recurring'
-				? EVERY.get(commitment.Frequency__c)
-				: null;
+			List<Object> every = commitment.Type__c == 'Recurring' ? EVERY.get(commitment.Frequency__c) : null;
 			if (
 				every != null &&
 				(commitment.Amount__c ?? 0) > 0 &&
@@ -193,10 +187,7 @@ public with sharing class GivingPortalPayments implements PortalActionExtension,
 			);
 			if (payment?.get('amount') instanceof Decimal) {
 				// The amount as charged: no decimals for a currency without them.
-				amountText =
-					((Decimal) payment.get('amount')).format() +
-					' ' +
-					String.valueOf(payment.get('currency'));
+				amountText = ((Decimal) payment.get('amount')).format() + ' ' + String.valueOf(payment.get('currency'));
 			}
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT, commitment.Id);
@@ -206,21 +197,14 @@ public with sharing class GivingPortalPayments implements PortalActionExtension,
 	}
 
 	/** Emails the donor `subject` and `body`, its {0} the first name and {1} on the `words`. */
-	private static void email(
-		Commitment__c commitment,
-		String subject,
-		String body,
-		List<Object> words
-	) {
+	private static void email(Commitment__c commitment, String subject, String body, List<Object> words) {
 		words.add(0, commitment.Donor_Contact__r.FirstName ?? '');
 		Messaging.SingleEmailMessage message = new Messaging.SingleEmailMessage();
 		message.setToAddresses(new List<String>{ commitment.Donor_Contact__r.Email });
 		message.setSubject(subject);
 		message.setPlainTextBody(String.format(body, words));
 		message.setSaveAsActivity(false);
-		List<Messaging.SingleEmailMessage> messages = new List<Messaging.SingleEmailMessage>{
-			message
-		};
+		List<Messaging.SingleEmailMessage> messages = new List<Messaging.SingleEmailMessage>{ message };
 		for (EmailSendOutcome outcome : emailSender.send(messages)) {
 			if (outcome != null && outcome.sent != true) {
 				ErrorLogger.logMessage(
@@ -242,9 +226,7 @@ public with sharing class GivingPortalPayments implements PortalActionExtension,
 		if (next != null) {
 			return next.Expected_Amount__c - (next.Paid_Amount__c ?? 0);
 		}
-		Decimal fallback = commitment.Type__c == 'Pledge'
-			? commitment.Balance__c
-			: commitment.Amount__c;
+		Decimal fallback = commitment.Type__c == 'Pledge' ? commitment.Balance__c : commitment.Amount__c;
 		return fallback ?? 0;
 	}
 

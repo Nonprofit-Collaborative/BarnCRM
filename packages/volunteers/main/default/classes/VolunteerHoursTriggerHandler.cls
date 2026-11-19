@@ -38,10 +38,7 @@ public with sharing class VolunteerHoursTriggerHandler extends TriggerHandler {
 			}
 			// R-VG2: recomputed only when the person changes, so hours stay with the household
 			// they were given in when the person later moves (ADR-0071).
-			if (
-				entry.Contact__c != previous.Contact__c ||
-				entry.Account__c != previous.Account__c
-			) {
+			if (entry.Contact__c != previous.Contact__c || entry.Account__c != previous.Account__c) {
 				personChanged.add(entry);
 			}
 		}

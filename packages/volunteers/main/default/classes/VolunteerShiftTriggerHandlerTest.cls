@@ -26,11 +26,7 @@ private class VolunteerShiftTriggerHandlerTest {
 				shift.Name = null;
 				shifts.add(shift);
 			}
-			Volunteer_Shift__c typed = VolunteersTestData.newShift(
-				jobId,
-				VolunteersTestData.SHIFT_START,
-				2
-			);
+			Volunteer_Shift__c typed = VolunteersTestData.newShift(jobId, VolunteersTestData.SHIFT_START, 2);
 			typed.Name = 'Spring clean';
 			shifts.add(typed);
 
@@ -47,8 +43,7 @@ private class VolunteerShiftTriggerHandlerTest {
 				'A shift saved without a name is named from its job and start.'
 			);
 			Assert.areEqual(
-				'Food pantry sort: ' +
-				VolunteersTestData.SHIFT_START.addDays(250).format('d MMM yyyy, h:mm a'),
+				'Food pantry sort: ' + VolunteersTestData.SHIFT_START.addDays(250).format('d MMM yyyy, h:mm a'),
 				saved.get(shifts[250].Id).Name,
 				'Every one of them.'
 			);

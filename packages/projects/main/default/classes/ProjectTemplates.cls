@@ -54,14 +54,7 @@ public with sharing class ProjectTemplates {
 		List<Template> out = new List<Template>();
 		for (Object raw : shipped()) {
 			Map<String, Object> row = (Map<String, Object>) raw;
-			out.add(
-				template(
-					(String) row.get('key'),
-					(String) row.get('name'),
-					(String) row.get('type'),
-					true
-				)
-			);
+			out.add(template((String) row.get('key'), (String) row.get('name'), (String) row.get('type'), true));
 		}
 		for (Project__c project : [
 			SELECT Id, Name, Type__c
@@ -198,18 +191,10 @@ public with sharing class ProjectTemplates {
 				plan.days = toInteger(row.get('days'));
 				for (Object phaseRaw : (List<Object>) row.get('phases')) {
 					Map<String, Object> phaseRow = (Map<String, Object>) phaseRaw;
-					Step phase = step(
-						(String) phaseRow.get('name'),
-						phaseRow.get('start'),
-						phaseRow.get('end')
-					);
+					Step phase = step((String) phaseRow.get('name'), phaseRow.get('start'), phaseRow.get('end'));
 					for (Object taskRaw : (List<Object>) phaseRow.get('tasks')) {
 						Map<String, Object> taskRow = (Map<String, Object>) taskRaw;
-						Step task = step(
-							(String) taskRow.get('name'),
-							taskRow.get('start'),
-							taskRow.get('due')
-						);
+						Step task = step((String) taskRow.get('name'), taskRow.get('start'), taskRow.get('due'));
 						task.hours = taskRow.get('hours') == null
 							? null
 							: Decimal.valueOf(String.valueOf(taskRow.get('hours')));
@@ -281,20 +266,12 @@ public with sharing class ProjectTemplates {
 		plan.description = source.Description__c;
 		Map<Id, Step> byPhase = new Map<Id, Step>();
 		for (Project_Phase__c phase : source.Phases__r) {
-			Step step = step(
-				phase.Name,
-				offset(base, phase.Start_Date__c),
-				offset(base, phase.End_Date__c)
-			);
+			Step step = step(phase.Name, offset(base, phase.Start_Date__c), offset(base, phase.End_Date__c));
 			byPhase.put(phase.Id, step);
 			plan.phases.add(step);
 		}
 		for (Project_Task__c task : source.Tasks__r) {
-			Step step = step(
-				task.Name,
-				offset(base, task.Start_Date__c),
-				offset(base, task.Due_Date__c)
-			);
+			Step step = step(task.Name, offset(base, task.Start_Date__c), offset(base, task.Due_Date__c));
 			step.hours = task.Estimated_Hours__c;
 			step.milestone = task.Milestone__c;
 			step.sortOrder = task.Sort_Order__c;
@@ -306,11 +283,7 @@ public with sharing class ProjectTemplates {
 			}
 		}
 		for (Project_Assignment__c role : source.Assignments__r) {
-			Step step = step(
-				role.Role__c,
-				offset(base, role.Start_Date__c),
-				offset(base, role.End_Date__c)
-			);
+			Step step = step(role.Role__c, offset(base, role.Start_Date__c), offset(base, role.End_Date__c));
 			step.hours = role.Planned_Hours__c;
 			plan.roles.add(step);
 		}

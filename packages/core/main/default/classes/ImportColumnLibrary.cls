@@ -98,14 +98,7 @@ public with sharing class ImportColumnLibrary {
 		);
 		add(
 			C1 + ImportMapping.ATTRIBUTE_FULL_NAME,
-			new List<String>{
-				'Full Name',
-				'Name',
-				'Donor Name',
-				'Contact Name',
-				'Donor',
-				'Constituent Name'
-			}
+			new List<String>{ 'Full Name', 'Name', 'Donor Name', 'Contact Name', 'Donor', 'Constituent Name' }
 		);
 		add(C1 + 'Salutation', new List<String>{ 'Salutation', 'Title Prefix', 'Prefix' });
 		add(
@@ -149,45 +142,21 @@ public with sharing class ImportColumnLibrary {
 		add(C1 + 'MailingCity', new List<String>{ 'City', 'Town', 'Mailing City', 'Home City' });
 		add(
 			C1 + 'MailingState',
-			new List<String>{
-				'State',
-				'Province',
-				'County',
-				'Region',
-				'Mailing State',
-				'State Province'
-			}
+			new List<String>{ 'State', 'Province', 'County', 'Region', 'Mailing State', 'State Province' }
 		);
 		add(
 			C1 + 'MailingPostalCode',
-			new List<String>{
-				'Postal Code',
-				'Postcode',
-				'Zip',
-				'Zip Code',
-				'Mailing Zip',
-				'Mailing Postal Code'
-			}
+			new List<String>{ 'Postal Code', 'Postcode', 'Zip', 'Zip Code', 'Mailing Zip', 'Mailing Postal Code' }
 		);
 		add(C1 + 'MailingCountry', new List<String>{ 'Country', 'Mailing Country' });
 
 		add(
 			C2 + 'FirstName',
-			new List<String>{
-				'Spouse First Name',
-				'Partner First Name',
-				'Second First Name',
-				'Contact 2 First Name'
-			}
+			new List<String>{ 'Spouse First Name', 'Partner First Name', 'Second First Name', 'Contact 2 First Name' }
 		);
 		add(
 			C2 + 'LastName',
-			new List<String>{
-				'Spouse Last Name',
-				'Partner Last Name',
-				'Second Last Name',
-				'Contact 2 Last Name'
-			}
+			new List<String>{ 'Spouse Last Name', 'Partner Last Name', 'Second Last Name', 'Contact 2 Last Name' }
 		);
 		add(
 			C2 + ImportMapping.ATTRIBUTE_FULL_NAME,
@@ -198,12 +167,7 @@ public with sharing class ImportColumnLibrary {
 
 		add(
 			HH + 'Name',
-			new List<String>{
-				'Household Name',
-				'Household',
-				'Family Name As Addressed',
-				'Account Name Household'
-			}
+			new List<String>{ 'Household Name', 'Household', 'Family Name As Addressed', 'Account Name Household' }
 		);
 
 		add(
@@ -219,95 +183,38 @@ public with sharing class ImportColumnLibrary {
 				'Business Name'
 			}
 		);
-		add(
-			ORG + 'Phone',
-			new List<String>{
-				'Organization Phone',
-				'Company Phone',
-				'Work Phone',
-				'Business Phone'
-			}
-		);
-		add(
-			ORG + 'Website',
-			new List<String>{ 'Website', 'Web Site', 'Url', 'Organization Website' }
-		);
+		add(ORG + 'Phone', new List<String>{ 'Organization Phone', 'Company Phone', 'Work Phone', 'Business Phone' });
+		add(ORG + 'Website', new List<String>{ 'Website', 'Web Site', 'Url', 'Organization Website' });
 		add(
 			ORG + 'BillingStreet',
-			new List<String>{
-				'Organization Street',
-				'Company Street',
-				'Billing Street',
-				'Work Street'
-			}
+			new List<String>{ 'Organization Street', 'Company Street', 'Billing Street', 'Work Street' }
 		);
-		add(
-			ORG + 'BillingCity',
-			new List<String>{ 'Organization City', 'Company City', 'Billing City' }
-		);
-		add(
-			ORG + 'BillingState',
-			new List<String>{ 'Organization State', 'Company State', 'Billing State' }
-		);
+		add(ORG + 'BillingCity', new List<String>{ 'Organization City', 'Company City', 'Billing City' });
+		add(ORG + 'BillingState', new List<String>{ 'Organization State', 'Company State', 'Billing State' });
 		add(
 			ORG + 'BillingPostalCode',
-			new List<String>{
-				'Organization Postal Code',
-				'Company Zip',
-				'Billing Zip',
-				'Billing Postal Code'
-			}
+			new List<String>{ 'Organization Postal Code', 'Company Zip', 'Billing Zip', 'Billing Postal Code' }
 		);
-		add(
-			ORG + 'BillingCountry',
-			new List<String>{ 'Organization Country', 'Company Country', 'Billing Country' }
-		);
+		add(ORG + 'BillingCountry', new List<String>{ 'Organization Country', 'Company Country', 'Billing Country' });
 
 		// Recognized so the picker can say what the column is, and staged with the row.
 		// Nothing in Core writes them (R-IR6).
 		add(
 			GIFT + 'Amount__c',
-			new List<String>{
-				'Amount',
-				'Gift Amount',
-				'Donation Amount',
-				'Total Amount',
-				'Gross Amount'
-			}
+			new List<String>{ 'Amount', 'Gift Amount', 'Donation Amount', 'Total Amount', 'Gross Amount' }
 		);
 		add(
 			GIFT + 'Gift_Date__c',
-			new List<String>{
-				'Date',
-				'Gift Date',
-				'Donation Date',
-				'Transaction Date',
-				'Payment Date'
-			}
+			new List<String>{ 'Date', 'Gift Date', 'Donation Date', 'Transaction Date', 'Payment Date' }
 		);
-		add(
-			GIFT + 'Type__c',
-			new List<String>{ 'Payment Method', 'Gift Type', 'Payment Type', 'Method' }
-		);
+		add(GIFT + 'Type__c', new List<String>{ 'Payment Method', 'Gift Type', 'Payment Type', 'Method' });
 		add(
 			GIFT + 'Payment_Reference__c',
-			new List<String>{
-				'Check Number',
-				'Cheque Number',
-				'Reference',
-				'Payment Reference',
-				'Transaction Id'
-			}
+			new List<String>{ 'Check Number', 'Cheque Number', 'Reference', 'Payment Reference', 'Transaction Id' }
 		);
 		add(
 			'Allocation.Fund',
-			new List<String>{
-				'Fund',
-				'Designation',
-				'Restriction',
-				'Gau',
-				'General Accounting Unit'
-			}
+			new List<String>{ 'Fund', 'Designation', 'Restriction', 'Gau', 'General Accounting Unit' }
 		);
 		return knownTargets;
 	}

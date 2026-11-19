@@ -168,13 +168,7 @@ public with sharing class ProjectRequestsController {
 					Change_Request__c,
 					Change_Request__r.Name,
 					(
-						SELECT
-							Id,
-							Body__c,
-							Shared__c,
-							From_Requester__c,
-							CreatedBy.Name,
-							CreatedDate
+						SELECT Id, Body__c, Shared__c, From_Requester__c, CreatedBy.Name, CreatedDate
 						FROM Comments__r
 						ORDER BY CreatedDate ASC
 						LIMIT 500
@@ -257,10 +251,7 @@ public with sharing class ProjectRequestsController {
 				Due_Date__c = request.Due_Date__c
 			);
 			insert as user task;
-			Project_Request__c link = new Project_Request__c(
-				Id = requestId,
-				Project_Task__c = task.Id
-			);
+			Project_Request__c link = new Project_Request__c(Id = requestId, Project_Task__c = task.Id);
 			if (request.Status__c == 'New') {
 				link.Status__c = ProjectRequestHandler.IN_PROGRESS;
 			}
@@ -306,9 +297,7 @@ public with sharing class ProjectRequestsController {
 
 	/** The request number, then its description, for the task or change it becomes. */
 	private static String describe(Project_Request__c request) {
-		return String.isBlank(request.Description__c)
-			? request.Name
-			: request.Name + ': ' + request.Description__c;
+		return String.isBlank(request.Description__c) ? request.Name : request.Name + ': ' + request.Description__c;
 	}
 
 	private static Row fill(Row row, Project_Request__c request) {

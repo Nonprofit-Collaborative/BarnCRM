@@ -60,11 +60,7 @@ public with sharing class DonationMatcher {
 	 * as they stand now. A batch whose dry run recorded none, which is every batch dry run
 	 * before the values were recorded, falls back to the template.
 	 */
-	public static DonationMatcher forRun(
-		Import_Batch__c batch,
-		Import_Template__c template,
-		Boolean dryRun
-	) {
+	public static DonationMatcher forRun(Import_Batch__c batch, Import_Template__c template, Boolean dryRun) {
 		if (dryRun == true) {
 			DonationMatcher taken = fromRecord(GiftImportRunState.carriedSettings());
 			if (taken == null) {
@@ -76,9 +72,7 @@ public with sharing class DonationMatcher {
 			}
 			return taken;
 		}
-		DonationMatcher recorded = fromRecord(
-			batch == null ? null : batch.Processor_Settings_JSON__c
-		);
+		DonationMatcher recorded = fromRecord(batch == null ? null : batch.Processor_Settings_JSON__c);
 		return recorded == null ? new DonationMatcher(template) : recorded;
 	}
 
@@ -124,12 +118,7 @@ public with sharing class DonationMatcher {
 			return;
 		}
 		for (GiftImportRow item : gifts) {
-			if (
-				item.error == null &&
-				item.matchedExisting &&
-				item.sameAs == null &&
-				!item.repeatsEarlierChunk
-			) {
+			if (item.error == null && item.matchedExisting && item.sameAs == null && !item.repeatsEarlierChunk) {
 				item.error = String.format(
 					BarnHelp.text('Giving', 'Giving_Import_ErrorExternalIdRepeated'),
 					new List<String>{ item.externalId }
@@ -239,11 +228,7 @@ public with sharing class DonationMatcher {
 	}
 
 	/** The unclaimed candidates of this donor at the smallest distance in days, in a list. */
-	private List<Installment__c> closest(
-		GiftImportRow item,
-		List<Installment__c> candidates,
-		Set<Id> claimed
-	) {
+	private List<Installment__c> closest(GiftImportRow item, List<Installment__c> candidates, Set<Id> claimed) {
 		Id household = householdOf(item);
 		List<Installment__c> best = new List<Installment__c>();
 		Integer bestDistance;
@@ -278,11 +263,7 @@ public with sharing class DonationMatcher {
 	 * without R-DM4's choice between them: a gift entry screen shows them to a person, who
 	 * decides (R-DM8). The candidates are the caller's, already narrowed to the donor.
 	 */
-	public List<Installment__c> matching(
-		Date giftDate,
-		Decimal amount,
-		List<Installment__c> candidates
-	) {
+	public List<Installment__c> matching(Date giftDate, Decimal amount, List<Installment__c> candidates) {
 		List<Installment__c> matched = new List<Installment__c>();
 		for (Installment__c candidate : candidates) {
 			if (distanceIfMatching(giftDate, amount, candidate) != null) {

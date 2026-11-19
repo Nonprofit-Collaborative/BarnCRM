@@ -9,12 +9,7 @@
  */
 public with sharing class GrantDeadlineSelector {
 	/** Grants before submitting whose Application Deadline falls in the range. */
-	public static List<Grant__c> applications(
-		Date fromDate,
-		Date toDate,
-		Boolean mineOnly,
-		Integer maxRows
-	) {
+	public static List<Grant__c> applications(Date fromDate, Date toDate, Boolean mineOnly, Integer maxRows) {
 		return (List<Grant__c>) Database.queryWithBinds(
 			'SELECT Id, Name, Stage__c, Funder__c, Funder__r.Name, Amount_Requested__c,' +
 				' Application_Deadline__c, Next_Step__c, Owner.Name FROM Grant__c' +
@@ -46,9 +41,7 @@ public with sharing class GrantDeadlineSelector {
 				' FROM Grant_Requirement__c WHERE Status__c IN :openStatuses' +
 				' AND Due_Date__c <= :toDate' +
 				(fromDate == null ? '' : ' AND Due_Date__c >= :fromDate') +
-				(mineOnly == true
-					? ' AND (Assigned_To__c = :ownerId OR Grant__r.OwnerId = :ownerId)'
-					: '') +
+				(mineOnly == true ? ' AND (Assigned_To__c = :ownerId OR Grant__r.OwnerId = :ownerId)' : '') +
 				' ORDER BY Due_Date__c ASC, Name LIMIT :maxRows',
 			binds,
 			AccessLevel.USER_MODE

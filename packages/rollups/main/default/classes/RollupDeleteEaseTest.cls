@@ -55,9 +55,7 @@ private class RollupDeleteEaseTest {
 	@IsTest
 	static void keepingTheValuesLeavesThemAndStartsNothing() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			Account org = TestDataFactory.organization(
-				new Account(Name = 'Alpha Org', Member_Count__c = 4)
-			);
+			Account org = TestDataFactory.organization(new Account(Name = 'Alpha Org', Member_Count__c = 4));
 			insert org;
 			Rollup_Definition__c mine = rollup('Alpha count', null, true);
 			insert mine;
@@ -67,22 +65,15 @@ private class RollupDeleteEaseTest {
 			Test.stopTest();
 
 			System.Assert.areEqual(0, clearJobs(), 'Nothing is cleared');
-			System.Assert.areEqual(
-				4,
-				[SELECT Member_Count__c FROM Account WHERE Id = :org.Id].Member_Count__c
-			);
+			System.Assert.areEqual(4, [SELECT Member_Count__c FROM Account WHERE Id = :org.Id].Member_Count__c);
 		}
 	}
 
 	@IsTest
 	static void clearingBlanksTheFieldOnTheRecordsTheRollupFillsOnly() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			Account alpha = TestDataFactory.organization(
-				new Account(Name = 'Alpha Org', Member_Count__c = 4)
-			);
-			Account beta = TestDataFactory.organization(
-				new Account(Name = 'Beta Org', Member_Count__c = 7)
-			);
+			Account alpha = TestDataFactory.organization(new Account(Name = 'Alpha Org', Member_Count__c = 4));
+			Account beta = TestDataFactory.organization(new Account(Name = 'Beta Org', Member_Count__c = 7));
 			insert new List<Account>{ alpha, beta };
 			Rollup_Definition__c mine = rollup('Alpha count', nameStartsWith('Alpha'), true);
 			insert mine;
@@ -119,10 +110,7 @@ private class RollupDeleteEaseTest {
 			}
 
 			System.Assert.areEqual(
-				String.format(
-					BarnHelp.text('Rollups', 'Core_RollupEase_ClearShared'),
-					new List<String>{ 'New count' }
-				),
+				String.format(BarnHelp.text('Rollups', 'Core_RollupEase_ClearShared'), new List<String>{ 'New count' }),
 				message
 			);
 			System.Assert.areEqual(
@@ -137,13 +125,8 @@ private class RollupDeleteEaseTest {
 	@IsTest
 	static void theClearReadsOnlyRecordsWithAValueThatMeetTheConditions() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			String query = new RollupClearBatch(
-					rollup('Alpha count', nameStartsWith('Alpha'), true)
-				)
-				.query();
-			System.Assert.isTrue(
-				query.startsWith('SELECT Id, Member_Count__c FROM Account WHERE ')
-			);
+			String query = new RollupClearBatch(rollup('Alpha count', nameStartsWith('Alpha'), true)).query();
+			System.Assert.isTrue(query.startsWith('SELECT Id, Member_Count__c FROM Account WHERE '));
 			System.Assert.isTrue(query.contains('Member_Count__c != null'));
 			System.Assert.isTrue(query.contains('Alpha'), 'Within the target conditions');
 

@@ -120,8 +120,8 @@ the record type it had before, BarnCRM's two greetings, the primary contact and 
 setting. It does not put back the member count, which NPSP does not use.
 
 A household is not put back when it was deleted since, when it is no longer a BarnCRM household,
-or when you cannot edit it. Each adopted account has a **Household Adoption** record (BarnCRM
-Admin can report on them), which says **Undone** or **Not Restored** with the reason.
+or when you cannot edit it. Each adopted account has an **Admin Journal** record of Kind **Household
+Adoption** (BarnCRM Admin can report on them), which says **Undone** or **Not Restored** with the reason.
 
 ## Common Mistakes
 

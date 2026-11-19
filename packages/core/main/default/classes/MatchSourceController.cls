@@ -92,14 +92,9 @@ public with sharing class MatchSourceController {
 			for (Match_Source__mdt row : MatchSourceSelector.selectAllSources()) {
 				view.sources.add(sourceView(row));
 			}
-			for (
-				Schema.PicklistEntry entry : Match_Source__mdt.Normalization__c.getDescribe()
-					.getPicklistValues()
-			) {
+			for (Schema.PicklistEntry entry : Match_Source__mdt.Normalization__c.getDescribe().getPicklistValues()) {
 				if (entry.isActive()) {
-					view.normalizations.add(
-						new Choice(normalizationText(entry.getValue()), entry.getValue())
-					);
+					view.normalizations.add(new Choice(normalizationText(entry.getValue()), entry.getValue()));
 				}
 			}
 			return view;
@@ -115,25 +110,17 @@ public with sharing class MatchSourceController {
 		Schema.SObjectType type = NamespaceUtil.objectType(objectName);
 		if (type == null) {
 			throw UserErrors.message(
-				String.format(
-					BarnHelp.text('Core', 'Core_MatchSource_NoSuchObject'),
-					new List<Object>{ objectName }
-				)
+				String.format(BarnHelp.text('Core', 'Core_MatchSource_NoSuchObject'), new List<Object>{ objectName })
 			);
 		}
 		try {
-			Schema.DescribeSObjectResult described = type.getDescribe(
-				SObjectDescribeOptions.DEFERRED
-			);
+			Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
 			ObjectView view = new ObjectView();
 			view.objectName = described.getLocalName();
 			view.objectLabel = described.getLabel();
 			for (Schema.SObjectField token : described.fields.getMap().values()) {
 				Schema.DescribeFieldResult field = token.getDescribe();
-				Choice choice = new Choice(
-					field.getLabel() + ' (' + field.getLocalName() + ')',
-					field.getLocalName()
-				);
+				Choice choice = new Choice(field.getLabel() + ' (' + field.getLocalName() + ')', field.getLocalName());
 				if (MatchSourceService.isMatchableText(field)) {
 					view.valueFields.add(choice);
 				} else if (!MatchSourceService.parentObjectsOf(field).isEmpty()) {
@@ -153,12 +140,7 @@ public with sharing class MatchSourceController {
 	 * yet), found as the scan would find them. The source is checked as a save would be.
 	 */
 	@AuraEnabled
-	public static TryResult tryValue(
-		String label,
-		Map<String, String> values,
-		String value,
-		String postal
-	) {
+	public static TryResult tryValue(String label, Map<String, String> values, String value, String postal) {
 		requireReader();
 		Map<String, Object> given = new Map<String, Object>();
 		if (values != null) {
@@ -174,25 +156,13 @@ public with sharing class MatchSourceController {
 			}
 			TryResult result = new TryResult();
 			result.comparedAs = MatchSourceService.key(source.normalization, value, postal);
-			Map<Schema.SObjectType, Set<Id>> holders = MatchSourceService.holdersOfValue(
-				source,
-				value,
-				postal
-			);
+			Map<Schema.SObjectType, Set<Id>> holders = MatchSourceService.holdersOfValue(source, value, postal);
 			for (Schema.SObjectType target : holders.keySet()) {
 				String kind = target == Contact.SObjectType
 					? System.Label.Core_Section_Person
 					: System.Label.Core_Section_Household;
-				for (
-					SObject record : MatchSourceSelector.namesOf(
-						target,
-						holders.get(target),
-						MAX_NAMED
-					)
-				) {
-					result.records.add(
-						new Choice(kind + ': ' + (String) record.get('Name'), record.Id)
-					);
+				for (SObject record : MatchSourceSelector.namesOf(target, holders.get(target), MAX_NAMED)) {
+					result.records.add(new Choice(kind + ': ' + (String) record.get('Name'), record.Id));
 				}
 			}
 			return result;

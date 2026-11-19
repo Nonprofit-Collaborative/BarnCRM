@@ -24,10 +24,7 @@ private class SetupObjectSelectorTest {
 	@IsTest
 	static void readsAShippedStaticResource() {
 		Assert.isNotNull(SetupObjectSelector.staticResource('SampleData'), 'Core ships it');
-		Assert.isTrue(
-			SetupObjectSelector.staticResourceBody('SampleData').startsWith('{'),
-			'Its JSON body'
-		);
+		Assert.isTrue(SetupObjectSelector.staticResourceBody('SampleData').startsWith('{'), 'Its JSON body');
 		Assert.isNull(SetupObjectSelector.staticResourceBody('No_Such_Barn_Resource'), 'None');
 	}
 
@@ -36,8 +33,7 @@ private class SetupObjectSelectorTest {
 		Assert.isNull(SetupObjectSelector.groupId('No_Such_Barn_Group'), 'No group');
 		Assert.isNull(SetupObjectSelector.emailTemplateId('No_Such_Barn_Template', false), 'None');
 		Assert.isTrue(
-			SetupObjectSelector.permissionSetGroups(new Set<String>{ 'No_Such_Barn_Role' })
-				.isEmpty(),
+			SetupObjectSelector.permissionSetGroups(new Set<String>{ 'No_Such_Barn_Role' }).isEmpty(),
 			'No role'
 		);
 	}

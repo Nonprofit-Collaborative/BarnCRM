@@ -18,9 +18,7 @@ private class VolunteerLogHoursControllerTest {
 			Volunteer_Shift__c shift = VolunteersTestData.shift(job.Id);
 
 			Test.startTest();
-			VolunteerLogHoursController.Context context = VolunteerLogHoursController.getContext(
-				shift.Id
-			);
+			VolunteerLogHoursController.Context context = VolunteerLogHoursController.getContext(shift.Id);
 			Test.stopTest();
 
 			Assert.isTrue(context.canCreate, 'An admin can log hours.');
@@ -43,12 +41,8 @@ private class VolunteerLogHoursControllerTest {
 			Contact person = VolunteersTestData.contacts(1)[0];
 
 			Test.startTest();
-			VolunteerLogHoursController.Context fromJob = VolunteerLogHoursController.getContext(
-				job.Id
-			);
-			VolunteerLogHoursController.Context fromPerson = VolunteerLogHoursController.getContext(
-				person.Id
-			);
+			VolunteerLogHoursController.Context fromJob = VolunteerLogHoursController.getContext(job.Id);
+			VolunteerLogHoursController.Context fromPerson = VolunteerLogHoursController.getContext(person.Id);
 			Test.stopTest();
 
 			Assert.areEqual(job.Id, fromJob.jobId, 'The job is filled.');
@@ -71,12 +65,8 @@ private class VolunteerLogHoursControllerTest {
 			ShiftScheduleService.nowOverride = VolunteersTestData.SHIFT_START.addHours(4);
 
 			Test.startTest();
-			VolunteerLogHoursController.Context signedUp = VolunteerLogHoursController.getContext(
-				people[0].Id
-			);
-			VolunteerLogHoursController.Context notComing = VolunteerLogHoursController.getContext(
-				people[1].Id
-			);
+			VolunteerLogHoursController.Context signedUp = VolunteerLogHoursController.getContext(people[0].Id);
+			VolunteerLogHoursController.Context notComing = VolunteerLogHoursController.getContext(people[1].Id);
 			Test.stopTest();
 
 			Assert.areEqual(people[0].Id, signedUp.personId, 'The person is filled.');
@@ -97,10 +87,7 @@ private class VolunteerLogHoursControllerTest {
 		User staff;
 		User reader;
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
-			staff = TestDataFactory.createUser(
-				'Staff',
-				new List<String>{ 'BarnCRM_Staff', 'Volunteers_Staff' }
-			);
+			staff = TestDataFactory.createUser('Staff', new List<String>{ 'BarnCRM_Staff', 'Volunteers_Staff' });
 			reader = TestDataFactory.createUser(
 				'Reader',
 				new List<String>{ 'BarnCRM_Read_Only', 'Volunteers_Read_Only' }

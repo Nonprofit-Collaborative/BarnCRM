@@ -51,10 +51,7 @@ public with sharing class MembershipPayments implements Queueable, Database.Allo
 			problem = BarnHelp.text('Memberships', 'Memberships_Error_NotFound');
 		} else if (!ready()) {
 			problem = BarnHelp.text('Memberships', 'Memberships_Error_PaymentsNotReady');
-		} else if (
-			term.Status__c == MembershipService.RENEWED ||
-			term.Status__c == MembershipService.CANCELLED
-		) {
+		} else if (term.Status__c == MembershipService.RENEWED || term.Status__c == MembershipService.CANCELLED) {
 			problem = BarnHelp.text('Memberships', 'Memberships_Error_CannotRenew');
 		} else if (term.Contact__r?.Email == null) {
 			problem = BarnHelp.text('Memberships', 'Memberships_Error_NoEmail');
@@ -145,10 +142,7 @@ public with sharing class MembershipPayments implements Queueable, Database.Allo
 		];
 		if (!sites.isEmpty()) {
 			// The durable id is the site's id; matched both ways since its length is not documented.
-			Set<String> ids = new Set<String>{
-				String.valueOf(sites[0].Id),
-				String.valueOf(sites[0].Id).left(15)
-			};
+			Set<String> ids = new Set<String>{ String.valueOf(sites[0].Id), String.valueOf(sites[0].Id).left(15) };
 			for (SiteDetail detail : [
 				SELECT SecureUrl
 				FROM SiteDetail

@@ -70,10 +70,7 @@ public with sharing class RollupPreviewRows {
 	 */
 	public static List<Sample> samplesOf(Rollup_Definition__c definition) {
 		Schema.SObjectType targetType = SettingsService.typeByName(definition.Target_Object__c);
-		RollupPlanner.Plan plan = RollupPlanner.plan(
-			targetType,
-			new List<Rollup_Definition__c>{ definition }
-		);
+		RollupPlanner.Plan plan = RollupPlanner.plan(targetType, new List<Rollup_Definition__c>{ definition });
 		String targetFilter = plan.targetFilters.isEmpty() ? '' : plan.targetFilters[0];
 		String admitted = String.isBlank(targetFilter) ? '' : ' AND (' + targetFilter + ')';
 		Set<Id> candidates = new Set<Id>();
@@ -83,10 +80,7 @@ public with sharing class RollupPreviewRows {
 			}
 		}
 		String nameField = nameFieldOf(targetType);
-		Map<String, Object> binds = new Map<String, Object>{
-			'candidates' => candidates,
-			'wanted' => MAX_SAMPLES
-		};
+		Map<String, Object> binds = new Map<String, Object>{ 'candidates' => candidates, 'wanted' => MAX_SAMPLES };
 		List<SObject> picked = new List<SObject>();
 		if (!candidates.isEmpty()) {
 			// The entity comes from describe and the clause from RollupFilterParser, which checks
@@ -171,10 +165,7 @@ public with sharing class RollupPreviewRows {
 	 */
 	public static Detail of(Rollup_Definition__c definition, Id targetId) {
 		Schema.SObjectType targetType = SettingsService.typeByName(definition.Target_Object__c);
-		RollupPlanner.Plan plan = RollupPlanner.plan(
-			targetType,
-			new List<Rollup_Definition__c>{ definition }
-		);
+		RollupPlanner.Plan plan = RollupPlanner.plan(targetType, new List<Rollup_Definition__c>{ definition });
 		Detail detail = new Detail();
 		detail.rows = new List<Row>();
 		detail.total = 0;
@@ -258,13 +249,7 @@ public with sharing class RollupPreviewRows {
 		}
 		Set<Id> ids = new Map<Id, SObject>(rows).keySet();
 		Set<Id> counted = passing(query, ids, query.whereClause, true);
-		Map<Id, List<String>> failed = failedConditions(
-			definition,
-			query,
-			sourceType,
-			ids,
-			counted
-		);
+		Map<Id, List<String>> failed = failedConditions(definition, query, sourceType, ids, counted);
 		Integer limitLeft = query.measures[0].rowLimit;
 		for (SObject source : rows) {
 			Row row = new Row();
@@ -296,12 +281,7 @@ public with sharing class RollupPreviewRows {
 	}
 
 	/** Which of these rows meet a clause, and have a value to order by when that is asked. */
-	private static Set<Id> passing(
-		RollupPlanner.SourceQuery query,
-		Set<Id> ids,
-		String clause,
-		Boolean ordered
-	) {
+	private static Set<Id> passing(RollupPlanner.SourceQuery query, Set<Id> ids, String clause, Boolean ordered) {
 		List<String> conditions = new List<String>{ 'Id IN :ids' };
 		if (String.isNotBlank(clause)) {
 			conditions.add('(' + clause + ')');
@@ -338,9 +318,7 @@ public with sharing class RollupPreviewRows {
 		if (counted.containsAll(ids) || String.isBlank(definition.Filter_JSON__c)) {
 			return failed;
 		}
-		Map<String, Object> document = (Map<String, Object>) JSON.deserializeUntyped(
-			definition.Filter_JSON__c
-		);
+		Map<String, Object> document = (Map<String, Object>) JSON.deserializeUntyped(definition.Filter_JSON__c);
 		List<Object> conditions = (List<Object>) document.get('conditions');
 		if (conditions == null) {
 			return failed;
@@ -352,9 +330,7 @@ public with sharing class RollupPreviewRows {
 				break;
 			}
 			Object conditionId = ((Map<String, Object>) condition).get('id');
-			String conditionNumber = conditionId == null
-				? String.valueOf(position)
-				: String.valueOf(conditionId);
+			String conditionNumber = conditionId == null ? String.valueOf(position) : String.valueOf(conditionId);
 			String clause = RollupFilterParser.toWhereClause(
 				JSON.serialize(
 					new Map<String, Object>{
@@ -385,15 +361,9 @@ public with sharing class RollupPreviewRows {
 		List<String> failed
 	) {
 		if (failed != null && !failed.isEmpty()) {
-			return String.format(
-				Label.Rollups_RollupEase_RowFails,
-				new List<String>{ String.join(failed, ', ') }
-			);
+			return String.format(Label.Rollups_RollupEase_RowFails, new List<String>{ String.join(failed, ', ') });
 		}
-		if (
-			query.kind == RollupPlanner.KIND_ORDERED &&
-			RollupAggregator.valueAt(row, query.orderBy) == null
-		) {
+		if (query.kind == RollupPlanner.KIND_ORDERED && RollupAggregator.valueAt(row, query.orderBy) == null) {
 			return String.format(
 				Label.Rollups_RollupEase_RowNoOrder,
 				new List<String>{ fieldLabel(sourceType, query.orderBy) }
@@ -414,9 +384,7 @@ public with sharing class RollupPreviewRows {
 	@TestVisible
 	private static String nameFieldOf(Schema.SObjectType objectType) {
 		for (
-			Schema.SObjectField field : objectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-				.fields.getMap()
-				.values()
+			Schema.SObjectField field : objectType.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap().values()
 		) {
 			Schema.DescribeFieldResult described = field.getDescribe();
 			if (described.isNameField() && described.isAccessible()) {
@@ -432,8 +400,6 @@ public with sharing class RollupPreviewRows {
 
 	private static String nameOf(SObject record, String nameField) {
 		Object name = record.get(nameField);
-		return name == null || String.isBlank(String.valueOf(name))
-			? String.valueOf(record.Id)
-			: String.valueOf(name);
+		return name == null || String.isBlank(String.valueOf(name)) ? String.valueOf(record.Id) : String.valueOf(name);
 	}
 }

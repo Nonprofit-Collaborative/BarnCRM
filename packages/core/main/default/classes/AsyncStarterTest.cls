@@ -59,11 +59,7 @@ private class AsyncStarterTest {
 					WHERE Context__c = 'AsyncStarterTest'
 				][0]
 				.get('total');
-			Assert.areEqual(
-				2,
-				refusals.intValue(),
-				'One count per refusal, none for the caller logging it again'
-			);
+			Assert.areEqual(2, refusals.intValue(), 'One count per refusal, none for the caller logging it again');
 		}
 	}
 
@@ -76,8 +72,7 @@ private class AsyncStarterTest {
 	static void aRefusalThatIsNotABusyOrgKeepsItsRealMessage() {
 		System.runAs(TestUsers.admin()) {
 			String notAllowed =
-				'Database.executeBatch cannot be called from a batch start, batch execute, ' +
-				'or future method.';
+				'Database.executeBatch cannot be called from a batch start, batch execute, ' + 'or future method.';
 			AsyncStarter.refusalForTest = new AsyncException(notAllowed);
 			Exception batchThrown;
 			Exception queueThrown;

@@ -371,7 +371,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 ## T-HC-22: Report Subscriptions
 
 **Purpose:** Confirm BarnCRM's reports are listed, a subscription is created for the person through the org connection, a second save updates it, and a missing connection is explained.
-**Prerequisites:** admin with **BarnCRM Metadata Admin**, Customize Application, Modify Metadata and Salesforce's Subscribe to Reports; Giving installed for its reports. For step 1 the org connection is not set up; from step 2 it is set up and connected (see [Creating a New Field From an Import](../admin-guide/import-new-fields.md)). Fewer than 7 report subscriptions of your own.
+**Prerequisites:** admin with **BarnCRM Metadata Admin**, Customize Application, Modify Metadata and Salesforce's Subscribe to Reports; Fundraising installed for its reports. For step 1 the org connection is not set up; from step 2 it is set up and connected (see [Creating a New Field From an Import](../admin-guide/import-new-fields.md)). Fewer than 7 report subscriptions of your own.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -387,7 +387,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 ## T-HC-23: Skew Findings and a Report That Stops Early
 
 **Purpose:** Confirm Health Check reports a fund with very many gifts, and that a run near Salesforce's limits reports the checks it left instead of failing.
-**Prerequisites:** admin with BarnCRM Admin; Giving installed; a test fund you may change. Workbench or the Developer Console to set a field the page does not show.
+**Prerequisites:** admin with BarnCRM Admin; Fundraising installed; a test fund you may change. Workbench or the Developer Console to set a field the page does not show.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -395,6 +395,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 2 | Set **Gift Count** back to what it was and **Run Again**. | The finding is gone. |
 | 3 | In an org where one user with a role owns more than 10,000 households or gifts (a large sandbox), run Health Check. | **One User Owns Too Many Accounts** (or **Gifts**), a warning, names that user. |
 | 4 | In a large sandbox where Health Check takes many seconds, run it. | Either every finding, or the findings that ran plus **Not Checked, Run Again** naming the checks it left. The page never shows a load failure. |
+| 5 | When step 4 shows **Not Checked, Run Again**, click **Run Remaining Checks** (next to **Run Again**). | Only the checks it named run. Their findings join the same report, the **Not Checked** warning is gone (or names only what is still left, with the button again), and the org shape card is unchanged. With every check run, the button is not shown. |
+| 6 | In an org where every check runs (a small one), run Health Check. | No **Run Remaining Checks** button. |
 
 **Cleanup:** Put the test fund's Gift Count back.
 
@@ -408,5 +410,17 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | In **Debug**, **Open Execute Anonymous Window**, run `List<String> m = new List<String>(); List<Id> ids = new List<Id>(); for (User u : [SELECT Id FROM User LIMIT 20]) { m.add('QA repeat test'); ids.add(u.Id); } ErrorLogger.logMessages(m, ids, 'QA', 'Warning');` | It runs without an error. |
 | 2 | Open the **Error Log** tab, **New Errors**. | One **QA** entry, not one per user. Opened, **Occurrences** reads the number of users found (up to 20), **Record Reference** names the first user and **Other Records** lists up to ten more. |
 | 3 | Mark the entry **Acknowledged** and run step 1 again. | A second **QA** entry with its own count; the acknowledged one keeps its count. |
+
+**Cleanup:** Delete the two test entries.
+
+## T-HC-25: Different Failures With One Message Are Separate Entries
+
+**Purpose:** Confirm two failures that show the same message but differ in exception type or code line get their own Error Log entries, while a repeat of one is still counted (D-208).
+**Prerequisites:** admin; the Developer Console (in an org where BarnCRM is installed from a package, put the namespace prefix before `ErrorLogger`).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In **Execute Anonymous**, run `for (Integer i = 0; i < 3; i++) { try { Integer x = null; x++; } catch (Exception e) { ErrorLogger.logWithMessage(e, 'QA', 'QA same message'); } } try { insert new Account(); } catch (Exception e) { ErrorLogger.logWithMessage(e, 'QA', 'QA same message'); }` | It runs without an error. |
+| 2 | Open the **Error Log** tab, **New Errors**. | Two **QA** entries, both reading `QA same message`: one with **Occurrences** 3 (its Technical Detail names a NullPointerException) and one with 1 (a DmlException). |
 
 **Cleanup:** Delete the two test entries.

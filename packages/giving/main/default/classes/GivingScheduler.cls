@@ -18,10 +18,10 @@
  */
 public with sharing class GivingScheduler {
 	/** The names the jobs were scheduled under, now their step keys. */
-	public static final String TOP_UP_JOB_NAME = 'BarnCRM Giving Installment Top Up';
-	public static final String OVERDUE_JOB_NAME = 'BarnCRM Giving Installments Overdue';
-	public static final String LEVELS_JOB_NAME = 'BarnCRM Giving Donor Levels';
-	public static final String ASK_JOB_NAME = 'BarnCRM Giving Ask Reminders';
+	public static final String TOP_UP_JOB_NAME = 'BarnCRM Fundraising Installment Top Up';
+	public static final String OVERDUE_JOB_NAME = 'BarnCRM Fundraising Installments Overdue';
+	public static final String LEVELS_JOB_NAME = 'BarnCRM Fundraising Donor Levels';
+	public static final String ASK_JOB_NAME = 'BarnCRM Fundraising Ask Reminders';
 	public static final String PLEDGE_JOB_NAME = PledgeReminderScheduler.JOB_NAME;
 
 	/**
@@ -63,9 +63,7 @@ public with sharing class GivingScheduler {
 					new DonorLevelSchedulable()
 				)
 				.withSwitch(true),
-			PledgeReminderScheduler.step()
-				.withSummary(settings.Pledge_Reminders_Last_Run_Summary__c)
-				.runnableNow(),
+			PledgeReminderScheduler.step().withSummary(settings.Pledge_Reminders_Last_Run_Summary__c).runnableNow(),
 			new NightlyStep(
 					ASK_JOB_NAME,
 					System.Label.Giving_NightlyJobs_AskRemindersName,

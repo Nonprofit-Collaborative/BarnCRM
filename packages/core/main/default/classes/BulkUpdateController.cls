@@ -124,10 +124,7 @@ public with sharing class BulkUpdateController {
 
 	/** The fields whose values may be copied into one target. */
 	@AuraEnabled(cacheable=true)
-	public static List<QueryFieldCatalog.PicklistOption> getCopySources(
-		String objectName,
-		String fieldName
-	) {
+	public static List<QueryFieldCatalog.PicklistOption> getCopySources(String objectName, String fieldName) {
 		try {
 			requirePermission();
 			return BulkUpdateFields.copySources(objectName, fieldName);
@@ -178,9 +175,7 @@ public with sharing class BulkUpdateController {
 	public static MatchCount countMatches(String queryJson) {
 		try {
 			requirePermission();
-			Schema.SObjectType type = BulkUpdateFields.writableObject(
-				QueryCompiler.parse(queryJson).objectName
-			);
+			Schema.SObjectType type = BulkUpdateFields.writableObject(QueryCompiler.parse(queryJson).objectName);
 			MatchCount result = new MatchCount();
 			result.runLimit = BulkUpdateService.runLimit();
 			result.count = DataJobs.countWithin(queryJson, result.runLimit, COUNT_MARGIN);
@@ -216,10 +211,7 @@ public with sharing class BulkUpdateController {
 
 	/** Saves the page's object, filter and changes as a new named list (C-50f1). */
 	@AuraEnabled
-	public static SavedTransformService.SavedList saveSavedList(
-		String name,
-		String definitionJson
-	) {
+	public static SavedTransformService.SavedList saveSavedList(String name, String definitionJson) {
 		try {
 			requirePermission();
 			return SavedTransformService.save(name, definitionJson);
@@ -258,11 +250,7 @@ public with sharing class BulkUpdateController {
 	public static BulkUpdateService.Preview previewSample(String queryJson, String changesJson) {
 		try {
 			requirePermission();
-			return BulkUpdateService.preview(
-				queryJson,
-				changesJson,
-				BulkUpdateService.MAX_SAMPLE_SIZE
-			);
+			return BulkUpdateService.preview(queryJson, changesJson, BulkUpdateService.MAX_SAMPLE_SIZE);
 		} catch (Exception caught) {
 			throw ERRORS.wrap(caught, 'Super Transformer preview');
 		}
@@ -284,11 +272,7 @@ public with sharing class BulkUpdateController {
 	public static JobView start(String queryJson, String changesJson, Integer confirmedCount) {
 		try {
 			requirePermission();
-			Import_Batch__c started = BulkUpdateService.start(
-				queryJson,
-				changesJson,
-				confirmedCount
-			);
+			Import_Batch__c started = BulkUpdateService.start(queryJson, changesJson, confirmedCount);
 			return toView(requireJob(started.Id), true);
 		} catch (Exception caught) {
 			throw ERRORS.wrap(caught, 'Start a bulk update');
@@ -345,22 +329,14 @@ public with sharing class BulkUpdateController {
 
 	private static void requirePermission() {
 		if (!hasPermission()) {
-			throw new BulkUpdateFields.BulkUpdateException(
-				BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoPermission')
-			);
+			throw new BulkUpdateFields.BulkUpdateException(BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoPermission'));
 		}
 	}
 
 	private static Import_Batch__c requireJob(String jobId) {
-		Import_Batch__c found = DataJobs.find(
-			JOB_FIELDS,
-			BulkUpdateService.OPERATION_UPDATE,
-			jobId
-		);
+		Import_Batch__c found = DataJobs.find(JOB_FIELDS, BulkUpdateService.OPERATION_UPDATE, jobId);
 		if (found == null) {
-			throw new BulkUpdateFields.BulkUpdateException(
-				BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNotBulkUpdate')
-			);
+			throw new BulkUpdateFields.BulkUpdateException(BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNotBulkUpdate'));
 		}
 		return found;
 	}
@@ -391,21 +367,15 @@ public with sharing class BulkUpdateController {
 			view.updatesToUndo = undoPreview.updates;
 		}
 		view.objectLabel = objectLabel(job.Operation_JSON__c);
-		view.failures = detail && view.failed > 0
-			? DataJobs.failures(job.Id)
-			: new List<DataJobs.Failure>();
+		view.failures = detail && view.failed > 0 ? DataJobs.failures(job.Id) : new List<DataJobs.Failure>();
 		return view;
 	}
 
 	/** The plural label of the object a job's definition names, or its name if gone. */
 	private static String objectLabel(String definitionJson) {
 		try {
-			Map<String, Object> definition = (Map<String, Object>) JSON.deserializeUntyped(
-				definitionJson
-			);
-			String objectName = String.valueOf(
-				((Map<String, Object>) definition.get('query')).get('object')
-			);
+			Map<String, Object> definition = (Map<String, Object>) JSON.deserializeUntyped(definitionJson);
+			String objectName = String.valueOf(((Map<String, Object>) definition.get('query')).get('object'));
 			try {
 				return QueryFieldCatalog.describeObject(objectName).getLabelPlural();
 			} catch (QueryFieldCatalog.QueryFieldCatalogException gone) {

@@ -37,13 +37,7 @@ public with sharing class ErrorDigestScheduler implements Schedulable {
 	 * steps, so a failure in any of them is in the digest read with the morning coffee.
 	 */
 	public static NightlyStep step() {
-		return new NightlyStep(
-				JOB_NAME,
-				System.Label.Core_HealthCheck_JobErrorDigest,
-				7,
-				0,
-				new ErrorDigestScheduler()
-			)
+		return new NightlyStep(JOB_NAME, System.Label.Core_HealthCheck_JobErrorDigest, 7, 0, new ErrorDigestScheduler())
 			.withSwitch(true);
 	}
 

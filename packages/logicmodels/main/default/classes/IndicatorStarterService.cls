@@ -13,11 +13,7 @@ public with sharing class IndicatorStarterService {
 	private static final Integer CHOICE_LIMIT = 500;
 	private static final Integer NAME_LIMIT = 80;
 	private static final List<Object> NOT_ABSENT = new List<Object>{
-		new Map<String, Object>{
-			'field' => 'Attendance__c',
-			'operator' => 'not equals',
-			'value' => 'Excused Absence'
-		},
+		new Map<String, Object>{ 'field' => 'Attendance__c', 'operator' => 'not equals', 'value' => 'Excused Absence' },
 		new Map<String, Object>{
 			'field' => 'Attendance__c',
 			'operator' => 'not equals',
@@ -78,22 +74,14 @@ public with sharing class IndicatorStarterService {
 			.measuring('Hours__c')
 			.filtered(
 				new List<Object>{
-					new Map<String, Object>{
-						'field' => 'Status__c',
-						'operator' => 'equals',
-						'value' => 'Approved'
-					}
+					new Map<String, Object>{ 'field' => 'Status__c', 'operator' => 'equals', 'value' => 'Approved' }
 				}
 			)
 			.asking('Volunteer_Job__c', 'Volunteer_Job__c', false),
 		new Starter('grantsAwarded', 'Grant__c', 'Decision_Date__c', 'count')
 			.filtered(
 				new List<Object>{
-					new Map<String, Object>{
-						'field' => 'Stage__c',
-						'operator' => 'equals',
-						'value' => 'Awarded'
-					}
+					new Map<String, Object>{ 'field' => 'Stage__c', 'operator' => 'equals', 'value' => 'Awarded' }
 				}
 			)
 			.asking('Program__c', 'Program_Id__c', false)
@@ -157,10 +145,7 @@ public with sharing class IndicatorStarterService {
 			)
 		) {
 			options.add(
-				new Map<String, String>{
-					'value' => (String) record.Id,
-					'label' => (String) record.get('Name')
-				}
+				new Map<String, String>{ 'value' => (String) record.Id, 'label' => (String) record.get('Name') }
 			);
 		}
 		return options;
@@ -176,11 +161,7 @@ public with sharing class IndicatorStarterService {
 	 * @param queryName the saved query's name, as the person reads the starter
 	 * @return id-less source fields: source, queryId, dateField, function, field
 	 */
-	public static Map<String, Object> createQuery(
-		String starterKey,
-		String choiceId,
-		String queryName
-	) {
+	public static Map<String, Object> createQuery(String starterKey, String choiceId, String queryName) {
 		Starter starter = starterFor(starterKey);
 		Schema.SObjectType target = readable(starter.objectName);
 		if (target == null) {
@@ -221,12 +202,8 @@ public with sharing class IndicatorStarterService {
 		);
 		// Compiled as the person first: an object or field they cannot read is refused (R-IN4).
 		IndicatorSourceService.compile(document);
-		if (
-			!Saved_Query__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isCreateable()
-		) {
-			throw new LogicModelService.BuilderException(
-				BarnHelp.text('LogicModels', 'LogicModels_Starter_NoFind')
-			);
+		if (!Saved_Query__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isCreateable()) {
+			throw new LogicModelService.BuilderException(BarnHelp.text('LogicModels', 'LogicModels_Starter_NoFind'));
 		}
 		String name = String.isBlank(queryName) ? starter.key : queryName.trim();
 		Saved_Query__c query = new Saved_Query__c(
@@ -264,11 +241,7 @@ public with sharing class IndicatorStarterService {
 			type.getDescribe(SObjectDescribeOptions.DEFERRED).getName() +
 			' WHERE Id = :recordId';
 		if (
-			Database.queryWithBinds(
-					soql,
-					new Map<String, Object>{ 'recordId' => recordId },
-					AccessLevel.USER_MODE
-				)
+			Database.queryWithBinds(soql, new Map<String, Object>{ 'recordId' => recordId }, AccessLevel.USER_MODE)
 				.isEmpty()
 		) {
 			throw new LogicModelService.BuilderException(
@@ -284,25 +257,17 @@ public with sharing class IndicatorStarterService {
 				return starter;
 			}
 		}
-		throw new LogicModelService.BuilderException(
-			BarnHelp.text('LogicModels', 'LogicModels_Starter_Unavailable')
-		);
+		throw new LogicModelService.BuilderException(BarnHelp.text('LogicModels', 'LogicModels_Starter_Unavailable'));
 	}
 
 	/** A packaged object the person can read, or null. */
 	private static Schema.SObjectType readable(String objectName) {
-		Schema.SObjectType type = String.isBlank(objectName)
-			? null
-			: NamespaceUtil.packagedObjectType(objectName);
-		return type != null && type.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()
-			? type
-			: null;
+		Schema.SObjectType type = String.isBlank(objectName) ? null : NamespaceUtil.packagedObjectType(objectName);
+		return type != null && type.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible() ? type : null;
 	}
 
 	/** A custom field's API name with whatever prefix the org needs; standard names as they are. */
 	private static String qualified(String fieldName) {
-		return fieldName != null && fieldName.endsWith('__c')
-			? NamespaceUtil.qualify(fieldName)
-			: fieldName;
+		return fieldName != null && fieldName.endsWith('__c') ? NamespaceUtil.qualify(fieldName) : fieldName;
 	}
 }

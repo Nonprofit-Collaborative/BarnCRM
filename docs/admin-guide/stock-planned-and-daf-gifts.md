@@ -18,16 +18,16 @@ levels and scores as before. The fields describe the gift; nothing reads them fo
 accounting export or the posting lock.
 
 They are on the gift page (**Details** tab, **Gift** section), on the standard New and Edit
-form, and in the **Gifts** report type. Giving Admin and Giving Staff edit them; Giving Read
+form, and in the **Gifts** report type. Fundraising Admin and Fundraising Staff Access edit them; Fundraising Read
 Only sees them.
 
 ## How to Turn It On
 
-Nothing to turn on: the fields and the report come with the Giving module.
+Nothing to turn on: the fields and the report come with the Fundraising module.
 
 ## The DAF and Stock Gifts Report
 
-**DAF and Stock Gifts This Year**, in the **BarnCRM Giving** report folder, lists this year's
+**DAF and Stock Gifts This Year**, in the **BarnCRM Fundraising** report folder, lists this year's
 gifts that came through a donor-advised fund or were gifts of stock, with the sponsor, the
 symbol and shares, and the total. Pending and Cancelled gifts are left out. Change the date
 filter or add **Planned Gift Type** to make your own planned giving report.

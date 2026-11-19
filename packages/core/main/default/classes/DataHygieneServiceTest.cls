@@ -77,10 +77,7 @@ private class DataHygieneServiceTest {
 			User maria = maria();
 
 			Test.startTest();
-			DataHygieneService.CheckResult result = runAs(
-				maria,
-				DataHygieneService.PEOPLE_WITHOUT_HOUSEHOLD
-			);
+			DataHygieneService.CheckResult result = runAs(maria, DataHygieneService.PEOPLE_WITHOUT_HOUSEHOLD);
 			Integer listed = findRows(maria, DataHygieneService.PEOPLE_WITHOUT_HOUSEHOLD);
 			Test.stopTest();
 
@@ -105,15 +102,12 @@ private class DataHygieneServiceTest {
 			insert new Household_Member__c(
 				Household__c = household.Id,
 				Contact__c = former.Id,
-				Start_Date__c = Date.today().addYears(-3),
-				End_Date__c = Date.today().addYears(-1)
+				Start_Date__c = OrgDate.today().addYears(-3),
+				End_Date__c = OrgDate.today().addYears(-1)
 			);
 			User maria = maria();
 
-			DataHygieneService.CheckResult result = runAs(
-				maria,
-				DataHygieneService.PEOPLE_WITHOUT_HOUSEHOLD
-			);
+			DataHygieneService.CheckResult result = runAs(maria, DataHygieneService.PEOPLE_WITHOUT_HOUSEHOLD);
 			Integer listed = findRows(maria, DataHygieneService.PEOPLE_WITHOUT_HOUSEHOLD);
 
 			Assert.isNull(result.errorMessage, 'The check runs: ' + result.errorMessage);
@@ -141,15 +135,10 @@ private class DataHygieneServiceTest {
 				standIns.add(newOrganization('Stand-in ' + index));
 			}
 			insert standIns;
-			OrgShapeDetector.overrideShape.personAccountRecordTypeIds = new Set<Id>{
-				standIns[0].RecordTypeId
-			};
+			OrgShapeDetector.overrideShape.personAccountRecordTypeIds = new Set<Id>{ standIns[0].RecordTypeId };
 			insertWithoutAutomaticHouseholds(HouseholdTestDataFactory.manyContacts(3, 'Loose'));
 
-			DataHygieneService.CheckResult result = runAs(
-				maria(),
-				DataHygieneService.PEOPLE_WITHOUT_HOUSEHOLD
-			);
+			DataHygieneService.CheckResult result = runAs(maria(), DataHygieneService.PEOPLE_WITHOUT_HOUSEHOLD);
 
 			Assert.isNull(result.errorMessage, 'The check runs: ' + result.errorMessage);
 			Assert.areEqual(203, result.count, 'Three contacts and 200 people kept as accounts.');
@@ -182,10 +171,7 @@ private class DataHygieneServiceTest {
 			User maria = maria();
 
 			Test.startTest();
-			DataHygieneService.CheckResult result = runAs(
-				maria,
-				DataHygieneService.HOUSEHOLDS_WITHOUT_MEMBERS
-			);
+			DataHygieneService.CheckResult result = runAs(maria, DataHygieneService.HOUSEHOLDS_WITHOUT_MEMBERS);
 			Integer listed = findRows(maria, DataHygieneService.HOUSEHOLDS_WITHOUT_MEMBERS);
 			Test.stopTest();
 
@@ -203,14 +189,10 @@ private class DataHygieneServiceTest {
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
 			// A membership is saved naming a person (R-M4); it comes to name nobody when that
 			// person is deleted with the household automation off, which is how it happens.
-			List<Contact> gone = insertWithoutAutomaticHouseholds(
-				HouseholdTestDataFactory.manyContacts(200, 'Gone')
-			);
+			List<Contact> gone = insertWithoutAutomaticHouseholds(HouseholdTestDataFactory.manyContacts(200, 'Gone'));
 			List<Household_Member__c> rows = new List<Household_Member__c>();
 			for (Contact goner : gone) {
-				rows.add(
-					new Household_Member__c(Household__c = household.Id, Contact__c = goner.Id)
-				);
+				rows.add(new Household_Member__c(Household__c = household.Id, Contact__c = goner.Id));
 			}
 			Contact person = HouseholdTestDataFactory.newContact('Eve', 'Named');
 			insertWithoutAutomaticHouseholds(new List<Contact>{ person });
@@ -221,10 +203,7 @@ private class DataHygieneServiceTest {
 			AutomationControl.clearBypass('ContactTriggerHandler');
 			User maria = maria();
 
-			DataHygieneService.CheckResult result = runAs(
-				maria,
-				DataHygieneService.MEMBERSHIPS_WITHOUT_PERSON
-			);
+			DataHygieneService.CheckResult result = runAs(maria, DataHygieneService.MEMBERSHIPS_WITHOUT_PERSON);
 
 			Assert.isNull(result.errorMessage, 'The check runs: ' + result.errorMessage);
 			Assert.areEqual(200, result.count, 'The row that names a person is not counted.');
@@ -240,35 +219,19 @@ private class DataHygieneServiceTest {
 			insert new List<Account>{ gone, kept };
 			List<Address__c> addresses = new List<Address__c>();
 			for (Integer index = 0; index < 200; index++) {
-				addresses.add(
-					new Address__c(
-						Account__c = gone.Id,
-						Type__c = 'Other',
-						City__c = 'Town ' + index
-					)
-				);
+				addresses.add(new Address__c(Account__c = gone.Id, Type__c = 'Other', City__c = 'Town ' + index));
 			}
 			addresses.add(new Address__c(Account__c = kept.Id, Type__c = 'Work', City__c = 'Kept'));
 			insert addresses;
 			// Orphans exist only when the org keeps the addresses of a deleted record (D-184).
-			SettingsService.saveSystemValue(
-				'Address_Delete_Behavior__c',
-				AddressDeleteHandler.KEEP
-			);
+			SettingsService.saveSystemValue('Address_Delete_Behavior__c', AddressDeleteHandler.KEEP);
 			delete gone;
 			User maria = maria();
 
-			DataHygieneService.CheckResult result = runAs(
-				maria,
-				DataHygieneService.ADDRESSES_WITHOUT_OWNER
-			);
+			DataHygieneService.CheckResult result = runAs(maria, DataHygieneService.ADDRESSES_WITHOUT_OWNER);
 
 			Assert.isNull(result.errorMessage, 'The check runs: ' + result.errorMessage);
-			Assert.areEqual(
-				200,
-				result.count,
-				'The address that still has an owner is not counted.'
-			);
+			Assert.areEqual(200, result.count, 'The address that still has an owner is not counted.');
 		}
 	}
 
@@ -324,10 +287,7 @@ private class DataHygieneServiceTest {
 			User maria = maria();
 
 			Test.startTest();
-			DataHygieneService.CheckResult result = runAs(
-				maria,
-				DataHygieneService.DEFAULT_ADDRESSES_INCOMPLETE
-			);
+			DataHygieneService.CheckResult result = runAs(maria, DataHygieneService.DEFAULT_ADDRESSES_INCOMPLETE);
 			Integer listed = findRows(maria, DataHygieneService.DEFAULT_ADDRESSES_INCOMPLETE);
 			Test.stopTest();
 
@@ -369,10 +329,7 @@ private class DataHygieneServiceTest {
 			};
 			User maria = maria();
 
-			DataHygieneService.CheckResult result = runAs(
-				maria,
-				DataHygieneService.DEFAULT_ADDRESSES_FAILED
-			);
+			DataHygieneService.CheckResult result = runAs(maria, DataHygieneService.DEFAULT_ADDRESSES_FAILED);
 
 			Assert.isNull(result.errorMessage, 'The check runs: ' + result.errorMessage);
 			Assert.areEqual(1, result.count, 'Only the default address that failed.');
@@ -401,19 +358,11 @@ private class DataHygieneServiceTest {
 					City__c = 'Old',
 					Status__c = 'Undeliverable'
 				),
-				new Address__c(
-					Account__c = second.Id,
-					Type__c = 'Home',
-					Is_Default__c = true,
-					City__c = 'Springfield'
-				)
+				new Address__c(Account__c = second.Id, Type__c = 'Home', Is_Default__c = true, City__c = 'Springfield')
 			};
 			User maria = maria();
 
-			DataHygieneService.CheckResult result = runAs(
-				maria,
-				DataHygieneService.DEFAULT_ADDRESSES_UNDELIVERABLE
-			);
+			DataHygieneService.CheckResult result = runAs(maria, DataHygieneService.DEFAULT_ADDRESSES_UNDELIVERABLE);
 
 			Assert.isNull(result.errorMessage, 'The check runs: ' + result.errorMessage);
 			Assert.areEqual(1, result.count, 'Only the primary address marked Undeliverable.');
@@ -439,11 +388,7 @@ private class DataHygieneServiceTest {
 
 			Assert.areEqual(DataHygieneService.CHECK_KEYS.size(), results.size(), 'Every check.');
 			for (Integer index = 0; index < results.size(); index++) {
-				Assert.areEqual(
-					DataHygieneService.CHECK_KEYS[index],
-					results[index].key,
-					'In order.'
-				);
+				Assert.areEqual(DataHygieneService.CHECK_KEYS[index], results[index].key, 'In order.');
 				Assert.isNull(results[index].errorMessage, results[index].key + ' runs.');
 				Assert.areEqual(0, results[index].count, results[index].key + ' finds nothing.');
 				Assert.isFalse(String.isBlank(results[index].title), 'Each has a title.');
@@ -457,23 +402,14 @@ private class DataHygieneServiceTest {
 		System.runAs(TestUsers.admin()) {
 			mode(HouseholdTestDataFactory.MODE_CONTACT);
 			User maria = maria();
-			DataHygieneService.CheckResult platformOnly = runAs(
-				maria,
-				DataHygieneService.HOUSEHOLDS_WITHOUT_MEMBERS
-			);
+			DataHygieneService.CheckResult platformOnly = runAs(maria, DataHygieneService.HOUSEHOLDS_WITHOUT_MEMBERS);
 			OrgShapeDetector.OrgShape nativeShape = new OrgShapeDetector.OrgShape();
 			nativeShape.hasNativeHouseholdGroups = true;
 			OrgShapeDetector.overrideShape = nativeShape;
 
 			Test.startTest();
-			DataHygieneService.CheckResult withNative = runAs(
-				maria,
-				DataHygieneService.HOUSEHOLDS_WITHOUT_MEMBERS
-			);
-			DataHygieneService.CheckResult otherCheck = runAs(
-				maria,
-				DataHygieneService.MEMBERSHIPS_WITHOUT_PERSON
-			);
+			DataHygieneService.CheckResult withNative = runAs(maria, DataHygieneService.HOUSEHOLDS_WITHOUT_MEMBERS);
+			DataHygieneService.CheckResult otherCheck = runAs(maria, DataHygieneService.MEMBERSHIPS_WITHOUT_PERSON);
 			Test.stopTest();
 
 			Assert.isNull(platformOnly.note, 'No note where there are no native households.');
@@ -491,10 +427,7 @@ private class DataHygieneServiceTest {
 	static void aCheckOnAnObjectThePersonCannotSeeSaysSoInsteadOfANumber() {
 		System.runAs(TestUsers.admin()) {
 			mode(HouseholdTestDataFactory.MODE_CONTACT);
-			User david = TestDataFactory.createUser(
-				'David',
-				new List<String>{ 'BarnCRM_Find_And_Export' }
-			);
+			User david = TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Find_And_Export' });
 
 			DataHygieneService.CheckResult result;
 			Boolean canSeeAddresses;
@@ -536,9 +469,7 @@ private class DataHygieneServiceTest {
 		System.runAs(TestUsers.admin()) {
 			mode(HouseholdTestDataFactory.MODE_CONTACT);
 			for (String key : DataHygieneService.CHECK_KEYS) {
-				QueryCompiler.QueryDocument parsed = QueryCompiler.parse(
-					DataHygieneService.queryDocument(key)
-				);
+				QueryCompiler.QueryDocument parsed = QueryCompiler.parse(DataHygieneService.queryDocument(key));
 				Assert.isFalse(parsed.fields.isEmpty(), key + ' has columns.');
 				Assert.areEqual('CreatedDate', parsed.orderField, key + ' lists oldest first.');
 				Assert.isTrue(
@@ -567,10 +498,7 @@ private class DataHygieneServiceTest {
 			User maria = maria();
 
 			Test.startTest();
-			DataHygieneService.CheckResult result = runAs(
-				maria,
-				DataHygieneService.PEOPLE_UNREACHABLE
-			);
+			DataHygieneService.CheckResult result = runAs(maria, DataHygieneService.PEOPLE_UNREACHABLE);
 			Integer listed = findRows(maria, DataHygieneService.PEOPLE_UNREACHABLE);
 			Test.stopTest();
 
@@ -601,10 +529,7 @@ private class DataHygieneServiceTest {
 			User maria = maria();
 
 			Test.startTest();
-			DataHygieneService.CheckResult result = runAs(
-				maria,
-				DataHygieneService.DECEASED_STILL_EMAILED
-			);
+			DataHygieneService.CheckResult result = runAs(maria, DataHygieneService.DECEASED_STILL_EMAILED);
 			Integer listed = findRows(maria, DataHygieneService.DECEASED_STILL_EMAILED);
 			Test.stopTest();
 
@@ -636,10 +561,7 @@ private class DataHygieneServiceTest {
 			User maria = maria();
 
 			Test.startTest();
-			DataHygieneService.CheckResult result = runAs(
-				maria,
-				DataHygieneService.PEOPLE_NOT_UPDATED
-			);
+			DataHygieneService.CheckResult result = runAs(maria, DataHygieneService.PEOPLE_NOT_UPDATED);
 			Test.stopTest();
 
 			Assert.isNull(result.errorMessage, 'The check runs: ' + result.errorMessage);

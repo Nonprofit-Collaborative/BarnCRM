@@ -113,10 +113,7 @@ public with sharing class GrantManagementController {
 						document.put('fileId', link.ContentDocumentId);
 						document.put('fileTitle', link.ContentDocument.Title);
 						document.put('fileExtension', link.ContentDocument.FileExtension);
-						document.put(
-							'fileVersion',
-							link.ContentDocument.LatestPublishedVersion?.VersionNumber
-						);
+						document.put('fileVersion', link.ContentDocument.LatestPublishedVersion?.VersionNumber);
 						document.put('fileDate', link.ContentDocument.LastModifiedDate);
 					}
 				}

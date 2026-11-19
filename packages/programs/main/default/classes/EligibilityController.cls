@@ -8,11 +8,7 @@
  */
 public with sharing class EligibilityController {
 	private static final String CONTEXT = 'Eligibility rules panel';
-	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
-			CONTEXT,
-			'Programs',
-			'Programs_Fail_Elig'
-		)
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(CONTEXT, 'Programs', 'Programs_Fail_Elig')
 		.showingDml();
 	/** The most enrollments the preview lists, and the most one Screen run changes. */
 	public static final Integer MAX_SHOWN = 200;
@@ -112,10 +108,7 @@ public with sharing class EligibilityController {
 				Schema.SObjectType.Enrollment__c.fields.Eligibility_Reason__c.isUpdateable();
 			Map<String, Field> fields = ruleFields();
 			state.fields = fields.values();
-			for (
-				Schema.PicklistEntry entry : Enrollment__c.Eligibility_Basis__c.getDescribe()
-					.getPicklistValues()
-			) {
+			for (Schema.PicklistEntry entry : Enrollment__c.Eligibility_Basis__c.getDescribe().getPicklistValues()) {
 				if (entry.isActive()) {
 					state.bases.add(entry.getValue());
 				}
@@ -146,10 +139,7 @@ public with sharing class EligibilityController {
 			if (!problems.isEmpty()) {
 				return problems;
 			}
-			Database.update(
-				new Program__c(Id = programId, Eligibility_Rules__c = clean),
-				AccessLevel.USER_MODE
-			);
+			Database.update(new Program__c(Id = programId, Eligibility_Rules__c = clean), AccessLevel.USER_MODE);
 			return problems;
 		} catch (Exception failure) {
 			throw ERRORS.wrap(failure);
@@ -171,11 +161,7 @@ public with sharing class EligibilityController {
 				return summary;
 			}
 			Map<String, Field> fields = ruleFields();
-			List<Enrollment__c> candidates = openEnrollments(
-				programId,
-				enrollmentId,
-				MAX_SHOWN + 1
-			);
+			List<Enrollment__c> candidates = openEnrollments(programId, enrollmentId, MAX_SHOWN + 1);
 			summary.moreThanScreened = candidates.size() > MAX_SHOWN;
 			List<Enrollment__c> changes = new List<Enrollment__c>();
 			Date today = Date.today();
@@ -188,10 +174,7 @@ public with sharing class EligibilityController {
 					summary.skipped++;
 					continue;
 				}
-				EligibilityRules.Result result = EligibilityRules.evaluate(
-					rules,
-					valuesOf(enrollment, fields)
-				);
+				EligibilityRules.Result result = EligibilityRules.evaluate(rules, valuesOf(enrollment, fields));
 				if (result == null) {
 					summary.skipped++;
 					continue;
@@ -205,9 +188,7 @@ public with sharing class EligibilityController {
 					change.Eligibility_Basis__c = result.basis;
 				}
 				if (result.status != enrollment.Eligibility_Status__c) {
-					change.Eligibility_Date__c = result.status == EligibilityRules.REVIEW
-						? null
-						: today;
+					change.Eligibility_Date__c = result.status == EligibilityRules.REVIEW ? null : today;
 				}
 				changes.add(change);
 				if (result.status == EligibilityRules.ELIGIBLE) {
@@ -342,10 +323,7 @@ public with sharing class EligibilityController {
 	}
 
 	/** The intake values the rules read: text, number, Boolean, or a date as `yyyy-MM-dd`. */
-	private static Map<String, Object> valuesOf(
-		Enrollment__c enrollment,
-		Map<String, Field> fields
-	) {
+	private static Map<String, Object> valuesOf(Enrollment__c enrollment, Map<String, Field> fields) {
 		Map<String, Object> values = new Map<String, Object>();
 		for (Field field : fields.values()) {
 			// A person field is read through the Contact lookup, blank when there is no Contact.
@@ -371,8 +349,6 @@ public with sharing class EligibilityController {
 	}
 
 	private static String personName(Enrollment__c enrollment) {
-		return enrollment.Contact__r != null
-			? enrollment.Contact__r.Name
-			: enrollment.Account__r?.Name;
+		return enrollment.Contact__r != null ? enrollment.Contact__r.Name : enrollment.Account__r?.Name;
 	}
 }

@@ -91,9 +91,7 @@ public with sharing class IntegrationAppService {
 			info.key = row.DeveloperName;
 			info.name = String.isBlank(row.MasterLabel) ? row.DeveloperName : row.MasterLabel;
 			info.category = categoryOf(row);
-			info.status = STATUS_AVAILABLE.equalsIgnoreCase(row.Status__c)
-				? STATUS_AVAILABLE
-				: STATUS_IN_PROGRESS;
+			info.status = STATUS_AVAILABLE.equalsIgnoreCase(row.Status__c) ? STATUS_AVAILABLE : STATUS_IN_PROGRESS;
 			info.description = row.Description__c;
 			info.maintainer = row.Maintainer__c;
 			info.licenseCost = row.License_Cost__c;
@@ -113,13 +111,7 @@ public with sharing class IntegrationAppService {
 	/** The row's category, or Complement when it is blank or none of the three. */
 	@TestVisible
 	private static String categoryOf(Integration_App__mdt row) {
-		for (
-			String known : new List<String>{
-				CATEGORY_COMPLEMENT,
-				CATEGORY_IN_DEVELOPMENT,
-				CATEGORY_ALTERNATIVE
-			}
-		) {
+		for (String known : new List<String>{ CATEGORY_COMPLEMENT, CATEGORY_IN_DEVELOPMENT, CATEGORY_ALTERNATIVE }) {
 			if (known.equalsIgnoreCase((row.Category__c == null ? '' : row.Category__c).trim())) {
 				return known;
 			}

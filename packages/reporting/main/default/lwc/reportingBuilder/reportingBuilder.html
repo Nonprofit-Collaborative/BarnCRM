@@ -1,0 +1,445 @@
+<template>
+  <div class="builder" aria-busy={busy} data-id="builder">
+    <div class="slds-grid slds-wrap slds-grid_vertical-align-center slds-grid_align-spread slds-var-m-bottom_small">
+      <div class="slds-grid slds-grid_vertical-align-center">
+        <lightning-button-icon
+          icon-name="utility:back"
+          variant="border-filled"
+          alternative-text={labels.back}
+          title={labels.back}
+          onclick={handleBack}
+          class="slds-var-m-right_small"
+          data-id="back"
+        ></lightning-button-icon>
+        <h2 class="slds-text-heading_medium" data-id="heading">{heading}</h2>
+      </div>
+      <div class="slds-grid slds-wrap toolbar">
+        <lightning-button
+          variant="brand"
+          label={labels.run}
+          onclick={handleRun}
+          disabled={runDisabled}
+          data-id="run"
+        ></lightning-button>
+        <template lwc:if={forWidget}>
+          <lightning-button label={labels.done} onclick={handleDone} disabled={doneDisabled} data-id="done"></lightning-button>
+        </template>
+        <template lwc:if={canSave}>
+          <lightning-button label={labels.save} onclick={handleSave} disabled={busy} data-id="save"></lightning-button>
+        </template>
+        <template lwc:if={canSaveAs}>
+          <lightning-button label={labels.saveAs} onclick={handleSaveAs} disabled={busy} data-id="save-as"></lightning-button>
+        </template>
+        <template lwc:if={isOwner}>
+          <lightning-button label={labels.share} onclick={handleShare} disabled={busy} data-id="share"></lightning-button>
+          <lightning-button
+            variant="destructive-text"
+            label={labels.delete}
+            onclick={handleDelete}
+            disabled={busy}
+            data-id="delete"
+          ></lightning-button>
+        </template>
+      </div>
+    </div>
+
+    <template lwc:if={error}>
+      <c-barn-notice variant="error" message={error} class="slds-var-m-bottom_small" data-id="error"></c-barn-notice>
+    </template>
+    <template lwc:if={notice}>
+      <c-barn-notice variant="success" message={notice} class="slds-var-m-bottom_small" data-id="notice"></c-barn-notice>
+    </template>
+    <template lwc:if={ownerText}>
+      <p class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_x-small" data-id="owner">{ownerText}</p>
+    </template>
+    <template lwc:if={readOnly}>
+      <c-barn-notice variant="info" message={labels.readOnly} class="slds-var-m-bottom_small" data-id="read-only"></c-barn-notice>
+    </template>
+
+    <template lwc:if={sharingOpen}>
+      <c-reporting-share
+        title={report.title}
+        sharing={sharing}
+        onsave={handleShareSave}
+        oncancel={handleShareCancel}
+        class="slds-var-m-bottom_medium"
+        data-id="share-panel"
+      ></c-reporting-share>
+    </template>
+
+    <div class="slds-grid slds-wrap slds-gutters_small">
+      <div class="slds-col slds-size_1-of-1 slds-large-size_5-of-12">
+        <section class="part" data-id="basics">
+          <lightning-input label={labels.title} value={report.title} onchange={handleTitle} max-length="255" data-id="title"></lightning-input>
+          <lightning-combobox
+            label={labels.object}
+            options={objectOptions}
+            value={report.object}
+            onchange={handleObject}
+            required
+            data-id="object"
+          ></lightning-combobox>
+        </section>
+
+        <template lwc:if={hasObject}>
+          <template lwc:if={isList}>
+            <section class="part" data-id="columns">
+              <h3 class="slds-text-heading_small">{labels.columns}</h3>
+              <p class="slds-text-body_small slds-text-color_weak">{labels.columnsHelp}</p>
+              <ul class="slds-var-m-vertical_x-small">
+                <template for:each={columns} for:item="column">
+                  <li key={column.key} class="slds-grid slds-grid_vertical-align-center slds-var-p-vertical_xx-small item">
+                    <span class="slds-col slds-truncate" title={column.label}>{column.label}</span>
+                    <template lwc:if={column.isDate}>
+                      <lightning-input
+                        type="checkbox"
+                        label={labels.showAge}
+                        checked={column.asAge}
+                        data-index={column.index}
+                        onchange={handleColumnAge}
+                        class="slds-var-m-right_x-small"
+                      ></lightning-input>
+                    </template>
+                    <lightning-button-icon
+                      icon-name="utility:arrowup"
+                      variant="bare"
+                      alternative-text={column.upLabel}
+                      title={column.upLabel}
+                      disabled={column.first}
+                      data-index={column.index}
+                      data-step="up"
+                      onclick={handleColumnMove}
+                    ></lightning-button-icon>
+                    <lightning-button-icon
+                      icon-name="utility:arrowdown"
+                      variant="bare"
+                      alternative-text={column.downLabel}
+                      title={column.downLabel}
+                      disabled={column.last}
+                      data-index={column.index}
+                      data-step="down"
+                      onclick={handleColumnMove}
+                    ></lightning-button-icon>
+                    <lightning-button-icon
+                      icon-name="utility:close"
+                      variant="bare"
+                      alternative-text={column.removeLabel}
+                      title={column.removeLabel}
+                      data-index={column.index}
+                      onclick={handleColumnRemove}
+                      data-id="column-remove"
+                    ></lightning-button-icon>
+                  </li>
+                </template>
+              </ul>
+              <template lwc:if={canAddColumn}>
+                <c-reporting-field-picker
+                  label={labels.addColumn}
+                  object-api-name={report.object}
+                  kind="column"
+                  onchange={handleAddColumn}
+                  data-id="add-column"
+                ></c-reporting-field-picker>
+              </template>
+            </section>
+          </template>
+
+          <section class="part" data-id="filters">
+            <h3 class="slds-text-heading_small">{labels.filters}</h3>
+            <c-filter-builder object-api-name={report.object} value={filterJson} onchange={handleFilter} data-id="filter"></c-filter-builder>
+          </section>
+
+          <section class="part" data-id="dates">
+            <h3 class="slds-text-heading_small">{labels.dateRange}</h3>
+            <c-reporting-field-picker
+              label={labels.dateField}
+              object-api-name={report.object}
+              kind="date"
+              value={dateField}
+              onchange={handleDateField}
+              data-id="date-field"
+            ></c-reporting-field-picker>
+            <c-reporting-range label={labels.range} value={dateRange} allow-any onchange={handleDateRange} data-id="date-range"></c-reporting-range>
+          </section>
+
+          <template lwc:if={hasChildren}>
+            <section class="part" data-id="related">
+              <h3 class="slds-text-heading_small">{labels.related}</h3>
+              <p class="slds-text-body_small slds-text-color_weak">{labels.relatedHelp}</p>
+              <template for:each={related} for:item="entry">
+                <div key={entry.key} class="slds-box slds-box_x-small slds-var-m-vertical_x-small" data-id="related-entry">
+                  <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                      <lightning-combobox
+                        label={labels.relatedHas}
+                        options={hasOptions}
+                        value={entry.hasValue}
+                        data-index={entry.index}
+                        onchange={handleRelatedHas}
+                      ></lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-grow">
+                      <lightning-combobox
+                        label={labels.relatedKind}
+                        options={childOptions}
+                        value={entry.choice}
+                        data-index={entry.index}
+                        onchange={handleRelatedChild}
+                      ></lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-grow-none">
+                      <lightning-button-icon
+                        icon-name="utility:close"
+                        variant="bare"
+                        alternative-text={entry.removeLabel}
+                        title={entry.removeLabel}
+                        data-index={entry.index}
+                        onclick={handleRelatedRemove}
+                      ></lightning-button-icon>
+                    </div>
+                  </div>
+                  <c-filter-builder
+                    object-api-name={entry.object}
+                    value={entry.filterJson}
+                    data-index={entry.index}
+                    onchange={handleRelatedFilter}
+                  ></c-filter-builder>
+                </div>
+              </template>
+              <template lwc:if={canAddRelated}>
+                <lightning-button
+                  icon-name="utility:add"
+                  label={labels.addRelated}
+                  onclick={handleAddRelated}
+                  data-id="add-related"
+                ></lightning-button>
+              </template>
+            </section>
+          </template>
+
+          <section class="part" data-id="totals">
+            <h3 class="slds-text-heading_small">{labels.totals}</h3>
+            <p class="slds-text-body_small slds-text-color_weak">{labels.totalsHelp}</p>
+            <template for:each={groups} for:item="group">
+              <div key={group.key} class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end slds-var-m-vertical_x-small" data-id="group">
+                <div class="slds-col slds-grow">
+                  <p class="slds-form-element__label">{group.fieldLabel}</p>
+                  <p class="slds-truncate" title={group.label}>{group.label}</p>
+                </div>
+                <template lwc:if={group.isDate}>
+                  <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-3">
+                    <lightning-combobox
+                      label={labels.bucket}
+                      options={bucketOptions}
+                      value={group.bucketValue}
+                      data-index={group.index}
+                      onchange={handleBucket}
+                    ></lightning-combobox>
+                  </div>
+                </template>
+                <div class="slds-col slds-grow-none">
+                  <lightning-button-icon
+                    icon-name="utility:close"
+                    variant="bare"
+                    alternative-text={group.removeLabel}
+                    title={group.removeLabel}
+                    data-index={group.index}
+                    onclick={handleGroupRemove}
+                  ></lightning-button-icon>
+                </div>
+              </div>
+            </template>
+            <template lwc:if={canAddGroup}>
+              <c-reporting-field-picker
+                label={labels.addGroup}
+                object-api-name={report.object}
+                kind="group"
+                onchange={handleAddGroup}
+                data-id="add-group"
+              ></c-reporting-field-picker>
+            </template>
+            <template for:each={measures} for:item="measure">
+              <div key={measure.key} class="slds-box slds-box_x-small slds-var-m-vertical_x-small" data-id="measure">
+                <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
+                  <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                    <lightning-combobox
+                      label={labels.fn}
+                      options={functionOptions}
+                      value={measure.fn}
+                      data-index={measure.index}
+                      onchange={handleMeasureFn}
+                    ></lightning-combobox>
+                  </div>
+                  <div class="slds-col slds-grow">
+                    <lightning-input
+                      label={labels.measureLabel}
+                      value={measure.label}
+                      data-index={measure.index}
+                      onchange={handleMeasureLabel}
+                    ></lightning-input>
+                  </div>
+                  <div class="slds-col slds-grow-none">
+                    <lightning-button-icon
+                      icon-name="utility:close"
+                      variant="bare"
+                      alternative-text={measure.removeLabel}
+                      title={measure.removeLabel}
+                      data-index={measure.index}
+                      onclick={handleMeasureRemove}
+                    ></lightning-button-icon>
+                  </div>
+                </div>
+                <template lwc:if={measure.needsField}>
+                  <c-reporting-field-picker
+                    label={labels.field}
+                    object-api-name={report.object}
+                    kind={measure.pickerKind}
+                    value={measure.path}
+                    data-index={measure.index}
+                    onchange={handleMeasureField}
+                  ></c-reporting-field-picker>
+                </template>
+              </div>
+            </template>
+            <template lwc:if={canAddMeasure}>
+              <lightning-button
+                icon-name="utility:add"
+                label={labels.addMeasure}
+                onclick={handleAddMeasure}
+                class="slds-var-m-top_x-small"
+                data-id="add-measure"
+              ></lightning-button>
+            </template>
+          </section>
+
+          <template lwc:if={isList}>
+            <template lwc:if={hasChildren}>
+              <section class="part" data-id="summaries">
+                <h3 class="slds-text-heading_small">{labels.summaries}</h3>
+                <p class="slds-text-body_small slds-text-color_weak">{labels.summariesHelp}</p>
+                <template for:each={summaries} for:item="entry">
+                  <div key={entry.key} class="slds-box slds-box_x-small slds-var-m-vertical_x-small" data-id="summary">
+                    <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
+                      <div class="slds-col slds-grow">
+                        <lightning-combobox
+                          label={labels.relatedKind}
+                          options={childOptions}
+                          value={entry.choice}
+                          data-index={entry.index}
+                          onchange={handleSummaryChild}
+                        ></lightning-combobox>
+                      </div>
+                      <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                        <lightning-combobox
+                          label={labels.fn}
+                          options={functionOptions}
+                          value={entry.fn}
+                          data-index={entry.index}
+                          onchange={handleSummaryFn}
+                        ></lightning-combobox>
+                      </div>
+                      <div class="slds-col slds-grow-none">
+                        <lightning-button-icon
+                          icon-name="utility:close"
+                          variant="bare"
+                          alternative-text={entry.removeLabel}
+                          title={entry.removeLabel}
+                          data-index={entry.index}
+                          onclick={handleSummaryRemove}
+                        ></lightning-button-icon>
+                      </div>
+                    </div>
+                    <template lwc:if={entry.needsField}>
+                      <c-reporting-field-picker
+                        label={labels.field}
+                        object-api-name={entry.object}
+                        kind={entry.pickerKind}
+                        value={entry.path}
+                        direct
+                        data-index={entry.index}
+                        onchange={handleSummaryField}
+                      ></c-reporting-field-picker>
+                    </template>
+                    <lightning-input
+                      label={labels.measureLabel}
+                      value={entry.label}
+                      data-index={entry.index}
+                      onchange={handleSummaryLabel}
+                    ></lightning-input>
+                    <c-filter-builder
+                      object-api-name={entry.object}
+                      value={entry.filterJson}
+                      data-index={entry.index}
+                      onchange={handleSummaryFilter}
+                    ></c-filter-builder>
+                  </div>
+                </template>
+                <template lwc:if={canAddSummary}>
+                  <lightning-button
+                    icon-name="utility:add"
+                    label={labels.addSummary}
+                    onclick={handleAddSummary}
+                    data-id="add-summary"
+                  ></lightning-button>
+                </template>
+              </section>
+            </template>
+          </template>
+
+          <section class="part" data-id="display">
+            <h3 class="slds-text-heading_small">{labels.display}</h3>
+            <div class="slds-grid slds-wrap slds-gutters_x-small">
+              <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                <lightning-combobox label={labels.view} options={viewOptions} value={report.view.type} onchange={handleView} data-id="view"></lightning-combobox>
+              </div>
+              <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                <lightning-input
+                  type="number"
+                  min="1"
+                  max={maxRows}
+                  label={limitLabel}
+                  value={report.limit}
+                  onchange={handleLimit}
+                  data-id="limit"
+                ></lightning-input>
+              </div>
+              <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                <lightning-combobox label={labels.sortBy} options={sortOptions} value={sortBy} onchange={handleSortBy} data-id="sort-by"></lightning-combobox>
+              </div>
+              <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                <lightning-combobox
+                  label={labels.direction}
+                  options={directionOptions}
+                  value={sortDirection}
+                  onchange={handleDirection}
+                  data-id="direction"
+                ></lightning-combobox>
+              </div>
+            </div>
+            <template lwc:if={canStack}>
+              <lightning-input
+                type="checkbox"
+                label={labels.stacked}
+                checked={report.view.stacked}
+                onchange={handleStacked}
+                class="slds-var-m-top_x-small"
+                data-id="stacked"
+              ></lightning-input>
+            </template>
+          </section>
+        </template>
+      </div>
+
+      <div class="slds-col slds-size_1-of-1 slds-large-size_7-of-12">
+        <section class="part result" aria-label={labels.result} data-id="result">
+          <template lwc:if={preview}>
+            <c-reporting-view report={preview} can-export={canExport} data-id="preview"></c-reporting-view>
+          </template>
+          <template lwc:else>
+            <c-barn-empty-state heading={labels.result} message={labels.runFirst} size="small" data-id="run-first"></c-barn-empty-state>
+          </template>
+        </section>
+      </div>
+    </div>
+  </div>
+</template>

@@ -39,9 +39,7 @@ private class ProgramsWhereUsedExtensionTest {
 			Assert.areEqual(1, source.size(), 'Only the program whose rules read it.');
 			Assert.areEqual('Pantry', source[0].getName());
 			Assert.areEqual(
-				new List<String>{
-					Schema.SObjectType.Program__c.fields.Eligibility_Rules__c.getLabel()
-				},
+				new List<String>{ Schema.SObjectType.Program__c.fields.Eligibility_Rules__c.getLabel() },
 				source[0].getParts()
 			);
 			Assert.areEqual(System.Label.Core_WhereUsed_BreaksModuleRecord, source[0].getBreaks());
@@ -58,14 +56,9 @@ private class ProgramsWhereUsedExtensionTest {
 	@IsTest
 	static void unreadableRulesNameNothing() {
 		System.runAs(TestUsers.adminWith(ADMIN)) {
-			WhereUsedService.Target target = WhereUsedService.target(
-				'Enrollment__c',
-				'Referral_Source__c'
-			);
+			WhereUsedService.Target target = WhereUsedService.target('Enrollment__c', 'Referral_Source__c');
 			Assert.isFalse(ProgramsWhereUsedExtension.rulesName(target, 'not json'));
-			Assert.isFalse(
-				ProgramsWhereUsedExtension.rulesName(target, '{"rules": [1, {"all": [2]}]}')
-			);
+			Assert.isFalse(ProgramsWhereUsedExtension.rulesName(target, '{"rules": [1, {"all": [2]}]}'));
 			Assert.isTrue(ProgramsWhereUsedExtension.rulesName(target, RULES));
 		}
 	}
@@ -75,17 +68,11 @@ private class ProgramsWhereUsedExtensionTest {
 		System.runAs(TestUsers.adminWith(ADMIN)) {
 			String rules = RULES.replace('Referral_Source__c', 'Contact__r.Birthdate');
 			Assert.isTrue(
-				ProgramsWhereUsedExtension.rulesName(
-					WhereUsedService.target('Contact', 'Birthdate'),
-					rules
-				),
+				ProgramsWhereUsedExtension.rulesName(WhereUsedService.target('Contact', 'Birthdate'), rules),
 				'A rule on the person\'s Birthdate names Contact.Birthdate (P-14b).'
 			);
 			Assert.isFalse(
-				ProgramsWhereUsedExtension.rulesName(
-					WhereUsedService.target('Contact', 'Email'),
-					rules
-				),
+				ProgramsWhereUsedExtension.rulesName(WhereUsedService.target('Contact', 'Email'), rules),
 				'Not another Contact field.'
 			);
 		}

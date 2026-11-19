@@ -17,9 +17,7 @@ private class GivingSubscriptionsTest {
 	private static List<Commitment__c> recurring(Integer count) {
 		List<Contact> people = new List<Contact>();
 		for (Integer i = 0; i < count; i++) {
-			people.add(
-				TestDataFactory.person(new Contact(FirstName = 'Sam', LastName = 'Zzsub' + i))
-			);
+			people.add(TestDataFactory.person(new Contact(FirstName = 'Sam', LastName = 'Zzsub' + i)));
 		}
 		insert as user people;
 		List<Commitment__c> gifts = new List<Commitment__c>();
@@ -53,8 +51,7 @@ private class GivingSubscriptionsTest {
 	}
 
 	private static Object tell(List<Map<String, Object>> changes) {
-		return new GivingDonations()
-			.call('subscriptionsChanged', new Map<String, Object>{ 'changes' => changes });
+		return new GivingDonations().call('subscriptionsChanged', new Map<String, Object>{ 'changes' => changes });
 	}
 
 	@IsTest
@@ -73,11 +70,7 @@ private class GivingSubscriptionsTest {
 
 			Assert.areEqual(true, answer, 'the bulk form is handled');
 			Commitment__c after = [
-				SELECT
-					Processor_Subscription_Id__c,
-					Processor_Customer_Id__c,
-					Failed_Charges__c,
-					Card_Expires__c
+				SELECT Processor_Subscription_Id__c, Processor_Customer_Id__c, Failed_Charges__c, Card_Expires__c
 				FROM Commitment__c
 				WHERE Id = :gift.Id
 			];
@@ -126,11 +119,7 @@ private class GivingSubscriptionsTest {
 			}
 
 			Test.startTest();
-			tell(
-				new List<Map<String, Object>>{
-					change(gifts[0].Id, 'chargeSucceeded', 'paypal:WH-0')
-				}
-			);
+			tell(new List<Map<String, Object>>{ change(gifts[0].Id, 'chargeSucceeded', 'paypal:WH-0') });
 			Integer oneDml = Limits.getDmlStatements();
 			Integer oneQueries = Limits.getQueries();
 			tell(changes);

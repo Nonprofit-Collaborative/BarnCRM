@@ -93,15 +93,9 @@ public with sharing class EventSpeakersController {
 			result.canAssign = Schema.SObjectType.Session_Speaker__c.isCreateable();
 			Map<String, Schema.SObjectField> fields = Schema.SObjectType.Event_Speaker__c.fields.getMap();
 			for (String name : new List<String>{ 'Name', 'Headline__c', 'Status__c' }) {
-				result.fieldLabels.put(
-					name,
-					NamespaceUtil.field(fields, name).getDescribe().getLabel()
-				);
+				result.fieldLabels.put(name, NamespaceUtil.field(fields, name).getDescribe().getLabel());
 			}
-			result.fieldLabels.put(
-				'Sessions',
-				Schema.SObjectType.Event_Session__c.getLabelPlural()
-			);
+			result.fieldLabels.put('Sessions', Schema.SObjectType.Event_Session__c.getLabelPlural());
 			Map<String, Schema.SObjectField> links = Schema.SObjectType.Session_Speaker__c.fields.getMap();
 			for (String name : new List<String>{ 'Event_Session__c', 'Role__c' }) {
 				result.fieldLabels.put(name, links.get(name).getDescribe().getLabel());
@@ -184,17 +178,13 @@ public with sharing class EventSpeakersController {
 			}
 			for (SpeakerRow row : result.speakers) {
 				if (row.ratingCount > 0) {
-					row.averageRating = (row.ratingTotal / row.ratingCount)
-						.setScale(1, System.RoundingMode.HALF_UP);
+					row.averageRating = (row.ratingTotal / row.ratingCount).setScale(1, System.RoundingMode.HALF_UP);
 				}
 			}
 			return result;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getSpeakers', eventId);
-			throw UserErrors.wrapShowingDml(
-				e,
-				BarnHelp.text('Events', 'Events_Speakers_LoadFailed')
-			);
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Speakers_LoadFailed'));
 		}
 	}
 
@@ -222,11 +212,7 @@ public with sharing class EventSpeakersController {
 	@AuraEnabled
 	public static void assign(Id sessionId, Id speakerId, String role) {
 		save(
-			new Session_Speaker__c(
-				Event_Session__c = sessionId,
-				Event_Speaker__c = speakerId,
-				Role__c = role
-			),
+			new Session_Speaker__c(Event_Session__c = sessionId, Event_Speaker__c = speakerId, Role__c = role),
 			'assign'
 		);
 	}
@@ -246,8 +232,8 @@ public with sharing class EventSpeakersController {
 				WHERE Event_Speaker__c = :speakerId
 				WITH USER_MODE
 			];
-			Database.delete(links, true, AccessLevel.USER_MODE);
-			Database.delete(new Event_Speaker__c(Id = speakerId), true, AccessLevel.USER_MODE);
+			delete as user links;
+			delete as user new Event_Speaker__c(Id = speakerId);
 		} catch (DmlException e) {
 			Database.rollback(savepoint);
 			throw UserErrors.message(e.getDmlMessage(0));
@@ -260,7 +246,7 @@ public with sharing class EventSpeakersController {
 
 	private static void save(SObject record, String method) {
 		try {
-			Database.insert(record, true, AccessLevel.USER_MODE);
+			insert as user record;
 		} catch (DmlException e) {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {

@@ -240,12 +240,7 @@ public virtual with sharing class TriggerHandler {
 	 * that does not already carry one: a record already refused with a message that tells the
 	 * person what to change keeps it, and a second message would bury it.
 	 */
-	protected void reportFailure(
-		Exception thrown,
-		List<SObject> records,
-		String context,
-		String message
-	) {
+	protected void reportFailure(Exception thrown, List<SObject> records, String context, String message) {
 		ErrorLogger.log(thrown, context);
 		if (records == null) {
 			return;

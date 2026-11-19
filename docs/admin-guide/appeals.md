@@ -12,13 +12,13 @@ from the gifts themselves, so nobody keeps a running total by hand.
 
 ## How to Turn It On
 
-Appeals arrive with the Giving module. There is nothing to install separately.
+Appeals arrive with the Fundraising module. There is nothing to install separately.
 
 1. Open the **Appeals** tab.
 2. Create one appeal per effort you want to measure. Do not create one per mailing list or
    per segment: an appeal you cannot report on is an appeal nobody fills in.
 3. If you want a particular appeal proposed on new gifts, open **BarnCRM Settings**,
-   choose **Giving**, and set **Default appeal**.
+   choose **Fundraising**, and set **Default appeal**.
 
 No Salesforce Setup step is needed.
 
@@ -65,11 +65,11 @@ is confirmed, then **Received** (dated the day it was paid), or **Cancelled** if
 checkout without paying. A refund made at the processor sets the gift to **Refunded**. The
 payment's identifier is in the gift's **Payment Reference**.
 
-If Payments is not installed or its keys are missing, the page shows the appeal and says online
+If Payments is not installed or its processor is not connected, the page shows the appeal and says online
 giving is not open. Recurring online gifts are not offered yet.
 
 Against card testing (stolen cards tried with tiny gifts), a page refuses a gift below
-**Donation Page Minimum Amount** (Settings, Giving section; default 5) and refuses new checkouts
+**Donation Page Minimum Amount** (Settings, Fundraising section; default 5) and refuses new checkouts
 once the appeal has started 30 in the last hour. A refused gift starts no checkout, the form says
 it could not be sent, and the Error Log says why.
 

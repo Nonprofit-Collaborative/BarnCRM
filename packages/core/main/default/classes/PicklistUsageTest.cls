@@ -12,10 +12,7 @@ private class PicklistUsageTest {
 		TestUsers.admin();
 	}
 
-	private static final String LOG = Error_Log__c.SObjectType.getDescribe(
-			SObjectDescribeOptions.DEFERRED
-		)
-		.getName();
+	private static final String LOG = Error_Log__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
 	private static final String STATUS = Error_Log__c.Status__c.getDescribe().getName();
 
 	private static User maria() {
@@ -61,10 +58,7 @@ private class PicklistUsageTest {
 			System.runAs(maria()) {
 				Test.startTest();
 				planned = FieldUtilizationController.getPicklistPlan(LOG);
-				chunk = FieldUtilizationController.getPicklistUsage(
-					LOG,
-					new List<String>{ STATUS }
-				);
+				chunk = FieldUtilizationController.getPicklistUsage(LOG, new List<String>{ STATUS });
 				Test.stopTest();
 			}
 
@@ -119,10 +113,7 @@ private class PicklistUsageTest {
 			System.runAs(maria()) {
 				Test.startTest();
 				total = FieldUtilizationController.getPicklistPlan(LOG).total;
-				counted = FieldUtilizationController.getPicklistUsage(
-					LOG,
-					new List<String>{ STATUS }
-				);
+				counted = FieldUtilizationController.getPicklistUsage(LOG, new List<String>{ STATUS });
 				String afterId;
 				Boolean done = false;
 				while (!done && calls < 10) {
@@ -220,21 +211,13 @@ private class PicklistUsageTest {
 					foreign = caught.getMessage();
 				}
 				try {
-					FieldUtilizationController.getPicklistLastUsed(
-						LOG,
-						new List<String>{ STATUS },
-						'not an id'
-					);
+					FieldUtilizationController.getPicklistLastUsed(LOG, new List<String>{ STATUS }, 'not an id');
 				} catch (AuraHandledException caught) {
 					garbage = caught.getMessage();
 				}
 				FieldUtilizationService.sizeLimit = 1;
 				try {
-					FieldUtilizationController.getPicklistLastUsed(
-						LOG,
-						new List<String>{ STATUS },
-						null
-					);
+					FieldUtilizationController.getPicklistLastUsed(LOG, new List<String>{ STATUS }, null);
 				} catch (AuraHandledException caught) {
 					tooLarge = caught.getMessage();
 				}
@@ -266,10 +249,7 @@ private class PicklistUsageTest {
 			update new Error_Log__c(Id = blank.Id, Status__c = null);
 			FieldUtilizationController.PicklistChunk chunk;
 			System.runAs(maria()) {
-				chunk = FieldUtilizationController.getPicklistUsage(
-					LOG,
-					new List<String>{ STATUS }
-				);
+				chunk = FieldUtilizationController.getPicklistUsage(LOG, new List<String>{ STATUS });
 			}
 			Map<String, FieldUtilizationController.PicklistValueRow> rows = byValue(chunk, STATUS);
 			Assert.areEqual('NoValue', rows.get('').status, 'Blank is its own row.');
@@ -289,11 +269,7 @@ private class PicklistUsageTest {
 		blank.records = 5;
 		PicklistUsageService.FieldResult result = PicklistUsageService.combine(
 			new Map<String, String>{ 'Open' => 'Open', 'Closed' => 'Closed' },
-			new Map<String, PicklistUsageService.Usage>{
-				'Old' => retired,
-				'Open' => live,
-				'' => blank
-			}
+			new Map<String, PicklistUsageService.Usage>{ 'Old' => retired, 'Open' => live, '' => blank }
 		);
 		Assert.areEqual(4, result.values.size(), 'Three in the data and one never used.');
 		Assert.areEqual('Old', result.values[0].value, 'Most used first.');
@@ -314,10 +290,7 @@ private class PicklistUsageTest {
 			seen.records = 1;
 			observed.put('v' + i, seen);
 		}
-		PicklistUsageService.FieldResult result = PicklistUsageService.combine(
-			new Map<String, String>(),
-			observed
-		);
+		PicklistUsageService.FieldResult result = PicklistUsageService.combine(new Map<String, String>(), observed);
 		Assert.isTrue(result.truncated, 'More values than the limit.');
 		Assert.areEqual(PicklistUsageService.MAX_VALUES, result.values.size(), 'Cut to the limit.');
 	}

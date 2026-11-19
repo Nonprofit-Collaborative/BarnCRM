@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    Save, share and delete Advanced Reporting reports and dashboards (each saved as a Salesforce
+    File). In Advanced Reporting Staff and Admin, not Read Only.
+  </description>
+  <isLicensed>false</isLicensed>
+  <label>Save Advanced Reporting Reports</label>
+</CustomPermission>

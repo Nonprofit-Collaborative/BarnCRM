@@ -2,7 +2,8 @@
 <PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
     For development and fundraising staff. What Team Member gives, with giving records through
-    Giving Staff and Rollup Builder Read Only; each module's staff set follows, except Programs.
+    Fundraising Staff Access and Rollup Builder Read Only; each module's staff set follows, except
+    Programs.
     Does not include BarnCRM Settings.
   </description>
   <hasActivationRequired>false</hasActivationRequired>

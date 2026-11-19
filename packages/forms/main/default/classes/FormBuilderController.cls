@@ -72,9 +72,7 @@ public with sharing class FormBuilderController {
 		try {
 			List<Choice> choices = new List<Choice>();
 			for (Schema.SObjectType type : NamespaceUtil.globalDescribe().values()) {
-				Schema.DescribeSObjectResult described = type.getDescribe(
-					SObjectDescribeOptions.DEFERRED
-				);
+				Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
 				String name = described.getName();
 				if (
 					described.isCustom() &&
@@ -106,11 +104,7 @@ public with sharing class FormBuilderController {
 				Schema.DescribeFieldResult about = field.getDescribe();
 				if (about.isCreateable() && about.isAccessible()) {
 					choices.add(
-						choice(
-							about.getName(),
-							about.getLabel(),
-							String.valueOf(about.getType()).toLowerCase()
-						)
+						choice(about.getName(), about.getLabel(), String.valueOf(about.getType()).toLowerCase())
 					);
 				}
 			}
@@ -145,9 +139,7 @@ public with sharing class FormBuilderController {
 		try {
 			Map<String, Object> definition = FormRules.parse(definitionJson);
 			if (definition.get('schemaVersion') != 1) {
-				throw new FormSubmitService.FormException(
-					BarnHelp.text('Forms', 'Forms_Builder_SchemaVersion')
-				);
+				throw new FormSubmitService.FormException(BarnHelp.text('Forms', 'Forms_Builder_SchemaVersion'));
 			}
 			FormSubmitService.checkTargets(definition);
 			Boolean isPublic = FormPublicPolicy.isPublic(definition);
@@ -192,9 +184,7 @@ public with sharing class FormBuilderController {
 			WITH USER_MODE
 		];
 		if (forms.isEmpty()) {
-			throw new FormSubmitService.FormException(
-				BarnHelp.text('Forms', 'Forms_Builder_NotFound')
-			);
+			throw new FormSubmitService.FormException(BarnHelp.text('Forms', 'Forms_Builder_NotFound'));
 		}
 		Form__c form = forms[0];
 		BuilderView result = new BuilderView();
@@ -202,12 +192,8 @@ public with sharing class FormBuilderController {
 		result.name = form.Name;
 		result.status = form.Status__c;
 		result.definition = form.Definition__c;
-		result.publishedVersion = form.Published_Version__c == null
-			? null
-			: form.Published_Version__c.intValue();
-		result.canEdit =
-			Schema.SObjectType.Form__c.isUpdateable() &&
-			Schema.SObjectType.Form_Version__c.isCreateable();
+		result.publishedVersion = form.Published_Version__c == null ? null : form.Published_Version__c.intValue();
+		result.canEdit = Schema.SObjectType.Form__c.isUpdateable() && Schema.SObjectType.Form_Version__c.isCreateable();
 		result.isPublic = form.Public__c == true && form.Status__c == 'Published';
 		if (result.isPublic) {
 			for (String base : FormsSites.activeSiteUrls()) {

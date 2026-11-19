@@ -98,20 +98,14 @@ public with sharing class GrantManagementService {
 		Date today = Date.today();
 		for (Grant__c grant : grants) {
 			for (Grant_Checklist_Item__c item : items) {
-				if (
-					item.Stage__c == grant.Stage__c && !existing.contains('' + grant.Id + item.Id)
-				) {
+				if (item.Stage__c == grant.Stage__c && !existing.contains('' + grant.Id + item.Id)) {
 					tasks.add(
 						new Grant_Requirement__c(
 							Grant__c = grant.Id,
 							Name = item.Name,
 							Type__c = GrantRequirementService.TYPE_TASK,
 							Status__c = GrantRequirementService.STATUS_NOT_STARTED,
-							Due_Date__c = dueDate(
-								grant.Application_Deadline__c,
-								item.Days_Before_Deadline__c,
-								today
-							),
+							Due_Date__c = dueDate(grant.Application_Deadline__c, item.Days_Before_Deadline__c, today),
 							Assigned_To__c = item.Assigned_To__c,
 							Instructions__c = item.Instructions__c,
 							Checklist_Item__c = item.Id
@@ -137,9 +131,7 @@ public with sharing class GrantManagementService {
 	public static void setTaskDone(Id requirementId, Boolean done) {
 		update as user new Grant_Requirement__c(
 			Id = requirementId,
-			Status__c = done == true
-				? GrantRequirementService.STATUS_DONE
-				: GrantRequirementService.STATUS_NOT_STARTED
+			Status__c = done == true ? GrantRequirementService.STATUS_DONE : GrantRequirementService.STATUS_NOT_STARTED
 		);
 	}
 
@@ -250,18 +242,14 @@ public with sharing class GrantManagementService {
 				LIMIT 1
 			] > 0
 		) {
-			throw new GrantService.GrantException(
-				BarnHelp.text('Funders', 'Funders_Renewals_AlreadyStarted')
-			);
+			throw new GrantService.GrantException(BarnHelp.text('Funders', 'Funders_Renewals_AlreadyStarted'));
 		}
 		Grant__c next = new Grant__c(
 			Name = grant.Name,
 			Stage__c = GrantService.STAGE_PROSPECT,
 			Renewable__c = true,
 			Renewal_Of__c = grant.Id,
-			Amount_Requested__c = grant.Amount_Awarded__c != null
-				? grant.Amount_Awarded__c
-				: grant.Amount_Requested__c
+			Amount_Requested__c = grant.Amount_Awarded__c != null ? grant.Amount_Awarded__c : grant.Amount_Requested__c
 		);
 		for (String field : COPIED) {
 			next.put(field, grant.get(field));
@@ -317,11 +305,7 @@ public with sharing class GrantManagementService {
 				WITH USER_MODE
 				LIMIT 1
 			];
-			if (
-				rows.isEmpty() ||
-				rows[0].Renewal_Of__c == null ||
-				seen.contains(rows[0].Renewal_Of__c)
-			) {
+			if (rows.isEmpty() || rows[0].Renewal_Of__c == null || seen.contains(rows[0].Renewal_Of__c)) {
 				break;
 			}
 			first = rows[0].Renewal_Of__c;

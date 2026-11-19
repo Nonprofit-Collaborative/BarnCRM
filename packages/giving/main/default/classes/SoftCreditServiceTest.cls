@@ -22,31 +22,15 @@ private class SoftCreditServiceTest {
 			Test.stopTest();
 
 			List<Soft_Credit__c> credits = RecognitionTestData.creditsFor(gift.Id);
-			System.assertEquals(
-				1,
-				credits.size(),
-				'Luis is the only other member of the household'
-			);
-			System.assertEquals(
-				luis.Id,
-				credits[0].Contact__c,
-				'The spouse is the credited person'
-			);
+			System.assertEquals(1, credits.size(), 'Luis is the only other member of the household');
+			System.assertEquals(luis.Id, credits[0].Contact__c, 'The spouse is the credited person');
 			System.assertEquals(
 				SoftCreditService.ROLE_HOUSEHOLD_MEMBER,
 				credits[0].Role__c,
 				'The role says why the credit is there'
 			);
-			System.assertEquals(
-				500,
-				credits[0].Amount__c,
-				'A household credit is for the whole gift'
-			);
-			System.assertEquals(
-				true,
-				credits[0].Is_Automatic__c,
-				'The package created this credit'
-			);
+			System.assertEquals(500, credits[0].Amount__c, 'A household credit is for the whole gift');
+			System.assertEquals(true, credits[0].Is_Automatic__c, 'The package created this credit');
 		}
 	}
 
@@ -66,16 +50,8 @@ private class SoftCreditServiceTest {
 			Test.stopTest();
 
 			List<Soft_Credit__c> credits = RecognitionTestData.creditsFor(gift.Id);
-			System.assertEquals(
-				1,
-				credits.size(),
-				'Junction membership credits the same one person'
-			);
-			System.assertEquals(
-				luis.Id,
-				credits[0].Contact__c,
-				'The spouse is the credited person'
-			);
+			System.assertEquals(1, credits.size(), 'Junction membership credits the same one person');
+			System.assertEquals(luis.Id, credits[0].Contact__c, 'The spouse is the credited person');
 			System.assertEquals(250, credits[0].Amount__c, 'The credit is for the whole gift');
 		}
 	}
@@ -108,11 +84,7 @@ private class SoftCreditServiceTest {
 			Contact ana = RecognitionTestData.person('Ana', 'Garcia', garcias.Id);
 			Contact luis = RecognitionTestData.person('Luis', 'Garcia', garcias.Id);
 			Gift__c gift = RecognitionTestData.gift(ana.Id, null, 500);
-			System.assertEquals(
-				1,
-				RecognitionTestData.creditsFor(gift.Id).size(),
-				'Luis starts credited'
-			);
+			System.assertEquals(1, RecognitionTestData.creditsFor(gift.Id).size(), 'Luis starts credited');
 
 			Test.startTest();
 			RecognitionTestData.setAutomaticHouseholdCredits(false);
@@ -140,9 +112,7 @@ private class SoftCreditServiceTest {
 			List<Account> households = new List<Account>();
 			for (Integer i = 0; i < 200; i++) {
 				households.add(
-					TestDataFactory.household(
-						new Account(Name = 'Household ' + i, RecordTypeId = householdType)
-					)
+					TestDataFactory.household(new Account(Name = 'Household ' + i, RecordTypeId = householdType))
 				);
 			}
 			Database.insert(households, AccessLevel.SYSTEM_MODE);
@@ -151,16 +121,10 @@ private class SoftCreditServiceTest {
 			RecognitionTestData.gift(ana.Id, null, 500);
 			List<Contact> people = new List<Contact>();
 			for (Account household : households) {
-				people.add(
-					TestDataFactory.person(
-						new Contact(LastName = household.Name, AccountId = household.Id)
-					)
-				);
+				people.add(TestDataFactory.person(new Contact(LastName = household.Name, AccountId = household.Id)));
 			}
 			people.add(
-				TestDataFactory.person(
-					new Contact(FirstName = 'Luis', LastName = 'Garcia', AccountId = givers.Id)
-				)
+				TestDataFactory.person(new Contact(FirstName = 'Luis', LastName = 'Garcia', AccountId = givers.Id))
 			);
 
 			Test.startTest();
@@ -196,11 +160,7 @@ private class SoftCreditServiceTest {
 			Account garcias = RecognitionTestData.household('The Garcia Family');
 			Contact ana = RecognitionTestData.person('Ana', 'Garcia', garcias.Id);
 			Gift__c gift = RecognitionTestData.gift(ana.Id, null, 500);
-			System.assertEquals(
-				0,
-				RecognitionTestData.creditsFor(gift.Id).size(),
-				'Ana lives alone'
-			);
+			System.assertEquals(0, RecognitionTestData.creditsFor(gift.Id).size(), 'Ana lives alone');
 
 			Test.startTest();
 			RecognitionTestData.person('Luis', 'Garcia', garcias.Id);
@@ -225,11 +185,7 @@ private class SoftCreditServiceTest {
 			Contact ana = RecognitionTestData.person('Ana', 'Garcia', garcias.Id);
 			Contact luis = RecognitionTestData.person('Luis', 'Garcia', garcias.Id);
 			Gift__c gift = RecognitionTestData.gift(ana.Id, null, 500);
-			System.assertEquals(
-				1,
-				RecognitionTestData.creditsFor(gift.Id).size(),
-				'Luis starts credited'
-			);
+			System.assertEquals(1, RecognitionTestData.creditsFor(gift.Id).size(), 'Luis starts credited');
 
 			Test.startTest();
 			luis.AccountId = alvarez.Id;
@@ -306,11 +262,7 @@ private class SoftCreditServiceTest {
 			List<Soft_Credit__c> credits = RecognitionTestData.creditsFor(gift.Id);
 			System.assertEquals(1, credits.size(), 'The gift keeps the credit it earned');
 			System.assertEquals(luis.Id, credits[0].Contact__c, 'Still the same person recognized');
-			System.assertEquals(
-				500,
-				credits[0].Amount__c,
-				'At the amount it earned, for the negative gift to cancel'
-			);
+			System.assertEquals(500, credits[0].Amount__c, 'At the amount it earned, for the negative gift to cancel');
 		}
 	}
 
@@ -376,27 +328,16 @@ private class SoftCreditServiceTest {
 			RecognitionTestData.person('Luis', 'Garcia', garcias.Id);
 			Contact solicitor = RecognitionTestData.person('Tom', 'Alvarez', null);
 			Gift__c gift = RecognitionTestData.gift(ana.Id, null, 500);
-			Soft_Credit__c manual = RecognitionTestData.manualCredit(
-				gift.Id,
-				solicitor.Id,
-				'Solicitor',
-				500
-			);
+			Soft_Credit__c manual = RecognitionTestData.manualCredit(gift.Id, solicitor.Id, 'Solicitor', 500);
 
 			Test.startTest();
 			gift.Amount__c = 900;
 			update gift;
 			Test.stopTest();
 
-			Map<Id, Soft_Credit__c> byId = new Map<Id, Soft_Credit__c>(
-				RecognitionTestData.creditsFor(gift.Id)
-			);
+			Map<Id, Soft_Credit__c> byId = new Map<Id, Soft_Credit__c>(RecognitionTestData.creditsFor(gift.Id));
 			System.assertEquals(2, byId.size(), 'Both credits are still there');
-			System.assertEquals(
-				500,
-				byId.get(manual.Id).Amount__c,
-				'The credit a person entered is not recomputed'
-			);
+			System.assertEquals(500, byId.get(manual.Id).Amount__c, 'The credit a person entered is not recomputed');
 		}
 	}
 
@@ -446,16 +387,9 @@ private class SoftCreditServiceTest {
 			Contact luis = RecognitionTestData.person('Luis', 'Garcia', garcias.Id);
 			Contact solicitor = RecognitionTestData.person('Tom', 'Alvarez', null);
 			Gift__c gift = RecognitionTestData.gift(ana.Id, null, 500);
-			Soft_Credit__c manual = RecognitionTestData.manualCredit(
-				gift.Id,
-				solicitor.Id,
-				'Solicitor',
-				500
-			);
+			Soft_Credit__c manual = RecognitionTestData.manualCredit(gift.Id, solicitor.Id, 'Solicitor', 500);
 			Test.stopTest();
-			Map<Id, Soft_Credit__c> before = new Map<Id, Soft_Credit__c>(
-				RecognitionTestData.creditsFor(gift.Id)
-			);
+			Map<Id, Soft_Credit__c> before = new Map<Id, Soft_Credit__c>(RecognitionTestData.creditsFor(gift.Id));
 			System.assertEquals(2, before.size(), 'Luis is credited automatically, Tom by hand');
 			System.assertEquals(
 				luis.Id,
@@ -472,22 +406,10 @@ private class SoftCreditServiceTest {
 			);
 			List<Soft_Credit__c> remaining = RecognitionTestData.creditsFor(gift.Id);
 			System.assertEquals(1, remaining.size(), 'Only one credit is left');
-			System.assertEquals(
-				manual.Id,
-				remaining[0].Id,
-				'And it is the one Tom was given by hand'
-			);
-			System.assertEquals(
-				false,
-				remaining[0].Is_Automatic__c,
-				'A manual credit stays manual'
-			);
+			System.assertEquals(manual.Id, remaining[0].Id, 'And it is the one Tom was given by hand');
+			System.assertEquals(false, remaining[0].Is_Automatic__c, 'A manual credit stays manual');
 			System.assertEquals(500, remaining[0].Amount__c, 'With the amount staff entered');
-			System.assertEquals(
-				0,
-				automaticIn(remaining).size(),
-				'Every credit BarnCRM created for the gift is gone'
-			);
+			System.assertEquals(0, automaticIn(remaining).size(), 'Every credit BarnCRM created for the gift is gone');
 		}
 	}
 
@@ -548,21 +470,9 @@ private class SoftCreditServiceTest {
 	@IsTest
 	static void percentAndAmountConvertBothWays() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			System.assertEquals(
-				50,
-				SoftCreditService.percentOf(250, 500),
-				'Half a gift is fifty percent of it'
-			);
-			System.assertEquals(
-				250,
-				SoftCreditService.amountOf(50, 500),
-				'Fifty percent of a gift is half of it'
-			);
-			System.assertEquals(
-				null,
-				SoftCreditService.percentOf(250, 0),
-				'A gift of nothing has no share'
-			);
+			System.assertEquals(50, SoftCreditService.percentOf(250, 500), 'Half a gift is fifty percent of it');
+			System.assertEquals(250, SoftCreditService.amountOf(50, 500), 'Fifty percent of a gift is half of it');
+			System.assertEquals(null, SoftCreditService.percentOf(250, 0), 'A gift of nothing has no share');
 		}
 	}
 }

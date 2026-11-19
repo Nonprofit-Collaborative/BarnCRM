@@ -15,18 +15,11 @@ public without sharing class ContactPointBackfillBatch implements Database.Batch
 
 	/** Starts the backfill and returns its job ID. */
 	public static Id start() {
-		return AsyncStarter.batch(
-			new ContactPointBackfillBatch(),
-			CHUNK_SIZE,
-			'ContactPointBackfillBatch'
-		);
+		return AsyncStarter.batch(new ContactPointBackfillBatch(), CHUNK_SIZE, 'ContactPointBackfillBatch');
 	}
 
 	public Database.QueryLocator start(Database.BatchableContext context) {
-		return Database.getQueryLocator(
-			'SELECT Id FROM Contact ORDER BY Id',
-			AccessLevel.SYSTEM_MODE
-		);
+		return Database.getQueryLocator('SELECT Id FROM Contact ORDER BY Id', AccessLevel.SYSTEM_MODE);
 	}
 
 	public void execute(Database.BatchableContext context, List<SObject> scope) {

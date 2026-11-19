@@ -44,10 +44,10 @@
  * version reaches an org that already has others. Core adds its own here; each module that
  * ships templates calls the same method from its own script.
  *
- * Alongside these (ADR-0124): a new install starts with every feature off, and every run
- * schedules the hourly tab access check unless it is already scheduled. The managed release is a
- * fresh install everywhere (D-199), so no step migrates an older unnamespaced install. When Seasonal Addresses is on and its nightly job is missing,
- * the job is scheduled too; an upgraded org that already runs the job has the switch turned on.
+ * Alongside these (ADR-0124): every run fills a blank feature list (a new install with no
+ * feature on, an org already in use with every feature on), and schedules the hourly tab access
+ * check unless it is already scheduled. When Seasonal Addresses is on and its nightly job is
+ * missing, the job is scheduled too.
  * A checkbox that ships on and was added in an upgrade is turned on once in an org that saved its
  * settings before it existed (`ShippedDefaultUpgrades`, QA-F2).
  *
@@ -153,9 +153,7 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 	 */
 	@TestVisible
 	private static Boolean mayGrantOutsideInstall(Id installerId) {
-		return installerId != null &&
-			installerId == UserInfo.getUserId() &&
-			AccessService.canAssignPermissionSets();
+		return installerId != null && installerId == UserInfo.getUserId() && AccessService.canAssignPermissionSets();
 	}
 
 	/**
@@ -182,7 +180,7 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 	}
 
 	private void run(Boolean isNewInstall, Id installerId) {
-		markFeaturesOffOnANewInstall(isNewInstall);
+		fillFeatureList(isNewInstall);
 		applyRecommendedMode();
 		storeOrganizationRecordType();
 		AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
@@ -194,11 +192,7 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 		scheduleTabAccessCheck();
 		alignSeasonalAddresses();
 		scheduleNightlyRunOnANewInstall(isNewInstall);
-		ShippedDefaultUpgrades.apply(
-			ModuleSetups.CORE,
-			BarnCRM_Settings__c.SObjectType,
-			SHIPPED_ON_ADDED_IN_UPGRADES
-		);
+		ShippedDefaultUpgrades.apply(ModuleSetups.CORE, BarnCRM_Settings__c.SObjectType, SHIPPED_ON_ADDED_IN_UPGRADES);
 		ModuleSetups.markRan(ModuleSetups.CORE);
 		if (installerId == null) {
 			return;
@@ -207,15 +201,12 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 	}
 
 	/**
-	 * A new install starts with every Core feature off until first-run setup (ADR-0124). An
-	 * upgrade leaves the list empty, which means every feature is on, so an existing org loses
-	 * nothing it used.
+	 * Fills a blank feature list (ADR-0124): a new install starts with every Core feature off
+	 * until first-run setup; an org already in use gets every feature on, as it has run with them.
 	 */
-	private void markFeaturesOffOnANewInstall(Boolean isNewInstall) {
+	private void fillFeatureList(Boolean isNewInstall) {
 		try {
-			if (isNewInstall) {
-				FeatureSwitchService.markNewInstall();
-			}
+			FeatureSwitchService.fillBlankList(isNewInstall);
 		} catch (Exception e) {
 			ErrorLogger.log(e, FEATURE_CONTEXT);
 		}
@@ -224,7 +215,7 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 	/**
 	 * Schedules the hourly tab access check, the safety net for roles given outside BarnCRM's
 	 * Access page (ADR-0124). `start` finds a job already scheduled by name, so a reinstall or an
-	 * upgrade never doubles it, and it moves a job still on the old nightly cron to hourly. Skipped in tests unless a test asks, so that a test of something
+	 * upgrade never doubles it. Skipped in tests unless a test asks, so that a test of something
 	 * else does not leave a scheduled job that runs at `Test.stopTest`.
 	 */
 	private void scheduleTabAccessCheck() {
@@ -320,10 +311,7 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 		return [
 			SELECT COUNT()
 			FROM Error_Log__c
-			WHERE
-				(Context__c LIKE :pattern
-				OR Context__c = :moduleSetups)
-				AND Status__c = :statusNew
+			WHERE (Context__c LIKE :pattern OR Context__c = :moduleSetups) AND Status__c = :statusNew
 			WITH USER_MODE
 			LIMIT :readUpTo
 		];

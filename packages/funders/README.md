@@ -1,4 +1,4 @@
-# BarnCRM Funders (the BarnCRM Grants app)
+# BarnCRM Grants (package folder `funders`)
 
 ## Purpose
 
@@ -19,7 +19,7 @@ links follow in 0.17.
 
 - BarnCRM Core
 
-Nothing in this package references Giving or Programs (ADR-0162
+Nothing in this package references Fundraising or Programs (ADR-0162
 `0162-funders-restricted-funds-schedules-calendar.md` decision 1): a grant may name a program
 and a Giving fund by record identifier (text), resolved by describe only where a `Program__c` or
 `Fund__c` object exists.
@@ -35,7 +35,7 @@ and a Giving fund by record identifier (text), resolved by describe only where a
 - `Grant_Payment__c` (29ZM), an award's schedule, with the Award Schedule card (`grantSchedule`,
   framework-free `grantScheduleModel`, `GrantScheduleController`) on the Grant record page.
 - `Grant_Fund_Entry__c` (29ZL), a restricted grant's ledger, kept in step with received payments
-  by `GrantPaymentService.syncLedger`; the Giving Fund card (`grantLinkedRecord`, kind Fund, `GrantFundController`,
+  by `GrantPaymentService.syncLedger`; the Fund card (`grantLinkedRecord`, kind Fund, `GrantFundController`,
   `GrantFundService`) on the Grant record page.
 - The **Grant Calendar** tab (`grantCalendar`, framework-free `grantCalendarModel`,
   `GrantCalendarController`), reading the same rows as Upcoming Deadlines through
@@ -46,6 +46,6 @@ and a Giving fund by record identifier (text), resolved by describe only where a
   `GrantOutcomeService`), resolved by describe only where Logic Models is installed.
 - `Funder_Report_Template__c` (29ZO) and its shipped defaults, merged in the browser by the
   Funder Report card (`grantReport`, framework-free `grantReportModel`, `GrantReportController`).
-- The **Funders Board** tab (`fundersBoard`, framework-free `fundersBoardModel`,
+- The **Board Dashboard** tab (`Funders_Board`, `fundersBoard`, framework-free `fundersBoardModel`,
   `FundersBoardController`).
-- Permission sets Funders Admin, Staff and Read Only, given by role through `FundersAccessSync`.
+- Permission sets Grants Admin, Staff and Read Only, given by role through `FundersAccessSync`.

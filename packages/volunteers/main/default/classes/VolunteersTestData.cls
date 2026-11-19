@@ -39,11 +39,7 @@ public class VolunteersTestData {
 			PermissionSet access = new PermissionSet(Name = name, Label = name);
 			insert as system access;
 			insert as system new List<ObjectPermissions>{
-				new ObjectPermissions(
-					ParentId = access.Id,
-					SobjectType = jobObject,
-					PermissionsRead = true
-				),
+				new ObjectPermissions(ParentId = access.Id, SobjectType = jobObject, PermissionsRead = true),
 				new ObjectPermissions(
 					ParentId = access.Id,
 					SobjectType = hoursObject,
@@ -91,27 +87,19 @@ public class VolunteersTestData {
 					.Id
 				);
 			}
-			insert as system new PermissionSetAssignment(
-				AssigneeId = userId,
-				PermissionSetId = access.Id
-			);
+			insert as system new PermissionSetAssignment(AssigneeId = userId, PermissionSetId = access.Id);
 		}
 	}
 
 	/** Contact membership mode with automatic households off: people are made as each test says. */
 	public static void contactModeWithoutAutomaticHouseholds() {
-		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-			HouseholdTestDataFactory.MODE_CONTACT
-		);
+		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 		settings.Auto_Create_Households__c = false;
 		TestDataFactory.saveSettings(settings);
 	}
 
 	/** Saves the Volunteers settings as an administrator would, and forgets the cached copy. */
-	public static void volunteerSettings(
-		Boolean hoursRequireApproval,
-		Boolean attendanceCreatesHours
-	) {
+	public static void volunteerSettings(Boolean hoursRequireApproval, Boolean attendanceCreatesHours) {
 		OrgSettingsSystemWriter.save(
 			Volunteer_Settings__c.SObjectType,
 			new Map<Schema.SObjectField, Object>{
@@ -126,9 +114,7 @@ public class VolunteersTestData {
 	public static void shiftHorizonWeeks(Integer weeks) {
 		OrgSettingsSystemWriter.save(
 			Volunteer_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{
-				Volunteer_Settings__c.Shift_Horizon_Weeks__c => weeks
-			}
+			new Map<Schema.SObjectField, Object>{ Volunteer_Settings__c.Shift_Horizon_Weeks__c => weeks }
 		);
 		SettingsService.clearCaches();
 	}
@@ -221,10 +207,6 @@ public class VolunteersTestData {
 	}
 
 	public static Volunteer_Signup__c newSignup(Id shiftId, Id contactId) {
-		return new Volunteer_Signup__c(
-			Volunteer_Shift__c = shiftId,
-			Contact__c = contactId,
-			Status__c = 'Signed up'
-		);
+		return new Volunteer_Signup__c(Volunteer_Shift__c = shiftId, Contact__c = contactId, Status__c = 'Signed up');
 	}
 }

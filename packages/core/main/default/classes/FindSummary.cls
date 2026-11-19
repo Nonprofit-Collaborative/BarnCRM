@@ -58,25 +58,16 @@ public with sharing class FindSummary {
 			? ''
 			: String.valueOf(aggregate.get('function')).toLowerCase();
 		if (!SOQL_BY_FUNCTION.containsKey(function)) {
-			throw new QueryCompiler.QueryCompilerException(
-				BarnHelp.text('Core', 'Core_Find_ErrorSummary')
-			);
+			throw new QueryCompiler.QueryCompilerException(BarnHelp.text('Core', 'Core_Find_ErrorSummary'));
 		}
-		QueryCompiler.Compiled records = QueryCompiler.compileSelection(
-			queryJson,
-			new Set<String>{ 'Id' },
-			null
-		);
+		QueryCompiler.Compiled records = QueryCompiler.compileSelection(queryJson, new Set<String>{ 'Id' }, null);
 		String measured = function == 'count'
 			? 'Id'
 			: measuredField(records.objectName, function, aggregate.get('field'));
-		String groupPath = aggregate.get('groupBy') == null ||
-			String.isBlank(String.valueOf(aggregate.get('groupBy')))
+		String groupPath = aggregate.get('groupBy') == null || String.isBlank(String.valueOf(aggregate.get('groupBy')))
 			? null
 			: String.valueOf(aggregate.get('groupBy'));
-		Schema.DescribeFieldResult groupField = groupPath == null
-			? null
-			: groupingField(records.objectName, groupPath);
+		Schema.DescribeFieldResult groupField = groupPath == null ? null : groupingField(records.objectName, groupPath);
 
 		if (QueryCompiler.count(records, MAX_RECORDS + 1) > MAX_RECORDS) {
 			throw new QueryCompiler.QueryCompilerException(
@@ -94,20 +85,14 @@ public with sharing class FindSummary {
 			'(' +
 			measured +
 			') val';
-		String tail = groupPath == null
-			? ''
-			: ' GROUP BY ' + groupPath + ' ORDER BY ' + groupPath + ' NULLS FIRST';
+		String tail = groupPath == null ? '' : ' GROUP BY ' + groupPath + ' ORDER BY ' + groupPath + ' NULLS FIRST';
 		String shownFromWhere = records.display.substring(records.display.indexOf(' FROM '));
 		Map<String, Object> binds = new Map<String, Object>(records.binds);
 		if (groupPath != null) {
 			binds.put('groupLimit', MAX_GROUPS + 1);
 		}
 		SummaryResult result = new SummaryResult();
-		result.soql =
-			head +
-			shownFromWhere +
-			tail +
-			(groupPath == null ? '' : ' LIMIT ' + MAX_GROUPS);
+		result.soql = head + shownFromWhere + tail + (groupPath == null ? '' : ' LIMIT ' + MAX_GROUPS);
 
 		Map<String, String> labelByValue = picklistLabels(groupField);
 		for (
@@ -126,9 +111,7 @@ public with sharing class FindSummary {
 			line.groupValue = groupText(groupField, grouped);
 			line.groupLabel = line.groupValue == null
 				? null
-				: (labelByValue.containsKey(line.groupValue)
-						? labelByValue.get(line.groupValue)
-						: line.groupValue);
+				: (labelByValue.containsKey(line.groupValue) ? labelByValue.get(line.groupValue) : line.groupValue);
 			line.value = row.get('val');
 			result.lines.add(line);
 		}
@@ -155,9 +138,7 @@ public with sharing class FindSummary {
 		String path = rawPath == null ? '' : String.valueOf(rawPath);
 		Schema.DescribeFieldResult field = QueryCompiler.resolve(objectName, path);
 		Schema.DisplayType type = field.getType();
-		Boolean fits = function == 'sum'
-			? NUMBERS.contains(type)
-			: NUMBERS.contains(type) || DATES.contains(type);
+		Boolean fits = function == 'sum' ? NUMBERS.contains(type) : NUMBERS.contains(type) || DATES.contains(type);
 		if (!fits || !field.isAggregatable()) {
 			throw new QueryCompiler.QueryCompilerException(
 				String.format(

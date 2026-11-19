@@ -32,20 +32,11 @@ private class GivingUserModeTest {
 	static void createTestUser() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			// Maria, who configures BarnCRM.
-			TestDataFactory.createUser(
-				'Maria',
-				new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
-			);
+			TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' });
 			// David, who enters the gifts.
-			TestDataFactory.createUser(
-				'David',
-				new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' }
-			);
+			TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' });
 			// Tom, on the board, who may look but not touch.
-			TestDataFactory.createUser(
-				'Tom',
-				new List<String>{ 'BarnCRM_Read_Only', 'Giving_Read_Only' }
-			);
+			TestDataFactory.createUser('Tom', new List<String>{ 'BarnCRM_Read_Only', 'Giving_Read_Only' });
 			insert new Fund__c(Name = 'General', Active__c = true, Is_Default__c = true);
 			// A donor who is the only person in her household, so that the gift she gives implies
 			// no automatic household soft credits. This class is about the controllers, not about
@@ -166,10 +157,7 @@ private class GivingUserModeTest {
 			}
 			Test.stopTest();
 
-			Assert.isTrue(
-				result.success,
-				'Giving Admin carries what a gift needs: ' + result.formError
-			);
+			Assert.isTrue(result.success, 'Giving Admin carries what a gift needs: ' + result.formError);
 			Assert.isNotNull(result.giftId, 'The saved gift is identified.');
 			Assert.isNotNull(result.giftName, 'And named, so Maria can find it again.');
 			Assert.areEqual(
@@ -195,10 +183,7 @@ private class GivingUserModeTest {
 			}
 			Test.stopTest();
 
-			Assert.isTrue(
-				result.success,
-				'Giving Staff carries what a gift needs: ' + result.formError
-			);
+			Assert.isTrue(result.success, 'Giving Staff carries what a gift needs: ' + result.formError);
 			Gift__c saved = [
 				SELECT Donor_Contact__c, Amount__c, Status__c
 				FROM Gift__c
@@ -280,11 +265,7 @@ private class GivingUserModeTest {
 			];
 			Assert.areEqual(-40, reversal.Amount__c, 'A refund is a negative gift.');
 			Assert.areEqual(gift.Id, reversal.Original_Gift__c, 'Linked to the gift it reverses.');
-			Assert.areEqual(
-				'Cheque returned unpaid',
-				reversal.Refund_Reason__c,
-				'Carrying the reason David gave.'
-			);
+			Assert.areEqual('Cheque returned unpaid', reversal.Refund_Reason__c, 'Carrying the reason David gave.');
 		}
 	}
 
@@ -326,9 +307,7 @@ private class GivingUserModeTest {
 			User tom = boardMember();
 			defaultFund();
 			Contact ana = donor();
-			Contact luis = TestDataFactory.person(
-				new Contact(FirstName = 'Luis', LastName = 'Garcia')
-			);
+			Contact luis = TestDataFactory.person(new Contact(FirstName = 'Luis', LastName = 'Garcia'));
 			insert luis;
 			Gift__c gift = GivingTestDataFactory.buildGift(ana.Id, 100);
 			insert gift;
@@ -356,18 +335,10 @@ private class GivingUserModeTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				1,
-				panel.credits.size(),
-				'Tom can see the credit that is already there.'
-			);
+			Assert.areEqual(1, panel.credits.size(), 'Tom can see the credit that is already there.');
 			Assert.isFalse(panel.canAdd, 'And the panel tells him he cannot add one.');
 			assertReadableRefusal(refusal);
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Soft_Credit__c],
-				'The credit he tried to add was not written.'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Soft_Credit__c], 'The credit he tried to add was not written.');
 		}
 	}
 
@@ -390,11 +361,7 @@ private class GivingUserModeTest {
 			Contact ana = donor();
 			Gift__c gift = GivingTestDataFactory.buildGift(ana.Id, 100);
 			insert gift;
-			Tribute__c tribute = RecognitionTestData.tribute(
-				gift.Id,
-				TRIBUTE_IN_HONOR_OF,
-				'Luis Garcia'
-			);
+			Tribute__c tribute = RecognitionTestData.tribute(gift.Id, TRIBUTE_IN_HONOR_OF, 'Luis Garcia');
 			insert tribute;
 			handTo(david, new List<Id>{ ana.Id, gift.Id });
 			TributeController.TributeView view;
@@ -428,11 +395,7 @@ private class GivingUserModeTest {
 			Contact ana = donor();
 			Gift__c gift = GivingTestDataFactory.buildGift(ana.Id, 100);
 			insert gift;
-			Tribute__c tribute = RecognitionTestData.tribute(
-				gift.Id,
-				TRIBUTE_IN_HONOR_OF,
-				'Luis Garcia'
-			);
+			Tribute__c tribute = RecognitionTestData.tribute(gift.Id, TRIBUTE_IN_HONOR_OF, 'Luis Garcia');
 			insert tribute;
 			String refusal = null;
 
@@ -453,10 +416,7 @@ private class GivingUserModeTest {
 				FROM Tribute__c
 				WHERE Id = :tribute.Id
 			];
-			Assert.isFalse(
-				unchanged.Notification_Sent__c,
-				'And the tribute still says the letter has not gone out.'
-			);
+			Assert.isFalse(unchanged.Notification_Sent__c, 'And the tribute still says the letter has not gone out.');
 		}
 	}
 

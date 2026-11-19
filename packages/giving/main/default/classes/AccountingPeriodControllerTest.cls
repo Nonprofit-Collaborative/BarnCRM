@@ -13,17 +13,11 @@ private class AccountingPeriodControllerTest {
 	}
 
 	private static User maria() {
-		return TestDataFactory.createUser(
-			'Maria',
-			new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
-		);
+		return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' });
 	}
 
 	private static User david() {
-		return TestDataFactory.createUser(
-			'David',
-			new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' }
-		);
+		return TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' });
 	}
 
 	/** The end of the month before the day before yesterday: always closable, even on the 1st. */
@@ -50,26 +44,17 @@ private class AccountingPeriodControllerTest {
 				Assert.isFalse(before.canReopen, 'Nobody can reopen without the override');
 				Assert.areEqual(Date.today().addDays(-2), before.latestAllowed);
 
-				AccountingPeriodController.PeriodView after = AccountingPeriodController.closeThrough(
-					lastMonthEnd()
-				);
+				AccountingPeriodController.PeriodView after = AccountingPeriodController.closeThrough(lastMonthEnd());
 
 				Assert.areEqual(lastMonthEnd(), after.closedThrough);
-				Assert.areEqual(
-					lastMonthEnd(),
-					GiftPostingLock.closedThrough(),
-					'The lock reads it'
-				);
+				Assert.areEqual(lastMonthEnd(), GiftPostingLock.closedThrough(), 'The lock reads it');
 			}
 			List<Setting_Change__c> changes = [
 				SELECT Setting_Name__c, Old_Value__c, New_Value__c
 				FROM Setting_Change__c
 			];
 			Assert.areEqual(1, changes.size(), 'One Setting Change');
-			Assert.areEqual(
-				'Giving_Settings__c.Books_Closed_Through__c',
-				changes[0].Setting_Name__c
-			);
+			Assert.areEqual('Giving_Settings__c.Books_Closed_Through__c', changes[0].Setting_Name__c);
 			Assert.areEqual(String.valueOf(lastMonthEnd()), changes[0].New_Value__c);
 		}
 	}
@@ -82,10 +67,7 @@ private class AccountingPeriodControllerTest {
 				AccountingPeriodController.closeThrough(lastMonthEnd());
 				Assert.areEqual(lastMonthEnd(), GiftPostingLock.closedThrough(), 'Forward is fine');
 
-				Assert.areEqual(
-					BarnHelp.text('Giving', 'Giving_Periods_NotBeforeToday'),
-					refusalOf(Date.today())
-				);
+				Assert.areEqual(BarnHelp.text('Giving', 'Giving_Periods_NotBeforeToday'), refusalOf(Date.today()));
 				// Yesterday in Maria's time zone can be today in the org's.
 				Assert.areEqual(
 					BarnHelp.text('Giving', 'Giving_Periods_NotBeforeToday'),
@@ -97,10 +79,7 @@ private class AccountingPeriodControllerTest {
 					BarnHelp.text('Giving', 'Giving_Periods_NotBeforeToday'),
 					refusalOf(Date.today().addDays(3))
 				);
-				Assert.isNull(
-					refusalOf(Date.today().addDays(-2)),
-					'Saving the same date changes nothing'
-				);
+				Assert.isNull(refusalOf(Date.today().addDays(-2)), 'Saving the same date changes nothing');
 			}
 
 		}
@@ -157,10 +136,7 @@ private class AccountingPeriodControllerTest {
 			];
 			Assert.areEqual(1, logs.size(), 'The reopening is written down');
 			Assert.areEqual(ErrorLogger.SEVERITY_WARNING, logs[0].Severity__c);
-			Assert.isTrue(
-				logs[0].Message__c.contains(String.valueOf(lastMonthEnd())),
-				logs[0].Message__c
-			);
+			Assert.isTrue(logs[0].Message__c.contains(String.valueOf(lastMonthEnd())), logs[0].Message__c);
 			Assert.areEqual(maria.Id, logs[0].User__c);
 		}
 	}

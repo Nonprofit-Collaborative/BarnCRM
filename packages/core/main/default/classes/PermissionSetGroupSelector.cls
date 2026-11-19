@@ -51,9 +51,7 @@ public with sharing class PermissionSetGroupSelector {
 			return systemModeOverride;
 		}
 		for (
-			PermissionSetGroup found : SetupObjectSelector.permissionSetGroups(
-					new Set<String>{ developerName }
-				)
+			PermissionSetGroup found : SetupObjectSelector.permissionSetGroups(new Set<String>{ developerName })
 				.values()
 		) {
 			return found;

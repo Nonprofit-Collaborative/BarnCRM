@@ -16,9 +16,7 @@ private class CommitmentServiceTest {
 	}
 
 	private static Contact donor() {
-		Contact person = TestDataFactory.person(
-			new Contact(FirstName = 'Sarah', LastName = 'Nguyen')
-		);
+		Contact person = TestDataFactory.person(new Contact(FirstName = 'Sarah', LastName = 'Nguyen'));
 		insert person;
 		return person;
 	}
@@ -60,16 +58,8 @@ private class CommitmentServiceTest {
 			Test.stopTest();
 
 			List<Installment__c> schedule = installmentsOf(pledge.Id);
-			Assert.areEqual(
-				12,
-				schedule.size(),
-				'A 1,200 pledge of 100 a month is twelve payments.'
-			);
-			Assert.areEqual(
-				start,
-				schedule[0].Due_Date__c,
-				'The first payment falls on the start date.'
-			);
+			Assert.areEqual(12, schedule.size(), 'A 1,200 pledge of 100 a month is twelve payments.');
+			Assert.areEqual(start, schedule[0].Due_Date__c, 'The first payment falls on the start date.');
 			Assert.areEqual(
 				start.addMonths(11),
 				schedule[11].Due_Date__c,
@@ -97,11 +87,7 @@ private class CommitmentServiceTest {
 
 			List<Installment__c> schedule = installmentsOf(pledge.Id);
 			Assert.areEqual(3, schedule.size(), '250 divided by 100 rounds up to three payments.');
-			Assert.areEqual(
-				100,
-				schedule[0].Expected_Amount__c,
-				'The first payment is the amount.'
-			);
+			Assert.areEqual(100, schedule[0].Expected_Amount__c, 'The first payment is the amount.');
 			Assert.areEqual(
 				50,
 				schedule[2].Expected_Amount__c,
@@ -228,9 +214,7 @@ private class CommitmentServiceTest {
 			insert recurring;
 			CommitmentService.generateInstallments(new Set<Id>{ recurring.Id });
 			Integer firstPass = installmentsOf(recurring.Id).size();
-			CommitmentService.topUpRecurringSchedules(
-				new List<Commitment__c>{ new Commitment__c(Id = recurring.Id) }
-			);
+			CommitmentService.topUpRecurringSchedules(new List<Commitment__c>{ new Commitment__c(Id = recurring.Id) });
 			Test.stopTest();
 
 			Assert.isTrue(firstPass >= 12, 'A year of payments is generated ahead: ' + firstPass);
@@ -461,11 +445,7 @@ private class CommitmentServiceTest {
 
 			List<Installment__c> schedule = installmentsOf(pledge.Id);
 			Assert.areEqual(4, schedule.size(), 'The number of payments did not change.');
-			Assert.areEqual(
-				50,
-				schedule[0].Expected_Amount__c,
-				'The unpaid payments carry the new amount.'
-			);
+			Assert.areEqual(50, schedule[0].Expected_Amount__c, 'The unpaid payments carry the new amount.');
 		}
 	}
 

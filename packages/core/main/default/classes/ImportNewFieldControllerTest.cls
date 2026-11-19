@@ -1,9 +1,6 @@
 @IsTest(testFor='ApexClass:ImportNewFieldController')
 private class ImportNewFieldControllerTest {
-	private static final List<String> FIELD_ADMIN = new List<String>{
-		'BarnCRM_Admin',
-		'BarnCRM_Metadata_Admin'
-	};
+	private static final List<String> FIELD_ADMIN = new List<String>{ 'BarnCRM_Admin', 'BarnCRM_Metadata_Admin' };
 
 	@TestSetup
 	static void createUsers() {
@@ -142,9 +139,7 @@ private class ImportNewFieldControllerTest {
 			PermissionSet own = new PermissionSet(Name = 'Barn_Test_Own', Label = 'Barn Test Own');
 			insert as system own;
 			Boolean listed = false;
-			for (
-				ImportNewFieldController.Choice each : ImportNewFieldController.getPermissionSets()
-			) {
+			for (ImportNewFieldController.Choice each : ImportNewFieldController.getPermissionSets()) {
 				listed = listed || (each.value == own.Id && each.label == 'Barn Test Own');
 			}
 			Assert.isTrue(listed, 'the org permission set is offered');
@@ -162,10 +157,7 @@ private class ImportNewFieldControllerTest {
 				'Shirt_Size'
 			);
 			Assert.areEqual(ImportNewFieldService.FAILED, outcome.state);
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_ImportNewField_JobFailed'),
-				outcome.message
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_ImportNewField_JobFailed'), outcome.message);
 
 			outcome = ImportNewFieldController.findField('Account', alternateEmail() + '__c');
 			Assert.areEqual(ImportNewFieldService.CREATED, outcome.state);

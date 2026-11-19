@@ -50,14 +50,15 @@ public with sharing class SettingSections {
 	public static final String FIELD_HISTORY = 'Field History';
 	@NamespaceAccessible
 	public static final String ORGANIZATION = 'Organization';
+	/** The Fundraising module's (BarnCRM Giving package) settings, gift mirrors included. */
 	@NamespaceAccessible
-	public static final String GIVING = 'Giving';
-	/** Receipts, which Giving ships: its own section because a receipt run is its own job. */
+	public static final String GIVING = 'Fundraising';
+	/** Receipts, which Fundraising ships: its own section because a receipt run is its own job. */
 	@NamespaceAccessible
 	public static final String RECEIPTS = 'Receipts';
-	/** The Funders module's grant reminder settings, listed under Fundraising. */
+	/** The Grants module's (BarnCRM Funders package) grant reminder settings, listed under Fundraising. */
 	@NamespaceAccessible
-	public static final String FUNDERS = 'Funders';
+	public static final String FUNDERS = 'Grants';
 	/**
 	 * The Event Management module's settings (speaker notice templates, EV-06; reminder,
 	 * follow-up and No-Show settings, EV-14), listed after Funders.
@@ -112,6 +113,9 @@ public with sharing class SettingSections {
 	/** The Project Management module's time tracking and health settings. */
 	@NamespaceAccessible
 	public static final String PROJECTS = 'Projects';
+	/** The Advanced Reporting module's row, which opens its Advanced Reporting tab. */
+	@NamespaceAccessible
+	public static final String REPORTING = 'Advanced Reporting';
 
 	/** Every section name a package may use, in the order the console lists them. */
 	@NamespaceAccessible
@@ -141,6 +145,7 @@ public with sharing class SettingSections {
 			TERRITORY,
 			MEMBERSHIPS,
 			PROJECTS,
+			REPORTING,
 			AUTOMATION,
 			ERROR_LOG,
 			ACCESS,

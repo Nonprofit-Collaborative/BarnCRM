@@ -7,9 +7,7 @@
  * A test may start one batch job, so a retry of many rows is driven through the processor
  * itself, in chunks, the way the platform would.
  */
-@IsTest(
-	testFor='ApexClass:ImportRowCorrectionController, ApexClass:ImportBatchService, ApexClass:ImportProcessorBatch'
-)
+@IsTest(testFor='ApexClass:ImportRowCorrectionController, ApexClass:ImportBatchService, ApexClass:ImportProcessorBatch')
 private class ImportRowCorrectionTest {
 	private static final Integer FILE_ROWS = 502;
 	/** Every other row of the file has no last name, so 251 rows are rejected. */
@@ -112,11 +110,7 @@ private class ImportRowCorrectionTest {
 			ImportRowCorrectionController.RowView shown = ImportRowCorrectionController.saveCorrections(
 				row.Id,
 				JSON.serialize(
-					new Map<String, Object>{
-						'Last Name' => 'Fixed',
-						'City' => 'Portland',
-						'Not A Column' => 'x'
-					}
+					new Map<String, Object>{ 'Last Name' => 'Fixed', 'City' => 'Portland', 'Not A Column' => 'x' }
 				)
 			);
 			Test.stopTest();
@@ -146,8 +140,7 @@ private class ImportRowCorrectionTest {
 
 			ImportRowCorrectionController.saveCorrections(row.Id, '{"Last Name": ""}');
 			Assert.isNull(
-				[SELECT Corrected_Values_JSON__c FROM Import_Row__c WHERE Id = :row.Id]
-				.Corrected_Values_JSON__c,
+				[SELECT Corrected_Values_JSON__c FROM Import_Row__c WHERE Id = :row.Id].Corrected_Values_JSON__c,
 				'Saving the file values again clears the corrections.'
 			);
 		}
@@ -183,24 +176,14 @@ private class ImportRowCorrectionTest {
 			Import_Batch__c batch = committed();
 			Assert.areEqual(ImportBatchService.STATUS_COMPLETE, batch.Status__c);
 			Assert.areEqual(REJECTS - 1, batch.Rows_Rejected__c, 'Every row is counted again.');
-			Assert.areEqual(
-				before.Started_At__c,
-				batch.Started_At__c,
-				'The import keeps its start.'
-			);
+			Assert.areEqual(before.Started_At__c, batch.Started_At__c, 'The import keeps its start.');
 			Assert.isTrue(
 				batch.Run_Log__c.contains(
-					String.format(
-						BarnHelp.text('Core', 'Core_Import_LogCorrectedRetry'),
-						new List<String>{ '1' }
-					)
+					String.format(BarnHelp.text('Core', 'Core_Import_LogCorrectedRetry'), new List<String>{ '1' })
 				),
 				'The run log says so, after the commit\'s: ' + batch.Run_Log__c
 			);
-			Assert.isTrue(
-				ImportUndoService.preview(batch.Id).total > 0,
-				'The one undo covers what the retry created.'
-			);
+			Assert.isTrue(ImportUndoService.preview(batch.Id).total > 0, 'The one undo covers what the retry created.');
 		}
 	}
 
@@ -210,10 +193,7 @@ private class ImportRowCorrectionTest {
 			List<Import_Row__c> corrections = new List<Import_Row__c>();
 			for (Import_Row__c row : rejectedRows()) {
 				corrections.add(
-					new Import_Row__c(
-						Id = row.Id,
-						Corrected_Values_JSON__c = lastNameFix('Bulk' + row.Row_Number__c)
-					)
+					new Import_Row__c(Id = row.Id, Corrected_Values_JSON__c = lastNameFix('Bulk' + row.Row_Number__c))
 				);
 			}
 			update corrections;
@@ -252,9 +232,7 @@ private class ImportRowCorrectionTest {
 			List<String> said = new List<String>();
 
 			ImportRowCorrectionController.permissionOverride = false;
-			ImportRowCorrectionController.RowView view = ImportRowCorrectionController.getRow(
-				rejected.Id
-			);
+			ImportRowCorrectionController.RowView view = ImportRowCorrectionController.getRow(rejected.Id);
 			Assert.isFalse(view.canCorrect, 'Without the permission it is read only.');
 			Assert.areEqual(BarnHelp.text('Core', 'Core_Import_ErrorNoPermission'), view.refusal);
 			try {
@@ -291,8 +269,7 @@ private class ImportRowCorrectionTest {
 				said
 			);
 			Assert.isNull(
-				[SELECT Corrected_Values_JSON__c FROM Import_Row__c WHERE Id = :rejected.Id]
-				.Corrected_Values_JSON__c,
+				[SELECT Corrected_Values_JSON__c FROM Import_Row__c WHERE Id = :rejected.Id].Corrected_Values_JSON__c,
 				'Nothing refused was saved.'
 			);
 		}
@@ -302,9 +279,7 @@ private class ImportRowCorrectionTest {
 	static void anyoneWhoRunsImportsMayCorrectAndRetry() {
 		Id committer = TestUsers.admin().Id;
 		// A second holder of the import permission, who did not commit the import.
-		User importer = TestUsers.withPermissionSets(
-			new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Staff' }
-		);
+		User importer = TestUsers.withPermissionSets(new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Staff' });
 		Assert.areNotEqual(committer, importer.Id, 'Two different people.');
 		Id contactId;
 		System.runAs(importer) {
@@ -314,9 +289,7 @@ private class ImportRowCorrectionTest {
 				ImportBatchService.retryRefusal(committed()),
 				'Retry by file stays with the committer.'
 			);
-			ImportRowCorrectionController.RowView view = ImportRowCorrectionController.getRow(
-				row.Id
-			);
+			ImportRowCorrectionController.RowView view = ImportRowCorrectionController.getRow(row.Id);
 			Assert.isTrue(view.canCorrect, 'Not the committer, yet may correct: ' + view.refusal);
 			ImportRowCorrectionController.saveCorrections(row.Id, lastNameFix('Byanother'));
 
@@ -352,18 +325,13 @@ private class ImportRowCorrectionTest {
 	 */
 	@IsTest
 	static void theUndoRemovesWhatAnotherRetrierCreated() {
-		User importer = TestUsers.withPermissionSets(
-			new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Staff' }
-		);
+		User importer = TestUsers.withPermissionSets(new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Staff' });
 		Import_Batch__c batch;
 		System.runAs(TestUsers.admin()) {
 			// Core's undo on its own: a module installed in the test org is not asked.
 			ImportEntityProcessors.noneForTest = true;
 			batch = ImportTestDataFactory.batch(
-				ImportTestDataFactory.template(
-					ImportTestDataFactory.donorMapping(),
-					ImportTemplateService.RULE_EMAIL
-				)
+				ImportTestDataFactory.template(ImportTestDataFactory.donorMapping(), ImportTemplateService.RULE_EMAIL)
 			);
 			batch.Is_Dry_Run__c = false;
 			batch.Status__c = ImportBatchService.STATUS_COMPLETE;
@@ -376,11 +344,7 @@ private class ImportRowCorrectionTest {
 			Database.update(batch, AccessLevel.SYSTEM_MODE);
 		}
 		Contact person = TestDataFactory.person(
-			new Contact(
-				FirstName = 'Ana',
-				LastName = 'Byretrier',
-				Created_By_Import_Batch__c = batch.Id
-			)
+			new Contact(FirstName = 'Ana', LastName = 'Byretrier', Created_By_Import_Batch__c = batch.Id)
 		);
 		System.runAs(importer) {
 			Database.insert(person, AccessLevel.SYSTEM_MODE);
@@ -406,14 +370,9 @@ private class ImportRowCorrectionTest {
 			Import_Row__c row = rejectedRows()[0];
 			ImportRowCorrectionController.permissionOverride = true;
 			ImportRowCorrectionController.editAccessOverride = false;
-			ImportRowCorrectionController.RowView view = ImportRowCorrectionController.getRow(
-				row.Id
-			);
+			ImportRowCorrectionController.RowView view = ImportRowCorrectionController.getRow(row.Id);
 			Assert.isFalse(view.canCorrect, 'Sharing withholds the rows.');
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Import_ErrorNoRowEditAccess'),
-				view.refusal
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Import_ErrorNoRowEditAccess'), view.refusal);
 			List<String> said = new List<String>();
 			try {
 				ImportRowCorrectionController.saveCorrections(row.Id, lastNameFix('X'));

@@ -82,11 +82,7 @@ public with sharing class AcknowledgmentRuleService {
 	 * (R-AK2).
 	 */
 	@TestVisible
-	private static Boolean matches(
-		Acknowledgment_Rule__c rule,
-		Gift__c gift,
-		Set<String> donorsWithEarlierGifts
-	) {
+	private static Boolean matches(Acknowledgment_Rule__c rule, Gift__c gift, Set<String> donorsWithEarlierGifts) {
 		if (rule.Active__c != true) {
 			return false;
 		}

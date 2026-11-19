@@ -13,8 +13,8 @@
         <categories>Giving</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Fix button: open Giving settings (no more specific page target exists).</shortDescription>
-        <value>Open Giving settings</value>
+        <shortDescription>Fix button: open Fundraising settings (no more specific page target exists).</shortDescription>
+        <value>Open Fundraising Settings</value>
     </labels>
     <labels>
         <fullName>Giving_HealthCheck_OverrideLockTitle</fullName>

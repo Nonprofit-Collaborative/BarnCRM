@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+  <brand>
+    <headerColor>#1E2A3A</headerColor>
+    <logo>BarnCRM_Patch_Scholarships_Logo</logo>
+    <logoVersion>1</logoVersion>
+    <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
+  </brand>
+  <description>
+    The BarnCRM Scholarships and Outbound Grants module: award programs and cycles, applications
+    and reviews, awards and their disbursements.
+  </description>
+  <formFactors>Large</formFactors>
+  <formFactors>Small</formFactors>
+  <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
+  <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
+  <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
+  <label>BarnCRM Scholarships</label>
+  <navType>Console</navType>
+  <tabs>Scholarships</tabs>
+  <tabs>Award_Program__c</tabs>
+  <tabs>Award_Application__c</tabs>
+  <tabs>Award__c</tabs>
+  <tabs>standard-report</tabs>
+  <tabs>standard-Dashboard</tabs>
+  <tabs>Error_Log__c</tabs>
+  <uiType>Lightning</uiType>
+  <workspaceConfig>
+    <mappings>
+      <tab>Scholarships</tab>
+    </mappings>
+    <mappings>
+      <tab>Award_Program__c</tab>
+    </mappings>
+    <mappings>
+      <tab>Award_Application__c</tab>
+    </mappings>
+    <mappings>
+      <tab>Award__c</tab>
+    </mappings>
+    <mappings>
+      <tab>standard-report</tab>
+    </mappings>
+    <mappings>
+      <tab>standard-Dashboard</tab>
+    </mappings>
+    <mappings>
+      <tab>Error_Log__c</tab>
+    </mappings>
+  </workspaceConfig>
+</CustomApplication>

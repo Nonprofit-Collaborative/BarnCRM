@@ -84,14 +84,10 @@ private class AutomationResumeJobTest {
 				List<CronTrigger> jobs = resumeJobs();
 				Assert.areEqual(1, jobs.size(), 'Pausing schedules exactly one resume.');
 				Assert.isTrue(
-					jobs[0].NextFireTime >= until.addSeconds(-1) &&
-						jobs[0].NextFireTime <= until.addSeconds(2),
+					jobs[0].NextFireTime >= until.addSeconds(-1) && jobs[0].NextFireTime <= until.addSeconds(2),
 					'For the moment the pause ends.'
 				);
-				Assert.isFalse(
-					AutomationControl.isPauseWithoutResume(),
-					'So the pause has an end.'
-				);
+				Assert.isFalse(AutomationControl.isPauseWithoutResume(), 'So the pause has an end.');
 
 				AutomationControl.resumeAll();
 				Assert.isNull(AutomationResumeJob.scheduledAt(), 'Resuming by hand cancels it.');
@@ -120,10 +116,7 @@ private class AutomationResumeJobTest {
 
 				List<CronTrigger> jobs = resumeJobs();
 				Assert.areEqual(1, jobs.size(), 'Still one resume, never two.');
-				Assert.isTrue(
-					jobs[0].NextFireTime >= later.addSeconds(-1),
-					'Set for the new end, not the old one.'
-				);
+				Assert.isTrue(jobs[0].NextFireTime >= later.addSeconds(-1), 'Set for the new end, not the old one.');
 				Test.stopTest();
 			}
 
@@ -142,16 +135,8 @@ private class AutomationResumeJobTest {
 				Test.stopTest();
 			}
 
-			Assert.areEqual(
-				stored,
-				storedPause(),
-				'Not the pause this job was set for: untouched.'
-			);
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Setting_Change__c],
-				'And no resume is audited.'
-			);
+			Assert.areEqual(stored, storedPause(), 'Not the pause this job was set for: untouched.');
+			Assert.areEqual(0, [SELECT COUNT() FROM Setting_Change__c], 'And no resume is audited.');
 		}
 	}
 
@@ -194,11 +179,7 @@ private class AutomationResumeJobTest {
 			}
 
 			Assert.isTrue(AutomationControl.isPaused(), 'The pause still has two hours to run.');
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Setting_Change__c],
-				'Only the pause is audited.'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Setting_Change__c], 'Only the pause is audited.');
 			Assert.areEqual(1, resumeJobs().size(), 'The early job set itself again for the end.');
 		}
 	}
@@ -221,16 +202,12 @@ private class AutomationResumeJobTest {
 	static void theConsoleNamesWhoPaused() {
 		System.runAs(TestUsers.admin()) {
 			TestDataFactory.defaultSettings();
-			TestDataFactory.insertAutomationSettings(
-				new Map<String, Boolean>{ 'Household_Naming' => true }
-			);
+			TestDataFactory.insertAutomationSettings(new Map<String, Boolean>{ 'Household_Naming' => true });
 			User maria = barnCrmAdmin();
 
 			System.runAs(maria) {
 				Test.startTest();
-				AutomationControlController.AutomationPageView paused = AutomationControlController.pauseAll(
-					2
-				);
+				AutomationControlController.AutomationPageView paused = AutomationControlController.pauseAll(2);
 				Assert.areEqual(
 					[SELECT Name FROM User WHERE Id = :maria.Id].Name,
 					paused.pausedBy,
@@ -258,21 +235,13 @@ private class AutomationResumeJobTest {
 					AutomationControl.pauseAll(2);
 					Assert.fail('David may not pause.');
 				} catch (AutomationControl.AutomationControlException expected) {
-					Assert.areEqual(
-						Label.Core_Automation_NoPermission,
-						expected.getMessage(),
-						'Why.'
-					);
+					Assert.areEqual(Label.Core_Automation_NoPermission, expected.getMessage(), 'Why.');
 				}
 				try {
 					AutomationControl.resumeAll();
 					Assert.fail('David may not resume.');
 				} catch (AutomationControl.AutomationControlException expected) {
-					Assert.areEqual(
-						Label.Core_Automation_NoPermission,
-						expected.getMessage(),
-						'Why.'
-					);
+					Assert.areEqual(Label.Core_Automation_NoPermission, expected.getMessage(), 'Why.');
 				}
 				Test.stopTest();
 			}

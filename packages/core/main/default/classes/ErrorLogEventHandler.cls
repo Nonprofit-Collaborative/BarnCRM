@@ -8,11 +8,12 @@
  * permission to create it. It runs in the platform's own subscriber transaction and returns
  * nothing.
  *
- * Repeats are counted, not written (R-E7): an event with the same Context, Message and Severity
- * as a New entry first written within the last hour adds one to that entry's Occurrences and
- * names its record among the entry's first few, so a bulk load failing the same way on 10,000
- * rows leaves one row to read, not 10,000. The match is on `Occurrence_Key__c`, a hash of the
- * three, because a long text Message cannot be filtered on.
+ * Repeats are counted, not written (R-E7): an event with the same Context, Message and Severity,
+ * and for an exception the same type and first frame of our code, as a New entry first written
+ * within the last hour adds one to that entry's Occurrences and names its record among the
+ * entry's first few, so a bulk load failing the same way on 10,000 rows leaves one row to read,
+ * not 10,000. The match is on `Occurrence_Key__c`, a hash of those parts, because a long text
+ * Message cannot be filtered on.
  *
  * The entry names the person who published the event, `CreatedById`, which the platform sets.
  * The payload's `User_Id__c` is never trusted for that: anyone with Create on the event could
@@ -26,12 +27,7 @@
  */
 public without sharing class ErrorLogEventHandler {
 	private static final String DEFAULT_SEVERITY = 'Error';
-	private static final Set<String> SEVERITIES = new Set<String>{
-		'Info',
-		'Warning',
-		'Error',
-		'Critical'
-	};
+	private static final Set<String> SEVERITIES = new Set<String>{ 'Info', 'Warning', 'Error', 'Critical' };
 
 	/** How long after an entry's first occurrence a repeat is counted on it. */
 	@TestVisible
@@ -42,6 +38,12 @@ public without sharing class ErrorLogEventHandler {
 	private static final Integer MORE_RECORDS = 10;
 
 	private static final String SEPARATOR = ',';
+
+	/** An Apex type name, the start of the first line ErrorLogger writes in Technical Detail. */
+	private static final Pattern TYPE_NAME = Pattern.compile('[A-Za-z_][A-Za-z0-9_.]*');
+
+	/** A stack frame in our own code, kept to its line: `Class.HouseholdService.save: line 12`. */
+	private static final Pattern FRAME = Pattern.compile('(?m)^\\s*((?:Class|Trigger)\\.[^\\s:]+: line \\d+)');
 
 	public static void handle(List<Error_Log_Event__e> events) {
 		if (events == null || events.isEmpty()) {
@@ -71,8 +73,7 @@ public without sharing class ErrorLogEventHandler {
 					toInsert.add(entry);
 					continue;
 				}
-				open.Occurrences__c =
-					(open.Occurrences__c == null ? 1 : open.Occurrences__c) + entry.Occurrences__c;
+				open.Occurrences__c = (open.Occurrences__c == null ? 1 : open.Occurrences__c) + entry.Occurrences__c;
 				addRecord(open, entry.Record_Reference__c, entry.Object_Name__c);
 				for (String recordId : idsIn(entry.Other_Record_Ids__c)) {
 					addRecord(open, recordId, entry.Object_Name__c);
@@ -88,8 +89,7 @@ public without sharing class ErrorLogEventHandler {
 			// accepted, not suppressed).
 			System.debug(
 				LoggingLevel.ERROR,
-				'BarnCRM could not write an Error Log record from an event: ' +
-				failedToLog.getMessage()
+				'BarnCRM could not write an Error Log record from an event: ' + failedToLog.getMessage()
 			);
 		}
 	}
@@ -103,9 +103,7 @@ public without sharing class ErrorLogEventHandler {
 			Technical_Detail__c = event.Technical_Detail__c,
 			Record_Reference__c = event.Record_Reference__c,
 			Object_Name__c = event.Object_Name__c,
-			Severity__c = SEVERITIES.contains(event.Severity__c)
-				? event.Severity__c
-				: DEFAULT_SEVERITY,
+			Severity__c = SEVERITIES.contains(event.Severity__c) ? event.Severity__c : DEFAULT_SEVERITY,
 			Status__c = 'New',
 			Occurrences__c = 1
 		);
@@ -113,18 +111,54 @@ public without sharing class ErrorLogEventHandler {
 		return entry;
 	}
 
-	/** The hash two entries share when they report the same failure (R-E7). */
+	/**
+	 * The hash two entries share when they report the same failure (R-E7): the same Context,
+	 * Severity and Message, and for a caught exception also the same exception type and the
+	 * same first frame of our code, line number included (plan D-208, N-05). Two different
+	 * failures that show the same general message ("Something went wrong saving the
+	 * household") are then two entries, while one failure repeated over a bulk load is still
+	 * one. An entry with no exception (a message logged on its own) hashes the three parts
+	 * alone, exactly as before, so it still finds an open entry written before this change.
+	 */
 	@TestVisible
 	private static String keyOf(Error_Log__c entry) {
-		String text = String.join(
-			new List<String>{
-				entry.Context__c == null ? '' : entry.Context__c,
-				entry.Severity__c,
-				entry.Message__c == null ? '' : entry.Message__c
-			},
-			'\n'
-		);
+		List<String> parts = new List<String>{
+			entry.Context__c == null ? '' : entry.Context__c,
+			entry.Severity__c,
+			entry.Message__c == null ? '' : entry.Message__c
+		};
+		String typeName = exceptionType(entry.Technical_Detail__c);
+		String frame = topFrame(entry.Technical_Detail__c);
+		if (String.isNotBlank(typeName) || String.isNotBlank(frame)) {
+			parts.add(typeName);
+			parts.add(frame);
+		}
+		String text = String.join(parts, '\n');
 		return EncodingUtil.convertToHex(Crypto.generateDigest('SHA-256', Blob.valueOf(text)));
+	}
+
+	/** The exception type from Technical Detail's first line (`Type: message`), or blank. */
+	@TestVisible
+	private static String exceptionType(String detail) {
+		if (String.isBlank(detail)) {
+			return '';
+		}
+		String firstLine = detail.substringBefore('\n');
+		if (!firstLine.contains(':')) {
+			return '';
+		}
+		String candidate = firstLine.substringBefore(':').trim();
+		return TYPE_NAME.matcher(candidate).matches() ? candidate : '';
+	}
+
+	/** The first stack frame in Apex code, with its line number, or blank. */
+	@TestVisible
+	private static String topFrame(String detail) {
+		if (String.isBlank(detail)) {
+			return '';
+		}
+		Matcher found = FRAME.matcher(detail);
+		return found.find() ? found.group(1) : '';
 	}
 
 	/** The newest New entry of each key first written within the window. */
@@ -132,13 +166,7 @@ public without sharing class ErrorLogEventHandler {
 		Map<String, Error_Log__c> byKey = new Map<String, Error_Log__c>();
 		Datetime since = System.now().addMinutes(-WINDOW_MINUTES);
 		for (Error_Log__c open : [
-			SELECT
-				Id,
-				Occurrence_Key__c,
-				Occurrences__c,
-				Record_Reference__c,
-				Object_Name__c,
-				Other_Record_Ids__c
+			SELECT Id, Occurrence_Key__c, Occurrences__c, Record_Reference__c, Object_Name__c, Other_Record_Ids__c
 			FROM Error_Log__c
 			WHERE Occurrence_Key__c IN :keys AND Timestamp__c >= :since AND Status__c = 'New'
 			WITH SYSTEM_MODE

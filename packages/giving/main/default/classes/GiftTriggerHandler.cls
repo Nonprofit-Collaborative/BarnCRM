@@ -55,13 +55,7 @@ public with sharing class GiftTriggerHandler extends TriggerHandler {
 	}
 
 	public override void afterUpdate() {
-		GiftService.synchronizeAllocationsToAmount(
-			(List<Gift__c>) newRecords(),
-			(Map<Id, Gift__c>) oldRecordsById()
-		);
-		GiftStatusRules.logCancellations(
-			(List<Gift__c>) newRecords(),
-			(Map<Id, Gift__c>) oldRecordsById()
-		);
+		GiftService.synchronizeAllocationsToAmount((List<Gift__c>) newRecords(), (Map<Id, Gift__c>) oldRecordsById());
+		GiftStatusRules.logCancellations((List<Gift__c>) newRecords(), (Map<Id, Gift__c>) oldRecordsById());
 	}
 }

@@ -101,13 +101,7 @@ public with sharing class HubReminders implements Schedulable {
 				continue;
 			}
 			Date target = row.Discovered_At__c.addDays(3).date();
-			if (
-				bell.send(
-					row.OwnerId,
-					String.format(title, new List<Object>{ row.Name, target.format() }),
-					row.Id
-				)
-			) {
+			if (bell.send(row.OwnerId, String.format(title, new List<Object>{ row.Name, target.format() }), row.Id)) {
 				stamped.add(new Data_Breach__c(Id = row.Id, Reminded_For__c = target));
 			}
 		}
@@ -260,11 +254,7 @@ public with sharing class HubReminders implements Schedulable {
 					BarnHelp.text(
 						'CorporateHub',
 						'CorporateHub_Reminder_TermTitle',
-						new List<Object>{
-							row.Person__r?.Name,
-							row.Board__r.Name,
-							row.Term_End__c.format()
-						}
+						new List<Object>{ row.Person__r?.Name, row.Board__r.Name, row.Term_End__c.format() }
 					),
 					row.Id
 				)
@@ -282,10 +272,7 @@ public with sharing class HubReminders implements Schedulable {
 			[
 				SELECT Id, Name, OwnerId, DPIA_Review_Date__c, Reminded_For__c
 				FROM Processing_Activity__c
-				WHERE
-					Status__c = :ACTIVE
-					AND DPIA_Required__c = TRUE
-					AND DPIA_Review_Date__c != NULL
+				WHERE Status__c = :ACTIVE AND DPIA_Required__c = TRUE AND DPIA_Review_Date__c != NULL
 				WITH SYSTEM_MODE
 				ORDER BY DPIA_Review_Date__c
 				LIMIT :MAX_ROWS
@@ -301,10 +288,7 @@ public with sharing class HubReminders implements Schedulable {
 			[
 				SELECT Id, Name, OwnerId, Authority_Deadline__c, Reminded_For__c
 				FROM Data_Breach__c
-				WHERE
-					Status__c != 'Closed'
-					AND Risk__c != 'Unlikely'
-					AND Authority_Notified_At__c = NULL
+				WHERE Status__c != 'Closed' AND Risk__c != 'Unlikely' AND Authority_Notified_At__c = NULL
 				WITH SYSTEM_MODE
 				ORDER BY Discovered_At__c
 				LIMIT :MAX_ROWS
@@ -321,14 +305,7 @@ public with sharing class HubReminders implements Schedulable {
 	 */
 	private List<Data_Subject_Request__c> requests(Boolean remind) {
 		List<Data_Subject_Request__c> open = [
-			SELECT
-				Id,
-				Name,
-				OwnerId,
-				Due_Date__c,
-				Reminded_For__c,
-				Request_Type__c,
-				Erasure_Record__c
+			SELECT Id, Name, OwnerId, Due_Date__c, Reminded_For__c, Request_Type__c, Erasure_Record__c
 			FROM Data_Subject_Request__c
 			WHERE Status__c IN ('Received', 'In Progress')
 			WITH SYSTEM_MODE
@@ -362,11 +339,7 @@ public with sharing class HubReminders implements Schedulable {
 			}
 			if (
 				remind &&
-				remindRow(
-					row,
-					row.Due_Date__c,
-					BarnHelp.text('CorporateHub', 'CorporateHub_Reminder_RequestTitle')
-				)
+				remindRow(row, row.Due_Date__c, BarnHelp.text('CorporateHub', 'CorporateHub_Reminder_RequestTitle'))
 			) {
 				changed.put(row.Id, row);
 			}
@@ -411,11 +384,7 @@ public with sharing class HubReminders implements Schedulable {
 
 	/** One reminder to a record's owner, within tonight's cap. A queue owner is skipped. */
 	private Boolean send(Id ownerId, String title, Id recordId) {
-		if (
-			sent >= maxReminders ||
-			ownerId == null ||
-			ownerId.getSObjectType() != User.SObjectType
-		) {
+		if (sent >= maxReminders || ownerId == null || ownerId.getSObjectType() != User.SObjectType) {
 			return false;
 		}
 		sent++;

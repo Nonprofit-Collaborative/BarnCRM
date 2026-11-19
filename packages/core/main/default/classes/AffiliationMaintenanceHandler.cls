@@ -27,11 +27,7 @@ public with sharing class AffiliationMaintenanceHandler extends TriggerHandler {
 	private static Exception upkeepFailureForTest;
 
 	public override void afterInsert() {
-		refresh(
-			(List<Affiliation__c>) newRecords(),
-			null,
-			'AffiliationMaintenanceHandler.afterInsert'
-		);
+		refresh((List<Affiliation__c>) newRecords(), null, 'AffiliationMaintenanceHandler.afterInsert');
 	}
 
 	/**
@@ -47,9 +43,7 @@ public with sharing class AffiliationMaintenanceHandler extends TriggerHandler {
 		List<Affiliation__c> before = new List<Affiliation__c>();
 		Map<Id, SObject> previousById = oldRecordsById();
 		for (Affiliation__c record : records) {
-			Affiliation__c previous = previousById == null
-				? null
-				: (Affiliation__c) previousById.get(record.Id);
+			Affiliation__c previous = previousById == null ? null : (Affiliation__c) previousById.get(record.Id);
 			if (previous == null || mayMovePrimary(record, previous)) {
 				changed.add(record);
 				if (previous != null) {
@@ -71,28 +65,15 @@ public with sharing class AffiliationMaintenanceHandler extends TriggerHandler {
 	}
 
 	public override void afterDelete() {
-		refresh(
-			null,
-			(List<Affiliation__c>) oldRecords(),
-			'AffiliationMaintenanceHandler.afterDelete'
-		);
+		refresh(null, (List<Affiliation__c>) oldRecords(), 'AffiliationMaintenanceHandler.afterDelete');
 	}
 
 	public override void afterUndelete() {
-		refresh(
-			(List<Affiliation__c>) newRecords(),
-			null,
-			'AffiliationMaintenanceHandler.afterUndelete'
-		);
+		refresh((List<Affiliation__c>) newRecords(), null, 'AffiliationMaintenanceHandler.afterUndelete');
 	}
 
-	private void refresh(
-		List<Affiliation__c> records,
-		List<Affiliation__c> previous,
-		String context
-	) {
-		Boolean nothingToDo =
-			(records == null || records.isEmpty()) && (previous == null || previous.isEmpty());
+	private void refresh(List<Affiliation__c> records, List<Affiliation__c> previous, String context) {
+		Boolean nothingToDo = (records == null || records.isEmpty()) && (previous == null || previous.isEmpty());
 		if (nothingToDo) {
 			return;
 		}

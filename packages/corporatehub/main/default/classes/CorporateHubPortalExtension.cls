@@ -89,16 +89,8 @@ public without sharing class CorporateHubPortalExtension implements PortalAction
 		if (rows[0].Motion__r.Status__c != HubBoard.VOTING_OPEN) {
 			return BarnHelp.text('CorporateHub', 'CorporateHub_Portal_VotingClosed');
 		}
-		update as system new Board_Vote__c(
-			Id = voteId,
-			Vote__c = choice,
-			Voted_On__c = System.now()
-		);
-		return BarnHelp.text(
-			'CorporateHub',
-			'CorporateHub_Portal_Voted',
-			new List<Object>{ choice }
-		);
+		update as system new Board_Vote__c(Id = voteId, Vote__c = choice, Voted_On__c = System.now());
+		return BarnHelp.text('CorporateHub', 'CorporateHub_Portal_Voted', new List<Object>{ choice });
 	}
 
 	private static String acknowledge(Id personId, Id requestId) {

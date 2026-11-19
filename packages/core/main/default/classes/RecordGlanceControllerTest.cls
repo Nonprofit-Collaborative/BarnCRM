@@ -70,16 +70,8 @@ private class RecordGlanceControllerTest {
 			Assert.areEqual(1, cards.size(), 'One card from the one module');
 			Assert.areEqual('Stub Card', cards[0].title, 'The module names its card');
 			Assert.areEqual(12.5, cards[0].tiles[0].numberValue, 'The figure is passed through');
-			Assert.areEqual(
-				RecordGlance.KIND_CURRENCY,
-				cards[0].tiles[0].kind,
-				'Money is marked as money'
-			);
-			Assert.areEqual(
-				RecordGlance.KIND_NUMBER,
-				cards[0].tiles[1].kind,
-				'A count is a number'
-			);
+			Assert.areEqual(RecordGlance.KIND_CURRENCY, cards[0].tiles[0].kind, 'Money is marked as money');
+			Assert.areEqual(RecordGlance.KIND_NUMBER, cards[0].tiles[1].kind, 'A count is a number');
 			Assert.areEqual(Date.newInstance(2026, 11, 1), cards[0].tiles[2].dateValue, 'A date');
 			Assert.areEqual('Friend', cards[0].tiles[3].textValue, 'A word');
 			Assert.isTrue(
@@ -125,22 +117,13 @@ private class RecordGlanceControllerTest {
 			Test.startTest();
 			RecordGlanceExtensions.EXTENSION_CLASSES.clear();
 			RecordGlanceExtensions.EXTENSION_CLASSES.add('NoSuchClassAnywhere');
-			Assert.isTrue(
-				RecordGlanceExtensions.installed().isEmpty(),
-				'A class that is not installed is absent'
-			);
+			Assert.isTrue(RecordGlanceExtensions.installed().isEmpty(), 'A class that is not installed is absent');
 			RecordGlanceExtensions.EXTENSION_CLASSES.clear();
 			RecordGlanceExtensions.EXTENSION_CLASSES.add('ExtensionFakeNotAnExtension');
-			Assert.isTrue(
-				RecordGlanceExtensions.installed().isEmpty(),
-				'A class that is not an extension is absent'
-			);
+			Assert.isTrue(RecordGlanceExtensions.installed().isEmpty(), 'A class that is not an extension is absent');
 			RecordGlanceExtensions.EXTENSION_CLASSES.clear();
 			RecordGlanceExtensions.EXTENSION_CLASSES.add('ExtensionFakeUnbuildable');
-			Assert.isTrue(
-				RecordGlanceExtensions.installed().isEmpty(),
-				'A class that cannot be built is absent'
-			);
+			Assert.isTrue(RecordGlanceExtensions.installed().isEmpty(), 'A class that cannot be built is absent');
 			Test.stopTest();
 		}
 		// Both read as the unexpected error, so they are counted on one entry (R-E7).

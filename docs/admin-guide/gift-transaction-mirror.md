@@ -55,7 +55,7 @@ Gift Transactions to Gifts, the other way round, is not available yet.
 
 ## How to Turn It On
 
-You need the Mirror module and Nonprofit Cloud fundraising: the Fundraising Access license, and
+You need the BarnCRM Fundraising module and Nonprofit Cloud fundraising: the Fundraising Access license, and
 for you and whoever schedules the run, the Fundraising User permission. Without them the Gift
 Transaction Mirror page says the mirror is not available, and nothing else happens.
 
@@ -65,7 +65,7 @@ Transaction Mirror page says the mirror is not available, and nothing else happe
    Transaction and note its Status. The mirror needs the value's API name, which is usually the
    same as what you see; Setup, Object Manager, Gift Transaction, Fields, Status lists both. The
    setting starts as `Paid`.
-3. Open **BarnCRM Settings**, choose **Giving**, and set:
+3. Open **BarnCRM Settings**, choose **Fundraising**, and set:
    - **Gift Transaction mirror paid status**, if your paid value is not `Paid` (a dropdown of
      your org's active Status values);
    - **Gift Transaction mirror start date**: only gifts dated on or after it are copied; while it
@@ -77,7 +77,7 @@ Transaction Mirror page says the mirror is not available, and nothing else happe
 4. To have designations copied, open the **Funds** tab, choose the **Funds and Their Gift
    Designations** list view, and paste each fund's Gift Designation record ID (the 18-character
    code in its web address) into **Gift Designation ID**.
-5. Still in **Giving**, open **Gift Transaction Mirror** (the row shows only to someone with the
+5. Still in **Fundraising**, open **Gift Transaction Mirror** (the row shows only to someone with the
    permission set). Click **Run Now** once, and **Schedule Nightly Run**, which switches the mirror's step
    on in [BarnCRM Nightly Jobs](nightly-jobs.md), so the mirror catches up every night. The page shows when the last run completed and what it did, and Health Check
    warns if two days pass without one.
@@ -97,7 +97,7 @@ off, a run does nothing and the Error Log says so once.
 
 Do this as Maria, in an org with Nonprofit Cloud fundraising and the sample data loaded.
 
-1. In **BarnCRM Settings**, **Giving**, check **Gift Transaction mirror paid status** against
+1. In **BarnCRM Settings**, **Fundraising**, check **Gift Transaction mirror paid status** against
    your paid value, set **Gift Transaction mirror start date** to the first of this month, and
    set **Gift Transaction mirror direction** to **Gifts to Gift Transactions**. Save.
 2. In the **Funds and Their Gift Designations** list view, paste a Gift Designation's record ID

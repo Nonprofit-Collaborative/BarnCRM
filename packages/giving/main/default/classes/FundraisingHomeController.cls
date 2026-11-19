@@ -76,10 +76,7 @@ public with sharing class FundraisingHomeController {
 	}
 
 	/** The page tabs among the More tiles, shown with the gifts they are about. */
-	private static final List<String> MORE_PAGE_TABS = new List<String>{
-		'Donor_Segments',
-		'Recurring_Donor_Health'
-	};
+	private static final List<String> MORE_PAGE_TABS = new List<String>{ 'Donor_Segments', 'Recurring_Donor_Health' };
 
 	@AuraEnabled
 	public static HomeView getHome() {
@@ -89,8 +86,7 @@ public with sharing class FundraisingHomeController {
 			view.canEnterGift = Schema.SObjectType.Gift__c.isCreateable();
 			view.setupTiles = setupTiles();
 			view.moreTiles = moreTiles();
-			view.firstRun =
-				view.canEnterGift && [SELECT Id FROM Gift__c WITH USER_MODE LIMIT 1].isEmpty();
+			view.firstRun = view.canEnterGift && [SELECT Id FROM Gift__c WITH USER_MODE LIMIT 1].isEmpty();
 			view.canImport = view.firstRun && Schema.SObjectType.Import_Batch__c.isCreateable();
 			return view;
 		} catch (Exception caught) {
@@ -100,11 +96,7 @@ public with sharing class FundraisingHomeController {
 
 	private static void addTiles(List<Tile> tiles) {
 		if (Schema.SObjectType.Gift__c.isAccessible()) {
-			Tile thank = tile(
-				'giftsToThank',
-				Schema.SObjectType.Gift__c.getLabelPlural(),
-				countGiftsToThank()
-			);
+			Tile thank = tile('giftsToThank', Schema.SObjectType.Gift__c.getLabelPlural(), countGiftsToThank());
 			thank.badgeLabel = picklistLabel(
 				Schema.SObjectType.Gift__c.fields.Acknowledgment_Status__c,
 				AcknowledgmentRuleService.STATUS_TO_ACKNOWLEDGE
@@ -120,10 +112,7 @@ public with sharing class FundraisingHomeController {
 				Schema.SObjectType.Installment__c.getLabelPlural(),
 				countOverdueInstallments()
 			);
-			overdue.badgeLabel = picklistLabel(
-				Schema.SObjectType.Installment__c.fields.Status__c,
-				'Overdue'
-			);
+			overdue.badgeLabel = picklistLabel(Schema.SObjectType.Installment__c.fields.Status__c, 'Overdue');
 			overdue.badgeStatus = 'overdue';
 			overdue.objectApiName = Schema.SObjectType.Installment__c.getName();
 			overdue.filterName = 'Overdue';
@@ -136,15 +125,8 @@ public with sharing class FundraisingHomeController {
 			addIfCounted(tiles, asks);
 		}
 		if (Schema.SObjectType.Gift_Batch__c.isAccessible()) {
-			Tile batches = tile(
-				'openBatches',
-				Schema.SObjectType.Gift_Batch__c.getLabelPlural(),
-				countOpenBatches()
-			);
-			batches.badgeLabel = picklistLabel(
-				Schema.SObjectType.Gift_Batch__c.fields.Status__c,
-				'Open'
-			);
+			Tile batches = tile('openBatches', Schema.SObjectType.Gift_Batch__c.getLabelPlural(), countOpenBatches());
+			batches.badgeLabel = picklistLabel(Schema.SObjectType.Gift_Batch__c.fields.Status__c, 'Open');
 			batches.badgeStatus = 'info';
 			batches.objectApiName = Schema.SObjectType.Gift_Batch__c.getName();
 			batches.filterName = 'Open_Batches';
@@ -156,10 +138,7 @@ public with sharing class FundraisingHomeController {
 				Schema.SObjectType.Stewardship_Plan__c.getLabelPlural(),
 				countRunningPlans()
 			);
-			plans.badgeLabel = picklistLabel(
-				Schema.SObjectType.Stewardship_Plan__c.fields.Status__c,
-				'Running'
-			);
+			plans.badgeLabel = picklistLabel(Schema.SObjectType.Stewardship_Plan__c.fields.Status__c, 'Running');
 			plans.badgeStatus = 'running';
 			plans.objectApiName = Schema.SObjectType.Stewardship_Plan__c.getName();
 			plans.filterName = 'Running_Plans';
@@ -350,13 +329,7 @@ public with sharing class FundraisingHomeController {
 			}
 		) {
 			if (described.isAccessible()) {
-				tiles.add(
-					moreTile(
-						described.getLocalName(),
-						described.getLabelPlural(),
-						described.getName()
-					)
-				);
+				tiles.add(moreTile(described.getLocalName(), described.getLabelPlural(), described.getName()));
 			}
 		}
 		if (Schema.SObjectType.Gift__c.isAccessible()) {
@@ -368,9 +341,7 @@ public with sharing class FundraisingHomeController {
 			}
 		}
 		if (Schema.SObjectType.Dashboard.isAccessible()) {
-			tiles.add(
-				moreTile('Dashboard', Schema.SObjectType.Dashboard.getLabelPlural(), 'Dashboard')
-			);
+			tiles.add(moreTile('Dashboard', Schema.SObjectType.Dashboard.getLabelPlural(), 'Dashboard'));
 		}
 		return tiles;
 	}

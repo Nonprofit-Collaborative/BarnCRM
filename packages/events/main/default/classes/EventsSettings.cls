@@ -78,9 +78,7 @@ public with sharing class EventsSettings {
 	/** The note shown beside a priced ticket on a public event page (EV-16); never blank. */
 	public static String publicPaymentNote() {
 		String note = text('Public_Payment_Note__c');
-		return String.isBlank(note)
-			? BarnHelp.text('Events', 'Events_Public_PaymentNoteDefault')
-			: note;
+		return String.isBlank(note) ? BarnHelp.text('Events', 'Events_Public_PaymentNoteDefault') : note;
 	}
 
 	private static String text(String key) {

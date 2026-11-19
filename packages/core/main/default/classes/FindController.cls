@@ -12,11 +12,7 @@
  */
 @NamespaceAccessible
 public with sharing class FindController {
-	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
-		null,
-		'Core',
-		'Core_Find_UnexpectedError'
-	);
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(null, 'Core', 'Core_Find_UnexpectedError');
 
 	/** Raised for anything the person can fix; the message is shown as it is. */
 	public class FindException extends Exception {
@@ -118,9 +114,7 @@ public with sharing class FindController {
 			requirePermission();
 			Map<String, Option> byLabel = new Map<String, Option>();
 			for (Schema.SObjectType type : NamespaceUtil.globalDescribe().values()) {
-				Schema.DescribeSObjectResult objectDescribe = type.getDescribe(
-					SObjectDescribeOptions.DEFERRED
-				);
+				Schema.DescribeSObjectResult objectDescribe = type.getDescribe(SObjectDescribeOptions.DEFERRED);
 				if (!isOffered(objectDescribe)) {
 					continue;
 				}
@@ -154,9 +148,7 @@ public with sharing class FindController {
 
 	/** The kinds of related record of an object, for related records (C-36, R-SQ8). */
 	@AuraEnabled(cacheable=true)
-	public static List<FindRelatedRecords.ChildOption> listChildRelationships(
-		String objectApiName
-	) {
+	public static List<FindRelatedRecords.ChildOption> listChildRelationships(String objectApiName) {
 		try {
 			requirePermission();
 			return FindRelatedRecords.childOptions(objectApiName);
@@ -177,10 +169,7 @@ public with sharing class FindController {
 			result.done = true;
 			if (compiled.radiusField != null) {
 				// The query already compiled: the document is not read and checked again.
-				result.withoutGeocode = QueryCompiler.countWithoutGeocode(
-					compiled,
-					MAX_WITHOUT_GEOCODE
-				);
+				result.withoutGeocode = QueryCompiler.countWithoutGeocode(compiled, MAX_WITHOUT_GEOCODE);
 			}
 			return result;
 		} catch (Exception caught) {
@@ -230,10 +219,7 @@ public with sharing class FindController {
 	 * as well as Find's (R-BU6).
 	 */
 	@AuraEnabled
-	public static FindInlineEditService.SaveSummary saveEdits(
-		String objectApiName,
-		String editsJson
-	) {
+	public static FindInlineEditService.SaveSummary saveEdits(String objectApiName, String editsJson) {
 		try {
 			requirePermission();
 			if (!BulkUpdateController.hasPermission()) {
@@ -278,11 +264,7 @@ public with sharing class FindController {
 	}
 
 	private static final Pattern EXPORT_TAG = Pattern.compile('[0-9a-f]{6}');
-	private static final Set<String> FINISHED_JOB = new Set<String>{
-		'Completed',
-		'Failed',
-		'Aborted'
-	};
+	private static final Set<String> FINISHED_JOB = new Set<String>{ 'Completed', 'Failed', 'Aborted' };
 
 	/**
 	 * Starts an export to Files of the query (R-SQ12), at most the export row limit, with the
@@ -297,9 +279,7 @@ public with sharing class FindController {
 			QueryCompiler.compileServerExport(queryJson, rowLimit);
 			Map<String, String> labels = new Map<String, String>();
 			if (String.isNotBlank(labelsJson)) {
-				Map<String, Object> given = (Map<String, Object>) JSON.deserializeUntyped(
-					labelsJson
-				);
+				Map<String, Object> given = (Map<String, Object>) JSON.deserializeUntyped(labelsJson);
 				for (String path : given.keySet()) {
 					labels.put(path, String.valueOf(given.get(path)).left(255));
 				}
@@ -355,9 +335,7 @@ public with sharing class FindController {
 		view.chunksTotal = jobs[0].TotalJobItems;
 		view.done = FINISHED_JOB.contains(view.status);
 		view.failed =
-			(view.done && view.status != 'Completed') ||
-			(jobs[0].NumberOfErrors != null &&
-			jobs[0].NumberOfErrors > 0);
+			(view.done && view.status != 'Completed') || (jobs[0].NumberOfErrors != null && jobs[0].NumberOfErrors > 0);
 		String titles = '%-' + tag + '-part-%';
 		for (ContentVersion version : [
 			SELECT ContentDocumentId, Title, ContentSize
@@ -387,9 +365,7 @@ public with sharing class FindController {
 			result.soql = compiled.display;
 			result.rows = QueryCompiler.run(compiled);
 			result.done = result.rows.size() < QueryCompiler.EXPORT_PAGE_SIZE;
-			result.lastId = result.rows.isEmpty()
-				? afterId
-				: String.valueOf(result.rows[result.rows.size() - 1].Id);
+			result.lastId = result.rows.isEmpty() ? afterId : String.valueOf(result.rows[result.rows.size() - 1].Id);
 			return result;
 		} catch (Exception caught) {
 			throw ERRORS.wrap(caught, 'Export a Find query');
@@ -401,12 +377,7 @@ public with sharing class FindController {
 	 * The document is compiled first, so a query that would not run is never saved.
 	 */
 	@AuraEnabled
-	public static FindPage saveQuery(
-		String recordId,
-		String name,
-		String queryJson,
-		Boolean shared
-	) {
+	public static FindPage saveQuery(String recordId, String name, String queryJson, Boolean shared) {
 		try {
 			requirePermission();
 			if (String.isBlank(name) || name.trim().length() > 80) {
@@ -456,10 +427,7 @@ public with sharing class FindController {
 	@NamespaceAccessible
 	public static Integer exportLimit() {
 		Decimal rows = SettingsService.storedNumber('Find_Export_Row_Limit__c');
-		return rows == null ||
-			rows < 1
-			? DEFAULT_EXPORT_LIMIT
-			: Math.min(rows.intValue(), MAX_EXPORT_LIMIT);
+		return rows == null || rows < 1 ? DEFAULT_EXPORT_LIMIT : Math.min(rows.intValue(), MAX_EXPORT_LIMIT);
 	}
 
 	private static FindPage currentPage() {

@@ -143,9 +143,7 @@ public with sharing class GiftService {
 			}
 		}
 
-		Map<Id, String> recordTypeNames = GivingAccountSelector.selectRecordTypeNamesById(
-			accountIds
-		);
+		Map<Id, String> recordTypeNames = GivingAccountSelector.selectRecordTypeNamesById(accountIds);
 		Set<Id> personIds = new Set<Id>(contactIds);
 		for (Id accountId : accountIds) {
 			if (RECORD_TYPE_HOUSEHOLD != recordTypeNames.get(accountId)) {
@@ -161,8 +159,7 @@ public with sharing class GiftService {
 			if (gift.Donor_Contact__c != null) {
 				gift.Household__c = householdsByPerson.get(gift.Donor_Contact__c);
 			} else if (gift.Donor_Account__c != null) {
-				gift.Household__c = RECORD_TYPE_HOUSEHOLD ==
-					recordTypeNames.get(gift.Donor_Account__c)
+				gift.Household__c = RECORD_TYPE_HOUSEHOLD == recordTypeNames.get(gift.Donor_Account__c)
 					? gift.Donor_Account__c
 					: householdsByPerson.get(gift.Donor_Account__c);
 			} else {
@@ -342,9 +339,7 @@ public with sharing class GiftService {
 	 */
 	private static Boolean canOverrideReceiptLock() {
 		if (receiptLockOverride == null) {
-			receiptLockOverride = FeatureManagement.checkPermission(
-				OVERRIDE_RECEIPT_LOCK_PERMISSION
-			);
+			receiptLockOverride = FeatureManagement.checkPermission(OVERRIDE_RECEIPT_LOCK_PERMISSION);
 		}
 		return receiptLockOverride;
 	}
@@ -362,32 +357,18 @@ public with sharing class GiftService {
 			changes.add(change(Gift__c.Gift_Date__c, previous.Gift_Date__c, gift.Gift_Date__c));
 		}
 		if (gift.Donor_Contact__c != previous.Donor_Contact__c) {
-			changes.add(
-				change(Gift__c.Donor_Contact__c, previous.Donor_Contact__c, gift.Donor_Contact__c)
-			);
+			changes.add(change(Gift__c.Donor_Contact__c, previous.Donor_Contact__c, gift.Donor_Contact__c));
 		}
 		if (gift.Donor_Account__c != previous.Donor_Account__c) {
-			changes.add(
-				change(Gift__c.Donor_Account__c, previous.Donor_Account__c, gift.Donor_Account__c)
-			);
+			changes.add(change(Gift__c.Donor_Account__c, previous.Donor_Account__c, gift.Donor_Account__c));
 		}
 		if (gift.In_Kind_Description__c != previous.In_Kind_Description__c) {
 			changes.add(
-				change(
-					Gift__c.In_Kind_Description__c,
-					previous.In_Kind_Description__c,
-					gift.In_Kind_Description__c
-				)
+				change(Gift__c.In_Kind_Description__c, previous.In_Kind_Description__c, gift.In_Kind_Description__c)
 			);
 		}
 		if (gift.Receipt_Number__c != previous.Receipt_Number__c) {
-			changes.add(
-				change(
-					Gift__c.Receipt_Number__c,
-					previous.Receipt_Number__c,
-					gift.Receipt_Number__c
-				)
-			);
+			changes.add(change(Gift__c.Receipt_Number__c, previous.Receipt_Number__c, gift.Receipt_Number__c));
 		}
 		return String.format(
 			BarnHelp.text('Giving', 'Giving_Gift_ReceiptLockOverridden'),
@@ -406,18 +387,12 @@ public with sharing class GiftService {
 	public static String change(Schema.SObjectField field, Object before, Object after) {
 		return String.format(
 			BarnHelp.text('Giving', 'Giving_Gift_OverrideChange'),
-			new List<String>{
-				field.getDescribe().getLabel(),
-				valueOrNone(before),
-				valueOrNone(after)
-			}
+			new List<String>{ field.getDescribe().getLabel(), valueOrNone(before), valueOrNone(after) }
 		);
 	}
 
 	private static String valueOrNone(Object value) {
-		return value == null
-			? BarnHelp.text('Giving', 'Giving_Gift_OverrideValueNone')
-			: String.valueOf(value);
+		return value == null ? BarnHelp.text('Giving', 'Giving_Gift_OverrideValueNone') : String.valueOf(value);
 	}
 
 	/**
@@ -489,11 +464,7 @@ public with sharing class GiftService {
 			return;
 		}
 
-		for (
-			Gift_Allocation__c allocation : GiftAllocationSelector.selectByGiftIds(
-				candidates.keySet()
-			)
-		) {
+		for (Gift_Allocation__c allocation : GiftAllocationSelector.selectByGiftIds(candidates.keySet())) {
 			candidates.remove(allocation.Gift__c);
 		}
 		if (candidates.isEmpty()) {
@@ -548,10 +519,10 @@ public with sharing class GiftService {
 	public static Set<Id> applyChosenFunds(List<Gift__c> gifts, Map<Id, Id> fundIdByGiftId) {
 		ChosenFundPlan plan = planChosenFunds(gifts, fundIdByGiftId);
 		if (!plan.added.isEmpty()) {
-			Database.insert(plan.added, true, AccessLevel.USER_MODE);
+			insert as user plan.added;
 		}
 		if (!plan.changed.isEmpty()) {
-			Database.update(plan.changed, true, AccessLevel.USER_MODE);
+			update as user plan.changed;
 		}
 		return plan.notApplied;
 	}
@@ -568,21 +539,14 @@ public with sharing class GiftService {
 	 * it had before, and the caller decides whether to keep it.
 	 */
 	@NamespaceAccessible
-	public static Map<Id, String> applyChosenFundsEach(
-		List<Gift__c> gifts,
-		Map<Id, Id> fundIdByGiftId
-	) {
+	public static Map<Id, String> applyChosenFundsEach(List<Gift__c> gifts, Map<Id, Id> fundIdByGiftId) {
 		ChosenFundPlan plan = planChosenFunds(gifts, fundIdByGiftId);
 		Map<Id, String> notApplied = new Map<Id, String>();
 		for (Id giftId : plan.notApplied) {
 			notApplied.put(giftId, null);
 		}
 		if (!plan.added.isEmpty()) {
-			collectFailures(
-				Database.insert(plan.added, false, AccessLevel.USER_MODE),
-				plan.addedGiftIds,
-				notApplied
-			);
+			collectFailures(Database.insert(plan.added, false, AccessLevel.USER_MODE), plan.addedGiftIds, notApplied);
 		}
 		if (!plan.changed.isEmpty()) {
 			collectFailures(
@@ -609,11 +573,7 @@ public with sharing class GiftService {
 			return plan;
 		}
 		Map<Id, List<Gift_Allocation__c>> byGift = new Map<Id, List<Gift_Allocation__c>>();
-		for (
-			Gift_Allocation__c allocation : GiftSelector.selectAllocationsByGiftIds(
-				fundIdByGiftId.keySet()
-			)
-		) {
+		for (Gift_Allocation__c allocation : GiftSelector.selectAllocationsByGiftIds(fundIdByGiftId.keySet())) {
 			if (!byGift.containsKey(allocation.Gift__c)) {
 				byGift.put(allocation.Gift__c, new List<Gift_Allocation__c>());
 			}
@@ -625,23 +585,13 @@ public with sharing class GiftService {
 			if (fundId == null) {
 				continue;
 			} else if (existing == null) {
-				plan.added.add(
-					new Gift_Allocation__c(
-						Gift__c = gift.Id,
-						Fund__c = fundId,
-						Amount__c = gift.Amount__c
-					)
-				);
+				plan.added.add(new Gift_Allocation__c(Gift__c = gift.Id, Fund__c = fundId, Amount__c = gift.Amount__c));
 				plan.addedGiftIds.add(gift.Id);
 			} else if (existing.size() > 1) {
 				plan.notApplied.add(gift.Id);
 			} else if (existing[0].Fund__c != fundId) {
 				plan.changed.add(
-					new Gift_Allocation__c(
-						Id = existing[0].Id,
-						Fund__c = fundId,
-						Amount__c = gift.Amount__c
-					)
+					new Gift_Allocation__c(Id = existing[0].Id, Fund__c = fundId, Amount__c = gift.Amount__c)
 				);
 				plan.changedGiftIds.add(gift.Id);
 			}
@@ -649,11 +599,7 @@ public with sharing class GiftService {
 		return plan;
 	}
 
-	private static void collectFailures(
-		List<Database.SaveResult> saves,
-		List<Id> giftIds,
-		Map<Id, String> notApplied
-	) {
+	private static void collectFailures(List<Database.SaveResult> saves, List<Id> giftIds, Map<Id, String> notApplied) {
 		for (Integer index = 0; index < saves.size(); index++) {
 			if (saves[index].isSuccess()) {
 				continue;
@@ -721,9 +667,7 @@ public with sharing class GiftService {
 			if (gift == null || gift.Amount__c == null || gift.Amount__c == 0) {
 				continue;
 			}
-			Gift_Allocation__c previous = oldAllocations == null
-				? null
-				: oldAllocations.get(allocation.Id);
+			Gift_Allocation__c previous = oldAllocations == null ? null : oldAllocations.get(allocation.Id);
 			Boolean amountChanged = previous == null
 				? allocation.Amount__c != null
 				: allocation.Amount__c != previous.Amount__c;
@@ -753,11 +697,7 @@ public with sharing class GiftService {
 		spreadRoundingDifference(percentEntered, giftsById);
 	}
 
-	private static void addTo(
-		Map<Id, List<Gift_Allocation__c>> byGift,
-		Id giftId,
-		Gift_Allocation__c allocation
-	) {
+	private static void addTo(Map<Id, List<Gift_Allocation__c>> byGift, Id giftId, Gift_Allocation__c allocation) {
 		if (!byGift.containsKey(giftId)) {
 			byGift.put(giftId, new List<Gift_Allocation__c>());
 		}
@@ -810,16 +750,9 @@ public with sharing class GiftService {
 		for (Id giftId : giftsById.keySet()) {
 			totals.put(giftId, 0);
 		}
-		for (
-			Gift_Allocation__c allocation : GiftAllocationSelector.selectByGiftIds(
-				giftsById.keySet()
-			)
-		) {
+		for (Gift_Allocation__c allocation : GiftAllocationSelector.selectByGiftIds(giftsById.keySet())) {
 			Decimal running = totals.get(allocation.Gift__c);
-			totals.put(
-				allocation.Gift__c,
-				running + (allocation.Amount__c == null ? 0 : allocation.Amount__c)
-			);
+			totals.put(allocation.Gift__c, running + (allocation.Amount__c == null ? 0 : allocation.Amount__c));
 		}
 
 		for (Id giftId : giftsById.keySet()) {
@@ -852,10 +785,7 @@ public with sharing class GiftService {
 	 * chose. A gift split across several funds is left alone and the person is told to adjust
 	 * the split first, because the package cannot know which fund lost the money.
 	 */
-	public static void synchronizeAllocationsToAmount(
-		List<Gift__c> gifts,
-		Map<Id, Gift__c> oldGifts
-	) {
+	public static void synchronizeAllocationsToAmount(List<Gift__c> gifts, Map<Id, Gift__c> oldGifts) {
 		Map<Id, Gift__c> changed = new Map<Id, Gift__c>();
 		for (Gift__c gift : gifts) {
 			Gift__c previous = oldGifts.get(gift.Id);
@@ -868,9 +798,7 @@ public with sharing class GiftService {
 		}
 
 		Map<Id, List<Gift_Allocation__c>> byGift = new Map<Id, List<Gift_Allocation__c>>();
-		for (
-			Gift_Allocation__c allocation : GiftAllocationSelector.selectByGiftIds(changed.keySet())
-		) {
+		for (Gift_Allocation__c allocation : GiftAllocationSelector.selectByGiftIds(changed.keySet())) {
 			addTo(byGift, allocation.Gift__c, allocation);
 		}
 
@@ -889,11 +817,7 @@ public with sharing class GiftService {
 				// Only the fields being changed: a user mode update of the row as read would
 				// also carry the master detail to the gift, which nobody may edit.
 				toUpdate.add(
-					new Gift_Allocation__c(
-						Id = allocations[0].Id,
-						Amount__c = gift.Amount__c,
-						Percent__c = 100
-					)
+					new Gift_Allocation__c(Id = allocations[0].Id, Amount__c = gift.Amount__c, Percent__c = 100)
 				);
 			} else {
 				gift.addError(BarnHelp.text('Giving', 'Giving_Gift_AmountChangeSplit'));
@@ -927,22 +851,13 @@ public with sharing class GiftService {
 		Gift__c original = loadReversible(giftId);
 		Decimal remaining = remainingAmount(original);
 		if (amount == null || amount <= 0) {
-			throw new GiftServiceException(
-				BarnHelp.text('Giving', 'Giving_Gift_RefundAmountRequired')
-			);
+			throw new GiftServiceException(BarnHelp.text('Giving', 'Giving_Gift_RefundAmountRequired'));
 		}
 		if (amount > remaining) {
-			throw new GiftServiceException(
-				BarnHelp.text('Giving', 'Giving_Gift_RefundExceedsRemaining')
-			);
+			throw new GiftServiceException(BarnHelp.text('Giving', 'Giving_Gift_RefundExceedsRemaining'));
 		}
 		Boolean nothingLeftAfterThis = amount == remaining;
-		return recordReversal(
-			original,
-			-amount,
-			reason,
-			nothingLeftAfterThis ? STATUS_REFUNDED : null
-		);
+		return recordReversal(original, -amount, reason, nothingLeftAfterThis ? STATUS_REFUNDED : null);
 	}
 
 	/**
@@ -973,23 +888,15 @@ public with sharing class GiftService {
 		}
 		Gift__c original = gifts[0];
 		if (original.Amount__c == null || original.Amount__c <= 0) {
-			throw new GiftServiceException(
-				BarnHelp.text('Giving', 'Giving_Gift_CannotReverseNegative')
-			);
+			throw new GiftServiceException(BarnHelp.text('Giving', 'Giving_Gift_CannotReverseNegative'));
 		}
 		// R-G3: only money received goes back. A Pending gift that will never be paid is
 		// cancelled instead (R-G16); a Refunded or Written off one has nothing left and is
 		// answered by the callers with what already happened to it.
 		String status = String.isBlank(original.Status__c) ? STATUS_RECEIVED : original.Status__c;
-		if (
-			status == GiftStatusRules.STATUS_PENDING ||
-			status == GiftStatusRules.STATUS_CANCELLED
-		) {
+		if (status == GiftStatusRules.STATUS_PENDING || status == GiftStatusRules.STATUS_CANCELLED) {
 			throw new GiftServiceException(
-				String.format(
-					BarnHelp.text('Giving', 'Giving_Gift_ReverseNeedsReceived'),
-					new List<String>{ status }
-				)
+				String.format(BarnHelp.text('Giving', 'Giving_Gift_ReverseNeedsReceived'), new List<String>{ status })
 			);
 		}
 		return original;
@@ -1044,21 +951,13 @@ public with sharing class GiftService {
 
 		if (mirrorAllocations) {
 			Database.insert(
-				mirroredAllocations(
-					reversal.Id,
-					originalAllocations,
-					original.Amount__c,
-					negativeAmount
-				),
+				mirroredAllocations(reversal.Id, originalAllocations, original.Amount__c, negativeAmount),
 				AccessLevel.USER_MODE
 			);
 		}
 
 		if (newOriginalStatus != null) {
-			Database.update(
-				new Gift__c(Id = original.Id, Status__c = newOriginalStatus),
-				AccessLevel.USER_MODE
-			);
+			Database.update(new Gift__c(Id = original.Id, Status__c = newOriginalStatus), AccessLevel.USER_MODE);
 		}
 		return reversal.Id;
 	}
@@ -1078,10 +977,7 @@ public with sharing class GiftService {
 		Gift_Allocation__c largest = null;
 		for (Gift_Allocation__c source : originalAllocations) {
 			Decimal share = source.Amount__c == null ? 0 : source.Amount__c;
-			Decimal mirroredAmount = (share /
-				originalAmount *
-				negativeAmount)
-				.setScale(2, System.RoundingMode.HALF_UP);
+			Decimal mirroredAmount = (share / originalAmount * negativeAmount).setScale(2, System.RoundingMode.HALF_UP);
 			Gift_Allocation__c allocation = new Gift_Allocation__c(
 				Gift__c = reversalGiftId,
 				Fund__c = source.Fund__c,

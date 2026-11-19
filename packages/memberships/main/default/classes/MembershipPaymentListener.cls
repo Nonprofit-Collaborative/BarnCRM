@@ -53,8 +53,7 @@ public with sharing class MembershipPaymentListener implements Callable {
 		}
 		Membership_Term__c term = found[0];
 		if (term.Status__c == MembershipService.PENDING) {
-			Membership_Level__c level = MembershipService.levels(new Set<Id>{ term.Level__c })
-				.get(term.Level__c);
+			Membership_Level__c level = MembershipService.levels(new Set<Id>{ term.Level__c }).get(term.Level__c);
 			update as system new Membership_Term__c(
 				Id = term.Id,
 				Status__c = MembershipService.CURRENT,
@@ -67,10 +66,7 @@ public with sharing class MembershipPaymentListener implements Callable {
 			);
 			return;
 		}
-		if (
-			term.Status__c == MembershipService.RENEWED ||
-			term.Status__c == MembershipService.CANCELLED
-		) {
+		if (term.Status__c == MembershipService.RENEWED || term.Status__c == MembershipService.CANCELLED) {
 			// Renewed meanwhile (by a gift or staff): the payment stands in Payments, nothing to add.
 			return;
 		}

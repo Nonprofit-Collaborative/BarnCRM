@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>The Advanced Reporting tab: saved dashboards and reports, shipped dashboard templates, New Report and New Dashboard (O-02).</description>
+  <isExposed>true</isExposed>
+  <masterLabel>Advanced Reporting</masterLabel>
+  <targets>
+    <target>lightning__AppPage</target>
+    <target>lightning__Tab</target>
+  </targets>
+</LightningComponentBundle>

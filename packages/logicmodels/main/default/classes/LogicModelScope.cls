@@ -24,9 +24,7 @@ public with sharing class LogicModelScope {
 		for (Logic_Model__c model : models) {
 			String key = keyFor(model.Program_Id__c);
 			if (key == null) {
-				model.Program_Id__c.addError(
-					BarnHelp.text('LogicModels', 'LogicModels_Scope_BadProgram')
-				);
+				model.Program_Id__c.addError(BarnHelp.text('LogicModels', 'LogicModels_Scope_BadProgram'));
 				continue;
 			}
 			model.Program_Id__c = key == ORGANIZATION ? null : key;
@@ -46,12 +44,7 @@ public with sharing class LogicModelScope {
 			return;
 		}
 		Set<Id> own = previousById == null ? new Set<Id>() : previousById.keySet();
-		for (
-			Logic_Model__c existing : LogicModelIntegritySelector.selectByScopeKeys(
-				claimed.keySet(),
-				own
-			)
-		) {
+		for (Logic_Model__c existing : LogicModelIntegritySelector.selectByScopeKeys(claimed.keySet(), own)) {
 			Logic_Model__c model = claimed.get(existing.Scope_Key__c);
 			if (model != null) {
 				model.addError(messageFor(existing.Scope_Key__c));

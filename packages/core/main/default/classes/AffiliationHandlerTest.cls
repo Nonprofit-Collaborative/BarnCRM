@@ -25,11 +25,7 @@ private class AffiliationHandlerTest {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
 			List<Account> orgs = RelationshipTestDataFactory.organizations(1, 'Union Foundation');
-			Affiliation__c ended = RelationshipTestDataFactory.affiliation(
-				people[0],
-				orgs[0],
-				'Program Officer'
-			);
+			Affiliation__c ended = RelationshipTestDataFactory.affiliation(people[0], orgs[0], 'Program Officer');
 			ended.Is_Primary__c = true;
 			ended.End_Date__c = Date.today().addDays(-1);
 
@@ -38,10 +34,7 @@ private class AffiliationHandlerTest {
 			Test.stopTest();
 
 			Assert.areEqual('Former', ended.Status__c, 'An affiliation with an end date has ended');
-			Assert.isFalse(
-				ended.Is_Primary__c,
-				'And a former affiliation is never the primary one'
-			);
+			Assert.isFalse(ended.Is_Primary__c, 'And a former affiliation is never the primary one');
 		}
 	}
 
@@ -53,11 +46,7 @@ private class AffiliationHandlerTest {
 			AutomationControl.bypass(VALIDATION);
 			List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
 			List<Account> orgs = RelationshipTestDataFactory.organizations(1, 'Union Foundation');
-			Affiliation__c work = RelationshipTestDataFactory.affiliation(
-				people[0],
-				orgs[0],
-				'Program Officer'
-			);
+			Affiliation__c work = RelationshipTestDataFactory.affiliation(people[0], orgs[0], 'Program Officer');
 			work.Is_Primary__c = true;
 			insert work;
 			AutomationControl.clearBypass(MAINTENANCE);
@@ -73,10 +62,7 @@ private class AffiliationHandlerTest {
 				FROM Contact
 				WHERE Id = :people[0].Id
 			];
-			Assert.isNull(
-				reloaded.Primary_Affiliation__c,
-				'The validation handler never writes the person'
-			);
+			Assert.isNull(reloaded.Primary_Affiliation__c, 'The validation handler never writes the person');
 		}
 	}
 
@@ -90,11 +76,7 @@ private class AffiliationHandlerTest {
 			AutomationControl.bypass(VALIDATION);
 			List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
 			List<Account> orgs = RelationshipTestDataFactory.organizations(1, 'Union Foundation');
-			Affiliation__c work = RelationshipTestDataFactory.affiliation(
-				people[0],
-				orgs[0],
-				'Program Officer'
-			);
+			Affiliation__c work = RelationshipTestDataFactory.affiliation(people[0], orgs[0], 'Program Officer');
 			work.Is_Primary__c = true;
 			insert work;
 			AutomationControl.clearBypass(MAINTENANCE);
@@ -123,16 +105,10 @@ private class AffiliationHandlerTest {
 		System.runAs(TestUsers.admin()) {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
-			Affiliation__c noOrganization = new Affiliation__c(
-				Contact__c = people[0].Id,
-				Role__c = 'Officer'
-			);
+			Affiliation__c noOrganization = new Affiliation__c(Contact__c = people[0].Id, Role__c = 'Officer');
 
 			Test.startTest();
-			driveBeforeInsert(
-				new AffiliationMaintenanceHandler(),
-				new List<SObject>{ noOrganization }
-			);
+			driveBeforeInsert(new AffiliationMaintenanceHandler(), new List<SObject>{ noOrganization });
 			Test.stopTest();
 
 			Assert.isFalse(
@@ -158,10 +134,7 @@ private class AffiliationHandlerTest {
 			);
 			Test.stopTest();
 
-			Assert.isFalse(
-				result.isSuccess(),
-				'Switching the primary upkeep off does not switch the rules off'
-			);
+			Assert.isFalse(result.isSuccess(), 'Switching the primary upkeep off does not switch the rules off');
 		}
 	}
 
@@ -185,11 +158,7 @@ private class AffiliationHandlerTest {
 				result.isSuccess(),
 				'The overlap check is exactly what an import needs and it is still there'
 			);
-			Assert.areEqual(
-				1,
-				RelationshipTestDataFactory.allAffiliations().size(),
-				'And nothing was written'
-			);
+			Assert.areEqual(1, RelationshipTestDataFactory.allAffiliations().size(), 'And nothing was written');
 		}
 	}
 
@@ -197,9 +166,7 @@ private class AffiliationHandlerTest {
 
 	/** Switches the maintenance automation off the way the Automation page does, and only it. */
 	private static void switchMaintenanceOff() {
-		TestDataFactory.insertAutomationSettings(
-			new Map<String, Boolean>{ MAINTENANCE => false, VALIDATION => true }
-		);
+		TestDataFactory.insertAutomationSettings(new Map<String, Boolean>{ MAINTENANCE => false, VALIDATION => true });
 		Assert.isFalse(AutomationControl.isEnabled(MAINTENANCE), 'The upkeep is off');
 		Assert.isTrue(AutomationControl.isEnabled(VALIDATION), 'The checks are on');
 	}

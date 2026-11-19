@@ -8,6 +8,7 @@ public with sharing class BarnCRMShippedPermissionSets {
 	public static final Set<String> NAMES = new Set<String>{
 		'Accounting_Export',
 		'Address_Verification_Admin',
+		'Address_Verification_User',
 		'BarnCRM_Access_Manager',
 		'BarnCRM_Accounts_Tab',
 		'BarnCRM_Admin',
@@ -71,6 +72,10 @@ public with sharing class BarnCRMShippedPermissionSets {
 		'Projects_Read_Only',
 		'Projects_Request_Intake',
 		'Projects_Staff',
+		'Provider_Requests',
+		'Reporting_Admin',
+		'Reporting_Read_Only',
+		'Reporting_Staff',
 		'Rollup_Builder_Admin',
 		'Rollup_Builder_User',
 		'Salesforce_Records_Sync',

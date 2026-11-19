@@ -25,9 +25,7 @@ private class AskRulesTest {
 	}
 
 	private static Contact person() {
-		Contact donor = TestDataFactory.person(
-			new Contact(FirstName = 'Ana', LastName = 'Ramirez')
-		);
+		Contact donor = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Ramirez'));
 		insert donor;
 		return donor;
 	}
@@ -47,11 +45,7 @@ private class AskRulesTest {
 	@IsTest
 	static void anEmptySettingMeansTheShippedList() {
 		System.runAs(staff()) {
-			Assert.areEqual(
-				AskRules.parse(AskRules.DEFAULT_STAGES),
-				AskRules.stages(),
-				'The shipped stages.'
-			);
+			Assert.areEqual(AskRules.parse(AskRules.DEFAULT_STAGES), AskRules.stages(), 'The shipped stages.');
 		}
 	}
 
@@ -73,11 +67,7 @@ private class AskRulesTest {
 			];
 			Assert.areEqual('Prospect', saved.Stage__c, 'The first stage.');
 			Assert.areEqual(AskRules.OUTCOME_OPEN, saved.Outcome__c, 'Open.');
-			Assert.areEqual(
-				System.today(),
-				saved.Stage_Changed_Date__c,
-				'In this stage from today.'
-			);
+			Assert.areEqual(System.today(), saved.Stage_Changed_Date__c, 'In this stage from today.');
 			Assert.isNull(saved.Closed_Date__c, 'Not closed.');
 		}
 	}
@@ -104,10 +94,7 @@ private class AskRulesTest {
 			Test.stopTest();
 
 			Assert.isFalse(refused.isSuccess(), 'A stage not in the list is refused.');
-			Assert.isTrue(
-				refused.getErrors()[0].getMessage().contains('Negotiating'),
-				'The message names the stage.'
-			);
+			Assert.isTrue(refused.getErrors()[0].getMessage().contains('Negotiating'), 'The message names the stage.');
 		}
 	}
 
@@ -134,10 +121,7 @@ private class AskRulesTest {
 	static void closingFillsTheClosedDateAndReopeningClearsIt() {
 		System.runAs(staff()) {
 			Contact donor = person();
-			Ask__c ask = new Ask__c(
-				Donor_Contact__c = donor.Id,
-				Stage_Changed_Date__c = System.today().addDays(-30)
-			);
+			Ask__c ask = new Ask__c(Donor_Contact__c = donor.Id, Stage_Changed_Date__c = System.today().addDays(-30));
 			insert ask;
 			Assert.areEqual(
 				System.today().addDays(-30),
@@ -170,9 +154,7 @@ private class AskRulesTest {
 	static void aPersonAccountsContactBecomesTheDonorAccount() {
 		System.runAs(staff()) {
 			Contact behind = person();
-			Contact plain = TestDataFactory.person(
-				new Contact(FirstName = 'Lee', LastName = 'Chen')
-			);
+			Contact plain = TestDataFactory.person(new Contact(FirstName = 'Lee', LastName = 'Chen'));
 			insert plain;
 			Account personAccount = GivingTestDataFactory.insertOrganization('Ana Ramirez');
 			AskRules.accountsBehindForTest = new Map<Id, Id>{ behind.Id => personAccount.Id };
@@ -201,11 +183,7 @@ private class AskRulesTest {
 			Contact donor = person();
 			Account organization = GivingTestDataFactory.insertOrganization('Summit Foundation');
 
-			Database.SaveResult neither = Database.insert(
-				new Ask__c(Amount__c = 100),
-				false,
-				AccessLevel.USER_MODE
-			);
+			Database.SaveResult neither = Database.insert(new Ask__c(Amount__c = 100), false, AccessLevel.USER_MODE);
 			Database.SaveResult both = Database.insert(
 				new Ask__c(Donor_Contact__c = donor.Id, Donor_Account__c = organization.Id),
 				false,

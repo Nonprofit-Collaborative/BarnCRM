@@ -98,11 +98,7 @@ private class FindControllerTest {
 
 			System.Assert.areEqual(200, page.rows.size(), 'One page holds every row here');
 			System.Assert.isTrue(page.done, 'A short page is the last one');
-			System.Assert.areEqual(
-				String.valueOf(page.rows[199].Id),
-				page.lastId,
-				'The next page starts here'
-			);
+			System.Assert.areEqual(String.valueOf(page.rows[199].Id), page.lastId, 'The next page starts here');
 		}
 	}
 
@@ -155,10 +151,7 @@ private class FindControllerTest {
 				FindController.saveQuery(recordId, 'Errors to review', ERRORS_ONLY, false);
 			}
 			System.runAs(david) {
-				System.Assert.isTrue(
-					FindController.getPage().savedQueries.isEmpty(),
-					'Unsharing takes it away again'
-				);
+				System.Assert.isTrue(FindController.getPage().savedQueries.isEmpty(), 'Unsharing takes it away again');
 			}
 
 		}
@@ -172,26 +165,17 @@ private class FindControllerTest {
 				for (
 					List<String> attempt : new List<List<String>>{
 						new List<String>{ '', ERRORS_ONLY },
-						new List<String>{
-							'Broken',
-							'{"version": 1, "object": "Error_Log__c", "fields": ["Nope__c"]}'
-						}
+						new List<String>{ 'Broken', '{"version": 1, "object": "Error_Log__c", "fields": ["Nope__c"]}' }
 					}
 				) {
 					try {
 						FindController.saveQuery(null, attempt[0], attempt[1], false);
 						System.Assert.fail('Must not be saved: ' + attempt[0]);
 					} catch (AuraHandledException refused) {
-						System.Assert.isTrue(
-							String.isNotBlank(refused.getMessage()),
-							'The refusal says what to fix'
-						);
+						System.Assert.isTrue(String.isNotBlank(refused.getMessage()), 'The refusal says what to fix');
 					}
 				}
-				System.Assert.isTrue(
-					FindController.getPage().savedQueries.isEmpty(),
-					'Nothing saved'
-				);
+				System.Assert.isTrue(FindController.getPage().savedQueries.isEmpty(), 'Nothing saved');
 			}
 
 		}
@@ -276,10 +260,7 @@ private class FindControllerTest {
 				}
 				System.Assert.isFalse(names.isEmpty(), 'Maria can query something');
 				for (String name : names) {
-					System.Assert.isFalse(
-						name.endsWith('barncrm_settings__c'),
-						'Settings are not offered'
-					);
+					System.Assert.isFalse(name.endsWith('barncrm_settings__c'), 'Settings are not offered');
 					System.Assert.isFalse(name.endsWith('share'), 'Share tables are not offered');
 					System.Assert.isFalse(name.endsWith('history'), 'History tables neither');
 					System.Assert.isFalse(name.endsWith('feed'), 'Feeds neither');

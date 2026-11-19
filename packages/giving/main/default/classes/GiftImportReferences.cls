@@ -92,10 +92,7 @@ public with sharing class GiftImportReferences {
 				item.appealId = recordId;
 			}
 			if (recordId == null) {
-				item.error = String.format(
-					notFound(brands, found.isAmbiguous(word)),
-					new List<String>{ word }
-				);
+				item.error = String.format(notFound(brands, found.isAmbiguous(word)), new List<String>{ word });
 			}
 		}
 	}

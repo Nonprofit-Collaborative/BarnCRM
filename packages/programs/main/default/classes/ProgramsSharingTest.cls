@@ -37,9 +37,7 @@ private class ProgramsSharingTest {
 	private static Service__c service() {
 		Service__c meal;
 		System.runAs(admin()) {
-			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-				HouseholdTestDataFactory.MODE_CONTACT
-			);
+			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			settings.Auto_Create_Households__c = false;
 			TestDataFactory.saveSettings(settings);
 			Program__c pantry = new Program__c(Name = 'Pantry');
@@ -58,11 +56,7 @@ private class ProgramsSharingTest {
 			insert person;
 			enrolled.Contact__c = person.Id;
 			insert enrolled;
-			insert new Service_Delivery__c(
-				Service__c = meal.Id,
-				Contact__c = person.Id,
-				Enrollment__c = enrolled.Id
-			);
+			insert new Service_Delivery__c(Service__c = meal.Id, Contact__c = person.Id, Enrollment__c = enrolled.Id);
 		}
 		return enrolled;
 	}
@@ -138,9 +132,7 @@ private class ProgramsSharingTest {
 			insert people;
 			List<Enrollment__c> enrollments = new List<Enrollment__c>();
 			for (Contact person : people) {
-				enrollments.add(
-					new Enrollment__c(Program__c = meal.Program__c, Contact__c = person.Id)
-				);
+				enrollments.add(new Enrollment__c(Program__c = meal.Program__c, Contact__c = person.Id));
 			}
 			insert enrollments;
 			List<Service_Delivery__c> deliveries = new List<Service_Delivery__c>();
@@ -226,9 +218,7 @@ private class ProgramsSharingTest {
 	static void savingTheSamePresetChangesNothing() {
 		System.runAs(admin()) {
 			Test.startTest();
-			ProgramsSettingsController.Settings settings = ProgramsSettingsController.savePrivacy(
-				false
-			);
+			ProgramsSettingsController.Settings settings = ProgramsSettingsController.savePrivacy(false);
 			Test.stopTest();
 
 			Assert.areEqual('Shared', settings.participantPrivacy, 'Shared by default.');
@@ -257,11 +247,7 @@ private class ProgramsSharingTest {
 			Test.stopTest();
 		}
 
-		Assert.areEqual(
-			BarnHelp.text('Programs', 'Programs_Settings_NoAccess'),
-			refusal,
-			'Refused, with why.'
-		);
+		Assert.areEqual(BarnHelp.text('Programs', 'Programs_Settings_NoAccess'), refusal, 'Refused, with why.');
 		Assert.isFalse(ProgramsSharing.isPrivate(), 'Still Shared.');
 	}
 

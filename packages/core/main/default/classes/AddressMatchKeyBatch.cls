@@ -30,8 +30,8 @@ public without sharing class AddressMatchKeyBatch implements Database.Batchable<
 
 	/**
 	 * Marks the keys filled when no address is left without one, so matching reads addresses
-	 * by their keys. Returns whether there was nothing left to fill. Addresses whose save keeps
-	 * failing stay unfilled, and the keys stay unmarked, as before.
+	 * by their keys. Returns whether there was nothing left to fill. Before a fill has run,
+	 * addresses without a key keep the keys unmarked; after one, `finish` marks them anyway.
 	 */
 	public static Boolean markFilledIfNoneUnfilled() {
 		if (anyUnfilled()) {
@@ -73,10 +73,7 @@ public without sharing class AddressMatchKeyBatch implements Database.Batchable<
 			keyed.add(
 				new Address__c(
 					Id = address.Id,
-					Match_Key__c = AddressMatchKeyHandler.keyFor(
-						address.Street__c,
-						address.Postal_Code__c
-					)
+					Match_Key__c = AddressMatchKeyHandler.keyFor(address.Street__c, address.Postal_Code__c)
 				)
 			);
 			ids.add(address.Id);
@@ -89,7 +86,39 @@ public without sharing class AddressMatchKeyBatch implements Database.Batchable<
 		);
 	}
 
-	public void finish(Database.BatchableContext context) {
-		markFilledIfNoneUnfilled();
+	/**
+	 * Marks the keys filled once the run is over, even when some addresses are still without a
+	 * key (plan D-208, N-06). Those are addresses whose save failed in this run (a validation
+	 * rule, another automation), each already logged with its reason; left unmarked, every
+	 * later Fill Match Keys would try them again, and matching would never read addresses by
+	 * key. One Warning entry says how many and where to look. The mark is reversible per
+	 * address: any edit to one that saves gives it its key (AddressMatchKeyHandler always runs).
+	 */
+	public void finish(Database.BatchableContext batchContext) {
+		if (markFilledIfNoneUnfilled()) {
+			return;
+		}
+		Integer left = countUnfilled();
+		SettingsService.saveBookkeeping(new Map<String, Object>{ 'Match_Keys_Filled__c' => true });
+		ErrorLogger.logMessage(
+			BarnHelp.text('Core', 'Core_HealthCheck_MatchKeysLeft', new List<Object>{ left }),
+			CONTEXT,
+			ErrorLogger.SEVERITY_WARNING
+		);
+	}
+
+	/** How many addresses with a street and postal code still have no key, up to 50,000. */
+	@TestVisible
+	private static Integer countUnfilled() {
+		if (unfilledForTest == true) {
+			return 1;
+		}
+		return [
+			SELECT COUNT()
+			FROM Address__c
+			WHERE Match_Key__c = NULL AND Postal_Code__c != NULL AND Street__c != NULL
+			WITH SYSTEM_MODE
+			LIMIT 50000
+		];
 	}
 }

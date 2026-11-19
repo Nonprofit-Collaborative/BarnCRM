@@ -80,9 +80,7 @@ public with sharing class GrantFinder {
 		if (response.getStatusCode() != 200) {
 			throw new GrantFinderException('Grants.gov answered ' + response.getStatusCode());
 		}
-		Map<String, Object> body = (Map<String, Object>) JSON.deserializeUntyped(
-			response.getBody()
-		);
+		Map<String, Object> body = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
 		Map<String, Object> data = (Map<String, Object>) body.get('data');
 		List<Object> hits = data == null ? null : (List<Object>) data.get('oppHits');
 		List<Listing> listings = new List<Listing>();
@@ -141,9 +139,7 @@ public with sharing class GrantFinder {
 		if (listing == null || String.isBlank(listing.title) || String.isBlank(listing.agency)) {
 			throw new GrantFinderException('A listing needs a title and an agency.');
 		}
-		String url = listing.url != null && listing.url.startsWith(LISTING_PAGE)
-			? listing.url
-			: null;
+		String url = listing.url != null && listing.url.startsWith(LISTING_PAGE) ? listing.url : null;
 		if (url != null) {
 			for (Grant__c saved : [
 				SELECT Id

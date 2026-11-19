@@ -52,6 +52,10 @@
   </values>
   <values>
     <field>Quick_Links__c</field>
-    <value xsi:type="xsd:string">Log_Hours:Log Hours:Hours a volunteer worked, in one short form.</value>
+    <value xsi:type="xsd:string">Log_Hours:Log Hours:Core_HubHome_QuickLinkLogHoursLine</value>
+  </values>
+  <values>
+    <field>Beta__c</field>
+    <value xsi:type="xsd:boolean">true</value>
   </values>
 </CustomMetadata>

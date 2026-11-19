@@ -55,10 +55,7 @@ public with sharing class ScholarshipReminders implements Schedulable {
 			List<Award_Application__c> drafts = [
 				SELECT Id
 				FROM Award_Application__c
-				WHERE
-					Status__c = 'Draft'
-					AND Form_Link__c = NULL
-					AND Cycle__r.Application_Form_Key__c != NULL
+				WHERE Status__c = 'Draft' AND Form_Link__c = NULL AND Cycle__r.Application_Form_Key__c != NULL
 				WITH SYSTEM_MODE
 				LIMIT 200
 			];
@@ -115,11 +112,7 @@ public with sharing class ScholarshipReminders implements Schedulable {
 					'Scholarships_Reminder_Title',
 					new List<Object>{ row.Name, row.Award__r.Name, row.Due_Date__c.format() }
 				);
-				Scholarships.notify(
-					new Set<String>{ row.Award__r.Cycle__r.Program__r.OwnerId },
-					title,
-					row.Id
-				);
+				Scholarships.notify(new Set<String>{ row.Award__r.Cycle__r.Program__r.OwnerId }, title, row.Id);
 				if (email && row.Award__r.Contact__r?.Email != null) {
 					emails.add(message(row, title));
 				}

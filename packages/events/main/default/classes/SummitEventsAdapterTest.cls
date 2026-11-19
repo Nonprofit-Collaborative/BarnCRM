@@ -32,13 +32,7 @@ private class SummitEventsAdapterTest {
 	}
 
 	/** A Summit registration as the import reads it from Summit's fields. */
-	private static Map<String, Object> row(
-		String id,
-		String status,
-		String first,
-		String last,
-		String email
-	) {
+	private static Map<String, Object> row(String id, String status, String first, String last, String email) {
 		return SummitEventsAdapter.registrationRow(
 			new Map<String, Object>{
 				'id' => id,
@@ -74,9 +68,7 @@ private class SummitEventsAdapterTest {
 				}
 			);
 			Integer again = SummitEventsAdapter.importRows(
-				new List<Map<String, Object>>{
-					row('REG1', 'Registered', 'Jane', 'Doe', 'jane@example.org')
-				}
+				new List<Map<String, Object>>{ row('REG1', 'Registered', 'Jane', 'Doe', 'jane@example.org') }
 			);
 			Test.stopTest();
 
@@ -89,11 +81,7 @@ private class SummitEventsAdapterTest {
 			];
 			Assert.areEqual(1, events.size(), 'One event for the instance');
 			Assert.areEqual('Fall Open House', events[0].Name, 'Named after the instance');
-			Assert.areEqual(
-				'summit:' + INSTANCE_ID,
-				events[0].External_Key__c,
-				'Keyed by the instance'
-			);
+			Assert.areEqual('summit:' + INSTANCE_ID, events[0].External_Key__c, 'Keyed by the instance');
 			Assert.areEqual('Open', events[0].Status__c, 'A future instance is open');
 			Assert.areEqual(
 				1,
@@ -107,11 +95,7 @@ private class SummitEventsAdapterTest {
 			);
 			Map<Id, Event_Attendee__c> byPerson = new Map<Id, Event_Attendee__c>();
 			for (Event_Attendee__c attendee : [
-				SELECT
-					Contact__c,
-					Status__c,
-					Event_Registration__r.Source__c,
-					Event_Registration__r.External_Key__c
+				SELECT Contact__c, Status__c, Event_Registration__r.Source__c, Event_Registration__r.External_Key__c
 				FROM Event_Attendee__c
 				WITH USER_MODE
 			]) {
@@ -119,26 +103,11 @@ private class SummitEventsAdapterTest {
 			}
 			Event_Attendee__c janeSeat = byPerson.get(jane.Id);
 			Assert.areEqual('Registered', janeSeat.Status__c, 'Jane registered');
-			Assert.areEqual(
-				'Summit Events',
-				janeSeat.Event_Registration__r.Source__c,
-				'Source Summit Events'
-			);
-			Assert.areEqual(
-				'summit:REG1',
-				janeSeat.Event_Registration__r.External_Key__c,
-				'Keyed by the registration'
-			);
+			Assert.areEqual('Summit Events', janeSeat.Event_Registration__r.Source__c, 'Source Summit Events');
+			Assert.areEqual('summit:REG1', janeSeat.Event_Registration__r.External_Key__c, 'Keyed by the registration');
 			Assert.areEqual('Attended', byPerson.get(sam.Id).Status__c, 'Summit attendance kept');
-			Assert.areEqual(
-				jane.Id,
-				SummitEventsAdapter.writtenBack.get('REG1'),
-				'Jane goes back to Summit'
-			);
-			Assert.isFalse(
-				SummitEventsAdapter.writtenBack.containsKey('REG2'),
-				'Sam already had a contact'
-			);
+			Assert.areEqual(jane.Id, SummitEventsAdapter.writtenBack.get('REG1'), 'Jane goes back to Summit');
+			Assert.isFalse(SummitEventsAdapter.writtenBack.containsKey('REG2'), 'Sam already had a contact');
 		}
 	}
 
@@ -172,11 +141,7 @@ private class SummitEventsAdapterTest {
 			);
 			Test.stopTest();
 			Assert.isTrue(imported == 0, 'An instance with no start date makes no event');
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Event_Registration__c WITH USER_MODE],
-				'Nothing saved'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Event_Registration__c WITH USER_MODE], 'Nothing saved');
 		}
 	}
 
@@ -185,16 +150,8 @@ private class SummitEventsAdapterTest {
 		System.runAs(staff()) {
 			Assert.areEqual('Attended', SummitEventsAdapter.attendeeStatus('Attended'), 'Attended');
 			Assert.areEqual('No-Show', SummitEventsAdapter.attendeeStatus('No Show'), 'No Show');
-			Assert.areEqual(
-				'No-Show',
-				SummitEventsAdapter.attendeeStatus('Did Not Attend'),
-				'Did not attend'
-			);
-			Assert.areEqual(
-				'Registered',
-				SummitEventsAdapter.attendeeStatus('Confirmed'),
-				'Confirmed'
-			);
+			Assert.areEqual('No-Show', SummitEventsAdapter.attendeeStatus('Did Not Attend'), 'Did not attend');
+			Assert.areEqual('Registered', SummitEventsAdapter.attendeeStatus('Confirmed'), 'Confirmed');
 			Assert.areEqual('Registered', SummitEventsAdapter.attendeeStatus(null), 'Blank');
 
 			Map<String, Object> instance = SummitEventsAdapter.instanceRow(
@@ -214,6 +171,24 @@ private class SummitEventsAdapterTest {
 			Assert.areEqual('Completed', past.Status__c, 'A past instance is completed');
 			Assert.isTrue(past.End__c > past.Start__c, 'Ends after it starts');
 			Assert.areEqual('summit:X1', past.External_Key__c, 'Keyed by the instance');
+		}
+	}
+
+	@IsTest
+	static void scheduledRunStartsNothingWithoutSummit() {
+		System.runAs(staff()) {
+			Test.startTest();
+			new SummitEventsScheduler().execute(null);
+			Test.stopTest();
+
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = 'SummitEventsBatch'],
+				'The scheduled step starts no import without Summit'
+			);
+			NightlyStep step = SummitEventsScheduler.step();
+			Assert.areEqual(SummitEventsScheduler.JOB_NAME, step.key, 'The step carries its key in the nightly run');
+			Assert.areEqual(7 * 60 + 15, step.minute, 'The import runs at 7:15 AM, before the reminders');
 		}
 	}
 

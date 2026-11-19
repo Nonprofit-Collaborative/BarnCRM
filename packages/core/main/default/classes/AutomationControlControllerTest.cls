@@ -68,11 +68,7 @@ private class AutomationControlControllerTest {
 				'The page offers the five lengths, in order.'
 			);
 			Assert.areEqual(1, page.automations.size(), 'One automation is listed.');
-			Assert.areEqual(
-				NAMING,
-				page.automations[0].automationName,
-				'Named as it is registered.'
-			);
+			Assert.areEqual(NAMING, page.automations[0].automationName, 'Named as it is registered.');
 			Assert.isTrue(page.automations[0].enabled, 'And switched on.');
 			Assert.isNotNull(page.automations[0].label, 'With a label Maria reads.');
 		}
@@ -123,16 +119,10 @@ private class AutomationControlControllerTest {
 	static void aRowWhoseFeatureIsOffIsListedAndMarkedStopped() {
 		System.runAs(TestUsers.admin()) {
 			TestDataFactory.insertAutomationSettings(
-				new Map<String, Boolean>{
-					'Relationship_Reciprocal' => true,
-					'Account_Address_Capture' => true
-				}
+				new Map<String, Boolean>{ 'Relationship_Reciprocal' => true, 'Account_Address_Capture' => true }
 			);
 			TestDataFactory.defaultSettings();
-			SettingsService.saveSystemValue(
-				'Features_Turned_On__c',
-				FeatureSwitchService.ADDRESSES
-			);
+			SettingsService.saveSystemValue('Features_Turned_On__c', FeatureSwitchService.ADDRESSES);
 
 			Test.startTest();
 			AutomationControlController.AutomationPageView page = AutomationControlController.getPage();
@@ -157,9 +147,7 @@ private class AutomationControlControllerTest {
 
 			Test.startTest();
 			System.runAs(maria) {
-				AutomationControlController.AutomationPageView paused = AutomationControlController.pauseAll(
-					2
-				);
+				AutomationControlController.AutomationPageView paused = AutomationControlController.pauseAll(2);
 				Assert.isTrue(paused.canManage, 'Maria may change this page.');
 				Assert.isTrue(paused.paused, 'And has paused everything.');
 
@@ -174,11 +162,7 @@ private class AutomationControlControllerTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				3,
-				[SELECT COUNT() FROM Setting_Change__c],
-				'Three changes, three audit rows.'
-			);
+			Assert.areEqual(3, [SELECT COUNT() FROM Setting_Change__c], 'Three changes, three audit rows.');
 		}
 	}
 

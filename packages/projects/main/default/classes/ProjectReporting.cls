@@ -26,13 +26,7 @@ public with sharing class ProjectReporting {
 	/** Writes a Project Status Update dated today, filled from the project (R-PM8). */
 	public static Id draftStatusUpdate(Id projectId) {
 		Project__c project = [
-			SELECT
-				Health__c,
-				Health_Reasons__c,
-				Tasks__c,
-				Tasks_Done__c,
-				Actual_Hours__c,
-				Start_Date__c
+			SELECT Health__c, Health_Reasons__c, Tasks__c, Tasks_Done__c, Actual_Hours__c, Start_Date__c
 			FROM Project__c
 			WHERE Id = :projectId
 			WITH USER_MODE
@@ -68,21 +62,11 @@ public with sharing class ProjectReporting {
 		]) {
 			String due = task.Due_Date__c == null ? '' : task.Due_Date__c.format();
 			if (task.Status__c == Projects.DONE) {
-				if (
-					since == null ||
-					(task.Completed_Date__c != null &&
-					task.Completed_Date__c >= since)
-				) {
+				if (since == null || (task.Completed_Date__c != null && task.Completed_Date__c >= since)) {
 					done.add('- ' + task.Name);
 				}
 			} else if (task.Status__c == 'Blocked') {
-				risks.add(
-					BarnHelp.text(
-						'Projects',
-						'Projects_Update_Blocked',
-						new List<Object>{ task.Name }
-					)
-				);
+				risks.add(BarnHelp.text('Projects', 'Projects_Update_Blocked', new List<Object>{ task.Name }));
 			}
 			if (
 				task.Status__c != Projects.DONE &&
@@ -197,9 +181,7 @@ public with sharing class ProjectReporting {
 			if (ends < starts || overlapEnd < overlapStart) {
 				continue;
 			}
-			Decimal share =
-				Decimal.valueOf(overlapStart.daysBetween(overlapEnd) + 1) /
-				(starts.daysBetween(ends) + 1);
+			Decimal share = Decimal.valueOf(overlapStart.daysBetween(overlapEnd) + 1) / (starts.daysBetween(ends) + 1);
 			person(
 					byUser,
 					assignment.Resource__c,
@@ -215,11 +197,7 @@ public with sharing class ProjectReporting {
 	 * The billable entries dated in the range, not yet exported unless `includeExported`, as
 	 * rows for the CSV; stamps their Exported Date with today (R-PM7). Needs Manage Projects.
 	 */
-	public static List<Map<String, Object>> exportBillable(
-		Date fromDate,
-		Date toDate,
-		Boolean includeExported
-	) {
+	public static List<Map<String, Object>> exportBillable(Date fromDate, Date toDate, Boolean includeExported) {
 		Projects.requireManage();
 		checkRange(fromDate, toDate);
 		List<Time_Entry__c> entries = new List<Time_Entry__c>();
@@ -259,9 +237,7 @@ public with sharing class ProjectReporting {
 		List<Time_Entry__c> stamps = new List<Time_Entry__c>();
 		for (Time_Entry__c entry : entries) {
 			// The rate the entry was logged at (PM-06), else the project's, as before.
-			Decimal rate = entry.Bill_Rate__c != null
-				? entry.Bill_Rate__c
-				: entry.Project__r.Hourly_Rate__c;
+			Decimal rate = entry.Bill_Rate__c != null ? entry.Bill_Rate__c : entry.Project__r.Hourly_Rate__c;
 			rows.add(
 				new Map<String, Object>{
 					'entry' => entry.Name,
@@ -286,12 +262,7 @@ public with sharing class ProjectReporting {
 		return ((own == null ? standard : own) * days / 7).setScale(2);
 	}
 
-	private static Utilization person(
-		Map<Id, Utilization> byUser,
-		Id userId,
-		String name,
-		Decimal capacity
-	) {
+	private static Utilization person(Map<Id, Utilization> byUser, Id userId, String name, Decimal capacity) {
 		Utilization person = byUser.get(userId);
 		if (person == null) {
 			person = new Utilization();
@@ -304,12 +275,7 @@ public with sharing class ProjectReporting {
 	}
 
 	private static void checkRange(Date fromDate, Date toDate) {
-		if (
-			fromDate == null ||
-			toDate == null ||
-			toDate < fromDate ||
-			fromDate.daysBetween(toDate) >= MAX_RANGE_DAYS
-		) {
+		if (fromDate == null || toDate == null || toDate < fromDate || fromDate.daysBetween(toDate) >= MAX_RANGE_DAYS) {
 			throw Projects.refuse(BarnHelp.text('Projects', 'Projects_Range_Invalid'));
 		}
 	}

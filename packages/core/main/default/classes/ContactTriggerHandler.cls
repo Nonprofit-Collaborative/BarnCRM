@@ -89,9 +89,7 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
 	 */
 	public override void beforeDelete() {
 		departingByPerson.putAll(
-			HouseholdService.removeMembershipsWithoutUpkeep(
-				personIdsOf((List<Contact>) oldRecords())
-			)
+			HouseholdService.removeMembershipsWithoutUpkeep(personIdsOf((List<Contact>) oldRecords()))
 		);
 	}
 
@@ -113,9 +111,7 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
 		affected.addAll(householdIds(gone));
 
 		Map<Id, Id> survivorByMerged = survivorsOf(gone);
-		affected.addAll(
-			HouseholdService.moveMembershipsToSurvivorsWithoutUpkeep(removed, survivorByMerged)
-		);
+		affected.addAll(HouseholdService.moveMembershipsToSurvivorsWithoutUpkeep(removed, survivorByMerged));
 		if (survivorByMerged.isEmpty()) {
 			// A household this delete empties is stamped for the nightly tidy-up (R-H12a).
 			HouseholdService.afterPeopleDeleted(affected);

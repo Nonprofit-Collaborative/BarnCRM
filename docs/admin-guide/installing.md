@@ -30,17 +30,17 @@ stop mattering once BarnCRM is on AppExchange.
 |---|---|---|---|
 | Core | 2,336,034 | 2,354 | 22 |
 | Rollup Builder | 456,862 | 380 | 4 |
-| Giving | 708,095 | 656 | 25 |
+| Fundraising (with its gift mirrors) | 904,103 | 698 | 25 |
 | Volunteers | 202,668 | 151 | 11 |
 | Programs | 181,195 | 203 | 12 |
 | Logic Models | 58,027 | 106 | 5 |
-| Funders | 116,136 | 100 | 7 |
-| Mirror | 221,010 | 170 | 1 |
+| Grants | 116,136 | 100 | 7 |
+| Mirror (needs Core only) | 31,483 | 1 | 2 |
 | Contact Point Sync | 43,980 | 2 | 2 |
 | **Every package** | **4,324,007** | **4,122** | **89** |
 | **Org limit** | 6,000,000 (can be raised) | 5,000 | 200 Enterprise, 2,000 Unlimited, 400 Developer |
 
-Measured 2026-11-04. The install pre-check below measures the release you are installing,
+Measured 2026-11-04; the Mirror and Fundraising rows 2026-11-14. The install pre-check below measures the release you are installing,
 against your org.
 
 **More room for Apex code.** If the pre-check says your Apex code will not fit, install fewer
@@ -65,7 +65,7 @@ This is done from a computer's command line. You need:
 python3 scripts/org/install-precheck.py myorg --modules core,rollups,giving
 ```
 
-Name the modules you plan to install; the ones they need are added (Giving adds Core and
+Name the modules you plan to install; the ones they need are added (Fundraising adds Core and
 Rollup Builder). Leave `--modules` out to check every module. It only reads from your org,
 changes nothing and prints nothing about your login. Each line is PASS, WARN or FAIL:
 

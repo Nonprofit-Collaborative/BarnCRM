@@ -1,0 +1,161 @@
+<template>
+  <template lwc:if={helpReady}>
+    <c-barn-page-shell data-id="shell" icon-name="custom:custom84" title={labels.title} purpose={labels.purpose}>
+      <template lwc:if={isHome}>
+        <template lwc:if={canCreate}>
+          <lightning-button
+            slot="actions"
+            icon-name="utility:chart"
+            label={labels.newDashboard}
+            onclick={handleNewDashboard}
+            class="slds-var-m-right_x-small"
+            data-id="new-dashboard"
+          ></lightning-button>
+          <lightning-button
+            slot="actions"
+            variant="brand"
+            icon-name="utility:add"
+            label={labels.newReport}
+            onclick={handleNewReport}
+            data-id="new-report"
+          ></lightning-button>
+        </template>
+      </template>
+      <div slot="help">
+        <p>{labels.help}</p>
+      </div>
+
+      <div class="slds-is-relative home">
+        <template lwc:if={loading}>
+          <lightning-spinner alternative-text={labels.loading} size="small" data-id="loading"></lightning-spinner>
+        </template>
+        <template lwc:if={error}>
+          <c-barn-notice variant="error" message={error} class="slds-var-m-bottom_small" data-id="error"></c-barn-notice>
+        </template>
+
+        <template lwc:if={isReport}>
+          <c-reporting-builder
+            context={context}
+            objects={objects}
+            document-id={openId}
+            onclose={handleClose}
+            onsaved={handleSaved}
+            data-id="builder"
+          ></c-reporting-builder>
+        </template>
+
+        <template lwc:if={isDashboard}>
+          <c-reporting-dashboard
+            context={context}
+            objects={objects}
+            saved-reports={savedReports}
+            document-id={openId}
+            definition={openDefinition}
+            onclose={handleClose}
+            onsaved={handleSaved}
+            data-id="dashboard"
+          ></c-reporting-dashboard>
+        </template>
+
+        <template lwc:if={isHome}>
+          <template lwc:if={savedCapText}>
+            <p class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_small" data-id="saved-cap">{savedCapText}</p>
+          </template>
+          <template lwc:if={showLists}>
+            <lightning-tabset active-tab-value={activeTab}>
+              <lightning-tab label={labels.dashboards} value="dashboards" onactive={handleTab} data-id="tab-dashboards">
+                <template lwc:if={hasTemplates}>
+                  <h2 class="slds-text-heading_small">{labels.templates}</h2>
+                  <p class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_small">{labels.templatesHelp}</p>
+                  <ul class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_medium" data-id="templates">
+                    <template for:each={templateCards} for:item="card">
+                      <li key={card.key} class="slds-col slds-grid slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-4 slds-var-m-bottom_small">
+                        <button
+                          type="button"
+                          class="slds-size_1-of-1 template"
+                          data-entry={card.key}
+                          onclick={handleTemplate}
+                          aria-label={card.openLabel}
+                          data-id="template"
+                        >
+                          <span class="slds-text-heading_small template__title">{card.title}</span>
+                          <span class="slds-text-body_small template__text">{card.description}</span>
+                          <span class="slds-text-body_small slds-text-color_weak">{card.count}</span>
+                        </button>
+                      </li>
+                    </template>
+                  </ul>
+                </template>
+                <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.saved}</h2>
+                <template lwc:if={hasDashboards}>
+                  <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-max-medium-table_stacked" data-id="dashboards">
+                    <thead>
+                      <tr class="slds-line-height_reset">
+                        <th scope="col">{labels.name}</th>
+                        <th scope="col">{labels.owner}</th>
+                        <th scope="col">{labels.access}</th>
+                        <th scope="col">{labels.modified}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <template for:each={dashboards} for:item="row">
+                        <tr key={row.key}>
+                          <th scope="row" data-label={labels.name}>
+                            <button type="button" class="slds-button" data-entry={row.id} onclick={handleOpen} aria-label={row.openLabel} data-id="open">
+                              {row.title}
+                            </button>
+                          </th>
+                          <td data-label={labels.owner}>{row.ownerText}</td>
+                          <td data-label={labels.access}>{row.accessText}</td>
+                          <td data-label={labels.modified}>{row.modifiedText}</td>
+                        </tr>
+                      </template>
+                    </tbody>
+                  </table>
+                </template>
+                <template lwc:else>
+                  <c-barn-empty-state heading={labels.noDashboards} message={labels.noDashboardsHelp} size="small" data-id="no-dashboards"></c-barn-empty-state>
+                </template>
+              </lightning-tab>
+              <lightning-tab label={labels.reports} value="reports" onactive={handleTab} data-id="tab-reports">
+                <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.savedReports}</h2>
+                <template lwc:if={hasReports}>
+                  <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-max-medium-table_stacked" data-id="reports">
+                    <thead>
+                      <tr class="slds-line-height_reset">
+                        <th scope="col">{labels.name}</th>
+                        <th scope="col">{labels.owner}</th>
+                        <th scope="col">{labels.access}</th>
+                        <th scope="col">{labels.modified}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <template for:each={reports} for:item="row">
+                        <tr key={row.key}>
+                          <th scope="row" data-label={labels.name}>
+                            <button type="button" class="slds-button" data-entry={row.id} onclick={handleOpen} aria-label={row.openLabel} data-id="open">
+                              {row.title}
+                            </button>
+                          </th>
+                          <td data-label={labels.owner}>{row.ownerText}</td>
+                          <td data-label={labels.access}>{row.accessText}</td>
+                          <td data-label={labels.modified}>{row.modifiedText}</td>
+                        </tr>
+                      </template>
+                    </tbody>
+                  </table>
+                </template>
+                <template lwc:else>
+                  <c-barn-empty-state heading={labels.noReports} message={labels.noReportsHelp} size="small" data-id="no-reports"></c-barn-empty-state>
+                </template>
+              </lightning-tab>
+            </lightning-tabset>
+          </template>
+          <template lwc:if={showNoObjects}>
+            <c-barn-empty-state heading={labels.title} message={labels.noObjects} data-id="no-objects"></c-barn-empty-state>
+          </template>
+        </template>
+      </div>
+    </c-barn-page-shell>
+  </template>
+</template>

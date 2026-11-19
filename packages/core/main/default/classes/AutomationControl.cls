@@ -95,10 +95,7 @@ public with sharing class AutomationControl {
 		// Only the switch is sent. The record read above also carries Always_Runs__c, which
 		// no packaged permission set may edit, and a user mode update of a record carrying a
 		// field the user cannot edit is refused even when its value has not changed.
-		Database.update(
-			new Automation_Setting__c(Id = setting.Id, Enabled__c = target),
-			AccessLevel.USER_MODE
-		);
+		Database.update(new Automation_Setting__c(Id = setting.Id, Enabled__c = target), AccessLevel.USER_MODE);
 		clearCache();
 		SettingsService.logChange(
 			'Automation: ' + setting.Automation_Name__c,
@@ -115,12 +112,7 @@ public with sharing class AutomationControl {
 	 * the caller builds every value from describe and its own labels, never from typed input.
 	 */
 	@NamespaceAccessible
-	public static void ensureSwitch(
-		String automationName,
-		String switchLabel,
-		String objectName,
-		String description
-	) {
+	public static void ensureSwitch(String automationName, String switchLabel, String objectName, String description) {
 		if (String.isBlank(automationName)) {
 			throw new AutomationControlException(Label.Core_Automation_NameRequired);
 		}
@@ -165,9 +157,7 @@ public with sharing class AutomationControl {
 		if (settings == null || settings.Automation_Paused_Until__c == null) {
 			return null;
 		}
-		return settings.Automation_Paused_Until__c > System.now()
-			? settings.Automation_Paused_Until__c
-			: null;
+		return settings.Automation_Paused_Until__c > System.now() ? settings.Automation_Paused_Until__c : null;
 	}
 
 	// ---------------------------------------------------- BarnCRM Automation Control setting
@@ -353,8 +343,7 @@ public with sharing class AutomationControl {
 		if (until == null) {
 			return false;
 		}
-		return until > System.now().addHours(LONGEST_PAUSE_HOURS) ||
-			AutomationResumeJob.scheduledAt() == null;
+		return until > System.now().addHours(LONGEST_PAUSE_HOURS) || AutomationResumeJob.scheduledAt() == null;
 	}
 
 	private static Datetime writePausedUntil(Datetime until) {
@@ -366,11 +355,7 @@ public with sharing class AutomationControl {
 		AutomationSettingsWriter.savePausedUntil(locked, until);
 		SettingsService.clearCaches();
 		// asText: the one way a value is written in Recent changes (ADMIN-20).
-		SettingsService.logChange(
-			PAUSE_SETTING_NAME,
-			SettingsService.asText(previous),
-			SettingsService.asText(until)
-		);
+		SettingsService.logChange(PAUSE_SETTING_NAME, SettingsService.asText(previous), SettingsService.asText(until));
 		return until;
 	}
 
@@ -397,8 +382,7 @@ public with sharing class AutomationControl {
 
 	@NamespaceAccessible
 	public static Boolean isBypassed(String automationName) {
-		return String.isNotBlank(automationName) &&
-			BYPASSED_NAMES.contains(automationName.toLowerCase());
+		return String.isNotBlank(automationName) && BYPASSED_NAMES.contains(automationName.toLowerCase());
 	}
 
 	// ------------------------------------------------------------------------ materialization
@@ -442,10 +426,7 @@ public with sharing class AutomationControl {
 		try {
 			return ensureDefaults();
 		} catch (Exception failed) {
-			ErrorLogger.log(
-				failed,
-				String.isBlank(context) ? 'AutomationControl.ensureDefaults' : context
-			);
+			ErrorLogger.log(failed, String.isBlank(context) ? 'AutomationControl.ensureDefaults' : context);
 			return 0;
 		}
 	}
@@ -477,18 +458,13 @@ public with sharing class AutomationControl {
 			}
 		}
 		for (Automation_Registry__mdt entry : registry) {
-			if (
-				String.isBlank(entry.DeveloperName) ||
-				existingNames.contains(entry.DeveloperName.toLowerCase())
-			) {
+			if (String.isBlank(entry.DeveloperName) || existingNames.contains(entry.DeveloperName.toLowerCase())) {
 				continue;
 			}
 			existingNames.add(entry.DeveloperName.toLowerCase());
 			toCreate.add(
 				new Automation_Setting__c(
-					Name = String.isBlank(entry.MasterLabel)
-						? entry.DeveloperName
-						: entry.MasterLabel,
+					Name = String.isBlank(entry.MasterLabel) ? entry.DeveloperName : entry.MasterLabel,
 					Automation_Name__c = entry.DeveloperName,
 					Description__c = entry.Description__c,
 					Enabled__c = entry.Enabled_By_Default__c == true,

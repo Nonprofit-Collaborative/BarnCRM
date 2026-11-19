@@ -38,11 +38,7 @@ private class GiftSaveRollupCostTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GivingTestDataFactory.insertDefaultFund();
 			GivingTestDataFactory.insertHouseholdContact('The Nolan Family', 'Ana', 'Nolan');
-			GivingTestDataFactory.insertHouseholdContact(
-				'The Lindqvist Family',
-				'Bea',
-				'Lindqvist'
-			);
+			GivingTestDataFactory.insertHouseholdContact('The Lindqvist Family', 'Bea', 'Lindqvist');
 			RollupService.ensureDefaults();
 		}
 	}
@@ -144,28 +140,13 @@ private class GiftSaveRollupCostTest {
 			insert gift;
 
 			Test.startTest();
-			insert new Soft_Credit__c(
-				Gift__c = gift.Id,
-				Contact__c = bea.Id,
-				Role__c = 'Solicitor',
-				Amount__c = 100
-			);
+			insert new Soft_Credit__c(Gift__c = gift.Id, Contact__c = bea.Id, Role__c = 'Solicitor', Amount__c = 100);
 			Cost without = new Cost(
-				new Soft_Credit__c(
-					Gift__c = gift.Id,
-					Contact__c = bea.Id,
-					Role__c = 'Solicitor',
-					Amount__c = 100
-				)
+				new Soft_Credit__c(Gift__c = gift.Id, Contact__c = bea.Id, Role__c = 'Solicitor', Amount__c = 100)
 			);
 			bypassRollups(false);
 			Cost withRollups = new Cost(
-				new Soft_Credit__c(
-					Gift__c = gift.Id,
-					Contact__c = bea.Id,
-					Role__c = 'Solicitor',
-					Amount__c = 300
-				)
+				new Soft_Credit__c(Gift__c = gift.Id, Contact__c = bea.Id, Role__c = 'Solicitor', Amount__c = 300)
 			);
 			Test.stopTest();
 
@@ -214,31 +195,18 @@ private class GiftSaveRollupCostTest {
 					AND Mode__c != :RollupService.MODE_SCHEDULED
 			]) {
 				if (!softCreditTotals.containsKey(definition.Target_Object__c)) {
-					softCreditTotals.put(
-						definition.Target_Object__c,
-						new List<Rollup_Definition__c>()
-					);
+					softCreditTotals.put(definition.Target_Object__c, new List<Rollup_Definition__c>());
 				}
 				softCreditTotals.get(definition.Target_Object__c).add(definition);
 			}
 
 			Test.startTest();
 			Cost without = new Cost(
-				new Soft_Credit__c(
-					Gift__c = gift.Id,
-					Contact__c = bea.Id,
-					Role__c = 'Solicitor',
-					Amount__c = 100
-				)
+				new Soft_Credit__c(Gift__c = gift.Id, Contact__c = bea.Id, Role__c = 'Solicitor', Amount__c = 100)
 			);
 			bypassRollups(false);
 			Cost inTheSave = new Cost(
-				new Soft_Credit__c(
-					Gift__c = gift.Id,
-					Contact__c = bea.Id,
-					Role__c = 'Solicitor',
-					Amount__c = 300
-				)
+				new Soft_Credit__c(Gift__c = gift.Id, Contact__c = bea.Id, Role__c = 'Solicitor', Amount__c = 300)
 			);
 			Contact person = GivingRollupTestData.person(bea.Id);
 			Test.stopTest();

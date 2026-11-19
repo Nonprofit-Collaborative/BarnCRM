@@ -26,7 +26,7 @@ private class HouseholdMemberTriggerHandlerTest {
 			Contact__c = personId,
 			Role__c = 'Head',
 			Is_Primary__c = true,
-			Start_Date__c = Date.today()
+			Start_Date__c = OrgDate.today()
 		);
 	}
 
@@ -50,11 +50,7 @@ private class HouseholdMemberTriggerHandlerTest {
 
 			Account saved = reload();
 			Assert.areEqual(1, saved.Member_Count__c, 'John is counted');
-			Assert.areEqual(
-				'The Smith Family',
-				saved.Name,
-				'The household is named from its member'
-			);
+			Assert.areEqual('The Smith Family', saved.Name, 'The household is named from its member');
 		}
 	}
 
@@ -69,7 +65,7 @@ private class HouseholdMemberTriggerHandlerTest {
 			insert row;
 
 			Test.startTest();
-			update new Household_Member__c(Id = row.Id, End_Date__c = Date.today());
+			update new Household_Member__c(Id = row.Id, End_Date__c = OrgDate.today());
 			Test.stopTest();
 
 			Assert.areEqual(0, reload().Member_Count__c, 'A membership that ended today is over');
@@ -172,10 +168,7 @@ private class HouseholdMemberTriggerHandlerTest {
 			second.Is_Primary__c = false;
 
 			Test.startTest();
-			List<Database.SaveResult> results = Database.insert(
-				new List<Household_Member__c>{ first, second },
-				false
-			);
+			List<Database.SaveResult> results = Database.insert(new List<Household_Member__c>{ first, second }, false);
 			Test.stopTest();
 
 			Assert.isTrue(results[0].isSuccess(), 'The first is saved');
@@ -188,8 +181,8 @@ private class HouseholdMemberTriggerHandlerTest {
 		System.runAs(TestUsers.admin()) {
 			setUp();
 			Household_Member__c ended = membership(john.Id);
-			ended.Start_Date__c = Date.today().addYears(-2);
-			ended.End_Date__c = Date.today().addYears(-1);
+			ended.Start_Date__c = OrgDate.today().addYears(-2);
+			ended.End_Date__c = OrgDate.today().addYears(-1);
 			ended.Is_Primary__c = false;
 			insert ended;
 
@@ -210,7 +203,7 @@ private class HouseholdMemberTriggerHandlerTest {
 		System.runAs(TestUsers.admin()) {
 			setUp();
 			Household_Member__c ended = membership(john.Id);
-			ended.End_Date__c = Date.today().addYears(-1);
+			ended.End_Date__c = OrgDate.today().addYears(-1);
 			ended.Is_Primary__c = false;
 			insert new List<Household_Member__c>{ ended, membership(john.Id) };
 
@@ -235,10 +228,7 @@ private class HouseholdMemberTriggerHandlerTest {
 			both.Account__c = other.Id;
 
 			Test.startTest();
-			List<Database.SaveResult> results = Database.insert(
-				new List<Household_Member__c>{ nobody, both },
-				false
-			);
+			List<Database.SaveResult> results = Database.insert(new List<Household_Member__c>{ nobody, both }, false);
 			Test.stopTest();
 
 			Assert.isFalse(results[0].isSuccess(), 'A row naming nobody is refused (R-M4)');
@@ -257,7 +247,7 @@ private class HouseholdMemberTriggerHandlerTest {
 			AutomationControl.clearBypass('ContactTriggerHandler');
 
 			Test.startTest();
-			row.End_Date__c = Date.today();
+			row.End_Date__c = OrgDate.today();
 			Database.SaveResult result = Database.update(row, false);
 			Test.stopTest();
 

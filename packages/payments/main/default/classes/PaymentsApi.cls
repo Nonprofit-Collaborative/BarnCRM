@@ -7,8 +7,8 @@
  *                    payerName?, payerEmail?, personId?, sourceRecordId?, listener?, detail? }
  *                  returns { paymentId, checkoutUrl, status, reference }
  *   getPayment     { paymentId } returns the payment map, or null
- *   isReady        { processor?, recurring? } returns true when that processor's keys are
- *                  entered (and, with recurring true, Automatic Recurring Payments is on)
+ *   isReady        { processor?, recurring? } returns true when that processor is connected
+ *                  (and, with recurring true, Automatic Recurring Payments is on)
  *   updateCard     { subscriptionId, customerId?, returnUrl } returns { url }, the processor's
  *                  own page for a new card (ADR-0218 `0218-payments-subscriptions.md`)
  *   countRecent    { sourceRecordId, minutes?, status? } returns how many payments for that
@@ -48,9 +48,7 @@ public with sharing class PaymentsApi implements Callable {
 				};
 			}
 			when 'getPayment' {
-				Id paymentId = given.get('paymentId') instanceof Id
-					? (Id) given.get('paymentId')
-					: null;
+				Id paymentId = given.get('paymentId') instanceof Id ? (Id) given.get('paymentId') : null;
 				if (paymentId == null && given.get('paymentId') instanceof String) {
 					paymentId = Id.valueOf((String) given.get('paymentId'));
 				}
@@ -75,9 +73,7 @@ public with sharing class PaymentsApi implements Callable {
 			}
 			when 'countRecent' {
 				// A count only, in system mode: a public page's guest checks it before a checkout.
-				Integer minutes = given.get('minutes') instanceof Integer
-					? (Integer) given.get('minutes')
-					: 60;
+				Integer minutes = given.get('minutes') instanceof Integer ? (Integer) given.get('minutes') : 60;
 				String source = String.valueOf(given.get('sourceRecordId')).left(18);
 				Set<String> statuses = given.get('status') == null
 					? new Set<String>{
@@ -92,33 +88,22 @@ public with sharing class PaymentsApi implements Callable {
 				return [
 					SELECT COUNT()
 					FROM Payment__c
-					WHERE
-						Source_Record_Id__c = :source
-						AND CreatedDate >= :since
-						AND Status__c IN :statuses
+					WHERE Source_Record_Id__c = :source AND CreatedDate >= :since AND Status__c IN :statuses
 					WITH SYSTEM_MODE
 				];
 			}
 			when 'isReady' {
 				Object processor = given.get('processor');
 				return PaymentService.isReady(
-						processor == null
-							? PaymentService.defaultProcessor()
-							: String.valueOf(processor)
-					) &&
-					(given.get('recurring') != true ||
-					PaymentService.settings().Recurring_Payments__c == true);
+						processor == null ? PaymentService.defaultProcessor() : String.valueOf(processor)
+					) && (given.get('recurring') != true || PaymentService.settings().Recurring_Payments__c == true);
 			}
 			when 'updateCard' {
 				return new Map<String, Object>{ 'url' => PaymentService.updateCard(given) };
 			}
 			when else {
 				throw new PaymentException(
-					BarnHelp.text(
-						'Payments',
-						'Payments_Error_UnknownAction',
-						new List<Object>{ action }
-					)
+					BarnHelp.text('Payments', 'Payments_Error_UnknownAction', new List<Object>{ action })
 				);
 			}
 		}

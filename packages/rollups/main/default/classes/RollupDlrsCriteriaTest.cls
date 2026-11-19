@@ -7,9 +7,7 @@
 @IsTest(testFor='ApexClass:RollupDlrsCriteria')
 private class RollupDlrsCriteriaTest {
 	private static Map<String, Object> read(String criteria) {
-		return (Map<String, Object>) JSON.deserializeUntyped(
-			RollupDlrsCriteria.toFilter(criteria, null)
-		);
+		return (Map<String, Object>) JSON.deserializeUntyped(RollupDlrsCriteria.toFilter(criteria, null));
 	}
 
 	private static Map<String, Object> condition(Map<String, Object> filter, Integer index) {
@@ -52,9 +50,7 @@ private class RollupDlrsCriteriaTest {
 
 	@IsTest
 	static void groupingFollowsSoql() {
-		Map<String, Object> filter = read(
-			'Amount__c > 100 and (Type__c = \'Gift\' OR Type__c = \'Pledge\')'
-		);
+		Map<String, Object> filter = read('Amount__c > 100 and (Type__c = \'Gift\' OR Type__c = \'Pledge\')');
 		Assert.areEqual('(1) AND ((2) OR (3))', filter.get('logic'), 'Brackets are kept');
 		Assert.areEqual(3, ((List<Object>) filter.get('conditions')).size(), 'Three conditions');
 		Assert.areEqual('Pledge', condition(filter, 2).get('value'), 'Text stays text');
@@ -71,16 +67,8 @@ private class RollupDlrsCriteriaTest {
 	@IsTest
 	static void blanksDatesListsAndPatternsAreRead() {
 		Assert.areEqual('is null', condition(read('Date__c = null'), 0).get('operator'), '= null');
-		Assert.areEqual(
-			'is not null',
-			condition(read('Date__c != NULL'), 0).get('operator'),
-			'!= null'
-		);
-		Assert.areEqual(
-			'this year',
-			condition(read('Date__c = THIS_YEAR'), 0).get('operator'),
-			'This year'
-		);
+		Assert.areEqual('is not null', condition(read('Date__c != NULL'), 0).get('operator'), '!= null');
+		Assert.areEqual('this year', condition(read('Date__c = THIS_YEAR'), 0).get('operator'), 'This year');
 		Assert.areEqual(
 			'last year',
 			condition(read('Date__c = last_year'), 0).get('operator'),
@@ -89,29 +77,17 @@ private class RollupDlrsCriteriaTest {
 		Map<String, Object> recent = condition(read('Date__c = LAST_N_DAYS:30'), 0);
 		Assert.areEqual('last n days', recent.get('operator'), 'Last n days');
 		Assert.areEqual(30, recent.get('value'), 'The number of days');
-		Assert.areEqual(
-			'2024-01-31',
-			condition(read('Date__c >= 2024-01-31'), 0).get('value'),
-			'A date'
-		);
+		Assert.areEqual('2024-01-31', condition(read('Date__c >= 2024-01-31'), 0).get('value'), 'A date');
 
 		Map<String, Object> inList = condition(read('Stage__c IN (\'A\', \'B\')'), 0);
 		Assert.areEqual('in', inList.get('operator'), 'IN');
 		Assert.areEqual(2, ((List<Object>) inList.get('value')).size(), 'Both values');
-		Assert.areEqual(
-			'not in',
-			condition(read('Stage__c NOT IN (\'A\')'), 0).get('operator'),
-			'NOT IN'
-		);
+		Assert.areEqual('not in', condition(read('Stage__c NOT IN (\'A\')'), 0).get('operator'), 'NOT IN');
 
 		Map<String, Object> starts = condition(read('Name LIKE \'Smith%\''), 0);
 		Assert.areEqual('starts with', starts.get('operator'), 'LIKE x%');
 		Assert.areEqual('Smith', starts.get('value'), 'Without the wildcard');
-		Assert.areEqual(
-			'contains',
-			condition(read('Name LIKE \'%Smith%\''), 0).get('operator'),
-			'LIKE %x%'
-		);
+		Assert.areEqual('contains', condition(read('Name LIKE \'%Smith%\''), 0).get('operator'), 'LIKE %x%');
 		Assert.areEqual(
 			'O\'Brien AND Sons',
 			condition(read('Name = \'O\\\'Brien AND Sons\''), 0).get('value'),

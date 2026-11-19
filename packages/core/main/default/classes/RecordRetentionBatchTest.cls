@@ -51,18 +51,27 @@ private class RecordRetentionBatchTest {
 	@IsTest
 	static void mergeJournalPastItsDaysIsDeleted() {
 		System.runAs(TestUsers.admin()) {
-			Merge_Journal__c old = new Merge_Journal__c(Merged_Name__c = 'Old');
-			Merge_Journal__c recent = new Merge_Journal__c(Merged_Name__c = 'Recent');
-			insert as system new List<Merge_Journal__c>{ old, recent };
+			Merge_Journal__c old = new Merge_Journal__c(Kind__c = AutoMergeService.KIND_MERGE, Merged_Name__c = 'Old');
+			Merge_Journal__c recent = new Merge_Journal__c(
+				Kind__c = AutoMergeService.KIND_MERGE,
+				Merged_Name__c = 'Recent'
+			);
+			// An old row of another admin tool shares the object and is kept until deleted.
+			Merge_Journal__c oldSnapshot = new Merge_Journal__c(Kind__c = 'Deactivation', Status__c = 'Done');
+			insert as system new List<Merge_Journal__c>{ old, recent, oldSnapshot };
 			Test.setCreatedDate(old.Id, Datetime.now().addDays(-366));
+			Test.setCreatedDate(oldSnapshot.Id, Datetime.now().addDays(-366));
 
 			Test.startTest();
 			runPass(RecordRetentionBatch.MERGE_JOURNAL);
 			Test.stopTest();
 
-			List<Merge_Journal__c> left = [SELECT Id FROM Merge_Journal__c WITH SYSTEM_MODE];
-			Assert.areEqual(1, left.size(), 'Only the entry past 365 days is deleted');
-			Assert.areEqual(recent.Id, left[0].Id, 'The recent entry is kept');
+			Map<Id, Merge_Journal__c> left = new Map<Id, Merge_Journal__c>(
+				[SELECT Id FROM Merge_Journal__c WITH SYSTEM_MODE]
+			);
+			Assert.areEqual(2, left.size(), 'Only the merge entry past 365 days is deleted');
+			Assert.isTrue(left.containsKey(recent.Id), 'The recent entry is kept');
+			Assert.isTrue(left.containsKey(oldSnapshot.Id), 'Another kind is never aged out');
 		}
 	}
 
@@ -97,10 +106,7 @@ private class RecordRetentionBatchTest {
 					Status__c = ImportBatchService.STATUS_COMPLETE,
 					Undo_Deadline__c = Datetime.now().addDays(5)
 				),
-				new Import_Batch__c(
-					Id = running.Id,
-					Status__c = ImportBatchService.STATUS_COMMITTING
-				)
+				new Import_Batch__c(Id = running.Id, Status__c = ImportBatchService.STATUS_COMMITTING)
 			};
 			insert as system new Import_Journal__c(Import_Batch__c = closed.Id);
 
@@ -110,10 +116,7 @@ private class RecordRetentionBatchTest {
 			runPass(RecordRetentionBatch.IMPORT_BATCHES);
 			Test.stopTest();
 
-			Set<Id> left = new Map<Id, Import_Batch__c>(
-					[SELECT Id FROM Import_Batch__c WITH SYSTEM_MODE]
-				)
-				.keySet();
+			Set<Id> left = new Map<Id, Import_Batch__c>([SELECT Id FROM Import_Batch__c WITH SYSTEM_MODE]).keySet();
 			Assert.isFalse(left.contains(closed.Id), 'A finished import past its undo is deleted');
 			Assert.isTrue(left.contains(undoOpen.Id), 'An import that can still be undone is kept');
 			Assert.isTrue(left.contains(running.Id), 'An unfinished import is kept');
@@ -158,12 +161,7 @@ private class RecordRetentionBatchTest {
 			Import_Batch__c recent = ImportTestDataFactory.batch(template);
 			Import_Batch__c committing = ImportTestDataFactory.batch(template);
 			Test.setCreatedDate(committing.Id, Datetime.now().addDays(-400));
-			old.add(
-				new Import_Batch__c(
-					Id = committing.Id,
-					Status__c = ImportBatchService.STATUS_COMMITTING
-				)
-			);
+			old.add(new Import_Batch__c(Id = committing.Id, Status__c = ImportBatchService.STATUS_COMMITTING));
 			update as system old;
 
 			Test.startTest();
@@ -172,10 +170,7 @@ private class RecordRetentionBatchTest {
 			runPass(RecordRetentionBatch.IMPORT_BATCHES);
 			Test.stopTest();
 
-			Set<Id> left = new Map<Id, Import_Batch__c>(
-					[SELECT Id FROM Import_Batch__c WITH SYSTEM_MODE]
-				)
-				.keySet();
+			Set<Id> left = new Map<Id, Import_Batch__c>([SELECT Id FROM Import_Batch__c WITH SYSTEM_MODE]).keySet();
 			Assert.isTrue(left.contains(recent.Id), 'A recent draft is kept');
 			Assert.isTrue(left.contains(committing.Id), 'An import that is running is kept');
 			Assert.isFalse(left.contains(old[0].Id), 'An old draft is deleted');
@@ -322,11 +317,7 @@ private class RecordRetentionBatchTest {
 	static void daysFallBackToDefaultsAndStayInBounds() {
 		System.runAs(TestUsers.admin()) {
 			Assert.areEqual(365, RecordRetentionBatch.mergeJournalDays(), 'Merge journal default');
-			Assert.areEqual(
-				730,
-				RecordRetentionBatch.settingChangeDays(),
-				'Setting change default'
-			);
+			Assert.areEqual(730, RecordRetentionBatch.settingChangeDays(), 'Setting change default');
 
 			BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
 			settings.Merge_Journal_Retention_Days__c = 5;
@@ -336,11 +327,7 @@ private class RecordRetentionBatchTest {
 
 			Assert.areEqual(30, RecordRetentionBatch.mergeJournalDays(), 'Held at the minimum');
 			Assert.areEqual(3650, RecordRetentionBatch.settingChangeDays(), 'Held at ten years');
-			Assert.areEqual(
-				90,
-				RecordRetentionBatch.importHistoryDays(),
-				'A value in range is kept'
-			);
+			Assert.areEqual(90, RecordRetentionBatch.importHistoryDays(), 'A value in range is kept');
 		}
 	}
 

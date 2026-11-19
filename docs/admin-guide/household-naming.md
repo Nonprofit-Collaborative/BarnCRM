@@ -160,7 +160,7 @@ For report builders only.
 | Where | Field label | Purpose |
 |---|---|---|
 | Household | Account Name | The computed household name |
-| Household | Formal Greeting | Used on letters (and receipts, with Giving) |
+| Household | Formal Greeting | Used on letters (and receipts, with Fundraising) |
 | Household | Informal Greeting | Used on personal notes |
 | Household | Custom Name | When checked, nothing recalculates this household's name or a greeting that has a value; a blank greeting is filled from the members |
 | Person | Preferred Name | Used in place of the first name in greetings |

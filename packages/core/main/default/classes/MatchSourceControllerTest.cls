@@ -13,9 +13,7 @@ private class MatchSourceControllerTest {
 	}
 
 	private static User maria() {
-		return TestUsers.withPermissionSets(
-			new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Metadata_Admin' }
-		);
+		return TestUsers.withPermissionSets(new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Metadata_Admin' });
 	}
 
 	private static Map<String, String> personAddress() {
@@ -148,9 +146,7 @@ private class MatchSourceControllerTest {
 	static void anObjectOffersItsTextFieldsAndItsPersonOrHouseholdLookups() {
 		System.runAs(maria()) {
 			Test.startTest();
-			MatchSourceController.ObjectView view = MatchSourceController.describeObject(
-				'Address__c'
-			);
+			MatchSourceController.ObjectView view = MatchSourceController.describeObject('Address__c');
 			String refusal;
 			try {
 				MatchSourceController.describeObject('No_Such_Thing__c');
@@ -196,16 +192,8 @@ private class MatchSourceControllerTest {
 			};
 			Database.insert(people, options);
 			insert new List<Address__c>{
-				new Address__c(
-					Contact__c = people[0].Id,
-					Street__c = '12 North Main Street',
-					Postal_Code__c = '02139'
-				),
-				new Address__c(
-					Contact__c = people[1].Id,
-					Street__c = '99 Elm Road',
-					Postal_Code__c = '02139'
-				)
+				new Address__c(Contact__c = people[0].Id, Street__c = '12 North Main Street', Postal_Code__c = '02139'),
+				new Address__c(Contact__c = people[1].Id, Street__c = '99 Elm Road', Postal_Code__c = '02139')
 			};
 
 			Test.startTest();
@@ -259,9 +247,7 @@ private class MatchSourceControllerTest {
 	static void whatASourceIsTiedToAndHowItComparesAreSaidInWords() {
 		System.runAs(maria()) {
 			Test.startTest();
-			String either = MatchSourceController.linksTo(
-				new Set<String>{ 'Account', 'Individual' }
-			);
+			String either = MatchSourceController.linksTo(new Set<String>{ 'Account', 'Individual' });
 			String none = MatchSourceController.linksTo(new Set<String>());
 			String phone = MatchSourceController.normalizationText('Phone');
 			String address = MatchSourceController.normalizationText('Address');

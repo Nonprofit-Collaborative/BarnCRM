@@ -38,8 +38,7 @@ public with sharing class ProjectInvoiceDocument {
 			FirstPublishLocationId = invoiceId
 		);
 		insert as user file;
-		return [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :file.Id WITH USER_MODE]
-		.ContentDocumentId;
+		return [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :file.Id WITH USER_MODE].ContentDocumentId;
 	}
 
 	/** The invoice as HTML; every value is escaped. Labels come from the help catalog. */
@@ -65,10 +64,7 @@ public with sharing class ProjectInvoiceDocument {
 			row(label[4], day(invoice.Period_Start__c) + ' - ' + day(invoice.Period_End__c)) +
 			'</table><table width="100%" cellpadding="4" style="border-collapse: collapse;"><tr>';
 		for (String heading : head) {
-			out +=
-				'<th align="left" style="border-bottom: 1px solid #000;">' +
-				esc(heading) +
-				'</th>';
+			out += '<th align="left" style="border-bottom: 1px solid #000;">' + esc(heading) + '</th>';
 		}
 		out += '</tr>';
 		for (Project_Invoice_Line__c line : invoice.Lines__r) {

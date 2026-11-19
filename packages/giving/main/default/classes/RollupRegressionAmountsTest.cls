@@ -97,11 +97,7 @@ private class RollupRegressionAmountsTest {
 
 			Account household = GivingRollupTestData.account(ana.AccountId);
 			GivingTestDataFactory.assertRollupWrote(household.Total_Giving__c);
-			Assert.areEqual(
-				0,
-				household.Total_Giving__c,
-				'Nothing held, and zero rather than blank'
-			);
+			Assert.areEqual(0, household.Total_Giving__c, 'Nothing held, and zero rather than blank');
 			Assert.areEqual(1, household.Gift_Count__c, 'The household gave once');
 			Assert.areEqual(250, household.Largest_Gift__c, 'The gift as given');
 			Assert.areEqual(
@@ -153,11 +149,7 @@ private class RollupRegressionAmountsTest {
 				WHERE Id IN :donors
 			]) {
 				GivingTestDataFactory.assertRollupWrote(donor.Total_Giving__c);
-				Assert.areEqual(
-					200,
-					donor.Total_Giving__c,
-					'Ten gifts of 25, each with 5 returned'
-				);
+				Assert.areEqual(200, donor.Total_Giving__c, 'Ten gifts of 25, each with 5 returned');
 				Assert.areEqual(10, donor.Gift_Count__c, 'Still ten gifts given');
 			}
 		}
@@ -204,19 +196,11 @@ private class RollupRegressionAmountsTest {
 		Contact person = GivingRollupTestData.person(ana.Id);
 		GivingTestDataFactory.assertRollupWrote(person.Giving_This_Year__c);
 		Assert.areEqual(3, person.Giving_This_Year__c, 'Today and the first day of this year');
-		Assert.areEqual(
-			12,
-			person.Giving_Last_Year__c,
-			'The last day and the first day of last year'
-		);
+		Assert.areEqual(12, person.Giving_Last_Year__c, 'The last day and the first day of last year');
 		Assert.areEqual(16, person.Giving_Two_Years_Ago__c, 'The last day of two years ago');
 		Assert.areEqual(2, person.Gifts_Last_Year__c, 'Two gifts last year');
 		Assert.areEqual(63, person.Total_Giving__c, 'All time has all six');
-		Assert.areEqual(
-			thisYearStart.addYears(-2).addDays(-1),
-			person.First_Gift_Date__c,
-			'The oldest gift'
-		);
+		Assert.areEqual(thisYearStart.addYears(-2).addDays(-1), person.First_Gift_Date__c, 'The oldest gift');
 		Assert.areEqual(
 			3,
 			GivingRollupTestData.account(ana.AccountId).Giving_This_Year__c,
@@ -228,11 +212,7 @@ private class RollupRegressionAmountsTest {
 			WHERE Id = :general().Id
 			WITH SYSTEM_MODE
 		];
-		Assert.areEqual(
-			3,
-			fund.Total_Raised_This_Year__c,
-			'A fund\'s year is decided by the gift date too'
-		);
+		Assert.areEqual(3, fund.Total_Raised_This_Year__c, 'A fund\'s year is decided by the gift date too');
 	}
 
 	private static Set<String> fiscalKeys() {
@@ -308,21 +288,9 @@ private class RollupRegressionAmountsTest {
 
 			Contact person = GivingRollupTestData.person(ana.Id);
 			GivingTestDataFactory.assertRollupWrote(person.Giving_Two_Years_Ago__c);
-			Assert.areEqual(
-				300,
-				person.Giving_Two_Years_Ago__c,
-				'The gift, in the year it was given'
-			);
-			Assert.areEqual(
-				-100,
-				person.Giving_Last_Year__c,
-				'The refund, in the year it went back'
-			);
-			Assert.areEqual(
-				0,
-				GivingRollupTestData.valueOf(person.Gifts_Last_Year__c),
-				'No gift given last year'
-			);
+			Assert.areEqual(300, person.Giving_Two_Years_Ago__c, 'The gift, in the year it was given');
+			Assert.areEqual(-100, person.Giving_Last_Year__c, 'The refund, in the year it went back');
+			Assert.areEqual(0, GivingRollupTestData.valueOf(person.Gifts_Last_Year__c), 'No gift given last year');
 			Assert.areEqual(200, person.Total_Giving__c, 'All time nets the two');
 		}
 	}

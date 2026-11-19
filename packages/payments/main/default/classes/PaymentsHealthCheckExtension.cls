@@ -4,12 +4,16 @@
  * (`HealthCheckExtensions.EXTENSION_CLASSES`).
  *
  * Asked only while Payments is turned on, of a viewer who may manage settings:
- * - the chosen processor's keys not all entered;
- * - a Stripe secret key for the other mode (a test key in Live, or a live key in Test);
+ * - the chosen processor not connected (Check Connection on Payments Setup has not succeeded);
+ * - Stripe chosen and connected, but a test call through the `Barn_Stripe` Named Credential
+ *   fails now, or its key is for the other mode (a test key in Live, or a live key in Test),
+ *   checked only while the transaction has written nothing, since a callout after a write fails;
  * - no active Salesforce Site to receive processor events;
- * - a Site guest user without `Payments_Webhook_Guest` (fix: assign it);
+ * - a Site guest user without `Payments_Webhook_Guest` (fix: assign it), which receives events
+ *   and holds the credential access a public page's checkout needs;
  * - processing not scheduled (fix: schedule it as the viewer);
- * - received events waiting over an hour.
+ * - received events waiting over an hour;
+ * - the receiver reached its hourly cap in the last day.
  *
  * `@NamespaceAccessible`, public, with a public no-argument constructor, because Core resolves it
  * with `Type.forName` under ADR-0017.
@@ -32,8 +36,7 @@ public with sharing class PaymentsHealthCheckExtension implements HealthCheckExt
 		List<HealthCheckService.Finding> found = new List<HealthCheckService.Finding>();
 		if (
 			!HealthCheckService.canManageSettings() ||
-			ModuleManagerService.turnedOff()
-				.contains(PaymentsPostInstall.MODULE_KEY.toLowerCase()) ||
+			ModuleManagerService.turnedOff().contains(PaymentsPostInstall.MODULE_KEY.toLowerCase()) ||
 			!Schema.SObjectType.Payment_Event__c.isAccessible()
 		) {
 			return found;
@@ -53,29 +56,12 @@ public with sharing class PaymentsHealthCheckExtension implements HealthCheckExt
 				finding(
 					'payments_keys_missing',
 					BarnHelp.text('Payments', 'Payments_Health_KeysMissingTitle'),
-					BarnHelp.text(
-						'Payments',
-						'Payments_Health_KeysMissingDetail',
-						new List<Object>{ processor }
-					),
+					BarnHelp.text('Payments', 'Payments_Health_KeysMissingDetail', new List<Object>{ processor }),
 					HealthCheckService.SEVERITY_WARNING
 				)
 			);
 		}
-		if (stripeKeyMismatch()) {
-			found.add(
-				finding(
-					'payments_mode_mismatch',
-					BarnHelp.text('Payments', 'Payments_Health_ModeMismatchTitle'),
-					BarnHelp.text(
-						'Payments',
-						'Payments_Health_ModeMismatchDetail',
-						new List<Object>{ PaymentService.mode() }
-					),
-					HealthCheckService.SEVERITY_ERROR
-				)
-			);
-		}
+		addStripeCheck(found, processor);
 		if (PaymentSites.active().isEmpty()) {
 			found.add(
 				finding(
@@ -108,10 +94,7 @@ public with sharing class PaymentsHealthCheckExtension implements HealthCheckExt
 						HealthCheckService.SEVERITY_WARNING
 					)
 					.withScope(scopeOf(FIX_SCHEDULE))
-					.withFix(
-						labelOf(FIX_SCHEDULE),
-						HealthCheckService.FIX_ACTION_PREFIX + FIX_SCHEDULE
-					)
+					.withFix(labelOf(FIX_SCHEDULE), HealthCheckService.FIX_ACTION_PREFIX + FIX_SCHEDULE)
 			);
 		}
 		Datetime before = Datetime.now().addMinutes(-WAIT_MINUTES);
@@ -132,33 +115,74 @@ public with sharing class PaymentsHealthCheckExtension implements HealthCheckExt
 				)
 			);
 		}
-	}
-
-	/** True when the Stripe secret key is for the other mode (`sk_test_`, `sk_live_`, `rk_`). */
-	@TestVisible
-	private static Boolean stripeKeyMismatch() {
-		String key = PaymentService.keys().Stripe_Secret_Key__c;
-		if (String.isBlank(key) || key.length() < 8) {
-			return false;
+		Datetime capHit = PaymentService.settings().Webhook_Cap_Hit_At__c;
+		if (capHit != null && capHit > Datetime.now().addHours(-24)) {
+			found.add(
+				finding(
+					'payments_cap_reached',
+					BarnHelp.text('Payments', 'Payments_Health_CapReachedTitle'),
+					BarnHelp.text('Payments', 'Payments_Health_CapReachedDetail'),
+					HealthCheckService.SEVERITY_WARNING
+				)
+			);
 		}
-		Boolean testKey = key.substring(3, 8) == 'test_';
-		Boolean liveKey = key.substring(3, 8) == 'live_';
-		return PaymentService.mode() == PaymentService.LIVE ? testKey : liveKey;
 	}
 
-	private static HealthCheckService.Finding finding(
-		String key,
-		String title,
-		String detail,
-		String severity
-	) {
-		return new HealthCheckService.Finding(
-			key,
-			title,
-			detail,
-			severity,
-			HealthCheckService.CATEGORY_SETTINGS
-		);
+	/**
+	 * A live test call through the `Barn_Stripe` Named Credential while Stripe is the chosen,
+	 * connected processor: the credential no longer works (error), or the key is for the other
+	 * mode (error). Made only in a person's own request: skipped after a write in this
+	 * transaction and in jobs, where a callout would fail for reasons that are not Stripe's.
+	 */
+	private static void addStripeCheck(List<HealthCheckService.Finding> found, String processor) {
+		if (
+			processor != PaymentService.STRIPE ||
+			!PaymentService.isReady(processor) ||
+			Limits.getDmlStatements() > 0 ||
+			System.isBatch() ||
+			System.isScheduled() ||
+			System.isFuture() ||
+			System.isQueueable()
+		) {
+			return;
+		}
+		PaymentStripe.Connection connection = PaymentStripe.checkConnection();
+		if (!connection.ok) {
+			found.add(
+				finding(
+					'payments_connection_failed',
+					BarnHelp.text('Payments', 'Payments_Health_ConnectionFailedTitle'),
+					BarnHelp.text(
+						'Payments',
+						'Payments_Health_ConnectionFailedDetail',
+						new List<Object>{
+							'Stripe',
+							connection.statusCode == null
+								? connection.failure?.getMessage()
+								: String.valueOf(connection.statusCode)
+						}
+					),
+					HealthCheckService.SEVERITY_ERROR
+				)
+			);
+		} else if (connection.live != (PaymentService.mode() == PaymentService.LIVE)) {
+			found.add(
+				finding(
+					'payments_mode_mismatch',
+					BarnHelp.text('Payments', 'Payments_Health_ModeMismatchTitle'),
+					BarnHelp.text(
+						'Payments',
+						'Payments_Health_ModeMismatchDetail',
+						new List<Object>{ PaymentService.mode() }
+					),
+					HealthCheckService.SEVERITY_ERROR
+				)
+			);
+		}
+	}
+
+	private static HealthCheckService.Finding finding(String key, String title, String detail, String severity) {
+		return new HealthCheckService.Finding(key, title, detail, severity, HealthCheckService.CATEGORY_SETTINGS);
 	}
 
 	/** The names of active Sites whose guest user lacks the receiver's permission set. */
@@ -167,9 +191,7 @@ public with sharing class PaymentsHealthCheckExtension implements HealthCheckExt
 		for (PermissionSetAssignment assignment : [
 			SELECT AssigneeId
 			FROM PermissionSetAssignment
-			WHERE
-				PermissionSet.Name = :GUEST_PERMISSION_SET
-				AND AssigneeId IN :PaymentSites.guestUserIds()
+			WHERE PermissionSet.Name = :GUEST_PERMISSION_SET AND AssigneeId IN :PaymentSites.guestUserIds()
 			WITH SYSTEM_MODE
 		]) {
 			granted.add(assignment.AssigneeId);
@@ -202,9 +224,7 @@ public with sharing class PaymentsHealthCheckExtension implements HealthCheckExt
 		if (fixKey == FIX_GUEST) {
 			return BarnHelp.text('Payments', 'Payments_Health_GuestAccessFix');
 		}
-		return fixKey == FIX_SCHEDULE
-			? BarnHelp.text('Payments', 'Payments_Health_NotScheduledFix')
-			: null;
+		return fixKey == FIX_SCHEDULE ? BarnHelp.text('Payments', 'Payments_Health_NotScheduledFix') : null;
 	}
 
 	public String runFix(String fixKey, List<String> scope) {
@@ -221,10 +241,7 @@ public with sharing class PaymentsHealthCheckExtension implements HealthCheckExt
 		for (PaymentSites.SiteInfo site : PaymentSites.active()) {
 			if (permissionSet != null && names.contains(site.name) && site.guestUserId != null) {
 				added.add(
-					new PermissionSetAssignment(
-						AssigneeId = site.guestUserId,
-						PermissionSetId = permissionSet.Id
-					)
+					new PermissionSetAssignment(AssigneeId = site.guestUserId, PermissionSetId = permissionSet.Id)
 				);
 			}
 		}

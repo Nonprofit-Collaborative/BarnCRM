@@ -16,10 +16,7 @@ public with sharing class ProjectRequestHandler extends TriggerHandler {
 	public static final String IN_PROGRESS = 'In Progress';
 	public static final String RESOLVED = 'Resolved';
 	private static final Set<String> FINISHED = new Set<String>{ RESOLVED, 'Closed' };
-	private static final Set<String> REOPENED_BY_REPLY = new Set<String>{
-		'Waiting on Requester',
-		RESOLVED
-	};
+	private static final Set<String> REOPENED_BY_REPLY = new Set<String>{ 'Waiting on Requester', RESOLVED };
 	/** The fields a requester sets once, when sending; a portal save keeps them as they were. */
 	private static final List<String> SENT_FIELDS = new List<String>{
 		'Subject__c',
@@ -67,10 +64,7 @@ public with sharing class ProjectRequestHandler extends TriggerHandler {
 				}
 			}
 			if (row.Due_Date__c == null) {
-				row.Due_Date__c = addWeekdays(
-					Date.today(),
-					ProjectsSettings.requestDueDays(row.Priority__c)
-				);
+				row.Due_Date__c = addWeekdays(Date.today(), ProjectsSettings.requestDueDays(row.Priority__c));
 			}
 			if (row.Account__c == null && row.Requester__c != null) {
 				needAccount.add(row);
@@ -115,15 +109,9 @@ public with sharing class ProjectRequestHandler extends TriggerHandler {
 		Map<Id, String> titles = new Map<Id, String>();
 		for (Project_Request__c row : (List<Project_Request__c>) newRecords()) {
 			if (row.Channel__c != STAFF) {
-				titles.put(
-					row.Id,
-					BarnHelp.text('Projects', 'Projects_Requests_Notice_Arrived', named(row))
-				);
+				titles.put(row.Id, BarnHelp.text('Projects', 'Projects_Requests_Notice_Arrived', named(row)));
 			} else if (isOthersUser(row.OwnerId)) {
-				titles.put(
-					row.Id,
-					BarnHelp.text('Projects', 'Projects_Requests_Notice_Assigned', named(row))
-				);
+				titles.put(row.Id, BarnHelp.text('Projects', 'Projects_Requests_Notice_Assigned', named(row)));
 			}
 		}
 		notifyOwners(titles, (List<Project_Request__c>) newRecords());
@@ -149,15 +137,9 @@ public with sharing class ProjectRequestHandler extends TriggerHandler {
 						From_Requester__c = true
 					)
 				);
-				titles.put(
-					row.Id,
-					BarnHelp.text('Projects', 'Projects_Requests_Notice_Reply', named(row))
-				);
+				titles.put(row.Id, BarnHelp.text('Projects', 'Projects_Requests_Notice_Reply', named(row)));
 			} else if (row.OwnerId != old.OwnerId && isOthersUser(row.OwnerId)) {
-				titles.put(
-					row.Id,
-					BarnHelp.text('Projects', 'Projects_Requests_Notice_Assigned', named(row))
-				);
+				titles.put(row.Id, BarnHelp.text('Projects', 'Projects_Requests_Notice_Assigned', named(row)));
 			}
 			if (row.Status__c == RESOLVED && old.Status__c != RESOLVED) {
 				nowResolved.add(row.Id);
@@ -232,18 +214,11 @@ public with sharing class ProjectRequestHandler extends TriggerHandler {
 		Integer count = 0;
 		for (Project_Request__c row : rows) {
 			String title = titles.get(row.Id);
-			Set<String> recipients = isUser(row.OwnerId)
-				? new Set<String>{ row.OwnerId }
-				: members.get(row.OwnerId);
+			Set<String> recipients = isUser(row.OwnerId) ? new Set<String>{ row.OwnerId } : members.get(row.OwnerId);
 			if (recipients != null) {
 				recipients.remove(UserInfo.getUserId());
 			}
-			if (
-				title == null ||
-				recipients == null ||
-				recipients.isEmpty() ||
-				count >= NOTICE_CAP
-			) {
+			if (title == null || recipients == null || recipients.isEmpty() || count >= NOTICE_CAP) {
 				continue;
 			}
 			count++;
@@ -279,16 +254,8 @@ public with sharing class ProjectRequestHandler extends TriggerHandler {
 		List<Messaging.SingleEmailMessage> emails = new List<Messaging.SingleEmailMessage>();
 		for (Project_Request__c request : new Elevated().withRequesters(requestIds)) {
 			String subject = comments == null
-				? BarnHelp.text(
-						'Projects',
-						'Projects_Requests_Email_ResolvedSubject',
-						named(request)
-				  )
-				: BarnHelp.text(
-						'Projects',
-						'Projects_Requests_Email_CommentSubject',
-						named(request)
-				  );
+				? BarnHelp.text('Projects', 'Projects_Requests_Email_ResolvedSubject', named(request))
+				: BarnHelp.text('Projects', 'Projects_Requests_Email_CommentSubject', named(request));
 			String body = comments == null ? request.Resolution__c : comments.get(request.Id);
 			Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
 			email.setTargetObjectId(request.Requester__c);

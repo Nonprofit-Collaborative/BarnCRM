@@ -46,30 +46,12 @@ public with sharing class AccessService {
 
 	/** One plain sentence per add-on, and a warning flag on the two that remove data. */
 	private static final Map<String, AddOnText> ADD_ON_TEXT = new Map<String, AddOnText>{
-		'BarnCRM_Find_And_Export' => new AddOnText(
-			BarnHelp.text('Core', 'Core_Access_AddOnFindAndExport'),
-			false
-		),
-		'BarnCRM_Bulk_Update' => new AddOnText(
-			BarnHelp.text('Core', 'Core_Access_AddOnBulkUpdate'),
-			false
-		),
-		'BarnCRM_Bulk_Delete' => new AddOnText(
-			BarnHelp.text('Core', 'Core_Access_AddOnBulkDelete'),
-			true
-		),
-		'BarnCRM_Erase_People' => new AddOnText(
-			BarnHelp.text('Core', 'Core_Access_AddOnErasePeople'),
-			true
-		),
-		'BarnCRM_Duplicate_Review' => new AddOnText(
-			BarnHelp.text('Core', 'Core_Access_AddOnDuplicateReview'),
-			false
-		),
-		'BarnCRM_Metadata_Admin' => new AddOnText(
-			BarnHelp.text('Core', 'Core_Access_AddOnMetadataAdmin'),
-			false
-		)
+		'BarnCRM_Find_And_Export' => new AddOnText(BarnHelp.text('Core', 'Core_Access_AddOnFindAndExport'), false),
+		'BarnCRM_Bulk_Update' => new AddOnText(BarnHelp.text('Core', 'Core_Access_AddOnBulkUpdate'), false),
+		'BarnCRM_Bulk_Delete' => new AddOnText(BarnHelp.text('Core', 'Core_Access_AddOnBulkDelete'), true),
+		'BarnCRM_Erase_People' => new AddOnText(BarnHelp.text('Core', 'Core_Access_AddOnErasePeople'), true),
+		'BarnCRM_Duplicate_Review' => new AddOnText(BarnHelp.text('Core', 'Core_Access_AddOnDuplicateReview'), false),
+		'BarnCRM_Metadata_Admin' => new AddOnText(BarnHelp.text('Core', 'Core_Access_AddOnMetadataAdmin'), false)
 	};
 
 	/**
@@ -201,14 +183,10 @@ public with sharing class AccessService {
 			this.label = permissionSetRecord.Label;
 			AddOnText text = ADD_ON_TEXT.get(permissionSetRecord.Name);
 			// A module's add-on: its sentence comes from its own label, and none removes data.
-			this.description = text == null
-				? moduleAddOns().get(permissionSetRecord.Name)
-				: text.description;
+			this.description = text == null ? moduleAddOns().get(permissionSetRecord.Name) : text.description;
 			this.isDestructive = text != null && text.isDestructive;
 			// System.Label: a bare Label here would resolve to this class's own label field.
-			this.warning = this.isDestructive
-				? BarnHelp.text('Core', 'Core_Access_AddOnDestructiveWarning')
-				: null;
+			this.warning = this.isDestructive ? BarnHelp.text('Core', 'Core_Access_AddOnDestructiveWarning') : null;
 		}
 	}
 
@@ -272,17 +250,11 @@ public with sharing class AccessService {
 		}
 		try {
 			for (
-				PermissionSetAssignment assignment : assignmentSelector.selectByPermissionSetIds(
-					resultsById.keySet()
-				)
+				PermissionSetAssignment assignment : assignmentSelector.selectByPermissionSetIds(resultsById.keySet())
 			) {
 				resultsById.get(assignment.PermissionSetId)
 					.users.add(
-						new UserSummary(
-							assignment.AssigneeId,
-							assignment.Assignee.Name,
-							assignment.Assignee.Email
-						)
+						new UserSummary(assignment.AssigneeId, assignment.Assignee.Name, assignment.Assignee.Email)
 					);
 			}
 		} catch (Exception e) {
@@ -308,8 +280,7 @@ public with sharing class AccessService {
 		}
 		try {
 			UserPermissionAccess access = userSelector.selectRunningUserPermissionAccess();
-			return access != null &&
-				(access.PermissionsAssignPermissionSets || access.PermissionsManageUsers);
+			return access != null && (access.PermissionsAssignPermissionSets || access.PermissionsManageUsers);
 		} catch (Exception e) {
 			return false;
 		}
@@ -327,9 +298,7 @@ public with sharing class AccessService {
 		if (!BarnCRMPermissions.canManageSettings()) {
 			return BarnHelp.text('Core', 'Core_Access_ErrorNoPermission');
 		}
-		return canAssignPermissionSets()
-			? null
-			: BarnHelp.text('Core', 'Core_Access_ErrorNeedsAccessManager');
+		return canAssignPermissionSets() ? null : BarnHelp.text('Core', 'Core_Access_ErrorNeedsAccessManager');
 	}
 
 	/**
@@ -361,10 +330,7 @@ public with sharing class AccessService {
 			for (Id userId : targets.keySet()) {
 				if (!alreadyAssigned.contains(userId)) {
 					rows.add(
-						new PermissionSetAssignment(
-							AssigneeId = userId,
-							PermissionSetId = permissionSetRecord.Id
-						)
+						new PermissionSetAssignment(AssigneeId = userId, PermissionSetId = permissionSetRecord.Id)
 					);
 				}
 			}
@@ -379,11 +345,7 @@ public with sharing class AccessService {
 				permissionSetRecord.Label
 			);
 		} catch (Exception e) {
-			throw logAndWrap(
-				e,
-				'AccessService.assignAddOn',
-				BarnHelp.text('Core', 'Core_Access_ErrorUnexpected')
-			);
+			throw logAndWrap(e, 'AccessService.assignAddOn', BarnHelp.text('Core', 'Core_Access_ErrorUnexpected'));
 		}
 	}
 
@@ -421,11 +383,7 @@ public with sharing class AccessService {
 				permissionSetRecord.Label
 			);
 		} catch (Exception e) {
-			throw logAndWrap(
-				e,
-				'AccessService.removeAddOn',
-				BarnHelp.text('Core', 'Core_Access_ErrorUnexpected')
-			);
+			throw logAndWrap(e, 'AccessService.removeAddOn', BarnHelp.text('Core', 'Core_Access_ErrorUnexpected'));
 		}
 	}
 
@@ -525,11 +483,7 @@ public with sharing class AccessService {
 				setsByName.put(permissionSetRecord.Name, permissionSetRecord);
 			}
 		} catch (Exception e) {
-			throw logAndWrap(
-				e,
-				'AccessService.loadAddOnSets',
-				BarnHelp.text('Core', 'Core_Access_ErrorUnexpected')
-			);
+			throw logAndWrap(e, 'AccessService.loadAddOnSets', BarnHelp.text('Core', 'Core_Access_ErrorUnexpected'));
 		}
 		return setsByName;
 	}
@@ -637,10 +591,7 @@ public with sharing class AccessService {
 	 * @return the packaged permission set
 	 */
 	private static PermissionSet requireAddOn(String permissionSetName) {
-		if (
-			String.isBlank(permissionSetName) ||
-			!new Set<String>(addOnNames()).contains(permissionSetName)
-		) {
+		if (String.isBlank(permissionSetName) || !new Set<String>(addOnNames()).contains(permissionSetName)) {
 			throw new AccessException(BarnHelp.text('Core', 'Core_Access_ErrorAddOnNotFound'));
 		}
 		PermissionSet permissionSetRecord = loadAddOnSets().get(permissionSetName);
@@ -691,30 +642,16 @@ public with sharing class AccessService {
 			return results;
 		}
 		try {
-			for (
-				PermissionSetAssignment assignment : assignmentSelector.selectByGroupIds(
-					nameByGroupId.keySet()
-				)
-			) {
-				RoleAssignments entry = resultsByName.get(
-					nameByGroupId.get(assignment.PermissionSetGroupId)
-				);
+			for (PermissionSetAssignment assignment : assignmentSelector.selectByGroupIds(nameByGroupId.keySet())) {
+				RoleAssignments entry = resultsByName.get(nameByGroupId.get(assignment.PermissionSetGroupId));
 				if (entry != null) {
 					entry.users.add(
-						new UserSummary(
-							assignment.AssigneeId,
-							assignment.Assignee.Name,
-							assignment.Assignee.Email
-						)
+						new UserSummary(assignment.AssigneeId, assignment.Assignee.Name, assignment.Assignee.Email)
 					);
 				}
 			}
 		} catch (Exception e) {
-			throw logAndWrap(
-				e,
-				'AccessService.getAssignments',
-				BarnHelp.text('Core', 'Core_Access_ErrorUnexpected')
-			);
+			throw logAndWrap(e, 'AccessService.getAssignments', BarnHelp.text('Core', 'Core_Access_ErrorUnexpected'));
 		}
 		return results;
 	}
@@ -736,11 +673,7 @@ public with sharing class AccessService {
 			}
 			return summaries;
 		} catch (Exception e) {
-			throw logAndWrap(
-				e,
-				'AccessService.searchUsers',
-				BarnHelp.text('Core', 'Core_Access_ErrorUnexpected')
-			);
+			throw logAndWrap(e, 'AccessService.searchUsers', BarnHelp.text('Core', 'Core_Access_ErrorUnexpected'));
 		}
 	}
 
@@ -776,22 +709,14 @@ public with sharing class AccessService {
 			alreadyAssigned.add(assignment.AssigneeId);
 		}
 
-		List<PermissionSetAssignment> toInsert = buildAssignments(
-			targets,
-			alreadyAssigned,
-			groupRecord.Id
-		);
+		List<PermissionSetAssignment> toInsert = buildAssignments(targets, alreadyAssigned, groupRecord.Id);
 		if (toInsert.isEmpty()) {
 			return;
 		}
 		try {
-			Database.insert(toInsert, true, AccessLevel.USER_MODE);
+			insert as user toInsert;
 		} catch (Exception e) {
-			throw logAndWrap(
-				e,
-				'AccessService.assignRole',
-				BarnHelp.text('Core', 'Core_Access_ErrorUnexpected')
-			);
+			throw logAndWrap(e, 'AccessService.assignRole', BarnHelp.text('Core', 'Core_Access_ErrorUnexpected'));
 		}
 	}
 
@@ -814,9 +739,7 @@ public with sharing class AccessService {
 		List<PermissionSetAssignment> rows = new List<PermissionSetAssignment>();
 		for (Id userId : userIds) {
 			if (alreadyAssigned == null || !alreadyAssigned.contains(userId)) {
-				rows.add(
-					new PermissionSetAssignment(AssigneeId = userId, PermissionSetGroupId = groupId)
-				);
+				rows.add(new PermissionSetAssignment(AssigneeId = userId, PermissionSetGroupId = groupId));
 			}
 		}
 		return rows;
@@ -849,30 +772,16 @@ public with sharing class AccessService {
 		if (userId == null || String.isBlank(permissionSetName)) {
 			return false;
 		}
-		PermissionSet permissionSetRecord = permissionSetSelector.selectByNameInSystemMode(
-			permissionSetName
-		);
+		PermissionSet permissionSetRecord = permissionSetSelector.selectByNameInSystemMode(permissionSetName);
 		if (permissionSetRecord == null) {
 			return false;
 		}
-		if (
-			assignmentSelector.countPermissionSetAssignmentInSystemMode(
-				permissionSetRecord.Id,
-				userId
-			) > 0
-		) {
+		if (assignmentSelector.countPermissionSetAssignmentInSystemMode(permissionSetRecord.Id, userId) > 0) {
 			return true;
 		}
-		Database.insert(
-			new List<PermissionSetAssignment>{
-				new PermissionSetAssignment(
-					AssigneeId = userId,
-					PermissionSetId = permissionSetRecord.Id
-				)
-			},
-			true,
-			AccessLevel.SYSTEM_MODE
-		);
+		insert as system new List<PermissionSetAssignment>{
+			new PermissionSetAssignment(AssigneeId = userId, PermissionSetId = permissionSetRecord.Id)
+		};
 		return true;
 	}
 
@@ -893,25 +802,16 @@ public with sharing class AccessService {
 		if (userId == null || !new Set<String>(ROLE_DEVELOPER_NAMES).contains(roleDeveloperName)) {
 			return false;
 		}
-		PermissionSetGroup groupRecord = groupSelector.selectByDeveloperNameInSystemMode(
-			roleDeveloperName
-		);
+		PermissionSetGroup groupRecord = groupSelector.selectByDeveloperNameInSystemMode(roleDeveloperName);
 		if (groupRecord == null || !READY_STATUS.equalsIgnoreCase(groupRecord.Status)) {
 			return false;
 		}
 		if (assignmentSelector.countAssignmentInSystemMode(groupRecord.Id, userId) > 0) {
 			return true;
 		}
-		Database.insert(
-			new List<PermissionSetAssignment>{
-				new PermissionSetAssignment(
-					AssigneeId = userId,
-					PermissionSetGroupId = groupRecord.Id
-				)
-			},
-			true,
-			AccessLevel.SYSTEM_MODE
-		);
+		insert as system new List<PermissionSetAssignment>{
+			new PermissionSetAssignment(AssigneeId = userId, PermissionSetGroupId = groupRecord.Id)
+		};
 		return true;
 	}
 
@@ -952,20 +852,15 @@ public with sharing class AccessService {
 					activeLosses++;
 				}
 			}
-			Integer remaining =
-				assignmentSelector.countActiveAssignees(groupRecord.Id) - activeLosses;
+			Integer remaining = assignmentSelector.countActiveAssignees(groupRecord.Id) - activeLosses;
 			if (remaining < 1) {
 				throw new AccessException(BarnHelp.text('Core', 'Core_Access_ErrorLastAdmin'));
 			}
 		}
 		try {
-			Database.delete(toDelete, true, AccessLevel.USER_MODE);
+			delete as user toDelete;
 		} catch (Exception e) {
-			throw logAndWrap(
-				e,
-				'AccessService.removeRole',
-				BarnHelp.text('Core', 'Core_Access_ErrorUnexpected')
-			);
+			throw logAndWrap(e, 'AccessService.removeRole', BarnHelp.text('Core', 'Core_Access_ErrorUnexpected'));
 		}
 	}
 
@@ -985,11 +880,7 @@ public with sharing class AccessService {
 				groupsByName.put(groupRecord.DeveloperName, groupRecord);
 			}
 		} catch (Exception e) {
-			throw logAndWrap(
-				e,
-				'AccessService.loadRoleGroups',
-				BarnHelp.text('Core', 'Core_Access_ErrorUnexpected')
-			);
+			throw logAndWrap(e, 'AccessService.loadRoleGroups', BarnHelp.text('Core', 'Core_Access_ErrorUnexpected'));
 		}
 		return groupsByName;
 	}
@@ -1003,21 +894,14 @@ public with sharing class AccessService {
 	 * @return the group, ready to be assigned
 	 */
 	private static PermissionSetGroup requireReadyRole(String roleDeveloperName) {
-		if (
-			String.isBlank(roleDeveloperName) ||
-			!new Set<String>(ROLE_DEVELOPER_NAMES).contains(roleDeveloperName)
-		) {
+		if (String.isBlank(roleDeveloperName) || !new Set<String>(ROLE_DEVELOPER_NAMES).contains(roleDeveloperName)) {
 			throw new AccessException(BarnHelp.text('Core', 'Core_Access_ErrorRoleNotFound'));
 		}
 		PermissionSetGroup groupRecord;
 		try {
 			groupRecord = groupSelector.selectByDeveloperName(roleDeveloperName);
 		} catch (Exception e) {
-			throw logAndWrap(
-				e,
-				'AccessService.requireReadyRole',
-				BarnHelp.text('Core', 'Core_Access_ErrorUnexpected')
-			);
+			throw logAndWrap(e, 'AccessService.requireReadyRole', BarnHelp.text('Core', 'Core_Access_ErrorUnexpected'));
 		}
 		if (groupRecord == null) {
 			throw new AccessException(BarnHelp.text('Core', 'Core_Access_ErrorRoleNotFound'));

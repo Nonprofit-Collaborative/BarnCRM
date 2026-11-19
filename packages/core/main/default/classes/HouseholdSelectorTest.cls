@@ -29,10 +29,7 @@ private class HouseholdSelectorTest {
 
 			Test.startTest();
 			for (Set<Id> ids : new List<Set<Id>>{ null, none }) {
-				Assert.isTrue(
-					HouseholdSelector.getContactsByHouseholdIds(ids).isEmpty(),
-					'Contacts'
-				);
+				Assert.isTrue(HouseholdSelector.getContactsByHouseholdIds(ids).isEmpty(), 'Contacts');
 				Assert.isTrue(HouseholdSelector.getContactsByIds(ids).isEmpty(), 'Contacts by id');
 				Assert.isTrue(
 					HouseholdSelector.getContactsByHouseholdIdsForDisplay(ids).isEmpty(),
@@ -42,55 +39,27 @@ private class HouseholdSelectorTest {
 					HouseholdSelector.getContactsByIdsForDisplay(ids).isEmpty(),
 					'Contacts by id for display'
 				);
-				Assert.isTrue(
-					HouseholdSelector.getMembershipsForDisplay(ids).isEmpty(),
-					'Memberships for display'
-				);
+				Assert.isTrue(HouseholdSelector.getMembershipsForDisplay(ids).isEmpty(), 'Memberships for display');
 				Assert.isTrue(HouseholdSelector.getContactsWithHouseholds(ids).isEmpty(), 'Links');
 				Assert.isTrue(HouseholdSelector.getHouseholdsByIds(ids).isEmpty(), 'Households');
-				Assert.isTrue(
-					HouseholdSelector.getAccountRecordTypes(ids).isEmpty(),
-					'Record types'
-				);
-				Assert.isTrue(
-					HouseholdSelector.getAccountsWithNativeDependents(ids).isEmpty(),
-					'Native dependents'
-				);
-				Assert.isTrue(
-					HouseholdSelector.nativeHouseholdAccountsAmong(ids).isEmpty(),
-					'Native households among'
-				);
-				Assert.isTrue(
-					HouseholdSelector.accountsWithNativeHouseholdGroups(ids).isEmpty(),
-					'Native groups'
-				);
+				Assert.isTrue(HouseholdSelector.getAccountRecordTypes(ids).isEmpty(), 'Record types');
+				Assert.isTrue(HouseholdSelector.getAccountsWithNativeDependents(ids).isEmpty(), 'Native dependents');
+				Assert.isTrue(HouseholdSelector.nativeHouseholdAccountsAmong(ids).isEmpty(), 'Native households among');
+				Assert.isTrue(HouseholdSelector.accountsWithNativeHouseholdGroups(ids).isEmpty(), 'Native groups');
 				Assert.isTrue(HouseholdSelector.getHouseholdsForMerge(ids).isEmpty(), 'Merge');
 				Assert.isTrue(HouseholdSelector.getEditableIds(ids).isEmpty(), 'Editable');
 				Assert.isTrue(HouseholdSelector.getMemberships(ids).isEmpty(), 'Memberships');
-				Assert.isTrue(
-					HouseholdSelector.getMembershipsForPeople(ids).isEmpty(),
-					'Memberships for people'
-				);
+				Assert.isTrue(HouseholdSelector.getMembershipsForPeople(ids).isEmpty(), 'Memberships for people');
 				Assert.isTrue(
 					HouseholdSelector.getAllMembershipsForPeople(ids).isEmpty(),
 					'All memberships for people'
 				);
-				Assert.isTrue(
-					HouseholdSelector.getDeletedMembershipsForPeople(ids).isEmpty(),
-					'Deleted memberships'
-				);
-				Assert.isTrue(
-					HouseholdSelector.householdsWithAnyContact(ids).isEmpty(),
-					'Occupied households'
-				);
-				Assert.isTrue(
-					HouseholdSelector.nativeMembershipRows(ids, null).isEmpty(),
-					'Native membership rows'
-				);
+				Assert.isTrue(HouseholdSelector.getDeletedMembershipsForPeople(ids).isEmpty(), 'Deleted memberships');
+				Assert.isTrue(HouseholdSelector.householdsWithAnyContact(ids).isEmpty(), 'Occupied households');
+				Assert.isTrue(HouseholdSelector.nativeMembershipRows(ids, null).isEmpty(), 'Native membership rows');
 			}
 			Assert.isTrue(
-				HouseholdSelector.nativeMembershipRows(new Set<Id>{ UserInfo.getUserId() }, none)
-					.isEmpty(),
+				HouseholdSelector.nativeMembershipRows(new Set<Id>{ UserInfo.getUserId() }, none).isEmpty(),
 				'An empty set of people is not a question about every person'
 			);
 			Test.stopTest();
@@ -110,30 +79,22 @@ private class HouseholdSelectorTest {
 			Household_Member__c ended = new Household_Member__c(
 				Household__c = empty.Id,
 				Contact__c = resident.Id,
-				Start_Date__c = Date.today().addDays(-30),
-				End_Date__c = Date.today().addDays(-1)
+				Start_Date__c = OrgDate.today().addDays(-30),
+				End_Date__c = OrgDate.today().addDays(-1)
 			);
 			insert ended;
 			Set<Id> households = new Set<Id>{ household.Id, empty.Id };
 			Set<Id> people = new Set<Id>{ resident.Id };
 
 			Test.startTest();
-			Assert.areEqual(
-				1,
-				HouseholdSelector.getContactsByHouseholdIds(households).size(),
-				'The resident'
-			);
+			Assert.areEqual(1, HouseholdSelector.getContactsByHouseholdIds(households).size(), 'The resident');
 			Assert.areEqual(1, HouseholdSelector.getContactsByIds(people).size(), 'By id');
 			Assert.areEqual(
 				1,
 				HouseholdSelector.getContactsByHouseholdIdsForDisplay(households).size(),
 				'For display by household'
 			);
-			Assert.areEqual(
-				1,
-				HouseholdSelector.getContactsByIdsForDisplay(people).size(),
-				'For display by id'
-			);
+			Assert.areEqual(1, HouseholdSelector.getContactsByIdsForDisplay(people).size(), 'For display by id');
 			Assert.areEqual(
 				household.Id,
 				HouseholdSelector.getContactsWithHouseholds(people)[0].AccountId,
@@ -141,11 +102,7 @@ private class HouseholdSelectorTest {
 			);
 			Assert.areEqual(2, HouseholdSelector.getHouseholdsByIds(households).size(), 'Both');
 			Assert.areEqual(2, HouseholdSelector.getAccountRecordTypes(households).size(), 'Types');
-			Assert.areEqual(
-				2,
-				HouseholdSelector.getHouseholdsForMerge(households).size(),
-				'Merge candidates'
-			);
+			Assert.areEqual(2, HouseholdSelector.getHouseholdsForMerge(households).size(), 'Merge candidates');
 			Assert.areEqual(
 				households,
 				HouseholdSelector.getEditableIds(households),
@@ -156,16 +113,8 @@ private class HouseholdSelectorTest {
 				HouseholdSelector.getMemberships(households).size(),
 				'An ended membership is not current'
 			);
-			Assert.areEqual(
-				1,
-				HouseholdSelector.getMembershipsForDisplay(households).size(),
-				'Nor on screen'
-			);
-			Assert.areEqual(
-				1,
-				HouseholdSelector.getMembershipsForPeople(people).size(),
-				'Current only for the person'
-			);
+			Assert.areEqual(1, HouseholdSelector.getMembershipsForDisplay(households).size(), 'Nor on screen');
+			Assert.areEqual(1, HouseholdSelector.getMembershipsForPeople(people).size(), 'Current only for the person');
 			Assert.areEqual(
 				2,
 				HouseholdSelector.getAllMembershipsForPeople(people).size(),
@@ -210,9 +159,7 @@ private class HouseholdSelectorTest {
 			OrgShapeSelector.nativeHouseholdGroupCountOverride = 2;
 			Assert.areEqual(
 				stated,
-				HouseholdSelector.getAccountsWithNativeDependents(
-					new Set<Id>{ anyAccount, UserInfo.getUserId() }
-				),
+				HouseholdSelector.getAccountsWithNativeDependents(new Set<Id>{ anyAccount, UserInfo.getUserId() }),
 				'Only the accounts the stated rows name are dependent'
 			);
 		}
@@ -228,18 +175,14 @@ private class HouseholdSelectorTest {
 
 			Test.startTest();
 			Set<Id> located = new Set<Id>();
-			Database.QueryLocatorIterator rows = HouseholdSelector.getHouseholdsForRecomputeLocator()
-				.iterator();
+			Database.QueryLocatorIterator rows = HouseholdSelector.getHouseholdsForRecomputeLocator().iterator();
 			while (rows.hasNext()) {
 				located.add(((Account) rows.next()).Id);
 			}
 			Test.stopTest();
 
 			Assert.isTrue(located.contains(named.Id), 'A generated name is recomputed');
-			Assert.isTrue(
-				located.contains(custom.Id),
-				'A custom name is located so its blank greetings are filled'
-			);
+			Assert.isTrue(located.contains(custom.Id), 'A custom name is located so its blank greetings are filled');
 		}
 	}
 
@@ -283,10 +226,7 @@ private class HouseholdSelectorTest {
 			Test.startTest();
 			Set<Id> dependents = HouseholdSelector.getAccountsWithNativeDependents(ids);
 			Integer collisions = HouseholdSelector.nativeHouseholdCollisionCount();
-			List<HouseholdSelector.NativeMembership> rows = HouseholdSelector.nativeMembershipRows(
-				ids,
-				null
-			);
+			List<HouseholdSelector.NativeMembership> rows = HouseholdSelector.nativeMembershipRows(ids, null);
 			Test.stopTest();
 
 			Assert.isTrue(dependents.isEmpty(), 'No native object, nothing depends on it');
@@ -347,15 +287,9 @@ private class HouseholdSelectorTest {
 			pinned.Household_Model__c = HouseholdSelector.MODEL_NATIVE;
 			Account detected = HouseholdTestDataFactory.newHousehold('Detected Household');
 			Account plain = HouseholdTestDataFactory.newHousehold('Plain Household');
-			Database.insert(
-				new List<Account>{ converted, pinned, detected, plain },
-				AccessLevel.SYSTEM_MODE
-			);
+			Database.insert(new List<Account>{ converted, pinned, detected, plain }, AccessLevel.SYSTEM_MODE);
 			Set<Id> ids = new Set<Id>{ converted.Id, pinned.Id, detected.Id, plain.Id };
-			HouseholdSelector.accountsWithNativeDependentsOverride = new Set<Id>{
-				converted.Id,
-				detected.Id
-			};
+			HouseholdSelector.accountsWithNativeDependentsOverride = new Set<Id>{ converted.Id, detected.Id };
 			OrgShapeDetector.reset();
 			OrgShapeSelector.nativeHouseholdGroupCountOverride = 2;
 
@@ -376,10 +310,7 @@ private class HouseholdSelectorTest {
 				dependents.contains(converted.Id),
 				'The delete guard still protects the native group a converted household keeps'
 			);
-			Assert.isTrue(
-				noNativeOrg.isEmpty(),
-				'An org without native household groups is not queried for the field'
-			);
+			Assert.isTrue(noNativeOrg.isEmpty(), 'An org without native household groups is not queried for the field');
 		}
 	}
 }

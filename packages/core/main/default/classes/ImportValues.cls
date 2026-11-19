@@ -27,8 +27,7 @@ public inherited sharing class ImportValues {
 			incoming instanceof Double
 		) {
 			try {
-				return Decimal.valueOf(String.valueOf(stored)) ==
-					Decimal.valueOf(String.valueOf(incoming));
+				return Decimal.valueOf(String.valueOf(stored)) == Decimal.valueOf(String.valueOf(incoming));
 			} catch (Exception notANumber) {
 				return false;
 			}
@@ -72,8 +71,7 @@ public inherited sharing class ImportValues {
 	 */
 	@NamespaceAccessible
 	public static String digest(String kind, String key) {
-		return EncodingUtil.convertToHex(Crypto.generateDigest('MD5', Blob.valueOf(kind + key)))
-			.left(16);
+		return EncodingUtil.convertToHex(Crypto.generateDigest('MD5', Blob.valueOf(kind + key))).left(16);
 	}
 
 	/** The keys cut into lists of `size`, blanks dropped, so no IN clause grows past it. */
@@ -120,9 +118,7 @@ public inherited sharing class ImportValues {
 	public static Decimal number(String text) {
 		if (localeDecimal == null) {
 			// 1234.5 as the user's locale writes it: "1,234.5", "1.234,5", "1 234,5".
-			String marks = Decimal.valueOf('1234.5')
-				.format()
-				.replaceAll('[0-9\\s\\u00A0\\u202F]', '');
+			String marks = Decimal.valueOf('1234.5').format().replaceAll('[0-9\\s\\u00A0\\u202F]', '');
 			localeDecimal = String.isEmpty(marks) ? '.' : marks.right(1);
 			localeGroup = marks.length() > 1 ? marks.left(1) : '';
 		}
@@ -154,12 +150,8 @@ public inherited sharing class ImportValues {
 		if (decimalSeparator == 'none') {
 			return null;
 		}
-		String whole = decimalSeparator == null
-			? value
-			: value.substringBeforeLast(decimalSeparator);
-		String fraction = decimalSeparator == null
-			? ''
-			: value.substringAfterLast(decimalSeparator);
+		String whole = decimalSeparator == null ? value : value.substringBeforeLast(decimalSeparator);
+		String fraction = decimalSeparator == null ? '' : value.substringAfterLast(decimalSeparator);
 		// What is left in the whole part is the grouping mark, which must group in threes.
 		if (whole.containsAny('.,')) {
 			if (!Pattern.matches('[0-9]{1,3}([.,][0-9]{3})+', whole)) {

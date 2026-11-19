@@ -21,11 +21,7 @@ private class GivingPersonErasureExtensionTest {
 	static void keepsGiftsAndEmptiesWhatGivingHoldsAboutThePerson() {
 		System.runAs(eraser()) {
 			Contact jordan = donor();
-			Contact friend = GivingTestDataFactory.insertHouseholdContact(
-				'The Park Family',
-				'Ana',
-				'Park'
-			);
+			Contact friend = GivingTestDataFactory.insertHouseholdContact('The Park Family', 'Ana', 'Park');
 			Gift__c own = GivingTestDataFactory.buildGift(jordan.Id, 100);
 			Gift__c friends = GivingTestDataFactory.buildGift(friend.Id, 50);
 			insert new List<Gift__c>{ own, friends };
@@ -69,19 +65,11 @@ private class GivingPersonErasureExtensionTest {
 				FROM Gift__c
 				WHERE Id = :own.Id
 			];
-			Assert.areEqual(
-				jordan.Id,
-				kept.Donor_Contact__c,
-				'Still credited to the anonymous record'
-			);
+			Assert.areEqual(jordan.Id, kept.Donor_Contact__c, 'Still credited to the anonymous record');
 			Assert.areEqual(100, kept.Amount__c, 'Amount kept');
 			Assert.areEqual(householdId, kept.Household__c, 'Still given from its household');
 			Account household = [SELECT Name FROM Account WHERE Id = :householdId];
-			Assert.areEqual(
-				Label.Core_Erase_HouseholdName,
-				household.Name,
-				'Kept for the gift, and anonymized'
-			);
+			Assert.areEqual(Label.Core_Erase_HouseholdName, household.Name, 'Kept for the gift, and anonymized');
 			Assert.isNull(
 				[SELECT Message__c FROM Tribute__c WHERE Id = :ownWords.Id].Message__c,
 				'Their words emptied'
@@ -96,8 +84,7 @@ private class GivingPersonErasureExtensionTest {
 				'Their name emptied'
 			);
 			Assert.isNull(
-				[SELECT Recipient_Email__c FROM Acknowledgment__c WHERE Id = :sent.Id]
-				.Recipient_Email__c,
+				[SELECT Recipient_Email__c FROM Acknowledgment__c WHERE Id = :sent.Id].Recipient_Email__c,
 				'Ledger email emptied'
 			);
 			Assert.areEqual(
@@ -110,8 +97,7 @@ private class GivingPersonErasureExtensionTest {
 				giftsReported |=
 					change.getAction() == PersonErasure.KEPT &&
 					change.getObjectLabel() ==
-					Gift__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-						.getLabelPlural();
+					Gift__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural();
 			}
 			Assert.isTrue(giftsReported, 'The kept gifts are listed');
 		}
@@ -138,14 +124,8 @@ private class GivingPersonErasureExtensionTest {
 			PersonErasure.Result result = PersonErasure.erase(jordan.Id, 'Jordan Lee', null);
 			Test.stopTest();
 
-			Map<Id, Ask__c> asks = new Map<Id, Ask__c>(
-				[SELECT Outcome__c, Next_Step__c, Donor_Contact__c FROM Ask__c]
-			);
-			Assert.areEqual(
-				AskRules.OUTCOME_WITHDRAWN,
-				asks.get(open.Id).Outcome__c,
-				'Open ask withdrawn'
-			);
+			Map<Id, Ask__c> asks = new Map<Id, Ask__c>([SELECT Outcome__c, Next_Step__c, Donor_Contact__c FROM Ask__c]);
+			Assert.areEqual(AskRules.OUTCOME_WITHDRAWN, asks.get(open.Id).Outcome__c, 'Open ask withdrawn');
 			Assert.areEqual(AskRules.OUTCOME_WON, asks.get(won.Id).Outcome__c, 'Won ask kept');
 			Assert.isNull(asks.get(open.Id).Next_Step__c, 'Next step emptied');
 			Assert.isNull(asks.get(won.Id).Next_Step__c, 'Next step emptied on a closed ask');
@@ -155,8 +135,7 @@ private class GivingPersonErasureExtensionTest {
 				reported |=
 					change.getAction() == PersonErasure.ENDED &&
 					change.getObjectLabel() ==
-					Ask__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-						.getLabelPlural();
+					Ask__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural();
 			}
 			Assert.isTrue(reported, 'The asks are listed');
 		}
@@ -193,11 +172,7 @@ private class GivingPersonErasureExtensionTest {
 				}
 			}
 			Assert.areEqual(0, kept, 'Every message emptied');
-			Assert.areEqual(
-				200,
-				[SELECT COUNT() FROM Gift__c WHERE Donor_Contact__c = :jordan.Id],
-				'Every gift kept'
-			);
+			Assert.areEqual(200, [SELECT COUNT() FROM Gift__c WHERE Donor_Contact__c = :jordan.Id], 'Every gift kept');
 		}
 	}
 
@@ -207,28 +182,16 @@ private class GivingPersonErasureExtensionTest {
 			RecognitionTestData.setAutomaticHouseholdCredits(true);
 			Contact jordan = donor();
 			Contact sam = RecognitionTestData.person('Sam', 'Lee', jordan.AccountId);
-			Contact friend = GivingTestDataFactory.insertHouseholdContact(
-				'The Park Family',
-				'Ana',
-				'Park'
-			);
+			Contact friend = GivingTestDataFactory.insertHouseholdContact('The Park Family', 'Ana', 'Park');
 			Gift__c samsGift = RecognitionTestData.gift(sam.Id, null, 100);
 			Gift__c friendsGift = RecognitionTestData.gift(friend.Id, null, 50);
-			Soft_Credit__c manual = RecognitionTestData.manualCredit(
-				friendsGift.Id,
-				jordan.Id,
-				'Solicitor',
-				50
-			);
+			Soft_Credit__c manual = RecognitionTestData.manualCredit(friendsGift.Id, jordan.Id, 'Solicitor', 50);
 			Assert.areEqual(
 				1,
 				[
 					SELECT COUNT()
 					FROM Soft_Credit__c
-					WHERE
-						Gift__c = :samsGift.Id
-						AND Contact__c = :jordan.Id
-						AND Is_Automatic__c = TRUE
+					WHERE Gift__c = :samsGift.Id AND Contact__c = :jordan.Id AND Is_Automatic__c = TRUE
 				],
 				'Jordan is credited on Sam\'s gift as a household member'
 			);
@@ -258,18 +221,12 @@ private class GivingPersonErasureExtensionTest {
 					change.getObjectLabel() == Label.Giving_Erase_HouseholdCreditsLabel;
 			}
 			Assert.isTrue(deletedListed, 'The deleted credits are listed as Deleted');
-			String details = [SELECT Details__c FROM Erasure__c WHERE Contact__c = :jordan.Id]
-			.Details__c;
-			String softCredits = Soft_Credit__c.SObjectType.getDescribe(
-					SObjectDescribeOptions.DEFERRED
-				)
+			String details = [SELECT Details__c FROM Erasure__c WHERE Contact__c = :jordan.Id].Details__c;
+			String softCredits = Soft_Credit__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 				.getLabelPlural();
 			Assert.isTrue(
 				details.contains(
-					Label.Core_EraseAction_Deleted +
-						' | ' +
-						Label.Giving_Erase_HouseholdCreditsLabel +
-						' | 1'
+					Label.Core_EraseAction_Deleted + ' | ' + Label.Giving_Erase_HouseholdCreditsLabel + ' | 1'
 				),
 				'The Erasure record says the household credit was deleted: ' + details
 			);
@@ -284,13 +241,7 @@ private class GivingPersonErasureExtensionTest {
 	static void keepsTheDonorLevelFields() {
 		// runs-as: deploying user (pure logic: returns field tokens, no DML or SOQL)
 		GivingPersonErasureExtension extension = new GivingPersonErasureExtension();
-		Assert.isTrue(
-			extension.fieldsToKeep(Contact.SObjectType).contains(Contact.Donor_Level__c),
-			'Contact'
-		);
-		Assert.isTrue(
-			extension.fieldsToKeep(Account.SObjectType).contains(Account.Donor_Level__c),
-			'Account'
-		);
+		Assert.isTrue(extension.fieldsToKeep(Contact.SObjectType).contains(Contact.Donor_Level__c), 'Contact');
+		Assert.isTrue(extension.fieldsToKeep(Account.SObjectType).contains(Account.Donor_Level__c), 'Account');
 	}
 }

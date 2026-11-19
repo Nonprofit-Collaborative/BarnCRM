@@ -29,26 +29,20 @@ private class ContactMergeTest {
 		List<Household_Member__c> primaries = [
 			SELECT Contact__c
 			FROM Household_Member__c
-			WHERE
-				Household__c = :householdId
-				AND Is_Primary__c = TRUE
-				AND (End_Date__c = NULL
-				OR End_Date__c > TODAY)
+			WHERE Household__c = :householdId AND Is_Primary__c = TRUE AND (End_Date__c = NULL OR End_Date__c > TODAY)
 			WITH SYSTEM_MODE
 		];
 		Assert.areEqual(1, primaries.size(), 'The household keeps exactly one current primary.');
 		Assert.areEqual(personId, primaries[0].Contact__c, 'And it is the survivor.');
 		Assert.areEqual(
 			personId,
-			[SELECT Primary_Contact__c FROM Account WHERE Id = :householdId WITH SYSTEM_MODE]
-			.Primary_Contact__c,
+			[SELECT Primary_Contact__c FROM Account WHERE Id = :householdId WITH SYSTEM_MODE].Primary_Contact__c,
 			'Its Primary Contact mirrors the primary member (ADR-0044).'
 		);
 	}
 
 	private static Decimal memberCount(Id householdId) {
-		return [SELECT Member_Count__c FROM Account WHERE Id = :householdId WITH SYSTEM_MODE]
-		.Member_Count__c;
+		return [SELECT Member_Count__c FROM Account WHERE Id = :householdId WITH SYSTEM_MODE].Member_Count__c;
 	}
 
 	@IsTest
@@ -93,16 +87,8 @@ private class ContactMergeTest {
 			Contact bea = HouseholdTestDataFactory.newContact('Bea', 'Lindqvist');
 			insert new List<Contact>{ ana, bea };
 			insert new List<Household_Member__c>{
-				new Household_Member__c(
-					Household__c = hers.Id,
-					Contact__c = ana.Id,
-					Is_Primary__c = true
-				),
-				new Household_Member__c(
-					Household__c = other.Id,
-					Contact__c = bea.Id,
-					Is_Primary__c = true
-				)
+				new Household_Member__c(Household__c = hers.Id, Contact__c = ana.Id, Is_Primary__c = true),
+				new Household_Member__c(Household__c = other.Id, Contact__c = bea.Id, Is_Primary__c = true)
 			};
 
 			Test.startTest();
@@ -111,10 +97,7 @@ private class ContactMergeTest {
 
 			Map<Id, Household_Member__c> rowsByHousehold = new Map<Id, Household_Member__c>();
 			for (Household_Member__c row : currentRowsOf(ana.Id)) {
-				Assert.isFalse(
-					rowsByHousehold.containsKey(row.Household__c),
-					'One row per household, never two.'
-				);
+				Assert.isFalse(rowsByHousehold.containsKey(row.Household__c), 'One row per household, never two.');
 				rowsByHousehold.put(row.Household__c, row);
 			}
 			Assert.areEqual(
@@ -158,11 +141,7 @@ private class ContactMergeTest {
 
 			Assert.areEqual(1, currentRowsOf(ana.Id).size(), 'Ana is in the household once.');
 			Assert.areEqual(1, memberCount(household.Id), 'The household counts one person.');
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Account WHERE Id = :household.Id],
-				'The household is kept.'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Account WHERE Id = :household.Id], 'The household is kept.');
 		}
 	}
 
@@ -177,11 +156,7 @@ private class ContactMergeTest {
 			insert new List<Contact>{ ana, bea };
 			insert new List<Household_Member__c>{
 				new Household_Member__c(Household__c = household.Id, Contact__c = ana.Id),
-				new Household_Member__c(
-					Household__c = household.Id,
-					Contact__c = bea.Id,
-					Is_Primary__c = true
-				)
+				new Household_Member__c(Household__c = household.Id, Contact__c = bea.Id, Is_Primary__c = true)
 			};
 
 			Test.startTest();
@@ -206,14 +181,10 @@ private class ContactMergeTest {
 				new Household_Member__c(
 					Household__c = household.Id,
 					Contact__c = ana.Id,
-					Start_Date__c = Date.today().addYears(-3),
-					End_Date__c = Date.today().addYears(-1)
+					Start_Date__c = OrgDate.today().addYears(-3),
+					End_Date__c = OrgDate.today().addYears(-1)
 				),
-				new Household_Member__c(
-					Household__c = household.Id,
-					Contact__c = bea.Id,
-					Is_Primary__c = true
-				)
+				new Household_Member__c(Household__c = household.Id, Contact__c = bea.Id, Is_Primary__c = true)
 			};
 
 			Test.startTest();

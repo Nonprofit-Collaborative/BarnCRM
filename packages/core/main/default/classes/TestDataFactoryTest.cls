@@ -9,20 +9,11 @@ private class TestDataFactoryTest {
 	static void sampleValuesFitEachFieldType() {
 		Assert.areEqual('Test', TestDataFactory.sampleValue(Schema.DisplayType.STRING, 80, null));
 		Assert.areEqual('Te', TestDataFactory.sampleValue(Schema.DisplayType.STRING, 2, null));
-		Assert.areEqual(
-			'barncrm.test@example.com',
-			TestDataFactory.sampleValue(Schema.DisplayType.EMAIL, 80, null)
-		);
+		Assert.areEqual('barncrm.test@example.com', TestDataFactory.sampleValue(Schema.DisplayType.EMAIL, 80, null));
 		Assert.areEqual(0, TestDataFactory.sampleValue(Schema.DisplayType.INTEGER, 0, null));
 		Assert.areEqual(0.0, TestDataFactory.sampleValue(Schema.DisplayType.CURRENCY, 0, null));
-		Assert.areEqual(
-			Date.today(),
-			TestDataFactory.sampleValue(Schema.DisplayType.DATE, 0, null)
-		);
-		Assert.areEqual(
-			'East',
-			TestDataFactory.sampleValue(Schema.DisplayType.PICKLIST, 0, 'East')
-		);
+		Assert.areEqual(Date.today(), TestDataFactory.sampleValue(Schema.DisplayType.DATE, 0, null));
+		Assert.areEqual('East', TestDataFactory.sampleValue(Schema.DisplayType.PICKLIST, 0, 'East'));
 		Assert.isNull(
 			TestDataFactory.sampleValue(Schema.DisplayType.REFERENCE, 18, null),
 			'A required lookup cannot be given a sample value.'
@@ -47,9 +38,7 @@ private class TestDataFactoryTest {
 
 	@IsTest
 	static void aValueTheTestSetIsKept() {
-		Contact person = TestDataFactory.person(
-			new Contact(LastName = 'Keepme', FirstName = 'Ann')
-		);
+		Contact person = TestDataFactory.person(new Contact(LastName = 'Keepme', FirstName = 'Ann'));
 		Contact same = (Contact) TestDataFactory.pastDuplicateRules(person);
 		Assert.areEqual(person, same, 'The same record comes back.');
 		Assert.areEqual('Keepme', same.LastName);

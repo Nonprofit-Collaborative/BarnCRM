@@ -92,10 +92,7 @@ public with sharing class FindRadius {
 		Center center = new Center();
 		center.latitude = Decimal.valueOf(parts[1]);
 		center.longitude = Decimal.valueOf(parts[2]);
-		center.label = String.format(
-			BarnHelp.text('Core', 'Core_Find_RadiusPostalLabel'),
-			new List<Object>{ zip }
-		);
+		center.label = String.format(BarnHelp.text('Core', 'Core_Find_RadiusPostalLabel'), new List<Object>{ zip });
 		return center;
 	}
 
@@ -112,10 +109,7 @@ public with sharing class FindRadius {
 			Center found = centroid(given);
 			if (found == null) {
 				throw new FindRadiusException(
-					String.format(
-						BarnHelp.text('Core', 'Core_Find_RadiusUnknownPostal'),
-						new List<Object>{ given }
-					)
+					String.format(BarnHelp.text('Core', 'Core_Find_RadiusUnknownPostal'), new List<Object>{ given })
 				);
 			}
 			return found;
@@ -124,10 +118,7 @@ public with sharing class FindRadius {
 			return recordCenter(given);
 		}
 		throw new FindRadiusException(
-			String.format(
-				BarnHelp.text('Core', 'Core_Find_RadiusNotAPlace'),
-				new List<Object>{ given.abbreviate(40) }
-			)
+			String.format(BarnHelp.text('Core', 'Core_Find_RadiusNotAPlace'), new List<Object>{ given.abbreviate(40) })
 		);
 	}
 
@@ -142,17 +133,9 @@ public with sharing class FindRadius {
 		Decimal miles = SettingsService.toNumber(radius.get('miles'));
 		Decimal latitude = SettingsService.toNumber(radius.get('latitude'));
 		Decimal longitude = SettingsService.toNumber(radius.get('longitude'));
-		if (
-			miles == null ||
-			miles < MIN_MILES ||
-			miles > MAX_MILES ||
-			miles.stripTrailingZeros().scale() > 0
-		) {
+		if (miles == null || miles < MIN_MILES || miles > MAX_MILES || miles.stripTrailingZeros().scale() > 0) {
 			throw new FindRadiusException(
-				String.format(
-					BarnHelp.text('Core', 'Core_Find_RadiusMiles'),
-					new List<Object>{ MIN_MILES, MAX_MILES }
-				)
+				String.format(BarnHelp.text('Core', 'Core_Find_RadiusMiles'), new List<Object>{ MIN_MILES, MAX_MILES })
 			);
 		}
 		if (
@@ -197,8 +180,7 @@ public with sharing class FindRadius {
 			return null;
 		}
 		String prefix = fieldName.removeEnd('Address');
-		Map<String, Schema.SObjectField> fields = QueryFieldCatalog.describeObject(objectName)
-			.fields.getMap();
+		Map<String, Schema.SObjectField> fields = QueryFieldCatalog.describeObject(objectName).fields.getMap();
 		for (String part : new List<String>{ 'Latitude', 'PostalCode' }) {
 			Schema.SObjectField found = fields.get(prefix + part);
 			if (found == null || !found.getDescribe().isAccessible()) {
@@ -224,9 +206,7 @@ public with sharing class FindRadius {
 		Decimal longitude,
 		Decimal miles
 	) {
-		String stem = fieldName.endsWith('__c')
-			? fieldName.removeEnd('__c') + '__'
-			: fieldName.removeEnd('Address');
+		String stem = fieldName.endsWith('__c') ? fieldName.removeEnd('__c') + '__' : fieldName.removeEnd('Address');
 		String suffix = fieldName.endsWith('__c') ? '__s' : '';
 		String latitudeName = stem + 'Latitude' + suffix;
 		String longitudeName = stem + 'Longitude' + suffix;
@@ -242,10 +222,7 @@ public with sharing class FindRadius {
 		if (cosine > 0) {
 			longitudeSpan = latitudeSpan / cosine;
 		}
-		if (
-			Math.abs(centerLatitude) + latitudeSpan >= 89 ||
-			Math.abs(centerLongitude) + longitudeSpan >= 180
-		) {
+		if (Math.abs(centerLatitude) + latitudeSpan >= 89 || Math.abs(centerLongitude) + longitudeSpan >= 180) {
 			return clause;
 		}
 		binds.put('boxWest', centerLongitude - longitudeSpan);
@@ -255,8 +232,7 @@ public with sharing class FindRadius {
 
 	private static Boolean isGeocodable(Schema.DescribeFieldResult field) {
 		Schema.DisplayType type = field.getType();
-		return (type == Schema.DisplayType.ADDRESS || type == Schema.DisplayType.LOCATION) &&
-			field.isAccessible();
+		return (type == Schema.DisplayType.ADDRESS || type == Schema.DisplayType.LOCATION) && field.isAccessible();
 	}
 
 	private static void checkField(String objectName, String fieldName) {
@@ -331,11 +307,7 @@ public with sharing class FindRadius {
 			);
 		}
 		List<SObject> found = Database.queryWithBinds(
-			'SELECT ' +
-				String.join(selected, ', ') +
-				' FROM ' +
-				described.getName() +
-				' WHERE Id = :recordId LIMIT 1',
+			'SELECT ' + String.join(selected, ', ') + ' FROM ' + described.getName() + ' WHERE Id = :recordId LIMIT 1',
 			new Map<String, Object>{ 'recordId' => wanted },
 			AccessLevel.USER_MODE
 		);
@@ -353,9 +325,7 @@ public with sharing class FindRadius {
 			}
 		}
 		for (String name : selected) {
-			String latitudeName = name.endsWith('Latitude') || name.endsWith('__Latitude__s')
-				? name
-				: null;
+			String latitudeName = name.endsWith('Latitude') || name.endsWith('__Latitude__s') ? name : null;
 			if (latitudeName == null) {
 				continue;
 			}

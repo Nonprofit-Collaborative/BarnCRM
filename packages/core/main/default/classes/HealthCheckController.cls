@@ -24,6 +24,19 @@ public with sharing class HealthCheckController {
 	}
 
 	/**
+	 * Run Remaining Checks: only the checks an earlier run left when it stopped early to stay
+	 * inside the limits (D-208, N-07). Reading needs no permission, as with the whole report.
+	 */
+	@AuraEnabled
+	public static HealthCheckService.Report runRemaining(List<String> checkKeys) {
+		try {
+			return HealthCheckService.buildRemainingReport(checkKeys);
+		} catch (Exception e) {
+			throw loadFailed(e);
+		}
+	}
+
+	/**
 	 * When Health Check last ran in full and how many findings it had, without running it
 	 * (ADMIN-7). The panel shows this first where its lastResultFirst property is set.
 	 */
@@ -229,9 +242,7 @@ public with sharing class HealthCheckController {
 					(outcome == '' ? '' : ' ') +
 					String.format(
 						BarnHelp.text('Core', 'Core_HealthCheck_FixStoppedOnly'),
-						new List<Object>{
-							String.join(stoppedOnly, HealthCheckService.JOB_SEPARATOR)
-						}
+						new List<Object>{ String.join(stoppedOnly, HealthCheckService.JOB_SEPARATOR) }
 					);
 			}
 			return outcome;
@@ -239,9 +250,7 @@ public with sharing class HealthCheckController {
 		if (HealthCheckService.FIX_KEY_SCHEDULE_NIGHTLY_JOBS.equals(fixKey)) {
 			return String.format(
 				System.Label.Core_HealthCheck_FixScheduled,
-				new List<Object>{
-					String.join(NightlyJobs.scheduleAll(), HealthCheckService.JOB_SEPARATOR)
-				}
+				new List<Object>{ String.join(NightlyJobs.scheduleAll(), HealthCheckService.JOB_SEPARATOR) }
 			);
 		}
 		String outcome = String.format(

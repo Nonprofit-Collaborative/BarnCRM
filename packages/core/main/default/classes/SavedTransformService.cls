@@ -87,9 +87,7 @@ public with sharing class SavedTransformService {
 	public static SavedList load(Id recordId) {
 		SavedList view = toView(find(recordId));
 		try {
-			Map<String, Object> document = (Map<String, Object>) JSON.deserializeUntyped(
-				view.definitionJson
-			);
+			Map<String, Object> document = (Map<String, Object>) JSON.deserializeUntyped(view.definitionJson);
 			Object rawFilter = document.get('filter');
 			if (!(rawFilter instanceof Map<String, Object>)) {
 				return view;
@@ -113,9 +111,7 @@ public with sharing class SavedTransformService {
 
 	/** A condition's field, or a placeholder when it names none. */
 	private static String fieldOf(Object condition) {
-		Object field = condition instanceof Map<String, Object>
-			? ((Map<String, Object>) condition).get('field')
-			: null;
+		Object field = condition instanceof Map<String, Object> ? ((Map<String, Object>) condition).get('field') : null;
 		return field instanceof String ? (String) field : '?';
 	}
 
@@ -173,25 +169,16 @@ public with sharing class SavedTransformService {
 		} catch (Exception unreadable) {
 			throw refused(BarnHelp.text('Core', 'Core_SavedTransform_ErrorUnreadable'));
 		}
-		if (
-			document.get('version') != DOCUMENT_VERSION ||
-			!(document.get('object') instanceof String)
-		) {
+		if (document.get('version') != DOCUMENT_VERSION || !(document.get('object') instanceof String)) {
 			throw refused(BarnHelp.text('Core', 'Core_SavedTransform_ErrorUnreadable'));
 		}
 		String objectName = (String) document.get('object');
 		if (!BulkUpdateFields.isWritable(objectName)) {
 			throw refused(
-				String.format(
-					BarnHelp.text('Core', 'Core_SavedTransform_ErrorObject'),
-					new List<Object>{ objectName }
-				)
+				String.format(BarnHelp.text('Core', 'Core_SavedTransform_ErrorObject'), new List<Object>{ objectName })
 			);
 		}
-		if (
-			document.get('filter') != null &&
-			!(document.get('filter') instanceof Map<String, Object>)
-		) {
+		if (document.get('filter') != null && !(document.get('filter') instanceof Map<String, Object>)) {
 			throw refused(BarnHelp.text('Core', 'Core_SavedTransform_ErrorUnreadable'));
 		}
 		checkChanges(document.get('changes'));
@@ -212,9 +199,7 @@ public with sharing class SavedTransformService {
 			);
 		}
 		for (Object each : changes) {
-			Map<String, Object> change = each instanceof Map<String, Object>
-				? (Map<String, Object>) each
-				: null;
+			Map<String, Object> change = each instanceof Map<String, Object> ? (Map<String, Object>) each : null;
 			if (
 				change == null ||
 				!(change.get('field') instanceof String) ||
@@ -253,10 +238,7 @@ public with sharing class SavedTransformService {
 		String cleaned = name == null ? '' : name.normalizeSpace();
 		if (cleaned.length() == 0 || cleaned.length() > MAX_NAME) {
 			throw refused(
-				String.format(
-					BarnHelp.text('Core', 'Core_SavedTransform_ErrorName'),
-					new List<Object>{ MAX_NAME }
-				)
+				String.format(BarnHelp.text('Core', 'Core_SavedTransform_ErrorName'), new List<Object>{ MAX_NAME })
 			);
 		}
 		return cleaned;
@@ -273,10 +255,7 @@ public with sharing class SavedTransformService {
 		];
 		if (!same.isEmpty()) {
 			throw refused(
-				String.format(
-					BarnHelp.text('Core', 'Core_SavedTransform_ErrorExists'),
-					new List<Object>{ name }
-				)
+				String.format(BarnHelp.text('Core', 'Core_SavedTransform_ErrorExists'), new List<Object>{ name })
 			);
 		}
 	}

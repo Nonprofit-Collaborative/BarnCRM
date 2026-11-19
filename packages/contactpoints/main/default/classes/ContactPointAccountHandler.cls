@@ -14,10 +14,7 @@
  */
 @NamespaceAccessible
 public with sharing class ContactPointAccountHandler extends TriggerHandler {
-	private static final Set<String> VALUE_KINDS = new Set<String>{
-		ContactPointPlan.EMAIL,
-		ContactPointPlan.PHONE
-	};
+	private static final Set<String> VALUE_KINDS = new Set<String>{ ContactPointPlan.EMAIL, ContactPointPlan.PHONE };
 	private static final String INDIVIDUAL_LINK = 'PersonIndividualId';
 	/** Built once, not for every record of a save. */
 	private static final List<String> ACCOUNT_FIELDS = ContactPointPlan.accountFields();
@@ -63,10 +60,7 @@ public with sharing class ContactPointAccountHandler extends TriggerHandler {
 			}
 		}
 		ContactPointSyncService.syncOrQueue(claimValues('afterUpdate', everything), null);
-		ContactPointSyncService.syncOrQueue(
-			claimValues('afterUpdateValues', valuesOnly),
-			VALUE_KINDS
-		);
+		ContactPointSyncService.syncOrQueue(claimValues('afterUpdateValues', valuesOnly), VALUE_KINDS);
 	}
 
 	/**

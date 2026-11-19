@@ -33,11 +33,7 @@ private class BackupSetServiceTest {
 		DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
 		List<Contact> people = new List<Contact>();
 		for (Integer index = 0; index < 30; index++) {
-			people.add(
-				TestDataFactory.person(
-					new Contact(LastName = 'Person ' + index, Title = 'Volunteer')
-				)
-			);
+			people.add(TestDataFactory.person(new Contact(LastName = 'Person ' + index, Title = 'Volunteer')));
 		}
 		insert people;
 		Saved_Query__c query = new Saved_Query__c(
@@ -83,16 +79,8 @@ private class BackupSetServiceTest {
 			String body = part.VersionData.toString();
 			Assert.isTrue(body.contains('Id,'), 'API name headings, Id first: ' + body.left(80));
 			Assert.isTrue(body.contains('Title'), 'Every readable field, not only the columns.');
-			Assert.areEqual(
-				30,
-				[SELECT COUNT() FROM Contact WHERE Title = 'Volunteer'],
-				'Nothing deleted.'
-			);
-			Assert.areEqual(
-				0,
-				ImportBatchSelector.selectRecent(10).size(),
-				'A Backup job is not an import.'
-			);
+			Assert.areEqual(30, [SELECT COUNT() FROM Contact WHERE Title = 'Volunteer'], 'Nothing deleted.');
+			Assert.areEqual(0, ImportBatchSelector.selectRecent(10).size(), 'A Backup job is not an import.');
 		}
 	}
 
@@ -125,10 +113,7 @@ private class BackupSetServiceTest {
 				BackupSetController.runNow(query.Id);
 				Assert.fail('Refused.');
 			} catch (AuraHandledException refused) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_BackupSets_ErrorNotSet'),
-					refused.getMessage()
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_BackupSets_ErrorNotSet'), refused.getMessage());
 			}
 			Import_Batch__c job = new Import_Batch__c(
 				Operation__c = 'Backup',
@@ -144,38 +129,27 @@ private class BackupSetServiceTest {
 			];
 			Assert.areEqual(ImportBatchService.STATUS_FAILED, job.Status__c);
 			Assert.isNull(job.File_Id__c);
-			Assert.isTrue(
-				job.Run_Log__c.contains(BarnHelp.text('Core', 'Core_BackupSets_LogFailed'))
-			);
+			Assert.isTrue(job.Run_Log__c.contains(BarnHelp.text('Core', 'Core_BackupSets_LogFailed')));
 		}
 	}
 
 	@IsTest
 	static void someoneWithoutManageSettingsIsRefused() {
-		User staff = TestUsers.standardUserWith(
-			'BackupStaff',
-			new List<String>{ 'BarnCRM_Find_And_Export' }
-		);
+		User staff = TestUsers.standardUserWith('BackupStaff', new List<String>{ 'BarnCRM_Find_And_Export' });
 		System.runAs(staff) {
 			Assert.isFalse(BackupSetService.allowed());
 			try {
 				BackupSetController.getPage();
 				Assert.fail('Refused.');
 			} catch (AuraHandledException refused) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_BackupSets_ErrorNoPermission'),
-					refused.getMessage()
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_BackupSets_ErrorNoPermission'), refused.getMessage());
 			}
 		}
 	}
 
 	@IsTest
 	static void theRunListIsForSomeoneWhoMayUseBackupSetsAndNullForAnyoneElse() {
-		User staff = TestUsers.standardUserWith(
-			'BackupRunsStaff',
-			new List<String>{ 'BarnCRM_Find_And_Export' }
-		);
+		User staff = TestUsers.standardUserWith('BackupRunsStaff', new List<String>{ 'BarnCRM_Find_And_Export' });
 		System.runAs(TestUsers.admin()) {
 			Saved_Query__c query = savedQuery();
 			BackupSetController.setBackup(query.Id, true);
@@ -197,8 +171,7 @@ private class BackupSetServiceTest {
 	static void aQueryThatIsNotThereIsRefusedWithAMessage() {
 		System.runAs(TestUsers.admin()) {
 			Id missing =
-				Saved_Query__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-					.getKeyPrefix() + '000000000001';
+				Saved_Query__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() + '000000000001';
 			try {
 				BackupSetController.setBackup(missing, true);
 				Assert.fail('Nothing to mark');
@@ -216,28 +189,19 @@ private class BackupSetServiceTest {
 
 	@IsTest
 	static void someoneWithoutManageSettingsCannotMarkOrRunAQuery() {
-		User staff = TestUsers.standardUserWith(
-			'BackupNoManage',
-			new List<String>{ 'BarnCRM_Find_And_Export' }
-		);
+		User staff = TestUsers.standardUserWith('BackupNoManage', new List<String>{ 'BarnCRM_Find_And_Export' });
 		System.runAs(staff) {
 			try {
 				BackupSetController.setBackup(null, true);
 				Assert.fail('Refused');
 			} catch (AuraHandledException refused) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_BackupSets_ErrorNoPermission'),
-					refused.getMessage()
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_BackupSets_ErrorNoPermission'), refused.getMessage());
 			}
 			try {
 				BackupSetController.runNow(null);
 				Assert.fail('Refused');
 			} catch (AuraHandledException refused) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_BackupSets_ErrorNoPermission'),
-					refused.getMessage()
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_BackupSets_ErrorNoPermission'), refused.getMessage());
 			}
 		}
 	}

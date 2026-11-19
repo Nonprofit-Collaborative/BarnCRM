@@ -19,10 +19,7 @@ private class AffiliationSelectorTest {
 			Integer before = Limits.getQueries();
 
 			Assert.isTrue(AffiliationSelector.selectByPersonIds(null).isEmpty(), 'null people');
-			Assert.isTrue(
-				AffiliationSelector.selectByPersonIds(new Set<Id>()).isEmpty(),
-				'no people'
-			);
+			Assert.isTrue(AffiliationSelector.selectByPersonIds(new Set<Id>()).isEmpty(), 'no people');
 
 			Assert.areEqual(before, Limits.getQueries(), 'Nothing asked, nothing queried');
 		}
@@ -35,21 +32,9 @@ private class AffiliationSelectorTest {
 			List<Contact> contacts = RelationshipTestDataFactory.contacts(2, 'Garcia');
 			List<Account> accounts = RelationshipTestDataFactory.peopleAsAccounts(1, 'Okafor');
 			List<Account> orgs = RelationshipTestDataFactory.organizations(2, 'Union Foundation');
-			Affiliation__c viaContact = RelationshipTestDataFactory.affiliation(
-				contacts[0],
-				orgs[0],
-				'Board member'
-			);
-			Affiliation__c viaAccount = RelationshipTestDataFactory.affiliation(
-				accounts[0],
-				orgs[1],
-				'Volunteer'
-			);
-			Affiliation__c someoneElse = RelationshipTestDataFactory.affiliation(
-				contacts[1],
-				orgs[0],
-				'Officer'
-			);
+			Affiliation__c viaContact = RelationshipTestDataFactory.affiliation(contacts[0], orgs[0], 'Board member');
+			Affiliation__c viaAccount = RelationshipTestDataFactory.affiliation(accounts[0], orgs[1], 'Volunteer');
+			Affiliation__c someoneElse = RelationshipTestDataFactory.affiliation(contacts[1], orgs[0], 'Officer');
 			insert new List<Affiliation__c>{ viaContact, viaAccount, someoneElse };
 
 			Test.startTest();
@@ -75,23 +60,13 @@ private class AffiliationSelectorTest {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
 			List<Account> orgs = RelationshipTestDataFactory.organizations(2, 'Union Foundation');
-			Affiliation__c former = RelationshipTestDataFactory.affiliation(
-				people[0],
-				orgs[0],
-				'Treasurer'
-			);
+			Affiliation__c former = RelationshipTestDataFactory.affiliation(people[0], orgs[0], 'Treasurer');
 			former.Status__c = 'Former';
 			former.End_Date__c = Date.today().addDays(-30);
-			Affiliation__c current = RelationshipTestDataFactory.affiliation(
-				people[0],
-				orgs[1],
-				'Chair'
-			);
+			Affiliation__c current = RelationshipTestDataFactory.affiliation(people[0], orgs[1], 'Chair');
 			insert new List<Affiliation__c>{ former, current };
 
-			List<Affiliation__c> found = AffiliationSelector.selectByPersonIds(
-				new Set<Id>{ people[0].Id }
-			);
+			List<Affiliation__c> found = AffiliationSelector.selectByPersonIds(new Set<Id>{ people[0].Id });
 
 			Assert.areEqual(2, found.size());
 			Assert.areEqual('Current', found[0].Status__c, 'Current first');

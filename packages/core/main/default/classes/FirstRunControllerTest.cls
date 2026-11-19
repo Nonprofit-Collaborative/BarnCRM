@@ -43,10 +43,8 @@ private class FirstRunControllerTest {
 				);
 			} else {
 				Assert.isTrue(
-					state.recommendedSuite == null ||
-						state.recommendedSuite == ModuleDetectionService.SUITE_NONPROFIT,
-					'Without Giving an edition is suggested only for NPSP or Nonprofit Cloud: ' +
-					state.recommendedSuite
+					state.recommendedSuite == null || state.recommendedSuite == ModuleDetectionService.SUITE_NONPROFIT,
+					'Without Giving an edition is suggested only for NPSP or Nonprofit Cloud: ' + state.recommendedSuite
 				);
 			}
 			Assert.areEqual(8, state.features.size(), 'Every feature is offered');
@@ -56,7 +54,7 @@ private class FirstRunControllerTest {
 	@IsTest
 	static void finishingWithEveryFeatureAlreadyOnStillGivesTheToolTabs() {
 		System.runAs(TestUsers.admin()) {
-			// An org built from source: no feature list saved, so every feature is on already.
+			// No feature list saved: a test reads every feature on (FeatureSwitchService's seam).
 			TestSettings.neverSetUp();
 			FirstRunController.startTabCheckInTests = true;
 
@@ -111,10 +109,7 @@ private class FirstRunControllerTest {
 			Test.startTest();
 			FirstRunController.FirstRunState state = FirstRunController.finish(
 				ModuleDetectionService.SUITE_STANDARD,
-				new List<String>{
-					FeatureSwitchService.DATA_MANAGER,
-					FeatureSwitchService.RELATIONSHIPS
-				}
+				new List<String>{ FeatureSwitchService.DATA_MANAGER, FeatureSwitchService.RELATIONSHIPS }
 			);
 			Test.stopTest();
 
@@ -124,14 +119,8 @@ private class FirstRunControllerTest {
 				ModuleDetectionService.chosenSuite(),
 				'The edition is saved'
 			);
-			Assert.isTrue(
-				FeatureSwitchService.isOn(FeatureSwitchService.DATA_MANAGER),
-				'A ticked feature is on'
-			);
-			Assert.isTrue(
-				FeatureSwitchService.isOn(FeatureSwitchService.RELATIONSHIPS),
-				'So is the other'
-			);
+			Assert.isTrue(FeatureSwitchService.isOn(FeatureSwitchService.DATA_MANAGER), 'A ticked feature is on');
+			Assert.isTrue(FeatureSwitchService.isOn(FeatureSwitchService.RELATIONSHIPS), 'So is the other');
 			Assert.isFalse(
 				FeatureSwitchService.isOn(FeatureSwitchService.AFFILIATIONS),
 				'An unticked feature stays off'
@@ -208,10 +197,7 @@ private class FirstRunControllerTest {
 
 			Test.startTest();
 			try {
-				FirstRunController.finish(
-					ModuleDetectionService.SUITE_NONPROFIT,
-					new List<String>{ 'Rollups' }
-				);
+				FirstRunController.finish(ModuleDetectionService.SUITE_NONPROFIT, new List<String>{ 'Rollups' });
 			} catch (AuraHandledException e) {
 				refused = e;
 			}
@@ -251,13 +237,8 @@ private class FirstRunControllerTest {
 		System.runAs(TestUsers.admin()) {
 			// The org already finished first-run setup and saved its settings.
 			SettingsService.saveSystemValue('Suite__c', ModuleDetectionService.SUITE_STANDARD);
-			SettingsService.saveSystemValue(
-				'Features_Turned_On__c',
-				FeatureSwitchService.DATA_MANAGER
-			);
-			SettingsService.saveBookkeeping(
-				new Map<String, Object>{ 'Setup_Steps_Completed__c' => 'one' }
-			);
+			SettingsService.saveSystemValue('Features_Turned_On__c', FeatureSwitchService.DATA_MANAGER);
+			SettingsService.saveBookkeeping(new Map<String, Object>{ 'Setup_Steps_Completed__c' => 'one' });
 			TestSettings.newInstall();
 
 			Test.startTest();
@@ -277,10 +258,7 @@ private class FirstRunControllerTest {
 			Test.startTest();
 			FirstRunController.FirstRunState state = FirstRunController.getState();
 			try {
-				FirstRunController.finish(
-					ModuleDetectionService.SUITE_STANDARD,
-					new List<String>()
-				);
+				FirstRunController.finish(ModuleDetectionService.SUITE_STANDARD, new List<String>());
 			} catch (AuraHandledException e) {
 				refused = e;
 			}

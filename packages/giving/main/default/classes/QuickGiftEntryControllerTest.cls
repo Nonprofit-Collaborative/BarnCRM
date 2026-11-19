@@ -23,9 +23,7 @@ private class QuickGiftEntryControllerTest {
 	}
 
 	private static Contact makeContact() {
-		Contact donor = TestDataFactory.person(
-			new Contact(FirstName = 'Maria', LastName = 'Alvarez')
-		);
+		Contact donor = TestDataFactory.person(new Contact(FirstName = 'Maria', LastName = 'Alvarez'));
 		insert donor;
 		return donor;
 	}
@@ -56,9 +54,7 @@ private class QuickGiftEntryControllerTest {
 		return input;
 	}
 
-	private static Map<String, String> messagesByField(
-		List<QuickGiftEntryController.FieldError> errors
-	) {
+	private static Map<String, String> messagesByField(List<QuickGiftEntryController.FieldError> errors) {
 		Map<String, String> byField = new Map<String, String>();
 		for (QuickGiftEntryController.FieldError error : errors) {
 			byField.put(error.field, error.message);
@@ -78,21 +74,9 @@ private class QuickGiftEntryControllerTest {
 			Test.stopTest();
 
 			Assert.areEqual(Date.today(), defaults.giftDate, 'A new gift starts dated today.');
-			Assert.areEqual(
-				fund.Id,
-				defaults.defaultFundId,
-				'The default fund comes from settings.'
-			);
-			Assert.areEqual(
-				'Annual Fund',
-				defaults.defaultFundName,
-				'The fund is named for the form.'
-			);
-			Assert.areEqual(
-				appeal.Id,
-				defaults.defaultAppealId,
-				'The default appeal comes from settings.'
-			);
+			Assert.areEqual(fund.Id, defaults.defaultFundId, 'The default fund comes from settings.');
+			Assert.areEqual('Annual Fund', defaults.defaultFundName, 'The fund is named for the form.');
+			Assert.areEqual(appeal.Id, defaults.defaultAppealId, 'The default appeal comes from settings.');
 			Assert.isFalse(defaults.giftTypes.isEmpty(), 'The gift types come from the picklist.');
 			Assert.areEqual(
 				OrgShapeDetector.hasPersonAccounts(),
@@ -112,14 +96,8 @@ private class QuickGiftEntryControllerTest {
 			QuickGiftEntryController.EntryDefaults defaults = QuickGiftEntryController.getDefaults();
 			Test.stopTest();
 
-			Assert.isNull(
-				defaults.defaultFundId,
-				'A settings key naming the wrong kind of record is ignored.'
-			);
-			Assert.isNull(
-				defaults.defaultAppealId,
-				'An empty settings key leaves the appeal unset.'
-			);
+			Assert.isNull(defaults.defaultFundId, 'A settings key naming the wrong kind of record is ignored.');
+			Assert.isNull(defaults.defaultAppealId, 'An empty settings key leaves the appeal unset.');
 		}
 	}
 
@@ -161,13 +139,7 @@ private class QuickGiftEntryControllerTest {
 			Assert.isTrue(result.success, 'The gift saved.');
 			Assert.isNotNull(result.giftName, 'The saved gift is named so the person can find it.');
 			Gift__c saved = [
-				SELECT
-					Donor_Contact__c,
-					Amount__c,
-					Type__c,
-					Status__c,
-					Appeal__c,
-					Payment_Reference__c
+				SELECT Donor_Contact__c, Amount__c, Type__c, Status__c, Appeal__c, Payment_Reference__c
 				FROM Gift__c
 				WHERE Id = :result.giftId
 			];
@@ -175,27 +147,16 @@ private class QuickGiftEntryControllerTest {
 			Assert.areEqual(50, saved.Amount__c, 'The amount is what was typed.');
 			Assert.areEqual('Check', saved.Type__c, 'The type is what was chosen.');
 			Assert.areEqual('Received', saved.Status__c, 'A gift entered here has arrived.');
-			Assert.areEqual(
-				'1042',
-				saved.Payment_Reference__c,
-				'The check number is kept for reconciling.'
-			);
+			Assert.areEqual('1042', saved.Payment_Reference__c, 'The check number is kept for reconciling.');
 
 			List<Gift_Allocation__c> allocations = [
 				SELECT Fund__c, Amount__c
 				FROM Gift_Allocation__c
 				WHERE Gift__c = :result.giftId
 			];
-			Assert.isFalse(
-				result.fundNotApplied,
-				'A gift that is not already split takes the fund the person chose.'
-			);
+			Assert.isFalse(result.fundNotApplied, 'A gift that is not already split takes the fund the person chose.');
 			Assert.areEqual(1, allocations.size(), 'One gift, one allocation.');
-			Assert.areEqual(
-				fund.Id,
-				allocations[0].Fund__c,
-				'The allocation is to the fund chosen.'
-			);
+			Assert.areEqual(fund.Id, allocations[0].Fund__c, 'The allocation is to the fund chosen.');
 			Assert.areEqual(50, allocations[0].Amount__c, 'The allocation is the whole gift.');
 		}
 	}
@@ -262,9 +223,7 @@ private class QuickGiftEntryControllerTest {
 	static void asksForADonorWhenNoneWasChosen() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Test.startTest();
-			QuickGiftEntryController.SaveResult result = QuickGiftEntryController.saveGift(
-				baseInput()
-			);
+			QuickGiftEntryController.SaveResult result = QuickGiftEntryController.saveGift(baseInput());
 			Test.stopTest();
 
 			Assert.isFalse(result.success, 'A gift with no donor is not saved.');
@@ -412,11 +371,7 @@ private class QuickGiftEntryControllerTest {
 			Test.stopTest();
 
 			Assert.areEqual(1, choices.choices.size(), 'The one payment owed is offered.');
-			Assert.areEqual(
-				payment.Id,
-				choices.suggestedId,
-				'It is the only match, so it is chosen.'
-			);
+			Assert.areEqual(payment.Id, choices.suggestedId, 'It is the only match, so it is chosen.');
 		}
 	}
 
@@ -434,21 +389,14 @@ private class QuickGiftEntryControllerTest {
 			QuickGiftEntryController.SaveResult result = QuickGiftEntryController.saveGift(input);
 			Test.stopTest();
 
-			Assert.isTrue(
-				result.success,
-				'The gift saved: ' + result.fieldErrors + result.formError
-			);
+			Assert.isTrue(result.success, 'The gift saved: ' + result.fieldErrors + result.formError);
 			Gift__c saved = [
 				SELECT Installment__c, Commitment__c
 				FROM Gift__c
 				WHERE Id = :result.giftId
 			];
 			Assert.areEqual(payment.Id, saved.Installment__c, 'The gift pays the payment chosen.');
-			Assert.areEqual(
-				payment.Commitment__c,
-				saved.Commitment__c,
-				'And belongs to its pledge.'
-			);
+			Assert.areEqual(payment.Commitment__c, saved.Commitment__c, 'And belongs to its pledge.');
 			Assert.areEqual(
 				'Paid',
 				[SELECT Status__c FROM Installment__c WHERE Id = :payment.Id].Status__c,
@@ -462,9 +410,7 @@ private class QuickGiftEntryControllerTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			makeFund();
 			Contact donor = makeContact();
-			Contact someoneElse = TestDataFactory.person(
-				new Contact(FirstName = 'Kim', LastName = 'Lee')
-			);
+			Contact someoneElse = TestDataFactory.person(new Contact(FirstName = 'Kim', LastName = 'Lee'));
 			insert someoneElse;
 			Installment__c payment = pledgePaymentDueToday(someoneElse.Id);
 			QuickGiftEntryController.GiftInput input = baseInput();
@@ -513,9 +459,7 @@ private class QuickGiftEntryControllerTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			makeFund();
 			Contact donor = makeContact();
-			Contact widow = TestDataFactory.person(
-				new Contact(FirstName = 'Elena', LastName = 'Ruiz')
-			);
+			Contact widow = TestDataFactory.person(new Contact(FirstName = 'Elena', LastName = 'Ruiz'));
 			insert widow;
 			QuickGiftEntryController.GiftInput input = baseInput();
 			input.donorContactId = donor.Id;
@@ -556,11 +500,7 @@ private class QuickGiftEntryControllerTest {
 			Map<String, String> messages = messagesByField(result.fieldErrors);
 			Assert.isFalse(result.success, 'Refused.');
 			Assert.isTrue(messages.containsKey('tributeType'), 'Asks for the type.');
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_Tribute_HonoreeRequired'),
-				messages.get('honoree'),
-				'Who.'
-			);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Tribute_HonoreeRequired'), messages.get('honoree'), 'Who.');
 			Assert.areEqual(0, [SELECT COUNT() FROM Gift__c WITH SYSTEM_MODE], 'No gift.');
 		}
 	}

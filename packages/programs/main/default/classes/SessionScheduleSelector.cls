@@ -54,9 +54,7 @@ public with sharing class SessionScheduleSelector {
 	/** The nightly run's schedules: every active one that has not ended. */
 	public static Database.QueryLocator runnableLocator(Set<Id> onlyIds, Date today) {
 		if (onlyIds != null) {
-			return Database.getQueryLocator(
-				[SELECT Id FROM Session_Schedule__c WHERE Id IN :onlyIds WITH SYSTEM_MODE]
-			);
+			return Database.getQueryLocator([SELECT Id FROM Session_Schedule__c WHERE Id IN :onlyIds WITH SYSTEM_MODE]);
 		}
 		return Database.getQueryLocator(
 			[
@@ -73,11 +71,7 @@ public with sharing class SessionScheduleSelector {
 	 * schedules' own, of any status, and those of the same services, not Cancelled, which are
 	 * matched to a schedule by service and cohort.
 	 */
-	public static List<Session__c> sessionsFrom(
-		Set<Id> scheduleIds,
-		Set<Id> serviceIds,
-		Date fromDay
-	) {
+	public static List<Session__c> sessionsFrom(Set<Id> scheduleIds, Set<Id> serviceIds, Date fromDay) {
 		return [
 			SELECT Id, Session_Schedule__c, Service__c, Cohort__c, Session_Date__c, Status__c
 			FROM Session__c

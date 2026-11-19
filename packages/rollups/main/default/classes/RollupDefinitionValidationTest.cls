@@ -41,12 +41,7 @@ private class RollupDefinitionValidationTest {
 			for (Integer i = 0; i < 200; i++) {
 				Boolean wrong = Math.mod(i, 2) == 1;
 				definitions.add(
-					definition(
-						'Test_Check_' + i,
-						'ANY',
-						null,
-						wrong ? 'NumberOfEmployees' : 'Sample_Data__c'
-					)
+					definition('Test_Check_' + i, 'ANY', null, wrong ? 'NumberOfEmployees' : 'Sample_Data__c')
 				);
 			}
 
@@ -113,11 +108,7 @@ private class RollupDefinitionValidationTest {
 			Test.stopTest();
 
 			for (String expected : wrong.keySet()) {
-				Assert.areEqual(
-					expected,
-					refusedWith.get(expected),
-					'Refused with the plain message'
-				);
+				Assert.areEqual(expected, refusedWith.get(expected), 'Refused with the plain message');
 			}
 			Assert.areEqual(
 				1,
@@ -136,8 +127,8 @@ private class RollupDefinitionValidationTest {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			Rollup_Definition__c before = definition('Test_Old', 'SUM', 'Birthdate', 'Site');
 			before.Id = Id.valueOf(
-				Rollup_Definition__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-					.getKeyPrefix() + '000000000001'
+				Rollup_Definition__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() +
+				'000000000001'
 			);
 			Rollup_Definition__c switchedOff = before.clone(true);
 			switchedOff.Active__c = false;
@@ -158,23 +149,15 @@ private class RollupDefinitionValidationTest {
 	@IsTest
 	static void aRowLimitAddedWithoutAnOrderIsRefused() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			Rollup_Definition__c before = definition(
-				'Test_Limit',
-				'TEXT_LIST',
-				'LastName',
-				'Description'
-			);
+			Rollup_Definition__c before = definition('Test_Limit', 'TEXT_LIST', 'LastName', 'Description');
 			before.Id = Id.valueOf(
-				Rollup_Definition__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-					.getKeyPrefix() + '000000000002'
+				Rollup_Definition__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() +
+				'000000000002'
 			);
 			Rollup_Definition__c unordered = before.clone(true);
 			unordered.Row_Limit__c = 3;
 
-			TriggerHandler.setTestRecords(
-				new List<SObject>{ unordered },
-				new Map<Id, SObject>{ before.Id => before }
-			);
+			TriggerHandler.setTestRecords(new List<SObject>{ unordered }, new Map<Id, SObject>{ before.Id => before });
 			new RollupDefinitionValidationHandler().beforeUpdate();
 
 			Assert.areEqual(
@@ -188,17 +171,9 @@ private class RollupDefinitionValidationTest {
 	@IsTest
 	static void theRollupsPageNamesTheCalculationAndATextListSeparator() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			Rollup_Definition__c programs = definition(
-				'Test_Programs',
-				'TEXT_LIST_DISTINCT',
-				'Title',
-				'Description'
-			);
+			Rollup_Definition__c programs = definition('Test_Programs', 'TEXT_LIST_DISTINCT', 'Title', 'Description');
 			programs.Delimiter__c = 'Semicolon';
-			insert new List<Rollup_Definition__c>{
-				programs,
-				definition('Test_Any', 'ANY', null, 'Sample_Data__c')
-			};
+			insert new List<Rollup_Definition__c>{ programs, definition('Test_Any', 'ANY', null, 'Sample_Data__c') };
 
 			RollupController.RollupPageView page = RollupController.getPage();
 
@@ -211,11 +186,7 @@ private class RollupDefinitionValidationTest {
 				byKey.get('Test_Programs').aggregateLabel,
 				'By the picklist name'
 			);
-			Assert.areEqual(
-				'Semicolon',
-				byKey.get('Test_Programs').delimiterLabel,
-				'And its separator'
-			);
+			Assert.areEqual('Semicolon', byKey.get('Test_Programs').delimiterLabel, 'And its separator');
 			Assert.areEqual('Any', byKey.get('Test_Any').aggregateLabel, 'Any');
 			Assert.isNull(byKey.get('Test_Any').delimiterLabel, 'Only a text list has a separator');
 		}

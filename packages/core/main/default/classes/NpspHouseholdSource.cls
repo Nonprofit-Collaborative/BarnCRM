@@ -68,10 +68,7 @@ public with sharing virtual class NpspHouseholdSource {
 
 	/** NPSP's "this account is a household" marker and its value (R-HA1). */
 	@TestVisible
-	private static final String ACCOUNT_TYPE_FIELD = npspField(
-		CONTACTS_AND_ORGS,
-		'SYSTEM_AccountType'
-	);
+	private static final String ACCOUNT_TYPE_FIELD = npspField(CONTACTS_AND_ORGS, 'SYSTEM_AccountType');
 	@TestVisible
 	private static final String HOUSEHOLD_ACCOUNT_TYPE = 'Household Account';
 	/** NPSP's household record type. */
@@ -81,15 +78,9 @@ public with sharing virtual class NpspHouseholdSource {
 	@TestVisible
 	private static final String FORMAL_GREETING_FIELD = npspField(HOUSEHOLDS, 'Formal_Greeting');
 	@TestVisible
-	private static final String INFORMAL_GREETING_FIELD = npspField(
-		HOUSEHOLDS,
-		'Informal_Greeting'
-	);
+	private static final String INFORMAL_GREETING_FIELD = npspField(HOUSEHOLDS, 'Informal_Greeting');
 	@TestVisible
-	private static final String PRIMARY_CONTACT_FIELD = npspField(
-		CONTACTS_AND_ORGS,
-		'One2OneContact'
-	);
+	private static final String PRIMARY_CONTACT_FIELD = npspField(CONTACTS_AND_ORGS, 'One2OneContact');
 	@TestVisible
 	private static final String CUSTOM_NAMING_FIELD = npspField(HOUSEHOLDS, 'SYSTEM_CUSTOM_NAMING');
 
@@ -223,10 +214,7 @@ public with sharing virtual class NpspHouseholdSource {
 				fields.add(name);
 			}
 		}
-		String query =
-			'SELECT ' +
-			String.join(fields, ', ') +
-			' FROM Account WHERE Id IN :accountIds ORDER BY Id';
+		String query = 'SELECT ' + String.join(fields, ', ') + ' FROM Account WHERE Id IN :accountIds ORDER BY Id';
 		for (
 			SObject row : Database.queryWithBinds(
 				query,
@@ -258,15 +246,9 @@ public with sharing virtual class NpspHouseholdSource {
 
 	/** NPSP's Account Model setting, and its field, read by describe (RT-04, R-HA6). */
 	@TestVisible
-	private static final String ACCOUNT_MODEL_SETTING = npspField(
-		CONTACTS_AND_ORGS,
-		'Contacts_And_Orgs_Settings'
-	);
+	private static final String ACCOUNT_MODEL_SETTING = npspField(CONTACTS_AND_ORGS, 'Contacts_And_Orgs_Settings');
 	@TestVisible
-	private static final String ACCOUNT_MODEL_FIELD = npspField(
-		CONTACTS_AND_ORGS,
-		'Account_Processor'
-	);
+	private static final String ACCOUNT_MODEL_FIELD = npspField(CONTACTS_AND_ORGS, 'Account_Processor');
 
 	private static Boolean householdsInUse;
 

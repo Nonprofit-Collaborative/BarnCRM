@@ -17,7 +17,7 @@ public without sharing class DonorLevelWriter {
 		if (moved == null || moved.isEmpty()) {
 			return;
 		}
-		Database.update(moved, true, AccessLevel.SYSTEM_MODE);
+		update as system moved;
 	}
 
 	/**
@@ -41,9 +41,7 @@ public without sharing class DonorLevelWriter {
 			SObject original = before == null ? null : before.get(record.Id);
 			SObject changes = record.getSObjectType().newSObject(record.Id);
 			Boolean anyChange = false;
-			Map<String, Object> was = original == null
-				? new Map<String, Object>()
-				: original.getPopulatedFieldsAsMap();
+			Map<String, Object> was = original == null ? new Map<String, Object>() : original.getPopulatedFieldsAsMap();
 			Map<String, Object> now = record.getPopulatedFieldsAsMap();
 			for (String field : now.keySet()) {
 				Object value = now.get(field);
@@ -71,9 +69,7 @@ public without sharing class DonorLevelWriter {
 	public static void stampRecalculation(Datetime completedAt) {
 		OrgSettingsSystemWriter.save(
 			Giving_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{
-				Giving_Settings__c.Donor_Levels_Last_Recalculated__c => completedAt
-			}
+			new Map<Schema.SObjectField, Object>{ Giving_Settings__c.Donor_Levels_Last_Recalculated__c => completedAt }
 		);
 	}
 }

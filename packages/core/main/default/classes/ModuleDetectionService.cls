@@ -84,6 +84,9 @@ public with sharing class ModuleDetectionService {
 		 */
 		@AuraEnabled
 		public Boolean nonprofitOnly;
+		/** True when the catalog marks the module as in beta (`Beta__c`, D-211); false for Core. */
+		@AuraEnabled
+		public Boolean beta;
 		/**
 		 * For a module that is here, its tabs that belong in the BarnCRM and BarnCRM Console apps
 		 * (`Staff_Tabs__c`) and in the two admin apps (`Admin_Tabs__c`), by label and comma
@@ -145,10 +148,7 @@ public with sharing class ModuleDetectionService {
 	public static ModuleInfo givingModule() {
 		BarnCRM_Module__mdt row = catalogRow(MODULE_GIVING);
 		if (row == null) {
-			row = new BarnCRM_Module__mdt(
-				DeveloperName = MODULE_GIVING,
-				Package_Folder__c = 'giving'
-			);
+			row = new BarnCRM_Module__mdt(DeveloperName = MODULE_GIVING, Package_Folder__c = 'giving');
 		}
 		Boolean present = isGivingPresent();
 		return module(row, present, present ? appIds(new List<BarnCRM_Module__mdt>{ row }) : null);
@@ -171,11 +171,7 @@ public with sharing class ModuleDetectionService {
 		Set<String> announced = announcedModules();
 		String edition = chosenSuite() == null ? SUITE_STANDARD : chosenSuite();
 		List<ModuleInfo> offered = new List<ModuleInfo>{
-			module(
-				new BarnCRM_Module__mdt(DeveloperName = MODULE_CORE, Package_Folder__c = 'core'),
-				true,
-				null
-			)
+			module(new BarnCRM_Module__mdt(DeveloperName = MODULE_CORE, Package_Folder__c = 'core'), true, null)
 		};
 		List<BarnCRM_Module__mdt> rows = catalog();
 		Map<String, Boolean> presentByName = new Map<String, Boolean>();
@@ -335,21 +331,16 @@ public with sharing class ModuleDetectionService {
 		return names;
 	}
 
-	private static ModuleInfo module(
-		BarnCRM_Module__mdt row,
-		Boolean present,
-		Map<String, String> appIds
-	) {
+	private static ModuleInfo module(BarnCRM_Module__mdt row, Boolean present, Map<String, String> appIds) {
 		ModuleInfo info = new ModuleInfo();
 		info.name = row.DeveloperName;
 		info.label = labelOf(row);
 		info.present = present;
 		info.nonprofitOnly = isNonprofitOnly(row);
+		info.beta = row.Beta__c == true;
 		info.docsUrl = DOCS_BASE + row.Package_Folder__c + '/README.md';
 		info.installUrl = present ? null : installUrl(row.Install_Version_Id__c);
-		info.appUrl = present && String.isNotBlank(row.App_Name__c)
-			? appUrl(row.App_Name__c.trim(), appIds)
-			: null;
+		info.appUrl = present && String.isNotBlank(row.App_Name__c) ? appUrl(row.App_Name__c.trim(), appIds) : null;
 		return info;
 	}
 
@@ -443,9 +434,7 @@ public with sharing class ModuleDetectionService {
 			labels.add(
 				String.isNotBlank(written)
 					? written
-					: tabLabels.containsKey(name)
-							? tabLabels.get(name)
-							: name.removeEnd('__c').replace('_', ' ')
+					: tabLabels.containsKey(name) ? tabLabels.get(name) : name.removeEnd('__c').replace('_', ' ')
 			);
 		}
 		return labels.isEmpty() ? null : String.join(labels, ', ');
@@ -469,14 +458,9 @@ public with sharing class ModuleDetectionService {
 			List<String> names = tabNames(row.Staff_Tabs__c);
 			names.addAll(tabNames(row.Admin_Tabs__c));
 			for (String name : names) {
-				Schema.SObjectType type = name.endsWith('__c')
-					? NamespaceUtil.packagedObjectType(name)
-					: null;
+				Schema.SObjectType type = name.endsWith('__c') ? NamespaceUtil.packagedObjectType(name) : null;
 				if (type != null) {
-					found.put(
-						name,
-						type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural()
-					);
+					found.put(name, type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural());
 				}
 			}
 		}

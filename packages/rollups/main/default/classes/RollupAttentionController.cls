@@ -90,9 +90,7 @@ public with sharing class RollupAttentionController {
 					BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission')
 				);
 			}
-			RollupQueue.retry(
-				entryIds == null || entryIds.isEmpty() ? null : new Set<Id>(entryIds)
-			);
+			RollupQueue.retry(entryIds == null || entryIds.isEmpty() ? null : new Set<Id>(entryIds));
 			return getAttention();
 		} catch (Exception caught) {
 			throw ERRORS.wrap(caught);
@@ -208,11 +206,7 @@ public with sharing class RollupAttentionController {
 			Set<Id> ids = idsByTarget.get(target);
 			for (
 				SObject record : Database.queryWithBinds(
-					'SELECT Id, ' +
-						nameField +
-						' FROM ' +
-						String.valueOf(type) +
-						' WHERE Id IN :ids',
+					'SELECT Id, ' + nameField + ' FROM ' + String.valueOf(type) + ' WHERE Id IN :ids',
 					new Map<String, Object>{ 'ids' => ids },
 					AccessLevel.USER_MODE
 				)

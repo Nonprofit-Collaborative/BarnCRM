@@ -42,9 +42,7 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
 	}
 
 	public String fixLabel(String fixKey) {
-		return FIX_KEY_RESTORE_ROLLUPS.equals(fixKey)
-			? System.Label.Rollups_HealthCheck_RollupsMissingFix
-			: null;
+		return FIX_KEY_RESTORE_ROLLUPS.equals(fixKey) ? System.Label.Rollups_HealthCheck_RollupsMissingFix : null;
 	}
 
 	public String runFix(String fixKey, List<String> scope) {
@@ -74,11 +72,7 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
 		HealthCheckService.Finding run();
 	}
 
-	private static void addIsolated(
-		List<HealthCheckService.Finding> found,
-		String checkKey,
-		RollupCheck check
-	) {
+	private static void addIsolated(List<HealthCheckService.Finding> found, String checkKey, RollupCheck check) {
 		try {
 			HealthCheckService.Finding finding = check.run();
 			if (finding != null) {
@@ -107,10 +101,7 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
 			};
 			// The detail is complete before the Finding is built: another package writes a
 			// Finding only through its @NamespaceAccessible constructor and methods.
-			String detail = String.format(
-				BarnHelp.text('Rollups', 'Core_HealthCheck_RollupsMissingDetail'),
-				values
-			);
+			String detail = String.format(BarnHelp.text('Rollups', 'Core_HealthCheck_RollupsMissingDetail'), values);
 			List<String> skipped = RollupService.skippedDefaultNames();
 			if (!skipped.isEmpty()) {
 				detail +=
@@ -148,9 +139,7 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
 			if (RollupScheduler.isScheduled()) {
 				return null;
 			}
-			List<Rollup_Definition__c> waiting = RollupSelector.selectActiveForModes(
-				RollupService.scheduledModes()
-			);
+			List<Rollup_Definition__c> waiting = RollupSelector.selectActiveForModes(RollupService.scheduledModes());
 			if (waiting.isEmpty()) {
 				return null;
 			}
@@ -185,9 +174,7 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
 				'nightly_rollups_not_scheduled',
 				System.Label.Rollups_HealthCheck_NightlyOffTitle,
 				detail,
-				nightlyOnly > 0
-					? HealthCheckService.SEVERITY_WARNING
-					: HealthCheckService.SEVERITY_INFO,
+				nightlyOnly > 0 ? HealthCheckService.SEVERITY_WARNING : HealthCheckService.SEVERITY_INFO,
 				HealthCheckService.CATEGORY_SETTINGS
 			);
 		}

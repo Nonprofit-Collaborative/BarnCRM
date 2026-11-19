@@ -91,10 +91,7 @@ public with sharing class DataJobs {
 	public static State stateOf(Import_Batch__c job, Boolean withProgress) {
 		AsyncApexJob asyncJob = ImportBatchService.asyncJobOf(job);
 		State state = new State();
-		state.status = ImportUndoService.effectiveStatus(
-			job,
-			ImportBatchService.isRunning(job, asyncJob)
-		);
+		state.status = ImportUndoService.effectiveStatus(job, ImportBatchService.isRunning(job, asyncJob));
 		Boolean committing = ImportBatchService.STATUS_COMMITTING.equals(state.status);
 		// An undo still running is as much a running job: the list polls until it ends.
 		state.running = committing || ImportBatchService.STATUS_UNDOING.equals(state.status);
@@ -138,12 +135,7 @@ public with sharing class DataJobs {
 	 * A whole-number setting from BarnCRM Settings, held between `lowest` and `highest`; the
 	 * fallback when it is empty or unreadable.
 	 */
-	public static Integer wholeNumberSetting(
-		String key,
-		Integer fallback,
-		Integer lowest,
-		Integer highest
-	) {
+	public static Integer wholeNumberSetting(String key, Integer fallback, Integer lowest, Integer highest) {
 		Decimal value = SettingsService.storedNumber(key);
 		return value == null ? fallback : Math.max(lowest, Math.min(value.intValue(), highest));
 	}
@@ -158,9 +150,7 @@ public with sharing class DataJobs {
 
 	/** The confirmed count a job's definition holds. */
 	public static Integer confirmedCountOf(String definitionJson) {
-		Map<String, Object> definition = (Map<String, Object>) JSON.deserializeUntyped(
-			definitionJson
-		);
+		Map<String, Object> definition = (Map<String, Object>) JSON.deserializeUntyped(definitionJson);
 		return Integer.valueOf(definition.get('confirmedCount'));
 	}
 
@@ -191,10 +181,7 @@ public with sharing class DataJobs {
 	public static Import_Batch__c launch(Database.Batchable<SObject> work, Import_Batch__c job) {
 		Id asyncJobId = AsyncStarter.batch(work, job.Chunk_Size__c.intValue(), 'DataJobs.launch');
 		job.Job_Id__c = asyncJobId;
-		Database.update(
-			new Import_Batch__c(Id = job.Id, Job_Id__c = asyncJobId),
-			AccessLevel.SYSTEM_MODE
-		);
+		Database.update(new Import_Batch__c(Id = job.Id, Job_Id__c = asyncJobId), AccessLevel.SYSTEM_MODE);
 		return job;
 	}
 
@@ -212,11 +199,7 @@ public with sharing class DataJobs {
 
 	/** The records a job reads: at most the confirmed number, in Id order, as the person. */
 	public static Database.QueryLocator locatorFor(String queryJson, Integer confirmed) {
-		QueryCompiler.Compiled selection = QueryCompiler.compileSelection(
-			queryJson,
-			new Set<String>{ 'Id' },
-			null
-		);
+		QueryCompiler.Compiled selection = QueryCompiler.compileSelection(queryJson, new Set<String>{ 'Id' }, null);
 		selection.binds.put('confirmed', confirmed);
 		return Database.getQueryLocatorWithBinds(
 			selection.soql + ' ORDER BY Id LIMIT :confirmed',

@@ -54,16 +54,8 @@ private class AddressPropagationTest {
 			];
 			Assert.areEqual(3, moved.size(), 'All three members should still be in the household.');
 			for (Contact member : moved) {
-				Assert.areEqual(
-					WINTER_STREET,
-					member.MailingStreet,
-					'Every member moves with the household.'
-				);
-				Assert.areEqual(
-					WINTER_CITY,
-					member.MailingCity,
-					'Every member moves with the household.'
-				);
+				Assert.areEqual(WINTER_STREET, member.MailingStreet, 'Every member moves with the household.');
+				Assert.areEqual(WINTER_CITY, member.MailingCity, 'Every member moves with the household.');
 			}
 		}
 	}
@@ -78,9 +70,7 @@ private class AddressPropagationTest {
 			insert ana;
 
 			Test.startTest();
-			AddressService.membersByHouseholdOverride = new Map<Id, Set<Id>>{
-				garcia.Id => new Set<Id>{ ana.Id }
-			};
+			AddressService.membersByHouseholdOverride = new Map<Id, Set<Id>>{ garcia.Id => new Set<Id>{ ana.Id } };
 			try {
 				insert new Address__c(
 					Account__c = garcia.Id,
@@ -127,10 +117,7 @@ private class AddressPropagationTest {
 			Account personLikeAccount = AddressTestDataFactory.newHousehold('Ana Garcia');
 			personLikeAccount.BillingStreet = MEMBER_OWN_STREET;
 			personLikeAccount.BillingCity = MEMBER_OWN_CITY;
-			Database.insert(
-				new List<Account>{ garcia, personLikeAccount },
-				AccessLevel.SYSTEM_MODE
-			);
+			Database.insert(new List<Account>{ garcia, personLikeAccount }, AccessLevel.SYSTEM_MODE);
 
 			Test.startTest();
 			AddressService.membersByHouseholdOverride = new Map<Id, Set<Id>>{
@@ -259,11 +246,7 @@ private class AddressPropagationTest {
 			clearHandlerContext();
 			Test.stopTest();
 
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Address__c],
-				'A handler called with nothing to do writes nothing.'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Address__c], 'A handler called with nothing to do writes nothing.');
 		}
 	}
 
@@ -275,14 +258,7 @@ private class AddressPropagationTest {
 			garcia.BillingCity = WINTER_CITY;
 			Database.insert(garcia, AccessLevel.SYSTEM_MODE);
 			Account reloaded = [
-				SELECT
-					Id,
-					RecordTypeId,
-					BillingStreet,
-					BillingCity,
-					BillingState,
-					BillingPostalCode,
-					BillingCountry
+				SELECT Id, RecordTypeId, BillingStreet, BillingCity, BillingState, BillingPostalCode, BillingCountry
 				FROM Account
 				WHERE Id = :garcia.Id
 			];
@@ -343,11 +319,7 @@ private class AddressPropagationTest {
 			insert members;
 
 			Test.startTest();
-			update new Account(
-				Id = garcia.Id,
-				BillingStreet = WINTER_STREET,
-				BillingCity = WINTER_CITY
-			);
+			update new Account(Id = garcia.Id, BillingStreet = WINTER_STREET, BillingCity = WINTER_CITY);
 			Test.stopTest();
 
 			List<Address__c> addresses = [
@@ -447,11 +419,7 @@ private class AddressPropagationTest {
 			]) {
 				movedDefaults += address.Street__c.endsWith(' Winter Road') ? 1 : 0;
 			}
-			Assert.areEqual(
-				TWO_HUNDRED,
-				movedDefaults,
-				'Every household has the edit as its default.'
-			);
+			Assert.areEqual(TWO_HUNDRED, movedDefaults, 'Every household has the edit as its default.');
 			Integer movedMembers = 0;
 			for (Contact member : [SELECT MailingStreet FROM Contact WHERE Id IN :members]) {
 				movedMembers += member.MailingStreet?.endsWith(' Winter Road') == true ? 1 : 0;
@@ -465,21 +433,10 @@ private class AddressPropagationTest {
 		System.runAs(TestUsers.admin()) {
 			Account nativeHousehold = householdAt(HOME_STREET);
 			Database.insert(nativeHousehold, AccessLevel.SYSTEM_MODE);
-			Contact member = AddressTestDataFactory.newContact(
-				'Maria',
-				'Garcia',
-				nativeHousehold.Id
-			);
+			Contact member = AddressTestDataFactory.newContact('Maria', 'Garcia', nativeHousehold.Id);
 			insert member;
 			Account before = [
-				SELECT
-					Id,
-					RecordTypeId,
-					BillingStreet,
-					BillingCity,
-					BillingState,
-					BillingPostalCode,
-					BillingCountry
+				SELECT Id, RecordTypeId, BillingStreet, BillingCity, BillingState, BillingPostalCode, BillingCountry
 				FROM Account
 				WHERE Id = :nativeHousehold.Id
 			];
@@ -488,9 +445,7 @@ private class AddressPropagationTest {
 			OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
 			shape.hasNativeHouseholdGroups = true;
 			OrgShapeDetector.overrideShape = shape;
-			HouseholdSelector.accountsWithNativeDependentsOverride = new Set<Id>{
-				nativeHousehold.Id
-			};
+			HouseholdSelector.accountsWithNativeDependentsOverride = new Set<Id>{ nativeHousehold.Id };
 
 			Test.startTest();
 			driveAfterUpdate(
@@ -601,17 +556,9 @@ private class AddressPropagationTest {
 			// Ana's household is the Nowaks', where she is the primary member; she also
 			// belongs to the Garcias'. Luis's only household is the Garcias'.
 			insert new List<Household_Member__c>{
-				new Household_Member__c(
-					Household__c = nowak.Id,
-					Contact__c = ana.Id,
-					Is_Primary__c = true
-				),
+				new Household_Member__c(Household__c = nowak.Id, Contact__c = ana.Id, Is_Primary__c = true),
 				new Household_Member__c(Household__c = garcia.Id, Contact__c = ana.Id),
-				new Household_Member__c(
-					Household__c = garcia.Id,
-					Contact__c = luis.Id,
-					Is_Primary__c = true
-				)
+				new Household_Member__c(Household__c = garcia.Id, Contact__c = luis.Id, Is_Primary__c = true)
 			};
 
 			Test.startTest();
@@ -649,11 +596,7 @@ private class AddressPropagationTest {
 			insert new List<Contact>{ ana, luis };
 
 			Test.startTest();
-			update new Contact(
-				Id = ana.Id,
-				MailingStreet = MEMBER_OWN_STREET,
-				MailingCity = MEMBER_OWN_CITY
-			);
+			update new Contact(Id = ana.Id, MailingStreet = MEMBER_OWN_STREET, MailingCity = MEMBER_OWN_CITY);
 			Test.stopTest();
 
 			List<Address__c> anasOwn = [
@@ -673,10 +616,7 @@ private class AddressPropagationTest {
 				.Street__c,
 				'The household keeps its primary address.'
 			);
-			Assert.isNull(
-				[SELECT MailingStreet FROM Contact WHERE Id = :luis.Id].MailingStreet,
-				'Nobody else moves.'
-			);
+			Assert.isNull([SELECT MailingStreet FROM Contact WHERE Id = :luis.Id].MailingStreet, 'Nobody else moves.');
 		}
 	}
 
@@ -744,10 +684,7 @@ private class AddressPropagationTest {
 				[SELECT MailingStreet FROM Contact WHERE Id = :ana.Id].MailingStreet,
 				'Ana keeps the address of her own.'
 			);
-			Assert.isFalse(
-				AddressService.chooseHouseholdMoves(false),
-				'The swap puts the mark back when it is done.'
-			);
+			Assert.isFalse(AddressService.chooseHouseholdMoves(false), 'The swap puts the mark back when it is done.');
 		}
 	}
 
@@ -838,11 +775,7 @@ private class AddressPropagationTest {
 		}
 	}
 
-	private static void driveAfterUpdate(
-		TriggerHandler handler,
-		List<SObject> records,
-		Map<Id, SObject> previousById
-	) {
+	private static void driveAfterUpdate(TriggerHandler handler, List<SObject> records, Map<Id, SObject> previousById) {
 		TriggerHandler.testNew = records;
 		TriggerHandler.testNewMap = new Map<Id, SObject>(records);
 		TriggerHandler.testOld = previousById.values();

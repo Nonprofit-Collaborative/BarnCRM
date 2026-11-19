@@ -45,14 +45,8 @@ public with sharing class ContactPointMembershipHandler extends TriggerHandler {
 			return;
 		}
 		// Also forgets any household answer given earlier in this transaction.
-		HouseholdService.MembershipChange change = HouseholdService.membershipChangeOf(
-			rows,
-			before
-		);
+		HouseholdService.MembershipChange change = HouseholdService.membershipChangeOf(rows, before);
 		// A person being erased is synced once when the erasure ends (ADR-0193 erasure start seam).
-		ContactPointSyncService.syncOrQueue(
-			ContactPointSyncService.withoutHeld(change.personIds),
-			ADDRESS_ONLY
-		);
+		ContactPointSyncService.syncOrQueue(ContactPointSyncService.withoutHeld(change.personIds), ADDRESS_ONLY);
 	}
 }

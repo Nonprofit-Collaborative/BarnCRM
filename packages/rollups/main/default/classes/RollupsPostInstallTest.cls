@@ -85,9 +85,7 @@ private class RollupsPostInstallTest {
 		return [
 			SELECT COUNT()
 			FROM PermissionSetAssignment
-			WHERE
-				AssigneeId = :userId
-				AND PermissionSet.Name = :RollupsPostInstall.ADMIN_PERMISSION_SET
+			WHERE AssigneeId = :userId AND PermissionSet.Name = :RollupsPostInstall.ADMIN_PERMISSION_SET
 			WITH SYSTEM_MODE
 		];
 	}
@@ -98,9 +96,7 @@ private class RollupsPostInstallTest {
 			Id installer = newInstaller();
 			// The defect this covers: nothing called ensureDefaults, so a fresh org had no
 			// Rollup Definition records at all and every giving total stayed empty (ADR-0029).
-			RollupSelector.defaultsOverride = new List<Rollup_Definition_Default__mdt>{
-				memberCountDefault()
-			};
+			RollupSelector.defaultsOverride = new List<Rollup_Definition_Default__mdt>{ memberCountDefault() };
 
 			Test.startTest();
 			install(new RollupsPostInstall(), installer);
@@ -124,11 +120,7 @@ private class RollupsPostInstallTest {
 				created[0].Is_Package_Default__c,
 				'It is marked as shipped, so the Rollups page can tell it from an admin rollup.'
 			);
-			Assert.areEqual(
-				1,
-				adminSetsHeldBy(installer),
-				'The installer can open the Rollup Builder.'
-			);
+			Assert.areEqual(1, adminSetsHeldBy(installer), 'The installer can open the Rollup Builder.');
 		}
 	}
 
@@ -136,9 +128,7 @@ private class RollupsPostInstallTest {
 	static void upgradingDoesNotCreateASecondCopyOrUndoAnEdit() {
 		System.runAs(admin()) {
 			Id installer = newInstaller();
-			RollupSelector.defaultsOverride = new List<Rollup_Definition_Default__mdt>{
-				memberCountDefault()
-			};
+			RollupSelector.defaultsOverride = new List<Rollup_Definition_Default__mdt>{ memberCountDefault() };
 			RollupsPostInstall handler = new RollupsPostInstall();
 			Test.startTest();
 			install(handler, installer);
@@ -210,11 +200,7 @@ private class RollupsPostInstallTest {
 				[SELECT COUNT() FROM Rollup_Definition__c],
 				'A rollup over an object nobody has must not be created (R-R6).'
 			);
-			Assert.areEqual(
-				1,
-				adminSetsHeldBy(installer),
-				'And skipping it leaves the rest of the install alone.'
-			);
+			Assert.areEqual(1, adminSetsHeldBy(installer), 'And skipping it leaves the rest of the install alone.');
 		}
 	}
 
@@ -234,11 +220,7 @@ private class RollupsPostInstallTest {
 			install(new RollupsPostInstall(), installer);
 			Test.stopTest();
 
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Rollup_Definition__c],
-				'The bad row is not created.'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Rollup_Definition__c], 'The bad row is not created.');
 			List<Error_Log__c> logged = [
 				SELECT Context__c, Technical_Detail__c, Severity__c
 				FROM Error_Log__c
@@ -261,9 +243,7 @@ private class RollupsPostInstallTest {
 	@IsTest
 	static void aMissingContextChangesNothing() {
 		System.runAs(admin()) {
-			RollupSelector.defaultsOverride = new List<Rollup_Definition_Default__mdt>{
-				memberCountDefault()
-			};
+			RollupSelector.defaultsOverride = new List<Rollup_Definition_Default__mdt>{ memberCountDefault() };
 
 			Test.startTest();
 			new RollupsPostInstall().onInstall(null);
@@ -328,11 +308,7 @@ private class RollupsPostInstallTest {
 			Rollup_Settings__c row = Rollup_Settings__c.getOrgDefaults();
 			Assert.areEqual(UserInfo.getOrganizationId(), row.SetupOwnerId, 'The org-level row.');
 			Assert.areEqual(RollupService.MODE_BOTH, row.Rollup_Mode_Default__c, 'Mode Both.');
-			Assert.areEqual(
-				RollupService.PROCESSING_BACKGROUND,
-				row.Rollup_Processing__c,
-				'Processing Background.'
-			);
+			Assert.areEqual(RollupService.PROCESSING_BACKGROUND, row.Rollup_Processing__c, 'Processing Background.');
 			Assert.areEqual(0, [SELECT COUNT() FROM Setting_Change__c], 'Nothing audited.');
 			Assert.areEqual(
 				0,

@@ -16,9 +16,7 @@ private class CommitmentTriggerHandlerTest {
 	}
 
 	private static Contact donor() {
-		Contact person = TestDataFactory.person(
-			new Contact(FirstName = 'Sarah', LastName = 'Nguyen')
-		);
+		Contact person = TestDataFactory.person(new Contact(FirstName = 'Sarah', LastName = 'Nguyen'));
 		insert person;
 		return person;
 	}
@@ -43,8 +41,7 @@ private class CommitmentTriggerHandlerTest {
 			Commitment__c pledge = pledgeFor(person.Id);
 
 			Test.startTest();
-			new CommitmentTriggerHandler()
-				.deriveHouseholds(new List<Commitment__c>{ pledge }, null);
+			new CommitmentTriggerHandler().deriveHouseholds(new List<Commitment__c>{ pledge }, null);
 			Test.stopTest();
 
 			Contact saved = [SELECT AccountId FROM Contact WHERE Id = :person.Id];
@@ -91,9 +88,7 @@ private class CommitmentTriggerHandlerTest {
 			insert pledge;
 			CommitmentService.generateInstallments(new Set<Id>{ pledge.Id });
 
-			Map<Id, Commitment__c> oldMap = new Map<Id, Commitment__c>{
-				pledge.Id => pledge.clone(true, true)
-			};
+			Map<Id, Commitment__c> oldMap = new Map<Id, Commitment__c>{ pledge.Id => pledge.clone(true, true) };
 			pledge.Frequency__c = 'Weekly';
 			update pledge;
 
@@ -148,10 +143,7 @@ private class CommitmentTriggerHandlerTest {
 			}
 			Test.stopTest();
 
-			Assert.isTrue(
-				blocked,
-				'A commitment with a gift against it is history, so it is not deleted.'
-			);
+			Assert.isTrue(blocked, 'A commitment with a gift against it is history, so it is not deleted.');
 		}
 	}
 
@@ -188,10 +180,7 @@ private class CommitmentTriggerHandlerTest {
 			}
 			Test.stopTest();
 
-			Assert.isTrue(
-				blocked,
-				'A payment with a gift against it is marked Skipped, never deleted.'
-			);
+			Assert.isTrue(blocked, 'A payment with a gift against it is marked Skipped, never deleted.');
 		}
 	}
 
@@ -257,13 +246,11 @@ private class CommitmentTriggerHandlerTest {
 			}
 			Assert.areEqual(
 				250,
-				[SELECT Expected_Total__c FROM Commitment__c WHERE Id = :typed.Id]
-				.Expected_Total__c,
+				[SELECT Expected_Total__c FROM Commitment__c WHERE Id = :typed.Id].Expected_Total__c,
 				'A total someone typed is theirs.'
 			);
 			Assert.isNull(
-				[SELECT Expected_Total__c FROM Commitment__c WHERE Id = :recurring.Id]
-				.Expected_Total__c,
+				[SELECT Expected_Total__c FROM Commitment__c WHERE Id = :recurring.Id].Expected_Total__c,
 				'A recurring gift has no total.'
 			);
 		}

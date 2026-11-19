@@ -44,11 +44,7 @@ private class RollupEngineTest {
 		);
 	}
 
-	private static Rollup_Definition__c fromChildren(
-		String aggregate,
-		String sourceField,
-		String targetField
-	) {
+	private static Rollup_Definition__c fromChildren(String aggregate, String sourceField, String targetField) {
 		return definition('Account', 'ParentId', aggregate, sourceField, 'Account', targetField);
 	}
 
@@ -57,12 +53,7 @@ private class RollupEngineTest {
 			new Map<String, Object>{
 				'version' => 1,
 				'conditions' => new List<Object>{
-					new Map<String, Object>{
-						'id' => 1,
-						'field' => field,
-						'operator' => operator,
-						'value' => value
-					}
+					new Map<String, Object>{ 'id' => 1, 'field' => field, 'operator' => operator, 'value' => value }
 				}
 			}
 		);
@@ -127,10 +118,7 @@ private class RollupEngineTest {
 			};
 
 			Test.startTest();
-			RollupEngine.Result result = RollupEngine.recalculate(
-				new Set<Id>{ busy.Id, empty.Id },
-				definitions
-			);
+			RollupEngine.Result result = RollupEngine.recalculate(new Set<Id>{ busy.Id, empty.Id }, definitions);
 			Test.stopTest();
 
 			Account parent = reread(busy.Id);
@@ -170,17 +158,10 @@ private class RollupEngineTest {
 					)
 				)
 			};
-			Rollup_Definition__c large = fromChildren(
-				'SUM',
-				'NumberOfEmployees',
-				'Member_Count__c'
-			);
+			Rollup_Definition__c large = fromChildren('SUM', 'NumberOfEmployees', 'Member_Count__c');
 			large.Filter_JSON__c = filter('NumberOfEmployees', 'greater than', 10);
 
-			RollupEngine.recalculate(
-				new Set<Id>{ parent.Id },
-				new List<Rollup_Definition__c>{ large }
-			);
+			RollupEngine.recalculate(new Set<Id>{ parent.Id }, new List<Rollup_Definition__c>{ large });
 
 			Assert.areEqual(50, reread(parent.Id).Member_Count__c, 'Only the large child');
 		}
@@ -219,31 +200,16 @@ private class RollupEngineTest {
 					)
 				)
 			};
-			Rollup_Definition__c first = fromChildren(
-				'FIRST',
-				'NumberOfEmployees',
-				'Member_Count__c'
-			);
+			Rollup_Definition__c first = fromChildren('FIRST', 'NumberOfEmployees', 'Member_Count__c');
 			first.Order_By_Field__c = 'Anniversary__c';
-			Rollup_Definition__c last = fromChildren(
-				'LAST',
-				'NumberOfEmployees',
-				'NumberOfEmployees'
-			);
+			Rollup_Definition__c last = fromChildren('LAST', 'NumberOfEmployees', 'NumberOfEmployees');
 			last.Order_By_Field__c = 'Anniversary__c';
 
-			RollupEngine.recalculate(
-				new Set<Id>{ parent.Id },
-				new List<Rollup_Definition__c>{ first, last }
-			);
+			RollupEngine.recalculate(new Set<Id>{ parent.Id }, new List<Rollup_Definition__c>{ first, last });
 
 			Account reread = reread(parent.Id);
 			Assert.areEqual(7, reread.Member_Count__c, 'The earliest by date');
-			Assert.areEqual(
-				9,
-				reread.NumberOfEmployees,
-				'The latest by date; undated rows never win'
-			);
+			Assert.areEqual(9, reread.NumberOfEmployees, 'The latest by date; undated rows never win');
 		}
 	}
 
@@ -382,11 +348,7 @@ private class RollupEngineTest {
 					)
 				)
 			};
-			Rollup_Definition__c plain = fromChildren(
-				'SUM',
-				'NumberOfEmployees',
-				'Member_Count__c'
-			);
+			Rollup_Definition__c plain = fromChildren('SUM', 'NumberOfEmployees', 'Member_Count__c');
 			Rollup_Definition__c equalsNorth = plain.clone();
 			equalsNorth.Target_Filter_JSON__c = filter('Preferred_Name__c', 'equals', 'North');
 			Rollup_Definition__c notNorth = plain.clone();
@@ -428,14 +390,8 @@ private class RollupEngineTest {
 				fromChildren('COUNT', null, 'Member_Count__c')
 			};
 
-			RollupEngine.Result first = RollupEngine.recalculate(
-				new Set<Id>{ parent.Id },
-				definitions
-			);
-			RollupEngine.Result second = RollupEngine.recalculate(
-				new Set<Id>{ parent.Id },
-				definitions
-			);
+			RollupEngine.Result first = RollupEngine.recalculate(new Set<Id>{ parent.Id }, definitions);
+			RollupEngine.Result second = RollupEngine.recalculate(new Set<Id>{ parent.Id }, definitions);
 
 			Assert.areEqual(1, first.written.size(), 'The first run wrote the count');
 			Assert.areEqual(0, second.written.size(), 'Nothing changed, so nothing is saved');
@@ -466,11 +422,7 @@ private class RollupEngineTest {
 
 			Assert.areEqual(1, reread(parent.Id).Member_Count__c, 'The good one still ran');
 			Assert.areEqual(1, result.ran.size(), 'Only the good one ran');
-			Assert.areEqual(
-				4,
-				result.refused.size(),
-				'Checkbox, missing, token, unqueryable filter'
-			);
+			Assert.areEqual(4, result.refused.size(), 'Checkbox, missing, token, unqueryable filter');
 		}
 	}
 
@@ -481,18 +433,11 @@ private class RollupEngineTest {
 			insert parent;
 			insert organization('Child', parent.Id);
 			Rollup_Definition__c active = fromChildren('COUNT', null, 'Member_Count__c');
-			Rollup_Definition__c inactive = fromChildren(
-				'SUM',
-				'NumberOfEmployees',
-				'NumberOfEmployees'
-			);
+			Rollup_Definition__c inactive = fromChildren('SUM', 'NumberOfEmployees', 'NumberOfEmployees');
 			inactive.Active__c = false;
 			insert new List<Rollup_Definition__c>{ active, inactive };
 
-			RollupEngine.Result result = RollupEngine.recalculate(
-				new Set<Id>{ parent.Id },
-				Account.SObjectType
-			);
+			RollupEngine.Result result = RollupEngine.recalculate(new Set<Id>{ parent.Id }, Account.SObjectType);
 
 			Assert.areEqual(1, result.ran.size(), 'Only the active definition');
 			Assert.areEqual(1, reread(parent.Id).Member_Count__c, 'Written');
@@ -505,18 +450,10 @@ private class RollupEngineTest {
 	private static void assertHouseholdToken(Account household, Contact ana) {
 		insert new List<Contact>{
 			TestDataFactory.person(
-				new Contact(
-					LastName = 'Older',
-					ReportsToId = ana.Id,
-					Birthdate = Date.newInstance(1980, 1, 1)
-				)
+				new Contact(LastName = 'Older', ReportsToId = ana.Id, Birthdate = Date.newInstance(1980, 1, 1))
 			),
 			TestDataFactory.person(
-				new Contact(
-					LastName = 'Younger',
-					ReportsToId = ana.Id,
-					Birthdate = Date.newInstance(1990, 5, 5)
-				)
+				new Contact(LastName = 'Younger', ReportsToId = ana.Id, Birthdate = Date.newInstance(1990, 5, 5))
 			)
 		};
 		Rollup_Definition__c latest = definition(
@@ -530,10 +467,7 @@ private class RollupEngineTest {
 		latest.Target_Filter_JSON__c = filter('RecordType.DeveloperName', 'equals', 'Household');
 
 		Test.startTest();
-		RollupEngine.recalculate(
-			new Set<Id>{ household.Id },
-			new List<Rollup_Definition__c>{ latest }
-		);
+		RollupEngine.recalculate(new Set<Id>{ household.Id }, new List<Rollup_Definition__c>{ latest });
 		Test.stopTest();
 
 		Assert.areEqual(
@@ -564,11 +498,7 @@ private class RollupEngineTest {
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
 			Contact ana = HouseholdTestDataFactory.newContact('Ana', 'Garcia');
 			insert ana;
-			insert new Household_Member__c(
-				Household__c = household.Id,
-				Contact__c = ana.Id,
-				Is_Primary__c = true
-			);
+			insert new Household_Member__c(Household__c = household.Id, Contact__c = ana.Id, Is_Primary__c = true);
 			assertHouseholdToken(household, ana);
 		}
 	}
@@ -585,11 +515,7 @@ private class RollupEngineTest {
 			luis.AccountId = household.Id;
 			insert new List<Contact>{ ana, luis };
 			insert TestDataFactory.person(
-				new Contact(
-					LastName = 'Report',
-					ReportsToId = ana.Id,
-					Birthdate = Date.newInstance(1985, 2, 2)
-				)
+				new Contact(LastName = 'Report', ReportsToId = ana.Id, Birthdate = Date.newInstance(1985, 2, 2))
 			);
 			Rollup_Definition__c members = definition(
 				'Contact',
@@ -600,10 +526,7 @@ private class RollupEngineTest {
 				'Birthdate'
 			);
 
-			RollupEngine.recalculate(
-				new Set<Id>{ luis.Id },
-				new List<Rollup_Definition__c>{ members }
-			);
+			RollupEngine.recalculate(new Set<Id>{ luis.Id }, new List<Rollup_Definition__c>{ members });
 
 			Assert.areEqual(
 				Date.newInstance(1985, 2, 2),
@@ -653,10 +576,7 @@ private class RollupEngineTest {
 			};
 
 			Test.startTest();
-			RollupEngine.Result result = RollupEngine.recalculate(
-				new Map<Id, Account>(parents).keySet(),
-				definitions
-			);
+			RollupEngine.Result result = RollupEngine.recalculate(new Map<Id, Account>(parents).keySet(), definitions);
 			Integer queries = Limits.getQueries();
 			Test.stopTest();
 
@@ -682,11 +602,7 @@ private class RollupEngineTest {
 			insert anonymous;
 			List<Contact> people = new List<Contact>();
 			for (Integer i = 0; i < 5000; i++) {
-				people.add(
-					TestDataFactory.person(
-						new Contact(LastName = 'Donor' + i, AccountId = anonymous.Id)
-					)
-				);
+				people.add(TestDataFactory.person(new Contact(LastName = 'Donor' + i, AccountId = anonymous.Id)));
 			}
 			// Household upkeep runs once per 200 people saved, 25 times in one test transaction,
 			// which is the platform's limit being tested rather than the engine's. Contact Point
@@ -704,10 +620,7 @@ private class RollupEngineTest {
 			);
 
 			Test.startTest();
-			RollupEngine.recalculate(
-				new Set<Id>{ anonymous.Id },
-				new List<Rollup_Definition__c>{ count }
-			);
+			RollupEngine.recalculate(new Set<Id>{ anonymous.Id }, new List<Rollup_Definition__c>{ count });
 			Test.stopTest();
 
 			Assert.areEqual(5000, reread(anonymous.Id).Member_Count__c, 'Every child counted');

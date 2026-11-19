@@ -71,14 +71,8 @@ public with sharing class GrantOutcomeService {
 				elementType = elementObject();
 				looked = true;
 			}
-			if (
-				outcomeId == null ||
-				(elementType != null &&
-				outcomeId.getSObjectType() != elementType)
-			) {
-				requirement.Outcome_Id__c.addError(
-					BarnHelp.text('Funders', 'Funders_Outcomes_NotAnOutcome')
-				);
+			if (outcomeId == null || (elementType != null && outcomeId.getSObjectType() != elementType)) {
+				requirement.Outcome_Id__c.addError(BarnHelp.text('Funders', 'Funders_Outcomes_NotAnOutcome'));
 				continue;
 			}
 			requirement.Outcome_Id__c = String.valueOf(outcomeId);
@@ -147,11 +141,7 @@ public with sharing class GrantOutcomeService {
 	 * @param fromDate the award period's start, or null
 	 * @param toDate the award period's end, or null
 	 */
-	public static Map<String, Map<String, Object>> outcomes(
-		Set<String> outcomeIds,
-		Date fromDate,
-		Date toDate
-	) {
+	public static Map<String, Map<String, Object>> outcomes(Set<String> outcomeIds, Date fromDate, Date toDate) {
 		Map<String, Map<String, Object>> byId = new Map<String, Map<String, Object>>();
 		if (outcomeIds == null || outcomeIds.isEmpty() || !available()) {
 			return byId;
@@ -217,9 +207,7 @@ public with sharing class GrantOutcomeService {
 				'periods' => new List<Map<String, Object>>()
 			};
 			indicators.put(indicator.Id, shape);
-			((List<Map<String, Object>>) byId.get(String.valueOf(indicator.get(element)))
-					.get('indicators'))
-				.add(shape);
+			((List<Map<String, Object>>) byId.get(String.valueOf(indicator.get(element))).get('indicators')).add(shape);
 		}
 		if (!indicators.isEmpty()) {
 			addPeriods(indicators, fromDate, toDate);
@@ -227,11 +215,7 @@ public with sharing class GrantOutcomeService {
 		return byId;
 	}
 
-	private static void addPeriods(
-		Map<Id, Map<String, Object>> indicators,
-		Date fromDate,
-		Date toDate
-	) {
+	private static void addPeriods(Map<Id, Map<String, Object>> indicators, Date fromDate, Date toDate) {
 		String indicator = q('Indicator__c');
 		String startField = q('Start_Date__c');
 		String endField = q('End_Date__c');
@@ -252,9 +236,7 @@ public with sharing class GrantOutcomeService {
 			' WHERE ' +
 			indicator +
 			' IN :ids' +
-			(bounded
-				? ' AND ' + startField + ' <= :toDate AND ' + endField + ' >= :fromDate'
-				: '') +
+			(bounded ? ' AND ' + startField + ' <= :toDate AND ' + endField + ' >= :fromDate' : '') +
 			' ORDER BY ' +
 			startField +
 			' LIMIT :maxRows';
@@ -299,9 +281,7 @@ public with sharing class GrantOutcomeService {
 				: outcomes(new Set<String>{ String.valueOf(parsed) }, null, null);
 			Map<String, Object> outcome = found.get(String.valueOf(parsed));
 			if (outcome == null || !REPORTABLE_TYPES.contains((String) outcome.get('type'))) {
-				throw new GrantOutcomeException(
-					BarnHelp.text('Funders', 'Funders_Outcomes_NotAnOutcome')
-				);
+				throw new GrantOutcomeException(BarnHelp.text('Funders', 'Funders_Outcomes_NotAnOutcome'));
 			}
 			value = String.valueOf(parsed);
 		}

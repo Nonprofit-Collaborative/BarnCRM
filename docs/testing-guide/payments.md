@@ -1,6 +1,6 @@
 # Payments
 
-Scripts for the optional BarnCRM Payments module: settings and keys, Health Check, a Stripe and a PayPal test payment end to end, refunds, each processor event used once, abandoned checkouts and access. Setup detail: [Payments](../admin-guide/payments.md). Online giving through Zapier (MIG-06) is guidance only and has no script.
+Scripts for the optional BarnCRM Payments module: settings and connecting through Named Credentials, Health Check, a Stripe and a PayPal test payment end to end, refunds, each processor event used once, abandoned checkouts and access. Setup detail: [Payments](../admin-guide/payments.md). Online giving through Zapier (MIG-06) is guidance only and has no script.
 
 Before you start: an org from [Before you test](before-you-test.md), with Core and Payments deployed, an active Salesforce Site, a Stripe account in test mode and a PayPal developer account with a sandbox app and a sandbox buyer. No module charges through Payments yet, so the scripts start a checkout from **Developer Console**, **Debug**, **Open Execute Anonymous Window**, with:
 
@@ -23,7 +23,7 @@ Open the debug log and copy the `checkoutUrl` value into a browser.
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, **Payments**. | **Processor** Stripe, **Mode** Test, **Default currency** USD, and a **Payments Setup** link. |
-| 2 | Open **Health Check**. | `Payment Keys Are Missing` for Stripe, `Payment Processing Is Not Scheduled` with **Schedule Payment Processing**, and, if the Site guest lacks it, `A Site Guest User Can't Receive Payment News` with **Give Payments Webhook Guest**. |
+| 2 | Open **Health Check**. | `Payment Processor Is Not Connected` for Stripe, `Payment Processing Is Not Scheduled` with **Schedule Payment Processing**, and, if the Site guest lacks it, `A Site Guest User Can't Receive Payment News` with **Give Payments Webhook Guest**. |
 | 3 | Select both fixes. | Both findings are gone after the page refreshes. **Setup > Scheduled Jobs** lists four `BarnCRM Payments Processing` jobs. |
 | 4 | Open **Payments Setup**. | "Processing is scheduled" and no **Schedule Processing** button. |
 | 5 | In **Setup > Scheduled Jobs**, delete the four `BarnCRM Payments Processing` jobs. Reload **Payments Setup**. | A warning that processing is not scheduled and a **Schedule Processing** button. |
@@ -31,24 +31,27 @@ Open the debug log and copy the `checkoutUrl` value into a browser.
 
 **Cleanup:** None.
 
-## T-PAY-02: Keys Are Never Shown Again
+## T-PAY-02: Connecting Through a Named Credential
 
-**Purpose:** confirm keys are write-only and the mode check works.
+**Purpose:** confirm secrets are entered only in Setup, never reach BarnCRM, and Check Connection, Disconnect and the mode check work (N-13, D-209).
 **Prerequisites:** admin, after T-PAY-01.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Payments Setup**. | A Stripe address and a PayPal address on your Site, ending `/payments/v1/stripe` and `/payments/v1/paypal`. Every key reads **Not set**. |
-| 2 | Enter your Stripe test secret key and a made-up signing secret `whsec_test1234`, and select **Save Keys**. | Both read **Set**, ending `...` and their last four characters. The boxes are empty again. |
-| 3 | Reload the page and view its source or the network response. | No key appears anywhere, only the last four characters. |
-| 4 | In **BarnCRM Settings**, set **Mode** to Live. Open **Health Check**. | `Stripe Key Does Not Match the Mode`. Set **Mode** back to Test: the finding is gone. |
+| 1 | Open **Payments Setup**. | A Stripe address and a PayPal address on your Site, ending `/payments/v1/stripe` and `/payments/v1/paypal`. A Stripe and a PayPal card, each **Not connected**, naming its External Credential, principal and parameters (`SecretKey`; `ClientId, ClientSecret`) with the Setup steps. No box for a secret. |
+| 2 | Select **Check Connection** on the Stripe card before entering anything in Setup. | A message that Stripe could not be reached through its Named Credential; still **Not connected**. The **Error Log** has a row for it. |
+| 3 | In **Setup > Named Credentials > External Credentials**, open **BarnCRM Stripe**, edit the principal `Barn_Stripe_Key`, add the parameter `SecretKey` with your Stripe test secret key and save. Select **Check Connection** again. | `Stripe is connected (Test mode).`; the card reads **Connected**. `Payment Processor Is Not Connected` is gone from Health Check. |
+| 4 | Reload Payments Setup and look at the page's network responses. | No secret appears anywhere. |
+| 5 | In **BarnCRM Settings**, set **Mode** to Live. Open **Health Check**. | `Stripe Key Does Not Match the Mode`. Set **Mode** back to Test: the finding is gone. |
+| 6 | In Setup, change `SecretKey` to `sk_test_wrong` and open **Health Check**. | `Payment Processor Connection Failed`. Put the right key back; select **Check Connection**: connected again, and the finding is gone. |
+| 7 | Select **Disconnect** on the Stripe card. | **Not connected**; Health Check shows `Payment Processor Is Not Connected`. Select **Check Connection** to connect again. |
 
-**Cleanup:** None.
+**Cleanup:** None (Stripe stays connected for T-PAY-03).
 
 ## T-PAY-03: A Stripe Test Payment
 
-**Purpose:** confirm checkout on Stripe's page and Paid from the verified event.
-**Prerequisites:** admin; in Stripe test mode, a webhook endpoint at the Stripe address with the six events the Admin Guide lists; its real signing secret saved in **Payments Setup** (replacing T-PAY-02's).
+**Purpose:** confirm checkout on Stripe's page and Paid from the event as Stripe has it.
+**Prerequisites:** admin; Stripe connected (T-PAY-02); in Stripe test mode, a webhook endpoint at the Stripe address with the six events the Admin Guide lists (no signing secret is entered anywhere).
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -73,20 +76,25 @@ Open the debug log and copy the `checkoutUrl` value into a browser.
 
 ## T-PAY-05: Each Event Used Once, Forged Events Refused
 
-**Purpose:** confirm idempotency and signature checks.
+**Purpose:** confirm idempotency, and that a Stripe event is used only as Stripe itself has it (N-13: fetched back through the Named Credential, no signature check).
 **Prerequisites:** admin, after T-PAY-04.
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | In Stripe, **Developers > Events**, open the `charge.refunded` event and select **Resend**. | Stripe reports a 200 answer. **Payment Events** gains no new row and the payment is unchanged. |
-| 2 | From a terminal, `curl -X POST <Stripe address> -H 'Stripe-Signature: t=1,v1=00' -d '{}'`. | The answer is 400. No Payment Event is added. |
+| 2 | From a terminal, `curl -X POST <Stripe address> -d '{}'` (the full address, with its `token=`). | The answer is 400. No Payment Event is added. |
+| 2a | `curl -i -X POST <Stripe address without ?token=...> -d '{}'`, then again with a wrong token. | Both answers are 404 with an empty body. No Payment Event is added. |
+| 2b | On **Payments Setup**, select **Regenerate Token** and confirm. Post to the old address. | The addresses show a new token and the old address answers 404. Put the new address in Stripe and PayPal. |
+| 2c | Optional: with the receiver at its hourly cap (500 events from one processor in an hour), post again. | The answer is 429; the **Error Log** gains one Warning for the hour (not one per post) and **Health Check** shows `Payment Receiver Hit Its Hourly Limit`. |
+| 3 | `curl -X POST <Stripe address> -H 'Content-Type: application/json' -d '{"id":"evt_forged123","type":"checkout.session.completed","data":{"object":{"client_reference_id":"<a Pending payment Id>"}}}'`, then process. | The answer is 200 and a Payment Event `stripe:evt_forged123` is **Received**. After processing it is **Rejected**, "Stripe has no event with this ID", and the payment is still **Pending**. |
+| 4 | Post the same body with `"type":"customer.created"`. | The answer is 200 and nothing is stored: Payments does not use that type. |
 
 **Cleanup:** None.
 
 ## T-PAY-06: A PayPal Sandbox Payment
 
 **Purpose:** confirm the approve link, capture and Paid.
-**Prerequisites:** admin; the PayPal sandbox app's client id, secret and webhook id (webhook at the PayPal address with the five events the Admin Guide lists) saved in **Payments Setup**; processing scheduled.
+**Prerequisites:** admin; the PayPal sandbox app's client id and secret entered as `ClientId` and `ClientSecret` on the **BarnCRM PayPal** External Credential's principal `Barn_PayPal_App` in Setup; its webhook id (webhook at the PayPal address with the five events the Admin Guide lists) saved with **Save Webhook ID** and **Check Connection** showing PayPal connected (Sandbox) on **Payments Setup**; processing scheduled.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -118,6 +126,8 @@ Open the debug log and copy the `checkoutUrl` value into a browser.
 |---|---|---|
 | 1 | As the Team Member, open the **Payments** tab and a payment. | The payment shows; there is no **Edit** and no **Delete**. **Payments Setup** and **Payment Events** are not in the app. |
 | 2 | As the Read Only user, the same. | The same. |
+| 3 | As the Team Member, run the snippet above in Execute Anonymous. | A `checkoutUrl` on `checkout.stripe.com`: Payments Staff gives access to the Stripe credential. |
+| 4 | As the Read Only user, run the snippet. | The checkout does not start: Payments Read Only gives no access to the credential. |
 
 **Cleanup:** None.
 

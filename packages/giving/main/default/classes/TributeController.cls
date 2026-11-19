@@ -44,9 +44,7 @@ public with sharing class TributeController {
 	@AuraEnabled(cacheable=true)
 	public static TributeView getTribute(Id giftId) {
 		if (giftId == null) {
-			throw UserErrors.message(
-				BarnHelp.text('Giving', 'Giving_TributeNotification_NotFound')
-			);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_TributeNotification_NotFound'));
 		}
 		try {
 			return viewFor(giftId);
@@ -58,16 +56,12 @@ public with sharing class TributeController {
 	@AuraEnabled
 	public static TributeView markNotificationSent(Id tributeId) {
 		if (tributeId == null) {
-			throw UserErrors.message(
-				BarnHelp.text('Giving', 'Giving_TributeNotification_NotFound')
-			);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_TributeNotification_NotFound'));
 		}
 		try {
 			List<Tribute__c> found = TributeSelector.selectByIds(new Set<Id>{ tributeId });
 			if (found.isEmpty()) {
-				throw UserErrors.message(
-					BarnHelp.text('Giving', 'Giving_TributeNotification_NotFound')
-				);
+				throw UserErrors.message(BarnHelp.text('Giving', 'Giving_TributeNotification_NotFound'));
 			}
 			Id giftId = found[0].Gift__c;
 			TributeService.markNotificationSent(new Set<Id>{ tributeId });
@@ -95,12 +89,8 @@ public with sharing class TributeController {
 			tribute.Honoree_Name__c
 		);
 		view.recipientName = firstPresent(
-			tribute.Notification_Recipient_Contact__r == null
-				? null
-				: tribute.Notification_Recipient_Contact__r.Name,
-			tribute.Notification_Recipient_Account__r == null
-				? null
-				: tribute.Notification_Recipient_Account__r.Name,
+			tribute.Notification_Recipient_Contact__r == null ? null : tribute.Notification_Recipient_Contact__r.Name,
+			tribute.Notification_Recipient_Account__r == null ? null : tribute.Notification_Recipient_Account__r.Name,
 			tribute.Notification_Recipient_Name__c
 		);
 		view.message = tribute.Message__c;

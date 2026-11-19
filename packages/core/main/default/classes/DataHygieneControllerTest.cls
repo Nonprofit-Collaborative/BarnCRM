@@ -17,9 +17,7 @@ private class DataHygieneControllerTest {
 	}
 
 	private static void contactMode() {
-		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-			HouseholdTestDataFactory.MODE_CONTACT
-		);
+		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 		HouseholdTestDataFactory.save(settings);
 		OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
 		shape.hasNativeHouseholdGroups = false;
@@ -37,9 +35,7 @@ private class DataHygieneControllerTest {
 						if (attempt == 0) {
 							DataHygieneController.getChecks();
 						} else {
-							DataHygieneController.openInFind(
-								DataHygieneService.HOUSEHOLDS_WITHOUT_MEMBERS
-							);
+							DataHygieneController.openInFind(DataHygieneService.HOUSEHOLDS_WITHOUT_MEMBERS);
 						}
 						Assert.fail('The console needs the Find permission.');
 					} catch (AuraHandledException refused) {
@@ -97,21 +93,13 @@ private class DataHygieneControllerTest {
 			Assert.isNotNull(first.savedQueryId, 'The saved query is returned for the Find tab.');
 			Assert.areEqual(first.savedQueryId, second.savedQueryId, 'Opening again reuses it.');
 			Assert.areEqual(saved.Name, second.savedQueryName, 'Its name, for the page to show.');
-			Assert.areEqual(
-				NamespaceUtil.qualify('Find'),
-				second.findTabApiName,
-				'The Find tab, with any namespace.'
-			);
+			Assert.areEqual(NamespaceUtil.qualify('Find'), second.findTabApiName, 'The Find tab, with any namespace.');
 			Assert.areEqual(
 				NamespaceUtil.stateKey('savedQueryId'),
 				second.stateKey,
 				'And the page state key Find will read.'
 			);
-			Assert.areEqual(
-				DataHygieneService.savedQueryName(key),
-				saved.Name,
-				'Named for the check.'
-			);
+			Assert.areEqual(DataHygieneService.savedQueryName(key), saved.Name, 'Named for the check.');
 			Assert.areEqual(maria.Id, saved.OwnerId, 'Hers.');
 			Assert.isFalse(saved.Shared__c, 'Not shared with anyone.');
 			Assert.areEqual('Account', saved.Object_Name__c, 'Over households.');
@@ -153,17 +141,13 @@ private class DataHygieneControllerTest {
 	@IsTest
 	static void peopleWithNoHouseholdOpenInFindInMembershipRecordMode() {
 		System.runAs(TestUsers.admin()) {
-			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-				HouseholdTestDataFactory.MODE_JUNCTION
-			);
+			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
 			HouseholdTestDataFactory.save(settings);
 			User maria = maria();
 			DataHygieneController.OpenInFind opened;
 
 			System.runAs(maria) {
-				opened = DataHygieneController.openInFind(
-					DataHygieneService.PEOPLE_WITHOUT_HOUSEHOLD
-				);
+				opened = DataHygieneController.openInFind(DataHygieneService.PEOPLE_WITHOUT_HOUSEHOLD);
 			}
 
 			Assert.isNotNull(opened.savedQueryId, 'The query is saved and ready to open.');

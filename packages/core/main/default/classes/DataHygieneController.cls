@@ -8,11 +8,7 @@
  * FindController.saveQuery, so it is compiled, checked and stored exactly as Find stores one.
  */
 public with sharing class DataHygieneController {
-	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
-		null,
-		'Core',
-		'Core_DataHygiene_CheckFailed'
-	);
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(null, 'Core', 'Core_DataHygiene_CheckFailed');
 
 	private static final String FIND_TAB = 'Find';
 	private static final String SAVED_QUERY_STATE = 'savedQueryId';

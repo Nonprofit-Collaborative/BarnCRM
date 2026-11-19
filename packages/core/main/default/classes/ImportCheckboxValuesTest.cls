@@ -18,14 +18,9 @@ private class ImportCheckboxValuesTest {
 	private static void given(List<Map<String, String>> values) {
 		TestDataFactory.defaultSettings();
 		ImportMapping mapping = ImportMapping.parse(ImportTestDataFactory.donorMapping());
-		mapping.columns.add(
-			new ImportMapping.Column('Email Opt Out', 'Contact1.HasOptedOutOfEmail')
-		);
+		mapping.columns.add(new ImportMapping.Column('Email Opt Out', 'Contact1.HasOptedOutOfEmail'));
 		mapping.columns.add(new ImportMapping.Column('Do Not Call', 'Contact1.DoNotCall'));
-		template = ImportTestDataFactory.template(
-			mapping.serialize(),
-			ImportTemplateService.RULE_EMAIL
-		);
+		template = ImportTestDataFactory.template(mapping.serialize(), ImportTemplateService.RULE_EMAIL);
 		batch = ImportTestDataFactory.batch(template);
 		ImportTestDataFactory.rows(batch, values);
 	}
@@ -69,16 +64,7 @@ private class ImportCheckboxValuesTest {
 	@IsTest
 	static void readsEveryAcceptedSpellingIgnoringCaseAndSpaces() {
 		System.runAs(TestUsers.admin()) {
-			List<String> ticked = new List<String>{
-				'true',
-				'yes',
-				'y',
-				'1',
-				'x',
-				'checked',
-				'on',
-				't'
-			};
+			List<String> ticked = new List<String>{ 'true', 'yes', 'y', '1', 'x', 'checked', 'on', 't' };
 			List<String> cleared = new List<String>{ 'false', 'no', 'n', '0', 'off', 'f' };
 
 			Test.startTest();

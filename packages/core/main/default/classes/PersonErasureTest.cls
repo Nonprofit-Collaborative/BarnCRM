@@ -41,9 +41,7 @@ private class PersonErasureTest {
 
 	/** Jordan and Sam Lee in one household, in contact mode. Answers Jordan. */
 	private static Contact coupleInContactMode(Boolean deleteEmpty) {
-		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-			HouseholdTestDataFactory.MODE_CONTACT
-		);
+		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 		settings.Delete_Empty_Households__c = deleteEmpty;
 		HouseholdTestDataFactory.save(settings);
 		Contact jordan = TestDataFactory.person(
@@ -61,9 +59,7 @@ private class PersonErasureTest {
 	}
 
 	private static Contact addSam(Id householdId) {
-		Contact sam = TestDataFactory.person(
-			new Contact(FirstName = 'Sam', LastName = 'Lee', AccountId = householdId)
-		);
+		Contact sam = TestDataFactory.person(new Contact(FirstName = 'Sam', LastName = 'Lee', AccountId = householdId));
 		insert sam;
 		return sam;
 	}
@@ -74,41 +70,21 @@ private class PersonErasureTest {
 			isolate();
 			Contact jordan = coupleInContactMode(true);
 			Contact sam = addSam(jordan.AccountId);
-			insert new Address__c(
-				Contact__c = jordan.Id,
-				Type__c = 'Home',
-				City__c = 'Springfield'
-			);
+			insert new Address__c(Contact__c = jordan.Id, Type__c = 'Home', City__c = 'Springfield');
 			insert RelationshipTestDataFactory.between(jordan, sam, 'Spouse');
 			Account employer = RelationshipTestDataFactory.organizations(1, 'Union')[0];
-			Affiliation__c work = RelationshipTestDataFactory.affiliation(
-				jordan,
-				employer,
-				'Chair'
-			);
+			Affiliation__c work = RelationshipTestDataFactory.affiliation(jordan, employer, 'Chair');
 			work.Is_Primary__c = true;
 			work.Description__c = 'Board since 2019';
 			insert work;
 
 			Test.startTest();
-			PersonErasure.Result result = PersonErasure.erase(
-				jordan.Id,
-				' jordan  LEE ',
-				'PR-2041'
-			);
+			PersonErasure.Result result = PersonErasure.erase(jordan.Id, ' jordan  LEE ', 'PR-2041');
 			Test.stopTest();
 
 			Assert.isTrue(result.erased, 'The erasure ran');
 			Contact erased = [
-				SELECT
-					FirstName,
-					LastName,
-					Email,
-					Phone,
-					Birthdate,
-					Description,
-					AccountId,
-					HasOptedOutOfEmail
+				SELECT FirstName, LastName, Email, Phone, Birthdate, Description, AccountId, HasOptedOutOfEmail
 				FROM Contact
 				WHERE Id = :jordan.Id
 			];
@@ -120,20 +96,16 @@ private class PersonErasureTest {
 			Assert.isNull(erased.Description, 'Notes emptied');
 			Assert.isNull(erased.AccountId, 'Left the household');
 			Assert.isTrue(erased.HasOptedOutOfEmail, 'Opted out so no mailing reaches the record');
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Address__c WHERE Contact__c = :jordan.Id],
-				'Address deleted'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Address__c WHERE Contact__c = :jordan.Id], 'Address deleted');
 			for (Relationship__c side : [SELECT End_Date__c, Status__c FROM Relationship__c]) {
-				Assert.areEqual(Date.today(), side.End_Date__c, 'Both sides ended today');
+				Assert.areEqual(OrgDate.today(), side.End_Date__c, 'Both sides ended today');
 			}
 			Affiliation__c ended = [
 				SELECT End_Date__c, Role__c, Description__c, Is_Primary__c
 				FROM Affiliation__c
 				WHERE Id = :work.Id
 			];
-			Assert.areEqual(Date.today(), ended.End_Date__c, 'Affiliation ended');
+			Assert.areEqual(OrgDate.today(), ended.End_Date__c, 'Affiliation ended');
 			Assert.isNull(ended.Role__c, 'Role emptied');
 			Assert.isNull(ended.Description__c, 'Description emptied');
 			Assert.isFalse(ended.Is_Primary__c, 'No longer primary');
@@ -149,10 +121,7 @@ private class PersonErasureTest {
 			Assert.areEqual('PR-2041', audit.Request_Reference__c, 'And the request');
 			Assert.isFalse(audit.Details__c.contains('Jordan'), 'No erased value in the audit');
 			Assert.isFalse(audit.Details__c.contains('example.invalid'), 'Not even the email');
-			Assert.isTrue(
-				audit.Details__c.contains(String.valueOf(work.Id)),
-				'Each record changed is listed'
-			);
+			Assert.isTrue(audit.Details__c.contains(String.valueOf(work.Id)), 'Each record changed is listed');
 		}
 	}
 
@@ -164,11 +133,7 @@ private class PersonErasureTest {
 
 			PersonErasure.erase(jordan.Id, jordan.Name, null);
 
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Account WHERE Id = :jordan.AccountId],
-				'Tidied away'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Account WHERE Id = :jordan.AccountId], 'Tidied away');
 		}
 	}
 
@@ -191,10 +156,7 @@ private class PersonErasureTest {
 			);
 			PersonErasure.Change householdRow;
 			for (PersonErasure.Change change : result.changes) {
-				if (
-					change.action == PersonErasure.CLEARED &&
-					change.objectLabel == Label.Core_Section_Household
-				) {
+				if (change.action == PersonErasure.CLEARED && change.objectLabel == Label.Core_Section_Household) {
 					householdRow = change;
 				}
 			}
@@ -212,16 +174,8 @@ private class PersonErasureTest {
 		System.runAs(eraser()) {
 			isolate();
 			Contact jordan = coupleInContactMode(false);
-			update new Account(
-				Id = jordan.AccountId,
-				BillingCity = 'Springfield',
-				Phone = '555-0101'
-			);
-			insert new Address__c(
-				Account__c = jordan.AccountId,
-				Type__c = 'Home',
-				City__c = 'Springfield'
-			);
+			update new Account(Id = jordan.AccountId, BillingCity = 'Springfield', Phone = '555-0101');
+			insert new Address__c(Account__c = jordan.AccountId, Type__c = 'Home', City__c = 'Springfield');
 
 			PersonErasure.Result result = PersonErasure.erase(jordan.Id, jordan.Name, null);
 
@@ -262,9 +216,7 @@ private class PersonErasureTest {
 				'Lists the name it replaced: ' + householdRow.fields
 			);
 			Assert.isTrue(
-				householdRow.fields.contains(
-					Account.Household_Informal_Greeting__c.getDescribe().getLabel()
-				),
+				householdRow.fields.contains(Account.Household_Informal_Greeting__c.getDescribe().getLabel()),
 				'Lists the greetings it emptied: ' + householdRow.fields
 			);
 			Assert.isTrue(
@@ -275,22 +227,16 @@ private class PersonErasureTest {
 				personRow.fields.contains(Contact.AccountId.getDescribe().getLabel()),
 				'Not as the account field: ' + personRow.fields
 			);
-			String details = [SELECT Details__c FROM Erasure__c WHERE Id = :result.erasureId]
-			.Details__c;
+			String details = [SELECT Details__c FROM Erasure__c WHERE Id = :result.erasureId].Details__c;
 			Assert.isTrue(
-				details.contains(
-					Label.Core_EraseAction_Cleared + ' | ' + Label.Core_Section_Household + ' | 1'
-				),
+				details.contains(Label.Core_EraseAction_Cleared + ' | ' + Label.Core_Section_Household + ' | 1'),
 				'The Erasure record uses the same words: ' + details
 			);
 		}
 	}
 
 	/** The row reporting a household the person left that still has members. */
-	private static PersonErasure.Change sharedHouseholdRow(
-		PersonErasure.Result result,
-		Id householdId
-	) {
+	private static PersonErasure.Change sharedHouseholdRow(PersonErasure.Result result, Id householdId) {
 		for (PersonErasure.Change change : result.changes) {
 			if (
 				change.objectLabel == Label.Core_Section_Household &&
@@ -356,11 +302,7 @@ private class PersonErasureTest {
 					'The erased person is not named: ' + wording
 				);
 			}
-			Assert.areEqual(
-				'Sam',
-				household.Household_Informal_Greeting__c,
-				'Named from who is left'
-			);
+			Assert.areEqual('Sam', household.Household_Informal_Greeting__c, 'Named from who is left');
 			Assert.areEqual(1, household.Member_Count__c, 'Recounted without Jordan');
 
 			for (PersonErasure.Result run : new List<PersonErasure.Result>{ preview, result }) {
@@ -381,8 +323,7 @@ private class PersonErasureTest {
 					'And the box: ' + row.fields
 				);
 			}
-			String details = [SELECT Details__c FROM Erasure__c WHERE Id = :result.erasureId]
-			.Details__c;
+			String details = [SELECT Details__c FROM Erasure__c WHERE Id = :result.erasureId].Details__c;
 			Assert.isTrue(
 				details.contains(BarnHelp.text('Core', 'Core_Erase_NoteCustomNameReleased')),
 				'The Erasure record says the same: ' + details
@@ -412,19 +353,13 @@ private class PersonErasureTest {
 			);
 			PersonErasure.Change row = sharedHouseholdRow(result, jordan.AccountId);
 			Assert.areEqual(PersonErasure.UPDATED, row.action, 'Reported as updated');
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Erase_NoteRenamed'),
-				row.note,
-				'Named again by upkeep'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Erase_NoteRenamed'), row.note, 'Named again by upkeep');
 			Assert.isTrue(
 				row.fields.contains(Account.Member_Count__c.getDescribe().getLabel()),
 				'Lists the count: ' + row.fields
 			);
 			Assert.isTrue(
-				row.fields.contains(
-					Account.Household_Informal_Greeting__c.getDescribe().getLabel()
-				),
+				row.fields.contains(Account.Household_Informal_Greeting__c.getDescribe().getLabel()),
 				'And the greeting: ' + row.fields
 			);
 			Assert.areEqual(
@@ -439,18 +374,11 @@ private class PersonErasureTest {
 	static void aContactsOrganizationAccountKeepsItsFieldLabelNotHousehold() {
 		System.runAs(eraser()) {
 			isolate();
-			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-				HouseholdTestDataFactory.MODE_CONTACT
-			);
+			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			HouseholdTestDataFactory.save(settings);
 			Account employer = RelationshipTestDataFactory.organizations(1, 'Union')[0];
 			Contact jordan = TestDataFactory.person(
-				new Contact(
-					FirstName = 'Jordan',
-					LastName = 'Lee',
-					Phone = '555-0100',
-					AccountId = employer.Id
-				)
+				new Contact(FirstName = 'Jordan', LastName = 'Lee', Phone = '555-0100', AccountId = employer.Id)
 			);
 			insert jordan;
 
@@ -458,9 +386,7 @@ private class PersonErasureTest {
 
 			PersonErasure.Change personRow;
 			for (PersonErasure.Change change : result.changes) {
-				if (
-					change.action == PersonErasure.CLEARED && change.recordIds.contains(jordan.Id)
-				) {
+				if (change.action == PersonErasure.CLEARED && change.recordIds.contains(jordan.Id)) {
 					personRow = change;
 				}
 			}
@@ -473,12 +399,9 @@ private class PersonErasureTest {
 				personRow.fields.contains(Label.Core_Section_Household),
 				'Not as a household: ' + personRow.fields
 			);
-			String details = [SELECT Details__c FROM Erasure__c WHERE Id = :result.erasureId]
-			.Details__c;
+			String details = [SELECT Details__c FROM Erasure__c WHERE Id = :result.erasureId].Details__c;
 			Assert.isFalse(
-				details.contains(
-					Label.Core_EraseAction_Cleared + ' | ' + Label.Core_Section_Household + ' | 1'
-				),
+				details.contains(Label.Core_EraseAction_Cleared + ' | ' + Label.Core_Section_Household + ' | 1'),
 				'The Erasure record does not call it a household: ' + details
 			);
 		}
@@ -495,11 +418,7 @@ private class PersonErasureTest {
 			Contact sam = HouseholdTestDataFactory.newContact('Sam', 'Lee');
 			insert new List<Contact>{ jordan, sam };
 			insert new List<Household_Member__c>{
-				new Household_Member__c(
-					Household__c = household.Id,
-					Contact__c = jordan.Id,
-					Is_Primary__c = true
-				),
+				new Household_Member__c(Household__c = household.Id, Contact__c = jordan.Id, Is_Primary__c = true),
 				new Household_Member__c(Household__c = household.Id, Contact__c = sam.Id)
 			};
 
@@ -510,11 +429,7 @@ private class PersonErasureTest {
 				FROM Household_Member__c
 				WHERE Contact__c = :jordan.Id
 			];
-			Assert.areEqual(
-				Date.today(),
-				membership.End_Date__c,
-				'Membership ended, kept as history'
-			);
+			Assert.areEqual(OrgDate.today(), membership.End_Date__c, 'Membership ended, kept as history');
 			Assert.isFalse(membership.Is_Primary__c, 'No longer primary');
 			Account recounted = [SELECT Member_Count__c FROM Account WHERE Id = :household.Id];
 			Assert.areEqual(1, recounted.Member_Count__c, 'Recounted without Jordan');
@@ -536,16 +451,8 @@ private class PersonErasureTest {
 			Account employer = RelationshipTestDataFactory.organizations(1, 'Union')[0];
 			insert RelationshipTestDataFactory.affiliation(people[0], employer, 'Trustee');
 			insert RelationshipTestDataFactory.between(people[0], people[1], 'Sibling');
-			insert new Address__c(
-				Person_Account__c = people[0].Id,
-				Type__c = 'Home',
-				City__c = 'Lagos'
-			);
-			update new Account(
-				Id = people[0].Id,
-				Phone = '555-0102',
-				Description = 'Prefers calls'
-			);
+			insert new Address__c(Person_Account__c = people[0].Id, Type__c = 'Home', City__c = 'Lagos');
+			update new Account(Id = people[0].Id, Phone = '555-0102', Description = 'Prefers calls');
 			if (!realPeople) {
 				// An ordinary account stands in for a person account (RelationshipTestDataFactory).
 				PersonRecordSelector.personRecordOverride = true;
@@ -589,11 +496,7 @@ private class PersonErasureTest {
 		System.runAs(eraser()) {
 			isolate();
 			Contact jordan = coupleInContactMode(true);
-			insert new Address__c(
-				Contact__c = jordan.Id,
-				Type__c = 'Home',
-				City__c = 'Springfield'
-			);
+			insert new Address__c(Contact__c = jordan.Id, Type__c = 'Home', City__c = 'Springfield');
 
 			PersonErasure.Result result = PersonErasure.preview(jordan.Id);
 
@@ -613,8 +516,7 @@ private class PersonErasureTest {
 				actions.contains(
 					PersonErasure.DELETED +
 						' ' +
-						Address__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-							.getLabel()
+						Address__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel()
 				),
 				'Lists the address'
 			);
@@ -628,16 +530,8 @@ private class PersonErasureTest {
 				[SELECT FirstName FROM Contact WHERE Id = :jordan.Id].FirstName,
 				'Person unchanged'
 			);
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Address__c WHERE Contact__c = :jordan.Id],
-				'Address still there'
-			);
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Account WHERE Id = :jordan.AccountId],
-				'Household still there'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Address__c WHERE Contact__c = :jordan.Id], 'Address still there');
+			Assert.areEqual(1, [SELECT COUNT() FROM Account WHERE Id = :jordan.AccountId], 'Household still there');
 			Assert.areEqual(0, [SELECT COUNT() FROM Erasure__c], 'No audit for a preview');
 		}
 	}
@@ -672,8 +566,7 @@ private class PersonErasureTest {
 				}
 			}
 			String tasks = Task.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel();
-			String events = Event.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-				.getLabel();
+			String events = Event.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel();
 			Assert.areEqual(2, kept.get(tasks)?.count, 'Both tasks counted');
 			Assert.areEqual(1, kept.get(events)?.count, 'The event counted');
 			Assert.areEqual(1, kept.get(Label.Core_Erase_Files)?.count, 'The file counted');
@@ -713,11 +606,7 @@ private class PersonErasureTest {
 					'Says which permission'
 				);
 			}
-			Assert.areEqual(
-				'Jordan',
-				[SELECT FirstName FROM Contact WHERE Id = :jordan.Id].FirstName,
-				'Unchanged'
-			);
+			Assert.areEqual('Jordan', [SELECT FirstName FROM Contact WHERE Id = :jordan.Id].FirstName, 'Unchanged');
 		}
 	}
 
@@ -730,10 +619,7 @@ private class PersonErasureTest {
 		// A user who sees Jordan and may not edit him: a user on the running profile would be
 		// an administrator, and under private sharing one who cannot see him is told he is not
 		// a person.
-		System.runAs(TestUsers.peopleReaderWith(
-			'Reader',
-			new List<String>{ 'BarnCRM_Read_Only', ERASE_SET }
-		)) {
+		System.runAs(TestUsers.peopleReaderWith('Reader', new List<String>{ 'BarnCRM_Read_Only', ERASE_SET })) {
 			isolate();
 			try {
 				PersonErasure.preview(jordan.Id);
@@ -741,20 +627,13 @@ private class PersonErasureTest {
 			} catch (PersonErasure.ErasureException refused) {
 				Assert.isTrue(
 					refused.getMessage()
-						.contains(
-							Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-								.getLabelPlural()
-						),
+						.contains(Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural()),
 					'Names what is in the way'
 				);
 			}
 		}
 		System.runAs(TestUsers.admin()) {
-			Assert.areEqual(
-				'Jordan',
-				[SELECT FirstName FROM Contact WHERE Id = :jordan.Id].FirstName,
-				'Unchanged'
-			);
+			Assert.areEqual('Jordan', [SELECT FirstName FROM Contact WHERE Id = :jordan.Id].FirstName, 'Unchanged');
 		}
 	}
 
@@ -780,9 +659,7 @@ private class PersonErasureTest {
 			} catch (PersonErasure.ErasureException refused) {
 				Assert.isTrue(
 					refused.getMessage()
-						.startsWith(
-							BarnHelp.text('Core', 'Core_Erase_AlreadyErased').substringBefore('{0}')
-						),
+						.startsWith(BarnHelp.text('Core', 'Core_Erase_AlreadyErased').substringBefore('{0}')),
 					'Already erased'
 				);
 			}
@@ -819,11 +696,7 @@ private class PersonErasureTest {
 			Contact jordan = coupleInContactMode(true);
 			Contact sam = addSam(jordan.AccountId);
 			// A record of Sam's, which Core itself leaves alone, stands in for a module's own.
-			Address__c moduleRecord = new Address__c(
-				Contact__c = sam.Id,
-				Type__c = 'Home',
-				City__c = 'Springfield'
-			);
+			Address__c moduleRecord = new Address__c(Contact__c = sam.Id, Type__c = 'Home', City__c = 'Springfield');
 			insert moduleRecord;
 			PersonErasureExtensions.overrides.add(new DeletesARecord(moduleRecord.Id));
 
@@ -891,10 +764,7 @@ private class PersonErasureTest {
 	private static Integer filesKept(PersonErasure.Result result) {
 		Integer count = 0;
 		for (PersonErasure.Change change : result.changes) {
-			if (
-				change.action == PersonErasure.KEPT &&
-				change.objectLabel == Label.Core_Erase_Files
-			) {
+			if (change.action == PersonErasure.KEPT && change.objectLabel == Label.Core_Erase_Files) {
 				count += change.count;
 			}
 		}
@@ -907,11 +777,7 @@ private class PersonErasureTest {
 			isolate();
 			PersonErasureExtensions.overrides.add(new Fails());
 			Contact jordan = coupleInContactMode(true);
-			insert new Address__c(
-				Contact__c = jordan.Id,
-				Type__c = 'Home',
-				City__c = 'Springfield'
-			);
+			insert new Address__c(Contact__c = jordan.Id, Type__c = 'Home', City__c = 'Springfield');
 			try {
 				PersonErasure.erase(jordan.Id, 'Jordan Lee', null);
 				Assert.fail('Refused');
@@ -923,11 +789,7 @@ private class PersonErasureTest {
 				[SELECT FirstName FROM Contact WHERE Id = :jordan.Id].FirstName,
 				'Person unchanged'
 			);
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Address__c WHERE Contact__c = :jordan.Id],
-				'Address back'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Address__c WHERE Contact__c = :jordan.Id], 'Address back');
 			Assert.areEqual(0, [SELECT COUNT() FROM Erasure__c], 'No audit');
 		}
 	}
@@ -945,12 +807,8 @@ private class PersonErasureTest {
 			List<Address__c> addresses = new List<Address__c>();
 			for (Integer i = 0; i < 200; i++) {
 				relationships.add(RelationshipTestDataFactory.between(jordan, others[i], 'Friend'));
-				affiliations.add(
-					RelationshipTestDataFactory.affiliation(jordan, orgs[i], 'Member')
-				);
-				addresses.add(
-					new Address__c(Contact__c = jordan.Id, Type__c = 'Other', City__c = 'City ' + i)
-				);
+				affiliations.add(RelationshipTestDataFactory.affiliation(jordan, orgs[i], 'Member'));
+				addresses.add(new Address__c(Contact__c = jordan.Id, Type__c = 'Other', City__c = 'City ' + i));
 			}
 			insert relationships;
 			insert affiliations;
@@ -961,11 +819,7 @@ private class PersonErasureTest {
 			PersonErasure.erase(jordan.Id, 'Jordan Lee', null);
 			Test.stopTest();
 
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Address__c WHERE Contact__c = :jordan.Id],
-				'All addresses deleted'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Address__c WHERE Contact__c = :jordan.Id], 'All addresses deleted');
 			Assert.areEqual(
 				0,
 				[SELECT COUNT() FROM Relationship__c WHERE End_Date__c = NULL],
@@ -1007,11 +861,7 @@ private class PersonErasureTest {
 
 			List<PersonErasureExtension> found = PersonErasureExtensions.installed();
 
-			Assert.areEqual(
-				1 + installedModules,
-				found.size(),
-				'Each installed module is asked for by name'
-			);
+			Assert.areEqual(1 + installedModules, found.size(), 'Each installed module is asked for by name');
 			Assert.isTrue(found[0] instanceof KeepsDepartment, 'Injected ones come first');
 		}
 	}
@@ -1115,12 +965,7 @@ private class PersonErasureTest {
 		public List<PersonErasure.Change> erase(Id personId) {
 			Database.delete(new List<Id>{ recordId }, true, AccessLevel.USER_MODE);
 			return new List<PersonErasure.Change>{
-				new PersonErasure.Change(
-					PersonErasure.DELETED,
-					'Module record',
-					new List<Id>{ recordId },
-					null
-				)
+				new PersonErasure.Change(PersonErasure.DELETED, 'Module record', new List<Id>{ recordId }, null)
 			};
 		}
 	}

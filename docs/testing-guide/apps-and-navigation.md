@@ -45,7 +45,7 @@ takes the apps in a queued job: wait a minute and reload before checking the App
 ## T-APP-03: Module Pages Reach the BarnCRM Apps
 
 **Purpose:** confirm a source deploy adds each deployed module's pages to the Core apps, the Setup Assistant lists them for a package install, and the home page links each module app.
-**Prerequisites:** an org deployed with `scripts/org/deploy-packages.sh` (Core, Rollup Builder, Giving, Mirror, and Volunteers when it ships metadata); admin user and staff user.
+**Prerequisites:** an org deployed with `scripts/org/deploy-packages.sh` (Core, Rollup Builder, Fundraising, Mirror, and Volunteers when it ships metadata); admin user and staff user.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -55,9 +55,9 @@ takes the apps in a queued job: wait a minute and reload before checking the App
 | 4 | In **BarnCRM**, open a gift from **Gifts**. | The gift opens on the same record page as in **BarnCRM Fundraising**. |
 | 5 | Open **BarnCRM Console**, then a gift from **Gifts**. | The gift opens in a console tab. |
 | 6 | From the App Launcher, search for "BarnCRM Rollup Builder". | No such app is listed; the **Rollup Builder** tab is. |
-| 7 | Open **BarnCRM**, **Home**, **Setup Checklist**, **Modules**. | Under **BarnCRM Giving**: "Add to BarnCRM and BarnCRM Console: Quick Gift Entry, Gifts, Commitments, Gift Batches" and "Add to BarnCRM Admin and BarnCRM Admin Console: Accounting Periods, Donor Level Ladder, Stewardship Plan Setup, Pledge Reminders, Receipt Letters", then the App Manager steps. A module not installed lists no pages. |
-| 8 | On the **BarnCRM Console** home page, look at **Modules**. | **BarnCRM Giving** has an **Open the App** link that opens **BarnCRM Fundraising**; **BarnCRM Rollup Builder** has none. |
-| 9 | As staff, open **BarnCRM**. | The Giving pages show only if the staff user's access allows them; no admin page is listed. |
+| 7 | Open **BarnCRM**, **Home**, **Setup Checklist**, **Modules**. | Under **BarnCRM Fundraising**: "Add to BarnCRM and BarnCRM Console: Quick Gift Entry, Gifts, Commitments, Gift Batches" and "Add to BarnCRM Admin and BarnCRM Admin Console: Accounting Periods, Donor Level Ladder, Stewardship Plan Setup, Pledge Reminders, Receipt Letters", then the App Manager steps. A module not installed lists no pages. |
+| 8 | On the **BarnCRM Console** home page, look at **Modules**. | **BarnCRM Fundraising** has an **Open the App** link that opens **BarnCRM Fundraising**; **BarnCRM Rollup Builder** has none. |
+| 9 | As staff, open **BarnCRM**. | The Fundraising pages show only if the staff user's access allows them; no admin page is listed. |
 
 **Cleanup:** none.
 
@@ -88,7 +88,7 @@ best); for step 5, an org where first-run setup is not finished.
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As the new staff user, open the **BarnCRM** home page and click the **Households** quick link. | The households list opens, even though the user has no **Households** tab yet. |
-| 1a | Still as staff, look at the welcome and **Quick Links**, then click **New Person**. | The welcome reads "Find someone, add someone new, or pick up where you left off." Quick links are **People**, **Households**, **Organizations** and **Find** (plus **Import a File** for someone who can import, **Enter a Gift** with Giving, **Log Hours** with Volunteers and **Enroll** with Programs, each only while its module is installed and on), with no **BarnCRM Settings**. **Enroll** opens a new enrollment; turn Programs off in the Module Manager and reload: **Enroll** is gone. **New Person** opens the new contact form; save a person and a household is made for them. As admin, **BarnCRM Settings** is also listed. |
+| 1a | Still as staff, look at the welcome and **Quick Links**, then click **New Person**. | The welcome reads "Find someone, add someone new, or pick up where you left off." Quick links are **People**, **Households**, **Organizations** and **Find** (plus **Import a File** for someone who can import, **Enter a Gift** with Fundraising, **Log Hours** with Volunteers and **Enroll** with Programs, each only while its module is installed and on), with no **BarnCRM Settings**. **Enroll** opens a new enrollment; turn Programs off in the Module Manager and reload: **Enroll** is gone. **New Person** opens the new contact form; save a person and a household is made for them. As admin, **BarnCRM Settings** is also listed. |
 | 2 | As admin, in an org where a setup step is still **To Do**, open the home page in the Salesforce mobile app or a browser window about 400 pixels wide. | The **Setup Checklist** is the first card on the page, above the welcome. It shows once. |
 | 3 | Widen the window past 768 pixels. | The checklist moves to the side column. It shows once. |
 | 4 | In an org where setup is finished, repeat step 2. | The **Setup Complete** tile is at the bottom of the page, not the top. |
@@ -131,12 +131,13 @@ household and an organization owned by that user.
 
 **Cleanup:** leave **Account Tabs** on **Organization and Household Tabs**.
 
-## The Module Apps (T-APP-08 to T-APP-13)
+## The Module Apps (T-APP-08 to T-APP-15)
 
-Event Management, Forms, Portal Builder, Corporate Hub and Project Management each have an app
-of their own, and their tabs stay in the BarnCRM apps too. Run T-APP-08 to T-APP-12 on a
-production org or sandbox (`mwdbdevsb`): a scratch or Developer Edition org does not get these
-five apps (T-APP-13). In each, the module is installed and on, and its access sync has run
+Event Management, Forms, Portal Builder, Corporate Hub, Project Management, Memberships and
+Scholarships and Outbound Grants each have an app of their own, and their tabs stay in the
+BarnCRM apps too. Run T-APP-08 to T-APP-12, T-APP-14 and T-APP-15 on a production org or sandbox
+(`mwdbdevsb`): a scratch or Developer Edition org does not get these seven apps (T-APP-13). In
+each, the module is installed and on, and its access sync has run
 (**Finish Setup**, or wait an hour).
 
 ## T-APP-08: BarnCRM Events
@@ -205,13 +206,51 @@ five apps (T-APP-13). In each, the module is installed and on, and its access sy
 
 ## T-APP-13: A Scratch or Developer Edition Org Gets No Module Apps
 
-**Purpose:** confirm a capped org deploys without the five module apps and keeps their tabs.
+**Purpose:** confirm a capped org deploys without the seven module apps and keeps their tabs.
 **Prerequisites:** a scratch org deployed with `scripts/org/deploy-packages.sh` (for example
 `barn-sales`).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Read the deploy output. | It says "Capped org (scratch or Developer Edition): leaving out the apps of events forms portal corporatehub projects", and a "Permission sets without the left-out module apps" stage succeeds. |
-| 2 | As admin, open the App Launcher and type `BarnCRM`. | No **BarnCRM Events**, **BarnCRM Forms**, **BarnCRM Portal Builder**, **BarnCRM Corporate Hub** or **BarnCRM Projects**. The other BarnCRM apps are listed. |
-| 3 | Open **BarnCRM**, then **BarnCRM Admin**. | The Event Management, Forms, Corporate Hub and Project Management tabs are in **BarnCRM**; **Portals** and **Portal Accesses** are in **BarnCRM Admin**. |
-| 4 | As staff, open **Events Home**. | It opens: the Events permission sets deployed without the app. |
+| 1 | Read the deploy output. | It says "Capped org (scratch or Developer Edition): leaving out the apps of events forms portal corporatehub projects memberships scholarships", and a "Permission sets without the left-out module apps" stage succeeds. |
+| 2 | As admin, open the App Launcher and type `BarnCRM`. | No **BarnCRM Events**, **BarnCRM Forms**, **BarnCRM Portal Builder**, **BarnCRM Corporate Hub**, **BarnCRM Projects**, **BarnCRM Memberships** or **BarnCRM Scholarships**. The other BarnCRM apps are listed. |
+| 3 | Open **BarnCRM**, then **BarnCRM Admin**. | The Event Management, Forms, Corporate Hub, Project Management, Memberships and Scholarships tabs are in **BarnCRM**; **Portals** and **Portal Accesses** are in **BarnCRM Admin**. |
+| 4 | As staff, open **Events Home**, then **Memberships**. | Both open: the module permission sets deployed without the apps. |
+
+## T-APP-14: BarnCRM Memberships
+
+**Purpose:** confirm the Memberships app holds every Memberships page.
+**Prerequisites:** admin user; staff user with the Team Member role (so Memberships Staff).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As admin, open the App Launcher and type `Memberships`. | **BarnCRM Memberships** is listed with Patch wearing a green Member sash. |
+| 2 | Open it and its navigation menu. | Console navigation with the Barn Navy header. Tabs: **Memberships**, **Member Certifications**, **Membership Levels**, **Certifications**, **Reports**, **Error Log** (last). |
+| 3 | Open a membership. | It opens as a workspace tab on the membership record page, the same page as in **BarnCRM**. |
+| 4 | Open **BarnCRM**. | **Memberships** and **Member Certifications** are still there, after **Data Manager**. |
+| 5 | On BarnCRM Home, find Memberships under **Modules**. | It has an **Open the App** link to **BarnCRM Memberships**. |
+| 6 | As staff, open the App Launcher and type `Memberships`. | **BarnCRM Memberships** is listed. A user with no Memberships permission set does not see it. |
+
+## T-APP-15: BarnCRM Scholarships
+
+**Purpose:** confirm the Scholarships and Outbound Grants app holds every page of the module.
+**Prerequisites:** admin user; staff user with the Team Member role (so Scholarships Staff).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As admin, open the App Launcher and type `Scholarships`. | **BarnCRM Scholarships** is listed with Patch in a graduation cap, holding a diploma. |
+| 2 | Open it and its navigation menu. | Console navigation with the Barn Navy header. Tabs: **Scholarships and Grants**, **Award Programs**, **Award Applications**, **Awards**, **Reports**, **Dashboards**, **Error Log** (last). |
+| 3 | Open an award application. | It opens as a workspace tab on the application record page, the same page as in **BarnCRM**. |
+| 4 | Open **BarnCRM**. | The four Scholarships tabs are still there, after **Data Manager**. |
+| 5 | On BarnCRM Home, find Scholarships and Outbound Grants under **Modules**. | It has an **Open the App** link to **BarnCRM Scholarships**. |
+| 6 | As staff, open the App Launcher and type `Scholarships`. | **BarnCRM Scholarships** is listed. |
+
+## T-APP-16: Module Quick Links Keep Their Words
+
+**Purpose:** confirm the module quick links show the same one-line descriptions now that the words come from Core's help catalog (D-208).
+**Prerequisites:** admin; Fundraising, Volunteers and Programs installed and turned on.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **BarnCRM** home page and look at **Quick Links**. | **Enter a Gift** reads "Record a gift in a few keystrokes.", **Log Hours** reads "Hours a volunteer worked, in one short form." and **Enroll** reads "Start someone in a program." No tile shows a key such as `Core_HubHome_QuickLinkEnterGiftLine`. |
+| 2 | Turn Volunteers off in the Module Manager and reload the home page. | **Log Hours** is gone; the other two keep their words. Turn Volunteers back on. |

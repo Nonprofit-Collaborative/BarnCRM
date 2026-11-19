@@ -35,7 +35,7 @@ someone with Manage BarnCRM Settings can reorder rules.
 
 Everything is in the app, with one exception noted at step 3.
 
-1. Open **BarnCRM Settings**, then **Giving**, then **Acknowledgments**.
+1. Open **BarnCRM Settings**, then **Fundraising**, then **Acknowledgments**.
 2. Turn on **Send gift acknowledgments**. Nothing is queued until you do, because a thank you sent
    with the wrong wording cannot be recalled.
 3. Decide what your emailed thank you says. The wording lives in a standard Salesforce email
@@ -73,7 +73,7 @@ Everything is in the app, with one exception noted at step 3.
 
 Start with the sample data loaded (see [sample-data.md](sample-data.md)).
 
-1. Open **BarnCRM Settings**, then **Giving**, then **Acknowledgments**. Turn on
+1. Open **BarnCRM Settings**, then **Fundraising**, then **Acknowledgments**. Turn on
    **Send gift acknowledgments**.
 2. Choose **New Rule**. Name it `Everything else`, order `100`, channel `Email`, and choose
    **BarnCRM: thank you for your gift** as the email template. Save.

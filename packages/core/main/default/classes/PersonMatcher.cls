@@ -51,11 +51,7 @@ public with sharing class PersonMatcher {
 		ImportMatcher.forgetHeldKeys();
 		String emailKey = ImportMatcher.emailKey(person.email);
 		if (emailKey != null) {
-			Id found = byKey(
-				ImportMatcher.contactsByEmail(new Set<String>{ emailKey }),
-				emailKey,
-				person.firstName
-			);
+			Id found = byKey(ImportMatcher.contactsByEmail(new Set<String>{ emailKey }), emailKey, person.firstName);
 			if (found != null) {
 				return found;
 			}
@@ -81,10 +77,7 @@ public with sharing class PersonMatcher {
 	 */
 	private static Id byKey(Map<String, Id> found, String key, String first) {
 		List<String> keys = String.isNotBlank(first)
-			? new List<String>{
-					ImportMatcher.firstNameKey(key, first),
-					ImportMatcher.firstNameKey(key, null)
-			  }
+			? new List<String>{ ImportMatcher.firstNameKey(key, first), ImportMatcher.firstNameKey(key, null) }
 			: new List<String>{ key };
 		for (String candidate : keys) {
 			if (found.containsKey(candidate)) {
@@ -103,10 +96,7 @@ public with sharing class PersonMatcher {
 			return null;
 		}
 		SObject probe = ImportDuplicateRuleMatcher.probe(Contact.SObjectType, values, null);
-		List<List<SObject>> matches = ImportDuplicateRuleMatcher.matchesFor(
-			new List<SObject>{ probe },
-			null
-		);
+		List<List<SObject>> matches = ImportDuplicateRuleMatcher.matchesFor(new List<SObject>{ probe }, null);
 		if (matches == null || matches.isEmpty() || matches[0].isEmpty()) {
 			return null;
 		}

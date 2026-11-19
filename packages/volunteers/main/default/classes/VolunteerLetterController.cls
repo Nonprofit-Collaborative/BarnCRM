@@ -47,12 +47,7 @@ public with sharing class VolunteerLetterController {
 	 * job covers; the job's notification says how it went.
 	 */
 	@AuraEnabled
-	public static Integer startLetters(
-		Id templateId,
-		Date fromDate,
-		Date toDate,
-		List<Id> personIds
-	) {
+	public static Integer startLetters(Id templateId, Date fromDate, Date toDate, List<Id> personIds) {
 		try {
 			Set<Id> people = new Set<Id>(personIds == null ? new List<Id>() : personIds);
 			people.remove(null);
@@ -88,36 +83,25 @@ public with sharing class VolunteerLetterController {
 		List<Map<String, String>> templates = new List<Map<String, String>>();
 		if (showTemplates) {
 			Map<String, String> typeLabels = typeLabels();
-			for (
-				Volunteer_Letter_Template__c template : VolunteerLetterSelector.activeTemplates()
-			) {
+			for (Volunteer_Letter_Template__c template : VolunteerLetterSelector.activeTemplates()) {
 				String typeLabel = typeLabels.containsKey(template.Type__c)
 					? typeLabels.get(template.Type__c)
 					: template.Type__c;
 				// A template named for its type is not shown as "Certificate (Certificate)".
-				String label = template.Name == typeLabel
-					? template.Name
-					: template.Name + ' (' + typeLabel + ')';
+				String label = template.Name == typeLabel ? template.Name : template.Name + ' (' + typeLabel + ')';
 				templates.add(new Map<String, String>{ 'label' => label, 'value' => template.Id });
 			}
 		}
 		return new Map<String, Object>{
 			'canManage' => canManage,
 			'templates' => templates,
-			'organizationNameBlank' => String.isBlank(
-				BarnCRM_Settings__c.getOrgDefaults().Organization_Legal_Name__c
-			)
+			'organizationNameBlank' => String.isBlank(BarnCRM_Settings__c.getOrgDefaults().Organization_Legal_Name__c)
 		};
 	}
 
 	/** The merged letter, as the inside of its body, or why this person gets none. */
 	@AuraEnabled
-	public static Map<String, String> preview(
-		Id recordId,
-		Id templateId,
-		Date fromDate,
-		Date toDate
-	) {
+	public static Map<String, String> preview(Id recordId, Id templateId, Date fromDate, Date toDate) {
 		try {
 			VolunteerLetterService.Letter letter = VolunteerLetterService.mergeLetters(
 				new List<Id>{ recordId },
@@ -125,10 +109,7 @@ public with sharing class VolunteerLetterController {
 				fromDate,
 				toDate
 			)[0];
-			return new Map<String, String>{
-				'body' => letter.body,
-				'skipReason' => letter.skipReason
-			};
+			return new Map<String, String>{ 'body' => letter.body, 'skipReason' => letter.skipReason };
 		} catch (Exception failure) {
 			throw ERRORS.wrap(failure, CONTEXT, recordId);
 		}
@@ -136,12 +117,7 @@ public with sharing class VolunteerLetterController {
 
 	/** Saves the letter as a file on the person; returns why not when none is made. */
 	@AuraEnabled
-	public static Map<String, String> generate(
-		Id recordId,
-		Id templateId,
-		Date fromDate,
-		Date toDate
-	) {
+	public static Map<String, String> generate(Id recordId, Id templateId, Date fromDate, Date toDate) {
 		try {
 			VolunteerLetterService.Outcome outcome = VolunteerLetterService.generate(
 				new List<Id>{ recordId },
@@ -161,10 +137,7 @@ public with sharing class VolunteerLetterController {
 	/** The Type picklist's labels in the user's language, by value. */
 	private static Map<String, String> typeLabels() {
 		Map<String, String> labels = new Map<String, String>();
-		for (
-			Schema.PicklistEntry entry : Volunteer_Letter_Template__c.Type__c.getDescribe()
-				.getPicklistValues()
-		) {
+		for (Schema.PicklistEntry entry : Volunteer_Letter_Template__c.Type__c.getDescribe().getPicklistValues()) {
 			labels.put(entry.getValue(), entry.getLabel());
 		}
 		return labels;

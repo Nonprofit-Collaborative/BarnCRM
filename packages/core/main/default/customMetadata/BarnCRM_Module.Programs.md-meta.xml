@@ -49,6 +49,10 @@ ModuleAccessStep: ProgramsAccessStep</value>
   </values>
   <values>
     <field>Quick_Links__c</field>
-    <value xsi:type="xsd:string">Enrollment__c.new:Enroll:Start someone in a program.</value>
+    <value xsi:type="xsd:string">Enrollment__c.new:Enroll:Core_HubHome_QuickLinkEnrollLine</value>
+  </values>
+  <values>
+    <field>Beta__c</field>
+    <value xsi:type="xsd:boolean">true</value>
   </values>
 </CustomMetadata>

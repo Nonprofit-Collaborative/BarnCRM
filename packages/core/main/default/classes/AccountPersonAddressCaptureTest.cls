@@ -10,9 +10,7 @@
  * named only as text and written with put, so this class compiles on that shape too. The
  * last two tests run in every shape.
  */
-@IsTest(
-	testFor='ApexClass:AccountAddressHandler, ApexClass:AccountTriggerHandler, ApexTrigger:AccountTrigger'
-)
+@IsTest(testFor='ApexClass:AccountAddressHandler, ApexClass:AccountTriggerHandler, ApexTrigger:AccountTrigger')
 private class AccountPersonAddressCaptureTest {
 	@TestSetup
 	static void createTestUser() {
@@ -112,11 +110,7 @@ private class AccountPersonAddressCaptureTest {
 			for (Address__c address : addresses) {
 				if (address.Is_Default__c) {
 					defaults++;
-					Assert.areEqual(
-						'9 Birch Road',
-						address.Street__c,
-						'The new one is the default.'
-					);
+					Assert.areEqual('9 Birch Road', address.Street__c, 'The new one is the default.');
 				}
 			}
 			Assert.areEqual(1, defaults, 'Only one is the default (R-AD2).');
@@ -213,9 +207,7 @@ private class AccountPersonAddressCaptureTest {
 			if (OrgShapeDetector.detect().hasPersonAccounts) {
 				return;
 			}
-			Account organization = TestDataFactory.organization(
-				new Account(Name = 'Acme Foundation')
-			);
+			Account organization = TestDataFactory.organization(new Account(Name = 'Acme Foundation'));
 			insert organization;
 
 			Integer queriesBefore = Limits.getQueries();

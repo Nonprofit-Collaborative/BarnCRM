@@ -15,13 +15,7 @@ public with sharing class SummitEventsScheduler implements Schedulable {
 
 	/** The import as a step of the nightly run (ADR-0166). */
 	public static NightlyStep step() {
-		return new NightlyStep(
-				JOB_NAME,
-				System.Label.Events_NightlyJobs_SummitName,
-				7,
-				15,
-				new SummitEventsScheduler()
-			)
+		return new NightlyStep(JOB_NAME, System.Label.Events_NightlyJobs_SummitName, 7, 15, new SummitEventsScheduler())
 			.activeWhen(SummitEventsAdapter.isActive());
 	}
 }

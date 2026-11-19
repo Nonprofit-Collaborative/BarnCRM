@@ -405,22 +405,14 @@ public with sharing class ImportMatcher {
 		for (List<String> slice : ImportValues.slices(emails, MAX_KEYS_PER_QUERY)) {
 			List<SObject> found = personAccountsByEmailSlice(slice, recordTypeIds);
 			for (SObject record : found) {
-				put(
-					result,
-					emailKey((String) record.get(ACCOUNT_EMAIL_FIELD)),
-					firstNameOf(record),
-					record
-				);
+				put(result, emailKey((String) record.get(ACCOUNT_EMAIL_FIELD)), firstNameOf(record), record);
 			}
 		}
 		return result;
 	}
 
 	/** One slice's worth of person accounts matched on email, kept out of the caller's loop. */
-	private static List<SObject> personAccountsByEmailSlice(
-		List<String> slice,
-		Set<Id> recordTypeIds
-	) {
+	private static List<SObject> personAccountsByEmailSlice(List<String> slice, Set<Id> recordTypeIds) {
 		String query =
 			'SELECT Id, LastModifiedDate, ' +
 			firstNameColumn() +
@@ -442,10 +434,7 @@ public with sharing class ImportMatcher {
 	 * often wrote) are read, and a record is found under the key each one makes.
 	 */
 	@NamespaceAccessible
-	public static Map<String, Id> personAccountsByNameAndPostalCode(
-		Set<String> keys,
-		Set<Id> recordTypeIds
-	) {
+	public static Map<String, Id> personAccountsByNameAndPostalCode(Set<String> keys, Set<Id> recordTypeIds) {
 		Map<String, Id> result = new Map<String, Id>();
 		if (
 			keys == null ||
@@ -457,12 +446,7 @@ public with sharing class ImportMatcher {
 			return result;
 		}
 		List<String> postalFields = new List<String>();
-		for (
-			String field : new List<String>{
-				ACCOUNT_POSTAL_CODE_FIELD,
-				ACCOUNT_BILLING_POSTAL_CODE_FIELD
-			}
-		) {
+		for (String field : new List<String>{ ACCOUNT_POSTAL_CODE_FIELD, ACCOUNT_BILLING_POSTAL_CODE_FIELD }) {
 			// Each postal code the user may not read is named in the run log, even when the
 			// other still matches: a person holding their postal code only there is not found.
 			if (readable(Account.SObjectType, field)) {
@@ -487,10 +471,7 @@ public with sharing class ImportMatcher {
 				Set<String> recordKeys = new Set<String>();
 				for (String field : postalFields) {
 					recordKeys.add(
-						nameAndPostalKey(
-							(String) record.get(ACCOUNT_LAST_NAME_FIELD),
-							(String) record.get(field)
-						)
+						nameAndPostalKey((String) record.get(ACCOUNT_LAST_NAME_FIELD), (String) record.get(field))
 					);
 				}
 				for (String key : recordKeys) {
@@ -544,9 +525,7 @@ public with sharing class ImportMatcher {
 	}
 
 	private static String firstNameOf(SObject record) {
-		return accountHasField(ACCOUNT_FIRST_NAME_FIELD)
-			? (String) record.get(ACCOUNT_FIRST_NAME_FIELD)
-			: null;
+		return accountHasField(ACCOUNT_FIRST_NAME_FIELD) ? (String) record.get(ACCOUNT_FIRST_NAME_FIELD) : null;
 	}
 
 	/**
@@ -665,9 +644,7 @@ public with sharing class ImportMatcher {
 		if (!matchable.containsKey(type)) {
 			Map<String, Schema.DescribeFieldResult> byLabel = new Map<String, Schema.DescribeFieldResult>();
 			for (
-				Schema.SObjectField field : type.getDescribe(SObjectDescribeOptions.DEFERRED)
-					.fields.getMap()
-					.values()
+				Schema.SObjectField field : type.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap().values()
 			) {
 				Schema.DescribeFieldResult describe = field.getDescribe();
 				Schema.DisplayType kind = describe.getType();
@@ -697,7 +674,6 @@ public with sharing class ImportMatcher {
 	 */
 	@NamespaceAccessible
 	public static Boolean accountHasField(String fieldName) {
-		return ImportObjectSchema.fieldsOf(Account.SObjectType)
-			.containsKey(fieldName.toLowerCase());
+		return ImportObjectSchema.fieldsOf(Account.SObjectType).containsKey(fieldName.toLowerCase());
 	}
 }

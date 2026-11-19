@@ -14,16 +14,8 @@ private class DonorLevelServiceTest {
 	static void makeData() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			insert new List<Donor_Level__c>{
-				new Donor_Level__c(
-					Name = FRIEND,
-					Minimum_Amount__c = 100,
-					Maximum_Amount__c = 1000
-				),
-				new Donor_Level__c(
-					Name = SUSTAINER,
-					Minimum_Amount__c = 1000,
-					Maximum_Amount__c = 5000
-				),
+				new Donor_Level__c(Name = FRIEND, Minimum_Amount__c = 100, Maximum_Amount__c = 1000),
+				new Donor_Level__c(Name = SUSTAINER, Minimum_Amount__c = 1000, Maximum_Amount__c = 5000),
 				new Donor_Level__c(Name = LEADERSHIP, Minimum_Amount__c = 5000)
 			};
 		}
@@ -117,11 +109,7 @@ private class DonorLevelServiceTest {
 			DonorLevelService.clearCache();
 
 			List<Donor_Level__c> ladder = DonorLevelSelector.selectActiveLevels();
-			Assert.areEqual(
-				2,
-				ladder.size(),
-				'The ladder assignment reads is the active rungs only (R-DL8).'
-			);
+			Assert.areEqual(2, ladder.size(), 'The ladder assignment reads is the active rungs only (R-DL8).');
 			Assert.areEqual(
 				null,
 				DonorLevelService.levelFor(2000, ladder),
@@ -139,11 +127,7 @@ private class DonorLevelServiceTest {
 	@IsTest
 	static void overlappingRungsResolveUpwardRatherThanAtRandom() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			insert new Donor_Level__c(
-				Name = 'Overlapping',
-				Minimum_Amount__c = 500,
-				Maximum_Amount__c = 2000
-			);
+			insert new Donor_Level__c(Name = 'Overlapping', Minimum_Amount__c = 500, Maximum_Amount__c = 2000);
 			DonorLevelService.clearCache();
 
 			List<Donor_Level__c> ladder = DonorLevelSelector.selectActiveLevels();
@@ -161,11 +145,7 @@ private class DonorLevelServiceTest {
 			turnLevelsOn(DonorLevelService.DEFAULT_SOURCE_FIELD);
 			Map<String, Donor_Level__c> rungs = ladderByName();
 			Account household = TestDataFactory.household(
-				new Account(
-					Name = 'The Nolan Family',
-					Total_Giving__c = 6000,
-					Donor_Level__c = rungs.get(SUSTAINER).Id
-				)
+				new Account(Name = 'The Nolan Family', Total_Giving__c = 6000, Donor_Level__c = rungs.get(SUSTAINER).Id)
 			);
 
 			Boolean moved = DonorLevelService.assign(
@@ -185,11 +165,7 @@ private class DonorLevelServiceTest {
 				household.Previous_Donor_Level__c,
 				'The rung they came from is retained, which is what makes the movement visible.'
 			);
-			Assert.areEqual(
-				Date.today(),
-				household.Donor_Level_Changed_Date__c,
-				'The date says when the donor moved.'
-			);
+			Assert.areEqual(Date.today(), household.Donor_Level_Changed_Date__c, 'The date says when the donor moved.');
 		}
 	}
 
@@ -199,11 +175,7 @@ private class DonorLevelServiceTest {
 			turnLevelsOn(DonorLevelService.DEFAULT_SOURCE_FIELD);
 			Map<String, Donor_Level__c> rungs = ladderByName();
 			Contact person = TestDataFactory.person(
-				new Contact(
-					LastName = 'Nolan',
-					Total_Giving__c = 1200,
-					Donor_Level__c = rungs.get(LEADERSHIP).Id
-				)
+				new Contact(LastName = 'Nolan', Total_Giving__c = 1200, Donor_Level__c = rungs.get(LEADERSHIP).Id)
 			);
 
 			Boolean moved = DonorLevelService.assign(
@@ -259,11 +231,7 @@ private class DonorLevelServiceTest {
 			SettingsService.clearCaches();
 			Donor_Level__c held = [SELECT Id FROM Donor_Level__c WHERE Name = :FRIEND];
 			Account household = TestDataFactory.household(
-				new Account(
-					Name = 'The Okafor Family',
-					Total_Giving__c = 9000,
-					Donor_Level__c = held.Id
-				)
+				new Account(Name = 'The Okafor Family', Total_Giving__c = 9000, Donor_Level__c = held.Id)
 			);
 
 			List<SObject> moved = DonorLevelService.assignAll(new List<SObject>{ household });
@@ -308,11 +276,7 @@ private class DonorLevelServiceTest {
 			turnLevelsOn('Giving_This_Year__c');
 			Map<String, Donor_Level__c> rungs = ladderByName();
 			Account household = TestDataFactory.household(
-				new Account(
-					Name = 'The Reyes Family',
-					Total_Giving__c = 20000,
-					Giving_This_Year__c = 300
-				)
+				new Account(Name = 'The Reyes Family', Total_Giving__c = 20000, Giving_This_Year__c = 300)
 			);
 
 			DonorLevelService.assignAll(new List<SObject>{ household });
@@ -369,12 +333,7 @@ private class DonorLevelServiceTest {
 				new Account(Name = 'The Weber Family', Total_Giving__c = 600)
 			);
 
-			Boolean moved = DonorLevelService.assign(
-				household,
-				rungs,
-				DonorLevelService.DEFAULT_SOURCE_FIELD,
-				'EUR'
-			);
+			Boolean moved = DonorLevelService.assign(household, rungs, DonorLevelService.DEFAULT_SOURCE_FIELD, 'EUR');
 
 			Assert.isTrue(moved, 'Placed');
 			Assert.areEqual(

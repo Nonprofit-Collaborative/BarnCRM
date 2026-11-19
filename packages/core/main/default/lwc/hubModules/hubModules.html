@@ -20,6 +20,9 @@
                                         data-id="module-logo"
                                     ></lightning-avatar>
                                     <span class="slds-text-title_bold" data-id="module-name">{row.displayName}</span>
+                                    <template lwc:if={row.beta}>
+                                        <lightning-badge class="slds-var-m-left_x-small" label={labels.beta} data-id="beta"></lightning-badge>
+                                    </template>
                                 </span>
                                 <span class="slds-grid slds-grid_vertical-align-center">
                                     <c-barn-status-badge

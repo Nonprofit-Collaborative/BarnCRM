@@ -11,10 +11,7 @@ private class GiftBatchControllerTest {
 	}
 
 	private static User david() {
-		return TestDataFactory.createUser(
-			'David',
-			new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' }
-		);
+		return TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' });
 	}
 
 	private static Gift_Batch__c batch(Decimal controlTotal) {
@@ -39,9 +36,7 @@ private class GiftBatchControllerTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			User fundraiser = david();
 			System.runAs(fundraiser) {
-				Contact ana = TestDataFactory.person(
-					new Contact(FirstName = 'Ana', LastName = 'Garcia')
-				);
+				Contact ana = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Garcia'));
 				insert ana;
 				Commitment__c pledge = new Commitment__c(
 					Type__c = 'Pledge',
@@ -87,11 +82,7 @@ private class GiftBatchControllerTest {
 				Test.stopTest();
 
 				Assert.areEqual(3, byKey.get('new-1').choices.size(), 'Ana owes three payments.');
-				Assert.areEqual(
-					first.Id,
-					byKey.get('new-1').suggestedId,
-					'The only match is chosen.'
-				);
+				Assert.areEqual(first.Id, byKey.get('new-1').suggestedId, 'The only match is chosen.');
 				Assert.isTrue(byKey.get('new-2').choices.isEmpty(), 'No donor, nothing owed.');
 				Assert.areEqual(first.Id, saved.lines[0].installmentId, 'The choice is saved.');
 			}
@@ -114,16 +105,9 @@ private class GiftBatchControllerTest {
 				Assert.areEqual(100, view.controlTotal, 'The control total is shown.');
 				Assert.areEqual(0, view.enteredTotal, 'Nothing has been typed.');
 				Assert.isTrue(view.lines.isEmpty(), 'No lines yet.');
-				Assert.isFalse(
-					view.paymentMethods.isEmpty(),
-					'The methods come from the picklist.'
-				);
+				Assert.isFalse(view.paymentMethods.isEmpty(), 'The methods come from the picklist.');
 				for (GiftBatchController.Option option : view.paymentMethods) {
-					Assert.areNotEqual(
-						'In-kind',
-						option.value,
-						'Goods are not entered in a deposit.'
-					);
+					Assert.areNotEqual('In-kind', option.value, 'Goods are not entered in a deposit.');
 				}
 			}
 
@@ -135,9 +119,7 @@ private class GiftBatchControllerTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			User fundraiser = david();
 			System.runAs(fundraiser) {
-				Contact ana = TestDataFactory.person(
-					new Contact(FirstName = 'Ana', LastName = 'Garcia')
-				);
+				Contact ana = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Garcia'));
 				insert ana;
 				Gift_Batch__c tuesday = batch(150);
 				GiftBatchController.BatchView first = GiftBatchController.saveLines(
@@ -205,9 +187,7 @@ private class GiftBatchControllerTest {
 			insert general;
 			User fundraiser = david();
 			System.runAs(fundraiser) {
-				Contact ana = TestDataFactory.person(
-					new Contact(FirstName = 'Ana', LastName = 'Garcia')
-				);
+				Contact ana = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Garcia'));
 				insert ana;
 				Gift_Batch__c tuesday = batch(100);
 				GiftBatchController.saveLines(
@@ -261,9 +241,7 @@ private class GiftBatchControllerTest {
 			);
 			Gift_Batch__c tuesday;
 			System.runAs(fundraiser) {
-				Contact ana = TestDataFactory.person(
-					new Contact(FirstName = 'Ana', LastName = 'Garcia')
-				);
+				Contact ana = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Garcia'));
 				insert ana;
 				tuesday = batch(100);
 				GiftBatchController.saveLines(
@@ -271,11 +249,7 @@ private class GiftBatchControllerTest {
 					new List<GiftBatchController.Line>{ typed(ana.Id, 100) },
 					null
 				);
-				insert new Gift_Batch__Share(
-					ParentId = tuesday.Id,
-					UserOrGroupId = treasurer.Id,
-					AccessLevel = 'Read'
-				);
+				insert new Gift_Batch__Share(ParentId = tuesday.Id, UserOrGroupId = treasurer.Id, AccessLevel = 'Read');
 			}
 
 			System.runAs(treasurer) {
@@ -285,11 +259,7 @@ private class GiftBatchControllerTest {
 					GiftBatchController.saveLines(tuesday.Id, seen.lines, null);
 					Assert.fail('A reader cannot save lines.');
 				} catch (AuraHandledException e) {
-					Assert.areEqual(
-						BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorNoAccess'),
-						e.getMessage(),
-						'Why.'
-					);
+					Assert.areEqual(BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorNoAccess'), e.getMessage(), 'Why.');
 				}
 				GiftBatchController.PostResult refused = GiftBatchController.postBatch(tuesday.Id);
 				Test.stopTest();
@@ -297,11 +267,7 @@ private class GiftBatchControllerTest {
 				Assert.isFalse(seen.canEdit, 'The grid is told to offer no buttons.');
 				Assert.areEqual(1, seen.lines.size(), 'The reader still sees the lines.');
 				Assert.isFalse(refused.success, 'A reader cannot post.');
-				Assert.areEqual(
-					BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorNoAccess'),
-					refused.formError,
-					'Why.'
-				);
+				Assert.areEqual(BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorNoAccess'), refused.formError, 'Why.');
 			}
 			Assert.areEqual(0, [SELECT COUNT() FROM Gift__c], 'Nothing was posted.');
 		}
@@ -318,11 +284,7 @@ private class GiftBatchControllerTest {
 				GiftBatchController.getBatch(gone.Id);
 				Assert.fail('A deleted batch cannot be opened.');
 			} catch (AuraHandledException e) {
-				Assert.areEqual(
-					BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorBatchMissing'),
-					e.getMessage(),
-					'Why.'
-				);
+				Assert.areEqual(BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorBatchMissing'), e.getMessage(), 'Why.');
 			}
 			Test.stopTest();
 		}

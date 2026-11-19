@@ -44,5 +44,12 @@
       }
     }
   },
-  "Read_Only": {"label": "Payments Read Only", "description": "Reads payments. Changes nothing.", "readOnly": true}
+  "Read_Only": {
+    "label": "Payments Read Only",
+    "description": "Reads payments. Changes nothing.",
+    "readOnly": true,
+    "remove": {
+      "externalCredentialPrincipalAccesses": ["Barn_PayPal-Barn_PayPal_App", "Barn_Stripe-Barn_Stripe_Key"]
+    }
+  }
 }

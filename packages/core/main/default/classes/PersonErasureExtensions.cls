@@ -52,10 +52,7 @@ public with sharing class PersonErasureExtensions {
 
 	private static PersonErasureExtension resolve(String className) {
 		String prefix = NamespaceUtil.prefix();
-		Type extensionType = Type.forName(
-			String.isBlank(prefix) ? null : prefix.removeEnd('__'),
-			className
-		);
+		Type extensionType = Type.forName(String.isBlank(prefix) ? null : prefix.removeEnd('__'), className);
 		if (extensionType == null) {
 			extensionType = Type.forName(className);
 		}
@@ -81,10 +78,7 @@ public with sharing class PersonErasureExtensions {
 			ErrorLogger.SEVERITY_ERROR
 		);
 		return new PersonErasure.ErasureException(
-			String.format(
-				BarnHelp.text('Core', 'Core_Erase_ExtensionFailed'),
-				new List<String>{ className }
-			)
+			String.format(BarnHelp.text('Core', 'Core_Erase_ExtensionFailed'), new List<String>{ className })
 		);
 	}
 }

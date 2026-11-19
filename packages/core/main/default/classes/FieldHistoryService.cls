@@ -153,9 +153,7 @@ public with sharing class FieldHistoryService {
 			fieldsByObject = new Map<String, List<String>>();
 			for (History_Field__mdt row : rows()) {
 				// By type only: who saves a record must not decide what is kept.
-				Schema.DescribeFieldResult field = row.Active__c == true
-					? keepable(row.Field_Name__c, false)
-					: null;
+				Schema.DescribeFieldResult field = row.Active__c == true ? keepable(row.Field_Name__c, false) : null;
 				if (field != null) {
 					String key = row.Field_Name__c.substringBefore('.').trim().toLowerCase();
 					if (!fieldsByObject.containsKey(key)) {
@@ -184,12 +182,8 @@ public with sharing class FieldHistoryService {
 		for (Automation_Registry__mdt entry : AutomationRegistrySelector.selectForFramework()) {
 			dispatched |= key.equalsIgnoreCase(entry.Object_Name__c);
 		}
-		Schema.SObjectType type = dispatched && !NEVER.contains(key)
-			? NamespaceUtil.objectType(key)
-			: null;
-		return type != null && type.getDescribe(SObjectDescribeOptions.DEFERRED).isCustom()
-			? type
-			: null;
+		Schema.SObjectType type = dispatched && !NEVER.contains(key) ? NamespaceUtil.objectType(key) : null;
+		return type != null && type.getDescribe(SObjectDescribeOptions.DEFERRED).isCustom() ? type : null;
 	}
 
 	/**
@@ -208,14 +202,9 @@ public with sharing class FieldHistoryService {
 		Schema.SObjectType type = offeredType(name.substringBefore('.'));
 		Schema.SObjectField token = type == null
 			? null
-			: type.getDescribe(SObjectDescribeOptions.DEFERRED)
-					.fields.getMap()
-					.get(name.substringAfter('.').trim());
+			: type.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap().get(name.substringAfter('.').trim());
 		Schema.DescribeFieldResult field = token == null ? null : token.getDescribe();
-		Boolean longText =
-			field != null &&
-			field.getType() == Schema.DisplayType.TEXTAREA &&
-			field.getLength() > 255;
+		Boolean longText = field != null && field.getType() == Schema.DisplayType.TEXTAREA && field.getLength() > 255;
 		return field != null &&
 			!field.isCalculated() &&
 			!field.isAutoNumber() &&
@@ -233,10 +222,7 @@ public with sharing class FieldHistoryService {
 			String name = values == null ? null : (String) values.get('Field_Name__c');
 			if (keepable(name) == null) {
 				throw new CustomMetadataManagerService.CustomMetadataManagerException(
-					String.format(
-						BarnHelp.text('Core', 'Core_FieldHistory_FieldInvalid'),
-						new List<Object>{ name }
-					)
+					String.format(BarnHelp.text('Core', 'Core_FieldHistory_FieldInvalid'), new List<Object>{ name })
 				);
 			}
 		}
@@ -284,8 +270,7 @@ public with sharing class FieldHistoryService {
 	 * record, and only the fields they can read (R-FH4).
 	 */
 	public static List<Entry> historyFor(Id recordId) {
-		Schema.DescribeSObjectResult described = recordId.getSObjectType()
-			.getDescribe(SObjectDescribeOptions.DEFERRED);
+		Schema.DescribeSObjectResult described = recordId.getSObjectType().getDescribe(SObjectDescribeOptions.DEFERRED);
 		Integer readable = Database.countQueryWithBinds(
 			'SELECT COUNT() FROM ' + described.getName() + ' WHERE Id = :recordId',
 			new Map<String, Object>{ 'recordId' => recordId },
@@ -336,9 +321,7 @@ public with sharing class FieldHistoryService {
 	 */
 	public static void restore(Id historyId, String fieldName) {
 		if (!FeatureManagement.checkPermission(ADMIN_PERMISSION)) {
-			throw new FieldHistoryException(
-				BarnHelp.text('Core', 'Core_FieldHistory_NoPermission')
-			);
+			throw new FieldHistoryException(BarnHelp.text('Core', 'Core_FieldHistory_NoPermission'));
 		}
 		List<Field_History__c> rows = [
 			SELECT Record_Id__c, Changes__c
@@ -361,16 +344,11 @@ public with sharing class FieldHistoryService {
 		}
 		Id recordId = Id.valueOf(rows[0].Record_Id__c);
 		Map<String, Object> putBack = new Map<String, Object>{
-			'attributes' => new Map<String, Object>{
-				'type' => String.valueOf(recordId.getSObjectType())
-			},
+			'attributes' => new Map<String, Object>{ 'type' => String.valueOf(recordId.getSObjectType()) },
 			'Id' => recordId,
 			String.valueOf(found.get('f')) => found.get('o')
 		};
-		Database.update(
-			(SObject) JSON.deserialize(JSON.serialize(putBack), SObject.class),
-			AccessLevel.USER_MODE
-		);
+		Database.update((SObject) JSON.deserialize(JSON.serialize(putBack), SObject.class), AccessLevel.USER_MODE);
 	}
 
 	private static String text(Object value) {

@@ -82,10 +82,7 @@ private class StewardshipWriterTest {
 				new List<Stewardship_Plan__c>(),
 				new List<Stewardship_Plan_Template__c>{ template }
 			);
-			StewardshipWriter.startPlans(
-				new List<Stewardship_Plan__c>{ planFor(person.Id, template.Id) },
-				null
-			);
+			StewardshipWriter.startPlans(new List<Stewardship_Plan__c>{ planFor(person.Id, template.Id) }, null);
 			Test.stopTest();
 
 			Assert.areEqual(0, [SELECT COUNT() FROM Stewardship_Plan__c], 'No plan was started');
@@ -139,11 +136,7 @@ private class StewardshipWriterTest {
 			Assert.areEqual(2, tasks.size(), 'One task for each of the two steps');
 			Assert.areEqual('Call to say thank you', tasks[0].Subject, 'In step order');
 			Assert.areEqual(Date.today().addDays(1), tasks[0].ActivityDate, 'Dated from the start');
-			Assert.areEqual(
-				Date.today().addDays(7),
-				tasks[1].ActivityDate,
-				'A week on for the note'
-			);
+			Assert.areEqual(Date.today().addDays(7), tasks[1].ActivityDate, 'A week on for the note');
 			Assert.areEqual('High', tasks[0].Priority, 'The step priority is kept');
 			Assert.areEqual('Normal', tasks[1].Priority, 'A step with none gets Normal');
 			Assert.areEqual(
@@ -151,11 +144,7 @@ private class StewardshipWriterTest {
 				tasks[0].OwnerId,
 				'The record owner step goes to whoever owns the person'
 			);
-			Assert.areEqual(
-				UserInfo.getUserId(),
-				tasks[1].OwnerId,
-				'The plan starter step goes to the starter'
-			);
+			Assert.areEqual(UserInfo.getUserId(), tasks[1].OwnerId, 'The plan starter step goes to the starter');
 		}
 	}
 
@@ -163,9 +152,7 @@ private class StewardshipWriterTest {
 	static void aPlanForAnOrganizationUsesTheOrganizationsOwner() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Stewardship_Plan_Template__c template = templateWithSteps();
-			Account riverside = TestDataFactory.organization(
-				new Account(Name = 'Riverside Foundation')
-			);
+			Account riverside = TestDataFactory.organization(new Account(Name = 'Riverside Foundation'));
 			insert riverside;
 			Stewardship_Plan__c plan = new Stewardship_Plan__c(
 				Account__c = riverside.Id,
@@ -200,9 +187,7 @@ private class StewardshipWriterTest {
 			Stewardship_Plan_Template__c template = templateWithSteps();
 			List<Contact> people = new List<Contact>();
 			for (Integer i = 0; i < TWO_HUNDRED; i++) {
-				people.add(
-					TestDataFactory.person(new Contact(FirstName = 'Donor' + i, LastName = 'Plan'))
-				);
+				people.add(TestDataFactory.person(new Contact(FirstName = 'Donor' + i, LastName = 'Plan')));
 			}
 			insert people;
 			List<Stewardship_Plan__c> plans = new List<Stewardship_Plan__c>();
@@ -246,11 +231,7 @@ private class StewardshipWriterTest {
 			);
 			Test.stopTest();
 
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Stewardship_Plan__c],
-				'Only the good plan saved'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Stewardship_Plan__c], 'Only the good plan saved');
 			Assert.areEqual(2, [SELECT COUNT() FROM Task], 'And only it has tasks');
 		}
 	}

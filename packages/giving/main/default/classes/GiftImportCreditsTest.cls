@@ -13,10 +13,7 @@ private class GiftImportCreditsTest {
 	private static Import_Batch__c batch;
 
 	private static User maria() {
-		return TestDataFactory.createUser(
-			'Maria',
-			new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
-		);
+		return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' });
 	}
 
 	/** One row: Ana gives 100 on 15 March, Ben is on the row too, with these extra columns. */
@@ -37,10 +34,7 @@ private class GiftImportCreditsTest {
 		for (String target : row.keySet()) {
 			mapping.getColumns().add(new ImportMapping.Column(target, target));
 		}
-		template = ImportTestDataFactory.template(
-			mapping.serialize(),
-			ImportTemplateService.RULE_EMAIL
-		);
+		template = ImportTestDataFactory.template(mapping.serialize(), ImportTemplateService.RULE_EMAIL);
 		batch = ImportTestDataFactory.batch(template);
 		ImportTestDataFactory.rows(batch, new List<Map<String, String>>{ row });
 	}
@@ -61,13 +55,7 @@ private class GiftImportCreditsTest {
 
 	private static Import_Row__c row() {
 		return [
-			SELECT
-				Status__c,
-				Error_Message__c,
-				Gift_Id__c,
-				Soft_Credit_Id__c,
-				Contact_1__c,
-				Contact_2__c
+			SELECT Status__c, Error_Message__c, Gift_Id__c, Soft_Credit_Id__c, Contact_1__c, Contact_2__c
 			FROM Import_Row__c
 			WHERE Import_Batch__c = :batch.Id
 			WITH SYSTEM_MODE
@@ -82,11 +70,7 @@ private class GiftImportCreditsTest {
 			commitAsMaria();
 
 			Import_Row__c after = row();
-			Assert.areEqual(
-				ImportRowProcessor.STATUS_CREATED,
-				after.Status__c,
-				'Created: ' + after.Error_Message__c
-			);
+			Assert.areEqual(ImportRowProcessor.STATUS_CREATED, after.Status__c, 'Created: ' + after.Error_Message__c);
 			Soft_Credit__c credit = [
 				SELECT Contact__c, Role__c, Amount__c
 				FROM Soft_Credit__c
@@ -106,11 +90,7 @@ private class GiftImportCreditsTest {
 			commitAsMaria();
 
 			Import_Row__c after = row();
-			Assert.areEqual(
-				ImportRowProcessor.STATUS_CREATED,
-				after.Status__c,
-				'Created: ' + after.Error_Message__c
-			);
+			Assert.areEqual(ImportRowProcessor.STATUS_CREATED, after.Status__c, 'Created: ' + after.Error_Message__c);
 			Assert.areEqual(
 				1,
 				[
@@ -137,18 +117,10 @@ private class GiftImportCreditsTest {
 			commitAsMaria();
 
 			Import_Row__c after = row();
-			Assert.areEqual(
-				ImportRowProcessor.STATUS_CREATED,
-				after.Status__c,
-				'Created: ' + after.Error_Message__c
-			);
+			Assert.areEqual(ImportRowProcessor.STATUS_CREATED, after.Status__c, 'Created: ' + after.Error_Message__c);
 			Tribute__c tribute = [SELECT Type__c, Honoree_Name__c, Gift__c FROM Tribute__c];
 			Assert.areEqual('In memory of', tribute.Type__c, 'Its type.');
-			Assert.areEqual(
-				String.valueOf(tribute.Gift__c),
-				after.Gift_Id__c,
-				'On the row\'s gift.'
-			);
+			Assert.areEqual(String.valueOf(tribute.Gift__c), after.Gift_Id__c, 'On the row\'s gift.');
 		}
 	}
 
@@ -180,12 +152,7 @@ private class GiftImportCreditsTest {
 	@IsTest
 	static void aCreditValueThatCannotBeReadIsRefusedWithItsText() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			given(
-				new Map<String, String>{
-					'SoftCredit.Role__c' => 'Solicitor',
-					'SoftCredit.Amount__c' => 'a lot'
-				}
-			);
+			given(new Map<String, String>{ 'SoftCredit.Role__c' => 'Solicitor', 'SoftCredit.Amount__c' => 'a lot' });
 
 			commitAsMaria();
 
@@ -244,23 +211,13 @@ private class GiftImportCreditsTest {
 	@IsTest
 	static void theCreditedPartyCanBeTheFirstPerson() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			given(
-				new Map<String, String>{
-					'SoftCredit.Role__c' => 'Solicitor',
-					'SoftCredit.Party' => ' contact 1 '
-				}
-			);
+			given(new Map<String, String>{ 'SoftCredit.Role__c' => 'Solicitor', 'SoftCredit.Party' => ' contact 1 ' });
 			commitAsMaria();
 			Import_Row__c first = row();
-			Assert.areEqual(
-				ImportRowProcessor.STATUS_CREATED,
-				first.Status__c,
-				'Created: ' + first.Error_Message__c
-			);
+			Assert.areEqual(ImportRowProcessor.STATUS_CREATED, first.Status__c, 'Created: ' + first.Error_Message__c);
 			Assert.areEqual(
 				first.Contact_1__c,
-				[SELECT Contact__c FROM Soft_Credit__c WHERE Id = :first.Soft_Credit_Id__c]
-				.Contact__c,
+				[SELECT Contact__c FROM Soft_Credit__c WHERE Id = :first.Soft_Credit_Id__c].Contact__c,
 				'Ana, the first person, is credited.'
 			);
 		}
@@ -269,12 +226,7 @@ private class GiftImportCreditsTest {
 	@IsTest
 	static void aCreditToSomeoneOutsideTheFourChoicesIsRefused() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			given(
-				new Map<String, String>{
-					'SoftCredit.Role__c' => 'Solicitor',
-					'SoftCredit.Party' => 'Neighbour'
-				}
-			);
+			given(new Map<String, String>{ 'SoftCredit.Role__c' => 'Solicitor', 'SoftCredit.Party' => 'Neighbour' });
 			commitAsMaria();
 			assertRefused(
 				String.format(
@@ -289,12 +241,7 @@ private class GiftImportCreditsTest {
 	@IsTest
 	static void aCreditToAnOrganizationOrHouseholdTheRowDoesNotHaveIsRefused() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			given(
-				new Map<String, String>{
-					'SoftCredit.Role__c' => 'Solicitor',
-					'SoftCredit.Party' => 'Organization'
-				}
-			);
+			given(new Map<String, String>{ 'SoftCredit.Role__c' => 'Solicitor', 'SoftCredit.Party' => 'Organization' });
 
 			commitAsMaria();
 
@@ -354,11 +301,7 @@ private class GiftImportCreditsTest {
 			);
 			GiftImportProcessor processor = new GiftImportProcessor();
 
-			Map<Id, String> gifts = processor.reasonsToKeep(
-				batch.Id,
-				Gift__c.SObjectType,
-				new Set<Id>{ gift.Id }
-			);
+			Map<Id, String> gifts = processor.reasonsToKeep(batch.Id, Gift__c.SObjectType, new Set<Id>{ gift.Id });
 			Map<Id, String> people = processor.reasonsToKeep(
 				batch.Id,
 				Contact.SObjectType,
@@ -375,10 +318,7 @@ private class GiftImportCreditsTest {
 				people.get(gift.Donor_Contact__c),
 				'Ana.'
 			);
-			Assert.isTrue(
-				processor.taggedObjects().contains(Gift__c.SObjectType),
-				'Gifts are what the import tags.'
-			);
+			Assert.isTrue(processor.taggedObjects().contains(Gift__c.SObjectType), 'Gifts are what the import tags.');
 		}
 	}
 

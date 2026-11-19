@@ -3,7 +3,7 @@
 ## What It Does
 
 **Fundraising Home** is the first tab of the **BarnCRM Fundraising** app. It answers "what needs
-me today" in one look, so a fundraiser no longer starts on a menu of twenty tabs:
+me today" in one look, so a fundraiser starts on one page rather than a menu of tabs:
 
 - Five figures, each a link to the list behind it:
   - **Gifts** with **To acknowledge**: received gifts waiting for a thank you. Opens the
@@ -44,8 +44,8 @@ batches.
 
 ## How to Turn It On
 
-Nothing to turn on. The page and its tab come with the Giving module, and the **Giving Admin**,
-**Giving Staff** and **Giving Read Only** permission sets show the tab.
+Nothing to turn on. The page and its tab come with the Fundraising module, and the **Fundraising Admin**,
+**Fundraising Staff Access** and **Fundraising Read Only** permission sets show the tab.
 
 ## What Changed in the App's Menu
 
@@ -66,11 +66,11 @@ on Fundraising Home, are still in the App Launcher, and can be added back with t
 ## The Charts
 
 The charts are standard Salesforce report charts placed on the page, drawn by Salesforce in its
-own colors, theme and dark mode. They read packaged reports in the **BarnCRM Giving** report
+own colors, theme and dark mode. They read packaged reports in the **BarnCRM Fundraising** report
 folder:
 
 - **Giving by Month**: received gifts in each of the last twelve months (the same report the
-  Giving dashboard uses).
+  Fundraising dashboard uses).
 - **Open Asks by Stage**: open asks by stage, with the amount asked. It uses the **Asks** report
   type, which ships with the module.
 
@@ -101,7 +101,7 @@ region and pick a report). The figures and setup tiles are one component, **Fund
 - **Looking for Funds or Appeals in the menu.** They are tiles under **More**, and in the App
   Launcher.
 - **A chart says it has no data.** The person may lack the Run Reports permission or read access
-  to the records; the Giving permission sets give the second, a profile or role gives the first.
+  to the records; the Fundraising permission sets give the second, a profile or role gives the first.
 
 ## What This Does Not Do Yet
 

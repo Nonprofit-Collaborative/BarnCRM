@@ -20,21 +20,11 @@ public with sharing class CommitmentEntry {
 	 * The sentence to show when a pledge cannot be built from these entries, or null when it
 	 * can.
 	 */
-	public static String pledgeProblem(
-		Decimal total,
-		Integer payments,
-		String frequency,
-		Date firstPaymentDate
-	) {
+	public static String pledgeProblem(Decimal total, Integer payments, String frequency, Date firstPaymentDate) {
 		if (total == null || total <= 0) {
 			return BarnHelp.text('Giving', 'Giving_Ask_ErrorAmount');
 		}
-		if (
-			payments == null ||
-			payments < 1 ||
-			String.isBlank(frequency) ||
-			firstPaymentDate == null
-		) {
+		if (payments == null || payments < 1 || String.isBlank(frequency) || firstPaymentDate == null) {
 			return BarnHelp.text('Giving', 'Giving_Ask_ErrorPledgeSchedule');
 		}
 		return null;
@@ -70,11 +60,7 @@ public with sharing class CommitmentEntry {
 	 * The sentence to show when a recurring gift cannot be built from these entries, or null
 	 * when it can.
 	 */
-	public static String recurringProblem(
-		Decimal amountEachTime,
-		String frequency,
-		Date startDate
-	) {
+	public static String recurringProblem(Decimal amountEachTime, String frequency, Date startDate) {
 		if (amountEachTime == null || amountEachTime <= 0) {
 			return BarnHelp.text('Giving', 'Giving_CommitmentNew_ErrorAmountEachTime');
 		}
@@ -112,11 +98,7 @@ public with sharing class CommitmentEntry {
 	 * on the dates the schedule itself uses. Null when either date is missing or the last is
 	 * before the first.
 	 */
-	public static Integer paymentsThrough(
-		String frequency,
-		Date firstPaymentDate,
-		Date lastPaymentDate
-	) {
+	public static Integer paymentsThrough(String frequency, Date firstPaymentDate, Date lastPaymentDate) {
 		if (
 			String.isBlank(frequency) ||
 			firstPaymentDate == null ||
@@ -125,15 +107,9 @@ public with sharing class CommitmentEntry {
 		) {
 			return null;
 		}
-		Commitment__c draft = new Commitment__c(
-			Frequency__c = frequency,
-			Start_Date__c = firstPaymentDate
-		);
+		Commitment__c draft = new Commitment__c(Frequency__c = frequency, Start_Date__c = firstPaymentDate);
 		Integer count = 0;
-		while (
-			count < MAX_PAYMENTS &&
-			CommitmentService.dueDateFor(draft, count) <= lastPaymentDate
-		) {
+		while (count < MAX_PAYMENTS && CommitmentService.dueDateFor(draft, count) <= lastPaymentDate) {
 			count++;
 		}
 		return count;

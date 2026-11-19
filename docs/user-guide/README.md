@@ -1,6 +1,6 @@
 # User Guide
 
-Applies to: BarnCRM main f69141c1c (landing batch L, with batch K). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM landing/batch-n at 40915b25c (batch N: releases 1.26 to 1.28). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 ## Who This Is For
 
@@ -9,6 +9,8 @@ This guide is for staff who use BarnCRM every day: you look people up, keep hous
 Each page is a set of short recipes ("To do X: 1. 2. 3.") using the names you see on screen. Where a task needs an admin (a setting, a permission, a template), the page says so and links to the [Admin Guide](../admin-guide/README.md) instead of explaining it.
 
 What you can do depends on the role your admin gave you on the Access page (for example Fundraising Staff, Team Member or Read Only) and on which modules your organization uses. If a tab, button or panel in this guide is missing for you, ask your admin.
+
+Every BarnCRM module is in Beta right now: a **Beta** badge beside a module's name on the Home page Modules card means it is still maturing and may change. Core is not marked.
 
 ## Pages
 
@@ -53,9 +55,9 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 - [Logic models](logic-models.md): building a logic model with arrows and assumptions, and measuring outputs and outcomes with indicators, targets and results, filled in by hand, from a spreadsheet or worked out from your records, and comparing periods in a report for funders.
 
-### Funders (Nonprofit Edition)
+### Grants (Nonprofit Edition)
 
-- [Grants and funders](funders.md): adding grants, moving them through the stages on the Grant Pipeline, the deadlines coming up and the Grant Calendar, the program a grant pays for, an award's payments, a restricted grant's ledger and Giving fund, government award fields, the answer library, linking a requirement to the outcome it reports on, funder reports and the Board Dashboard.
+- [Grants](funders.md): adding grants, moving them through the stages on the Grant Pipeline, the deadlines coming up and the Grant Calendar, the program a grant pays for, an award's payments, a restricted grant's ledger and Fundraising fund, government award fields, the answer library, linking a requirement to the outcome it reports on, funder reports and the Board Dashboard.
 
 ### Forms
 
@@ -80,6 +82,10 @@ What you can do depends on the role your admin gave you on the Access page (for 
 ### LWC Builder
 
 - [Built Components](lwc-builder.md): what a component your admin built shows, its buttons, and why a block or a record can be missing.
+
+### Advanced Reporting
+
+- [Advanced Reporting](advanced-reporting.md): dashboard templates and their filters, building a report across related records, totals and charts, saving, sharing and exporting, building a dashboard.
 
 ### Project Management
 

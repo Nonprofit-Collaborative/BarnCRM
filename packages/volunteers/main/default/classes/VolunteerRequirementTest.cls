@@ -18,10 +18,7 @@ private class VolunteerRequirementTest {
 				COORDINATOR,
 				new List<String>{ VolunteersTestData.CORE_STAFF, 'Volunteers_Coordinator' }
 			);
-			TestUsers.standardUserWith(
-				STAFFER,
-				new List<String>{ VolunteersTestData.CORE_STAFF, 'Volunteers_Staff' }
-			);
+			TestUsers.standardUserWith(STAFFER, new List<String>{ VolunteersTestData.CORE_STAFF, 'Volunteers_Staff' });
 			TestUsers.standardUserWith(
 				READER,
 				new List<String>{ VolunteersTestData.CORE_STAFF, 'Volunteers_Read_Only' }
@@ -216,8 +213,7 @@ private class VolunteerRequirementTest {
 			update new Volunteer_Requirement__c(Id = requirement.Id, Status__c = 'In progress');
 			Assert.areEqual(
 				'In progress',
-				[SELECT Status__c FROM Volunteer_Requirement__c WHERE Id = :requirement.Id]
-				.Status__c,
+				[SELECT Status__c FROM Volunteer_Requirement__c WHERE Id = :requirement.Id].Status__c,
 				'A coordinator edits any requirement'
 			);
 		}

@@ -22,7 +22,10 @@ through Core's `FormAttachmentExtension` seam and holds the form's record identi
 ## Contents
 
 - Objects: `Form__c`, `Form_Version__c`, `Form_Submission__c` (canonical model Sections 29ZW to
-  29ZY).
+  29ZY). A submission is a lookup of its form, set null on delete, so it outlives the form;
+  `FormDeleteGuard` lets only a holder of `Forms_Manage` (in Forms Admin) delete a form or version
+  that submissions answer, and `FormSubmissionNames` stores the form name and version number on
+  each submission (R-FM4, R-FS8).
 - Permission sets `Forms_Admin`, `Forms_Staff`, `Forms_Read_Only`, given by role through
   `FormsAccessSync`; install steps in `FormsPostInstall`.
 - App `BarnCRM_Forms` (BarnCRM Forms, logo `BarnCRM_Patch_Forms_Logo`), visible through the Forms

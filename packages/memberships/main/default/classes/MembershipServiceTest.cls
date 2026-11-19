@@ -58,9 +58,7 @@ private class MembershipServiceTest {
 	}
 
 	private static Contact person() {
-		Contact person = TestDataFactory.person(
-			new Contact(LastName = 'Zzmem Member', Email = 'member@example.org')
-		);
+		Contact person = TestDataFactory.person(new Contact(LastName = 'Zzmem Member', Email = 'member@example.org'));
 		// An org's duplicate rule must not stop a test person sharing an email.
 		Database.DMLOptions options = new Database.DMLOptions();
 		options.DuplicateRuleHeader.allowSave = true;
@@ -77,11 +75,7 @@ private class MembershipServiceTest {
 			Assert.areEqual(50, made.Dues__c, 'dues come from the level');
 			Assert.areEqual(Date.newInstance(2026, 3, 15), made.Start_Date__c, 'starts today');
 			Assert.areEqual(Date.newInstance(2027, 3, 14), made.End_Date__c, 'one year less a day');
-			Assert.areEqual(
-				made.Start_Date__c,
-				made.Member_Since__c,
-				'a first term starts the membership'
-			);
+			Assert.areEqual(made.Start_Date__c, made.Member_Since__c, 'a first term starts the membership');
 
 			Membership_Level__c lifetime = level('Lifetime', 1000, 0);
 			Membership_Term__c forever = term(lifetime.Id, person().Id, 'Current', null);
@@ -98,43 +92,21 @@ private class MembershipServiceTest {
 			Membership_Level__c individual = level('Individual', 50, 12);
 			Membership_Level__c family = level('Family', 90, 12);
 			Contact member = person();
-			Membership_Term__c current = term(
-				individual.Id,
-				member.Id,
-				'Current',
-				Date.newInstance(2025, 7, 1)
-			);
+			Membership_Term__c current = term(individual.Id, member.Id, 'Current', Date.newInstance(2025, 7, 1));
 			MembershipService.Renewal upgrade = new MembershipService.Renewal(current.Id);
 			upgrade.levelId = family.Id;
-			Membership_Term__c next = MembershipService.renew(
-				new List<MembershipService.Renewal>{ upgrade },
-				false
-			)[0];
-			Assert.areEqual(
-				Date.newInstance(2026, 7, 1),
-				next.Start_Date__c,
-				'starts the day after'
-			);
+			Membership_Term__c next = MembershipService.renew(new List<MembershipService.Renewal>{ upgrade }, false)[0];
+			Assert.areEqual(Date.newInstance(2026, 7, 1), next.Start_Date__c, 'starts the day after');
 			Assert.areEqual('Renewal', next.Origin__c, 'renewed before it lapsed');
 			Assert.areEqual(90, next.Dues__c, 'at the new level');
-			Assert.areEqual(
-				Date.newInstance(2025, 7, 1),
-				next.Member_Since__c,
-				'member since kept'
-			);
+			Assert.areEqual(Date.newInstance(2025, 7, 1), next.Member_Since__c, 'member since kept');
 			Assert.areEqual(
 				'Renewed',
-				[SELECT Status__c FROM Membership_Term__c WHERE Id = :current.Id WITH USER_MODE]
-				.Status__c,
+				[SELECT Status__c FROM Membership_Term__c WHERE Id = :current.Id WITH USER_MODE].Status__c,
 				'the old term is closed'
 			);
 
-			Membership_Term__c lapsed = term(
-				individual.Id,
-				person().Id,
-				'Lapsed',
-				Date.newInstance(2024, 1, 1)
-			);
+			Membership_Term__c lapsed = term(individual.Id, person().Id, 'Lapsed', Date.newInstance(2024, 1, 1));
 			Membership_Term__c rejoined = MembershipService.renew(
 				new List<MembershipService.Renewal>{ new MembershipService.Renewal(lapsed.Id) },
 				false

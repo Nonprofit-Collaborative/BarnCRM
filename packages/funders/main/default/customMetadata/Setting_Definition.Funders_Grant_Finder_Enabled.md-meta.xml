@@ -12,7 +12,7 @@
     </values>
     <values>
         <field>Section__c</field>
-        <value xsi:type="xsd:string">Funders</value>
+        <value xsi:type="xsd:string">Grants</value>
     </values>
     <values>
         <field>Module__c</field>
@@ -28,7 +28,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">Whether the Grant Finder tab searches open federal funding opportunities on Grants.gov, a free public service that needs no account. On by default. Only the words searched leave your org. Setup prerequisite: the Remote Site Setting BarnCRM_Grants_Gov (https://api.grants.gov), installed with Funders, must stay active in Setup, Remote Site Settings.</value>
+        <value xsi:type="xsd:string">Whether the Grant Finder tab searches open federal funding opportunities on Grants.gov, a free public service that needs no account. On by default. Only the words searched leave your org. Setup prerequisite: the Remote Site Setting BarnCRM_Grants_Gov (https://api.grants.gov), installed with Grants, must stay active in Setup, Remote Site Settings.</value>
     </values>
     <values>
         <field>Help_Path__c</field>

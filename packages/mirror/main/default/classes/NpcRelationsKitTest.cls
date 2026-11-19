@@ -34,12 +34,7 @@ private class NpcRelationsKitTest {
 					template.Target_Object__c.endsWith(targetByStep.get(key)),
 					key + ' loads ' + targetByStep.get(key)
 				);
-				for (
-					ImportMapping.Column column : ImportMapping.parse(
-							template.Column_Mapping_JSON__c
-						)
-						.getColumns()
-				) {
+				for (ImportMapping.Column column : ImportMapping.parse(template.Column_Mapping_JSON__c).getColumns()) {
 					String heading = column.getSource();
 					Assert.isTrue(
 						step.fields.contains(heading) || heading == 'Role',
@@ -63,10 +58,7 @@ private class NpcRelationsKitTest {
 			new Map<String, Object>{ 'ContactId' => ben, 'RelatedContactId' => ana },
 			new Map<String, Object>{ 'ContactId' => cara, 'RelatedContactId' => ana }
 		};
-		List<Map<String, Object>> kept = NpcRelationsKit.oneSide(
-			rows,
-			new Set<String>{ ana + ben, ben + ana }
-		);
+		List<Map<String, Object>> kept = NpcRelationsKit.oneSide(rows, new Set<String>{ ana + ben, ben + ana });
 		Assert.areEqual(2, kept.size(), 'Ana and Ben once, Cara and Ana once');
 		Assert.areEqual(ana, kept[0].get('ContactId'), 'the side whose person sorts first');
 		Assert.areEqual(cara, kept[1].get('ContactId'), 'held one way only');
@@ -97,26 +89,18 @@ private class NpcRelationsKitTest {
 		System.runAs(TestUsers.admin()) {
 			List<Map<String, Object>> relationships = NpcRelationsKit.shape(
 				'relationships',
-				new List<Map<String, Object>>{
-					new Map<String, Object>{ 'ContactId' => '', 'RelatedContactId' => '' }
-				}
+				new List<Map<String, Object>>{ new Map<String, Object>{ 'ContactId' => '', 'RelatedContactId' => '' } }
 			);
 			Assert.areEqual(1, relationships.size(), 'no reverse side to drop');
 			List<Map<String, Object>> affiliations = NpcRelationsKit.shape(
 				'affiliations',
 				new List<Map<String, Object>>{
-					new Map<String, Object>{
-						'AccountId' => '001000000000004AAA',
-						'Roles' => 'Donor;Advisor'
-					}
+					new Map<String, Object>{ 'AccountId' => '001000000000004AAA', 'Roles' => 'Donor;Advisor' }
 				}
 			);
 			Assert.areEqual(1, affiliations.size(), 'an organization is kept');
 			Assert.areEqual('Donor, Advisor', affiliations[0].get('Role'), 'roles as text');
-			Assert.isTrue(
-				NpcRelationsKit.notOrganizations(new Set<String>()).isEmpty(),
-				'no accounts to check'
-			);
+			Assert.isTrue(NpcRelationsKit.notOrganizations(new Set<String>()).isEmpty(), 'no accounts to check');
 			Assert.areEqual(
 				new Set<String>{ 'x' },
 				NpcRelationsKit.column(
@@ -168,10 +152,7 @@ private class NpcRelationsKitTest {
 				'a present object is read'
 			);
 			Assert.isTrue(
-				NpcRelationsKit.read(
-						'SELECT Id FROM NoSuchObject__x WHERE Id IN :ids',
-						new Set<String>{ people[0].Id }
-					)
+				NpcRelationsKit.read('SELECT Id FROM NoSuchObject__x WHERE Id IN :ids', new Set<String>{ people[0].Id })
 					.isEmpty(),
 				'an absent object reads as none'
 			);
@@ -182,10 +163,7 @@ private class NpcRelationsKitTest {
 	static void aPairHeldOneWayOnlyKeepsEveryRowAndBlankRolesStayBlank() {
 		// runs-as: deploying user (text rows only, no record or permission is read)
 		List<Map<String, Object>> rows = new List<Map<String, Object>>{
-			new Map<String, Object>{
-				'ContactId' => '003000000000002AAA',
-				'RelatedContactId' => '003000000000001AAA'
-			}
+			new Map<String, Object>{ 'ContactId' => '003000000000002AAA', 'RelatedContactId' => '003000000000001AAA' }
 		};
 		Assert.areEqual(1, NpcRelationsKit.oneSide(rows, new Set<String>()).size(), 'one way');
 		List<Map<String, Object>> kept = NpcRelationsKit.organizations(
@@ -201,16 +179,10 @@ private class NpcRelationsKitTest {
 	static void anAffiliationWithAHouseholdIsSkipped() {
 		// runs-as: deploying user (text rows only, no record or permission is read)
 		List<Map<String, Object>> rows = new List<Map<String, Object>>{
-			new Map<String, Object>{
-				'AccountId' => '001000000000001AAA',
-				'Roles' => 'Employee;Board Member'
-			},
+			new Map<String, Object>{ 'AccountId' => '001000000000001AAA', 'Roles' => 'Employee;Board Member' },
 			new Map<String, Object>{ 'AccountId' => '001000000000002AAA', 'Roles' => null }
 		};
-		List<Map<String, Object>> kept = NpcRelationsKit.organizations(
-			rows,
-			new Set<String>{ '001000000000002AAA' }
-		);
+		List<Map<String, Object>> kept = NpcRelationsKit.organizations(rows, new Set<String>{ '001000000000002AAA' });
 		Assert.areEqual(1, kept.size(), 'the household is skipped');
 		Assert.areEqual('Employee, Board Member', kept[0].get('Role'), 'roles as text');
 	}

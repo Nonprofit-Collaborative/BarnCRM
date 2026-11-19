@@ -16,10 +16,10 @@ Admin). If you cannot find the apps, ask your admin. See
 | **BarnCRM Console** | The same work as **BarnCRM** | Console navigation: records open in tabs across the top |
 | **BarnCRM Admin** | BarnCRM Settings and the data tools (admins only) | Standard navigation |
 | **BarnCRM Admin Console** | The same as **BarnCRM Admin** (admins only) | Console navigation |
-| **BarnCRM Fundraising** | Gifts and everything around them (with the Giving module) | A standard app: each record replaces the page |
+| **BarnCRM Fundraising** | Gifts and everything around them (with the Fundraising module) | A standard app: each record replaces the page |
 | **BarnCRM Volunteers** | Jobs, shifts and volunteer hours (with the Volunteers module) | A console, like BarnCRM Console |
 | **BarnCRM Programs** | Programs, the services they offer and the people enrolled in them (with the Programs module) | A console, like BarnCRM Console |
-| **BarnCRM Grants** | Grants applied for and awarded, and what each award requires (with the Funders module) | A console, like BarnCRM Console |
+| **BarnCRM Grants** | Grants applied for and awarded, and what each award requires (with the Grants module) | A console, like BarnCRM Console |
 
 **Which one should I open?** For everyday work, open **BarnCRM** or **BarnCRM Console**: they
 hold the same things and differ only in how records open, so pick the one you like and star it.
@@ -37,7 +37,7 @@ have **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matc
 **Automation** and **Error Log**. You see only the tabs your access allows, so your menu may be shorter. **Find**,
 **Super Importer** and **Super Transformer** are not in the navigation: open them from their
 cards on the **Data Manager** tab. A finished import's **See Every Row** link opens the list
-of its rows, which has no tab of its own in the admin apps. Every tab, including those Giving, Volunteers and Programs add,
+of its rows, which has no tab of its own in the admin apps. Every tab, including those Fundraising, Volunteers and Programs add,
 has its own icon, so a tab is easy to spot in the menu. Administrators also find a **Data
 Dictionary** section inside **Org Optimizer**, which lists every field (and, when asked, the
 flows and Apex triggers that run on each kind of record) and downloads it as a CSV, an
@@ -70,7 +70,7 @@ Fundraising Home, and are in the App Launcher.
 **Fundraising Home** shows five figures, each a link to its list: gifts waiting for a thank
 you, overdue scheduled payments, your asks due this month, open gift batches and running
 stewardship plans. **Enter a Gift** opens Quick Gift Entry. Under **Fundraising Setup** are the
-setup pages that are no longer in the menu (**Donor Level Ladder**, **Stewardship Plan Setup**,
+setup pages that are not in the app's menu (**Donor Level Ladder**, **Stewardship Plan Setup**,
 **Pledge Reminders**, **Receipt Letters**), each shown only to people who may use it; they are
 also tabs in **BarnCRM Admin** and **BarnCRM Admin Console**, and in the App Launcher. Before
 the first gift is saved, **Record Your First Gift** offers **Enter a Gift** and **Import a

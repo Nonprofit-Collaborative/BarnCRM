@@ -58,9 +58,7 @@ public with sharing class ScholarshipAwards {
 		}
 		Decimal given = amount ?? application.Amount_Requested__c;
 		if (given == null || given <= 0) {
-			throw Scholarships.refuse(
-				BarnHelp.text('Scholarships', 'Scholarships_Decide_AmountNeeded')
-			);
+			throw Scholarships.refuse(BarnHelp.text('Scholarships', 'Scholarships_Decide_AmountNeeded'));
 		}
 		Award__c row = new Award__c(
 			Cycle__c = application.Cycle__c,
@@ -96,33 +94,23 @@ public with sharing class ScholarshipAwards {
 		for (String tag : values.keySet()) {
 			html = html.replace(tag, values.get(tag).escapeHtml4());
 		}
-		html =
-			'<html><body style="font-family: sans-serif;">' +
-			html.replace('\n', '<br/>') +
-			'</body></html>';
+		html = '<html><body style="font-family: sans-serif;">' + html.replace('\n', '<br/>') + '</body></html>';
 		ContentVersion file = new ContentVersion(
-			Title = BarnHelp.text(
-				'Scholarships',
-				'Scholarships_Letter_Title',
-				new List<Object>{ row.Name }
-			),
+			Title = BarnHelp.text('Scholarships', 'Scholarships_Letter_Title', new List<Object>{ row.Name }),
 			PathOnClient = row.Name + '.pdf',
 			VersionData = Blob.toPdf(html),
 			FirstPublishLocationId = awardId
 		);
 		insert as user file;
 		update as user new Award__c(Id = awardId, Letter_Sent_Date__c = Date.today());
-		return [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :file.Id WITH USER_MODE]
-		.ContentDocumentId;
+		return [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :file.Id WITH USER_MODE].ContentDocumentId;
 	}
 
 	/** Records the recipient's answer to an Offered award. */
 	public static void respond(Id awardId, Boolean accepted) {
 		Award__c row = award(awardId);
 		if (row.Status__c != 'Offered') {
-			throw Scholarships.refuse(
-				BarnHelp.text('Scholarships', 'Scholarships_Award_NotOffered')
-			);
+			throw Scholarships.refuse(BarnHelp.text('Scholarships', 'Scholarships_Award_NotOffered'));
 		}
 		update as user new Award__c(
 			Id = awardId,
@@ -132,18 +120,11 @@ public with sharing class ScholarshipAwards {
 	}
 
 	/** R-SG12: equal payments of the amount not yet scheduled, a number of months apart. */
-	public static Integer buildSchedule(
-		Id awardId,
-		Integer count,
-		Date firstDate,
-		Integer monthsApart
-	) {
+	public static Integer buildSchedule(Id awardId, Integer count, Date firstDate, Integer monthsApart) {
 		Award__c row = award(awardId);
 		Decimal left = row.Amount__c - (row.Scheduled_Amount__c ?? 0);
 		if (count == null || count < 1 || count > 60 || left <= 0 || firstDate == null) {
-			throw Scholarships.refuse(
-				BarnHelp.text('Scholarships', 'Scholarships_Schedule_Invalid')
-			);
+			throw Scholarships.refuse(BarnHelp.text('Scholarships', 'Scholarships_Schedule_Invalid'));
 		}
 		Decimal each = (left / count).setScale(2, RoundingMode.DOWN);
 		String payee = row.Organization__r?.Name ?? row.Contact__r?.Name;
@@ -192,25 +173,18 @@ public with sharing class ScholarshipAwards {
 	public static Id startRenewal(Id awardId) {
 		Award__c row = award(awardId);
 		if (!row.Renewable__c) {
-			throw Scholarships.refuse(
-				BarnHelp.text('Scholarships', 'Scholarships_Renewal_NotRenewable')
-			);
+			throw Scholarships.refuse(BarnHelp.text('Scholarships', 'Scholarships_Renewal_NotRenewable'));
 		}
 		List<Award_Cycle__c> next = [
 			SELECT Id
 			FROM Award_Cycle__c
-			WHERE
-				Program__c = :row.Cycle__r.Program__c
-				AND Id != :row.Cycle__c
-				AND Status__c IN ('Planned', 'Open')
+			WHERE Program__c = :row.Cycle__r.Program__c AND Id != :row.Cycle__c AND Status__c IN ('Planned', 'Open')
 			WITH USER_MODE
 			ORDER BY Open_Date__c NULLS LAST
 			LIMIT 1
 		];
 		if (next.isEmpty()) {
-			throw Scholarships.refuse(
-				BarnHelp.text('Scholarships', 'Scholarships_Renewal_NoCycle')
-			);
+			throw Scholarships.refuse(BarnHelp.text('Scholarships', 'Scholarships_Renewal_NoCycle'));
 		}
 		Award_Application__c renewal = new Award_Application__c(
 			Cycle__c = next[0].Id,

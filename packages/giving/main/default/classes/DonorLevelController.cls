@@ -53,8 +53,7 @@ public with sharing class DonorLevelController {
 			model.enabled = DonorLevelService.isEnabled();
 			model.canRecalculate = BarnCRMPermissions.canManageSettings();
 			model.sourceFieldLabel = sourceLabel();
-			model.lastRecalculated = Giving_Settings__c.getOrgDefaults()
-				.Donor_Levels_Last_Recalculated__c;
+			model.lastRecalculated = Giving_Settings__c.getOrgDefaults().Donor_Levels_Last_Recalculated__c;
 			Map<Id, Integer> counts = DonorLevelSelector.countDonorsByLevel();
 			model.rungs = new List<RungModel>();
 			for (Donor_Level__c level : DonorLevelSelector.selectAllLevels()) {
@@ -88,11 +87,7 @@ public with sharing class DonorLevelController {
 			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_DonorLevels_TurnOnFirst'));
 		}
 		try {
-			return AsyncStarter.batch(
-				new DonorLevelBatch(),
-				DonorLevelSchedulable.CHUNK_SIZE,
-				'DonorLevelController'
-			);
+			return AsyncStarter.batch(new DonorLevelBatch(), DonorLevelSchedulable.CHUNK_SIZE, 'DonorLevelController');
 		} catch (Exception failure) {
 			throw ERRORS.wrap(failure);
 		}
@@ -104,9 +99,7 @@ public with sharing class DonorLevelController {
 	 */
 	private static String sourceLabel() {
 		String source = DonorLevelService.sourceField();
-		Map<String, Schema.SObjectField> fields = Account.SObjectType.getDescribe(
-				SObjectDescribeOptions.DEFERRED
-			)
+		Map<String, Schema.SObjectField> fields = Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 			.fields.getMap();
 		for (Schema.SObjectField token : fields.values()) {
 			Schema.DescribeFieldResult field = token.getDescribe();

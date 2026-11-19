@@ -54,9 +54,7 @@ private class FormAttachmentExtensionsTest {
 		}
 
 		public void received(FormSubmissionReceipt receipt) {
-			insert as user TestDataFactory.organization(
-				new Account(Name = 'Written Before The Failure')
-			);
+			insert as user TestDataFactory.organization(new Account(Name = 'Written Before The Failure'));
 			throw new System.TypeException('The module refused it');
 		}
 	}
@@ -79,29 +77,17 @@ private class FormAttachmentExtensionsTest {
 			Account gala = context();
 			// Any record identifier stands for the form: Core never reads it.
 			Recording events = new Recording(gala.Id);
-			register(
-				new Map<String, FormAttachmentExtension>{
-					EVENTS_CLASS => (FormAttachmentExtension) events
-				}
-			);
+			register(new Map<String, FormAttachmentExtension>{ EVENTS_CLASS => (FormAttachmentExtension) events });
 
 			FormSubmissionReceipt receipt = new FormSubmissionReceipt();
 			receipt.contextRecordId = gala.Id;
 			receipt.answers.put('email', 'pat@example.org');
 			List<String> failures = FormAttachmentExtensions.notify(receipt);
 
-			Assert.areEqual(
-				gala.Id,
-				FormAttachmentExtensions.formFor(gala.Id),
-				'The form it attached'
-			);
+			Assert.areEqual(gala.Id, FormAttachmentExtensions.formFor(gala.Id), 'The form it attached');
 			Assert.isTrue(failures.isEmpty(), 'Nothing failed');
 			Assert.areEqual(1, events.heard.size(), 'The module heard the submission once');
-			Assert.areEqual(
-				'pat@example.org',
-				events.heard[0].answers.get('email'),
-				'With its answers'
-			);
+			Assert.areEqual('pat@example.org', events.heard[0].answers.get('email'), 'With its answers');
 			Assert.isNull(FormAttachmentExtensions.formFor(null), 'No record, no form');
 			Assert.isTrue(
 				FormAttachmentExtensions.notify(new FormSubmissionReceipt()).isEmpty(),
@@ -148,11 +134,7 @@ private class FormAttachmentExtensionsTest {
 			[
 				SELECT COUNT()
 				FROM Error_Log__c
-				WHERE
-					Context__c IN (
-						'FormAttachmentExtensions.notify',
-						'FormAttachmentExtensions.formFor'
-					)
+				WHERE Context__c IN ('FormAttachmentExtensions.notify', 'FormAttachmentExtensions.formFor')
 				WITH SYSTEM_MODE
 			],
 			'Both failures are in the Error Log'

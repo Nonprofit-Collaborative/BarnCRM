@@ -9,15 +9,7 @@ public with sharing class InstallmentSelector {
 	 */
 	public List<Installment__c> selectByCommitmentIds(Set<Id> commitmentIds) {
 		return [
-			SELECT
-				Id,
-				Name,
-				Commitment__c,
-				Sequence__c,
-				Due_Date__c,
-				Expected_Amount__c,
-				Status__c,
-				Paid_Amount__c
+			SELECT Id, Name, Commitment__c, Sequence__c, Due_Date__c, Expected_Amount__c, Status__c, Paid_Amount__c
 			FROM Installment__c
 			WHERE Commitment__c IN :commitmentIds
 			WITH USER_MODE
@@ -30,15 +22,7 @@ public with sharing class InstallmentSelector {
 	 */
 	public List<Installment__c> selectByIds(Set<Id> installmentIds) {
 		return [
-			SELECT
-				Id,
-				Name,
-				Commitment__c,
-				Sequence__c,
-				Due_Date__c,
-				Expected_Amount__c,
-				Status__c,
-				Paid_Amount__c
+			SELECT Id, Name, Commitment__c, Sequence__c, Due_Date__c, Expected_Amount__c, Status__c, Paid_Amount__c
 			FROM Installment__c
 			WHERE Id IN :installmentIds
 			WITH USER_MODE
@@ -51,11 +35,7 @@ public with sharing class InstallmentSelector {
 	 * one of them. No date bound: a gift entry screen lists them all for a person to choose
 	 * from (R-DM8). Earliest due first.
 	 */
-	public List<Installment__c> selectOpenForDonors(
-		Set<Id> donorIds,
-		Set<Id> householdIds,
-		Integer maximum
-	) {
+	public List<Installment__c> selectOpenForDonors(Set<Id> donorIds, Set<Id> householdIds, Integer maximum) {
 		return [
 			SELECT
 				Id,

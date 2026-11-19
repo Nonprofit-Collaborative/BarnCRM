@@ -10,14 +10,14 @@ next term and marks the old one Renewed, so you keep each year's history and pay
 - **Levels** are what you sell: a type and tier (Individual, Family Gold, Corporate Partner), the
   dues, how many months a term lasts, and how many grace days a member keeps after it ends.
 - **Benefits** are listed on each level (free admission, a newsletter, two guest passes).
-- **Renewals** come from staff, from Giving gifts to the level's fund when Giving is installed,
+- **Renewals** come from staff, from Fundraising gifts to the level's fund when Fundraising is installed,
   from a recurring gift that keeps a membership going, or from dues paid online through BarnCRM
   Payments.
 - **Lapse handling** runs each morning: an ended membership goes to Grace, then Lapsed.
 - **Reminders** can email members before their membership ends (off until you turn them on).
 - **A member directory** on your website lists members who opt in, through Portal Builder.
 
-Memberships does not use Opportunities and does not need Giving or Payments; it uses them when
+Memberships does not use Opportunities and does not need Fundraising or Payments; it uses them when
 they are installed.
 
 ## How to Turn It On
@@ -25,7 +25,7 @@ they are installed.
 ### Before You Install
 
 - Memberships is offered in **both editions** (see [Editions](editions.md)).
-- It needs BarnCRM Core only. Giving (renewals from gifts) and Payments (dues paid online) are
+- It needs BarnCRM Core only. Fundraising (renewals from gifts) and Payments (dues paid online) are
   optional.
 
 ### Installing
@@ -33,7 +33,11 @@ they are installed.
 Install it from **Module Manager** (see [Module Manager](module-manager.md)). When the install
 finishes, BarnCRM gives you, the person who installed it, the **Memberships Admin** permission
 set. Like every module it is installed **off**: turn it on in Module Manager when you are ready.
-Its tabs join the BarnCRM apps: **Memberships** for staff and **Membership Levels** for admins.
+It has its own app, **BarnCRM Memberships** (Memberships, Member Certifications, Membership
+Levels, Certifications, Reports and Error Log), shown to everyone with a Memberships permission
+set; a scratch or Developer Edition org gets the tabs only. Its tabs also join the BarnCRM apps:
+**Memberships** and **Member Certifications** for staff, **Membership Levels** and
+**Certifications** for admins.
 
 ### Who Gets What
 
@@ -58,7 +62,7 @@ BarnCRM gives the Memberships permission sets from the roles on the **Access** p
      not expire, such as a lifetime membership.
    - **Grace Days**: how long a member stays in **Grace** after the end before **Lapsed**
      (default 30).
-   - **Giving Fund ID**: only for renewals from gifts (see below). Leave blank otherwise.
+   - **Fund ID**: only for renewals from gifts (see below). Leave blank otherwise.
    - **Active**: clear it to stop offering the level. Existing memberships keep it.
 3. Save, then add the level's **Benefits** from its Benefits list: a name, details, a quantity
    when counted, and a sort order.
@@ -91,9 +95,9 @@ Online Payment or Import.
 On a membership, click **Renew** in the membership panel and choose the level (the same one by
 default). BarnCRM adds the next term and marks this one Renewed.
 
-### From Giving Gifts (When Giving Is Installed)
+### From Fundraising Gifts (When Fundraising Is Installed)
 
-1. On each level that gifts should pay for, enter the **Giving Fund ID**: open the fund in Giving,
+1. On each level that gifts should pay for, enter the **Fund ID**: open the fund in Fundraising,
    copy the record ID from the address bar (the 18 characters after `/Fund__c/`) and paste it.
 2. Leave **Renew memberships from gifts** on in **BarnCRM Settings**, **Memberships** (it ships
    on).
@@ -152,7 +156,7 @@ Reminders are **off** when you install, because they email your members. To turn
 | Send renewal reminders | Off | Emails each member once before their membership ends |
 | Days before to remind | 30 | How many days before the end the reminder goes (1 to 365) |
 | Renewal reminder template | BarnCRM_Membership_Renewal | The email template used; BarnCRM ships one for you to edit |
-| Renew memberships from gifts | On | Gifts to a level's Giving fund pay memberships |
+| Renew memberships from gifts | On | Gifts to a level's Fundraising fund pay memberships |
 
 A reminder goes to the membership's contact when they have an email address and have not opted
 out of email. A membership with no contact (a household with no named contact) gets no reminder;
@@ -239,7 +243,7 @@ Supporter, Business and Lifetime) with their benefits, and fourteen memberships 
 people, households and organizations. They show a renewal that points back to the term it
 renewed, memberships due for renewal in 10 to 25 days, one in grace, two lapsed, one pending,
 one cancelled, a lifetime membership with no end date, and three members listed in the
-directory. The sample is not linked to Giving gifts. **Remove Sample Data** deletes only the
+directory. The sample is not linked to Fundraising gifts. **Remove Sample Data** deletes only the
 levels and memberships the loader created (they carry a Sample Data checkbox); your own levels
 and memberships stay.
 
@@ -254,7 +258,7 @@ cleared.
 
 | Problem | What to check |
 |---|---|
-| A gift did not renew a membership | The level's Giving Fund ID, the gift is Received and allocated to that fund, the gift meets the level's dues, Renew memberships from gifts is on, the gift is from the last 45 days |
+| A gift did not renew a membership | The level's Fund ID, the gift is Received and allocated to that fund, the gift meets the level's dues, Renew memberships from gifts is on, the gift is from the last 45 days |
 | Email Payment Link says Payments is not ready | Payments is installed, turned on and its keys are entered on Payments Setup |
 | A paid membership is still Pending | Payments processing is scheduled (Health Check); payments are applied every 15 minutes |
 | Renew on a certification is refused | Credits Toward Renewal is below Credits Required, the certification never expires (Valid Months 0), or it is Pending or Revoked (use Grant) |

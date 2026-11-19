@@ -41,10 +41,7 @@ private class EventSurveyControllerTest {
 		}
 
 		public String publicLink(Id formId, Id contextRecordId) {
-			return 'https://zzforms.example.org/FormsPublic?form=' +
-				formId +
-				'&record=' +
-				contextRecordId;
+			return 'https://zzforms.example.org/FormsPublic?form=' + formId + '&record=' + contextRecordId;
 		}
 	}
 
@@ -143,15 +140,8 @@ private class EventSurveyControllerTest {
 			attachment.received(receipt(sam.Id, 5, 'Great'));
 			Test.stopTest();
 
-			Assert.isTrue(
-				attachment.handles(Event_Attendee__c.SObjectType),
-				'Attendees take a form'
-			);
-			Assert.areEqual(
-				FORM_KEY,
-				String.valueOf(attachment.formFor(sam.Id)),
-				'The event survey'
-			);
+			Assert.isTrue(attachment.handles(Event_Attendee__c.SObjectType), 'Attendees take a form');
+			Assert.areEqual(FORM_KEY, String.valueOf(attachment.formFor(sam.Id)), 'The event survey');
 			Assert.areEqual(
 				1,
 				[SELECT COUNT() FROM Event_Survey_Response__c WITH USER_MODE],
@@ -162,9 +152,7 @@ private class EventSurveyControllerTest {
 			Assert.areEqual(1, result.attended);
 			Assert.areEqual(0, result.sent, 'No link has been sent yet');
 			Assert.areEqual('Lee', result.responses[0].name.substringAfter(' '));
-			Map<String, Object> answers = (Map<String, Object>) JSON.deserializeUntyped(
-				result.responses[0].answers
-			);
+			Map<String, Object> answers = (Map<String, Object>) JSON.deserializeUntyped(result.responses[0].answers);
 			Assert.areEqual('Great', answers.get('comment'));
 			Assert.areEqual(sam.Id, result.responses[0].attendeeId);
 		}
@@ -181,16 +169,11 @@ private class EventSurveyControllerTest {
 			update as user stayed;
 			EventFormAttachment attachment = new EventFormAttachment();
 
-			Assert.isTrue(
-				attachment.signedClaim(came.Id),
-				'An attendee link carries a signed claim'
-			);
+			Assert.isTrue(attachment.signedClaim(came.Id), 'An attendee link carries a signed claim');
 			Assert.isFalse(attachment.signedClaim(event.Id), 'A registration link does not');
 			Assert.isNotNull(attachment.formFor(came.Id), 'Someone who attended is surveyed');
 			Assert.isNull(attachment.formFor(stayed.Id), 'A no-show is refused');
-			Map<Id, String> links = EventSurveyService.linksFor(
-				new List<Event_Attendee__c>{ came, stayed }
-			);
+			Map<Id, String> links = EventSurveyService.linksFor(new List<Event_Attendee__c>{ came, stayed });
 			Assert.isTrue(links.containsKey(came.Id));
 			Assert.isFalse(links.containsKey(stayed.Id), 'No link for a no-show');
 		}
@@ -228,9 +211,7 @@ private class EventSurveyControllerTest {
 			Assert.isNull(new EventFormAttachment().formFor(sam.Id), 'No survey chosen');
 			Assert.isNull(EventSurveyService.formId('not an id'));
 			Assert.isNull(EventSurveyService.formId(null));
-			Assert.isTrue(
-				EventSurveyService.linksFor(new List<Event_Attendee__c>{ sam }).isEmpty()
-			);
+			Assert.isTrue(EventSurveyService.linksFor(new List<Event_Attendee__c>{ sam }).isEmpty());
 		}
 	}
 
@@ -238,9 +219,7 @@ private class EventSurveyControllerTest {
 	static void clipsLongAnswersToFitTheField() {
 		System.runAs(staff()) {
 			String long1 = 'x'.repeat(40000);
-			String json = EventSurveyService.answersJson(
-				new Map<String, Object>{ 'comment' => long1, 'rating' => 4 }
-			);
+			String json = EventSurveyService.answersJson(new Map<String, Object>{ 'comment' => long1, 'rating' => 4 });
 			Assert.isTrue(json.length() <= EventSurveyService.MAX_ANSWERS_LENGTH);
 			Assert.isTrue(json.contains('"rating":4'));
 			Assert.areEqual('{}', EventSurveyService.answersJson(null));
@@ -253,9 +232,7 @@ private class EventSurveyControllerTest {
 			FormCatalogTestSupport.install(new Catalog());
 			OrgSettingsSystemWriter.save(
 				Events_Settings__c.SObjectType,
-				new Map<Schema.SObjectField, Object>{
-					Events_Settings__c.Follow_Ups_Enabled__c => true
-				}
+				new Map<Schema.SObjectField, Object>{ Events_Settings__c.Follow_Ups_Enabled__c => true }
 			);
 			SettingsService.clearCaches();
 			Event__c surveyed = past(FORM_KEY);
@@ -265,10 +242,7 @@ private class EventSurveyControllerTest {
 			EventEmailService.emailSender = stub;
 
 			Test.startTest();
-			Database.QueryLocatorIterator it = EventEmailService.locator(
-					EventEmailService.PHASE_FOLLOW_UP
-				)
-				.iterator();
+			Database.QueryLocatorIterator it = EventEmailService.locator(EventEmailService.PHASE_FOLLOW_UP).iterator();
 			List<Event_Attendee__c> due = new List<Event_Attendee__c>();
 			while (it.hasNext()) {
 				due.add((Event_Attendee__c) it.next());
@@ -300,15 +274,10 @@ private class EventSurveyControllerTest {
 				'His own link'
 			);
 			Assert.isNull(
-				[SELECT Survey_Link__c FROM Event_Attendee__c WHERE Id = :ray.Id WITH USER_MODE]
-				.Survey_Link__c,
+				[SELECT Survey_Link__c FROM Event_Attendee__c WHERE Id = :ray.Id WITH USER_MODE].Survey_Link__c,
 				'No survey, no link'
 			);
-			Assert.areEqual(
-				1,
-				EventSurveyController.getSurvey(surveyed.Id).sent,
-				'One survey link sent'
-			);
+			Assert.areEqual(1, EventSurveyController.getSurvey(surveyed.Id).sent, 'One survey link sent');
 		}
 	}
 }

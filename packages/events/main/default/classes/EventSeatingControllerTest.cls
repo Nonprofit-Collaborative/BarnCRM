@@ -23,12 +23,7 @@ private class EventSeatingControllerTest {
 			End__c = start.addHours(3)
 		);
 		insert as user record;
-		insert as user new Ticket_Type__c(
-			Event__c = record.Id,
-			Name = 'General',
-			Price__c = 20,
-			Active__c = true
-		);
+		insert as user new Ticket_Type__c(Event__c = record.Id, Name = 'General', Price__c = 20, Active__c = true);
 		return record;
 	}
 
@@ -51,12 +46,7 @@ private class EventSeatingControllerTest {
 
 	private static String tableJson(Id eventId, String id, String name, Integer capacity) {
 		return JSON.serialize(
-			new Map<String, Object>{
-				'id' => id,
-				'eventId' => eventId,
-				'name' => name,
-				'capacity' => capacity
-			}
+			new Map<String, Object>{ 'id' => id, 'eventId' => eventId, 'name' => name, 'capacity' => capacity }
 		);
 	}
 
@@ -84,9 +74,7 @@ private class EventSeatingControllerTest {
 			EventSeatingController.Seating before = EventSeatingController.getSeating(event.Id);
 			List<Map<String, Object>> seats = new List<Map<String, Object>>();
 			for (EventSeatingController.Guest guest : before.guests) {
-				seats.add(
-					new Map<String, Object>{ 'attendeeId' => guest.id, 'tableId' => tableId }
-				);
+				seats.add(new Map<String, Object>{ 'attendeeId' => guest.id, 'tableId' => tableId });
 			}
 			Integer moved = EventSeatingController.assignSeats(event.Id, JSON.serialize(seats));
 			EventSeatingController.Seating seated = EventSeatingController.getSeating(event.Id);
@@ -95,10 +83,7 @@ private class EventSeatingControllerTest {
 				event.Id,
 				JSON.serialize(
 					new List<Map<String, Object>>{
-						new Map<String, Object>{
-							'attendeeId' => seated.guests[0].id,
-							'tableId' => null
-						}
+						new Map<String, Object>{ 'attendeeId' => seated.guests[0].id, 'tableId' => null }
 					}
 				)
 			);
@@ -135,10 +120,7 @@ private class EventSeatingControllerTest {
 					event.Id,
 					JSON.serialize(
 						new List<Map<String, Object>>{
-							new Map<String, Object>{
-								'attendeeId' => seating.guests[0].id,
-								'tableId' => otherTable
-							}
+							new Map<String, Object>{ 'attendeeId' => seating.guests[0].id, 'tableId' => otherTable }
 						}
 					)
 				);
@@ -176,10 +158,7 @@ private class EventSeatingControllerTest {
 				event.Id,
 				JSON.serialize(
 					new List<Map<String, Object>>{
-						new Map<String, Object>{
-							'attendeeId' => seating.guests[0].id,
-							'tableId' => tableId
-						}
+						new Map<String, Object>{ 'attendeeId' => seating.guests[0].id, 'tableId' => tableId }
 					}
 				)
 			);

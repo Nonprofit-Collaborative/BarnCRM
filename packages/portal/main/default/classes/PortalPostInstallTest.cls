@@ -23,11 +23,7 @@ private class PortalPostInstallTest {
 	static void theInstallerGetsTheAdminSetOnce() {
 		System.runAs(TestUsers.admin()) {
 			Id fresh = TestDataFactory.createUser('Installer', new List<String>()).Id;
-			Id alreadyHolding = TestDataFactory.createUser(
-					'Holder',
-					new List<String>{ 'Portal_Admin' }
-				)
-				.Id;
+			Id alreadyHolding = TestDataFactory.createUser('Holder', new List<String>{ 'Portal_Admin' }).Id;
 
 			Test.startTest();
 			Test.testInstall(new PortalPostInstall(), null);
@@ -37,10 +33,7 @@ private class PortalPostInstallTest {
 
 			Assert.areEqual(1, adminSetsHeldBy(fresh), 'The installer holds the admin set');
 			Assert.areEqual(1, adminSetsHeldBy(alreadyHolding), 'Never given twice');
-			Assert.isFalse(
-				Portal_Settings__c.getOrgDefaults().Enabled__c == true,
-				'Portal Sign-In ships off'
-			);
+			Assert.isFalse(Portal_Settings__c.getOrgDefaults().Enabled__c == true, 'Portal Sign-In ships off');
 		}
 	}
 

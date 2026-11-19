@@ -17,10 +17,7 @@ private class ImportUndoTest {
 		ImportEntityProcessors.noneForTest = true;
 		TestDataFactory.defaultSettings();
 		Import_Batch__c batch = ImportTestDataFactory.batch(
-			ImportTestDataFactory.template(
-				ImportTestDataFactory.donorMapping(),
-				ImportTemplateService.RULE_EMAIL
-			)
+			ImportTestDataFactory.template(ImportTestDataFactory.donorMapping(), ImportTemplateService.RULE_EMAIL)
 		);
 		batch.Is_Dry_Run__c = false;
 		batch.Status__c = ImportBatchService.STATUS_COMPLETE;
@@ -77,11 +74,7 @@ private class ImportUndoTest {
 	/** A person the import created, and the household it created for them, both tagged. */
 	private static Contact importedPerson(Import_Batch__c batch, String lastName) {
 		Contact person = TestDataFactory.person(
-			new Contact(
-				FirstName = 'Ana',
-				LastName = lastName,
-				Created_By_Import_Batch__c = batch.Id
-			)
+			new Contact(FirstName = 'Ana', LastName = lastName, Created_By_Import_Batch__c = batch.Id)
 		);
 		insert person;
 		person = [SELECT Id, AccountId FROM Contact WHERE Id = :person.Id];
@@ -136,11 +129,7 @@ private class ImportUndoTest {
 	/** More records than any test here imports, so a pass given this is one chunk. */
 	private static final Integer MAX_ONE_CHUNK = 10000;
 
-	private static void runDeletePasses(
-		Import_Batch__c batch,
-		Integer total,
-		Datetime undoStartedAt
-	) {
+	private static void runDeletePasses(Import_Batch__c batch, Integer total, Datetime undoStartedAt) {
 		runDeletePasses(batch, total, undoStartedAt, null);
 	}
 
@@ -266,8 +255,8 @@ private class ImportUndoTest {
 	}
 
 	private static Boolean exists(Id recordId) {
-		return [SELECT COUNT() FROM Account WHERE Id = :recordId] +
-			[SELECT COUNT() FROM Contact WHERE Id = :recordId] > 0;
+		return [SELECT COUNT() FROM Account WHERE Id = :recordId] + [SELECT COUNT() FROM Contact WHERE Id = :recordId] >
+			0;
 	}
 
 	@IsTest
@@ -295,9 +284,7 @@ private class ImportUndoTest {
 			Import_Batch__c batch = committedBatch();
 			Contact imported = importedPerson(batch, 'Ramirez');
 			Account organization = importedOrganization(batch);
-			Contact existing = TestDataFactory.person(
-				new Contact(FirstName = 'Sam', LastName = 'Okafor')
-			);
+			Contact existing = TestDataFactory.person(new Contact(FirstName = 'Sam', LastName = 'Okafor'));
 			insert existing;
 
 			undo(batch);
@@ -317,15 +304,8 @@ private class ImportUndoTest {
 				FROM Import_Batch__c
 				WHERE Id = :batch.Id
 			];
-			Assert.areEqual(
-				ImportBatchService.STATUS_UNDONE,
-				after.Status__c,
-				'The batch is Undone.'
-			);
-			Assert.isTrue(
-				after.Run_Log__c.contains(UserInfo.getName()),
-				'And the run log says who undid it (R-IB9).'
-			);
+			Assert.areEqual(ImportBatchService.STATUS_UNDONE, after.Status__c, 'The batch is Undone.');
+			Assert.isTrue(after.Run_Log__c.contains(UserInfo.getName()), 'And the run log says who undid it (R-IB9).');
 		}
 	}
 
@@ -345,10 +325,7 @@ private class ImportUndoTest {
 
 			undo(batch);
 
-			Assert.isTrue(
-				exists(imported.Id),
-				'Somebody recorded an affiliation for this person since.'
-			);
+			Assert.isTrue(exists(imported.Id), 'Somebody recorded an affiliation for this person since.');
 			Assert.isTrue(exists(organization.Id), 'And for this organization.');
 			Assert.isTrue(exists(imported.AccountId), 'The kept person keeps their household.');
 			Assert.isTrue(
@@ -393,10 +370,7 @@ private class ImportUndoTest {
 			// not the undo: an edit since.
 			undo(batch, Datetime.now().addHours(1));
 
-			Assert.isTrue(
-				exists(imported.Id),
-				'An edit since the import keeps the record (R-IB9).'
-			);
+			Assert.isTrue(exists(imported.Id), 'An edit since the import keeps the record (R-IB9).');
 			Assert.isTrue(
 				undoJournal(batch).contains(BarnHelp.text('Core', 'Core_Import_UndoKeptEdited')),
 				'And the journal says why.'
@@ -440,10 +414,7 @@ private class ImportUndoTest {
 			User jo = TestUsers.standardUserWith('Jo', new List<String>{ TestUsers.CORE_ADMIN });
 			System.runAs(jo) {
 				// Whatever Jo may see, the save is hers.
-				Database.update(
-					new Contact(Id = edited.Id, Title = 'Board chair'),
-					AccessLevel.SYSTEM_MODE
-				);
+				Database.update(new Contact(Id = edited.Id, Title = 'Board chair'), AccessLevel.SYSTEM_MODE);
 			}
 			Integer total = ImportUndoService.preview(batch.Id).total;
 			System.abortJob(ImportUndoService.start(batch.Id, total));
@@ -568,10 +539,7 @@ private class ImportUndoTest {
 	 * other than the committer and the undo, as the Automated Process user makes it.
 	 */
 	private static void savedByARollup(Id contactId) {
-		User rollupQueue = TestUsers.standardUserWith(
-			'Queue',
-			new List<String>{ TestUsers.CORE_ADMIN }
-		);
+		User rollupQueue = TestUsers.standardUserWith('Queue', new List<String>{ TestUsers.CORE_ADMIN });
 		System.runAs(rollupQueue) {
 			Contact totals = new Contact(Id = contactId);
 			totals.put(stampField(), Datetime.now());
@@ -592,10 +560,7 @@ private class ImportUndoTest {
 			ImportUndoBatch.isRollupSave(stamp.addMinutes(1), stamp),
 			'A save a minute later is something else.'
 		);
-		Assert.isFalse(
-			ImportUndoBatch.isRollupSave(stamp.addSeconds(-1), stamp),
-			'As is one before the stamp.'
-		);
+		Assert.isFalse(ImportUndoBatch.isRollupSave(stamp.addSeconds(-1), stamp), 'As is one before the stamp.');
 		Assert.isFalse(ImportUndoBatch.isRollupSave(stamp, null), 'No stamp, no rollup.');
 	}
 
@@ -611,8 +576,7 @@ private class ImportUndoTest {
 			ImportUndoBatch.jobErrorsForTest = 1;
 			// The last pass finishing: the state execute would have set is lost with the chunk,
 			// and only the job's error count says what happened.
-			new ImportUndoBatch(batch.Id, total, ImportUndoBatch.PASS_ACCOUNTS, 0, false)
-				.finish(null);
+			new ImportUndoBatch(batch.Id, total, ImportUndoBatch.PASS_ACCOUNTS, 0, false).finish(null);
 
 			Assert.areEqual(
 				ImportBatchService.STATUS_UNDO_FAILED,
@@ -654,9 +618,7 @@ private class ImportUndoTest {
 			);
 			Assert.areEqual(
 				ImportBatchService.STATUS_UNDO_FAILED,
-				ImportUndoService.effectiveStatus(
-					[SELECT Status__c FROM Import_Batch__c WHERE Id = :batch.Id]
-				),
+				ImportUndoService.effectiveStatus([SELECT Status__c FROM Import_Batch__c WHERE Id = :batch.Id]),
 				'And it is shown as Undo failed (R-IB8).'
 			);
 		}
@@ -668,21 +630,14 @@ private class ImportUndoTest {
 			Import_Batch__c batch = committedBatch();
 			Contact imported = importedPerson(batch, 'Ramirez');
 			Contact joined = TestDataFactory.person(
-				new Contact(
-					FirstName = 'Luis',
-					LastName = 'Ramirez',
-					AccountId = imported.AccountId
-				)
+				new Contact(FirstName = 'Luis', LastName = 'Ramirez', AccountId = imported.AccountId)
 			);
 			insert joined;
 
 			undo(batch);
 
 			Assert.isFalse(exists(imported.Id), 'The imported person is gone.');
-			Assert.isTrue(
-				exists(imported.AccountId),
-				'Their household is kept for the person in it.'
-			);
+			Assert.isTrue(exists(imported.AccountId), 'Their household is kept for the person in it.');
 			Assert.isTrue(exists(joined.Id), 'Who is untouched.');
 		}
 	}
@@ -719,11 +674,7 @@ private class ImportUndoTest {
 		for (Integer i = 0; i < howMany; i++) {
 			people.add(
 				TestDataFactory.person(
-					new Contact(
-						FirstName = 'Ana',
-						LastName = 'Bulk' + i,
-						Created_By_Import_Batch__c = batch.Id
-					)
+					new Contact(FirstName = 'Ana', LastName = 'Bulk' + i, Created_By_Import_Batch__c = batch.Id)
 				)
 			);
 		}
@@ -731,9 +682,7 @@ private class ImportUndoTest {
 		people = [SELECT Id, AccountId FROM Contact WHERE Id IN :people];
 		List<Account> households = new List<Account>();
 		for (Contact person : people) {
-			households.add(
-				new Account(Id = person.AccountId, Created_By_Import_Batch__c = batch.Id)
-			);
+			households.add(new Account(Id = person.AccountId, Created_By_Import_Batch__c = batch.Id));
 		}
 		update households;
 		return people;
@@ -753,14 +702,8 @@ private class ImportUndoTest {
 			undo(batch, Datetime.now(), ImportUndoBatch.PASS_CONTACTS);
 
 			Assert.isFalse(exists(credited.Id), 'The person goes: ' + whyKept(batch));
-			Assert.isTrue(
-				exists(credited.AccountId),
-				'The household its gifts are credited to stays.'
-			);
-			Assert.isFalse(
-				exists(other.AccountId),
-				'A household nothing is credited to goes: ' + whyKept(batch)
-			);
+			Assert.isTrue(exists(credited.AccountId), 'The household its gifts are credited to stays.');
+			Assert.isFalse(exists(other.AccountId), 'A household nothing is credited to goes: ' + whyKept(batch));
 			Assert.isTrue(
 				undoJournal(batch).contains(BarnHelp.text('Core', 'Core_Import_UndoKeptCredited')),
 				'The reason is journaled (R-IB9).'
@@ -905,15 +848,9 @@ private class ImportUndoTest {
 	static void undoPutsBackOnlyTheValuesNobodyHasChangedSince() {
 		System.runAs(TestUsers.admin()) {
 			Import_Batch__c batch = committedBatch();
-			Contact untouched = TestDataFactory.person(
-				new Contact(LastName = 'Ramirez', MailingCity = 'Portland')
-			);
-			Contact corrected = TestDataFactory.person(
-				new Contact(LastName = 'Lee', MailingCity = 'Eugene')
-			);
-			Contact alreadyBack = TestDataFactory.person(
-				new Contact(LastName = 'Okafor', MailingCity = 'Salem')
-			);
+			Contact untouched = TestDataFactory.person(new Contact(LastName = 'Ramirez', MailingCity = 'Portland'));
+			Contact corrected = TestDataFactory.person(new Contact(LastName = 'Lee', MailingCity = 'Eugene'));
+			Contact alreadyBack = TestDataFactory.person(new Contact(LastName = 'Okafor', MailingCity = 'Salem'));
 			insert new List<Contact>{ untouched, corrected, alreadyBack };
 			ImportJournalService.write(
 				batch.Id,
@@ -924,11 +861,7 @@ private class ImportUndoTest {
 					cityWas(alreadyBack, 'Salem', 'Portland')
 				}
 			);
-			Assert.areEqual(
-				3,
-				ImportUndoService.preview(batch.Id).updates,
-				'The preview counts them.'
-			);
+			Assert.areEqual(3, ImportUndoService.preview(batch.Id).updates, 'The preview counts them.');
 
 			// Latched only: the passes below run here, the restore among them.
 			System.abortJob(ImportUndoService.start(batch.Id, 0));
@@ -944,11 +877,7 @@ private class ImportUndoTest {
 				ImportJournalService.pages(batch.Id, ImportJournalService.PHASE_UNDO, 10)[0]
 			);
 			Assert.areEqual(1, journal.size(), 'Only the correction is journaled as not put back.');
-			Assert.areEqual(
-				ImportJournalService.ACTION_NOT_RESTORED,
-				journal[0].get('action'),
-				'With its reason.'
-			);
+			Assert.areEqual(ImportJournalService.ACTION_NOT_RESTORED, journal[0].get('action'), 'With its reason.');
 		}
 	}
 
@@ -957,10 +886,7 @@ private class ImportUndoTest {
 	static void journaledValuesCompareAndComeBackTyped() {
 		System.runAs(TestUsers.admin()) {
 			Date birthday = Date.newInstance(1970, 5, 17);
-			Assert.isTrue(
-				ImportUndoBatch.same(birthday, '1970-05-17'),
-				'A date by its written form.'
-			);
+			Assert.isTrue(ImportUndoBatch.same(birthday, '1970-05-17'), 'A date by its written form.');
 			Assert.isTrue(ImportUndoBatch.same(5, 5.0), 'A number as a number.');
 			Assert.isFalse(ImportUndoBatch.same('Salem', 'salem'), 'Text exactly.');
 			Assert.isTrue(ImportUndoBatch.same(null, null), 'Nothing is nothing.');
@@ -1010,11 +936,7 @@ private class ImportUndoTest {
 			return tagged;
 		}
 
-		public Map<Id, String> reasonsToKeep(
-			Id batchId,
-			Schema.SObjectType type,
-			Set<Id> recordIds
-		) {
+		public Map<Id, String> reasonsToKeep(Id batchId, Schema.SObjectType type, Set<Id> recordIds) {
 			askedAbout.add(type);
 			if (throwOnKeep) {
 				throw new IllegalArgumentException('stub cannot tell');
@@ -1106,11 +1028,7 @@ private class ImportUndoTest {
 				ImportEntityProcessors.taggedTypes().isEmpty(),
 				'An object that does not name the import is left out.'
 			);
-			Assert.areEqual(
-				0,
-				ImportUndoService.preview(batch.Id).others.size(),
-				'And not counted.'
-			);
+			Assert.areEqual(0, ImportUndoService.preview(batch.Id).others.size(), 'And not counted.');
 		}
 	}
 
@@ -1124,14 +1042,8 @@ private class ImportUndoTest {
 			// The module pass is the one asserted on, so it gets a chunk's own limits.
 			undo(batch, Datetime.now(), ImportUndoBatch.PASS_TAGGED_PREFIX + 'Contact');
 
-			Assert.isFalse(
-				exists(imported.Id),
-				'The tagged record went in the module pass: ' + whyKept(batch)
-			);
-			Assert.isFalse(
-				exists(imported.AccountId),
-				'And its household after it: ' + whyKept(batch)
-			);
+			Assert.isFalse(exists(imported.Id), 'The tagged record went in the module pass: ' + whyKept(batch));
+			Assert.isFalse(exists(imported.AccountId), 'And its household after it: ' + whyKept(batch));
 			Assert.isTrue(
 				stub.askedAbout.contains(Contact.SObjectType),
 				'The module was asked before its tagged records went.'
@@ -1153,11 +1065,7 @@ private class ImportUndoTest {
 			stub.keep.put(kept.Id, 'A gift with a receipt still names this person.');
 
 			// The person passes get their own limits, as each chunk does in the job.
-			undo(
-				batch,
-				Datetime.now(),
-				ImportUndoBatch.PASS_JUDGE_PREFIX + ImportUndoBatch.PASS_CONTACTS
-			);
+			undo(batch, Datetime.now(), ImportUndoBatch.PASS_JUDGE_PREFIX + ImportUndoBatch.PASS_CONTACTS);
 
 			Assert.isTrue(exists(kept.Id), 'The module said this one stays.');
 			Assert.isTrue(exists(kept.AccountId), 'So does the household they are still on.');
@@ -1181,8 +1089,7 @@ private class ImportUndoTest {
 
 			Assert.isTrue(exists(imported.Id), 'Not knowing is not knowing nothing depends on it.');
 			Assert.isTrue(
-				undoJournal(batch)
-					.contains(BarnHelp.text('Core', 'Core_Import_UndoKeptNotChecked')),
+				undoJournal(batch).contains(BarnHelp.text('Core', 'Core_Import_UndoKeptNotChecked')),
 				'And the journal says it could not be checked.'
 			);
 		}

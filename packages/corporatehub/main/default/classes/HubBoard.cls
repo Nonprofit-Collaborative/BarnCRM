@@ -78,9 +78,7 @@ public with sharing class HubBoard {
 			requireManage();
 			meeting.Minutes_Approved_On__c = Date.today();
 		} else if (status != MINUTES_SUBMITTED) {
-			throw new HubPolicy.PolicyException(
-				BarnHelp.text('CorporateHub', 'CorporateHub_Board_NotAllowed')
-			);
+			throw new HubPolicy.PolicyException(BarnHelp.text('CorporateHub', 'CorporateHub_Board_NotAllowed'));
 		}
 		update as user meeting;
 	}
@@ -111,13 +109,7 @@ public with sharing class HubBoard {
 		]) {
 			String key = motionId + ':' + attendee.Person__c;
 			if (keys.add(key)) {
-				votes.add(
-					new Board_Vote__c(
-						Motion__c = motionId,
-						Person__c = attendee.Person__c,
-						Key__c = key
-					)
-				);
+				votes.add(new Board_Vote__c(Motion__c = motionId, Person__c = attendee.Person__c, Key__c = key));
 			}
 		}
 		// Only the changed field: the loaded row's Meeting field is not one a user may write.
@@ -147,9 +139,7 @@ public with sharing class HubBoard {
 			WITH USER_MODE
 		];
 		if (motion.Status__c != VOTING_OPEN) {
-			throw new HubPolicy.PolicyException(
-				BarnHelp.text('CorporateHub', 'CorporateHub_Board_NotVoting')
-			);
+			throw new HubPolicy.PolicyException(BarnHelp.text('CorporateHub', 'CorporateHub_Board_NotVoting'));
 		}
 		Decimal votesFor = motion.Votes_For__c == null ? 0 : motion.Votes_For__c;
 		Decimal against = motion.Votes_Against__c == null ? 0 : motion.Votes_Against__c;
@@ -173,9 +163,7 @@ public with sharing class HubBoard {
 	public static void sendPoll(Id meetingId) {
 		Board_Meeting__c meeting = meeting(meetingId);
 		if (meeting.Poll_Time_1__c == null) {
-			throw new HubPolicy.PolicyException(
-				BarnHelp.text('CorporateHub', 'CorporateHub_Board_NoPollTimes')
-			);
+			throw new HubPolicy.PolicyException(BarnHelp.text('CorporateHub', 'CorporateHub_Board_NoPollTimes'));
 		}
 		if (
 			[
@@ -199,15 +187,9 @@ public with sharing class HubBoard {
 			? null
 			: (Datetime) meeting.get('Poll_Time_' + option + '__c');
 		if (chosen == null) {
-			throw new HubPolicy.PolicyException(
-				BarnHelp.text('CorporateHub', 'CorporateHub_Board_NoPollTimes')
-			);
+			throw new HubPolicy.PolicyException(BarnHelp.text('CorporateHub', 'CorporateHub_Board_NoPollTimes'));
 		}
-		update as user new Board_Meeting__c(
-			Id = meetingId,
-			Start__c = chosen,
-			Poll_Open__c = false
-		);
+		update as user new Board_Meeting__c(Id = meetingId, Start__c = chosen, Poll_Open__c = false);
 	}
 
 	/** R-AI1: the board's open items raised before this meeting, or at no meeting, oldest first. */
@@ -232,21 +214,14 @@ public with sharing class HubBoard {
 	/** R-BA1: a self-assessment for the board with every question for every current seat. */
 	public static Id startAssessment(Id boardId) {
 		Map<String, Object> template = HubTemplates.assessment(ASSESSMENT_TEMPLATE);
-		List<Object> questions = template == null
-			? new List<Object>()
-			: (List<Object>) template.get('questions');
+		List<Object> questions = template == null ? new List<Object>() : (List<Object>) template.get('questions');
 		List<Board_Member__c> seats = currentSeats(boardId);
 		if (questions == null || questions.isEmpty() || seats.isEmpty()) {
-			throw new HubPolicy.PolicyException(
-				BarnHelp.text('CorporateHub', 'CorporateHub_Board_NothingToAsk')
-			);
+			throw new HubPolicy.PolicyException(BarnHelp.text('CorporateHub', 'CorporateHub_Board_NothingToAsk'));
 		}
 		Board_Assessment__c assessment = new Board_Assessment__c(
 			Board__c = boardId,
-			Name = (String.valueOf(template.get('title')) +
-				' ' +
-				Date.today().year())
-				.abbreviate(80),
+			Name = (String.valueOf(template.get('title')) + ' ' + Date.today().year()).abbreviate(80),
 			Status__c = 'Open',
 			Template_Key__c = ASSESSMENT_TEMPLATE
 		);
@@ -317,9 +292,7 @@ public with sharing class HubBoard {
 
 	private static void requireManage() {
 		if (!HubPolicy.canManage()) {
-			throw new HubPolicy.PolicyException(
-				BarnHelp.text('CorporateHub', 'CorporateHub_Policy_NoPermission')
-			);
+			throw new HubPolicy.PolicyException(BarnHelp.text('CorporateHub', 'CorporateHub_Policy_NoPermission'));
 		}
 	}
 }

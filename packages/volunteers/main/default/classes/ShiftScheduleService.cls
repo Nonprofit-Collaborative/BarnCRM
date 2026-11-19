@@ -83,9 +83,7 @@ public with sharing class ShiftScheduleService {
 			if (schedule.Created_Through__c != null) {
 				fromDay = latest(fromDay, schedule.Created_Through__c.addDays(1));
 			}
-			Date untilDay = schedule.End_Date__c == null
-				? horizon
-				: earliest(horizon, schedule.End_Date__c);
+			Date untilDay = schedule.End_Date__c == null ? horizon : earliest(horizon, schedule.End_Date__c);
 			if (fromDay == null || fromDay > untilDay) {
 				continue;
 			}
@@ -131,9 +129,7 @@ public with sharing class ShiftScheduleService {
 	 * before it moves it again, so Created Through is the day the save kept shifts through.
 	 * Returns the schedules' bookkeeping: Shifts Kept recorded and the mark cleared.
 	 */
-	private static Map<Id, Shift_Schedule__c> finishPendingRemovals(
-		List<Shift_Schedule__c> schedules
-	) {
+	private static Map<Id, Shift_Schedule__c> finishPendingRemovals(List<Shift_Schedule__c> schedules) {
 		Map<Id, Date> keepThrough = new Map<Id, Date>();
 		for (Shift_Schedule__c schedule : schedules) {
 			if (schedule.Rebuild_Pending__c == true) {
@@ -176,9 +172,7 @@ public with sharing class ShiftScheduleService {
 			: schedule.Every_N_Weeks__c.intValue();
 		Date firstMonday = mondayOf(schedule.Start_Date__c);
 		Date day = latest(fromDay, schedule.Start_Date__c);
-		Date lastDay = schedule.End_Date__c == null
-			? untilDay
-			: earliest(untilDay, schedule.End_Date__c);
+		Date lastDay = schedule.End_Date__c == null ? untilDay : earliest(untilDay, schedule.End_Date__c);
 		while (day <= lastDay) {
 			Integer weeks = firstMonday.daysBetween(mondayOf(day)) / 7;
 			if (chosen.contains(weekdayIndex(day)) && Math.mod(weeks, everyN) == 0) {
@@ -212,10 +206,7 @@ public with sharing class ShiftScheduleService {
 		for (Id scheduleId : scheduleIds) {
 			keepThrough.put(scheduleId, null);
 		}
-		return new Map<Id, Volunteer_Shift__c>(
-				removableFutureShifts(keepThrough, new Map<Id, Integer>())
-			)
-			.keySet();
+		return new Map<Id, Volunteer_Shift__c>(removableFutureShifts(keepThrough, new Map<Id, Integer>())).keySet();
 	}
 
 	/**
@@ -234,9 +225,7 @@ public with sharing class ShiftScheduleService {
 				future.add(shift);
 			}
 		}
-		Set<Id> booked = ShiftScheduleSelector.shiftsInUse(
-			new Map<Id, Volunteer_Shift__c>(future).keySet()
-		);
+		Set<Id> booked = ShiftScheduleSelector.shiftsInUse(new Map<Id, Volunteer_Shift__c>(future).keySet());
 		List<Volunteer_Shift__c> removed = new List<Volunteer_Shift__c>();
 		for (Volunteer_Shift__c shift : future) {
 			if (!booked.contains(shift.Id)) {
@@ -251,10 +240,7 @@ public with sharing class ShiftScheduleService {
 	 * The schedules' future shifts R-SSC4 and R-SSC5 remove, as `removeFutureShifts` describes,
 	 * counting into `kept`, per schedule, those kept for a sign-up or hours.
 	 */
-	private static List<Volunteer_Shift__c> removableFutureShifts(
-		Map<Id, Date> keepThrough,
-		Map<Id, Integer> kept
-	) {
+	private static List<Volunteer_Shift__c> removableFutureShifts(Map<Id, Date> keepThrough, Map<Id, Integer> kept) {
 		List<Volunteer_Shift__c> removed = new List<Volunteer_Shift__c>();
 		if (keepThrough == null || keepThrough.isEmpty()) {
 			return removed;
@@ -264,21 +250,14 @@ public with sharing class ShiftScheduleService {
 		}
 		Datetime cutoff = now();
 		List<Volunteer_Shift__c> future = new List<Volunteer_Shift__c>();
-		for (
-			Volunteer_Shift__c shift : ShiftScheduleSelector.shiftsFrom(
-				keepThrough.keySet(),
-				cutoff
-			)
-		) {
+		for (Volunteer_Shift__c shift : ShiftScheduleSelector.shiftsFrom(keepThrough.keySet(), cutoff)) {
 			Date lastKept = keepThrough.get(shift.Shift_Schedule__c);
 			Boolean uncovered = lastKept == null || orgDate(shift.Start_Time__c) > lastKept;
 			if (shift.Start_Time__c > cutoff && uncovered) {
 				future.add(shift);
 			}
 		}
-		Set<Id> booked = ShiftScheduleSelector.shiftsInUse(
-			new Map<Id, Volunteer_Shift__c>(future).keySet()
-		);
+		Set<Id> booked = ShiftScheduleSelector.shiftsInUse(new Map<Id, Volunteer_Shift__c>(future).keySet());
 		for (Volunteer_Shift__c shift : future) {
 			if (shift.Status__c == STATUS_CANCELLED) {
 				continue;
@@ -360,10 +339,7 @@ public with sharing class ShiftScheduleService {
 		Datetime startTime = toOrgDatetime(day, schedule.Start_Time__c);
 		String name = schedule.Job__r?.Name == null
 			? null
-			: (schedule.Job__r.Name +
-					': ' +
-					startTime.format(NAME_FORMAT, timeZone()))
-					.abbreviate(NAME_LENGTH);
+			: (schedule.Job__r.Name + ': ' + startTime.format(NAME_FORMAT, timeZone())).abbreviate(NAME_LENGTH);
 		return new Volunteer_Shift__c(
 			Name = name,
 			Volunteer_Job__c = schedule.Job__c,

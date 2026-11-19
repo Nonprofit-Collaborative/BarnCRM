@@ -28,10 +28,7 @@ private class GenericMergeControllerTest {
 			HouseholdTestDataFactory.save(settings);
 			Import_Template__c keep = mapping('Gifts 2025');
 			Import_Template__c other = mapping('Gifts 2025 copy');
-			String objectName = Import_Template__c.SObjectType.getDescribe(
-					SObjectDescribeOptions.DEFERRED
-				)
-				.getName();
+			String objectName = Import_Template__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
 			GenericMergeController.mergeRecords(objectName, keep.Id, other.Id, new List<String>());
 
 			Test.startTest();
@@ -39,11 +36,7 @@ private class GenericMergeControllerTest {
 			Assert.isTrue(view.enabled, 'Merge Records is on');
 			Assert.areEqual(1, view.merges.size(), 'The merge is listed');
 			Assert.isTrue(view.merges[0].canUndo, 'And can be undone');
-			Assert.areEqual(
-				0,
-				AutoMergeController.getView().runs.size(),
-				'Auto-merge lists only people merges'
-			);
+			Assert.areEqual(0, AutoMergeController.getView().runs.size(), 'Auto-merge lists only people merges');
 			view = GenericMergeController.undo(view.merges[0].journalId);
 			Test.stopTest();
 

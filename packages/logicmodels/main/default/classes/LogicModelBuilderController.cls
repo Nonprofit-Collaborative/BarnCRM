@@ -265,11 +265,7 @@ public with sharing class LogicModelBuilderController {
 	 * @return the model, with `added`: how many indicators got the period
 	 */
 	@AuraEnabled
-	public static Map<String, Object> addPeriodToEveryIndicator(
-		Id modelId,
-		String startDate,
-		String endDate
-	) {
+	public static Map<String, Object> addPeriodToEveryIndicator(Id modelId, String startDate, String endDate) {
 		try {
 			Integer added = LogicModelPeriodService.addToEvery(modelId, startDate, endDate);
 			Map<String, Object> model = LogicModelService.read(modelId);

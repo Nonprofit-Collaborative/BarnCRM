@@ -92,32 +92,16 @@ private class ScholarshipsSampleDataTest {
 			Assert.areEqual('Scholarships', module.moduleName(), 'The name startAfter looks for');
 			Assert.areEqual(2, module.countLoaded(), 'Two sample programs are counted');
 			Assert.isTrue(module.hasSampleRecords(), 'The card sees them');
-			Assert.areEqual(
-				3,
-				[SELECT COUNT() FROM Award_Cycle__c WITH SYSTEM_MODE],
-				'Three cycles'
-			);
+			Assert.areEqual(3, [SELECT COUNT() FROM Award_Cycle__c WITH SYSTEM_MODE], 'Three cycles');
 			Assert.areEqual(
 				14,
 				[SELECT COUNT() FROM Award_Application__c WITH SYSTEM_MODE],
 				'Fourteen applications at every stage'
 			);
-			Assert.areEqual(
-				14,
-				[SELECT COUNT() FROM Application_Review__c WITH SYSTEM_MODE],
-				'Fourteen reviews'
-			);
+			Assert.areEqual(14, [SELECT COUNT() FROM Application_Review__c WITH SYSTEM_MODE], 'Fourteen reviews');
 			Assert.areEqual(3, [SELECT COUNT() FROM Award__c WITH SYSTEM_MODE], 'Three awards');
-			Assert.areEqual(
-				5,
-				[SELECT COUNT() FROM Award_Payment__c WITH SYSTEM_MODE],
-				'Five disbursements'
-			);
-			Assert.areEqual(
-				4,
-				[SELECT COUNT() FROM Award_Requirement__c WITH SYSTEM_MODE],
-				'Four requirements'
-			);
+			Assert.areEqual(5, [SELECT COUNT() FROM Award_Payment__c WITH SYSTEM_MODE], 'Five disbursements');
+			Assert.areEqual(4, [SELECT COUNT() FROM Award_Requirement__c WITH SYSTEM_MODE], 'Four requirements');
 			Assert.areEqual(
 				2,
 				[
@@ -161,17 +145,9 @@ private class ScholarshipsSampleDataTest {
 	static void theRemovalTakesTheSampleProgramsAndLeavesARealOne() {
 		System.runAs(admin()) {
 			samplePeopleAndOrganizations();
-			Award_Program__c real = new Award_Program__c(
-				Name = 'Real Program',
-				Type__c = 'Grant',
-				Active__c = true
-			);
+			Award_Program__c real = new Award_Program__c(Name = 'Real Program', Type__c = 'Grant', Active__c = true);
 			insert as user real;
-			insert as user new Award_Cycle__c(
-				Program__c = real.Id,
-				Name = 'Real Cycle',
-				Status__c = 'Planned'
-			);
+			insert as user new Award_Cycle__c(Program__c = real.Id, Name = 'Real Cycle', Status__c = 'Planned');
 
 			Test.startTest();
 			loadEverything();
@@ -179,35 +155,16 @@ private class ScholarshipsSampleDataTest {
 			removeEverything();
 			Test.stopTest();
 
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Award_Program__c WHERE Sample_Data__c = TRUE WITH SYSTEM_MODE]
-			);
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Award_Program__c WITH SYSTEM_MODE],
-				'The real program stays'
-			);
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Award_Cycle__c WITH SYSTEM_MODE],
-				'Only the real cycle stays'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Award_Program__c WHERE Sample_Data__c = TRUE WITH SYSTEM_MODE]);
+			Assert.areEqual(1, [SELECT COUNT() FROM Award_Program__c WITH SYSTEM_MODE], 'The real program stays');
+			Assert.areEqual(1, [SELECT COUNT() FROM Award_Cycle__c WITH SYSTEM_MODE], 'Only the real cycle stays');
 			Assert.areEqual(
 				0,
 				[SELECT COUNT() FROM Award_Application__c WITH SYSTEM_MODE],
 				'The sample applications went with their cycles'
 			);
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Award__c WITH SYSTEM_MODE],
-				'The sample awards went too'
-			);
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Award_Payment__c WITH SYSTEM_MODE],
-				'And their disbursements'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Award__c WITH SYSTEM_MODE], 'The sample awards went too');
+			Assert.areEqual(0, [SELECT COUNT() FROM Award_Payment__c WITH SYSTEM_MODE], 'And their disbursements');
 		}
 	}
 
@@ -218,16 +175,8 @@ private class ScholarshipsSampleDataTest {
 			loadEverything();
 			Test.stopTest();
 
-			Assert.areEqual(
-				2,
-				[SELECT COUNT() FROM Award_Program__c WITH SYSTEM_MODE],
-				'The programs load'
-			);
-			Assert.areEqual(
-				3,
-				[SELECT COUNT() FROM Award_Cycle__c WITH SYSTEM_MODE],
-				'The cycles load'
-			);
+			Assert.areEqual(2, [SELECT COUNT() FROM Award_Program__c WITH SYSTEM_MODE], 'The programs load');
+			Assert.areEqual(3, [SELECT COUNT() FROM Award_Cycle__c WITH SYSTEM_MODE], 'The cycles load');
 		}
 	}
 }

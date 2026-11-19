@@ -23,20 +23,13 @@ private class AutomationControlSettingTest {
 
 	private static void control(Id ownerId, Boolean pauseAll, Boolean bypass) {
 		Database.insert(
-			new BarnCRM_Automation_Control__c(
-				SetupOwnerId = ownerId,
-				Pause_All__c = pauseAll,
-				Bypass__c = bypass
-			),
+			new BarnCRM_Automation_Control__c(SetupOwnerId = ownerId, Pause_All__c = pauseAll, Bypass__c = bypass),
 			AccessLevel.SYSTEM_MODE
 		);
 	}
 
 	private static void saveOnePerson() {
-		Database.insert(
-			TestDataFactory.person(new Contact(FirstName = 'Test', LastName = 'Avery')),
-			true
-		);
+		Database.insert(TestDataFactory.person(new Contact(FirstName = 'Test', LastName = 'Avery')), true);
 	}
 
 	@IsTest
@@ -108,9 +101,7 @@ private class AutomationControlSettingTest {
 	static void theActionAnswersAFlowTheSameWay() {
 		User admin = TestUsers.admin();
 		System.runAs(admin) {
-			TestDataFactory.insertAutomationSettings(
-				new Map<String, Boolean>{ 'Flow:Test_Flow' => false }
-			);
+			TestDataFactory.insertAutomationSettings(new Map<String, Boolean>{ 'Flow:Test_Flow' => false });
 			CheckAutomationAction.Request listedOff = new CheckAutomationAction.Request();
 			listedOff.automationName = 'Flow:Test_Flow';
 			CheckAutomationAction.Request unnamed = new CheckAutomationAction.Request();
@@ -156,11 +147,7 @@ private class AutomationControlSettingTest {
 
 			Assert.isFalse(paused[0].run, 'Nothing runs during the timed pause.');
 			Assert.areEqual(CheckAutomationAction.REASON_PAUSED, paused[0].reason, 'Why.');
-			Assert.areEqual(
-				0,
-				CheckAutomationAction.check(null).size(),
-				'No questions, no answers.'
-			);
+			Assert.areEqual(0, CheckAutomationAction.check(null).size(), 'No questions, no answers.');
 		}
 	}
 

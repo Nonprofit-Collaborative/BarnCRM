@@ -97,9 +97,7 @@ public with sharing class ReceiptRendererFactory {
 
 	/** A refusal that names the value, so an administrator can see what to clear. */
 	private static ReceiptRendererFactoryException refusal(String message, String chosen) {
-		return new ReceiptRendererFactoryException(
-			String.format(message, new List<String>{ chosen })
-		);
+		return new ReceiptRendererFactoryException(String.format(message, new List<String>{ chosen }));
 	}
 
 	/** The keys an administrator may choose, for the setting definition and for a test. */

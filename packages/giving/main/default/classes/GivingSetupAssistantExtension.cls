@@ -51,9 +51,7 @@ public with sharing class GivingSetupAssistantExtension implements SetupAssistan
 						'Default_Fund__c',
 						Label.Giving_SetupAssistant_FundLabel
 					)
-					.withObject(
-						Fund__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName()
-					)
+					.withObject(Fund__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName())
 			)
 			.withField(
 				new SetupAssistantService.StepField(
@@ -63,9 +61,7 @@ public with sharing class GivingSetupAssistantExtension implements SetupAssistan
 						'Default_Appeal__c',
 						Label.Giving_SetupAssistant_AppealLabel
 					)
-					.withObject(
-						Appeal__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName()
-					)
+					.withObject(Appeal__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName())
 			);
 	}
 
@@ -85,11 +81,7 @@ public with sharing class GivingSetupAssistantExtension implements SetupAssistan
 						'Organization_EIN__c',
 						Label.Giving_SetupAssistant_EinLabel
 					)
-					.withLimits(
-						20,
-						EIN_PATTERN,
-						BarnHelp.text('Giving', 'Giving_SetupAssistant_EinPatternMessage')
-					)
+					.withLimits(20, EIN_PATTERN, BarnHelp.text('Giving', 'Giving_SetupAssistant_EinPatternMessage'))
 			)
 			.withField(
 				new SetupAssistantService.StepField(
@@ -129,9 +121,7 @@ public with sharing class GivingSetupAssistantExtension implements SetupAssistan
 						'Receipt_Signature_Document_Id__c',
 						Label.Giving_SetupAssistant_SignatureLabel
 					)
-					.withPreviewAlt(
-						BarnHelp.text('Giving', 'Giving_SetupAssistant_SignaturePreviewAlt')
-					)
+					.withPreviewAlt(BarnHelp.text('Giving', 'Giving_SetupAssistant_SignaturePreviewAlt'))
 			);
 	}
 

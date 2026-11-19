@@ -17,7 +17,7 @@ public with sharing class DonorLevelBatch implements Database.Batchable<SObject>
 	@TestVisible
 	private static final String CONTACTS = 'Contact';
 	/** The settings console section the Donor Levels page is in. */
-	private static final String GIVING_SECTION = 'Giving';
+	private static final String GIVING_SECTION = SettingSections.GIVING;
 
 	private final String scopeObject;
 	private Integer moved = 0;
@@ -61,9 +61,7 @@ public with sharing class DonorLevelBatch implements Database.Batchable<SObject>
 		if (edges != null) {
 			return DonorLevelSelector.recencyEdgeLocator(scopeObject, edges);
 		}
-		return ACCOUNTS.equals(scopeObject)
-			? DonorLevelSelector.accountLocator()
-			: DonorLevelSelector.contactLocator();
+		return ACCOUNTS.equals(scopeObject) ? DonorLevelSelector.accountLocator() : DonorLevelSelector.contactLocator();
 	}
 
 	public void execute(Database.BatchableContext context, List<SObject> scope) {
@@ -91,10 +89,7 @@ public with sharing class DonorLevelBatch implements Database.Batchable<SObject>
 		try {
 			if (ACCOUNTS.equals(scopeObject)) {
 				if (!Test.isRunningTest()) {
-					Database.executeBatch(
-						new DonorLevelBatch(CONTACTS, notifyUserId, moved, edges),
-						200
-					);
+					Database.executeBatch(new DonorLevelBatch(CONTACTS, notifyUserId, moved, edges), 200);
 				}
 				return;
 			}

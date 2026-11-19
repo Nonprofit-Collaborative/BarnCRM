@@ -31,10 +31,7 @@ public with sharing class ReceiptContentBuilder {
 	 */
 	public static final Decimal QUID_PRO_QUO_THRESHOLD = 75;
 
-	public static final String SENTENCE_NO_GOODS = BarnHelp.text(
-		'Giving',
-		'Giving_Receipt_NoGoods'
-	);
+	public static final String SENTENCE_NO_GOODS = BarnHelp.text('Giving', 'Giving_Receipt_NoGoods');
 	public static final String SENTENCE_INTANGIBLE_RELIGIOUS = BarnHelp.text(
 		'Giving',
 		'Giving_Receipt_IntangibleReligious'
@@ -45,10 +42,7 @@ public with sharing class ReceiptContentBuilder {
 	 * there reads as a cash contribution of that amount, which is the one thing a document for
 	 * donated property must not say.
 	 */
-	public static final String IN_KIND_AMOUNT_PHRASE = BarnHelp.text(
-		'Giving',
-		'Giving_Receipt_InKindAmountPhrase'
-	);
+	public static final String IN_KIND_AMOUNT_PHRASE = BarnHelp.text('Giving', 'Giving_Receipt_InKindAmountPhrase');
 
 	/**
 	 * What every document states in place of a figure, for a gift of goods (G-18, ADR-0030,
@@ -56,10 +50,7 @@ public with sharing class ReceiptContentBuilder {
 	 * printing the fair market value the organization recorded is the one thing ADR-0016 forbids.
 	 * So the document says what is true: the organization has not stated a value.
 	 */
-	public static final String AMOUNT_NOT_STATED = BarnHelp.text(
-		'Giving',
-		'Giving_Receipt_AmountNotStated'
-	);
+	public static final String AMOUNT_NOT_STATED = BarnHelp.text('Giving', 'Giving_Receipt_AmountNotStated');
 
 	/** What an in-kind gift puts in the amount column of a statement (R-RC12). */
 	public static final String IN_KIND_LINE_AMOUNT = Label.Giving_Receipt_InKindLineAmount;
@@ -74,13 +65,6 @@ public with sharing class ReceiptContentBuilder {
 	private static final String TOKEN_OPEN = '{{';
 	private static final String TOKEN_CLOSE = '}}';
 	private static final Set<String> RAW_TOKENS = new Set<String>{ 'GiftLines' };
-
-	/**
-	 * What marks a letter saved before the package printed the letterhead itself: the shipped
-	 * letters opened with `<div class="letterhead">`. While a stored letter still has it, that
-	 * block prints the name and the package prints the logo only (ADR-0065 point 3).
-	 */
-	public static final String LEGACY_LETTERHEAD_MARKER = 'class="letterhead"';
 
 	/**
 	 * The gift lines token as the rich text editor stores it, on a paragraph of its own. The
@@ -122,9 +106,7 @@ public with sharing class ReceiptContentBuilder {
 	public static OrganizationDetails organizationDetails(Id brandId, Boolean useDefault) {
 		BarnCRM_Settings__c core = BarnCRM_Settings__c.getOrgDefaults();
 		Giving_Settings__c giving = Giving_Settings__c.getOrgDefaults();
-		BrandService.Profile brand = brandId != null || useDefault
-			? BrandService.profileFor(brandId)
-			: null;
+		BrandService.Profile brand = brandId != null || useDefault ? BrandService.profileFor(brandId) : null;
 		OrganizationDetails details = new OrganizationDetails();
 		details.legalName = core.Organization_Legal_Name__c;
 		details.taxId = giving.Organization_EIN__c;
@@ -137,18 +119,14 @@ public with sharing class ReceiptContentBuilder {
 			details.brandName = brand.brandName;
 			details.logoDocumentId = brand.logoDocumentId;
 			details.signature = brand.signature;
-			details.legalName = String.isBlank(brand.legalName)
-				? details.legalName
-				: brand.legalName;
+			details.legalName = String.isBlank(brand.legalName) ? details.legalName : brand.legalName;
 			details.taxId = String.isBlank(brand.taxId) ? details.taxId : brand.taxId;
 			if (!brand.addressLines.isEmpty()) {
 				details.address = String.join(brand.addressLines, '\n');
 			}
 		}
 		if (String.isBlank(details.legalName)) {
-			throw new ReceiptContentException(
-				BarnHelp.text('Giving', 'Giving_Receipt_OrganizationIncomplete')
-			);
+			throw new ReceiptContentException(BarnHelp.text('Giving', 'Giving_Receipt_OrganizationIncomplete'));
 		}
 		return details;
 	}
@@ -159,9 +137,7 @@ public with sharing class ReceiptContentBuilder {
 		for (Gift__c gift : gifts) {
 			brands.add(gift.isSet('Brand__c') ? gift.Brand__c : null);
 		}
-		return brands.size() == 1
-			? organizationDetails(new List<Id>(brands)[0], true)
-			: organizationDetails();
+		return brands.size() == 1 ? organizationDetails(new List<Id>(brands)[0], true) : organizationDetails();
 	}
 
 	// -------------------------------------------------------------- the tax sentences
@@ -182,10 +158,7 @@ public with sharing class ReceiptContentBuilder {
 				? BarnHelp.text('Giving', 'Giving_Receipt_InKindDescribedDefault')
 				: gift.In_Kind_Description__c.trim();
 			sentences.add(
-				String.format(
-					BarnHelp.text('Giving', 'Giving_Receipt_InKindSentence'),
-					new List<String>{ described }
-				)
+				String.format(BarnHelp.text('Giving', 'Giving_Receipt_InKindSentence'), new List<String>{ described })
 			);
 		}
 
@@ -258,7 +231,7 @@ public with sharing class ReceiptContentBuilder {
 		String body = mergeTokens(templateBody, tokens);
 		return document(
 			'Receipt ' + receiptNumber,
-			brandingBlock(details, templateBody) +
+			brandingBlock(details) +
 				body +
 				amountNote(isInKind(gift)) +
 				taxBlock(taxSentencesFor(gift)) +
@@ -305,12 +278,11 @@ public with sharing class ReceiptContentBuilder {
 
 		// The lines go where the template asked for them, and after the letter when it did not
 		// ask: a statement with no lines on it is not a statement.
-		Boolean templatePlacedLines =
-			templateBody != null && templateBody.contains('{{GiftLines}}');
+		Boolean templatePlacedLines = templateBody != null && templateBody.contains('{{GiftLines}}');
 		String body = mergeTokens(templateBody, tokens);
 		return document(
 			'Statement ' + receiptNumber,
-			brandingBlock(details, templateBody) +
+			brandingBlock(details) +
 				body +
 				(templatePlacedLines ? '' : giftLines(gifts)) +
 				amountNote(anyInKind) +
@@ -370,10 +342,7 @@ public with sharing class ReceiptContentBuilder {
 	) {
 		Map<String, String> tokens = new Map<String, String>();
 		tokens.put('OrganizationName', details.legalName);
-		tokens.put(
-			'BrandName',
-			String.isBlank(details.brandName) ? details.legalName : details.brandName
-		);
+		tokens.put('BrandName', String.isBlank(details.brandName) ? details.legalName : details.brandName);
 		tokens.put('OrganizationTaxId', blankToEmpty(details.taxId));
 		// A merge token sits inside a sentence or a line of the template, so it is one line.
 		tokens.put('OrganizationAddress', blankToEmpty(details.address).replace('\n', ', '));
@@ -393,9 +362,7 @@ public with sharing class ReceiptContentBuilder {
 	@TestVisible
 	private static String mergeTokens(String templateBody, Map<String, String> tokens) {
 		if (String.isBlank(templateBody)) {
-			throw new ReceiptContentException(
-				BarnHelp.text('Giving', 'Giving_Receipt_NoActiveTemplate')
-			);
+			throw new ReceiptContentException(BarnHelp.text('Giving', 'Giving_Receipt_NoActiveTemplate'));
 		}
 		String merged = templateBody.replace(GIFT_LINES_PARAGRAPH, '{{GiftLines}}');
 		for (String name : tokens.keySet()) {
@@ -439,30 +406,17 @@ public with sharing class ReceiptContentBuilder {
 	 * has one and has left it turned on, and the organization's name and address.
 	 *
 	 * The letterhead is code, not template (ADR-0065): a letter that merely mentions
-	 * `{{OrganizationName}}` in a sentence still gets it. The one exception is a letter saved
-	 * before that decision, which still carries its own letterhead block; that block prints the
-	 * name, so the package does not print it twice.
+	 * `{{OrganizationName}}` in a sentence still gets it.
 	 */
-	private static String brandingBlock(OrganizationDetails details, String templateBody) {
-		String logo = ReceiptLogoSource.imageTag(details.logoDocumentId);
-		Boolean templateHasOwnLetterhead =
-			templateBody != null && templateBody.contains(LEGACY_LETTERHEAD_MARKER);
-		if (String.isBlank(logo) && templateHasOwnLetterhead) {
-			return '';
+	private static String brandingBlock(OrganizationDetails details) {
+		String block = '<div class="branding">' + ReceiptLogoSource.imageTag(details.logoDocumentId);
+		// C-47b: a brand prints its own name, then the legal name it receipts under.
+		if (String.isNotBlank(details.brandName) && details.brandName != details.legalName) {
+			block += '<p class="orgname">' + escape(details.brandName) + '</p>';
 		}
-		String block = '<div class="branding">' + logo;
-		if (!templateHasOwnLetterhead) {
-			// C-47b: a brand prints its own name, then the legal name it receipts under.
-			if (String.isNotBlank(details.brandName) && details.brandName != details.legalName) {
-				block += '<p class="orgname">' + escape(details.brandName) + '</p>';
-			}
-			block += '<p class="orgname">' + escape(details.legalName) + '</p>';
-			if (String.isNotBlank(details.address)) {
-				block +=
-					'<p class="orgaddress">' +
-					escape(details.address).replace('\n', '<br/>') +
-					'</p>';
-			}
+		block += '<p class="orgname">' + escape(details.legalName) + '</p>';
+		if (String.isNotBlank(details.address)) {
+			block += '<p class="orgaddress">' + escape(details.address).replace('\n', '<br/>') + '</p>';
 		}
 		return block + '</div>';
 	}
@@ -476,9 +430,7 @@ public with sharing class ReceiptContentBuilder {
 	 * goods on it.
 	 */
 	private static String amountNote(Boolean anyInKind) {
-		return anyInKind == true
-			? '<p class="amountnote">' + escape(AMOUNT_NOT_STATED) + '</p>'
-			: '';
+		return anyInKind == true ? '<p class="amountnote">' + escape(AMOUNT_NOT_STATED) + '</p>' : '';
 	}
 
 	private static String taxBlock(List<String> sentences) {
@@ -563,8 +515,6 @@ public with sharing class ReceiptContentBuilder {
 	}
 
 	private static String formatDate(Date value) {
-		return value == null
-			? ''
-			: Datetime.newInstance(value, Time.newInstance(0, 0, 0, 0)).format('d MMMM yyyy');
+		return value == null ? '' : Datetime.newInstance(value, Time.newInstance(0, 0, 0, 0)).format('d MMMM yyyy');
 	}
 }

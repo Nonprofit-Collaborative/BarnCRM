@@ -10,7 +10,7 @@
     <values><field>Component__c</field><value xsi:nil="true" /></values>
     <values><field>Navigation_Target__c</field><value xsi:type="xsd:string">Payments_Setup</value></values>
     <values><field>Navigation_Label__c</field><value xsi:type="xsd:string">Payments Setup</value></values>
-    <values><field>Description__c</field><value xsi:type="xsd:string">The address to give Stripe or PayPal for each Site, whether each key is entered, and Save Keys. Keys are never shown again once saved.</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">The address to give Stripe or PayPal for each Site, whether each processor is connected, where to enter its secrets in Setup, and Check Connection. Secrets are never shown or stored by BarnCRM.</value></values>
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">50</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">payments.md</value></values>
 </CustomMetadata>

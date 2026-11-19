@@ -23,11 +23,7 @@ private class UserAccessSelectorTest {
 				UserAccessSelector.getAssignedUserIds(new Set<String>()).isEmpty(),
 				'An empty set of group names finds nobody rather than everybody.'
 			);
-			System.assertEquals(
-				0,
-				UserAccessSelector.countActiveAssignees(null),
-				'Counting nothing counts nobody.'
-			);
+			System.assertEquals(0, UserAccessSelector.countActiveAssignees(null), 'Counting nothing counts nobody.');
 			System.assertEquals(
 				0,
 				UserAccessSelector.countActiveAssignees(new Set<String>()),
@@ -64,17 +60,12 @@ private class UserAccessSelectorTest {
 	static void thePackagedGroupsAreQueryable() {
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
-			Set<Id> assigned = UserAccessSelector.getAssignedUserIds(
-				HealthCheckService.BARNCRM_GROUPS
-			);
+			Set<Id> assigned = UserAccessSelector.getAssignedUserIds(HealthCheckService.BARNCRM_GROUPS);
 			Integer standardUsers = UserAccessSelector.countActiveStandardUsersExcluding(assigned);
 			Test.stopTest();
 
 			System.assertNotEquals(null, assigned, 'The query runs against the packaged groups.');
-			System.assert(
-				standardUsers >= 0,
-				'Counting the people with no role always produces a number.'
-			);
+			System.assert(standardUsers >= 0, 'Counting the people with no role always produces a number.');
 		}
 	}
 }

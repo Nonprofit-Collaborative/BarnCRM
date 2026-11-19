@@ -1,7 +1,7 @@
 /**
  * Giving's steps of the nightly run (ADR-0166 nightly-job-dispatcher): the five jobs, each
  * switched on its own (four shipped on, the pledge reminders shipped off, G-37), then the acknowledgment
- * send, shipped off because it emails donors. Switching is checked under the test name of the run, so nothing
+ * send, shipped off because it emails donors, then the two gift mirror runs. Switching is checked under the test name of the run, so nothing
  * depends on what the org has scheduled.
  */
 @IsTest(testFor='ApexClass:GivingNightlyJobProvider, ApexClass:GivingScheduler')
@@ -18,17 +18,17 @@ private class GivingNightlyJobProviderTest {
 	}
 
 	@IsTest
-	static void listsSixStepsWithTheEmailingOnesShippedOff() {
+	static void listsEightStepsWithTheEmailingOnesShippedOff() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			List<NightlyStep> steps = new GivingNightlyJobProvider().nightlySteps();
 
-			Assert.areEqual(6, steps.size(), 'Five jobs and the acknowledgments.');
+			Assert.areEqual(8, steps.size(), 'Five jobs, the acknowledgments and the two gift mirrors.');
 			Map<String, NightlyStep> byKey = new Map<String, NightlyStep>();
 			for (NightlyStep step : steps) {
 				byKey.put(step.key, step);
 				Assert.isTrue(step.hasSwitch(), step.key + ' has a switch.');
 			}
-			Assert.areEqual(6, byKey.size(), 'No step is listed twice.');
+			Assert.areEqual(8, byKey.size(), 'No step is listed twice.');
 			Assert.areEqual(195, byKey.get(GivingScheduler.PLEDGE_JOB_NAME).minute, '3:15');
 			Assert.areEqual(75, byKey.get(GivingScheduler.TOP_UP_JOB_NAME).minute, '1:15');
 			Assert.areEqual(105, byKey.get(GivingScheduler.OVERDUE_JOB_NAME).minute, '1:45');

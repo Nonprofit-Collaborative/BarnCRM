@@ -11,10 +11,7 @@ private class LogicModelBuilderControllerTest {
 	@TestSetup
 	static void createTestUsers() {
 		TestUsers.adminWith(ADMIN);
-		TestUsers.standardUserWith(
-			'Reader',
-			new List<String>{ 'BarnCRM_Read_Only', 'Logic_Models_Read_Only' }
-		);
+		TestUsers.standardUserWith('Reader', new List<String>{ 'BarnCRM_Read_Only', 'Logic_Models_Read_Only' });
 	}
 
 	private static Id newModel() {
@@ -102,27 +99,15 @@ private class LogicModelBuilderControllerTest {
 			model = LogicModelBuilderController.saveLink(JSON.serialize(link));
 			String again = refusal(new Save('link', link));
 			String backwards = refusal(
-				new Save(
-					'link',
-					new Map<String, Object>{
-						'modelId' => modelId,
-						'fromId' => reads,
-						'toId' => tutors
-					}
-				)
+				new Save('link', new Map<String, Object>{ 'modelId' => modelId, 'fromId' => reads, 'toId' => tutors })
 			);
-			Id linkId = (Id) ((Map<String, Object>) ((List<Object>) model.get('links'))[0])
-				.get('id');
+			Id linkId = (Id) ((Map<String, Object>) ((List<Object>) model.get('links'))[0]).get('id');
 			model = LogicModelBuilderController.saveLink(
-				JSON.serialize(
-					new Map<String, Object>{ 'id' => linkId, 'assumption' => 'Changed.' }
-				)
+				JSON.serialize(new Map<String, Object>{ 'id' => linkId, 'assumption' => 'Changed.' })
 			);
 			model = LogicModelBuilderController.saveOrder(
 				modelId,
-				JSON.serialize(
-					new List<Object>{ new Map<String, Object>{ 'id' => tutors, 'sortOrder' => 5 } }
-				)
+				JSON.serialize(new List<Object>{ new Map<String, Object>{ 'id' => tutors, 'sortOrder' => 5 } })
 			);
 			Test.stopTest();
 
@@ -134,9 +119,7 @@ private class LogicModelBuilderControllerTest {
 				'One arrow per pair'
 			);
 			Assert.isNotNull(backwards, 'Backwards is refused by the platform, with its message');
-			Map<String, Object> saved = (Map<String, Object>) ((List<Object>) model.get(
-				'links'
-			))[0];
+			Map<String, Object> saved = (Map<String, Object>) ((List<Object>) model.get('links'))[0];
 			Assert.areEqual('Changed.', saved.get('assumption'), 'The assumption changed');
 			Assert.areEqual(true, model.get('canEdit'), 'An admin builds');
 			Assert.areEqual(true, model.get('canDelete'), 'And deletes');
@@ -153,23 +136,13 @@ private class LogicModelBuilderControllerTest {
 			Id tutors = idOf(model, 'elements', 'Two tutors');
 			Id sessions = idOf(model, 'elements', 'Weekly sessions');
 			LogicModelBuilderController.saveLink(
-				JSON.serialize(
-					new Map<String, Object>{
-						'modelId' => modelId,
-						'fromId' => tutors,
-						'toId' => sessions
-					}
-				)
+				JSON.serialize(new Map<String, Object>{ 'modelId' => modelId, 'fromId' => tutors, 'toId' => sessions })
 			);
 
 			String refused = refusal(
 				new Save(
 					'element',
-					new Map<String, Object>{
-						'id' => sessions,
-						'name' => 'Weekly sessions',
-						'type' => 'Input'
-					}
+					new Map<String, Object>{ 'id' => sessions, 'name' => 'Weekly sessions', 'type' => 'Input' }
 				)
 			);
 			String allowed = refusal(
@@ -188,10 +161,7 @@ private class LogicModelBuilderControllerTest {
 				String.format(
 					BarnHelp.text('LogicModels', 'LogicModels_Builder_BackwardArrows'),
 					new List<String>{
-						String.format(
-							Label.Core_Address_DateRange,
-							new List<String>{ 'Two tutors', 'Weekly sessions' }
-						)
+						String.format(Label.Core_Address_DateRange, new List<String>{ 'Two tutors', 'Weekly sessions' })
 					}
 				),
 				refused,
@@ -200,8 +170,7 @@ private class LogicModelBuilderControllerTest {
 			Assert.isNull(allowed, 'A move that keeps every arrow forward saves.');
 			Assert.areEqual(
 				6,
-				[SELECT Stage_Rank__c FROM Logic_Model_Element__c WHERE Id = :sessions]
-				.Stage_Rank__c,
+				[SELECT Stage_Rank__c FROM Logic_Model_Element__c WHERE Id = :sessions].Stage_Rank__c,
 				'The Apex rank matches the formula.'
 			);
 			Assert.areEqual(4, LogicModelService.rankFor('Outcome', null));
@@ -213,11 +182,7 @@ private class LogicModelBuilderControllerTest {
 	static void indicatorsHoldATargetAndResultPerPeriod() {
 		System.runAs(TestUsers.adminWith(ADMIN)) {
 			Id modelId = newModel();
-			Id reads = idOf(
-				addPart(modelId, 'Reads at home', 'Outcome', 'Short Term'),
-				'elements',
-				'Reads at home'
-			);
+			Id reads = idOf(addPart(modelId, 'Reads at home', 'Outcome', 'Short Term'), 'elements', 'Reads at home');
 
 			Test.startTest();
 			Map<String, Object> model = LogicModelBuilderController.saveIndicator(
@@ -253,9 +218,7 @@ private class LogicModelBuilderControllerTest {
 			);
 			Test.stopTest();
 
-			Map<String, Object> indicator = (Map<String, Object>) ((List<Object>) model.get(
-				'indicators'
-			))[0];
+			Map<String, Object> indicator = (Map<String, Object>) ((List<Object>) model.get('indicators'))[0];
 			List<Object> periods = (List<Object>) indicator.get('periods');
 			Assert.areEqual(1, periods.size(), 'One period');
 			Map<String, Object> period = (Map<String, Object>) periods[0];
@@ -279,13 +242,7 @@ private class LogicModelBuilderControllerTest {
 			Id held = idOf(model, 'elements', 'Sessions held');
 			Id reads = idOf(model, 'elements', 'Reads more');
 			LogicModelBuilderController.saveLink(
-				JSON.serialize(
-					new Map<String, Object>{
-						'modelId' => modelId,
-						'fromId' => held,
-						'toId' => reads
-					}
-				)
+				JSON.serialize(new Map<String, Object>{ 'modelId' => modelId, 'fromId' => held, 'toId' => reads })
 			);
 			model = LogicModelBuilderController.saveIndicator(
 				JSON.serialize(new Map<String, Object>{ 'elementId' => held, 'name' => 'Held' })
@@ -363,11 +320,7 @@ private class LogicModelBuilderControllerTest {
 			refused = refusal(
 				new Save(
 					'element',
-					new Map<String, Object>{
-						'modelId' => modelId,
-						'name' => 'More',
-						'type' => 'Input'
-					}
+					new Map<String, Object>{ 'modelId' => modelId, 'name' => 'More', 'type' => 'Input' }
 				)
 			);
 		}
@@ -381,9 +334,7 @@ private class LogicModelBuilderControllerTest {
 	static void anUnexpectedFailureIsLoggedAndShownPlainly() {
 		System.runAs(TestUsers.adminWith(ADMIN)) {
 			Test.startTest();
-			AuraHandledException shown = LogicModelBuilderController.handled(
-				new System.MathException('boom')
-			);
+			AuraHandledException shown = LogicModelBuilderController.handled(new System.MathException('boom'));
 			String missing;
 			try {
 				LogicModelBuilderController.getModel(UserInfo.getUserId());
@@ -401,11 +352,7 @@ private class LogicModelBuilderControllerTest {
 			String failed = LogicModelBuilderController.actionFailed();
 			Assert.isTrue(failed.contains('Error Log'), 'The generic failure says what to do');
 			Assert.areEqual(failed, shown.getMessage(), 'Plain');
-			Assert.areEqual(
-				BarnHelp.text('LogicModels', 'LogicModels_Builder_NotFound'),
-				missing,
-				'Not a model'
-			);
+			Assert.areEqual(BarnHelp.text('LogicModels', 'LogicModels_Builder_NotFound'), missing, 'Not a model');
 			Assert.areEqual(failed, unreadable, 'Not an object');
 		}
 	}

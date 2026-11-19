@@ -62,9 +62,7 @@ private class SoftCreditRefundTest {
 
 			Test.startTest();
 			RollupService.ensureDefaults();
-			RollupService.runFullRecalculation(
-				definitionsFor(new Set<String>{ KEY_TOTAL, KEY_COUNT })
-			);
+			RollupService.runFullRecalculation(definitionsFor(new Set<String>{ KEY_TOTAL, KEY_COUNT }));
 			Test.stopTest();
 
 			Contact recalculated = [
@@ -115,14 +113,9 @@ private class SoftCreditRefundTest {
 			RollupService.runFullRecalculation(definitionsFor(new Set<String>{ KEY_TOTAL }));
 			Test.stopTest();
 
-			Decimal total = [SELECT Total_Soft_Credits__c FROM Contact WHERE Id = :luis.Id]
-			.Total_Soft_Credits__c;
+			Decimal total = [SELECT Total_Soft_Credits__c FROM Contact WHERE Id = :luis.Id].Total_Soft_Credits__c;
 			GivingTestDataFactory.assertRollupWrote(total);
-			Assert.areEqual(
-				150,
-				total,
-				'Recognition tracks the money the organization still holds.'
-			);
+			Assert.areEqual(150, total, 'Recognition tracks the money the organization still holds.');
 		}
 	}
 

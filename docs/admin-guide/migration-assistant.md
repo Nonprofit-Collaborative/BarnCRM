@@ -26,13 +26,13 @@ org. These kits ship:
   [Programs](programs.md#moving-from-pmm).
 - **V4S Jobs, Shifts and Hours** (Volunteers): copies Volunteers for Salesforce jobs, shifts,
   sign-ups and completed hours. See [Volunteers](volunteers.md#moving-from-v4s).
-- **NPSP Funds, Levels, Recurring Donations** (Giving): copies General Accounting Units,
+- **NPSP Funds, Levels, Recurring Donations** (Fundraising): copies General Accounting Units,
   levels, recurring donations and engagement plans, and ends with a parity report. See
   [Migrating From NPSP](migrating-from-npsp.md#in-org-migration-kits).
-- **NPSP Gifts and Soft Credits** (Mirror): copies Campaigns as appeals, won Opportunities as
+- **NPSP Gifts and Soft Credits** (Fundraising): copies Campaigns as appeals, won Opportunities as
   gifts with their funds and tribute, and contact, partial and account soft credits. See
   [Migrating From NPSP](migrating-from-npsp.md#in-org-migration-kits).
-- **Nonprofit Cloud Gifts and Soft Credits** (Mirror): copies Campaigns as appeals, gift
+- **Nonprofit Cloud Gifts and Soft Credits** (Fundraising): copies Campaigns as appeals, gift
   designations as funds, gift commitments, paid gift transactions as gifts (linked for the
   Gift Transaction mirror) and gift soft credits. See
   [Migrating From Nonprofit Cloud](migrating-from-nonprofit-cloud.md#the-nonprofit-cloud-gifts-and-soft-credits-kit).

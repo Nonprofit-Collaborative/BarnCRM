@@ -131,9 +131,7 @@ public with sharing class DataTransform {
 	 * extension) and the extension digits. The same pattern and flags as the browser module
 	 * `transformFormat`, both tested against one JSON fixture.
 	 */
-	private static final Pattern EXTENSION = Pattern.compile(
-		'(?i)^(.*?)\\s*(?:ext(?:ension)?\\.?|x)\\s*([0-9]+)\\s*$'
-	);
+	private static final Pattern EXTENSION = Pattern.compile('(?i)^(.*?)\\s*(?:ext(?:ension)?\\.?|x)\\s*([0-9]+)\\s*$');
 
 	/** The separator `append` uses when the step names none. */
 	private static final String DEFAULT_SEPARATOR = ' ';
@@ -300,12 +298,7 @@ public with sharing class DataTransform {
 				new List<String>{ op == null ? '' : op.abbreviate(40) }
 			);
 		}
-		if (
-			tooLong(step.text) ||
-			tooLong(step.replaceWith) ||
-			tooLong(step.value) ||
-			tooLong(step.otherwise)
-		) {
+		if (tooLong(step.text) || tooLong(step.replaceWith) || tooLong(step.value) || tooLong(step.otherwise)) {
 			return BarnHelp.text('Core', 'Core_Transform_ErrorTooLong');
 		}
 		if (step.separator != null && step.separator.length() > MAX_SEPARATOR) {
@@ -349,8 +342,7 @@ public with sharing class DataTransform {
 					: null;
 			}
 			when 'part' {
-				Boolean hasSeparator =
-					String.isNotEmpty(step.separator) && step.separator.length() <= MAX_SEPARATOR;
+				Boolean hasSeparator = String.isNotEmpty(step.separator) && step.separator.length() <= MAX_SEPARATOR;
 				return hasSeparator && within(step.position, 1, MAX_POSITION)
 					? null
 					: String.format(
@@ -375,9 +367,7 @@ public with sharing class DataTransform {
 					: BarnHelp.text('Core', 'Core_Transform_ErrorShift');
 			}
 			when 'digits' {
-				return digitsPatternOk(step)
-					? null
-					: BarnHelp.text('Core', 'Core_Transform_ErrorDigits');
+				return digitsPatternOk(step) ? null : BarnHelp.text('Core', 'Core_Transform_ErrorDigits');
 			}
 			when else {
 				return null;
@@ -395,8 +385,7 @@ public with sharing class DataTransform {
 		) {
 			return false;
 		}
-		return String.isEmpty(step.country) ||
-			(step.country.length() <= MAX_COUNTRY && step.country.isNumeric());
+		return String.isEmpty(step.country) || (step.country.length() <= MAX_COUNTRY && step.country.isNumeric());
 	}
 
 	private static Integer slots(String pattern) {
@@ -412,12 +401,7 @@ public with sharing class DataTransform {
 			return false;
 		}
 		for (Pair pair : pairs) {
-			if (
-				pair == null ||
-				String.isBlank(pair.text) ||
-				tooLong(pair.text) ||
-				tooLong(pair.value)
-			) {
+			if (pair == null || String.isBlank(pair.text) || tooLong(pair.text) || tooLong(pair.value)) {
 				return false;
 			}
 		}
@@ -530,9 +514,7 @@ public with sharing class DataTransform {
 				return formatDigits(value, step.pattern, step.country);
 			}
 			when else {
-				return step.whenBlank == true && String.isNotBlank(value)
-					? value
-					: iso(Date.today());
+				return step.whenBlank == true && String.isNotBlank(value) ? value : iso(Date.today());
 			}
 		}
 	}
@@ -566,11 +548,7 @@ public with sharing class DataTransform {
 		String digits = main.replaceAll('[^0-9]', '');
 		Integer places = slots(pattern);
 		String code = String.isBlank(country) ? '' : country.trim();
-		if (
-			code.length() > 0 &&
-			digits.length() == places + code.length() &&
-			digits.startsWith(code)
-		) {
+		if (code.length() > 0 && digits.length() == places + code.length() && digits.startsWith(code)) {
 			digits = digits.substring(code.length());
 		}
 		if (places < 1 || digits.length() != places) {
@@ -672,9 +650,7 @@ public with sharing class DataTransform {
 				Integer.valueOf(read.mid(5, 2)),
 				Integer.valueOf(read.right(2))
 			);
-			Date moved = step.unit == 'days'
-				? day.addDays(step.amount)
-				: day.addMonths(step.amount);
+			Date moved = step.unit == 'days' ? day.addDays(step.amount) : day.addMonths(step.amount);
 			return moved.year() < 1700 || moved.year() > 4000 ? value : iso(moved);
 		} catch (Exception outOfRange) {
 			return value;
@@ -724,10 +700,7 @@ public with sharing class DataTransform {
 		if (matchCase) {
 			return value.replace(step.text, replacement);
 		}
-		return value.replaceAll(
-			'(?iu)' + Pattern.quote(step.text),
-			Matcher.quoteReplacement(replacement)
-		);
+		return value.replaceAll('(?iu)' + Pattern.quote(step.text), Matcher.quoteReplacement(replacement));
 	}
 
 	/** The value followed by the named other values, leaving blank ones out. */
@@ -773,12 +746,7 @@ public with sharing class DataTransform {
 		String yearText = numbers[yearAt];
 		String monthText = numbers[monthAt];
 		String dayText = numbers[dayAt];
-		if (
-			monthText.length() > 2 ||
-			dayText.length() > 2 ||
-			(yearText.length() != 2 &&
-			yearText.length() != 4)
-		) {
+		if (monthText.length() > 2 || dayText.length() > 2 || (yearText.length() != 2 && yearText.length() != 4)) {
 			return value;
 		}
 		Integer year = Integer.valueOf(yearText);
@@ -787,14 +755,7 @@ public with sharing class DataTransform {
 		}
 		Integer month = Integer.valueOf(monthText);
 		Integer day = Integer.valueOf(dayText);
-		if (
-			year < 1700 ||
-			year > 4000 ||
-			month < 1 ||
-			month > 12 ||
-			day < 1 ||
-			day > Date.daysInMonth(year, month)
-		) {
+		if (year < 1700 || year > 4000 || month < 1 || month > 12 || day < 1 || day > Date.daysInMonth(year, month)) {
 			return value;
 		}
 		return String.valueOf(year) +

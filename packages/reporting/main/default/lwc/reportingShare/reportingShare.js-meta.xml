@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>Who an Advanced Reporting report or dashboard is shared with: people and public groups, view or edit (O-02).</description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

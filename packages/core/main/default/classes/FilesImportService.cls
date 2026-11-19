@@ -123,9 +123,7 @@ public with sharing class FilesImportService {
 			byType.get(objectType).add(parsed);
 		}
 		if (byType.size() > MAX_TYPES_CHECKED) {
-			throw new FilesImportException(
-				BarnHelp.text('Core', 'Core_FilesImport_ErrorTooManyKinds')
-			);
+			throw new FilesImportException(BarnHelp.text('Core', 'Core_FilesImport_ErrorTooManyKinds'));
 		}
 		Set<Id> seen = new Set<Id>();
 		for (Schema.SObjectType objectType : byType.keySet()) {
@@ -194,10 +192,7 @@ public with sharing class FilesImportService {
 		}
 		if (files.size() > MAX_GROUP_FILES) {
 			throw new FilesImportException(
-				String.format(
-					BarnHelp.text('Core', 'Core_FilesImport_ErrorGroup'),
-					new List<Object>{ MAX_GROUP_FILES }
-				)
+				String.format(BarnHelp.text('Core', 'Core_FilesImport_ErrorGroup'), new List<Object>{ MAX_GROUP_FILES })
 			);
 		}
 		GroupResult result = new GroupResult();
@@ -222,12 +217,8 @@ public with sharing class FilesImportService {
 			}
 			versions.add(
 				new ContentVersion(
-					Title = String.isBlank(file.title)
-						? titleOf(file.fileName)
-						: file.title.abbreviate(255),
-					Description = String.isBlank(file.description)
-						? null
-						: file.description.abbreviate(1000),
+					Title = String.isBlank(file.title) ? titleOf(file.fileName) : file.title.abbreviate(255),
+					Description = String.isBlank(file.description) ? null : file.description.abbreviate(1000),
 					PathOnClient = file.fileName.substringAfterLast('/').length() > 0
 						? file.fileName.substringAfterLast('/')
 						: file.fileName,
@@ -319,10 +310,7 @@ public with sharing class FilesImportService {
 			throw new FilesImportException(
 				String.format(
 					BarnHelp.text('Core', 'Core_Import_UndoErrorCountChanged'),
-					new List<String>{
-						String.valueOf(confirmed == null ? 0 : confirmed),
-						String.valueOf(saved)
-					}
+					new List<String>{ String.valueOf(confirmed == null ? 0 : confirmed), String.valueOf(saved) }
 				)
 			);
 		}
@@ -342,9 +330,7 @@ public with sharing class FilesImportService {
 			}
 		}
 		Integer deleted = 0;
-		for (
-			Database.DeleteResult result : Database.delete(deletable, false, AccessLevel.USER_MODE)
-		) {
+		for (Database.DeleteResult result : Database.delete(deletable, false, AccessLevel.USER_MODE)) {
 			if (result.isSuccess()) {
 				deleted++;
 			} else {
@@ -368,9 +354,7 @@ public with sharing class FilesImportService {
 	public static List<JobView> jobs() {
 		requireAllowed();
 		List<JobView> result = new List<JobView>();
-		for (
-			Import_Batch__c job : DataJobs.read(JOB_FIELDS, OPERATION_FILES, null, JOBS_SHOWN, true)
-		) {
+		for (Import_Batch__c job : DataJobs.read(JOB_FIELDS, OPERATION_FILES, null, JOBS_SHOWN, true)) {
 			result.add(view(job));
 		}
 		return result;
@@ -422,11 +406,7 @@ public with sharing class FilesImportService {
 		refusal.row = file.row;
 		refusal.reason = reason;
 		result.refusals.add(refusal);
-		Map<String, Object> entry = ImportJournalService.failed(
-			DOCUMENT,
-			idOf(file.recordId),
-			reason
-		);
+		Map<String, Object> entry = ImportJournalService.failed(DOCUMENT, idOf(file.recordId), reason);
 		entry.put('row', file.row);
 		entries.add(entry);
 	}
@@ -535,9 +515,7 @@ public with sharing class FilesImportService {
 
 	private static void requireAllowed() {
 		if (!allowed()) {
-			throw new FilesImportException(
-				BarnHelp.text('Core', 'Core_FilesImport_ErrorNoPermission')
-			);
+			throw new FilesImportException(BarnHelp.text('Core', 'Core_FilesImport_ErrorNoPermission'));
 		}
 	}
 }

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
   <hasActivationRequired>false</hasActivationRequired>
-  <label>Giving Staff</label>
+  <label>Fundraising Staff Access</label>
   <description>
     David enters gifts, records refunds, and sets up the funds and appeals he is about to use. He
     can change a record but never delete one: a fund that has been used is deactivated and a gift is

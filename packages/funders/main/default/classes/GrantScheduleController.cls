@@ -107,12 +107,8 @@ public with sharing class GrantScheduleController {
 			schedule.amountAwarded = grant.Amount_Awarded__c;
 			schedule.startDate = grant.Award_Start_Date__c;
 			schedule.endDate = grant.Award_End_Date__c;
-			schedule.amountScheduled = grant.Amount_Scheduled__c == null
-				? 0
-				: grant.Amount_Scheduled__c;
-			schedule.amountReceived = grant.Amount_Received__c == null
-				? 0
-				: grant.Amount_Received__c;
+			schedule.amountScheduled = grant.Amount_Scheduled__c == null ? 0 : grant.Amount_Scheduled__c;
+			schedule.amountReceived = grant.Amount_Received__c == null ? 0 : grant.Amount_Received__c;
 			Integer live = 0;
 			for (Grant_Payment__c row : grant.Payments__r) {
 				Payment payment = new Payment();
@@ -128,8 +124,7 @@ public with sharing class GrantScheduleController {
 				}
 			}
 			schedule.canBuild =
-				Schema.SObjectType.Grant_Payment__c.isCreateable() &&
-				GrantPaymentService.canBuild(grant, live);
+				Schema.SObjectType.Grant_Payment__c.isCreateable() && GrantPaymentService.canBuild(grant, live);
 			schedule.canMarkReceived = Schema.SObjectType.Grant_Payment__c.isUpdateable();
 			return schedule;
 		} catch (Exception e) {
@@ -155,10 +150,7 @@ public with sharing class GrantScheduleController {
 			'receivedDate' => 'Received_Date__c'
 		};
 		for (String key : grantFields.keySet()) {
-			schedule.fieldLabels.put(
-				key,
-				NamespaceUtil.fieldLabel(Grant__c.SObjectType, grantFields.get(key))
-			);
+			schedule.fieldLabels.put(key, NamespaceUtil.fieldLabel(Grant__c.SObjectType, grantFields.get(key)));
 		}
 		for (String key : paymentFields.keySet()) {
 			schedule.fieldLabels.put(
@@ -166,10 +158,7 @@ public with sharing class GrantScheduleController {
 				NamespaceUtil.fieldLabel(Grant_Payment__c.SObjectType, paymentFields.get(key))
 			);
 		}
-		for (
-			Schema.PicklistEntry entry : Grant__c.Payment_Frequency__c.getDescribe()
-				.getPicklistValues()
-		) {
+		for (Schema.PicklistEntry entry : Grant__c.Payment_Frequency__c.getDescribe().getPicklistValues()) {
 			if (entry.isActive()) {
 				schedule.frequencies.add(new Option(entry.getLabel(), entry.getValue()));
 			}
@@ -186,16 +175,11 @@ public with sharing class GrantScheduleController {
 	@AuraEnabled
 	public static void saveSchedule(Id grantId, String frequency, String paymentsJson) {
 		if (!Schema.SObjectType.Grant_Payment__c.isCreateable()) {
-			throw UserErrors.message(
-				BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission')
-			);
+			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission'));
 		}
 		List<GrantPaymentService.Row> rows;
 		try {
-			rows = (List<GrantPaymentService.Row>) JSON.deserialize(
-				paymentsJson,
-				List<GrantPaymentService.Row>.class
-			);
+			rows = (List<GrantPaymentService.Row>) JSON.deserialize(paymentsJson, List<GrantPaymentService.Row>.class);
 		} catch (Exception unreadable) {
 			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Schedule_ErrorRows'));
 		}
@@ -218,9 +202,7 @@ public with sharing class GrantScheduleController {
 	@AuraEnabled
 	public static FundersUndoState markReceived(Id paymentId) {
 		if (!Schema.SObjectType.Grant_Payment__c.isUpdateable()) {
-			throw UserErrors.message(
-				BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission')
-			);
+			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission'));
 		}
 		try {
 			return GrantPaymentService.markReceived(paymentId);
@@ -239,9 +221,7 @@ public with sharing class GrantScheduleController {
 	@AuraEnabled
 	public static void undoReceived(Id paymentId, String status, Date receivedDate) {
 		if (!Schema.SObjectType.Grant_Payment__c.isUpdateable()) {
-			throw UserErrors.message(
-				BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission')
-			);
+			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission'));
 		}
 		Boolean undone;
 		try {

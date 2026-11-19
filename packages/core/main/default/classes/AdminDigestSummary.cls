@@ -106,10 +106,7 @@ public with sharing class AdminDigestSummary {
 			Integer unlisted = summary.failedJobs - summary.failedJobList.size();
 			if (unlisted > 0) {
 				lines.add(
-					String.format(
-						System.Label.Core_AdminDigest_MoreJobs,
-						new List<Object>{ String.valueOf(unlisted) }
-					)
+					String.format(System.Label.Core_AdminDigest_MoreJobs, new List<Object>{ String.valueOf(unlisted) })
 				);
 			}
 		}
@@ -130,9 +127,7 @@ public with sharing class AdminDigestSummary {
 				String.format(
 					System.Label.Core_AdminDigest_SetupChanges,
 					new List<Object>{
-						summary.setupChangesCapped
-							? summary.setupChanges + '+'
-							: String.valueOf(summary.setupChanges)
+						summary.setupChangesCapped ? summary.setupChanges + '+' : String.valueOf(summary.setupChanges)
 					}
 				)
 			);

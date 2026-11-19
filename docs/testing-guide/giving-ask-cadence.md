@@ -1,8 +1,8 @@
-# Giving: Ask Cadence
+# Fundraising: Ask Cadence
 
 Scripts for the Next Ask Date and Last Touch Date fields, the nightly reminder task and the Who Is Due list. Setup detail: [Ask cadence reminders](../admin-guide/ask-cadence.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core, BarnCRM Rollup Builder and Giving deployed and sample data loaded.
+Before you start: an org from [Before you test](before-you-test.md), with Core, BarnCRM Rollup Builder and Fundraising deployed and sample data loaded.
 
 ## T-ASK-09: A Next Ask Date Creates One Reminder Task
 
@@ -11,7 +11,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Giving**, open **Ask Reminders** under **Acknowledgments and Stewardship**. | The checkbox is on by default. |
+| 1 | In **BarnCRM Settings**, **Fundraising**, open **Ask Reminders** under **Acknowledgments and Stewardship**. | The checkbox is on by default. |
 | 2 | Open **Nightly Jobs**. If it says the jobs are not scheduled, select **Schedule**. | Four jobs are listed, including **Ask Reminders**, each a switched-on step of [BarnCRM Nightly Jobs](../admin-guide/nightly-jobs.md). |
 | 3 | Open Valentina Singh, select **Edit**, set **Next Ask Date** to today and **Last Touch Date** to last week. **Save**. | Saved. **Ask Reminder For Date** is empty and read only. |
 | 4 | On **Nightly Jobs** select **Run now**, or wait for 3:30 AM. | The jobs start. After a minute, refresh: **Ask Reminders** shows a last run and "Created 1 ask reminders." |
@@ -34,6 +34,6 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 3 | Set Susan's date to 10 days ago. Turn **Ask Reminders** off in **BarnCRM Settings** and run the job. | No task. Susan stays in the list. |
 | 4 | Turn **Ask Reminders** back on and run the job. | One task for Susan, due 10 days ago. |
 | 5 | Open an **Accounts** record for an organization, set **Next Ask Date** to today, run the job. | One task for its owner, related to the account. |
-| 6 | As **Giving Read Only**, open a donor. | The dates are visible and not editable. |
+| 6 | As **Fundraising Read Only**, open a donor. | The dates are visible and not editable. |
 
 **Cleanup:** Delete the tasks and clear the date fields.

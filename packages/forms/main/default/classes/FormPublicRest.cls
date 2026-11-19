@@ -75,9 +75,7 @@ global with sharing class FormPublicRest {
 		String token = request.params == null ? null : request.params.get('resume');
 		FormIntakeService.PublicForm form = formId == null
 			? null
-			: (String.isBlank(token)
-					? FormIntakeService.load(formId)
-					: FormIntakeService.resume(formId, token));
+			: (String.isBlank(token) ? FormIntakeService.load(formId) : FormIntakeService.resume(formId, token));
 		response.addHeader('Content-Type', 'application/json');
 		response.statusCode = form == null ? 404 : 200;
 		response.responseBody = Blob.valueOf(form == null ? '{}' : JSON.serialize(form));
@@ -87,9 +85,7 @@ global with sharing class FormPublicRest {
 		response.addHeader('Content-Type', 'application/json');
 		Object parsed;
 		try {
-			parsed = JSON.deserializeUntyped(
-				request.requestBody == null ? '{}' : request.requestBody.toString()
-			);
+			parsed = JSON.deserializeUntyped(request.requestBody == null ? '{}' : request.requestBody.toString());
 		} catch (JSONException notJson) {
 			parsed = null;
 		}
@@ -131,9 +127,7 @@ global with sharing class FormPublicRest {
 	private static void getPage(RestRequest request, RestResponse response) {
 		String path = request.requestURI.removeEnd('/');
 		String body = path.endsWith('/v1/pages')
-			? FormIntakeService.publicList(
-					request.params == null ? null : request.params.get('kind')
-			  )
+			? FormIntakeService.publicList(request.params == null ? null : request.params.get('kind'))
 			: FormIntakeService.publicPage(path.substringAfterLast('/'));
 		response.addHeader('Content-Type', 'application/json');
 		response.statusCode = body == null ? 404 : 200;
@@ -145,9 +139,7 @@ global with sharing class FormPublicRest {
 	}
 
 	private static Map<String, Object> mapOf(Object value) {
-		return value instanceof Map<String, Object>
-			? (Map<String, Object>) value
-			: new Map<String, Object>();
+		return value instanceof Map<String, Object> ? (Map<String, Object>) value : new Map<String, Object>();
 	}
 
 	private static Id formIdOf(RestRequest request) {

@@ -14,11 +14,7 @@ private class VolunteerWaitlistTest {
 			VolunteersTestData.contactModeWithoutAutomaticHouseholds();
 			VolunteersTestData.contacts(4);
 			Volunteer_Job__c job = VolunteersTestData.job('Food pantry sort');
-			Volunteer_Shift__c shift = VolunteersTestData.newShift(
-				job.Id,
-				Datetime.now().addDays(7),
-				3
-			);
+			Volunteer_Shift__c shift = VolunteersTestData.newShift(job.Id, Datetime.now().addDays(7), 3);
 			shift.Volunteers_Needed__c = 2;
 			insert shift;
 		}
@@ -31,9 +27,7 @@ private class VolunteerWaitlistTest {
 	private static void waitlist(Boolean enabled) {
 		OrgSettingsSystemWriter.save(
 			Volunteer_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{
-				Volunteer_Settings__c.Waitlist_Enabled__c => enabled
-			}
+			new Map<Schema.SObjectField, Object>{ Volunteer_Settings__c.Waitlist_Enabled__c => enabled }
 		);
 		SettingsService.clearCaches();
 	}
@@ -52,8 +46,7 @@ private class VolunteerWaitlistTest {
 	}
 
 	private static String statusOf(Id signupId) {
-		return [SELECT Status__c FROM Volunteer_Signup__c WHERE Id = :signupId WITH SYSTEM_MODE]
-		.Status__c;
+		return [SELECT Status__c FROM Volunteer_Signup__c WHERE Id = :signupId WITH SYSTEM_MODE].Status__c;
 	}
 
 	@IsTest
@@ -72,11 +65,7 @@ private class VolunteerWaitlistTest {
 			Assert.areEqual(VolunteerBooking.SIGNED_UP, first, 'A group of two fits two places.');
 			Assert.areEqual(VolunteerBooking.ALREADY, again, 'One sign-up per person per shift.');
 			Assert.areEqual(VolunteerBooking.FULL, full, 'The group took both places.');
-			Assert.areEqual(
-				VolunteerBooking.SIGNED_UP,
-				overTarget,
-				'A form already sent is booked (R-VS4).'
-			);
+			Assert.areEqual(VolunteerBooking.SIGNED_UP, overTarget, 'A form already sent is booked (R-VS4).');
 			Volunteer_Signup__c family = [
 				SELECT Group_Size__c, Group_Name__c, Status__c
 				FROM Volunteer_Signup__c
@@ -99,16 +88,8 @@ private class VolunteerWaitlistTest {
 			String result = VolunteerBooking.book(people()[0].Id, shift.Id, 1, null, true);
 			Test.stopTest();
 
-			Assert.areEqual(
-				VolunteerBooking.CLOSED,
-				result,
-				'Only an Open shift still to come is booked.'
-			);
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Volunteer_Signup__c WITH SYSTEM_MODE],
-				'Nothing saved.'
-			);
+			Assert.areEqual(VolunteerBooking.CLOSED, result, 'Only an Open shift still to come is booked.');
+			Assert.areEqual(0, [SELECT COUNT() FROM Volunteer_Signup__c WITH SYSTEM_MODE], 'Nothing saved.');
 		}
 	}
 
@@ -128,16 +109,8 @@ private class VolunteerWaitlistTest {
 
 			Assert.areEqual('Signed up', statusOf(signups[0].Id), 'First place.');
 			Assert.areEqual('Signed up', statusOf(signups[1].Id), 'Second place.');
-			Assert.areEqual(
-				'Waitlisted',
-				statusOf(signups[2].Id),
-				'Past Volunteers Needed, in order.'
-			);
-			Assert.areEqual(
-				'Waitlisted',
-				statusOf(signups[3].Id),
-				'Past Volunteers Needed, in order.'
-			);
+			Assert.areEqual('Waitlisted', statusOf(signups[2].Id), 'Past Volunteers Needed, in order.');
+			Assert.areEqual('Waitlisted', statusOf(signups[3].Id), 'Past Volunteers Needed, in order.');
 		}
 	}
 
@@ -151,11 +124,7 @@ private class VolunteerWaitlistTest {
 			for (Contact person : people) {
 				results.add(VolunteerBooking.book(person.Id, shift.Id, 1, null, false));
 			}
-			Assert.areEqual(
-				VolunteerBooking.WAITLISTED,
-				results[2],
-				'A full shift waitlists when on.'
-			);
+			Assert.areEqual(VolunteerBooking.WAITLISTED, results[2], 'A full shift waitlists when on.');
 			Map<Id, Volunteer_Signup__c> byPerson = new Map<Id, Volunteer_Signup__c>();
 			for (Volunteer_Signup__c signup : [
 				SELECT Id, Contact__c
@@ -166,21 +135,14 @@ private class VolunteerWaitlistTest {
 			}
 
 			Test.startTest();
-			update new Volunteer_Signup__c(
-				Id = byPerson.get(people[0].Id).Id,
-				Status__c = 'Cancelled'
-			);
+			update new Volunteer_Signup__c(Id = byPerson.get(people[0].Id).Id, Status__c = 'Cancelled');
 			String afterCancel = statusOf(byPerson.get(people[2].Id).Id);
 			shift.Volunteers_Needed__c = 3;
 			update shift;
 			Test.stopTest();
 
 			Assert.areEqual('Signed up', afterCancel, 'The oldest waiting takes the freed place.');
-			Assert.areEqual(
-				'Signed up',
-				statusOf(byPerson.get(people[3].Id).Id),
-				'A raised need moves the next up.'
-			);
+			Assert.areEqual('Signed up', statusOf(byPerson.get(people[3].Id).Id), 'A raised need moves the next up.');
 		}
 	}
 
@@ -198,11 +160,7 @@ private class VolunteerWaitlistTest {
 			String message = portal.run(VolunteersPortalExtension.SIGN_UP, people[2].Id, shiftId);
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Volunteers', 'Volunteers_Portal_Waitlisted'),
-				message,
-				'Told they wait.'
-			);
+			Assert.areEqual(BarnHelp.text('Volunteers', 'Volunteers_Portal_Waitlisted'), message, 'Told they wait.');
 		}
 	}
 
@@ -210,29 +168,18 @@ private class VolunteerWaitlistTest {
 	static void aStandingSignupContinuesOnLaterShifts() {
 		System.runAs(admin()) {
 			Volunteer_Job__c job = [SELECT Id FROM Volunteer_Job__c WITH SYSTEM_MODE LIMIT 1];
-			Shift_Schedule__c schedule = VolunteersTestData.newSchedule(
-				job.Id,
-				'Saturday',
-				Date.today()
-			);
+			Shift_Schedule__c schedule = VolunteersTestData.newSchedule(job.Id, 'Saturday', Date.today());
 			AutomationControl.bypass('Shift_Schedule_Rules');
 			insert schedule;
 			AutomationControl.clearBypass('Shift_Schedule_Rules');
 			List<Volunteer_Shift__c> weekly = new List<Volunteer_Shift__c>();
 			for (Integer week = 1; week <= 3; week++) {
-				Volunteer_Shift__c shift = VolunteersTestData.newShift(
-					job.Id,
-					Datetime.now().addDays(7 * week),
-					3
-				);
+				Volunteer_Shift__c shift = VolunteersTestData.newShift(job.Id, Datetime.now().addDays(7 * week), 3);
 				shift.Shift_Schedule__c = schedule.Id;
 				weekly.add(shift);
 			}
 			insert weekly;
-			Volunteer_Signup__c standing = VolunteersTestData.newSignup(
-				weekly[0].Id,
-				people()[0].Id
-			);
+			Volunteer_Signup__c standing = VolunteersTestData.newSignup(weekly[0].Id, people()[0].Id);
 			standing.Standing__c = true;
 			standing.Group_Size__c = 2;
 
@@ -251,11 +198,7 @@ private class VolunteerWaitlistTest {
 				Assert.isTrue(copy.Standing__c, 'A copy is itself standing.');
 				Assert.areEqual(2, copy.Group_Size__c, 'The group size carries over.');
 			}
-			Assert.areEqual(
-				0,
-				VolunteerStanding.extend(new Set<Id>{ schedule.Id }),
-				'Never booked twice.'
-			);
+			Assert.areEqual(0, VolunteerStanding.extend(new Set<Id>{ schedule.Id }), 'Never booked twice.');
 		}
 	}
 }

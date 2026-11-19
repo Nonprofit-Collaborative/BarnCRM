@@ -20,10 +20,7 @@ private class RollupCurrencyTest {
 
 			Assert.isTrue(RollupCurrency.toCorporate(50, 'EUR') == 100, 'Entered in EUR, to USD');
 			Assert.isTrue(RollupCurrency.fromCorporate(100, 'EUR') == 50, 'USD, to EUR');
-			Assert.isTrue(
-				RollupCurrency.fromCorporate(100, 'XXX') == 100,
-				'An unknown code is kept'
-			);
+			Assert.isTrue(RollupCurrency.fromCorporate(100, 'XXX') == 100, 'An unknown code is kept');
 		}
 	}
 
@@ -41,14 +38,8 @@ private class RollupCurrencyTest {
 	static void currencyAttributesAreRecognizedThroughARelationship() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			Assert.isTrue(RollupCurrency.isCurrencyPath('Account', 'AnnualRevenue'), 'Money');
-			Assert.isTrue(
-				RollupCurrency.isCurrencyPath('Contact', 'Account.AnnualRevenue'),
-				'Money on the parent'
-			);
-			Assert.isFalse(
-				RollupCurrency.isCurrencyPath('Account', 'NumberOfEmployees'),
-				'A count'
-			);
+			Assert.isTrue(RollupCurrency.isCurrencyPath('Contact', 'Account.AnnualRevenue'), 'Money on the parent');
+			Assert.isFalse(RollupCurrency.isCurrencyPath('Account', 'NumberOfEmployees'), 'A count');
 			Assert.isFalse(RollupCurrency.isCurrencyPath('Account', 'Nothing.Here'), 'Nothing');
 		}
 	}
@@ -69,9 +60,7 @@ private class RollupCurrencyTest {
 			String parentCurrency;
 			Decimal parentRate = 1;
 			if (UserInfo.isMultiCurrencyOrganization()) {
-				for (
-					SObject rate : Database.query(RollupCurrency.RATES + ' WHERE IsActive = TRUE')
-				) {
+				for (SObject rate : Database.query(RollupCurrency.RATES + ' WHERE IsActive = TRUE')) {
 					if ((Boolean) rate.get('IsCorporate')) {
 						corporate = (String) rate.get('IsoCode');
 					} else if (parentCurrency == null) {
@@ -86,20 +75,10 @@ private class RollupCurrencyTest {
 			insert parent;
 			List<Account> children = new List<Account>{
 				TestDataFactory.organization(
-					new Account(
-						Name = 'A',
-						RecordTypeId = organizationType,
-						ParentId = parent.Id,
-						AnnualRevenue = 100
-					)
+					new Account(Name = 'A', RecordTypeId = organizationType, ParentId = parent.Id, AnnualRevenue = 100)
 				),
 				TestDataFactory.organization(
-					new Account(
-						Name = 'B',
-						RecordTypeId = organizationType,
-						ParentId = parent.Id,
-						AnnualRevenue = 50
-					)
+					new Account(Name = 'B', RecordTypeId = organizationType, ParentId = parent.Id, AnnualRevenue = 50)
 				)
 			};
 			for (Account child : children) {
@@ -119,17 +98,11 @@ private class RollupCurrencyTest {
 				Active__c = true
 			);
 
-			RollupEngine.recalculate(
-				new Set<Id>{ parent.Id },
-				new List<Rollup_Definition__c>{ total }
-			);
+			RollupEngine.recalculate(new Set<Id>{ parent.Id }, new List<Rollup_Definition__c>{ total });
 
 			Decimal expected = UserInfo.isMultiCurrencyOrganization() && parentCurrency != null
 				? (150 * parentRate)
-						.setScale(
-							Account.AnnualRevenue.getDescribe().getScale(),
-							System.RoundingMode.HALF_UP
-						)
+						.setScale(Account.AnnualRevenue.getDescribe().getScale(), System.RoundingMode.HALF_UP)
 				: 150;
 			Assert.areEqual(
 				expected,

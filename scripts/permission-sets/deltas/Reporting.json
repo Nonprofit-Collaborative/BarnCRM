@@ -1,0 +1,14 @@
+{
+  "Admin": {
+    "label": "Advanced Reporting Admin",
+    "description": ["Everything Advanced Reporting Staff holds: build, run, save and share reports and", "dashboards with the person's own access. Given to BarnCRM Admin holders."]
+  },
+  "Read_Only": {
+    "label": "Advanced Reporting Read Only",
+    "description": ["Opens Advanced Reporting to run the dashboard templates and the reports and dashboards", "shared with the person, with their own access; cannot save. Given to Read Only holders."],
+    "readOnly": true,
+    "remove": {
+      "customPermissions": ["Reporting_Save"]
+    }
+  }
+}

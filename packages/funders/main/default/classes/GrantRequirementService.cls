@@ -23,10 +23,7 @@ public with sharing class GrantRequirementService {
 	};
 
 	/** R-GQ1: the open statuses; only these are reminded, counted overdue or listed. */
-	public static final List<String> OPEN_STATUSES = new List<String>{
-		STATUS_NOT_STARTED,
-		STATUS_IN_PROGRESS
-	};
+	public static final List<String> OPEN_STATUSES = new List<String>{ STATUS_NOT_STARTED, STATUS_IN_PROGRESS };
 
 	private static final Set<String> SENT = new Set<String>{ STATUS_SUBMITTED, STATUS_ACCEPTED };
 

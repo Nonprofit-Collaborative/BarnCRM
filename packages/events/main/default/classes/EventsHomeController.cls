@@ -71,9 +71,7 @@ public with sharing class EventsHomeController {
 			Home home = new Home();
 			home.canCreate = Schema.SObjectType.Event__c.isCreateable();
 			home.title = Schema.SObjectType.Event__c.getLabelPlural();
-			for (
-				String name : new List<String>{ 'Name', 'Status__c', 'Format__c', 'Capacity__c' }
-			) {
+			for (String name : new List<String>{ 'Name', 'Status__c', 'Format__c', 'Capacity__c' }) {
 				home.fieldLabels.put(name, NamespaceUtil.fieldLabel(Event__c.SObjectType, name));
 			}
 			Boolean past = view == VIEW_PAST;
@@ -119,18 +117,9 @@ public with sharing class EventsHomeController {
 		if (!Schema.SObjectType.Event__c.isCreateable()) {
 			throw UserErrors.message(BarnHelp.text('Events', 'Events_Repeat_NoPermission'));
 		}
-		if (
-			eventId == null ||
-			starts == null ||
-			starts.isEmpty() ||
-			starts.size() > MAX_OCCURRENCES
-		) {
+		if (eventId == null || starts == null || starts.isEmpty() || starts.size() > MAX_OCCURRENCES) {
 			throw UserErrors.message(
-				BarnHelp.text(
-					'Events',
-					'Events_Repeat_BadCount',
-					new List<Object>{ MAX_OCCURRENCES }
-				)
+				BarnHelp.text('Events', 'Events_Repeat_BadCount', new List<Object>{ MAX_OCCURRENCES })
 			);
 		}
 		Savepoint savepoint = Database.setSavepoint();
@@ -161,7 +150,7 @@ public with sharing class EventsHomeController {
 				}
 				copies.add(copyAt(source, start));
 			}
-			Database.insert(copies, true, AccessLevel.USER_MODE);
+			insert as user copies;
 			copyTicketTypes(source, copies);
 			copyTracks(source, copies);
 			return copies.size();
@@ -202,15 +191,7 @@ public with sharing class EventsHomeController {
 	/** Each occurrence gets the event's ticket types, their sales windows moved with it. */
 	private static void copyTicketTypes(Event__c source, List<Event__c> copies) {
 		List<Ticket_Type__c> tickets = [
-			SELECT
-				Name,
-				Price__c,
-				Quantity__c,
-				Sales_Start__c,
-				Sales_End__c,
-				Description__c,
-				Active__c,
-				Sort_Order__c
+			SELECT Name, Price__c, Quantity__c, Sales_Start__c, Sales_End__c, Description__c, Active__c, Sort_Order__c
 			FROM Ticket_Type__c
 			WHERE Event__c = :source.Id
 			WITH USER_MODE
@@ -231,7 +212,7 @@ public with sharing class EventsHomeController {
 				made.add(clone);
 			}
 		}
-		Database.insert(made, true, AccessLevel.USER_MODE);
+		insert as user made;
 	}
 
 	/** Each occurrence gets the event's tracks; its sessions are planned anew. */
@@ -252,7 +233,7 @@ public with sharing class EventsHomeController {
 			}
 		}
 		if (!made.isEmpty()) {
-			Database.insert(made, true, AccessLevel.USER_MODE);
+			insert as user made;
 		}
 	}
 

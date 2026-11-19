@@ -35,17 +35,12 @@ private class RollupsStaffSaveTest {
 
 		System.runAs(staff) {
 			organization = TestDataFactory.organization(
-				new Account(
-					Name = 'Food Bank',
-					RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
-				)
+				new Account(Name = 'Food Bank', RecordTypeId = AccountKindsTestData.organizationRecordTypeId())
 			);
 			insert organization;
 
 			Test.startTest();
-			insert TestDataFactory.person(
-				new Contact(LastName = 'Volunteer', AccountId = organization.Id)
-			);
+			insert TestDataFactory.person(new Contact(LastName = 'Volunteer', AccountId = organization.Id));
 			Test.getEventBus().deliver();
 			Test.stopTest();
 		}
@@ -53,8 +48,7 @@ private class RollupsStaffSaveTest {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			Assert.areEqual(
 				1,
-				[SELECT NumberOfEmployees FROM Account WHERE Id = :organization.Id]
-				.NumberOfEmployees,
+				[SELECT NumberOfEmployees FROM Account WHERE Id = :organization.Id].NumberOfEmployees,
 				'The save went through and its total was kept current without a rollup set'
 			);
 			Assert.areEqual(
@@ -74,9 +68,7 @@ private class RollupsStaffSaveTest {
 		}
 
 		public void execute(QueueableContext context) {
-			insert TestDataFactory.person(
-				new Contact(LastName = 'Queued Volunteer', AccountId = organizationId)
-			);
+			insert TestDataFactory.person(new Contact(LastName = 'Queued Volunteer', AccountId = organizationId));
 			// Asserted here, where the job's own transaction state is: a Queueable leaves the
 			// processor job to its caller and announces the entries with the ready event.
 			Assert.areEqual(
@@ -113,10 +105,7 @@ private class RollupsStaffSaveTest {
 
 		System.runAs(person) {
 			organization = TestDataFactory.organization(
-				new Account(
-					Name = 'Shelter',
-					RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
-				)
+				new Account(Name = 'Shelter', RecordTypeId = AccountKindsTestData.organizationRecordTypeId())
 			);
 			insert organization;
 
@@ -144,10 +133,7 @@ private class RollupsStaffSaveTest {
 				[SELECT COUNT() FROM Contact WHERE AccountId = :organizationId],
 				'The save inside the Queueable went through'
 			);
-			Assert.isTrue(
-				[SELECT COUNT() FROM Rollup_Queue__c] > 0,
-				'Its entry waits in the queue for the next run'
-			);
+			Assert.isTrue([SELECT COUNT() FROM Rollup_Queue__c] > 0, 'Its entry waits in the queue for the next run');
 			List<Error_Log__c> logged = [
 				SELECT Context__c, Severity__c
 				FROM Error_Log__c
@@ -162,10 +148,7 @@ private class RollupsStaffSaveTest {
 	/** Staff who also hold Rollup Builder User, as the Fundraising Staff group gives them. */
 	@IsTest
 	static void aSaveInsideAQueueableWithRollupBuilderUserPublishesTheReadyEvent() {
-		saveInAQueueableAs(
-			'Staffreader',
-			new List<String>{ 'BarnCRM_Staff', 'Rollup_Builder_User' }
-		);
+		saveInAQueueableAs('Staffreader', new List<String>{ 'BarnCRM_Staff', 'Rollup_Builder_User' });
 
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			Assert.areEqual(

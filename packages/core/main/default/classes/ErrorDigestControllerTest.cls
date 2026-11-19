@@ -27,17 +27,12 @@ private class ErrorDigestControllerTest {
 
 			System.runAs(maria) {
 				Test.startTest();
-				ErrorDigestController.DigestView scheduled = ErrorDigestController.setSchedule(
-					true
-				);
+				ErrorDigestController.DigestView scheduled = ErrorDigestController.setSchedule(true);
 				Assert.isTrue(scheduled.scheduled, 'Scheduling switches the digest on.');
 				Assert.isNotNull(scheduled.nextRunAt, 'And says when it runs next.');
 				Assert.areEqual(7, scheduled.nextRunAt.hour(), 'Every morning at 7:00.');
 				Assert.isTrue(scheduled.canManage, 'Maria may change it.');
-				Assert.isTrue(
-					scheduled.toAdministrators,
-					'Nobody is listed, so it goes to admins.'
-				);
+				Assert.isTrue(scheduled.toAdministrators, 'Nobody is listed, so it goes to admins.');
 
 				ErrorDigestController.setSchedule(true);
 				Assert.areEqual(1, runJobs().size(), 'Pressing Schedule twice keeps one run.');
@@ -113,10 +108,7 @@ private class ErrorDigestControllerTest {
 			}
 
 			Assert.isTrue(runJobs().isEmpty(), 'Nothing was scheduled.');
-			Assert.isNull(
-				BarnCRM_Settings__c.getOrgDefaults().Error_Digest_Last_Run__c,
-				'And nothing was sent.'
-			);
+			Assert.isNull(BarnCRM_Settings__c.getOrgDefaults().Error_Digest_Last_Run__c, 'And nothing was sent.');
 		}
 	}
 }

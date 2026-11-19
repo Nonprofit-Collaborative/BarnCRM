@@ -16,7 +16,7 @@ Release **1.12** (SG-01 to SG-06, SG-08, SG-09, PB-06), with SG-10 from release 
 - BarnCRM Core
 
 Forms and Portal Builder are used when installed, through Core's `FormAttachmentExtension` and
-`PortalActionExtension` seams; this package references neither. Giving and Funders are not
+`PortalActionExtension` seams; this package references neither. Fundraising and Grants are not
 referenced.
 
 ## Contents
@@ -26,7 +26,9 @@ referenced.
   `Award_Requirement__c`, settings `Scholarships_Settings__c` (canonical model 29SG1 to 29SG8).
 - Permission sets `Scholarships_Admin`, `Scholarships_Staff`, `Scholarships_Read_Only`, given by
   `ScholarshipsAccessSync`; custom permission `Scholarships_Manage`.
-- No app of its own: the tabs join BarnCRM and BarnCRM Console before Error Log through the
-  catalog row's `Staff_Tabs__c`.
+- App `BarnCRM_Scholarships` (BarnCRM Scholarships, logo `BarnCRM_Patch_Scholarships_Logo`),
+  visible through the Scholarships permission sets; left out of scratch and Developer Edition
+  orgs (ADR-0223, module apps, and its 2026-11-14 amendment). The tabs also join BarnCRM and
+  BarnCRM Console before Error Log through the catalog row's `Staff_Tabs__c`.
 - Settings in the Scholarships and Grants section of BarnCRM Settings; help text in
   `BarnHelp_Scholarships`.

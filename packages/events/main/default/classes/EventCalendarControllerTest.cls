@@ -44,10 +44,7 @@ private class EventCalendarControllerTest {
 	@IsTest
 	static void returnsTheEventsAndSessionsInsideTheDays() {
 		System.runAs(staff()) {
-			Datetime noon = Datetime.newInstance(
-				Date.today().addDays(10),
-				Time.newInstance(12, 0, 0, 0)
-			);
+			Datetime noon = Datetime.newInstance(Date.today().addDays(10), Time.newInstance(12, 0, 0, 0));
 			Event__c inside = event('Community Dreamin', noon, noon.addHours(8));
 			event('Next Year', noon.addDays(400), noon.addDays(400).addHours(2));
 			session(inside, 'Opening Keynote', noon.addHours(1));
@@ -81,10 +78,7 @@ private class EventCalendarControllerTest {
 	@IsTest
 	static void anEventSpanningTheRangeEdgesIsIncluded() {
 		System.runAs(staff()) {
-			Datetime start = Datetime.newInstance(
-				Date.today().addDays(-3),
-				Time.newInstance(9, 0, 0, 0)
-			);
+			Datetime start = Datetime.newInstance(Date.today().addDays(-3), Time.newInstance(9, 0, 0, 0));
 			event('Long Conference', start, start.addDays(6));
 
 			EventCalendarController.Calendar result = EventCalendarController.getCalendar(
@@ -100,10 +94,7 @@ private class EventCalendarControllerTest {
 	@IsTest
 	static void saysWhenMoreMatchedThanOneViewReads() {
 		System.runAs(staff()) {
-			Datetime noon = Datetime.newInstance(
-				Date.today().addDays(2),
-				Time.newInstance(12, 0, 0, 0)
-			);
+			Datetime noon = Datetime.newInstance(Date.today().addDays(2), Time.newInstance(12, 0, 0, 0));
 			event('One', noon, noon.addHours(1));
 			event('Two', noon.addHours(2), noon.addHours(3));
 			EventCalendarController.maxEvents = 1;

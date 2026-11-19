@@ -22,11 +22,7 @@ private class TerritoryPostInstallTest {
 	static void theInstallerGetsTheAdminSetOnce() {
 		System.runAs(TestUsers.admin()) {
 			Id fresh = TestDataFactory.createUser('Installer', new List<String>()).Id;
-			Id alreadyHolding = TestDataFactory.createUser(
-					'Holder',
-					new List<String>{ 'Territory_Admin' }
-				)
-				.Id;
+			Id alreadyHolding = TestDataFactory.createUser('Holder', new List<String>{ 'Territory_Admin' }).Id;
 
 			Test.startTest();
 			Test.testInstall(new TerritoryPostInstall(), null);

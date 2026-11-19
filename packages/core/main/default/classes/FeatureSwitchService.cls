@@ -4,10 +4,10 @@
  *
  * A feature comes with Core; a module is a separate package with its own on and off (the
  * Module Manager). Features are off on a new install until an administrator turns them on, and
- * turning one on is one-way. `Features_Turned_On__c` lists the keys that are on: empty means
- * every feature is on (an org upgraded from before features existed), `None` means none is (a
- * new install before first-run setup), and `NoneChosen` means none is and first-run setup is
- * finished (every feature was unticked).
+ * turning one on is one-way. `Features_Turned_On__c` lists the keys that are on: `None` means
+ * none is (a new install before first-run setup), and `NoneChosen` means none is and first-run
+ * setup is finished (every feature was unticked). Post-install fills a blank list
+ * (`fillBlankList`), so a blank list means no feature is on.
  *
  * Two kinds of feature:
  * - a tool (Data Manager, Duplicate Matching, Org Optimizer), whose tabs `TabAccessService` gives
@@ -211,15 +211,23 @@ public with sharing class FeatureSwitchService {
 		return null;
 	}
 
+	/**
+	 * Test seam: a test runs in an org whose list post-install never filled, so a blank list
+	 * reads as every feature on there unless a test of the blank list turns this off.
+	 */
+	@TestVisible
+	private static Boolean blankIsAllOnInTests = true;
+
 	/** The keys of the features that are on, lower case. */
 	public static Set<String> featuresOn() {
 		Set<String> keys = new Set<String>();
 		String stored = SettingsService.getSettings().Features_Turned_On__c;
 		if (String.isBlank(stored)) {
-			for (Item feature : all()) {
-				keys.add(feature.key.toLowerCase());
+			if (Test.isRunningTest() && blankIsAllOnInTests) {
+				stored = String.join(allKeys(), ',');
+			} else {
+				return keys;
 			}
-			return keys;
 		}
 		for (String part : stored.split(',')) {
 			String key = part.trim();
@@ -232,8 +240,7 @@ public with sharing class FeatureSwitchService {
 
 	/**
 	 * Whether first-run setup is still to be finished as far as features go: the list holds
-	 * `None`, which only a new install stores. Blank (an upgraded org) and `NoneChosen` (setup
-	 * finished with nothing ticked) are both done.
+	 * `None`, which only a new install stores.
 	 */
 	public static Boolean awaitingFirstRun() {
 		String stored = SettingsService.getSettings().Features_Turned_On__c;
@@ -272,11 +279,7 @@ public with sharing class FeatureSwitchService {
 	 * a household for the same person.
 	 */
 	public static String blockedReason(String key) {
-		if (
-			String.isNotBlank(key) &&
-			key.equalsIgnoreCase(HOUSEHOLD_UPKEEP) &&
-			NpspHouseholdSource.householdsInUse()
-		) {
+		if (String.isNotBlank(key) && key.equalsIgnoreCase(HOUSEHOLD_UPKEEP) && NpspHouseholdSource.householdsInUse()) {
 			return BarnHelp.text('Core', 'Core_Feature_HouseholdUpkeep_NpspBlocked');
 		}
 		return null;
@@ -298,9 +301,7 @@ public with sharing class FeatureSwitchService {
 		for (String key : keys) {
 			Item feature = item(key);
 			if (feature == null) {
-				throw new FeatureSwitchException(
-					BarnHelp.text('Core', 'Core_Feature_UnknownKeyError')
-				);
+				throw new FeatureSwitchException(BarnHelp.text('Core', 'Core_Feature_UnknownKeyError'));
 			}
 			String lower = feature.key.toLowerCase();
 			if (!current.contains(lower) && !newKeys.contains(lower)) {
@@ -349,14 +350,30 @@ public with sharing class FeatureSwitchService {
 		}
 	}
 
-	/**
-	 * Marks a new install: no feature on until first-run setup. An org that already has a
-	 * value (an upgrade, or a reinstall that kept its settings) is left as it is.
-	 */
+	/** Marks a new install: no feature on until first-run setup (`fillBlankList`). */
 	public static void markNewInstall() {
+		fillBlankList(true);
+	}
+
+	/**
+	 * Post-install's fill of a blank list: a new install stores `None`, no feature on until
+	 * first-run setup; an org already in use stores every feature's key, as it has run with them
+	 * on. A list that has a value is left as it is.
+	 */
+	public static void fillBlankList(Boolean isNewInstall) {
 		if (String.isBlank(SettingsService.getSettings().Features_Turned_On__c)) {
-			SettingsService.saveBookkeeping(new Map<String, Object>{ ON_KEY => NONE_ON });
+			SettingsService.saveBookkeeping(
+				new Map<String, Object>{ ON_KEY => isNewInstall ? NONE_ON : String.join(allKeys(), ',') }
+			);
 		}
+	}
+
+	private static List<String> allKeys() {
+		List<String> keys = new List<String>();
+		for (Item feature : all()) {
+			keys.add(feature.key);
+		}
+		return keys;
 	}
 
 	/** The access sets (tab sets and the Households set) whose feature is on. */

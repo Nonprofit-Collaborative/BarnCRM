@@ -53,15 +53,10 @@ private class HubDataProtectionTest {
 			new HubReminders().execute(null);
 			Test.stopTest();
 
-			Assert.areEqual(
-				3,
-				HubReminders.sentTitles.size(),
-				'One DPIA, one request, one breach, once each'
-			);
+			Assert.areEqual(3, HubReminders.sentTitles.size(), 'One DPIA, one request, one breach, once each');
 			Assert.areEqual(
 				Date.today().addDays(10),
-				[SELECT Reminded_For__c FROM Data_Subject_Request__c WHERE Id = :open.Id]
-				.Reminded_For__c,
+				[SELECT Reminded_For__c FROM Data_Subject_Request__c WHERE Id = :open.Id].Reminded_For__c,
 				'The request remembers its reminder'
 			);
 			Assert.isNotNull(
@@ -93,11 +88,7 @@ private class HubDataProtectionTest {
 				FROM Data_Subject_Request__c
 				WHERE Id = :erase.Id
 			];
-			Assert.areEqual(
-				audit.Id,
-				after.Erasure_Record__c,
-				'Linked by its reference, ignoring case'
-			);
+			Assert.areEqual(audit.Id, after.Erasure_Record__c, 'Linked by its reference, ignoring case');
 			Assert.areEqual('Received', after.Status__c, 'The person completes the request');
 		}
 	}

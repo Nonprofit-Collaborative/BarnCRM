@@ -46,9 +46,7 @@ public with sharing class HubPolicy {
 		requireManage();
 		Hub_Document__c document = document(documentId);
 		if (document.Status__c != 'Active' || document.Requires_Acknowledgment__c != true) {
-			throw new PolicyException(
-				BarnHelp.text('CorporateHub', 'CorporateHub_Policy_NotAskable')
-			);
+			throw new PolicyException(BarnHelp.text('CorporateHub', 'CorporateHub_Policy_NotAskable'));
 		}
 		Set<Id> userIds = String.isBlank(groupName) ? barnCrmUsers() : groupUsers(groupName);
 		return ask(document, userIds, new Set<Id>());
@@ -62,9 +60,7 @@ public with sharing class HubPolicy {
 		requireManage();
 		Hub_Document__c document = document(documentId);
 		if (document.Status__c != 'Active' || document.Requires_Acknowledgment__c != true) {
-			throw new PolicyException(
-				BarnHelp.text('CorporateHub', 'CorporateHub_Policy_NotAskable')
-			);
+			throw new PolicyException(BarnHelp.text('CorporateHub', 'CorporateHub_Policy_NotAskable'));
 		}
 		Set<Id> personIds = new Set<Id>();
 		for (Board_Member__c seat : HubBoard.currentSeats(boardId)) {
@@ -105,9 +101,7 @@ public with sharing class HubPolicy {
 	/** R-HD2: reviewed today, next review one interval on. Needs only edit access. */
 	public static void markReviewed(Id documentId) {
 		Hub_Document__c document = document(documentId);
-		Integer months = document.Review_Months__c == null
-			? 12
-			: document.Review_Months__c.intValue();
+		Integer months = document.Review_Months__c == null ? 12 : document.Review_Months__c.intValue();
 		document.Last_Reviewed_On__c = Date.today();
 		document.Review_Date__c = Date.today().addMonths(Math.max(1, months));
 		update as user document;
@@ -164,20 +158,9 @@ public with sharing class HubPolicy {
 	/** Every request for the document's current version, outstanding first. */
 	public static List<Policy_Acknowledgment__c> currentRequests(Hub_Document__c document) {
 		return [
-			SELECT
-				Id,
-				Status__c,
-				Due_Date__c,
-				Acknowledged_On__c,
-				User__c,
-				User__r.Name,
-				Person__c,
-				Person__r.Name
+			SELECT Id, Status__c, Due_Date__c, Acknowledged_On__c, User__c, User__r.Name, Person__c, Person__r.Name
 			FROM Policy_Acknowledgment__c
-			WHERE
-				Document__c = :document.Id
-				AND Version__c = :document.Version__c
-				AND Status__c != :SUPERSEDED
+			WHERE Document__c = :document.Id AND Version__c = :document.Version__c AND Status__c != :SUPERSEDED
 			WITH USER_MODE
 			ORDER BY Status__c DESC, Due_Date__c
 			LIMIT 2000
@@ -204,9 +187,7 @@ public with sharing class HubPolicy {
 
 	private static void requireManage() {
 		if (!canManage()) {
-			throw new PolicyException(
-				BarnHelp.text('CorporateHub', 'CorporateHub_Policy_NoPermission')
-			);
+			throw new PolicyException(BarnHelp.text('CorporateHub', 'CorporateHub_Policy_NoPermission'));
 		}
 	}
 
@@ -241,12 +222,7 @@ public with sharing class HubPolicy {
 		Set<Id> everyone = new Set<Id>(userIds);
 		everyone.addAll(personIds);
 		// R-PAK1: an Ask Every Year document carries the year, so the same version is asked yearly.
-		String stem =
-			document.Id +
-			':' +
-			version +
-			(document.Annual__c == true ? ':' + Date.today().year() : '') +
-			':';
+		String stem = document.Id + ':' + version + (document.Annual__c == true ? ':' + Date.today().year() : '') + ':';
 		for (Id personId : everyone) {
 			String key = stem + personId;
 			if (asked.contains(key)) {
@@ -280,11 +256,7 @@ public with sharing class HubPolicy {
 		}
 		HubReminders.notify(
 			notified,
-			BarnHelp.text(
-				'CorporateHub',
-				'CorporateHub_Policy_RequestTitle',
-				new List<Object>{ document.Name }
-			),
+			BarnHelp.text('CorporateHub', 'CorporateHub_Policy_RequestTitle', new List<Object>{ document.Name }),
 			BarnHelp.text('CorporateHub', 'CorporateHub_Policy_RequestBody'),
 			document.Id
 		);
@@ -321,9 +293,7 @@ public with sharing class HubPolicy {
 				memberIds.add(member.UserOrGroupId);
 			}
 		}
-		return new Map<Id, User>(
-				[SELECT Id FROM User WHERE Id IN :memberIds AND IsActive = TRUE WITH SYSTEM_MODE]
-			)
+		return new Map<Id, User>([SELECT Id FROM User WHERE Id IN :memberIds AND IsActive = TRUE WITH SYSTEM_MODE])
 			.keySet();
 	}
 }

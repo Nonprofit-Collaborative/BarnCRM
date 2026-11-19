@@ -36,10 +36,7 @@ public inherited sharing class NameSearch {
 	 * @return one list per object in the RETURNING clause
 	 */
 	public static List<List<SObject>> find(String searchText, String returning) {
-		return Search.query(
-			'FIND {' + searchText + '} IN NAME FIELDS RETURNING ' + returning,
-			AccessLevel.USER_MODE
-		);
+		return Search.query('FIND {' + searchText + '} IN NAME FIELDS RETURNING ' + returning, AccessLevel.USER_MODE);
 	}
 
 	private static String escape(String word) {

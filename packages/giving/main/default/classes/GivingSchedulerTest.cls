@@ -14,9 +14,7 @@ private class GivingSchedulerTest {
 	@IsTest
 	static void theOverdueJobRuns() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Contact person = TestDataFactory.person(
-				new Contact(FirstName = 'Sarah', LastName = 'Nguyen')
-			);
+			Contact person = TestDataFactory.person(new Contact(FirstName = 'Sarah', LastName = 'Nguyen'));
 			insert person;
 			Commitment__c pledge = new Commitment__c(
 				Type__c = 'Pledge',
@@ -71,9 +69,7 @@ private class GivingSchedulerTest {
 	@IsTest
 	static void theOverdueJobLeavesAPaymentInsideTheGracePeriodAlone() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Contact person = TestDataFactory.person(
-				new Contact(FirstName = 'Sarah', LastName = 'Nguyen')
-			);
+			Contact person = TestDataFactory.person(new Contact(FirstName = 'Sarah', LastName = 'Nguyen'));
 			insert person;
 			Commitment__c pledge = new Commitment__c(
 				Type__c = 'Pledge',
@@ -125,9 +121,7 @@ private class GivingSchedulerTest {
 	@IsTest
 	static void theTopUpJobRunsAndRecordsWhatItDid() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Contact person = TestDataFactory.person(
-				new Contact(FirstName = 'Sarah', LastName = 'Nguyen')
-			);
+			Contact person = TestDataFactory.person(new Contact(FirstName = 'Sarah', LastName = 'Nguyen'));
 			insert person;
 			insert new Commitment__c(
 				Type__c = 'Recurring',

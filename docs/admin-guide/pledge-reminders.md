@@ -18,7 +18,7 @@ run does anything.
 
 ## How to Turn It On
 
-1. Open **BarnCRM Settings**, then **Giving**. Under **Commitments and Installments**, open
+1. Open **BarnCRM Settings**, then **Fundraising**. Under **Commitments and Installments**, open
    **Pledge Reminders**. This is the page where you write and watch the steps.
 2. Write your steps (below) and choose your email templates. BarnCRM ships two to start from:
    **BarnCRM: pledge installment coming due** and **BarnCRM: pledge installment overdue**. Edit
@@ -29,7 +29,7 @@ run does anything.
    Reminders page to switch on the Pledge Reminders step of [BarnCRM Nightly Jobs](nightly-jobs.md), the one
    nightly run, so it happens at 3:15 each morning. Its row on the **Nightly Jobs** panel of
    BarnCRM Settings is the same switch, with **Run Now**, its last run and what it sent
-   (G-37; the panel replaced the Giving Nightly Jobs page in 1.23, D-200). The step only does
+   (G-37; the panel replaced the Fundraising Nightly Jobs page in 1.23, D-200). The step only does
    anything while **Send pledge reminders** is on, so you can stop reminders at any time by
    clearing that setting.
 
@@ -98,7 +98,7 @@ again on its own with a fixed reason, so no email row is left Queued.
 
 ## A Five-Minute Walkthrough
 
-1. Open **BarnCRM Settings**, then **Giving**, then **Pledge Reminders**. The page says
+1. Open **BarnCRM Settings**, then **Fundraising**, then **Pledge Reminders**. The page says
    reminders are off.
 2. Choose **New Step**. Name it `Week late`, days from due date `7`, channel `Email`, and pick
    **BarnCRM: pledge installment overdue**. Save.

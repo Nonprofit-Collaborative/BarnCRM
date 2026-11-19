@@ -44,9 +44,7 @@ private class GiftRollupRefundTest {
 
 			Test.startTest();
 			RollupService.ensureDefaults();
-			RollupService.runFullRecalculation(
-				definitionsFor(new Set<String>{ KEY_TOTAL, KEY_COUNT })
-			);
+			RollupService.runFullRecalculation(definitionsFor(new Set<String>{ KEY_TOTAL, KEY_COUNT }));
 			Test.stopTest();
 
 			Contact recalculated = [
@@ -83,9 +81,7 @@ private class GiftRollupRefundTest {
 
 			Test.startTest();
 			RollupService.ensureDefaults();
-			RollupService.runFullRecalculation(
-				definitionsFor(new Set<String>{ KEY_TOTAL, KEY_COUNT })
-			);
+			RollupService.runFullRecalculation(definitionsFor(new Set<String>{ KEY_TOTAL, KEY_COUNT }));
 			Test.stopTest();
 
 			Contact recalculated = [
@@ -120,9 +116,7 @@ private class GiftRollupRefundTest {
 
 			Test.startTest();
 			RollupService.ensureDefaults();
-			RollupService.runFullRecalculation(
-				definitionsFor(new Set<String>{ KEY_TOTAL, KEY_COUNT })
-			);
+			RollupService.runFullRecalculation(definitionsFor(new Set<String>{ KEY_TOTAL, KEY_COUNT }));
 			Test.stopTest();
 
 			Contact recalculated = [

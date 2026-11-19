@@ -126,9 +126,9 @@ class PackageUpgradePlanTest(unittest.TestCase):
 
     def test_uninstall_check_needs_a_module_nothing_chosen_depends_on(self):
         result = run("--plan", "--project", self.project_file, "--from", "HEAD", "--to", "HEAD",
-                     "--packages", "mirror", "--uninstall-check=giving")
+                     "--packages", "giving", "--uninstall-check=rollups")
         self.assertEqual(result.returncode, 2)
-        self.assertIn("mirror", result.stderr)
+        self.assertIn("giving", result.stderr)
         output = self.plan("--shapes", "platform", "--packages", "volunteers", "--uninstall-check")
         self.assertIn("[uninstall:volunteers]", output)
         self.assertIn("--absent BarnCRM Volunteers", output)

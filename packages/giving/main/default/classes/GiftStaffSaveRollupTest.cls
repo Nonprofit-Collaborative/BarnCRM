@@ -10,10 +10,7 @@
  */
 @IsTest(testFor='ApexClass:RollupPlanner, ApexClass:RollupService, ApexClass:RollupQueue')
 private class GiftStaffSaveRollupTest {
-	private static final List<String> STAFF_SETS = new List<String>{
-		'BarnCRM_Staff',
-		'Giving_Staff'
-	};
+	private static final List<String> STAFF_SETS = new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' };
 
 	/** The bulk case: one more than the platform's trigger chunk of 200 and a batch of 250. */
 	private static final Integer BULK_GIFTS = 251;
@@ -109,8 +106,7 @@ private class GiftStaffSaveRollupTest {
 		Assert.areEqual(BULK_GIFTS, person.Gift_Count__c, 'Every gift is counted once');
 		Assert.areEqual(
 			BULK_GIFTS * 10,
-			[SELECT Total_Giving__c FROM Account WHERE Id = :ana.AccountId WITH SYSTEM_MODE]
-			.Total_Giving__c,
+			[SELECT Total_Giving__c FROM Account WHERE Id = :ana.AccountId WITH SYSTEM_MODE].Total_Giving__c,
 			'The household\'s total too'
 		);
 	}
@@ -136,11 +132,7 @@ private class GiftStaffSaveRollupTest {
 
 	/** A donor in a household of her own, saved by the running user. */
 	private static Contact donor() {
-		Contact ana = GivingTestDataFactory.insertHouseholdContact(
-			'The Nolan Family',
-			'Ana',
-			'Nolan'
-		);
+		Contact ana = GivingTestDataFactory.insertHouseholdContact('The Nolan Family', 'Ana', 'Nolan');
 		return [SELECT Id, AccountId FROM Contact WHERE Id = :ana.Id];
 	}
 

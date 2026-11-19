@@ -17,63 +17,34 @@
                     <c-barn-notice class="slds-var-m-bottom_small" variant="info" message={labels.noManage} data-id="no-manage"></c-barn-notice>
                 </template>
                 <div class="slds-grid slds-wrap slds-gutters">
-                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2" data-id="smarty">
-                        <h2 class="slds-text-title_bold slds-var-m-bottom_x-small">{labels.smarty}</h2>
-                        <template for:each={smartyKeys} for:item="key">
-                            <lightning-input
-                                key={key.name}
-                                type="password"
-                                autocomplete="off"
-                                label={key.label}
-                                field-level-help={key.status}
-                                placeholder={key.status}
-                                value={key.value}
-                                data-name={key.name}
+                    <template for:each={credentials} for:item="credential">
+                        <div key={credential.provider} class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2" data-id={credential.dataId}>
+                            <h2 class="slds-text-title_bold slds-var-m-bottom_x-small">{credential.heading}</h2>
+                            <p class="slds-var-m-bottom_x-small" data-id={credential.statusId}>{credential.status}</p>
+                            <p class="slds-var-m-bottom_small slds-text-body_small" data-id={credential.stepsId}>{credential.steps}</p>
+                            <lightning-button
+                                class="slds-var-m-right_small"
+                                label={labels.check}
+                                data-provider={credential.provider}
+                                data-id={credential.checkId}
                                 disabled={locked}
-                                onchange={handleType}
-                            ></lightning-input>
-                        </template>
-                        <lightning-button
-                            class="slds-var-m-top_small"
-                            label={labels.clear}
-                            data-provider="Smarty"
-                            data-id="clear-smarty"
-                            disabled={locked}
-                            onclick={handleClear}
-                        ></lightning-button>
-                    </div>
-                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2" data-id="google">
-                        <h2 class="slds-text-title_bold slds-var-m-bottom_x-small">{labels.google}</h2>
-                        <template for:each={googleKeys} for:item="key">
-                            <lightning-input
-                                key={key.name}
-                                type="password"
-                                autocomplete="off"
-                                label={key.label}
-                                field-level-help={key.status}
-                                placeholder={key.status}
-                                value={key.value}
-                                data-name={key.name}
+                                onclick={handleCheck}
+                            ></lightning-button>
+                            <lightning-button
+                                label={labels.clear}
+                                data-provider={credential.provider}
+                                data-id={credential.clearId}
                                 disabled={locked}
-                                onchange={handleType}
-                            ></lightning-input>
-                        </template>
-                        <lightning-button
-                            class="slds-var-m-top_small"
-                            label={labels.clear}
-                            data-provider="Google"
-                            data-id="clear-google"
-                            disabled={locked}
-                            onclick={handleClear}
-                        ></lightning-button>
-                    </div>
+                                onclick={handleClear}
+                            ></lightning-button>
+                        </div>
+                    </template>
                 </div>
                 <div class="slds-var-m-vertical_medium">
-                    <lightning-button variant="brand" label={labels.saveKeys} onclick={handleSave} disabled={locked} data-id="save"></lightning-button>
-                    <lightning-button class="slds-var-m-left_small" label={labels.verify} onclick={handleVerify} disabled={verifyLocked} data-id="verify"></lightning-button>
+                    <lightning-button variant="brand" label={labels.verify} onclick={handleVerify} disabled={verifyLocked} data-id="verify"></lightning-button>
                 </div>
                 <template lwc:if={message}>
-                    <c-barn-notice class="slds-var-m-bottom_medium" variant="success" message={message} data-id="message"></c-barn-notice>
+                    <c-barn-notice class="slds-var-m-bottom_medium" variant={messageVariant} message={message} data-id="message"></c-barn-notice>
                 </template>
             </template>
             <template lwc:if={error}>

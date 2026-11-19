@@ -8,6 +8,14 @@
                 class="slds-var-m-right_x-small"
                 data-id="rerun"
             ></lightning-button>
+            <template lwc:if={showRunRemaining}>
+                <lightning-button
+                    label={labels.runRemaining}
+                    onclick={handleRunRemaining}
+                    class="slds-var-m-right_x-small"
+                    data-id="run-remaining"
+                ></lightning-button>
+            </template>
             <template if:true={showUseRecommended}>
                 <lightning-button
                     variant="brand"

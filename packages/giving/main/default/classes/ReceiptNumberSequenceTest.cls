@@ -25,17 +25,11 @@ private class ReceiptNumberSequenceTest {
 			Test.startTest();
 			List<String> allocated = new List<String>();
 			for (Integer index = 0; index < 5; index++) {
-				allocated.add(
-					ReceiptNumberSequence.allocateOne(ReceiptNumberSequence.TYPE_PER_GIFT, YEAR)
-				);
+				allocated.add(ReceiptNumberSequence.allocateOne(ReceiptNumberSequence.TYPE_PER_GIFT, YEAR));
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				'HFH-2026-000001',
-				allocated[0],
-				'The series starts at the counter in settings.'
-			);
+			Assert.areEqual('HFH-2026-000001', allocated[0], 'The series starts at the counter in settings.');
 			Set<String> unique = new Set<String>(allocated);
 			Assert.areEqual(5, unique.size(), 'No number is ever handed out twice.');
 			for (Integer index = 1; index < allocated.size(); index++) {
@@ -59,15 +53,8 @@ private class ReceiptNumberSequenceTest {
 	static void blockAllocationDoesNotOverlapALaterSingleAllocation() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Test.startTest();
-			List<String> block = ReceiptNumberSequence.allocate(
-				ReceiptNumberSequence.TYPE_STATEMENT,
-				YEAR,
-				25
-			);
-			String afterwards = ReceiptNumberSequence.allocateOne(
-				ReceiptNumberSequence.TYPE_STATEMENT,
-				YEAR
-			);
+			List<String> block = ReceiptNumberSequence.allocate(ReceiptNumberSequence.TYPE_STATEMENT, YEAR, 25);
+			String afterwards = ReceiptNumberSequence.allocateOne(ReceiptNumberSequence.TYPE_STATEMENT, YEAR);
 			Test.stopTest();
 
 			Assert.areEqual(25, block.size(), 'A block of twenty five is twenty five numbers.');
@@ -92,18 +79,10 @@ private class ReceiptNumberSequenceTest {
 	@IsTest
 	static void aNumberConsumedByAFailedGenerationIsReconciledIntoAVoidReceipt() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			List<String> consumed = ReceiptNumberSequence.allocate(
-				ReceiptNumberSequence.TYPE_STATEMENT,
-				YEAR,
-				3
-			);
+			List<String> consumed = ReceiptNumberSequence.allocate(ReceiptNumberSequence.TYPE_STATEMENT, YEAR, 3);
 			// The middle document is the one that made it to a record. The other two are numbers that
 			// were handed out to a chunk that then failed.
-			Contact donor = GivingTestDataFactory.insertHouseholdContact(
-				'The Reyes Family',
-				'Ana',
-				'Reyes'
-			);
+			Contact donor = GivingTestDataFactory.insertHouseholdContact('The Reyes Family', 'Ana', 'Reyes');
 			insert new Receipt__c(
 				Receipt_Number__c = consumed[1],
 				Type__c = ReceiptNumberSequence.TYPE_STATEMENT,
@@ -112,22 +91,12 @@ private class ReceiptNumberSequenceTest {
 				Donor_Contact__c = donor.Id,
 				Total_Amount__c = 250,
 				Issue_Date__c = Date.today(),
-				Series_Key__c = ReceiptNumberSequence.seriesKeyFor(
-					ReceiptNumberSequence.TYPE_STATEMENT,
-					YEAR
-				)
+				Series_Key__c = ReceiptNumberSequence.seriesKeyFor(ReceiptNumberSequence.TYPE_STATEMENT, YEAR)
 			);
 
 			Test.startTest();
-			Integer accountedFor = ReceiptNumberSequence.reconcile(
-				ReceiptNumberSequence.TYPE_STATEMENT,
-				YEAR,
-				null
-			);
-			String next = ReceiptNumberSequence.allocateOne(
-				ReceiptNumberSequence.TYPE_STATEMENT,
-				YEAR
-			);
+			Integer accountedFor = ReceiptNumberSequence.reconcile(ReceiptNumberSequence.TYPE_STATEMENT, YEAR, null);
+			String next = ReceiptNumberSequence.allocateOne(ReceiptNumberSequence.TYPE_STATEMENT, YEAR);
 			Test.stopTest();
 
 			Assert.areEqual(2, accountedFor, 'The two numbers with no receipt are accounted for.');
@@ -142,10 +111,7 @@ private class ReceiptNumberSequenceTest {
 
 			for (String consumedNumber : new List<String>{ consumed[0], consumed[2] }) {
 				Receipt__c reconciled = byNumber.get(consumedNumber);
-				Assert.isNotNull(
-					reconciled,
-					'Number ' + consumedNumber + ' has a record, not silence.'
-				);
+				Assert.isNotNull(reconciled, 'Number ' + consumedNumber + ' has a record, not silence.');
 				Assert.areEqual(ReceiptService.STATUS_VOID, reconciled.Status__c, 'It is void.');
 				Assert.areEqual(
 					ReceiptNumberSequence.VOID_REASON_GENERATION_FAILED,
@@ -184,22 +150,11 @@ private class ReceiptNumberSequenceTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			ReceiptService.issuePermission = true;
 			ReceiptRendererFactory.overrideRenderer = new ReceiptTestDataFactory.FailingRenderer();
-			Contact donor = GivingTestDataFactory.insertHouseholdContact(
-				'The Okafor Family',
-				'Ada',
-				'Okafor'
-			);
-			Gift__c gift = ReceiptTestDataFactory.plainCashGift(
-				donor.Id,
-				120,
-				Date.newInstance(YEAR, 3, 4)
-			);
+			Contact donor = GivingTestDataFactory.insertHouseholdContact('The Okafor Family', 'Ada', 'Okafor');
+			Gift__c gift = ReceiptTestDataFactory.plainCashGift(donor.Id, 120, Date.newInstance(YEAR, 3, 4));
 			insert gift;
 
-			String key = ReceiptNumberSequence.seriesKeyFor(
-				ReceiptNumberSequence.TYPE_PER_GIFT,
-				YEAR
-			);
+			String key = ReceiptNumberSequence.seriesKeyFor(ReceiptNumberSequence.TYPE_PER_GIFT, YEAR);
 			// One good allocation first, so there is a series row to compare against.
 			ReceiptNumberSequence.allocateOne(ReceiptNumberSequence.TYPE_PER_GIFT, YEAR);
 			Decimal before = nextCounterOf(key);

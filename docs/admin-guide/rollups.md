@@ -5,8 +5,8 @@
 Rollups are the totals that appear on a household, a person, an organization, or another
 record without anyone adding them up: a count, a sum, a first or last date, a largest
 value. The rollup engine is its own module, **BarnCRM Rollup Builder**, offered in both
-editions and needed by Giving; without it BarnCRM keeps no totals. The totals themselves are
-shipped by the modules that own the records being counted, and with the Giving module installed they
+editions and needed by Fundraising; without it BarnCRM keeps no totals. The totals themselves are
+shipped by the modules that own the records being counted, and with the Fundraising module installed they
 include total giving, gift counts and dates, pledge balances and what a fund and an appeal
 have raised.
 
@@ -20,10 +20,10 @@ you never have to guess whether a number on a record is current. If the calculat
 not run recently, the BarnCRM home page says so rather than leaving a stale number
 looking fresh.
 
-## What BarnCRM Calculates for You (with Giving)
+## What BarnCRM Calculates for You (with Fundraising)
 
-This section applies only when the Giving module is installed. The Rollup Builder module on
-its own ships no totals, so without Giving it lists only rollups you add yourself.
+This section applies only when the Fundraising module is installed. The Rollup Builder module on
+its own ships no totals, so without Fundraising it lists only rollups you add yourself.
 
 Every total below is created when you install the module that owns it, switched on and
 ready to calculate, and every one of them can then be switched to another mode, made
@@ -43,7 +43,7 @@ single number.
 | Largest gift | The largest single gift this donor has given. |
 | Giving this year | Given in the fiscal year you are in now. |
 | Giving last year | Given in the fiscal year before it, which is the LY in LYBUNT. |
-| Giving two years ago | Given the year before that, used by SYBUNT and retention reporting. |
+| Fundraising two years ago | Given the year before that, used by SYBUNT and retention reporting. |
 | Pledge balance | Promised and not yet paid. |
 | Total soft credits | What this donor is recognized for without being hard credited. |
 | Soft credit count | How many gifts this donor is recognized on. |
@@ -92,12 +92,12 @@ about a number that looks wrong:
 
 ## How to Turn It On
 
-Install the **BarnCRM Rollup Builder** module after Core; Giving cannot be installed without
+Install the **BarnCRM Rollup Builder** module after Core; Fundraising cannot be installed without
 it. Installing it gives you, the installer, the **Rollup Builder Admin** permission set.
 
 After that most of it is already on. Installing a module creates its rollups, active and ready
-to calculate (with Giving, the giving totals), and an upgrade adds anything newly shipped
-without touching a rollup you have changed. An org with the Rollup Builder and no Giving starts
+to calculate (with Fundraising, the giving totals), and an upgrade adds anything newly shipped
+without touching a rollup you have changed. An org with the Rollup Builder and no Fundraising starts
 with no shipped totals.
 
 One step is left for you, and nothing in the app does it on your behalf:
@@ -405,7 +405,7 @@ rollups you tick are added when you click **Add the Chosen Rollups**. Each is ad
 **switched off**, through the same checks as a save in the Builder, so switch it on once its
 field shows what you expect. Only people with **Manage BarnCRM Settings** see the button.
 
-The **Nonprofit Starter** (needs Giving) adds totals Giving does not ship, all from received
+The **Nonprofit Starter** (needs Fundraising) adds totals Fundraising does not ship, all from received
 gifts (Received, Refunded or Written off, with an amount above zero, as the shipped giving
 totals count them):
 
@@ -427,7 +427,7 @@ Each rollup shows its sentence and whether it can be added:
   Create the field, click **Refresh Fields**, and save there (it saves switched off), or come
   back here and tick it.
 - **Already filled by ...**: another rollup fills that field, so this one is not added.
-- **Needs ..., which this org does not have**: the module it needs (Giving) is not installed.
+- **Needs ..., which this org does not have**: the module it needs (Fundraising) is not installed.
 - **Ready to add, switched off.**
 
 After **Add the Chosen Rollups**, each ticked rollup says **Added, switched off.** or why it
@@ -715,7 +715,7 @@ happens to the values the rollup wrote:
 
 ### Explain These Totals on a Record Page
 
-When someone asks "where does this number come from?", open the record: with Giving, the
+When someone asks "where does this number come from?", open the record: with Fundraising, the
 contact and account record pages show **Explain These Totals** in the sidebar to people with
 Manage BarnCRM Settings. To show it to staff too, or on another object's page, click the
 gear, **Edit Page**, select the card (or drag **Explain These Totals** from the custom
@@ -916,7 +916,7 @@ line per tool:
 
 - at the top of the **Rollup Builder** tab;
 - in the Setup Assistant, on the step that says what BarnCRM found in your org;
-- in the **Modules** section of BarnCRM Settings, when Rollup Builder or Giving is installed.
+- in the **Modules** section of BarnCRM Settings, when Rollup Builder or Fundraising is installed.
 
 The line reads, for DLRS: "This org also runs DLRS (Declarative Lookup Rollup Summaries). It is
 a separate rollup tool; BarnCRM does not manage its rollups." An org without either tool sees
@@ -1077,7 +1077,7 @@ and so does changing a gift's status or deleting a gift. What is not here yet:
 ## A Five-Minute Walkthrough
 
 Do this as Maria, with the sample data loaded. Steps 2 to 5 use the giving totals, so they
-need the Giving module; without it, do them on a rollup you have added.
+need the Fundraising module; without it, do them on a rollup you have added.
 
 1. Open the **BarnCRM** app. On the home page, find the **Rollups** tile. It reads
    "Rollups Last Completed" with a time. If it has been more than 36 hours, the tile turns
@@ -1115,7 +1115,7 @@ your change disappears without a message. If a total looks wrong, the records be
 it are wrong; fix those and recalculate. If you need a number the rollups do not
 calculate, add your own field rather than borrowing one of these.
 
-**Expecting a soft credit to show in total giving (with Giving).** It never will. A spouse recognized on
+**Expecting a soft credit to show in total giving (with Fundraising).** It never will. A spouse recognized on
 a household gift has it in **Total soft credits**, and the person who actually gave has it
 in **Total giving**. Adding the two together double counts the gift, which is why they are
 two numbers and not one. Report on whichever answers your question, and say which one you
@@ -1138,8 +1138,8 @@ queued and catch up within minutes, not in the same instant. Give it a few minut
 checking. If a number still has not moved, look at **Needs Attention** in the Rollup Builder,
 which shows how many records are still waiting and which could not be saved.
 
-**Switching off a rollup automation and forgetting it (with Giving).** Instantly and Both
-work because Giving runs an automation each time a gift, a commitment, a gift allocation or
+**Switching off a rollup automation and forgetting it (with Fundraising).** Instantly and Both
+work because Fundraising runs an automation each time a gift, a commitment, a gift allocation or
 a soft credit is saved. They are listed on the **Automation** page as **Update rollups when
 a gift changes**, **Update rollups when a commitment changes**, **Update rollups for gift
 allocations** and **Update rollups for soft credits**. Switching one off,
@@ -1149,7 +1149,7 @@ mode stays behind until you click **Recalculate** on its row. Switch the automat
 afterwards.
 
 **Turning the module off and forgetting it.** **Turn Off** on the BarnCRM Rollup Builder row
-of **BarnCRM Settings**, **Modules** stops every rollup at once, Giving's included: saves,
+of **BarnCRM Settings**, **Modules** stops every rollup at once, Fundraising's included: saves,
 the Flow action, the queue, the nightly run and a recalculation already running all stop,
 and nothing is processed while it is off. **Recalculate**, **Recalculate All** and **Run
 tonight** say the module is off; a rollup you save in the Builder then is saved and calculated
@@ -1191,7 +1191,7 @@ For report builders only. Nothing on this page requires you to know these.
 | Skip for people with this custom permission | `Bypass_Permission__c` on Rollup Definition |
 | Member count on a household, maintained by the household automation rather than by a rollup | `Member_Count__c` |
 
-With Giving installed:
+With Fundraising installed:
 
 | What you see | Field |
 |---|---|

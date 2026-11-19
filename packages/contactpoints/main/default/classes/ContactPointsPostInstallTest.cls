@@ -23,11 +23,7 @@ private class ContactPointsPostInstallTest {
 	static void theInstallerGetsTheAdminSetOnce() {
 		System.runAs(TestUsers.admin()) {
 			Id fresh = TestDataFactory.createUser('Installer', new List<String>()).Id;
-			Id alreadyHolding = TestDataFactory.createUser(
-					'Holder',
-					new List<String>{ 'Contact_Point_Sync_Admin' }
-				)
-				.Id;
+			Id alreadyHolding = TestDataFactory.createUser('Holder', new List<String>{ 'Contact_Point_Sync_Admin' }).Id;
 
 			Test.startTest();
 			Test.testInstall(new ContactPointsPostInstall(), null);

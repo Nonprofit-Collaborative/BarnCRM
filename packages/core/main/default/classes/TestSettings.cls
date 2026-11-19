@@ -11,9 +11,7 @@ public class TestSettings {
 	public static void neverSetUp() {
 		SettingsService.saveSystemValue('Features_Turned_On__c', null);
 		SettingsService.saveSystemValue('Suite__c', null);
-		SettingsService.saveBookkeeping(
-			new Map<String, Object>{ 'Setup_Steps_Completed__c' => '' }
-		);
+		SettingsService.saveBookkeeping(new Map<String, Object>{ 'Setup_Steps_Completed__c' => '' });
 	}
 
 	/** A new install: never set up, with the feature list marked as awaiting first-run setup. */

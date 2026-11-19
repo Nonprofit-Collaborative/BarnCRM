@@ -3,7 +3,7 @@
 ## 1. What It Does
 
 Importing loads a spreadsheet of people, households, and organizations into BarnCRM
-without a consultant, and, with the Giving module installed, their gifts too
+without a consultant, and, with the Fundraising module installed, their gifts too
 ([Importing gifts](gift-import.md)). You upload the file, BarnCRM suggests which column means what,
 you say how a row should be matched against records you already have, and then you run a
 **preview** that tells you exactly what would be created, updated, matched, or rejected
@@ -25,7 +25,7 @@ The cards work like radio buttons: Tab reaches them and the arrow keys move betw
 | Card | What it loads | Where to read more |
 |---|---|---|
 | **People and Organizations** | People, a second person on the same row, households, organizations and the links between people and organizations, with their mailing addresses. A file of organizations only works too. You choose the template; the first one is chosen for you. | Sections 3, 4 and 8 |
-| **Gifts** | Gifts with the people and organizations who gave them. Shown only when one of your active templates loads gifts, which means the Giving module is installed. | [Importing gifts](gift-import.md) |
+| **Gifts** | Gifts with the people and organizations who gave them. Shown only when one of your active templates loads gifts, which means the Fundraising module is installed. | [Importing gifts](gift-import.md) |
 | **One Kind of Record** | Adds new records or updates ones you already have, for any one kind of record you may load, such as program sessions or your own records. You choose the kind of record and name a new template. | Section 9 |
 | **Several Kinds of Record in One File** | Records of several kinds from one file: a sheet for each kind of record, or several kinds on one row (`Account.Name` and `Contact.LastName`), each record linked to the records it points at, such as programs, their sessions and the attendees. You choose the kinds of record and name a new template. | Section 9, "Several Kinds of Record in One File" |
 | **Delete the Records a File Lists** | Sends the records whose IDs the file lists to the Recycle Bin, after a preview and a confirmed count. Shown only to people with **Bulk Delete Records**. As **One Kind of Record**, with **Delete by record ID** chosen for you. | Section 9, "Deleting the records a file lists" |
@@ -46,7 +46,7 @@ removed and the values it changed are put back (section 5).
 Import is part of the **Data Manager** feature, which on a new install is off until you turn
 it on: choose **Turn On** in the **Data Manager** row in **BarnCRM Settings**, **General**
 (or leave it ticked in first-run setup); see [BarnCRM Settings](barncrm-settings.md). Once it
-is on, the **Super Importer** tab (called **Import** in earlier versions) is for anyone with the **Manage BarnCRM Settings** permission. Open it from the **Data Manager** tab in the BarnCRM app: choose **Super Importer**
+is on, the **Super Importer** tab is for anyone with the **Manage BarnCRM Settings** permission. Open it from the **Data Manager** tab in the BarnCRM app: choose **Super Importer**
 (see [Data Manager](data-manager.md)). If you do not see the tile, ask whoever set up your org
 to give you the BarnCRM Admin role on the **Access** page.
 
@@ -73,7 +73,7 @@ A few things are worth knowing before your first large file:
    **After 90 Days** or **Never**. See [How long the rows are kept](#how-long-the-rows-are-kept).
 5. **Import** on the same page has an **Open Super Importer** button, which is the same
    place the **Super Importer** tab takes you.
-6. With the Giving module installed, the same page has the two payment matching settings
+6. With the Fundraising module installed, the same page has the two payment matching settings
    ([Importing gifts](gift-import.md), section 2).
 
 BarnCRM Core ships three ready-made people templates, added at install and on upgrade:
@@ -100,8 +100,8 @@ enough.
 
 In an org installed before 2026-10-28 the first is called **Generic contact list**: an upgrade
 adds the two new templates but never renames or changes one you already have. You can edit
-any of them, and your edits are never overwritten by an upgrade. With the Giving module installed (and
-only then), Giving adds a **generic gift list** and templates that read the exports of the
+any of them, and your edits are never overwritten by an upgrade. With the Fundraising module installed (and
+only then), Fundraising adds a **generic gift list** and templates that read the exports of the
 system you are moving from, without renaming a column: see [Migrating from Nonprofit
 Cloud](migrating-from-nonprofit-cloud.md) and [Migrating from NPSP](migrating-from-npsp.md).
 
@@ -161,7 +161,7 @@ pipes) or an Excel workbook (.xlsx). A small one is best for the first run: five
    already have and never add new ones, and **Also match with my duplicate rules** to let your
    org's duplicate rules find people the rule missed. Section 8 explains every choice.
 5. Optionally, under **More Options**, **Control Totals (Optional)**, type how many rows the file should have (and, with
-   Giving, for a gift file, what its amounts should add up to). The preview checks them and the import is
+   Fundraising, for a gift file, what its amounts should add up to). The preview checks them and the import is
    refused while they do not match.
 6. Select **Preview**. Nothing is written. When it finishes you see four counts, "would
    create", "would update", "would match and change nothing", and "would be rejected",
@@ -195,7 +195,7 @@ pipes) or an Excel workbook (.xlsx). A small one is best for the first run: five
 9. The results screen shows the same four counts for what actually happened, the run log,
    and links to the records. **See Every Row** opens the list of every row of this import
    (the data job's **Import Rows**), so a row you want to look at, or report on, is one click
-   away. The **Import Rows** tab no longer sits in the Admin app's navigation; this link, and a
+   away. The **Import Rows** tab is not in the Admin app's navigation; this link, and a
    rejected row's own page, are how you reach it. Select **Download**, then **Download Results**, to get every row of the file back as
    a CSV with what became of it: its outcome (Created, Updated, Matched, Rejected or Skipped),
    the Salesforce record IDs it resulted in (person, second person, household, organization,
@@ -286,18 +286,18 @@ Three things are worth knowing about it.
 ## 5. Undoing an Import
 
 An import you regret can be undone for 30 days after you import it. Undo removes the
-people, households and organizations that import created (and, with Giving, its gifts), and
+people, households and organizations that import created (and, with Fundraising, its gifts), and
 puts back the values it changed on records you already had. An import that loaded one object
 (section 9) has the records it created removed the same way, counted under that object's name.
 An import whose rejected rows you retried (section 3) is undone as one, both runs together.
 It does not touch anything else.
-With Giving, a gift with a receipt is never removed, and neither is its donor ([Importing
+With Fundraising, a gift with a receipt is never removed, and neither is its donor ([Importing
 gifts](gift-import.md), section 6).
 
 1. Open the **Super Importer** tab. **Recent Imports** lists your last imports, newest first, with
    the date each one can be undone until.
 2. Select **Undo** beside the import. BarnCRM counts what it would remove (people,
-   households and organizations, and gifts with Giving) and how many changed values it would put back, and shows
+   households and organizations, and gifts with Fundraising) and how many changed values it would put back, and shows
    you the numbers with the import's name and file name. Nothing has changed yet. The
    numbers count the records the import created from your file. Undo also removes the
    households and gift allocations BarnCRM created automatically for those rows, so the
@@ -314,9 +314,9 @@ What undo will not do, on purpose:
 - **It never deletes a record the import only matched or updated.** Those records were
   yours before the import. Values the import wrote to them are put back instead.
 - **It keeps a record that has gained something since.** If somebody recorded a
-  relationship, an affiliation or an address (or, with Giving, a gift) for a person the import created, that person is
+  relationship, an affiliation or an address (or, with Fundraising, a gift) for a person the import created, that person is
   kept, and so is their household. A household somebody else has joined is kept too, and so
-  is a household that gifts or pledges (with Giving) are still credited to, even when the
+  is a household that gifts or pledges (with Fundraising) are still credited to, even when the
   gift was not entered after the import, for example an older gift whose donor was changed
   to a person in that household. Each record kept is listed with the reason in the import's
   journal.
@@ -479,7 +479,7 @@ at it, so a second import matches it instead of creating it again. Fix those row
 spreadsheet, save them as a smaller file, and import that file on its own.
 
 **Rows rejected with "The people on this row were saved, but its ... columns were not
-loaded".** A module (Giving, for a gift file) failed while loading its columns for part of
+loaded".** A module (Fundraising, for a gift file) failed while loading its columns for part of
 the file. Everything it had saved for those rows was undone, so no half-loaded gifts remain,
 but the people on them were already saved. The run log and the Error Log give the reason.
 Fix it, then import the rejected rows again: the people are matched, not created twice.
@@ -523,9 +523,9 @@ other still matches. Do not import: ask your Salesforce administrator
 for access to the field, then preview again.
 
 **Columns for amounts, dates and the like were set to Do not load.** Only a module can load
-them (the Giving module loads gifts), so without one BarnCRM offers nowhere to put them and
+them (the Fundraising module loads gifts), so without one BarnCRM offers nowhere to put them and
 suggests **Do not load**. Nothing is lost: the staged row still keeps the whole original
-line. With Giving installed, see [Importing gifts](gift-import.md).
+line. With Fundraising installed, see [Importing gifts](gift-import.md).
 
 **"This file is larger than 2.5 MB, so it imports without a copy of the original".** BarnCRM
 keeps a copy of each file you import as a Salesforce File, so the original can be downloaded
@@ -534,7 +534,7 @@ ahead and loads every row. Keep your own copy of the file. "The original file wa
 with a reason means the copy could not be saved; again, the import goes ahead.
 
 **"The control totals do not match."** The preview counted a different number of rows (or,
-with Giving, a different total of gift amounts) from the control totals you typed. The run log gives both
+with Fundraising, a different total of gift amounts) from the control totals you typed. The run log gives both
 numbers. Fix the file or the totals and preview again; the import is refused until they agree.
 
 **"A value for every row cannot give a person's name, email or matching ID".** A value for
@@ -862,7 +862,7 @@ may create or edit records. Never listed, whatever your access:
 - Custom settings, custom metadata, platform events, and history, sharing and feed records.
 - BarnCRM's own bookkeeping (import templates, imports, import rows and journals, the error log,
   setting changes, automation settings, rollup definitions) and household membership rows,
-  which households manage themselves. With Giving, receipts, receipt runs, receipt number
+  which households manage themselves. With Fundraising, receipts, receipt runs, receipt number
   series and acknowledgments are never listed either.
 
 **People and organizations load by Update only.** Contacts and accounts can be updated by record
@@ -1107,8 +1107,8 @@ For building a report on your imports.
 | The values given to every row of a file | Data Job | File Values |
 | Whether a file only matched existing records | Data Job | Match Only |
 | The records a row resolved to | Import Row | Household, Contact 1, Contact 2, Organization, Resulting Record, Second Resulting Record |
-| The control totals of a file | Data Job | Expected Count (and, with Giving, Expected Amount, File Amount) |
-| The import a record came from | Account, Contact (and Gift, with Giving) | Created By Import Batch |
+| The control totals of a file | Data Job | Expected Count (and, with Fundraising, Expected Amount, File Amount) |
+| The import a record came from | Account, Contact (and Gift, with Fundraising) | Created By Import Batch |
 | Which templates are for a recurring file, and when each was last used | Import Template | Is Recurring, Source Name, Last Import Date |
 | When an import can be undone until | Data Job | Undo Deadline |
 | What an import changed on existing records, and what an undo kept | Import Journal | Phase, Entry Count, Entries |

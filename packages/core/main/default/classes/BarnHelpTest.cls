@@ -24,26 +24,14 @@ private class BarnHelpTest {
 			'en_US'
 		);
 		System.runAs(TestUsers.admin()) {
-			Assert.areEqual(
-				'Start here.',
-				BarnHelp.text('Core', 'Core_Example_Intro'),
-				'The English text.'
-			);
+			Assert.areEqual('Start here.', BarnHelp.text('Core', 'Core_Example_Intro'), 'The English text.');
 			Assert.areEqual(
 				'12 rows.',
 				BarnHelp.text('Core', 'Core_Example_Count', new List<Object>{ 12 }),
 				'Placeholders are filled in as for a label.'
 			);
-			Assert.areEqual(
-				'',
-				BarnHelp.text('Core', 'Core_Not_There'),
-				'A missing key is empty text.'
-			);
-			Assert.areEqual(
-				'',
-				BarnHelp.text('Programs', 'Programs_Anything'),
-				'A missing catalog is empty.'
-			);
+			Assert.areEqual('', BarnHelp.text('Core', 'Core_Not_There'), 'A missing key is empty text.');
+			Assert.areEqual('', BarnHelp.text('Programs', 'Programs_Anything'), 'A missing catalog is empty.');
 		}
 	}
 
@@ -58,11 +46,7 @@ private class BarnHelpTest {
 			'fr_CA'
 		);
 		System.runAs(TestUsers.admin()) {
-			Assert.areEqual(
-				'Allo.',
-				BarnHelp.text('Giving', 'A'),
-				'The regional translation wins.'
-			);
+			Assert.areEqual('Allo.', BarnHelp.text('Giving', 'A'), 'The regional translation wins.');
 			Assert.areEqual('Don.', BarnHelp.text('Giving', 'C'), 'Then the language.');
 			Assert.areEqual('Only English.', BarnHelp.text('Giving', 'B'), 'Then English.');
 		}
@@ -79,37 +63,17 @@ private class BarnHelpTest {
 			'de'
 		);
 		System.runAs(TestUsers.admin()) {
-			Assert.areEqual(
-				'Hello.',
-				BarnHelp.text('Core', 'A'),
-				'A translation not listed is not read.'
-			);
-			Assert.areEqual(
-				'',
-				BarnHelp.text('Mirror', 'A'),
-				'A file that is not JSON reads as empty.'
-			);
+			Assert.areEqual('Hello.', BarnHelp.text('Core', 'A'), 'A translation not listed is not read.');
+			Assert.areEqual('', BarnHelp.text('Mirror', 'A'), 'A file that is not JSON reads as empty.');
 		}
 	}
 
 	@IsTest
 	static void languageCandidatesNeverIncludeEnglish() {
 		System.runAs(TestUsers.admin()) {
-			Assert.areEqual(
-				new List<String>(),
-				BarnHelp.languageCandidates('en_US'),
-				'English is the base.'
-			);
-			Assert.areEqual(
-				new List<String>{ 'fr_CA', 'fr' },
-				BarnHelp.languageCandidates('fr_CA'),
-				'Regional first.'
-			);
-			Assert.areEqual(
-				new List<String>{ 'de' },
-				BarnHelp.languageCandidates('de'),
-				'One language.'
-			);
+			Assert.areEqual(new List<String>(), BarnHelp.languageCandidates('en_US'), 'English is the base.');
+			Assert.areEqual(new List<String>{ 'fr_CA', 'fr' }, BarnHelp.languageCandidates('fr_CA'), 'Regional first.');
+			Assert.areEqual(new List<String>{ 'de' }, BarnHelp.languageCandidates('de'), 'One language.');
 		}
 	}
 
@@ -118,11 +82,7 @@ private class BarnHelpTest {
 		System.runAs(TestUsers.admin()) {
 			// The real resource: present in every org BarnCRM Core is in, so reading it never
 			// throws, and an unknown key is empty.
-			Assert.areEqual(
-				'',
-				BarnHelp.text('Core', 'Core_No_Such_Help_Key'),
-				'Unknown keys are empty.'
-			);
+			Assert.areEqual('', BarnHelp.text('Core', 'Core_No_Such_Help_Key'), 'Unknown keys are empty.');
 		}
 	}
 }

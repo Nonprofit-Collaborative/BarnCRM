@@ -50,24 +50,12 @@ private class LwcBuilderControllerTest {
 			Map<String, Object> studio = LwcBuilderController.getStudio();
 			Test.stopTest();
 
-			Assert.areEqual(
-				1,
-				((Decimal) first.get('version')).intValue(),
-				'A new component is version 1'
-			);
-			Assert.areEqual(
-				2,
-				((Decimal) second.get('version')).intValue(),
-				'Each save raises the version'
-			);
+			Assert.areEqual(1, ((Decimal) first.get('version')).intValue(), 'A new component is version 1');
+			Assert.areEqual(2, ((Decimal) second.get('version')).intValue(), 'Each save raises the version');
 			Assert.areEqual(true, shown.get('found'), 'The renderer finds it by key');
 			Assert.areEqual(DEFINITION, shown.get('definition'), 'With its definition');
 			Assert.areEqual(false, hidden.get('found'), 'An inactive component shows nothing');
-			Assert.areEqual(
-				1,
-				((List<Object>) studio.get('components')).size(),
-				'One row in the builder'
-			);
+			Assert.areEqual(1, ((List<Object>) studio.get('components')).size(), 'One row in the builder');
 			Assert.areEqual(true, studio.get('sourceExport'), 'Source export ships on');
 			Assert.areEqual(
 				LwcBuilderController.rowsPerList(),
@@ -88,9 +76,7 @@ private class LwcBuilderControllerTest {
 				'key' => refusalOf(new Map<String, Object>{ 'key' => 'has space' }),
 				'dotted' => refusalOf(new Map<String, Object>{ 'key' => 'Has.Dot' }),
 				'used' => refusalOf(new Map<String, Object>{ 'key' => 'DONOR_SNAPSHOT' }),
-				'object' => refusalOf(
-					new Map<String, Object>{ 'key' => 'Other', 'objectName' => 'Not_There__c' }
-				),
+				'object' => refusalOf(new Map<String, Object>{ 'key' => 'Other', 'objectName' => 'Not_There__c' }),
 				'definition' => refusalOf(
 					new Map<String, Object>{
 						'key' => 'Other',
@@ -100,36 +86,16 @@ private class LwcBuilderControllerTest {
 			};
 			Test.stopTest();
 
+			Assert.areEqual(BarnHelp.text('LwcBuilder', 'LwcBuilder_Error_NameNeeded'), refusals.get('name'), 'Name');
+			Assert.areEqual(BarnHelp.text('LwcBuilder', 'LwcBuilder_Error_Key'), refusals.get('key'), 'Key');
+			Assert.areEqual(BarnHelp.text('LwcBuilder', 'LwcBuilder_Error_Key'), refusals.get('dotted'), 'No dots');
 			Assert.areEqual(
-				BarnHelp.text('LwcBuilder', 'LwcBuilder_Error_NameNeeded'),
-				refusals.get('name'),
-				'Name'
-			);
-			Assert.areEqual(
-				BarnHelp.text('LwcBuilder', 'LwcBuilder_Error_Key'),
-				refusals.get('key'),
-				'Key'
-			);
-			Assert.areEqual(
-				BarnHelp.text('LwcBuilder', 'LwcBuilder_Error_Key'),
-				refusals.get('dotted'),
-				'No dots'
-			);
-			Assert.areEqual(
-				BarnHelp.text(
-					'LwcBuilder',
-					'LwcBuilder_Error_KeyUsed',
-					new List<Object>{ 'DONOR_SNAPSHOT' }
-				),
+				BarnHelp.text('LwcBuilder', 'LwcBuilder_Error_KeyUsed', new List<Object>{ 'DONOR_SNAPSHOT' }),
 				refusals.get('used'),
 				'Keys are unique whatever the case'
 			);
 			Assert.areEqual(
-				BarnHelp.text(
-					'LwcBuilder',
-					'LwcBuilder_Error_Object',
-					new List<Object>{ 'Not_There__c' }
-				),
+				BarnHelp.text('LwcBuilder', 'LwcBuilder_Error_Object', new List<Object>{ 'Not_There__c' }),
 				refusals.get('object'),
 				'Object'
 			);
@@ -184,11 +150,7 @@ private class LwcBuilderControllerTest {
 			Integer rows = LwcBuilderController.rowsPerList();
 			Test.stopTest();
 
-			Assert.areEqual(
-				false,
-				result.get('enabled'),
-				'Show Built Components off hides them all'
-			);
+			Assert.areEqual(false, result.get('enabled'), 'Show Built Components off hides them all');
 			Assert.areEqual(false, result.get('found'), 'And nothing is read');
 			Assert.areEqual(2, rows, 'Rows per List as saved');
 		}
@@ -198,13 +160,7 @@ private class LwcBuilderControllerTest {
 	static void listBlocksReadOnlyNamedFieldsAndBindTheFilter() {
 		System.runAs(admin()) {
 			for (String key : new List<String>{ 'Alpha', 'Bravo', 'Charlie' }) {
-				save(
-					new Map<String, Object>{
-						'name' => key,
-						'key' => key,
-						'active' => key != 'Bravo'
-					}
-				);
+				save(new Map<String, Object>{ 'name' => key, 'key' => key, 'active' => key != 'Bravo' });
 			}
 
 			Test.startTest();
@@ -234,10 +190,7 @@ private class LwcBuilderControllerTest {
 				)
 			);
 			String badField = listRefusal(
-				new Map<String, Object>{
-					'object' => 'Built_Component__c',
-					'fields' => new List<String>{ 'Nope__c' }
-				}
+				new Map<String, Object>{ 'object' => 'Built_Component__c', 'fields' => new List<String>{ 'Nope__c' } }
 			);
 			String injected = listRefusal(
 				new Map<String, Object>{
@@ -257,18 +210,10 @@ private class LwcBuilderControllerTest {
 			List<Object> columns = (List<Object>) active.get('columns');
 			List<SObject> rows = (List<SObject>) active.get('rows');
 			Assert.areEqual(2, columns.size(), 'A field named twice is one column');
-			Assert.areEqual(
-				true,
-				((Map<String, Object>) columns[0]).get('isName'),
-				'Name links to the record'
-			);
+			Assert.areEqual(true, ((Map<String, Object>) columns[0]).get('isName'), 'Name links to the record');
 			Assert.areEqual(2, rows.size(), 'Only active components');
 			Assert.areEqual('Charlie', rows[0].get('Name'), 'Sorted descending');
-			Assert.areEqual(
-				1,
-				((List<SObject>) mine.get('rows')).size(),
-				'Parent and not-equals filters'
-			);
+			Assert.areEqual(1, ((List<SObject>) mine.get('rows')).size(), 'Parent and not-equals filters');
 			Assert.areEqual(
 				BarnHelp.text(
 					'LwcBuilder',
@@ -287,10 +232,7 @@ private class LwcBuilderControllerTest {
 				injected,
 				'Anything but a field name is refused, never spliced into the query'
 			);
-			Assert.isTrue(
-				badValue.contains('abc'),
-				'A value that is not a number is refused: ' + badValue
-			);
+			Assert.isTrue(badValue.contains('abc'), 'A value that is not a number is refused: ' + badValue);
 		}
 	}
 
@@ -323,17 +265,9 @@ private class LwcBuilderControllerTest {
 			VisualEditor.DataRow first = picklist.getDefaultValue();
 			Test.stopTest();
 
+			Assert.areEqual(new Map<String, Boolean>{ 'LWC_Builder_Not_Real' => false }, held, 'Unknown is false');
 			Assert.areEqual(
-				new Map<String, Boolean>{ 'LWC_Builder_Not_Real' => false },
-				held,
-				'Unknown is false'
-			);
-			Assert.areEqual(
-				BarnHelp.text(
-					'LwcBuilder',
-					'LwcBuilder_Chart_NoReport',
-					new List<Object>{ 'No_Such_Report_Anywhere' }
-				),
+				BarnHelp.text('LwcBuilder', 'LwcBuilder_Chart_NoReport', new List<Object>{ 'No_Such_Report_Anywhere' }),
 				chart,
 				'A report that is not there'
 			);
@@ -347,18 +281,12 @@ private class LwcBuilderControllerTest {
 		}
 	}
 
-	private static Map<String, Object> group(
-		String key,
-		String label,
-		List<Map<String, Object>> children
-	) {
+	private static Map<String, Object> group(String key, String label, List<Map<String, Object>> children) {
 		return new Map<String, Object>{ 'key' => key, 'label' => label, 'children' => children };
 	}
 
 	private static List<Object> one(Object value) {
-		return new List<Object>{
-			new Map<String, Object>{ 'value' => value, 'label' => String.valueOf(value) }
-		};
+		return new List<Object>{ new Map<String, Object>{ 'value' => value, 'label' => String.valueOf(value) } };
 	}
 
 	@IsTest
@@ -402,17 +330,11 @@ private class LwcBuilderControllerTest {
 				group(
 					'1',
 					'Beta',
-					new List<Map<String, Object>>{
-						new Map<String, Object>{ 'key' => '1_1', 'label' => 'Closed' }
-					}
+					new List<Map<String, Object>>{ new Map<String, Object>{ 'key' => '1_1', 'label' => 'Closed' } }
 				)
 			},
 			null,
-			new Map<String, List<Object>>{
-				'0_0!T' => one(1),
-				'0_1!T' => one(2),
-				'1_1!T' => one(3)
-			},
+			new Map<String, List<Object>>{ '0_0!T' => one(1), '0_1!T' => one(2), '1_1!T' => one(3) },
 			series
 		);
 		Assert.areEqual(new List<String>{ 'Open', 'Closed' }, series, 'Series in the order met');
@@ -446,9 +368,7 @@ private class LwcBuilderControllerTest {
 	static void aDefinitionSentAsTextIsCheckedAndOneTooLargeIsRefused() {
 		System.runAs(admin()) {
 			Map<String, Object> saved = save(new Map<String, Object>{ 'definition' => DEFINITION });
-			String notJson = refusalOf(
-				new Map<String, Object>{ 'key' => 'Other', 'definition' => '{not json' }
-			);
+			String notJson = refusalOf(new Map<String, Object>{ 'key' => 'Other', 'definition' => '{not json' });
 			String tooLarge = refusalOf(
 				new Map<String, Object>{
 					'key' => 'Other',
@@ -495,9 +415,7 @@ private class LwcBuilderControllerTest {
 			delete as user new Built_Component__c(Id = (Id) gone.get('id'));
 			String deleted = refusalOf(new Map<String, Object>{ 'id' => gone.get('id') });
 			String badId = refusalOf(new Map<String, Object>{ 'id' => 'not an id' });
-			Map<String, Object> noObject = save(
-				new Map<String, Object>{ 'key' => 'No_Object', 'objectName' => '' }
-			);
+			Map<String, Object> noObject = save(new Map<String, Object>{ 'key' => 'No_Object', 'objectName' => '' });
 
 			Assert.isNotNull(deleted, 'Updating a row that was deleted is refused');
 			Assert.areEqual(
@@ -505,11 +423,7 @@ private class LwcBuilderControllerTest {
 				badId,
 				'An id that is not an id shows the generic message'
 			);
-			Assert.areEqual(
-				'',
-				noObject.get('objectName') ?? '',
-				'A component need not name an object'
-			);
+			Assert.areEqual('', noObject.get('objectName') ?? '', 'A component need not name an object');
 		}
 	}
 
@@ -536,10 +450,7 @@ private class LwcBuilderControllerTest {
 
 			Assert.areEqual(50, held.size(), 'At most fifty are checked');
 			Assert.isFalse(held.get('Not_Real_0'), 'Unknown is false');
-			Assert.isTrue(
-				LwcBuilderController.checkPermissions(null).isEmpty(),
-				'No names, no answers'
-			);
+			Assert.isTrue(LwcBuilderController.checkPermissions(null).isEmpty(), 'No names, no answers');
 		}
 	}
 
@@ -595,30 +506,17 @@ private class LwcBuilderControllerTest {
 
 			Assert.areEqual(6, ((List<Object>) wide.get('columns')).size(), 'Six columns at most');
 			Assert.areEqual(1, ((List<SObject>) wide.get('rows')).size(), 'Version 1 matches');
-			Assert.isTrue(
-				((List<Object>) noFields.get('columns')).isEmpty(),
-				'Fields not a list: none'
-			);
-			Assert.isTrue(
-				((List<SObject>) noFields.get('rows')).isEmpty(),
-				'A parent with no id matches nothing'
-			);
+			Assert.isTrue(((List<Object>) noFields.get('columns')).isEmpty(), 'Fields not a list: none');
+			Assert.isTrue(((List<SObject>) noFields.get('rows')).isEmpty(), 'A parent with no id matches nothing');
 			Assert.areEqual(
 				1,
 				((List<SObject>) blankFilter.get('rows')).size(),
 				'A blank filter value compares with null, so the row with no description matches'
 			);
-			String expected = BarnHelp.text(
-				'LwcBuilder',
-				'LwcBuilder_Error_Object',
-				new List<Object>{ 'Nope__c' }
-			);
+			String expected = BarnHelp.text('LwcBuilder', 'LwcBuilder_Error_Object', new List<Object>{ 'Nope__c' });
 			Assert.areEqual(expected, noObject, 'An object that is not there');
 			Assert.isNotNull(noName, 'No object at all is refused');
-			Assert.isTrue(
-				badSort.contains('Nope__c'),
-				'A sort field not on the object: ' + badSort
-			);
+			Assert.isTrue(badSort.contains('Nope__c'), 'A sort field not on the object: ' + badSort);
 		}
 	}
 
@@ -659,11 +557,7 @@ private class LwcBuilderControllerTest {
 		);
 		SettingsService.clearCaches();
 		System.runAs(admin()) {
-			Assert.areEqual(
-				10,
-				LwcBuilderController.rowsPerList(),
-				'Over 200 is the default of 10'
-			);
+			Assert.areEqual(10, LwcBuilderController.rowsPerList(), 'Over 200 is the default of 10');
 		}
 	}
 
@@ -677,11 +571,7 @@ private class LwcBuilderControllerTest {
 				refused = e.getMessage();
 			}
 			Assert.areEqual(
-				BarnHelp.text(
-					'LwcBuilder',
-					'LwcBuilder_Chart_NoReport',
-					new List<Object>{ 'not a name' }
-				),
+				BarnHelp.text('LwcBuilder', 'LwcBuilder_Chart_NoReport', new List<Object>{ 'not a name' }),
 				refused,
 				'Refused without querying'
 			);
@@ -697,13 +587,7 @@ private class LwcBuilderControllerTest {
 		}
 		Assert.areEqual(
 			200,
-			LwcBuilderController.chartRows(
-					groups,
-					null,
-					new Map<String, List<Object>>(),
-					new List<String>()
-				)
-				.size(),
+			LwcBuilderController.chartRows(groups, null, new Map<String, List<Object>>(), new List<String>()).size(),
 			'Capped'
 		);
 	}

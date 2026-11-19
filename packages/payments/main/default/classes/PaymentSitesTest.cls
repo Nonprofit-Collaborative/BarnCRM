@@ -9,13 +9,7 @@ private class PaymentSitesTest {
 
 	private static Site site(String id, String label, Id guestUserId) {
 		return (Site) JSON.deserialize(
-			JSON.serialize(
-				new Map<String, Object>{
-					'Id' => id,
-					'MasterLabel' => label,
-					'GuestUserId' => guestUserId
-				}
-			),
+			JSON.serialize(new Map<String, Object>{ 'Id' => id, 'MasterLabel' => label, 'GuestUserId' => guestUserId }),
 			Site.class
 		);
 	}
@@ -33,39 +27,25 @@ private class PaymentSitesTest {
 
 		Assert.areEqual(2, infos.size(), 'Every Site is reported');
 		Assert.areEqual('Donations', infos[0].name, 'The Site keeps its name');
-		Assert.areEqual(
-			UserInfo.getUserId(),
-			infos[0].guestUserId,
-			'The Site keeps its guest user'
-		);
+		Assert.areEqual(UserInfo.getUserId(), infos[0].guestUserId, 'The Site keeps its guest user');
 		Assert.isNull(infos[0].url, 'A Site with no secure address has none');
 		Assert.isNull(infos[1].guestUserId, 'A Site with no guest user has none');
 	}
 
 	@IsTest
 	static void noSitesMeansNothingReported() {
-		Assert.isTrue(
-			PaymentSites.describe(new List<Site>()).isEmpty(),
-			'No Sites, nothing reported'
-		);
+		Assert.isTrue(PaymentSites.describe(new List<Site>()).isEmpty(), 'No Sites, nothing reported');
 	}
 
 	@IsTest
 	static void guestUsersComeFromTheReportedSites() {
 		PaymentSites.SiteInfo withGuest = new PaymentSites.SiteInfo();
 		withGuest.guestUserId = UserInfo.getUserId();
-		PaymentSites.testSites = new List<PaymentSites.SiteInfo>{
-			withGuest,
-			new PaymentSites.SiteInfo()
-		};
+		PaymentSites.testSites = new List<PaymentSites.SiteInfo>{ withGuest, new PaymentSites.SiteInfo() };
 
 		Set<Id> ids = PaymentSites.guestUserIds();
 
-		Assert.areEqual(
-			new Set<Id>{ UserInfo.getUserId() },
-			ids,
-			'Only Sites with a guest user count'
-		);
+		Assert.areEqual(new Set<Id>{ UserInfo.getUserId() }, ids, 'Only Sites with a guest user count');
 	}
 
 	@IsTest

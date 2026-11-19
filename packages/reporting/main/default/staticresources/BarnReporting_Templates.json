@@ -1,0 +1,675 @@
+{
+  "version": 1,
+  "templates": [
+    {
+      "key": "board-governance",
+      "requires": ["Board_Member__c"],
+      "title": "Board Governance",
+      "description": "Who serves, who attends, whose terms end soon and which disclosures are still open.",
+      "filters": [{ "key": "board", "kind": "record", "label": "Board", "object": "Board__c" }],
+      "widgets": [
+        {
+          "key": "roster",
+          "title": "Current Members by Board",
+          "size": "small",
+          "bindings": { "board": { "field": "Board__c" } },
+          "report": {
+            "object": "Board_Member__c",
+            "filter": {
+              "version": 1,
+              "conditions": [
+                { "id": 1, "field": "Is_Current__c", "operator": "equals", "value": true }
+              ]
+            },
+            "groups": [
+              {
+                "field": "Board__c",
+                "label": "Board",
+                "type": "reference",
+                "labelPath": "Board__r.Name"
+              }
+            ],
+            "measures": [{ "fn": "count", "label": "Members" }],
+            "view": { "type": "bar" },
+            "limit": 25
+          }
+        },
+        {
+          "key": "attendance",
+          "title": "Attendance This Year",
+          "size": "large",
+          "bindings": { "board": { "field": "Meeting__r.Board__c" } },
+          "report": {
+            "object": "Meeting_Attendee__c",
+            "dateRange": {
+              "range": "THIS_YEAR",
+              "field": "Meeting__r.Start__c",
+              "type": "datetime",
+              "label": "Meeting Start"
+            },
+            "groups": [
+              {
+                "field": "Person__c",
+                "label": "Member",
+                "type": "reference",
+                "labelPath": "Person__r.Name"
+              },
+              { "field": "Attendance__c", "label": "Attendance", "type": "picklist" }
+            ],
+            "measures": [{ "fn": "count", "label": "Meetings" }],
+            "view": { "type": "bar", "stacked": true },
+            "limit": 25
+          }
+        },
+        {
+          "key": "terms",
+          "title": "Terms Ending in the Next 90 Days",
+          "size": "medium",
+          "bindings": { "board": { "field": "Board__c" } },
+          "report": {
+            "object": "Board_Member__c",
+            "columns": [
+              { "path": "Person__r.Name", "label": "Member", "type": "string" },
+              { "path": "Board__r.Name", "label": "Board", "type": "string" },
+              { "path": "Role__c", "label": "Role", "type": "picklist" },
+              { "path": "Term_End__c", "label": "Term Ends", "type": "date" },
+              { "path": "Term_Number__c", "label": "Term", "type": "double" }
+            ],
+            "filter": {
+              "version": 1,
+              "conditions": [
+                { "id": 1, "field": "Is_Current__c", "operator": "equals", "value": true }
+              ]
+            },
+            "dateRange": {
+              "range": "NEXT_N_DAYS",
+              "n": 90,
+              "field": "Term_End__c",
+              "type": "date",
+              "label": "Term Ends"
+            },
+            "sort": { "by": "Term_End__c", "direction": "asc" },
+            "limit": 200
+          }
+        },
+        {
+          "key": "disclosures",
+          "title": "Open Disclosures",
+          "size": "medium",
+          "report": {
+            "object": "Policy_Acknowledgment__c",
+            "columns": [
+              { "path": "Person__r.Name", "label": "Person", "type": "string" },
+              { "path": "Document__r.Name", "label": "Policy", "type": "string" },
+              { "path": "Requested_On__c", "label": "Requested", "type": "date" },
+              { "path": "Due_Date__c", "label": "Due", "type": "date" }
+            ],
+            "filter": {
+              "version": 1,
+              "conditions": [
+                { "id": 1, "field": "Status__c", "operator": "equals", "value": "Requested" },
+                { "id": 2, "field": "Person__c", "operator": "is not null" }
+              ]
+            },
+            "sort": { "by": "Due_Date__c", "direction": "asc" },
+            "limit": 200
+          }
+        }
+      ]
+    },
+    {
+      "key": "giving-overview",
+      "requires": ["Gift__c"],
+      "title": "Giving Overview",
+      "description": "Giving this month and over the last year, by fund and appeal, and the top donors.",
+      "filters": [
+        { "key": "dates", "kind": "date", "label": "Gift Date" },
+        { "key": "fund", "kind": "record", "label": "Fund", "object": "Fund__c" },
+        { "key": "appeal", "kind": "record", "label": "Appeal", "object": "Appeal__c" }
+      ],
+      "widgets": [
+        {
+          "key": "month-total",
+          "title": "Given This Month",
+          "size": "small",
+          "bindings": {
+            "dates": { "field": "Gift_Date__c", "type": "date" },
+            "fund": {
+              "field": "Fund__c",
+              "related": { "object": "Gift_Allocation__c", "field": "Gift__c" }
+            },
+            "appeal": { "field": "Appeal__c" }
+          },
+          "report": {
+            "object": "Gift__c",
+            "filter": {
+              "version": 1,
+              "conditions": [
+                {
+                  "id": 1,
+                  "field": "Status__c",
+                  "operator": "in",
+                  "value": ["Received", "Refunded", "Written off"]
+                }
+              ]
+            },
+            "dateRange": {
+              "range": "THIS_MONTH",
+              "field": "Gift_Date__c",
+              "type": "date",
+              "label": "Gift Date"
+            },
+            "measures": [
+              { "fn": "sum", "path": "Amount__c", "label": "Total Given", "type": "currency" }
+            ],
+            "view": { "type": "metric" }
+          }
+        },
+        {
+          "key": "by-day",
+          "title": "Giving by Day This Month",
+          "size": "medium",
+          "bindings": {
+            "dates": { "field": "Gift_Date__c", "type": "date" },
+            "fund": {
+              "field": "Fund__c",
+              "related": { "object": "Gift_Allocation__c", "field": "Gift__c" }
+            },
+            "appeal": { "field": "Appeal__c" }
+          },
+          "report": {
+            "object": "Gift__c",
+            "filter": {
+              "version": 1,
+              "conditions": [
+                {
+                  "id": 1,
+                  "field": "Status__c",
+                  "operator": "in",
+                  "value": ["Received", "Refunded", "Written off"]
+                }
+              ]
+            },
+            "dateRange": {
+              "range": "THIS_MONTH",
+              "field": "Gift_Date__c",
+              "type": "date",
+              "label": "Gift Date"
+            },
+            "groups": [
+              { "field": "Gift_Date__c", "label": "Gift Date", "type": "date", "bucket": "day" }
+            ],
+            "measures": [
+              { "fn": "sum", "path": "Amount__c", "label": "Amount", "type": "currency" }
+            ],
+            "view": { "type": "column" },
+            "limit": 31
+          }
+        },
+        {
+          "key": "by-month",
+          "title": "Giving by Month, Last 12 Months",
+          "size": "large",
+          "bindings": {
+            "dates": { "field": "Gift_Date__c", "type": "date" },
+            "fund": {
+              "field": "Fund__c",
+              "related": { "object": "Gift_Allocation__c", "field": "Gift__c" }
+            },
+            "appeal": { "field": "Appeal__c" }
+          },
+          "report": {
+            "object": "Gift__c",
+            "filter": {
+              "version": 1,
+              "conditions": [
+                {
+                  "id": 1,
+                  "field": "Status__c",
+                  "operator": "in",
+                  "value": ["Received", "Refunded", "Written off"]
+                }
+              ]
+            },
+            "dateRange": {
+              "range": "LAST_N_MONTHS",
+              "n": 12,
+              "field": "Gift_Date__c",
+              "type": "date",
+              "label": "Gift Date"
+            },
+            "groups": [
+              { "field": "Gift_Date__c", "label": "Month", "type": "date", "bucket": "month" }
+            ],
+            "measures": [
+              { "fn": "sum", "path": "Amount__c", "label": "Amount", "type": "currency" },
+              { "fn": "count", "label": "Gifts" }
+            ],
+            "view": { "type": "column" },
+            "limit": 12
+          }
+        },
+        {
+          "key": "by-fund",
+          "title": "Allocations by Fund This Year",
+          "size": "medium",
+          "bindings": {
+            "dates": { "field": "Gift__r.Gift_Date__c", "type": "date" },
+            "fund": { "field": "Fund__c" },
+            "appeal": { "field": "Gift__r.Appeal__c" }
+          },
+          "report": {
+            "object": "Gift_Allocation__c",
+            "filter": {
+              "version": 1,
+              "conditions": [
+                {
+                  "id": 1,
+                  "field": "Gift__r.Status__c",
+                  "operator": "in",
+                  "value": ["Received", "Refunded", "Written off"]
+                }
+              ]
+            },
+            "dateRange": {
+              "range": "THIS_YEAR",
+              "field": "Gift__r.Gift_Date__c",
+              "type": "date",
+              "label": "Gift Date"
+            },
+            "groups": [
+              {
+                "field": "Fund__c",
+                "label": "Fund",
+                "type": "reference",
+                "labelPath": "Fund__r.Name"
+              }
+            ],
+            "measures": [
+              { "fn": "sum", "path": "Amount__c", "label": "Allocated", "type": "currency" }
+            ],
+            "view": { "type": "bar" },
+            "limit": 15
+          }
+        },
+        {
+          "key": "by-appeal",
+          "title": "Giving by Appeal This Year",
+          "size": "medium",
+          "bindings": {
+            "dates": { "field": "Gift_Date__c", "type": "date" },
+            "fund": {
+              "field": "Fund__c",
+              "related": { "object": "Gift_Allocation__c", "field": "Gift__c" }
+            },
+            "appeal": { "field": "Appeal__c" }
+          },
+          "report": {
+            "object": "Gift__c",
+            "filter": {
+              "version": 1,
+              "conditions": [
+                {
+                  "id": 1,
+                  "field": "Status__c",
+                  "operator": "in",
+                  "value": ["Received", "Refunded", "Written off"]
+                }
+              ]
+            },
+            "dateRange": {
+              "range": "THIS_YEAR",
+              "field": "Gift_Date__c",
+              "type": "date",
+              "label": "Gift Date"
+            },
+            "groups": [
+              {
+                "field": "Appeal__c",
+                "label": "Appeal",
+                "type": "reference",
+                "labelPath": "Appeal__r.Name"
+              }
+            ],
+            "measures": [
+              { "fn": "sum", "path": "Amount__c", "label": "Amount", "type": "currency" }
+            ],
+            "view": { "type": "donut" },
+            "limit": 10
+          }
+        },
+        {
+          "key": "top-donors",
+          "title": "Top Donors This Year",
+          "size": "medium",
+          "bindings": {
+            "dates": { "field": "Gift_Date__c", "type": "date" },
+            "fund": {
+              "field": "Fund__c",
+              "related": { "object": "Gift_Allocation__c", "field": "Gift__c" }
+            },
+            "appeal": { "field": "Appeal__c" }
+          },
+          "report": {
+            "object": "Gift__c",
+            "filter": {
+              "version": 1,
+              "conditions": [
+                {
+                  "id": 1,
+                  "field": "Status__c",
+                  "operator": "in",
+                  "value": ["Received", "Refunded", "Written off"]
+                },
+                { "id": 2, "field": "Household__c", "operator": "is not null" }
+              ]
+            },
+            "dateRange": {
+              "range": "THIS_YEAR",
+              "field": "Gift_Date__c",
+              "type": "date",
+              "label": "Gift Date"
+            },
+            "groups": [
+              {
+                "field": "Household__c",
+                "label": "Household",
+                "type": "reference",
+                "labelPath": "Household__r.Name"
+              }
+            ],
+            "measures": [
+              { "fn": "sum", "path": "Amount__c", "label": "Total Given", "type": "currency" },
+              { "fn": "count", "label": "Gifts" }
+            ],
+            "sort": { "by": "m0", "direction": "desc" },
+            "view": { "type": "table" },
+            "limit": 10
+          }
+        }
+      ]
+    },
+    {
+      "key": "scholarships-grants",
+      "requires": ["Award_Application__c"],
+      "title": "Scholarships and Grants",
+      "description": "Applications by cycle and status, awards by program, payments due and requirements outstanding.",
+      "filters": [
+        { "key": "cycle", "kind": "record", "label": "Cycle", "object": "Award_Cycle__c" },
+        { "key": "program", "kind": "record", "label": "Program", "object": "Award_Program__c" }
+      ],
+      "widgets": [
+        {
+          "key": "applications",
+          "title": "Applications by Cycle and Status",
+          "size": "large",
+          "bindings": {
+            "cycle": { "field": "Cycle__c" },
+            "program": { "field": "Cycle__r.Program__c" }
+          },
+          "report": {
+            "object": "Award_Application__c",
+            "groups": [
+              {
+                "field": "Cycle__c",
+                "label": "Cycle",
+                "type": "reference",
+                "labelPath": "Cycle__r.Name"
+              },
+              { "field": "Status__c", "label": "Status", "type": "picklist" }
+            ],
+            "measures": [{ "fn": "count", "label": "Applications" }],
+            "view": { "type": "bar", "stacked": true },
+            "limit": 10
+          }
+        },
+        {
+          "key": "awards",
+          "title": "Awards by Program",
+          "size": "medium",
+          "bindings": {
+            "cycle": { "field": "Cycle__c" },
+            "program": { "field": "Cycle__r.Program__c" }
+          },
+          "report": {
+            "object": "Award__c",
+            "groups": [
+              {
+                "field": "Cycle__r.Program__c",
+                "label": "Program",
+                "type": "reference",
+                "labelPath": "Cycle__r.Program__r.Name"
+              }
+            ],
+            "measures": [
+              { "fn": "sum", "path": "Amount__c", "label": "Awarded", "type": "currency" },
+              { "fn": "sum", "path": "Paid_Amount__c", "label": "Paid", "type": "currency" }
+            ],
+            "view": { "type": "bar" },
+            "limit": 15
+          }
+        },
+        {
+          "key": "ranked",
+          "title": "Ranked Applications",
+          "size": "medium",
+          "bindings": {
+            "cycle": { "field": "Cycle__c" },
+            "program": { "field": "Cycle__r.Program__c" }
+          },
+          "report": {
+            "object": "Award_Application__c",
+            "columns": [
+              { "path": "Name", "label": "Application", "type": "string" },
+              { "path": "Contact__r.Name", "label": "Applicant", "type": "string" },
+              { "path": "Cycle__r.Name", "label": "Cycle", "type": "string" },
+              { "path": "Average_Score__c", "label": "Average Score", "type": "double" },
+              { "path": "Review_Count__c", "label": "Reviews", "type": "double" },
+              { "path": "Status__c", "label": "Status", "type": "picklist" }
+            ],
+            "filter": {
+              "version": 1,
+              "conditions": [
+                {
+                  "id": 1,
+                  "field": "Status__c",
+                  "operator": "in",
+                  "value": ["Eligible", "In Review"]
+                }
+              ]
+            },
+            "sort": { "by": "Average_Score__c", "direction": "desc" },
+            "limit": 100
+          }
+        },
+        {
+          "key": "payments",
+          "title": "Payments Due in the Next 30 Days",
+          "size": "medium",
+          "bindings": {
+            "cycle": { "field": "Award__r.Cycle__c" },
+            "program": { "field": "Award__r.Cycle__r.Program__c" }
+          },
+          "report": {
+            "object": "Award_Payment__c",
+            "columns": [
+              { "path": "Award__r.Name", "label": "Award", "type": "string" },
+              { "path": "Payee_Name__c", "label": "Payee", "type": "string" },
+              { "path": "Scheduled_Date__c", "label": "Scheduled", "type": "date" },
+              { "path": "Amount__c", "label": "Amount", "type": "currency" }
+            ],
+            "filter": {
+              "version": 1,
+              "conditions": [
+                { "id": 1, "field": "Status__c", "operator": "equals", "value": "Scheduled" }
+              ]
+            },
+            "dateRange": {
+              "range": "NEXT_N_DAYS",
+              "n": 30,
+              "field": "Scheduled_Date__c",
+              "type": "date",
+              "label": "Scheduled"
+            },
+            "sort": { "by": "Scheduled_Date__c", "direction": "asc" },
+            "limit": 200
+          }
+        },
+        {
+          "key": "requirements",
+          "title": "Requirements Due",
+          "size": "medium",
+          "bindings": {
+            "cycle": { "field": "Award__r.Cycle__c" },
+            "program": { "field": "Award__r.Cycle__r.Program__c" }
+          },
+          "report": {
+            "object": "Award_Requirement__c",
+            "columns": [
+              { "path": "Award__r.Name", "label": "Award", "type": "string" },
+              { "path": "Type__c", "label": "Type", "type": "picklist" },
+              { "path": "Due_Date__c", "label": "Due", "type": "date" },
+              { "path": "Status__c", "label": "Status", "type": "picklist" }
+            ],
+            "filter": {
+              "version": 1,
+              "conditions": [
+                { "id": 1, "field": "Status__c", "operator": "in", "value": ["Open", "Submitted"] }
+              ]
+            },
+            "sort": { "by": "Due_Date__c", "direction": "asc" },
+            "limit": 200
+          }
+        }
+      ]
+    },
+    {
+      "key": "volunteers",
+      "requires": ["Volunteer_Hours__c"],
+      "title": "Volunteers",
+      "description": "Hours by job, volunteers who have not served lately, hours waiting for approval and shifts still short.",
+      "filters": [
+        { "key": "dates", "kind": "date", "label": "Date Worked" },
+        { "key": "job", "kind": "record", "label": "Job", "object": "Volunteer_Job__c" }
+      ],
+      "widgets": [
+        {
+          "key": "hours",
+          "title": "Approved Hours by Job This Year",
+          "size": "medium",
+          "bindings": {
+            "dates": { "field": "Date_Worked__c", "type": "date" },
+            "job": { "field": "Volunteer_Job__c" }
+          },
+          "report": {
+            "object": "Volunteer_Hours__c",
+            "filter": {
+              "version": 1,
+              "conditions": [
+                { "id": 1, "field": "Status__c", "operator": "equals", "value": "Approved" }
+              ]
+            },
+            "dateRange": {
+              "range": "THIS_YEAR",
+              "field": "Date_Worked__c",
+              "type": "date",
+              "label": "Date Worked"
+            },
+            "groups": [
+              {
+                "field": "Volunteer_Job__c",
+                "label": "Job",
+                "type": "reference",
+                "labelPath": "Volunteer_Job__r.Name"
+              }
+            ],
+            "measures": [{ "fn": "sum", "path": "Hours__c", "label": "Hours", "type": "double" }],
+            "view": { "type": "bar" },
+            "limit": 15
+          }
+        },
+        {
+          "key": "lapsing",
+          "title": "Lapsing Volunteers",
+          "size": "medium",
+          "report": {
+            "object": "Contact",
+            "columns": [
+              { "path": "Name", "label": "Name", "type": "string" },
+              { "path": "Email", "label": "Email", "type": "email" },
+              { "path": "Last_Volunteer_Date__c", "label": "Last Volunteered", "type": "date" }
+            ],
+            "dateRange": {
+              "range": "BETWEEN_DAYS_AGO",
+              "n": 365,
+              "m": 182,
+              "field": "Last_Volunteer_Date__c",
+              "type": "date",
+              "label": "Last Volunteered"
+            },
+            "sort": { "by": "Last_Volunteer_Date__c", "direction": "asc" },
+            "limit": 200
+          }
+        },
+        {
+          "key": "awaiting",
+          "title": "Hours Awaiting Approval",
+          "size": "medium",
+          "bindings": {
+            "dates": { "field": "Date_Worked__c", "type": "date" },
+            "job": { "field": "Volunteer_Job__c" }
+          },
+          "report": {
+            "object": "Volunteer_Hours__c",
+            "columns": [
+              { "path": "Contact__r.Name", "label": "Volunteer", "type": "string" },
+              { "path": "Volunteer_Job__r.Name", "label": "Job", "type": "string" },
+              { "path": "Date_Worked__c", "label": "Date Worked", "type": "date" },
+              { "path": "Hours__c", "label": "Hours", "type": "double" },
+              { "path": "CreatedDate", "label": "Days Waiting", "type": "datetime", "show": "age" }
+            ],
+            "filter": {
+              "version": 1,
+              "conditions": [
+                { "id": 1, "field": "Status__c", "operator": "equals", "value": "Submitted" }
+              ]
+            },
+            "sort": { "by": "CreatedDate", "direction": "asc" },
+            "limit": 200
+          }
+        },
+        {
+          "key": "shifts",
+          "title": "Unfilled Shifts in the Next 14 Days",
+          "size": "medium",
+          "bindings": { "job": { "field": "Volunteer_Job__c" } },
+          "report": {
+            "object": "Volunteer_Shift__c",
+            "columns": [
+              { "path": "Volunteer_Job__r.Name", "label": "Job", "type": "string" },
+              { "path": "Start_Time__c", "label": "Starts", "type": "datetime" },
+              { "path": "Volunteers_Needed__c", "label": "Needed", "type": "double" },
+              { "path": "Slots_Remaining__c", "label": "Open Slots", "type": "double" }
+            ],
+            "filter": {
+              "version": 1,
+              "conditions": [
+                { "id": 1, "field": "Status__c", "operator": "equals", "value": "Open" },
+                { "id": 2, "field": "Slots_Remaining__c", "operator": "greater than", "value": 0 }
+              ]
+            },
+            "dateRange": {
+              "range": "NEXT_N_DAYS",
+              "n": 14,
+              "field": "Start_Time__c",
+              "type": "datetime",
+              "label": "Starts"
+            },
+            "sort": { "by": "Start_Time__c", "direction": "asc" },
+            "limit": 200
+          }
+        }
+      ]
+    }
+  ]
+}

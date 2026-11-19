@@ -9,11 +9,7 @@
  */
 public with sharing class ProgramRosterController {
 	private static final String CONTEXT = 'Program roster panel';
-	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
-			CONTEXT,
-			'Programs',
-			'Programs_Fail_Roster'
-		)
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(CONTEXT, 'Programs', 'Programs_Fail_Roster')
 		.showingDml();
 	/** The most enrollments listed: a bound on the read; the Enrollments tab lists them all. */
 	public static final Integer MAX_SHOWN = 200;
@@ -105,7 +101,7 @@ public with sharing class ProgramRosterController {
 			enrollment.Account__c = personId;
 		}
 		try {
-			Database.insert(new List<Enrollment__c>{ enrollment }, true, AccessLevel.USER_MODE);
+			insert as user new List<Enrollment__c>{ enrollment };
 			return rosterFor(programId, showEnded == true);
 		} catch (Exception failure) {
 			throw ERRORS.wrap(failure, CONTEXT, programId);
@@ -124,11 +120,7 @@ public with sharing class ProgramRosterController {
 			if (programId == null) {
 				throw UserErrors.message(failed());
 			}
-			Database.update(
-				new List<Enrollment__c>{ new Enrollment__c(Id = enrollmentId, Stage__c = wanted) },
-				true,
-				AccessLevel.USER_MODE
-			);
+			update as user new List<Enrollment__c>{ new Enrollment__c(Id = enrollmentId, Stage__c = wanted) };
 			return rosterFor(programId, showEnded == true);
 		} catch (Exception failure) {
 			throw ERRORS.wrap(failure, CONTEXT, enrollmentId);
@@ -138,8 +130,7 @@ public with sharing class ProgramRosterController {
 	// ------------------------------------------------------------------------------ helpers
 
 	private static Roster rosterFor(Id programId, Boolean showEnded) {
-		String programName = EnrollmentSelector.selectProgramNames(new Set<Id>{ programId })
-			.get(programId);
+		String programName = EnrollmentSelector.selectProgramNames(new Set<Id>{ programId }).get(programId);
 		if (programName == null) {
 			throw UserErrors.message(failed());
 		}
@@ -162,19 +153,13 @@ public with sharing class ProgramRosterController {
 			}
 		}
 
-		List<Enrollment__c> found = EnrollmentSelector.selectRoster(
-			programId,
-			listed,
-			MAX_SHOWN + 1
-		);
+		List<Enrollment__c> found = EnrollmentSelector.selectRoster(programId, listed, MAX_SHOWN + 1);
 		roster.moreThanShown = found.size() > MAX_SHOWN;
 		for (Integer i = 0; i < found.size() && i < MAX_SHOWN; i++) {
 			roster.enrollments.add(rowFor(found[i]));
 		}
 
-		Schema.DescribeSObjectResult describe = Enrollment__c.SObjectType.getDescribe(
-			SObjectDescribeOptions.DEFERRED
-		);
+		Schema.DescribeSObjectResult describe = Enrollment__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED);
 		roster.canAdd = describe.isCreateable();
 		roster.canEdit = describe.isUpdateable();
 		roster.hasPersonAccounts = HouseholdService.isPersonAccountOrg();
@@ -199,9 +184,7 @@ public with sharing class ProgramRosterController {
 
 	private static List<Schema.PicklistEntry> stageEntries() {
 		List<Schema.PicklistEntry> active = new List<Schema.PicklistEntry>();
-		for (
-			Schema.PicklistEntry entry : Enrollment__c.Stage__c.getDescribe().getPicklistValues()
-		) {
+		for (Schema.PicklistEntry entry : Enrollment__c.Stage__c.getDescribe().getPicklistValues()) {
 			if (entry.isActive()) {
 				active.add(entry);
 			}

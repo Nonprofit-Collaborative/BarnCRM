@@ -23,11 +23,7 @@ private class AddressVerificationPostInstallTest {
 	static void theInstallerAndBarnCrmAdminsGetTheAdminSetOnce() {
 		System.runAs(TestUsers.admin()) {
 			Id fresh = TestDataFactory.createUser('Installer', new List<String>()).Id;
-			Id holding = TestDataFactory.createUser(
-					'Holder',
-					new List<String>{ 'Address_Verification_Admin' }
-				)
-				.Id;
+			Id holding = TestDataFactory.createUser('Holder', new List<String>{ 'Address_Verification_Admin' }).Id;
 			User boss = TestUsers.standardUser('Boss');
 			insert new PermissionSetAssignment(
 				AssigneeId = boss.Id,
@@ -43,10 +39,7 @@ private class AddressVerificationPostInstallTest {
 			Assert.areEqual(1, adminSetsHeldBy(fresh), 'The installer holds the admin set');
 			Assert.areEqual(1, adminSetsHeldBy(holding), 'Never given twice');
 			Assert.areEqual(1, adminSetsHeldBy(boss.Id), 'A BarnCRM Admin holder gets it');
-			Assert.isFalse(
-				ModuleAccessSyncs.syncOnce('AddressVerification'),
-				'Nothing left to give'
-			);
+			Assert.isFalse(ModuleAccessSyncs.syncOnce('AddressVerification'), 'Nothing left to give');
 		}
 	}
 

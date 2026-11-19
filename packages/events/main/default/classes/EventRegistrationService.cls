@@ -26,11 +26,7 @@ public with sharing class EventRegistrationService {
 	private static final String EVENT_OPEN = 'Open';
 
 	/** Attendee statuses that hold a seat (R-EAT1). */
-	public static final Set<String> SEATED = new Set<String>{
-		STATUS_REGISTERED,
-		STATUS_ATTENDED,
-		STATUS_NO_SHOW
-	};
+	public static final Set<String> SEATED = new Set<String>{ STATUS_REGISTERED, STATUS_ATTENDED, STATUS_NO_SHOW };
 	private static final Set<String> ATTENDEE_STATUSES = new Set<String>{
 		STATUS_REGISTERED,
 		STATUS_WAITLISTED,
@@ -125,9 +121,7 @@ public with sharing class EventRegistrationService {
 	private static Result registerNow(Request request) {
 		Event__c event = lockEvent(Id.valueOf(request.eventId));
 		if (event.Status__c == STATUS_CANCELLED) {
-			throw new RegistrationException(
-				BarnHelp.text('Events', 'Events_Register_EventCancelled')
-			);
+			throw new RegistrationException(BarnHelp.text('Events', 'Events_Register_EventCancelled'));
 		}
 		Datetime now = Datetime.now();
 		if (request.source == SOURCE_FORM) {
@@ -170,9 +164,7 @@ public with sharing class EventRegistrationService {
 			);
 		}
 		if (code != null && !appliesToAny(code, fresh, now)) {
-			throw new RegistrationException(
-				BarnHelp.text('Events', 'Events_Register_CodeNotForTicket')
-			);
+			throw new RegistrationException(BarnHelp.text('Events', 'Events_Register_CodeNotForTicket'));
 		}
 
 		Event_Registration__c registration = new Event_Registration__c(
@@ -226,14 +218,7 @@ public with sharing class EventRegistrationService {
 		}
 		update as user totals;
 		if (holdForPayment) {
-			Database.update(
-				new Event_Registration__c(
-					Id = registration.Id,
-					Payment_Status__c = EventPayments.UNPAID
-				),
-				true,
-				AccessLevel.SYSTEM_MODE
-			);
+			update as system new Event_Registration__c(Id = registration.Id, Payment_Status__c = EventPayments.UNPAID);
 			EventPayments.queueCheckouts();
 		}
 
@@ -256,12 +241,7 @@ public with sharing class EventRegistrationService {
 		System.Savepoint before = Database.setSavepoint();
 		try {
 			Event_Attendee__c attendee = [
-				SELECT
-					Id,
-					Status__c,
-					Ticket_Type__c,
-					Event_Registration__c,
-					Event_Registration__r.Event__c
+				SELECT Id, Status__c, Ticket_Type__c, Event_Registration__c, Event_Registration__r.Event__c
 				FROM Event_Attendee__c
 				WHERE Id = :attendeeId
 				WITH USER_MODE
@@ -271,9 +251,7 @@ public with sharing class EventRegistrationService {
 				Event__c event = lockEvent(attendee.Event_Registration__r.Event__c);
 				SeatCounter counter = new SeatCounter(event, activeTickets(event.Id));
 				if (!counter.take(attendee.Ticket_Type__c)) {
-					throw new RegistrationException(
-						BarnHelp.text('Events', 'Events_Register_NoSeat')
-					);
+					throw new RegistrationException(BarnHelp.text('Events', 'Events_Register_NoSeat'));
 				}
 			}
 			update as user new Event_Attendee__c(Id = attendee.Id, Status__c = status);
@@ -297,11 +275,7 @@ public with sharing class EventRegistrationService {
 			attendees.add(new Event_Attendee__c(Id = attendee.Id, Status__c = STATUS_CANCELLED));
 		}
 		update as user attendees;
-		update as user new Event_Registration__c(
-			Id = registrationId,
-			Status__c = STATUS_CANCELLED,
-			Amount_Owed__c = 0
-		);
+		update as user new Event_Registration__c(Id = registrationId, Status__c = STATUS_CANCELLED, Amount_Owed__c = 0);
 	}
 
 	/** Sets each registration's status and amount owed from its attendees as they are now. */
@@ -329,14 +303,9 @@ public with sharing class EventRegistrationService {
 		}
 		List<Event_Registration__c> updates = new List<Event_Registration__c>();
 		for (Id registrationId : byRegistration.keySet()) {
-			Event_Registration__c settled = settle(
-				registrationId,
-				byRegistration.get(registrationId)
-			);
+			Event_Registration__c settled = settle(registrationId, byRegistration.get(registrationId));
 			// A registration waiting for its payment keeps waiting while it holds a seat (R-ERG5).
-			if (
-				awaitingPayment.contains(registrationId) && settled.Status__c == STATUS_REGISTERED
-			) {
+			if (awaitingPayment.contains(registrationId) && settled.Status__c == STATUS_REGISTERED) {
 				settled.Status__c = STATUS_PENDING_PAYMENT;
 			}
 			updates.add(settled);
@@ -345,10 +314,7 @@ public with sharing class EventRegistrationService {
 	}
 
 	/** Registered while any attendee holds a seat, Waitlisted while all wait, else Cancelled. */
-	private static Event_Registration__c settle(
-		Id registrationId,
-		List<Event_Attendee__c> attendees
-	) {
+	private static Event_Registration__c settle(Id registrationId, List<Event_Attendee__c> attendees) {
 		Decimal owed = 0;
 		Boolean holdsSeat = false;
 		Boolean waiting = false;
@@ -363,9 +329,7 @@ public with sharing class EventRegistrationService {
 		return new Event_Registration__c(
 			Id = registrationId,
 			Amount_Owed__c = owed,
-			Status__c = holdsSeat
-				? STATUS_REGISTERED
-				: (waiting ? STATUS_WAITLISTED : STATUS_CANCELLED)
+			Status__c = holdsSeat ? STATUS_REGISTERED : (waiting ? STATUS_WAITLISTED : STATUS_CANCELLED)
 		);
 	}
 
@@ -377,9 +341,7 @@ public with sharing class EventRegistrationService {
 	 */
 	private static void refuseOutsideWindow(Event__c event, Datetime now) {
 		if (event.Registration_Opens__c != null && now < event.Registration_Opens__c) {
-			throw new RegistrationException(
-				BarnHelp.text('Events', 'Events_Public_RegisterNotYet')
-			);
+			throw new RegistrationException(BarnHelp.text('Events', 'Events_Public_RegisterNotYet'));
 		}
 		Boolean over =
 			event.Status__c != EVENT_OPEN ||
@@ -388,23 +350,14 @@ public with sharing class EventRegistrationService {
 			(event.Registration_Closes__c != null &&
 			now > event.Registration_Closes__c);
 		if (over) {
-			throw new RegistrationException(
-				BarnHelp.text('Events', 'Events_Public_RegisterClosed')
-			);
+			throw new RegistrationException(BarnHelp.text('Events', 'Events_Public_RegisterClosed'));
 		}
 	}
 
 	/** The event, locked so two registrations never take its last seat twice. */
 	private static Event__c lockEvent(Id eventId) {
 		List<Event__c> events = [
-			SELECT
-				Id,
-				Name,
-				Status__c,
-				Capacity__c,
-				End__c,
-				Registration_Opens__c,
-				Registration_Closes__c
+			SELECT Id, Name, Status__c, Capacity__c, End__c, Registration_Opens__c, Registration_Closes__c
 			FROM Event__c
 			WHERE Id = :eventId
 			WITH USER_MODE
@@ -432,11 +385,7 @@ public with sharing class EventRegistrationService {
 	 * `onSaleAt` (a form), only a ticket on sale then: blank means the first on sale, and a named
 	 * ticket outside its Sales Start and Sales End is refused.
 	 */
-	private static Ticket_Type__c ticketFor(
-		List<Ticket_Type__c> tickets,
-		String wanted,
-		Datetime onSaleAt
-	) {
+	private static Ticket_Type__c ticketFor(List<Ticket_Type__c> tickets, String wanted, Datetime onSaleAt) {
 		if (String.isBlank(wanted)) {
 			for (Ticket_Type__c ticket : tickets) {
 				if (onSaleAt == null || onSale(ticket, onSaleAt)) {
@@ -449,10 +398,7 @@ public with sharing class EventRegistrationService {
 			throw notOnSale(tickets[0]);
 		}
 		for (Ticket_Type__c ticket : tickets) {
-			if (
-				String.valueOf(ticket.Id) == wanted.trim() ||
-				ticket.Name.equalsIgnoreCase(wanted.trim())
-			) {
+			if (String.valueOf(ticket.Id) == wanted.trim() || ticket.Name.equalsIgnoreCase(wanted.trim())) {
 				if (onSaleAt != null && !onSale(ticket, onSaleAt)) {
 					throw notOnSale(ticket);
 				}
@@ -472,11 +418,7 @@ public with sharing class EventRegistrationService {
 
 	private static RegistrationException notOnSale(Ticket_Type__c ticket) {
 		return new RegistrationException(
-			BarnHelp.text(
-				'Events',
-				'Events_Register_TicketNotOnSale',
-				new List<Object>{ ticket.Name }
-			)
+			BarnHelp.text('Events', 'Events_Register_TicketNotOnSale', new List<Object>{ ticket.Name })
 		);
 	}
 
@@ -551,21 +493,14 @@ public with sharing class EventRegistrationService {
 		}
 		for (Id personId : ids) {
 			if (!names.containsKey(personId)) {
-				throw new RegistrationException(
-					BarnHelp.text('Events', 'Events_Register_NoPerson')
-				);
+				throw new RegistrationException(BarnHelp.text('Events', 'Events_Register_NoPerson'));
 			}
 		}
 		return names;
 	}
 
 	/** The seats wanted less anyone already on the event or named twice (R-EAT2). */
-	private static List<Seat> withoutRegistered(
-		Id eventId,
-		List<Seat> wanted,
-		Map<Id, String> names,
-		Result result
-	) {
+	private static List<Seat> withoutRegistered(Id eventId, List<Seat> wanted, Map<Id, String> names, Result result) {
 		Set<Id> taken = new Set<Id>();
 		for (Event_Attendee__c attendee : [
 			SELECT Contact__c
@@ -602,9 +537,7 @@ public with sharing class EventRegistrationService {
 			Integer ticketLeft = counter.ticketLeft.get(ticket.Id);
 			Integer seats = counter.eventLeft == null
 				? ticketLeft
-				: (ticketLeft == null
-						? counter.eventLeft
-						: Math.min(ticketLeft, counter.eventLeft));
+				: (ticketLeft == null ? counter.eventLeft : Math.min(ticketLeft, counter.eventLeft));
 			if (seats != null) {
 				left.put(ticket.Id, Math.max(seats, 0));
 			}
@@ -642,10 +575,7 @@ public with sharing class EventRegistrationService {
 
 		/** Takes a seat when one is free on both, and says whether it did. */
 		Boolean take(Id ticketId) {
-			Boolean ticketFree =
-				ticketId == null ||
-				!ticketLeft.containsKey(ticketId) ||
-				ticketLeft.get(ticketId) > 0;
+			Boolean ticketFree = ticketId == null || !ticketLeft.containsKey(ticketId) || ticketLeft.get(ticketId) > 0;
 			if ((eventLeft != null && eventLeft <= 0) || !ticketFree) {
 				return false;
 			}

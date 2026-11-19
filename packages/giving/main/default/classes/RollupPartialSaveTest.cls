@@ -26,11 +26,7 @@ private class RollupPartialSaveTest {
 	static void makeData() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GivingTestDataFactory.insertDefaultFund();
-			Contact ana = GivingTestDataFactory.insertHouseholdContact(
-				'The Nolan Family',
-				'Ana',
-				'Nolan'
-			);
+			Contact ana = GivingTestDataFactory.insertHouseholdContact('The Nolan Family', 'Ana', 'Nolan');
 			GivingRollupTestData.installShippedRollups();
 			List<Gift__c> gifts = GivingTestDataFactory.buildGifts(ana.Id, 2, CLOSED_AMOUNT);
 			for (Gift__c gift : gifts) {
@@ -85,11 +81,7 @@ private class RollupPartialSaveTest {
 		GivingTestDataFactory.assertRollupWrote(person.Total_Giving__c);
 		Assert.areEqual(total, person.Total_Giving__c, 'Ana\'s total giving');
 		Assert.areEqual(count, person.Gift_Count__c, 'Ana\'s gift count');
-		Assert.areEqual(
-			total,
-			GivingRollupTestData.account(ana().AccountId).Total_Giving__c,
-			'The household follows'
-		);
+		Assert.areEqual(total, GivingRollupTestData.account(ana().AccountId).Total_Giving__c, 'The household follows');
 		Assert.areEqual(
 			count,
 			GivingRollupTestData.fund(defaultFundId()).Gift_Count__c,

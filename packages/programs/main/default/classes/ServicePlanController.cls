@@ -60,9 +60,7 @@ public with sharing class ServicePlanController {
 	private static Map<String, Object> parse(String payload) {
 		Object value = String.isBlank(payload) ? null : JSON.deserializeUntyped(payload);
 		if (!(value instanceof Map<String, Object>)) {
-			throw new ServicePlanService.PlanException(
-				BarnHelp.text('Programs', 'Programs_Fail_Plan')
-			);
+			throw new ServicePlanService.PlanException(BarnHelp.text('Programs', 'Programs_Fail_Plan'));
 		}
 		return (Map<String, Object>) value;
 	}

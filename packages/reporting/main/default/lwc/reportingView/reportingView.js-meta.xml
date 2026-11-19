@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>Runs one Advanced Reporting report as the person and shows it as a table, chart or metric tile, totalling large reports in pages, with CSV export (O-02).</description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

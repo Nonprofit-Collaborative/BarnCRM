@@ -12,7 +12,7 @@
     </values>
     <values>
         <field>Section__c</field>
-        <value xsi:type="xsd:string">Funders</value>
+        <value xsi:type="xsd:string">Grants</value>
     </values>
     <values>
         <field>Module__c</field>

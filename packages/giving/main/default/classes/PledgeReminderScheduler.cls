@@ -9,7 +9,7 @@
  */
 public with sharing class PledgeReminderScheduler implements Schedulable {
 	/** The name the scheduled job carries, so the page can find it again. */
-	public static final String JOB_NAME = 'BarnCRM Giving Pledge Reminders';
+	public static final String JOB_NAME = 'BarnCRM Fundraising Pledge Reminders';
 
 	private static final String LOG_CONTEXT = 'PledgeReminderScheduler.execute';
 
@@ -19,11 +19,7 @@ public with sharing class PledgeReminderScheduler implements Schedulable {
 				// Switched off since the schedule was started. Nothing to do, and nothing wrong.
 				return;
 			}
-			AsyncStarter.batch(
-				new PledgeReminderBatch(),
-				PledgeReminderBatch.SCOPE,
-				'PledgeReminderScheduler'
-			);
+			AsyncStarter.batch(new PledgeReminderBatch(), PledgeReminderBatch.SCOPE, 'PledgeReminderScheduler');
 		} catch (Exception nightlyFailure) {
 			// A scheduled job's exception goes nowhere a person will ever look, so it goes here.
 			ErrorLogger.log(nightlyFailure, LOG_CONTEXT);

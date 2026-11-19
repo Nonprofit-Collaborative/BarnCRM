@@ -12,10 +12,7 @@ public with sharing class ErrorLogSelector {
 	// Counting new entries is ErrorLogCountSelector.countNewUpTo, the one capped count.
 
 	public static List<Error_Log__c> selectRecent(Integer rowCount) {
-		Integer rows = rowCount == null ||
-			rowCount <= 0
-			? DEFAULT_ROWS
-			: Math.min(rowCount, MAX_ROWS);
+		Integer rows = rowCount == null || rowCount <= 0 ? DEFAULT_ROWS : Math.min(rowCount, MAX_ROWS);
 		return [
 			SELECT
 				Id,
@@ -66,13 +63,7 @@ public with sharing class ErrorLogSelector {
 		List<Error_Log__c> found;
 		if (Schema.SObjectType.Error_Log__c.fields.Technical_Detail__c.isAccessible()) {
 			found = [
-				SELECT
-					Context__c,
-					Severity__c,
-					Timestamp__c,
-					Occurrences__c,
-					Object_Name__c,
-					Technical_Detail__c
+				SELECT Context__c, Severity__c, Timestamp__c, Occurrences__c, Object_Name__c, Technical_Detail__c
 				FROM Error_Log__c
 				WHERE Id = :errorLogId
 				WITH USER_MODE

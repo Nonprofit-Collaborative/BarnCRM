@@ -48,10 +48,7 @@ private class UserSelectorTest {
 			for (User person : found) {
 				foundIds.add(person.Id);
 			}
-			Assert.isTrue(
-				foundIds.contains(david.Id),
-				'Typing the start of a name should find the person.'
-			);
+			Assert.isTrue(foundIds.contains(david.Id), 'Typing the start of a name should find the person.');
 		}
 	}
 
@@ -80,11 +77,7 @@ private class UserSelectorTest {
 			List<User> found = selector.searchActive('%', 20);
 			Test.stopTest();
 
-			Assert.areEqual(
-				0,
-				found.size(),
-				'A percent sign is a character to search for, not a wildcard.'
-			);
+			Assert.areEqual(0, found.size(), 'A percent sign is a character to search for, not a wildcard.');
 		}
 	}
 
@@ -101,11 +94,7 @@ private class UserSelectorTest {
 			List<User> found = selector.searchActive('Limitcheck', 2);
 			Test.stopTest();
 
-			Assert.areEqual(
-				2,
-				found.size(),
-				'The search should return no more than it was asked for.'
-			);
+			Assert.areEqual(2, found.size(), 'The search should return no more than it was asked for.');
 			Assert.areEqual(3, staff.size(), 'Three people were created for this check.');
 		}
 	}

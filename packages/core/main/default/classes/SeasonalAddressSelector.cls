@@ -32,11 +32,7 @@ public without sharing class SeasonalAddressSelector {
 				FROM Address__c
 				WHERE Type__c = :seasonal
 				WITH SYSTEM_MODE
-				ORDER BY
-					Account__c NULLS LAST,
-					Contact__c NULLS LAST,
-					Person_Account__c NULLS LAST,
-					CreatedDate
+				ORDER BY Account__c NULLS LAST, Contact__c NULLS LAST, Person_Account__c NULLS LAST, CreatedDate
 			]
 		);
 	}
@@ -71,10 +67,7 @@ public without sharing class SeasonalAddressSelector {
 				Status__c,
 				CreatedDate
 			FROM Address__c
-			WHERE
-				Account__c IN :ownerIds
-				OR Contact__c IN :ownerIds
-				OR Person_Account__c IN :ownerIds
+			WHERE Account__c IN :ownerIds OR Contact__c IN :ownerIds OR Person_Account__c IN :ownerIds
 			WITH SYSTEM_MODE
 			ORDER BY CreatedDate
 			LIMIT 10000

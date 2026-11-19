@@ -68,15 +68,9 @@ public with sharing class MergeRuleService {
 	/** The active rules by field name in lower case; a row with an unknown rule is skipped. */
 	public static Map<String, String> rulesByField() {
 		Map<String, String> byField = new Map<String, String>();
-		List<Merge_Rule__mdt> rows = rowsForTest != null
-			? rowsForTest
-			: Merge_Rule__mdt.getAll().values();
+		List<Merge_Rule__mdt> rows = rowsForTest != null ? rowsForTest : Merge_Rule__mdt.getAll().values();
 		for (Merge_Rule__mdt row : rows) {
-			if (
-				row.Active__c &&
-				String.isNotBlank(row.Field_Name__c) &&
-				RULES.contains(row.Rule__c)
-			) {
+			if (row.Active__c && String.isNotBlank(row.Field_Name__c) && RULES.contains(row.Rule__c)) {
 				byField.put(row.Field_Name__c.trim().toLowerCase(), row.Rule__c);
 			}
 		}
@@ -115,11 +109,7 @@ public with sharing class MergeRuleService {
 	 * the survivor's, mapped to that value. Both records must carry the fields, `CreatedDate`
 	 * and `LastModifiedDate`.
 	 */
-	public static Map<String, Object> winningValues(
-		SObject master,
-		SObject other,
-		List<String> fields
-	) {
+	public static Map<String, Object> winningValues(SObject master, SObject other, List<String> fields) {
 		return winningValues(master, other, fields, '');
 	}
 
@@ -127,12 +117,7 @@ public with sharing class MergeRuleService {
 	 * The same, reading the rules a scope names: empty for people, `object__c.` (lower case,
 	 * no namespace prefix) for a Generic Record Merge object, whose rows are `Object.Field`.
 	 */
-	public static Map<String, Object> winningValues(
-		SObject master,
-		SObject other,
-		List<String> fields,
-		String scope
-	) {
+	public static Map<String, Object> winningValues(SObject master, SObject other, List<String> fields, String scope) {
 		Map<String, String> rules = rulesByField();
 		String fallback = defaultRule();
 		Map<String, Object> result = new Map<String, Object>();
@@ -148,13 +133,7 @@ public with sharing class MergeRuleService {
 			}
 			String key = scope + bare(field).toLowerCase();
 			String rule = rules.containsKey(key) ? rules.get(key) : fallback;
-			Boolean takeOther = takesOther(
-				rule,
-				master.get(field),
-				other.get(field),
-				master,
-				other
-			);
+			Boolean takeOther = takesOther(rule, master.get(field), other.get(field), master, other);
 			if (takeOther && !sameValue(master.get(field), other.get(field))) {
 				result.put(field, other.get(field));
 			}
@@ -189,10 +168,7 @@ public with sharing class MergeRuleService {
 			return true;
 		}
 		if (rule == MOST_RECENT) {
-			return later(
-				(Datetime) other.get('LastModifiedDate'),
-				(Datetime) master.get('LastModifiedDate')
-			);
+			return later((Datetime) other.get('LastModifiedDate'), (Datetime) master.get('LastModifiedDate'));
 		}
 		if (rule == OLDEST) {
 			return later((Datetime) master.get('CreatedDate'), (Datetime) other.get('CreatedDate'));
@@ -246,9 +222,7 @@ public with sharing class MergeRuleService {
 	/** An API name without this package's namespace prefix, as merge rule rows name it. */
 	public static String bare(String name) {
 		String prefix = NamespaceUtil.prefix();
-		return prefix != '' && name.startsWithIgnoreCase(prefix)
-			? name.substring(prefix.length())
-			: name;
+		return prefix != '' && name.startsWithIgnoreCase(prefix) ? name.substring(prefix.length()) : name;
 	}
 
 	// ------------------------------------------------------------------ saving a rule
@@ -282,16 +256,9 @@ public with sharing class MergeRuleService {
 			type = GenericMergeService.offeredType(name.substringBefore('.'));
 			name = name.substringAfter('.');
 		}
-		Schema.SObjectField token = type == null
-			? null
-			: type.getDescribe().fields.getMap().get(name);
+		Schema.SObjectField token = type == null ? null : type.getDescribe().fields.getMap().get(name);
 		Schema.DescribeFieldResult field = token == null ? null : token.getDescribe();
-		if (
-			field == null ||
-			NEVER.contains(name) ||
-			!field.isUpdateable() ||
-			field.isCalculated()
-		) {
+		if (field == null || NEVER.contains(name) || !field.isUpdateable() || field.isCalculated()) {
 			throw new CustomMetadataManagerService.CustomMetadataManagerException(
 				String.format(
 					BarnHelp.text('Core', 'Core_DuplicateManagement_RuleFieldInvalid'),

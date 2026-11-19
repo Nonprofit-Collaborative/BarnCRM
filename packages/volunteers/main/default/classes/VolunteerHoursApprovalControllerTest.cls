@@ -19,14 +19,8 @@ private class VolunteerHoursApprovalControllerTest {
 			COORDINATOR,
 			new List<String>{ VolunteersTestData.CORE_STAFF, 'Volunteers_Coordinator' }
 		);
-		TestUsers.standardUserWith(
-			STAFFER,
-			new List<String>{ VolunteersTestData.CORE_STAFF, 'Volunteers_Staff' }
-		);
-		TestUsers.standardUserWith(
-			READER,
-			new List<String>{ 'BarnCRM_Read_Only', 'Volunteers_Read_Only' }
-		);
+		TestUsers.standardUserWith(STAFFER, new List<String>{ VolunteersTestData.CORE_STAFF, 'Volunteers_Staff' });
+		TestUsers.standardUserWith(READER, new List<String>{ 'BarnCRM_Read_Only', 'Volunteers_Read_Only' });
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
 			VolunteersTestData.contactModeWithoutAutomaticHouseholds();
 			VolunteersTestData.contact('Rivera', null);
@@ -93,14 +87,7 @@ private class VolunteerHoursApprovalControllerTest {
 				last.dateWorked,
 				last.recordId
 			);
-			garden = VolunteerHoursApprovalController.getHours(
-				SUBMITTED,
-				jobId('Garden'),
-				null,
-				null,
-				null,
-				null
-			);
+			garden = VolunteerHoursApprovalController.getHours(SUBMITTED, jobId('Garden'), null, null, null, null);
 			firstWeek = VolunteerHoursApprovalController.getHours(
 				SUBMITTED,
 				jobId('Food pantry sort'),
@@ -169,14 +156,7 @@ private class VolunteerHoursApprovalControllerTest {
 		System.runAs(user(COORDINATOR)) {
 			noReason = refusal(new Attempt('reject', ids, ' '));
 			rejected = VolunteerHoursApprovalController.reject(ids, 'Wrong date');
-			rejectedList = VolunteerHoursApprovalController.getHours(
-				'Rejected',
-				null,
-				null,
-				null,
-				null,
-				null
-			);
+			rejectedList = VolunteerHoursApprovalController.getHours('Rejected', null, null, null, null, null);
 			reopened = VolunteerHoursApprovalController.reopen(new List<Id>{ ids[0], ids[1] });
 		}
 		Test.stopTest();
@@ -209,26 +189,12 @@ private class VolunteerHoursApprovalControllerTest {
 
 		Test.startTest();
 		System.runAs(user(STAFFER)) {
-			stafferPage = VolunteerHoursApprovalController.getHours(
-				null,
-				null,
-				null,
-				null,
-				null,
-				null
-			);
+			stafferPage = VolunteerHoursApprovalController.getHours(null, null, null, null, null, null);
 			stafferApprove = refusal(new Attempt('approve', ids, null));
 			stafferReopen = refusal(new Attempt('reopen', ids, null));
 		}
 		System.runAs(user(READER)) {
-			readerPage = VolunteerHoursApprovalController.getHours(
-				null,
-				null,
-				null,
-				null,
-				null,
-				null
-			);
+			readerPage = VolunteerHoursApprovalController.getHours(null, null, null, null, null, null);
 		}
 		Test.stopTest();
 
@@ -246,11 +212,7 @@ private class VolunteerHoursApprovalControllerTest {
 		Assert.isFalse(readerPage.canManage, 'Read Only may not approve.');
 		Assert.isTrue(readerPage.rows.isEmpty(), 'And sees no hours entries.');
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
-			Assert.areEqual(
-				2,
-				[SELECT COUNT() FROM Volunteer_Hours__c WHERE Status__c = :SUBMITTED],
-				'Nothing moved.'
-			);
+			Assert.areEqual(2, [SELECT COUNT() FROM Volunteer_Hours__c WHERE Status__c = :SUBMITTED], 'Nothing moved.');
 		}
 	}
 

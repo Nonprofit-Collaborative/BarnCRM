@@ -1,8 +1,8 @@
-# Giving: Soft Credits, Tributes and Matching Gifts
+# Fundraising: Soft Credits, Tributes and Matching Gifts
 
 Scripts for soft credits (automatic household credits and credits entered by hand), tributes and their notification, and linking an employer's matching gift. Setup detail: [Soft credits](../admin-guide/soft-credits.md), [Tributes](../admin-guide/tributes.md), [Matching gifts](../admin-guide/matching-gifts.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core and Giving deployed and sample data loaded unless a script says otherwise. Work in the **BarnCRM Fundraising** app, where gifts open on the packaged gift page with the **Soft Credits** and **Tribute** panels. A default fund must be set (script T-GIFT-01 in [Giving: gifts, funds and batches](giving-gifts-funds-batches.md)). **Auto-create household soft credits** (BarnCRM Settings, **Giving**) is on, as shipped. The Garcia Family in the sample data is Harper, Luis and Diego Garcia.
+Before you start: an org from [Before you test](before-you-test.md), with Core and Fundraising deployed and sample data loaded unless a script says otherwise. Work in the **BarnCRM Fundraising** app, where gifts open on the packaged gift page with the **Soft Credits** and **Tribute** panels. A default fund must be set (script T-GIFT-01 in [Fundraising: gifts, funds and batches](giving-gifts-funds-batches.md)). **Auto-create household soft credits** (BarnCRM Settings, **Fundraising**) is on, as shipped. The Garcia Family in the sample data is Harper, Luis and Diego Garcia.
 
 ## T-CRED-01: Automatic Household Soft Credits
 
@@ -57,7 +57,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Giving**, untick **Auto-create household soft credits**, **Save**. | Saved. |
+| 1 | Open **BarnCRM Settings**, **Fundraising**, untick **Auto-create household soft credits**, **Save**. | Saved. |
 | 2 | Enter a gift of `40` from **Luis Garcia** on Quick Gift Entry and open it. | **Soft Credits**: "Nobody else is recognized for this gift yet." |
 | 3 | Open the T-CRED-01 gift. | Its automatic credits are still there. |
 | 4 | Tick **Auto-create household soft credits** again and **Save** (undo). Edit the step 2 gift **Amount** to `45`, save. | Harper and Diego Garcia now appear on it as **Household Member**, 45.00, **Automatic**. |
@@ -157,8 +157,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 ## T-CRED-11: Sample Matching Gifts, Stock and Gift Sources
 
-**Purpose:** confirm the Giving sample data shows matching gifts, stock details and gift sources, and removes them cleanly.
-**Prerequisites:** admin with Giving Admin; sample data not loaded.
+**Purpose:** confirm the Fundraising sample data shows matching gifts, stock details and gift sources, and removes them cleanly.
+**Prerequisites:** admin with Fundraising Admin; sample data not loaded.
 
 | Step | Action | Expected result |
 |---|---|---|

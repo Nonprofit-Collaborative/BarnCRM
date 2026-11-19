@@ -40,12 +40,7 @@ public without sharing class EmptyHouseholdTidyBatch implements Database.Batchab
 	 * object, and a subquery on it with real rows ends the transaction with a platform fault no
 	 * catch can handle (found on `oi-test`). Big objects (`__b`) are skipped for the same reason.
 	 */
-	private static final List<String> BOOKKEEPING_SUFFIXES = new List<String>{
-		'Share',
-		'History',
-		'Feed',
-		'__b'
-	};
+	private static final List<String> BOOKKEEPING_SUFFIXES = new List<String>{ 'Share', 'History', 'Feed', '__b' };
 	private static final Set<String> BOOKKEEPING_OBJECTS = new Set<String>{
 		'FeedItem',
 		'FeedComment',
@@ -271,10 +266,7 @@ public without sharing class EmptyHouseholdTidyBatch implements Database.Batchab
 		for (String relationship : relationships) {
 			subqueries.add('(SELECT Id FROM ' + relationship + ' LIMIT 1)');
 		}
-		String soql =
-			'SELECT Id, ' +
-			String.join(subqueries, ', ') +
-			' FROM Account WHERE Id IN :householdIds';
+		String soql = 'SELECT Id, ' + String.join(subqueries, ', ') + ' FROM Account WHERE Id IN :householdIds';
 		Set<Id> found = new Set<Id>();
 		for (
 			Account household : (List<Account>) Database.queryWithBinds(
@@ -311,9 +303,7 @@ public without sharing class EmptyHouseholdTidyBatch implements Database.Batchab
 		List<String> names = new List<String>();
 		Set<String> seen = new Set<String>();
 		for (
-			Schema.ChildRelationship relationship : Account.SObjectType.getDescribe(
-					SObjectDescribeOptions.DEFERRED
-				)
+			Schema.ChildRelationship relationship : Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 				.getChildRelationships()
 		) {
 			String name = relationship.getRelationshipName();
@@ -370,11 +360,7 @@ public without sharing class EmptyHouseholdTidyBatch implements Database.Batchab
 		List<String> failures = new List<String>();
 		Set<Id> addressesRefused = new Set<Id>();
 		if (!addresses.isEmpty()) {
-			List<Database.DeleteResult> addressResults = Database.delete(
-				addresses,
-				false,
-				AccessLevel.SYSTEM_MODE
-			);
+			List<Database.DeleteResult> addressResults = Database.delete(addresses, false, AccessLevel.SYSTEM_MODE);
 			for (Integer i = 0; i < addressResults.size(); i++) {
 				if (!addressResults[i].isSuccess()) {
 					addressesRefused.add(addresses[i].Account__c);
@@ -389,11 +375,7 @@ public without sharing class EmptyHouseholdTidyBatch implements Database.Batchab
 			}
 		}
 		Set<Id> kept = new Set<Id>(addressesRefused);
-		List<Database.DeleteResult> results = Database.delete(
-			households,
-			false,
-			AccessLevel.SYSTEM_MODE
-		);
+		List<Database.DeleteResult> results = Database.delete(households, false, AccessLevel.SYSTEM_MODE);
 		for (Integer i = 0; i < results.size(); i++) {
 			if (results[i].isSuccess()) {
 				removed++;

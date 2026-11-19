@@ -5,6 +5,10 @@
   <description>
     Read every Scholarships and Outbound Grants record. Given to the Read Only role.
   </description>
+  <applicationVisibilities>
+    <application>BarnCRM_Scholarships</application>
+    <visible>true</visible>
+  </applicationVisibilities>
   <classAccesses>
     <apexClass>ScholarshipsController</apexClass>
     <enabled>true</enabled>

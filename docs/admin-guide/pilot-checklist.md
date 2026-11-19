@@ -35,7 +35,7 @@ The first week, one task a day:
 1. Add a household with two people, and an organization with an affiliation.
 2. Import a small spreadsheet with Super Importer, then undo it from Data Jobs.
 3. Find a group of people with Find and export them.
-4. If you use Giving, enter a gift, a soft credit and a gift batch.
+4. If you use Fundraising, enter a gift, a soft credit and a gift batch.
 5. Open Org Optimizer, Errors. If an entry is there, read its message and do what it says.
 
 Every week after that:

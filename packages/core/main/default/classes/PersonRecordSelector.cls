@@ -22,11 +22,7 @@
 public with sharing class PersonRecordSelector {
 	// detection-only: these field names exist on the account object only where the org
 	// stores people as accounts, so they are held as text and never referenced statically.
-	private static final List<String> NAME_FIELDS = new List<String>{
-		'FirstName',
-		'LastName',
-		'Salutation'
-	};
+	private static final List<String> NAME_FIELDS = new List<String>{ 'FirstName', 'LastName', 'Salutation' };
 	// The person attributes Core adds, present on both the contact and the account object
 	// so that a person carries them whichever object holds them.
 	private static final List<String> PERSON_FIELDS = new List<String>{
@@ -91,8 +87,7 @@ public with sharing class PersonRecordSelector {
 			return personRecordOverride;
 		}
 		Object recordTypeId = record.getPopulatedFieldsAsMap().get(RECORD_TYPE_FIELD);
-		return recordTypeId != null &&
-			OrgShapeDetector.personRecordTypeIds().contains((Id) recordTypeId);
+		return recordTypeId != null && OrgShapeDetector.personRecordTypeIds().contains((Id) recordTypeId);
 	}
 
 	/**
@@ -207,11 +202,7 @@ public with sharing class PersonRecordSelector {
 	 */
 	private static List<SObject> queryPersonRecords(Set<Id> personRecordIds) {
 		List<SObject> result = new List<SObject>();
-		if (
-			personRecordIds == null ||
-			personRecordIds.isEmpty() ||
-			!HouseholdService.isPersonAccountOrg()
-		) {
+		if (personRecordIds == null || personRecordIds.isEmpty() || !HouseholdService.isPersonAccountOrg()) {
 			return result;
 		}
 		List<String> selected = new List<String>{ 'Id', 'Name', 'CreatedDate' };
@@ -255,10 +246,7 @@ public with sharing class PersonRecordSelector {
 		) {
 			return result;
 		}
-		String query =
-			'SELECT Id, ' +
-			PERSON_CONTACT_FIELD +
-			' FROM Account WHERE Id IN :personRecordIds LIMIT 10000';
+		String query = 'SELECT Id, ' + PERSON_CONTACT_FIELD + ' FROM Account WHERE Id IN :personRecordIds LIMIT 10000';
 		Map<String, Object> binds = new Map<String, Object>{ 'personRecordIds' => personRecordIds };
 		for (SObject record : Database.queryWithBinds(query, binds, AccessLevel.SYSTEM_MODE)) {
 			Object value = record.get(PERSON_CONTACT_FIELD);
@@ -298,13 +286,7 @@ public with sharing class PersonRecordSelector {
 			return result;
 		}
 		Map<String, Object> binds = new Map<String, Object>{ 'contactIds' => contactIds };
-		for (
-			SObject record : Database.queryWithBinds(
-				ACCOUNTS_BEHIND_CONTACTS_QUERY,
-				binds,
-				AccessLevel.SYSTEM_MODE
-			)
-		) {
+		for (SObject record : Database.queryWithBinds(ACCOUNTS_BEHIND_CONTACTS_QUERY, binds, AccessLevel.SYSTEM_MODE)) {
 			Object value = record.get('AccountId');
 			if (value instanceof Id) {
 				result.put(record.Id, (Id) value);

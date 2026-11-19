@@ -37,9 +37,7 @@ private class BulkDeleteBatchTest {
 	/** `volunteers` contacts titled Volunteer and `staff` titled Staff. */
 	private static void makePeople(Integer volunteers, Integer staff) {
 		DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
-		Account organization = TestDataFactory.organization(
-			new Account(Name = 'Springfield Food Bank')
-		);
+		Account organization = TestDataFactory.organization(new Account(Name = 'Springfield Food Bank'));
 		insert organization;
 		List<Contact> people = new List<Contact>();
 		for (Integer index = 0; index < volunteers + staff; index++) {
@@ -57,9 +55,7 @@ private class BulkDeleteBatchTest {
 	}
 
 	private static User deleter() {
-		return TestUsers.withPermissionSets(
-			new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Bulk_Delete' }
-		);
+		return TestUsers.withPermissionSets(new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Bulk_Delete' });
 	}
 
 	private static Import_Batch__c reread(Id jobId) {
@@ -113,18 +109,13 @@ private class BulkDeleteBatchTest {
 			Test.stopTest();
 			job = reread(job.Id);
 
-			System.Assert.areEqual(
-				ImportBatchService.STATUS_COMPLETE,
-				job.Status__c,
-				job.Run_Log__c
-			);
+			System.Assert.areEqual(ImportBatchService.STATUS_COMPLETE, job.Status__c, job.Run_Log__c);
 			System.Assert.areEqual(BulkDeleteService.OPERATION_DELETE, job.Operation__c);
 			System.Assert.areEqual(200, job.Row_Count__c, 'The count confirmed at the start');
 			System.Assert.areEqual(200, job.Rows_Deleted__c, 'Every match is deleted');
 			System.Assert.areEqual(0, job.Rows_Rejected__c, 'None refused');
 			System.Assert.isTrue(
-				job.Undo_Deadline__c <=
-				job.Started_At__c.addDays(BulkDeleteService.RECYCLE_BIN_DAYS),
+				job.Undo_Deadline__c <= job.Started_At__c.addDays(BulkDeleteService.RECYCLE_BIN_DAYS),
 				'The undo ends before the Recycle Bin empties'
 			);
 			System.Assert.areEqual(0, [SELECT COUNT() FROM Contact WHERE Title = 'Volunteer']);
@@ -151,11 +142,7 @@ private class BulkDeleteBatchTest {
 		System.runAs(TestUsers.admin()) {
 			makePeople(200, 0);
 			System.runAs(deleter()) {
-				Import_Batch__c created = BulkDeleteService.createJob(
-					BulkDeleteService.plan(VOLUNTEERS),
-					200,
-					200
-				);
+				Import_Batch__c created = BulkDeleteService.createJob(BulkDeleteService.plan(VOLUNTEERS), 200, 200);
 				BulkDeleteBatch job = new BulkDeleteBatch(created.Id);
 				List<SObject> scope = startQuery(job);
 				System.Assert.areEqual(200, scope.size(), 'The confirmed records');
@@ -180,11 +167,7 @@ private class BulkDeleteBatchTest {
 	static void aRefusalPartWayStopsTheJobAndSaysWhy() {
 		System.runAs(TestUsers.admin()) {
 			makePeople(200, 0);
-			Import_Batch__c created = BulkDeleteService.createJob(
-				BulkDeleteService.plan(VOLUNTEERS),
-				200,
-				200
-			);
+			Import_Batch__c created = BulkDeleteService.createJob(BulkDeleteService.plan(VOLUNTEERS), 200, 200);
 			BulkDeleteBatch job = new BulkDeleteBatch(created.Id);
 			List<SObject> scope = startQuery(job);
 			List<SObject> first = new List<SObject>();
@@ -215,9 +198,7 @@ private class BulkDeleteBatchTest {
 			System.Assert.areEqual(100, done.Rows_Deleted__c, done.Run_Log__c);
 			System.Assert.areEqual(100, [SELECT COUNT() FROM Contact], 'The rest stay');
 			System.Assert.isTrue(
-				done.Run_Log__c.contains(
-					BarnHelp.text('Core', 'Core_BulkDelete_LogStopped').substringBefore('{0}')
-				),
+				done.Run_Log__c.contains(BarnHelp.text('Core', 'Core_BulkDelete_LogStopped').substringBefore('{0}')),
 				done.Run_Log__c
 			);
 			System.Assert.areEqual(
@@ -232,11 +213,7 @@ private class BulkDeleteBatchTest {
 	static void aJobWhoseObjectIsNoLongerAllowedStopsBeforeDeleting() {
 		System.runAs(TestUsers.admin()) {
 			makePeople(10, 0);
-			Import_Batch__c created = BulkDeleteService.createJob(
-				BulkDeleteService.plan(VOLUNTEERS),
-				10,
-				10
-			);
+			Import_Batch__c created = BulkDeleteService.createJob(BulkDeleteService.plan(VOLUNTEERS), 10, 10);
 			// A definition that names an object the protected list refuses.
 			created.Operation_JSON__c = JSON.serialize(
 				new Map<String, Object>{

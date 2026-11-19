@@ -13,9 +13,7 @@ private class PersonEnrollmentsControllerTest {
 	}
 
 	private static void contactMode() {
-		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-			HouseholdTestDataFactory.MODE_CONTACT
-		);
+		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 		settings.Auto_Create_Households__c = false;
 		TestDataFactory.saveSettings(settings);
 	}
@@ -50,9 +48,7 @@ private class PersonEnrollmentsControllerTest {
 			};
 
 			Test.startTest();
-			PersonEnrollmentsController.PersonEnrollments result = PersonEnrollmentsController.getEnrollments(
-				ana.Id
-			);
+			PersonEnrollmentsController.PersonEnrollments result = PersonEnrollmentsController.getEnrollments(ana.Id);
 			Test.stopTest();
 
 			Assert.isTrue(result.canSee, 'A contact is a person.');
@@ -95,16 +91,10 @@ private class PersonEnrollmentsControllerTest {
 			};
 
 			Test.startTest();
-			PersonEnrollmentsController.PersonEnrollments result = PersonEnrollmentsController.getEnrollments(
-				ana.Id
-			);
+			PersonEnrollmentsController.PersonEnrollments result = PersonEnrollmentsController.getEnrollments(ana.Id);
 			Test.stopTest();
 
-			Assert.areEqual(
-				Date.today().addDays(-3),
-				result.lastServiceDate,
-				'The absence is not a service.'
-			);
+			Assert.areEqual(Date.today().addDays(-3), result.lastServiceDate, 'The absence is not a service.');
 			Assert.areEqual(2, result.servicesAttended, 'Two attended.');
 		}
 	}
@@ -161,10 +151,7 @@ private class PersonEnrollmentsControllerTest {
 			ana = HouseholdTestDataFactory.newContact('Ana', 'Rivera');
 			insert ana;
 		}
-		System.runAs(TestUsers.standardUserWith(
-			'Noprograms',
-			new List<String>{ 'BarnCRM_Read_Only' }
-		)) {
+		System.runAs(TestUsers.standardUserWith('Noprograms', new List<String>{ 'BarnCRM_Read_Only' })) {
 			Assert.isFalse(
 				PersonEnrollmentsController.getEnrollments(ana.Id).canSee,
 				'Without a Programs set there is no card.'
@@ -175,10 +162,7 @@ private class PersonEnrollmentsControllerTest {
 	@IsTest
 	static void aPersonHeldAsAnAccountIsRead() {
 		System.runAs(TestUsers.adminWith(ADMIN)) {
-			if (
-				!OrgShapeDetector.hasPersonAccounts() ||
-				OrgShapeDetector.creatablePersonRecordTypeId() == null
-			) {
+			if (!OrgShapeDetector.hasPersonAccounts() || OrgShapeDetector.creatablePersonRecordTypeId() == null) {
 				return; // An org without person accounts has no such person.
 			}
 			Account person = TestDataFactory.organization(new Account());

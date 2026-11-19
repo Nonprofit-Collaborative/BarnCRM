@@ -33,12 +33,27 @@ private class ProjectRequestsTest {
 		return person;
 	}
 
+	/**
+	 * Saves as Portal Builder's `PortalData` does: without sharing, in system mode. Its
+	 * integration user cannot see the requester, which an org with private accounts would
+	 * otherwise refuse on the Requester lookup.
+	 */
+	private without sharing class PortalSave {
+		void insertRequest(Project_Request__c row) {
+			Database.insert(row, AccessLevel.SYSTEM_MODE);
+		}
+	}
+
+	/**
+	 * Gives the staff user the requester's organization, so they can see the person, as staff
+	 * logging a request for someone can in an org whose accounts are private.
+	 */
+	private static void shareRequesterWith(Id organizationId, User staff) {
+		update as system new Account(Id = organizationId, OwnerId = staff.Id);
+	}
+
 	private static Project_Request__c request(String subject, String priority, Id requesterId) {
-		return new Project_Request__c(
-			Subject__c = subject,
-			Priority__c = priority,
-			Requester__c = requesterId
-		);
+		return new Project_Request__c(Subject__c = subject, Priority__c = priority, Requester__c = requesterId);
 	}
 
 	@IsTest
@@ -50,6 +65,7 @@ private class ProjectRequestsTest {
 			turnOn(false);
 			person = requester();
 			organizationId = [SELECT AccountId FROM Contact WHERE Id = :person.Id].AccountId;
+			shareRequesterWith(organizationId, staff);
 		}
 		System.runAs(staff) {
 			Project_Request__c saved = request('Report totals are wrong', 'High', person.Id);
@@ -67,17 +83,12 @@ private class ProjectRequestsTest {
 			);
 			Assert.areEqual(organizationId, saved.Account__c, 'Organization from the requester');
 
-			ProjectRequestsController.RequestList mine = ProjectRequestsController.getRequests(
-				'mine'
-			);
+			ProjectRequestsController.RequestList mine = ProjectRequestsController.getRequests('mine');
 			Assert.isTrue(mine.enabled, 'On');
 			Assert.areEqual(1, mine.rows.size(), 'Mine lists it');
 
 			try {
-				ProjectRequestsController.saveRequest(
-					saved.Id,
-					new Map<String, Object>{ 'Status__c' => 'Resolved' }
-				);
+				ProjectRequestsController.saveRequest(saved.Id, new Map<String, Object>{ 'Status__c' => 'Resolved' });
 				Assert.fail('Resolved needs a resolution');
 			} catch (AuraHandledException expected) {
 				Assert.isNotNull(expected.getMessage(), 'Refused in words');
@@ -93,14 +104,11 @@ private class ProjectRequestsTest {
 					'Name' => 'ignored'
 				}
 			);
-			ProjectRequestsController.Detail detail = ProjectRequestsController.getRequest(
-				saved.Id
-			);
+			ProjectRequestsController.Detail detail = ProjectRequestsController.getRequest(saved.Id);
 			Assert.areEqual('Resolved', detail.status, 'Resolved');
 			Assert.areEqual(2, detail.comments.size(), 'Both comments');
 			Assert.isNotNull(
-				[SELECT Resolved_Date__c FROM Project_Request__c WHERE Id = :saved.Id]
-				.Resolved_Date__c,
+				[SELECT Resolved_Date__c FROM Project_Request__c WHERE Id = :saved.Id].Resolved_Date__c,
 				'Resolved Date stamped'
 			);
 			Assert.areEqual(
@@ -108,11 +116,7 @@ private class ProjectRequestsTest {
 				ProjectRequestHandler.sent.size(),
 				'Requester emailed the shared comment and the resolution, not the staff note'
 			);
-			Assert.areEqual(
-				1,
-				ProjectRequestsController.getRequests('closed').rows.size(),
-				'Closed view'
-			);
+			Assert.areEqual(1, ProjectRequestsController.getRequests('closed').rows.size(), 'Closed view');
 		}
 	}
 
@@ -125,14 +129,8 @@ private class ProjectRequestsTest {
 			turnOn(false);
 			Project_Request__c outside = request('Outside', 'Low', null);
 			outside.Channel__c = ProjectRequestHandler.PARTNER;
-			Assert.isFalse(
-				Database.insert(outside, false).isSuccess(),
-				'Outside refused while external is off'
-			);
-			Assert.isTrue(
-				Database.insert(request('Inside', 'Low', null), false).isSuccess(),
-				'Staff request saved'
-			);
+			Assert.isFalse(Database.insert(outside, false).isSuccess(), 'Outside refused while external is off');
+			Assert.isTrue(Database.insert(request('Inside', 'Low', null), false).isSuccess(), 'Staff request saved');
 		}
 	}
 
@@ -147,7 +145,7 @@ private class ProjectRequestsTest {
 		}
 		Project_Request__c incoming = request('Please add a user', 'Medium', person.Id);
 		System.runAs(portal) {
-			Database.insert(incoming, AccessLevel.SYSTEM_MODE);
+			new PortalSave().insertRequest(incoming);
 		}
 		System.runAs(ProjectsTestData.admin()) {
 			Project_Request__c saved = [
@@ -156,35 +154,19 @@ private class ProjectRequestsTest {
 				WHERE Id = :incoming.Id
 			];
 			Assert.areEqual('Portal', saved.Channel__c, 'Portal channel');
-			Assert.areEqual(
-				ProjectsTestData.requestsQueueId(),
-				saved.OwnerId,
-				'Lands in the Requests queue'
-			);
-			update new Project_Request__c(
-				Id = incoming.Id,
-				OwnerId = owner.Id,
-				Status__c = 'Waiting on Requester'
-			);
+			Assert.areEqual(ProjectsTestData.requestsQueueId(), saved.OwnerId, 'Lands in the Requests queue');
+			update new Project_Request__c(Id = incoming.Id, OwnerId = owner.Id, Status__c = 'Waiting on Requester');
 			Assert.isTrue(ProjectRequestHandler.sent.size() >= 1, 'The new owner is told');
 		}
 		System.runAs(portal) {
 			Database.update(
-				new Project_Request__c(
-					Id = incoming.Id,
-					Priority__c = 'Urgent',
-					Reply__c = 'It is for Sam'
-				),
+				new Project_Request__c(Id = incoming.Id, Priority__c = 'Urgent', Reply__c = 'It is for Sam'),
 				AccessLevel.SYSTEM_MODE
 			);
 		}
 		System.runAs(ProjectsTestData.admin()) {
 			Project_Request__c after = [
-				SELECT
-					Priority__c,
-					Status__c,
-					Reply__c,
-					(SELECT Body__c, Shared__c, From_Requester__c FROM Comments__r)
+				SELECT Priority__c, Status__c, Reply__c, (SELECT Body__c, Shared__c, From_Requester__c FROM Comments__r)
 				FROM Project_Request__c
 				WHERE Id = :incoming.Id
 			];
@@ -211,15 +193,10 @@ private class ProjectRequestsTest {
 				Assert.isNotNull(expected.getMessage(), 'Refused in words');
 			}
 			Project__c project = ProjectsTestData.project('Active', 10);
-			ProjectRequestsController.saveRequest(
-				saved.Id,
-				new Map<String, Object>{ 'Project__c' => project.Id }
-			);
+			ProjectRequestsController.saveRequest(saved.Id, new Map<String, Object>{ 'Project__c' => project.Id });
 			Id taskId = ProjectRequestsController.createTask(saved.Id);
 			Id changeId = ProjectRequestsController.createChangeRequest(saved.Id);
-			ProjectRequestsController.Detail detail = ProjectRequestsController.getRequest(
-				saved.Id
-			);
+			ProjectRequestsController.Detail detail = ProjectRequestsController.getRequest(saved.Id);
 			Assert.areEqual(taskId, detail.taskId, 'Task linked');
 			Assert.areEqual(changeId, detail.changeRequestId, 'Change request linked');
 			Assert.areEqual('In Progress', detail.status, 'New moves to In Progress');
@@ -290,11 +267,7 @@ private class ProjectRequestsTest {
 				'Every request has a due date'
 			);
 			Assert.areEqual(50, ProjectRequestHandler.sent.size(), 'Notices capped at 50');
-			Assert.areEqual(
-				0,
-				ProjectRequestsController.getRequests('overdue').rows.size(),
-				'None overdue yet'
-			);
+			Assert.areEqual(0, ProjectRequestsController.getRequests('overdue').rows.size(), 'None overdue yet');
 		}
 	}
 
@@ -302,15 +275,7 @@ private class ProjectRequestsTest {
 	static void weekdaysSkipTheWeekend() {
 		// runs-as: deploying user (pure logic: date arithmetic, no DML or SOQL)
 		Date friday = Date.newInstance(2026, 11, 13);
-		Assert.areEqual(
-			Date.newInstance(2026, 11, 16),
-			ProjectRequestHandler.addWeekdays(friday, 1),
-			'Monday'
-		);
-		Assert.areEqual(
-			Date.newInstance(2026, 11, 20),
-			ProjectRequestHandler.addWeekdays(friday, 5),
-			'Next Friday'
-		);
+		Assert.areEqual(Date.newInstance(2026, 11, 16), ProjectRequestHandler.addWeekdays(friday, 1), 'Monday');
+		Assert.areEqual(Date.newInstance(2026, 11, 20), ProjectRequestHandler.addWeekdays(friday, 5), 'Next Friday');
 	}
 }

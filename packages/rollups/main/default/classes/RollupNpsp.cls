@@ -95,19 +95,13 @@ public with sharing class RollupNpsp implements RollupDlrs.Reader {
 	 * kept only when describe finds them, so nothing user supplied reaches the query, which has
 	 * no values to bind.
 	 */
-	private static List<Map<String, Object>> readRows(
-		String localType,
-		List<String> plain,
-		List<String> related
-	) {
+	private static List<Map<String, Object>> readRows(String localType, List<String> plain, List<String> related) {
 		List<Map<String, Object>> found = new List<Map<String, Object>>();
-		Schema.SObjectType type = NamespaceUtil.globalDescribe()
-			.get((PREFIX + localType).toLowerCase());
+		Schema.SObjectType type = NamespaceUtil.globalDescribe().get((PREFIX + localType).toLowerCase());
 		if (type == null) {
 			return found;
 		}
-		Map<String, Schema.SObjectField> fields = type.getDescribe(SObjectDescribeOptions.DEFERRED)
-			.fields.getMap();
+		Map<String, Schema.SObjectField> fields = type.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap();
 		List<String> selected = new List<String>{ 'DeveloperName', 'MasterLabel' };
 		List<String> plainHere = new List<String>();
 		List<String> relatedHere = new List<String>();
@@ -123,20 +117,8 @@ public with sharing class RollupNpsp implements RollupDlrs.Reader {
 				relatedHere.add(name);
 			}
 		}
-		String query =
-			'SELECT ' +
-			String.join(selected, ', ') +
-			' FROM ' +
-			PREFIX +
-			localType +
-			' LIMIT 2000';
-		for (
-			SObject row : Database.queryWithBinds(
-				query,
-				new Map<String, Object>(),
-				AccessLevel.SYSTEM_MODE
-			)
-		) {
+		String query = 'SELECT ' + String.join(selected, ', ') + ' FROM ' + PREFIX + localType + ' LIMIT 2000';
+		for (SObject row : Database.queryWithBinds(query, new Map<String, Object>(), AccessLevel.SYSTEM_MODE)) {
 			Map<String, Object> values = new Map<String, Object>{
 				'DeveloperName' => row.get('DeveloperName'),
 				'MasterLabel' => row.get('MasterLabel')
@@ -185,11 +167,7 @@ public with sharing class RollupNpsp implements RollupDlrs.Reader {
 			definition.description = text(rollup, 'Description');
 			List<Map<String, Object>> groupRules = rulesByGroup.get(text(rollup, 'Filter_Group'));
 			try {
-				mapRollup(
-					definition,
-					rollup,
-					groupRules == null ? new List<Map<String, Object>>() : groupRules
-				);
+				mapRollup(definition, rollup, groupRules == null ? new List<Map<String, Object>>() : groupRules);
 			} catch (UnsupportedException refused) {
 				definition.unsupported = refused.getMessage();
 			}
@@ -205,29 +183,18 @@ public with sharing class RollupNpsp implements RollupDlrs.Reader {
 		List<Map<String, Object>> rules
 	) {
 		String npspOperation = text(rollup, 'Operation');
-		String operation = OPERATION_BY_NPSP.get(
-			npspOperation == null ? '' : npspOperation.toLowerCase()
-		);
+		String operation = OPERATION_BY_NPSP.get(npspOperation == null ? '' : npspOperation.toLowerCase());
 		if (operation == null) {
-			throw unsupported(
-				BarnHelp.text('Rollups', 'Core_RollupNpsp_ReasonOperation'),
-				npspOperation
-			);
+			throw unsupported(BarnHelp.text('Rollups', 'Core_RollupNpsp_ReasonOperation'), npspOperation);
 		}
 		String detail = definition.childObject;
 		for (String side : new List<String>{ 'Amount_Object', 'Date_Object' }) {
 			String other = text(rollup, side);
 			if (other != null && !other.equalsIgnoreCase(detail)) {
-				throw unsupported(
-					BarnHelp.text('Rollups', 'Core_RollupNpsp_ReasonOtherObject'),
-					other
-				);
+				throw unsupported(BarnHelp.text('Rollups', 'Core_RollupNpsp_ReasonOtherObject'), other);
 			}
 		}
-		if (
-			'Contact'.equalsIgnoreCase(definition.parentObject) &&
-			GIFT_OBJECT.equalsIgnoreCase(detail)
-		) {
+		if ('Contact'.equalsIgnoreCase(definition.parentObject) && GIFT_OBJECT.equalsIgnoreCase(detail)) {
 			throw unsupported(BarnHelp.text('Rollups', 'Core_RollupNpsp_ReasonContact'), null);
 		}
 		if (rollup.get('Use_Fiscal_Year') == true) {
@@ -276,26 +243,16 @@ public with sharing class RollupNpsp implements RollupDlrs.Reader {
 			literal = 'LAST_N_DAYS:' + count;
 		}
 		if (literal == null || dateField == null) {
-			throw unsupported(
-				BarnHelp.text('Rollups', 'Core_RollupNpsp_ReasonTimeBound'),
-				type + ' ' + count
-			);
+			throw unsupported(BarnHelp.text('Rollups', 'Core_RollupNpsp_ReasonTimeBound'), type + ' ' + count);
 		}
 		return dateField + ' = ' + literal;
 	}
 
 	/** One filter rule as a DLRS criteria condition, on the counted records only. */
-	private static String clause(
-		Map<String, Object> rule,
-		String detail,
-		Schema.SObjectType detailType
-	) {
+	private static String clause(Map<String, Object> rule, String detail, Schema.SObjectType detailType) {
 		String ruleObject = text(rule, 'Object');
 		if (ruleObject != null && !ruleObject.equalsIgnoreCase(detail)) {
-			throw unsupported(
-				BarnHelp.text('Rollups', 'Core_RollupNpsp_ReasonOtherObject'),
-				ruleObject
-			);
+			throw unsupported(BarnHelp.text('Rollups', 'Core_RollupNpsp_ReasonOtherObject'), ruleObject);
 		}
 		String field = text(rule, 'Field');
 		String npspOperator = text(rule, 'Operator');
@@ -303,14 +260,9 @@ public with sharing class RollupNpsp implements RollupDlrs.Reader {
 		Schema.SObjectField token = field == null ||
 			detailType == null
 			? null
-			: detailType.getDescribe(SObjectDescribeOptions.DEFERRED)
-					.fields.getMap()
-					.get(field.toLowerCase());
+			: detailType.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap().get(field.toLowerCase());
 		if (token == null) {
-			throw unsupported(
-				BarnHelp.text('Rollups', 'Core_RollupNpsp_ReasonOperator'),
-				npspOperator
-			);
+			throw unsupported(BarnHelp.text('Rollups', 'Core_RollupNpsp_ReasonOperator'), npspOperator);
 		}
 		Object constantValue = rule.get('Constant');
 		String constant = constantValue == null ? '' : String.valueOf(constantValue);
@@ -328,12 +280,7 @@ public with sharing class RollupNpsp implements RollupDlrs.Reader {
 			for (String value : values) {
 				literals.add(literal(token, value));
 			}
-			return field +
-				' ' +
-				LIST_BY_OPERATOR.get(operator) +
-				' (' +
-				String.join(literals, ', ') +
-				')';
+			return field + ' ' + LIST_BY_OPERATOR.get(operator) + ' (' + String.join(literals, ', ') + ')';
 		}
 		if (COMPARISON_BY_OPERATOR.containsKey(operator) && values.size() <= 1) {
 			String value = values.isEmpty() ? null : values[0];
@@ -357,10 +304,7 @@ public with sharing class RollupNpsp implements RollupDlrs.Reader {
 				? byDeveloperName.get(name)
 				: byName.get(name);
 			if (info == null) {
-				throw unsupported(
-					BarnHelp.text('Rollups', 'Core_RollupNpsp_ReasonRecordType'),
-					name
-				);
+				throw unsupported(BarnHelp.text('Rollups', 'Core_RollupNpsp_ReasonRecordType'), name);
 			}
 			ids.add(info.getRecordTypeId());
 		}
@@ -381,15 +325,10 @@ public with sharing class RollupNpsp implements RollupDlrs.Reader {
 		List<String> standard = new List<String>();
 		List<String> custom = new List<String>();
 		for (
-			Schema.SObjectField token : detailType.getDescribe(SObjectDescribeOptions.DEFERRED)
-				.fields.getMap()
-				.values()
+			Schema.SObjectField token : detailType.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap().values()
 		) {
 			Schema.DescribeFieldResult field = token.getDescribe();
-			if (
-				field.getReferenceTo().contains(summaryType) &&
-				field.getName() != MERGE_SURVIVOR_FIELD
-			) {
+			if (field.getReferenceTo().contains(summaryType) && field.getName() != MERGE_SURVIVOR_FIELD) {
 				if (field.isCustom()) {
 					custom.add(field.getName());
 				} else {
@@ -411,15 +350,11 @@ public with sharing class RollupNpsp implements RollupDlrs.Reader {
 	}
 
 	private static UnsupportedException unsupported(String template, String value) {
-		return new UnsupportedException(
-			value == null ? template : String.format(template, new List<String>{ value })
-		);
+		return new UnsupportedException(value == null ? template : String.format(template, new List<String>{ value }));
 	}
 
 	private static String text(Map<String, Object> values, String name) {
 		Object value = values.get(name);
-		return value == null || String.isBlank(String.valueOf(value))
-			? null
-			: String.valueOf(value).trim();
+		return value == null || String.isBlank(String.valueOf(value)) ? null : String.valueOf(value).trim();
 	}
 }

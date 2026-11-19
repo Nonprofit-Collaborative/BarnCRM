@@ -43,14 +43,8 @@ private class GivingSaveBudgetTest {
 		Integer dml = Limits.getDmlStatements();
 		Test.stopTest();
 
-		Assert.isTrue(
-			soql <= soqlCeiling,
-			what + ' used ' + soql + ' SOQL queries; the budget is ' + soqlCeiling
-		);
-		Assert.isTrue(
-			cpu <= CPU_CEILING_MS,
-			what + ' used ' + cpu + ' ms of CPU; the budget is ' + CPU_CEILING_MS
-		);
+		Assert.isTrue(soql <= soqlCeiling, what + ' used ' + soql + ' SOQL queries; the budget is ' + soqlCeiling);
+		Assert.isTrue(cpu <= CPU_CEILING_MS, what + ' used ' + cpu + ' ms of CPU; the budget is ' + CPU_CEILING_MS);
 		Assert.isTrue(dml <= 75, what + ' used ' + dml + ' DML statements');
 	}
 
@@ -74,9 +68,7 @@ private class GivingSaveBudgetTest {
 			Id donorId = donor();
 			List<Gift__c> saved = gifts(donorId, 200);
 			insert saved;
-			Contact credited = TestDataFactory.person(
-				new Contact(FirstName = 'Sam', LastName = 'Credited')
-			);
+			Contact credited = TestDataFactory.person(new Contact(FirstName = 'Sam', LastName = 'Credited'));
 			insert credited;
 			List<Soft_Credit__c> rows = new List<Soft_Credit__c>();
 			for (Gift__c gift : saved) {

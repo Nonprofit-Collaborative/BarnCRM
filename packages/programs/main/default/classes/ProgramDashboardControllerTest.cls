@@ -15,9 +15,7 @@ private class ProgramDashboardControllerTest {
 	}
 
 	private static List<Contact> people(Integer howMany) {
-		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-			HouseholdTestDataFactory.MODE_CONTACT
-		);
+		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 		settings.Auto_Create_Households__c = false;
 		TestDataFactory.saveSettings(settings);
 		List<Contact> records = new List<Contact>();
@@ -28,12 +26,7 @@ private class ProgramDashboardControllerTest {
 		return records;
 	}
 
-	private static Service_Delivery__c delivery(
-		Id serviceId,
-		Id contactId,
-		Date day,
-		String attendance
-	) {
+	private static Service_Delivery__c delivery(Id serviceId, Id contactId, Date day, String attendance) {
 		return new Service_Delivery__c(
 			Service__c = serviceId,
 			Contact__c = contactId,
@@ -58,11 +51,7 @@ private class ProgramDashboardControllerTest {
 			Service__c camp = new Service__c(Name = 'Day', Program__c = oldCamp.Id);
 			insert new List<Service__c>{ meal, camp };
 			insert new List<Enrollment__c>{
-				new Enrollment__c(
-					Program__c = pantry.Id,
-					Contact__c = folks[0].Id,
-					Start_Date__c = monthStart
-				),
+				new Enrollment__c(Program__c = pantry.Id, Contact__c = folks[0].Id, Start_Date__c = monthStart),
 				new Enrollment__c(
 					Program__c = pantry.Id,
 					Contact__c = folks[1].Id,
@@ -134,10 +123,7 @@ private class ProgramDashboardControllerTest {
 	@IsTest
 	static void aUserWithoutProgramsOrWithoutAPeriodGetsNothing() {
 		ProgramDashboardController.Dashboard withoutPrograms;
-		System.runAs(TestUsers.standardUserWith(
-			'Noprograms',
-			new List<String>{ 'BarnCRM_Read_Only' }
-		)) {
+		System.runAs(TestUsers.standardUserWith('Noprograms', new List<String>{ 'BarnCRM_Read_Only' })) {
 			Test.startTest();
 			withoutPrograms = ProgramDashboardController.getDashboard(Date.today(), Date.today());
 			Test.stopTest();

@@ -18,9 +18,7 @@ private class CreatePersonActionTest {
 
 			Test.startTest();
 			List<CreatePersonAction.Result> results = CreatePersonAction.create(
-				new List<CreatePersonAction.Request>{
-					request('Maria', 'Garcia', 'maria.garcia@example.org', null)
-				}
+				new List<CreatePersonAction.Request>{ request('Maria', 'Garcia', 'maria.garcia@example.org', null) }
 			);
 			Test.stopTest();
 
@@ -47,9 +45,7 @@ private class CreatePersonActionTest {
 
 			Test.startTest();
 			List<CreatePersonAction.Result> results = CreatePersonAction.create(
-				new List<CreatePersonAction.Request>{
-					request('Luis', 'Garcia', null, household.Id)
-				}
+				new List<CreatePersonAction.Request>{ request('Luis', 'Garcia', null, household.Id) }
 			);
 			Test.stopTest();
 
@@ -60,15 +56,10 @@ private class CreatePersonActionTest {
 				[SELECT AccountId FROM Contact WHERE Id = :results[0].personId].AccountId,
 				'He points at the household'
 			);
-			Assert.areEqual(
-				householdsBefore,
-				[SELECT COUNT() FROM Account],
-				'No household of his own was made'
-			);
+			Assert.areEqual(householdsBefore, [SELECT COUNT() FROM Account], 'No household of his own was made');
 			Assert.areEqual(
 				1,
-				[SELECT Member_Count__c FROM Account WHERE Id = :household.Id]
-					.Member_Count__c.intValue(),
+				[SELECT Member_Count__c FROM Account WHERE Id = :household.Id].Member_Count__c.intValue(),
 				'The household counts him'
 			);
 		}
@@ -105,9 +96,7 @@ private class CreatePersonActionTest {
 	static void aRequestThatCannotBeSavedIsAnsweredAndTheOthersAreSaved() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-			Account organization = TestDataFactory.organization(
-				new Account(Name = 'The Union Foundation')
-			);
+			Account organization = TestDataFactory.organization(new Account(Name = 'The Union Foundation'));
 			insert organization;
 
 			Test.startTest();
@@ -123,24 +112,12 @@ private class CreatePersonActionTest {
 			Test.stopTest();
 
 			Assert.areEqual(5, results.size(), 'Every request is answered');
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_HouseholdPanel_AddMemberMissingName'),
-				results[0].errorMessage
-			);
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Households_ErrorNotAHousehold'),
-				results[1].errorMessage
-			);
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Households_ErrorNotAHousehold'),
-				results[2].errorMessage
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_HouseholdPanel_AddMemberMissingName'), results[0].errorMessage);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Households_ErrorNotAHousehold'), results[1].errorMessage);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Households_ErrorNotAHousehold'), results[2].errorMessage);
 			Assert.isNull(results[3].errorMessage, 'The good request was saved');
 			Assert.isNotNull(results[3].personId);
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_HouseholdPanel_AddMemberMissingName'),
-				results[4].errorMessage
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_HouseholdPanel_AddMemberMissingName'), results[4].errorMessage);
 			Assert.areEqual(1, [SELECT COUNT() FROM Contact], 'Only Ada was created, once');
 		}
 	}
@@ -154,14 +131,7 @@ private class CreatePersonActionTest {
 			List<CreatePersonAction.Request> requests = new List<CreatePersonAction.Request>();
 			for (Integer i = 0; i < 200; i++) {
 				// Half join the household, half get one of their own.
-				requests.add(
-					request(
-						'Person' + i,
-						'Bulk' + i,
-						null,
-						Math.mod(i, 2) == 0 ? household.Id : null
-					)
-				);
+				requests.add(request('Person' + i, 'Bulk' + i, null, Math.mod(i, 2) == 0 ? household.Id : null));
 			}
 
 			Test.startTest();
@@ -198,9 +168,7 @@ private class CreatePersonActionTest {
 		Test.startTest();
 		System.runAs(reader) {
 			results = CreatePersonAction.create(
-				new List<CreatePersonAction.Request>{
-					request('Luis', 'Garcia', null, household.Id)
-				}
+				new List<CreatePersonAction.Request>{ request('Luis', 'Garcia', null, household.Id) }
 			);
 		}
 		Test.stopTest();

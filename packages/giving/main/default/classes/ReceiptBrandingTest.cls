@@ -44,8 +44,7 @@ private class ReceiptBrandingTest {
 			VersionData = Blob.valueOf('not really a png, and no test can say whether one renders')
 		);
 		insert version;
-		Id documentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :version.Id]
-		.ContentDocumentId;
+		Id documentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :version.Id].ContentDocumentId;
 		Giving_Settings__c giving = Giving_Settings__c.getOrgDefaults();
 		giving.SetupOwnerId = UserInfo.getOrganizationId();
 		giving.Receipt_Logo_Document_Id__c = documentId;
@@ -75,38 +74,12 @@ private class ReceiptBrandingTest {
 				'The legal name is printed above the letter: ' + html
 			);
 			Assert.isTrue(
-				html.contains(
-					'<p class="orgaddress">14 Bridge Street<br/>Suite 3<br/>Springfield, IL 62701</p>'
-				),
+				html.contains('<p class="orgaddress">14 Bridge Street<br/>Suite 3<br/>Springfield, IL 62701</p>'),
 				'So is the address, one line per part, City, State and Zip together: ' + html
 			);
 			Assert.isTrue(
 				html.contains('12-3456789'),
 				'The tax identification number is on it, as it always was: ' + html
-			);
-		}
-	}
-
-	/**
-	 * A letter saved before the package printed the letterhead keeps its own block, and the
-	 * package does not print the name a second time (ADR-0065 point 3).
-	 */
-	@IsTest
-	static void aLetterWithTheOldLetterheadBlockIsNotGivenASecondCopyOfIt() {
-		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Test.startTest();
-			String html = receiptFrom(
-				'<div class="letterhead"><h1>{{OrganizationName}}</h1></div>' + BARE_TEMPLATE
-			);
-			Test.stopTest();
-
-			Assert.isFalse(
-				html.contains('class="orgname"'),
-				'The package does not print a name the letter already printed: ' + html
-			);
-			Assert.isTrue(
-				html.contains('<h1>Hope For Homes</h1>'),
-				'The letter prints it: ' + html
 			);
 		}
 	}
@@ -119,9 +92,7 @@ private class ReceiptBrandingTest {
 	static void aLetterThatMentionsTheOrganizationInASentenceStillGetsTheLetterhead() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Test.startTest();
-			String html = receiptFrom(
-				'<p>Thank you for supporting {{OrganizationName}}, {{DonorName}}.</p>'
-			);
+			String html = receiptFrom('<p>Thank you for supporting {{OrganizationName}}, {{DonorName}}.</p>');
 			Test.stopTest();
 
 			Assert.isTrue(
@@ -169,10 +140,7 @@ private class ReceiptBrandingTest {
 				html.contains('class="orgaddress"'),
 				'The address is optional, so a blank one leaves no empty paragraph: ' + html
 			);
-			Assert.isTrue(
-				html.contains('<p class="orgname">Hope For Homes</p>'),
-				'The name still prints: ' + html
-			);
+			Assert.isTrue(html.contains('<p class="orgname">Hope For Homes</p>'), 'The name still prints: ' + html);
 		}
 	}
 
@@ -260,10 +228,7 @@ private class ReceiptBrandingTest {
 				Test.stopTest();
 
 				Assert.isFalse(html.contains('<img'), 'Off means off: ' + html);
-				Assert.isTrue(
-					html.contains('Hope For Homes'),
-					'A receipt with no images is still a receipt: ' + html
-				);
+				Assert.isTrue(html.contains('Hope For Homes'), 'A receipt with no images is still a receipt: ' + html);
 			}
 
 		}
@@ -286,14 +251,8 @@ private class ReceiptBrandingTest {
 			String html = receiptFrom(BARE_TEMPLATE);
 			Test.stopTest();
 
-			Assert.isFalse(
-				html.contains('<img'),
-				'Nothing is printed for a file that is not there.'
-			);
-			Assert.isTrue(
-				html.contains('Hope For Homes'),
-				'The document is produced anyway: ' + html
-			);
+			Assert.isFalse(html.contains('<img'), 'Nothing is printed for a file that is not there.');
+			Assert.isTrue(html.contains('Hope For Homes'), 'The document is produced anyway: ' + html);
 		}
 	}
 }

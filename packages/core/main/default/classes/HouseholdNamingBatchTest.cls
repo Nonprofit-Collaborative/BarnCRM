@@ -32,16 +32,8 @@ private class HouseholdNamingBatchTest {
 
 			Account filled = wordingOf(blank.Id);
 			Assert.areEqual('The Reverend and Mrs. Smith', filled.Name, 'Custom name kept');
-			Assert.areEqual(
-				'Mr. John Smith',
-				filled.Household_Formal_Greeting__c,
-				'A blank formal greeting is filled'
-			);
-			Assert.areEqual(
-				'John',
-				filled.Household_Informal_Greeting__c,
-				'A blank informal greeting is filled'
-			);
+			Assert.areEqual('Mr. John Smith', filled.Household_Formal_Greeting__c, 'A blank formal greeting is filled');
+			Assert.areEqual('John', filled.Household_Informal_Greeting__c, 'A blank informal greeting is filled');
 
 			Account kept = wordingOf(oneTyped.Id);
 			Assert.areEqual('The Reverend Smith', kept.Name, 'Custom name kept');
@@ -92,11 +84,7 @@ private class HouseholdNamingBatchTest {
 					household.Household_Formal_Greeting__c,
 					'Typed formal greeting kept'
 				);
-				Assert.areEqual(
-					'John',
-					household.Household_Informal_Greeting__c,
-					'Blank informal greeting filled'
-				);
+				Assert.areEqual('John', household.Household_Informal_Greeting__c, 'Blank informal greeting filled');
 			}
 		}
 	}
@@ -141,20 +129,10 @@ private class HouseholdNamingBatchTest {
 			Database.insert(new List<Account>{ patterned, byHand }, AccessLevel.SYSTEM_MODE);
 			insert new List<Contact>{
 				TestDataFactory.person(
-					new Contact(
-						Salutation = 'Ms.',
-						FirstName = 'Maria',
-						LastName = 'Garcia',
-						AccountId = patterned.Id
-					)
+					new Contact(Salutation = 'Ms.', FirstName = 'Maria', LastName = 'Garcia', AccountId = patterned.Id)
 				),
 				TestDataFactory.person(
-					new Contact(
-						Salutation = 'Mr.',
-						FirstName = 'John',
-						LastName = 'Smith',
-						AccountId = byHand.Id
-					)
+					new Contact(Salutation = 'Mr.', FirstName = 'John', LastName = 'Smith', AccountId = byHand.Id)
 				)
 			};
 			update new Account(Id = patterned.Id, Name = 'Old name');
@@ -207,20 +185,10 @@ private class HouseholdNamingBatchTest {
 			Database.insert(new List<Account>{ native, ordinary }, AccessLevel.SYSTEM_MODE);
 			insert new List<Contact>{
 				TestDataFactory.person(
-					new Contact(
-						Salutation = 'Ms.',
-						FirstName = 'Maria',
-						LastName = 'Garcia',
-						AccountId = native.Id
-					)
+					new Contact(Salutation = 'Ms.', FirstName = 'Maria', LastName = 'Garcia', AccountId = native.Id)
 				),
 				TestDataFactory.person(
-					new Contact(
-						Salutation = 'Mr.',
-						FirstName = 'John',
-						LastName = 'Smith',
-						AccountId = ordinary.Id
-					)
+					new Contact(Salutation = 'Mr.', FirstName = 'John', LastName = 'Smith', AccountId = ordinary.Id)
 				)
 			};
 			update new List<Account>{

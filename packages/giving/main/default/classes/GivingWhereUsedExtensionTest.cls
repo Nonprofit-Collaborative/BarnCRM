@@ -27,23 +27,14 @@ private class GivingWhereUsedExtensionTest {
 			List<WhereUsedService.Reference> amount = extension.references(
 				WhereUsedService.target('Gift__c', 'Amount__c')
 			);
-			List<WhereUsedService.Reference> type = extension.references(
-				WhereUsedService.target('Gift__c', 'Type__c')
-			);
-			List<WhereUsedService.Reference> email = extension.references(
-				WhereUsedService.target('Contact', 'Email')
-			);
+			List<WhereUsedService.Reference> type = extension.references(WhereUsedService.target('Gift__c', 'Type__c'));
+			List<WhereUsedService.Reference> email = extension.references(WhereUsedService.target('Contact', 'Email'));
 			Test.stopTest();
 
 			Assert.areEqual(1, amount.size());
 			Assert.areEqual('Gift File', amount[0].getName());
 			Assert.areEqual(
-				new List<String>{
-					String.format(
-						System.Label.Core_WhereUsed_PartColumn,
-						new List<Object>{ 'Amount' }
-					)
-				},
+				new List<String>{ String.format(System.Label.Core_WhereUsed_PartColumn, new List<Object>{ 'Amount' }) },
 				amount[0].getParts()
 			);
 			Assert.areEqual(
@@ -81,10 +72,7 @@ private class GivingWhereUsedExtensionTest {
 				Schema.Giving_Settings__c.Donor_Level_Source_Field__c.getDescribe().getLabel(),
 				onContact[0].getName()
 			);
-			Assert.areEqual(
-				System.Label.Core_WhereUsed_BreaksSettingValue,
-				onContact[0].getBreaks()
-			);
+			Assert.areEqual(System.Label.Core_WhereUsed_BreaksSettingValue, onContact[0].getBreaks());
 			Assert.isTrue(notChosen.isEmpty(), 'A total the levels do not run on finds nothing.');
 		}
 	}

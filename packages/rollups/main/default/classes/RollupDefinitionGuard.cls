@@ -216,10 +216,7 @@ public with sharing class RollupDefinitionGuard {
 	}
 
 	/** Every field a filter names is readable, one lookup away included. */
-	private static Boolean filterReadable(
-		Map<String, Schema.SObjectField> fields,
-		String document
-	) {
+	private static Boolean filterReadable(Map<String, Schema.SObjectField> fields, String document) {
 		if (String.isBlank(document)) {
 			return true;
 		}

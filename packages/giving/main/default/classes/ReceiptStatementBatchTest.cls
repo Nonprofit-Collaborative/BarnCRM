@@ -19,27 +19,11 @@ private class ReceiptStatementBatchTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			System.runAs(ReceiptTestDataFactory.issuer()) {
 				ReceiptTestDataFactory.setUpReceipting();
-				Contact reyes = GivingTestDataFactory.insertHouseholdContact(
-					'The Reyes Family',
-					'Ana',
-					'Reyes'
-				);
-				Contact osei = GivingTestDataFactory.insertHouseholdContact(
-					'The Osei Family',
-					'Kofi',
-					'Osei'
-				);
+				Contact reyes = GivingTestDataFactory.insertHouseholdContact('The Reyes Family', 'Ana', 'Reyes');
+				Contact osei = GivingTestDataFactory.insertHouseholdContact('The Osei Family', 'Kofi', 'Osei');
 				insert new List<Gift__c>{
-					ReceiptTestDataFactory.plainCashGift(
-						reyes.Id,
-						100,
-						Date.newInstance(YEAR, 2, 1)
-					),
-					ReceiptTestDataFactory.plainCashGift(
-						reyes.Id,
-						150,
-						Date.newInstance(YEAR, 8, 1)
-					),
+					ReceiptTestDataFactory.plainCashGift(reyes.Id, 100, Date.newInstance(YEAR, 2, 1)),
+					ReceiptTestDataFactory.plainCashGift(reyes.Id, 150, Date.newInstance(YEAR, 8, 1)),
 					ReceiptTestDataFactory.plainCashGift(osei.Id, 400, Date.newInstance(YEAR, 5, 1))
 				};
 
@@ -54,28 +38,15 @@ private class ReceiptStatementBatchTest {
 				insert run;
 
 				Test.startTest();
-				Database.executeBatch(
-					new ReceiptStatementBatch(YEAR, run.Id),
-					ReceiptStatementBatch.SCOPE
-				);
+				Database.executeBatch(new ReceiptStatementBatch(YEAR, run.Id), ReceiptStatementBatch.SCOPE);
 				Test.stopTest();
 
 				List<Receipt__c> issued = [
-					SELECT
-						Id,
-						Receipt_Number__c,
-						Total_Amount__c,
-						Donor_Account__c,
-						Donor_Year_Key__c,
-						Status__c
+					SELECT Id, Receipt_Number__c, Total_Amount__c, Donor_Account__c, Donor_Year_Key__c, Status__c
 					FROM Receipt__c
 					WHERE Type__c = :ReceiptNumberSequence.TYPE_STATEMENT AND Status__c = 'Issued'
 				];
-				Assert.areEqual(
-					2,
-					issued.size(),
-					'Two households gave, so two statements were issued.'
-				);
+				Assert.areEqual(2, issued.size(), 'Two households gave, so two statements were issued.');
 
 				Map<Id, Decimal> totalByDonor = new Map<Id, Decimal>();
 				for (Receipt__c receipt : issued) {
@@ -90,19 +61,10 @@ private class ReceiptStatementBatchTest {
 					totalByDonor.get(reyes.AccountId),
 					'A household statement totals the household year.'
 				);
-				Assert.areEqual(
-					400,
-					totalByDonor.get(osei.AccountId),
-					'The other household totals its own year.'
-				);
+				Assert.areEqual(400, totalByDonor.get(osei.AccountId), 'The other household totals its own year.');
 
 				Receipt_Run__c finished = [
-					SELECT
-						Status__c,
-						Donors_Processed__c,
-						Receipts_Issued__c,
-						Errors__c,
-						Finished__c
+					SELECT Status__c, Donors_Processed__c, Receipts_Issued__c, Errors__c, Finished__c
 					FROM Receipt_Run__c
 					WHERE Id = :run.Id
 				];
@@ -128,16 +90,8 @@ private class ReceiptStatementBatchTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			System.runAs(ReceiptTestDataFactory.issuer()) {
 				ReceiptTestDataFactory.setUpReceipting();
-				Contact reyes = GivingTestDataFactory.insertHouseholdContact(
-					'The Reyes Family',
-					'Ana',
-					'Reyes'
-				);
-				Gift__c gift = ReceiptTestDataFactory.plainCashGift(
-					reyes.Id,
-					100,
-					Date.newInstance(YEAR, 2, 1)
-				);
+				Contact reyes = GivingTestDataFactory.insertHouseholdContact('The Reyes Family', 'Ana', 'Reyes');
+				Gift__c gift = ReceiptTestDataFactory.plainCashGift(reyes.Id, 100, Date.newInstance(YEAR, 2, 1));
 				insert gift;
 
 				Receipt_Run__c first = new Receipt_Run__c(
@@ -152,16 +106,10 @@ private class ReceiptStatementBatchTest {
 				insert new List<Receipt_Run__c>{ first, second };
 
 				Test.startTest();
-				Database.executeBatch(
-					new ReceiptStatementBatch(YEAR, first.Id),
-					ReceiptStatementBatch.SCOPE
-				);
+				Database.executeBatch(new ReceiptStatementBatch(YEAR, first.Id), ReceiptStatementBatch.SCOPE);
 				Test.stopTest();
 
-				Database.executeBatch(
-					new ReceiptStatementBatch(YEAR, second.Id),
-					ReceiptStatementBatch.SCOPE
-				);
+				Database.executeBatch(new ReceiptStatementBatch(YEAR, second.Id), ReceiptStatementBatch.SCOPE);
 
 				Assert.areEqual(
 					1,
@@ -196,15 +144,8 @@ private class ReceiptStatementBatchTest {
 				WHERE Id = :run.Id
 			];
 			Assert.areEqual(YEAR, stored.Statement_Year__c, 'The run knows which year it covers.');
-			Assert.areEqual(
-				ReceiptNumberSequence.TYPE_STATEMENT,
-				stored.Type__c,
-				'The run knows what it generates.'
-			);
-			Assert.isNotNull(
-				stored.Async_Job_Id__c,
-				'The run names the job, so a stuck one can be found.'
-			);
+			Assert.areEqual(ReceiptNumberSequence.TYPE_STATEMENT, stored.Type__c, 'The run knows what it generates.');
+			Assert.isNotNull(stored.Async_Job_Id__c, 'The run names the job, so a stuck one can be found.');
 		}
 	}
 }

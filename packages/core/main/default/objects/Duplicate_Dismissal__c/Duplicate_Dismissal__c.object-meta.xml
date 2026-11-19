@@ -4,9 +4,11 @@
   <description>
     A record that a person looked at two records the duplicate scan proposed and said they are
     not the same household or the same person, so that the scan does not propose them again
-    (canonical model Section 29A, rule R-DP5). It is the only thing duplicate detection
-    stores: the suggestions themselves are the platform's own duplicate record sets. Public
-    read and write, because a dismissal is the organization's decision rather than one person's.
+    (canonical model Section 29A, rule R-DP5). Rows of Kind Match Reason instead hold why the
+    scan proposed a suggestion a match source found (R-DP6), keyed by the duplicate record
+    set. These are the only things duplicate detection stores: the suggestions themselves are
+    the platform's own duplicate record sets. Public read and write, because a dismissal is the
+    organization's decision rather than one person's.
   </description>
   <enableActivities>false</enableActivities>
   <enableBulkApi>true</enableBulkApi>

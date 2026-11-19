@@ -10,11 +10,7 @@ private class ImportColumnLibraryTest {
 		Assert.areEqual('Contact1.FirstName', ImportColumnLibrary.suggest('First Name'), 'Plain.');
 		Assert.areEqual('Contact1.LastName', ImportColumnLibrary.suggest('Surname'), 'A synonym.');
 		Assert.areEqual('Contact1.Email', ImportColumnLibrary.suggest('Donor Email'), 'Processor.');
-		Assert.areEqual(
-			'Organization.Name',
-			ImportColumnLibrary.suggest('Company Name'),
-			'A business list heading.'
-		);
+		Assert.areEqual('Organization.Name', ImportColumnLibrary.suggest('Company Name'), 'A business list heading.');
 	}
 
 	@IsTest
@@ -56,9 +52,7 @@ private class ImportColumnLibraryTest {
 
 	@IsTest
 	static void aSecondColumnSuggestingTheSameTargetIsLeftUnmapped() {
-		ImportMapping mapping = ImportColumnLibrary.suggestMapping(
-			new List<String>{ 'Email', 'Email Address' }
-		);
+		ImportMapping mapping = ImportColumnLibrary.suggestMapping(new List<String>{ 'Email', 'Email Address' });
 		Assert.areEqual('Contact1.Email', mapping.columns[0].target, 'The first column wins.');
 		Assert.areEqual(
 			ImportMapping.TARGET_IGNORE,

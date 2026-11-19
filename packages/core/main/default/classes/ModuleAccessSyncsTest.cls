@@ -35,10 +35,7 @@ private class ModuleAccessSyncsTest {
 				Access_By_Permission_Set__c = 'Example_A_Admin=BarnCRM_Admin',
 				Access_By_Role__c = 'Example_A_Staff=Program_Staff,Fundraising_Staff'
 			),
-			new BarnCRM_Module__mdt(
-				DeveloperName = 'Example_B',
-				Access_By_Role__c = 'Example_B_Staff=Program_Staff'
-			),
+			new BarnCRM_Module__mdt(DeveloperName = 'Example_B', Access_By_Role__c = 'Example_B_Staff=Program_Staff'),
 			new BarnCRM_Module__mdt(DeveloperName = 'Example_None')
 		};
 	}

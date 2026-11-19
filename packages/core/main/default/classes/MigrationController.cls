@@ -34,11 +34,7 @@ public with sharing class MigrationController {
 
 	/** Marks a tool step done, or not done. */
 	@AuraEnabled
-	public static MigrationKitService.KitView setToolStep(
-		String kitKey,
-		String stepKey,
-		Boolean done
-	) {
+	public static MigrationKitService.KitView setToolStep(String kitKey, String stepKey, Boolean done) {
 		try {
 			MigrationKitService.markToolStep(kitKey, stepKey, done);
 			return MigrationKitService.view(kitKey);
@@ -49,11 +45,7 @@ public with sharing class MigrationController {
 
 	/** Ticks or unticks a retire checklist item. */
 	@AuraEnabled
-	public static MigrationKitService.KitView setChecklistItem(
-		String kitKey,
-		String itemKey,
-		Boolean ticked
-	) {
+	public static MigrationKitService.KitView setChecklistItem(String kitKey, String itemKey, Boolean ticked) {
 		try {
 			MigrationKitService.tick(kitKey, itemKey, ticked);
 			return MigrationKitService.view(kitKey);

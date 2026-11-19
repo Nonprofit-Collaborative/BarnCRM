@@ -9,10 +9,7 @@ private class RecordServiceControllerTest {
 
 	private static final List<String> STAFF = new List<String>{ 'BarnCRM_Staff', 'Programs_Staff' };
 
-	private static final List<String> READ_ONLY = new List<String>{
-		'BarnCRM_Read_Only',
-		'Programs_Read_Only'
-	};
+	private static final List<String> READ_ONLY = new List<String>{ 'BarnCRM_Read_Only', 'Programs_Read_Only' };
 
 	@TestSetup
 	static void createTestUsers() {
@@ -22,19 +19,13 @@ private class RecordServiceControllerTest {
 	}
 
 	private static void contactMode() {
-		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-			HouseholdTestDataFactory.MODE_CONTACT
-		);
+		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 		settings.Auto_Create_Households__c = false;
 		TestDataFactory.saveSettings(settings);
 	}
 
 	private static Service__c serviceIn(Program__c program, String name) {
-		Service__c service = new Service__c(
-			Program__c = program.Id,
-			Name = name,
-			Unit_Of_Measure__c = 'meals'
-		);
+		Service__c service = new Service__c(Program__c = program.Id, Name = name, Unit_Of_Measure__c = 'meals');
 		insert service;
 		return service;
 	}
@@ -54,9 +45,7 @@ private class RecordServiceControllerTest {
 			insert enrolled;
 
 			Test.startTest();
-			RecordServiceController.Form fromEnrollment = RecordServiceController.getForm(
-				enrolled.Id
-			);
+			RecordServiceController.Form fromEnrollment = RecordServiceController.getForm(enrolled.Id);
 			RecordServiceController.Form fromPerson = RecordServiceController.getForm(ana.Id);
 			Test.stopTest();
 

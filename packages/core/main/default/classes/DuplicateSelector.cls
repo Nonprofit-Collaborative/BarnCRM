@@ -108,8 +108,7 @@ public with sharing class DuplicateSelector {
 		if (rulesOverride != null) {
 			return rulesFor(new Set<String>{ objectName });
 		}
-		Boolean hasSubtype = Schema.SObjectType.DuplicateRule.fields.getMap()
-			.containsKey(SUBTYPE_FIELD.toLowerCase());
+		Boolean hasSubtype = Schema.SObjectType.DuplicateRule.fields.getMap().containsKey(SUBTYPE_FIELD.toLowerCase());
 		return Database.queryWithBinds(
 			'SELECT Id, SobjectType, IsActive' +
 				(hasSubtype ? ', ' + SUBTYPE_FIELD : '') +
@@ -237,24 +236,27 @@ public with sharing class DuplicateSelector {
 		];
 	}
 
-	/** The reasons written for these suggestions by a match source (R-DP6). */
-	public static List<Duplicate_Reason__c> reasonRows(Set<Id> setIds) {
+	/**
+	 * The reasons written for these suggestions by a match source (R-DP6): Duplicate Dismissal
+	 * rows of Kind Match Reason, whose Pair Key is the set's identifier.
+	 */
+	public static List<Duplicate_Dismissal__c> reasonRows(Set<Id> setIds) {
 		Set<String> keys = new Set<String>();
 		for (Id setId : setIds == null ? new Set<Id>() : setIds) {
 			keys.add(String.valueOf(setId));
 		}
 		if (keys.isEmpty()) {
-			return new List<Duplicate_Reason__c>();
+			return new List<Duplicate_Dismissal__c>();
 		}
 		// System mode on purpose: a reason holds nothing sensitive, only the label of the match
 		// source that found the pair ("Same email on Contact Point Email"), and it is read only
 		// for suggestions the reviewer can already see. Reading it in user mode would hide why
 		// a pair is listed from a reviewer who holds Duplicate Review but no BarnCRM role.
-		// Writes and deletes stay in user mode (DuplicateService).
+		// Writes and deletes are system mode too, for the reasons DuplicateService gives.
 		return [
-			SELECT Id, Set_Id__c, Reason__c
-			FROM Duplicate_Reason__c
-			WHERE Set_Id__c IN :keys
+			SELECT Id, Pair_Key__c, Reason__c
+			FROM Duplicate_Dismissal__c
+			WHERE Kind__c = :DuplicateService.KIND_MATCH_REASON AND Pair_Key__c IN :keys
 			WITH SYSTEM_MODE
 		];
 	}
@@ -268,7 +270,7 @@ public with sharing class DuplicateSelector {
 		for (Duplicate_Dismissal__c dismissal : [
 			SELECT Pair_Key__c
 			FROM Duplicate_Dismissal__c
-			WHERE Pair_Key__c IN :pairKeys
+			WHERE Pair_Key__c IN :pairKeys AND Kind__c != :DuplicateService.KIND_MATCH_REASON
 			WITH USER_MODE
 		]) {
 			result.add(dismissal.Pair_Key__c);
@@ -298,7 +300,12 @@ public with sharing class DuplicateSelector {
 
 	/** How many pairs have been dismissed, for the count on the panel. */
 	public static Integer dismissalCount() {
-		return [SELECT COUNT() FROM Duplicate_Dismissal__c WITH USER_MODE];
+		return [
+			SELECT COUNT()
+			FROM Duplicate_Dismissal__c
+			WHERE Kind__c != :DuplicateService.KIND_MATCH_REASON
+			WITH USER_MODE
+		];
 	}
 
 	/** The latest runs of the scan, so the panel can say whether one is going on. */
@@ -328,10 +335,7 @@ public with sharing class DuplicateSelector {
 		return [
 				SELECT COUNT()
 				FROM AsyncApexJob
-				WHERE
-					JobType = 'BatchApex'
-					AND ApexClass.Name = :className
-					AND Status IN :SCAN_UNFINISHED
+				WHERE JobType = 'BatchApex' AND ApexClass.Name = :className AND Status IN :SCAN_UNFINISHED
 				WITH SYSTEM_MODE
 			] > 0;
 	}
@@ -435,10 +439,7 @@ public with sharing class DuplicateSelector {
 		}
 		return Database.queryWithBinds(
 			'SELECT ' +
-				selectList(
-					new List<String>{ 'Id', 'Name', 'BillingCity', 'BillingPostalCode' },
-					HOUSEHOLD_COMPARED
-				) +
+				selectList(new List<String>{ 'Id', 'Name', 'BillingCity', 'BillingPostalCode' }, HOUSEHOLD_COMPARED) +
 				' FROM Account WHERE Id IN :recordIds AND RecordTypeId = :householdType',
 			new Map<String, Object>{ 'recordIds' => recordIds, 'householdType' => householdType },
 			AccessLevel.USER_MODE

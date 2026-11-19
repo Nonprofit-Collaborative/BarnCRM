@@ -15,15 +15,11 @@ private class QueryFieldCatalogTest {
 		System.runAs(TestUsers.admin()) {
 			QueryFieldCatalog.ObjectInfo info = QueryFieldCatalog.getObjectInfo('Affiliation__c');
 
-			System.Assert.isTrue(
-				info.apiName.endsWith('Affiliation__c'),
-				'The object comes back by its API name'
-			);
+			System.Assert.isTrue(info.apiName.endsWith('Affiliation__c'), 'The object comes back by its API name');
 			System.Assert.isFalse(info.fields.isEmpty(), 'An object the user can read has fields');
 			for (Integer index = 1; index < info.fields.size(); index++) {
 				System.Assert.isTrue(
-					info.fields[index - 1].label.toLowerCase() <=
-					info.fields[index].label.toLowerCase(),
+					info.fields[index - 1].label.toLowerCase() <= info.fields[index].label.toLowerCase(),
 					'Fields are sorted by label so the builder can show them as they come'
 				);
 			}
@@ -33,10 +29,7 @@ private class QueryFieldCatalogTest {
 	@IsTest
 	static void aLookupNamesItsParentAndRelationship() {
 		System.runAs(TestUsers.admin()) {
-			QueryFieldCatalog.FieldInfo contact = field(
-				QueryFieldCatalog.describe('Affiliation__c'),
-				'Contact__c'
-			);
+			QueryFieldCatalog.FieldInfo contact = field(QueryFieldCatalog.describe('Affiliation__c'), 'Contact__c');
 
 			System.Assert.areEqual('reference', contact.dataType, 'A lookup is a reference');
 			System.Assert.areEqual('Contact', contact.referenceTo, 'The parent object is named');
@@ -50,10 +43,7 @@ private class QueryFieldCatalogTest {
 	@IsTest
 	static void aPicklistCarriesItsActiveValues() {
 		System.runAs(TestUsers.admin()) {
-			QueryFieldCatalog.FieldInfo status = field(
-				QueryFieldCatalog.describe('Affiliation__c'),
-				'Status__c'
-			);
+			QueryFieldCatalog.FieldInfo status = field(QueryFieldCatalog.describe('Affiliation__c'), 'Status__c');
 
 			System.Assert.areEqual('picklist', status.dataType, 'Status is a picklist');
 			System.Assert.isFalse(status.picklistValues.isEmpty(), 'Its values come with it');
@@ -64,19 +54,12 @@ private class QueryFieldCatalogTest {
 	@IsTest
 	static void anUnknownOrMalformedObjectIsRefusedInPlainWords() {
 		System.runAs(TestUsers.admin()) {
-			for (
-				String objectName : new List<String>{ 'No_Such_Object__c', 'Account; DELETE', '' }
-			) {
+			for (String objectName : new List<String>{ 'No_Such_Object__c', 'Account; DELETE', '' }) {
 				try {
 					QueryFieldCatalog.getObjectInfo(objectName);
-					System.Assert.fail(
-						'An object that cannot be described is refused: ' + objectName
-					);
+					System.Assert.fail('An object that cannot be described is refused: ' + objectName);
 				} catch (AuraHandledException refused) {
-					System.Assert.isTrue(
-						String.isNotBlank(refused.getMessage()),
-						'The refusal says what is wrong'
-					);
+					System.Assert.isTrue(String.isNotBlank(refused.getMessage()), 'The refusal says what is wrong');
 				}
 			}
 		}
@@ -87,8 +70,7 @@ private class QueryFieldCatalogTest {
 		System.runAs(TestUsers.admin()) {
 			System.Assert.areEqual(
 				'Name',
-				QueryFieldCatalog.resolvePath('Affiliation__c', 'Contact__r.Account.Name')
-					.getName(),
+				QueryFieldCatalog.resolvePath('Affiliation__c', 'Contact__r.Account.Name').getName(),
 				'A path crosses two lookups and ends on the parent field'
 			);
 			System.Assert.areEqual(
@@ -136,8 +118,7 @@ private class QueryFieldCatalogTest {
 			for (Integer index = 0; index < 200; index++) {
 				System.Assert.areEqual(
 					'Name',
-					QueryFieldCatalog.resolvePath('Affiliation__c', 'contact__r.ACCOUNT.Name')
-						.getName(),
+					QueryFieldCatalog.resolvePath('Affiliation__c', 'contact__r.ACCOUNT.Name').getName(),
 					'Every path crossing the same lookups resolves the same way'
 				);
 			}
@@ -197,28 +178,19 @@ private class QueryFieldCatalogTest {
 				QueryCompiler.compile('{"object":"AccountHistory","fields":["Id"]}');
 				System.Assert.fail('Find and its export refuse a system object');
 			} catch (QueryCompiler.QueryCompilerException refused) {
-				System.Assert.isTrue(
-					refused.getMessage().contains('AccountHistory'),
-					'Named: ' + refused.getMessage()
-				);
+				System.Assert.isTrue(refused.getMessage().contains('AccountHistory'), 'Named: ' + refused.getMessage());
 			}
 			try {
 				BulkDeleteService.planForFile('AccountShare');
 				System.Assert.fail('Bulk Delete refuses a system object');
 			} catch (Exception refused) {
-				System.Assert.isTrue(
-					refused.getMessage().contains('AccountShare'),
-					'Named: ' + refused.getMessage()
-				);
+				System.Assert.isTrue(refused.getMessage().contains('AccountShare'), 'Named: ' + refused.getMessage());
 			}
 			try {
 				BulkUpdateFields.writableObject('AccountShare');
 				System.Assert.fail('Bulk Update refuses a system object');
 			} catch (BulkUpdateFields.BulkUpdateException refused) {
-				System.Assert.isTrue(
-					refused.getMessage().contains('AccountShare'),
-					'Named: ' + refused.getMessage()
-				);
+				System.Assert.isTrue(refused.getMessage().contains('AccountShare'), 'Named: ' + refused.getMessage());
 			}
 			System.Assert.areEqual(
 				'Account',
@@ -228,10 +200,7 @@ private class QueryFieldCatalogTest {
 		}
 	}
 
-	private static QueryFieldCatalog.FieldInfo field(
-		QueryFieldCatalog.ObjectInfo info,
-		String apiNameSuffix
-	) {
+	private static QueryFieldCatalog.FieldInfo field(QueryFieldCatalog.ObjectInfo info, String apiNameSuffix) {
 		for (QueryFieldCatalog.FieldInfo candidate : info.fields) {
 			if (candidate.apiName.endsWith(apiNameSuffix)) {
 				return candidate;

@@ -106,9 +106,7 @@ public with sharing class EventSessionRatings {
 					}
 				}
 				if (chosen == null) {
-					throw new System.IllegalArgumentException(
-						BarnHelp.text('Events', 'Events_Survey_NotPublic')
-					);
+					throw new System.IllegalArgumentException(BarnHelp.text('Events', 'Events_Survey_NotPublic'));
 				}
 			}
 			update as user new Event__c(Id = eventId, Session_Rating_Form_Key__c = chosen);
@@ -180,12 +178,7 @@ public with sharing class EventSessionRatings {
 	@TestVisible
 	private static Integer ratingOf(Object value) {
 		Decimal given = SettingsService.toNumber(value);
-		if (
-			given == null ||
-			given != given.round(System.RoundingMode.DOWN) ||
-			given < 1 ||
-			given > 5
-		) {
+		if (given == null || given != given.round(System.RoundingMode.DOWN) || given < 1 || given > 5) {
 			return null;
 		}
 		return given.intValue();

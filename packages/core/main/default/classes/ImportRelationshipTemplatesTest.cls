@@ -16,20 +16,12 @@ private class ImportRelationshipTemplatesTest {
 			for (Integer i = 0; i < ROWS; i++) {
 				people.add(
 					TestDataFactory.person(
-						new Contact(
-							FirstName = 'Pat',
-							LastName = 'Rel' + i,
-							Email = 'pat' + i + '@rel.example.org'
-						)
+						new Contact(FirstName = 'Pat', LastName = 'Rel' + i, Email = 'pat' + i + '@rel.example.org')
 					)
 				);
 				people.add(
 					TestDataFactory.person(
-						new Contact(
-							FirstName = 'Quinn',
-							LastName = 'Rel' + i,
-							Email = 'quinn' + i + '@rel.example.org'
-						)
+						new Contact(FirstName = 'Quinn', LastName = 'Rel' + i, Email = 'quinn' + i + '@rel.example.org')
 					)
 				);
 			}
@@ -60,10 +52,7 @@ private class ImportRelationshipTemplatesTest {
 		return ImportTemplateSelector.selectById(found.Id);
 	}
 
-	private static ImportRowProcessor.Outcome load(
-		Import_Template__c template,
-		List<Map<String, String>> values
-	) {
+	private static ImportRowProcessor.Outcome load(Import_Template__c template, List<Map<String, String>> values) {
 		Import_Batch__c batch = ImportTestDataFactory.batch(template);
 		ImportTestDataFactory.rows(batch, values);
 		ImportBatchService.beginPass(batch.Id);
@@ -188,9 +177,7 @@ private class ImportRelationshipTemplatesTest {
 						WHERE Is_Primary__c = TRUE
 					)
 				FROM Contact
-				WHERE
-					Email LIKE 'pat%@rel.example.org'
-					AND Id IN (SELECT Contact__c FROM Affiliation__c)
+				WHERE Email LIKE 'pat%@rel.example.org' AND Id IN (SELECT Contact__c FROM Affiliation__c)
 			]) {
 				Assert.areEqual(1, person.Affiliations__r.size(), 'Exactly one primary.');
 				Assert.areEqual(

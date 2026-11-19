@@ -43,8 +43,7 @@ no switch of its own. If **Health Check** says the nightly run is not scheduled,
 all nightly jobs** fix schedules it.
 
 Then open the **Logic Models** tab, which joins the BarnCRM apps (and is in the App Launcher).
-Logic Models has no app of its own: the two-tab BarnCRM Logic Models app was retired in release
-1.24 (D-200 R6). A logic model opens on its builder page in every app, as the object's default
+Logic Models has no app of its own (D-200 R6). A logic model opens on its builder page in every app, as the object's default
 record page.
 
 Logic Models has no org-wide settings yet: each logic model is set up on its own record.
@@ -59,7 +58,7 @@ You never assign the Logic Models permission sets by hand. Give people their Bar
 | BarnCRM role | Logic Models set they get | What they can do |
 |---|---|---|
 | Admin (anyone holding BarnCRM Admin) | Logic Models Admin | Everything, including deleting a whole logic model and choosing where an indicator's results come from |
-| Team Member, Fundraising Staff (Giving) | Logic Models Staff | Create logic models and build them: add, change and remove parts, arrows, evidence, indicators and periods; never deletes a whole model |
+| Team Member, Fundraising Staff (Fundraising) | Logic Models Staff | Create logic models and build them: add, change and remove parts, arrows, evidence, indicators and periods; never deletes a whole model |
 | Read Only | Logic Models Read Only | Look at logic models, evidence, indicators and results |
 
 The sets are given at install, when you give a role on the Access page (within a minute), when
@@ -257,7 +256,7 @@ offers the starters your org can use, then **Saved Query**:
 | **People Served by a Service** | Each person once (Count Unique of Contact), by Delivery Date, leaving out absences | The service (required) | Programs is installed |
 | **Services Delivered** | Service deliveries, by Delivery Date, leaving out absences | The service (required) | Programs is installed |
 | **Approved Volunteer Hours** | The total of Hours on approved volunteer hours, by Date Worked | A volunteer job, or **All** | Volunteers is installed |
-| **Grants Awarded** | Grants at the Awarded stage, by Decision Date | A program, or **All** (where Programs is installed) | Funders is installed |
+| **Grants Awarded** | Grants at the Awarded stage, by Decision Date | A program, or **All** (where Programs is installed) | Grants is installed |
 
 Pick the template and the record it is about, then **Save**. BarnCRM writes the saved query in
 **Find** for you, named after the template and the record (for example "Services Delivered:
@@ -325,15 +324,15 @@ you choose, the target, the result and the progress (**Met** or a percent).
 - **Download Printable Report** saves one web page with the table and the model's name. Open it
   in your browser and print it.
 - **Download PDF** saves the same page as a PDF, landscape, ready to send to a funder. Salesforce's
-  own PDF service makes it (the one that makes Giving's receipts); nothing is stored and nothing
+  own PDF service makes it (the one that makes Fundraising's receipts); nothing is stored and nothing
   is sent anywhere else.
 
 Everyone who can open the model can see and download its report, including Read Only users. The
 report shows only what the person can read and stores nothing. Nothing needs setting up.
 
-## With the Funders Module
+## With the Grants Module
 
-When the Funders module is installed too, each grant requirement (a report or deliverable a
+When the Grants module is installed too, each grant requirement (a report or deliverable a
 funder expects) can name the outcome or output it reports on, from a **Logic Model Outcomes** card
 on the grant's page; the card shows that outcome's indicators with their targets and results for
 the award period. Nothing changes in your logic models: the link is kept on the requirement, by

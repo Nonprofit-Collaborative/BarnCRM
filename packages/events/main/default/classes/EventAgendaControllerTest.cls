@@ -40,16 +40,8 @@ private class EventAgendaControllerTest {
 		System.runAs(staff()) {
 			Datetime start = Datetime.now().addDays(30);
 			Event__c event = conference(start);
-			Event_Track__c developers = new Event_Track__c(
-				Event__c = event.Id,
-				Name = 'Developers',
-				Sort_Order__c = 2
-			);
-			Event_Track__c admins = new Event_Track__c(
-				Event__c = event.Id,
-				Name = 'Admins',
-				Sort_Order__c = 1
-			);
+			Event_Track__c developers = new Event_Track__c(Event__c = event.Id, Name = 'Developers', Sort_Order__c = 2);
+			Event_Track__c admins = new Event_Track__c(Event__c = event.Id, Name = 'Admins', Sort_Order__c = 1);
 			insert as user new List<Event_Track__c>{ developers, admins };
 			Event_Session__c talk = session(event, 'Flows 101', start.addHours(2));
 			talk.Track__c = admins.Id;
@@ -77,14 +69,9 @@ private class EventAgendaControllerTest {
 		System.runAs(staff()) {
 			Datetime start = Datetime.now().addDays(30);
 			Event__c event = conference(start);
-			Contact person = TestDataFactory.person(
-				new Contact(FirstName = 'Ana', LastName = 'Garcia')
-			);
+			Contact person = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Garcia'));
 			insert as user person;
-			Event_Speaker__c speaker = new Event_Speaker__c(
-				Event__c = event.Id,
-				Contact__c = person.Id
-			);
+			Event_Speaker__c speaker = new Event_Speaker__c(Event__c = event.Id, Contact__c = person.Id);
 			insert as user speaker;
 			Event_Session__c talk = session(event, 'Flows 101', start.addHours(1));
 			insert as user talk;

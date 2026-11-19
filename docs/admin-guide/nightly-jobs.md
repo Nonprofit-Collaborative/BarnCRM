@@ -9,8 +9,7 @@ each job in turn, one at a time, at its usual time or as soon as the job before 
 finished, whichever is later. A job never starts while the one before it is still working, so
 the jobs never compete with each other for the platform's limits.
 
-Before this version each job had its own schedule, up to about 19 of them. There is now one,
-plus the hourly tab access check Health Check keeps.
+There is one schedule for every job, plus the hourly tab access check Health Check keeps.
 
 The jobs in the run, by time of night:
 
@@ -29,18 +28,23 @@ without a switch runs whenever its module is on):
 
 | Time | Job | Module | Switched on and off |
 |---|---|---|---|
-| 1:15, 1:45, 3:00, 3:30 | Installment top up, installments overdue, donor levels, ask reminders | Giving | **Nightly Jobs** panel, each on its own (on unless switched off) |
-| 1:30 | Opportunity mirror | Mirror | Opportunity mirror page, while a direction is chosen |
-| 1:35 | Gift Transaction mirror | Mirror | Gift Transaction mirror page, while the mirror is on |
+| 1:15, 1:45, 3:00, 3:30 | Installment top up, installments overdue, donor levels, ask reminders | Fundraising | **Nightly Jobs** panel, each on its own (on unless switched off) |
+| 1:30 | Opportunity mirror | Fundraising | Opportunity mirror page, while a direction is chosen |
+| 1:35 | Gift Transaction mirror | Fundraising | Gift Transaction mirror page, while the mirror is on |
+| 1:40 | Cases Sent to a Service Provider: makes sure the hourly check (**BarnCRM Mirror: Case requests hourly**, at a quarter past each hour, working only while a request or a Case of the chosen Type is open) is scheduled, and checks once | Mirror | **Nightly Jobs** panel, while **Send Cases to a service provider** is on; switching it off stops the hourly check (see [Cases Sent to a Service Provider](mirror-case-requests.md)) |
 | 2:00 (the **Time of the Nightly Run** setting) | Rollup recalculation | Rollup Builder | Rollups page |
-| 2:45 | Acknowledgment emails | Giving | Acknowledgments page (off until switched on) |
+| 2:45 | Acknowledgment emails | Fundraising | Acknowledgments page (off until switched on) |
 | 3:00 | Volunteer schedules | Volunteers | No switch |
-| 3:15 | Pledge reminders | Giving | Pledge Reminders page (off until switched on) |
+| 3:15 | Pledge reminders | Fundraising | Pledge Reminders page (off until switched on) |
 | 3:30 | Indicator results | Logic Models | No switch |
 | 5:45 | Territory assignment (records with no territory yet) | Territory Management | **Nightly Jobs** panel (off until switched on) |
-| 6:00 | Grant reminders | Funders | No switch |
+| 6:00 | Grant reminders | Grants | No switch |
 | 7:00 | Volunteer shift reminders | Volunteers | No switch |
 | 7:15 | Volunteer unfilled shift nudges | Volunteers | No switch (the **Send unfilled shift nudges** setting decides) |
+
+In Setup, **Scheduled Jobs**, every Fundraising job reads "BarnCRM Fundraising" and its name:
+Installment Top Up, Installments Overdue, Donor Levels, Ask Reminders, Opportunity Mirror, Gift
+Transaction Mirror, Acknowledgments and Pledge Reminders.
 
 The rollup recalculation goes over every record once a week (Sunday unless the **Night of the
 full recalculation** setting says otherwise) and over what changed on the other nights; see
@@ -48,8 +52,8 @@ full recalculation** setting says otherwise) and over what changed on the other 
 
 The donor levels pass writes a donor only when its level or scores changed.
 
-Modules add their own jobs to the same run when they are installed (Rollup Builder, Giving,
-Mirror, Volunteers, Logic Models, Funders). The Nightly Jobs panel lists every job your org has.
+Modules add their own jobs to the same run when they are installed (Rollup Builder, Fundraising,
+Mirror, Volunteers, Logic Models, Grants). The Nightly Jobs panel lists every job your org has.
 
 ## Where to Find It
 
@@ -66,7 +70,7 @@ The panel shows:
 
 A result other than Done comes with a short reason. Done With Errors means the job finished but
 some of its records failed: the [Error Log](error-log.md) has the details. A job that keeps its
-own summary of what it did (the Giving installment, reminder and acknowledgment jobs) shows it
+own summary of what it did (the Fundraising installment, reminder and acknowledgment jobs) shows it
 under its result, and a job that is on but did not run when the last nightly run did is marked
 **Missed Last Run**.
 
@@ -74,14 +78,13 @@ People who can manage BarnCRM Settings also see, on each job's row:
 
 - **Turn On** or **Turn Off**, for a job with a switch of its own. It saves at once, for the
   whole organization, and turning a job on schedules the nightly run when it is not scheduled.
-- **Run Now**, for a job that is safe to start by hand at any time (the Giving installment top
+- **Run Now**, for a job that is safe to start by hand at any time (the Fundraising installment top
   up, installments overdue, pledge reminders and ask reminders). It starts the job's work now
   without waiting for tonight; the job still runs tonight as usual. Donor levels and
   acknowledgment emails have no **Run Now** here: the Donor Levels page has its own
   **Recalculate Now**, and acknowledgments are sent from the Acknowledgments page.
 
-This panel replaces the Giving module's own **Nightly Jobs** page and tab, which earlier versions
-had: every module's jobs, Giving's included, are on this one panel.
+Every module's jobs, Fundraising's included, are on this one panel.
 
 ## How to Turn It On
 
@@ -89,8 +92,6 @@ The nightly run is scheduled for you when:
 
 - BarnCRM is installed new (the install schedules it; a schedule that already exists is kept and
   no job's switch is changed), or you finish first-run setup;
-- you upgrade from a version that had any job scheduled on its own (the old schedules are
-  replaced by the one run, and each job that was scheduled stays on);
 - you switch on a job that has its own switch, such as **Turn On Seasonal Addresses** or the
   Error Log's **Schedule Daily Run**;
 - you press **Schedule Nightly Jobs** on the panel, or Health Check's **Schedule All Nightly
@@ -110,7 +111,7 @@ and applies to the whole organization:
 
 | Setting | Section | Default | Accepted | What is deleted |
 |---|---|---|---|---|
-| **Days to keep merge history** | Duplicate Matching | 365 | 30 to 3650 | Merge Journal entries (undo is offered for 15 days, so this does not shorten it) |
+| **Days to keep merge history** | Duplicate Matching | 365 | 30 to 3650 | Admin Journal entries of Kind Merge; scan, deactivation, migration and household adoption entries are kept (undo is offered for 15 days, so this does not shorten it) |
 | **Days to keep field history** | Field History | 730 | 30 to 3650 | The changes [Field History](field-history.md) kept |
 | **Days to keep settings changes** | General | 730 | 180 to 3650 | The record of who changed which setting |
 | **Days to keep import history** | Import | 365 | 30 to 3650 | Finished imports and bulk jobs, with their rows and journal, once they can no longer be undone; and imports abandoned in Draft, Parsing or Preview (started and never committed), with their staged rows |

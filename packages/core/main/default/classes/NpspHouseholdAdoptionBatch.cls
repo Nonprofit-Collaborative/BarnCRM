@@ -44,23 +44,14 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
 	private Integer skipped = 0;
 	private Integer refused = 0;
 
-	private NpspHouseholdAdoptionBatch(
-		String runId,
-		Boolean undoing,
-		Boolean keepNames,
-		Integer runLimit
-	) {
+	private NpspHouseholdAdoptionBatch(String runId, Boolean undoing, Boolean keepNames, Integer runLimit) {
 		this.runId = runId;
 		this.undoing = undoing;
 		this.keepNames = keepNames;
 		this.runLimit = runLimit;
 	}
 
-	public static NpspHouseholdAdoptionBatch adopt(
-		String runId,
-		Boolean keepNames,
-		Integer limitTo
-	) {
+	public static NpspHouseholdAdoptionBatch adopt(String runId, Boolean keepNames, Integer limitTo) {
 		return new NpspHouseholdAdoptionBatch(runId, false, keepNames, limitTo);
 	}
 
@@ -72,18 +63,17 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
 		if (undoing) {
 			return Database.getQueryLocatorWithBinds(
 				'SELECT Id, Account_Id__c, Previous_Record_Type_Id__c, Previous_Values__c ' +
-					'FROM Household_Adoption__c WHERE Run_Id__c = :runId AND Status__c = :adopted ' +
-					'ORDER BY Id',
+					'FROM Merge_Journal__c WHERE Kind__c = :kind AND Run_Id__c = :runId ' +
+					'AND Status__c = :adopted ORDER BY Id',
 				new Map<String, Object>{
+					'kind' => NpspHouseholdAdoptionService.KIND_ADOPTION,
 					'runId' => runId,
 					'adopted' => NpspHouseholdAdoptionService.STATUS_ADOPTED
 				},
 				AccessLevel.SYSTEM_MODE
 			);
 		}
-		NpspHouseholdSource source = NpspHouseholdSource.forKey(
-			NpspHouseholdSource.keyOfRun(runId)
-		);
+		NpspHouseholdSource source = NpspHouseholdSource.forKey(NpspHouseholdSource.keyOfRun(runId));
 		String condition = source != null && source.available() ? source.condition() : '';
 		if (String.isBlank(condition)) {
 			return Database.getQueryLocatorWithBinds(
@@ -103,7 +93,7 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
 
 	public void execute(Database.BatchableContext context, List<SObject> scope) {
 		if (undoing) {
-			undoChunk((List<Household_Adoption__c>) scope);
+			undoChunk((List<Merge_Journal__c>) scope);
 		} else {
 			adoptChunk(new Map<Id, SObject>(scope).keySet());
 		}
@@ -115,8 +105,7 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
 		skipped += scopeIds.size() - editable.size();
 		String key = NpspHouseholdSource.keyOfRun(runId);
 		Boolean converting = key == NpspHouseholdSource.NPC;
-		List<NpspHouseholdSource.Household> sources = NpspHouseholdSource.forKey(key)
-			.read(editable);
+		List<NpspHouseholdSource.Household> sources = NpspHouseholdSource.forKey(key).read(editable);
 
 		Set<Id> primaryIds = new Set<Id>();
 		for (NpspHouseholdSource.Household source : sources) {
@@ -143,7 +132,7 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
 		);
 
 		List<Account> changes = new List<Account>();
-		Map<Id, Household_Adoption__c> journal = new Map<Id, Household_Adoption__c>();
+		Map<Id, Merge_Journal__c> journal = new Map<Id, Merge_Journal__c>();
 		for (NpspHouseholdSource.Household source : sources) {
 			Account previous = before.get(source.accountId);
 			if (previous == null || previous.RecordTypeId == household) {
@@ -156,10 +145,7 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
 				Custom_Name__c = keepNames || source.customNaming,
 				Household_Formal_Greeting__c = source.formalGreeting,
 				Household_Informal_Greeting__c = source.informalGreeting,
-				Primary_Contact__c = primary != null &&
-					primary.AccountId == source.accountId
-					? primary.Id
-					: null
+				Primary_Contact__c = primary != null && primary.AccountId == source.accountId ? primary.Id : null
 			);
 			Map<String, Object> saved = savedValues(previous);
 			if (converting) {
@@ -170,7 +156,8 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
 			changes.add(change);
 			journal.put(
 				source.accountId,
-				new Household_Adoption__c(
+				new Merge_Journal__c(
+					Kind__c = NpspHouseholdAdoptionService.KIND_ADOPTION,
 					Account_Id__c = source.accountId,
 					Run_Id__c = runId,
 					Previous_Record_Type_Id__c = previous.RecordTypeId,
@@ -193,7 +180,7 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
 				joinMembers(sources, journal);
 			}
 			if (!journal.isEmpty()) {
-				Database.insert(journal.values(), true, AccessLevel.SYSTEM_MODE);
+				insert as system journal.values();
 			}
 		} catch (Exception e) {
 			// An Account is never left adopted without the row that undoes it.
@@ -214,10 +201,7 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
 	 * rows' ids so the undo removes exactly those. A person already a current member is left as
 	 * they are. In Contact mode nobody is moved.
 	 */
-	private static void joinMembers(
-		List<NpspHouseholdSource.Household> sources,
-		Map<Id, Household_Adoption__c> journal
-	) {
+	private static void joinMembers(List<NpspHouseholdSource.Household> sources, Map<Id, Merge_Journal__c> journal) {
 		if (!HouseholdService.isJunctionMode()) {
 			return;
 		}
@@ -236,9 +220,7 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
 		if (people.isEmpty()) {
 			return;
 		}
-		Map<Id, Id> personAccounts = PersonRecordSelector.getAccountsBehindPersonContacts(
-			contactIds
-		);
+		Map<Id, Id> personAccounts = PersonRecordSelector.getAccountsBehindPersonContacts(contactIds);
 		Set<String> held = new Set<String>(memberKeys(people.keySet()).keySet());
 		HouseholdService.addMembers(people);
 		Map<String, Household_Member__c> now = memberKeys(people.keySet());
@@ -269,10 +251,8 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
 		}
 		Database.update(created, AccessLevel.USER_MODE);
 		for (Id accountId : createdByHousehold.keySet()) {
-			Household_Adoption__c row = journal.get(accountId);
-			Map<String, Object> saved = (Map<String, Object>) JSON.deserializeUntyped(
-				row.Previous_Values__c
-			);
+			Merge_Journal__c row = journal.get(accountId);
+			Map<String, Object> saved = (Map<String, Object>) JSON.deserializeUntyped(row.Previous_Values__c);
 			saved.put(MEMBERS_KEY, createdByHousehold.get(accountId));
 			row.Previous_Values__c = JSON.serialize(saved);
 		}
@@ -295,10 +275,10 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
 		return rows;
 	}
 
-	private void undoChunk(List<Household_Adoption__c> rows) {
+	private void undoChunk(List<Merge_Journal__c> rows) {
 		Id household = HouseholdService.householdRecordTypeId();
 		Set<Id> accountIds = new Set<Id>();
-		for (Household_Adoption__c row : rows) {
+		for (Merge_Journal__c row : rows) {
 			if (String.isNotBlank(row.Account_Id__c)) {
 				accountIds.add(Id.valueOf(row.Account_Id__c));
 			}
@@ -311,7 +291,7 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
 		// R-HA9: the run's own membership rows are removed; a household with any other member
 		// cannot stop being one.
 		Set<Id> journaled = new Set<Id>();
-		for (Household_Adoption__c row : rows) {
+		for (Merge_Journal__c row : rows) {
 			journaled.addAll(journaledMembers(row));
 		}
 		Set<Id> withMembers = new Set<Id>();
@@ -330,11 +310,9 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
 		}
 
 		List<Account> restores = new List<Account>();
-		Map<Id, Household_Adoption__c> rowByAccount = new Map<Id, Household_Adoption__c>();
-		for (Household_Adoption__c row : rows) {
-			Account account = String.isBlank(row.Account_Id__c)
-				? null
-				: current.get(Id.valueOf(row.Account_Id__c));
+		Map<Id, Merge_Journal__c> rowByAccount = new Map<Id, Merge_Journal__c>();
+		for (Merge_Journal__c row : rows) {
+			Account account = String.isBlank(row.Account_Id__c) ? null : current.get(Id.valueOf(row.Account_Id__c));
 			String note;
 			if (account == null) {
 				note = BarnHelp.text('Core', 'Core_NpspAdoption_NoteGone');
@@ -356,19 +334,13 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
 		// After the record type is back, so removing the last member never tidies the Account.
 		List<Household_Member__c> removals = new List<Household_Member__c>();
 		for (Household_Member__c member : ours) {
-			if (
-				rowByAccount.containsKey(member.Household__c) &&
-				!refusals.containsKey(member.Household__c)
-			) {
+			if (rowByAccount.containsKey(member.Household__c) && !refusals.containsKey(member.Household__c)) {
 				removals.add(member);
 			}
 		}
-		Map<Id, String> kept = deleteFailures(
-			removals,
-			Database.delete(removals, false, AccessLevel.USER_MODE)
-		);
+		Map<Id, String> kept = deleteFailures(removals, Database.delete(removals, false, AccessLevel.USER_MODE));
 		for (Id accountId : rowByAccount.keySet()) {
-			Household_Adoption__c row = rowByAccount.get(accountId);
+			Merge_Journal__c row = rowByAccount.get(accountId);
 			if (kept.containsKey(accountId)) {
 				notRestored(
 					row,
@@ -387,7 +359,7 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
 				);
 			} else {
 				row.Status__c = NpspHouseholdAdoptionService.STATUS_UNDONE;
-				row.Note__c = null;
+				row.Notes__c = null;
 				done++;
 			}
 		}
@@ -410,13 +382,12 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
 	}
 
 	/** The membership rows an NPC conversion journaled on this row (R-HA9). */
-	private static Set<Id> journaledMembers(Household_Adoption__c row) {
+	private static Set<Id> journaledMembers(Merge_Journal__c row) {
 		Set<Id> ids = new Set<Id>();
 		if (String.isBlank(row.Previous_Values__c)) {
 			return ids;
 		}
-		Object listed = ((Map<String, Object>) JSON.deserializeUntyped(row.Previous_Values__c))
-			.get(MEMBERS_KEY);
+		Object listed = ((Map<String, Object>) JSON.deserializeUntyped(row.Previous_Values__c)).get(MEMBERS_KEY);
 		if (listed instanceof List<Object>) {
 			for (Object memberId : (List<Object>) listed) {
 				ids.add(Id.valueOf((String) memberId));
@@ -425,15 +396,15 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
 		return ids;
 	}
 
-	private void notRestored(Household_Adoption__c row, String note) {
+	private void notRestored(Merge_Journal__c row, String note) {
 		row.Status__c = NpspHouseholdAdoptionService.STATUS_NOT_RESTORED;
-		row.Note__c = note == null ? null : note.left(255);
+		row.Notes__c = note == null ? null : note.left(255);
 		refused++;
 	}
 
 	/** The Account as it was before adoption: its record type and the four saved fields. */
 	@TestVisible
-	private static Account restoreOf(Household_Adoption__c row) {
+	private static Account restoreOf(Merge_Journal__c row) {
 		Account restore = new Account(Id = Id.valueOf(row.Account_Id__c));
 		restore.RecordTypeId = String.isBlank(row.Previous_Record_Type_Id__c)
 			? null
@@ -443,9 +414,7 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
 			: (Map<String, Object>) JSON.deserializeUntyped(row.Previous_Values__c);
 		restore.Custom_Name__c = values.get('Custom_Name__c') == true;
 		restore.Household_Formal_Greeting__c = (String) values.get('Household_Formal_Greeting__c');
-		restore.Household_Informal_Greeting__c = (String) values.get(
-			'Household_Informal_Greeting__c'
-		);
+		restore.Household_Informal_Greeting__c = (String) values.get('Household_Informal_Greeting__c');
 		String primary = (String) values.get('Primary_Contact__c');
 		restore.Primary_Contact__c = String.isBlank(primary) ? null : Id.valueOf(primary);
 		if (values.containsKey(MODEL_FIELD)) {
@@ -478,10 +447,6 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
 			pattern,
 			undoing ? new List<Object>{ done, refused } : new List<Object>{ done, skipped, refused }
 		);
-		ErrorLogger.logMessage(
-			summary,
-			Label.Core_NpspAdoption_ErrorContext,
-			ErrorLogger.SEVERITY_INFO
-		);
+		ErrorLogger.logMessage(summary, Label.Core_NpspAdoption_ErrorContext, ErrorLogger.SEVERITY_INFO);
 	}
 }

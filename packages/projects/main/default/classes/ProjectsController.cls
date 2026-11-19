@@ -7,11 +7,7 @@
  */
 public with sharing class ProjectsController {
 	private static final String CONTEXT = 'ProjectsController';
-	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
-			CONTEXT,
-			'Projects',
-			'Projects_Error_Generic'
-		)
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(CONTEXT, 'Projects', 'Projects_Error_Generic')
 		.showingDml();
 
 	public class Board {
@@ -139,13 +135,7 @@ public with sharing class ProjectsController {
 	}
 
 	@AuraEnabled
-	public static Id addTask(
-		Id projectId,
-		Id phaseId,
-		String name,
-		Date dueDate,
-		Boolean milestone
-	) {
+	public static Id addTask(Id projectId, Id phaseId, String name, Date dueDate, Boolean milestone) {
 		try {
 			if (String.isBlank(name)) {
 				throw Projects.refuse(BarnHelp.text('Projects', 'Projects_Task_NameNeeded'));
@@ -167,14 +157,7 @@ public with sharing class ProjectsController {
 
 	/** Log Time: hours for the running user on a day, on a task or the project. */
 	@AuraEnabled
-	public static Id logTime(
-		Id projectId,
-		Id taskId,
-		Date workDate,
-		Decimal hours,
-		Boolean billable,
-		String notes
-	) {
+	public static Id logTime(Id projectId, Id taskId, Date workDate, Decimal hours, Boolean billable, String notes) {
 		try {
 			if (!ProjectsSettings.timeTracking()) {
 				throw Projects.refuse(BarnHelp.text('Projects', 'Projects_Time_Off'));
@@ -291,10 +274,7 @@ public with sharing class ProjectsController {
 					OwnerId,
 					Owner.Name
 				FROM Project__c
-				WHERE
-					Status__c = :Projects.ACTIVE
-					AND Is_Template__c = FALSE
-					AND Health__c IN ('At Risk', 'Off Track')
+				WHERE Status__c = :Projects.ACTIVE AND Is_Template__c = FALSE AND Health__c IN ('At Risk', 'Off Track')
 				WITH USER_MODE
 				ORDER BY Health__c DESC, Target_Date__c NULLS LAST
 				LIMIT 200
@@ -310,13 +290,7 @@ public with sharing class ProjectsController {
 	}
 
 	@AuraEnabled
-	public static Id createFromTemplate(
-		String templateKey,
-		String name,
-		Date startDate,
-		Id accountId,
-		Id contactId
-	) {
+	public static Id createFromTemplate(String templateKey, String name, Date startDate, Id accountId, Id contactId) {
 		try {
 			return ProjectTemplates.create(templateKey, name, startDate, accountId, contactId);
 		} catch (Exception e) {
@@ -344,11 +318,7 @@ public with sharing class ProjectsController {
 	}
 
 	@AuraEnabled
-	public static List<Map<String, Object>> exportBillable(
-		Date fromDate,
-		Date toDate,
-		Boolean includeExported
-	) {
+	public static List<Map<String, Object>> exportBillable(Date fromDate, Date toDate, Boolean includeExported) {
 		try {
 			return ProjectReporting.exportBillable(fromDate, toDate, includeExported);
 		} catch (Exception e) {
