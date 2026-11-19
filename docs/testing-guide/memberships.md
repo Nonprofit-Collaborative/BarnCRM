@@ -28,7 +28,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 ## T-MEM-04: Renewals From Gifts and Recurring Gifts
 
 **Purpose:** confirm gifts to a level's fund pay memberships (R-MEM6, R-MEM4).
-**Prerequisites:** Fundraising installed; a fund Memberships; the level's Giving Fund ID set to it; a second level Family Silver at 60 on the same fund.
+**Prerequisites:** Fundraising installed; a fund Memberships; the level's Fund ID set to it; a second level Family Silver at 60 on the same fund.
 **Steps:** 1. Enter a received gift of 100 from a contact with no membership, allocated to the fund, and run the step. 2. Run the step again. 3. Enter a gift of 30 to the fund and run it. 4. Add an Active monthly recurring gift of 10 on the fund for another contact, receive one payment, and run the step. 5. Set that membership's End Date to yesterday and run the step.
 **Expected:** 1. A New Family Silver membership, Source Gift, Gift ID set, starting on the gift date. 2. Nothing new: a gift is used once. 3. Nothing: it meets no level. 4. A Family Gold membership (10 a month is 120 a year), Source Recurring Gift, Recurring Gift ID set. 5. It is Renewed and a new Current term follows, instead of Grace.
 

@@ -62,7 +62,7 @@ BarnCRM gives the Memberships permission sets from the roles on the **Access** p
      not expire, such as a lifetime membership.
    - **Grace Days**: how long a member stays in **Grace** after the end before **Lapsed**
      (default 30).
-   - **Giving Fund ID**: only for renewals from gifts (see below). Leave blank otherwise.
+   - **Fund ID**: only for renewals from gifts (see below). Leave blank otherwise.
    - **Active**: clear it to stop offering the level. Existing memberships keep it.
 3. Save, then add the level's **Benefits** from its Benefits list: a name, details, a quantity
    when counted, and a sort order.
@@ -97,7 +97,7 @@ default). BarnCRM adds the next term and marks this one Renewed.
 
 ### From Fundraising Gifts (When Fundraising Is Installed)
 
-1. On each level that gifts should pay for, enter the **Giving Fund ID**: open the fund in Fundraising,
+1. On each level that gifts should pay for, enter the **Fund ID**: open the fund in Fundraising,
    copy the record ID from the address bar (the 18 characters after `/Fund__c/`) and paste it.
 2. Leave **Renew memberships from gifts** on in **BarnCRM Settings**, **Memberships** (it ships
    on).
@@ -156,7 +156,7 @@ Reminders are **off** when you install, because they email your members. To turn
 | Send renewal reminders | Off | Emails each member once before their membership ends |
 | Days before to remind | 30 | How many days before the end the reminder goes (1 to 365) |
 | Renewal reminder template | BarnCRM_Membership_Renewal | The email template used; BarnCRM ships one for you to edit |
-| Renew memberships from gifts | On | Gifts to a level's Giving fund pay memberships |
+| Renew memberships from gifts | On | Gifts to a level's Fundraising fund pay memberships |
 
 A reminder goes to the membership's contact when they have an email address and have not opted
 out of email. A membership with no contact (a household with no named contact) gets no reminder;
@@ -258,7 +258,7 @@ cleared.
 
 | Problem | What to check |
 |---|---|
-| A gift did not renew a membership | The level's Giving Fund ID, the gift is Received and allocated to that fund, the gift meets the level's dues, Renew memberships from gifts is on, the gift is from the last 45 days |
+| A gift did not renew a membership | The level's Fund ID, the gift is Received and allocated to that fund, the gift meets the level's dues, Renew memberships from gifts is on, the gift is from the last 45 days |
 | Email Payment Link says Payments is not ready | Payments is installed, turned on and its keys are entered on Payments Setup |
 | A paid membership is still Pending | Payments processing is scheduled (Health Check); payments are applied every 15 minutes |
 | Renew on a certification is refused | Credits Toward Renewal is below Credits Required, the certification never expires (Valid Months 0), or it is Pending or Revoked (use Grant) |

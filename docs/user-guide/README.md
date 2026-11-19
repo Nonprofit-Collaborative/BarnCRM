@@ -57,7 +57,7 @@ Every BarnCRM module is in Beta right now: a **Beta** badge beside a module's na
 
 ### Grants (Nonprofit Edition)
 
-- [Grants](funders.md): adding grants, moving them through the stages on the Grant Pipeline, the deadlines coming up and the Grant Calendar, the program a grant pays for, an award's payments, a restricted grant's ledger and Giving fund, government award fields, the answer library, linking a requirement to the outcome it reports on, funder reports and the Board Dashboard.
+- [Grants](funders.md): adding grants, moving them through the stages on the Grant Pipeline, the deadlines coming up and the Grant Calendar, the program a grant pays for, an award's payments, a restricted grant's ledger and Fundraising fund, government award fields, the answer library, linking a requirement to the outcome it reports on, funder reports and the Board Dashboard.
 
 ### Forms
 
