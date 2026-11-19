@@ -298,7 +298,10 @@ CAPS = {
     # Named Credentials (N-13, D-209, ADR-0229): Stripe events fetched back from
     # Stripe, Check Connection for both processors and the Health Check credential test, in place
     # of the HMAC check and the key fields, 73,461 measured 2026-11-18, plus about 2%.
-    "payments": 74_900,
+    # Pre-batch review M1: the receiver's address token (made, compared in constant time,
+    # regenerated), the hourly cap Warning and its Health Check finding, 75,619 measured
+    # 2026-11-19; raised by 800.
+    "payments": 75_700,
     # LWC Builder (LB-01 to LB-06, ADR-0203 lwc builder module): the builder and renderer
     # controller, the App Builder picklist, access sync and post-install, 17,322 measured, plus
     # about 2%. LB-07 (D-196) charts by two groupings and three totals: 19,741 measured, plus

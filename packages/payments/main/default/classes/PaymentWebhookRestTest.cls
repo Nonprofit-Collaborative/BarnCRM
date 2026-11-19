@@ -12,6 +12,12 @@ private class PaymentWebhookRestTest {
 	}
 
 	private static RestRequest request(String processor, String body, Map<String, String> headers) {
+		RestRequest request = bare(processor, body, headers);
+		request.params.put('token', PaymentService.webhookToken(false));
+		return request;
+	}
+
+	private static RestRequest bare(String processor, String body, Map<String, String> headers) {
 		RestRequest request = new RestRequest();
 		request.requestURI = '/barncrm/payments/v1/' + processor;
 		request.httpMethod = 'POST';
@@ -182,6 +188,39 @@ private class PaymentWebhookRestTest {
 	}
 
 	@IsTest
+	static void aPostWithoutTheSavedTokenIsRefusedAndStoresNothing() {
+		System.runAs(PaymentsTestData.admin()) {
+			PaymentsTestData.connect(PaymentService.STRIPE);
+			String token = PaymentService.webhookToken(false);
+			Assert.isTrue(token.length() >= 32, 'A long random token');
+			String body = PaymentsTestData.stripeEvent(
+				'evt_5',
+				'checkout.session.completed',
+				new Map<String, Object>()
+			);
+
+			RestRequest none = bare('stripe', body, new Map<String, String>());
+			Assert.areEqual(404, PaymentWebhookRest.store(none), 'No token');
+			RestRequest wrong = bare('stripe', body, new Map<String, String>());
+			wrong.params.put('token', token.left(token.length() - 1) + 'x');
+			Assert.areEqual(404, PaymentWebhookRest.store(wrong), 'Another token');
+			RestRequest shorter = bare('stripe', body, new Map<String, String>());
+			shorter.params.put('token', token.left(10));
+			Assert.areEqual(404, PaymentWebhookRest.store(shorter), 'A prefix of the token');
+			Assert.areEqual(0, storedEvents(), 'Nothing stored');
+
+			RestRequest right = bare('stripe', body, new Map<String, String>());
+			right.params.put('token', token);
+			Assert.areEqual(200, PaymentWebhookRest.store(right), 'The saved token is accepted');
+			Assert.areEqual(1, storedEvents(), 'Stored');
+
+			String replaced = PaymentService.webhookToken(true);
+			Assert.areNotEqual(token, replaced, 'Regenerated');
+			Assert.areEqual(404, PaymentWebhookRest.store(right), 'The old token stops working');
+		}
+	}
+
+	@IsTest
 	static void theHourlyCapIsCountedPerProcessor() {
 		System.runAs(PaymentsTestData.admin()) {
 			PaymentsTestData.connect(PaymentService.PAYPAL);
@@ -212,6 +251,26 @@ private class PaymentWebhookRestTest {
 					)
 				),
 				'PayPal is at its cap'
+			);
+			String second = PaymentsTestData.payPalEvent(
+				'WH-2',
+				'PAYMENT.CAPTURE.COMPLETED',
+				new Map<String, Object>()
+			);
+			Assert.areEqual(429, payPal(second), 'Still at its cap');
+			Assert.areEqual(
+				1,
+				[
+					SELECT COUNT()
+					FROM Error_Log__c
+					WHERE Context__c = 'PaymentWebhookRest' AND Severity__c = 'Warning'
+					WITH SYSTEM_MODE
+				],
+				'One Warning for the hour, not one per refused post'
+			);
+			Assert.isNotNull(
+				PaymentService.settings().Webhook_Cap_Hit_At__c,
+				'Health Check can see the cap was hit'
 			);
 			Assert.areEqual(
 				200,

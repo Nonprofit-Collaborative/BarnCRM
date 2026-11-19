@@ -107,3 +107,17 @@ This ADR removes reason 1 by not checking the signature at all, and finds reason
   assigned to a Site guest user; and the packaging of External and Named Credentials in a 2GP
   managed package.
 - ADR-0220's revisit list is closed: no provider secret remains in a custom setting.
+
+## Amended 2026-11-19
+
+Pre-batch review M1: the receiver accepted any anonymous post, bounded only by the hourly cap.
+It now stores a post only when its address carries a random token (`?token=`, 64 hexadecimal
+characters from `Crypto.generateAesKey(256)`). BarnCRM makes the token the first time Payments
+Setup is opened and keeps it in `Payments_Settings__c.Webhook_Token__c` (protected; not a
+provider secret, and still no secret is stored). The receiver compares it character by
+character in constant time and answers 404 with an empty body, storing nothing, on a missing or
+different token. Payments Setup shows each full address and a Regenerate Token button
+(confirmation first; the old addresses stop working). The first refusal at the hourly cap each
+hour writes one Warning to the Error Log and sets `Webhook_Cap_Hit_At__c`, which Health Check
+reports for a day. The consequence above about a forged Stripe post now holds only for someone
+holding the token.

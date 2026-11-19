@@ -17128,6 +17128,8 @@ The Payments module's org-wide choices, edited in the Payments section of BarnCR
 | PayPal Connected | checkbox | no (defaults off) | The same for PayPal's sign-in through `Barn_PayPal_Live` or `Barn_PayPal_Sandbox`. |
 | PayPal Webhook Id | text | for PayPal | The id PayPal gives the webhook, used to verify events. Not a secret; entered on the Payments Setup page. |
 | PayPal Product Id | text | no | The PayPal catalog product every PayPal subscription plan belongs to, made at the first PayPal subscription checkout and written by Payments only (R-PAY7). Not a secret, and not shown on the setup page. |
+| Webhook Token | text | no | The random token (64 hexadecimal characters) a processor's post must carry as `token=` in its address, or the receiver stores nothing. Made by BarnCRM the first time Payments Setup is opened, replaced by Regenerate Token. Not a provider secret (R-PK1). |
+| Webhook Cap Hit At | datetime | no | When the receiver last refused an event at the hourly cap; written at most once an hour, with one Warning in the Error Log, and read by Health Check. Written by Payments only. |
 
 ### Rules
 
@@ -17152,6 +17154,8 @@ webhook id is entered).
 | PayPal Connected | `PayPal_Connected__c` | Checkbox, default false |
 | PayPal Webhook Id | `PayPal_Webhook_Id__c` | Text(64) |
 | PayPal Product Id | `PayPal_Product_Id__c` | Text(50) |
+| Webhook Token | `Webhook_Token__c` | Text(64) |
+| Webhook Cap Hit At | `Webhook_Cap_Hit_At__c` | DateTime |
 
 - **Setting Definitions:** `Payments_Processor`, `Payments_Mode`, `Payments_Currency`,
   `Payments_Recurring`, `Payments_Setup_Page`, section Payments.
@@ -19341,6 +19345,7 @@ mirrors the primary member).
 | 1.67 | 2026-11-14 | Gift mirrors folded into Fundraising (N-15, D-210, release 1.27; ADR-0228). The Mirror for Giving package is removed: its attributes on Appeal, Gift and Fund, list views, code and permission sets ship in Fundraising (`packages/giving`, the Giving module renamed BarnCRM Fundraising). The eleven gift mirror keys (Campaign sync, Opportunity mirror and Gift Transaction mirror) move from `Mirror_Settings__c` to `Giving_Settings__c` with unchanged names and types; `Mirror_Settings__c` keeps the Case request keys only. No object added or removed. |
 | 1.68 | 2026-11-18 | Provider secrets in Named Credentials (N-13, D-209; ADR-0229, amending ADR-0220). Two objects removed, 199 to 197 in the suite: `Payment_Keys__c` (29PAY4) and `Address_Verification_Keys__c` (29AV2). `Payments_Settings__c` gains `Stripe_Connected__c`, `PayPal_Connected__c` (Checkbox) and takes `PayPal_Webhook_Id__c` (Text(64)) and `PayPal_Product_Id__c` (Text(50)); `Address_Verification_Settings__c` gains `Connected_Provider__c` (Text(20)). Removed fields: `Stripe_Secret_Key__c`, `Stripe_Webhook_Secret__c`, `PayPal_Client_Id__c`, `PayPal_Client_Secret__c`, `Smarty_Auth_Id__c`, `Smarty_Auth_Token__c`, `Google_Api_Key__c`. R-PK1, R-AV4, R-PEV1 and R-PEV2 rewritten: a Stripe event is fetched back from Stripe and only that copy is used. |
 | 1.69 | 2026-11-18 | Beta badge on every module (D-211, N-14, release 1.27). `BarnCRM_Module__mdt` gains Beta (`Beta__c`, Checkbox, default false), ticked on every shipped module record: the Module Manager, the Setup Assistant's modules step and the Home Modules card show a Beta badge beside the module name. No object added or removed. |
+| 1.70 | 2026-11-19 | Receiver token (pre-batch review M1; ADR-0229 amended). `Payments_Settings__c` gains `Webhook_Token__c` (Text(64)) and `Webhook_Cap_Hit_At__c` (DateTime): the receiver stores a post only when it carries the token in its address, and records the first refusal at the hourly cap each hour. No object added or removed. |
 
 ---
 ## 32. Entity ownership by package

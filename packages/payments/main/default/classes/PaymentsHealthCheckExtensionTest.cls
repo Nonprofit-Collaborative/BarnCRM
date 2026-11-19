@@ -41,6 +41,12 @@ private class PaymentsHealthCheckExtensionTest {
 				'Not scheduled'
 			);
 			Assert.isTrue(found.contains('payments_waiting'), 'Waiting: ' + found);
+			Assert.isFalse(found.contains('payments_cap_reached'), 'No cap hit yet: ' + found);
+			Assert.isTrue(PaymentService.noteCapHit(), 'The receiver hit its cap');
+			Assert.isTrue(
+				keys(extension.findings()).contains('payments_cap_reached'),
+				'The cap hit is reported'
+			);
 
 			Test.startTest();
 			String done = extension.runFix(

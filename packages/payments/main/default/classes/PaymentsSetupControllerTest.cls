@@ -36,14 +36,27 @@ private class PaymentsSetupControllerTest {
 			PaymentsSetupController.Setup setup = PaymentsSetupController.getSetup();
 
 			Assert.areEqual(1, setup.receivers.size(), 'Only Sites with an address');
+			String token = PaymentService.webhookToken(false);
+			Assert.isTrue(token.length() >= 32, 'A token was made on first need');
 			Assert.areEqual(
-				'https://zzpay.example.org/services/apexrest/barncrm/payments/v1/stripe',
+				'https://zzpay.example.org/services/apexrest/barncrm/payments/v1/stripe?token=' +
+				token,
 				setup.receivers[0].stripeUrl,
 				'The Stripe address'
 			);
 			Assert.isTrue(
-				setup.receivers[0].payPalUrl.endsWith('/v1/paypal'),
+				setup.receivers[0].payPalUrl.endsWith('/v1/paypal?token=' + token),
 				'The PayPal address'
+			);
+			PaymentsSetupController.Setup replaced = PaymentsSetupController.regenerateToken();
+			Assert.isFalse(
+				replaced.receivers[0].stripeUrl.endsWith('token=' + token),
+				'Regenerate gives a new token'
+			);
+			Assert.areEqual(
+				PaymentService.webhookToken(false),
+				replaced.receivers[0].stripeUrl.substringAfter('token='),
+				'The new token is the saved one'
 			);
 			Map<String, PaymentsSetupController.Credential> found = byProcessor(setup);
 			Assert.isTrue(found.get(PaymentService.STRIPE).connected, 'Stripe connected');
