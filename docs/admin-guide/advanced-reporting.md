@@ -48,10 +48,15 @@ BarnCRM Settings has an **Advanced Reporting** row that opens it. There is nothi
 | Advanced Reporting Staff | Team Member and Fundraising Staff holders | The tab; build and run reports and dashboards; save, share and delete their own |
 | Advanced Reporting Read Only | Read Only holders | The tab; run templates and anything shared with them; build and run reports without saving |
 
-Saving is the **Save Advanced Reporting Reports** custom permission, in Staff and Admin. Export
-CSV follows Salesforce's own **Export Reports** user permission: a person without it does not
-see Export CSV. Reading records always follows the person's object, field and sharing access;
-the permission sets grant no record access of their own.
+Saving, sharing and deleting need the **Save Advanced Reporting Reports** custom permission, in
+Staff and Admin; the server checks it on each. Export CSV follows Salesforce's own **Export
+Reports** user permission: a person without it does not see Export CSV, and the server refuses
+every export page for them too. Reading records always follows the person's object, field and
+sharing access; the permission sets grant no record access of their own.
+
+People with **View All Data** (or Modify All Data), such as system administrators, may see
+everyone's saved reports and dashboards in their list, because Salesforce lets them read every
+File.
 
 ## Where Reports and Dashboards Are Kept
 
@@ -61,10 +66,15 @@ section 29AR). No custom object is added. This means:
 
 - People need access to Salesforce Files (on in every org by default).
 - Sharing is a file share: Can View is a Viewer share, Can Edit a Collaborator share. Only the
-  owner shares or deletes. A Can Edit person's save keeps the owner's sharing as it was.
-- A public group is shared with its active members as they are when the owner saves or shares;
-  someone who joins the group later sees it after the owner saves or shares again. Up to 500
-  people per report or dashboard.
+  owner shares or deletes. Each file is saved with sharing restricted ("prevent others from
+  sharing and unlinking"), so a Can Edit person cannot share it further from the Files tab.
+- Only Share changes who has access. A save, by the owner or a Can Edit person, never does, so
+  an older copy saved late cannot remove anyone.
+- A Public Group is shared with its active direct members as they are when the owner shares;
+  members of groups inside it are not included, and someone who joins the group later sees it
+  after the owner shares again. Up to 500 people per report or dashboard.
+- The saved list shows the first 1,000 reports and dashboards by name, and says so when it
+  reaches that.
 - Each save is a new file version, so Files keeps the history.
 - They count toward file storage like any other file, at a few kilobytes each.
 
@@ -72,13 +82,20 @@ Deleting a saved report or dashboard deletes the file for everyone it is shared 
 
 ## Large Data Volumes
 
-- A list report reads up to 2,000 rows on screen; Export CSV reads every row in pages of 5,000.
+- A list report reads up to 2,000 rows on screen; Export CSV reads up to 20 columns in pages of
+  2,000 and stops at 100,000 rows with a note saying so.
 - A totals report is counted first. When the matching records fit Salesforce's aggregate query
   limits (about 20,000, or half the rows left in the request), one aggregate query totals them.
   Otherwise the browser reads the records in pages of 5,000 in Id order and totals them itself,
   showing progress and a Stop button, up to 1,000,000 records; a note says when totals are
-  partial. Add a filter or a date range to keep large reports fast.
-- Grouping by a date uses the person's time zone for date and time fields.
+  partial. Add a filter or a date range to keep large reports fast. On a dashboard, widgets that
+  need this are read one at a time.
+- In an org with more than one currency, a report too large for one aggregate query cannot
+  total a money field (sum, average, smallest, largest), because each record holds its own
+  currency; it asks for a filter or a date range so the aggregate query can total it.
+- Dates are the person's: this year, last year and the last N days run as Salesforce date
+  literals; every other range, and grouping a date and time field, uses the person's Salesforce
+  time zone, and This Week and Last Week start on their locale's first day of the week.
 - Up to 2,000 groups are read; a note says when there are more.
 
 ## Dashboard Templates
@@ -119,6 +136,9 @@ dashboard does.
 | Save is missing | The person has Read Only | Give Advanced Reporting Staff |
 | Export CSV is missing | The person lacks Salesforce's Export Reports permission | Add it in their profile or a permission set |
 | "Totals cover the first 1,000,000 records only" | The report matches more records than the browser totals | Add a filter or a date range |
-| A shared report is missing for a group member | They joined the group after it was shared | The owner opens it and selects Share, then Save |
+| A shared report is missing for a group member | They joined the group after it was shared, or they are in a group inside it | The owner opens it and selects Share, then Save; or add the person or that inner group directly |
+| "Exported the first 100,000 rows" | One export holds at most 100,000 rows | Add a filter or a date range and export in parts |
+| "Too many related records to total" | A related total matches more child records than one query may total | Add a filter or a date range |
+| "This report is too large to total ... more than one currency" | Multi-currency org, money total, too many records for one aggregate query | Add a filter or a date range |
 
 Errors are written to the Error Log with the request that failed.

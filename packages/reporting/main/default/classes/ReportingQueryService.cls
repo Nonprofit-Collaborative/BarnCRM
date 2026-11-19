@@ -191,7 +191,9 @@ public with sharing class ReportingQueryService {
 				throw invalid();
 			}
 			if (exporting && !canExport()) {
-				throw new ReportingException(BarnHelp.text('Reporting', 'Reporting_Error_NoExport'));
+				throw new ReportingException(
+					BarnHelp.text('Reporting', 'Reporting_Error_NoExport')
+				);
 			}
 			List<String> fields = exporting ? request.fields.values() : scanFields(request);
 			Integer most = exporting ? QueryCompiler.EXPORT_PAGE_SIZE : MAX_PAGE;

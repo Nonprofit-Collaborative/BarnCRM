@@ -23,6 +23,10 @@ private class ReportingLibraryTest {
 		return TestUsers.fromSetup('Viewer');
 	}
 
+	private static User readerUser() {
+		return TestUsers.fromSetup('Reader');
+	}
+
 	private static Id saveAsOwner() {
 		return (Id) ReportingLibrary.save(ReportingLibrary.REPORT, null, 'Orgs', DEFINITION)
 			.get('id');
@@ -134,7 +138,10 @@ private class ReportingLibraryTest {
 		}
 		System.runAs(viewer) {
 			Assert.areEqual(1, ReportingLibrary.listSaved().size(), 'Still shared after a save');
-			Assert.isNull(ReportingLibrary.load(documentId).get('sharing'), 'Shown to its owner only');
+			Assert.isNull(
+				ReportingLibrary.load(documentId).get('sharing'),
+				'Shown to its owner only'
+			);
 		}
 		System.runAs(ownerUser()) {
 			ReportingLibrary.share(documentId, '{}');
@@ -147,7 +154,7 @@ private class ReportingLibraryTest {
 	@IsTest
 	static void aCollaboratorCannotShareItFurther() {
 		User viewer = viewerUser();
-		User reader = TestUsers.fromSetup('Reader');
+		User reader = readerUser();
 		Id documentId;
 		System.runAs(ownerUser()) {
 			documentId = saveAsOwner();
@@ -178,8 +185,7 @@ private class ReportingLibraryTest {
 
 	@IsTest
 	static void sharingAndDeletingNeedTheSavePermission() {
-		User reader = TestUsers.fromSetup('Reader');
-		System.runAs(reader) {
+		System.runAs(readerUser()) {
 			ContentVersion own = new ContentVersion(
 				Title = 'Orgs',
 				PathOnClient = 'definition.' + ReportingLibrary.REPORT,
@@ -235,7 +241,7 @@ private class ReportingLibraryTest {
 
 	@IsTest
 	static void readOnlyPeopleCannotSaveAndBadDefinitionsAreRefused() {
-		System.runAs(TestUsers.fromSetup('Reader')) {
+		System.runAs(readerUser()) {
 			Assert.isFalse((Boolean) ReportingLibrary.getContext().get('canSave'), 'Read only');
 			Boolean refused = false;
 			try {

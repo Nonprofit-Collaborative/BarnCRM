@@ -348,7 +348,9 @@ public with sharing class ReportingLibrary {
 	/** Saving, sharing and deleting need the Advanced Reporting Staff or Admin permission set. */
 	private static void requireSave() {
 		if (!FeatureManagement.checkPermission(SAVE_PERMISSION)) {
-			throw new ReportingLibraryException(BarnHelp.text('Reporting', 'Reporting_Error_NoSave'));
+			throw new ReportingLibraryException(
+				BarnHelp.text('Reporting', 'Reporting_Error_NoSave')
+			);
 		}
 	}
 

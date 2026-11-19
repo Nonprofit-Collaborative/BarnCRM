@@ -456,7 +456,9 @@ export default class ReportingView extends LightningElement {
       });
       downloadCsv(base, columns, rows);
       this.exportStatus = format(
-        helpText('Reporting', capped ? 'Reporting_ExportCapped' : 'Reporting_Exported'),
+        capped
+          ? helpText('Reporting', 'Reporting_ExportCapped')
+          : helpText('Reporting', 'Reporting_Exported'),
         rows.length.toLocaleString(LOCALE)
       );
     } catch (error) {

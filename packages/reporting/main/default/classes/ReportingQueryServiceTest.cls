@@ -18,6 +18,10 @@ private class ReportingQueryServiceTest {
 		TestUsers.standardUserWith('Cal', new List<String>{ 'Reporting_Staff' });
 	}
 
+	private static User cal() {
+		return TestUsers.fromSetup('Cal');
+	}
+
 	private static Map<String, Object> query(String objectName, List<String> fields) {
 		return new Map<String, Object>{
 			'version' => 1,
@@ -109,7 +113,7 @@ private class ReportingQueryServiceTest {
 				'Counted in his access only'
 			);
 		}
-		System.runAs(TestUsers.fromSetup('Cal')) {
+		System.runAs(cal()) {
 			Boolean refused = false;
 			try {
 				ReportingQueryService.run(
@@ -233,9 +237,7 @@ private class ReportingQueryServiceTest {
 			String pageRequest = request(
 				accounts,
 				new Map<String, Object>{
-					'groups' => new List<Object>{
-						new Map<String, Object>{ 'field' => 'OwnerId' }
-					},
+					'groups' => new List<Object>{ new Map<String, Object>{ 'field' => 'OwnerId' } },
 					'measures' => new List<Object>{
 						new Map<String, Object>{ 'fn' => 'sum', 'path' => 'NumberOfEmployees' }
 					},
@@ -273,10 +275,7 @@ private class ReportingQueryServiceTest {
 
 	@IsTest
 	static void exportNeedsExportReportsAndReadsEachColumnOnce() {
-		for (User person : new List<User>{
-			TestUsers.adminWith('Reporting_Admin'),
-			TestUsers.fromSetup('Cal')
-		}) {
+		for (User person : new List<User>{ TestUsers.adminWith('Reporting_Admin'), cal() }) {
 			System.runAs(person) {
 				String exportRequest = request(
 					query('Account', new List<String>{ 'Name' }),

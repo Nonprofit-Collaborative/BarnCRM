@@ -18916,7 +18916,7 @@ use the same dashboard JSON, shipped in a static resource.
 | sort | object | no | `{by, direction}`; `by` is a column path for a list, or `g1` (the first grouping) or `m0` to `m3` (a measure) for totals. |
 | limit | number | yes | Rows listed, or top groups shown: 1 to 2,000, default 200. |
 | view | object | yes | `{type, stacked}`; `type` is table, bar, column, line, donut or metric. |
-| sharing | object | no | The owner's sharing choices: `{users: [{id, name, access}], groups: [{id, name, access}]}`, `access` View or Edit. |
+| sharing | object | no | The owner's sharing choices: `{users: [{id, name, access}], groups: [{id, name, access}]}`, `access` View or Edit. Written only by the server's Share; a save never takes it from the browser, and a load returns it apart from the definition, to the owner only. |
 
 ### Attributes of a dashboard definition
 
@@ -18936,10 +18936,11 @@ ContentDocument. Definitions are at most 1,000,000 characters.
 
 **R-AR2 Sharing is Files sharing.** The owner shares through a ContentDocumentLink to each
 person: ShareType V (Viewer) for View, C (Collaborator) for Edit. A public group is expanded to
-its active members when the owner saves or shares, and those links are rewritten each time, so
-membership changes apply then. At most 500 people. Only the owner shares or deletes; a person
-with Edit saves a new version and keeps the owner's sharing. Saving, sharing and deleting need
-the custom permission `Reporting_Save`.
+its active direct members when the owner shares, and those links are rewritten each time, so
+membership changes apply then. At most 500 people. Only the owner shares or deletes: every
+version has SharingOption R, so a Collaborator cannot share or unlink it from Files. A save (by
+the owner or a person with Edit) is a new version that keeps the stored sharing and never
+changes a link. Saving, sharing and deleting need the custom permission `Reporting_Save`.
 
 **R-AR3 Everything runs as the viewer.** Listing, loading, saving and running are user mode.
 Every object, field, relationship and function in a definition is checked against the viewer's
@@ -18948,7 +18949,9 @@ cannot read stops the run with a message.
 
 **R-AR4 Large data volumes.** A totals report is counted first; within the aggregate query
 limits one aggregate query totals it, otherwise the browser reads the records in Id order in
-pages of 5,000 and totals them, up to 1,000,000 records, saying when totals are partial.
+pages of 5,000 and totals them, up to 1,000,000 records, saying when totals are partial; the
+server works out the fields such a scan reads. A list export reads at most 20 columns in pages of
+2,000, needs Export Reports on every page, and stops at 100,000 rows.
 
 **R-AR5 Names are portable.** Object and field names in a definition are never prefixed; the
 server resolves them against the org's describe, so a definition moves between orgs, with or
