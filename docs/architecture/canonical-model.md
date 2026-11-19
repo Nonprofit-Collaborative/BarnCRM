@@ -7034,7 +7034,7 @@ sort in package metadata, so the list opens unsorted and a click on the Next Ask
 - **Settings keys** (on `Giving_Settings__c`, Section 12): `Ask_Reminders_Enabled__c`,
   `Ask_Reminders_Last_Run__c`, `Ask_Reminders_Last_Run_Summary__c`.
 - **Nightly job:** `AskReminderSchedulable` and `AskReminderBatch`, scheduled by
-  `GivingScheduler` as the module's fourth job (`BarnCRM Giving Ask Reminders`, 03:30) and
+  `GivingScheduler` as the module's fourth job (`BarnCRM Fundraising Ask Reminders`, 03:30) and
   listed by `GivingNightlyJobProvider` for Health Check.
 - **Service:** `AskReminderService`, `AskReminderSelector`, `AskReminderWriter`.
 

@@ -13,7 +13,7 @@
  */
 public with sharing class AcknowledgmentScheduler implements Schedulable {
 	/** The name the scheduled job carries, so the page can find it again. */
-	public static final String JOB_NAME = 'BarnCRM Giving Acknowledgments';
+	public static final String JOB_NAME = 'BarnCRM Fundraising Acknowledgments';
 
 	private static final String LOG_CONTEXT = 'AcknowledgmentScheduler.execute';
 

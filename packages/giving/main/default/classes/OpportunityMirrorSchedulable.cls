@@ -9,7 +9,7 @@
  */
 public with sharing class OpportunityMirrorSchedulable implements Schedulable {
 	/** The name the run was scheduled under, now the step's key. */
-	public static final String JOB_NAME = 'BarnCRM Mirror Opportunity Mirror';
+	public static final String JOB_NAME = 'BarnCRM Fundraising Opportunity Mirror';
 
 	/** Starts tonight's run, unless the mirror is off or a run is still going. */
 	public void execute(SchedulableContext context) {

@@ -642,7 +642,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Fundraising owns the nonprofit setup steps | Minor | Fundraising contributes its own Setup Assistant steps (default fund and appeal, organization identity) and Health Check questions. | Shipped | C-29 |
 | Fundraising settings that ship on stay on | Minor | The first Fundraising settings save keeps on the settings that ship on (apply gifts to installments, household soft credits, receipt logo). | Shipped | plan 11.3 |
 | New ship-on settings start on after an upgrade | Minor | A setting added in an upgrade that ships on is turned on once in an org that saved its settings before it, by the upgrade's post-install or a source deploy's setup step; an admin who turns it off afterwards keeps it off. A CI check makes every new ship-on checkbox join this step. No setting is on the list since the fresh-install cut-over (D-199, D-200 S4); the step waits for the next one. | Shipped | QA-F2 |
-| Nightly job names in one style | Minor | Fundraising and Mirror nightly jobs are named "BarnCRM Giving Ask Reminders" and the like, and a scheduled job is never scheduled twice. Shipped import template names are in title casing. | Shipped | QA-F6 |
+| Nightly job names in one style | Minor | Fundraising's nightly jobs, gift mirrors included, are named "BarnCRM Fundraising Ask Reminders" and the like, and Mirror's "BarnCRM Mirror: Case requests", and a scheduled job is never scheduled twice. Shipped import template names are in title casing. | Shipped | QA-F6 |
 
 ---
 
