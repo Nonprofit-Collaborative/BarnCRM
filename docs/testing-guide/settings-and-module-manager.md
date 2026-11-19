@@ -613,7 +613,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 |---|---|---|
 | 1 | Open **BarnCRM Read Only Access**, **Object Settings**, **Merge Settlement Ready**. | **Read** is ticked and **Create** is not; the set cannot publish the event. |
 | 2 | In the same set open **Error Log Event**. | **Read** and **Create** are ticked, the same as BarnCRM Staff. Sign in as the read-only user, cause an error, and open the Error Log as an admin: the entry is there, written through the event. |
-| 3 | Open **BarnCRM Admin Access**, **Object Settings**, **Contact**, then field permissions. | Title, Home Phone, Mobile Phone, Do Not Call, Email Opt Out and Fax Opt Out are not listed in the set (they come from the user's profile, as for Staff). Email, Phone, Birthdate and Mailing Address stay, because Load Sample Data writes them in user mode. |
+| 3 | Open **BarnCRM Admin Access**, **Object Settings**, **Contact**, then field permissions. | Email, Phone, Mobile Phone, Home Phone, Mailing Address, Title, Birthdate, Email Opt Out, Fax Opt Out and Do Not Call are listed with Read and Edit: the import templates and Load Sample Data write them in user mode, Person Erasure empties them, and the opt-outs must never be dropped from a migration file (see the admin guide, Importing, Fields the BarnCRM Admin Role Can Import). |
 | 4 | Open **Corporate Hub Read Only**, **Object Settings**, **Policy Acknowledgment**. | **Edit** is ticked and **Create** is not, as for Corporate Hub Staff. As a read-only user answer your own acknowledgment on the hub: it saves. Marking another person's request Acknowledged (Data Loader or a flow) is refused with "Only the person asked can acknowledge this." |
 
 **Cleanup:** none.

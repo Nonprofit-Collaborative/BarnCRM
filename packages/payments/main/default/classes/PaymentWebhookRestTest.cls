@@ -258,6 +258,8 @@ private class PaymentWebhookRestTest {
 				new Map<String, Object>()
 			);
 			Assert.areEqual(429, payPal(second), 'Still at its cap');
+			// The Warning travels as an Error Log event, written when the event is delivered.
+			Test.getEventBus().deliver();
 			Assert.areEqual(
 				1,
 				[

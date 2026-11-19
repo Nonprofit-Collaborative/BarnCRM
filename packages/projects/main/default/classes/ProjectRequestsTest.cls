@@ -33,6 +33,25 @@ private class ProjectRequestsTest {
 		return person;
 	}
 
+	/**
+	 * Saves as Portal Builder's `PortalData` does: without sharing, in system mode. Its
+	 * integration user cannot see the requester, which an org with private accounts would
+	 * otherwise refuse on the Requester lookup.
+	 */
+	private without sharing class PortalSave {
+		void insertRequest(Project_Request__c row) {
+			Database.insert(row, AccessLevel.SYSTEM_MODE);
+		}
+	}
+
+	/**
+	 * Gives the staff user the requester's organization, so they can see the person, as staff
+	 * logging a request for someone can in an org whose accounts are private.
+	 */
+	private static void shareRequesterWith(Id organizationId, User staff) {
+		update as system new Account(Id = organizationId, OwnerId = staff.Id);
+	}
+
 	private static Project_Request__c request(String subject, String priority, Id requesterId) {
 		return new Project_Request__c(
 			Subject__c = subject,
@@ -50,6 +69,7 @@ private class ProjectRequestsTest {
 			turnOn(false);
 			person = requester();
 			organizationId = [SELECT AccountId FROM Contact WHERE Id = :person.Id].AccountId;
+			shareRequesterWith(organizationId, staff);
 		}
 		System.runAs(staff) {
 			Project_Request__c saved = request('Report totals are wrong', 'High', person.Id);
@@ -147,7 +167,7 @@ private class ProjectRequestsTest {
 		}
 		Project_Request__c incoming = request('Please add a user', 'Medium', person.Id);
 		System.runAs(portal) {
-			Database.insert(incoming, AccessLevel.SYSTEM_MODE);
+			new PortalSave().insertRequest(incoming);
 		}
 		System.runAs(ProjectsTestData.admin()) {
 			Project_Request__c saved = [

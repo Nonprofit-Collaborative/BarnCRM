@@ -799,10 +799,10 @@ private class MergeSettlementTest {
 				WHERE ParentId = :readOnlySet AND SobjectType = 'Merge_Settlement_Ready__e'
 				WITH SYSTEM_MODE
 			];
-			for (ObjectPermissions row : granted) {
-				Assert.isFalse(row.PermissionsCreate, 'Read Only cannot publish it');
-				Assert.isFalse(row.PermissionsRead, 'Nor read it');
-			}
+			// Read matches BarnCRM Staff (D-209): Read alone publishes nothing.
+			Assert.areEqual(1, granted.size(), 'Read Only holds a row for the event');
+			Assert.isFalse(granted[0].PermissionsCreate, 'Read Only cannot publish it');
+			Assert.isTrue(granted[0].PermissionsRead, 'It may read it, as Staff may');
 		}
 	}
 

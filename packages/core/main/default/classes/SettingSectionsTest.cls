@@ -14,9 +14,13 @@ private class SettingSectionsTest {
 			Test.stopTest();
 
 			Assert.areEqual(
-				32,
+				33,
 				sections.size(),
-				'Thirty-two section names are agreed across the suite'
+				'Thirty-three section names are agreed across the suite'
+			);
+			Assert.isTrue(
+				SettingSections.isKnown(SettingSections.REPORTING),
+				'Advanced Reporting is a section the Advanced Reporting module ships a row into'
 			);
 			Assert.isTrue(
 				SettingSections.isKnown(SettingSections.FORMS) &&

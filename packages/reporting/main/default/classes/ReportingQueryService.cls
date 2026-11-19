@@ -308,15 +308,16 @@ public with sharing class ReportingQueryService {
 			selected.add(measure(request.objectName, request.measures[m]) + ' m' + m);
 		}
 		Map<String, Object> binds = new Map<String, Object>(compiled.binds);
-		binds.put('reportGroupLimit', GROUP_LIMIT + 1);
+		// A total with no grouping returns one row, and SOQL refuses LIMIT on it.
+		String tail = '';
+		if (!grouping.isEmpty()) {
+			binds.put('reportGroupLimit', GROUP_LIMIT + 1);
+			tail = ' GROUP BY ' + String.join(grouping, ', ') + ' LIMIT :reportGroupLimit';
+		}
 		List<Map<String, Object>> groups = new List<Map<String, Object>>();
 		for (
 			SObject row : Database.queryWithBinds(
-				'SELECT ' +
-					String.join(selected, ', ') +
-					compiled.fromWhere +
-					(grouping.isEmpty() ? '' : ' GROUP BY ' + String.join(grouping, ', ')) +
-					' LIMIT :reportGroupLimit',
+				'SELECT ' + String.join(selected, ', ') + compiled.fromWhere + tail,
 				binds,
 				AccessLevel.USER_MODE
 			)
