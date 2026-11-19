@@ -83,6 +83,10 @@ Every BarnCRM module is in Beta right now: a **Beta** badge beside a module's na
 
 - [Built Components](lwc-builder.md): what a component your admin built shows, its buttons, and why a block or a record can be missing.
 
+### Advanced Reporting
+
+- [Advanced Reporting](advanced-reporting.md): dashboard templates and their filters, building a report across related records, totals and charts, saving, sharing and exporting, building a dashboard.
+
 ### Project Management
 
 - [Projects](projects.md): Projects Home, new projects from templates, tasks and milestones, logging time, health and status updates.

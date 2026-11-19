@@ -294,6 +294,12 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 |---|---|---|
 | LB-01 to LB-06 LWC Builder: install, access, settings, the grid canvas builder, placing the packaged component, blocks, buttons, visibility rules, export as LWC source, moving components between orgs | [lwc-builder.md](lwc-builder.md) | BarnCRM LWC Builder |
 
+### Advanced Reporting
+
+| Feature | Page | Package |
+|---|---|---|
+| O-02 Advanced Reporting (beta): install, access, where reports and dashboards are kept and how sharing works, large data volumes, the dashboard templates, how it relates to Salesforce reports, Grid and Analytics, troubleshooting | [advanced-reporting.md](advanced-reporting.md) | BarnCRM Advanced Reporting |
+
 ### Project Management
 
 | Feature | Page | Package |

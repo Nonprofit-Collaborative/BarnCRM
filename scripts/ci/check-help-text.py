@@ -49,6 +49,7 @@ PACKAGES = {
     "scholarships": "Scholarships",
     "territory": "Territory",
     "projects": "Projects",
+    "reporting": "Reporting",
 }
 DASHES = (chr(0x2014), chr(0x2013))  # em and en dash, written by code point
 LOADER_FILES = (

@@ -243,7 +243,8 @@ public with sharing class ModuleManagerService {
 		'Territory' => 'Territory_Admin',
 		'Memberships' => 'Memberships_Admin',
 		'Projects' => 'Projects_Admin',
-		'AddressVerification' => 'Address_Verification_Admin'
+		'AddressVerification' => 'Address_Verification_Admin',
+		'Reporting' => 'Reporting_Admin'
 	};
 
 	/** Raised for a module the org does not have, or one that cannot be switched. */

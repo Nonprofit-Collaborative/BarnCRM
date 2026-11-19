@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Advanced Reporting</label>
+    <protected>true</protected>
+    <values><field>Setting_Key__c</field><value xsi:nil="true" /></values>
+    <values><field>Settings_Object__c</field><value xsi:nil="true" /></values>
+    <values><field>Module__c</field><value xsi:type="xsd:string">Reporting</value></values>
+    <values><field>Section__c</field><value xsi:type="xsd:string">Advanced Reporting</value></values>
+    <values><field>Data_Type__c</field><value xsi:type="xsd:string">Component</value></values>
+    <values><field>Component__c</field><value xsi:nil="true" /></values>
+    <values><field>Navigation_Target__c</field><value xsi:type="xsd:string">Advanced_Reporting</value></values>
+    <values><field>Navigation_Label__c</field><value xsi:type="xsd:string">Advanced Reporting</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">Build reports and dashboards across BarnCRM objects, start from a dashboard template, and save and share them. Each person sees only the records their own access allows. Nothing here needs setting up.</value></values>
+    <values><field>Sort_Order__c</field><value xsi:type="xsd:double">10</value></values>
+    <values><field>Help_Path__c</field><value xsi:type="xsd:string">advanced-reporting.md</value></values>
+</CustomMetadata>

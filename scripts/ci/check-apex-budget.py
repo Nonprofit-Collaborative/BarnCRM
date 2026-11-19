@@ -361,6 +361,11 @@ CAPS = {
     # page's credential list and stopping a run at the first credential failure, 24,072 measured
     # 2026-11-18, plus about 2%.
     "addressverification": 24_550,
+    # Advanced Reporting (O-02, D-202, D-207, ADR-NEXT advanced reporting): one query service
+    # (allow-listed by describe, user mode, binds only, aggregates and keyset pages), the library
+    # of saved reports and dashboards as Files with their sharing, and post-install, 28,060
+    # measured 2026-11-19, plus about 2%.
+    "reporting": 28_700,
     # Mirror: the NPSP gifts migration kit's extension (MIG-05), 187,295 measured, then the
     # Nonprofit Cloud gifts kit's (MIG-04), 195,957 measured, then the Nonprofit Cloud
     # relationships kit's (MIG-02), about 200,500 combined, plus about 1%.

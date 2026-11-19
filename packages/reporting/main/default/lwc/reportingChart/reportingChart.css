@@ -1,0 +1,129 @@
+/* Advanced Reporting charts: SLDS 2 styling hooks with fallbacks, so light and dark themes both
+   read; eight series tones, the first five the LWC Builder's chart tones. The SVG's width and
+   height attributes size it to its column. */
+.chart {
+  margin: 0;
+}
+
+.canvas {
+  display: block;
+  overflow: visible;
+}
+
+.grid {
+  stroke: var(--slds-g-color-border-1, #e5e5e5);
+  stroke-width: var(--slds-g-sizing-border-1, 1px);
+}
+
+.axis {
+  stroke: var(--slds-g-color-border-2, #c9c9c9);
+  stroke-width: var(--slds-g-sizing-border-1, 1px);
+}
+
+.tick,
+.category,
+.value {
+  fill: var(--slds-g-color-on-surface-2, #444444);
+  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+}
+
+.total {
+  fill: var(--slds-g-color-on-surface-3, #181818);
+  font-size: var(--slds-g-font-scale-4, 1.5rem);
+  font-weight: var(--slds-g-font-weight-7, 700);
+}
+
+.line {
+  fill: none;
+  stroke-width: var(--slds-g-sizing-border-3, 3px);
+}
+
+.mark:hover,
+.mark:focus {
+  opacity: 0.8;
+}
+
+.legend {
+  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+}
+
+.swatch {
+  display: inline-block;
+  width: var(--slds-g-sizing-5, 0.75rem);
+  height: var(--slds-g-sizing-5, 0.75rem);
+  margin-right: var(--slds-g-spacing-1, 0.25rem);
+  border-radius: var(--slds-g-radius-border-1, 0.125rem);
+  vertical-align: middle;
+}
+
+.tone0 {
+  fill: var(--slds-g-color-palette-blue-50, #0176d3);
+  background: var(--slds-g-color-palette-blue-50, #0176d3);
+}
+
+.tone1 {
+  fill: var(--slds-g-color-palette-teal-50, #0b827c);
+  background: var(--slds-g-color-palette-teal-50, #0b827c);
+}
+
+.tone2 {
+  fill: var(--slds-g-color-palette-violet-50, #9050e9);
+  background: var(--slds-g-color-palette-violet-50, #9050e9);
+}
+
+.tone3 {
+  fill: var(--slds-g-color-palette-green-50, #3ba755);
+  background: var(--slds-g-color-palette-green-50, #3ba755);
+}
+
+.tone4 {
+  fill: var(--slds-g-color-palette-orange-50, #dd7a01);
+  background: var(--slds-g-color-palette-orange-50, #dd7a01);
+}
+
+.tone5 {
+  fill: var(--slds-g-color-palette-pink-50, #e3066a);
+  background: var(--slds-g-color-palette-pink-50, #e3066a);
+}
+
+.tone6 {
+  fill: var(--slds-g-color-palette-cloud-blue-50, #1b96ff);
+  background: var(--slds-g-color-palette-cloud-blue-50, #1b96ff);
+}
+
+.tone7 {
+  fill: var(--slds-g-color-palette-yellow-50, #ca8501);
+  background: var(--slds-g-color-palette-yellow-50, #ca8501);
+}
+
+.stroke0 {
+  stroke: var(--slds-g-color-palette-blue-50, #0176d3);
+}
+
+.stroke1 {
+  stroke: var(--slds-g-color-palette-teal-50, #0b827c);
+}
+
+.stroke2 {
+  stroke: var(--slds-g-color-palette-violet-50, #9050e9);
+}
+
+.stroke3 {
+  stroke: var(--slds-g-color-palette-green-50, #3ba755);
+}
+
+.stroke4 {
+  stroke: var(--slds-g-color-palette-orange-50, #dd7a01);
+}
+
+.stroke5 {
+  stroke: var(--slds-g-color-palette-pink-50, #e3066a);
+}
+
+.stroke6 {
+  stroke: var(--slds-g-color-palette-cloud-blue-50, #1b96ff);
+}
+
+.stroke7 {
+  stroke: var(--slds-g-color-palette-yellow-50, #ca8501);
+}

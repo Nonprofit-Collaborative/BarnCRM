@@ -1258,6 +1258,7 @@ core/SettingSections.cls | public static final String PROGRAMS
 core/SettingSections.cls | public static final String PROJECTS
 core/SettingSections.cls | public static final String RECEIPTS
 core/SettingSections.cls | public static final String RELATIONSHIPS
+core/SettingSections.cls | public static final String REPORTING
 core/SettingSections.cls | public static final String ROLLUPS
 core/SettingSections.cls | public static final String SCHOLARSHIPS
 core/SettingSections.cls | public static final String TERRITORY
@@ -1732,6 +1733,8 @@ projects/ProjectsNightlyJobProvider.cls | public ProjectsNightlyJobProvider()
 projects/ProjectsNightlyJobProvider.cls | public class ProjectsNightlyJobProvider
 projects/ProjectsPostInstall.cls | public ProjectsPostInstall()
 projects/ProjectsPostInstall.cls | public class ProjectsPostInstall
+reporting/ReportingPostInstall.cls | public ReportingPostInstall()
+reporting/ReportingPostInstall.cls | public class ReportingPostInstall
 rollups/RollupApi.cls | global class RollupApi
 rollups/RollupApi.cls | global static void recalculate(Set<Id>)
 rollups/RollupApi.cls | global static void recalculateChanges(List<SObject>,Map<Id,SObject>,Boolean)

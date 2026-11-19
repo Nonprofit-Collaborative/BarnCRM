@@ -1,0 +1,88 @@
+<template>
+  <section class="share slds-box slds-var-p-around_medium" aria-labelledby="share-heading" data-id="share">
+    <h2 id="share-heading" class="slds-text-heading_small slds-var-m-bottom_x-small">{heading}</h2>
+    <p class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_small">{labels.intro}</p>
+
+    <template lwc:if={error}>
+      <c-barn-notice variant="error" message={error} data-id="error"></c-barn-notice>
+    </template>
+
+    <lightning-input
+      type="search"
+      label={labels.search}
+      value={term}
+      onchange={handleSearch}
+      is-loading={searching}
+      data-id="search"
+    ></lightning-input>
+    <template lwc:if={hasResults}>
+      <ul class="slds-has-dividers_bottom-space slds-var-m-top_x-small results" data-id="results">
+        <template for:each={results} for:item="entry">
+          <li key={entry.key} class="slds-item slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+            <span class="slds-truncate">{entry.text}</span>
+            <lightning-button
+              variant="base"
+              label={labels.add}
+              title={entry.text}
+              data-entry={entry.id}
+              onclick={handleAdd}
+              data-id="add"
+            ></lightning-button>
+          </li>
+        </template>
+      </ul>
+    </template>
+
+    <template lwc:if={hasRows}>
+      <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-max-medium-table_stacked slds-var-m-top_small" data-id="entries">
+        <thead>
+          <tr class="slds-line-height_reset">
+            <th scope="col">{labels.name}</th>
+            <th scope="col">{labels.access}</th>
+            <th scope="col"><span class="slds-assistive-text">{labels.remove}</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <template for:each={rows} for:item="row">
+            <tr key={row.key}>
+              <td data-label={labels.name}>
+                <span class="slds-truncate">{row.name}</span>
+                <span class="slds-text-body_small slds-text-color_weak slds-var-m-left_x-small">{row.kindLabel}</span>
+              </td>
+              <td data-label={labels.access}>
+                <lightning-combobox
+                  label={row.accessLabel}
+                  variant="label-hidden"
+                  options={accessOptions}
+                  value={row.access}
+                  data-entry={row.id}
+                  onchange={handleAccess}
+                  data-id="access"
+                ></lightning-combobox>
+              </td>
+              <td data-label={labels.remove}>
+                <lightning-button-icon
+                  icon-name="utility:close"
+                  variant="bare"
+                  alternative-text={row.removeLabel}
+                  title={row.removeLabel}
+                  data-entry={row.id}
+                  onclick={handleRemove}
+                  data-id="remove"
+                ></lightning-button-icon>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </template>
+    <template lwc:else>
+      <p class="slds-text-body_small slds-var-m-top_small" data-id="none">{labels.none}</p>
+    </template>
+
+    <div class="slds-var-m-top_medium">
+      <lightning-button label={labels.cancel} onclick={handleCancel} class="slds-var-m-right_x-small" data-id="cancel"></lightning-button>
+      <lightning-button variant="brand" label={labels.save} onclick={handleSave} data-id="save"></lightning-button>
+    </div>
+  </section>
+</template>
