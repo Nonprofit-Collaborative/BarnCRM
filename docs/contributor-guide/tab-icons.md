@@ -111,7 +111,7 @@ Rules:
 | projects | Projects_Home | Custom64: Compass |
 | projects | Time_Entry__c | Custom95: Stopwatch |
 | reporting | Advanced_Reporting | Custom84: Presenter |
-| giving | Accounting_Export | Custom21: Computer |
+| giving | Accounting_Export | Custom16: Bank |
 | giving | Campaign_Sync | Custom35: Microphone |
 | giving | Gift_Transaction_Mirror | Custom31: Car |
 | giving | Opportunity_Mirror | Custom30: Radardish |
@@ -202,7 +202,7 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | scholarships | awardPanel | custom:custom80 | Award__c |
 | projects | projectBoard | custom:custom62 | Project__c |
 | projects | projectsAtRisk | custom:custom62 | Project__c |
-| giving | accountingExport | custom:custom21 | Accounting_Export |
+| giving | accountingExport | custom:custom16 | Accounting_Export |
 | giving | campaignSync | custom:custom35 | Campaign_Sync |
 | giving | mirrorPage | custom:custom31 | Gift_Transaction_Mirror |
 | giving | mirrorPage | custom:custom30 | Opportunity_Mirror |
