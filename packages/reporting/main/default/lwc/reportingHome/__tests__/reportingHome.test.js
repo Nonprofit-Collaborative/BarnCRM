@@ -145,7 +145,16 @@ describe('c-reporting-home', () => {
     const reportRows = find(element, 'reports').querySelectorAll('tbody tr');
     expect(reportRows[0].textContent).toContain('Ben');
     expect(reportRows[0].textContent).toContain('c.Reporting_Share_View');
+    expect(find(element, 'saved-cap')).toBeNull();
     await expectAccessible(element);
+  });
+
+  it('says when the saved list reached its cap of 1,000', async () => {
+    listSaved.mockResolvedValue(
+      Array.from({ length: 1000 }, (unused, index) => ({ ...SAVED[0], id: `069${index}` }))
+    );
+    const element = await mount();
+    expect(find(element, 'saved-cap').textContent).toBe('c.Reporting_Home_SavedCap');
   });
 
   it('opens a template, a saved item, a new report and a new dashboard, and comes back', async () => {

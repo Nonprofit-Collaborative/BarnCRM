@@ -11,6 +11,7 @@ import { availableTemplates, newDashboard } from 'c/reportingModel';
 
 const REPORT = 'barnreport';
 const DASHBOARD = 'barndash';
+const MAX_SAVED = 1000;
 
 /**
  * The Advanced Reporting tab: dashboards and reports the person can open (their own and those
@@ -119,6 +120,13 @@ export default class ReportingHome extends LightningElement {
 
   get dashboards() {
     return this.rows(DASHBOARD);
+  }
+
+  /** Said when the list reached its cap (ReportingLibrary.listSaved lists the first 1,000). */
+  get savedCapText() {
+    return this.saved.length >= MAX_SAVED
+      ? format(helpText('Reporting', 'Reporting_Home_SavedCap'), MAX_SAVED.toLocaleString(LOCALE))
+      : '';
   }
 
   get reports() {

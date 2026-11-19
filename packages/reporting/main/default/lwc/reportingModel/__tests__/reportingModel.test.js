@@ -29,10 +29,13 @@ import {
   runRequest,
   scanPage,
   scanResult,
+  makeClock,
   tableRows,
   valueAt,
+  weekStartOf,
   withConditions
 } from 'c/reportingModel';
+import { zonedParts } from 'c/findCsv';
 
 // A Wednesday, 15 May 2026, at noon local time.
 const NOW = new Date(2026, 4, 13, 12, 0, 0);
@@ -182,6 +185,56 @@ describe('reportingModel: dates', () => {
       { field: 'D', operator: 'less or equal', value: '2026-01-31' }
     ]);
   });
+
+  it('sends this year, last year and the last n days as date literals', () => {
+    expect(dateConditions({ range: 'THIS_YEAR', field: 'D' }, NOW)).toEqual([
+      { field: 'D', operator: 'this year' }
+    ]);
+    expect(dateConditions({ range: 'LAST_YEAR', field: 'D', type: 'datetime' }, NOW)).toEqual([
+      { field: 'D', operator: 'last year' }
+    ]);
+    expect(dateConditions({ range: 'LAST_N_DAYS', n: 7, field: 'D' }, NOW)).toEqual([
+      { field: 'D', operator: 'last n days', value: 7 }
+    ]);
+  });
+
+  it("works on the person's time zone and week, not the browser's", () => {
+    // 03:00 UTC on 13 May is still 12 May in Los Angeles.
+    const clock = makeClock({
+      now: new Date(Date.UTC(2026, 4, 13, 3)),
+      timeZone: 'America/Los_Angeles',
+      locale: 'en_US',
+      zonedParts
+    });
+    expect(dateBounds({ range: 'TODAY' }, clock)).toEqual({ from: '2026-05-12', to: '2026-05-12' });
+    const timed = dateConditions({ range: 'TODAY', field: 'S', type: 'datetime' }, clock);
+    expect(timed[0].value).toBe('2026-05-12T07:00:00.000Z');
+    expect(timed[1].value).toBe('2026-05-13T07:00:00.000Z');
+    // A day that ends with the clocks going back an hour is 25 hours long.
+    const autumn = dateConditions(
+      { range: 'CUSTOM', from: '2026-11-01', to: '2026-11-01', field: 'S', type: 'datetime' },
+      clock
+    );
+    expect(autumn.map((condition) => condition.value)).toEqual([
+      '2026-11-01T07:00:00.000Z',
+      '2026-11-02T08:00:00.000Z'
+    ]);
+    expect(
+      bucketParts('2026-05-13T03:00:00.000Z', { type: 'datetime', bucket: 'day' }, clock)
+    ).toEqual(['2026-05-12']);
+    expect(daysSince('2026-05-11T20:00:00.000Z', clock)).toBe(1);
+
+    expect(weekStartOf('en_US')).toBe(0);
+    expect(weekStartOf('en_GB')).toBe(1);
+    expect(weekStartOf('de-DE')).toBe(1);
+    const london = makeClock({ now: NOW, timeZone: 'Europe/London', locale: 'en_GB', zonedParts });
+    expect(london.weekStart).toBe(1);
+    // Wednesday 13 May: a Monday week runs 11 to 17 May.
+    expect(dateBounds({ range: 'THIS_WEEK' }, london)).toEqual({
+      from: '2026-05-11',
+      to: '2026-05-17'
+    });
+  });
 });
 
 describe('reportingModel: requests', () => {
@@ -222,7 +275,10 @@ describe('reportingModel: requests', () => {
     expect(document.orderBy).toEqual([{ field: 'Email', direction: 'DESC' }]);
     expect(document.limit).toBe(50);
     expect(document.related[0].has).toBe(false);
-    expect(document.filter.conditions).toHaveLength(2);
+    // This year goes as the platform's date literal, worked out on the server.
+    expect(document.filter.conditions).toEqual([
+      { id: 1, field: 'CreatedDate', operator: 'this year' }
+    ]);
     const request = runRequest(report, NOW);
     expect(request.groups).toEqual([]);
     expect(request.measures).toEqual([]);
@@ -246,16 +302,15 @@ describe('reportingModel: requests', () => {
     ]);
     expect(request.measures).toEqual([{ fn: 'count' }, { fn: 'sum', path: 'Amount__c' }]);
     expect(request.summaries).toEqual([]);
-    expect(pageRequest(report, NOW).fields).toEqual([
-      'Fund__c',
-      'Fund__r.Name',
-      'Gift_Date__c',
-      'Amount__c'
-    ]);
+    // A scan sends its groupings and totals; the server works out the fields to read.
+    const scan = pageRequest(report, NOW);
+    expect(scan.fields).toBeUndefined();
+    expect(scan.groups).toEqual(request.groups);
+    expect(scan.measures).toEqual(request.measures);
 
     const list = normalizeReport({
       object: 'A',
-      columns: [{ path: 'Id' }, { path: 'Name' }],
+      columns: [{ path: 'Id' }, { path: 'Name' }, { path: 'NAME' }, { path: 'ID' }],
       summaries: [{ object: 'X__c', field: 'Y__c', fn: 'sum', path: 'Z__c', filter: 'f' }]
     });
     const page = pageRequest(list, NOW);
@@ -520,7 +575,8 @@ describe('reportingModel: dashboards', () => {
     expect(dashboard.widgets[0].size).toBe('medium');
     expect(dashboard.widgets[0].title).toBe('By Fund');
     expect(Object.keys(dashboard.widgets[0].bindings)).toEqual(['dates', 'fund']);
-    expect(dashboard.sharing).toEqual({ users: [] });
+    // Sharing never travels in a definition; only Share changes it.
+    expect(dashboard.sharing).toBeUndefined();
     expect(newDashboard().widgets).toEqual([]);
     expect(nextWidgetKey(dashboard)).toBe('w3');
     expect(nextWidgetKey(normalizeDashboard({ widgets: [{ key: 'w2', report: {} }] }))).toBe('w3');

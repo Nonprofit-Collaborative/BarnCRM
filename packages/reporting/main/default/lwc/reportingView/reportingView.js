@@ -6,8 +6,10 @@ import runReport from '@salesforce/apex/ReportingQueryService.run';
 import readPage from '@salesforce/apex/ReportingQueryService.page';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { format, recordHref } from 'c/barnFormat';
-import { downloadCsv, messageFrom } from 'c/findCsv';
+import { downloadCsv, messageFrom, zonedParts } from 'c/findCsv';
 import {
+  EXPORT_PAGE_SIZE,
+  MAX_EXPORT_ROWS,
   MAX_SCAN_ROWS,
   PAGE_SIZE,
   arrangeGroups,
@@ -15,6 +17,7 @@ import {
   formatValue,
   groupTable,
   isTotals,
+  makeClock,
   newScan,
   normalizeReport,
   pageRequest,
@@ -27,6 +30,20 @@ import {
 import { chartModel } from 'c/reportingChartModel';
 
 const ROWS_STEP = 50;
+
+// Scans run one at a time across every view on the page, so a dashboard's large widgets never
+// read pages in parallel; aggregate runs are not queued.
+let scanQueue = Promise.resolve();
+function oneScanAtATime(task) {
+  const run = scanQueue.then(task, task);
+  scanQueue = run.catch(() => undefined);
+  return run;
+}
+
+/** The person's calendar for one run: their Salesforce time zone and locale, now. */
+function personClock() {
+  return makeClock({ now: new Date(), timeZone: TIME_ZONE, locale: LOCALE, zonedParts });
+}
 
 /**
  * Runs one Advanced Reporting report as the person and shows it: a list as a table, totals as a
@@ -48,6 +65,10 @@ export default class ReportingView extends LightningElement {
   loading = false;
   error = '';
   result;
+  /** The result's groups in order, worked out once when the result is set (setResult). */
+  arranged = null;
+  /** The calendar the current result was run on, reused for its pages and its export. */
+  clock;
   scanned = 0;
   stopRequested = false;
   stoppedAt = null;
@@ -74,9 +95,18 @@ export default class ReportingView extends LightningElement {
     if (!this.helpReady) {
       loadHelp(['Reporting', 'Core']).then(() => {
         this.helpReady = true;
+        // Group names use words from the help catalog (Blank, Yes, No).
+        this.setResult(this.result);
       });
     }
     this.refresh();
+  }
+
+  /** Sets the result and arranges its groups once, rather than on every read. */
+  setResult(result) {
+    this.result = result;
+    this.arranged =
+      result && this.totals ? arrangeGroups(this._report, result, this.words, LOCALE) : null;
   }
 
   disconnectedCallback() {
@@ -87,7 +117,7 @@ export default class ReportingView extends LightningElement {
   @api
   refresh() {
     this.token++;
-    this.result = undefined;
+    this.setResult(undefined);
     this.error = '';
     this.stoppedAt = null;
     this.rowsShown = ROWS_STEP;
@@ -101,15 +131,19 @@ export default class ReportingView extends LightningElement {
   async load(token) {
     this.loading = true;
     this.scanned = 0;
+    this.stopRequested = false;
+    this.clock = personClock();
     try {
-      const result = await runReport({ requestJson: JSON.stringify(runRequest(this._report)) });
+      const result = await runReport({
+        requestJson: JSON.stringify(runRequest(this._report, this.clock))
+      });
       if (token !== this.token) {
         return;
       }
       if (result && result.scan) {
-        await this.scan(token);
+        await oneScanAtATime(() => this.scan(token));
       } else {
-        this.result = result || {};
+        this.setResult(result || {});
       }
     } catch (error) {
       if (token === this.token) {
@@ -122,19 +156,25 @@ export default class ReportingView extends LightningElement {
     }
   }
 
-  /** Reads every record in pages of 5,000 and totals them here (ADR-0231, large volumes). */
+  /**
+   * Reads every record in pages of 5,000 and totals them here (ADR-0231, large volumes), on the
+   * run's calendar. Waits its turn behind any other view's scan (oneScanAtATime).
+   */
   async scan(token) {
+    if (token !== this.token) {
+      return;
+    }
     const scan = newScan();
-    const requestJson = JSON.stringify(pageRequest(this._report));
-    this.stopRequested = false;
+    const clock = this.clock;
+    const requestJson = JSON.stringify(pageRequest(this._report, clock));
     let afterId = null;
     for (;;) {
       // eslint-disable-next-line no-await-in-loop
-      const page = await readPage({ requestJson, afterId, pageSize: PAGE_SIZE });
+      const page = await readPage({ requestJson, afterId, pageSize: PAGE_SIZE, forExport: false });
       if (token !== this.token) {
         return;
       }
-      scanPage(this._report, scan, page.rows);
+      scanPage(this._report, scan, page.rows, clock);
       this.scanned = scan.rows;
       if (page.done || this.stopRequested || scan.rows >= MAX_SCAN_ROWS) {
         break;
@@ -142,7 +182,7 @@ export default class ReportingView extends LightningElement {
       afterId = page.lastId;
     }
     this.stoppedAt = this.stopRequested ? scan.rows : null;
-    this.result = scanResult(this._report, scan);
+    this.setResult(scanResult(this._report, scan));
   }
 
   handleStop() {
@@ -190,12 +230,6 @@ export default class ReportingView extends LightningElement {
 
   get totals() {
     return isTotals(this._report);
-  }
-
-  get arranged() {
-    return this.totals && this.result
-      ? arrangeGroups(this._report, this.result, this.words, LOCALE)
-      : null;
   }
 
   get isMetric() {
@@ -276,7 +310,7 @@ export default class ReportingView extends LightningElement {
     if (this.totals) {
       return groupTable(this._report, this.arranged, this.options);
     }
-    const table = tableRows(this._report, this.result, this.options);
+    const table = tableRows(this._report, this.result, this.options, this.clock);
     return {
       headers: table.headers,
       rows: table.rows.map((row) => ({
@@ -364,7 +398,10 @@ export default class ReportingView extends LightningElement {
     return helpText('Reporting', 'Reporting_Export');
   }
 
-  /** CSV of every record (a list, read again in pages) or of the groups shown (totals). */
+  /**
+   * CSV of every record (a list, read again in pages of 2,000, at most 100,000 rows) or of the
+   * groups shown (totals). The server checks Export Reports on every page.
+   */
   async handleExport() {
     if (this.exporting) {
       return;
@@ -372,23 +409,35 @@ export default class ReportingView extends LightningElement {
     this.exporting = true;
     this.exportStatus = '';
     const base = this._report.title || this._report.object;
+    let capped = false;
     try {
       let table;
       if (this.totals) {
         table = this.table;
       } else {
         table = { headers: this.table.headers, rows: [] };
-        const requestJson = JSON.stringify(pageRequest(this._report));
+        const clock = this.clock;
+        const requestJson = JSON.stringify(pageRequest(this._report, clock));
         let afterId = null;
         for (;;) {
           // eslint-disable-next-line no-await-in-loop
-          const page = await readPage({ requestJson, afterId, pageSize: PAGE_SIZE });
-          table.rows.push(...tableRows(this._report, page, this.options).rows);
+          const page = await readPage({
+            requestJson,
+            afterId,
+            pageSize: EXPORT_PAGE_SIZE,
+            forExport: true
+          });
+          table.rows.push(...tableRows(this._report, page, this.options, clock).rows);
           this.exportStatus = format(
             helpText('Reporting', 'Reporting_Exporting'),
             table.rows.length.toLocaleString(LOCALE)
           );
           if (page.done) {
+            break;
+          }
+          if (table.rows.length >= MAX_EXPORT_ROWS) {
+            capped = true;
+            table.rows.length = MAX_EXPORT_ROWS;
             break;
           }
           afterId = page.lastId;
@@ -407,7 +456,9 @@ export default class ReportingView extends LightningElement {
       });
       downloadCsv(base, columns, rows);
       this.exportStatus = format(
-        helpText('Reporting', 'Reporting_Exported'),
+        capped
+          ? helpText('Reporting', 'Reporting_ExportCapped')
+          : helpText('Reporting', 'Reporting_Exported'),
         rows.length.toLocaleString(LOCALE)
       );
     } catch (error) {

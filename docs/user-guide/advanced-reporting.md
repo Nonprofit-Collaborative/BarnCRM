@@ -42,7 +42,8 @@ select **Save**.
 
 Under **Groups and Totals**, select **Add Total** to count or sum instead of listing. Add up to
 two groupings (**Group By**, **Then By**) to split the totals, such as by month and fund. Dates
-group by day, week, month, quarter or year.
+group by day, week, month, quarter or year. Dates and date ranges follow your own Salesforce
+time zone, and This Week starts on the first day of the week for your locale.
 
 Under **Display**, **Show As** picks Table, Bar Chart, Column Chart, Line Chart, Donut Chart or
 Metric (one total, no grouping). With two groupings a bar or column chart can be **Stacked**.
@@ -55,17 +56,19 @@ table carries the numbers.
 
 A report that totals a very large number of records reads them in pages and shows how many it
 has read; select **Stop** to see totals so far (marked partial). A filter or a date range makes it
-faster.
+faster. On a dashboard, such widgets are read one after another.
 
 ## Save, Share and Export
 
 - **Save** keeps the report or dashboard as yours. **Save As** keeps a copy under a new name.
-- **Share** (owner only): find people or public groups and choose **Can View** or **Can Edit**.
-  People you share with see the records their own access allows, not yours. A public group is
-  shared with its members as they are now; share again to include people who join later.
+- **Share** (owner only): find people or Public Groups and choose **Can View** or **Can Edit**.
+  People you share with see the records their own access allows, not yours. A Public Group is
+  shared with its direct members as they are now (not members of groups inside it); share again
+  to include people who join later. Saving never changes who it is shared with, and people you
+  share with cannot share it further.
 - **Delete** (owner only) deletes it for everyone it is shared with.
-- **Export CSV** downloads a list report's rows (every row, not only those on screen) or a totals
-  report's groups. It needs Salesforce's Export Reports permission.
+- **Export CSV** downloads a list report's rows (every row, not only those on screen, up to
+  100,000) or a totals report's groups. It needs Salesforce's Export Reports permission.
 
 Reports and dashboards shared with you show in the lists with their owner and your access. If
 you can only view one, use **Save As** to make your own copy.
@@ -93,3 +96,5 @@ Up to 12 widgets and four filters per dashboard.
 | No Save button | Your role can run reports and open shared ones, but not save them |
 | No Export CSV | You do not have Salesforce's Export Reports permission |
 | "There are more groups than shown" | More than 2,000 groups matched; add a filter |
+| "Only the first 1,000 saved reports and dashboards are listed" | The list holds 1,000; delete your own that are no longer needed |
+| "Exported the first 100,000 rows" | One export holds 100,000 rows; add a filter and export in parts |

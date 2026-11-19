@@ -374,7 +374,11 @@ CAPS = {
     # (allow-listed by describe, user mode, binds only, aggregates and keyset pages), the library
     # of saved reports and dashboards as Files with their sharing, and post-install, 28,060
     # measured 2026-11-19, plus about 2%.
-    "reporting": 28_700,
+    # Review fixes (release 1.29): restricted Files sharing, sharing kept out of saves, the save
+    # permission on share and delete, the server-side export check, scan fields worked out on the
+    # server with the multi-currency refusal, checked lookup names: 30,239 measured 2026-11-19,
+    # raised by 2,200 (what the fixes added).
+    "reporting": 30_900,
     # Mirror: the NPSP gifts migration kit's extension (MIG-05), 187,295 measured, then the
     # Nonprofit Cloud gifts kit's (MIG-04), 195,957 measured, then the Nonprofit Cloud
     # relationships kit's (MIG-02), about 200,500 combined, plus about 1%.

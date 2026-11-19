@@ -75,10 +75,13 @@ T-AR-03 if it is not already.
 | 2 | As staff user B, open Advanced Reporting. | "Shared Test" is not listed. |
 | 3 | As A, open it, select **Share**, find staff user B, Add, keep **Can View**, Save. | "Sharing saved." |
 | 4 | As B, open it. | Listed with owner A, access Can View; opening shows "shared with you to view"; no Save, Share or Delete; Save As is there. |
-| 5 | As A, Share: remove B, add the public group with **Can Edit**. Save. As B, change the title and Save. | B's save works. As A, Share still lists the group (B's save kept A's sharing). |
+| 5 | As A, Share: remove B, add the public group with **Can Edit**. Save. As B, change the title and Save. | The group shows as "(Public Group)". B's save works. As A, Share still lists the group (B's save kept A's sharing). |
 | 6 | As the read only user, open a report shared with them. | It runs; no Save or Save As. |
 | 7 | As B, try Delete. | No Delete button. |
-| 8 | As A, Delete, confirm. | Gone for A and B. In Files (Setup or the Files tab as A), the file is deleted. |
+| 8 | As B (Can Edit), open the Files tab, find "Shared Test" (shared with me), and try **Share** or a share link. | Sharing is not offered or is refused: the file prevents others from sharing and unlinking. |
+| 9 | As A, open "Shared Test" in two browser tabs. In tab 1, Share it with the read only user too. In tab 2 (opened before), change the title and Save. | The save works; the read only user still sees it (a save never changes sharing). |
+| 10 | As A, open Share. | The intro says a Public Group shares with its direct members. |
+| 11 | As A, Delete, confirm. | Gone for A and B. In Files (Setup or the Files tab as A), the file is deleted. |
 
 **Cleanup:** None.
 
@@ -93,6 +96,8 @@ T-AR-03 if it is not already.
 | 1 | As A, run a list report with a row limit of 10 on an object with more than 10 records. Select **Export CSV**. | A CSV with every matching record (not only 10), the column labels as the header. |
 | 2 | Run a grouped report; Export CSV. | One row per group shown, totals as numbers. |
 | 3 | As B (no Export Reports), run a report. | No Export CSV button. |
+| 4 | As B, in the Developer Console call `ReportingQueryService.page` with a list report request and `forExport` true. | Refused: "Exporting needs the Export Reports permission in Salesforce." |
+| 5 | As A, export a list report on an object with more than 100,000 matching records (or skip if none). | The CSV holds 100,000 rows and the note "Exported the first 100,000 rows, the most one export holds." |
 
 **Cleanup:** None.
 
@@ -144,6 +149,8 @@ T-AR-03 if it is not already.
 | 2 | Let it finish. | Totals match a Salesforce summary report of the same object. |
 | 3 | Run again and select **Stop** part way. | Totals shown with "Stopped after N records. These totals are partial." |
 | 4 | Add a date range that matches under 20,000 records. Run. | Totals appear at once, with no progress. |
+| 5 | Put two such large widgets (no date range) on one dashboard and open it. | One widget shows progress at a time; the second starts when the first finishes. |
+| 6 | In a multi-currency org only: group the large object and Sum a currency field, no filter. | Refused with "This report is too large to total ... more than one currency"; with a narrower date range it totals. |
 
 **Cleanup:** None.
 
@@ -158,5 +165,21 @@ T-AR-03 if it is not already.
 | 1 | Call `ReportingQueryService.run` with an object the user cannot read, a field name holding a quote or a space, a grouping on a long text field, and an unknown total function. | Each is refused with a message; nothing runs. |
 | 2 | Call `ReportingQueryService.page` with an after-Id that is not an Id. | Refused. |
 | 3 | Call `ReportingLibrary.share` on another person's report. | "Only its owner can share or delete this." |
+| 4 | As the read only user, call `ReportingLibrary.share` or `ReportingLibrary.remove` on any report. | Refused: saving, sharing and deleting need Advanced Reporting Staff or Admin. |
+| 5 | Call `ReportingQueryService.run` with a grouping on a field that cannot be grouped. | The message names the field, for example "That field (Description) cannot be used to group records." |
 
 **Cleanup:** None.
+
+## T-AR-10: Dates in the Person's Time Zone and Week
+
+**Purpose:** confirm date ranges and buckets use the person's Salesforce time zone and locale.
+**Prerequisites:** staff user A; records with a Created Date today.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Set A's time zone (Settings, Personal Information) to one far from the browser's, for example Pacific/Auckland when the computer is in America. Report on any object, Date Range Created Date Today. Run. | Records created during A's today in Auckland, not the computer's day. |
+| 2 | Set A's locale to English (United Kingdom). Date Range This Week. | The week runs Monday to Sunday; with English (United States), Sunday to Saturday. |
+| 3 | Date Range This Year, then Last 7 Days. Run each. | Results match a Salesforce list view filtered THIS_YEAR and LAST_N_DAYS:7. |
+
+**Cleanup:** Put A's time zone and locale back.

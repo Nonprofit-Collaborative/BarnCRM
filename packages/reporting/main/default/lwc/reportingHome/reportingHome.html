@@ -58,6 +58,9 @@
         </template>
 
         <template lwc:if={isHome}>
+          <template lwc:if={savedCapText}>
+            <p class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_small" data-id="saved-cap">{savedCapText}</p>
+          </template>
           <template lwc:if={showLists}>
             <lightning-tabset active-tab-value={activeTab}>
               <lightning-tab label={labels.dashboards} value="dashboards" onactive={handleTab} data-id="tab-dashboards">

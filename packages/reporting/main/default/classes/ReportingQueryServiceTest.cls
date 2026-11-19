@@ -18,6 +18,10 @@ private class ReportingQueryServiceTest {
 		TestUsers.standardUserWith('Cal', new List<String>{ 'Reporting_Staff' });
 	}
 
+	private static User cal() {
+		return TestUsers.fromSetup('Cal');
+	}
+
 	private static Map<String, Object> query(String objectName, List<String> fields) {
 		return new Map<String, Object>{
 			'version' => 1,
@@ -109,7 +113,7 @@ private class ReportingQueryServiceTest {
 				'Counted in his access only'
 			);
 		}
-		System.runAs(TestUsers.fromSetup('Cal')) {
+		System.runAs(cal()) {
 			Boolean refused = false;
 			try {
 				ReportingQueryService.run(
@@ -232,16 +236,31 @@ private class ReportingQueryServiceTest {
 
 			String pageRequest = request(
 				accounts,
-				new Map<String, Object>{ 'fields' => new List<Object>{ 'NumberOfEmployees' } }
+				new Map<String, Object>{
+					'groups' => new List<Object>{ new Map<String, Object>{ 'field' => 'OwnerId' } },
+					'measures' => new List<Object>{
+						new Map<String, Object>{ 'fn' => 'sum', 'path' => 'NumberOfEmployees' }
+					},
+					'fields' => new List<Object>{ 'Description' }
+				}
 			);
-			Map<String, Object> first = ReportingQueryService.page(pageRequest, null, 2);
+			Map<String, Object> first = ReportingQueryService.page(pageRequest, null, 2, false);
 			List<SObject> firstRows = (List<SObject>) first.get('rows');
 			Assert.areEqual(2, firstRows.size(), 'A page of two');
 			Assert.isFalse((Boolean) first.get('done'), 'More to read');
+			Assert.isFalse(
+				firstRows[0].isSet('Description'),
+				'A scan reads only the fields its groupings and totals use'
+			);
+			Assert.isNotNull(
+				firstRows[0].getSObject('Owner').get('Name'),
+				'The grouping lookup is read with its record name'
+			);
 			Map<String, Object> second = ReportingQueryService.page(
 				pageRequest,
 				String.valueOf(first.get('lastId')),
-				2
+				2,
+				false
 			);
 			List<SObject> secondRows = (List<SObject>) second.get('rows');
 			Assert.areEqual(1, secondRows.size(), 'The rest');
@@ -250,8 +269,59 @@ private class ReportingQueryServiceTest {
 				String.valueOf(secondRows[0].Id) > String.valueOf(firstRows[1].Id),
 				'In Id order after the last one read'
 			);
-			Assert.isNotNull(secondRows[0].get('NumberOfEmployees'), 'The asked field is read');
+			Assert.isNotNull(secondRows[0].get('NumberOfEmployees'), 'The totalled field is read');
 		}
+	}
+
+	@IsTest
+	static void exportNeedsExportReportsAndReadsEachColumnOnce() {
+		for (User person : new List<User>{ TestUsers.adminWith('Reporting_Admin'), cal() }) {
+			System.runAs(person) {
+				String exportRequest = request(
+					query('Account', new List<String>{ 'Name' }),
+					new Map<String, Object>{
+						'fields' => new List<Object>{ 'Name', 'name', 'ID', 'NumberOfEmployees' }
+					}
+				);
+				Boolean allowed = ReportingQueryService.canExport();
+				Boolean refused = false;
+				try {
+					Map<String, Object> exported = ReportingQueryService.page(
+						exportRequest,
+						null,
+						null,
+						true
+					);
+					Assert.isNotNull(exported.get('rows'), 'A page of rows');
+				} catch (AuraHandledException e) {
+					refused = true;
+				}
+				Assert.areEqual(!allowed, refused, 'Export follows Export Reports');
+				refused = false;
+				try {
+					ReportingQueryService.page(exportRequest, null, null, false);
+				} catch (AuraHandledException e) {
+					refused = true;
+				}
+				Assert.isTrue(refused, 'A list is never read in pages without the export flag');
+			}
+		}
+		List<Object> tooMany = new List<Object>();
+		for (Integer i = 0; i <= ReportingQueryService.MAX_FIELDS; i++) {
+			tooMany.add('Name');
+		}
+		Boolean refused = false;
+		try {
+			ReportingQueryService.read(
+				request(
+					query('Account', new List<String>{ 'Name' }),
+					new Map<String, Object>{ 'fields' => tooMany }
+				)
+			);
+		} catch (ReportingQueryService.ReportingException e) {
+			refused = true;
+		}
+		Assert.isTrue(refused, 'At most 20 columns');
 	}
 
 	@IsTest
@@ -412,10 +482,15 @@ private class ReportingQueryServiceTest {
 				ReportingQueryService.page(
 					request(
 						query('Account', new List<String>{ 'Name' }),
-						new Map<String, Object>()
+						new Map<String, Object>{
+							'measures' => new List<Object>{
+								new Map<String, Object>{ 'fn' => 'count' }
+							}
+						}
 					),
 					'001\' OR Id != null',
-					10
+					10,
+					false
 				);
 			} catch (AuraHandledException e) {
 				badCursor = true;

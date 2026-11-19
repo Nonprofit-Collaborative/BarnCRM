@@ -82,10 +82,8 @@ const SAVED_ROW = {
   ownerName: 'Ana',
   mine: true,
   canEdit: true,
-  definition: JSON.stringify({
-    ...GIVING,
-    sharing: { users: [], groups: [{ id: '00G000000000001AAA', name: 'Board', access: 'view' }] }
-  })
+  definition: JSON.stringify(GIVING),
+  sharing: { users: [], groups: [{ id: '00G000000000001AAA', name: 'Board', access: 'view' }] }
 };
 
 function flush() {
@@ -251,7 +249,7 @@ describe('c-reporting-dashboard', () => {
     expect(find(element, 'widget-builder')).toBeNull();
   });
 
-  it('saves a new dashboard, then keeps sharing on save, shares and deletes a saved one', async () => {
+  it('saves a new dashboard, then saves without sharing, shares and deletes a saved one', async () => {
     save.mockResolvedValue(SAVED_ROW);
     share.mockResolvedValue(SAVED_ROW);
     remove.mockResolvedValue();
@@ -270,13 +268,13 @@ describe('c-reporting-dashboard', () => {
     element.addEventListener('close', closed);
     find(element, 'save').click();
     await flush();
-    expect(JSON.parse(save.mock.calls[0][0].definitionJson).sharing.groups[0].id).toBe(
-      '00G000000000001AAA'
-    );
+    // Sharing never goes with a save, so a stale save cannot change who has access.
+    expect(JSON.parse(save.mock.calls[0][0].definitionJson).sharing).toBeUndefined();
     expect(save.mock.calls[0][0].kind).toBe('barndash');
 
     find(element, 'share').click();
     await flush();
+    expect(find(element, 'share-panel').sharing.groups[0].id).toBe('00G000000000001AAA');
     find(element, 'share-panel').dispatchEvent(
       new CustomEvent('save', { detail: { sharing: { users: [], groups: [] } } })
     );
