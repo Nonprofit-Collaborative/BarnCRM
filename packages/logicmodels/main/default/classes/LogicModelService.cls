@@ -734,7 +734,7 @@ public with sharing class LogicModelService {
 				BarnHelp.text('LogicModels', 'LogicModels_Builder_NotFound')
 			);
 		}
-		delete as user recordId;
+		Database.delete(recordId, true, AccessLevel.USER_MODE);
 		return modelId;
 	}
 

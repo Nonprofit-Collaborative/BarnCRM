@@ -61,7 +61,7 @@ public without sharing class AutomationSettingsWriter {
 	 * permission and that the row is a `Flow:` row that is not a package default.
 	 */
 	public static void deleteSwitch(Id switchId) {
-		delete as system switchId;
+		Database.delete(switchId, true, AccessLevel.SYSTEM_MODE);
 	}
 
 	/**
@@ -75,6 +75,6 @@ public without sharing class AutomationSettingsWriter {
 
 	/** Deletes one profile or user BarnCRM Automation Control row, after the same checks. */
 	public static void deleteControl(Id rowId) {
-		delete as system rowId;
+		Database.delete(rowId, true, AccessLevel.SYSTEM_MODE);
 	}
 }
