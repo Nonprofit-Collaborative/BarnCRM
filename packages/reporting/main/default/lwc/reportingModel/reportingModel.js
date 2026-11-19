@@ -741,7 +741,7 @@ export function groupText(group, keys, label, words = {}, locale) {
     return { text: String(label), sort: String(label).toLowerCase() };
   }
   if (first === null || first === undefined || first === '') {
-    return { text: words.blank || '', sort: '￿' };
+    return { text: words.blank || '', sort: '\uffff' };
   }
   if (DATE_TYPES.has(group.type)) {
     const bucket = group.bucket || 'day';
