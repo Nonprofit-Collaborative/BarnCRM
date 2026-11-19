@@ -12,7 +12,8 @@
  * - a Site guest user without `Payments_Webhook_Guest` (fix: assign it), which receives events
  *   and holds the credential access a public page's checkout needs;
  * - processing not scheduled (fix: schedule it as the viewer);
- * - received events waiting over an hour.
+ * - received events waiting over an hour;
+ * - the receiver reached its hourly cap in the last day.
  *
  * `@NamespaceAccessible`, public, with a public no-argument constructor, because Core resolves it
  * with `Type.forName` under ADR-0017.
@@ -118,6 +119,17 @@ public with sharing class PaymentsHealthCheckExtension implements HealthCheckExt
 					'payments_waiting',
 					BarnHelp.text('Payments', 'Payments_Health_WaitingTitle'),
 					BarnHelp.text('Payments', 'Payments_Health_WaitingDetail'),
+					HealthCheckService.SEVERITY_WARNING
+				)
+			);
+		}
+		Datetime capHit = PaymentService.settings().Webhook_Cap_Hit_At__c;
+		if (capHit != null && capHit > Datetime.now().addHours(-24)) {
+			found.add(
+				finding(
+					'payments_cap_reached',
+					BarnHelp.text('Payments', 'Payments_Health_CapReachedTitle'),
+					BarnHelp.text('Payments', 'Payments_Health_CapReachedDetail'),
 					HealthCheckService.SEVERITY_WARNING
 				)
 			);

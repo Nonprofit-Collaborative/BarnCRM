@@ -5,6 +5,14 @@ import saveKeys from '@salesforce/apex/PaymentsSetupController.saveKeys';
 import clearKeys from '@salesforce/apex/PaymentsSetupController.clearKeys';
 import checkConnection from '@salesforce/apex/PaymentsSetupController.checkConnection';
 import scheduleProcessing from '@salesforce/apex/PaymentsSetupController.scheduleProcessing';
+import regenerateToken from '@salesforce/apex/PaymentsSetupController.regenerateToken';
+import BarnConfirmModal from 'c/barnConfirmModal';
+
+jest.mock(
+  '@salesforce/apex/PaymentsSetupController.regenerateToken',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
 
 jest.mock('@salesforce/apex/PaymentsSetupController.getSetup', () => ({ default: jest.fn() }), {
   virtual: true
@@ -160,6 +168,26 @@ describe('c-payments-setup', () => {
     expect(scheduleProcessing).toHaveBeenCalled();
     expect(find(element, 'scheduled')).not.toBeNull();
     expect(find(element, 'schedule')).toBeNull();
+  });
+
+  it('regenerates the token only after the admin confirms', async () => {
+    const element = await render(SETUP);
+    BarnConfirmModal.open.mockResolvedValue(false);
+    find(element, 'regenerate').click();
+    await flush();
+    expect(regenerateToken).not.toHaveBeenCalled();
+    BarnConfirmModal.open.mockResolvedValue(true);
+    regenerateToken.mockResolvedValue({
+      ...SETUP,
+      receivers: [{ ...SETUP.receivers[0], stripeUrl: 'https://new/stripe?token=b' }]
+    });
+    find(element, 'regenerate').click();
+    await flush();
+    expect(BarnConfirmModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({ confirmVariant: 'destructive' })
+    );
+    expect(regenerateToken).toHaveBeenCalledTimes(1);
+    expect(inputs(element, 'receivers')[0].value).toContain('token=b');
   });
 
   it('shows a general message when the page cannot load', async () => {

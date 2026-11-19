@@ -252,7 +252,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | F-01 Grants: install, roles, grants and their stages, the program a grant pays for, the Grant Pipeline tab | [funders.md](funders.md) | BarnCRM Grants |
 | F-02 Reporting requirements and deadlines: grant requirements, morning reminder tasks and emails, the Grants settings, overdue requirements in Health Check | [funders.md](funders.md#grant-requirements) | BarnCRM Grants |
 | F-05 Multi-year award schedules: payments, Build Schedule, Mark Received | [funders.md](funders.md#award-schedules) | BarnCRM Grants |
-| F-03 Restricted fund tracking: the restricted ledger, its balance, received payments entered for you, the Giving fund a grant is booked to | [funders.md](funders.md#restricted-funds) | BarnCRM Grants |
+| F-03 Restricted fund tracking: the restricted ledger, its balance, received payments entered for you, the Fundraising fund a grant is booked to | [funders.md](funders.md#restricted-funds) | BarnCRM Grants |
 | F-08 Deadline calendar: the Grant Calendar tab | [funders.md](funders.md#the-grant-calendar-tab) | BarnCRM Grants |
 | F-04 Government award fields: funding source, federal agency, Assistance Listing number, award number, indirect cost rate, match | [funders.md](funders.md#government-awards) | BarnCRM Grants |
 | F-14 Answer and boilerplate library: Grant Answers | [funders.md](funders.md#answer-library) | BarnCRM Grants |

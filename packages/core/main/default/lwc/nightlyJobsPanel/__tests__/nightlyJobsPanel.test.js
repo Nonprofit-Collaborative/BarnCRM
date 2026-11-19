@@ -93,7 +93,7 @@ describe('c-nightly-jobs-panel', () => {
 
   it('switches a step with a switch and starts one that allows it, from its row', async () => {
     const giving = {
-      key: 'BarnCRM Giving Installment Top Up',
+      key: 'BarnCRM Fundraising Installment Top Up',
       label: 'Installment top up',
       minute: 75,
       isOn: true,

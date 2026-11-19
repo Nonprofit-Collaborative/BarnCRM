@@ -72,11 +72,11 @@ const KINDS = [
     dataId: 'fund',
     none: 'No fund',
     saved: 'Saved',
-    title: 'Giving Fund',
+    title: 'Fund',
     icon: 'custom:custom42',
     recordId: 'a03000000000001AAA',
     recordName: 'Literacy Fund',
-    card: { title: 'Giving Fund' }
+    card: { title: 'Fund' }
   }
 ];
 

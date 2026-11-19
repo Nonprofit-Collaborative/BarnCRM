@@ -42,6 +42,10 @@ without a switch runs whenever its module is on):
 | 7:00 | Volunteer shift reminders | Volunteers | No switch |
 | 7:15 | Volunteer unfilled shift nudges | Volunteers | No switch (the **Send unfilled shift nudges** setting decides) |
 
+In Setup, **Scheduled Jobs**, every Fundraising job reads "BarnCRM Fundraising" and its name:
+Installment Top Up, Installments Overdue, Donor Levels, Ask Reminders, Opportunity Mirror, Gift
+Transaction Mirror, Acknowledgments and Pledge Reminders.
+
 The rollup recalculation goes over every record once a week (Sunday unless the **Night of the
 full recalculation** setting says otherwise) and over what changed on the other nights; see
 [How the Nightly Run Works](rollups.md#how-the-nightly-run-works).

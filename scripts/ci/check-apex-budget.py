@@ -298,7 +298,10 @@ CAPS = {
     # Named Credentials (N-13, D-209, ADR-0229): Stripe events fetched back from
     # Stripe, Check Connection for both processors and the Health Check credential test, in place
     # of the HMAC check and the key fields, 73,461 measured 2026-11-18, plus about 2%.
-    "payments": 74_900,
+    # Pre-batch review M1: the receiver's address token (made, compared in constant time,
+    # regenerated), the hourly cap Warning and its Health Check finding, 75,619 measured
+    # 2026-11-19; raised by 800.
+    "payments": 75_700,
     # LWC Builder (LB-01 to LB-06, ADR-0203 lwc builder module): the builder and renderer
     # controller, the App Builder picklist, access sync and post-install, 17,322 measured, plus
     # about 2%. LB-07 (D-196) charts by two groupings and three totals: 19,741 measured, plus
@@ -364,7 +367,9 @@ CAPS = {
     # Named Credentials (N-13, D-209, ADR-0229): Check Connection, the setup
     # page's credential list and stopping a run at the first credential failure, 24,072 measured
     # 2026-11-18, plus about 2%.
-    "addressverification": 24_550,
+    # Pre-batch review M2: no lookup is queued for a saver without principal access, and the
+    # missing access is logged once a day, 25,364 measured 2026-11-19; raised by 850.
+    "addressverification": 25_400,
     # Mirror: the NPSP gifts migration kit's extension (MIG-05), 187,295 measured, then the
     # Nonprofit Cloud gifts kit's (MIG-04), 195,957 measured, then the Nonprofit Cloud
     # relationships kit's (MIG-02), about 200,500 combined, plus about 1%.

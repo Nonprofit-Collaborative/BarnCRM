@@ -8,7 +8,7 @@
  */
 public with sharing class GiftTransactionMirrorSchedulable implements Schedulable {
 	/** The name the run was scheduled under, now the step's key. */
-	public static final String JOB_NAME = 'BarnCRM Mirror: Gift Transaction mirror';
+	public static final String JOB_NAME = 'BarnCRM Fundraising Gift Transaction Mirror';
 
 	/** Starts tonight's run, unless the mirror is off or a run is still going. */
 	public void execute(SchedulableContext context) {

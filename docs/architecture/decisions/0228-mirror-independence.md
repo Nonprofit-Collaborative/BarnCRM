@@ -114,8 +114,9 @@ place: the module catalog, the settings section, the settings object label, the 
 labels (Fundraising Admin, Fundraising Staff, Fundraising Read Only), help text, guides and the
 feature catalog. API names, the `giving` folder, class names, the `Giving` developer names and
 the package name in `sfdx-project.json` stay, as the Funders to Grants rename did (N-01). The
-scheduled job names (`BarnCRM Mirror Opportunity Mirror`, `BarnCRM Mirror: Gift Transaction
-mirror`) stay too: they are how an org's existing schedule is found.
+scheduled job names become `BarnCRM Fundraising Opportunity Mirror` and `BarnCRM Fundraising
+Gift Transaction Mirror`, the one style every Fundraising job uses (nothing is released, so no
+old name is looked for).
 
 ## Alternatives considered
 

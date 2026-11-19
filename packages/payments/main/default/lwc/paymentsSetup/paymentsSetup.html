@@ -40,6 +40,13 @@
                             </li>
                         </template>
                     </ul>
+                    <lightning-button
+                        class="slds-var-m-bottom_medium"
+                        label={labels.regenerate}
+                        disabled={locked}
+                        data-id="regenerate"
+                        onclick={handleRegenerate}
+                    ></lightning-button>
                 </template>
                 <template lwc:if={noManageShown}>
                     <c-barn-notice class="slds-var-m-bottom_small" variant="info" message={labels.noManage} data-id="no-manage"></c-barn-notice>

@@ -4,6 +4,8 @@ import saveKeys from '@salesforce/apex/PaymentsSetupController.saveKeys';
 import clearKeys from '@salesforce/apex/PaymentsSetupController.clearKeys';
 import checkConnection from '@salesforce/apex/PaymentsSetupController.checkConnection';
 import scheduleProcessing from '@salesforce/apex/PaymentsSetupController.scheduleProcessing';
+import regenerateToken from '@salesforce/apex/PaymentsSetupController.regenerateToken';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { iconFor } from 'c/barnIcons';
 
@@ -64,6 +66,9 @@ export default class PaymentsSetup extends LightningElement {
     },
     get schedule() {
       return helpText('Payments', 'Payments_Setup_Schedule');
+    },
+    get regenerate() {
+      return helpText('Payments', 'Payments_Setup_RegenerateToken');
     }
   };
 
@@ -179,6 +184,22 @@ export default class PaymentsSetup extends LightningElement {
   /** Scheduling stays the admin's click, never automatic (D-195). */
   handleSchedule() {
     return this.run(() => scheduleProcessing());
+  }
+
+  /** Replacing the token breaks the addresses already given, so it asks first. */
+  async handleRegenerate() {
+    const confirmed = await BarnConfirmModal.open({
+      size: 'small',
+      label: helpText('Payments', 'Payments_Setup_RegenerateTitle'),
+      message: helpText('Payments', 'Payments_Setup_RegenerateConfirm'),
+      confirmLabel: this.labels.regenerate,
+      confirmVariant: 'destructive',
+      cancelLabel: helpText('Payments', 'Payments_Setup_Cancel')
+    });
+    if (!confirmed) {
+      return undefined;
+    }
+    return this.run(() => regenerateToken());
   }
 
   handleClear(event) {

@@ -109,7 +109,9 @@ shown.
 4. Open **Payments Setup** in BarnCRM and select **Check Connection** on the Stripe card. It
    reads **Connected** and says which mode the key is for.
 5. Copy the **Stripe address** Payments Setup shows, for example
-   `https://yourorg.my.salesforce-sites.com/services/apexrest/barncrm/payments/v1/stripe`.
+   `https://yourorg.my.salesforce-sites.com/services/apexrest/barncrm/payments/v1/stripe?token=...`.
+   Copy all of it: the random token after the question mark is what lets Stripe's posts in, and
+   a post without it is refused and stores nothing.
 6. In Stripe, **Developers > Webhooks > Add endpoint**: paste the address and choose these
    events: `checkout.session.completed`, `checkout.session.async_payment_succeeded`,
    `checkout.session.async_payment_failed`, `checkout.session.expired`, `charge.refunded`,
@@ -164,6 +166,10 @@ It shows the address to give each processor and, for each processor, a card with
   connected and writes the detail to the Error Log. Checkouts start only for a connected
   processor.
 - For PayPal, the **PayPal Webhook ID** box and **Save Webhook ID**.
+- **Regenerate Token** (under the addresses, after a confirmation): BarnCRM made the token in
+  the addresses the first time you opened this page. Regenerating replaces it, so the addresses
+  already given to Stripe and PayPal stop working until you paste in the new ones. Use it if an
+  address may have been shared.
 - **Disconnect**: marks the processor not connected (and, for PayPal, clears the webhook id).
   The secrets stay on the External Credential until you remove them in Setup.
 
@@ -251,6 +257,12 @@ with no dependency on Payments: see the
   PayPal sandbox credentials fail to sign in when Mode is Live.
 - **The webhook pointed at the Salesforce login address** instead of the Site address shown on
   Payments Setup: the processor gets an error and nothing is recorded.
+- **The address pasted without its token**, or an old address after **Regenerate Token**: the
+  receiver answers 404 and stores nothing. Copy the full address from Payments Setup again.
+- **The hourly limit**: each processor's address stores at most 500 events an hour and refuses
+  the rest (the processor sends them again later). The first refusal each hour writes one
+  Warning to the Error Log and Health Check shows `Payment Receiver Hit Its Hourly Limit` for a
+  day. If the volume is not yours, regenerate the token.
 - **The webhook created before the processor is connected**: until **Check Connection** has
   succeeded (and, for PayPal, the webhook id is saved), the processor's address refuses every
   message and stores nothing. Stripe and PayPal retry, so connect soon after adding the webhook.
