@@ -66,7 +66,7 @@ private class DataDictionaryControllerTest {
 			Assert.isTrue(key.externalId, 'External ID.');
 			Assert.isTrue(key.isCustom, 'Custom.');
 			Assert.areEqual(
-				'The two records that are not duplicates of each other.',
+				'The two records that are not duplicates of each other, or the suggestion a match reason explains.',
 				key.helpText,
 				'Help text.'
 			);

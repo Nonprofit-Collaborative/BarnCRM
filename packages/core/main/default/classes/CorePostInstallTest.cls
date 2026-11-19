@@ -118,10 +118,19 @@ private class CorePostInstallTest {
 			Test.startTest();
 			upgrade(handler, installer);
 			Boolean onAfterUpgrade = FeatureSwitchService.isOn(FeatureSwitchService.DATA_MANAGER);
+			String storedAfterUpgrade = SettingsService.getSettings().Features_Turned_On__c;
+			// A list with a value is never changed (ADR-0230), so the new install starts from
+			// a fresh org's blank list, not from the upgraded one.
+			forgetSavedSettings();
 			install(handler, installer);
 			Test.stopTest();
 
 			Assert.isTrue(onAfterUpgrade, 'An upgraded org keeps every feature it used');
+			Assert.areEqual(
+				FeatureSwitchService.all().size(),
+				storedAfterUpgrade.split(',').size(),
+				'The upgrade stored every feature key, so a blank list never reads as on'
+			);
 			Assert.areEqual(
 				FeatureSwitchService.NONE_ON,
 				SettingsService.getSettings().Features_Turned_On__c,
@@ -289,9 +298,16 @@ private class CorePostInstallTest {
 			CorePostInstall.runAsSourceDeploy();
 
 			SettingsService.clearCaches();
-			Assert.isNull(
-				SettingsService.getSettings().Features_Turned_On__c,
+			String stored = SettingsService.getSettings().Features_Turned_On__c;
+			Assert.areNotEqual(
+				FeatureSwitchService.NONE_ON,
+				stored,
 				'An org already in use is never marked as a new install'
+			);
+			Assert.areEqual(
+				FeatureSwitchService.all().size(),
+				stored.split(',').size(),
+				'Its blank list is filled with every feature key (ADR-0230)'
 			);
 			Assert.isTrue(
 				FeatureSwitchService.isOn(FeatureSwitchService.DATA_MANAGER),

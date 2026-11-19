@@ -249,7 +249,9 @@ private class PaymentServiceTest {
 				),
 				null
 			);
-			runOnce();
+			// The next run is its own transaction, as each queued run is: Stripe is asked for the
+			// event again, and no callout may follow the first run's writes in this one.
+			System.enqueueJob(new PaymentEventProcessor.Run());
 			Test.stopTest();
 
 			Assert.areEqual(
