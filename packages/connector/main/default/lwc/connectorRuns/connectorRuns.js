@@ -90,6 +90,7 @@ export default class ConnectorRuns extends LightningElement {
         run.version,
         run.recordsWritten
       ),
+      reference: run.reference ? text('Connector_Runs_Reference', run.reference) : '',
       nextAttempt:
         run.status === 'Waiting' && run.nextAttemptAt
           ? text('Connector_Runs_NextAttempt', new Date(run.nextAttemptAt).toLocaleString())

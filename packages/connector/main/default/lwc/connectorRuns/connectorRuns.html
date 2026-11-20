@@ -30,6 +30,9 @@
                     </div>
                     <p class="slds-text-body_small">{openedRow.when}</p>
                     <p class="slds-text-body_small slds-var-m-bottom_x-small">{openedRow.detail}</p>
+                    <template lwc:if={openedRow.reference}>
+                        <p class="slds-text-body_small slds-var-m-bottom_x-small" data-id="opened-reference">{openedRow.reference}</p>
+                    </template>
                     <template lwc:if={openedRow.failure}>
                         <c-barn-notice class="slds-var-m-bottom_small" variant="error" message={openedRow.failure} data-id="opened-failure"></c-barn-notice>
                     </template>

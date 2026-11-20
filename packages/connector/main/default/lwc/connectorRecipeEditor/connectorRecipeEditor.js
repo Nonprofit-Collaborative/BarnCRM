@@ -23,6 +23,7 @@ import {
   runAsKey,
   STEP_KINDS,
   RECORD_KINDS,
+  CALL_KINDS,
   METHODS,
   OPERATORS,
   OUTCOMES,
@@ -139,6 +140,15 @@ export default class ConnectorRecipeEditor extends LightningElement {
     },
     get whenRecord() {
       return text('Connector_Editor_WhenRecord');
+    },
+    get whenWebhook() {
+      return text('Connector_Editor_WhenWebhook');
+    },
+    get urlFrom() {
+      return text('Connector_Editor_UrlFrom');
+    },
+    get urlFromHelp() {
+      return text('Connector_Editor_UrlFromHelp');
     },
     get triggerKind() {
       return text('Connector_Editor_TriggerKind');
@@ -454,7 +464,11 @@ export default class ConnectorRecipeEditor extends LightningElement {
   }
 
   get isManual() {
-    return !this.isSchedule && !this.isRecordChange;
+    return !this.isSchedule && !this.isRecordChange && !this.isWebhook;
+  }
+
+  get isWebhook() {
+    return this.trigger.kind === 'webhook';
   }
 
   get isSchedule() {
@@ -597,11 +611,16 @@ export default class ConnectorRecipeEditor extends LightningElement {
         isFind: step.kind === 'find',
         isRecord: RECORD_KINDS.includes(step.kind),
         isUpdate: step.kind === 'update',
-        isCall: step.kind === 'callApp',
+        isCall: CALL_KINDS.includes(step.kind),
+        isCallApp: step.kind === 'callApp',
+        pathHelp:
+          step.kind === 'sendWebhook'
+            ? text('Connector_Editor_WebhookPathHelp')
+            : this.labels.pathHelp,
         isIf: step.kind === 'if',
         isStop: step.kind === 'stop',
         canNest: step.kind === 'if' && row.depth < 1,
-        maps: step.kind === 'callApp' ? jsonMaps : recordMaps,
+        maps: CALL_KINDS.includes(step.kind) ? jsonMaps : recordMaps,
         hints: hints.join(', '),
         findConditions: this.findConditions(step),
         pathValues: list('pathValues'),
@@ -774,7 +793,16 @@ export default class ConnectorRecipeEditor extends LightningElement {
       const codes = readCodes(value);
       changes.success = codes === undefined ? [value] : codes;
     }
+    // An address from the data replaces the path, its values and its query (R-CR10).
+    if (field === 'urlFrom' && value) {
+      Object.assign(changes, { path: '', pathValues: [], query: [] });
+    }
     this.document = updateStep(this.document, address, changes);
+  }
+
+  /** The Webhook card's Event Id and reply. */
+  handleTriggerChange(event) {
+    this.document = updateTrigger(this.document, event.detail);
   }
 
   /** A Find step's saved query: its document is copied into the step. */

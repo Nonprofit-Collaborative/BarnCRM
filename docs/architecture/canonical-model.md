@@ -19143,17 +19143,19 @@ design Section 3.3a), which the receiver reads with the recipe it already finds 
 Step ids are 1 to 20 letters, digits or underscores, unique in the recipe. No string anywhere in
 the document may contain `{!` (security review F1).
 
-The kinds release 1.31 (CN-02) and 1.32 (CN-03: `schedule` and `record`) build, the others
-arriving with their slices:
+The kinds release 1.31 (CN-02) and 1.32 (CN-03: `schedule` and `record`; CN-04: `webhook` and
+`sendWebhook`) build, the others arriving with their slices:
 
 | Kind | Keys | Result for later steps |
 |---|---|---|
 | trigger `manual` | `sample` (optional JSON object for the editor's data pills and Test) | Input: Run Now's pasted JSON; the Flow action's `{ "recordId", "recordIds", "data" }` |
 | trigger `schedule` | `every` (`15m`, `hour`, `day` or `week`), `at` (`HH:MM`, 24 hour, the org's time zone; `day` and `week`), `day` (`MON` to `SUN`; `week`), `sample` | Input: `{ "scheduledAt" }` (R-CR6) |
 | trigger `record` | `query` (an R-SQ1 document copied from a saved query: the object, at most 20 fields and an optional filter), `savedQuery`, `on` (`created` or `changed`), `mode` (`each` or `batch`), `limit` (1 to 200, default 200), `sample` | Input: `each` `{ "recordId", "record": {field: value} }`; `batch` `{ "recordIds", "records" }` (R-CR6) |
+| trigger `webhook` | `eventId` (optional path whose value names the post, for duplicates), `reply` (`status` 200 or 202, default 202; `body`, fixed JSON text of at most 4,000 characters, `{reference}` filled with the run's Reference; `challenge`, optional name of one top-level field or query parameter echoed back), `sample` | Input: the posted JSON object; a posted list is `{ "items": [...] }`; a form post is its fields as text (R-CR9) |
 | `find` | `query` (an R-SQ1 document, copied from a saved query), `values` (`[{ "condition": <id>, "path" }]`, a path's value replaces that condition's value), `stopIfNone` | `{ "count", "records": [ {field: value} ] }`, at most 200 records |
 | `create`, `update`, `upsert` | `map` (a saved map's Id, `to.kind` record), `input` (the path the map reads from; blank is `trigger`); `update` also `recordId` (a path) | `{ "id", "action" }`, action created, updated or skipped |
-| `callApp` | `connection`, `method` (GET, POST, PUT, PATCH, DELETE), `path` (with `{name}` slots), `pathValues` and `query` (`[{ "name", "value" or "path" }]`), `headers` (`[{ "name", "value" or "path" }]`), `bodyMap` and `bodyInput` (a saved map with `to.kind` json), `success` (status codes; blank is 200 to 299), `notFoundOk` | `{ "status", "body" }`, the body parsed when it is JSON |
+| `callApp` | `connection`, `method` (GET, POST, PUT, PATCH, DELETE), `path` (with `{name}` slots), `pathValues` and `query` (`[{ "name", "value" or "path" }]`), `headers` (`[{ "name", "value" or "path" }]`), `bodyMap` and `bodyInput` (a saved map with `to.kind` json), `success` (status codes; blank is 200 to 299), `notFoundOk`, `urlFrom` (optional path to an address in the data, used in place of `path` under R-CR10: fetch back) | `{ "status", "body" }`, the body parsed when it is JSON |
+| `sendWebhook` | `connection`, `path` (optional; blank posts to the connection's own address), `urlFrom` (optional path to a callback address in the data, R-CR10), `headers`, `bodyMap` and `bodyInput`, `success`; always POST with a JSON body | `{ "status", "body" }` |
 | `if` | `conditions` (`[{ "path", "operator", "value" }]`, R-R2 operator names: equals, not equals, contains, does not contain, starts with, greater than, less than, is null, is not null), `match` (`all` or `any`), `then`, `otherwise` | `{ "branch" }` |
 | `stop` | `outcome` (Succeeded, Skipped or Failed), `message` | none |
 
@@ -19161,7 +19163,7 @@ A `callApp` path starts with one `/`, and neither the path nor any value put int
 value or a header holds `@`, `\`, `{!`, a carriage return or a line feed; each value put into the
 path or the query is URL-encoded; a header is never `Authorization`, `Host`, `Cookie`,
 `Content-Length` or `Transfer-Encoding` (F1, F4). The request goes to `callout:<connection>` plus
-that path, never to a typed address.
+that path, never to a typed address. The same rules hold for `sendWebhook`.
 **R-CR2 Checked on Publish,** as the publisher and against the identity's access, and against
 the catalog; a recipe whose connection is disconnected or whose map is gone cannot be published.
 For BarnCRM Automation the identity's access is that of the permission sets assigned to the
@@ -19230,6 +19232,31 @@ user is chosen, or it is inactive (error, "Integration User inactive"), or it la
 Connections (warning); runs Queued for more than 30 minutes (warning); recipes Paused by
 Failures (warning); Active recipes whose Record Owner is inactive (warning); Pause All Recipes
 on (info).
+**R-CR9 Webhooks in** (CN-04; design Section 3.3, review F13). A `webhook` recipe receives posts
+at `<Site address>/services/apexrest/barncrm/connector/v1/hook`, with its token in the
+`X-BarnCRM-Token` header or, for apps that cannot send headers, `?token=`. The token is 64
+hexadecimal characters from 256 random bits, shown once by New Webhook Token (Connector admins)
+and stored only as its SHA-256 hash in Webhook Token Hash; a new token replaces the old one. The
+Site guest only stores: a post with no token, an unknown one, or one for a recipe never
+published is answered 404 with an empty body and stores nothing; a body over 131,072
+characters 413; a body that is neither JSON nor form fields 415 or 400; a post past the
+recipe's Webhook Hourly Cap (1 to 5,000, default 500) in the last hour 429, the first refusal
+each hour writing one Error Log warning naming the recipe. Otherwise one Run is inserted,
+Received, Started By Webhook, its Input the posted data and its Reference 20 random characters,
+and the lane's start event is published; the runner takes Received runs as it takes Queued
+ones, as the recipe's identity. A Paused recipe still stores posts and runs them on Resume. When
+`eventId` names a value, Event Key is the recipe Id and that value, so a resend is dropped and
+answered as the first was. The reply is the trigger's `reply`: its status and fixed body (never
+a record or a step's result), or the challenge value as plain text; a refused post is never
+given a body. The token never appears in a run, a log or an error.
+**R-CR10 Fetch back and callback addresses** (CN-04; design Section 3.3a, review F4). A
+`callApp` or `sendWebhook` step's `urlFrom` reads an address from the data (an app's resource
+URL, or a `response_url` a post carries). It is used only when it is `https`, has no user
+information or fragment, and has the step's connection's exact host and port (ignoring capitals)
+and starts with the connection's own path; then only its remaining path and query are appended
+to `callout:<connection>`, under R-CR1's path rules. Anything else fails the step; the posted
+address is never the endpoint. `sendWebhook` always POSTs a JSON body built from its map and
+retries as Call an App does (R-CR7).
 
 ### Salesforce implementation
 
@@ -19829,6 +19856,7 @@ mirrors the primary member).
 | 1.72 | 2026-11-20 | BarnCRM Connector connections (CN-01, D-215, D-216, release 1.31; ADR-NEXT `NEXT-integration-module.md`). No object added (the suite stays at 197; Connector Recipe and Connector Run follow in CN-02). Section 29CN1 records a connection as an External Credential and Named Credential pair named `BarnConn_<connector>_<6 random>`, with rules R-CN1 to R-CN8. The Admin Journal's `Kind__c` gains Connection and `Status__c` gains Key Replaced (R-CN6). |
 | 1.73 | 2026-11-20 | BarnCRM Connector recipes and runs (CN-02, CN-06, D-215, release 1.31; design Appendix A.3 and A.4). Two objects added, 197 to 199 in the suite: Section 29CN2 Connector Recipe (`Connector_Recipe__c`, R-CR1 to R-CR5) and Section 29CN3 Connector Run (`Connector_Run__c`, R-RUN1 to R-RUN4), and the platform event `Connector_Start__e`. R-CN7 gives BarnCRM Connections to the Automated Process user through Recipe Access; R-CN8 refuses Delete of a connection a recipe names. |
 | 1.74 | 2026-11-20 | BarnCRM Connector recipe clock (CN-03, D-215, release 1.32). Connector Recipe gains `Watermark__c`, `Next_Run_At__c`, `Consecutive_Failures__c`, `Pause_After_Failures__c`, `Retry_Attempts__c`, `Keep_Runs_Days__c` and `Ignore_Own_Changes__c`; Connector Run gains `Next_Attempt_At__c`. New custom setting Section 29CN4 Connector Settings (`Connector_Settings__c`, R-CS1) and platform event `Connector_Start_User__e`. R-CR1 adds the `schedule` and `record` triggers, R-CR4 the Integration User lane, and new R-CR6 (clock), R-CR7 (retries and pause) and R-CR8 (Health Check). No object added (custom settings are not counted). |
+| 1.75 | 2026-11-20 | BarnCRM Connector webhooks in and sending data back (CN-04, D-216, release 1.32). Connector Recipe gains `Webhook_Token_Hash__c` and `Webhook_Hourly_Cap__c`; Connector Run gains `Event_Key__c` and `Reference__c` (all defined in CN-02). R-CR1 adds the `webhook` trigger, the `sendWebhook` step and `urlFrom`; new R-CR9 (the receiver) and R-CR10 (fetch back and callback addresses). New permission set `BarnCRM_Connector_Webhook_Guest`. No object added. |
 
 ---
 ## 32. Entity ownership by package

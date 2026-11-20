@@ -156,7 +156,7 @@ public inherited sharing class ConnectorStepRunner {
 				done.add(id);
 				continue;
 			}
-			if (budget.low() || (kind == 'callApp' && budget.wrote)) {
+			if (budget.low() || (ConnectorRecipeDocument.CALL_KINDS.contains(kind) && budget.wrote)) {
 				throw new CheckpointException();
 			}
 			Long started = System.currentTimeMillis();
@@ -220,8 +220,8 @@ public inherited sharing class ConnectorStepRunner {
 		if (ConnectorRecipeDocument.RECORD_KINDS.contains(kind)) {
 			return saveRecord(kind, step);
 		}
-		if (kind == 'callApp') {
-			return callApp(step);
+		if (ConnectorRecipeDocument.CALL_KINDS.contains(kind)) {
+			return callApp(kind, step);
 		}
 		StoppedException stop = new StoppedException(ConnectorRecipeDocument.textOf(step.get('message')));
 		stop.outcome = ConnectorRecipeDocument.textOf(step.get('outcome'));
@@ -337,23 +337,37 @@ public inherited sharing class ConnectorStepRunner {
 	// Call an App (F1, F4)
 	// ---------------------------------------------------------------------------------------
 
-	private Object callApp(Map<String, Object> step) {
+	/**
+	 * Call an App, and Send to Webhook (always POST, R-CR10). An address read from the data
+	 * (`urlFrom`: fetch back, or a callback) is held to the connection's host and only its path
+	 * and query are used (F4).
+	 */
+	private Object callApp(String kind, Map<String, Object> step) {
 		String connection = ConnectorRecipeDocument.textOf(step.get('connection'));
-		String method = ConnectorRecipeDocument.textOf(step.get('method'));
+		String method = kind == 'sendWebhook' ? 'POST' : ConnectorRecipeDocument.textOf(step.get('method'));
 		String path = ConnectorRecipeDocument.textOf(step.get('path'));
-		if (!connection.startsWith(ConnectorConnections.PREFIX) || ConnectorRecipeDocument.pathProblem(path)) {
+		String urlFrom = ConnectorRecipeDocument.textOf(step.get('urlFrom'));
+		if (
+			!connection.startsWith(ConnectorConnections.PREFIX) ||
+			(String.isBlank(urlFrom) && ConnectorRecipeDocument.requestPathProblem(kind, path))
+		) {
 			throw failure(BarnHelp.text('Connector', 'Connector_Run_ErrorRequest'));
 		}
-		for (Object raw : ConnectorRecipeDocument.listOf(step.get('pathValues'))) {
-			Map<String, Object> slot = ConnectorRecipeDocument.mapOf(raw);
-			path = path.replace('{' + slot.get('name') + '}', encoded(valueOf(slot)));
+		String address;
+		if (String.isNotBlank(urlFrom)) {
+			address = ConnectorWebhooks.calloutAddress(ConnectorMapRuntime.text(pill(urlFrom)), connection);
+		} else {
+			for (Object raw : ConnectorRecipeDocument.listOf(step.get('pathValues'))) {
+				Map<String, Object> slot = ConnectorRecipeDocument.mapOf(raw);
+				path = path.replace('{' + slot.get('name') + '}', encoded(valueOf(slot)));
+			}
+			List<String> pairs = new List<String>();
+			for (Object raw : ConnectorRecipeDocument.listOf(step.get('query'))) {
+				Map<String, Object> pair = ConnectorRecipeDocument.mapOf(raw);
+				pairs.add(encoded(ConnectorRecipeDocument.textOf(pair.get('name'))) + '=' + encoded(valueOf(pair)));
+			}
+			address = path + (pairs.isEmpty() ? '' : '?' + String.join(pairs, '&'));
 		}
-		List<String> pairs = new List<String>();
-		for (Object raw : ConnectorRecipeDocument.listOf(step.get('query'))) {
-			Map<String, Object> pair = ConnectorRecipeDocument.mapOf(raw);
-			pairs.add(encoded(ConnectorRecipeDocument.textOf(pair.get('name'))) + '=' + encoded(valueOf(pair)));
-		}
-		String address = path + (pairs.isEmpty() ? '' : '?' + String.join(pairs, '&'));
 		HttpRequest request = new HttpRequest();
 		request.setEndpoint('callout:' + connection + address);
 		request.setMethod(method);

@@ -16,6 +16,7 @@ export const STEP_KINDS = [
   { value: 'update', key: 'Connector_Step_Update' },
   { value: 'upsert', key: 'Connector_Step_Upsert' },
   { value: 'callApp', key: 'Connector_Step_CallApp' },
+  { value: 'sendWebhook', key: 'Connector_Step_SendWebhook' },
   { value: 'if', key: 'Connector_Step_If' },
   { value: 'stop', key: 'Connector_Step_Stop' }
 ];
@@ -42,8 +43,15 @@ export const RUN_AS_USER = 'IntegrationUser';
 export const TRIGGERS = [
   { value: 'manual', key: 'Connector_Trigger_Manual' },
   { value: 'schedule', key: 'Connector_Trigger_Schedule' },
-  { value: 'record', key: 'Connector_Trigger_Record' }
+  { value: 'record', key: 'Connector_Trigger_Record' },
+  { value: 'webhook', key: 'Connector_Trigger_Webhook' }
 ];
+/** The steps that make a request through a connection. */
+export const CALL_KINDS = ['callApp', 'sendWebhook'];
+/** A webhook trigger's reply when the recipe sets none (R-CR9). */
+export const DEFAULT_REPLY = '{"received": true, "reference": "{reference}"}';
+export const MAX_REPLY = 4000;
+const FIELD_NAME = /^[A-Za-z0-9_.-]{1,100}$/;
 export const EVERY = ['15m', 'hour', 'day', 'week'];
 export const DAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 export const STAMPS = ['created', 'changed'];
@@ -91,6 +99,13 @@ export function setTrigger(document, kind) {
     next.trigger = { kind, every: 'day', at: '08:00', sample };
   } else if (kind === 'record') {
     next.trigger = { kind, query: null, savedQuery: '', on: 'changed', mode: 'each', sample };
+  } else if (kind === 'webhook') {
+    next.trigger = {
+      kind,
+      eventId: '',
+      reply: { status: 202, body: DEFAULT_REPLY, challenge: '' },
+      sample
+    };
   } else {
     next.trigger = { kind: 'manual', sample };
   }
@@ -138,7 +153,32 @@ export function triggerProblem(trigger) {
         !(Number.isInteger(most) && most >= 1 && most <= MAX_POLLED));
     return bad ? 'Connector_Recipe_ErrorRecordTrigger' : null;
   }
+  if (starter.kind === 'webhook') {
+    return webhookProblem(starter) ? 'Connector_Recipe_ErrorWebhook' : null;
+  }
   return null;
+}
+
+/** True when a webhook trigger's event id path or reply breaks R-CR9 (the server's twin). */
+function webhookProblem(starter) {
+  const reply = starter.reply || {};
+  const body = typeof reply.body === 'string' ? reply.body : '';
+  const challenge = reply.challenge || '';
+  let jsonBody = true;
+  if (body) {
+    try {
+      JSON.parse(body);
+    } catch {
+      jsonBody = false;
+    }
+  }
+  return (
+    Boolean(starter.eventId && !isPill(starter.eventId)) ||
+    (reply.status !== undefined && reply.status !== null && ![200, 202].includes(reply.status)) ||
+    body.length > MAX_REPLY ||
+    !jsonBody ||
+    Boolean(challenge && (!FIELD_NAME.test(challenge) || challenge.toLowerCase() === 'token'))
+  );
 }
 
 /** The help key naming a Run As value. */
@@ -153,6 +193,9 @@ export function runAsKey(runAs) {
 export function triggerKindKey(kind) {
   if (kind === 'Schedule') {
     return 'Connector_Trigger_Schedule';
+  }
+  if (kind === 'Webhook') {
+    return 'Connector_Trigger_Webhook';
   }
   return kind === 'RecordChange' ? 'Connector_Trigger_Record' : 'Connector_Trigger_Manual';
 }
@@ -204,6 +247,18 @@ export function newStep(document, kind) {
       bodyInput: 'trigger',
       success: [],
       notFoundOk: false
+    });
+  } else if (kind === 'sendWebhook') {
+    Object.assign(step, {
+      connection: '',
+      path: '',
+      urlFrom: '',
+      pathValues: [],
+      query: [],
+      headers: [],
+      bodyMap: '',
+      bodyInput: 'trigger',
+      success: []
     });
   } else if (kind === 'if') {
     Object.assign(step, {
@@ -380,6 +435,7 @@ function stepProblem(step, label) {
         ? { key: 'Connector_Recipe_ErrorRecordId', args: at }
         : null;
     case 'callApp':
+    case 'sendWebhook':
       return callProblem(step, at);
     case 'if': {
       const conditions = step.conditions || [];
@@ -404,10 +460,17 @@ function callProblem(step, at) {
   if (!step.connection) {
     return { key: 'Connector_Recipe_ErrorConnection', args: at };
   }
-  if (!METHODS.includes(step.method)) {
+  if (step.kind === 'callApp' && !METHODS.includes(step.method)) {
     return { key: 'Connector_Recipe_ErrorMethod', args: at };
   }
-  if (pathProblem(step.path)) {
+  const fromData = Boolean(step.urlFrom);
+  const badPath = fromData
+    ? !isPill(step.urlFrom) ||
+      Boolean(step.path) ||
+      (step.pathValues || []).length > 0 ||
+      (step.query || []).length > 0
+    : !(step.kind === 'sendWebhook' && !step.path) && pathProblem(step.path);
+  if (badPath) {
     return { key: 'Connector_Recipe_ErrorRequestPath', args: at };
   }
   const slots = slotsOf(step.path);
@@ -526,7 +589,7 @@ export function pathSuggestions(document, beforeStep) {
       );
     } else if (RECORD_KINDS.includes(step.kind)) {
       found.push(`${base}.id`, `${base}.action`);
-    } else if (step.kind === 'callApp') {
+    } else if (CALL_KINDS.includes(step.kind)) {
       found.push(`${base}.status`, `${base}.body`);
     }
   }
@@ -565,6 +628,7 @@ export function statusVariant(status) {
       Skipped: 'neutral',
       Draft: 'neutral',
       Queued: 'info',
+      Received: 'info',
       Running: 'info',
       Waiting: 'warning',
       Failed: 'error',

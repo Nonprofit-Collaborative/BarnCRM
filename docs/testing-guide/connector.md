@@ -1,6 +1,6 @@
 # BarnCRM Connector
 
-Scripts for the optional BarnCRM Connector module, release 1.31: creating Connections of each sign-in kind, the one Setup step with Check Again, checking, replacing, disconnecting and deleting, the refusals that keep keys safe, access and Health Check (CN-01, T-CN-01 to T-CN-06); Recipe Access, recipes, Test, Publish, Run Now, Run History, Retry, Run As and the merge-field guard (CN-02, T-CN-07 to T-CN-12); the Flow actions and Where Used (CN-06, T-CN-13 and T-CN-14); the recipe clock, Schedule and Record Change triggers, retries, pausing, the integration user, Health Check and the nightly cleanup (CN-03, release 1.32, T-CN-15 to T-CN-20). Setup detail: [BarnCRM Connector](../admin-guide/connector.md).
+Scripts for the optional BarnCRM Connector module, release 1.31: creating Connections of each sign-in kind, the one Setup step with Check Again, checking, replacing, disconnecting and deleting, the refusals that keep keys safe, access and Health Check (CN-01, T-CN-01 to T-CN-06); Recipe Access, recipes, Test, Publish, Run Now, Run History, Retry, Run As and the merge-field guard (CN-02, T-CN-07 to T-CN-12); the Flow actions and Where Used (CN-06, T-CN-13 and T-CN-14); the recipe clock, Schedule and Record Change triggers, retries, pausing, the integration user, Health Check and the nightly cleanup (CN-03, release 1.32, T-CN-15 to T-CN-20); webhooks in, their refusals, fetch back and Send to Webhook (CN-04, release 1.32, T-CN-21 to T-CN-23). Setup detail: [BarnCRM Connector](../admin-guide/connector.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core and BarnCRM Connector deployed, and an HTTPS test endpoint that echoes requests (for example a free request bin you control). Use made-up keys such as `test-key-1234`; never a real one.
 
@@ -289,3 +289,53 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 |---|---|---|
 | 1 | Open BarnCRM Settings, **Nightly Jobs**. | **Connector Cleanup** at 2:40, switched on. |
 | 2 | Set the recipe's **Keep Runs Days** to 7. The next morning, open Run History. | Finished runs older than 7 days are gone; Queued and Waiting runs and newer runs remain. If the clock was stopped, it is going again. |
+
+## T-CN-21: A Webhook Recipe
+
+**Purpose:** confirm a post with the token is kept at once, answered with its reference and run as the recipe's Run As.
+**Prerequisites:** admin, after T-CN-08 (the `Contact by Email` map); an active Salesforce Site (Setup, **Sites**); a terminal with `curl`.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Health Check**. | A warning **Site Guest Missing Webhook Access** names the Site. Select **Give Webhook Access**: the finding is gone, and the Site's guest user holds **BarnCRM Connector Webhook Guest**. |
+| 2 | New recipe `Gifts In`: **When** **Another App Sends Data**. Before saving, the **Webhook** card says **Save the draft to get a webhook address and token.** Save Draft. | The card shows the Site's **Address**, the **Header** `X-BarnCRM-Token` and **No token yet**. |
+| 3 | Select **New Webhook Token**. | **Copy the token now.** The token and the **Address With Token** are shown. Copy both. |
+| 4 | Paste `{"id":"evt_1","email":"ada@example.org","last":"Lovelace"}` as sample data. Add a **Create or Update a Record** step using `Contact by Email`, reading `trigger`. Set **Event Id** `trigger.id` and **Reply Status** 200. Publish. | Publish succeeds. The value path hints list `trigger.email`. |
+| 5 | Run `curl -i -X POST -H "X-BarnCRM-Token: <token>" -H "Content-Type: application/json" -d '{"id":"evt_1","email":"ada@example.org","last":"Lovelace"}' "<address>"`. | `200` at once, with the body `{"received": true, "reference": "..."}`. |
+| 6 | Open Run History. | A run started by **Webhook**, with the same **Reference**, Succeeded within a minute or two; the Contact exists. |
+| 7 | Send the same `curl` again. | The same reply and reference; no second run. |
+| 8 | Send it once more with `"id":"evt_2"` to the **Address With Token** and no header. | Accepted; a second run. |
+| 9 | Pause the recipe and post `evt_3`. | Accepted; the run shows **Received** and waits. Select **Resume**: it runs. |
+
+**Cleanup:** Keep `Gifts In` for T-CN-22; delete the test Contact.
+
+## T-CN-22: Webhook Refusals
+
+**Purpose:** confirm the receiver refuses everything without a valid token with an empty 404, and enforces its size, type and hourly limits.
+**Prerequisites:** admin, after T-CN-21.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Post with no token, with a made-up 64-character token, and with `?token=abc`. | Each answers `404` with an empty body. Run History shows nothing new. |
+| 2 | On `Gifts In`, select **New Webhook Token** and confirm **Replace the Webhook Token?**. Post with the old token. | `404`. The new token is accepted. |
+| 3 | Post a body of 140,000 characters; then `{not json` with JSON content type; then `<a/>` with `Content-Type: application/xml`. | `413`, `400` and `415`, each with an empty body; nothing kept. |
+| 4 | Post form fields `email=ada%40example.org&last=Lovelace` with `Content-Type: application/x-www-form-urlencoded`. | Accepted; the run's data holds `email` and `last` as text and no `token`. |
+| 5 | Set **Webhook Hourly Cap** to 1 and **Save Cap**, then post twice. | The second is `429`. One Error Log warning names `Gifts In`; a third post adds no second warning. Set the cap back to 500. |
+| 6 | Set **Reply Body** to `{"name": "{!$User.Email}"}` and publish. | Refused: **A recipe cannot hold a Salesforce merge field.** Set it back to the default. |
+| 7 | Open the Site guest user's permission sets in Setup and **BarnCRM Connector Webhook Guest**. | Apex class access to the receiver and Read and Create on the two Connector Start events only: no object, field or record access. |
+
+**Cleanup:** None.
+
+## T-CN-23: Fetch Back and Send to Webhook
+
+**Purpose:** confirm a recipe reads the item back from the app and sends data back over a connection, and that an address in the data never reaches another host.
+**Prerequisites:** admin, after T-CN-21; a Generic REST connection `Echo` to your HTTPS echo endpoint (base path `/hooks`); a Secret URL connection `Chat` to a request bin standing in for a chat app's incoming webhook.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On `Gifts In`, add a first step **Call an App** over `Echo`, GET, **Address From the Data** `trigger.resource_url`. | The path, path values and query clear. |
+| 2 | Add a last step **Send to Webhook** over `Chat`, path blank, with a JSON body map holding the email. Publish. | Publish succeeds. |
+| 3 | Post `{"id":"evt_9","email":"ada@example.org","resource_url":"https://<echo host>/hooks/orders/9?expand=x"}`. | The run Succeeded. The echo endpoint received GET `/hooks/orders/9?expand=x`; the chat request bin received one POST with the mapped body. |
+| 4 | Post `evt_10` with `resource_url` set to `https://evil.example/hooks/orders/9`, then to `http://<echo host>/hooks/orders/9`, then to `https://<echo host>/other/9`. | Each run Failed at the first step: **The address read from the data was not used, so nothing was sent...** Neither endpoint received anything for these runs. |
+
+**Cleanup:** Delete `Gifts In`, `Echo` and `Chat`.

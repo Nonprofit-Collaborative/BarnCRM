@@ -19,6 +19,8 @@ public with sharing class BarnCRMShippedPermissionSets {
 		'BarnCRM_Bulk_Delete',
 		'BarnCRM_Bulk_Update',
 		'BarnCRM_Connector_Admin',
+		'BarnCRM_Connector_Viewer',
+		'BarnCRM_Connector_Webhook_Guest',
 		'BarnCRM_Duplicate_Review',
 		'BarnCRM_Erase_People',
 		'BarnCRM_Find_And_Export',

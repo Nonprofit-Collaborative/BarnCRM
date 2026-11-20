@@ -10,19 +10,35 @@
  *   F12);
  * - recipes that run as System, with who chose it and when (info, CN-02);
  * - Active BarnCRM Automation recipes while Recipe Access was never saved (warning, CN-02);
- * - the CN-03 clock checks of canonical model R-CR8 (`ConnectorClockChecks`).
+ * - the CN-03 clock checks of canonical model R-CR8 (`ConnectorClockChecks`);
+ * - while a recipe receives webhooks (CN-04): no active Site, and Site guest users without
+ *   `BarnCRM_Connector_Webhook_Guest` (fix: assign it) (`ConnectorWebhooks`).
  *
  * `@NamespaceAccessible`, public, with a public no-argument constructor, because Core resolves it
  * with `Type.forName` under ADR-0017.
  */
 @NamespaceAccessible
-public with sharing class ConnectorHealthCheckExtension implements HealthCheckExtension {
+public with sharing class ConnectorHealthCheckExtension implements HealthCheckExtension, HealthCheckFixExtension {
 	private static final String MODULE = ConnectorConnections.MODULE;
 	private static final Integer REPLACED_DAYS = 7;
 
 	@NamespaceAccessible
 	public ConnectorHealthCheckExtension() {
 		// Built by name from Core (HealthCheckExtensions), so it needs a public constructor.
+	}
+
+	public List<String> fixScope(String fixKey) {
+		return fixKey == ConnectorWebhooks.FIX_GUEST ? ConnectorWebhooks.sitesWithoutGuestAccess() : null;
+	}
+
+	public String fixLabel(String fixKey) {
+		return fixKey == ConnectorWebhooks.FIX_GUEST
+			? BarnHelp.text('Connector', 'Connector_Health_WebhookGuest_Fix')
+			: null;
+	}
+
+	public String runFix(String fixKey, List<String> scope) {
+		return fixKey == ConnectorWebhooks.FIX_GUEST ? ConnectorWebhooks.grantGuestAccess(scope) : null;
 	}
 
 	public List<HealthCheckService.Finding> findings() {
@@ -98,6 +114,7 @@ public with sharing class ConnectorHealthCheckExtension implements HealthCheckEx
 			}
 			found.addAll(recipeFindings());
 			found.addAll(ConnectorClockChecks.findings());
+			found.addAll(ConnectorWebhooks.findings());
 		} catch (Exception e) {
 			found.add(HealthCheckService.checkFailed('connector', e));
 		}

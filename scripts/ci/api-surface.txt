@@ -36,6 +36,8 @@ connector/ConnectorRunRecipeAction.cls | global class ConnectorRunRecipeAction
 connector/ConnectorRunRecipeAction.cls | global class Request
 connector/ConnectorRunRecipeAction.cls | global class Result
 connector/ConnectorRunRecipeAction.cls | global static List<Result> run(List<Request>)
+connector/ConnectorWebhookRest.cls | global class ConnectorWebhookRest
+connector/ConnectorWebhookRest.cls | global static void receive()
 connector/ConnectorWhereUsedExtension.cls | public ConnectorWhereUsedExtension()
 connector/ConnectorWhereUsedExtension.cls | public class ConnectorWhereUsedExtension
 contactpoints/ContactPointAccountHandler.cls | public ContactPointAccountHandler()

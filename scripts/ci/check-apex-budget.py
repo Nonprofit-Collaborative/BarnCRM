@@ -392,7 +392,10 @@ CAPS = {
     # Raised 2026-11-20 for CN-03 the recipe clock (the lane heartbeat, Schedule and Record Change
     # triggers, retries with backoff and auto-pause, the integration user and its subscriber
     # write, Health Check findings, the nightly cleanup): 140,100 measured, plus about 2%.
-    "connector": 142_900,
+    # Raised 2026-11-20 for CN-04 webhooks in and sending data back (the receiver, the Webhook
+    # card's controller, Send to Webhook, Address From the Data, the guest Health Check fix):
+    # 174,338 measured on the stacked CN-03 head (170,634 there before CN-04), plus about 2%.
+    "connector": 177_800,
     # Mirror: the NPSP gifts migration kit's extension (MIG-05), 187,295 measured, then the
     # Nonprofit Cloud gifts kit's (MIG-04), 195,957 measured, then the Nonprofit Cloud
     # relationships kit's (MIG-02), about 200,500 combined, plus about 1%.

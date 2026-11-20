@@ -19,7 +19,8 @@ public with sharing class ConnectorRecipes {
 	private static final Map<String, String> KIND_BY_TRIGGER = new Map<String, String>{
 		'manual' => MANUAL,
 		'schedule' => SCHEDULE,
-		'record' => RECORD_CHANGE
+		'record' => RECORD_CHANGE,
+		'webhook' => ConnectorWebhooks.WEBHOOK
 	};
 
 	/** Pause After Failures, 1 to 100; blank or out of range is 10 (R-CR7). */
@@ -158,6 +159,9 @@ public with sharing class ConnectorRecipes {
 		/** When a Waiting run is tried again (R-CR7). */
 		@AuraEnabled
 		public Datetime nextAttemptAt;
+		/** A webhook run's reference, as its app was given it (R-CR9). */
+		@AuraEnabled
+		public String reference;
 		/** Opened only: the step log and, for a Test run, what each step would have done. */
 		@AuraEnabled
 		public String stepLogJson;
@@ -443,13 +447,14 @@ public with sharing class ConnectorRecipes {
 			if (kind == 'find') {
 				QueryCompiler.compile(JSON.serialize(step.get('query')));
 			}
-			String mapId = ConnectorRecipeDocument.textOf(step.get(kind == 'callApp' ? 'bodyMap' : 'map'));
+			Boolean calls = ConnectorRecipeDocument.CALL_KINDS.contains(kind);
+			String mapId = ConnectorRecipeDocument.textOf(step.get(calls ? 'bodyMap' : 'map'));
 			if (String.isBlank(mapId)) {
 				return found;
 			}
 			ConnectorMapRuntime.SavedMap saved = ConnectorMapRuntime.load(mapId, AccessLevel.USER_MODE);
 			String objectName = ConnectorMapRuntime.objectOf(saved.document);
-			Boolean wantsRecord = kind != 'callApp';
+			Boolean wantsRecord = !calls;
 			if (wantsRecord == String.isBlank(objectName)) {
 				found.add(BarnHelp.text('Connector', 'Connector_Publish_MapKind', new List<Object>{ id, saved.name }));
 				return found;
@@ -704,7 +709,7 @@ public with sharing class ConnectorRecipes {
 		String query =
 			'SELECT Id, Name, Recipe__c, Recipe__r.Name, Status__c, Started_By__c, Ran_As__c, ' +
 			'Recipe_Version__c, CreatedDate, Finished_At__c, Records_Written__c, Failed_Step__c, ' +
-			'Error_Message__c, Is_Test__c, Attempt__c, Next_Attempt_At__c' +
+			'Error_Message__c, Is_Test__c, Attempt__c, Next_Attempt_At__c, Reference__c' +
 			(runId == null ? '' : ', Step_Log_JSON__c, State_JSON__c') +
 			' FROM Connector_Run__c' +
 			(runId != null ? ' WHERE Id = :runId' : (recipeId != null ? ' WHERE Recipe__c = :recipeId' : '')) +
@@ -742,6 +747,7 @@ public with sharing class ConnectorRecipes {
 		result.isTest = row.Is_Test__c;
 		result.attempt = row.Attempt__c == null ? 0 : row.Attempt__c.intValue();
 		result.nextAttemptAt = row.Next_Attempt_At__c;
+		result.reference = row.Reference__c;
 		if (opened) {
 			result.stepLogJson = row.Step_Log_JSON__c;
 			// A Test run shows what each step would have written or sent (R-CR5).
