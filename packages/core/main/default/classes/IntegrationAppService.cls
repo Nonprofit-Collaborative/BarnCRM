@@ -80,8 +80,9 @@ public with sharing class IntegrationAppService {
 	private static final String MIGRATION_MODULE = 'Migration';
 
 	/** Stands in for whether the Migration package is installed, in tests. */
+	@NamespaceAccessible
 	@TestVisible
-	private static Boolean migrationInstalledOverride;
+	public static Boolean migrationInstalledOverride;
 
 	/**
 	 * Test seam for the Migration package's tests, where `@TestVisible` does not reach: the
@@ -172,6 +173,7 @@ public with sharing class IntegrationAppService {
 	}
 
 	/** Whether the Migration package (the Migration Assistant tab) is installed. */
+	@NamespaceAccessible
 	public static Boolean migrationInstalled() {
 		if (migrationInstalledOverride != null) {
 			return migrationInstalledOverride;

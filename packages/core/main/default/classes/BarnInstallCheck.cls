@@ -16,29 +16,35 @@
  */
 global with sharing class BarnInstallCheck {
 	/**
-	 * Runs every Health Check. Returns `findings` (Integer, how many), `errors` (Integer, how
-	 * many have Error severity) and `errorFindings` (List<String>, `key: title` per error).
+	 * Runs every Health Check. Returns `available` (Boolean, false when the Org Optimizer module,
+	 * which holds Health Check, is not installed), `findings` (Integer, how many), `errors`
+	 * (Integer, how many have Error severity) and `errorFindings` (List<String>, `key: title` per
+	 * error).
 	 */
 	global static Map<String, Object> runHealthCheck() {
 		requireSetupAccess();
-		List<HealthCheckService.Finding> findings = HealthCheckService.run();
+		List<HealthCheckService.Finding> findings = HealthCheckService.runInstalled();
 		List<String> errors = new List<String>();
-		for (HealthCheckService.Finding finding : findings) {
+		for (HealthCheckService.Finding finding : findings == null ? new List<HealthCheckService.Finding>() : findings) {
 			if (finding.severity == HealthCheckService.SEVERITY_ERROR) {
 				errors.add(finding.key + ': ' + finding.title);
 			}
 		}
 		return new Map<String, Object>{
-			'findings' => findings.size(),
+			'available' => findings != null,
+			'findings' => findings == null ? 0 : findings.size(),
 			'errors' => errors.size(),
 			'errorFindings' => errors
 		};
 	}
 
-	/** Starts the sample data load (SampleDataLoader.load); throws when it is already loaded. */
+	/**
+	 * Starts the sample data load in the Sample Data package (`SampleDataHost`); throws when it
+	 * is already loaded, or when that package is not installed.
+	 */
 	global static void loadSampleData() {
 		requireSetupAccess();
-		SampleDataLoader.load();
+		SampleDataModules.requireHost().load();
 	}
 
 	/**

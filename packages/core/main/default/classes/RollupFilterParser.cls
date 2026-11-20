@@ -164,16 +164,19 @@ public with sharing class RollupFilterParser {
 	 * Renders a filter document over one object with every value in a bind variable. The clause
 	 * is empty when the document is; the binder carries the values and the display rendering.
 	 */
+	@NamespaceAccessible
 	public static FilterValueBinder toBoundClause(String filterDocument, String objectApiName) {
 		return toBoundClause(filterDocument, new FilterValueBinder(objectApiName));
 	}
 
 	/** The same, with bind names of the caller's own prefix (C-36, related records). */
+	@NamespaceAccessible
 	public static FilterValueBinder toBoundClause(String filterDocument, String objectApiName, String bindPrefix) {
 		return toBoundClause(filterDocument, new FilterValueBinder(objectApiName, bindPrefix));
 	}
 
-	private static FilterValueBinder toBoundClause(String filterDocument, FilterValueBinder binder) {
+	@NamespaceAccessible
+	public static FilterValueBinder toBoundClause(String filterDocument, FilterValueBinder binder) {
 		binder.clause = compile(filterDocument, binder, null);
 		return binder;
 	}

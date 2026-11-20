@@ -5,6 +5,7 @@
  * never needs the schedule changed. Entries past their retention (R-E6) are deleted by the
  * nightly Record Cleanup step (`RecordRetentionBatch`).
  */
+@NamespaceAccessible
 public with sharing class ErrorDigestScheduler implements Schedulable {
 	/** The name the job was scheduled under, now the step's key. */
 	public static final String JOB_NAME = 'BarnCRM Error Digest';
@@ -18,6 +19,7 @@ public with sharing class ErrorDigestScheduler implements Schedulable {
 	}
 
 	/** Switches the daily run on, scheduling the nightly run when it is not. */
+	@NamespaceAccessible
 	public static Id start() {
 		return NightlyJobs.turnOn(JOB_NAME);
 	}
@@ -42,6 +44,7 @@ public with sharing class ErrorDigestScheduler implements Schedulable {
 	}
 
 	/** When the digest step runs next, or null when it is not scheduled. */
+	@NamespaceAccessible
 	public static Datetime nextRunAt() {
 		return isScheduled() ? NightlyJobs.nextRunAt(step()) : null;
 	}

@@ -215,19 +215,6 @@ private class JobNotificationPathsTest {
 	}
 
 	@IsTest
-	static void fieldUtilizationOnDemandSendsNothing() {
-		System.runAs(TestUsers.admin()) {
-			notifications(true);
-
-			// Field utilization counts on demand on its own tab (ADR-0101): the count runs while
-			// the person watches the page, so no job is left to tell them about.
-			FieldUtilizationController.countFields('Contact', new List<String>{ 'LastName' });
-
-			Assert.areEqual(0, JobNotifier.sent.size(), 'An on-demand count sends no notice');
-		}
-	}
-
-	@IsTest
 	static void seasonalAddressRunNowOpensAddresses() {
 		System.runAs(TestUsers.admin()) {
 			notifications(true);

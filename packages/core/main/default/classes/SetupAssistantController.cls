@@ -34,6 +34,9 @@ public with sharing class SetupAssistantController {
 		public List<AccessService.Role> roles;
 		@AuraEnabled
 		public Boolean importAvailable;
+		/** Whether the BarnCRM Sample Data package, which holds the Sample Data tab, is installed. */
+		@AuraEnabled
+		public Boolean sampleDataAvailable;
 	}
 
 	/**
@@ -274,6 +277,7 @@ public with sharing class SetupAssistantController {
 		state.modules = ModuleDetectionService.getModules();
 		state.roles = roles();
 		state.importAvailable = ModuleDetectionService.isImportPresent();
+		state.sampleDataAvailable = ModuleDetectionService.isInstalled(ModuleDetectionService.MODULE_SAMPLE_DATA);
 		return state;
 	}
 

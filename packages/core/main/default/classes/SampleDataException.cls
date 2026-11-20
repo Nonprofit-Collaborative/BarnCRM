@@ -3,5 +3,6 @@
  * is already present. Always caught, logged through ErrorLogger, and rethrown so the
  * caller (SampleDataController) can surface a clear message to the LWC.
  */
+@NamespaceAccessible
 public with sharing class SampleDataException extends Exception {
 }

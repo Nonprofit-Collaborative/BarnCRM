@@ -5,7 +5,9 @@
  * ADR-0082 A2), then gives BarnCRM's permission sets access with `FieldPermissions` rows. The
  * wizard polls `check` until the field is in describe.
  */
+@NamespaceAccessible
 public with sharing class ImportNewFieldService {
+	@NamespaceAccessible
 	public static final String CONNECTION = 'Barn_Org_Connection';
 	public static final String API_VERSION = '67.0';
 	public static final String LOG_CONTEXT = 'Import: create field ';
@@ -44,14 +46,17 @@ public with sharing class ImportNewFieldService {
 		'BarnCRM_Read_Only' => false
 	};
 
+	@NamespaceAccessible
 	@TestVisible
-	private static Boolean systemPermissionOverride;
+	public static Boolean systemPermissionOverride;
 	/** Stands in for "the Named Credential exists" in tests. */
+	@NamespaceAccessible
 	@TestVisible
-	private static Boolean connectedOverride;
+	public static Boolean connectedOverride;
 	/** Stands in for the Named Credential's callout status in tests ('Enabled' or 'Disabled'). */
+	@NamespaceAccessible
 	@TestVisible
-	private static String calloutStatusOverride;
+	public static String calloutStatusOverride;
 	private static final String ENABLED = 'Enabled';
 
 	/** The field the admin asked for. `apiName` is without `__c`. */
@@ -66,10 +71,13 @@ public with sharing class ImportNewFieldService {
 		public Id permissionSetId;
 	}
 
+	@NamespaceAccessible
 	public class Connection {
+		@NamespaceAccessible
 		@AuraEnabled
 		public Boolean canCreate = false;
 		/** Set up and enabled for callouts: a field can be created. */
+		@NamespaceAccessible
 		@AuraEnabled
 		public Boolean connected = false;
 		/** Set up, but Enabled for Callouts is off: the admin turns it on in Setup. */

@@ -21,6 +21,7 @@
  * account will accept a value in one, so the record type decides the write and not the
  * org shape. See personAccountIdsAmong.
  */
+@NamespaceAccessible
 public with sharing class AddressService {
 	@TestVisible
 	private static Boolean isPropagating = false;
@@ -53,6 +54,7 @@ public with sharing class AddressService {
 	/** The three address statuses (R-AD10). A blank reads as Current. */
 	public static final String STATUS_CURRENT = 'Current';
 	public static final String STATUS_FORMER = 'Former';
+	@NamespaceAccessible
 	public static final String STATUS_UNDELIVERABLE = 'Undeliverable';
 
 	private static final String RECORD_TYPE_HOUSEHOLD = 'Household';

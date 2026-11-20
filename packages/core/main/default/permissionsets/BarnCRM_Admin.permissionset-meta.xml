@@ -11,10 +11,6 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
-    <apexClass>AccessExplorerController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
     <apexClass>AddressMoveController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -47,14 +43,6 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
-    <apexClass>DataDictionaryController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>DataHygieneController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
     <apexClass>DataManagerController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -83,15 +71,7 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
-    <apexClass>FieldAccessController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
     <apexClass>FieldHistoryController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>FieldUtilizationController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -120,10 +100,6 @@
   </classAccesses>
   <classAccesses>
     <apexClass>GetHouseholdSummaryAction</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>HealthCheckController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -156,14 +132,6 @@
   </classAccesses>
   <classAccesses>
     <apexClass>OrgAutomationController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>OrgOptimizerSetupController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>OrgOptimizerStorageController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -207,14 +175,6 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
-    <apexClass>ReportSubscriptions</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>SampleDataController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
     <apexClass>SeasonalAddressController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -224,10 +184,6 @@
   </classAccesses>
   <classAccesses>
     <apexClass>SetupAssistantController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>SetupChangeController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>

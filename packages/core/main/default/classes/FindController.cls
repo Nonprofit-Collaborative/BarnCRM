@@ -158,6 +158,7 @@ public with sharing class FindController {
 	}
 
 	/** Runs a document with the person's own access. */
+	@NamespaceAccessible
 	@AuraEnabled
 	public static QueryResult runQuery(String queryJson) {
 		try {
@@ -376,6 +377,7 @@ public with sharing class FindController {
 	 * Saves a query under a name: a new one when recordId is empty, otherwise the person's own.
 	 * The document is compiled first, so a query that would not run is never saved.
 	 */
+	@NamespaceAccessible
 	@AuraEnabled
 	public static FindPage saveQuery(String recordId, String name, String queryJson, Boolean shared) {
 		try {
@@ -501,6 +503,7 @@ public with sharing class FindController {
 	}
 
 	/** Whether an object is offered for querying; field utilization offers objects by it too. */
+	@NamespaceAccessible
 	public static Boolean isOffered(Schema.DescribeSObjectResult objectDescribe) {
 		return objectDescribe.isAccessible() &&
 			objectDescribe.isQueryable() &&

@@ -10,6 +10,7 @@
  * `Manage_BarnCRM_Settings`; that check is the authorization for what the job does later, as
  * in ADR-0027. `resumeAll` and a second pause cancel it first, so there is never more than one.
  */
+@NamespaceAccessible
 public with sharing class AutomationResumeJob implements Schedulable {
 	/** The name the job carries, so it can be found, replaced and cancelled. */
 	public static final String JOB_NAME = 'BarnCRM Automation Resume';
@@ -56,6 +57,7 @@ public with sharing class AutomationResumeJob implements Schedulable {
 	 * later: a job that fired a fraction of a second before the end would find the pause still
 	 * running and leave it alone.
 	 */
+	@NamespaceAccessible
 	public static Id scheduleAt(Datetime pauseEnds) {
 		return schedule(pauseEnds, pauseEnds.addSeconds(1));
 	}

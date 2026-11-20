@@ -2,19 +2,14 @@
  * Health Check: what this org looks like, whether BarnCRM is set up to match, who can
  * get in, and what is currently in the way (plan Section 4.8, feature C-11).
  *
- * This class holds the vocabulary every check shares (the Finding, the severities, the
- * categories, the fix targets), the order the checks are read in, and the report the panel
- * receives. What each check actually says lives in one of three classes grouped by the
- * question it asks, so adding a check means reading one of them rather than all of them
- * (ADR-0039):
- *
- * - HealthCheckOrgShapeChecks: what is installed, and whether the mode matches it.
- * - HealthCheckAccessChecks: who administers the app and who cannot see it. Only asked of a
- *   viewer who may manage settings.
- * - HealthCheckSettingsChecks: automation, fiscal year, Error Log, and
- *   the package defaults and nightly run a fix button can restore (C-21, ADR-0048).
- * - HealthCheckHouseholdChecks: whether everyone is in a household and every household has
- *   somebody in it. Detection only, with no fix button (C-21, ADR-0048).
+ * This class is the seam Health Check's checks are written against: the vocabulary every check
+ * shares (the Finding, the severities, the categories, the fix targets), the report the panel
+ * receives, the limit guard, and the isolated run of every installed module's extension. The
+ * runner itself, Core's own checks in reading order, the fixes and the panel are the Org
+ * Optimizer module's (`HealthCheckRunner`, ADR-NEXT
+ * `NEXT-org-optimizer-and-sample-data-modules.md`), so a module's checks and Core's own check
+ * contributors (`BrandShareJob`, `FieldHistoryService`, `ModuleSetups`, `AddressMatchKeyHandler`)
+ * compile without it. `runInstalled()` reaches the runner by name when the module is installed.
  *
  * A dependent package that owns data Core may not name (a gift, a receipt, an accounting
  * period) adds its own findings through `HealthCheckExtension`, found by `HealthCheckExtensions` with
@@ -31,7 +26,7 @@
  * the class itself, `Finding` with its constructor, `withFix` and `withLinks`, `Link` with its
  * constructor, the vocabulary constants Giving's findings use (`SEVERITY_INFO`,
  * `SEVERITY_WARNING`, `CATEGORY_ACCESS`, `CATEGORY_SETTINGS`, `FIX_CUSTOM_PERMISSIONS_URL`),
- * `canManageSettings()`, and `run()`, which `GivingHealthCheckExtensionTest`
+ * `canManageSettings()`, and `extensionFindings()`, which `GivingHealthCheckExtensionTest`
  * calls directly to prove Core reaches the installed extension. A severity, category or method a
  * future extension needs and this one does not gets annotated when that extension is built, not
  * ahead of it.
@@ -56,6 +51,7 @@ public with sharing class HealthCheckService {
 
 	@NamespaceAccessible
 	public static final String CATEGORY_ORG_SHAPE = 'OrgShape';
+	@NamespaceAccessible
 	public static final String CATEGORY_LICENSES = 'Licenses';
 	@NamespaceAccessible
 	public static final String CATEGORY_ACCESS = 'Access';
@@ -70,8 +66,11 @@ public with sharing class HealthCheckService {
 	 */
 	@NamespaceAccessible
 	public static final String FIX_ACTION_PREFIX = 'action:';
+	@NamespaceAccessible
 	public static final String FIX_APPLY_RECOMMENDED_MODE = 'action:applyRecommendedMode';
+	@NamespaceAccessible
 	public static final String FIX_APPLY_JUNCTION_MEMBERSHIP = 'action:applyJunctionMembership';
+	@NamespaceAccessible
 	public static final String FIX_ENABLE_AUTOMATIC_HOUSEHOLDS = 'action:enableAutomaticHouseholds';
 
 	/**
@@ -80,9 +79,13 @@ public with sharing class HealthCheckService {
 	 * once. The key is what follows the action prefix in the fix target. A dependent package's
 	 * fixes are its own keys, answered by its `HealthCheckFixExtension` (ADR-0125).
 	 */
+	@NamespaceAccessible
 	public static final String FIX_KEY_RESTORE_AUTOMATION_SWITCHES = 'restoreAutomationSwitches';
+	@NamespaceAccessible
 	public static final String FIX_KEY_RESTORE_IMPORT_TEMPLATES = 'restoreImportTemplates';
+	@NamespaceAccessible
 	public static final String FIX_KEY_SCHEDULE_NIGHTLY_JOBS = 'scheduleNightlyJobs';
+	@NamespaceAccessible
 	public static final String FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS = 'rescheduleInactiveOwnerJobs';
 	public static final String FIX_KEY_FILL_MATCH_KEYS = 'fillMatchKeys';
 
@@ -90,6 +93,7 @@ public with sharing class HealthCheckService {
 	 * What a finding puts between the job names it lists. A job name can hold a comma
 	 * ("Installment top up, 1:15 AM"), so a comma between them would run two jobs together.
 	 */
+	@NamespaceAccessible
 	public static final String JOB_SEPARATOR = '; ';
 
 	/**
@@ -111,6 +115,7 @@ public with sharing class HealthCheckService {
 	 * exactly what the administrator read in the confirm box, never what changed since
 	 * (ADR-0048 condition 5).
 	 */
+	@NamespaceAccessible
 	public static List<String> fixScope(String fixKey) {
 		if (FIX_KEY_RESTORE_AUTOMATION_SWITCHES.equals(fixKey)) {
 			return AutomationControl.missingDefaultNames();
@@ -156,10 +161,14 @@ public with sharing class HealthCheckService {
 	/** The page state parameter that tells the console which section to open. */
 	public static final String SECTION_STATE_PARAMETER = 'section';
 
+	@NamespaceAccessible
 	public static final String SECTION_GENERAL = 'General';
 	/** The People box of People and Households, where the way of belonging lives (P1). */
+	@NamespaceAccessible
 	public static final String SECTION_PEOPLE = SettingSections.PEOPLE;
+	@NamespaceAccessible
 	public static final String SECTION_ACCESS = 'Access';
+	@NamespaceAccessible
 	public static final String SECTION_AUTOMATION = 'Automation';
 
 	/**
@@ -167,8 +176,11 @@ public with sharing class HealthCheckService {
 	 * assigns) that mean "this person uses BarnCRM", and the permission set that means
 	 * "this person administers it". See packages/core/integration/c-07-c-11.permissions.md.
 	 */
+	@NamespaceAccessible
 	public static final String GROUP_ADMIN = 'BarnCRM_Admin_Group';
+	@NamespaceAccessible
 	public static final String PERMISSION_SET_ADMIN = 'BarnCRM_Admin';
+	@NamespaceAccessible
 	public static final Set<String> BARNCRM_GROUPS = new Set<String>{
 		GROUP_ADMIN,
 		'Fundraising_Staff',
@@ -180,6 +192,7 @@ public with sharing class HealthCheckService {
 	 * The packaged permission sets themselves. An administrator who assigned one of these
 	 * directly, rather than through a role, has still given that person the app.
 	 */
+	@NamespaceAccessible
 	public static final Set<String> BARNCRM_PERMISSION_SETS = new Set<String>{
 		PERMISSION_SET_ADMIN,
 		'BarnCRM_Staff',
@@ -197,57 +210,56 @@ public with sharing class HealthCheckService {
 	public static final String MANAGE_SETTINGS = BarnCRMPermissions.MANAGE_SETTINGS;
 
 	/**
-	 * Test injection points, null in every real transaction: a check that always throws, and
-	 * an exception for the Error Log call to throw. Between them they prove that one failing
-	 * check, and a logger that is itself broken, still leave the rest of the report standing.
+	 * Test injection point, null in every real transaction: an exception for the Error Log call
+	 * to throw. It proves that a logger that is itself broken still leaves the rest of the
+	 * report standing.
 	 */
+	@NamespaceAccessible
 	@TestVisible
-	private static Check faultInjection;
-
-	@TestVisible
-	private static Exception loggerFault;
+	public static Exception loggerFault;
 
 	/**
 	 * Past these, the remaining checks are left for another run (D-200 P7): about 80 of the
 	 * 100 queries, 7 of the 10 seconds of CPU, 40,000 of the 50,000 query rows. A test
 	 * lowers them.
 	 */
+	@NamespaceAccessible
 	@TestVisible
-	private static Integer queryBudget = 80;
+	public static Integer queryBudget = 80;
 	@TestVisible
 	private static Integer cpuBudget = 7000;
 	@TestVisible
 	private static Integer rowBudget = 40000;
 
-	/**
-	 * Where the two access counts come from. Injected in tests so that the findings are
-	 * asserted against numbers the test chose, not against whichever people and permission
-	 * sets happen to exist in the org the tests run in.
-	 */
-	@TestVisible
-	private static AccessCounts accessCountsOverride;
-
 	/** One thing Health Check has to say about this org. */
 	@NamespaceAccessible
 	public class Finding {
+		@NamespaceAccessible
 		@AuraEnabled
 		public String key;
+		@NamespaceAccessible
 		@AuraEnabled
 		public String title;
+		@NamespaceAccessible
 		@AuraEnabled
 		public String detail;
+		@NamespaceAccessible
 		@AuraEnabled
 		public String severity;
 		@AuraEnabled
 		public String fixLabel;
+		@NamespaceAccessible
 		@AuraEnabled
 		public String fixTarget;
+		@NamespaceAccessible
 		@AuraEnabled
 		public String category;
 		/** What the fix would change, as fixScope computed it for this report. */
+		@NamespaceAccessible
 		@AuraEnabled
 		public List<String> fixScope;
 		/** Records the finding is about, to open one by one. Never a fix. */
+		@NamespaceAccessible
 		@AuraEnabled
 		public List<Link> links;
 
@@ -308,6 +320,7 @@ public with sharing class HealthCheckService {
 	/** One record a finding names, with where to open it. */
 	@NamespaceAccessible
 	public class Link {
+		@NamespaceAccessible
 		@AuraEnabled
 		public String label;
 		@AuraEnabled
@@ -323,22 +336,31 @@ public with sharing class HealthCheckService {
 	/** Everything the panel needs in one round trip. */
 	@NamespaceAccessible
 	public class Report {
+		@NamespaceAccessible
 		@AuraEnabled
 		public List<Finding> findings;
+		@NamespaceAccessible
 		@AuraEnabled
 		public OrgShapeDetector.OrgShape orgShape;
+		@NamespaceAccessible
 		@AuraEnabled
 		public String orgShapeSummary;
+		@NamespaceAccessible
 		@AuraEnabled
 		public String currentMode;
+		@NamespaceAccessible
 		@AuraEnabled
 		public String currentModeLabel;
+		@NamespaceAccessible
 		@AuraEnabled
 		public String recommendedMode;
+		@NamespaceAccessible
 		@AuraEnabled
 		public String recommendedModeLabel;
+		@NamespaceAccessible
 		@AuraEnabled
 		public Boolean modeNeedsAttention;
+		@NamespaceAccessible
 		@AuraEnabled
 		public Boolean canManageSettings;
 
@@ -353,15 +375,18 @@ public with sharing class HealthCheckService {
 		@AuraEnabled
 		public String sectionStateKey;
 		/** After a fix: what it created or scheduled, and what it left out. Null otherwise. */
+		@NamespaceAccessible
 		@AuraEnabled
 		public String fixOutcome;
 		/**
 		 * The keys of the checks this run left because it stopped early to stay inside the
 		 * limits, for Run Remaining Checks; empty when every check ran (D-208, N-07).
 		 */
+		@NamespaceAccessible
 		@AuraEnabled
 		public List<String> skippedChecks;
 
+		@NamespaceAccessible
 		public Report() {
 			this.findings = new List<Finding>();
 			this.skippedChecks = new List<String>();
@@ -386,99 +411,20 @@ public with sharing class HealthCheckService {
 	 * One check. Returning null means there is nothing to report, which is the normal case
 	 * for most of them.
 	 */
+	@NamespaceAccessible
 	public interface Check {
 		Finding run();
 	}
 
 	/**
-	 * How many people administer BarnCRM, and how many active people cannot see it at
-	 * all. Both are questions about the whole org, which is why only an administrator is
-	 * allowed to ask them.
-	 */
-	public interface AccessCounts {
-		Integer administrators();
-		Integer usersWithoutAccess();
-	}
-
-	/** The real counts, read from the org. */
-	private class OrgAccessCounts implements AccessCounts {
-		public Integer administrators() {
-			return UserAccessSelector.countActiveAssignees(new Set<String>{ GROUP_ADMIN }) +
-				UserAccessSelector.countActiveDirectAssignees(new Set<String>{ PERMISSION_SET_ADMIN });
-		}
-
-		public Integer usersWithoutAccess() {
-			Set<Id> assigned = UserAccessSelector.getAssignedUserIds(BARNCRM_GROUPS);
-			assigned.addAll(UserAccessSelector.getPermissionSetAssigneeIds(BARNCRM_PERMISSION_SETS));
-			return UserAccessSelector.countActiveStandardUsersExcluding(assigned);
-		}
-	}
-
-	private static AccessCounts accessCounts() {
-		return accessCountsOverride == null ? new OrgAccessCounts() : accessCountsOverride;
-	}
-
-	/** A check and the key its failure is reported under. */
-	private class CheckStep {
-		private final String key;
-		private final Check check;
-
-		private CheckStep(String key, Check check) {
-			this.key = key;
-			this.check = check;
-		}
-	}
-
-	/**
-	 * Every finding, in the order an administrator should read them.
-	 *
-	 * A check that throws becomes one finding of its own; the rest still run, because a
-	 * report that hides eight answers because the ninth failed is worse than no report.
+	 * Every finding of a full Health Check, or null when the Org Optimizer module, which holds
+	 * the runner, is not installed (`HealthCheckRun`, ADR-0057). A null is never a clean org: the
+	 * caller says Health Check is not available.
 	 */
 	@NamespaceAccessible
-	public static List<Finding> run() {
-		return run(null);
-	}
-
-	/**
-	 * The keys of the checks the last run in this transaction left because it stopped early to
-	 * stay inside the limits; empty when every check ran.
-	 */
-	private static List<String> lastSkipped = new List<String>();
-
-	/**
-	 * The same, running only the checks whose keys are given (null for all of them): how
-	 * Run Remaining Checks runs just the checks an earlier run left (D-208, N-07).
-	 */
-	private static List<Finding> run(Set<String> only) {
-		List<Finding> findings = new List<Finding>();
-		List<String> skipped = new List<String>();
-
-		for (CheckStep step : steps()) {
-			if (only != null && !only.contains(step.key)) {
-				continue;
-			}
-			if (!skipped.isEmpty() || nearLimits()) {
-				skipped.add(step.key);
-				continue;
-			}
-			try {
-				Finding finding = step.check.run();
-				if (finding != null) {
-					findings.add(finding);
-				}
-			} catch (Exception e) {
-				findings.add(checkFailed(step.key, e));
-			}
-		}
-
-		findings.addAll(extensionFindings(skipped, only));
-		if (!skipped.isEmpty()) {
-			findings.add(notChecked(skipped));
-		}
-		lastSkipped = skipped;
-
-		return findings;
+	public static List<Finding> runInstalled() {
+		HealthCheckRun runner = (HealthCheckRun) ModuleExtensions.first(HealthCheckRun.class);
+		return runner == null ? null : runner.findings();
 	}
 
 	/**
@@ -493,87 +439,21 @@ public with sharing class HealthCheckService {
 			Limits.getQueryRows() > rowBudget;
 	}
 
-	/** One finding naming, as an administrator reads them, the checks left for another run. */
-	private static Finding notChecked(List<String> keys) {
-		Map<String, String> labels = stepLabels();
-		List<String> names = new List<String>();
-		for (String key : keys) {
-			names.add(labels.containsKey(key) ? labels.get(key) : extensionLabel(key));
-		}
-		return new Finding(
-			'not_checked',
-			BarnHelp.text('Core', 'Core_HealthCheck_NotCheckedTitle'),
-			String.format(
-				BarnHelp.text('Core', 'Core_HealthCheck_NotCheckedDetail'),
-				new List<Object>{ keys.size(), String.join(names, ', ') }
-			),
-			SEVERITY_WARNING,
-			CATEGORY_SETTINGS
-		);
-	}
-
-	/** Each of Core's own check steps by the name an administrator reads, keyed by step key. */
-	private static Map<String, String> stepLabels() {
-		return new Map<String, String>{
-			'org_shape' => BarnHelp.text('Core', 'Core_HealthCheck_Step_OrgShape'),
-			'coexistence_mode' => BarnHelp.text('Core', 'Core_HealthCheck_Step_CoexistenceMode'),
-			'membership_mode' => BarnHelp.text('Core', 'Core_HealthCheck_Step_MembershipMode'),
-			'membership_data' => BarnHelp.text('Core', 'Core_HealthCheck_Step_MembershipData'),
-			'household_creation' => BarnHelp.text('Core', 'Core_HealthCheck_Step_HouseholdCreation'),
-			'npsp_upkeep_overlap' => BarnHelp.text('Core', 'Core_HealthCheck_Step_NpspUpkeepOverlap'),
-			'native_households' => BarnHelp.text('Core', 'Core_HealthCheck_Step_NativeHouseholds'),
-			'native_household_collision' => BarnHelp.text('Core', 'Core_HealthCheck_Step_NativeHouseholdCollision'),
-			'mirror_module' => BarnHelp.text('Core', 'Core_HealthCheck_Step_MirrorModule'),
-			'brand_visibility' => BarnHelp.text('Core', 'Core_HealthCheck_Step_BrandVisibility'),
-			'multi_currency' => BarnHelp.text('Core', 'Core_HealthCheck_Step_MultiCurrency'),
-			'admin_role' => BarnHelp.text('Core', 'Core_HealthCheck_Step_AdminRole'),
-			'users_without_access' => BarnHelp.text('Core', 'Core_HealthCheck_Step_UsersWithoutAccess'),
-			'access_checks_need_admin' => BarnHelp.text('Core', 'Core_HealthCheck_Step_AccessChecks'),
-			'automation' => BarnHelp.text('Core', 'Core_HealthCheck_Step_Automation'),
-			'field_history' => BarnHelp.text('Core', 'Core_HealthCheck_Step_FieldHistory'),
-			'fiscal_year' => BarnHelp.text('Core', 'Core_HealthCheck_Step_FiscalYear'),
-			'organization_record_type' => BarnHelp.text('Core', 'Core_HealthCheck_Step_OrganizationRecordType'),
-			'error_log' => BarnHelp.text('Core', 'Core_HealthCheck_Step_ErrorLog'),
-			'error_digest' => BarnHelp.text('Core', 'Core_HealthCheck_Step_ErrorDigest'),
-			'people_without_household' => BarnHelp.text('Core', 'Core_HealthCheck_Step_PeopleWithoutHousehold'),
-			'households_without_members' => BarnHelp.text('Core', 'Core_HealthCheck_Step_HouseholdsWithoutMembers'),
-			'household_ownership_skew' => BarnHelp.text('Core', 'Core_HealthCheck_Step_HouseholdOwnershipSkew'),
-			'relationships_without_person' => BarnHelp.text('Core', 'Core_HealthCheck_Step_RelationshipsWithoutPerson'),
-			'affiliations_without_person' => BarnHelp.text('Core', 'Core_HealthCheck_Step_AffiliationsWithoutPerson'),
-			'automation_switches' => BarnHelp.text('Core', 'Core_HealthCheck_Step_AutomationSwitches'),
-			'import_templates' => BarnHelp.text('Core', 'Core_HealthCheck_Step_ImportTemplates'),
-			'nightly_jobs' => BarnHelp.text('Core', 'Core_HealthCheck_Step_NightlyJobs'),
-			'jobs_inactive_owner' => BarnHelp.text('Core', 'Core_HealthCheck_Step_JobsInactiveOwner'),
-			'module_setup' => BarnHelp.text('Core', 'Core_HealthCheck_Step_ModuleSetup'),
-			'match_keys' => BarnHelp.text('Core', 'Core_HealthCheck_Step_MatchKeys')
-		};
-	}
-
-	/**
-	 * A module extension's checks by the module's name (`addressverification_extension` reads
-	 * "Address Verification module checks"), found from the class it is registered under. A key
-	 * that is neither is shown as it is.
-	 */
-	private static String extensionLabel(String key) {
-		for (String className : HealthCheckExtensions.EXTENSION_CLASSES) {
-			String module = className.removeEnd('HealthCheckExtension');
-			if ((module.toLowerCase() + '_extension').equals(key)) {
-				return String.format(
-					BarnHelp.text('Core', 'Core_HealthCheck_Step_Extension'),
-					new List<Object>{ String.join(module.splitByCharacterTypeCamelCase(), ' ') }
-				);
-			}
-		}
-		return key;
+	/** Every installed module's findings, each isolated: how a module's test sees Core reach it. */
+	@NamespaceAccessible
+	public static List<Finding> extensionFindings() {
+		return extensionFindings(new List<String>(), null);
 	}
 
 	/**
 	 * Findings a dependent package adds through `HealthCheckExtension` (G-20 follow-up,
 	 * ADR-0057), isolated the same way a check that throws is: the rest of the report still
 	 * stands, and the failure is written to the Error Log rather than shown as this package's
-	 * own answer.
+	 * own answer. An extension the run reaches near the limits is added to `skipped` instead;
+	 * `only`, when not null, limits the run to those keys.
 	 */
-	private static List<Finding> extensionFindings(List<String> skipped, Set<String> only) {
+	@NamespaceAccessible
+	public static List<Finding> extensionFindings(List<String> skipped, Set<String> only) {
 		List<Finding> all = new List<Finding>();
 		Map<String, HealthCheckExtension> byKey = HealthCheckExtensions.findAll();
 		for (String key : byKey.keySet()) {
@@ -597,165 +477,12 @@ public with sharing class HealthCheckService {
 	}
 
 	/**
-	 * The checks to run, in reading order. The access and Error Log counts are only asked
-	 * for when the viewer can actually see the answer: a person without the administrator
-	 * permission sees their own permission set assignments and nothing else, and a count
-	 * taken from that is confidently wrong, which is worse than no count at all. The package
-	 * defaults checks are gated the same way, because only that viewer can press their fix,
-	 * and so are the household counts, which are read with the viewer's own access.
-	 */
-	private static List<CheckStep> steps() {
-		List<CheckStep> steps = new List<CheckStep>();
-		if (faultInjection != null) {
-			steps.add(new CheckStep('injected', faultInjection));
-		}
-
-		steps.add(new CheckStep('org_shape', new HealthCheckOrgShapeChecks.OrgShapeCheck()));
-		steps.add(new CheckStep('coexistence_mode', new HealthCheckOrgShapeChecks.CoexistenceModeCheck()));
-		steps.add(new CheckStep('membership_mode', new HealthCheckOrgShapeChecks.MembershipModeCheck()));
-		steps.add(new CheckStep('membership_data', new HealthCheckOrgShapeChecks.MembershipDataCheck()));
-		steps.add(new CheckStep('household_creation', new HealthCheckOrgShapeChecks.HouseholdCreationCheck()));
-		steps.add(new CheckStep('npsp_upkeep_overlap', new HealthCheckOrgShapeChecks.NpspUpkeepOverlapCheck()));
-		steps.add(new CheckStep('native_households', new HealthCheckOrgShapeChecks.NativeHouseholdsCheck()));
-		steps.add(
-			new CheckStep('native_household_collision', new HealthCheckOrgShapeChecks.NativeHouseholdCollisionCheck())
-		);
-		steps.add(new CheckStep('mirror_module', new HealthCheckOrgShapeChecks.MirrorModuleCheck()));
-		steps.add(new CheckStep('brand_visibility', new BrandShareJob.VisibilityCheck()));
-		steps.add(new CheckStep('multi_currency', new HealthCheckOrgShapeChecks.MultiCurrencyCheck()));
-
-		if (canManageSettings()) {
-			steps.add(new CheckStep('admin_role', new HealthCheckAccessChecks.NoAdminCheck(accessCounts())));
-			steps.add(
-				new CheckStep(
-					'users_without_access',
-					new HealthCheckAccessChecks.UsersWithoutAccessCheck(accessCounts())
-				)
-			);
-		} else {
-			steps.add(new CheckStep('access_checks_need_admin', new HealthCheckAccessChecks.NeedsAdminCheck()));
-		}
-
-		steps.add(new CheckStep('automation', new HealthCheckSettingsChecks.AutomationCheck()));
-		steps.add(new CheckStep('field_history', new FieldHistoryService.HealthCheck()));
-		steps.add(new CheckStep('fiscal_year', new HealthCheckSettingsChecks.FiscalYearCheck()));
-		steps.add(
-			new CheckStep('organization_record_type', new HealthCheckSettingsChecks.OrganizationRecordTypeCheck())
-		);
-
-		if (canManageSettings()) {
-			steps.add(new CheckStep('error_log', new HealthCheckSettingsChecks.ErrorLogCheck()));
-			steps.add(new CheckStep('error_digest', new HealthCheckSettingsChecks.ErrorDigestCheck()));
-			steps.add(
-				new CheckStep('people_without_household', new HealthCheckHouseholdChecks.PeopleWithoutHouseholdCheck())
-			);
-			steps.add(
-				new CheckStep(
-					'households_without_members',
-					new HealthCheckHouseholdChecks.HouseholdsWithoutMembersCheck()
-				)
-			);
-			steps.add(new CheckStep('household_ownership_skew', new HealthCheckSkew.HouseholdOwnershipCheck()));
-			steps.add(
-				new CheckStep(
-					'relationships_without_person',
-					new HealthCheckHouseholdChecks.RelationshipsWithoutPersonCheck()
-				)
-			);
-			steps.add(
-				new CheckStep(
-					'affiliations_without_person',
-					new HealthCheckHouseholdChecks.AffiliationsWithoutPersonCheck()
-				)
-			);
-			steps.add(new CheckStep('automation_switches', new HealthCheckSettingsChecks.AutomationSwitchesCheck()));
-			steps.add(new CheckStep('import_templates', new HealthCheckSettingsChecks.ImportTemplatesCheck()));
-			steps.add(new CheckStep('nightly_jobs', new HealthCheckSettingsChecks.NightlyJobsCheck()));
-			steps.add(new CheckStep('jobs_inactive_owner', new HealthCheckSettingsChecks.InactiveOwnerJobsCheck()));
-			// A package copied in by hand, whose setup never ran (FS1).
-			steps.add(new CheckStep('module_setup', new ModuleSetups.SetupCheck()));
-			steps.add(new CheckStep('match_keys', new AddressMatchKeyHandler.FilledCheck()));
-			// The rollup checks are the Rollup Builder module's (RollupsHealthCheckExtension,
-			// ADR-0125), asked with the other extensions after these.
-		}
-
-		return steps;
-	}
-
-	/**
 	 * Whether the viewer may change settings, which is also the permission that lets them
 	 * see who else is in the org.
 	 */
 	@NamespaceAccessible
 	public static Boolean canManageSettings() {
 		return BarnCRMPermissions.canManageSettings();
-	}
-
-	/**
-	 * The findings plus the context the panel shows above them.
-	 */
-	public static Report buildReport() {
-		Report report = new Report();
-		report.findings = run();
-		report.skippedChecks = lastSkipped;
-		report.canManageSettings = canManageSettings();
-
-		try {
-			report.orgShape = OrgShapeDetector.detect();
-			report.orgShapeSummary = detectedSummary(report.orgShape);
-			report.recommendedMode = OrgShapeDetector.recommendedCoexistenceMode();
-			report.recommendedModeLabel = modeLabel(report.recommendedMode);
-		} catch (Exception e) {
-			logQuietly(e);
-		}
-
-		try {
-			report.currentMode = CoexistenceService.getCurrentMode();
-			report.currentModeLabel = modeLabel(report.currentMode);
-			report.modeNeedsAttention =
-				String.isBlank(report.currentMode) ||
-				(report.recommendedMode != null && !report.recommendedMode.equals(report.currentMode));
-		} catch (Exception e) {
-			logQuietly(e);
-		}
-
-		try {
-			HealthCheckLastRun.record(report);
-		} catch (Exception e) {
-			logQuietly(e);
-		}
-
-		return report;
-	}
-
-	/**
-	 * Only the checks an earlier run left (D-208, N-07): their findings, and the keys of any it
-	 * had to leave again. The panel merges these into the report it already shows, so the org
-	 * shape and modes are not read again. The stored last result gains these findings in place
-	 * of the earlier Not Checked warning.
-	 */
-	public static Report buildRemainingReport(List<String> keys) {
-		Report report = new Report();
-		report.canManageSettings = canManageSettings();
-		if (keys == null || keys.isEmpty()) {
-			return report;
-		}
-		report.findings = run(new Set<String>(keys));
-		report.skippedChecks = lastSkipped;
-		try {
-			HealthCheckLastRun.addRemaining(report);
-		} catch (Exception e) {
-			logQuietly(e);
-		}
-		return report;
-	}
-
-	/**
-	 * What was found, as a sentence an administrator can read out loud. The sentence itself
-	 * is built next to the org shape checks that also use it.
-	 */
-	public static String detectedSummary(OrgShapeDetector.OrgShape shape) {
-		return HealthCheckOrgShapeChecks.detectedSummary(shape);
 	}
 
 	/**
@@ -782,6 +509,7 @@ public with sharing class HealthCheckService {
 	/**
 	 * A mode's name as an administrator sees it.
 	 */
+	@NamespaceAccessible
 	public static String modeLabel(String mode) {
 		if (CoexistenceService.MODE_NONPROFIT_CLOUD.equals(mode)) {
 			return System.Label.Core_CoexistenceMode_NonprofitCloud;

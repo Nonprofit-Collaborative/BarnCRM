@@ -30,12 +30,14 @@ public with sharing class HealthCheckExtensions {
 	};
 
 	/** Injected by Core's tests by class name, since no other package is there to resolve. */
+	@NamespaceAccessible
 	@TestVisible
-	private static Map<String, HealthCheckExtension> overrides = new Map<String, HealthCheckExtension>();
+	public static Map<String, HealthCheckExtension> overrides = new Map<String, HealthCheckExtension>();
 
 	/** Set by Core's tests to see the org as having no extension beyond those injected. */
+	@NamespaceAccessible
 	@TestVisible
-	private static Boolean noneForTest = false;
+	public static Boolean noneForTest = false;
 
 	/** Each class looked up so far this transaction, null when it is not installed. */
 	private static Map<String, HealthCheckExtension> found = new Map<String, HealthCheckExtension>();

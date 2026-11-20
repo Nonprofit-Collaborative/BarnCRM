@@ -19,8 +19,9 @@ public with sharing class OrgShapeDetector {
 	private static final String INDUSTRIES_GIFT_OBJECT = 'GiftTransaction'; // detection-only: describe key
 	private static final String SALES_CLOUD_OBJECT = 'Opportunity'; // detection-only: describe key, reported only
 
+	@NamespaceAccessible
 	@TestVisible
-	private static OrgShape overrideShape;
+	public static OrgShape overrideShape;
 
 	private static OrgShape cachedShape;
 
@@ -30,15 +31,21 @@ public with sharing class OrgShapeDetector {
 	 * cannot be detected reliably from inside a managed package, so Health Check says so
 	 * rather than guessing.
 	 */
+	@NamespaceAccessible
 	public class OrgShape {
+		@NamespaceAccessible
 		@AuraEnabled
 		public Boolean hasNpsp;
+		@NamespaceAccessible
 		@AuraEnabled
 		public Boolean hasPersonAccounts;
+		@NamespaceAccessible
 		@AuraEnabled
 		public Boolean hasIndustriesNonprofit;
+		@NamespaceAccessible
 		@AuraEnabled
 		public Boolean hasSalesCloudObjects;
+		@NamespaceAccessible
 		@AuraEnabled
 		public Boolean isMultiCurrency;
 		@AuraEnabled
@@ -51,6 +58,7 @@ public with sharing class OrgShapeDetector {
 		 * OrgShapeSelector.nativeHouseholdGroupCount and ADR-0036. An org without the object
 		 * at all is a definite zero, not an unknown (ADR-0130).
 		 */
+		@NamespaceAccessible
 		@AuraEnabled
 		public Boolean hasNativeHouseholdGroups;
 
@@ -59,6 +67,7 @@ public with sharing class OrgShapeDetector {
 		 * Null is the honest answer to an unanswerable question, and Health Check says so
 		 * rather than showing a zero it does not have.
 		 */
+		@NamespaceAccessible
 		@AuraEnabled
 		public Integer nativeHouseholdGroupCount;
 
@@ -67,8 +76,10 @@ public with sharing class OrgShapeDetector {
 		 * Person Accounts are enabled. HouseholdService reads this set, so it is computed
 		 * dynamically and never from a static record type reference.
 		 */
+		@NamespaceAccessible
 		public Set<Id> personAccountRecordTypeIds;
 
+		@NamespaceAccessible
 		public OrgShape() {
 			this.hasNpsp = false;
 			this.hasPersonAccounts = false;
@@ -84,6 +95,7 @@ public with sharing class OrgShapeDetector {
 	}
 
 	/** Account record types that are person types. Empty unless Person Accounts are enabled. */
+	@NamespaceAccessible
 	public static Set<Id> personRecordTypeIds() {
 		// The cheap read: no full detect(), and never null.
 		Set<Id> personTypes = personAccountRecordTypeIds();
@@ -93,6 +105,7 @@ public with sharing class OrgShapeDetector {
 	/**
 	 * What this org looks like, computed once per transaction.
 	 */
+	@NamespaceAccessible
 	public static OrgShape detect() {
 		if (overrideShape != null) {
 			return overrideShape;
@@ -254,11 +267,13 @@ public with sharing class OrgShapeDetector {
 	 * Accounts and neither product is Standalone; its people still get junction membership
 	 * (CoexistenceService.withMembership).
 	 */
+	@NamespaceAccessible
 	public static String recommendedCoexistenceMode() {
 		return recommendedCoexistenceMode(detect());
 	}
 
 	/** The same rule for a given shape, so the Setup Assistant can ask it of its own. */
+	@NamespaceAccessible
 	public static String recommendedCoexistenceMode(OrgShape shape) {
 		if (shape != null && shape.hasIndustriesNonprofit == true) {
 			return CoexistenceService.MODE_NONPROFIT_CLOUD;

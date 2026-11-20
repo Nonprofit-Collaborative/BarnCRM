@@ -321,7 +321,7 @@ private class ErrorDigestServiceTest {
 	}
 
 	private static void limitAt(Integer used, Integer max) {
-		OrgOptimizerStorageController.limitsOverride = new Map<String, List<Integer>>{
+		OrgLimitReader.limitsOverride = new Map<String, List<Integer>>{
 			'DataStorageMB' => new List<Integer>{ used, max }
 		};
 	}
@@ -352,7 +352,7 @@ private class ErrorDigestServiceTest {
 			failedJob();
 			limitAt(85, 100);
 			// Under the threshold: not reported.
-			OrgOptimizerStorageController.limitsOverride.put('FileStorageMB', new List<Integer>{ 79, 100 });
+			OrgLimitReader.limitsOverride.put('FileStorageMB', new List<Integer>{ 79, 100 });
 
 			ErrorDigestService.Outcome outcome = sendAs(admin);
 

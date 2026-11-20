@@ -122,6 +122,8 @@ const ICONS = Object.freeze({
   Advanced_Reporting: 'custom:custom84',
   // Migration
   Migration_Assistant: 'custom:custom98',
+  // Sample Data
+  Sample_Data: 'custom:custom13',
   // Memberships
   Membership_Level__c: 'custom:custom48',
   Membership_Term__c: 'custom:custom45',

@@ -7,6 +7,7 @@
  * mode, as every data job is (ADR-0021). Only people holding Manage BarnCRM Settings and Find and
  * Export Records may use it.
  */
+@NamespaceAccessible
 public with sharing class BackupSetService {
 	public static final String OPERATION_BACKUP = 'Backup';
 	private static final String KEY = 'backup';
@@ -244,6 +245,7 @@ public with sharing class BackupSetService {
 	}
 
 	/** Whether a query document carries the `backup` key. */
+	@NamespaceAccessible
 	public static Boolean isBackupSet(String queryJson) {
 		try {
 			return String.isNotBlank(queryJson) &&

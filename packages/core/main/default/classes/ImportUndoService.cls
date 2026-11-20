@@ -27,6 +27,7 @@ public with sharing class ImportUndoService {
 		@AuraEnabled
 		public Boolean allowed = false;
 		/** Why an undo is refused, in a sentence an administrator can act on. */
+		@NamespaceAccessible
 		@AuraEnabled
 		public String reason;
 		@AuraEnabled
@@ -88,7 +89,7 @@ public with sharing class ImportUndoService {
 			return view;
 		}
 		// A field access change puts permission rows back, on the Field Access Manager (R-FA1).
-		if (FieldAccessService.OPERATION_ACCESS.equals(batch.Operation__c)) {
+		if (ImportBatchService.OPERATION_ACCESS.equals(batch.Operation__c)) {
 			view.reason = BarnHelp.text('Core', 'Core_Import_UndoErrorAccessChange');
 			return view;
 		}

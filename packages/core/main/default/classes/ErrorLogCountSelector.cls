@@ -14,6 +14,7 @@ public with sharing class ErrorLogCountSelector {
 	 * access is told nothing rather than shown a failure, because what they cannot see is not
 	 * evidence of what is there. There is no uncapped count on purpose.
 	 */
+	@NamespaceAccessible
 	public static Integer countNewUpTo(Integer cap) {
 		if (!isReadable()) {
 			return 0;

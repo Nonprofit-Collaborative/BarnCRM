@@ -26,6 +26,7 @@ public with sharing class HealthCheckSkew {
 	private static final Integer ROWS_KEPT_SPARE = 5000;
 
 	/** Households owned by one user with a role. */
+	@NamespaceAccessible
 	public class HouseholdOwnershipCheck implements HealthCheckService.Check {
 		public HealthCheckService.Finding run() {
 			Id householdType = HouseholdService.householdRecordTypeId();

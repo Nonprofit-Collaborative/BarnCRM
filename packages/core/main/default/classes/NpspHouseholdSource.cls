@@ -64,6 +64,7 @@ public with sharing virtual class NpspHouseholdSource {
 			npcInstance = source;
 		} else {
 			instance = source;
+			householdsInUse = null;
 		}
 	}
 
@@ -275,6 +276,7 @@ public with sharing virtual class NpspHouseholdSource {
 	 * person. Read once per transaction; never throws (a read failure answers false and is
 	 * logged).
 	 */
+	@NamespaceAccessible
 	public static Boolean householdsInUse() {
 		if (householdsInUse == null) {
 			try {

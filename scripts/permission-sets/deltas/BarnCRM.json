@@ -4,17 +4,12 @@
     "description": ["Part of the BarnCRM Admin role. Give the role, not this set. Settings, custom metadata,", "automation control, Error Log; View All and Modify All on Account and Contact (ADR-0142)."],
     "add": {
       "classAccesses": {
-        "AccessExplorerController": {"enabled": "true"},
         "AutoMergeController": {"enabled": "true"},
         "BackupSetController": {"enabled": "true"},
         "BulkUpdateController": {"enabled": "true"},
         "CustomMetadataManagerController": {"enabled": "true"},
-        "DataDictionaryController": {"enabled": "true"},
-        "DataHygieneController": {"enabled": "true"},
         "DataManagerController": {"enabled": "true"},
         "DuplicateRulesStarter": {"enabled": "true"},
-        "FieldAccessController": {"enabled": "true"},
-        "FieldUtilizationController": {"enabled": "true"},
         "FilesImportController": {"enabled": "true"},
         "FindController": {"enabled": "true"},
         "GenericMergeController": {"enabled": "true"},
@@ -23,11 +18,7 @@
         "ImportRowCorrectionController": {"enabled": "true"},
         "MatchSourceController": {"enabled": "true"},
         "OrgAutomationController": {"enabled": "true"},
-        "OrgOptimizerSetupController": {"enabled": "true"},
-        "OrgOptimizerStorageController": {"enabled": "true"},
         "RecordInspectorController": {"enabled": "true"},
-        "ReportSubscriptions": {"enabled": "true"},
-        "SetupChangeController": {"enabled": "true"},
         "WhereUsedController": {"enabled": "true"}
       },
       "customPermissions": {

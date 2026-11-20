@@ -1,6 +1,6 @@
 /**
  * Proves the whole path, end to end, in an org where both packages are installed (G-20
- * follow-up, ADR-0053, ADR-0057): Core's `HealthCheckService.run()` finds
+ * follow-up, ADR-0053, ADR-0057): Core's `HealthCheckService.extensionFindings()` finds
  * `GivingHealthCheckExtension` by name, calls it, and folds its finding into the one report
  * Health Check shows. `HealthCheckGivingChecksTest` covers what the finding says; this class
  * covers only that Core actually reaches it.
@@ -60,7 +60,7 @@ private class GivingHealthCheckExtensionTest {
 			GivingTestDataFactory.closeBooksThrough(Date.today().toStartOfMonth().addDays(-1));
 			User jen = jen();
 			System.runAs(jen) {
-				List<HealthCheckService.Finding> findings = HealthCheckService.run();
+				List<HealthCheckService.Finding> findings = HealthCheckService.extensionFindings();
 
 				HealthCheckService.Finding giving = null;
 				for (HealthCheckService.Finding finding : findings) {

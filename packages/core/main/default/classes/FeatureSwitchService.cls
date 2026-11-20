@@ -10,8 +10,8 @@
  * (`fillBlankList`), so a blank list means no feature is on.
  *
  * Two kinds of feature:
- * - a tool (Data Manager, Duplicate Matching, Org Optimizer), whose tabs `TabAccessService` gives
- *   once it is on;
+ * - a tool (Data Manager, Duplicate Matching), whose tabs `TabAccessService` gives once it is on
+ *   (Org Optimizer and Health Check are a module: installing it turns them on);
  * - a Core feature group, whose Automation Registry switches are turned on with it and whose
  *   automations do not run while it is off (`automationsOff`, read by `AutomationControl`).
  *   A group can also carry an access set: Household Upkeep carries `BarnCRM_Households`, which
@@ -22,13 +22,14 @@
  * While a feature is off its rows in BarnCRM Settings are hidden (`hiddenSettingRows`). The
  * list is owner-overridable: it is held here, in one place, so a change is one edit.
  */
+@NamespaceAccessible
 public with sharing class FeatureSwitchService {
 	public static final String KIND_TOOL = 'Tool';
 	public static final String KIND_FEATURE = 'Feature';
 
 	public static final String DATA_MANAGER = 'DataManager';
 	public static final String DUPLICATE_REVIEW = 'DuplicateReview';
-	public static final String ORG_OPTIMIZER = 'OrgOptimizer';
+	@NamespaceAccessible
 	public static final String HOUSEHOLD_UPKEEP = 'HouseholdUpkeep';
 	public static final String ADDRESSES = 'Addresses';
 	public static final String RELATIONSHIPS = 'Relationships';
@@ -118,22 +119,7 @@ public with sharing class FeatureSwitchService {
 				),
 			new Item(DUPLICATE_REVIEW, KIND_TOOL)
 				.tabs(new List<String>{ TabAccessService.DUPLICATE_MATCHING_TAB })
-				.rows(new List<String>{ 'Duplicate_Review' }),
-			new Item(ORG_OPTIMIZER, KIND_TOOL)
-				.tabs(new List<String>{ TabAccessService.DATA_HYGIENE_TAB })
-				.rows(
-					new List<String>{
-						'Health_Check',
-						'Health_Check_Optimizer_Link',
-						'Error_Log_Optimizer_Link',
-						'Stale_Record_Years',
-						'Unused_Login_Days',
-						'Unused_Report_Days',
-						'Setup_Change_Retention_Days',
-						'Field_Utilization_Retention_Days',
-						'Old_Api_Version'
-					}
-				)
+				.rows(new List<String>{ 'Duplicate_Review' })
 		};
 	}
 
@@ -269,6 +255,7 @@ public with sharing class FeatureSwitchService {
 	}
 
 	/** Whether the feature is on. */
+	@NamespaceAccessible
 	public static Boolean isOn(String key) {
 		return String.isNotBlank(key) && featuresOn().contains(key.toLowerCase());
 	}
@@ -286,6 +273,7 @@ public with sharing class FeatureSwitchService {
 	}
 
 	/** Turns one feature on, for good. Callers check Manage BarnCRM Settings first. */
+	@NamespaceAccessible
 	public static void turnOn(String key) {
 		turnOn(new Set<String>{ key });
 	}
@@ -294,6 +282,7 @@ public with sharing class FeatureSwitchService {
 	 * Turns features on, for good: lists them, switches on their automations and queues their
 	 * tabs. One already on changes nothing. Used by General and by first-run setup.
 	 */
+	@NamespaceAccessible
 	public static void turnOn(Set<String> keys) {
 		Set<String> current = featuresOn();
 		List<Item> newlyOn = new List<Item>();

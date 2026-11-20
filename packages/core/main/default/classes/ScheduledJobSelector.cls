@@ -140,8 +140,9 @@ public with sharing class ScheduledJobSelector {
 	 * Test seam: the owner a job is read with, so a test can see a job as owned by an inactive
 	 * user without deactivating anyone. Null in production.
 	 */
+	@NamespaceAccessible
 	@TestVisible
-	private static Id ownerOverride;
+	public static Id ownerOverride;
 
 	private static CronTrigger triggerByName(String jobName) {
 		if (String.isBlank(jobName)) {

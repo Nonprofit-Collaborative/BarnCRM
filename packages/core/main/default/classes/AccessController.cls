@@ -289,6 +289,25 @@ public with sharing class AccessController {
 	}
 
 	/**
+	 * Where the Access page's Open Access Explorer button goes: the Org Optimizer tab, opened on
+	 * its Access Explorer section through the page state.
+	 *
+	 * @return the tab URL, or null when the Org Optimizer module, which holds Access Explorer, is
+	 * not installed, or the person may not manage settings
+	 */
+	@AuraEnabled(cacheable=true)
+	public static String getAccessExplorerUrl() {
+		if (!canManageAccess() || !ModuleDetectionService.isInstalled(ModuleDetectionService.MODULE_ORG_OPTIMIZER)) {
+			return null;
+		}
+		return '/lightning/n/' +
+			NamespaceUtil.qualify('Data_Hygiene') +
+			'?' +
+			NamespaceUtil.stateKey('section') +
+			'=accessExplorer';
+	}
+
+	/**
 	 * Whether the person using the page may change roles.
 	 *
 	 * @return true when they hold the Manage BarnCRM Settings custom permission

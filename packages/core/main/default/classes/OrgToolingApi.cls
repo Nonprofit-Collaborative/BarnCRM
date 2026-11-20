@@ -5,6 +5,7 @@
  * "Duplicate Rules Starter and report subscriptions through the org connection"). Only a queued
  * job calls it: a Lightning session cannot call the API.
  */
+@NamespaceAccessible
 public with sharing class OrgToolingApi {
 	@TestVisible
 	private static final String BASE =
@@ -34,6 +35,7 @@ public with sharing class OrgToolingApi {
 	}
 
 	/** A call to the org's REST API; `path` follows `/services/data/vXX.0/`. Returns the body. */
+	@NamespaceAccessible
 	public static String rest(String method, String path, String body) {
 		return send(method, path, body);
 	}

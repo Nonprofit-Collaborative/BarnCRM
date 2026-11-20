@@ -9,6 +9,7 @@
  * concatenated into it, and each Nonprofit Cloud name is a String constant carrying the
  * marker scripts/ci/check-standard-objects.sh honors, never a compile-time reference.
  */
+@NamespaceAccessible
 public with sharing class OrgShapeSelector {
 	private static final String PERSON_ACCOUNT_FIELD = 'ispersonaccount'; // detection-only: Account field map key, present only where Person Accounts are enabled
 	private static final String PERSON_RECORD_TYPE_QUERY = 'SELECT Id FROM RecordType WHERE SobjectType = \'Account\' AND IsPersonType = true';
@@ -29,6 +30,7 @@ public with sharing class OrgShapeSelector {
 	private static final String NATIVE_HOUSEHOLD_GROUP_ANY_QUERY = 'SELECT Id FROM PartyRelationshipGroup WHERE Type = \'Household\' LIMIT 1'; // detection-only: whether the org has any native household at all, one row
 
 	/** The native household count stops one above this, and Health Check says "more than". */
+	@NamespaceAccessible
 	public static final Integer NATIVE_COUNT_CAP = 1000;
 
 	/**

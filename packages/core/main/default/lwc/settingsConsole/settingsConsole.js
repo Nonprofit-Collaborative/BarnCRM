@@ -119,10 +119,6 @@ function importCoreComponent(name) {
       return import('c/errorLogTile');
     case 'accessManager':
       return import('c/accessManager');
-    case 'healthCheckPanel':
-      return import('c/healthCheckPanel');
-    case 'sampleDataManager':
-      return import('c/sampleDataManager');
     case 'seasonalAddressJob':
       return import('c/seasonalAddressJob');
     case 'errorDigestJob':

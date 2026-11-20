@@ -101,8 +101,8 @@ private class EmptyHouseholdTidyTest {
 			Assert.isFalse(isInRecycleBin(household), 'A linked record keeps the household');
 			Assert.areEqual(
 				1,
-				DataHygieneService.run(DataHygieneService.HOUSEHOLDS_WITHOUT_MEMBERS).count,
-				'It stays on the list of empty households to review'
+				[SELECT COUNT() FROM Account WHERE Id = :household],
+				'It stays, for Data Quality\'s list of empty households to review'
 			);
 		}
 	}
@@ -259,8 +259,8 @@ private class EmptyHouseholdTidyTest {
 			Assert.isFalse(isInRecycleBin(household.Id), 'Ana\'s ended membership is its history');
 			Assert.areEqual(
 				1,
-				DataHygieneService.run(DataHygieneService.HOUSEHOLDS_WITHOUT_MEMBERS).count,
-				'It stays on the list of empty households to review'
+				[SELECT COUNT() FROM Account WHERE Id = :household.Id],
+				'It stays, for Data Quality\'s list of empty households to review'
 			);
 		}
 	}

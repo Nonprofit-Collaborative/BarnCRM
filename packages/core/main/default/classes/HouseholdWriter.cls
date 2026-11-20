@@ -95,6 +95,7 @@ public with sharing class HouseholdWriter {
 	 * Every record is of the Household record type: one with no record type is given it, and
 	 * one of another record type is refused. Answers one save result per record, in order.
 	 */
+	@NamespaceAccessible
 	public static List<Database.SaveResult> createHouseholdsForUser(
 		List<Account> households,
 		Set<Id> touchedHouseholdIds
@@ -103,6 +104,7 @@ public with sharing class HouseholdWriter {
 	}
 
 	/** The same, saved with the caller's options (an import's duplicate rules, all or none). */
+	@NamespaceAccessible
 	public static List<Database.SaveResult> createHouseholdsForUser(
 		List<Account> households,
 		Set<Id> touchedHouseholdIds,

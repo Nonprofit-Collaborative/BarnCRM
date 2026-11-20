@@ -159,6 +159,7 @@ public with sharing class SettingsController {
 
 	// Not cacheable: the console calls it again after a save, and a cached answer would show
 	// the values from before the save (ADR-0093, record reads through Lightning Data Service).
+	@NamespaceAccessible
 	@AuraEnabled
 	public static ConsoleModel getConsoleModel() {
 		try {
@@ -641,15 +642,12 @@ public with sharing class SettingsController {
 		return hiddenByFeature.contains(definition.DeveloperName);
 	}
 
-	/** Rows that open Org Optimizer, for those who can open it (admin-14). */
+	/**
+	 * Rows that open an Org Optimizer section only some people may open (admin-14). Health Check
+	 * reads for everyone the Org Optimizer module gives its tab, so its link is not here.
+	 */
 	@TestVisible
-	private static final Set<String> OPTIMIZER_LINK_ROWS = new Set<String>{
-		'Health_Check_Optimizer_Link',
-		'Error_Log_Optimizer_Link'
-	};
-	/** The Health Check report itself, kept for those who cannot open Org Optimizer. */
-	@TestVisible
-	private static final String HEALTH_CHECK_PANEL_ROW = 'Health_Check';
+	private static final Set<String> OPTIMIZER_LINK_ROWS = new Set<String>{ 'Error_Log_Optimizer_Link' };
 
 	@TestVisible
 	private static Boolean canOpenOptimizerOverride;
@@ -669,10 +667,7 @@ public with sharing class SettingsController {
 	}
 
 	private static Boolean isHiddenByAccess(Setting_Definition__mdt definition) {
-		if (OPTIMIZER_LINK_ROWS.contains(definition.DeveloperName)) {
-			return !canOpenOptimizer();
-		}
-		return HEALTH_CHECK_PANEL_ROW.equals(definition.DeveloperName) && canOpenOptimizer();
+		return OPTIMIZER_LINK_ROWS.contains(definition.DeveloperName) && !canOpenOptimizer();
 	}
 
 	private static SettingModel toSetting(Setting_Definition__mdt definition) {

@@ -7,7 +7,7 @@ import getAccessOverview from '@salesforce/apex/AccessController.getAccessOvervi
 import searchUsers from '@salesforce/apex/AccessController.searchUsers';
 import assignRole from '@salesforce/apex/AccessController.assignRole';
 import removeRole from '@salesforce/apex/AccessController.removeRole';
-import getOpenLink from '@salesforce/apex/AccessExplorerController.getOpenLink';
+import getOpenLink from '@salesforce/apex/AccessController.getAccessExplorerUrl';
 
 jest.mock('@salesforce/apex', () => ({ refreshApex: jest.fn(() => Promise.resolve()) }), {
   virtual: true
@@ -18,7 +18,7 @@ jest.mock(
   { virtual: true }
 );
 jest.mock(
-  '@salesforce/apex/AccessExplorerController.getOpenLink',
+  '@salesforce/apex/AccessController.getAccessExplorerUrl',
   () => ({ default: mockCreateApexTestWireAdapter(jest.fn()) }),
   { virtual: true }
 );
@@ -300,7 +300,7 @@ describe('c-access-manager', () => {
     expect(element.shadowRoot.querySelector('[data-id="open-access-explorer"]')).toBeNull();
 
     const url = '/lightning/n/Data_Hygiene?c__section=accessExplorer';
-    getOpenLink.emit({ url, stateKey: 'c__section', section: 'accessExplorer' });
+    getOpenLink.emit(url);
     await flush();
 
     const link = element.shadowRoot.querySelector('[data-id="open-access-explorer"]');

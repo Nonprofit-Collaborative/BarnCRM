@@ -32,13 +32,16 @@ private class BarnInstallCheckTest {
 		System.runAs(TestUsers.admin()) {
 			User maria = HealthCheckTestHelper.mariaWithManageSettings();
 			System.runAs(maria) {
-				Integer expected = HealthCheckService.run().size();
+				// Null where the Org Optimizer module, which holds Health Check, is not installed.
+				List<HealthCheckService.Finding> direct = HealthCheckService.runInstalled();
+				Integer expected = direct == null ? 0 : direct.size();
 
 				// Its own limits: a second run in the same budget would leave checks for later.
 				Test.startTest();
 				Map<String, Object> summary = BarnInstallCheck.runHealthCheck();
 				Test.stopTest();
 
+				Assert.areEqual(direct != null, summary.get('available'), 'Says whether Health Check ran');
 				Assert.areEqual(expected, summary.get('findings'), 'Every finding counted');
 				List<String> errors = (List<String>) summary.get('errorFindings');
 				Assert.areEqual(errors.size(), summary.get('errors'), 'One line per error');

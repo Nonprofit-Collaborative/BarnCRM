@@ -8,8 +8,10 @@
  * also asks each installed module's access sync to give its sets to people given a role since
  * (ADR-0131 `0131-module-access-sync-by-role.md`).
  */
+@NamespaceAccessible
 public with sharing class TabAccessScheduler implements Schedulable {
 	/** The name the scheduled job carries, so it is found again rather than doubled. */
+	@NamespaceAccessible
 	public static final String JOB_NAME = 'BarnCRM Tab Access Check';
 
 	/** Every hour, on the hour. */
@@ -21,11 +23,13 @@ public with sharing class TabAccessScheduler implements Schedulable {
 	}
 
 	/** Starts the hourly check, or does nothing when it is already scheduled. */
+	@NamespaceAccessible
 	public static Id start() {
 		return ScheduledJobSelector.ensure(JOB_NAME, HOURLY_CRON, new TabAccessScheduler());
 	}
 
 	/** True when the hourly check is scheduled. */
+	@NamespaceAccessible
 	public static Boolean isScheduled() {
 		return ScheduledJobSelector.isScheduled(JOB_NAME);
 	}

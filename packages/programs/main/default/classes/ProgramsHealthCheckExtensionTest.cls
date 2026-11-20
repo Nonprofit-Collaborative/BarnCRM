@@ -96,7 +96,7 @@ private class ProgramsHealthCheckExtensionTest {
 		System.runAs(TestUsers.adminWith(ADMIN)) {
 			enrollmentsInEndedPrograms();
 
-			Map<String, Map<String, Object>> all = byKey(HealthCheckService.run());
+			Map<String, Map<String, Object>> all = byKey(HealthCheckService.extensionFindings());
 
 			Assert.isTrue(
 				all.containsKey(ProgramsHealthCheckExtension.KEY),
