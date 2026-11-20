@@ -11,6 +11,7 @@
     "prettier:verify": "prettier --check \"**/*.{cls,trigger,cmp,page,component,xml,json,md,yaml,yml,js}\"",
     "test:unit": "sfdx-lwc-jest",
     "test:unit:coverage": "sfdx-lwc-jest --coverage",
+    "test:e2e": "bash scripts/org/run-e2e.sh",
     "check:namespace": "bash scripts/ci/check-namespace.sh",
     "check:standard-objects": "bash scripts/ci/check-standard-objects.sh",
     "check:person-account-fields": "python3 scripts/ci/check-person-account-fields.py",
@@ -36,6 +37,7 @@
   },
   "devDependencies": {
     "@lwc/eslint-plugin-lwc": "3.5.0",
+    "@playwright/test": "1.64.1",
     "@prettier/plugin-xml": "3.4.2",
     "@salesforce-ux/sds-metadata": "1.2.1",
     "@salesforce-ux/slds-linter": "1.2.1",

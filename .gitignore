@@ -47,3 +47,7 @@ apexguru-results/
 
 # Generated CSVs and results of scripts/org/scale-test-tier1.sh (the v0.11 scale test).
 scale-test-data/
+
+# Output of scripts/org/run-e2e.sh (Playwright). e2e-results/.auth/ holds a signed-in browser
+# session: never commit or share it.
+e2e-results/

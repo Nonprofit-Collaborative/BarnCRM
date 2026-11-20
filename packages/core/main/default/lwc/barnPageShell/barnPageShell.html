@@ -12,7 +12,8 @@
                         <div class="slds-media__body">
                             <h1 class={titleClass} data-id="title">{title}</h1>
                             <template lwc:if={purpose}>
-                                <p class="slds-page-header__name-meta" data-id="purpose">{purpose}</p>
+                                <!-- Body text, not slds-page-header__name-meta: that class cuts a long purpose to one line. -->
+                                <p class="slds-text-body_regular" data-id="purpose">{purpose}</p>
                             </template>
                         </div>
                     </div>

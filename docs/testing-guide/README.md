@@ -17,11 +17,12 @@ script. Never include donor or other personal data. Report a security problem pr
 
 ## How This Relates to the Automated Tests
 
-Two layers check every build.
+Three layers check every build.
 
 | Layer | What it is | What it proves |
 |---|---|---|
 | Apex test gate | `scripts/org/run-org-tests.sh <alias>` deploys the checked-out commit and runs every Apex test class in it (about 3,500 tests), then posts the result to GitHub as the commit status the merge rule requires. See [CI](../contributor-guide/ci.md), "The org test gate". | Logic: triggers, services, rollups, validation, sharing, permission checks in code. |
+| Browser smoke tests | `bash scripts/org/run-e2e.sh <alias>` opens every tab of every BarnCRM app in a real browser and checks it loads with no error panel, toast or BarnCRM console error, plus a few deeper checks on the newest pages. See [Browser smoke tests](../contributor-guide/e2e.md). | That every page opens clean in Lightning. Run it before the manual scripts: a page it fails on is not ready for manual testing. |
 | Manual scripts (this guide) | A person follows numbered steps in a real org and compares what they see with the expected result. | What the gate cannot see: that pages, tabs, buttons and labels are there and say the right thing, that setup flows work end to end, that a user without a permission set is refused in the UI, that undo really puts data back as a person sees it, and that pages work with a keyboard and on a phone. |
 
 Run the gate first. A build that fails it is not ready for manual testing. Scale and the full

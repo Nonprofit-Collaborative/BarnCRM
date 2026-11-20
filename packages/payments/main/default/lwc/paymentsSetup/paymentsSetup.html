@@ -18,13 +18,15 @@
                 </template>
                 <template lwc:else>
                     <c-barn-notice class="slds-var-m-bottom_small" variant="warning" message={labels.notScheduled} data-id="not-scheduled"></c-barn-notice>
-                    <lightning-button
-                        class="slds-var-m-bottom_medium"
-                        label={labels.schedule}
-                        disabled={locked}
-                        data-id="schedule"
-                        onclick={handleSchedule}
-                    ></lightning-button>
+                    <!-- A block wrapper: margin on the button itself is lost, as the button is inline. -->
+                    <div class="slds-var-m-bottom_medium">
+                        <lightning-button
+                            label={labels.schedule}
+                            disabled={locked}
+                            data-id="schedule"
+                            onclick={handleSchedule}
+                        ></lightning-button>
+                    </div>
                 </template>
                 <template lwc:if={noSiteShown}>
                     <c-barn-notice class="slds-var-m-bottom_medium" variant="warning" message={labels.noSite} data-id="no-site"></c-barn-notice>
@@ -88,14 +90,16 @@
                                 disabled={locked}
                                 onclick={handleCheck}
                             ></lightning-button>
-                            <lightning-button
-                                class="slds-var-m-top_small"
-                                label={labels.clear}
-                                data-processor={credential.processor}
-                                data-id={credential.clearId}
-                                disabled={locked}
-                                onclick={handleClear}
-                            ></lightning-button>
+                            <template lwc:if={credential.canClear}>
+                                <lightning-button
+                                    class="slds-var-m-top_small"
+                                    label={labels.clear}
+                                    data-processor={credential.processor}
+                                    data-id={credential.clearId}
+                                    disabled={locked}
+                                    onclick={handleClear}
+                                ></lightning-button>
+                            </template>
                         </div>
                     </template>
                 </div>

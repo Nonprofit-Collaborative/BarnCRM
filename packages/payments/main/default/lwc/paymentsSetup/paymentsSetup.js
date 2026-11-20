@@ -141,6 +141,9 @@ export default class PaymentsSetup extends LightningElement {
         checkId: `check-${id}`,
         clearId: `clear-${id}`,
         isPayPal: credential.processor === 'PayPal',
+        // Disconnect has something to forget only when connected, or for PayPal a stored webhook id.
+        canClear:
+          credential.connected || (credential.processor === 'PayPal' && this.payPalWebhookSet),
         status: credential.connected
           ? helpText('Payments', 'Payments_Setup_StatusConnected')
           : helpText('Payments', 'Payments_Setup_StatusNotConnected'),
@@ -152,6 +155,11 @@ export default class PaymentsSetup extends LightningElement {
         ])
       };
     });
+  }
+
+  /** Whether a PayPal webhook id is stored. */
+  get payPalWebhookSet() {
+    return (this.setup.keys || []).some((key) => key.processor === 'PayPal' && key.lastFour);
   }
 
   /** The PayPal webhook id: not a secret, but shown by its last four characters only. */
