@@ -272,6 +272,10 @@ Endpoint: `POST <site URL>/services/apexrest/barncrm/connector/v1/hook?token=<64
   presented token and finds the recipe by the hash, so no token is stored and a read-only user who
   can see the recipe cannot rebuild the URL. Regenerate Token (confirmation first) replaces it.
   Missing or unknown token: 404 with an empty body, nothing stored.
+- **Token in a header where possible (F13).** The receiver accepts the token in an
+  `X-BarnCRM-Token` header, and the page shows that form first for apps that allow custom headers,
+  because a query string can appear in the sender's logs, proxies and Event Monitoring URI fields.
+  The `?token=` form stays for apps that cannot send headers.
 - **Bounds:** JSON or form-encoded bodies only, at most 131,072 characters (413 otherwise); an
   hourly cap per recipe (default 500, recipe setting) whose first refusal each hour writes one
   Warning to the Error Log; a paused recipe still stores posts (up to its cap) and processes them
@@ -282,12 +286,18 @@ Endpoint: `POST <site URL>/services/apexrest/barncrm/connector/v1/hook?token=<64
   and access mode (Section 3.10), never more. Where the sending app offers it, the connector's **fetch back** option
   reads only an id (or a resource URL whose host must equal the Connection's host) from the post
   and fetches the real data through the Connection, so a forged post with a stolen token cannot
-  inject data (the ADR-0229 Stripe pattern; Eventbrite sends an `api_url` exactly for this).
+  inject data (the ADR-0229 Stripe pattern; Eventbrite sends an `api_url` exactly for this). The
+  posted URL is parsed under the F4 rules (Section 3.5): `https`, no user info, the connection's
+  exact host and port, and only its path and query appended to `callout:`. When a connector
+  offers fetch back, the page recommends it for webhook recipes that write records.
+- **Payload values are untrusted text for F1:** a `{!` in any payload value that reaches a
+  request fails that step (Section 3.5).
 - **No signature checks:** an HMAC check would need Apex to read a signing secret, which ADR-0229
   rules out. Token, fetch back, caps and idempotency replace it. Apps that refuse to deliver
   without a secret-based handshake (Zoom's URL validation) use the polling trigger instead.
-- **Guest access:** a `BarnCRM_Connector_Webhook_Guest` permission set with the REST class only,
-  assigned to Site guest users by the existing Health Check fix. A Site is needed (most orgs with
+- **Guest access:** a `BarnCRM_Connector_Webhook_Guest` permission set with the REST class and
+  create on the start event only (no Connections controller, no principal access: the receiver
+  makes no callout), assigned to Site guest users by the existing Health Check fix. A Site is needed (most orgs with
   Payments or Forms have one); the Settings tab says how to create one.
 - **Logging:** the token never appears in a log, run or error message.
 
@@ -297,7 +307,7 @@ Endpoint: `POST <site URL>/services/apexrest/barncrm/connector/v1/hook?token=<64
 |---|---|---|
 | `find` | Find Records | A Find query document (R-R2) with values from earlier steps; returns up to 200 records; "stop if none" option |
 | `create`, `update`, `upsert` | Create, Update, or Create or Update a Record | Applies a map (linked or inline) to build the record; upsert uses the map's `match`; `Database` DML in user mode with partial success off per run |
-| `callApp` | Call an App | A connector action, or a custom request on a generic connection: method, path, query, non-secret headers, body built from a map (`to.kind` json, serialized with `JSON.serialize`, never by string substitution), expected success codes, "404 means not found" option |
+| `callApp` | Call an App | A connector action, or a custom request on a generic connection: method, path (F4 rules), query, non-secret headers (never `Authorization` or a `{!` value, F1), body built from a map (`to.kind` json, serialized with `JSON.serialize`, never by string substitution), expected success codes, "404 means not found" option |
 | `transform` | Change Data | Applies a map with `to.kind` json to produce a new data object for later steps |
 | `if` | If | A condition (filter document over trigger and step data) with Then steps and optional Otherwise steps; nesting at most 2 levels |
 | `forEach` | For Each | Runs its steps once per item of a list from an earlier step, at most 1,000 items a run, checkpointing every 200 |
@@ -313,8 +323,14 @@ expressions.
 
 Every connection is an External Credential plus a Named Credential, both created by BarnCRM at
 run time with `ConnectApi.NamedCredentials` (`createExternalCredential`, `createNamedCredential`)
-and named `BarnConn_<connector>_<6 random>`; the admin's display name is the label. There is no
-Connection object: the Connections section lists the org's External Credentials with that prefix.
+and named `BarnConn_<connector>_<6 random>` by the server only (F2); the admin's display name is
+the label. There is no Connection object: the Connections section lists the org's External
+Credentials with that prefix. `BarnConn_` names are subscriber names and never go through
+`NamespaceUtil.qualify`.
+
+The independent security review (`connector-secrets-security-review.md`, findings F1 to F13)
+found page entry "secure with required mitigations". Each mitigation below is a binding
+requirement, marked with its finding, and the slice that builds it carries its tests (Section 7).
 
 Authentication kinds, from the connector definition:
 
@@ -322,13 +338,15 @@ Authentication kinds, from the connector definition:
 |---|---|---|
 | API key or token in a header | Paste the key on BarnCRM's page | Mailchimp (Basic over any user and the key), Eventbrite (Bearer) |
 | Basic user and password | Paste both | Older REST APIs |
-| Secret URL | Paste the webhook URL (it becomes the Named Credential's URL) | Slack, Microsoft Teams Workflows |
+| Secret URL | Paste the webhook URL. It becomes the Named Credential's URL, which is configuration, not an encrypted credential: administrators who can view Setup can read it (F5) | Microsoft Teams Workflows; Slack incoming webhook as the simpler alternative to a Slack bot token (Bearer, encrypted), which is recommended |
 | OAuth 2.0 client credentials | Paste client id and secret (External Credential's native flow) | Many server-to-server APIs |
 | Token step | Paste client id and secret; the connector's sign-in call returns a short-lived token held for one transaction (the PayPal pattern of ADR-0229) | Zoom Server-to-Server OAuth |
-| OAuth 2.0 browser sign-in | Create an app at the provider (BarnCRM shows the callback URL and the scopes to tick), paste its client id and secret; BarnCRM creates the Auth Provider and External Credential; then one Authenticate click | Google Sheets, Constant Contact, QuickBooks Online |
+| OAuth 2.0 browser sign-in | Create an app at the provider (BarnCRM shows the callback URL and the scopes to tick); create the Auth Provider in Setup, pasting the client id and secret into Setup's own form (guided, F9); BarnCRM then creates the External Credential and Named Credential that reference it (no secret involved); then one Authenticate click | Google Sheets, Constant Contact, QuickBooks Online |
 
 Headers use merge formulas (`{!$Credential.BarnConn_x.ApiKey}`, Allow Formulas in HTTP Header
-on), so Apex never reads a stored secret (ADR-0229 decision 1).
+on), so Apex never reads a stored secret (ADR-0229 decision 1). The auth header template comes
+only from the catalog's auth kind; Generic REST builds it from the auth kind, never from free text
+(F1).
 
 **Honest list of steps a non-technical admin must still do in Setup**, each shown on the page with
 the exact clicks and a Check Again button (the ADR-0148 amendment A1 pattern):
@@ -342,29 +360,95 @@ the exact clicks and a Check Again button (the ADR-0148 amendment A1 pattern):
 3. **At the provider, for OAuth browser connections:** register an app and copy two values. No
    shared BarnCRM app is offered: it would be a service BarnCRM runs and a client secret shipped
    to every org (self-service only; nothing paid).
-4. **A Salesforce Site**, only for webhooks, once per org.
+4. **The Auth Provider, once per OAuth browser connection** (F9): Setup, Auth. Providers, New,
+   with the provider type, callback URL and scopes the page shows, and the client id and secret
+   pasted into Setup's form. BarnCRM never creates an Auth Provider, so the client secret never
+   passes through BarnCRM's Apex, a queued job or a Metadata API call.
+5. **A Salesforce Site**, only for webhooks, once per org.
 
-The secret itself is pasted on BarnCRM's page and written to the principal with
-`ConnectApi.NamedCredentials.createCredential`: it passes through Apex memory once and is never
-stored in a record, logged or returned. This differs from ADR-0229 decision 5 (packaged
-providers' secrets are entered in Setup); approved under D-215 subject to a separate in-depth
-security review.
+The secret itself (for the other kinds) is pasted on BarnCRM's page and written to the principal
+with `ConnectApi.NamedCredentials.createCredential` or `updateCredential`. This differs from
+ADR-0229 decision 5 (packaged providers' secrets are entered in Setup) and is approved under
+D-215 with the requirements below.
 
-Principal access: BarnCRM creates one org-owned permission set, "BarnCRM Connections"
-(unpackaged, because a packaged permission set cannot be changed in a subscriber org), adds each
-connection's principal to it, and assigns it to the recipe identities (Section 3.10) and to
-Connector admins.
+**Binding requirements for page-entered secrets (security review F1 to F13):**
+
+- **F1 Merge-field injection guard.** Every Connector Named Credential is created with Allow
+  Formulas in HTTP Body off, and the catalog schema cannot turn it on. Only the catalog's auth
+  header template may contain `{!`. After building a request and before `send`, the executor
+  fails the step with a fixed message if any header name or value, path, query value or body
+  string that came from recipe configuration, data pills, webhook payloads, app responses or
+  records contains `{!`. Saving a recipe or map whose literal values contain `{!` is refused.
+- **F2 Only BarnCRM's own credentials.** The server generates every new name; the client never
+  supplies one for creation. Update, Disconnect and Delete accept only a name that starts with
+  `BarnConn_`, exists in the org's External Credential list and is linked to a Named Credential
+  with the same prefix; anything else (for example `Barn_Stripe`, `Barn_PayPal`,
+  `Barn_Org_Connection`) is refused before any ConnectApi call. Principal and parameter names
+  come from the catalog, never the client.
+- **F3 Who may write, and how.** Every credential-writing method first checks the custom
+  permission `Manage_BarnCRM_Connector` and that the user holds `ManageNamedCredentials` or
+  Customize Application (a `PermissionSetAssignment` query, as `BarnCRMPermissions` does), and
+  refuses in plain words otherwise. The ConnectApi call runs synchronously in that request, as
+  that user: a secret is never queued, scheduled, published or handed to a recipe identity or any
+  system-context path. The controller is granted only by `BarnCRM_Connector_Admin` (never the
+  guest set or a user-level set) and its page is in the internal app only, with no Visualforce
+  page or REST resource exposing the write.
+- **F4 Hosts cannot move.** Base URLs must be `https://`. A connection's scheme and host are
+  immutable once a secret is stored: changing them means a new connection with the secret entered
+  again, or one call that replaces URL and secret together, never the URL alone. Catalog
+  connectors lock the host to the catalog pattern (Mailchimp's `{dc}` must match
+  `^[a-z]{2}[0-9]{1,3}$`). Every path appended to `callout:` starts with `/`, does not start with
+  `//`, and contains no `@`, `\`, `{!`, CR or LF; each value inserted is URL-encoded. Fetch back
+  parses the posted URL with `System.Url` and requires `https`, no user info, and the
+  connection's exact host (case-insensitive) and port, then calls `callout:` plus that URL's path
+  and query only; the posted URL is never the endpoint.
+- **F5 Secret URLs are configuration.** Page text, guide and ADR say plainly that a secret-URL
+  connection is stored as the Named Credential's URL and is visible to administrators who can
+  view Setup. The URL is never returned to the client (the list shows host and last four
+  characters); runs store the step's path, never the full URL. Slack recommends a bot token
+  (`Authorization: Bearer` to `chat.postMessage`, an encrypted principal) with the incoming
+  webhook as the simpler alternative; Teams Workflows keeps the disclosure. If the Setup Audit
+  Trail records Named Credential URLs, the Setup Changes copy masks them.
+- **F6 Encrypted, never read back.** Every secret parameter (key, token, password, client secret)
+  is written with `encrypted = true`; only non-secret ids (client id, user name) may be `false`.
+  BarnCRM never calls `getCredential` to return values; the list and edit form return names,
+  labels, host, auth kind and status only, and the secret box is always empty ("Replace Key").
+- **F7 Nothing echoes a secret.** Credential-writing methods catch every exception and log a fixed
+  message plus the exception type only, after replacing any occurrence of the secret (and each
+  secret part) with `****`; the raw exception never reaches `ErrorLogger.log`, `logWithMessage`
+  or `UserErrors.wrap`. No `System.debug` of inputs, credential inputs or callout requests in the
+  module (AvoidDebugStatements stays unsuppressed). The secret is never a field on any object,
+  setting, Admin Journal row, Setting Change row, Connector Run or platform event, nor an LMS
+  message. Failed-step responses are stored only for catalog check calls and recipe steps, never
+  for the credential write.
+- **F8 One method, no copies.** The `@AuraEnabled` parameter goes straight into the ConnectApi
+  input in one method, with no helper chain or wrapper class holding it. The admin guide says to
+  enter keys only when no debug logging is active for you, and to replace a key entered while a
+  trace flag was on. BarnCRM never enables namespace debug logs at FINEST in a subscriber org, and
+  production is supported on the managed package only.
+- **F9 Auth Providers only in Setup** (step 4 above).
+- **F10 Browser handling.** `lightning-input type="password"` with `autocomplete="new-password"`,
+  never prefilled; the value is cleared after the call returns, success or failure, and kept out
+  of any tracked object, store, `localStorage`, `sessionStorage`, URL, LMS message or event; the
+  write method is not `cacheable=true` and its response never contains the secret; no
+  `console.log` in the module; Mailchimp's data center is derived in the browser and sent as a
+  separate non-secret value.
+- **F11 Key replaced is visible.** Replacing a key writes one Admin Journal entry "Connection key
+  replaced" with who and when (no value); where the app's check call returns an account name or
+  id, it is shown after Check Connection; Health Check lists connections whose key changed in the
+  last 7 days.
+- **F12 The "BarnCRM Connections" permission set.** BarnCRM creates one org-owned permission set,
+  "BarnCRM Connections" (unpackaged, because a packaged permission set cannot be changed in a
+  subscriber org), and adds each connection's principal to it. It is assigned only to users who
+  already hold `BarnCRM_Connector_Admin` and to the recipe identities (Section 3.10); user Ids
+  never come from the client; Health Check warns when the set holds anything other than External
+  Credential principal access.
+- **F13 Webhooks:** Section 3.3.
 
 Each connection has **Check Connection** (the connector's check call, or a HEAD/GET of the base
-URL for generic), **Disconnect** (deletes the principal's credential, keeps the recipe
-definitions, pauses recipes that use it) and **Delete** (refused while a recipe uses it).
-
-Things to confirm on the first org deploy, as ADR-0229 listed its own: that `createCredential`
-writes a Custom protocol principal parameter for an admin with Customize Application; that
-`SetupEntityAccess` rows for an External Credential principal can be inserted from Apex (fallback:
-a guided Setup step); that an Auth Provider can be created at run time (fallback: guided Setup
-step with the values to paste); and that a namespaced package's Apex can call `callout:` on a
-subscriber-created Named Credential.
+URL for generic), **Replace Key**, **Disconnect** (deletes the principal's credential, keeps the
+recipe definitions, pauses recipes that use it) and **Delete** (refused while a recipe uses it).
+What remains to confirm in an org is listed in Section 3.11.
 
 ### 3.6 Connector Catalog (JSON)
 
@@ -400,7 +484,7 @@ never reads the key. Pickers (`pick`) call the app to list choices (audiences, e
 | Order | Connector | Auth | First templates |
 |---|---|---|---|
 | 1 | Generic REST | Any kind above | Any |
-| 2 | Slack and Microsoft Teams (Workflows webhook) | Secret URL | Post a message when a record matches (a large gift, a new volunteer) |
+| 2 | Slack (bot token recommended; incoming webhook as the simpler alternative) and Microsoft Teams (Workflows webhook) | Bearer token; secret URL with the F5 disclosure | Post a message when a record matches (a large gift, a new volunteer) |
 | 3 | Mailchimp | API key | Add new or changed people to an audience; pull unsubscribes back |
 | 4 | Google Sheets (C-38 source) | OAuth browser (Auth Provider type Google) | Load a sheet daily through an import template |
 | 5 | Giving tools that send webhooks (Givebutter, Donorbox, Zeffy and similar) | Webhook token; fetch back where the tool has an API | Gift and person, replacing the paid Zapier path of MIG-06 (needs Fundraising) |
@@ -539,6 +623,26 @@ the Automated Process user can call out through a principal it was granted; that
 Integration licensed user can be a platform event trigger's running user; and what the trigger
 does when that user is deactivated (assumed: it fails until changed, which Health Check catches).
 
+### 3.11 Confirm on the First Org Deploy
+
+Only an org test settles these; each has a stated fallback, and the F1 to F13 requirements hold
+whatever the results.
+
+| # | Check | Source | If it fails or is worse than expected |
+|---|---|---|---|
+| 1 | Whether `{!$Credential.Other_EC.Param}` resolves in a header of a callout to a Named Credential linked to a different External Credential | Review F1 | Treat F1 as Critical; the `{!` guard already blocks it, and the release notes say so |
+| 2 | Which permission `createCredential`, `updateCredential`, `createExternalCredential` and `createNamedCredential` require (expected `ManageNamedCredentials`); a user with only the Connector permission set gets an error | Review F3 | Adjust the F3 pre-check to the permission found |
+| 3 | Whether `callout:NC` plus `.attacker.net/x` or `@attacker.net/x` changes the host | Review F4 | The F4 path rules stay either way |
+| 4 | Whether the Setup Audit Trail records Named Credential URLs | Review F5 | The Setup Changes copy masks them |
+| 5 | That `getCredential` returns no clear value for an `encrypted = true` parameter | Review F6 | BarnCRM never calls it for values anyway; record the finding |
+| 6 | Whether a subscriber trace flag at FINEST shows variable assignments in namespaced code | Review F8 | Admin guide warning stands; strengthen it if they show |
+| 7 | `createCredential` writes a Custom protocol principal parameter | Section 3.5 | Guided Setup entry |
+| 8 | `SetupEntityAccess` rows for an External Credential principal can be inserted from Apex (one write-up says no Apex path exists) | Section 3.5, review F12 | Guided Setup step adding each principal to "BarnCRM Connections" |
+| 9 | Namespaced Apex can call `callout:` on a subscriber-created Named Credential | Section 3.5 | Blocks the design; must pass before CN-01 lands |
+| 10 | An Apex `PermissionSetAssignment` to the Automated Process user is accepted, and `USER_MODE` and callouts honor it | Section 3.10 | Integration User becomes the recommended default; System by explicit choice |
+| 11 | A Salesforce Integration licensed user can be a platform event trigger's running user | Section 3.10 | Any full-license user as the integration user |
+| 12 | What the trigger does once its configured user is deactivated | Section 3.10 | Health Check already pauses those recipes |
+
 ---
 
 ## 4. Governor Limits and Scale
@@ -602,8 +706,18 @@ Large one-off loads belong in Super Importer, which a recipe can call (`importRo
   built from the connector's template with each value URL-encoded; bodies are built as structures
   and serialized; a fetch-back URL must match the Connection's host (no server-side request
   forgery to other hosts).
-- **Secrets never in records,** logs, runs, errors or responses; headers are never stored.
-- **Guest endpoint:** Section 3.3.
+- **Secrets never in records,** logs, runs, errors or responses; headers are never stored. The one
+  exception is stated, not hidden: a secret-URL connection's URL is Named Credential
+  configuration, readable by administrators who can view Setup (F5).
+- **Page-entered secrets** follow the binding requirements F1 to F12 in Section 3.5: the `{!`
+  injection guard and formulas in body off (F1), server-generated `BarnConn_` names only (F2),
+  permission checks and synchronous ConnectApi writes as the person (F3), fixed `https` hosts,
+  path rules and exact-host fetch back (F4), `encrypted = true` and no read-back (F6), redacted
+  errors and no debug statements (F7), one-method pass-through (F8), Auth Providers only in Setup
+  (F9), browser handling (F10), a journaled key replacement (F11) and the Connections permission
+  set rules (F12). The independent review is `connector-secrets-security-review.md`; its data
+  flow and findings go in the AppExchange security review submission with the Code Analyzer run.
+- **Guest endpoint:** Section 3.3, including the header token (F13).
 - **Personal data in runs:** inputs and state can hold personal data; retention defaults to 30
   days, failed-step responses are trimmed, and a later minor adds runs to the GDPR erasure path
   (delete runs that name the person's record Id or email).
@@ -670,16 +784,16 @@ Connector module.
 | MAP-02 | `barnMapper` component: three panes, pick and drag, step editor, sample preview, Check Before Running | Core | Major |
 | MAP-03 | Saved Maps: `Kind__c`, save, load, rename, delete, Where Used for maps, Maps list in Data Manager | Core | Minor |
 | MAP-04 | Super Importer: Save as Map and Use a Saved Map | Core | Minor |
-| CN-01 | Package skeleton, two objects, permission sets, app, tab, Module Manager row, catalog loader, generic REST Connections (create, guided callout step, Check, Disconnect) | Module | Major |
-| CN-02 | Recipes and runs: editor (When and Then cards), manual and scheduled triggers, Find, Create, Update, Upsert, Call an App, If, Stop; run history; Test; map runtime | Module (may split into CN-02a model and history, CN-02b runner and steps) | Major |
+| CN-01 | Package skeleton, two objects, permission sets, app, tab, Module Manager row, catalog loader, generic REST Connections (create, guided callout step, Check, Replace Key, Disconnect) with F2, F3, F5, F6, F7, F8, F10, F11, F12. Tests: an update, Disconnect or Delete naming `Barn_Stripe` (or any name not created by BarnCRM) is refused before ConnectApi; a user with the Connector set but without `ManageNamedCredentials` or Customize Application is refused; no credential write is queued; each auth kind writes secrets with `encrypted = true` and ids with `false`; list and edit responses carry no secret and no secret URL (host and last four only); a ConnectApi exception echoing the secret is logged with `****` and only a fixed message reaches the user; no `System.debug` in the module; `http://` base URLs and host changes without a new secret are refused; Mailchimp `{dc}` pattern; key replacement writes one Admin Journal entry; the Connections set is assigned only to Connector admins and identities, never to a client-supplied Id; Jest: the password input is cleared after success and failure and never stored | Module | Major |
+| CN-02 | Recipes and runs: editor (When and Then cards), manual and scheduled triggers, Find, Create, Update, Upsert, Call an App, If, Stop; run history; Test; map runtime; executor with F1 and F4. Tests: `{!$Credential.` text in a webhook payload value, a record field, a recipe header and a map literal fails the step or the save; Named Credentials are created with formulas in body off; paths with `//`, `@`, `\`, `{!`, CR or LF are refused and inserted values are URL-encoded; recipe headers cannot set `Authorization` | Module (may split into CN-02a model and history, CN-02b runner and steps) | Major |
 | CN-03 | Recipe clock (platform event heartbeat), Run As identities (BarnCRM Automation, System, Integration User), record-change polling, retries with backoff, pause and auto-pause, Error Log, Health Check, Nightly cleanup | Module | Major |
-| CN-04 | Inbound webhooks: receiver, token, caps, idempotency, fetch back | Module | Major |
+| CN-04 | Inbound webhooks: receiver, token in `X-BarnCRM-Token` or the query, caps, idempotency, fetch back under F4 (F13). Tests: header and query token both accepted, wrong token 404 with empty body; fetch back refuses `http`, user info (`https://api.example.com@attacker.net`), a suffix host (`api.example.com.attacker.net`) and another port, and calls `callout:` with path and query only; the guest set holds only the REST class and create on the start event | Module | Major |
 | CN-05 | For Each, Wait, Change Data steps | Module | Minor |
 | CN-06 | Flow actions "Run BarnCRM Recipe" and "Apply BarnCRM Map and Save"; Where Used extension | Module | Minor |
-| CN-07 | Slack and Teams connectors with templates | Module | Minor |
+| CN-07 | Slack (bot token recommended, incoming webhook alternative) and Teams connectors with templates (F5). Tests: a secret-URL connection's URL is never returned to the client or stored on a run; page text carries the Setup-visibility disclosure | Module | Minor |
 | CN-08 | Publish, draft, Roll Back, Export and Import Recipe; Templates section | Module | Minor |
 | CN-09 | Load Rows with an Import Template: scheduled dry run with commit limits (C-38), with the small Core staging seam | Module and Core | Major |
-| CN-10 | Google Sheets connector (OAuth browser; Auth Provider guided creation) as an import source | Module | Major |
+| CN-10 | Google Sheets connector (OAuth browser) as an import source; the Auth Provider is created by the admin in Setup from the page's guidance, never by BarnCRM (F9), and this slice builds that guided step for CN-16 and CN-17 too. Tests: no code path creates an Auth Provider or accepts a client secret | Module | Major |
 | CN-11 | Mailchimp connector and templates | Module | Major |
 | CN-12 | Giving tool webhook templates (Givebutter, Donorbox, Zeffy) | Module (templates need Fundraising) | Minor |
 | CN-13 | App polling trigger (generic) | Module | Minor |
@@ -717,8 +831,13 @@ Decided 2026-11-20 (plan D-215):
    dry run that commits only inside the admin's limits; Google Sheets (CN-10) is the first source;
    SFTP and direct database sources leave C-38 (Section 4.1).
 2. **Pasting a connection's secret on BarnCRM's page through `ConnectApi`:** approved, subject to a
-   separate in-depth security review (in progress elsewhere; Section 3.5 is unchanged until it
-   reports). Stripe, PayPal, Smarty and Google keep ADR-0229.
+   separate in-depth security review. The review
+   (`docs/architecture/connector-secrets-security-review.md`) found it secure with required
+   mitigations; all of them (F1 to F13) are binding requirements in Sections 3.3 and 3.5, with
+   tests in CN-01, CN-02, CN-04, CN-07 and CN-10. Consequences of the review: OAuth Auth
+   Providers are created only by the admin in Setup (F9), and secret-URL connections (Teams, a
+   Slack incoming webhook) are disclosed as Setup-visible configuration, with a Slack bot token
+   recommended (F5). Stripe, PayPal, Smarty and Google keep ADR-0229.
 3. **Names:** approved: module BarnCRM Connector, tab Super Connector, Core feature the Mapper
    with saved Maps.
 4. **Runs as the admin who turned recipes on:** rejected. Brandon: "I'd rather recipes being able
