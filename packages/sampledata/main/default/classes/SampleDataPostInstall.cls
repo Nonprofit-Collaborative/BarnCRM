@@ -6,9 +6,8 @@
  * to the Error Log instead:
  *
  * 1. Mark the package's setup as run (`ModuleSetups`).
- * 2. Queue the job that gives the installer and every BarnCRM Admin, Staff and Read Only
- *    holder Sample Data (`ModuleAccessSyncs`; a permission set assignment is a setup object
- *    write).
+ * 2. Queue the job that gives the installer and every BarnCRM Admin holder Sample Data
+ *    (`ModuleAccessSyncs`; a permission set assignment is a setup object write).
  *
  * Nothing else changes: the package stores no settings, and the sample records are Core's
  * objects, flagged Sample Data.

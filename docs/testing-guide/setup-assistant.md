@@ -152,16 +152,17 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 
 ## T-SA-09: Sample Data and the Assistant Without Permission
 
-**Purpose:** confirm a user without Manage BarnCRM Settings cannot load or remove sample data or see the checklist.
-**Prerequisites:** read-only user, then staff user.
+**Purpose:** confirm only administrators get the Sample Data tab, and a user without Manage BarnCRM Settings cannot load or remove sample data or see the checklist.
+**Prerequisites:** BarnCRM Sample Data installed; read-only user, then staff user.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As read-only, open the **Sample Data** tab. | The card shows its status and counts, and "You need the Manage BarnCRM Settings permission to load or remove sample data." There is no **Load Sample Data** or **Remove Sample Data**. |
+| 1 | As read-only, open the App Launcher and search for "Sample Data". | No **Sample Data** tab: the package gives it to BarnCRM Admin holders only. |
 | 2 | Open **Home**. | No **Setup Checklist** and no **Setup Complete** tile. |
 | 3 | Repeat steps 1 and 2 as staff. | The same. |
+| 4 | As admin, assign the **Sample Data** permission set by itself to the staff user in Setup. As staff, open the **Sample Data** tab. | The card shows its status and counts, and "You need the Manage BarnCRM Settings permission to load or remove sample data." There is no **Load Sample Data** or **Remove Sample Data**. |
 
-**Cleanup:** None.
+**Cleanup:** Remove the **Sample Data** permission set from the staff user.
 
 ## T-SA-10: In-App Tips
 

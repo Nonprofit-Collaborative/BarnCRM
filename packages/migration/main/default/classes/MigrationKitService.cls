@@ -73,16 +73,6 @@ public with sharing class MigrationKitService {
 		public String step;
 	}
 
-	/** A kit the Migration Assistant tab lists: one whose product is detected here. */
-	public class KitRef {
-		@AuraEnabled
-		public String key;
-		@AuraEnabled
-		public String label;
-		@AuraEnabled
-		public String description;
-	}
-
 	/** One retire checklist item. */
 	public class Item {
 		@AuraEnabled
@@ -171,41 +161,21 @@ public with sharing class MigrationKitService {
 	// ------------------------------------------------------------------------------- catalog
 
 	/** The kits whose product is detected here, in Sort Order: what the tab offers to start. */
-	public static List<KitRef> offeredKits() {
+	public static List<IntegrationAppService.KitRef> offeredKits() {
 		requirePermission();
 		Set<String> detected = IntegrationAppService.detectedKeys();
-		List<KitRef> offered = new List<KitRef>();
+		List<IntegrationAppService.KitRef> offered = new List<IntegrationAppService.KitRef>();
 		for (Migration_Kit__mdt kit : catalog()) {
 			if (detected.contains(kit.Source_App__c)) {
-				KitRef ref = new KitRef();
-				ref.key = kit.DeveloperName;
-				ref.label = kit.MasterLabel;
-				ref.description = kit.Description__c;
-				offered.add(ref);
+				offered.add(IntegrationAppService.kitRef(kit));
 			}
 		}
 		return offered;
 	}
 
+	/** The shipped kits, read by Core's one kit query (`IntegrationAppService.kits`). */
 	private static List<Migration_Kit__mdt> catalog() {
-		if (catalogOverride != null) {
-			return catalogOverride;
-		}
-		// A query, not getAll(): getAll() cuts long text to 255 characters.
-		return [
-			SELECT
-				DeveloperName,
-				MasterLabel,
-				Source_App__c,
-				Description__c,
-				Steps_JSON__c,
-				Retire_Checklist_JSON__c,
-				Extension_Class__c,
-				Sort_Order__c
-			FROM Migration_Kit__mdt
-			WITH SYSTEM_MODE
-			ORDER BY Sort_Order__c, DeveloperName
-		];
+		return catalogOverride != null ? catalogOverride : IntegrationAppService.kits();
 	}
 
 	/** The kit, when it ships here and the product it moves from is detected; else refused. */

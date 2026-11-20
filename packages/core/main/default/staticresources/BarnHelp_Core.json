@@ -968,6 +968,7 @@
     "Core_Households_TidyProbeFailed": "The empty household tidy-up could not check {0} for records linked to a household, so it kept every household it was checking. Reason: {1}",
     "Core_HubHomeActions_NewHouseholdFailed": "The household could not be created: {0}",
     "Core_HubHome_AutomationPausedBanner": "BarnCRM automation is paused. Households and greetings are not being updated until it resumes.",
+    "Core_HubHome_HealthCheckNever": "Health Check has not run yet. Open it to check this org.",
     "Core_HubHome_InstallCompleted": "The install and upgrades logged no problems. The number above counts every new error.",
     "Core_HubHome_InstallProblems": "Of the new errors above, {0} came from the install and upgrades. See the Error Log.",
     "Core_HubHome_LoadErrorMessage": "The home page could not load everything. The error is recorded in the Error Log.",

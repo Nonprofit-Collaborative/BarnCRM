@@ -171,7 +171,7 @@ person what they can act on:
 | **New Person** button (opens the standard new contact form; the household is made automatically) | People who can create contacts |
 | **New Household** button | People who can create and edit accounts (BarnCRM makes the household for them; nobody needs the Household record type) |
 | **Setup Checklist** (or the **Setup Complete** tile once it is finished) | Administrators |
-| **Health Check** (a summary of its last run; the full list of findings after **Run Now**) | Administrators |
+| **Health Check** (a summary of its last run, with **Open Health Check**) | Administrators, while BarnCRM Org Optimizer is installed |
 | **Errors to Review** | Administrators |
 | **Rollups Last Completed** | Administrators |
 | **Seasonal Addresses Last Swapped** | Administrators |
@@ -250,11 +250,13 @@ Admin role.
 5. Use **Next** and **Skip for Now**, or click any step's name, to move around. Skipping
    does not mark a step done: it moves the step out of the way and offers it to you again
    next time. The full walkthrough of every step is in [setup-assistant.md](setup-assistant.md).
-6. Below the checklist, **Health Check** shows a summary of its last run: a badge (**Not
-   Run Yet**, **Passed**, or how many errors or warnings it found) and when it ran. Click
-   **Run Now** to check the org again and see every finding as a row, with a button to fix it
-   where it can. These are the same rows as the Health Check tab of Org Optimizer. The full
-   guide is [health-check.md](health-check.md).
+6. With the optional BarnCRM Org Optimizer package installed, the **Health Check** tile
+   shows a summary of its last full run: a badge (**Needs Fixing**, **Worth Knowing**, **All
+   Clear** or **Not Run Yet**, the same badge as Org Optimizer's), when it ran, and how many
+   findings it had to fix, to be aware of and for your information. Click **Open Health
+   Check** to open the Health Check section of Org Optimizer, where you run it again and fix
+   what it found. Opening Home never runs Health Check, so the tile costs the page nothing.
+   Without the package there is no tile. The full guide is [health-check.md](health-check.md).
 7. Look at the status tiles, each with an icon and a badge. **Errors to Review** shows the
    count of new errors, with **All Clear** when there are none. If it ever shows a number,
    click **Open the Error Log** and read the plain-language message on each row. The tile
@@ -314,9 +316,10 @@ you can move, remove, or add tiles in the Lightning App Builder without any code
 1. Open the home page, click the gear icon, then **Edit Page**.
 2. Drag a tile to another region, or select it and click the delete icon to remove it.
    The BarnCRM tiles are listed under **Custom** with names that start with
-   **BarnCRM Home**. With BarnCRM Org Optimizer installed, **Health Check** is listed too: add
-   it and tick **Show the last result first** for the last run's summary with **Run Health
-   Check**.
+   **BarnCRM Home**; **BarnCRM Home: Health Check** is the Health Check tile. With BarnCRM
+   Org Optimizer installed, the full **Health Check** panel is listed too: add it and tick
+   **Show the last result first** for the last run's summary with **Run Health Check** on
+   the home page itself.
 3. To add something of your own, drag in a standard component: **List View** (for example
    your households), **Report Chart**, or **Rich Text** for a note to your team.
 4. To show a tile only to some people, select it and use **Set Component Visibility**. The

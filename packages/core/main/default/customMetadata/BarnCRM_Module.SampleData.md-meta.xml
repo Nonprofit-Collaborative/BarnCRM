@@ -40,7 +40,7 @@
   </values>
   <values>
     <field>Access_By_Permission_Set__c</field>
-    <value xsi:type="xsd:string">Sample_Data=BarnCRM_Admin,BarnCRM_Staff,BarnCRM_Read_Only</value>
+    <value xsi:type="xsd:string">Sample_Data=BarnCRM_Admin</value>
   </values>
   <values>
     <field>Extensions__c</field>

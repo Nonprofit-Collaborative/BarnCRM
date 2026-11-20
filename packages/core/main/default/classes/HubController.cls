@@ -49,6 +49,17 @@ public with sharing class HubController {
 		public Datetime rollupsLastCalculated;
 		@AuraEnabled
 		public Boolean rollupsStale;
+		/**
+		 * The Org Optimizer tab, qualified, while that module is installed; the Health Check tile
+		 * shows only then (ADR-0233). With it, the stored last run (ADR-0106).
+		 */
+		@AuraEnabled
+		public String healthCheckTab;
+		@AuraEnabled
+		public Datetime healthCheckRanAt;
+		/** The last run's counts as "errors,warnings,infos"; the tile reads them. */
+		@AuraEnabled
+		public String healthCheckLastResult;
 		@AuraEnabled
 		public Datetime seasonalAddressLastRun;
 		@AuraEnabled
@@ -150,6 +161,7 @@ public with sharing class HubController {
 			model.stepsCompleted = SetupAssistantService.countCompleted(steps);
 			readErrorCounts(model);
 			readRollupFreshness(model);
+			readHealthCheckLastRun(model);
 			readSeasonalAddressRun(model);
 		} else {
 			// The checklist and the administrator tiles are hidden from staff (the page's
@@ -314,6 +326,29 @@ public with sharing class HubController {
 		} catch (Exception e) {
 			ErrorLogger.log(e, ERROR_CONTEXT);
 			model.rollupsStale = false;
+		}
+	}
+
+	/**
+	 * The last Health Check result, while the Org Optimizer module that runs Health Check is
+	 * installed (ADR-0233). Its tab comes from the module catalog and the result from the two
+	 * settings keys the module writes (ADR-0106), so Core names nothing in the module.
+	 */
+	private static void readHealthCheckLastRun(HomeModel model) {
+		try {
+			String moduleName = ModuleDetectionService.MODULE_ORG_OPTIMIZER;
+			String tab = ModuleDetectionService.isInstalled(moduleName)
+				? ModuleDetectionService.firstAdminTab(moduleName)
+				: null;
+			if (tab == null) {
+				return;
+			}
+			BarnCRM_Settings__c settings = SettingsService.getSettings();
+			model.healthCheckTab = NamespaceUtil.qualify(tab);
+			model.healthCheckRanAt = settings.Health_Check_Last_Run__c;
+			model.healthCheckLastResult = settings.Health_Check_Last_Result__c;
+		} catch (Exception e) {
+			ErrorLogger.log(e, ERROR_CONTEXT);
 		}
 	}
 

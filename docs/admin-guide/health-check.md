@@ -37,6 +37,11 @@ badge (**Needs Fixing: 2**, **Worth Knowing: 3**, **All Clear**, or **Not Run Ye
 same words as the report's findings). A run by someone without the **Manage BarnCRM
 Settings** permission is not kept as the last result, because it skips the access checks.
 
+The **BarnCRM Home** page shows the same last result to administrators on its **Health
+Check** tile: the badge, when it ran, the counts to fix, to be aware of and for your
+information, and **Open Health Check**, which opens this section. Home never runs Health
+Check itself (see [BarnCRM app](barncrm-app.md)).
+
 Staff, Read Only, Find and Export, Bulk Update and Bulk Delete holders get the Org Optimizer
 tab from the package too, so they can read Health Check.
 

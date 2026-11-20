@@ -4,7 +4,7 @@
   <label>Sample Data</label>
   <description>
     Opens the Sample Data tab and its counts. Loading and removing also need Manage BarnCRM
-    Settings. Given to BarnCRM Admin, Staff and Read Only holders.
+    Settings. Given to BarnCRM Admin holders.
   </description>
   <classAccesses>
     <apexClass>SampleDataController</apexClass>

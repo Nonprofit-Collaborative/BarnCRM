@@ -47,6 +47,19 @@
     </itemInstances>
     <itemInstances>
       <componentInstance>
+        <componentName>hubHealthCheck</componentName>
+        <identifier>hubHealthCheck1</identifier>
+        <visibilityRule>
+          <criteria>
+            <leftValue>{!$Permission.CustomPermission.Manage_BarnCRM_Settings}</leftValue>
+            <operator>EQUAL</operator>
+            <rightValue>true</rightValue>
+          </criteria>
+        </visibilityRule>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
         <componentName>hubErrors</componentName>
         <identifier>hubErrors1</identifier>
         <visibilityRule>

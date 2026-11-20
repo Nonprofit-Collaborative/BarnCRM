@@ -67,12 +67,50 @@ public with sharing class IntegrationAppService {
 		public List<KitRef> migrationKits = new List<KitRef>();
 	}
 
-	/** A kit a product offers, as the page names it on its Start Migration button. */
+	/**
+	 * A kit a product offers: the Integrations page names it on its Start Migration button and
+	 * the Migration Assistant tab lists it (ADR-0232).
+	 */
+	@NamespaceAccessible
 	public class KitRef {
 		@AuraEnabled
 		public String key;
 		@AuraEnabled
 		public String label;
+		@AuraEnabled
+		public String description;
+	}
+
+	/** The kit row as a `KitRef`, for this page and the Migration Assistant tab. */
+	@NamespaceAccessible
+	public static KitRef kitRef(Migration_Kit__mdt kit) {
+		KitRef ref = new KitRef();
+		ref.key = kit.DeveloperName;
+		ref.label = kit.MasterLabel;
+		ref.description = kit.Description__c;
+		return ref;
+	}
+
+	/**
+	 * Every shipped kit, lowest Sort Order first, with the fields the Migration Assistant runs
+	 * it from. A query, not getAll(): getAll() cuts long text to 255 characters.
+	 */
+	@NamespaceAccessible
+	public static List<Migration_Kit__mdt> kits() {
+		return [
+			SELECT
+				DeveloperName,
+				MasterLabel,
+				Source_App__c,
+				Description__c,
+				Steps_JSON__c,
+				Retire_Checklist_JSON__c,
+				Extension_Class__c,
+				Sort_Order__c
+			FROM Migration_Kit__mdt
+			WITH SYSTEM_MODE
+			ORDER BY Sort_Order__c, DeveloperName
+		];
 	}
 
 	/** The module catalog key of the Migration package, which runs the kits (ADR-0232). */
@@ -153,21 +191,14 @@ public with sharing class IntegrationAppService {
 		if (!migrationInstalled()) {
 			return byApp;
 		}
-		// A query, not getAll(): the rows are few and only these two fields are needed.
-		for (Migration_Kit__mdt kit : [
-			SELECT DeveloperName, MasterLabel, Source_App__c
-			FROM Migration_Kit__mdt
-			WHERE Source_App__c != NULL
-			WITH SYSTEM_MODE
-			ORDER BY Sort_Order__c, DeveloperName
-		]) {
+		for (Migration_Kit__mdt kit : kits()) {
+			if (kit.Source_App__c == null) {
+				continue;
+			}
 			if (!byApp.containsKey(kit.Source_App__c)) {
 				byApp.put(kit.Source_App__c, new List<KitRef>());
 			}
-			KitRef ref = new KitRef();
-			ref.key = kit.DeveloperName;
-			ref.label = kit.MasterLabel;
-			byApp.get(kit.Source_App__c).add(ref);
+			byApp.get(kit.Source_App__c).add(kitRef(kit));
 		}
 		return byApp;
 	}
