@@ -20,7 +20,6 @@ Rules:
 | core | BarnCRM_Settings | Custom67: Gears |
 | core | Brand__c | Custom56: Bottle |
 | core | Bulk_Update | Custom19: Wrench |
-| core | Data_Hygiene | Custom94: Stethoscope |
 | core | Data_Manager | Custom57: BuildingBlock |
 | core | Duplicate_Matching | Custom90: Scales |
 | core | Error_Log__c | Custom53: Bell |
@@ -112,6 +111,8 @@ Rules:
 | projects | Time_Entry__c | Custom95: Stopwatch |
 | reporting | Advanced_Reporting | Custom84: Presenter |
 | migration | Migration_Assistant | Custom98: Truck |
+| orgoptimizer | Data_Hygiene | Custom94: Stethoscope |
+| sampledata | Sample_Data | Custom13: Box |
 | giving | Accounting_Export | Custom16: Bank |
 | giving | Campaign_Sync | Custom35: Microphone |
 | giving | Gift_Transaction_Mirror | Custom31: Car |

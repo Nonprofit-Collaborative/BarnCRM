@@ -46,18 +46,30 @@ public with sharing class ImportNewFieldService {
 		'BarnCRM_Read_Only' => false
 	};
 
-	@NamespaceAccessible
+	/** Stands in for "the user holds the system permissions" in tests. */
 	@TestVisible
-	public static Boolean systemPermissionOverride;
+	private static Boolean systemPermissionOverride;
 	/** Stands in for "the Named Credential exists" in tests. */
-	@NamespaceAccessible
 	@TestVisible
-	public static Boolean connectedOverride;
+	private static Boolean connectedOverride;
 	/** Stands in for the Named Credential's callout status in tests ('Enabled' or 'Disabled'). */
-	@NamespaceAccessible
 	@TestVisible
-	public static String calloutStatusOverride;
+	private static String calloutStatusOverride;
 	private static final String ENABLED = 'Enabled';
+
+	/**
+	 * Has a module's test stand in for the system permissions, the Named Credential and its
+	 * callout status, where `@TestVisible` does not reach once the packages are separate. Each
+	 * null reads the org. Does nothing outside a test.
+	 */
+	@NamespaceAccessible
+	public static void overrideForTest(Boolean systemPermission, Boolean connected, String calloutStatus) {
+		if (Test.isRunningTest()) {
+			systemPermissionOverride = systemPermission;
+			connectedOverride = connected;
+			calloutStatusOverride = calloutStatus;
+		}
+	}
 
 	/** The field the admin asked for. `apiName` is without `__c`. */
 	public class FieldRequest {

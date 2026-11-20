@@ -150,13 +150,7 @@ public with sharing class SampleDataLoader {
 			// The counts are a courtesy: a load that is in must never be undone by counting it.
 			ErrorLogger.log(notCounted, JobNotifier.LOG_CONTEXT);
 		}
-		JobNotifier.aboutSettings(
-			UserInfo.getUserId(),
-			Label.Core_JobNotice_SampleData,
-			false,
-			body,
-			JobNotifier.SECTION_GENERAL
-		);
+		JobNotifier.aboutSampleData(UserInfo.getUserId(), Label.Core_JobNotice_SampleData, false, body);
 	}
 
 	/**

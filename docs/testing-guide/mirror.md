@@ -322,6 +322,6 @@ Fundraising deployed by `scripts/org/deploy-packages.sh` and Mirror not deployed
 | 4 | Open **Access**, **Extra Permissions**. | **Salesforce Records Sync**, **Accounting Export** and **Inbound Gifts** are offered with the Fundraising sets. |
 | 5 | Give yourself **Salesforce Records Sync** and open **Campaign Sync** from the App Launcher. | The page opens and offers **Sync All Appeals**. |
 | 6 | Open **General**, **Nightly Jobs**. | The Opportunity mirror and Gift Transaction mirror steps are listed with Fundraising's other jobs. |
-| 7 | Open **Health**, run the check. | No finding says the gift mirrors need another module. |
+| 7 | Open the **Org Optimizer** tab, **Health Check**, and run the check. | No finding says the gift mirrors need another module. |
 
 **Cleanup:** delete the scratch org.

@@ -416,9 +416,9 @@ core/HealthCheckExtensions.cls | public static final List<String> EXTENSION_CLAS
 core/HealthCheckFixExtension.cls | public interface HealthCheckFixExtension
 core/HealthCheckFixes.cls | public class HealthCheckFixes
 core/HealthCheckFixes.cls | public static AuraHandledException failed(Exception,Boolean)
-core/HealthCheckFixes.cls | public static Boolean failAfterFixForTest
 core/HealthCheckFixes.cls | public static HealthCheckService.Report applyForModules(String,List<String>)
 core/HealthCheckFixes.cls | public static String apply(String,List<String>)
+core/HealthCheckFixes.cls | public static void failAfterFixForTest(Boolean)
 core/HealthCheckFixes.cls | public static void requireManageSettings()
 core/HealthCheckRun.cls | public interface HealthCheckRun
 core/HealthCheckService.cls | public Boolean getCanManageSettings()
@@ -437,7 +437,6 @@ core/HealthCheckService.cls | public Report put(String,Object)
 core/HealthCheckService.cls | public Report()
 core/HealthCheckService.cls | public String getCategory()
 core/HealthCheckService.cls | public String getCurrentMode()
-core/HealthCheckService.cls | public String getCurrentModeLabel()
 core/HealthCheckService.cls | public String getDetail()
 core/HealthCheckService.cls | public String getFixOutcome()
 core/HealthCheckService.cls | public String getFixTarget()
@@ -461,7 +460,6 @@ core/HealthCheckService.cls | public static Finding checkFailed(String,Exception
 core/HealthCheckService.cls | public static Integer queryBudget
 core/HealthCheckService.cls | public static List<Finding> extensionFindings()
 core/HealthCheckService.cls | public static List<Finding> extensionFindings(List<String>,Set<String>)
-core/HealthCheckService.cls | public static List<Finding> runInstalled()
 core/HealthCheckService.cls | public static List<String> fixScope(String)
 core/HealthCheckService.cls | public static String forCount(Integer,String,String,List<Object>)
 core/HealthCheckService.cls | public static String modeLabel(String)
@@ -858,10 +856,8 @@ core/ImportNewFieldService.cls | public Boolean getCanCreate()
 core/ImportNewFieldService.cls | public Boolean getConnected()
 core/ImportNewFieldService.cls | public class Connection
 core/ImportNewFieldService.cls | public class ImportNewFieldService
-core/ImportNewFieldService.cls | public static Boolean connectedOverride
-core/ImportNewFieldService.cls | public static Boolean systemPermissionOverride
-core/ImportNewFieldService.cls | public static String calloutStatusOverride
 core/ImportNewFieldService.cls | public static final String CONNECTION
+core/ImportNewFieldService.cls | public static void overrideForTest(Boolean,Boolean,String)
 core/ImportObjectLoader.cls | public class ImportObjectLoader
 core/ImportObjectLoader.cls | public static ImportRowProcessor.Outcome process(Import_Batch__c,Import_Template__c,ImportMapping,List<Import_Row__c>,Boolean)
 core/ImportObjectLoader.cls | public static List<String> relatedLines(Id,Boolean)
@@ -1055,16 +1051,17 @@ core/IntegrationAppService.cls | public static void useCatalogForTest(List<Integ
 core/JobNotifier.cls | public Id recipientId
 core/JobNotifier.cls | public Id targetId
 core/JobNotifier.cls | public String section
+core/JobNotifier.cls | public String tab
 core/JobNotifier.cls | public String title
 core/JobNotifier.cls | public class JobNotifier
 core/JobNotifier.cls | public class Notice
 core/JobNotifier.cls | public static Id starter()
-core/JobNotifier.cls | public static List<Notice> sent
 core/JobNotifier.cls | public static List<Notice> sentNotices()
 core/JobNotifier.cls | public static final String LOG_CONTEXT
 core/JobNotifier.cls | public static final String SECTION_GENERAL
 core/JobNotifier.cls | public static final String SECTION_ROLLUPS
 core/JobNotifier.cls | public static void aboutRecord(Id,String,Boolean,String,Id)
+core/JobNotifier.cls | public static void aboutSampleData(Id,String,Boolean,String)
 core/JobNotifier.cls | public static void aboutSettings(Id,String,Boolean,String,String)
 core/JobNotifier.cls | public static void ownType(String,Set<String>,String,String,Id,String)
 core/LinkedRecords.cls | public String label
@@ -1211,7 +1208,6 @@ core/OrgLimitReader.cls | public String getName()
 core/OrgLimitReader.cls | public class LimitUse
 core/OrgLimitReader.cls | public class OrgLimitReader
 core/OrgLimitReader.cls | public static List<LimitUse> all()
-core/OrgLimitReader.cls | public static List<LimitUse> atOrAbove(Integer)
 core/OrgLimitReader.cls | public static void useLimitsForTest(Map<String,List<Integer>>)
 core/OrgSettingsSystemWriter.cls | public class OrgSettingsException
 core/OrgSettingsSystemWriter.cls | public class OrgSettingsSystemWriter
@@ -1444,7 +1440,6 @@ core/SampleDataModules.cls | public static Boolean anyHasSampleRecords()
 core/SampleDataModules.cls | public static List<ModuleCount> counts()
 core/SampleDataModules.cls | public static List<SampleDataModule> moduleOverride
 core/SampleDataModules.cls | public static SampleDataHost host()
-core/SampleDataModules.cls | public static SampleDataHost requireHost()
 core/SampleDataModules.cls | public static void removeAfter(String)
 core/SampleDataModules.cls | public static void startAfter(String)
 core/SampleDataModules.cls | public static void startFirst()
@@ -1455,7 +1450,6 @@ core/SampleDataRemoveBatch.cls | public static Id startRemoval(SampleDataStages)
 core/SampleDataStageBatch.cls | public Boolean stopped
 core/SampleDataStageBatch.cls | public SampleDataStageBatch(SampleDataStages)
 core/SampleDataStageBatch.cls | public static Boolean everyStageInTest
-core/SampleDataStageBatch.cls | public static Boolean mayQueueNextStage()
 core/SampleDataStageBatch.cls | public static Id start(SampleDataStages)
 core/SampleDataStageBatch.cls | public static List<SampleDataStages> started
 core/SampleDataStageBatch.cls | public static void noteStarted(SampleDataStages)
@@ -1468,7 +1462,6 @@ core/ScheduledJobSelector.cls | public static Boolean isScheduled(String)
 core/ScheduledJobSelector.cls | public static Datetime nextFireTime(String)
 core/ScheduledJobSelector.cls | public static Datetime startTime(String)
 core/ScheduledJobSelector.cls | public static Id ensure(String,String,Schedulable)
-core/ScheduledJobSelector.cls | public static Id ownerOverride
 core/ScheduledJobSelector.cls | public static Id schedule(String,String,Schedulable)
 core/ScheduledJobSelector.cls | public static Id triggerIdByName(String)
 core/ScheduledJobSelector.cls | public static List<String> namesOwnedByInactiveUsers()
@@ -1476,6 +1469,7 @@ core/ScheduledJobSelector.cls | public static String cronExpressionByName(String
 core/ScheduledJobSelector.cls | public static String nameKey(String)
 core/ScheduledJobSelector.cls | public static void abort(Id)
 core/ScheduledJobSelector.cls | public static void forget()
+core/ScheduledJobSelector.cls | public static void overrideOwnerForTest(Id)
 core/ScheduledJobSelector.cls | public static void stopNamed(String)
 core/SettingSections.cls | public class SettingSections
 core/SettingSections.cls | public static Boolean isKnown(String)
@@ -1579,12 +1573,12 @@ core/SetupAssistantService.cls | public static final String RULE_ACTION
 core/SetupAssistantService.cls | public static final String RULE_SETTING
 core/SetupChangeCopyJob.cls | public Database.QueryLocator start(Database.BatchableContext)
 core/SetupChangeCopyJob.cls | public class SetupChangeCopyJob
-core/SetupChangeCopyJob.cls | public static Boolean chainPurge
 core/SetupChangeCopyJob.cls | public static Boolean isRunning()
 core/SetupChangeCopyJob.cls | public static Boolean isScheduled()
 core/SetupChangeCopyJob.cls | public static Boolean runNow()
 core/SetupChangeCopyJob.cls | public static Id start()
 core/SetupChangeCopyJob.cls | public static Integer retentionDays()
+core/SetupChangeCopyJob.cls | public static void chainPurgeForTest(Boolean)
 core/SetupObjectSelector.cls | public class SetupObjectSelector
 core/SetupObjectSelector.cls | public static Id customPermissionId(String)
 core/SetupObjectSelector.cls | public static Id emailTemplateId(String,Boolean)

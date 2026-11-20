@@ -80,7 +80,7 @@ Before you convert:
 
 There is nothing to do in Salesforce Setup.
 
-Health Check's **What We Found in Your Org** card (BarnCRM Settings, **Health**) says how many
+Health Check's **What We Found in Your Org** card (the **Org Optimizer** tab, **Health Check**) says how many
 Nonprofit Cloud households BarnCRM found, as information. If it cannot count them, it says that
 instead, and BarnCRM assumes they are there and stays out of their way.
 
@@ -119,7 +119,7 @@ Her colleagues have grouped 1,240 families there.
 5. When it finishes, **Last conversion** shows 1,238 converted. She opens the Lee household:
    it is a BarnCRM household with Sam Lee as its primary member and greetings filled in, and
    Household Model reads Converted.
-6. She opens **Health** and sees no **Household Model Disagrees With Nonprofit Cloud** warning.
+6. She opens the **Org Optimizer** tab, **Health Check**, runs it, and sees no **Household Model Disagrees With Nonprofit Cloud** warning.
 7. On the same tab she starts the **NPC Households** kit, marks its step done and ticks the
    retire checklist.
 

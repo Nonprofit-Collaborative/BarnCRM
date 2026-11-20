@@ -154,7 +154,7 @@ private class HealthCheckFixesTest {
 
 			System.runAs(maria) {
 				HealthCheckService.Finding finding = find('stub_things_missing');
-				HealthCheckFixes.failAfterFixForTest = true;
+				HealthCheckFixes.failAfterFixForTest(true);
 
 				Test.startTest();
 				try {
@@ -316,7 +316,7 @@ private class HealthCheckFixesTest {
 			clearOrgBarnCrmJobs();
 			NightlyJobs.start();
 			ScheduledJobSelector.schedule(otherJob, '0 0 3 * * ?', new ErrorDigestScheduler());
-			ScheduledJobSelector.ownerOverride = gone;
+			ScheduledJobSelector.overrideOwnerForTest(gone);
 			ScheduledJobSelector.forget();
 			String fixKey = HealthCheckService.FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS;
 
@@ -351,7 +351,7 @@ private class HealthCheckFixesTest {
 					'The fix is recorded in the settings change history'
 				);
 			}
-			ScheduledJobSelector.ownerOverride = null;
+			ScheduledJobSelector.overrideOwnerForTest(null);
 			ScheduledJobSelector.forget();
 			Assert.isNull(ScheduledJobSelector.triggerIdByName(otherJob), 'The unknown job was stopped');
 			Assert.isNotNull(ScheduledJobSelector.triggerIdByName(NightlyJobs.jobName()), 'The known job runs again');
@@ -377,7 +377,7 @@ private class HealthCheckFixesTest {
 					'Jobs of an active owner are left alone, the org\'s own included'
 				);
 
-				ScheduledJobSelector.ownerOverride = gone;
+				ScheduledJobSelector.overrideOwnerForTest(gone);
 				ScheduledJobSelector.forget();
 				List<String> scope = HealthCheckService.fixScope(fixKey);
 				Assert.areEqual(
@@ -407,7 +407,7 @@ private class HealthCheckFixesTest {
 					'The one it never schedules is said to be stopped only: ' + report.getFixOutcome()
 				);
 			}
-			ScheduledJobSelector.ownerOverride = null;
+			ScheduledJobSelector.overrideOwnerForTest(null);
 			ScheduledJobSelector.forget();
 			Assert.isNotNull(ScheduledJobSelector.triggerIdByName(orgJob), 'The org\'s own job is scheduled again');
 			Assert.isNull(ScheduledJobSelector.triggerIdByName(otherJob), 'The unknown job was stopped');

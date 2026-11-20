@@ -87,6 +87,28 @@ private class JobNotificationPathsTest {
 		Assert.areEqual(title, notice.title, 'Saying what happened');
 	}
 
+	/** Exactly one notification, to the running user, opening the Sample Data tab. */
+	private static void assertOneAboutSampleDataTab(String title) {
+		Assert.areEqual(1, JobNotifier.sent.size(), 'Exactly one notification: ' + title);
+		JobNotifier.Notice notice = JobNotifier.sent[0];
+		Assert.areEqual(UserInfo.getUserId(), notice.recipientId, 'To the person who started it');
+		Assert.isNull(notice.targetId, 'No record');
+		Assert.isNull(notice.section, 'No settings section');
+		String sampleDataTab = ModuleDetectionService.firstAdminTab(ModuleDetectionService.MODULE_SAMPLE_DATA);
+		Assert.isNotNull(sampleDataTab, 'The module catalog names the Sample Data tab');
+		Assert.areEqual(sampleDataTab, notice.tab, 'Opening the Sample Data tab');
+		Assert.areEqual(title, notice.title, 'Saying what happened');
+		Map<String, Object> page = (Map<String, Object>) JSON.deserializeUntyped(
+			JobNotifier.tabPageReference(notice.tab)
+		);
+		Assert.areEqual('standard__navItemPage', page.get('type'), 'A tab page');
+		Assert.areEqual(
+			NamespaceUtil.qualify(sampleDataTab),
+			((Map<String, Object>) page.get('attributes')).get('apiName'),
+			'The Sample Data tab, as this org names it'
+		);
+	}
+
 	@IsTest
 	static void importAndPreviewOpenTheImport() {
 		System.runAs(TestUsers.admin()) {
@@ -191,21 +213,28 @@ private class JobNotificationPathsTest {
 	}
 
 	@IsTest
-	static void sampleDataLoadOpensGeneralWhenDoneOrStopped() {
+	static void sampleDataLoadOpensTheSampleDataTabWhenDoneOrStopped() {
 		System.runAs(TestUsers.admin()) {
 			notifications(true);
 			SampleDataModules.moduleOverride = new List<SampleDataModule>();
+			ModuleDetectionService.installedOverride.put(ModuleDetectionService.MODULE_SAMPLE_DATA, true);
 
 			SampleDataModules.startFirst();
 
-			assertOneAboutSection(
-				JobNotifier.SECTION_GENERAL,
+			assertOneAboutSampleDataTab(
 				title(System.Label.Core_JobNotice_Finished, System.Label.Core_JobNotice_SampleData)
 			);
 
 			JobNotifier.sent.clear();
 			runOneStage(false);
 			Assert.areEqual(0, JobNotifier.sent.size(), 'A stage that worked says nothing');
+			runOneStage(true);
+			assertOneAboutSampleDataTab(
+				title(System.Label.Core_JobNotice_Stopped, System.Label.Core_JobNotice_SampleData)
+			);
+
+			JobNotifier.sent.clear();
+			ModuleDetectionService.installedOverride.put(ModuleDetectionService.MODULE_SAMPLE_DATA, false);
 			runOneStage(true);
 			assertOneAboutSection(
 				JobNotifier.SECTION_GENERAL,

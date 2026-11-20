@@ -33,9 +33,19 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
 	private Boolean purging = false;
 
 	/** Set by a test so the delete pass is not started from the copy pass's finish. */
-	@NamespaceAccessible
 	@TestVisible
-	public static Boolean chainPurge = true;
+	private static Boolean chainPurge = true;
+
+	/**
+	 * Sets that from a module's test, where `@TestVisible` does not reach once the packages are
+	 * separate. Does nothing outside a test.
+	 */
+	@NamespaceAccessible
+	public static void chainPurgeForTest(Boolean chain) {
+		if (Test.isRunningTest()) {
+			chainPurge = chain;
+		}
+	}
 
 	public SetupChangeCopyJob() {
 		this.purging = false;

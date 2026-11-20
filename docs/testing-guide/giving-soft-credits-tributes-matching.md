@@ -162,7 +162,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | **BarnCRM Settings**, **Sample Data**, **Load Sample Data**, wait for it to finish. | The load finishes. |
+| 1 | Open the **Sample Data** tab, select **Load Sample Data**, wait for it to finish. | The load finishes. |
 | 2 | Open **Founders Consulting Group** and its **Gifts**; open the Received check. | **Matched Gift** names an employee's gift, and **Soft Credits** lists that employee as **Matched donor**. Open the employee's gift: its **Matched Gift** names the company's gift. |
 | 3 | On **Gifts**, filter **Type** equals Stock and open one. | **Stock Symbol** (EXMP, SMPL or DEMO) and **Shares** are filled in. |
 | 4 | Filter **Gift Source** equals Donor-Advised Fund and open one. | **Gift Source Name** names the giving account. |

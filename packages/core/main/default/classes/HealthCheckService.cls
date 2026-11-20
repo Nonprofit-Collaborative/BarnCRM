@@ -437,11 +437,6 @@ public with sharing class HealthCheckService {
 		}
 
 		@NamespaceAccessible
-		public String getCurrentModeLabel() {
-			return currentModeLabel;
-		}
-
-		@NamespaceAccessible
 		public String getRecommendedMode() {
 			return recommendedMode;
 		}
@@ -518,7 +513,6 @@ public with sharing class HealthCheckService {
 	 * the runner, is not installed (`HealthCheckRun`, ADR-0057). A null is never a clean org: the
 	 * caller says Health Check is not available.
 	 */
-	@NamespaceAccessible
 	public static List<Finding> runInstalled() {
 		HealthCheckRun runner = (HealthCheckRun) ModuleExtensions.first(HealthCheckRun.class);
 		return runner == null ? null : runner.findings();

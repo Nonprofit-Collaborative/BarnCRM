@@ -53,13 +53,11 @@ private class ReportSubscriptionsTest {
 	@IsTest
 	static void viewSaysWhetherThePersonCanSubscribeHere() {
 		System.runAs(TestUsers.withPermissionSets(CONNECTION_ADMIN)) {
-			ImportNewFieldService.systemPermissionOverride = true;
-			ImportNewFieldService.connectedOverride = true;
-			ImportNewFieldService.calloutStatusOverride = 'Enabled';
+			ImportNewFieldService.overrideForTest(true, true, 'Enabled');
 			ReportSubscriptions.SubscriptionView view = ReportSubscriptions.getView();
 			Assert.isTrue(view.canSubscribe, 'Connected admin.');
 			Assert.isNotNull(view.reports, 'A list, possibly empty in a test.');
-			ImportNewFieldService.calloutStatusOverride = 'Disabled';
+			ImportNewFieldService.overrideForTest(true, true, 'Disabled');
 			view = ReportSubscriptions.getView();
 			Assert.isFalse(view.canSubscribe, 'Callouts off.');
 			Assert.isTrue(view.canUseConnection, 'Still may use it once it is on.');
@@ -69,8 +67,7 @@ private class ReportSubscriptionsTest {
 	@IsTest
 	static void subscribeExplainsAMissingConnection() {
 		System.runAs(TestUsers.withPermissionSets(CONNECTION_ADMIN)) {
-			ImportNewFieldService.systemPermissionOverride = true;
-			ImportNewFieldService.connectedOverride = false;
+			ImportNewFieldService.overrideForTest(true, false, null);
 			try {
 				ReportSubscriptions.subscribe(JSON.serialize(weekly()));
 				Assert.fail('No connection.');
@@ -87,9 +84,7 @@ private class ReportSubscriptionsTest {
 	@IsTest
 	static void subscribeRefusesAnIncompleteSchedule() {
 		System.runAs(TestUsers.withPermissionSets(CONNECTION_ADMIN)) {
-			ImportNewFieldService.systemPermissionOverride = true;
-			ImportNewFieldService.connectedOverride = true;
-			ImportNewFieldService.calloutStatusOverride = 'Enabled';
+			ImportNewFieldService.overrideForTest(true, true, 'Enabled');
 			ReportSubscriptions.Choice chosen = weekly();
 			chosen.weekday = 'someday';
 			try {

@@ -178,12 +178,7 @@ public with sharing class IntegrationAppService {
 		if (migrationInstalledOverride != null) {
 			return migrationInstalledOverride;
 		}
-		for (BarnCRM_Module__mdt row : ModuleDetectionService.installedCatalog()) {
-			if (row.DeveloperName == MIGRATION_MODULE) {
-				return true;
-			}
-		}
-		return false;
+		return ModuleDetectionService.isInstalled(MIGRATION_MODULE);
 	}
 
 	/** The row's category, or Complement when it is blank or none of the three. */

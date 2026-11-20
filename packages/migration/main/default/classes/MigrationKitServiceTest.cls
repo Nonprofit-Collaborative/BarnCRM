@@ -9,10 +9,12 @@ private class MigrationKitServiceTest {
 	private static final String APP = 'Test_App';
 	private static final String KIT = 'Test_Kit';
 	private static final String LAST_NAME = 'Migrationtest';
+	/** Grants the kit fields on Merge Journal and Import Batch, and the Migration Assistant. */
+	private static final String MIGRATION_ADMIN = 'Migration_Admin';
 
 	@TestSetup
 	static void createTestUser() {
-		TestUsers.admin();
+		TestUsers.adminWith(MIGRATION_ADMIN);
 	}
 
 	/** The test product is detected by Contact, and the kit moves it. */
@@ -59,7 +61,7 @@ private class MigrationKitServiceTest {
 
 	@IsTest
 	static void aDetectedProductWithAKitOffersItsMigration() {
-		System.runAs(TestUsers.admin()) {
+		System.runAs(TestUsers.adminWith(MIGRATION_ADMIN)) {
 			useKit(TWO_TOOLS, ONE_ITEM, null);
 			MigrationController.Home home = MigrationController.getHome();
 			Assert.areEqual(1, home.kits.size(), 'The detected product offers its kit');
@@ -86,7 +88,7 @@ private class MigrationKitServiceTest {
 
 	@IsTest
 	static void toolStepsRunInOrderAndTheChecklistCompletesTheRun() {
-		System.runAs(TestUsers.admin()) {
+		System.runAs(TestUsers.adminWith(MIGRATION_ADMIN)) {
 			useKit(TWO_TOOLS, ONE_ITEM, null);
 			MigrationKitService.KitView view = MigrationController.getKit(KIT);
 			Assert.areEqual(MigrationKitService.NOT_STARTED, view.steps[0].status, 'First is ready');
@@ -141,7 +143,7 @@ private class MigrationKitServiceTest {
 
 	@IsTest
 	static void anImportStepStagesItsSourceIntoADataJob() {
-		System.runAs(TestUsers.admin()) {
+		System.runAs(TestUsers.adminWith(MIGRATION_ADMIN)) {
 			Import_Template__c template = ImportTemplateService.createObjectTemplate('Migration test', 'Contact');
 			// A kit's template maps its columns; an unmapped one fails the dry run that follows.
 			ImportMapping mapping = new ImportMapping();
@@ -192,7 +194,7 @@ private class MigrationKitServiceTest {
 
 	@IsTest
 	static void anEmptySourceIsDoneAtOnceAndVerified() {
-		System.runAs(TestUsers.admin()) {
+		System.runAs(TestUsers.adminWith(MIGRATION_ADMIN)) {
 			useKit(importStep('no_template_needed', 'Nobodyhere', '["Email"]'), null, null);
 			MigrationKitService.KitView view = MigrationController.startStep(KIT, 'people');
 			Assert.areEqual(MigrationKitService.DONE, view.steps[0].status, 'Nothing to move');
@@ -203,7 +205,7 @@ private class MigrationKitServiceTest {
 
 	@IsTest
 	static void aFieldTheOrgLacksIsRefusedByName() {
-		System.runAs(TestUsers.admin()) {
+		System.runAs(TestUsers.adminWith(MIGRATION_ADMIN)) {
 			useKit(importStep('any', LAST_NAME, '["Not_A_Field__c"]'), null, null);
 			String message;
 			try {
@@ -218,7 +220,7 @@ private class MigrationKitServiceTest {
 
 	@IsTest
 	static void unreadableStepsAreShownAsAProblem() {
-		System.runAs(TestUsers.admin()) {
+		System.runAs(TestUsers.adminWith(MIGRATION_ADMIN)) {
 			useKit('[{"key":"x","kind":"copy"}]', null, null);
 			MigrationKitService.KitView view = MigrationController.getKit(KIT);
 			Assert.isNotNull(view.problem, 'The reason is shown');
@@ -228,7 +230,7 @@ private class MigrationKitServiceTest {
 
 	@IsTest
 	static void anExtensionChecksAToolStep() {
-		System.runAs(TestUsers.admin()) {
+		System.runAs(TestUsers.adminWith(MIGRATION_ADMIN)) {
 			useKit(TWO_TOOLS, null, 'FakeExtension');
 			MigrationKitService.extensionOverride.put('FakeExtension', new FakeExtension());
 			MigrationKitService.KitView view = MigrationController.getKit(KIT);
@@ -255,7 +257,7 @@ private class MigrationKitServiceTest {
 
 	@IsTest
 	static void namesResolveThroughDescribeAndValuesReadAsAFileWould() {
-		System.runAs(TestUsers.admin()) {
+		System.runAs(TestUsers.adminWith(MIGRATION_ADMIN)) {
 			Assert.areEqual(
 				'Account.Name',
 				MigrationKitService.path(Contact.SObjectType, 'Account.Name', false),
@@ -277,7 +279,7 @@ private class MigrationKitServiceTest {
 
 	@IsTest
 	static void aLinkedColumnPointsAtWhatTheEarlierStepMoved() {
-		System.runAs(TestUsers.admin()) {
+		System.runAs(TestUsers.adminWith(MIGRATION_ADMIN)) {
 			Import_Template__c template = ImportTemplateService.createObjectTemplate('Migration link test', 'Contact');
 			List<Contact> people = new List<Contact>{
 				TestDataFactory.person(new Contact(LastName = 'Source')),
@@ -333,7 +335,7 @@ private class MigrationKitServiceTest {
 
 	@IsTest
 	static void aLinkToALaterStepAndANotEqualsFilterAreRead() {
-		System.runAs(TestUsers.admin()) {
+		System.runAs(TestUsers.adminWith(MIGRATION_ADMIN)) {
 			useKit(
 				'[{"key":"one","kind":"tool","tab":"Rollup_Builder",' +
 					'"links":[{"column":"X","step":"two"}]},' +
@@ -361,7 +363,7 @@ private class MigrationKitServiceTest {
 
 	@IsTest
 	static void aStagingJobThatCannotReadItsSourceMarksTheBatchFailedWithTheReason() {
-		System.runAs(TestUsers.admin()) {
+		System.runAs(TestUsers.adminWith(MIGRATION_ADMIN)) {
 			Import_Template__c template = ImportTemplateService.createObjectTemplate('Migration failure', 'Contact');
 			Import_Batch__c batch = ImportTestDataFactory.batch(template);
 			useKit(importStep(template.Template_Key__c, LAST_NAME, '["Email"]'), null, null);
@@ -388,7 +390,7 @@ private class MigrationKitServiceTest {
 
 	@IsTest
 	static void aPageThatCannotBeStagedStopsTheJobAndFailsTheBatch() {
-		System.runAs(TestUsers.admin()) {
+		System.runAs(TestUsers.adminWith(MIGRATION_ADMIN)) {
 			Import_Template__c template = ImportTemplateService.createObjectTemplate(
 				'Migration page failure',
 				'Contact'

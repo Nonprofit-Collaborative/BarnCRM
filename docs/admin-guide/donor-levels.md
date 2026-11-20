@@ -21,7 +21,7 @@ printed next to it can never disagree.
 Everything is in the app. You never open Setup.
 
 1. Open **BarnCRM Settings**, then **Fundraising**.
-2. Open **Donor Levels**. This is the page that shows your ladder.
+2. Open **Donor Levels and Scores**. This is the page that shows your ladder.
 3. Choose **New Level** and create your first rung. Each rung has:
    - a **name**, the one you use with donors and on your donor wall;
    - a **minimum amount**, the amount at which a donor reaches this rung. A donor whose
@@ -49,7 +49,7 @@ Everything is in the app. You never open Setup.
    - **Largest single gift**, the single biggest gift the donor has given, for a ladder
      built on one gift rather than on a total.
 6. Turn **Turn on donor levels** on in the same section.
-7. Back on the **Donor Levels** page, choose **Recalculate Now**. Levels are assigned to
+7. Back on the **Donor Levels and Scores** page, choose **Recalculate Now**. Levels are assigned to
    everyone who already has giving. The page then shows how many donors are on each rung
    and the time the recalculation finished.
 
@@ -63,17 +63,17 @@ time of the last full pass.
 
 ## A Five-Minute Walkthrough
 
-Start with the sample data loaded (BarnCRM Settings, then Sample Data).
+Start with the sample data loaded (the **Sample Data** tab).
 
-1. Open **BarnCRM Settings**, then **Fundraising**, then **Donor Levels**. The ladder is
-   empty.
+1. Open **BarnCRM Settings**, then **Fundraising**, then **Donor Levels and Scores**. The
+   ladder is empty.
 2. Choose **New Level**. Name it `Friend`, minimum `100`, maximum `1000`. Save.
 3. Choose **New Level** again. Name it `Sustainer`, minimum `1000`, maximum `5000`. Save.
 4. Choose **New Level** once more. Name it `Leadership Circle`, minimum `5000`, leave
    maximum empty. Save. You now have three rungs and the page lists them lowest first.
 5. Go back to **Fundraising** and turn **Turn on donor levels** on. Leave the source as **Total
    giving, everything ever given**.
-6. Open **Donor Levels** again and choose **Recalculate Now**. Each rung now shows a donor
+6. Open **Donor Levels and Scores** again and choose **Recalculate Now**. Each rung now shows a donor
    count, and the page says when the recalculation finished.
 7. Use **Quick Gift Entry** to enter a gift of 1200 from one of the sample households.
    Open that household. **Total giving** reads 1200, **Donor level** reads `Sustainer`,

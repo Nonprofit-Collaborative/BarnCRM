@@ -73,7 +73,6 @@ public with sharing class SampleDataModules {
 	}
 
 	/** The host, or a SampleDataException that says to install the Sample Data package. */
-	@NamespaceAccessible
 	public static SampleDataHost requireHost() {
 		SampleDataHost sampleHost = host();
 		if (sampleHost == null) {

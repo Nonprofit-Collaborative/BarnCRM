@@ -81,7 +81,7 @@ People who can manage BarnCRM Settings also see, on each job's row:
 - **Run Now**, for a job that is safe to start by hand at any time (the Fundraising installment top
   up, installments overdue, pledge reminders and ask reminders). It starts the job's work now
   without waiting for tonight; the job still runs tonight as usual. Donor levels and
-  acknowledgment emails have no **Run Now** here: the Donor Levels page has its own
+  acknowledgment emails have no **Run Now** here: the **Donor Levels and Scores** page has its own
   **Recalculate Now**, and acknowledgments are sent from the Acknowledgments page.
 
 Every module's jobs, Fundraising's included, are on this one panel.

@@ -340,6 +340,16 @@ public with sharing class ModuleDetectionService {
 		return null;
 	}
 
+	/**
+	 * The first tab the catalog lists for this module in the admin apps, unprefixed, or null
+	 * when it lists none: how Core opens a module's page without naming it.
+	 */
+	public static String firstAdminTab(String moduleName) {
+		BarnCRM_Module__mdt row = catalogRow(moduleName);
+		List<String> names = row == null ? new List<String>() : tabNames(row.Admin_Tabs__c);
+		return names.isEmpty() ? null : names[0];
+	}
+
 	/** The modules that have shipped settings console rows naming themselves. */
 	private static Set<String> announcedModules() {
 		Set<String> names = new Set<String>();

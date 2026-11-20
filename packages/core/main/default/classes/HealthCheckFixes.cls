@@ -19,9 +19,18 @@ public with sharing class HealthCheckFixes {
 	private static final String CHANGE_PREFIX = 'Health Check: ';
 
 	/** Set by a test to make a fix fail after it has written, so the rollback can be seen. */
+	private static Boolean failAfterFix = false;
+
+	/**
+	 * Has the next fix fail after it has written, for a test that shows the rollback, including
+	 * a module's test where `@TestVisible` does not reach. Does nothing outside a test.
+	 */
 	@NamespaceAccessible
-	@TestVisible
-	public static Boolean failAfterFixForTest = false;
+	public static void failAfterFixForTest(Boolean fail) {
+		if (Test.isRunningTest()) {
+			failAfterFix = fail;
+		}
+	}
 
 	/**
 	 * Runs the fix and returns the sentence that says what it did.
@@ -48,7 +57,7 @@ public with sharing class HealthCheckFixes {
 				'',
 				String.join(scope, HealthCheckService.JOB_SEPARATOR)
 			);
-			if (failAfterFixForTest) {
+			if (failAfterFix) {
 				throw new HealthCheckFixException('A failure after the fix had written.');
 			}
 			return outcome;

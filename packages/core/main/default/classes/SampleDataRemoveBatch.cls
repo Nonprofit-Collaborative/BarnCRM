@@ -23,12 +23,11 @@ public with sharing class SampleDataRemoveBatch extends SampleDataStageBatch {
 
 	/** Tells the person who removed the sample data that a stage of the removal stopped (Q-04). */
 	protected override void notifyStopped() {
-		JobNotifier.aboutSettings(
+		JobNotifier.aboutSampleData(
 			UserInfo.getUserId(),
 			Label.Core_JobNotice_SampleDataRemove,
 			true,
-			Label.Core_JobNotice_SampleDataRemoveStoppedBody,
-			JobNotifier.SECTION_GENERAL
+			Label.Core_JobNotice_SampleDataRemoveStoppedBody
 		);
 	}
 }

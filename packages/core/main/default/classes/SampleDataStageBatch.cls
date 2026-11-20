@@ -134,12 +134,11 @@ public virtual with sharing class SampleDataStageBatch implements Database.Batch
 
 	/** Tells the user the run stopped part way (Q-04); the removal batch says it about its own run. */
 	protected virtual void notifyStopped() {
-		JobNotifier.aboutSettings(
+		JobNotifier.aboutSampleData(
 			UserInfo.getUserId(),
 			Label.Core_JobNotice_SampleData,
 			true,
-			Label.Core_JobNotice_SampleDataStoppedBody,
-			JobNotifier.SECTION_GENERAL
+			Label.Core_JobNotice_SampleDataStoppedBody
 		);
 	}
 
@@ -148,7 +147,6 @@ public virtual with sharing class SampleDataStageBatch implements Database.Batch
 	 * of a batch, so there the stage batch runs the first stage alone, and each stage and
 	 * hand-off is tested by calling it directly. Everywhere else every stage runs.
 	 */
-	@NamespaceAccessible
 	public static Boolean mayQueueNextStage() {
 		return !Test.isRunningTest();
 	}

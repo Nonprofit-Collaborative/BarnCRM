@@ -169,6 +169,12 @@ has_key() {
   return 1
 }
 
+# Whether Health Check can run: its runner is in the Org Optimizer module. health-check.apex
+# fails when it should run and did not, and logs Skipped when the module is not installed.
+health_expected() { # [uninstalled key]
+  if has_key orgoptimizer && [[ "${1:-}" != orgoptimizer ]]; then echo true; else echo false; fi
+}
+
 if [[ -n "$UNINSTALL" ]]; then
   has_key "$UNINSTALL" || { echo "--uninstall-check: $UNINSTALL is not among the chosen packages." >&2; exit 2; }
   [[ "$UNINSTALL" != core ]] || { echo "--uninstall-check: Core cannot be uninstalled under its modules." >&2; exit 2; }
@@ -565,14 +571,14 @@ for s in "${!SHAPE_LIST[@]}"; do
   for i in "${!KEYS[@]}"; do run_step "$shape" "install-n1:${KEYS[$i]}" step_install "$alias" n1 "$i"; done
   setup_all "$shape" "$alias" n1
   run_step "$shape" installed-n1 step_installed "$alias" n1
-  run_step "$shape" health-n1 step_template "$alias" health-check.apex
+  run_step "$shape" health-n1 step_template "$alias" health-check.apex --set "EXPECT_HEALTH=$(health_expected)"
   run_step "$shape" error-log-n1 step_error_log "$alias"
   run_step "$shape" seed step_seed "$alias"
   run_step "$shape" counts-before step_counts "$alias" "${WORK:-<work>}/$shape-before.tsv"
   for i in "${!KEYS[@]}"; do run_step "$shape" "upgrade:${KEYS[$i]}" step_install "$alias" n "$i"; done
   setup_all "$shape" "$alias" n
   run_step "$shape" installed-n step_installed "$alias" n
-  run_step "$shape" health-n step_template "$alias" health-check.apex
+  run_step "$shape" health-n step_template "$alias" health-check.apex --set "EXPECT_HEALTH=$(health_expected)"
   run_step "$shape" error-log-n step_error_log "$alias"
   run_step "$shape" counts-after step_counts "$alias" "${WORK:-<work>}/$shape-after.tsv"
   run_step "$shape" counts-unchanged step_compare "${WORK:-<work>}/$shape-before.tsv" "${WORK:-<work>}/$shape-after.tsv"
@@ -585,7 +591,8 @@ for s in "${!SHAPE_LIST[@]}"; do
     run_step "$shape" "uninstall:$UNINSTALL" step_uninstall "$alias" "$UNINSTALL"
     run_step "$shape" uninstalled step_installed "$alias" n "$UNINSTALL"
     run_step "$shape" left-nothing step_template "$alias" uninstall-check.apex --module "$UNINSTALL"
-    run_step "$shape" health-after-uninstall step_template "$alias" health-check.apex
+    run_step "$shape" health-after-uninstall step_template "$alias" health-check.apex \
+      --set "EXPECT_HEALTH=$(health_expected "$UNINSTALL")"
     run_step "$shape" smoke-after-uninstall:core step_template "$alias" smoke-core.apex
   fi
   if [[ "$KEEP_ORGS" == 1 ]]; then

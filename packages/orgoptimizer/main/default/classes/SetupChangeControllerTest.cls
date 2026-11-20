@@ -147,7 +147,7 @@ private class SetupChangeControllerTest {
 	static void copyNowStartsACopyAndSchedulesTheNightlyOne() {
 		delete as system [SELECT Id FROM Setup_Change__c WITH SYSTEM_MODE];
 		insert as system change('now', Datetime.now(), null, null, 'marker');
-		SetupChangeCopyJob.chainPurge = false;
+		SetupChangeCopyJob.chainPurgeForTest(false);
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
 			SetupChangeController.CopyResult result = SetupChangeController.copyNow();

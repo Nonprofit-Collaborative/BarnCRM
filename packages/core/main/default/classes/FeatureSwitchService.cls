@@ -91,7 +91,7 @@ public with sharing class FeatureSwitchService {
 		}
 	}
 
-	/** The three tools, in the order General lists them. */
+	/** The two tools, in the order General lists them. */
 	public static List<Item> tools() {
 		return new List<Item>{
 			new Item(DATA_MANAGER, KIND_TOOL)

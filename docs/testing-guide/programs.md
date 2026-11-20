@@ -113,7 +113,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Sample Data**, select **Load Sample Data** and wait for **Loaded**. | The card lists **Program enrollments** with 18. |
+| 1 | On the **Sample Data** tab, select **Load Sample Data** and wait for **Loaded**. | The card lists **Program enrollments** with 18. |
 | 2 | Open **Programs**, list view **All Programs**. | **After-school tutoring** and **Food pantry** (Active) and **Summer reading** (Completed) are listed. |
 | 3 | Open **After-school tutoring**. | The roster shows **Applied** 1, **Enrolled** 4, **Withdrawn** 1, and the services Tutoring hour and Homework club session. Open **Tutoring hour**: its **Service Deliveries** list shows 8 deliveries of 2. The **Cohorts** tab lists **Fall homework club** (Active) with 4 members and 3 sessions: Homework club 1 and 2 Held, each with 4 attendance marks (one Excused Absence among them), and Homework club 3 Scheduled, plus the Scheduled sessions of the session schedule **Homework club twice a week** (active, Tuesdays and Thursdays, from tomorrow), which appear within a minute of the load. **Summer reading** has the cohort **Summer reading circle** (Completed) with its 4 members. The **Goals** tab lists 6 goals, each assigned to you with 2 steps: 4 "Read one grade level higher" (In Progress, one of them under **Reviews Due**), "Finish five books from the summer list" (Achieved, both steps Done) and "Apply for SNAP benefits" (In Progress, in the food pantry). |
 | 4 | Create a contact "Rita Real" and enroll her in **Food pantry**. | Accepted. |

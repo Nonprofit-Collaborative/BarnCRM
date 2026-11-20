@@ -47,8 +47,8 @@ Coexistence mode is always on: every org has a mode. What you do is confirm or c
 2. Click the **BarnCRM Settings** tab.
 3. Choose **General** in the left navigation.
 4. Find **Coexistence mode**. It shows the current mode and, underneath, a description of
-   it. What BarnCRM detected in your org is shown on the **Health** page and in the Setup
-   Assistant's second step.
+   it. What BarnCRM detected in your org is shown in Health Check (the **Org Optimizer**
+   tab, **Health Check**) and in the Setup Assistant's second step.
 5. Pick a mode and click **Save**.
 
 You need the **Manage BarnCRM Settings** permission to change it. If you do not have it,
@@ -63,9 +63,9 @@ Maria has just installed BarnCRM into her organization's Salesforce org. Person 
 are on, because that is how the org was set up for her two years ago, and nothing else that
 keeps households is installed.
 
-1. Maria opens the **BarnCRM Admin** app, clicks the **BarnCRM Settings** tab, and chooses
-   **Health** in the left navigation.
-2. Health Check runs. The first card is **What We Found in Your Org**.
+1. Maria opens the **BarnCRM Admin** app, clicks the **Org Optimizer** tab, and chooses
+   **Health Check**.
+2. She clicks **Run Health Check**. The first card is **What We Found in Your Org**.
 3. It says Person Accounts are enabled, and the recommended mode is **Standalone**.
 4. Below the card there is a finding titled **Coexistence Mode Is Not Confirmed Yet**, with
    the button **Use Recommended Mode**.

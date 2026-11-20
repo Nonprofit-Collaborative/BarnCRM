@@ -764,7 +764,7 @@ private class FieldUtilizationControllerTest {
 			// while the person watches the page, so no job is left to tell them about.
 			FieldUtilizationController.countFields('Contact', new List<String>{ 'LastName' });
 
-			Assert.areEqual(0, JobNotifier.sent.size(), 'An on-demand count sends no notice');
+			Assert.areEqual(0, JobNotifier.sentNotices().size(), 'An on-demand count sends no notice');
 		}
 	}
 }

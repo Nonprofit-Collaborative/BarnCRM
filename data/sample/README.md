@@ -282,7 +282,7 @@ removal has no queueable chain limit either): each module's records first
 (`GivingSampleData.RemoveStages`), because a gift points at a person and a household, then
 Core's (`SampleDataRemoveStages`): connections, affiliations, contacts and accounts. Allocations, soft credits and tributes are details of a gift, and
 installments are details of a commitment, so they go with their master. Both actions are
-exposed to admins through **Nonprofit Settings > Sample Data** (`sampleDataManager` LWC);
+exposed to admins on the **Sample Data** tab (`sampleDataManager` LWC);
 see `docs/admin-guide/sample-data.md`.
 `scripts/org/seed-sample-data.sh` runs the load from the command line for contributors
 setting up a scratch org.

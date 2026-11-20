@@ -47,7 +47,7 @@ private class FirstRunControllerTest {
 					'Without Giving an edition is suggested only for NPSP or Nonprofit Cloud: ' + state.recommendedSuite
 				);
 			}
-			Assert.areEqual(8, state.features.size(), 'Every feature is offered');
+			Assert.areEqual(7, state.features.size(), 'Every feature is offered');
 		}
 	}
 
@@ -246,7 +246,7 @@ private class FirstRunControllerTest {
 			Test.stopTest();
 
 			Assert.isTrue(state.needsSetup, 'A reset org needs setup however the org was saved');
-			Assert.areEqual(8, state.features.size(), 'Every feature is offered');
+			Assert.areEqual(7, state.features.size(), 'Every feature is offered');
 		}
 	}
 

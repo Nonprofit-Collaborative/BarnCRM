@@ -140,9 +140,19 @@ public with sharing class ScheduledJobSelector {
 	 * Test seam: the owner a job is read with, so a test can see a job as owned by an inactive
 	 * user without deactivating anyone. Null in production.
 	 */
-	@NamespaceAccessible
 	@TestVisible
-	public static Id ownerOverride;
+	private static Id ownerOverride;
+
+	/**
+	 * Sets that owner from a module's test, where `@TestVisible` does not reach once the
+	 * packages are separate; null reads each job's own owner again. Does nothing outside a test.
+	 */
+	@NamespaceAccessible
+	public static void overrideOwnerForTest(Id ownerId) {
+		if (Test.isRunningTest()) {
+			ownerOverride = ownerId;
+		}
+	}
 
 	private static CronTrigger triggerByName(String jobName) {
 		if (String.isBlank(jobName)) {

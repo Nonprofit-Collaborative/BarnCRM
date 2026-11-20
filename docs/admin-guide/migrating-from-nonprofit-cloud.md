@@ -24,8 +24,8 @@ upgrade: switch it off instead if you do not want it in the list.
 
 If one is missing (an install that logged a problem, for example), add it from Health Check:
 
-1. Open the **BarnCRM Admin** app, click **BarnCRM Settings** and choose **Health**.
-2. The report opens (click **Re-Run** if it is from earlier). A finding reads "4 shipped
+1. Open the **BarnCRM Admin** app, click the **Org Optimizer** tab and choose **Health Check**.
+2. The last run opens (click **Run Again** if it is from earlier). A finding reads "4 shipped
    import templates are missing" (a higher number if other shipped templates are missing too)
    and names them.
 3. Select **Restore Import Templates**. Your own templates, and any shipped template you have

@@ -59,7 +59,6 @@ public with sharing class OrgLimitReader {
 	 * The limits at or above `threshold` percent, for the weekly admin digest. No permission
 	 * check: the caller is the digest, which runs as an administrator, or a page that checked.
 	 */
-	@NamespaceAccessible
 	public static List<LimitUse> atOrAbove(Integer threshold) {
 		List<LimitUse> found = new List<LimitUse>();
 		Map<String, List<Integer>> readings = readLimits();

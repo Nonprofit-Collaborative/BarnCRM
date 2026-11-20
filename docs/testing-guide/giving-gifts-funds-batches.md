@@ -284,7 +284,7 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Sample Data**, and load the sample data with Fundraising installed. | The load finishes. |
+| 1 | Open the **Sample Data** tab and load the sample data with Fundraising installed. | The load finishes. |
 | 2 | Open the **Funds** tab, list view **All Funds**. | One **General Fund** (yours, still the default) and seven sample funds, 8 in all. |
 | 3 | Open **General Fund** and its gifts. | Sample gifts are allocated to it. |
 | 4 | Select **Remove Sample Data** and confirm. | The removal finishes. |
