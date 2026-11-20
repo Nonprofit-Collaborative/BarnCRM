@@ -318,8 +318,50 @@ const TEXTS = {
   get Connector_Recipe_ErrorHeader() {
     return helpText('Connector', 'Connector_Recipe_ErrorHeader');
   },
+  get Connector_Recipe_ErrorLimits() {
+    return helpText('Connector', 'Connector_Recipe_ErrorLimits');
+  },
   get Connector_Recipe_ErrorMap() {
     return helpText('Connector', 'Connector_Recipe_ErrorMap');
+  },
+  get Connector_Recipe_ErrorTemplate() {
+    return helpText('Connector', 'Connector_Recipe_ErrorTemplate');
+  },
+  get Connector_Editor_Limits() {
+    return helpText('Connector', 'Connector_Editor_Limits');
+  },
+  get Connector_Editor_LimitsHelp() {
+    return helpText('Connector', 'Connector_Editor_LimitsHelp');
+  },
+  get Connector_Editor_MostCreated() {
+    return helpText('Connector', 'Connector_Editor_MostCreated');
+  },
+  get Connector_Editor_MostHelp() {
+    return helpText('Connector', 'Connector_Editor_MostHelp');
+  },
+  get Connector_Editor_MostRejected() {
+    return helpText('Connector', 'Connector_Editor_MostRejected');
+  },
+  get Connector_Editor_MostRows() {
+    return helpText('Connector', 'Connector_Editor_MostRows');
+  },
+  get Connector_Editor_MostRowsHelp() {
+    return helpText('Connector', 'Connector_Editor_MostRowsHelp');
+  },
+  get Connector_Editor_MostUpdated() {
+    return helpText('Connector', 'Connector_Editor_MostUpdated');
+  },
+  get Connector_Editor_Rows() {
+    return helpText('Connector', 'Connector_Editor_Rows');
+  },
+  get Connector_Editor_RowsHelp() {
+    return helpText('Connector', 'Connector_Editor_RowsHelp');
+  },
+  get Connector_Editor_Template() {
+    return helpText('Connector', 'Connector_Editor_Template');
+  },
+  get Connector_Editor_TemplateHelp() {
+    return helpText('Connector', 'Connector_Editor_TemplateHelp');
   },
   get Connector_Recipe_ErrorMergeField() {
     return helpText('Connector', 'Connector_Recipe_ErrorMergeField');
@@ -521,6 +563,9 @@ const TEXTS = {
   },
   get Connector_Step_If() {
     return helpText('Connector', 'Connector_Step_If');
+  },
+  get Connector_Step_ImportRows() {
+    return helpText('Connector', 'Connector_Step_ImportRows');
   },
   get Connector_Step_Stop() {
     return helpText('Connector', 'Connector_Step_Stop');

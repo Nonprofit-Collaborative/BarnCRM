@@ -121,6 +121,9 @@ public with sharing class ConnectorRecipes {
 		public List<Option> maps = new List<Option>();
 		@AuraEnabled
 		public List<Option> queries = new List<Option>();
+		/** Active Super Importer templates a Load Rows step can use (R-CR9). */
+		@AuraEnabled
+		public List<Option> templates = new List<Option>();
 	}
 
 	/** One run in Run History, with its steps when opened. */
@@ -232,6 +235,14 @@ public with sharing class ConnectorRecipes {
 				LIMIT 500
 			]) {
 				result.queries.add(option(row.Id, row.Name, row.Object_Name__c, row.Query_JSON__c));
+			}
+			List<Import_Template__c> templates = Schema.SObjectType.Import_Template__c.isAccessible()
+				? ImportTemplateSelector.selectActive()
+				: new List<Import_Template__c>();
+			for (Import_Template__c row : templates) {
+				if (ImportObjectSchema.operationOf(row) != ImportObjectSchema.OPERATION_DELETE) {
+					result.templates.add(option(row.Id, row.Name, null, null));
+				}
 			}
 		}
 		return result;
@@ -443,6 +454,9 @@ public with sharing class ConnectorRecipes {
 			if (kind == 'find') {
 				QueryCompiler.compile(JSON.serialize(step.get('query')));
 			}
+			if (kind == 'importRows') {
+				return importProblems(step, id, identity);
+			}
 			String mapId = ConnectorRecipeDocument.textOf(step.get(kind == 'callApp' ? 'bodyMap' : 'map'));
 			if (String.isBlank(mapId)) {
 				return found;
@@ -478,6 +492,35 @@ public with sharing class ConnectorRecipes {
 		} catch (Exception refused) {
 			found.add(id + ': ' + refused.getMessage());
 		}
+		return found;
+	}
+
+	/**
+	 * A Load Rows step's Publish checks (R-CR9): its template active and seen by the publisher, not
+	 * a delete by file, and the identity able to create data jobs, since Super Importer stages and
+	 * commits in user mode whatever the recipe's access mode.
+	 */
+	private static List<String> importProblems(Map<String, Object> step, String stepName, Id identity) {
+		List<String> found = new List<String>();
+		Import_Template__c template = ImportTemplateSelector.selectById(
+			(Id) ConnectorRecipeDocument.textOf(step.get('template'))
+		);
+		if (
+			template == null ||
+			template.Active__c != true ||
+			ImportObjectSchema.operationOf(template) == ImportObjectSchema.OPERATION_DELETE
+		) {
+			found.add(BarnHelp.text('Connector', 'Connector_Publish_Template', new List<Object>{ stepName }));
+			return found;
+		}
+		found.addAll(
+			ConnectorIdentity.mapProblems(
+				identity,
+				'create',
+				Import_Batch__c.SObjectType.getDescribe().getName(),
+				new List<String>()
+			)
+		);
 		return found;
 	}
 

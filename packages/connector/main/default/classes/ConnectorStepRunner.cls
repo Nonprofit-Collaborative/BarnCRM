@@ -23,6 +23,12 @@ public inherited sharing class ConnectorStepRunner {
 	public class CheckpointException extends Exception {
 	}
 
+	/** Look again later: the run waits its minutes, keeping this step's progress (Load Rows, R-CR9). */
+	public class WaitException extends Exception {
+		public Map<String, Object> progress;
+		public Integer minutes;
+	}
+
 	/** A Stop step's end. */
 	public class StoppedException extends Exception {
 		public String outcome;
@@ -105,6 +111,9 @@ public inherited sharing class ConnectorStepRunner {
 			walk(ConnectorRecipeDocument.listOf(ConnectorRecipeDocument.parse(source).get('steps')));
 		} catch (CheckpointException paused) {
 			status = ConnectorRunStore.QUEUED;
+		} catch (WaitException waiting) {
+			status = ConnectorRunStore.WAITING;
+			run.Next_Attempt_At__c = Datetime.now().addMinutes(waiting.minutes);
 		} catch (StoppedException stop) {
 			status = stop.outcome;
 			run.Error_Message__c = String.isBlank(stop.getMessage()) ? null : stop.getMessage().left(1000);
@@ -130,7 +139,7 @@ public inherited sharing class ConnectorStepRunner {
 			run.Status__c = ConnectorRunStore.FAILED;
 			run.Error_Message__c = BarnHelp.text('Connector', 'Connector_Run_ErrorTooLarge');
 		}
-		if (run.Status__c != ConnectorRunStore.QUEUED) {
+		if (run.Status__c != ConnectorRunStore.QUEUED && run.Status__c != ConnectorRunStore.WAITING) {
 			run.Finished_At__c = Datetime.now();
 		}
 		return run;
@@ -168,7 +177,12 @@ public inherited sharing class ConnectorStepRunner {
 				throw stop;
 			} catch (CheckpointException paused) {
 				throw paused;
+			} catch (WaitException waiting) {
+				outputs.put(id, waiting.progress);
+				throw waiting;
 			} catch (Exception problem) {
+				// A failed step starts again from nothing on Retry.
+				outputs.remove(id);
 				StepFailureException failed = problem instanceof StepFailureException
 					? (StepFailureException) problem
 					: failure(plain(problem));
@@ -198,6 +212,9 @@ public inherited sharing class ConnectorStepRunner {
 			}
 			logged.put('status', result.get('status'));
 			logged.put('mapVersion', result.remove('mapVersion'));
+			if (result.containsKey('summary')) {
+				logged.put('message', result.get('summary'));
+			}
 		}
 	}
 
@@ -222,6 +239,17 @@ public inherited sharing class ConnectorStepRunner {
 		}
 		if (kind == 'callApp') {
 			return callApp(step);
+		}
+		if (kind == 'importRows') {
+			Map<String, Object> loaded = ConnectorImportStep.perform(
+				step,
+				pill(step.get('rows')),
+				ConnectorRecipeDocument.mapOf(outputs.get(ConnectorRecipeDocument.textOf(step.get('id')))),
+				run,
+				budget
+			);
+			written += ConnectorImportStep.written(loaded);
+			return loaded;
 		}
 		StoppedException stop = new StoppedException(ConnectorRecipeDocument.textOf(step.get('message')));
 		stop.outcome = ConnectorRecipeDocument.textOf(step.get('outcome'));

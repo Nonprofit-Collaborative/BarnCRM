@@ -17,6 +17,12 @@ reason that may pass, such as the other app being down, and shows when it is tri
 cannot change, test, run or retry a recipe. If a run failed, tell your admin; they can fix the
 recipe and select **Retry**.
 
+**Some recipes import rows.** A recipe can load a list from another app through a Super Importer
+template, for example every morning. It commits only when its dry run is inside the limits your
+admin set; otherwise it loads nothing and your admin checks the data job. Its data jobs appear in
+Super Importer named "Recipe" and the recipe name, and the records it creates show the recipe
+identity as who created them.
+
 **A flow may run a recipe for you.** Your admin can add the action **Run a BarnCRM Connector
 Recipe** to a flow, such as one behind a button. The recipe still runs as BarnCRM Automation, so
 it can do only what your admin allowed recipes to do, and its run shows in Run History as started

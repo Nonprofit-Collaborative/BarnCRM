@@ -41,7 +41,8 @@ import {
   readSample,
   readCodes,
   stepRows,
-  statusVariant
+  statusVariant,
+  importLimits
 } from 'c/connectorRecipeRules';
 import { say as text } from 'c/connectorRecipeText';
 
@@ -302,6 +303,24 @@ export default class ConnectorRecipeEditor extends LightningElement {
     get notFoundOk() {
       return text('Connector_Editor_NotFoundOk');
     },
+    get template() {
+      return text('Connector_Editor_Template');
+    },
+    get templateHelp() {
+      return text('Connector_Editor_TemplateHelp');
+    },
+    get rows() {
+      return text('Connector_Editor_Rows');
+    },
+    get rowsHelp() {
+      return text('Connector_Editor_RowsHelp');
+    },
+    get limits() {
+      return text('Connector_Editor_Limits');
+    },
+    get limitsHelp() {
+      return text('Connector_Editor_LimitsHelp');
+    },
     get match() {
       return text('Connector_Editor_Match');
     },
@@ -537,6 +556,13 @@ export default class ConnectorRecipeEditor extends LightningElement {
     }));
   }
 
+  get templateOptions() {
+    return ((this.page && this.page.templates) || []).map((option) => ({
+      label: option.label,
+      value: option.value
+    }));
+  }
+
   get methodOptions() {
     return METHODS.map((method) => ({ label: method, value: method }));
   }
@@ -600,6 +626,19 @@ export default class ConnectorRecipeEditor extends LightningElement {
         isCall: step.kind === 'callApp',
         isIf: step.kind === 'if',
         isStop: step.kind === 'stop',
+        isImport: step.kind === 'importRows',
+        limits:
+          step.kind === 'importRows'
+            ? importLimits(step).map((limit) => ({
+                ...limit,
+                label: text(limit.label),
+                help: text(
+                  limit.key === 'rows'
+                    ? 'Connector_Editor_MostRowsHelp'
+                    : 'Connector_Editor_MostHelp'
+                )
+              }))
+            : [],
         canNest: step.kind === 'if' && row.depth < 1,
         maps: step.kind === 'callApp' ? jsonMaps : recordMaps,
         hints: hints.join(', '),
@@ -775,6 +814,19 @@ export default class ConnectorRecipeEditor extends LightningElement {
       changes.success = codes === undefined ? [value] : codes;
     }
     this.document = updateStep(this.document, address, changes);
+  }
+
+  /** One Load Rows limit: data-limit names it; a blank keeps the default (R-CR9). */
+  handleLimit(event) {
+    const address = this.addressOf(event);
+    const limits = { ...(this.stepAt(address).limits || {}) };
+    const typed = event.detail.value;
+    if (typed === '' || typed === null || typed === undefined) {
+      delete limits[event.target.dataset.limit];
+    } else {
+      limits[event.target.dataset.limit] = Number(typed);
+    }
+    this.document = updateStep(this.document, address, { limits });
   }
 
   /** A Find step's saved query: its document is copied into the step. */

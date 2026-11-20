@@ -1,6 +1,6 @@
 # BarnCRM Connector
 
-Scripts for the optional BarnCRM Connector module, release 1.31: creating Connections of each sign-in kind, the one Setup step with Check Again, checking, replacing, disconnecting and deleting, the refusals that keep keys safe, access and Health Check (CN-01, T-CN-01 to T-CN-06); Recipe Access, recipes, Test, Publish, Run Now, Run History, Retry, Run As and the merge-field guard (CN-02, T-CN-07 to T-CN-12); the Flow actions and Where Used (CN-06, T-CN-13 and T-CN-14); the recipe clock, Schedule and Record Change triggers, retries, pausing, the integration user, Health Check and the nightly cleanup (CN-03, release 1.32, T-CN-15 to T-CN-20). Setup detail: [BarnCRM Connector](../admin-guide/connector.md).
+Scripts for the optional BarnCRM Connector module, release 1.31: creating Connections of each sign-in kind, the one Setup step with Check Again, checking, replacing, disconnecting and deleting, the refusals that keep keys safe, access and Health Check (CN-01, T-CN-01 to T-CN-06); Recipe Access, recipes, Test, Publish, Run Now, Run History, Retry, Run As and the merge-field guard (CN-02, T-CN-07 to T-CN-12); the Flow actions and Where Used (CN-06, T-CN-13 and T-CN-14); the recipe clock, Schedule and Record Change triggers, retries, pausing, the integration user, Health Check and the nightly cleanup (CN-03, release 1.32, T-CN-15 to T-CN-20); scheduled imports through Load Rows with an Import Template (CN-09, release 1.32, T-CN-21 and T-CN-22). Setup detail: [BarnCRM Connector](../admin-guide/connector.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core and BarnCRM Connector deployed, and an HTTPS test endpoint that echoes requests (for example a free request bin you control). Use made-up keys such as `test-key-1234`; never a real one.
 
@@ -289,3 +289,30 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 |---|---|---|
 | 1 | Open BarnCRM Settings, **Nightly Jobs**. | **Connector Cleanup** at 2:40, switched on. |
 | 2 | Set the recipe's **Keep Runs Days** to 7. The next morning, open Run History. | Finished runs older than 7 days are gone; Queued and Waiting runs and newer runs remain. If the clock was stopped, it is going again. |
+
+## T-CN-21: A Scheduled Import Inside Its Limits
+
+**Purpose:** confirm Load Rows with an Import Template stages, dry runs and commits through Super Importer when the dry run is inside every limit.
+**Prerequisites:** admin; Recipe Access holds BarnCRM Admin; a Super Importer template with columns First Name, Last Name and Email, tried once on a file.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Create a recipe with **When** Run Now and a step **Load Rows with an Import Template**. | The step shows Import Template, Rows (`trigger.rows`) and the limits Most Rows 1,000, Most Rejected Rows 0, Most New Records 1,000, Most Updated Records 1,000. |
+| 2 | Choose the template. Type 5000 in Most Rejected Rows. | The editor says each limit is a whole number from 0 to 4,000; Publish is off. Set it back to 0. |
+| 3 | In the sample data, paste `{"rows":[{"First Name":"Test","Last Name":"Loader","Email":"loader@example.org"}]}`. Select **Test**, then **Check Result**. | Succeeded; the step shows the template, 1 row and the limits. Super Importer has no new data job. |
+| 4 | Publish. Under Run Now, paste the same JSON and select **Run Now**. Open Run History. | The run is Waiting. Super Importer lists a data job named "Recipe <name>, run <run>", Dry run complete within a minute. |
+| 5 | Wait up to 10 minutes and refresh Run History. | The run is Waiting again while the commit runs, then Succeeded; the step reads "Data job IB-...: 1 rows, 1 created, 0 updated, 0 rejected." Records Written is 1. The contact exists, and the data job is Complete with Undo available. |
+| 6 | Change the recipe's When to a Schedule every day at a time a few minutes ahead, with an earlier Call an App step that returns rows, and publish. | The next day's run loads the rows on its own the same way. |
+
+## T-CN-22: A Scheduled Import Outside Its Limits
+
+**Purpose:** confirm nothing is committed when the dry run crosses a limit, and that the data job waits for a person.
+**Prerequisites:** the recipe from T-CN-21.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Run Now with two rows, one without a Last Name (so the dry run rejects it). | After up to 5 minutes the run is Failed: "The dry run of data job IB-... would reject 1 rows, more than the limit of 0 set on this step, so nothing was committed." One Error Log entry names the recipe and step. |
+| 2 | Open Super Importer. | The data job is Dry run complete; no contact was created. Commit it there: the valid row loads. |
+| 3 | Set Most Rows to 1 and Run Now with two rows. | The run fails at once saying 2 rows arrived, more than the 1 the step allows; no data job is created. |
+| 4 | In Recipe Access, untick BarnCRM Admin and save. Publish. | Publish refuses: recipes cannot create data jobs. Tick it again. |
+| 5 | Retry the failed run from step 1 after raising Most Rejected Rows to 1 and publishing. | A new data job is staged and dry run, then committed; the run Succeeds. |

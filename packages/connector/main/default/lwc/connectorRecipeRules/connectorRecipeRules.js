@@ -16,9 +16,31 @@ export const STEP_KINDS = [
   { value: 'update', key: 'Connector_Step_Update' },
   { value: 'upsert', key: 'Connector_Step_Upsert' },
   { value: 'callApp', key: 'Connector_Step_CallApp' },
+  { value: 'importRows', key: 'Connector_Step_ImportRows' },
   { value: 'if', key: 'Connector_Step_If' },
   { value: 'stop', key: 'Connector_Step_Stop' }
 ];
+
+/**
+ * Load Rows limits (CN-09, R-CR9) in the order the editor shows them, each with its default and
+ * help key; Most Rows is 1 to 4,000, the others 0 to 4,000.
+ */
+export const MOST_IMPORT_ROWS = 4000;
+export const IMPORT_LIMITS = [
+  { key: 'rows', fallback: 1000, label: 'Connector_Editor_MostRows', min: 1 },
+  { key: 'rejected', fallback: 0, label: 'Connector_Editor_MostRejected', min: 0 },
+  { key: 'created', fallback: 1000, label: 'Connector_Editor_MostCreated', min: 0 },
+  { key: 'updated', fallback: 1000, label: 'Connector_Editor_MostUpdated', min: 0 }
+];
+
+/** A Load Rows step's limits, each its own value or its default. */
+export function importLimits(step) {
+  const given = (step && step.limits) || {};
+  return IMPORT_LIMITS.map((entry) => ({
+    ...entry,
+    value: Number.isInteger(given[entry.key]) ? given[entry.key] : entry.fallback
+  }));
+}
 
 export const RECORD_KINDS = ['create', 'update', 'upsert'];
 export const METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
@@ -205,6 +227,12 @@ export function newStep(document, kind) {
       success: [],
       notFoundOk: false
     });
+  } else if (kind === 'importRows') {
+    const limits = {};
+    IMPORT_LIMITS.forEach((entry) => {
+      limits[entry.key] = entry.fallback;
+    });
+    Object.assign(step, { template: '', rows: 'trigger.rows', limits });
   } else if (kind === 'if') {
     Object.assign(step, {
       match: 'all',
@@ -381,6 +409,8 @@ function stepProblem(step, label) {
         : null;
     case 'callApp':
       return callProblem(step, at);
+    case 'importRows':
+      return importProblem(step, at);
     case 'if': {
       const conditions = step.conditions || [];
       const bad =
@@ -398,6 +428,25 @@ function stepProblem(step, label) {
     default:
       return { key: 'Connector_Recipe_ErrorStepKind', args: at };
   }
+}
+
+function importProblem(step, at) {
+  if (!step.template) {
+    return { key: 'Connector_Recipe_ErrorTemplate', args: at };
+  }
+  if (!isPill(step.rows)) {
+    return { key: 'Connector_Recipe_ErrorPath', args: at };
+  }
+  const given = step.limits || {};
+  const bad = IMPORT_LIMITS.some((entry) => {
+    const value = given[entry.key];
+    return (
+      value !== undefined &&
+      value !== null &&
+      !(Number.isInteger(value) && value >= entry.min && value <= MOST_IMPORT_ROWS)
+    );
+  });
+  return bad ? { key: 'Connector_Recipe_ErrorLimits', args: at } : null;
 }
 
 function callProblem(step, at) {
@@ -528,6 +577,8 @@ export function pathSuggestions(document, beforeStep) {
       found.push(`${base}.id`, `${base}.action`);
     } else if (step.kind === 'callApp') {
       found.push(`${base}.status`, `${base}.body`);
+    } else if (step.kind === 'importRows') {
+      found.push(`${base}.batch`, `${base}.created`, `${base}.updated`, `${base}.rejected`);
     }
   }
   return found;

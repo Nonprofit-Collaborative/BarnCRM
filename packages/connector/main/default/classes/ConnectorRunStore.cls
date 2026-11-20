@@ -161,11 +161,14 @@ public without sharing class ConnectorRunStore {
 		];
 	}
 
-	/** Waiting runs whose time has come are queued again, their attempt counted (R-CR7). */
+	/**
+	 * Waiting runs whose time has come are queued again (R-CR7): a retry, which has a failed step,
+	 * counts an attempt; a run waiting on a Load Rows pass does not (R-CR9).
+	 */
 	public static void releaseWaiting(Set<String> runAs) {
 		Datetime now = Datetime.now();
 		List<Connector_Run__c> due = [
-			SELECT Id, Attempt__c
+			SELECT Id, Attempt__c, Failed_Step__c
 			FROM Connector_Run__c
 			WHERE Status__c = :WAITING AND Ran_As__c IN :runAs AND Next_Attempt_At__c <= :now
 			WITH SYSTEM_MODE
@@ -173,7 +176,10 @@ public without sharing class ConnectorRunStore {
 		];
 		for (Connector_Run__c run : due) {
 			run.Status__c = QUEUED;
-			run.Attempt__c = (run.Attempt__c == null ? 0 : run.Attempt__c) + 1;
+			if (run.Failed_Step__c != null) {
+				run.Attempt__c = (run.Attempt__c == null ? 0 : run.Attempt__c) + 1;
+			}
+			run.Failed_Step__c = null;
 			run.Next_Attempt_At__c = null;
 		}
 		update as system due;

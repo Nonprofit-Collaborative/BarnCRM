@@ -236,6 +236,7 @@ private class ConnectorClockTest {
 				Ran_As__c = ConnectorRecipes.RUN_AS_AUTOMATION,
 				Recipe_Version__c = 1,
 				Attempt__c = 0,
+				Failed_Step__c = 'send',
 				Next_Attempt_At__c = now.addMinutes(-1)
 			);
 			insert as system due;

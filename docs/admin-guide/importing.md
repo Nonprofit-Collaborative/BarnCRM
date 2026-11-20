@@ -394,9 +394,14 @@ The BarnCRM home page then lists every recurring source with the date it was las
 imported, oldest first, and **Never** for one you have not loaded yet. When a date is older
 than you expect, that file has not been loaded this month.
 
-Marking a template recurring changes nothing about how its files are imported. BarnCRM
-never fetches or loads a file on its own: every file is still uploaded, previewed and
-imported by a person, because an import nobody watched is an import nobody checked.
+Marking a template recurring changes nothing about how its files are imported. Super
+Importer never fetches or loads a file on its own: every file is still uploaded, previewed and
+imported by a person, because an import nobody watched is an import nobody checked. When the
+optional BarnCRM Connector module is installed, a recipe can load rows through a template on a
+schedule, committing only when its dry run is inside limits you set and otherwise leaving the
+data job here for you to check (see
+[Scheduled Imports](connector.md#scheduled-imports-load-rows-with-an-import-template)). Its data
+jobs are named "Recipe <name>, run <run>" in the history.
 
 ### Start a New Template From This One
 

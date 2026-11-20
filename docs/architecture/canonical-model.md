@@ -3794,6 +3794,17 @@ the batch when it finishes and re-stamps the undo deadline; the records it creat
 batch's tag and the values it changes are journaled under the batch, so the one undo covers
 them (R-IB8, R-IB9).
 
+**R-IB18 A data job a recipe starts** (C-38, CN-09). A BarnCRM Connector recipe's Load Rows step
+(R-CR9) creates an import exactly as the wizard does, through the same entry points (create,
+stage, dry run, commit), so every rule of this section holds: R-IB1 dry run first, R-IB13 one
+pass at a time, the same matching, transforms, rejections, journal and Undo. The differences
+are only who and what: the recipe's identity is the running user, so it needs Manage BarnCRM
+Settings and is Committed By; File Reference is empty and File Name reads "Recipe <name>, run
+<run>"; there are no control totals or file values, and the rows are staged in one page of at
+most 4,000. A dry run whose counts are outside the step's limits is left Dry run complete for
+a person to check and commit, or to leave, in Super Importer. No Core field or method is added
+for it.
+
 ### Salesforce implementation
 
 - **Object:** `Import_Batch__c`, auto-number Name with format `IB-{000000}`.
@@ -19156,6 +19167,7 @@ arriving with their slices:
 | `callApp` | `connection`, `method` (GET, POST, PUT, PATCH, DELETE), `path` (with `{name}` slots), `pathValues` and `query` (`[{ "name", "value" or "path" }]`), `headers` (`[{ "name", "value" or "path" }]`), `bodyMap` and `bodyInput` (a saved map with `to.kind` json), `success` (status codes; blank is 200 to 299), `notFoundOk` | `{ "status", "body" }`, the body parsed when it is JSON |
 | `if` | `conditions` (`[{ "path", "operator", "value" }]`, R-R2 operator names: equals, not equals, contains, does not contain, starts with, greater than, less than, is null, is not null), `match` (`all` or `any`), `then`, `otherwise` | `{ "branch" }` |
 | `stop` | `outcome` (Succeeded, Skipped or Failed), `message` | none |
+| `importRows` (CN-09) | `template` (an active Import Template's Id, not a delete by file), `rows` (a path to a list of objects keyed by column name, a list of lists whose first list holds the column names, or CSV text with a header row), `limits` (`rows` 1 to 4,000, default 1,000; `rejected` default 0; `created` and `updated` default 1,000; each 0 to 4,000) | `{ "batchId", "batch", "rows", "created", "updated", "matched", "rejected" }` (R-CR9) |
 
 A `callApp` path starts with one `/`, and neither the path nor any value put into it, a query
 value or a header holds `@`, `\`, `{!`, a carriage return or a line feed; each value put into the
@@ -19230,6 +19242,22 @@ user is chosen, or it is inactive (error, "Integration User inactive"), or it la
 Connections (warning); runs Queued for more than 30 minutes (warning); recipes Paused by
 Failures (warning); Active recipes whose Record Owner is inactive (warning); Pause All Recipes
 on (info).
+**R-CR9 Load Rows with an Import Template** (CN-09, C-38, release 1.32). The step hands its rows
+to Super Importer (R-IB18) and commits only inside its limits. Its first pass reads the rows
+(values become text, as in a file; a nested value is kept as its JSON), refuses more than Most
+Rows before anything is staged, creates the data job, stages the rows, starts the dry run and
+waits: the run is Waiting with Next Attempt At 5 minutes on, its State holds the job and the
+phase, and waking it counts no attempt (R-CR7 counts only a retry, which has a failed step).
+While the pass runs the run waits again, failing after 24 hours. A finished dry run whose
+rejected, created or updated count is over its limit fails the step, naming the job, the count
+and the limit; nothing is committed and the job stays Dry run complete in Super Importer. Inside
+every limit the step starts the commit and waits; a Complete commit ends the step with the
+counts (Records Written adds created and updated, and the Step Log names the job). A failed
+step keeps no progress, so Retry stages the rows again as a new job. A Test run reads the rows
+and reports the template, row count and limits, staging nothing. The identity must hold
+Manage BarnCRM Settings (Super Importer's permission), whatever Run As says, since Super
+Importer writes in user mode; Publish checks that the template is active and visible to the
+publisher, not a delete by file, and that the identity can create data jobs.
 
 ### Salesforce implementation
 
@@ -19829,6 +19857,7 @@ mirrors the primary member).
 | 1.72 | 2026-11-20 | BarnCRM Connector connections (CN-01, D-215, D-216, release 1.31; ADR-NEXT `NEXT-integration-module.md`). No object added (the suite stays at 197; Connector Recipe and Connector Run follow in CN-02). Section 29CN1 records a connection as an External Credential and Named Credential pair named `BarnConn_<connector>_<6 random>`, with rules R-CN1 to R-CN8. The Admin Journal's `Kind__c` gains Connection and `Status__c` gains Key Replaced (R-CN6). |
 | 1.73 | 2026-11-20 | BarnCRM Connector recipes and runs (CN-02, CN-06, D-215, release 1.31; design Appendix A.3 and A.4). Two objects added, 197 to 199 in the suite: Section 29CN2 Connector Recipe (`Connector_Recipe__c`, R-CR1 to R-CR5) and Section 29CN3 Connector Run (`Connector_Run__c`, R-RUN1 to R-RUN4), and the platform event `Connector_Start__e`. R-CN7 gives BarnCRM Connections to the Automated Process user through Recipe Access; R-CN8 refuses Delete of a connection a recipe names. |
 | 1.74 | 2026-11-20 | BarnCRM Connector recipe clock (CN-03, D-215, release 1.32). Connector Recipe gains `Watermark__c`, `Next_Run_At__c`, `Consecutive_Failures__c`, `Pause_After_Failures__c`, `Retry_Attempts__c`, `Keep_Runs_Days__c` and `Ignore_Own_Changes__c`; Connector Run gains `Next_Attempt_At__c`. New custom setting Section 29CN4 Connector Settings (`Connector_Settings__c`, R-CS1) and platform event `Connector_Start_User__e`. R-CR1 adds the `schedule` and `record` triggers, R-CR4 the Integration User lane, and new R-CR6 (clock), R-CR7 (retries and pause) and R-CR8 (Health Check). No object added (custom settings are not counted). |
+| 1.75 | 2026-11-20 | BarnCRM Connector Load Rows with an Import Template (CN-09, C-38, D-215, release 1.32). R-CR1 adds the `importRows` step; new R-CR9 (a scheduled dry run that commits only inside the step's limits) and R-IB18 (a data job a recipe starts, through Super Importer's own entry points). R-CR7: waking a run that waits on a data job counts no attempt. No object or field added. |
 
 ---
 ## 32. Entity ownership by package

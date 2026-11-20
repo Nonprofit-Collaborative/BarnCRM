@@ -6,7 +6,8 @@
  *
  * Release 1.31 (CN-02) builds the Manual trigger (Run Now and the Flow action) and the steps
  * Find, Create, Update, Create or Update, Call an App, If and Stop; release 1.32 (CN-03) the
- * Schedule and Record Change triggers (`ConnectorTriggers`). Any other kind is refused.
+ * Schedule and Record Change triggers (`ConnectorTriggers`) and CN-09 Load Rows with an Import
+ * Template (`ConnectorImportStep`). Any other kind is refused.
  */
 public with sharing class ConnectorRecipeDocument {
 	public static final Integer MAX_STEPS = 25;
@@ -21,7 +22,8 @@ public with sharing class ConnectorRecipeDocument {
 		'upsert',
 		'callApp',
 		'if',
-		'stop'
+		'stop',
+		'importRows'
 	};
 	public static final Set<String> RECORD_KINDS = new Set<String>{ 'create', 'update', 'upsert' };
 	public static final Set<String> METHODS = new Set<String>{ 'GET', 'POST', 'PUT', 'PATCH', 'DELETE' };
@@ -127,6 +129,9 @@ public with sharing class ConnectorRecipeDocument {
 
 	/** What is wrong with one Find, record, If or Stop step, in words naming it, or null. */
 	private static String stepProblem(String kind, Map<String, Object> step, List<Object> at) {
+		if (kind == 'importRows') {
+			return ConnectorImportStep.problem(step, at);
+		}
 		if (kind == 'find') {
 			if (mapOf(step.get('query')).get('object') == null) {
 				return BarnHelp.text('Connector', 'Connector_Recipe_ErrorFind', at);

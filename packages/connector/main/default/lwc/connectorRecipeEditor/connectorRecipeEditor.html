@@ -133,6 +133,20 @@
                             <lightning-input type="checkbox" label={labels.notFoundOk} checked={row.step.notFoundOk} disabled={readOnly} data-address={row.address} data-field="notFoundOk" onchange={handleField}></lightning-input>
                         </template>
 
+                        <template lwc:if={row.isImport}>
+                            <lightning-combobox label={labels.template} options={templateOptions} value={row.step.template} field-level-help={labels.templateHelp} read-only={readOnly} data-address={row.address} data-field="template" onchange={handleField}></lightning-combobox>
+                            <lightning-input label={labels.rows} value={row.step.rows} field-level-help={labels.rowsHelp} read-only={readOnly} data-address={row.address} data-field="rows" onchange={handleField}></lightning-input>
+                            <fieldset class="slds-var-m-top_x-small">
+                                <legend class="slds-text-body_small">{labels.limits}</legend>
+                                <p class="slds-text-body_small">{labels.limitsHelp}</p>
+                                <div class="slds-grid slds-gutters_x-small slds-wrap">
+                                    <template for:each={row.limits} for:item="limit">
+                                        <lightning-input key={limit.key} class="slds-col" type="number" label={limit.label} value={limit.value} min={limit.min} max="4000" step="1" required field-level-help={limit.help} read-only={readOnly} data-address={row.address} data-limit={limit.key} onchange={handleLimit}></lightning-input>
+                                    </template>
+                                </div>
+                            </fieldset>
+                        </template>
+
                         <template lwc:if={row.isIf}>
                             <lightning-radio-group label={labels.match} options={matchOptions} value={row.step.match} type="button" disabled={readOnly} data-address={row.address} data-field="match" onchange={handleField}></lightning-radio-group>
                             <fieldset class="slds-var-m-top_x-small">

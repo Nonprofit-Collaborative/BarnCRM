@@ -7,7 +7,8 @@ organization uses, without Flow Builder, Apex or a paid integration service. It 
 each a tab of **Super Connector**:
 
 - **Recipes**: "when this happens, then do these steps" automations that find, create and update
-  BarnCRM records through saved maps and call other apps (see [Recipes](#recipes)).
+  BarnCRM records through saved maps, call other apps, and load rows through Super Importer on a
+  schedule, committing only inside limits you set (see [Recipes](#recipes)).
 - **Run History**: every run of every recipe, step by step, with Retry (see
   [Run History](#run-history)).
 - **Connections**: a saved, checked sign-in to another app's REST API. Each connection keeps its
@@ -174,6 +175,7 @@ reads an earlier step's result, or the run's own data, by a **value path**:
 | Update a Record | Builds the map's fields and updates the record whose Id the value path gives. | The map; the record Id's value path; the value path it reads. |
 | Create or Update a Record | Finds the existing record through the map's **Match** (by record Id, a field or an external Id) and updates it, or creates one. | The map; the value path it reads. |
 | Call an App | Sends one request over a connection and keeps the app's answer. | The connection; GET, POST, PUT, PATCH or DELETE; the path after the connection's base URL, such as `/contacts/{id}`; a value for each `{slot}`; query parameters; extra headers; a body map (a map that builds JSON) and the value path it reads; the status codes that count as success (blank is any 2xx); whether a 404 is all right. |
+| Load Rows with an Import Template | Hands rows to Super Importer with one of its templates, runs the dry run, and commits only when the dry run is inside the limits you set. See [Scheduled Imports](#scheduled-imports-load-rows-with-an-import-template). | The template; the value path that holds the rows; Most Rows, Most Rejected Rows, Most New Records and Most Updated Records. |
 | If | Runs its **Then** steps when its conditions hold, otherwise its **Otherwise** steps. | Up to 10 conditions (value path, operator, value), all or any. An If can hold one more If, no deeper. |
 | Stop | Ends the run as Succeeded, Skipped or Failed, with a message. | The outcome and message. |
 
@@ -187,6 +189,52 @@ cannot add a path segment or a parameter. Authorization and the other sign-in he
 the connection, never from a step. Any value that holds a Salesforce merge field (an opening
 brace followed by an exclamation mark), whether typed in the recipe, sent by an app or read from a
 record, fails the step and nothing is sent: a recipe can never make Salesforce insert a key.
+
+### Scheduled Imports: Load Rows with an Import Template
+
+Use this step for an import that should happen on its own, such as a sign-up list loaded every
+morning. Put it in a recipe whose **When** is a Schedule, after the step that fetches the rows
+(usually Call an App). The step loads the rows exactly as Super Importer loads an uploaded file:
+the template's columns, matching, transforms, lookups and rejections, the journal and Undo are
+all the same. The difference is that nobody is watching, so the step commits only when the dry
+run looks the way you expect.
+
+**What you choose:**
+
+| Setting | Default | What it does |
+|---|---|---|
+| Import Template | none | An active Super Importer template (a template that deletes records by file cannot be used). Build and try it on a file in Super Importer first. |
+| Rows | `trigger.rows` | The value path that holds the rows, such as `steps.callApp1.body.values`: a list of records keyed by column name, a list of lists whose first list holds the column names (a Google Sheets range), or CSV text with a header row. |
+| Most Rows | 1,000 | 1 to 4,000. When more rows arrive, nothing is loaded and the run fails. |
+| Most Rejected Rows | 0 | The dry run may reject at most this many rows. |
+| Most New Records | 1,000 | The dry run may create at most this many records. |
+| Most Updated Records | 1,000 | The dry run may update at most this many records. |
+
+**What happens on each run:**
+
+1. The step reads the rows, creates a Super Importer data job named "Recipe <name>, run <run>",
+   stages the rows and starts the dry run. The run shows **Waiting**; the recipe clock looks
+   again every 5 minutes. Waiting here uses none of the recipe's Retry Attempts.
+2. When the dry run finishes inside every limit, the step starts the commit and waits again.
+3. When the commit is complete, the step ends with the counts (rows, created, updated,
+   rejected) in Run History, and the records it wrote count in **Records Written**.
+
+**When a limit is crossed,** nothing is committed. The run fails with a message such as "The dry
+run of data job IB-000123 would reject 12 rows, more than the limit of 0 set on this step". The
+data job stays a finished dry run on Super Importer: open it there, check the rejected rows, and
+select **Commit** if it is right, or fix the source and select **Retry** on the run, which loads
+the rows again as a new data job. A failed run writes one Error Log entry, so the Error Log digest
+tells you.
+
+**Who loads the rows.** The recipe's identity (the Automated Process user, or the integration
+user) stages and commits, with Super Importer's own permission checks, so it needs **BarnCRM
+Admin** (the Manage BarnCRM Settings permission) in **Recipe Access** whatever Run As says; Publish
+refuses the recipe when it cannot create data jobs. The data job shows that identity as who
+committed it; you can still correct and retry its rejected rows on screen and undo it from Super
+Importer, as with any import.
+
+**Test** reads the rows from the sample data and shows the template, the number of rows and the
+limits, without staging anything.
 
 ### Run As
 
@@ -262,7 +310,9 @@ A run that writes records and then calls an app pauses before the call and conti
 transaction, because Salesforce allows no callout after an unsaved write. A run also pauses near
 Salesforce's limits (90 callouts, 100 seconds of callouts, 45 seconds of processing, 180 queries
 or 140 saves in one transaction) and continues where it stopped; a step that already ran is never
-run again. A run's data, kept between steps, is limited to about 130,000 characters.
+run again. A run's data, kept between steps, is limited to about 130,000 characters, which also
+bounds the rows one Load Rows step can take from an earlier step; larger loads belong in Super
+Importer.
 
 ## Run History
 
