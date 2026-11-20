@@ -788,6 +788,9 @@ This subsection is the schedule for every open, approved item. Where Sections 6.
 | I | 1.18 | Project Management module, possibly a PSA tool (D-175); later by Brandon's direction |
 | K | 1.20, 1.21, 1.22, 1.23, 1.24 | Batch D to I review decisions and the full PSA (1.20); pilot readiness: requests and namespace readiness, performance, simplify, UX and testing (1.21 to 1.24). Landed 2026-11-14 inside batch L |
 | L | 1.25 (on batch K) | Sample data for every module (1.25, D-203), module apps (ADR-0223, D-204), the Funders app labelled Grants (D-205). Landed 2026-11-14 with batch K: squash `f69141c1c`, PR #1317 (#1316 closed as landed); release gate passed on `barn-platform` (6,099 of 6,099 tests, 93% coverage, 0 classes under the floor); Core deployed to `mwdbdevsb` at `2c0bb9378` (check-only first, D-192) |
+| M | 1.26 | Patch brand (ADR-0224, D-207): new logo assets per app, Barn Navy app headers, Patch Rust for decoration only, Patch welcome on the Home page. Landed 2026-11-14: squash `33ca62f30`, PR #1323 (#1322 closed as landed); incremental gate 168 of 168 on `barn-platform`; Core deployed to `mwdbdevsb` at `33ca62f30` (validation 0AfWF00000HRiZR0A1, 2,742 of 2,742 tests; quick deploy 0AfWF00000HRkWP0A1; D-192) |
+| N | 1.27, 1.28 | Owner decisions of 2026-11-14 (D-208): Grants rename everywhere, Memberships and Scholarships apps, org-wide Core dates, admin-only Form delete, Error Log grouping key, address match-key warning, Health Check Run Remaining Checks, quick link help in BarnHelp JSON, Mirror without nonprofit modules, hourly case status pull (1.27); fewer custom objects without losing function (1.28). Landed 2026-11-19 with batch O: squash `8c772d5d4`, PR #1327; release gate at `32c252100` passed on `barn-sales` and `barn-platform` (6,167 of 6,167 tests each, 93% coverage, 0 classes under the floor), then incremental gates 6,166 of 6,166 on `barn-sales` for three CI fixes; Core deployed to `mwdbdevsb` at `8c772d5d4` (validation 0AfWF00000HZDlN0AX, 2,759 of 2,759 tests, removed BarnCRM objects destroyed; quick deploy 0AfWF00000HZGo50AH; D-192) |
+| O | 1.29 | Apex character trim pass plus the Advanced Reporting module (D-202, D-208), after all current and pending work. Landed 2026-11-19 with batch N |
 
 Portals into Batch C (Brandon, 2026-11-04, "Yes", D-178): C-46 Address Verification is no longer a Portal Builder or Corporate Hub prerequisite, so Portal Builder (PB-01) and the volunteer, speaker and donor portal templates (PB-03, PB-07, PB-08) are in release 1.3. PB-01 still starts only after the item 30 terms check confirms option B; if it does not, the Portal Builder items are re-slotted.
 
@@ -1270,6 +1273,51 @@ Owner request (Brandon): "run sample data for everything so someone can load the
 | SD-01 | Sample data for every module and feature, loadable and removable from the app: packaged JSON sample sets read by Core's generic loader (`SampleDataFile`, D-200 S2), with sets for Forms, Portal Builder, Territory Management, Memberships, Scholarships, Projects, Corporate Hub, Logic Models and Programs (goals, cohorts, schedule), richer Funders data, and the Core, Giving, Volunteers and Events gaps filled; a fixed load order (Logic Models after Programs, then Memberships, Scholarships, Projects, Corporate Hub, Forms, Portal Builder and Territory) | Major | Landed | D-203 |
 | SD-02 | Module apps (ADR-0223, amends ADR-0192): BarnCRM Events, Forms, Portal Builder, Corporate Hub and Projects ship their own console apps; capped orgs (Developer Edition, scratch, trial) leave them out (`MODULE_APPS=auto`, overridable with `capped` or `all`) | Major | Landed | D-204 |
 | SD-03 | Funders app labelled BarnCRM Grants (app label only) | Minor | Landed | D-205 |
+
+#### Release 1.26 (Batch M): Patch brand
+
+Status (2026-11-14): Landed on `main`: squash `33ca62f30`, PR #1323 (#1322 closed as landed). Incremental gate 168 of 168 on `barn-platform`. Owner request (Brandon): "use them to update the images and branding across the solution (including module badges on their corresponding apps) and website" (D-207).
+
+| ID | Item | Size | Status | Source |
+|---|---|---|---|---|
+| BR-01 | Patch brand (ADR-0224): `BarnCRM_Patch_*` logo ContentAssets per app (module badges on their apps), Barn Navy (#1E2A3A) app headers, Patch Rust for decoration and large text only, `BarnPatchWelcome` on the Home page (`c/hubWelcome`); the 12 old barn assets removed | Major | Landed | D-207 |
+| BR-02 | BarnCRM.com rebranded with Patch (logo, palette, poses, module badges), a page per module, and A Letter From Patch (`/meet-patch/`); live on prod 2026-11-14 | Minor | Done (website repo) | D-207 |
+
+#### Release 1.27 (Batch N): owner decisions of 2026-11-14
+
+Status (2026-11-19): Landed on `main` with releases 1.28 and 1.29 (batches N and O, squash `8c772d5d4`, PR #1327); release gate passed on `barn-sales` and `barn-platform`; Core deployed to `mwdbdevsb` (D-192).
+
+| ID | Item | Size | Status | Source |
+|---|---|---|---|---|
+| N-01 | Rename the Funders module to BarnCRM Grants everywhere (Setup Assistant, Module Manager, guides, catalog, website), visible text only; API names stay | Major | Landed | D-208 (item 48) |
+| N-02 | Own apps for Memberships and for Scholarships and Outbound Grants (ADR-0223 pattern; left out on capped orgs) | Major | Landed | D-208 (item 50) |
+| N-03 | Core date rules use one org-wide date, not each user's time zone | Minor | Landed | D-208 (item 46) |
+| N-04 | Forms with submissions can be deleted by admins only (others retire them); submissions kept | Minor | Landed | D-208 (item 47) |
+| N-05 | Error Log grouping key adds the exception type and the top stack line | Minor | Landed | D-208 |
+| N-06 | Addresses that fail the match key are marked filled and get a warning | Minor | Landed | D-208 |
+| N-07 | Health Check "Run Remaining Checks" button | Minor | Landed | D-208 |
+| N-08 | Quick link help text moves into BarnHelp JSON | Minor | Landed | D-208 |
+| N-09 | Mirror never requires Giving or any other nonprofit module | Major | Landed | D-208 |
+| N-10 | Case status pull runs hourly, only when cases exist | Minor | Landed | D-208 |
+| N-12 | Four permission set grants fixed to match Staff | Minor | Landed | D-209 |
+| N-13 | Provider secrets (Stripe webhook, Google, Smarty) move to Named Credentials and External Credentials; Stripe events fetched back through the Named Credential | Major | Landed | D-209 |
+| N-14 | Every module marked Beta in the product, guides and website (one catalog flag) | Minor | Landed | D-211 |
+| N-15 | Gift mirrors fold into Giving; Giving shown as BarnCRM Fundraising everywhere | Major | Landed | D-210 |
+
+#### Release 1.28 (Batch N): fewer custom objects
+
+| ID | Item | Size | Status | Source |
+|---|---|---|---|---|
+| N-11 | Cut a few custom objects where the function survives (merge or move to fields or JSON); never remove a capability (203 to 197 objects; Admin Journal) | Major | Landed | D-208 |
+
+#### Release 1.29 (Batch O): Apex trim and Advanced Reporting
+
+Status (2026-11-19): Landed with batch N (squash `8c772d5d4`). Brandon's earlier scheduling: "schedule trim pass after all the current/pending work is completed. The Advanced Reporting can also be done at the same time".
+
+| ID | Item | Size | Status | Source |
+|---|---|---|---|---|
+| O-01 | Apex character trim pass (suite regrew to about 4.99M characters by release 1.25; AR-03 budget). Upgrade-only code removed (ADR-0230) and Apex formatted at printWidth 120 (D-212): suite 4,985,543 characters, Core 2,254,017 against its 2,000,000 target; the two remaining options (Data Manager in its own package, about 666K; unused `@NamespaceAccessible` markers, about 10.6K) await Brandon | Major | Landed | D-208, AR-03, D-212 |
+| O-02 | Advanced Reporting module (Section 6.1 item 22; ADR-0231) | Major | Landed | D-202, D-208 (item 49) |
 
 #### Held
 
@@ -2044,12 +2092,12 @@ The pre-batch review (9.8) checks new work against this list; existing code is m
 43. (modules-21, usability review) One Core person panel listing every installed module (Giving, Volunteers, Programs and others) instead of each module adding its own. Raised 2026-11-04. It may reverse D-03. **Resolved 2026-11-04 (Brandon): recorded as Decision D-171; no, each module keeps its own panel (D-03).**
 44. (admin-22, usability review) Move the raw Import Rows tab out of the Admin app navigation. Raised 2026-11-04. It may reverse the Admin app navigation set in D-144. **Resolved 2026-11-04 (Brandon): recorded as Decision D-171; yes, the raw Import Rows tab leaves the Admin app navigation and stays reachable from Super Importer.**
 45. (admin-24, usability review) Retitle Field Utilization. Raised 2026-11-04. It may reverse a recorded tool name. **Resolved 2026-11-04 (Brandon): recorded as Decision D-171; yes, Field Utilization is retitled "Field Use".**
-46. (Core dates) How Core date rules behave across user time zones. Raised 2026-11-14 at landing batch L. Recommendation: one org-wide date for Core date rules, as a later fix.
-47. (Forms) Whether a Form with submissions can be deleted: `Form_Submission__c.Form_Version__c` is a Restrict lookup, so a Form whose versions have submissions cannot be deleted today. Raised 2026-11-14. Recommendation: keep it (the submissions stay intact; retire the form instead).
-48. (Funders naming) Rename the Funders module to BarnCRM Grants everywhere (Setup Assistant, Module Manager, docs), beyond the app label (D-205). Raised 2026-11-14.
-49. (Advanced Reporting) Build Advanced Reporting in this batch, or keep it in the backlog as D-202 placed it (Section 6.1 item 22). Raised 2026-11-14.
-50. (Module apps) Own apps for Scholarships and Memberships, beyond the ADR-0223 apps (D-206). Raised 2026-11-14; proposed, awaiting Brandon.
-51. (Module apps) How Brandon previews the new module apps, which capped orgs leave out (D-204): a full-suite sandbox, or `barn-npc` deployed with `MODULE_APPS=all`. Raised 2026-11-14.
+46. (Core dates) How Core date rules behave across user time zones. Raised 2026-11-14 at landing batch L. Recommendation: one org-wide date for Core date rules, as a later fix. **Resolved 2026-11-14 (Brandon): org-wide; D-208, release 1.27 (N-03).**
+47. (Forms) Whether a Form with submissions can be deleted: `Form_Submission__c.Form_Version__c` is a Restrict lookup, so a Form whose versions have submissions cannot be deleted today. Raised 2026-11-14. Recommendation: keep it (the submissions stay intact; retire the form instead). **Resolved 2026-11-14 (Brandon): "Keep protection except for admins"; D-208, N-04.**
+48. (Funders naming) Rename the Funders module to BarnCRM Grants everywhere (Setup Assistant, Module Manager, docs), beyond the app label (D-205). Raised 2026-11-14. **Resolved 2026-11-14 (Brandon): yes; D-208, N-01.**
+49. (Advanced Reporting) Build Advanced Reporting in this batch, or keep it in the backlog as D-202 placed it (Section 6.1 item 22). Raised 2026-11-14. **Resolved 2026-11-14 (Brandon): with the Apex trim pass after all current and pending work; D-208, release 1.29 (O-02).**
+50. (Module apps) Own apps for Scholarships and Memberships, beyond the ADR-0223 apps (D-206). Raised 2026-11-14; proposed, awaiting Brandon. **Resolved 2026-11-14 (Brandon): approved; D-208, N-02.**
+51. (Module apps) How Brandon previews the new module apps, which capped orgs leave out (D-204): a full-suite sandbox, or `barn-npc` deployed with `MODULE_APPS=all`. Raised 2026-11-14. Update 2026-11-14: `barn-npc` is dropped (D-208); Brandon has not checked the apps yet and will provide a different NPC org.
 
 ### 11.3 Parking lot (good ideas, deliberately not now)
 
@@ -2371,6 +2419,12 @@ Findings and decisions about the modules (Giving, Mirror, Volunteers, Programs, 
 | D-204 | Module apps (ADR-0223, amends ADR-0192 decision 1). The bigger modules ship their own Lightning console app: BarnCRM Events, Forms, Portal Builder, Corporate Hub and Projects; their tabs stay in the BarnCRM apps. Capped orgs (Developer Edition, scratch and trial orgs) leave the module apps out: `deploy-packages.sh` runs with `MODULE_APPS=auto`, looks up the org type, and deploys those modules without their apps (`capped` or `all` overrides the lookup); a CI budget allows 9 suite apps on a capped org | No module apps (ADR-0192 as it was); leave out only the apps that do not fit (the limit is not queryable); a separate permission set per app for visibility | The app limit belongs to scratch and Developer Edition orgs, which every test org is; real orgs and managed packages are not limited, so they get the apps the owner asked for, and the five apps are tested on a real org (`mwdbdevsb`) |
 | D-205 | The Funders module's app is labelled "BarnCRM Grants" (app label only; landed in batch L). Renaming the module itself in Setup Assistant, Module Manager and the docs is an open question for the owner (Section 11.2 item 48) | Keep the app labelled Funders | Chosen with the owner; the app label changes without touching API names or the module name |
 | D-206 | First module apps, chosen with the owner: Grants (the Funders app, relabelled), Portal Builder and Forms, plus the other ADR-0223 apps, Events, Corporate Hub and Projects. Own apps for Scholarships and Memberships are proposed and wait on the owner (Section 11.2 item 50) | Apps for every module now | Start with the modules big enough to need their own navigation; each further app either fits the capped-org budget or joins the left-out list (ADR-0223 decision 5) |
+| D-207 | Patch the highland cow is the BarnCRM brand (ADR-0224; Brandon, 2026-11-14: "use them to update the images and branding across the solution (including module badges on their corresponding apps) and website"). App headers Barn Navy #1E2A3A; Patch Rust #D35400 for decoration and large text only; Sage, Cream and Charcoal complete the palette. Supersedes the D-58 colors, ADR-0102 decision 4 and ADR-0137 decision 5. Masters live in the website repo `brand/patch-assets/` | Keep the barn logo | The owner supplied the Patch brand sheets |
+| D-208 | Owner decisions of 2026-11-14 (Brandon): rename Funders to BarnCRM Grants everywhere ("Yes"); Core date rules org-wide; Forms with submissions deletable by admins only ("Keep protection except for admins"); Memberships and Scholarships and Outbound Grants apps approved; Advanced Reporting with the Apex trim pass after all current and pending work; cut a few custom objects without losing functionality in the next batch; Error Log grouping key adds exception type and stack line; addresses failing the match key are marked filled with a warning; Health Check Run Remaining Checks button in the next batch; quick link help text in BarnHelp JSON; case status pull hourly if cases exist; Mirror must never require Giving or any nonprofit module ("using nonprofit modules should never be required"); `barn-npc` dropped (Brandon will provide a different NPC org); `barn-npsp` and a multi-currency org approved once the PBO exists. Slotted as releases 1.27 to 1.29 (batches N and O) | Recommendations as raised | Owner decisions |
+| D-209 | Owner answers of 2026-11-14 (Brandon: "1. Yes, fix permissions. 2. Yes 3. Named Credentials approved 4. Approved"): the four odd permission set grants are fixed to match Staff (Read Only's no-op Merge_Settlement_Ready__e entry removed, Admin's extra standard Contact and Account field grants aligned, Read Only no longer creates Error_Log_Event__e, Corporate Hub Read Only no longer edits Policy_Acknowledgment__c); S11 optional Migration package stays deferred until one ADR settles its three seams after M-2; provider secrets move from protected custom settings to Named Credentials and External Credentials (Stripe: fetch each event back from Stripe through the Named Credential instead of checking the HMAC with a stored secret; Google: key in the `X-Goog-Api-Key` header; Smarty: header auth if supported, else one documented exception), amending ADR-0220; the website Grants rename deploys to barncrm.com. Slotted in release 1.27 (N-12, N-13) | Keep the grants; keep secrets in protected settings | Owner decisions |
+| D-210 | Mirror for Giving folds into Giving, and Giving is renamed Fundraising (Brandon, 2026-11-14: "Can Mirror for Giving just be included in Giving? And I'd prefer Fundraising over Giving"). The gift mirrors (Opportunity, Gift Transaction, Campaign sync, accounting export, inbound gifts, NPSP and NPC gift kits) move from the interim `packages/mirrorgiving` into `packages/giving`, off by default, with only dynamic references to standard and NPC objects so Fundraising still installs and runs on Platform-only and non-NPC orgs; their settings move from Mirror_Settings__c to Giving's settings; Mirror stays Core-only (Case requests, NPC household kits). The module is shown as "BarnCRM Fundraising" everywhere visible; API names and the `giving` folder stay. Amends ADR-0013's standard-object rule (Mirror and, dynamic only, Fundraising) and the N-09 ADR | A separate Mirror for Giving package | One fewer package for admins; the code already has no static standard-object references |
+| D-211 | Every module is in Beta for now (Brandon, 2026-11-14: "All the modules should be considered as in Beta right now"). The product marks each module Beta wherever modules are listed (Module Manager, Setup Assistant, Home Modules, module apps' descriptions), driven by one catalog flag so a module leaves Beta by changing data; the guides, feature catalog and website say Beta for each module. Core is not a module and is not marked. Slotted in release 1.27 (N-14) | Per-module status wording ("being tested for the pilot", "still in testing and review") | Owner decision |
+| D-212 | Owner decisions of 2026-11-18 and 2026-11-19 (Brandon). No history references: "None of this has been rolled out to the public so there doesnt need to be any reference to old features/setup on the solution, documentation, or the website" (product, guides, help and website describe only current BarnCRM; ADRs, changelogs and this decision log keep history). "mwd cleanup approved, just don't remove anything that wasn't part of BarnCRM" (removed BarnCRM objects destroyed on `mwdbdevsb`; the org's own objects kept). "Change to Fund ID" (Memberships field label). "Reformat Apex to 120 character lines is approved" (printWidth 120 for Apex, part of O-01). Removing unused `@NamespaceAccessible` markers was asked about, not approved (recommendation: keep them) | Keep history notes; keep printWidth 100 | Owner decisions |
 
 ---
 
@@ -2392,3 +2446,4 @@ Findings and decisions about the modules (Giving, Mirror, Volunteers, Programs, 
 ---
 
 *End of document. Everything above is intended to be enough to begin. When in doubt, return to Section 1.3 and ask which principle the decision serves.*
+
