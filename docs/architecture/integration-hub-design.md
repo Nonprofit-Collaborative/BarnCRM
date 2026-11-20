@@ -242,24 +242,31 @@ Templates. The module's own app and Settings tab follow D-101 and ADR-0223.
   imports and bulk updates, and resumes from the watermark after an outage. The cost is up to 15
   minutes of delay, the same order as Workato's own polling triggers. Deletes are not seen
   (a later option: an `ALL ROWS` poll of `IsDeleted`).
-- *Loop guard:* "Ignore changes made by the recipe runner" is on by default, so a recipe that
-  writes to the object it watches does not trigger itself.
+- *Loop guard:* "Ignore changes made by recipes" is on by default: records last changed by a
+  recipe identity (Section 3.10) are skipped, so a recipe that writes to the object it watches
+  does not trigger itself.
 - *Later, only if delay proves a problem:* an instant option through the ADR-0138 generated
   trigger the admin deploys, publishing to the run queue.
 
-**The recipe clock.** One Schedulable class scheduled four times an hour (four CronTriggers at :00,
-:15, :30 and :45; the org limit is 100). Turn On Recipes on the module's Settings tab schedules it
-as the person pressing it, who becomes the **runner** (Section 5). Each tick queues due runs and
-starts one runner chain. Health Check reports a missing clock, an inactive runner, or a runner
-without the permission set.
+**The recipe clock (no scheduled job, no person).** Scheduled Apex runs as the user who scheduled
+it and fails once that user is deactivated, so the clock is not a CronTrigger. Turn On Recipes
+publishes a platform event; its Apex trigger runs as a recipe identity (Section 3.10), not as the
+person pressing, and enqueues a heartbeat Queueable that re-enqueues itself with a 5-minute delay
+(`System.enqueueJob` takes a delay of 0 to 10 minutes). Asynchronous Apex runs as the user who
+enqueued it, so the heartbeat and every run it starts keep that identity. Each beat queues the
+recipes that are due and starts the runner chain for each identity. A Transaction Finalizer
+re-enqueues a beat that failed; any webhook post, Flow action or Run Now also publishes the event,
+which restarts a missing heartbeat; and a Nightly Jobs step checks it. Health Check reports a
+stopped heartbeat with a Restart button.
 
 ### 3.3 Inbound Webhooks: Security Analysis
 
 Endpoint: `POST <site URL>/services/apexrest/barncrm/connector/v1/hook?token=<64 hex>`.
 
 - **Guest only stores** (ADR-0184, ADR-0201): the receiver inserts one Run, Received, in system
-  mode, and makes no callout, no record read and no processing. The runner processes it later as
-  the runner, in user mode.
+  mode, publishes the start event (the guest permission set grants create on that event only), and
+  makes no callout, no record read and no processing. The recipe's identity (Section 3.10)
+  processes it later.
 - **Token:** 256 random bits (`Crypto.generateAesKey(256)`), shown once with Copy and stored only
   as its SHA-256 hash on the recipe (`Webhook_Token_Hash__c`, unique). The receiver hashes the
   presented token and finds the recipe by the hash, so no token is stored and a read-only user who
@@ -271,8 +278,8 @@ Endpoint: `POST <site URL>/services/apexrest/barncrm/connector/v1/hook?token=<64
   when resumed, and a draft recipe answers 404.
 - **Duplicates:** a connector or recipe may name an event id path; the run's unique `Event_Key__c`
   drops a resend, answered 200.
-- **Untrusted payload:** a post can only do what the recipe's steps do, as the runner, in user mode
-  (CRUD, FLS, sharing). Where the sending app offers it, the connector's **fetch back** option
+- **Untrusted payload:** a post can only do what the recipe's steps do, with the recipe's identity
+  and access mode (Section 3.10), never more. Where the sending app offers it, the connector's **fetch back** option
   reads only an id (or a resource URL whose host must equal the Connection's host) from the post
   and fetches the real data through the Connection, so a forged post with a stolen token cannot
   inject data (the ADR-0229 Stripe pattern; Eventbrite sends an `api_url` exactly for this).
@@ -294,7 +301,7 @@ Endpoint: `POST <site URL>/services/apexrest/barncrm/connector/v1/hook?token=<64
 | `transform` | Change Data | Applies a map with `to.kind` json to produce a new data object for later steps |
 | `if` | If | A condition (filter document over trigger and step data) with Then steps and optional Otherwise steps; nesting at most 2 levels |
 | `forEach` | For Each | Runs its steps once per item of a list from an earlier step, at most 1,000 items a run, checkpointing every 200 |
-| `wait` | Wait | Pauses the run for minutes, hours or days; resumed by the clock (15-minute granularity) |
+| `wait` | Wait | Pauses the run for minutes, hours or days; resumed by the clock (5-minute granularity) |
 | `importRows` | Load Rows with an Import Template | Hands rows (from Google Sheets, a CSV at a connection, or a list from an app) to Super Importer staging with a template, runs the dry run, and commits only inside the recipe's limits (C-38) |
 | `stop` | Stop | Ends the run as Succeeded, Skipped or Failed with a message |
 
@@ -340,11 +347,13 @@ the exact clicks and a Check Again button (the ADR-0148 amendment A1 pattern):
 The secret itself is pasted on BarnCRM's page and written to the principal with
 `ConnectApi.NamedCredentials.createCredential`: it passes through Apex memory once and is never
 stored in a record, logged or returned. This differs from ADR-0229 decision 5 (packaged
-providers' secrets are entered in Setup) and is Open Decision 2.
+providers' secrets are entered in Setup); approved under D-215 subject to a separate in-depth
+security review.
 
 Principal access: BarnCRM creates one org-owned permission set, "BarnCRM Connections"
 (unpackaged, because a packaged permission set cannot be changed in a subscriber org), adds each
-connection's principal to it, and assigns it to the runner and to Connector admins.
+connection's principal to it, and assigns it to the recipe identities (Section 3.10) and to
+Connector admins.
 
 Each connection has **Check Connection** (the connector's check call, or a HEAD/GET of the base
 URL for generic), **Disconnect** (deletes the principal's credential, keeps the recipe
@@ -427,7 +436,9 @@ never reads the key. Pickers (`pick`) call the app to list choices (audiences, e
 - **Test** runs the draft on a sample: pasted JSON, a chosen record, or the last received payload.
   Record steps show what they would write and do not save; Call an App steps with GET run for
   real; other methods show the request that would be sent unless "Send for real" is ticked. The
-  test result is a run marked Test.
+  test result is a run marked Test. Test and Run Now run with the recipe's own identity and access
+  mode (Section 3.10), so a test shows what the live recipe would be allowed to do, not what the
+  person testing may do.
 - **Templates:** shipped as recipe JSON with placeholders for connections and choices; Use
   Template opens the draft with each blank highlighted.
 - **Versioning:** a recipe has a published definition and a draft. Publish checks the draft,
@@ -439,13 +450,94 @@ never reads the key. Pickers (`pick`) call the app to list choices (audiences, e
 - **Where Used** (C-59): the module implements `WhereUsedExtension` (ADR-0057 pattern), listing
   recipes that name a field or object in maps, filters or Find steps, and recipes using a saved
   map or a connection. Retire a Field warns before a field a recipe writes is retired.
-- **Health Check** (`HealthCheckExtension`): clock scheduled, runner active with the permission
-  set, connections enabled for callouts and checked, recipes paused by failures, Site guest
-  permission set assigned.
-- **Nightly Jobs:** the run cleanup step.
+- **Health Check** (`HealthCheckExtension`): heartbeat running; each identity in use holds its
+  permission sets (and, for the integration user, is active and set on its event trigger); a
+  notice listing every recipe that runs in System mode, with who chose it and when; recipes whose
+  record owner is inactive; connections enabled for callouts and checked; recipes paused by
+  failures; Site guest permission set assigned.
+- **Nightly Jobs:** the run cleanup step and the heartbeat check.
 - **Module Manager:** a `BarnCRM_Module__mdt` row and the module's objects in
   `ModuleManagerService.ownedObjects`; the Integrations page (C-48) links to the Connector when it
   is installed.
+
+### 3.10 Who a Recipe Runs As (owner decision D-215)
+
+Brandon, 2026-11-20: "I'd rather recipes being able to be ran as system, integration user, or
+non-user specific to avoid disruptions due to changed permissions or deactivated users." No
+recipe runs as a staff member, so nobody leaving or changing roles stops a recipe.
+
+Two separate questions decide what a run may do:
+
+- **Identity:** who Salesforce sees (Created By, Last Modified By, default record owner, whose
+  credential access a callout uses).
+- **Access mode:** whether the run's object, field and sharing checks are applied (user mode) or
+  skipped (system mode).
+
+Each recipe has a **Run As** choice, one of three. The choice is per recipe, made by an admin on the
+recipe's Settings card, shown on the recipe list, and recorded with who made it and when.
+
+| Run As | Identity | Access mode | What it means for a non-technical admin |
+|---|---|---|---|
+| **BarnCRM Automation** (recommended default) | Salesforce's built-in Automated Process user, which belongs to no person and cannot be deactivated | User mode, limited to the permission sets the admin picks on the Settings tab (BarnCRM picks BarnCRM Admin and each installed module's admin set to start) | "Recipes run as BarnCRM itself. They can do what the permission sets you picked allow, nothing more. Nobody leaving or changing roles affects them. Records they change show Automated Process as the last changer." |
+| **System** | Automated Process | System mode: no object, field or sharing checks | "Recipes can read and change any record and field in the org. Use only when a recipe must reach something the permission sets cannot grant." Needs an explicit choice with a confirmation sentence, and Health Check lists every System recipe |
+| **Integration User** | One designated Salesforce user, ideally on a Salesforce Integration license | User mode, with that user's own permission sets | "Recipes run as a dedicated user named, for example, BarnCRM Integration. Changes show that name. It keeps working when staff leave, as long as nobody deactivates that user or removes its permissions." |
+
+How each works on the platform:
+
+- **Dispatch by platform event.** Two platform events, one per identity: `Connector_Start__e` (its
+  trigger left at Salesforce's default, which runs as the Automated Process user) and
+  `Connector_Start_User__e` (its trigger set to run as the integration user). BarnCRM Automation and
+  System recipes share the first; the access mode is applied per recipe in code (`WITH USER_MODE`
+  and `AccessLevel.USER_MODE`, or `SYSTEM_MODE` for System recipes). A platform event trigger cannot
+  make a callout itself, so each trigger only enqueues that identity's heartbeat and runner chain,
+  which keep the identity.
+- **Setting the integration user.** Salesforce sets a platform event trigger's running user only
+  through `PlatformEventSubscriberConfig` (Tooling or Metadata API); Setup only shows it and offers
+  Suspend and Resume. BarnCRM writes it through the Core org connection of ADR-0148 (already
+  required for Super Importer's new fields). Then one guided Setup step: Setup, Platform Events,
+  BarnCRM Connector Integration User, Subscriptions, Suspend, then Resume, so the new user takes
+  effect at once instead of after caching.
+- **Credential access.** A callout through a Named Credential needs the running user to have
+  access to the External Credential's principal (and, by community report, read on User External
+  Credential), granted by a permission set. BarnCRM assigns its "BarnCRM Connections" set and the
+  chosen sets: to the integration user with an ordinary assignment, and to the Automated Process
+  user with a `PermissionSetAssignment` inserted from Apex, since Setup does not show that user.
+- **Integration license.** Salesforce provisions five free Salesforce Integration user licenses in
+  Enterprise, Unlimited and Performance editions (one in Developer Edition). The license is API
+  only (no screens) and its permission set license, Salesforce API Integration, grants no object
+  access by itself; access comes from permission sets. Orgs without it can use any user license.
+
+What happens when things change:
+
+| Event | BarnCRM Automation and System | Integration User |
+|---|---|---|
+| A staff member who set recipes up leaves | Nothing | Nothing |
+| An admin edits a picked permission set | Recipes gain or lose that access; Health Check shows what each identity can reach | The same for the user's sets |
+| The integration user is deactivated | Not affected | Its recipes stop; Health Check reports it, the recipes say "Integration user inactive", and runs wait until a new user is chosen (choosing one rewrites the trigger setting) |
+| A package upgrade | Assignments to the Automated Process user are kept (they are org data); Health Check confirms them after each upgrade | Not affected |
+
+**Record ownership.** Records a run creates default to its identity as owner. A record owned by the
+Automated Process user is reachable by people only through sharing rules or View All, so a recipe
+that creates records asks for an owner (a person or a queue where the object allows queues), with
+the integration user suggested when there is one. An owner who is later deactivated makes creates
+fail with a plain message, and Health Check names the recipe; ownership is the one place a person
+can still matter, and the admin sees it.
+
+**Audit.** Created By and Last Modified By show Automated Process or the integration user. The run
+history ties every record Id a run wrote to the recipe, its version and the admin who published it,
+so "which recipe changed this?" is answered from the record's Ids in Run History.
+
+**New Setup steps:** none for BarnCRM Automation and System (if Salesforce refuses the Apex
+assignment to the Automated Process user, a one-time guided fallback is shown, and System is
+offered only by explicit choice). For Integration User: create the user and assign the
+Salesforce API Integration permission set license (Setup, Users), then the Suspend and Resume
+click above; BarnCRM assigns the rest.
+
+To confirm on the first org deploy (Section 3.5 lists the connection checks): that an Apex
+`PermissionSetAssignment` to the Automated Process user is accepted and honored by `USER_MODE`; that
+the Automated Process user can call out through a principal it was granted; that a Salesforce
+Integration licensed user can be a platform event trigger's running user; and what the trigger
+does when that user is deactivated (assumed: it fails until changed, which Health Check catches).
 
 ---
 
@@ -457,12 +549,12 @@ never reads the key. Pickers (`pick`) call the app to list choices (audiences, e
 | Total callout time per transaction | 120 seconds | Each callout times out at 30 seconds (connector may set up to 120); the runner stops at 100 seconds and chains |
 | Callout after uncommitted DML | Not allowed | When a step needs a callout and the transaction has DML pending, the runner checkpoints the run and chains a new Queueable |
 | Queueable chaining | One child per async transaction; no depth limit in production (5 in Developer Edition and trial orgs) | One runner chain at a time (checked through `AsyncApexJob`); test orgs note the depth cap |
-| Asynchronous executions per 24 hours | The greater of 250,000 and 200 per user license | Many runs per execution; the clock costs 96 a day; the Settings tab shows the day's use |
+| Asynchronous executions per 24 hours | The greater of 250,000 and 200 per user license | Many runs per execution; the heartbeat costs 288 a day per identity in use; the Settings tab shows the day's use |
 | Heap | 12 MB | Responses over 4 MB are refused with a clear message; run state keeps only paths later steps use (computed at Publish) |
 | HTTP response size | 12 MB | As above; connectors page large lists |
 | CPU | 60 seconds | The runner stops at 45 seconds and chains |
 | SOQL, DML statements, DML rows | 200, 150, 10,000 | Batch mode writes lists in one statement; For Each checkpoints every 200 items |
-| Scheduled Apex jobs | 100 per org | The clock uses 4 |
+| Queueable delay | 0 to 10 minutes | The heartbeat waits 5 minutes between beats |
 | Long text field | 131,072 characters | Webhook body cap; run state cap, else the run fails with "data too large" |
 
 Throughput estimate: with two callouts of about half a second per run, one execution finishes about
@@ -481,7 +573,7 @@ Large one-off loads belong in Super Importer, which a recipe can call (`importRo
 | Code steps (Ruby, JavaScript, Python) and formula mode | Evaluating admin-typed code is refused (ADR-0081) | The closed step list, conditions, maps; a new step is an ADR |
 | Webhooks with secret-based signatures or handshakes | Apex must not read secrets (ADR-0229) | Token plus fetch back, or polling |
 | Synchronous API endpoints (recipe answers the caller with data) | Guest only stores (ADR-0184) | The Inbound Gift API or a module's own REST resource |
-| Sub-minute polling and high concurrency | Scheduled Apex granularity, one runner chain | 15-minute polling; Flow action for immediate starts |
+| Sub-minute polling and high concurrency | A delayed-Queueable heartbeat, one runner chain per identity | 15-minute polling; Flow action for immediate starts |
 | A thousand prebuilt connectors | A small project | Generic REST plus a short JSON catalog anyone can extend |
 | Inbound email trigger | Possible (Email Services) but not needed now | A later trigger if asked |
 
@@ -489,16 +581,21 @@ Large one-off loads belong in Super Importer, which a recipe can call (`importRo
 
 ## 5. Security Review Notes
 
-- **User mode for data, system mode for bookkeeping only.** Every Find, create, update and upsert
-  runs `WITH USER_MODE` and `AccessLevel.USER_MODE` as the person the run executes as. System mode
-  is used only for the module's own Recipe and Run rows (ADR-0021 pattern) and the guest's store,
-  each entered in the without-sharing register.
-- **Who a run executes as.** Scheduled, record-change, webhook, app-polling and Flow-queued runs
-  execute as the **runner**, the admin who pressed Turn On Recipes (asynchronous Apex runs as the
-  user who scheduled it). Run Now and Test execute as the person pressing. Anyone who can publish a
-  recipe can therefore act with the runner's access: publishing needs the custom permission
-  `Manage_BarnCRM_Connector`, granted only by `BarnCRM_Connector_Admin`, which the guide says to
-  give only to system administrators. Open Decision 4 records this.
+- **User mode for data unless the admin chose System.** Every Find, create, update and upsert in a
+  BarnCRM Automation or Integration User recipe runs `WITH USER_MODE` and `AccessLevel.USER_MODE`
+  as the recipe's identity (Section 3.10). A System recipe's data steps run in system mode: that
+  is an explicit, recorded admin choice per recipe, confirmed with a sentence saying it skips
+  every object, field and sharing check, listed by Health Check, and named in the security review
+  notes as a deliberate admin-only option. Otherwise system mode is used only for the module's
+  own Recipe and Run rows (ADR-0021 pattern) and the guest's store, each entered in the
+  without-sharing register.
+- **Who a run executes as.** Never a staff member (D-215): the Automated Process user or the
+  designated integration user, so whoever publishes a recipe acts with that identity's access.
+  Publishing, and choosing Run As, need the custom permission `Manage_BarnCRM_Connector`, granted
+  only by `BarnCRM_Connector_Admin`, which the guide says to give only to system administrators.
+  At Publish, a BarnCRM Automation or Integration User recipe's map targets and Find fields are
+  also checked against the identity's describe, so the editor sees access problems before the
+  first run.
 - **Queries are documents, never text** (Section 4.9): Find steps and record-change filters go
   through `QueryCompiler` with bind variables; object and field names come from describe.
 - **Callouts only through Named Credentials** (`callout:`), no Remote Site Settings; paths are
@@ -517,7 +614,7 @@ Large one-off loads belong in Super Importer, which a recipe can call (`importRo
 
 ## 6. Objects, Metadata and Naming
 
-### 6.1 Names (Open Decision 3)
+### 6.1 Names (approved, D-215)
 
 - **Module:** BarnCRM Connector (D-101: modules are "BarnCRM <name>"), package folder
   `packages/connector`, module key `Connector`, Beta (N-14). Not "BarnCRM Integrations", which
@@ -532,7 +629,8 @@ Large one-off loads belong in Super Importer, which a recipe can call (`importRo
 |---|---|---|---|
 | Connector | `Connector_Recipe__c` | Custom object | +1 |
 | Connector | `Connector_Run__c` | Custom object (master-detail to Recipe) | +1 |
-| Connector | No settings object: every option is per recipe, and the clock is its CronTriggers | none | 0 |
+| Connector | No settings object: every option is per recipe; the identity choices (picked permission sets, integration user) are read back from the permission set assignments and the event trigger's configuration | none | 0 |
+| Connector | `Connector_Start__e`, `Connector_Start_User__e` | Platform events (their own allocation, not custom objects, ADR-0227) | 0 |
 | Connector | Connections | External and Named Credentials created at run time, not objects | 0 |
 | Connector | Connector catalog and templates | JSON static resources | 0 |
 | Connector | `Connector_Webhook_Rest`, the runner, clock and controllers | Apex | 0 |
@@ -544,7 +642,7 @@ The suite goes from 197 to 199 custom objects (custom settings included), under 
 Enterprise org allows for the full-suite gate (ADR-0227). This leaves one slot: the next object
 anywhere in the suite needs another cut first. Rejected to save the second object: recipes as
 Salesforce Files (ADR-0231 style); a recipe carries mutable state (status, watermark, token hash,
-failure count) the clock queries every 15 minutes, which a File cannot hold well. Rejected:
+failure count) the clock queries every 5 minutes, which a File cannot hold well. Rejected:
 recipes as custom metadata (deploying records from Apex needs a Setup setting for packages that
 are not certified, and every watermark change would be a deploy).
 
@@ -574,7 +672,7 @@ Connector module.
 | MAP-04 | Super Importer: Save as Map and Use a Saved Map | Core | Minor |
 | CN-01 | Package skeleton, two objects, permission sets, app, tab, Module Manager row, catalog loader, generic REST Connections (create, guided callout step, Check, Disconnect) | Module | Major |
 | CN-02 | Recipes and runs: editor (When and Then cards), manual and scheduled triggers, Find, Create, Update, Upsert, Call an App, If, Stop; run history; Test; map runtime | Module (may split into CN-02a model and history, CN-02b runner and steps) | Major |
-| CN-03 | Recipe clock, record-change polling, retries with backoff, pause and auto-pause, Error Log, Health Check, Nightly cleanup | Module | Major |
+| CN-03 | Recipe clock (platform event heartbeat), Run As identities (BarnCRM Automation, System, Integration User), record-change polling, retries with backoff, pause and auto-pause, Error Log, Health Check, Nightly cleanup | Module | Major |
 | CN-04 | Inbound webhooks: receiver, token, caps, idempotency, fetch back | Module | Major |
 | CN-05 | For Each, Wait, Change Data steps | Module | Minor |
 | CN-06 | Flow actions "Run BarnCRM Recipe" and "Apply BarnCRM Map and Save"; Where Used extension | Module | Minor |
@@ -611,29 +709,31 @@ All four are one or two landing batches per D-155; the build follows the batch r
 
 ---
 
-## 8. Open Decisions for the Owner
+## 8. Owner Decisions (D-215) and What Remains Open
 
-1. **Start C-38 now, inside the Connector.** C-38 (scheduled imports and external sources) is on
-   hold until you start it (D-39). This request starts it: scheduled imports become a recipe step
-   (CN-09) with the scheduled dry run that commits only inside your limits, and Google Sheets
-   (CN-10) is the first source. SFTP and direct database sources are dropped from C-38 because
-   Apex cannot open them (Section 4.1). **Recommendation:** approve; release C-38 from hold as
-   CN-09 and CN-10.
-2. **Where an admin pastes a connection's secret.** ADR-0229 has packaged providers' secrets typed
-   in Setup. For Connector connections, BarnCRM's page would take the key and write it to the
-   External Credential through `ConnectApi` (it passes through Apex memory once and is never
-   stored, logged or shown again). **Recommendation:** approve page entry for the Connector, with
-   the Setup path documented as an alternative; Stripe, PayPal, Smarty and Google keep ADR-0229.
-3. **Names.** Module BarnCRM Connector, tab Super Connector, Core feature the Mapper with saved
-   Maps. **Recommendation:** approve (alternatives: BarnCRM Recipes; BarnCRM Automations collides
-   with the Automation page).
-4. **Runs execute as the runner.** Unattended runs act with the access of the admin who turned
-   recipes on, so anyone allowed to publish recipes can act with that admin's access.
-   **Recommendation:** approve, with publishing limited to `BarnCRM_Connector_Admin` (system
-   administrators only) and Health Check watching the runner.
-5. **Two new objects, suite at 199 of 200.** **Recommendation:** approve; the next new object in
-   any module needs a cut first (the alternative, recipes as Files, is workable but makes the
-   clock and webhook lookups slower and harder to read).
+Decided 2026-11-20 (plan D-215):
+
+1. **C-38 starts inside the Connector:** approved. Scheduled imports are CN-09 with the scheduled
+   dry run that commits only inside the admin's limits; Google Sheets (CN-10) is the first source;
+   SFTP and direct database sources leave C-38 (Section 4.1).
+2. **Pasting a connection's secret on BarnCRM's page through `ConnectApi`:** approved, subject to a
+   separate in-depth security review (in progress elsewhere; Section 3.5 is unchanged until it
+   reports). Stripe, PayPal, Smarty and Google keep ADR-0229.
+3. **Names:** approved: module BarnCRM Connector, tab Super Connector, Core feature the Mapper
+   with saved Maps.
+4. **Runs as the admin who turned recipes on:** rejected. Brandon: "I'd rather recipes being able
+   to be ran as system, integration user, or non-user specific to avoid disruptions due to changed
+   permissions or deactivated users." Replaced by Section 3.10.
+5. **Two new objects, suite at 199 of 200:** approved.
+
+Still open:
+
+1. **Run As default.** **Recommendation:** BarnCRM Automation (the Automated Process user in user
+   mode, limited to the permission sets the admin picks, starting with BarnCRM Admin and the
+   installed modules' admin sets) as the default for every new recipe; System only by explicit
+   per-recipe choice; Integration User offered where the org has one. If the first org deploy
+   shows that Salesforce refuses a permission set assignment to the Automated Process user, the
+   fallback is: Integration User recommended, and System by explicit choice (Section 3.10).
 
 ---
 
@@ -698,16 +798,24 @@ no record data beyond what its definition names.
 | Retry Attempts | integer | yes (defaults 3) | Retries of a transient failure (0 to 4). |
 | Webhook Hourly Cap | integer | yes (defaults 500) | Posts stored per hour (1 to 5,000). |
 | Keep Runs Days | integer | yes (defaults 30) | Days runs are kept (7 to 365). |
-| Ignore Runner Changes | boolean | yes (defaults true) | Record Change trigger skips records last changed by the runner. |
+| Ignore Own Changes | boolean | yes (defaults true) | Record Change trigger skips records last changed by a recipe identity. |
+| Run As | picklist(BarnCRM Automation, System, Integration User) | yes (defaults BarnCRM Automation) | The identity and access mode its runs use (design Section 3.10). |
+| Run As Chosen By | reference(User) | computed | Who last set Run As; shown with System recipes in Health Check. |
+| Run As Chosen At | datetime | computed | When Run As was last set. |
+| Record Owner | text(18) | no | The user or queue Id given as owner of records the recipe creates; blank means the identity. |
 
 **R-CR1 The recipe document.** `{ "version": 1, "trigger": { "kind", ... }, "steps": [ { "id", "kind", ... } ] }`
 with the trigger kinds and step kinds of the design Sections 3.2 and 3.4; at most 25 steps in all,
 nesting at most 2, at most 100,000 characters. Steps name connections by developer name, maps by
 key or inline, and values by paths (R-MAP2).
-**R-CR2 Checked on Publish,** as the publisher, against describe and the catalog; a recipe whose
-connection is disconnected or whose map is gone cannot be published.
+**R-CR2 Checked on Publish,** as the publisher and against the identity's describe, and against
+the catalog; a recipe whose connection is disconnected or whose map is gone cannot be published.
 **R-CR3 Only Connector admins** (custom permission Manage BarnCRM Connector) create, publish,
-pause and delete recipes; Connector viewers read recipes and runs.
+pause and delete recipes and set Run As; Connector viewers read recipes and runs.
+**R-CR4 Run As.** A run never executes as a staff member: BarnCRM Automation (Automated Process
+user, user mode with the picked permission sets), System (Automated Process user, system mode;
+set only through a confirmation that says so) or Integration User (the designated user, user
+mode). Changing Run As writes Run As Chosen By and Chosen At.
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -719,7 +827,10 @@ pause and delete recipes; Connector viewers read recipes and runs.
 | Watermark | `Watermark__c` | Text(60) |
 | Next Run At, Last Run At | `Next_Run_At__c`, `Last_Run_At__c` | Date/Time |
 | Consecutive Failures, Pause After Failures, Retry Attempts, Webhook Hourly Cap, Keep Runs Days | `Consecutive_Failures__c`, `Pause_After_Failures__c`, `Retry_Attempts__c`, `Webhook_Hourly_Cap__c`, `Keep_Runs_Days__c` | Number |
-| Ignore Runner Changes | `Ignore_Runner_Changes__c` | Checkbox |
+| Ignore Own Changes | `Ignore_Own_Changes__c` | Checkbox |
+| Run As | `Run_As__c` | Picklist (restricted): `Automation` (default), `System`, `IntegrationUser` |
+| Run As Chosen By, Run As Chosen At | `Run_As_Chosen_By__c` (Lookup(User)), `Run_As_Chosen_At__c` | Lookup, Date/Time |
+| Record Owner | `Record_Owner_Id__c` | Text(18) |
 
 Object `Connector_Recipe__c`, private sharing, `BarnCRM_Connector_Admin` full access with View
 All and Modify All, `BarnCRM_Connector_Viewer` read with View All.
@@ -733,6 +844,7 @@ All and Modify All, `BarnCRM_Connector_Viewer` read with View All.
 | Recipe | reference(Connector Recipe) | yes | The recipe (master). |
 | Status | picklist(Received, Queued, Running, Waiting, Succeeded, Skipped, Failed, Rejected) | yes | Where the run stands. |
 | Started By | picklist(Schedule, Record Change, Webhook, App Poll, Manual, Flow, Test) | yes | What started it. |
+| Ran As | picklist(BarnCRM Automation, System, Integration User) | yes | The recipe's Run As when the run executed, for audit. |
 | Recipe Version | integer | yes | The version it ran. |
 | Input | long text | no | The trigger data (record Ids, webhook body or polled item). |
 | State | long text | no | Completed step Ids and the data later steps need. |
@@ -749,7 +861,7 @@ All and Modify All, `BarnCRM_Connector_Viewer` read with View All.
 runner's bookkeeping); nobody edits a run. **R-RUN2 Retention:** the nightly step deletes runs
 older than the recipe's Keep Runs Days. **R-RUN3 No secret or header is ever stored.**
 
-API names: `Recipe__c` (master-detail), `Status__c`, `Started_By__c`, `Recipe_Version__c`,
+API names: `Recipe__c` (master-detail), `Status__c`, `Started_By__c`, `Ran_As__c`, `Recipe_Version__c`,
 `Input_JSON__c`, `State_JSON__c`, `Step_Log_JSON__c` (Long Text Area(131072)), `Event_Key__c`
 (Text(255), unique, external ID), `Attempt__c`, `Next_Attempt_At__c`, `Started_At__c`,
 `Finished_At__c`, `Failed_Step__c` (Text(40)), `Error_Message__c` (Text(1000)),

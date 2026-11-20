@@ -4,7 +4,9 @@
 **Date:** 2026-11-20
 **Source:** Brandon, 2026-11-20 ("an integration/middleware module ... similar to Workato in
 capabilities and super easy for a non technical user to setup and use"); design in
-`docs/architecture/integration-hub-design.md` Sections 1 and 3 to 8. Starts C-38 (held by D-39)
+`docs/architecture/integration-hub-design.md` Sections 1 and 3 to 8; owner decisions D-215
+(2026-11-20: C-38, secrets subject to security review, names and two objects approved; running as
+the admin who turned recipes on rejected in favor of system, integration user or non-user runs). Starts C-38 (held by D-39)
 and amends plan Section 4.9's C-38 scope; builds on ADR-0013, ADR-0057, ADR-0148 amendment A1,
 ADR-0165, ADR-0166, ADR-0184, ADR-0201, ADR-0227, ADR-0229 and MIG-06. Companion: ADR-NEXT
 `NEXT-reusable-mapper.md`.
@@ -36,16 +38,18 @@ budget (197 of 200) bound the design.
    Online.
 4. **Triggers:** schedule; record created or changed by polling `SystemModstamp` past a watermark
    every 15 minutes (not the trigger framework, not Change Data Capture); inbound webhook; app
-   polling; manual and the Flow action Run BarnCRM Recipe. A clock of four CronTriggers runs as the
-   admin who turned recipes on (the runner).
+   polling; manual and the Flow action Run BarnCRM Recipe. The clock is not Scheduled Apex (which
+   runs as, and fails without, the user who scheduled it): a platform event trigger starts a
+   heartbeat Queueable that re-enqueues itself every 5 minutes and keeps the trigger's identity
+   (decision 10).
 5. **Webhooks follow ADR-0184 and ADR-0201:** a Site guest REST receiver only stores a Received run;
    a 256-bit token in the URL is kept only as its SHA-256 hash; body and hourly caps; idempotency
    by event key; optional fetch back through the connection, limited to the connection's host. No
    HMAC signatures (they need a readable secret); apps that require one are polled instead.
 6. **Steps:** Find, Create, Update, Create or Update (through a map), Call an App, Change Data, If,
    For Each, Wait, Load Rows with an Import Template, Stop. Values are paths, never expressions.
-   Data steps run in user mode as the person the run executes as; only the module's own rows are
-   written in system mode.
+   Data steps run in user mode as the recipe's identity, or in system mode for a System recipe
+   (decision 10); otherwise only the module's own rows are written in system mode.
 7. **Runs:** one Queueable runner chain processes many runs per execution and checkpoints before a
    callout that follows DML, before 90 callouts, 100 seconds of callout time or 45 seconds of CPU.
    Transient failures retry at 15 minutes, 1, 4 and 12 hours from the failed step; repeated
@@ -55,7 +59,25 @@ budget (197 of 200) bound the design.
    runs the dry run and commits only inside the recipe's limits. Google Sheets is the first source.
    SFTP and direct database sources leave C-38's scope: Apex cannot open them.
 9. **Two objects, no settings object:** `Connector_Recipe__c` and `Connector_Run__c` (suite 197 to
-   199). Every option is per recipe.
+   199). Every option is per recipe. Two platform events (`Connector_Start__e`,
+   `Connector_Start_User__e`) dispatch the work; they are not custom objects.
+10. **No recipe runs as a staff member (D-215).** Each recipe has Run As, set only by a Connector
+    admin and recorded with who set it and when:
+    - **BarnCRM Automation** (default): the Automated Process user, in user mode, limited to the
+      permission sets the admin picks (BarnCRM Admin and installed modules' admin sets to start),
+      which BarnCRM assigns to that user with a `PermissionSetAssignment` from Apex.
+    - **System:** the Automated Process user in system mode (no object, field or sharing checks),
+      set only through a confirmation that says so, and listed by Health Check.
+    - **Integration User:** one designated user, ideally on a free Salesforce Integration license
+      (five in Enterprise, Unlimited and Performance editions), in user mode with its own
+      permission sets. It is set as the running user of the second event's trigger through
+      `PlatformEventSubscriberConfig`, which Salesforce exposes only in the Tooling and Metadata
+      APIs; BarnCRM writes it over the ADR-0148 org connection, then guides one Suspend and Resume
+      click on the event's Subscriptions list.
+
+    Each identity holds the connections' principal access. Records a recipe creates get the owner
+    the recipe names (an Automated Process owner hides records from people). Test and Run Now run
+    as the recipe's identity.
 
 ## Alternatives considered
 
@@ -72,18 +94,33 @@ budget (197 of 200) bound the design.
   for packages that are not certified, and a watermark would be a deploy; Files hold mutable state
   poorly.
 - **A formula or code step:** refused (ADR-0081).
+- **Runs as the admin who turned recipes on (Scheduled Apex):** rejected by Brandon (D-215):
+  recipes would stop when that admin left or lost permissions.
+- **Integration User as the only option:** survives staff changes, but needs a license, a user to
+  create and a Tooling API write, too much for a default; kept as a choice.
+- **System mode by default:** the simplest identity that never breaks, but it drops CRUD and FLS for
+  every recipe; kept as an explicit per-recipe choice.
 
 ## Consequences
 
 - An admin connects an app, picks a template, tests it with a sample and turns it on without Flow
   Builder; one guided Setup click per connection remains, and OAuth apps need an app at the
   provider.
-- Record-change recipes can lag up to 15 minutes; the Flow action gives immediate starts.
-- Anyone who can publish recipes acts with the runner's access; publishing is limited to
-  `BarnCRM_Connector_Admin`, and Health Check watches the runner.
+- Record-change recipes can lag up to 15 minutes (polled at most every 15, checked by a 5-minute
+  heartbeat); the Flow action gives immediate starts.
+- Recipes survive staff leaving and staff permission changes. Created By and Last Modified By show
+  Automated Process or the integration user; Run History ties each written record to its recipe,
+  version and publisher. Anyone who can publish recipes acts with the chosen identity's access, so
+  publishing and Run As are limited to `BarnCRM_Connector_Admin`.
+- A deactivated integration user stops its recipes until another is chosen, and a deactivated
+  record owner makes creates fail; Health Check reports both.
 - The suite reaches 199 of 200 objects; the next object anywhere needs a cut.
 - To confirm on the first org deploy: `createCredential` for Custom protocol principals,
-  `SetupEntityAccess` inserts for principals, run-time Auth Provider creation, and `callout:` to a
-  subscriber-created Named Credential from namespaced Apex. Each has a guided Setup fallback.
+  `SetupEntityAccess` inserts for principals, run-time Auth Provider creation, `callout:` to a
+  subscriber-created Named Credential from namespaced Apex, a `PermissionSetAssignment` to the
+  Automated Process user (and that `USER_MODE` and callouts honor it), an Integration-licensed user
+  as an event trigger's running user, and that trigger's behavior once the user is deactivated.
+  Each has a guided fallback; if the Automated Process assignment is refused, Integration User
+  becomes the recommended default and System stays an explicit choice.
 - Workato features left out (SFTP, databases, agents, streams, code steps, synchronous APIs) are
   listed in the design with what to do instead.
