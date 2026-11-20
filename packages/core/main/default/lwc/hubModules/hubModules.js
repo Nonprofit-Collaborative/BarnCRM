@@ -47,6 +47,7 @@ const FALLBACK_TABS = {
   Memberships: 'Membership_Term__c',
   Projects: 'Projects_Home',
   AddressVerification: 'Address_Verification_Setup',
+  Connector: 'Super_Connector',
   Reporting: 'Advanced_Reporting'
 };
 const DEFAULT_ICON = 'standard:apps';

@@ -189,6 +189,15 @@
       "dependencies": [{ "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" }]
     },
     {
+      "path": "packages/connector",
+      "default": false,
+      "package": "BarnCRM Connector",
+      "versionName": "v1.21",
+      "versionNumber": "1.21.0.NEXT",
+      "postInstallScript": "ConnectorPostInstall",
+      "dependencies": [{ "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" }]
+    },
+    {
       "path": "packages/mirror",
       "default": false,
       "package": "BarnCRM Mirror",

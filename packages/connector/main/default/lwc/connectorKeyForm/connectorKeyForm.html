@@ -1,0 +1,31 @@
+<template>
+    <section class="slds-var-p-around_medium slds-border_top slds-border_bottom" aria-labelledby="key-form-heading" data-id="form">
+        <h2 id="key-form-heading" class="slds-text-heading_small slds-var-m-bottom_small">{heading}</h2>
+        <template lwc:if={creating}>
+            <lightning-input label={labels.name} value={label} max-length="80" required data-field="label" data-id="label" onchange={handleField}></lightning-input>
+            <lightning-combobox label={labels.kind} value={authKind} options={kindOptions} required data-field="authKind" data-id="kind" onchange={handleField}></lightning-combobox>
+            <template lwc:if={showBaseUrl}>
+                <lightning-input type="url" label={labels.baseUrl} value={baseUrl} field-level-help={labels.baseUrlHelp} required data-field="baseUrl" data-id="base-url" onchange={handleField}></lightning-input>
+            </template>
+            <template lwc:if={showHeaderName}>
+                <lightning-input label={labels.headerName} value={headerName} max-length="64" required data-field="headerName" data-id="header-name" onchange={handleField}></lightning-input>
+            </template>
+        </template>
+        <template lwc:if={showUserName}>
+            <lightning-input label={labels.userName} value={userName} required data-field="userName" data-id="user-name" onchange={handleField}></lightning-input>
+        </template>
+        <!-- The key box: never prefilled, never bound to a tracked field, cleared after every call (F10). -->
+        <lightning-input type="password" autocomplete="new-password" label={secretLabel} required data-id="secret"></lightning-input>
+        <template lwc:if={isSecretUrl}>
+            <c-barn-notice class="slds-var-m-top_small" variant="warning" message={labels.secretUrlNotice} data-id="secret-url-notice"></c-barn-notice>
+        </template>
+        <p class="slds-var-m-top_small slds-text-body_small" data-id="debug-notice">{labels.debugNotice}</p>
+        <template lwc:if={problemText}>
+            <c-barn-notice class="slds-var-m-top_small" variant="error" message={problemText} data-id="problems"></c-barn-notice>
+        </template>
+        <div class="slds-var-m-top_medium">
+            <lightning-button class="slds-var-m-right_small" variant="brand" label={saveLabel} disabled={working} onclick={handleSave} data-id="save"></lightning-button>
+            <lightning-button label={labels.cancel} disabled={working} onclick={handleCancel} data-id="cancel"></lightning-button>
+        </div>
+    </section>
+</template>

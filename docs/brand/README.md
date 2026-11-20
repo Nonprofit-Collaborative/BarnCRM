@@ -45,4 +45,5 @@ rebuilds every packaged asset and the copies here from `hires/`.
 | `barncrm-portal-logo.png` | `BarnCRM_Patch_Portal_Logo` | portal | BarnCRM Portal Builder |
 | `barncrm-memberships-logo.png` | `BarnCRM_Patch_Memberships_Logo` | memberships | BarnCRM Memberships |
 | `barncrm-scholarships-logo.png` | `BarnCRM_Patch_Scholarships_Logo` | scholarships | BarnCRM Scholarships |
+| `barncrm-connector-logo.png` | `BarnCRM_Patch_Connector_Logo` | connector | BarnCRM Connector (the BarnCRM mark until a Connector master exists) |
 | (none) | Static resource `BarnPatchWelcome` | core | BarnCRM Home welcome |

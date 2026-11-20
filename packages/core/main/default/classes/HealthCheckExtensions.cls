@@ -13,7 +13,7 @@ public with sharing class HealthCheckExtensions {
 	/**
 	 * The class names dependent packages register to add findings, in the order they are asked:
 	 * the Rollup Builder module's rollup checks (ADR-0125), Fundraising's (G-20 follow-up, and its nightly gift mirror runs, X-01), then
-	 * Mirror's (its household drift report), then Volunteers' (canonical model Part G), then Programs' (29ZA), then Funders' (29ZH), then Forms' public form checks (29ZY, C-42b), then Events' public page checks (29EV1, EV-16), then Payments' (29PAY1, PAY-01), then Address Verification's (29AV1, C-46).
+	 * Mirror's (its household drift report), then Volunteers' (canonical model Part G), then Programs' (29ZA), then Funders' (29ZH), then Forms' public form checks (29ZY, C-42b), then Events' public page checks (29EV1, EV-16), then Payments' (29PAY1, PAY-01), then Address Verification's (29AV1, C-46), then BarnCRM Connector's connections (29CN1, CN-01).
 	 */
 	@NamespaceAccessible
 	public static final List<String> EXTENSION_CLASSES = new List<String>{
@@ -26,7 +26,8 @@ public with sharing class HealthCheckExtensions {
 		'FormsHealthCheckExtension',
 		'EventsHealthCheckExtension',
 		'PaymentsHealthCheckExtension',
-		'AddressVerificationHealthCheckExtension'
+		'AddressVerificationHealthCheckExtension',
+		'ConnectorHealthCheckExtension'
 	};
 
 	/** Injected by Core's tests by class name, since no other package is there to resolve. */

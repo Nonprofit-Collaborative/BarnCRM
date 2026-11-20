@@ -100,6 +100,7 @@ Rules:
 | memberships | Certification__c | Custom8: Diamond |
 | memberships | Member_Certification__c | Custom46: Stamp |
 | addressverification | Address_Verification_Setup | Custom73: HighwaySign |
+| connector | Super_Connector | Custom76: Keys |
 | payments | Payments_Setup | Custom70: Handsaw |
 | lwcbuilder | LWC_Builder | Custom34: Insect |
 | scholarships | Award__c | Custom80: Motorcycle |

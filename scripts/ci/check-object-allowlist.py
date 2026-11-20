@@ -99,6 +99,7 @@ SYSTEM_TYPES = {
     "TriggerOperation",
     "Type",
     "TypeException",
+    "Url",
     "Version",
 }
 

@@ -8,6 +8,10 @@ addressverification/AddressVerificationNightlyJobProvider.cls | public AddressVe
 addressverification/AddressVerificationNightlyJobProvider.cls | public class AddressVerificationNightlyJobProvider
 addressverification/AddressVerificationPostInstall.cls | public AddressVerificationPostInstall()
 addressverification/AddressVerificationPostInstall.cls | public class AddressVerificationPostInstall
+connector/ConnectorHealthCheckExtension.cls | public ConnectorHealthCheckExtension()
+connector/ConnectorHealthCheckExtension.cls | public class ConnectorHealthCheckExtension
+connector/ConnectorPostInstall.cls | public ConnectorPostInstall()
+connector/ConnectorPostInstall.cls | public class ConnectorPostInstall
 contactpoints/ContactPointAccountHandler.cls | public ContactPointAccountHandler()
 contactpoints/ContactPointAccountHandler.cls | public class ContactPointAccountHandler
 contactpoints/ContactPointAddressHandler.cls | public ContactPointAddressHandler()

@@ -60,6 +60,7 @@ SOURCES = [
     "packages/projects/main/**/*.cls",
     "packages/addressverification/main/**/*.cls",
     "packages/reporting/main/**/*.cls",
+    "packages/connector/main/**/*.cls",
     "packages/mirror/main/**/*.cls",
 ]
 OPT_OUT = re.compile(r"//\s*runs-as:\s*deploying user\s*\(\s*\S[^\n]*\)", re.I)
