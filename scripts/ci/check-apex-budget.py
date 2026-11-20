@@ -103,7 +103,10 @@ CAPS = {
     # AutomationInventoryService, UserAccessSelector and PersonLinkOrphanSelector moved into
     # Org Optimizer, the Migration package reads Core's one kit query, and Home gained the
     # Health Check tile. 1,971,740 measured before, 1,955,421 after, plus about 0.1%.
-    "core": 1_957_400,
+    # Set 2026-11-20 for landing batch Q (releases 1.31 to 1.33): the Mapper and saved maps
+    # (MAP-01 to MAP-07), the Connector seams (CN-01 to CN-18) and D-217 merged together:
+    # 1,977,602 measured, plus about 0.1% (2% would pass the 2.0M target).
+    "core": 1_979_600,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured
@@ -411,7 +414,12 @@ CAPS = {
     # Raised 2026-11-20 for CN-04 webhooks in and sending data back (the receiver, the Webhook
     # card's controller, Send to Webhook, Address From the Data, the guest Health Check fix):
     # 205,718 measured with CN-09 and CN-04 merged (landing batch Q), plus about 2%.
-    "connector": 209_900,
+    # Raised 2026-11-20 for CN-13 the App Poll trigger (ConnectorAppPoll: the poll run, item
+    # stamps, the watermark) and CN-18 runs in the erasure path (ConnectorErasureExtension and
+    # the run search in ConnectorRunStore): 210,563 measured, plus about 2%.
+    # Set 2026-11-20 for landing batch Q with CN-04, CN-05, CN-08, CN-09, CN-13 and CN-18
+    # merged together: 254,714 measured, plus about 2%.
+    "connector": 259_800,
     # Mirror: the NPSP gifts migration kit's extension (MIG-05), 187,295 measured, then the
     # Nonprofit Cloud gifts kit's (MIG-04), 195,957 measured, then the Nonprofit Cloud
     # relationships kit's (MIG-02), about 200,500 combined, plus about 1%.

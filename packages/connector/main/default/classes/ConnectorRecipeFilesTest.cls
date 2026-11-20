@@ -211,6 +211,42 @@ private class ConnectorRecipeFilesTest {
 	}
 
 	@IsTest
+	static void anAppPollTriggerTravelsByLabelWithoutItsSignInValue() {
+		System.runAs(admin()) {
+			ConnectorRecipeTestData.readyConnection();
+			String document =
+				'{"version":1,"trigger":{"kind":"appPoll","connection":"' +
+				ConnectorRecipeTestData.CONNECTION +
+				'","path":"/members","items":"members","id":"id","stamp":"changed","mode":"each",' +
+				'"headers":[{"name":"X-Api-Key","value":"typed1234567890"}]},' +
+				'"steps":[{"id":"end","kind":"stop","outcome":"Succeeded"}]}';
+			ConnectorRecipes.Recipe saved = ConnectorRecipesController.saveDraft(
+				null,
+				'Poll People',
+				'',
+				document,
+				null
+			);
+
+			Test.startTest();
+			String fileText = ConnectorRecipesController.exportRecipe(saved.id);
+			ConnectorRecipeFiles.Imported imported = ConnectorRecipesController.importFile(fileText);
+			Test.stopTest();
+
+			Assert.isFalse(fileText.contains('typed1234567890'), 'A sign-in header value never leaves the org.');
+			Map<String, Object> names = (Map<String, Object>) ((Map<String, Object>) JSON.deserializeUntyped(fileText))
+				.get('names');
+			Assert.areEqual('Test App', names.get(ConnectorRecipeTestData.CONNECTION), 'The poll connection by label.');
+			Map<String, Object> starter = (Map<String, Object>) ((Map<String, Object>) JSON.deserializeUntyped(
+					imported.recipes[0].draftJson
+				))
+				.get('trigger');
+			Assert.areEqual(ConnectorRecipeTestData.CONNECTION, starter.get('connection'), 'Matched by label.');
+			Assert.areEqual(new List<String>{ 'trigger' }, imported.recipes[0].blanks, 'The blank value is listed.');
+		}
+	}
+
+	@IsTest
 	static void aTemplateOffersALockedConnectionAndDraftsAndStoresNothing() {
 		System.runAs(admin()) {
 			Test.startTest();

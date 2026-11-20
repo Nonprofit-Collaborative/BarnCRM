@@ -182,6 +182,17 @@ public with sharing class ConnectorRecipeFiles {
 		ConnectorRecipeDocument.mapOf(document.get('trigger')).remove('savedQuery');
 		Set<String> recordIds = new Set<String>();
 		Set<String> connections = new Set<String>();
+		// An App Poll trigger asks an app as Call an App does (R-CR16): its connection travels by
+		// label and a typed sign-in header value is left blank.
+		Map<String, Object> starter = ConnectorRecipeDocument.mapOf(document.get('trigger'));
+		if (String.isNotBlank(ConnectorRecipeDocument.textOf(starter.get('connection')))) {
+			connections.add(ConnectorRecipeDocument.textOf(starter.get('connection')));
+		}
+		for (Object raw : ConnectorRecipeDocument.listOf(starter.get('headers'))) {
+			if (signInHeader(ConnectorRecipeDocument.mapOf(raw))) {
+				ConnectorRecipeDocument.mapOf(raw).put('value', '');
+			}
+		}
 		for (Map<String, Object> step : ConnectorRecipeDocument.allSteps(document)) {
 			step.remove('savedQuery');
 			for (String key : new List<String>{ 'map', 'bodyMap', 'template' }) {
@@ -484,11 +495,19 @@ public with sharing class ConnectorRecipeFiles {
 		Map<String, Map<String, Object>> actions
 	) {
 		Matches matches = new Matches(names.values());
-		ConnectorRecipeDocument.mapOf(document.get('trigger')).remove('savedQuery');
+		Map<String, Object> starter = ConnectorRecipeDocument.mapOf(document.get('trigger'));
+		starter.remove('savedQuery');
 		Set<String> expected = new Set<String>();
 		Draft result = new Draft();
 		result.name = name;
 		result.description = description;
+		if (starter.get('kind') == ConnectorAppPoll.KIND && triggerBlanked(starter, names, matches)) {
+			result.blanks.add('trigger');
+			String problem = ConnectorTriggers.problem(starter);
+			if (problem != null) {
+				expected.add(problem);
+			}
+		}
 		for (Map<String, Object> step : ConnectorRecipeDocument.allSteps(document)) {
 			step.remove('savedQuery');
 			if (actions != null) {
@@ -548,6 +567,26 @@ public with sharing class ConnectorRecipeFiles {
 		}
 		result.draftJson = text;
 		return result;
+	}
+
+	/**
+	 * An App Poll trigger's connection matched by label (blank when this org has none), and
+	 * whether the import left it or a sign-in header value blank for the admin to fill.
+	 */
+	private static Boolean triggerBlanked(Map<String, Object> starter, Map<String, Object> names, Matches matches) {
+		String found = matches.connectionByLabel.get(
+			ConnectorRecipeDocument.textOf(names.get(ConnectorRecipeDocument.textOf(starter.get('connection'))))
+		);
+		starter.put('connection', found == null ? '' : found);
+		Boolean blanked = found == null;
+		for (Object raw : ConnectorRecipeDocument.listOf(starter.get('headers'))) {
+			Map<String, Object> header = ConnectorRecipeDocument.mapOf(raw);
+			blanked |=
+				SIGN_IN_HEADER.matcher(ConnectorRecipeDocument.textOf(header.get('name'))).matches() &&
+				String.isBlank(ConnectorRecipeDocument.textOf(header.get('path'))) &&
+				String.isBlank(ConnectorRecipeDocument.textOf(header.get('value')));
+		}
+		return blanked;
 	}
 
 	/** The problems Save reports for the keys an import left blank, which the editor fills. */

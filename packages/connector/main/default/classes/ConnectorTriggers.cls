@@ -56,6 +56,8 @@ public inherited sharing class ConnectorTriggers {
 			}
 		} else if (kind == 'webhook') {
 			return ConnectorWebhooks.triggerProblem(starter);
+		} else if (kind == ConnectorAppPoll.KIND) {
+			return ConnectorAppPoll.problem(starter);
 		}
 		return null;
 	}

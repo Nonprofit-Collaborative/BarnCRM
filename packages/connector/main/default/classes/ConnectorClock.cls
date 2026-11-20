@@ -257,8 +257,12 @@ public with sharing class ConnectorClock implements Queueable {
 				)
 			};
 		}
-		ConnectorTriggers poller = new ConnectorTriggers(recipe, starter, identities);
 		recipe.Next_Run_At__c = now.addMinutes(POLL_MINUTES);
+		if (recipe.Trigger_Kind__c == ConnectorAppPoll.APP_POLL) {
+			// A beat cannot call out: the runner makes the poll (R-CR16).
+			return ConnectorAppPoll.pollRun(recipe);
+		}
+		ConnectorTriggers poller = new ConnectorTriggers(recipe, starter, identities);
 		return recipe.Run_As__c == ConnectorRecipes.RUN_AS_SYSTEM
 			? ConnectorRunStore.pollInSystemMode(poller)
 			: poller.poll();

@@ -12,12 +12,13 @@ CN-03 ships the **recipe clock**: Schedule and Record Change triggers, retries, 
 Integration User Run As and the nightly cleanup (R-CR6 to R-CR8, 29CN4 Connector Settings).
 CN-05 ships the For Each, Wait and Change Data steps (R-CR12); CN-08 ships versions, Roll Back,
 Export Recipe and the Templates tab, importing templates and recipe files that are never
-preloaded or kept (R-CR13 to R-CR15, D-216).
+preloaded or kept (R-CR13 to R-CR15, D-216). CN-04 ships webhooks in and Send to Webhook
+(R-CR10, R-CR11); CN-13 the App Poll trigger (R-CR16); CN-18 runs in a person's erasure (R-CR17).
 Setup and use: [Admin Guide, BarnCRM Connector](../../docs/admin-guide/connector.md).
 
 ## First ships in
 
-Release **1.31** (CN-01, CN-02, CN-06); release **1.32** adds CN-03, CN-05, CN-08 and CN-09. Beta, offered in both
+Release **1.31** (CN-01, CN-02, CN-06); release **1.32** adds CN-03, CN-04, CN-05, CN-08 and CN-09; release **1.33** adds CN-13 and CN-18. Beta, offered in both
 editions, not installed by default.
 
 ## Depends on

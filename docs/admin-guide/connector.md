@@ -132,13 +132,60 @@ are never offered.
 | Schedule | The recipe clock, every 15 minutes, every hour, every day at a time, or every week on a day at a time. Times are in your org's time zone. The steps read the time it was due as `trigger.scheduledAt`. |
 | Record Change | Records of an object created, or created or changed, that match a saved Find query (see [Find](find.md)). The clock looks every 15 minutes. **One Run per Record** starts a run for each record (`trigger.recordId`, `trigger.record.LastName`); **One Run for All** starts one run with them all (`trigger.recordIds`, `trigger.records[0].LastName`). **Most Records per Look** is 1 to 200 (200 when blank). |
 | Another App Sends Data | Another app posts to the recipe's webhook address (see [Webhooks: Data Sent In](#webhooks-data-sent-in)). The steps read the posted JSON under `trigger`, such as `trigger.amount` or `trigger.donor.email`. |
+| An App Has New Items | The recipe clock asks another app for its list through a connection every 15 minutes (see [Watching Apps for New Items](#watching-apps-for-new-items)). **One Run per Item** starts a run for each new or changed item (`trigger.itemId`, `trigger.item.email`); **One Run for All** starts one run with them all (`trigger.itemIds`, `trigger.items`). |
 
 A Record Change recipe starts from the moment you publish it: records changed before then are
 not run. It reads the fields the saved query lists, sees imports and bulk updates, and carries on
 where it stopped after a pause or an outage; it does not see deleted records. **Ignore Own
 Changes** (on by default, in **Run Settings**) skips records last changed by a recipe, so a
-recipe that updates the records it watches does not start itself again. App polling comes in a
-later release.
+recipe that updates the records it watches does not start itself again.
+
+### Watching Apps for New Items
+
+Use **An App Has New Items** for an app that cannot send webhooks, or whose webhooks need a
+signing secret BarnCRM does not hold: new event attendees, new unsubscribes, changed contacts.
+The app needs a list address that can return the items changed since a time or a number.
+
+1. Open the recipe and, under **When**, choose **An App Has New Items**.
+2. **Connection**: the connection to the app (see [Creating a Connection](#creating-a-connection)).
+3. **Path**: the list's address after the connection's base URL, such as
+   `/lists/{listId}/members`. Fill in each `{name}` below it, as for Call an App.
+4. **Query Parameters**: the app's filters, such as `status` = `unsubscribed`. For the app's
+   "changed since" parameter, enter the value `trigger.watermark`: BarnCRM puts in the stamp of the
+   newest item it has already seen. Before the first look the parameter is left out. Each value is
+   fixed or `trigger.watermark`; nothing else is read, since no run exists yet.
+5. **Item List**: where the list sits in the app's answer, such as `members` or `data.items`.
+   Leave it blank when the answer is the list itself.
+6. **Item Id**: where each item keeps its id, such as `id`.
+7. **Item Stamp**: where each item keeps the time it last changed, such as `last_changed`, or a
+   number that only grows. Stamps are compared as numbers when both are numbers, otherwise as text,
+   so the app must write them in one format (such as `2026-11-20T09:15:00+00:00`).
+8. **Runs** and **Most Items per Look** (1 to 200, 200 when blank), then Save Draft, Test and
+   Publish. Publish checks the connection as for any step that uses one.
+
+How it looks:
+
+- Every 15 minutes the recipe clock queues one look. The runner makes the request (a GET), keeps
+  the items whose stamp is after the newest stamp already seen, oldest first, at most **Most Items
+  per Look**, plus any more that share the last one's stamp, so none is skipped. It starts their
+  runs and keeps the newest stamp as the recipe's watermark. More items wait for the next look.
+- **The first look after you publish only notes the newest stamp**: items already in the app are
+  not run, as a Record Change recipe does not run records changed before you publish. A recipe
+  published with another kind of When, then back, starts again the same way; Pause and Resume
+  carry on from the watermark.
+- One look is one page of the app's answer. Use the app's "changed since" parameter with
+  `trigger.watermark` and, where the app allows, ask for the oldest first and a large page, so a
+  busy period is caught up over the next looks instead of missed.
+- A look that fails (the app refuses the key, is down, or answers without a list at **Item
+  List**) shows in Run History as a failed run started by **App Poll** on the step `trigger`, is
+  retried and counted toward **Pause After Failures** like any run, and writes one Error Log
+  entry. The watermark does not move, so nothing is missed. A look that finds nothing new leaves
+  nothing in Run History.
+- Test runs on the sample you paste, not on the app; put one item from the app's answer in the
+  sample, under `item`, to see the value paths.
+- The request follows Call an App's rules: only the connection's own address, no merge fields,
+  each value encoded, no Authorization header. The key never leaves Salesforce's credential
+  store.
 
 ### Webhooks: Data Sent In
 
@@ -197,9 +244,10 @@ cannot use a webhook recipe; use a Schedule recipe that calls the app instead.
 
 ### The Recipe Clock
 
-Schedule and Record Change recipes need no Scheduled Apex and no person. Each Run As lane has a
-heartbeat: a short job that starts every 5 minutes while the lane has work, runs or polls each
-recipe that is due, queues again the runs waiting for a retry and starts the runner. It runs as
+Schedule, Record Change and App Poll recipes need no Scheduled Apex and no person. Each Run As
+lane has a heartbeat: a short job that starts every 5 minutes while the lane has work, runs or
+polls each recipe that is due (an App Poll's look is queued for the runner, since only the runner
+may call an app), queues again the runs waiting for a retry and starts the runner. It runs as
 the lane's identity (the Automated Process user, or the integration user), so it never stops
 because someone left. The nightly run (see [Nightly Jobs](nightly-jobs.md); step **Connector
 Cleanup**, on by default at 2:40) restarts a heartbeat that stopped and deletes old runs (see
@@ -509,7 +557,7 @@ with each path slot left to fill. `auth.kind` is one of `ApiKeyHeader` (with `he
 
 **Run History** lists the latest 50 runs, newest first, with the recipe, status (Received,
 Queued, Waiting, Succeeded, Skipped, Failed), what started it (Manual, Flow, Test, Schedule,
-Record Change, Webhook), Run As, version, records written, the failed step and, for a Waiting run,
+Record Change, Webhook, App Poll), Run As, version, records written, the failed step and, for a Waiting run,
 when it is tried next. A webhook run also shows the reference its app was given. Open a run to see each step: its outcome, how long it took, the
 records it wrote, the app's status code and, for a failed Call an App, the first 2,000 characters
 of the app's answer. A Test run also shows what each step would have written or sent. No request
@@ -519,6 +567,20 @@ header and no key is ever kept.
 that already succeeded are not repeated. Each failed run also writes one Error Log entry naming
 the recipe, run, step and plain message, never the request. The nightly step deletes finished
 runs older than each recipe's **Keep Runs Days**.
+
+### Erasing a Person
+
+A run keeps what it received, what its steps found and its step log, so it can hold a person's
+details. When someone erases a person (see [Erase a Person](erase-a-person.md)), every run whose
+data names the person's record Id or one of their email addresses (as a whole address, ignoring
+capitals) is deleted in the same erasure, whoever erases and whatever their Connector access, and
+listed in the preview and on the Erasure record as Deleted Connector Runs. Recipes are kept: they
+are your settings. A run's reference goes with it. Runs are found through Salesforce search,
+which is why Connector Run is searchable, plus every run changed in the last hour, which search
+may not hold yet; each is read and checked before it is deleted. When search finds 2,000 runs or
+more, the erasure is refused, so none is left behind: lower **Keep Runs Days** on the recipes
+that handle the person, let the nightly cleanup run, and erase again. A recipe's own sample data
+is not searched: keep real people's details out of samples.
 
 ## Flow Actions
 

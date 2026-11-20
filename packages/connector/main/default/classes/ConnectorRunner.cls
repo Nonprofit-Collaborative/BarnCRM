@@ -90,12 +90,23 @@ public with sharing class ConnectorRunner implements Queueable, Database.AllowsC
 		Map<Id, Datetime> lastRuns = new Map<Id, Datetime>();
 		List<String> failures = new List<String>();
 		List<Id> failedRuns = new List<Id>();
+		ConnectorAppPoll polls = new ConnectorAppPoll();
 		for (Connector_Run__c run : runs) {
 			if (budget.low()) {
 				break;
 			}
 			guard.current = run.Id;
-			Connector_Run__c result = runOne(run, budget);
+			Connector_Run__c result;
+			if (ConnectorAppPoll.isPoll(run)) {
+				// An App Poll's poll run (R-CR16): spent once its items are found.
+				result = polls.poll(run, budget);
+				if (result == null) {
+					continue;
+				}
+				result = waitIfPassing(result, polls.passingFailure);
+			} else {
+				result = runOne(run, budget);
+			}
 			touched.add(result);
 			if (result.Status__c != ConnectorRunStore.QUEUED && result.Is_Test__c != true) {
 				lastRuns.put(result.Recipe__c, Datetime.now());
@@ -110,6 +121,7 @@ public with sharing class ConnectorRunner implements Queueable, Database.AllowsC
 		}
 		guard.current = null;
 		List<String> paused = ConnectorRunStore.save(touched, lastRuns);
+		polls.save();
 		// After every callout of the transaction: an Error Log write is DML.
 		ErrorLogger.logMessages(failures, failedRuns, 'ConnectorRunner', ErrorLogger.SEVERITY_ERROR);
 		ErrorLogger.logMessages(paused, 'ConnectorRunner', ErrorLogger.SEVERITY_ERROR);

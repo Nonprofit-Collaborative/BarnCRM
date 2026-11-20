@@ -20,7 +20,8 @@ public with sharing class ConnectorRecipes {
 		'manual' => MANUAL,
 		'schedule' => SCHEDULE,
 		'record' => RECORD_CHANGE,
-		'webhook' => ConnectorWebhooks.WEBHOOK
+		'webhook' => ConnectorWebhooks.WEBHOOK,
+		'appPoll' => ConnectorAppPoll.APP_POLL
 	};
 
 	/** Pause After Failures, 1 to 100; blank or out of range is 10 (R-CR7). */
@@ -492,6 +493,12 @@ public with sharing class ConnectorRecipes {
 			row.Next_Run_At__c = now;
 			if (fresh) {
 				row.Watermark__c = ConnectorTriggers.watermark(now, null);
+			}
+		} else if (kind == ConnectorAppPoll.APP_POLL) {
+			// The first poll sets the Watermark from the app's newest item (CN-13).
+			row.Next_Run_At__c = now;
+			if (fresh) {
+				row.Watermark__c = null;
 			}
 		}
 	}

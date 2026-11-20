@@ -50,6 +50,11 @@ With the Programs module installed, enrollments and service deliveries are kept 
 the person's case notes are deleted, whoever wrote them; only someone with Programs Admin can
 erase a person who has case notes. See [Programs](programs.md#people-merging-deleting-and-erasing).
 
+With BarnCRM Connector installed, every recipe run that names the person's record Id or one of
+their email addresses is deleted, whoever erases; recipes are kept. When too many runs match to be
+sure of finding every one, the erasure is refused. See
+[BarnCRM Connector](connector.md#erasing-a-person).
+
 Every erasure writes an **Erasure** record: who erased, when, the request reference you typed,
 and each record that changed with the fields that were emptied. It never holds an erased value.
 

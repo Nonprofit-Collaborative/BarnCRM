@@ -999,6 +999,16 @@ const TEXTS = {
   },
   get Connector_Trigger_Webhook() {
     return helpText('Connector', 'Connector_Trigger_Webhook');
+  },
+  // Watching apps for new items (CN-13).
+  get Connector_Editor_WhenAppPoll() {
+    return helpText('Connector', 'Connector_Editor_WhenAppPoll');
+  },
+  get Connector_Recipe_ErrorAppPoll() {
+    return helpText('Connector', 'Connector_Recipe_ErrorAppPoll');
+  },
+  get Connector_Trigger_AppPoll() {
+    return helpText('Connector', 'Connector_Trigger_AppPoll');
   }
 };
 
