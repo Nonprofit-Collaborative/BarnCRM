@@ -4,7 +4,7 @@
   <defaultValue>60</defaultValue>
   <externalId>false</externalId>
   <inlineHelpText>
-    How many days before a recurring donor's card expires the gift joins the Save the Sustainer list.
+    How many days before a recurring donor's card expires the gift joins the Gifts That Need Attention list.
   </inlineHelpText>
   <label>Recurring Card Expiry Days</label>
   <precision>18</precision>

@@ -235,7 +235,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0224](0224-patch-brand.md) | Patch the highland cow is the BarnCRM brand: new logo assets per app, Barn Navy app headers, Patch Rust for decoration only (supersedes ADR-0102 decision 4 and ADR-0137 decision 5) | Accepted (owner decision) |
 | [0225](0225-forms-delete-with-submissions.md) | A Forms administrator deletes a form with submissions, and the submissions stay | Accepted (owner decision) |
 | [0226](0226-memberships-and-scholarships-apps.md) | Memberships and Scholarships ship their own apps (amends ADR-0223 decisions 1 and 4) | Accepted (owner decision) |
-| [0227](0227-fewer-custom-objects.md) | Fewer custom objects: one Admin Journal and match reasons on duplicate dismissal | Proposed |
+| [0227](0227-fewer-custom-objects.md) | Fewer custom objects: one Admin Journal and match reasons on duplicate dismissal | Accepted (owner decision) |
 | [0228](0228-mirror-independence.md) | Mirror depends on Core only; the gift mirrors are part of Fundraising, with dynamic-only standard-object references; the Case status check runs hourly while Cases are open (amends ADR-0013, ADR-0194, ADR-0221 decision 7) | Accepted |
 | [0229](0229-provider-secrets-named-credentials.md) | Provider secrets in Named Credentials, and Stripe events fetched back from Stripe (amends ADR-0220, ADR-0201) | Accepted (owner decision) |
 | [0230](0230-feature-list-filled-at-install.md) | A blank feature list means no feature is on; post-install fills it (amends ADR-0124) | Accepted (owner decision) |

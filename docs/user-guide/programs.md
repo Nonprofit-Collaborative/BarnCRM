@@ -149,7 +149,7 @@ For a drop-in service where nobody is recorded by name (a walk-in meal, a pantry
 You should see: "Added (number) to the count." and the day's total go up. Each click adds to
 the total, so you can add a second count later the same day. To correct one, open the
 **Service Counts** tab or the **Service Counts** list on the service and edit the row. These
-people show on the dashboard as **Counted Without Names**, apart from the people you named.
+people show on the dashboard as **Served Without Enrollment**, apart from the people you named.
 
 ## To Record a Referral
 

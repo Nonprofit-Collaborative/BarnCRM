@@ -374,8 +374,18 @@ describe('c-grant-pipeline', () => {
       openCount: 0
     });
     expect(one(element, '[data-id="empty-state"]')).not.toBeNull();
+    expect(one(element, '[data-id="empty-new-grant"]')).not.toBeNull();
+    expect(one(element, '[data-id="new-grant"]')).toBeNull();
     expect(one(element, '[data-id="board"]')).toBeNull();
     expect(one(element, '[data-id="deadlines-empty"]')).not.toBeNull();
+  });
+
+  it('shows the awarded count inside the Awarded tile, and the header New button once there is a board', async () => {
+    const element = await render();
+    const tile = one(element, '[data-id="awarded-amount"]');
+    expect(tile.badgeLabel).toBeTruthy();
+    expect(one(element, '[data-id="awarded-count"]')).toBeNull();
+    expect(one(element, '[data-id="new-grant"]')).not.toBeNull();
   });
 
   it('shows the reason when the board cannot load', async () => {

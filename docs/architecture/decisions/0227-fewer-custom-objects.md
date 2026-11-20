@@ -1,6 +1,6 @@
 # ADR-0227: Fewer Custom Objects: One Admin Journal and Match Reasons on Duplicate Dismissal
 
-**Status:** Proposed
+**Status:** Accepted (owner decision, 2026-11-20, D-213)
 **Date:** 2026-11-14
 **Source:** D-208, release 1.28 item N-11 (Brandon, 2026-11-14: "Cut by a few if possible without
 losing functionality"). Amends ADR-0174 (automation snapshot), ADR-0145 (merge journal),

@@ -1,7 +1,7 @@
 {
   "Admin": {
-    "label": "LWC Builder Admin",
-    "description": ["The LWC Builder tab: create, edit, delete and export built components, and see them where", "they are placed. Given to BarnCRM Admin holders."],
+    "label": "Component Builder Admin",
+    "description": ["The Component Builder tab: create, edit, delete and export built components, and see them where", "they are placed. Given to BarnCRM Admin holders."],
     "add": {
       "classAccesses": {
         "LwcBuilderComponentPicklist": {"enabled": "true"}
@@ -24,8 +24,8 @@
     }
   },
   "Read_Only": {
-    "label": "LWC Builder Read Only",
-    "description": ["Sees the components built in the LWC Builder where they are placed on Lightning pages.", "Given to Read Only holders."],
+    "label": "Component Builder Read Only",
+    "description": ["Sees the components built in the Component Builder where they are placed on Lightning pages.", "Given to Read Only holders."],
     "readOnly": true
   }
 }

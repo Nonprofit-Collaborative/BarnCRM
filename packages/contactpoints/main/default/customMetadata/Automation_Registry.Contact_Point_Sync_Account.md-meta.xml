@@ -24,7 +24,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">Copies a person account's email addresses and phone numbers to Salesforce Contact Points after each save, and removes their copies when the person is deleted or merged away. Does nothing in an org without person accounts. Switched off or paused, changes are not copied; run the backfill on the Contact Point Sync page.</value>
+        <value xsi:type="xsd:string">Copies a person account's email addresses and phone numbers to Salesforce Contact Points after each save, and removes their copies when the person is deleted or merged away. Does nothing in an org without person accounts. Switched off or paused, changes are not copied; press Copy Existing People on the Contact Point Sync page.</value>
     </values>
     <values>
         <field>Module__c</field>

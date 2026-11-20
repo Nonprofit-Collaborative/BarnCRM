@@ -151,6 +151,7 @@ export default class LwcBuilderStudio extends LightningElement {
       title: helpText('LwcBuilder', 'LwcBuilder_Studio_Title'),
       intro: helpText('LwcBuilder', 'LwcBuilder_Studio_Intro'),
       component: helpText('LwcBuilder', 'LwcBuilder_Studio_Component'),
+      choose: helpText('LwcBuilder', 'LwcBuilder_Studio_Choose'),
       newComponent: helpText('LwcBuilder', 'LwcBuilder_Studio_New'),
       save: helpText('LwcBuilder', 'LwcBuilder_Studio_Save'),
       preview: helpText('LwcBuilder', 'LwcBuilder_Studio_Preview'),

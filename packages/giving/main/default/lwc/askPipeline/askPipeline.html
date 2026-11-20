@@ -24,7 +24,7 @@
           value={scope}
           onchange={handleScope}
         ></lightning-radio-group>
-        <template lwc:if={canCreate}>
+        <template lwc:if={showHeaderNew}>
           <lightning-button
             data-id="new-ask"
             label={labels.newAsk}
@@ -119,7 +119,11 @@
         <template lwc:if={isEmpty}>
           <c-barn-empty-state data-id="empty-state" illustration="no-data" message={labels.empty}>
             <template lwc:if={canCreate}>
-              <lightning-button label={labels.newAsk} onclick={handleNewAsk}></lightning-button>
+              <lightning-button
+                data-id="empty-new-ask"
+                label={labels.newAsk}
+                onclick={handleNewAsk}
+              ></lightning-button>
             </template>
           </c-barn-empty-state>
         </template>

@@ -2,7 +2,7 @@
   "languages": ["en"],
   "texts": {
     "Scholarships_Nightly_StepName": "Scholarships reminders",
-    "Scholarships_Notify_Body": "Open the record to see what to do. Reminder settings are in BarnCRM Settings, Scholarships and Grants.",
+    "Scholarships_Notify_Body": "Open the record to see what to do. Reminder settings are in BarnCRM Settings, Scholarships and Outbound Grants.",
     "Scholarships_Notify_Assigned": "You have applications to review in {0}",
     "Scholarships_Reminder_Title": "{0} for {1} is due {2}",
     "Scholarships_Reminder_Email": "This is a reminder that {0} is due {1}. You can send it here: {2}",

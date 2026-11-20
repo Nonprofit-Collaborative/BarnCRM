@@ -70,7 +70,7 @@ Fundraising Home, and are in the App Launcher.
 **Fundraising Home** shows five figures, each a link to its list: gifts waiting for a thank
 you, overdue scheduled payments, your asks due this month, open gift batches and running
 stewardship plans. **Enter a Gift** opens Quick Gift Entry. Under **Fundraising Setup** are the
-setup pages that are not in the app's menu (**Donor Level Ladder**, **Stewardship Plan Setup**,
+setup pages that are not in the app's menu (**Donor Levels and Scores**, **Stewardship Plans**,
 **Pledge Reminders**, **Receipt Letters**), each shown only to people who may use it; they are
 also tabs in **BarnCRM Admin** and **BarnCRM Admin Console**, and in the App Launcher. Before
 the first gift is saved, **Record Your First Gift** offers **Enter a Gift** and **Import a

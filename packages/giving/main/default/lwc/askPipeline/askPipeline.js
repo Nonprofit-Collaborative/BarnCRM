@@ -355,6 +355,11 @@ export default class AskPipeline extends NavigationMixin(LightningElement) {
     return Boolean(this.board && this.board.canCreate);
   }
 
+  /** The header New button, hidden while the empty state offers its own, so it shows once. */
+  get showHeaderNew() {
+    return this.canCreate && !this.isEmpty;
+  }
+
   get showReadOnly() {
     return Boolean(this.board) && !this.canEdit;
   }

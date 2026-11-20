@@ -32,7 +32,7 @@
     </values>
     <values>
         <field>Navigation_Label__c</field>
-        <value xsi:type="xsd:string">Stewardship Plan Setup</value>
+        <value xsi:type="xsd:string">Stewardship Plans</value>
     </values>
     <values>
         <field>Sort_Order__c</field>

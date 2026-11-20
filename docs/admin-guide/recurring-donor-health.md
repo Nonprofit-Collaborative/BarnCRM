@@ -10,10 +10,10 @@ signs together for every open-ended recurring gift (a Commitment of Type **Recur
   gift's amount turned into a monthly value (a yearly gift of 120 counts as 10 a month).
 - **Recurring Gifts Received, Last 12 Months**: received gifts on recurring commitments, by
   month.
-- **Save the Sustainer**: the active recurring gifts that need attention, largest first, with
+- **Gifts That Need Attention**: the active recurring gifts that need attention, largest first, with
   the reasons and a **Create Follow-Up Task** button.
 
-A gift is on the Save the Sustainer list when any of these is true:
+A gift is on the Gifts That Need Attention list when any of these is true:
 
 | Reason | Where it comes from |
 |---|---|

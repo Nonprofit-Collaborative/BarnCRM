@@ -12233,7 +12233,7 @@ person, so counts of unnamed people are never mistaken for, or added to, named p
 Service Delivery Log adds a row for each count entered, and every total adds the rows.
 
 **R-SC3 Counted apart from named people.** The Programs Dashboard shows the sum of People Served
-in the period as Counted Without Names, per program and in total. It is never added to People
+in the period as Served Without Enrollment, per program and in total. It is never added to People
 Served (named people with a Present delivery).
 
 **R-SC4 No person, so no privacy or erasure rule.** A count names no one, so organization-wide
@@ -17711,11 +17711,11 @@ A condition the recipient must meet before payment, or a progress or final repor
 
 ### Definition
 
-The module's org-wide settings, edited in the Scholarships and Grants section of BarnCRM Settings.
+The module's org-wide settings, edited in the Scholarships and Outbound Grants section of BarnCRM Settings.
 
 ### Rules
 
-- **Setting Definitions:** `Scholarships_Reminders_Enabled`, `Scholarships_Reminder_Days`, `Scholarships_Email_Recipients`, section Scholarships and Grants, module `Scholarships`.
+- **Setting Definitions:** `Scholarships_Reminders_Enabled`, `Scholarships_Reminder_Days`, `Scholarships_Email_Recipients`, section Scholarships and Outbound Grants, module `Scholarships`.
 
 ### Salesforce implementation
 

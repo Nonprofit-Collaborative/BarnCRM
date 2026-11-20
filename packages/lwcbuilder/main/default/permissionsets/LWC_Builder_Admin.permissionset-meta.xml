@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
   <hasActivationRequired>false</hasActivationRequired>
-  <label>LWC Builder Admin</label>
+  <label>Component Builder Admin</label>
   <description>
-    The LWC Builder tab: create, edit, delete and export built components, and see them where
+    The Component Builder tab: create, edit, delete and export built components, and see them where
     they are placed. Given to BarnCRM Admin holders.
   </description>
   <classAccesses>

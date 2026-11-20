@@ -4,7 +4,7 @@
     <protected>true</protected>
     <values><field>Setting_Key__c</field><value xsi:type="xsd:string">Reminder_Days__c</value></values>
     <values><field>Settings_Object__c</field><value xsi:type="xsd:string">Scholarships_Settings__c</value></values>
-    <values><field>Section__c</field><value xsi:type="xsd:string">Scholarships and Grants</value></values>
+    <values><field>Section__c</field><value xsi:type="xsd:string">Scholarships and Outbound Grants</value></values>
     <values><field>Module__c</field><value xsi:type="xsd:string">Scholarships</value></values>
     <values><field>Data_Type__c</field><value xsi:type="xsd:string">Number</value></values>
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">20</value></values>

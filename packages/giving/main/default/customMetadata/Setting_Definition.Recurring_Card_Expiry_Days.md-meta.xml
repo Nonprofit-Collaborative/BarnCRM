@@ -28,7 +28,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">How many days before a recurring donor's card expires the gift joins the Save the Sustainer list on Recurring Donor Health.</value>
+        <value xsi:type="xsd:string">How many days before a recurring donor's card expires the gift joins the Gifts That Need Attention list on Recurring Donor Health.</value>
     </values>
     <values>
         <field>Help_Path__c</field>

@@ -1,4 +1,4 @@
-# BarnCRM LWC Builder
+# BarnCRM Component Builder
 
 ## Purpose
 
@@ -25,7 +25,7 @@ by two groupings and three totals, working list and chart export).
   chart and permission reads, all user mode), `LwcBuilderComponentPicklist` (the App Builder
   property), `LwcBuilderPostInstall`, `LwcBuilderAccessSync`.
 - LWC: `lwcBuilderModel` (framework-free definition logic, chart layout and source export), `lwcBuilderStudio`
-  (the LWC Builder tab), `lwcBuilderRenderer` (BarnCRM Built Component), `lwcBuilderBlock`,
+  (the Component Builder tab), `lwcBuilderRenderer` (BarnCRM Built Component), `lwcBuilderBlock`,
   `lwcBuilderExportKit` (the exported controller, test, helpers and chart styles, as text).
 - Permission sets: `LWC_Builder_Admin`, `LWC_Builder_Staff`, `LWC_Builder_Read_Only`.
 - Help text: `BarnHelp_LwcBuilder`.

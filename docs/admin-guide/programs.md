@@ -529,14 +529,14 @@ default, **Last Month**, **This Year**, **Last Year** or **Last 12 Months**). Ti
 | Open Enrollments | Enrollments at Applied or Enrolled, now. |
 | New Enrollments | Enrollments whose Start Date falls in the period. |
 | People Served | Different people (contacts plus accounts) with a Present delivery in the period, counted as people rather than by scanning every delivery. |
-| Counted Without Names | People counted without names (service counts, above) in the period. Kept apart from People Served. |
+| Served Without Enrollment | People counted without names (service counts, above) in the period. Kept apart from People Served. |
 | Services Delivered | Service deliveries marked Present in the period. |
 | Attendance Rate | Present deliveries as a share of all deliveries in the period, absences included. |
 
 Below the tiles, **Tools** has a tile for each Programs tab the person can open (Programs,
 Cohorts, Sessions, Enrollments, Service Deliveries, Case Notes, Referrals, Service Counts and
 Goals), so the dashboard is the Programs app's home page. Then a **By Program** table gives the
-same figures for each program (including **Counted Without Names**), plus **Completed**
+same figures for each program (including **Served Without Enrollment**), plus **Completed**
 (enrollments completed in the period), with each program's attendance rate drawn as a bar beside
 the percent; click a program's name to open it. It lists every Active program and any other
 program with activity in the period.

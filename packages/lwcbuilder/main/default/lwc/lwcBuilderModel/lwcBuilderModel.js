@@ -833,7 +833,7 @@ export function exportSource(definition, { name, key, objectName, rowLimit } = {
     ...(usesNavigation ? ["import { NavigationMixin } from 'lightning/navigation';"] : []),
     ...(data ? data.imports : []),
     '',
-    `// Exported from the BarnCRM LWC Builder (${escapeHtml(name || bundle)}). This bundle is yours to change,`,
+    `// Exported from the BarnCRM Component Builder (${escapeHtml(name || bundle)}). This bundle is yours to change,`,
     `// deploy and maintain; it does not depend on BarnCRM.${data ? ` Deploy ${names.controller} with it.` : ''}`,
     ...(data ? data.helpers : []),
     '',

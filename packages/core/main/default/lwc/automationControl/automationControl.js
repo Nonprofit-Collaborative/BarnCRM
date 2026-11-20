@@ -84,6 +84,9 @@ export default class AutomationControl extends LightningElement {
 
   labels = {
     title: TITLE,
+    get listTitle() {
+      return helpText('Core', 'Core_AutomationControl_ListTitle');
+    },
     get intro() {
       return helpText('Core', 'Core_AutomationControl_Intro');
     },

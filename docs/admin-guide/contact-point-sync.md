@@ -75,7 +75,7 @@ Contact Point Sync** opens the module's page.
 The four automations, **Contact Point Sync: People**, **Contact Point Sync: Addresses**,
 **Contact Point Sync: Person Accounts** and **Contact Point Sync: Household Moves**, are on the
 **Automation** page, where you can switch each off or pause all automation. With Household Moves
-off, a moved person's addresses catch up at their next save or with the backfill.
+off, a moved person's addresses catch up at their next save or when you press **Copy Existing People**.
 
 ## The Contact Point Sync Page
 
@@ -84,28 +84,28 @@ The page (BarnCRM Settings, **Contact Points**, **Open Contact Point Sync**) sho
 - **Whether each kind can be copied in this org**, and if not, why: the object is not in this org,
   the Individual object is turned off, or your own access to the object is restricted (copies are
   still made; you just cannot see them).
-- **The preview count**: how many people the backfill will check, and how many Contact Points
+- **The preview count**: how many people it will check, and how many Contact Points
   BarnCRM manages now.
-- **Run Backfill**: copies every person's details now, 200 people at a time. Use it once after
+- **Copy Existing People**: copies every person's details now, 200 people at a time. Use it once after
   installing, and after turning a kind back on. It needs the Manage BarnCRM Settings permission.
-- **Last backfill**: when it finished and how many Contact Points it created, updated, removed and
+- **When existing people were last copied**: when it finished and how many Contact Points it created, updated, removed and
   could not save.
 
 ## Who Can Do What
 
 - **Contact Point Sync Admin** (given to everyone holding BarnCRM Admin): opens the page, previews
-  and starts the backfill.
+  and starts Copy Existing People.
 - Everyone else needs nothing: the copy is made for them when they save a person.
 
 ## Troubleshooting
 
 - **The page says a kind cannot be copied.** Follow what the page says, for example turn on the
-  Individual object in Setup, then run the backfill.
-- **Failed copies in the last backfill.** Open the Error Log, filter on Contact Point Sync, and
+  Individual object in Setup, then press **Copy Existing People**.
+- **Failed copies the last time existing people were copied.** Open the Error Log, filter on Contact Point Sync, and
   fix what Salesforce refused (often a required field or validation rule on the Contact Point
-  object). Then run the backfill again.
+  object). Then press **Copy Existing People** again.
 - **An app shows an old value.** Check the Automation page: if Contact Point Sync is switched off
-  or automation is paused, changes are not copied. Run the backfill once it is back on. After a
+  or automation is paused, changes are not copied. Press **Copy Existing People** once it is back on. After a
   data load of more than 50 people, give the background job a minute; if copies are still
   missing, look in the Error Log for a Contact Point Sync warning that the job could not be
-  queued, and run the backfill.
+  queued, and press **Copy Existing People**.

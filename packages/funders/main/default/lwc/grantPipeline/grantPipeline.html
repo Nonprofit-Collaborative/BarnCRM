@@ -18,7 +18,7 @@
           value={scope}
           onchange={handleScope}
         ></lightning-radio-group>
-        <template lwc:if={canCreate}>
+        <template lwc:if={showHeaderNew}>
           <lightning-button
             data-id="new-grant"
             label={labels.newGrant}
@@ -75,17 +75,13 @@
               label={labels.tileAwarded}
               value={board.awardedAmount}
               format-style="currency"
+              badge-label={awardedDetail}
+              badge-variant="success"
               bordered
               align="start"
             ></c-barn-stat-tile>
           </div>
         </div>
-        <p
-          class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_small"
-          data-id="awarded-count"
-        >
-          {awardedDetail}
-        </p>
 
         <template lwc:if={truncatedMessage}>
           <c-barn-notice

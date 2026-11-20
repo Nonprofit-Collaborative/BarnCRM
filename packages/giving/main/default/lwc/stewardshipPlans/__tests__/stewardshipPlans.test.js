@@ -15,7 +15,9 @@ setHelpTextForTest({
 });
 
 setHelpTextForTest({
-  Giving_Stewardship_Empty: 'You have not written a plan down yet.'
+  Giving_Stewardship_Empty: 'You have not written a plan down yet.',
+  Giving_Stewardship_EmptyHeading: require('../../../staticresources/BarnHelp_Giving.json').texts
+    .Giving_Stewardship_EmptyHeading
 });
 
 jest.mock(
@@ -190,7 +192,9 @@ describe('c-stewardship-plans', () => {
     getPage.emit({ ...PAGE, templates: [] });
     await flush();
 
-    expect(element.shadowRoot.querySelector('[data-id="empty-state"]')).not.toBeNull();
+    const empty = element.shadowRoot.querySelector('[data-id="empty-state"]');
+    expect(empty).not.toBeNull();
+    expect(empty.heading).toBe('No Plans Yet');
   });
 
   it('shows a plan its steps in order once it is chosen', async () => {

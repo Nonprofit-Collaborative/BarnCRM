@@ -60,7 +60,7 @@ program to a team, set the Award Program default to Private in Sharing Settings 
 
 ## Settings
 
-BarnCRM Settings, **Scholarships and Grants**. Every setting is org-wide.
+BarnCRM Settings, **Scholarships and Outbound Grants**. Every setting is org-wide.
 
 | Setting | Default | What it does |
 |---|---|---|
@@ -221,7 +221,7 @@ should see every Outbound Funds record.
 | Requirements | Copies each requirement of an awarded request onto its award, linked to its disbursement: its name as the instructions, due date, type (a report becomes Progress Report or Final Report, anything else Condition) and status (Complete and Accepted become Met). |
 
 Before you load requirements, switch **Send Scholarships reminders** off (BarnCRM Settings,
-**Scholarships and Grants**) if you do not want reminders for old requirements, and switch it back
+**Scholarships and Outbound Grants**) if you do not want reminders for old requirements, and switch it back
 on afterwards. The retire checklist reminds you
 to point applicants at BarnCRM, deactivate your own flows on Outbound Funds objects, and rebuild
 your reports. Review scores, the review board and award letters start fresh in BarnCRM: Outbound
