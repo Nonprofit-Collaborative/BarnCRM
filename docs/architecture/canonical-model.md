@@ -1130,7 +1130,7 @@ lists, undoes or deletes another's rows.
 | Items | `Items__c` | Long Text Area(131072) | Scan, Deactivation: JSON. |
 | Message | `Message__c` | Long Text Area(32768) | Scan, Deactivation. |
 | Restored At | `Restored_At__c` | DateTime | Deactivation. |
-| Kit | `Kit__c` | Text(80), external id | Migration: the Migration Kit DeveloperName. Ships in the Migration package (ADR-NEXT `NEXT-migration-package.md`), so it exists only while that package is installed. |
+| Kit | `Kit__c` | Text(80), external id | Migration: the Migration Kit DeveloperName. Ships in the Migration package (ADR-0232 `0232-migration-package.md`), so it exists only while that package is installed. |
 | State | `State_JSON__c` | Long Text Area(32768) | Migration: JSON of tool steps done and checklist items ticked. |
 | Account ID | `Account_Id__c` | Text(18), external id, not unique, read-only to the role | Household Adoption. Text, not a lookup, so the journal adds no child relationship to Account and never keeps a household from the tidy-up (R-H12a) or a delete. |
 | Previous Record Type ID | `Previous_Record_Type_Id__c` | Text(18), read-only to the role | Household Adoption. |
@@ -1862,7 +1862,7 @@ row exists only where that module is installed. The Migration Assistant offers a
 its Source App is detected (Integration App Detection Objects, by describe). The type, the
 extension seam (`MigrationKitExtension`, `MigrationCheck`) and Integration App's kit listing are
 Core's; the Assistant that runs a kit is the optional Migration package's (`packages/migration`,
-ADR-NEXT `NEXT-migration-package.md`), and the Integrations page offers Start Migration only
+ADR-0232 `0232-migration-package.md`), and the Integrations page offers Start Migration only
 while that package is installed.
 
 | Field | API name | Type | Definition |
@@ -3802,8 +3802,8 @@ them (R-IB8, R-IB9).
 | Migration Run | `Migration_Journal__c` | Lookup(Admin Journal, `Merge_Journal__c`, a row of Kind Migration; relationship `Data_Jobs`), cleared when the run is deleted. Named `Migration_Run__c` until N-11, when runs moved into the Admin Journal. |
 | Migration Step | `Migration_Step__c` | Text (80) |
 
-Migration Run and Migration Step ship in the Migration package (ADR-NEXT
-`NEXT-migration-package.md`); no Core code reads them.
+Migration Run and Migration Step ship in the Migration package (ADR-0232
+`0232-migration-package.md`); no Core code reads them.
 
 - **Batch tag on other objects:** `Created_By_Import_Batch__c`, a Lookup to
   `Import_Batch__c`, on Account (households and organizations), on Contact, and on
@@ -13597,8 +13597,8 @@ stop being one.
   `npe01__Contacts_And_Orgs_Settings__c` and its `npe01__Account_Processor__c` (org default only).
 - **Classes:** Core's `NpspHouseholdSource` (describe-only reads of NPSP, the test seam, and
   the R-HA6 guard a running org keeps) and `HouseholdWriter.saveAdoptionChanges` (the one
-  writer of the record type, ADR-0141). The Migration package (ADR-NEXT
-  `NEXT-migration-package.md`) holds `NpspHouseholdAdoptionService` (preview, start, undo,
+  writer of the record type, ADR-0141). The Migration package (ADR-0232
+  `0232-migration-package.md`) holds `NpspHouseholdAdoptionService` (preview, start, undo,
   status), `NpspHouseholdAdoptionBatch` (adopt and undo chunks) and
   `NpspHouseholdAdoptionController` (thin, plain JSON shapes). The panel is
   `npspHouseholdAdoption`, under Households on the Migration Assistant tab, shown only when
@@ -13765,7 +13765,7 @@ writes, switches off or uninstalls the product migrated from.
   a run was the object `Migration_Run__c` (`MR-{0000}`), and
   the Import Batch lookup had that name.
 
-- **Classes:** in the Migration package (ADR-NEXT `NEXT-migration-package.md`),
+- **Classes:** in the Migration package (ADR-0232 `0232-migration-package.md`),
   `MigrationKitService` (catalog, run state, order, verification), `MigrationStageBatch` (reads
   the source, stages rows, starts the dry run) and `MigrationController` (thin, plain JSON
   shapes); in Core, `MigrationKitExtension` and `MigrationCheck` (the seam a module's kit
@@ -19437,8 +19437,8 @@ mirrors the primary member).
 | 1.69 | 2026-11-18 | Beta badge on every module (D-211, N-14, release 1.27). `BarnCRM_Module__mdt` gains Beta (`Beta__c`, Checkbox, default false), ticked on every shipped module record: the Module Manager, the Setup Assistant's modules step and the Home Modules card show a Beta badge beside the module name. No object added or removed. |
 | 1.70 | 2026-11-19 | Receiver token (pre-batch review M1; ADR-0229 amended). `Payments_Settings__c` gains `Webhook_Token__c` (Text(64)) and `Webhook_Cap_Hit_At__c` (DateTime): the receiver stores a post only when it carries the token in its address, and records the first refusal at the hourly cap each hour. No object added or removed. |
 | 1.71 | 2026-11-19 | Advanced Reporting (O-02, D-202, D-207, release 1.29; ADR-0231 `0231-advanced-reporting.md`). No object or field added. Section 29AR records the saved report and dashboard JSON formats and their storage as Salesforce Files (`.barnreport`, `.barndash`) shared through ContentDocumentLink, with rules R-AR1 to R-AR5. |
-| 1.72 | 2026-11-20 | Migration package (S11, D-213, release 1.30; ADR-NEXT `NEXT-migration-package.md`). No object added or removed. The optional BarnCRM Migration package (`packages/migration`) ships Admin Journal's Kit (`Kit__c`) and Import Batch's Migration Run (`Migration_Journal__c`) and Migration Step (`Migration_Step__c`), the Migration Assistant (29ZS) and the NPSP and Nonprofit Cloud household adoption (29ZQ), kit `NPSP_People` with its three templates, and a Migration Assistant tab. Core keeps `Migration_Kit__mdt`, the extension seam (`MigrationKitExtension` now receives the rows the Assistant read) and `NpspHouseholdSource`. The settings rows `NPSP_Household_Adoption` and `NPC_Household_Conversion` are removed; Setting Definition `Migration_Assistant_Page` (Integrations) and `BarnCRM_Module.Migration` are added. |
-| 1.73 | 2026-11-20 | Org Optimizer and Sample Data modules (D-215, release 1.30; ADR-NEXT `NEXT-org-optimizer-and-sample-data-modules.md`). No object or field added or removed. The optional BarnCRM Org Optimizer package (`packages/orgoptimizer`) ships the Org Optimizer page (app page `Data_Hygiene`) with every section's classes and components, and Health Check's runner, checks, controller, last run and panel; `Setup_Change__c`, `Field_Utilization_Snapshot__c`, the Org Optimizer and Health Check keys of `BarnCRM_Settings__c`, the Health Check vocabulary and seams (new `HealthCheckRun`, `HealthCheckFixes`) stay in Core. The optional BarnCRM Sample Data package (`packages/sampledata`) ships the loader, the Core sample set and a Sample Data tab; the framework every module's set runs on stays in Core, with a new seam `SampleDataHost`. Setting Definitions `Error_Log_Optimizer_Link`, `Health_Check_Optimizer_Link`, `Field_Utilization_Retention_Days`, `Old_Api_Version`, `Setup_Change_Retention_Days`, `Stale_Record_Years`, `Unused_Login_Days` and `Unused_Report_Days` ship in the Org Optimizer package and `Sample_Data` in the Sample Data package; `Health_Check` (the Settings panel) is removed; `BarnCRM_Module.OrgOptimizer` and `BarnCRM_Module.SampleData` are added. R-SU8 follows the package, not a feature switch. |
+| 1.72 | 2026-11-20 | Migration package (S11, D-213, release 1.30; ADR-0232 `0232-migration-package.md`). No object added or removed. The optional BarnCRM Migration package (`packages/migration`) ships Admin Journal's Kit (`Kit__c`) and Import Batch's Migration Run (`Migration_Journal__c`) and Migration Step (`Migration_Step__c`), the Migration Assistant (29ZS) and the NPSP and Nonprofit Cloud household adoption (29ZQ), kit `NPSP_People` with its three templates, and a Migration Assistant tab. Core keeps `Migration_Kit__mdt`, the extension seam (`MigrationKitExtension` now receives the rows the Assistant read) and `NpspHouseholdSource`. The settings rows `NPSP_Household_Adoption` and `NPC_Household_Conversion` are removed; Setting Definition `Migration_Assistant_Page` (Integrations) and `BarnCRM_Module.Migration` are added. |
+| 1.73 | 2026-11-20 | Org Optimizer and Sample Data modules (D-215, release 1.30; ADR-0233 `0233-org-optimizer-and-sample-data-modules.md`). No object or field added or removed. The optional BarnCRM Org Optimizer package (`packages/orgoptimizer`) ships the Org Optimizer page (app page `Data_Hygiene`) with every section's classes and components, and Health Check's runner, checks, controller, last run and panel; `Setup_Change__c`, `Field_Utilization_Snapshot__c`, the Org Optimizer and Health Check keys of `BarnCRM_Settings__c`, the Health Check vocabulary and seams (new `HealthCheckRun`, `HealthCheckFixes`) stay in Core. The optional BarnCRM Sample Data package (`packages/sampledata`) ships the loader, the Core sample set and a Sample Data tab; the framework every module's set runs on stays in Core, with a new seam `SampleDataHost`. Setting Definitions `Error_Log_Optimizer_Link`, `Health_Check_Optimizer_Link`, `Field_Utilization_Retention_Days`, `Old_Api_Version`, `Setup_Change_Retention_Days`, `Stale_Record_Years`, `Unused_Login_Days` and `Unused_Report_Days` ship in the Org Optimizer package and `Sample_Data` in the Sample Data package; `Health_Check` (the Settings panel) is removed; `BarnCRM_Module.OrgOptimizer` and `BarnCRM_Module.SampleData` are added. R-SU8 follows the package, not a feature switch. |
 
 ---
 ## 32. Entity ownership by package

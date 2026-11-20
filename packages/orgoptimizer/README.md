@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Org Optimizer and Health Check (ADR-NEXT `NEXT-org-optimizer-and-sample-data-modules.md`,
+Org Optimizer and Health Check (ADR-0233 `0233-org-optimizer-and-sample-data-modules.md`,
 D-215): the Org Optimizer page with Health Check and its fixes, Data Quality, Field
 Utilization, Picklist Usage, the Data Dictionary, the AI Readiness export, Storage, Unused
 Setup, Setup Changes, Report Subscriptions, Access Explorer and Field Access Manager. Optional,

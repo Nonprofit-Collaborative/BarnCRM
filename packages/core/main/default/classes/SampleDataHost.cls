@@ -1,6 +1,6 @@
 /**
- * The BarnCRM Sample Data package, as Core reaches it (ADR-NEXT
- * `NEXT-org-optimizer-and-sample-data-modules.md`). Core keeps the sample data framework every
+ * The BarnCRM Sample Data package, as Core reaches it (ADR-0233
+ * `0233-org-optimizer-and-sample-data-modules.md`). Core keeps the sample data framework every
  * module's set runs on (SampleDataModules, SampleDataStageBatch, SampleDataFile); the package
  * holds Core's own sample set, its loader and the Sample Data page, and names its class for
  * this seam in its catalog row (`SampleDataHost: <class>`, ADR-0057). Without the package there

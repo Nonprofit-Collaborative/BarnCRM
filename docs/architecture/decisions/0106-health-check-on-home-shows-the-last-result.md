@@ -1,7 +1,7 @@
 # ADR-0106: Health Check on Home shows the last result, with Run now
 
 **Status:** Accepted (owner approved, Brandon, 2026-10-13; builder decision on the shape)
-**Amended by:** ADR-NEXT `NEXT-org-optimizer-and-sample-data-modules.md` (D-215, 2026-11-20):
+**Amended by:** ADR-0233 `0233-org-optimizer-and-sample-data-modules.md` (D-215, 2026-11-20):
 Core's Home page no longer places the Health Check panel (note at the end).
 **Date:** 2026-10-13
 **Source:** Core review finding ADMIN-7; follows ADR-0021 (system mode writes for package
@@ -52,7 +52,7 @@ the orphan counts in particular can be slow at volume (ADMIN-24).
 
 ## Amendment, 2026-11-20 (D-215, release 1.30): Home no longer places the panel
 
-ADR-NEXT `NEXT-org-optimizer-and-sample-data-modules.md` moves `healthCheckPanel` and
+ADR-0233 `0233-org-optimizer-and-sample-data-modules.md` moves `healthCheckPanel` and
 `HealthCheckLastRun` into the optional Org Optimizer module. Core's Home page cannot place a
 module's component (ADR-0020), so it no longer places the panel; the last result and Run now are
 on the Org Optimizer page's Health Check section. The component keeps its Home page target and

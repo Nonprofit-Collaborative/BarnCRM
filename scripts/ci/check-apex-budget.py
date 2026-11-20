@@ -91,10 +91,10 @@ CAPS = {
     # and warning, Run Remaining Checks): 2,274,807 measured, plus about 0.1%.
     # Batch O trim (O-01, D-207): 2,275,872 measured 2026-11-19 (upgrade-only code out, the
     # feature list fill in, DML statements); kept, since size plus 2% would raise it.
-    # Lowered 2026-11-20 for S11 (D-213, ADR-NEXT migration package): the Migration Assistant and
+    # Lowered 2026-11-20 for S11 (D-213, ADR-0232): the Migration Assistant and
     # the NPSP and Nonprofit Cloud household adoption moved into the optional Migration package,
     # about 54,500 out: 2,200,764 measured, plus about 0.1%.
-    # Lowered 2026-11-20 for D-215 (ADR-NEXT org optimizer and sample data modules): Org
+    # Lowered 2026-11-20 for D-215 (ADR-0233): Org
     # Optimizer with Health Check, and the sample data loader with its set, moved into two
     # optional packages; the seams, @NamespaceAccessible marks and getters they need stay.
     # 2,201,145 measured before, 1,970,388 after, plus about 0.1%: Core is under the 2.0M
@@ -382,7 +382,7 @@ CAPS = {
     # Pre-batch review M2: no lookup is queued for a saver without principal access, and the
     # missing access is logged once a day, 25,364 measured 2026-11-19; raised by 850.
     "addressverification": 25_400,
-    # Advanced Reporting (O-02, D-202, D-207, ADR-NEXT advanced reporting): one query service
+    # Advanced Reporting (O-02, D-202, D-207, ADR-0231): one query service
     # (allow-listed by describe, user mode, binds only, aggregates and keyset pages), the library
     # of saved reports and dashboards as Files with their sharing, and post-install, 28,060
     # measured 2026-11-19, plus about 2%.
@@ -414,11 +414,11 @@ CAPS = {
     # 2026-11-20; kept, as are Giving's (851,800), Volunteers' (229,585) and Rollups' (394,571),
     # since size plus 2% would raise each.
     "mirror": 32_100,
-    # Migration (S11, D-213, ADR-NEXT migration package): the Migration Assistant (kits, runs,
+    # Migration (S11, D-213, ADR-0232): the Migration Assistant (kits, runs,
     # the staging job, its controller) and the NPSP and Nonprofit Cloud household adoption and
     # undo, moved out of Core, with the post-install: 56,490 measured 2026-11-20, plus about 2%.
     "migration": 57_700,
-    # Org Optimizer (D-215, ADR-NEXT org optimizer and sample data modules): Health Check's
+    # Org Optimizer (D-215, ADR-0233): Health Check's
     # runner, checks, controller and last run, and every Org Optimizer section's controllers
     # and services, moved out of Core, with the post-install: 215,159 measured 2026-11-20,
     # plus about 2%.

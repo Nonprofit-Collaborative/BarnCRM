@@ -218,6 +218,6 @@ Migration package, and the module that ships it does not depend on the Migration
    need not match the source count); a rejected row still stops **Verified**.
 4. Document the kit in its module's admin guide and add test rows to the Testing Guide.
 
-See ADR-0197 `0197-migration-assistant.md` and ADR-NEXT
-`NEXT-migration-package.md` for the design and the canonical model Section 29ZS and R-MK1 for
+See ADR-0197 `0197-migration-assistant.md` and ADR-0232
+`0232-migration-package.md` for the design and the canonical model Section 29ZS and R-MK1 for
 the rules.

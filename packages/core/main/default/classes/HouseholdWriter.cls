@@ -31,7 +31,7 @@
  *   user mode, and everything a screen reads is read in user mode.
  *
  * Only saveAdoptionChanges is namespace accessible: the Migration package's household adoption
- * calls it (ADR-NEXT migration package), and every other writer stays Core's own.
+ * calls it (ADR-0232), and every other writer stays Core's own.
  */
 @NamespaceAccessible
 public with sharing class HouseholdWriter {

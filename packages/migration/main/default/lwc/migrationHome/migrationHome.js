@@ -14,7 +14,7 @@ export function kitFromState(state) {
 }
 
 /**
- * The Migration Assistant tab (ADR-NEXT migration package): the Migration Kits for the products
+ * The Migration Assistant tab (ADR-0232): the Migration Kits for the products
  * detected in this org, each with Start, and the two household tools, Adopt NPSP Households and
  * Convert Nonprofit Cloud Households, where they apply. A kit opens in place, from Start here or
  * from Start Migration on Settings, Integrations, which names it in the page state; Back returns

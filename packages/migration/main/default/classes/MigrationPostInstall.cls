@@ -1,6 +1,5 @@
 /**
- * What the BarnCRM Migration package does at install and at every upgrade (ADR-NEXT migration
- * package).
+ * What the BarnCRM Migration package does at install and at every upgrade (ADR-0232).
  *
  * Each step is safe to run twice and none can abort an install, since every failure is written
  * to the Error Log instead:

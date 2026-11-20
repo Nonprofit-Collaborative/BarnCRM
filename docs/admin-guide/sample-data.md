@@ -1,7 +1,7 @@
 # Sample Data
 
 **Package:** BarnCRM Sample Data (optional, both editions)
-**Decision:** ADR-NEXT `NEXT-org-optimizer-and-sample-data-modules.md`
+**Decision:** ADR-0233 `0233-org-optimizer-and-sample-data-modules.md`
 
 ## 1. What It Does
 

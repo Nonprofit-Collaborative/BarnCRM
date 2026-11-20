@@ -1,6 +1,6 @@
 /**
- * What the BarnCRM Sample Data package does at install and at every upgrade (ADR-NEXT
- * `NEXT-org-optimizer-and-sample-data-modules.md`).
+ * What the BarnCRM Sample Data package does at install and at every upgrade (ADR-0233
+ * `0233-org-optimizer-and-sample-data-modules.md`).
  *
  * Each step is safe to run twice and none can abort an install, since every failure is written
  * to the Error Log instead:

@@ -1,7 +1,7 @@
 # ADR-0103: Org Optimizer and Data Manager pages
 
 **Status:** Accepted (owner decisions, Brandon, 2026-10-13)
-**Amended by:** ADR-NEXT `NEXT-org-optimizer-and-sample-data-modules.md` (D-215, 2026-11-20):
+**Amended by:** ADR-0233 `0233-org-optimizer-and-sample-data-modules.md` (D-215, 2026-11-20):
 the Org Optimizer page ships in the optional Org Optimizer module (note at the end).
 **Date:** 2026-10-13
 **Source:** owner request 2026-10-13 (expand Data Hygiene into an Org Optimizer, add a Data
@@ -95,7 +95,7 @@ names should not, because links, permission sets and the console's workspace map
 
 ## Amendment, 2026-11-20 (D-215, release 1.30): the page ships in the Org Optimizer module
 
-ADR-NEXT `NEXT-org-optimizer-and-sample-data-modules.md` puts the Org Optimizer page, its
+ADR-0233 `0233-org-optimizer-and-sample-data-modules.md` puts the Org Optimizer page, its
 sections and Health Check in the optional BarnCRM Org Optimizer module. The tab keeps the API
 name `Data_Hygiene` and the label Org Optimizer. Data Manager shows its Org Optimizer card, and
 Settings its Health Check and Error Log links, only while the module is installed. Data Manager

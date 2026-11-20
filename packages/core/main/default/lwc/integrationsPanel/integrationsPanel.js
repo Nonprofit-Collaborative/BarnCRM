@@ -60,7 +60,7 @@ function groupOf(app) {
     : GROUPS[0].category;
 }
 
-/** The Migration package's tab, where a kit runs (ADR-NEXT migration package). */
+/** The Migration package's tab, where a kit runs (ADR-0232). */
 const MIGRATION_TAB = 'Migration_Assistant';
 
 /** A label with one {0} placeholder filled in. */

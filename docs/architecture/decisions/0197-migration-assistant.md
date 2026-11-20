@@ -1,7 +1,7 @@
 # ADR-0197: The Migration Assistant Runs In-Org Migration Kits on the Import Engine
 
 **Status:** Proposed
-**Amended by:** ADR-NEXT `NEXT-migration-package.md` (D-213, 2026-11-20): the Assistant moves into
+**Amended by:** ADR-0232 `0232-migration-package.md` (D-213, 2026-11-20): the Assistant moves into
 the optional Migration package; decision 1 and the tab alternative are amended (note at the end).
 **Date:** 2026-11-11
 **Source:** release 1.4 items MIG-01 (Migration Assistant framework), MIG-10 (Integrations page:
@@ -124,7 +124,7 @@ reversible answer is needed now. Each decision below takes the review's recommen
 
 ## Amendment, 2026-11-20 (D-213, S11, release 1.30): an optional Migration package
 
-ADR-NEXT `NEXT-migration-package.md` amends decision 1. The Assistant (`MigrationKitService`,
+ADR-0232 `0232-migration-package.md` amends decision 1. The Assistant (`MigrationKitService`,
 `MigrationStageBatch`, `MigrationController`, `migrationAssistant`) and the fields only a run
 uses ship in the optional BarnCRM Migration package, which depends on Core only. Kits still ship
 in the module that owns their records, and `Migration_Kit__mdt`, `MigrationKitExtension` and

@@ -1,7 +1,7 @@
 /**
  * Runs Health Check (plan Section 4.8, feature C-11): Core's own checks in reading order, then
  * every installed module's `HealthCheckExtension`, each isolated, and the report the panel
- * receives (ADR-NEXT `NEXT-org-optimizer-and-sample-data-modules.md`).
+ * receives (ADR-0233 `0233-org-optimizer-and-sample-data-modules.md`).
  *
  * The vocabulary every check shares (the Finding, the severities, the categories, the fix
  * targets) stays in Core's `HealthCheckService`, with the extension seam, so a module's checks

@@ -1,7 +1,7 @@
 /**
  * The seam a migration kit uses when its JSON steps are not enough (MIG-01, ADR-0197
  * migration-assistant decision 3, the shape of ADR-0057). A kit names the class in its Extension
- * Class field; the Migration Assistant (the Migration package, ADR-NEXT migration package) finds
+ * Class field; the Migration Assistant (the Migration package, ADR-0232) finds
  * it by name with `NamespaceUtil.build` and calls it only when it is installed. Core holds only
  * this interface and `MigrationCheck`, so a kit's package needs neither the Assistant nor any
  * other module.

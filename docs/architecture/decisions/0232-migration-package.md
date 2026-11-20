@@ -1,4 +1,4 @@
-# ADR-NEXT: An Optional Migration Package Holds the Migration Assistant and Household Adoption
+# ADR-0232: An Optional Migration Package Holds the Migration Assistant and Household Adoption
 
 **Status:** Proposed
 **Date:** 2026-11-20

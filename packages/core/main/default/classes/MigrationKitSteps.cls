@@ -1,6 +1,6 @@
 /**
  * Reads a shipped Migration Kit's steps for a module's kit test (canonical model R-MK1). The
- * Assistant that runs kits is the Migration package (ADR-NEXT migration package), which no
+ * Assistant that runs kits is the Migration package (ADR-0232), which no
  * module depends on, so a module's test reads its own kit row here: each step's key, kind,
  * fields, template and links, as the JSON writes them.
  */

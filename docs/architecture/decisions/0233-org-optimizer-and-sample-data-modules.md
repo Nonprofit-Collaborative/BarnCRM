@@ -1,4 +1,4 @@
-# ADR-NEXT: Org Optimizer With Health Check, and the Sample Data Loader, Are Optional Modules
+# ADR-0233: Org Optimizer With Health Check, and the Sample Data Loader, Are Optional Modules
 
 **Status:** Proposed
 **Date:** 2026-11-20
@@ -9,7 +9,7 @@ D-101's feature list (Org Optimizer and Health Check were a Core feature) and, w
 ADR-0124 (features), ADR-0086 (field utilization in Core), ADR-0103 (the Org Optimizer page)
 and ADR-0106 (Health Check on Home). Builds on ADR-0017 (one namespace,
 `@NamespaceAccessible`), ADR-0020 (Core never imports a module's component), ADR-0057 (seams
-found by class name), ADR-0131 (module access by role) and ADR-NEXT `NEXT-migration-package.md`,
+found by class name), ADR-0131 (module access by role) and ADR-0232 `0232-migration-package.md`,
 which this follows.
 
 ## Context

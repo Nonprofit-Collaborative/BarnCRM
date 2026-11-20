@@ -1,8 +1,8 @@
 # Org Optimizer
 
 **Package:** BarnCRM Org Optimizer (optional, both editions)
-**Decision:** ADR-0103 `0103-org-optimizer-and-data-manager-pages.md`, ADR-NEXT
-`NEXT-org-optimizer-and-sample-data-modules.md`
+**Decision:** ADR-0103 `0103-org-optimizer-and-data-manager-pages.md`, ADR-0233
+`0233-org-optimizer-and-sample-data-modules.md`
 
 ## 1. What It Does
 

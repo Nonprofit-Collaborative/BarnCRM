@@ -1,6 +1,6 @@
 /**
- * The Sample Data package's side of Core's `SampleDataHost` seam (ADR-NEXT
- * `NEXT-org-optimizer-and-sample-data-modules.md`): Core's install check and the module sample
+ * The Sample Data package's side of Core's `SampleDataHost` seam (ADR-0233
+ * `0233-org-optimizer-and-sample-data-modules.md`): Core's install check and the module sample
  * sets reach the loader, Core's removal stages and the finished notice through it, by the class
  * name in this package's catalog row (ADR-0057).
  */

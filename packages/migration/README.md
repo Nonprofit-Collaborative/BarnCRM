@@ -5,7 +5,7 @@
 The one-time tools that move an org into BarnCRM from another product in the same org: the
 Migration Assistant, which runs Migration Kits step by step on the Import engine, and Adopt NPSP
 Households and Convert Nonprofit Cloud Households, which make existing household accounts
-BarnCRM households in place (ADR-NEXT `NEXT-migration-package.md`, ADR-0197, ADR-0155,
+BarnCRM households in place (ADR-0232 `0232-migration-package.md`, ADR-0197, ADR-0155,
 ADR-0217). Optional: install it to migrate, and uninstall it once every migration is done and no
 undo is needed. The records it moved stay. In beta.
 

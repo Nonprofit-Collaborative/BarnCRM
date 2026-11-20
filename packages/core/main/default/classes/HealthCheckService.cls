@@ -6,8 +6,8 @@
  * shares (the Finding, the severities, the categories, the fix targets), the report the panel
  * receives, the limit guard, and the isolated run of every installed module's extension. The
  * runner itself, Core's own checks in reading order, the fixes and the panel are the Org
- * Optimizer module's (`HealthCheckRunner`, ADR-NEXT
- * `NEXT-org-optimizer-and-sample-data-modules.md`), so a module's checks and Core's own check
+ * Optimizer module's (`HealthCheckRunner`, ADR-0233
+ * `0233-org-optimizer-and-sample-data-modules.md`), so a module's checks and Core's own check
  * contributors (`BrandShareJob`, `FieldHistoryService`, `ModuleSetups`, `AddressMatchKeyHandler`)
  * compile without it. `runInstalled()` reaches the runner by name when the module is installed.
  *

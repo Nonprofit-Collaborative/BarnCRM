@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The sample data set and its loader (ADR-NEXT `NEXT-org-optimizer-and-sample-data-modules.md`,
+The sample data set and its loader (ADR-0233 `0233-org-optimizer-and-sample-data-modules.md`,
 D-215): 200 households, 440 contacts, 25 organizations, 60 connections and 80 affiliations,
 Core's extra sample records, and each installed module's own sample set, loaded and removed
 from the Sample Data tab. Optional, in both editions: install it for a scratch org, sandbox or

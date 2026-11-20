@@ -2,8 +2,8 @@
  * Runs one Health Check fix by its key (C-21, ADR-0048, ADR-0125): Core's own fixes and any
  * module's, through `HealthCheckFixExtension`. It stays in Core with the vocabulary
  * (`HealthCheckService`) so a module's fix, and the module's tests that press it, work without
- * the Org Optimizer module, which holds the panel and its controller (ADR-NEXT
- * `NEXT-org-optimizer-and-sample-data-modules.md`). The controller runs a fix here, then the
+ * the Org Optimizer module, which holds the panel and its controller (ADR-0233
+ * `0233-org-optimizer-and-sample-data-modules.md`). The controller runs a fix here, then the
  * whole report again.
  *
  * The panel sends back the fix scope of the finding the administrator confirmed. The fix runs

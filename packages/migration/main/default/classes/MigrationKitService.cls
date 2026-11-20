@@ -9,7 +9,7 @@
  * no BarnCRM package names another product's schema (ADR-0013, ADR-0062). Runs are read and
  * written in the running administrator's access. The Migration package holds the Assistant; a
  * kit's rows, templates and extension ship in the package that owns its records, and Core
- * holds the seam they share (ADR-NEXT migration package).
+ * holds the seam they share (ADR-0232).
  */
 public with sharing class MigrationKitService {
 	public static final String KIND_IMPORT = 'import';

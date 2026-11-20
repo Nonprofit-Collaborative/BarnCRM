@@ -1,7 +1,7 @@
 # ADR-0155: NPSP Household Adoption Lives in Core, Converts Accounts in Place, and Is Undone From a Journal
 
 **Status:** Proposed
-**Amended by:** ADR-NEXT `NEXT-migration-package.md` (D-213, 2026-11-20): the adoption tool moves
+**Amended by:** ADR-0232 `0232-migration-package.md` (D-213, 2026-11-20): the adoption tool moves
 into the optional Migration package; decision 1 is amended (note at the end).
 **Date:** 2026-11-02
 **Source:** release 0.17 item X-05 (plan Section 6.0a, Section 4.5 NPSP coexistence row,
@@ -104,7 +104,7 @@ Three questions were open:
 
 ## Amendment, 2026-11-20 (D-213, S11, release 1.30): the tool ships in the Migration package
 
-ADR-NEXT `NEXT-migration-package.md` amends decision 1. Adoption and conversion
+ADR-0232 `0232-migration-package.md` amends decision 1. Adoption and conversion
 (`NpspHouseholdAdoptionService`, `NpspHouseholdAdoptionBatch`,
 `NpspHouseholdAdoptionController`, the `npspHouseholdAdoption` panel) ship in the optional
 BarnCRM Migration package, which depends on Core only, and the panels appear under Households

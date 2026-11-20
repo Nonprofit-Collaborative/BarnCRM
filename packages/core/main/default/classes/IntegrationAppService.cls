@@ -75,7 +75,7 @@ public with sharing class IntegrationAppService {
 		public String label;
 	}
 
-	/** The module catalog key of the Migration package, which runs the kits (ADR-NEXT). */
+	/** The module catalog key of the Migration package, which runs the kits (ADR-0232). */
 	@TestVisible
 	private static final String MIGRATION_MODULE = 'Migration';
 

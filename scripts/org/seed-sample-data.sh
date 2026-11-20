@@ -5,8 +5,7 @@
 # connections and affiliations, and the Giving gifts where Giving is installed) into the
 # target org and waits for it to actually finish.
 #
-# The loader is the optional BarnCRM Sample Data package (packages/sampledata, ADR-NEXT
-# org optimizer and sample data modules). A source-deployed org without it (a --core-only
+# The loader is the optional BarnCRM Sample Data package (packages/sampledata, ADR-0233). A source-deployed org without it (a --core-only
 # build) gets it deployed here first, since it depends on Core alone.
 #
 # SampleDataLoader.load() runs as Batch Apex (SampleDataStageBatch, one stage per execute:

@@ -980,16 +980,16 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   MODULES+=(projects)
   # Address Verification depends on Core only (ADR-0209 address verification module).
   MODULES+=(addressverification)
-  # Advanced Reporting depends on Core only; module objects are read by name (ADR-NEXT advanced reporting).
+  # Advanced Reporting depends on Core only; module objects are read by name (ADR-0231).
   MODULES+=(reporting)
   # Mirror depends on Core only (N-09, ADR-0228); the gift mirrors are
   # Fundraising's (the giving package, deployed above).
   MODULES+=(mirror)
   # Migration depends on Core only; kits ship in the packages that own their records and are
-  # found by name (ADR-NEXT migration package).
+  # found by name (ADR-0232).
   MODULES+=(migration)
   # Org Optimizer (with Health Check) and Sample Data depend on Core only; Core finds each by
-  # the class its catalog row names (ADR-NEXT org optimizer and sample data modules).
+  # the class its catalog row names (ADR-0233).
   MODULES+=(orgoptimizer sampledata)
   RECORD_PACKAGES+=("${MODULES[@]}")
   # MODULE APPS ON A CAPPED ORG (ADR-0223, module apps). A scratch or Developer Edition org refuses

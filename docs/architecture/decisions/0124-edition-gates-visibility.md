@@ -1,7 +1,7 @@
 # ADR-0124: The edition, features, modules and first-run setup decide what BarnCRM shows
 
 **Status:** Accepted (owner decisions, Brandon, 2026-10-14)
-**Amended by:** ADR-NEXT `NEXT-org-optimizer-and-sample-data-modules.md` (D-215, 2026-11-20):
+**Amended by:** ADR-0233 `0233-org-optimizer-and-sample-data-modules.md` (D-215, 2026-11-20):
 Org Optimizer is a module, not a feature (note at the end).
 **Date:** 2026-10-14
 **Source:** owner decisions of 2026-10-14 (A to H, then the terms, the BarnCRM module names,
@@ -159,7 +159,7 @@ separate work, and BarnCRM Giving will depend on it.
 
 ## Amendment, 2026-11-20 (D-215, release 1.30): Org Optimizer is a module
 
-ADR-NEXT `NEXT-org-optimizer-and-sample-data-modules.md` takes Org Optimizer off the features
+ADR-0233 `0233-org-optimizer-and-sample-data-modules.md` takes Org Optimizer off the features
 list. Org Optimizer and Health Check ship in the optional BarnCRM Org Optimizer module, which
 installing turns on; there is no Org Optimizer switch and no Org Optimizer tab permission set.
 Module access follows the module's catalog row like every other module.

@@ -5,7 +5,7 @@
 2026-10-13): the count runs on demand in Org Optimizer. The batch, weekly schedule, tracked list,
 run stamps, 13-month retention and Health Check registration (decisions 5, 6 and 7, the tracked
 list in 3, the run stamps in 2) are replaced; decisions 1, 3 and 4 otherwise stand.
-**Amended by:** ADR-NEXT `NEXT-org-optimizer-and-sample-data-modules.md` (D-215, 2026-11-20):
+**Amended by:** ADR-0233 `0233-org-optimizer-and-sample-data-modules.md` (D-215, 2026-11-20):
 the count ships in the Org Optimizer module (note at the end).
 **Date:** 2026-10-12
 **Source:** plan Section 6.1 item 10 (Analytics module, field utilization first; Brandon,
@@ -84,7 +84,7 @@ Lightning session cannot call the org's own APIs without a self-callout (ADR-004
 
 ## Amendment, 2026-11-20 (D-215, release 1.30): the count ships in the Org Optimizer module
 
-ADR-NEXT `NEXT-org-optimizer-and-sample-data-modules.md` amends decision 1. The field
+ADR-0233 `0233-org-optimizer-and-sample-data-modules.md` amends decision 1. The field
 utilization count (`FieldUtilizationService`, `FieldUtilizationController`, the
 `fieldUtilization` component) ships in the optional Org Optimizer module with the rest of the
 page. `Field_Utilization_Snapshot__c` stays in Core. Decisions 3 and 4 stand.
