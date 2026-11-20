@@ -196,6 +196,15 @@
       "versionNumber": "1.21.0.NEXT",
       "postInstallScript": "MirrorPostInstall",
       "dependencies": [{ "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" }]
+    },
+    {
+      "path": "packages/migration",
+      "default": false,
+      "package": "BarnCRM Migration",
+      "versionName": "v1.21",
+      "versionNumber": "1.21.0.NEXT",
+      "postInstallScript": "MigrationPostInstall",
+      "dependencies": [{ "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" }]
     }
   ],
   "packageAliases": {}

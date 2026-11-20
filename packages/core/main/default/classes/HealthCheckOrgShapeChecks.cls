@@ -75,8 +75,9 @@ public with sharing class HealthCheckOrgShapeChecks {
 	 * Household Upkeep was switched on, and NPSP households came into use afterwards (NPSP
 	 * installed, or its Household Account model chosen). Turning Upkeep on is refused while
 	 * NPSP households are in use, but nothing re-checks later, so both packages would make
-	 * a household for the same person. A warning: the fix is to adopt the households or
-	 * change NPSP's Account Model, both done on the adoption panel's page (General).
+	 * a household for the same person. A warning: the fix is to adopt the households, on the
+	 * Migration Assistant tab while the Migration package is installed, or to turn Households
+	 * off on the General page, where the button goes without that package.
 	 */
 	private static HealthCheckService.Finding npspUpkeepOverlapFinding() {
 		if (
@@ -84,15 +85,28 @@ public with sharing class HealthCheckOrgShapeChecks {
 		) {
 			return null;
 		}
-		return new HealthCheckService.Finding(
-				'npsp_upkeep_overlap',
-				System.Label.Core_HealthCheck_NpspUpkeepOverlapTitle,
-				BarnHelp.text('Core', 'Core_HealthCheck_NpspUpkeepOverlapDetail'),
-				HealthCheckService.SEVERITY_WARNING,
-				HealthCheckService.CATEGORY_SETTINGS
-			)
-			.withFix(System.Label.Core_HealthCheck_NpspUpkeepOverlapFix, HealthCheckService.SECTION_GENERAL);
+		HealthCheckService.Finding finding = new HealthCheckService.Finding(
+			'npsp_upkeep_overlap',
+			System.Label.Core_HealthCheck_NpspUpkeepOverlapTitle,
+			BarnHelp.text('Core', 'Core_HealthCheck_NpspUpkeepOverlapDetail'),
+			HealthCheckService.SEVERITY_WARNING,
+			HealthCheckService.CATEGORY_SETTINGS
+		);
+		if (IntegrationAppService.migrationInstalled()) {
+			return finding.withFix(
+				System.Label.Core_HealthCheck_NpspUpkeepOverlapFix,
+				'/lightning/n/' + NamespaceUtil.qualify(MIGRATION_TAB)
+			);
+		}
+		return finding.withFix(
+			BarnHelp.text('Core', 'Core_HealthCheck_NpspUpkeepOverlapFixSettings'),
+			HealthCheckService.SECTION_GENERAL
+		);
 	}
+
+	/** The Migration package's tab, where Adopt NPSP Households is. */
+	@TestVisible
+	private static final String MIGRATION_TAB = 'Migration_Assistant';
 
 	/** How many households here are already the Nonprofit Cloud native ones. */
 	public class NativeHouseholdsCheck implements HealthCheckService.Check {

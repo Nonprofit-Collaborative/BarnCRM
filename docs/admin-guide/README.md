@@ -109,7 +109,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-30 Editions | [editions.md](editions.md) | Core |
 | C-24 Module Manager | [module-manager.md](module-manager.md) | Core |
 | Integrations roadmap page, detected apps and migration links (MIG-10) | [integrations.md](integrations.md) | Core |
-| MIG-01 Migration Assistant: kits from another app in the same org, ordered steps, verification, undo, retire checklist; adding a kit | [migration-assistant.md](migration-assistant.md) | Core, kits in modules |
+| MIG-01 Migration Assistant: the optional Migration package and its tab, kits from another app in the same org, ordered steps, verification, undo, retire checklist, uninstalling when done; adding a kit | [migration-assistant.md](migration-assistant.md) | BarnCRM Migration, kits in modules |
 | C-03 BarnCRM Settings console | [barncrm-settings.md](barncrm-settings.md) | Core |
 | Plan 6.1 item 9 Custom metadata (CMDT Manager) | [custom-metadata.md](custom-metadata.md) | Core |
 | C-06 Access | [access.md](access.md) | Core (the Fundraising Staff role comes with Fundraising) |
@@ -129,8 +129,8 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-02 Household names and greetings | [household-naming.md](household-naming.md) | Core |
 | C-09 Household merge and split | [household-merge-split.md](household-merge-split.md) | Core |
 | C-07 Coexistence mode | [coexistence-mode.md](coexistence-mode.md) | Core |
-| X-09 Nonprofit Cloud households, MIG-02b Household Model and conversion | [nonprofit-cloud-households.md](nonprofit-cloud-households.md) | Core (guards, Household Model, the conversion section) and Mirror (conversion source, kit, drift report), only in an org with Nonprofit Cloud |
-| X-05 Adopt NPSP households | [npsp-households.md](npsp-households.md) | Core, only in an org with NPSP |
+| X-09 Nonprofit Cloud households, MIG-02b Household Model and conversion | [nonprofit-cloud-households.md](nonprofit-cloud-households.md) | Core (guards, Household Model), BarnCRM Migration (the conversion section) and Mirror (conversion source, kit, drift report), only in an org with Nonprofit Cloud |
+| X-05 Adopt NPSP households | [npsp-households.md](npsp-households.md) | BarnCRM Migration (Core detects NPSP), only in an org with NPSP |
 | C-15 Relationships | [relationships.md](relationships.md) | Core |
 | C-16 Affiliations | [affiliations.md](affiliations.md) | Core |
 | C-17, C-18 Addresses and seasonal addresses | [addresses.md](addresses.md) | Core |

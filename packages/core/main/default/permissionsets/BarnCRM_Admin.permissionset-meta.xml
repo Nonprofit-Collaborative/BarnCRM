@@ -155,14 +155,6 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
-    <apexClass>MigrationController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>NpspHouseholdAdoptionController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
     <apexClass>OrgAutomationController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -529,16 +521,6 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Field_Utilization_Snapshot__c.Taken_At__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>true</editable>
-    <field>Import_Batch__c.Migration_Journal__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>true</editable>
-    <field>Import_Batch__c.Migration_Step__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -1439,11 +1421,6 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Merge_Journal__c.Kind__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>true</editable>
-    <field>Merge_Journal__c.Kit__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>

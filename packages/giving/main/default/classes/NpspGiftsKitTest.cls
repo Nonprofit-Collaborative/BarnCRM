@@ -5,7 +5,7 @@
  * method and its split; a soft credit's role and amount follow BarnCRM's. NPSP itself is not
  * needed: the kit holds its names as data.
  */
-@IsTest(testFor='ApexClass:NpspGiftsKit, ApexClass:MigrationKitService')
+@IsTest(testFor='ApexClass:NpspGiftsKit')
 private class NpspGiftsKitTest {
 	private static final Set<String> ADDED = new Set<String>{
 		'Donor',
@@ -32,7 +32,7 @@ private class NpspGiftsKitTest {
 	@IsTest
 	static void eachStepHasItsTemplateAndNamesOnlyWhatItReads() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Migration_Kit__mdt kit = MigrationKitService.kitNamed(NpspGiftsKit.KIT);
+			String kit = NpspGiftsKit.KIT;
 			ImportTemplateService.materializeDefaults();
 			Map<String, String> targetByStep = new Map<String, String>{
 				'appeals' => 'Appeal__c',
@@ -43,8 +43,8 @@ private class NpspGiftsKitTest {
 			List<String> keys = new List<String>(targetByStep.keySet());
 			keys.add('gifts');
 			for (String key : keys) {
-				MigrationKitService.Step step = MigrationKitService.stepNamed(kit, key);
-				Assert.areEqual(MigrationKitService.KIND_IMPORT, step.kind, key + ' loads');
+				MigrationKitSteps.Step step = MigrationKitSteps.step(kit, key);
+				Assert.areEqual('import', step.kind, key + ' loads');
 				Import_Template__c template = [
 					SELECT Column_Mapping_JSON__c, Target_Object__c
 					FROM Import_Template__c
@@ -216,11 +216,11 @@ private class NpspGiftsKitTest {
 			new List<String>{ TestUsers.CORE_ADMIN, 'Rollup_Builder_Admin', 'Giving_Admin', 'Salesforce_Records_Sync' }
 		)) {
 			NpspGiftsKit extension = new NpspGiftsKit();
-			List<Map<String, Object>> credits = extension.rows('contactCredits', new List<SObject>());
+			List<Map<String, Object>> credits = extension.rows('contactCredits', new List<Map<String, Object>>());
 			Assert.isTrue(credits.isEmpty(), 'no records, no staged credits');
 			for (String key : new List<String>{ 'gifts', 'accountCredits' }) {
 				try {
-					Assert.isNotNull(extension.rows(key, new List<SObject>()), key);
+					Assert.isNotNull(extension.rows(key, new List<Map<String, Object>>()), key);
 				} catch (Exception refused) {
 					Assert.isTrue(
 						refused.getMessage().contains('this org does not have'),
@@ -251,7 +251,7 @@ private class NpspGiftsKitTest {
 		Assert.areEqual('Soft Credit', ofAccount.get('CustomRole'), 'a blank role');
 		Assert.isFalse(ofAccount.containsKey('Amount'), 'an account credit keeps its amount');
 		NpspGiftsKit extension = new NpspGiftsKit();
-		Assert.isNull(extension.rows('appeals', new List<SObject>()), 'default rows');
+		Assert.isNull(extension.rows('appeals', new List<Map<String, Object>>()), 'default rows');
 		Assert.isNull(extension.verify('gifts'), 'counts are compared');
 	}
 }

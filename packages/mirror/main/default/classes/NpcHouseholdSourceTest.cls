@@ -18,8 +18,8 @@ private class NpcHouseholdSourceTest {
 			NpspHouseholdSource source = NpspHouseholdSource.forKey(NpspHouseholdSource.NPC);
 			Assert.isTrue(source instanceof NpcHouseholdSource, 'Core builds it by name');
 			Assert.areEqual(NpspHouseholdSource.NPC, source.key(), 'its key');
-			Migration_Kit__mdt kit = MigrationKitService.kitNamed('NPC_Households');
-			MigrationKitService.Step step = MigrationKitService.stepNamed(kit, 'households');
+			String kit = 'NPC_Households';
+			MigrationKitSteps.Step step = MigrationKitSteps.step(kit, 'households');
 			Assert.areEqual('tool', step.kind, 'one tool step');
 			Assert.isNull(new NpcHouseholdSource().rows('households', null), 'no rows to shape');
 		}

@@ -641,19 +641,6 @@ public with sharing class SettingsController {
 		return hiddenByFeature.contains(definition.DeveloperName);
 	}
 
-	/** The row that adopts NPSP households (X-05), shown only where NPSP applies (ADR-0062). */
-	@TestVisible
-	private static final String NPSP_ADOPTION_ROW = 'NPSP_Household_Adoption';
-
-	/** The row that converts Nonprofit Cloud households (MIG-02b), shown only where it applies. */
-	@TestVisible
-	private static final String NPC_CONVERSION_ROW = 'NPC_Household_Conversion';
-
-	private static Boolean isHiddenByProduct(Setting_Definition__mdt definition) {
-		return NPSP_ADOPTION_ROW.equals(definition.DeveloperName) && !NpspHouseholdAdoptionService.isOffered() ||
-			NPC_CONVERSION_ROW.equals(definition.DeveloperName) && !NpspHouseholdAdoptionService.isNpcOffered();
-	}
-
 	/** Rows that open Org Optimizer, for those who can open it (admin-14). */
 	@TestVisible
 	private static final Set<String> OPTIMIZER_LINK_ROWS = new Set<String>{
@@ -689,12 +676,7 @@ public with sharing class SettingsController {
 	}
 
 	private static SettingModel toSetting(Setting_Definition__mdt definition) {
-		if (
-			!isVisible(definition) ||
-			isHiddenByFeature(definition) ||
-			isHiddenByProduct(definition) ||
-			isHiddenByAccess(definition)
-		) {
+		if (!isVisible(definition) || isHiddenByFeature(definition) || isHiddenByAccess(definition)) {
 			return null;
 		}
 		Boolean isComponent = TYPE_COMPONENT.equalsIgnoreCase(definition.Data_Type__c);

@@ -198,6 +198,10 @@ funds, appeals, commitments, soft credits and tributes.
 
 ### The Nonprofit Cloud Relationships and Affiliations Kit
 
+Every kit below needs the optional BarnCRM Migration package, which runs it (see
+[Migration Assistant](migration-assistant.md#how-to-turn-it-on)); each kit is also listed, with
+**Start**, on its **Migration Assistant** tab.
+
 With BarnCRM Mirror installed in the same org, on **Integrations**, Nonprofit Cloud
 Fundraising, click **Start Migration: NPC Relationships and Affiliations**. The
 Migration Assistant ([Migration Assistant](migration-assistant.md)) runs two steps, each with a
@@ -265,8 +269,8 @@ if your org differs, a step reports the missing field by name and copies nothing
 
 With BarnCRM Mirror installed in the same org, on **Integrations**, Nonprofit Cloud
 Fundraising, click **Start Migration: NPC Households**. Its one step, **Convert Nonprofit Cloud
-Households**, opens BarnCRM Settings, **General**, where you preview, confirm the count, run
-and, if you need to, undo the conversion. Each Nonprofit Cloud household becomes a BarnCRM
+Households**, is done under **Households** on the Migration Assistant tab, where you preview,
+confirm the count, run and, if you need to, undo the conversion. Each Nonprofit Cloud household becomes a BarnCRM
 household on the same account, with its members when household membership is set to
 membership records; no Nonprofit Cloud record is changed. The step's check counts accounts with a
 Nonprofit Cloud household group (less any you mark to stay in Nonprofit Cloud) against those

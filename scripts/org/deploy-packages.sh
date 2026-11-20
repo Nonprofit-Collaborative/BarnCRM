@@ -985,6 +985,9 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # Mirror depends on Core only (N-09, ADR-0228); the gift mirrors are
   # Fundraising's (the giving package, deployed above).
   MODULES+=(mirror)
+  # Migration depends on Core only; kits ship in the packages that own their records and are
+  # found by name (ADR-NEXT migration package).
+  MODULES+=(migration)
   RECORD_PACKAGES+=("${MODULES[@]}")
   # MODULE APPS ON A CAPPED ORG (ADR-0223, module apps). A scratch or Developer Edition org refuses
   # a custom app past about 10 (barn-sales and oi-test, 2026-11-07), and the suite ships more. On
@@ -1069,7 +1072,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # modules add their tabs to the BarnCRM apps). Module tabs stay here even for a module with an
   # app of its own, which is how a capped org reaches the modules whose apps it does not get
   # (ADR-0223, module apps).
-  deployed_modules=(rollups giving mirror programs logicmodels funders forms contactpoints events portal corporatehub payments lwcbuilder scholarships territory memberships projects addressverification reporting)
+  deployed_modules=(rollups giving mirror programs logicmodels funders forms contactpoints events portal corporatehub payments lwcbuilder scholarships territory memberships projects addressverification reporting migration)
   volunteers_has_metadata && deployed_modules+=(volunteers)
   APP_TABS_DIR="$(mktemp -d)"
   python3 scripts/org/module-app-tabs.py --all "$APP_TABS_DIR" "${deployed_modules[@]}" || exit 1
@@ -1104,7 +1107,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     if volunteers_has_metadata; then
       SETUP_MODULES+=(Volunteers)
     fi
-    SETUP_MODULES+=(Programs LogicModels Funders Forms ContactPoints Events Portal CorporateHub Payments LwcBuilder Scholarships Territory Memberships Projects AddressVerification Reporting Mirror)
+    SETUP_MODULES+=(Programs LogicModels Funders Forms ContactPoints Events Portal CorporateHub Payments LwcBuilder Scholarships Territory Memberships Projects AddressVerification Reporting Mirror Migration)
     for module in "${SETUP_MODULES[@]}"; do
       echo ""
       echo "== Running the ${module} module's setup steps =="

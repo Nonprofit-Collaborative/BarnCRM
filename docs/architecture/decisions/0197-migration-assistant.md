@@ -1,6 +1,8 @@
 # ADR-0197: The Migration Assistant Runs In-Org Migration Kits on the Import Engine
 
 **Status:** Proposed
+**Amended by:** ADR-NEXT `NEXT-migration-package.md` (D-213, 2026-11-20): the Assistant moves into
+the optional Migration package; decision 1 and the tab alternative are amended (note at the end).
 **Date:** 2026-11-11
 **Source:** release 1.4 items MIG-01 (Migration Assistant framework), MIG-10 (Integrations page:
 detected apps, compatibility notes and migration links) and MIG-08 (rollup migration: DLRS and
@@ -119,3 +121,15 @@ reversible answer is needed now. Each decision below takes the review's recommen
   exception through the extension.
 - **A Migration Assistant tab.** Rejected for now: a tab needs its own tab permission set and
   app entries; the Integrations page is where a detected app is already shown. Easy to add.
+
+## Amendment, 2026-11-20 (D-213, S11, release 1.30): an optional Migration package
+
+ADR-NEXT `NEXT-migration-package.md` amends decision 1. The Assistant (`MigrationKitService`,
+`MigrationStageBatch`, `MigrationController`, `migrationAssistant`) and the fields only a run
+uses ship in the optional BarnCRM Migration package, which depends on Core only. Kits still ship
+in the module that owns their records, and `Migration_Kit__mdt`, `MigrationKitExtension` and
+`MigrationCheck` stay in Core, so the reason this ADR gave against a separate package (it would
+depend on every module) does not apply. `MigrationKitExtension.rows` receives the rows the
+Assistant read. The package has a Migration Assistant tab, its own permission set and catalog
+row; Start Migration on the Integrations page shows only while the package is installed and
+opens that tab at the kit.

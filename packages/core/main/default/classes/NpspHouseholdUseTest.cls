@@ -213,8 +213,11 @@ private class NpspHouseholdUseTest {
 
 			// NPSP arrives, with the Household Account model, after Upkeep was switched on.
 			useSource(new FakeSource(true, true));
+			IntegrationAppService.migrationInstalledOverride = false;
 			Test.startTest();
 			HealthCheckService.Finding finding = overlapFinding();
+			IntegrationAppService.migrationInstalledOverride = true;
+			HealthCheckService.Finding withMigration = overlapFinding();
 			Test.stopTest();
 
 			Assert.isNotNull(finding, 'Both packages would make households, so it is reported');
@@ -222,7 +225,12 @@ private class NpspHouseholdUseTest {
 			Assert.areEqual(
 				HealthCheckService.SECTION_GENERAL,
 				finding.fixTarget,
-				'It links to the General page, where the adoption panel is'
+				'Without the Migration package it links to the General page, to turn Households off'
+			);
+			Assert.areEqual(
+				'/lightning/n/' + NamespaceUtil.qualify(HealthCheckOrgShapeChecks.MIGRATION_TAB),
+				withMigration.fixTarget,
+				'With it, the Migration Assistant tab, where Adopt NPSP Households is'
 			);
 		}
 	}

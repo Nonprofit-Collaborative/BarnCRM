@@ -6,7 +6,7 @@
  * back, and Gift Soft Credits soft credits. A donor or recipient account is named by record Id:
  * a person account's contact, else the account as an organization. Nonprofit Cloud is read by
  * describe only, in the running user's access; its names are text here, and Mirror may name
- * standard objects as text (plan Section 4.2). Core builds this class by name (ADR-0017).
+ * standard objects as text (plan Section 4.2). The Assistant builds this class by name (ADR-0017).
  */
 @NamespaceAccessible
 public with sharing class NpcGiftsKit implements MigrationKitExtension {
@@ -20,14 +20,10 @@ public with sharing class NpcGiftsKit implements MigrationKitExtension {
 	}
 
 	@NamespaceAccessible
-	public List<Map<String, Object>> rows(String stepKey, List<SObject> records) {
+	public List<Map<String, Object>> rows(String stepKey, List<Map<String, Object>> rows) {
 		if (stepKey == 'appeals') {
 			return null;
 		}
-		List<Map<String, Object>> rows = new MigrationKitService.Source(
-				MigrationKitService.stepNamed(MigrationKitService.kitNamed(KIT), stepKey)
-			)
-			.rows(records);
 		return shape(stepKey, rows);
 	}
 

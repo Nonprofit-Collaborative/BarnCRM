@@ -154,6 +154,25 @@ public with sharing class OrgShapeDetector {
 		return cachedHasPersonAccounts;
 	}
 
+	/** Whether NPSP is installed, for other packages (see hasPersonAccounts). */
+	@NamespaceAccessible
+	public static Boolean hasNpsp() {
+		OrgShape shape = detect();
+		return shape != null && shape.hasNpsp == true;
+	}
+
+	/**
+	 * Makes detect() answer a shape with only hasNpsp set, from another package's test, where
+	 * `@TestVisible` does not reach. Does nothing outside a test.
+	 */
+	@NamespaceAccessible
+	public static void useNpspForTest(Boolean hasNpsp) {
+		if (Test.isRunningTest()) {
+			overrideShape = new OrgShape();
+			overrideShape.hasNpsp = hasNpsp == true;
+		}
+	}
+
 	/** Every Account record type that is a person type; empty, with no query, without them. */
 	@NamespaceAccessible
 	public static Set<Id> personAccountRecordTypeIds() {

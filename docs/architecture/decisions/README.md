@@ -240,6 +240,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0229](0229-provider-secrets-named-credentials.md) | Provider secrets in Named Credentials, and Stripe events fetched back from Stripe (amends ADR-0220, ADR-0201) | Accepted (owner decision) |
 | [0230](0230-feature-list-filled-at-install.md) | A blank feature list means no feature is on; post-install fills it (amends ADR-0124) | Accepted (owner decision) |
 | [0231](0231-advanced-reporting.md) | Advanced Reporting module: reports and dashboards stored as Files, user-mode queries, no custom objects | Accepted (owner decision) |
+| [NEXT](NEXT-migration-package.md) | An optional Migration package holds the Migration Assistant and household adoption (amends ADR-0197, ADR-0155) | Proposed |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

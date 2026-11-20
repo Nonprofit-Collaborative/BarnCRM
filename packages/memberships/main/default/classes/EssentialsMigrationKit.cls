@@ -4,8 +4,8 @@
  * keeps a membership product's term as a number and a unit, and a membership's state in its own
  * formulas, so this class works out the two columns the templates map that no one field holds:
  * `Months` for a level and `Ends` and `Status` for a membership. Essentials is read by describe
- * only: its field names are text here. Core builds this class by name, so it and its constructor
- * are namespace-accessible (ADR-0017).
+ * only: its field names are text here. The Assistant builds this class by name, so it and its
+ * constructor are namespace-accessible (ADR-0017).
  */
 @NamespaceAccessible
 public with sharing class EssentialsMigrationKit implements MigrationKitExtension {
@@ -23,14 +23,10 @@ public with sharing class EssentialsMigrationKit implements MigrationKitExtensio
 	}
 
 	@NamespaceAccessible
-	public List<Map<String, Object>> rows(String stepKey, List<SObject> records) {
+	public List<Map<String, Object>> rows(String stepKey, List<Map<String, Object>> rows) {
 		if (stepKey != LEVELS && stepKey != TERMS) {
 			return null;
 		}
-		MigrationKitService.Source source = new MigrationKitService.Source(
-			MigrationKitService.stepNamed(MigrationKitService.kitNamed(KIT), stepKey)
-		);
-		List<Map<String, Object>> rows = source.rows(records);
 		shapeRows(stepKey, rows, MembershipService.today());
 		return rows;
 	}

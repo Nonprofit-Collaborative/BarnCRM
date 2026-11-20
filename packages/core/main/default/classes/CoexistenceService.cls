@@ -9,6 +9,7 @@
 @NamespaceAccessible
 public with sharing class CoexistenceService {
 	public static final String MODE_STANDALONE = 'Standalone';
+	@NamespaceAccessible
 	public static final String MODE_NPSP = 'NPSP';
 	public static final String MODE_NONPROFIT_CLOUD = 'NonprofitCloud';
 
@@ -23,6 +24,7 @@ public with sharing class CoexistenceService {
 	/**
 	 * The mode this org is running in, or null when nobody has confirmed one yet.
 	 */
+	@NamespaceAccessible
 	public static String getCurrentMode() {
 		BarnCRM_Settings__c settings = SettingsService.getSettings();
 		String mode = settings == null ? null : settings.Coexistence_Mode__c;

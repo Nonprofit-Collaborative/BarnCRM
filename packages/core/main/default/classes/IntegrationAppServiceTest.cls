@@ -273,4 +273,33 @@ private class IntegrationAppServiceTest {
 			Assert.isFalse(apps.get('Missing').installed, 'One it does not have is not');
 		}
 	}
+
+	@IsTest
+	static void kitsAreOfferedOnlyWhileTheMigrationPackageIsInstalled() {
+		System.runAs(TestUsers.admin()) {
+			// Any shipped kit's product, detected; with no kit installed here, nothing is offered.
+			List<Migration_Kit__mdt> kits = [
+				SELECT DeveloperName, Source_App__c
+				FROM Migration_Kit__mdt
+				WHERE Source_App__c != NULL
+				ORDER BY Sort_Order__c, DeveloperName
+				LIMIT 1
+			];
+			String app = kits.isEmpty() ? 'No_Kit_App' : kits[0].Source_App__c;
+			IntegrationAppService.catalogOverride = new List<Integration_App__mdt>{
+				product(app, 'Alternative', 'Account', 1)
+			};
+			IntegrationAppService.objectNamesOverride = new Set<String>{ 'account' };
+
+			IntegrationAppService.migrationInstalledOverride = false;
+			Assert.isTrue(listed().get(app).migrationKits.isEmpty(), 'No Migration package, no kit button');
+
+			IntegrationAppService.migrationInstalledOverride = true;
+			List<IntegrationAppService.KitRef> offered = listed().get(app).migrationKits;
+			Assert.areEqual(kits.isEmpty() ? 0 : 1, Math.min(offered.size(), 1), 'Its kits are offered');
+			if (!kits.isEmpty()) {
+				Assert.areEqual(kits[0].DeveloperName, offered[0].key, 'In Sort Order, by key');
+			}
+		}
+	}
 }

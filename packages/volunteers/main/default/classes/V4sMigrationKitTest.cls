@@ -16,16 +16,14 @@ private class V4sMigrationKitTest {
 	@IsTest
 	static void eachStepHasItsTemplateAndLinksBackwards() {
 		System.runAs(TestUsers.adminWith('Volunteers_Admin')) {
-			Migration_Kit__mdt kit = MigrationKitService.kitNamed(V4sMigrationKit.KIT);
+			String kit = V4sMigrationKit.KIT;
 			ImportTemplateService.materializeDefaults();
 			Set<String> earlier = new Set<String>();
 			for (String key : STEPS) {
-				MigrationKitService.Step step = MigrationKitService.stepNamed(kit, key);
-				Assert.areEqual(MigrationKitService.KIND_IMPORT, step.kind, key + ' loads');
+				MigrationKitSteps.Step step = MigrationKitSteps.step(kit, key);
+				Assert.areEqual('import', step.kind, key + ' loads');
 				for (
-					MigrationKitService.Link link : step.links == null
-						? new List<MigrationKitService.Link>()
-						: step.links
+					MigrationKitSteps.Link link : step.links == null ? new List<MigrationKitSteps.Link>() : step.links
 				) {
 					Assert.isTrue(earlier.contains(link.step), key + ' links an earlier step');
 					Assert.isTrue(step.fields.contains(link.column), key + ' reads the column');
@@ -75,7 +73,10 @@ private class V4sMigrationKitTest {
 	static void theShiftsStepIsRefusedWithoutV4sAndLongShiftsRoundToMinutes() {
 		System.runAs(TestUsers.adminWith('Volunteers_Admin')) {
 			try {
-				Assert.isNotNull(new V4sMigrationKit().rows(V4sMigrationKit.SHIFTS, new List<SObject>()), 'staged');
+				Assert.isNotNull(
+					new V4sMigrationKit().rows(V4sMigrationKit.SHIFTS, new List<Map<String, Object>>()),
+					'staged'
+				);
 			} catch (Exception refused) {
 				Assert.isTrue(
 					refused.getMessage().contains('this org does not have'),
@@ -123,7 +124,7 @@ private class V4sMigrationKitTest {
 	static void otherStepsKeepTheDefaultRowsAndTheKitHasNoCheckOfItsOwn() {
 		// runs-as: deploying user (returns before any record or permission is read)
 		V4sMigrationKit extension = new V4sMigrationKit();
-		Assert.isNull(extension.rows('jobs', new List<SObject>()), 'default rows');
+		Assert.isNull(extension.rows('jobs', new List<Map<String, Object>>()), 'default rows');
 		Assert.isNull(extension.verify('hours'), 'counts are compared');
 	}
 }

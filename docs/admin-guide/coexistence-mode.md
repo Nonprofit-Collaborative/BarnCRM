@@ -106,7 +106,8 @@ mode.
 
 **Expecting NPSP coexistence to take over your NPSP households.** Choosing the mode does not.
 Adopting them is its own step, with a preview and an undo: **Adopt NPSP Households** on the
-**General** page ([Adopting Your NPSP Households](npsp-households.md)). Switching between NPSP
+**Migration Assistant** tab of the optional BarnCRM Migration package ([Adopting Your NPSP
+Households](npsp-households.md)). Switching between NPSP
 coexistence and Standalone changes nothing about households either way.
 
 **Turning on Households while NPSP still makes households.** BarnCRM does not allow it,

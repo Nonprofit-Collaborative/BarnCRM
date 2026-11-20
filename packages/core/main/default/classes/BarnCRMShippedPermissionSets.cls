@@ -59,6 +59,7 @@ public with sharing class BarnCRMShippedPermissionSets {
 		'Memberships_Admin',
 		'Memberships_Read_Only',
 		'Memberships_Staff',
+		'Migration_Admin',
 		'Payments_Admin',
 		'Payments_Read_Only',
 		'Payments_Staff',

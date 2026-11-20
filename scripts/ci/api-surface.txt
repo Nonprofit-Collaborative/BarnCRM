@@ -117,6 +117,8 @@ core/CheckAutomationAction.cls | global class Request
 core/CheckAutomationAction.cls | global class Result
 core/CheckAutomationAction.cls | global static List<Result> check(List<Request>)
 core/CoexistenceService.cls | public class CoexistenceService
+core/CoexistenceService.cls | public static String getCurrentMode()
+core/CoexistenceService.cls | public static final String MODE_NPSP
 core/CoexistenceService.cls | public static void applyMode(String)
 core/CreatePersonAction.cls | global String email
 core/CreatePersonAction.cls | global String errorMessage
@@ -497,6 +499,8 @@ core/HouseholdService.cls | public static void seedMissingPrimaryContacts(Map<Id
 core/HouseholdService.cls | public static void seedPrimaryContactsOfNewHouseholds(List<Contact>)
 core/HouseholdService.cls | public static void settlePrimaryContacts(Set<Id>)
 core/HouseholdService.cls | public static void suspendAutomaticCreation()
+core/HouseholdWriter.cls | public class HouseholdWriter
+core/HouseholdWriter.cls | public static Map<Id,String> saveAdoptionChanges(List<Account>)
 core/ImportBatchSelector.cls | public class ImportBatchSelector
 core/ImportBatchSelector.cls | public static Decimal selectLastRowNumber(Id)
 core/ImportBatchSelector.cls | public static Decimal selectRowNumberAt(Id,Integer)
@@ -782,6 +786,8 @@ core/ImportProcessorBatch.cls | public ImportProcessorBatch(Id,Boolean)
 core/ImportProcessorBatch.cls | public class ImportProcessorBatch
 core/ImportProcessorBatch.cls | public void execute(Database.BatchableContext,List<Import_Row__c>)
 core/ImportProcessorBatch.cls | public void finish(Database.BatchableContext)
+core/ImportRowFilter.cls | public class ImportRowFilter
+core/ImportRowFilter.cls | public static String digestOfValues(List<String>)
 core/ImportRowProcessor.cls | public Decimal fileAmount
 core/ImportRowProcessor.cls | public Integer cleared
 core/ImportRowProcessor.cls | public Integer created
@@ -895,6 +901,9 @@ core/ImportValues.cls | public static Integer rowNumber(Import_Row__c)
 core/ImportValues.cls | public static List<List<String>> slices(Set<String>,Integer)
 core/ImportValues.cls | public static String digest(String,String)
 core/ImportValues.cls | public static final Integer KEYS_PER_QUERY
+core/IntegrationAppService.cls | public class IntegrationAppService
+core/IntegrationAppService.cls | public static Set<String> detectedKeys()
+core/IntegrationAppService.cls | public static void useCatalogForTest(List<Integration_App__mdt>,Set<String>)
 core/JobNotifier.cls | public Id recipientId
 core/JobNotifier.cls | public Id targetId
 core/JobNotifier.cls | public String section
@@ -919,22 +928,6 @@ core/MigrationCheck.cls | public Integer source
 core/MigrationCheck.cls | public MigrationCheck(Integer,Integer)
 core/MigrationCheck.cls | public class MigrationCheck
 core/MigrationKitExtension.cls | public interface MigrationKitExtension
-core/MigrationKitService.cls | public List<Link> links
-core/MigrationKitService.cls | public List<Map<String,Object>> rows(List<SObject>)
-core/MigrationKitService.cls | public List<String> fields
-core/MigrationKitService.cls | public Source(Step)
-core/MigrationKitService.cls | public String column
-core/MigrationKitService.cls | public String key
-core/MigrationKitService.cls | public String kind
-core/MigrationKitService.cls | public String step
-core/MigrationKitService.cls | public String templateKey
-core/MigrationKitService.cls | public class Link
-core/MigrationKitService.cls | public class MigrationKitService
-core/MigrationKitService.cls | public class Source
-core/MigrationKitService.cls | public class Step
-core/MigrationKitService.cls | public static Migration_Kit__mdt kitNamed(String)
-core/MigrationKitService.cls | public static Step stepNamed(Migration_Kit__mdt,String)
-core/MigrationKitService.cls | public static final String KIND_IMPORT
 core/ModuleAccessStep.cls | public interface ModuleAccessStep
 core/ModuleAccessSyncs.cls | public Job(String,Id)
 core/ModuleAccessSyncs.cls | public class Job
@@ -1039,6 +1032,7 @@ core/NpspHouseholdSource.cls | public static NpspHouseholdSource forKey(String)
 core/NpspHouseholdSource.cls | public static String keyOfRun(String)
 core/NpspHouseholdSource.cls | public static final String NPC
 core/NpspHouseholdSource.cls | public static final String NPSP
+core/NpspHouseholdSource.cls | public static void useForTest(String,NpspHouseholdSource)
 core/NpspHouseholdSource.cls | public virtual Boolean available()
 core/NpspHouseholdSource.cls | public virtual Boolean createsHouseholds()
 core/NpspHouseholdSource.cls | public virtual Boolean unadoptedHouseholdsExist()
@@ -1059,9 +1053,11 @@ core/OrgSettingsSystemWriter.cls | public static void save(Map<Schema.SObjectFie
 core/OrgSettingsSystemWriter.cls | public static void save(Schema.SObjectType,Map<Schema.SObjectField,Object>)
 core/OrgSettingsSystemWriter.cls | public static void saveOver(Schema.SObjectType,SObject,Map<Schema.SObjectField,Object>)
 core/OrgShapeDetector.cls | public class OrgShapeDetector
+core/OrgShapeDetector.cls | public static Boolean hasNpsp()
 core/OrgShapeDetector.cls | public static Boolean hasPersonAccounts()
 core/OrgShapeDetector.cls | public static Id creatablePersonRecordTypeId()
 core/OrgShapeDetector.cls | public static Set<Id> personAccountRecordTypeIds()
+core/OrgShapeDetector.cls | public static void useNpspForTest(Boolean)
 core/OrganizationAddress.cls | public class OrganizationAddress
 core/OrganizationAddress.cls | public static List<String> lines()
 core/OrganizationAddress.cls | public static List<String> lines(BarnCRM_Settings__c)
@@ -1590,15 +1586,15 @@ giving/InboundGiftResult.cls | global String outcome
 giving/InboundGiftResult.cls | global class InboundGiftResult
 giving/InstallmentTriggerHandler.cls | public InstallmentTriggerHandler()
 giving/InstallmentTriggerHandler.cls | public class InstallmentTriggerHandler
-giving/NpcGiftsKit.cls | public List<Map<String,Object>> rows(String,List<SObject>)
+giving/NpcGiftsKit.cls | public List<Map<String,Object>> rows(String,List<Map<String,Object>>)
 giving/NpcGiftsKit.cls | public MigrationCheck verify(String)
 giving/NpcGiftsKit.cls | public NpcGiftsKit()
 giving/NpcGiftsKit.cls | public class NpcGiftsKit
-giving/NpspGiftsKit.cls | public List<Map<String,Object>> rows(String,List<SObject>)
+giving/NpspGiftsKit.cls | public List<Map<String,Object>> rows(String,List<Map<String,Object>>)
 giving/NpspGiftsKit.cls | public MigrationCheck verify(String)
 giving/NpspGiftsKit.cls | public NpspGiftsKit()
 giving/NpspGiftsKit.cls | public class NpspGiftsKit
-giving/NpspGivingKit.cls | public List<Map<String,Object>> rows(String,List<SObject>)
+giving/NpspGivingKit.cls | public List<Map<String,Object>> rows(String,List<Map<String,Object>>)
 giving/NpspGivingKit.cls | public MigrationCheck verify(String)
 giving/NpspGivingKit.cls | public NpspGivingKit()
 giving/NpspGivingKit.cls | public class NpspGivingKit
@@ -1629,7 +1625,7 @@ logicmodels/LogicModelsWhereUsedExtension.cls | public class LogicModelsWhereUse
 lwcbuilder/LwcBuilderPostInstall.cls | public LwcBuilderPostInstall()
 lwcbuilder/LwcBuilderPostInstall.cls | public class LwcBuilderPostInstall
 memberships/EssentialsMigrationKit.cls | public EssentialsMigrationKit()
-memberships/EssentialsMigrationKit.cls | public List<Map<String,Object>> rows(String,List<SObject>)
+memberships/EssentialsMigrationKit.cls | public List<Map<String,Object>> rows(String,List<Map<String,Object>>)
 memberships/EssentialsMigrationKit.cls | public MigrationCheck verify(String)
 memberships/EssentialsMigrationKit.cls | public class EssentialsMigrationKit
 memberships/MembershipPaymentListener.cls | public MembershipPaymentListener()
@@ -1644,6 +1640,8 @@ memberships/MembershipsPortalExtension.cls | public MembershipsPortalExtension()
 memberships/MembershipsPortalExtension.cls | public class MembershipsPortalExtension
 memberships/MembershipsPostInstall.cls | public MembershipsPostInstall()
 memberships/MembershipsPostInstall.cls | public class MembershipsPostInstall
+migration/MigrationPostInstall.cls | public MigrationPostInstall()
+migration/MigrationPostInstall.cls | public class MigrationPostInstall
 mirror/CaseProviderRequestAction.cls | global class CaseProviderRequestAction
 mirror/CaseProviderRequestAction.cls | global static void send(List<Id>)
 mirror/MirrorHealthCheckExtension.cls | public MirrorHealthCheckExtension()
@@ -1653,14 +1651,14 @@ mirror/MirrorNightlyJobProvider.cls | public class MirrorNightlyJobProvider
 mirror/MirrorPostInstall.cls | public MirrorPostInstall()
 mirror/MirrorPostInstall.cls | public class MirrorPostInstall
 mirror/NpcHouseholdSource.cls | public Integer count
-mirror/NpcHouseholdSource.cls | public List<Map<String,Object>> rows(String,List<SObject>)
+mirror/NpcHouseholdSource.cls | public List<Map<String,Object>> rows(String,List<Map<String,Object>>)
 mirror/NpcHouseholdSource.cls | public List<String> names
 mirror/NpcHouseholdSource.cls | public MigrationCheck verify(String)
 mirror/NpcHouseholdSource.cls | public NpcHouseholdSource()
 mirror/NpcHouseholdSource.cls | public class Drift
 mirror/NpcHouseholdSource.cls | public class NpcHouseholdSource
 mirror/NpcHouseholdSource.cls | public static Drift drift(Integer)
-mirror/NpcRelationsKit.cls | public List<Map<String,Object>> rows(String,List<SObject>)
+mirror/NpcRelationsKit.cls | public List<Map<String,Object>> rows(String,List<Map<String,Object>>)
 mirror/NpcRelationsKit.cls | public MigrationCheck verify(String)
 mirror/NpcRelationsKit.cls | public NpcRelationsKit()
 mirror/NpcRelationsKit.cls | public class NpcRelationsKit
@@ -1828,7 +1826,7 @@ rollups/RollupsWhereUsedExtension.cls | public RollupsWhereUsedExtension()
 rollups/RollupsWhereUsedExtension.cls | public class RollupsWhereUsedExtension
 scholarships/AwardPaymentRulesHandler.cls | public AwardPaymentRulesHandler()
 scholarships/AwardPaymentRulesHandler.cls | public class AwardPaymentRulesHandler
-scholarships/OutboundFundsKit.cls | public List<Map<String,Object>> rows(String,List<SObject>)
+scholarships/OutboundFundsKit.cls | public List<Map<String,Object>> rows(String,List<Map<String,Object>>)
 scholarships/OutboundFundsKit.cls | public MigrationCheck verify(String)
 scholarships/OutboundFundsKit.cls | public OutboundFundsKit()
 scholarships/OutboundFundsKit.cls | public class OutboundFundsKit
@@ -1846,7 +1844,7 @@ territory/TerritoryPostInstall.cls | public TerritoryPostInstall()
 territory/TerritoryPostInstall.cls | public class TerritoryPostInstall
 volunteers/ShiftScheduleTriggerHandler.cls | public ShiftScheduleTriggerHandler()
 volunteers/ShiftScheduleTriggerHandler.cls | public class ShiftScheduleTriggerHandler
-volunteers/V4sMigrationKit.cls | public List<Map<String,Object>> rows(String,List<SObject>)
+volunteers/V4sMigrationKit.cls | public List<Map<String,Object>> rows(String,List<Map<String,Object>>)
 volunteers/V4sMigrationKit.cls | public MigrationCheck verify(String)
 volunteers/V4sMigrationKit.cls | public V4sMigrationKit()
 volunteers/V4sMigrationKit.cls | public class V4sMigrationKit

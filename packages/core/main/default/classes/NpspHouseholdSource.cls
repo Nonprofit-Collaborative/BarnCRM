@@ -51,6 +51,22 @@ public with sharing virtual class NpspHouseholdSource {
 		return runId != null && runId.startsWith(NPC + '-') ? NPC : NPSP;
 	}
 
+	/**
+	 * Sets the source of that key from another package's test (the Migration package's
+	 * adoption tests), where `@TestVisible` does not reach. Does nothing outside a test.
+	 */
+	@NamespaceAccessible
+	public static void useForTest(String key, NpspHouseholdSource source) {
+		if (!Test.isRunningTest()) {
+			return;
+		}
+		if (key == NPC) {
+			npcInstance = source;
+		} else {
+			instance = source;
+		}
+	}
+
 	/** This source's key. */
 	@NamespaceAccessible
 	public virtual String key() {

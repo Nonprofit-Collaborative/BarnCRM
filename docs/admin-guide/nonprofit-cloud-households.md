@@ -1,7 +1,7 @@
 # Households You Already Have in Nonprofit Cloud
 
 **Feature:** X-09 Nonprofit Cloud household guards; MIG-02b Household Model and conversion (D-196)
-**Package:** Core (guards, Household Model, the conversion section); Mirror (the conversion's source, its Migration Assistant kit and the drift report)
+**Package:** Core (guards, Household Model); BarnCRM Migration (the conversion section and its undo); Mirror (the conversion's source, its Migration Assistant kit and the drift report)
 **Iteration:** release 1.20 (conversion); guards since v0.4
 
 This page applies only to an org with Salesforce Nonprofit Cloud. In any other org, BarnCRM
@@ -58,14 +58,16 @@ group disagree, so you can settle each one. It changes nothing for you.
 ## How to Turn It On
 
 There is nothing to turn on. The guards and the Household Model field work in every org. The
-**Convert Nonprofit Cloud Households** section appears on the **General** page of BarnCRM
-Settings when BarnCRM Mirror is installed and your org has Nonprofit Cloud's household objects,
-or when households were converted before (so an undo is never hidden). It is also a step of the
-**NPC Households** kit in the Migration Assistant (see [Migration Assistant](migration-assistant.md)).
+**Convert Nonprofit Cloud Households** section appears under **Households** on the **Migration
+Assistant** tab when the optional BarnCRM Migration package and BarnCRM Mirror are installed and
+your org has Nonprofit Cloud's household objects, or when households were converted before (so
+an undo is never hidden). It is also the step of the **NPC Households** kit (see
+[Migration Assistant](migration-assistant.md)). Keep BarnCRM Migration installed for as long as
+you may want to undo a conversion.
 
 Before you convert:
 
-1. **Choose household membership** (BarnCRM Settings, **General**). Membership records
+1. **Choose household membership** (BarnCRM Settings, **People and Households**). Membership records
    (Junction) is the usual choice for Nonprofit Cloud, where people can belong to more than one
    account and are often person accounts; members are added only in that mode.
 2. **Turn off Nonprofit Cloud's automatic household naming** if your org has it, so the two do
@@ -105,12 +107,11 @@ a Nonprofit Cloud household: naming, greetings, addresses and memberships work a
 Maria has installed BarnCRM into an org that has been running Nonprofit Cloud for two years.
 Her colleagues have grouped 1,240 families there.
 
-1. Maria opens the **BarnCRM Admin** app, clicks the **BarnCRM Settings** tab, and chooses
-   **General** in the left navigation. Household membership is already set to membership
-   records.
+1. Maria installs BarnCRM Migration, opens the **BarnCRM Admin** app and clicks the
+   **Migration Assistant** tab. Household membership is already set to membership records.
 2. Two families should stay in Nonprofit Cloud for now. She opens each account and sets
    **Household Model** to **Nonprofit Cloud**.
-3. In **Convert Nonprofit Cloud Households** she reads "1,238 Nonprofit Cloud households can be
+3. Under **Households**, in **Convert Nonprofit Cloud Households**, she reads "1,238 Nonprofit Cloud households can be
    converted" and the first ten, with each household's primary member and how many members it
    has. She leaves **Keep Nonprofit Cloud's household names** checked.
 4. She clicks **Convert Households**, types **1238** and clicks **Convert**. The section says it
@@ -119,8 +120,8 @@ Her colleagues have grouped 1,240 families there.
    it is a BarnCRM household with Sam Lee as its primary member and greetings filled in, and
    Household Model reads Converted.
 6. She opens **Health** and sees no **Household Model Disagrees With Nonprofit Cloud** warning.
-7. In the Migration Assistant she marks the **NPC Households** step done and ticks the retire
-   checklist.
+7. On the same tab she starts the **NPC Households** kit, marks its step done and ticks the
+   retire checklist.
 
 Total time: about five minutes, plus the conversion's own run.
 

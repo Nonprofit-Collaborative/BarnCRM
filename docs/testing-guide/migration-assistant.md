@@ -4,8 +4,8 @@ Scripts for the Integrations page's detected apps and migration links and for th
 Assistant. Setup detail: [Migration Assistant](../admin-guide/migration-assistant.md) and
 [Integrations](../admin-guide/integrations.md).
 
-Before you start: an org from [Before you test](before-you-test.md) with Core and BarnCRM Rollup
-Builder deployed. T-MIG-02 to T-MIG-05 need DLRS installed (free, from the AppExchange listing
+Before you start: an org from [Before you test](before-you-test.md) with Core, BarnCRM Rollup
+Builder and BarnCRM Migration deployed. T-MIG-02 to T-MIG-05 need DLRS installed (free, from the AppExchange listing
 "Declarative Lookup Rollup Summaries Tool") with the **Test child count** rollup of
 [T-RB-33](rollup-builder.md#t-rb-33-turning-on-a-rollup-that-dlrs-also-fills-asks-first-and-the-answer-is-recorded)
 active and its BarnCRM copy not yet made. T-MIG-06 needs an org with NPSP.
@@ -31,10 +31,10 @@ active and its BarnCRM copy not yet made. T-MIG-06 needs an org with NPSP.
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, **Integrations**. | **DLRS (Declarative Lookup Rollup Summaries)** shows **Installed in this org** and **Start Migration**. |
-| 2 | Click **Start Migration**. | The list is replaced by **DLRS Rollups** with **Back to Integrations**, its description, one step **Copy DLRS Rollups** (**Not Started**) with **Open Rollup Builder** and **Mark Done**, and **Retire the Old App** with its items, not yet tickable. |
+| 2 | Click **Start Migration**. | The **Migration Assistant** tab opens on **DLRS Rollups** with **Back to Migration Kits**, its description, one step **Copy DLRS Rollups** (**Not Started**) with **Open Rollup Builder** and **Mark Done**, and **Retire the Old App** with its items, not yet tickable. |
 | 3 | Under the step, read **Verification**. | **In the other app now** is the number of active DLRS rollups (at least 1); **Done** is 0; **Check this step**. |
-| 4 | Click **Back to Integrations**. | The list returns. |
-| 5 | Log in as the staff user and open **Integrations**. | DLRS is listed without **Start Migration**. |
+| 4 | Click **Back to Migration Kits**, then reload the page. | The kit list stays, with **DLRS Rollups** and **Start**; the address no longer names the kit. |
+| 5 | Log in as the staff user and open **Integrations**. | DLRS is listed without **Start Migration**. The app has no **Migration Assistant** tab. |
 
 **Cleanup:** None.
 
@@ -47,7 +47,7 @@ active and its BarnCRM copy not yet made. T-MIG-06 needs an org with NPSP.
 |---|---|---|
 | 1 | In the Assistant, click **Open Rollup Builder**. | The **Rollup Builder** tab opens. |
 | 2 | Click **Import From DLRS** and copy, compare and turn on **Test child count** as in [T-RB-35](rollup-builder.md). | The copy is on. |
-| 3 | Return to **BarnCRM Settings**, **Integrations**, **Start Migration** on DLRS. | The same run opens. **Verification**: **Done** equals **In the other app now** for the copied rollups; **Verified** when every active DLRS rollup has a copy that is on. |
+| 3 | Open the **Migration Assistant** tab and click **Start** on **DLRS Rollups**. | The same run opens. **Verification**: **Done** equals **In the other app now** for the copied rollups; **Verified** when every active DLRS rollup has a copy that is on. |
 | 4 | Click **Mark Done**. | The step reads **Done**; **Mark Not Done** replaces it. **Retire the Old App** items can now be ticked. |
 | 5 | Click **Mark Not Done**, then **Mark Done** again. | The step goes back to **Not Started**, then **Done**. |
 
@@ -99,9 +99,9 @@ active and its BarnCRM copy not yet made. T-MIG-06 needs an org with NPSP.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On **Integrations**, click **Start Migration: NPSP People and Addresses**. | Four steps: **Adopt NPSP Households** (Not Started, with **Open BarnCRM Settings**), then **Relationships**, **Affiliations** and **Household Addresses**, each Waiting. |
+| 1 | On **Integrations**, click **Start Migration: NPSP People and Addresses**. | Four steps: **Adopt NPSP Households** (Not Started, with **Mark Done** and its help saying to adopt under **Households** on this tab), then **Relationships**, **Affiliations** and **Household Addresses**, each Waiting. |
 | 2 | Click **Start** on **Relationships**. | Refused: "Finish the steps above this one first." |
-| 3 | Adopt the households ([T-HH-21](people-and-households.md#t-hh-21-adopt-npsp-households)). Come back and click **Mark Done** on the first step. | **Relationships** shows **Start**. |
+| 3 | Click **Back to Migration Kits** and adopt the households under **Households** ([T-HH-21](people-and-households.md#t-hh-21-adopt-npsp-households)). Start the kit again and click **Mark Done** on the first step. | **Relationships** shows **Start**. |
 | 4 | Click **Start** on **Relationships**, then **Refresh** until **Ready to Review**. Click **Show Results**. | The preview creates 1 relationship (not 2): NPSP's own other side is not read. |
 | 5 | Click **Load** and confirm. **Refresh**. | **Done** and **Verified** (1 in the other app now, 1 read, 1 loaded, 0 rejected). Ana's record shows Ben as **Spouse**, and Ben's shows Ana as **Spouse**, made by BarnCRM. |
 | 6 | Run **Affiliations** and **Household Addresses** the same way. | Each **Verified**. Ana's affiliation to **Test Org** is primary. The household has a **Seasonal** address with the NPSP months and days, and both street lines. |
@@ -162,14 +162,31 @@ active and its BarnCRM copy not yet made. T-MIG-06 needs an org with NPSP.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **General**. | **Convert Nonprofit Cloud Households** is shown. "2 Nonprofit Cloud households can be converted"; the sample lists Lee Household and Cho Household with primary member and member count, and no greeting columns. Park Household is not listed. |
-| 2 | On **Integrations**, Nonprofit Cloud Fundraising, click **Start Migration: NPC Households**. | One tool step, **Convert Nonprofit Cloud Households**, opening BarnCRM Settings. |
+| 1 | Open the **Migration Assistant** tab. | Under **Households**, **Convert Nonprofit Cloud Households** is shown. "2 Nonprofit Cloud households can be converted"; the sample lists Lee Household and Cho Household with primary member and member count, and no greeting columns. Park Household is not listed. |
+| 2 | On **Integrations**, Nonprofit Cloud Fundraising, click **Start Migration: NPC Households**. | One tool step, **Convert Nonprofit Cloud Households**, with **Mark Done** and its help saying to convert under **Households** on this tab. Click **Back to Migration Kits**. |
 | 3 | Leave **Keep Nonprofit Cloud's household names** checked, click **Convert Households**, type **2** and click **Convert**. | Started; the section updates by itself. **Last conversion**: 2 converted. |
 | 4 | Open Lee Household. | Record type Household, Household Model **Converted**, name unchanged, Custom Name checked, greetings filled. Household members: Sam (primary, Head, start 2020-01-01) and Kim (Child). Bo is not a member. |
 | 5 | Open Lee Household's Party Relationship Group and account contact relations. | Unchanged: same rows, same values, same last modified dates. |
 | 6 | Run step 1 again. | "Every Nonprofit Cloud household you can see is already a BarnCRM household or marked to stay in Nonprofit Cloud." |
 | 7 | Open **Health**. | No **Household Model Disagrees With Nonprofit Cloud** warning. Then set Cho Household's Household Model to **Automatic** and refresh: the warning names Cho Household. Set it back to **Converted**. |
 | 8 | Add a household member to Cho Household by hand, then click **Undo This Conversion**, type **2** and confirm. | **Last conversion**: 1 undone, 1 not put back. Lee Household has its old record type, its earlier Household Model (blank or **Automatic**), and no BarnCRM members; Cho Household is still a Household and a Warning entry in the Error Log says `Not put back, 1 households:` with the reason that it has other members (its Admin Journal record, Kind **Household Adoption**, holds the same text in Notes). No Nonprofit Cloud record changed. |
-| 9 | As a staff user without **Manage BarnCRM Settings**, open BarnCRM Settings, **General**. | **Convert Nonprofit Cloud Households** is not shown. |
+| 9 | Log in as a staff user without **Manage BarnCRM Settings**. | The app has no **Migration Assistant** tab, and **BarnCRM Settings**, **General** has no **Convert Nonprofit Cloud Households**. |
 
 **Cleanup:** remove Cho Household's hand-added member and undo again, then delete the test records.
+
+## T-MIG-12: The Migration Assistant Tab, and Uninstalling the Package
+
+**Purpose:** confirm the tab lists the offered kits and household tools, and that Core runs without the package.
+**Prerequisites:** the org with DLRS of T-MIG-02; admin user. Steps 4 to 6 in a sandbox you can uninstall a package from, or an org deployed with `--core-only` plus Rollup Builder.
+**Smoke:** yes
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the app launcher, **BarnCRM Admin**, **Migration Assistant**. | The tab shows **Migration Assistant** with its purpose, **Migration Kits** listing **DLRS Rollups** with its description and **Start**, and a closing line about uninstalling BarnCRM Migration. No **Households** section in an org without NPSP or Nonprofit Cloud. |
+| 2 | In an org with no product that has a kit, open the tab. | **Migration Kits** says no product with a Migration Kit is in this org, and points to Import on the Data Manager tab. |
+| 3 | Open **BarnCRM Settings**, **Integrations**, then **Modules**. | Integrations has a **Migration Assistant** entry; **Modules** lists **BarnCRM Migration** (Beta) as installed. |
+| 4 | Without BarnCRM Migration, open **BarnCRM Settings**, **Integrations**. | DLRS shows **Installed in this org** with no **Start Migration**. No **Migration Assistant** tab or entry. |
+| 5 | Open **BarnCRM Settings**, **General**, and **Rollup Builder**. | No household adoption section on General; Rollup Builder's **Import From DLRS** still works. |
+| 6 | Open **Org Optimizer**, **Health Check**, and **Run Again**. | No finding about the Migration package or a missing class. |
+
+**Cleanup:** install BarnCRM Migration again if you removed it.

@@ -5,8 +5,8 @@
  * steps read the record's own Id twice: once as the row's key, which later steps link to, and
  * once, as the column this class adds, linked to the earlier step's record. Every other step
  * keeps the default rows. Outbound Funds is read by describe only: its names are text in the
- * kit. Core builds this class by name, so it and its constructor are namespace-accessible
- * (ADR-0017).
+ * kit. The Migration Assistant builds this class by name, so it and its constructor are
+ * namespace-accessible (ADR-0017).
  */
 @NamespaceAccessible
 public with sharing class OutboundFundsKit implements MigrationKitExtension {
@@ -23,14 +23,10 @@ public with sharing class OutboundFundsKit implements MigrationKitExtension {
 	}
 
 	@NamespaceAccessible
-	public List<Map<String, Object>> rows(String stepKey, List<SObject> records) {
+	public List<Map<String, Object>> rows(String stepKey, List<Map<String, Object>> rows) {
 		if (stepKey != 'cycles' && stepKey != 'awards') {
 			return null;
 		}
-		List<Map<String, Object>> rows = new MigrationKitService.Source(
-				MigrationKitService.stepNamed(MigrationKitService.kitNamed(KIT), stepKey)
-			)
-			.rows(records);
 		linkToParent(rows);
 		return rows;
 	}

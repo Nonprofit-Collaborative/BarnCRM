@@ -105,7 +105,7 @@ Do these in order.
    match a real person, and never choose a real record in a merge, move, erase or relationship
    step.
 7. **Scripts to skip** (record Skipped, "Core-only real-org sandbox"): every script on the
-   Fundraising (gift mirrors included), Mirror, Volunteers and Rollup Builder pages; T-SA-02 (needs a fresh org) and T-SA-07
+   Fundraising (gift mirrors included), Mirror, Volunteers, Rollup Builder and Migration Assistant pages (except T-MIG-12 steps 4 to 6, which check Core without BarnCRM Migration); T-SA-02 (needs a fresh org) and T-SA-07
    to T-SA-09 (sample data); T-HH-14 (needs a person account); and the whole smoke list from
    item 16 on. Run smoke items 1 to 15 ([Smoke list](README.md#smoke-list-every-build-about-one-hour)).
    On the full list, skip any other step that names sample data or a module; do not change real

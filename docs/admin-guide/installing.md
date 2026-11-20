@@ -43,6 +43,12 @@ stop mattering once BarnCRM is on AppExchange.
 Measured 2026-11-04; the Mirror and Fundraising rows 2026-11-14. The install pre-check below measures the release you are installing,
 against your org.
 
+**BarnCRM Migration** is optional and needs Core only: the Migration Assistant and the NPSP and
+Nonprofit Cloud household tools, about 56,500 characters of Apex (comments left out), 10 custom
+labels and no custom objects. Install it only while you are moving records in from another
+product in the same org, then uninstall it (see
+[Migration Assistant](migration-assistant.md#when-you-are-done)).
+
 **More room for Apex code.** If the pre-check says your Apex code will not fit, install fewer
 modules, or ask Salesforce for a higher limit: open a case with Salesforce Support from the
 Help menu, asking to increase the Apex code character limit (Salesforce Help article "Increase
@@ -92,7 +98,9 @@ stages and runs their setup steps:
 scripts/org/deploy-packages.sh myorg
 ```
 
-Add `--core-only` for Core alone (the Standard Edition).
+Add `--core-only` for Core alone (the Standard Edition). Without it the command also deploys
+BarnCRM Migration; uninstall that package from Setup, **Installed Packages** when you have
+nothing to migrate.
 
 **In a production org**, validate first, then deploy what was validated. Production runs
 Apex tests on every deploy that carries code. By default those are all the tests in your org,

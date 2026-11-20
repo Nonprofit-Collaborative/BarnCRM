@@ -111,6 +111,7 @@ Rules:
 | projects | Projects_Home | Custom64: Compass |
 | projects | Time_Entry__c | Custom95: Stopwatch |
 | reporting | Advanced_Reporting | Custom84: Presenter |
+| migration | Migration_Assistant | Custom98: Truck |
 | giving | Accounting_Export | Custom16: Bank |
 | giving | Campaign_Sync | Custom35: Microphone |
 | giving | Gift_Transaction_Mirror | Custom31: Car |
@@ -192,6 +193,7 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | corporatehub | hubMeetingPanel | custom:custom84 | Board_Meeting__c |
 | lwcbuilder | lwcBuilderStudio | custom:custom34 | LWC_Builder |
 | reporting | reportingHome | custom:custom84 | Advanced_Reporting |
+| migration | migrationHome | custom:custom98 | Migration_Assistant |
 | forms | formBuilder | custom:custom28 | Form__c |
 | forms | formRunner | custom:custom28 | Form__c |
 | forms | formSubmission | custom:custom51 | Form_Submission__c |

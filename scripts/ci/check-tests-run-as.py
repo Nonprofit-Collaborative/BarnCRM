@@ -61,6 +61,7 @@ SOURCES = [
     "packages/addressverification/main/**/*.cls",
     "packages/reporting/main/**/*.cls",
     "packages/mirror/main/**/*.cls",
+    "packages/migration/main/**/*.cls",
 ]
 OPT_OUT = re.compile(r"//\s*runs-as:\s*deploying user\s*\(\s*\S[^\n]*\)", re.I)
 OPT_OUT_LOOSE = re.compile(r"//\s*runs-as:", re.I)

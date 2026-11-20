@@ -6,7 +6,7 @@
  * recipient, role and amount follow BarnCRM's; a designation a fund already has is skipped.
  * Nonprofit Cloud itself is not needed: the kit holds its names as data.
  */
-@IsTest(testFor='ApexClass:NpcGiftsKit, ApexClass:MigrationKitService')
+@IsTest(testFor='ApexClass:NpcGiftsKit')
 private class NpcGiftsKitTest {
 	@TestSetup
 	static void createTestUser() {
@@ -51,7 +51,7 @@ private class NpcGiftsKitTest {
 		System.runAs(TestUsers.withPermissionSets(
 			new List<String>{ TestUsers.CORE_ADMIN, 'Rollup_Builder_Admin', 'Giving_Admin', 'Salesforce_Records_Sync' }
 		)) {
-			Migration_Kit__mdt kit = MigrationKitService.kitNamed(NpcGiftsKit.KIT);
+			String kit = NpcGiftsKit.KIT;
 			ImportTemplateService.materializeDefaults();
 			Map<String, String> targetByStep = new Map<String, String>{
 				'appeals' => 'Appeal__c',
@@ -62,8 +62,8 @@ private class NpcGiftsKitTest {
 			List<String> keys = new List<String>(targetByStep.keySet());
 			keys.add('gifts');
 			for (String key : keys) {
-				MigrationKitService.Step step = MigrationKitService.stepNamed(kit, key);
-				Assert.areEqual(MigrationKitService.KIND_IMPORT, step.kind, key + ' loads');
+				MigrationKitSteps.Step step = MigrationKitSteps.step(kit, key);
+				Assert.areEqual('import', step.kind, key + ' loads');
 				Import_Template__c template = [
 					SELECT Column_Mapping_JSON__c, Target_Object__c
 					FROM Import_Template__c
@@ -85,7 +85,7 @@ private class NpcGiftsKitTest {
 				}
 			}
 			NpcGiftsKit extension = new NpcGiftsKit();
-			Assert.isNull(extension.rows('appeals', new List<SObject>()), 'default rows');
+			Assert.isNull(extension.rows('appeals', new List<Map<String, Object>>()), 'default rows');
 			Assert.isNull(extension.verify('gifts'), 'counts are compared');
 			MigrationCheck funds = extension.verify('funds');
 			Assert.areEqual(funds.source, funds.done, 'no designation lacks a fund');
@@ -170,7 +170,7 @@ private class NpcGiftsKitTest {
 			NpcGiftsKit extension = new NpcGiftsKit();
 			for (String key : new List<String>{ 'funds', 'gifts', 'commitments', 'credits' }) {
 				try {
-					Assert.isNotNull(extension.rows(key, new List<SObject>()), key);
+					Assert.isNotNull(extension.rows(key, new List<Map<String, Object>>()), key);
 				} catch (Exception refused) {
 					Assert.isTrue(
 						refused.getMessage().contains('this org does not have'),

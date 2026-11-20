@@ -9,6 +9,7 @@
  * text. A key is kept as a 64-bit digest on the row (`Row_Key__c`), so a later page of the file
  * finds an earlier row's key with one indexed query, however long the file.
  */
+@NamespaceAccessible
 public with sharing class ImportRowFilter {
 	/** The most Skip rows rules and key columns one mapping may have. */
 	public static final Integer MAX_RULES = 5;
@@ -157,6 +158,7 @@ public with sharing class ImportRowFilter {
 	 * The Row Key a row whose key cells hold these values keeps, or null when every one is
 	 * empty; the Migration Assistant finds a moved source record by it (R-MK1).
 	 */
+	@NamespaceAccessible
 	public static String digestOfValues(List<String> values) {
 		List<String> parts = new List<String>();
 		Boolean anyValue = false;

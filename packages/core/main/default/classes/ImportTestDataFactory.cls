@@ -41,6 +41,7 @@ public class ImportTestDataFactory {
 	 * Saves one part of a template the way the wizard does, through `saveUpload`, sending the
 	 * template's stored mapping and rule with it. Tests that check one part use these.
 	 */
+	@NamespaceAccessible
 	public static Import_Template__c saveMapping(Id templateId, String mapping, String rule) {
 		ImportTemplateService.UploadChoices choices = new ImportTemplateService.UploadChoices();
 		choices.mappingDocument = mapping;
