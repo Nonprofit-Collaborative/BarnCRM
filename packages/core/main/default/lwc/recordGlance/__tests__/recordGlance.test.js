@@ -99,6 +99,17 @@ describe('c-record-glance', () => {
         state: { c__donorId: '003000000000001AAA' }
       })
     );
+    expect(element.shadowRoot.querySelector('[data-id="actions-below"]')).toBeNull();
+  });
+
+  it('puts two or more actions below the tiles, so the title is not cut short', async () => {
+    const second = { label: 'Record Service', pageReference: null };
+    getCards.mockResolvedValue([{ ...CARD, actions: [...CARD.actions, second] }]);
+    const element = mount();
+    await flush();
+    const below = element.shadowRoot.querySelector('[data-id="actions-below"]');
+    expect(below.querySelectorAll('lightning-button').length).toBe(2);
+    expect(element.shadowRoot.querySelectorAll('lightning-button').length).toBe(2);
   });
 });
 

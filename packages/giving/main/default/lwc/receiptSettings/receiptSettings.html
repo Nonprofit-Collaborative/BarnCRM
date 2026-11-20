@@ -21,16 +21,15 @@
 
     <lightning-tabset>
       <lightning-tab label={labels.templatesTab}>
+        <template lwc:if={readOnly}>
+          <c-barn-notice
+            class="slds-show slds-var-m-bottom_small"
+            variant="info"
+            message={labels.readOnly}
+            data-id="read-only"
+          ></c-barn-notice>
+        </template>
         <template lwc:if={hasTemplates}>
-          <template lwc:if={readOnly}>
-            <c-barn-notice
-              class="slds-show slds-var-m-bottom_small"
-              variant="info"
-              message={labels.readOnly}
-              data-id="read-only"
-            ></c-barn-notice>
-          </template>
-
           <lightning-combobox
             data-id="letter"
             label={labels.letterPicker}

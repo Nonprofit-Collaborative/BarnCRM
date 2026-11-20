@@ -99,6 +99,9 @@ export default class PledgeReminders extends NavigationMixin(LightningElement) {
     get off() {
       return helpText('Giving', 'Giving_PledgeReminders_Off');
     },
+    get noLogMessage() {
+      return helpText('Giving', 'Giving_PledgeReminders_NoLog');
+    },
     get noSteps() {
       return helpText('Giving', 'Giving_PledgeReminders_NoSteps');
     },

@@ -13,6 +13,7 @@ import { setHelpTextForTest } from 'c/barnHelpText';
 setHelpTextForTest({
   Core_AutomationControl_PausedForEveryone: 'Pause All is on for the whole organization.',
   Core_AutomationControl_CatchUpStarted: 'Catching up has started.',
+  Core_AutomationControl_NoControlRows: 'No profiles or users added yet.',
   Core_AutomationControl_NoFlowsToAdd: 'No active flow of your own is waiting to be listed.'
 });
 
@@ -187,6 +188,15 @@ describe('c-automation-control: Automation Control rows, own flows, Catch Up Now
     await flush();
 
     expect(saveControl).toHaveBeenCalledWith({ ownerId: ORG_ID, pauseAll: false, bypass: false });
+  });
+
+  it('shows a message instead of an empty table when no profile or user is listed', async () => {
+    const element = build();
+    getPage.emit({ ...PAGE, controlRows: [] });
+    await flush();
+
+    expect(element.shadowRoot.querySelector('[data-id="control-table"]')).toBeNull();
+    expect(one(element, 'no-control-rows').textContent).toBe('No profiles or users added yet.');
   });
 
   it('adds a profile row and removes one', async () => {
