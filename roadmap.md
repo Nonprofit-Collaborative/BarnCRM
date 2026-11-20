@@ -82,46 +82,46 @@ Status as of 2026-11-19: batches N and O (releases 1.27 to 1.29: owner decisions
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| L-03 | Indicator sources | Major | Built (#820); landing B | v0.9 |
-| P-10 | Participant service plans and goals | Major | Built (#828, #829); landing B | D-156 |
-| P-11 | Cohorts, sessions and mass enrollment | Major | Built (#842, #843); landing B | D-156 |
-| L-04 | Logic model report | Minor | Built (#827); landing B | v0.9 |
-| G-19 | Donor scoring (RFM) as rollups | Minor | Built (#814); landing B | v0.9 |
-| P-12 | Anonymous and aggregate service counts | Minor | Built (#811); landing B | D-156 |
-| P-13 | Referrals in and out | Minor | Built (#811); landing B | D-156 |
-| P-14 | Eligibility screening results | Minor | Built (#811); landing B | D-156 |
-| UX-F3 | Module tab motifs | Minor | Built (#808); landing B | D-144 |
-| QA-F2 | Ship-on checkbox settings added in an upgrade start on (Include Admin Summary, Ask Reminders) | Minor | Built (#831); landing B | D-166 |
-| QA-F3 | Person account orgs: shift reminders, suggested volunteers, one ask donor field | Minor | Built (#832); landing B | D-166 |
-| QA-F4 | Enrollments and service deliveries require a person account on every path | Minor | Built (#832); landing B | D-166 |
-| QA-F5 | Nonprofit Cloud Program Management coexistence: Integrations, admin guide, Health Check info | Minor | Built (#832); landing B | D-166 |
-| QA-F6 | Batch A QA text fixes | Minor | Built (#832); landing B | D-166 |
+| L-03 | Indicator sources | Major | Landed (#820) | v0.9 |
+| P-10 | Participant service plans and goals | Major | Landed (#828, #829) | D-156 |
+| P-11 | Cohorts, sessions and mass enrollment | Major | Landed (#842, #843) | D-156 |
+| L-04 | Logic model report | Minor | Landed (#827) | v0.9 |
+| G-19 | Donor scoring (RFM) as rollups | Minor | Landed (#814) | v0.9 |
+| P-12 | Anonymous and aggregate service counts | Minor | Landed (#811) | D-156 |
+| P-13 | Referrals in and out | Minor | Landed (#811) | D-156 |
+| P-14 | Eligibility screening results | Minor | Landed (#811) | D-156 |
+| UX-F3 | Module tab motifs | Minor | Landed (#808) | D-144 |
+| QA-F2 | Ship-on checkbox settings added in an upgrade start on (Include Admin Summary, Ask Reminders) | Minor | Landed (#831) | D-166 |
+| QA-F3 | Person account orgs: shift reminders, suggested volunteers, one ask donor field | Minor | Landed (#832) | D-166 |
+| QA-F4 | Enrollments and service deliveries require a person account on every path | Minor | Landed (#832) | D-166 |
+| QA-F5 | Nonprofit Cloud Program Management coexistence: Integrations, admin guide, Health Check info | Minor | Landed (#832) | D-166 |
+| QA-F6 | Batch A QA text fixes | Minor | Landed (#832) | D-166 |
 
 ### 0.16 (Batch B): Funders start, Where Used
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| F-01 | Funder pipeline | Major | Built (#833 to #836); landing B | v0.10 |
-| F-02 | Reporting requirements and deadlines | Major | Built (#837); landing B | v0.10 |
-| C-59 | Where Used for BarnCRM setup | Major | Built (#823 to #825); landing B | D-156 |
-| F-04 | Government award fields | Minor | Built (#839); landing B | v0.10 |
-| F-05 | Multi-year award schedules | Minor | Built (#844, #845); landing B | v0.10 |
-| F-06 | Funder report merge template | Minor | Built (#848); landing B | v0.10 |
-| F-07 | Board dashboard | Minor | Built (#850); landing B | v0.10 |
-| F-14 | Answer and boilerplate library | Minor | Built (#841); landing B | D-156 |
+| F-01 | Funder pipeline | Major | Landed (#833 to #836) | v0.10 |
+| F-02 | Reporting requirements and deadlines | Major | Landed (#837) | v0.10 |
+| C-59 | Where Used for BarnCRM setup | Major | Landed (#823 to #825) | D-156 |
+| F-04 | Government award fields | Minor | Landed (#839) | v0.10 |
+| F-05 | Multi-year award schedules | Minor | Landed (#844, #845) | v0.10 |
+| F-06 | Funder report merge template | Minor | Landed (#848) | v0.10 |
+| F-07 | Board dashboard | Minor | Landed (#850) | v0.10 |
+| F-14 | Answer and boilerplate library | Minor | Landed (#841) | D-156 |
 
 ### 0.17 (Batch B): Funders complete, Nonprofit Cloud mirror, Field Access Manager
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| F-03 | Restricted fund tracking | Major | Built (#844, #847); landing B | v0.10 |
-| X-07 | Gift Transaction mirror | Major | Built (#818, #822, #826, #830, #838); landing B | Plan 6.3 |
-| C-65 | Field Access Manager (reverses the D-13 permission-management non-goal; ADR first) | Major | Built (#815 to #817); landing B | D-157 |
-| F-08 | Deadline calendar view | Minor | Built (#849); landing B | v0.10 |
-| L-06 | Link outcomes to grant deliverables | Minor | Built (#846); landing B | v0.10 |
+| F-03 | Restricted fund tracking | Major | Landed (#844, #847) | v0.10 |
+| X-07 | Gift Transaction mirror | Major | Landed (#818, #822, #826, #830, #838) | Plan 6.3 |
+| C-65 | Field Access Manager (reverses the D-13 permission-management non-goal; ADR first) | Major | Landed (#815 to #817) | D-157 |
+| F-08 | Deadline calendar view | Minor | Landed (#849) | v0.10 |
+| L-06 | Link outcomes to grant deliverables | Minor | Landed (#846) | v0.10 |
 | X-05 | NPSP coexistence: adopt household accounts | Minor | Built (#812, #813, #819); landing B | Plan 6.3 |
-| C-57 | Picklist value usage | Minor | Built (#809); landing B | D-156 |
-| C-58 | Technical debt checks | Minor | Built (#810); landing B | D-156 |
+| C-57 | Picklist value usage | Minor | Landed (#809) | D-156 |
+| C-58 | Technical debt checks | Minor | Landed (#810) | D-156 |
 | C-60 | Automation inventory in the Data Dictionary; own Automation tab, whole-org inventory and scan, deactivate org flows and validation rules with snapshot and Restore (D-184, ADR-0174) | Minor | Landed (#821, #979) | D-156, D-184 |
 
 ### 0.18 (Batch B): Usability and visual polish, architect-review fixes (v1.0 candidate)
@@ -130,27 +130,27 @@ Added 2026-11-04 (D-170). v1.0 is everything through the last Batch B release. E
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| UX-V1 | Shared visual kit: status badge, notice, stat tile formats, progress meter, icon registry, visual standard in ux-kit.md | Major | Built (#856, #860); landing B | D-170 |
+| UX-V1 | Shared visual kit: status badge, notice, stat tile formats, progress meter, icon registry, visual standard in ux-kit.md | Major | Landed (#856, #860) | D-170 |
 | UX-V2 | Usability fixes: admin and data tools | Major | Landed (in main: #862, #866, #869, #870, #885, #891, #892; stacked PRs #863, #877, #889, #890 landed through them; Batch B finished, released to `barn-npc` and `mwdbdevsb`) | D-170 |
 | UX-V3 | Usability fixes: people, households and Giving | Major | Landed (in main: people #864, #873, Fundraising Home #882; stacked #861, #872 landed through #873; Giving workstreams #949 to #957 in #958; #879 and #880 closed, superseded by #949 to #957; released to `barn-npc`) | D-170 |
 | UX-V4 | Usability fixes: Volunteers, Programs, Logic Models, Funders (absorbs UX-F4) | Major | Landed (in main: Logic Models #884, #935; Programs #945 to #947, Volunteers #933, #934, #936, #937, #948, Funders #938 to #942, all in #958; follow-ups in #968, #979; released to `barn-npc`) | D-170 |
 | UX-V5 | Record page tabs suite-wide | Minor | Landed (in main: tabbed record pages on Account, Contact, Gift, Commitment, Program, Enrollment, Session, Cohort, Grant, Logic Model, Shift, Event and Form pages; #958, #979; released to `barn-npc`) | D-170 |
-| UX-V6 | App logos for Programs, Funders and Logic Models; Fundraising badge recolored; brand color #007A9E | Minor | Built (#854, #855); landing B | D-170 |
+| UX-V6 | App logos for Programs, Funders and Logic Models; Fundraising badge recolored; brand color #007A9E | Minor | Landed (#854, #855) | D-170 |
 | UX-V7 | Drag and drop on existing controls | Minor | Landed (in main: c/barnDrag #860, transform steps #862, Find #891, Super Importer #892, Logic Models #935, Grant Pipeline, Ask Pipeline and rules in #958; released to `barn-npc`) | D-170 |
-| UX-V8 | Help text in English JSON help catalogs per package, label cap 4,150 | Major | Built (#858, #859); landing B | D-171, D-172 |
+| UX-V8 | Help text in English JSON help catalogs per package, label cap 4,150 | Major | Landed (#858, #859) | D-171, D-172 |
 | AR-01 | Messages move from labels to the help catalogs (about 2,400 labels after) | Major | Landed (Core #907: 943 moved; modules AR-01b #1195 to #1207, #1235; suite about 2,424 labels across packages, matching the target; released to `barn-npc`) | D-172 |
-| AR-02 | Install pre-check: edition, Apex room, label room, name collisions | Major | Built (#874 to #876); landing B | D-173 |
+| AR-02 | Install pre-check: edition, Apex room, label room, name collisions | Major | Landed (#874 to #876) | D-173 |
 | AR-03 | Per-package Apex size budget in CI, plus a character trim pass on Apex | Major | Landed (#876 budget; #908 trims and #909 tabs landed through #912: suite 4.39M to 3.52M characters, Core 1.94M at Batch B; regrown by releases 1.1 to 1.25 to 4.99M and Core 2.27M at 71617318c, above the 3.6M and 2.0M targets; no further trim pass scheduled) | D-173 |
-| AR-04 | Install guide | Minor | Built (#874 to #876); landing B | D-173 |
+| AR-04 | Install guide | Minor | Landed (#874 to #876) | D-173 |
 | AR-05 | Purge defaults for Merge Journal, Setting Change, Import Batch and Journal, Field Utilization Snapshot | Minor | Landed (#897; #908 adds abandoned imports and absorbs the import row purge and Error Log retention, landed through #912; `RecordRetentionBatch` purges all five objects; released to `barn-npc`) | D-173 |
-| AR-06 | A per-release destructive manifest | Minor | Built (#874 to #876); landing B | D-173 |
-| AR-07 | One nightly job dispatcher plus the hourly check | Major | Built (#894, #895, #897, #898); landing B | D-173 |
-| AR-08 | BarnCRM Automation Control hierarchy custom setting; own flows on the Automation page | Major | Built (#887, #893, #896); landing B | D-173, D-174 |
-| AR-09 | Trigger dispatcher errors only the affected record | Minor | Built (#868); landing B | D-173 |
-| AR-10 | Household Upkeep blocked while NPSP households are in use | Minor | Built (#888); landing B | D-173 |
-| AR-11 | Test hardening against org validation rules | Minor | Built (#874 to #876); landing B | D-173 |
-| AR-12 | A `without sharing` register | Minor | Built (#874 to #876); landing B | D-173 |
-| C-57b | Picklist value usage on large objects: grouped COUNT per value, Last Used in 20,000-record chunks, up to 1,000,000 records | Minor | Built (#853); landing B | D-170 |
+| AR-06 | A per-release destructive manifest | Minor | Landed (#874 to #876) | D-173 |
+| AR-07 | One nightly job dispatcher plus the hourly check | Major | Landed (#894, #895, #897, #898) | D-173 |
+| AR-08 | BarnCRM Automation Control hierarchy custom setting; own flows on the Automation page | Major | Landed (#887, #893, #896) | D-173, D-174 |
+| AR-09 | Trigger dispatcher errors only the affected record | Minor | Landed (#868) | D-173 |
+| AR-10 | Household Upkeep blocked while NPSP households are in use | Minor | Landed (#888) | D-173 |
+| AR-11 | Test hardening against org validation rules | Minor | Landed (#874 to #876) | D-173 |
+| AR-12 | A `without sharing` register | Minor | Landed (#874 to #876) | D-173 |
+| C-57b | Picklist value usage on large objects: grouped COUNT per value, Last Used in 20,000-record chunks, up to 1,000,000 records | Minor | Landed (#853) | D-170 |
 
 ### 1.1 (Batch C): Forms engine, Contact Point Sync
 
