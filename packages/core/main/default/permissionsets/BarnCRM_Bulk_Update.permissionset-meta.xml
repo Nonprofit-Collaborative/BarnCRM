@@ -226,6 +226,11 @@
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
+    <editable>false</editable>
+    <field>Saved_Transform__c.Kind__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
     <editable>true</editable>
     <field>Saved_Transform__c.Object_Name__c</field>
     <readable>true</readable>
@@ -235,9 +240,9 @@
     <allowDelete>true</allowDelete>
     <allowEdit>true</allowEdit>
     <allowRead>true</allowRead>
-    <modifyAllRecords>true</modifyAllRecords>
+    <modifyAllRecords>false</modifyAllRecords>
     <object>Saved_Transform__c</object>
-    <viewAllRecords>true</viewAllRecords>
+    <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
   <objectPermissions>
     <allowCreate>false</allowCreate>

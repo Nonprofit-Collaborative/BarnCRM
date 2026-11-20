@@ -1,0 +1,216 @@
+{
+  "description": "Cases for the map document (canonical model R-MAP1 to R-MAP3): SavedTransformService.checkMap (Apex) and mapDocument.problems and isPath (JavaScript) must agree. A case marked serverOnly is refused by the server alone (its steps or its object are checked there).",
+  "paths": {
+    "valid": [
+      "email",
+      "profile.email",
+      "order.lines[0].sku",
+      "a-b_c.d1",
+      "one.two.three.four.five.six.seven.eight.nine.ten",
+      "items[999]"
+    ],
+    "invalid": [
+      "",
+      "profile..email",
+      ".email",
+      "email.",
+      "profile.e mail",
+      "items[1000]",
+      "items[x]",
+      "one.two.three.four.five.six.seven.eight.nine.ten.eleven",
+      "{!$Credential.Password}",
+      "a/b",
+      "a@b"
+    ]
+  },
+  "valid": [
+    {
+      "name": "a version 1 template mapping",
+      "document": {
+        "version": 1,
+        "columns": [{ "source": "Donor Email", "target": "Contact1.Email" }],
+        "defaults": [{ "target": "Gift.Type__c", "value": "Check" }]
+      }
+    },
+    {
+      "name": "a version 2 template mapping with steps and row rules",
+      "document": {
+        "version": 2,
+        "columns": [
+          {
+            "source": "Phone",
+            "target": "Record.Phone",
+            "transforms": [
+              { "op": "trim" },
+              { "op": "digits", "pattern": "(###) ###-####", "country": "1" }
+            ]
+          },
+          { "source": "Program", "target": "Record.AccountId", "lookupField": "Name" }
+        ],
+        "defaults": [],
+        "skipRows": [{ "column": "Status", "test": "equals", "text": "Test" }]
+      }
+    },
+    {
+      "name": "a JSON payload to a Contact with a lookup, a fixed value and matching",
+      "document": {
+        "version": 4,
+        "from": {
+          "kind": "json",
+          "label": "Eventbrite attendee",
+          "sample": { "profile": { "email": "a@b.org" } }
+        },
+        "to": { "kind": "record", "object": "Contact" },
+        "columns": [
+          {
+            "source": "profile.email",
+            "target": "Record.Email",
+            "transforms": [{ "op": "trim" }, { "op": "lower" }],
+            "required": true
+          },
+          {
+            "source": "profile.last_name",
+            "target": "Record.LastName",
+            "transforms": [{ "op": "proper" }]
+          },
+          {
+            "source": "order.company",
+            "target": "Record.AccountId",
+            "lookup": { "object": "Account", "field": "Name", "notFound": "leaveEmpty" }
+          },
+          { "value": "Eventbrite", "target": "Record.Description" }
+        ],
+        "defaults": [{ "target": "Record.LeadSource", "value": "Eventbrite" }],
+        "match": { "by": "field", "field": "Email", "several": "reject", "none": "create" }
+      }
+    },
+    {
+      "name": "a record to a JSON body",
+      "document": {
+        "version": 4,
+        "from": { "kind": "record", "object": "Contact" },
+        "to": { "kind": "json" },
+        "columns": [
+          { "source": "Email", "target": "email_address" },
+          { "source": "Account.Name", "target": "merge_fields.COMPANY" },
+          { "value": "subscribed", "target": "status" }
+        ],
+        "defaults": []
+      }
+    }
+  ],
+  "invalid": [
+    { "name": "version 5", "document": { "version": 5, "columns": [] } },
+    { "name": "no version", "document": { "columns": [] } },
+    {
+      "name": "an unknown source kind",
+      "document": { "version": 4, "from": { "kind": "xml" }, "columns": [] }
+    },
+    {
+      "name": "an unknown target kind",
+      "document": { "version": 4, "to": { "kind": "file" }, "columns": [] }
+    },
+    {
+      "name": "columns that are not a list",
+      "document": { "version": 4, "columns": { "source": "a" } }
+    },
+    {
+      "name": "a column with no target",
+      "document": { "version": 4, "columns": [{ "source": "Email" }] }
+    },
+    {
+      "name": "a column with neither a source nor a value",
+      "document": { "version": 4, "columns": [{ "target": "Record.Email" }] }
+    },
+    {
+      "name": "a target used twice",
+      "document": {
+        "version": 4,
+        "columns": [
+          { "source": "a", "target": "Record.Email" },
+          { "source": "b", "target": "Record.email" }
+        ]
+      }
+    },
+    {
+      "name": "a JSON source that is not a path",
+      "document": {
+        "version": 4,
+        "from": { "kind": "json" },
+        "columns": [{ "source": "profile..email", "target": "Record.Email" }]
+      }
+    },
+    {
+      "name": "a JSON target that is not a path",
+      "document": {
+        "version": 4,
+        "to": { "kind": "json" },
+        "columns": [{ "source": "Email", "target": "{!$Credential.Password}" }]
+      }
+    },
+    {
+      "name": "a lookup with no field",
+      "document": {
+        "version": 4,
+        "columns": [
+          { "source": "Org", "target": "Record.AccountId", "lookup": { "object": "Account" } }
+        ]
+      }
+    },
+    {
+      "name": "a lookup with an unknown not-found choice",
+      "document": {
+        "version": 4,
+        "columns": [
+          {
+            "source": "Org",
+            "target": "Record.AccountId",
+            "lookup": { "object": "Account", "field": "Name", "notFound": "create" }
+          }
+        ]
+      }
+    },
+    {
+      "name": "matching by field with no field",
+      "document": { "version": 4, "columns": [], "match": { "by": "field" } }
+    },
+    {
+      "name": "matching by an unknown way",
+      "document": { "version": 4, "columns": [], "match": { "by": "name" } }
+    },
+    {
+      "name": "required that is not yes or no",
+      "document": {
+        "version": 4,
+        "columns": [{ "source": "a", "target": "Record.Email", "required": "yes" }]
+      }
+    },
+    {
+      "name": "a default with no target",
+      "document": { "version": 4, "columns": [], "defaults": [{ "value": "x" }] }
+    },
+    {
+      "name": "an unknown step",
+      "serverOnly": true,
+      "document": {
+        "version": 4,
+        "columns": [
+          {
+            "source": "a",
+            "target": "Record.Email",
+            "transforms": [{ "op": "formula", "text": "1+1" }]
+          }
+        ]
+      }
+    },
+    {
+      "name": "a record target no bulk update may write",
+      "serverOnly": true,
+      "document": {
+        "version": 4,
+        "to": { "kind": "record", "object": "Not_An_Object__c" },
+        "columns": []
+      }
+    }
+  ]
+}

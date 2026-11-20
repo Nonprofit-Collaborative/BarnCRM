@@ -1,0 +1,31 @@
+.barn-mapper-source {
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-1, #c9c9c9);
+  border-radius: var(--slds-g-radius-border-1, 0.25rem);
+  margin-bottom: var(--slds-g-spacing-1, 0.25rem);
+  cursor: grab;
+  touch-action: none;
+  background: var(--slds-g-color-surface-container-1, #fff);
+}
+
+.barn-mapper-source:focus-visible {
+  outline: none;
+  box-shadow: var(--slds-g-shadow-outline-focus-1, 0 0 0 2px #0b5cab);
+}
+
+.barn-mapper-dragging {
+  opacity: 0.5;
+}
+
+.barn-mapper-target {
+  border-bottom: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-1, #e5e5e5);
+}
+
+.barn-mapper-drop {
+  background: var(--slds-g-color-surface-container-2, #f3f3f3);
+  box-shadow: var(--slds-g-shadow-outline-focus-1, 0 0 0 2px #0b5cab);
+}
+
+.barn-mapper-details {
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-1, #e5e5e5);
+  border-radius: var(--slds-g-radius-border-1, 0.25rem);
+}

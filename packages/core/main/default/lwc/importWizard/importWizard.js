@@ -1989,6 +1989,43 @@ export default class ImportWizard extends LightningElement {
     return rules;
   }
 
+  // ---- Saved maps (MAP-04): Use a Saved Map copies a map in, Save as Map saves these columns.
+
+  /** The object a one-object template fills; a people or several-object map names none. */
+  get savedMapObject() {
+    return this.loadsSingleObject ? this.selectedTemplate.targetObject : '';
+  }
+
+  /** The targets this template may load, so a map column for any other is left unused. */
+  get savedMapTargets() {
+    return this.mappableTargets.map((option) => option.value).filter((value) => value !== IGNORE);
+  }
+
+  /** For each lookup the template offers, the fields it can name its parent by (R-IT13). */
+  get savedMapLookups() {
+    const choices = {};
+    if (this.loadsOneObject) {
+      this.loadFields
+        .filter((field) => field.isLookup)
+        .forEach((field) => {
+          choices[field.value] = (field.lookupFields || []).map((each) => each.value);
+        });
+    }
+    return choices;
+  }
+
+  get savedMapIgnored() {
+    return [IGNORE, NEW_FIELD];
+  }
+
+  /** A map was used: the columns it set take its field, steps and lookup; the rest keep theirs. */
+  handleSavedMapApply(event) {
+    this.columns = event.detail.columns.map((column) => ({
+      ...column,
+      lookupField: column.lookupField || LOOKUP_BY_ID
+    }));
+  }
+
   /** Skip rows where and One row per, from the rows to load panel (R-IT18). */
   handleRowRulesChange(event) {
     this.skipRows = event.detail.skipRows;

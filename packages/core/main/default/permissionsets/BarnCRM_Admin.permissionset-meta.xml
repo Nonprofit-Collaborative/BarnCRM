@@ -127,6 +127,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>MapController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>MatchSourceController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -1542,6 +1546,11 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Saved_Transform__c.Definition_JSON__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Saved_Transform__c.Kind__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>

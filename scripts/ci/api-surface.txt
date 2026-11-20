@@ -1661,11 +1661,13 @@ core/WhereUsedExtension.cls | public interface WhereUsedExtension
 core/WhereUsedExtensions.cls | public class WhereUsedExtensions
 core/WhereUsedExtensions.cls | public static Map<String,WhereUsedExtension> findAll()
 core/WhereUsedExtensions.cls | public static final List<String> EXTENSION_CLASSES
+core/WhereUsedService.cls | public Boolean isMap(Id)
 core/WhereUsedService.cls | public Boolean isObject()
 core/WhereUsedService.cls | public Boolean isObject(String)
 core/WhereUsedService.cls | public Boolean matchesField(String,String)
 core/WhereUsedService.cls | public Boolean matchesFilter(String,Object)
 core/WhereUsedService.cls | public Boolean matchesPath(String,String)
+core/WhereUsedService.cls | public Id mapId
 core/WhereUsedService.cls | public List<String> getParts()
 core/WhereUsedService.cls | public Reference addPart(String)
 core/WhereUsedService.cls | public Reference withBreaks(String)
@@ -1686,6 +1688,7 @@ core/WhereUsedService.cls | public class WhereUsedException
 core/WhereUsedService.cls | public class WhereUsedService
 core/WhereUsedService.cls | public static List<Object> listOf(Object)
 core/WhereUsedService.cls | public static List<Reference> importColumnReferences(Target,Map<String,String>)
+core/WhereUsedService.cls | public static List<Reference> mapUsers(Id,String)
 core/WhereUsedService.cls | public static Map<String,Object> parsed(String)
 core/WhereUsedService.cls | public static Reference settingReference(String,String,String)
 core/WhereUsedService.cls | public static String tabUrl(String,Map<String,String>)

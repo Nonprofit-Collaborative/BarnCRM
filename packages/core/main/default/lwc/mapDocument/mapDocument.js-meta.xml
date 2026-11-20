@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Framework-free logic of the Mapper (R-MAP1 to R-MAP4): the map document, its checks, paths,
+    auto-match, preview checks and Super Importer copies. Exposed so modules can import it.
+  </description>
+  <isExposed>true</isExposed>
+</LightningComponentBundle>
