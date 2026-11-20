@@ -14,6 +14,10 @@
     <apexClass>ConnectorRecipesController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <classAccesses>
+    <apexClass>ConnectorWebhooksController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
   <fieldPermissions>
     <editable>false</editable>
     <field>Connector_Recipe__c.Description__c</field>
@@ -86,6 +90,16 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Connector_Recipe__c.Webhook_Token_Hash__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Connector_Recipe__c.Webhook_Hourly_Cap__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Connector_Run__c.Input_JSON__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -132,6 +146,16 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Connector_Run__c.Next_Attempt_At__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Connector_Run__c.Event_Key__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Connector_Run__c.Reference__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <objectPermissions>

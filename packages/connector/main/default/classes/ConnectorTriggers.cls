@@ -54,6 +54,8 @@ public inherited sharing class ConnectorTriggers {
 			) {
 				return BarnHelp.text('Connector', 'Connector_Recipe_ErrorRecordTrigger');
 			}
+		} else if (kind == 'webhook') {
+			return ConnectorWebhooks.triggerProblem(starter);
 		}
 		return null;
 	}

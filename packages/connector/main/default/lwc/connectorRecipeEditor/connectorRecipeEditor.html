@@ -48,6 +48,10 @@
                     <lightning-radio-group label={labels.mode} options={modeOptions} value={trigger.mode} disabled={readOnly} data-field="mode" onchange={handleTriggerField} data-id="mode"></lightning-radio-group>
                     <lightning-input type="number" label={labels.limit} value={trigger.limit} min="1" max="200" step="1" field-level-help={labels.limitHelp} read-only={readOnly} data-field="limit" onchange={handleTriggerField} data-id="limit"></lightning-input>
                 </template>
+                <template lwc:if={isWebhook}>
+                    <p class="slds-text-body_small slds-var-m-vertical_x-small">{labels.whenWebhook}</p>
+                    <c-connector-webhook-setup recipe-id={recipeId} trigger={trigger} can-manage={canManage} ontriggerchange={handleTriggerChange} data-id="webhook"></c-connector-webhook-setup>
+                </template>
                 <template lwc:if={nextRunText}>
                     <p class="slds-text-body_small slds-var-m-vertical_x-small" data-id="next-run">{nextRunText}</p>
                 </template>
@@ -92,8 +96,11 @@
 
                         <template lwc:if={row.isCall}>
                             <lightning-combobox label={labels.connection} options={connectionOptions} value={row.step.connection} read-only={readOnly} data-address={row.address} data-field="connection" onchange={handleField}></lightning-combobox>
-                            <lightning-combobox label={labels.method} options={methodOptions} value={row.step.method} read-only={readOnly} data-address={row.address} data-field="method" onchange={handleField}></lightning-combobox>
-                            <lightning-input label={labels.path} value={row.step.path} field-level-help={labels.pathHelp} read-only={readOnly} data-address={row.address} data-field="path" onchange={handleField}></lightning-input>
+                            <template lwc:if={row.isCallApp}>
+                                <lightning-combobox label={labels.method} options={methodOptions} value={row.step.method} read-only={readOnly} data-address={row.address} data-field="method" onchange={handleField}></lightning-combobox>
+                            </template>
+                            <lightning-input label={labels.urlFrom} value={row.step.urlFrom} field-level-help={labels.urlFromHelp} read-only={readOnly} data-address={row.address} data-field="urlFrom" onchange={handleField}></lightning-input>
+                            <lightning-input label={labels.path} value={row.step.path} field-level-help={row.pathHelp} read-only={readOnly} data-address={row.address} data-field="path" onchange={handleField}></lightning-input>
                             <template for:each={row.pathValues} for:item="slot">
                                 <lightning-input key={slot.key} label={slot.name} value={slot.shown} field-level-help={labels.valueHelp} read-only={readOnly} data-address={row.address} data-list="pathValues" data-index={slot.index} data-field="shown" onchange={handleEntry}></lightning-input>
                             </template>
@@ -130,7 +137,9 @@
                             <lightning-combobox label={labels.bodyMap} options={row.maps} value={row.step.bodyMap} read-only={readOnly} data-address={row.address} data-field="bodyMap" onchange={handleField}></lightning-combobox>
                             <lightning-input label={labels.bodyInput} value={row.step.bodyInput} read-only={readOnly} data-address={row.address} data-field="bodyInput" onchange={handleField}></lightning-input>
                             <lightning-input label={labels.success} value={row.successText} field-level-help={labels.successHelp} read-only={readOnly} data-address={row.address} data-field="success" onchange={handleField}></lightning-input>
-                            <lightning-input type="checkbox" label={labels.notFoundOk} checked={row.step.notFoundOk} disabled={readOnly} data-address={row.address} data-field="notFoundOk" onchange={handleField}></lightning-input>
+                            <template lwc:if={row.isCallApp}>
+                                <lightning-input type="checkbox" label={labels.notFoundOk} checked={row.step.notFoundOk} disabled={readOnly} data-address={row.address} data-field="notFoundOk" onchange={handleField}></lightning-input>
+                            </template>
                         </template>
 
                         <template lwc:if={row.isImport}>

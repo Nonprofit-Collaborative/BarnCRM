@@ -4,10 +4,16 @@
  * cannot see the private recipe, and the runner and the recipe clock, as a recipe identity, read
  * and update every recipe and run of their lane. Its own queries and writes touch no other
  * object; the two exceptions are `runInSystemMode` and `pollInSystemMode`, through which only a
- * recipe an admin set to System runs its steps and polls its object.
+ * recipe an admin set to System runs its steps and polls its object. The webhook receiver's
+ * Site guest, which has no object access, finds its recipe by token hash and stores a Received
+ * run here (R-CR10), and reads its own Error Log warnings to write one an hour.
  */
 public without sharing class ConnectorRunStore {
 	public static final String QUEUED = 'Queued';
+	/** A webhook post stored by the receiver, run as a Queued run is (R-CR10). */
+	public static final String RECEIVED = 'Received';
+	/** The statuses the runner takes. */
+	public static final Set<String> READY = new Set<String>{ QUEUED, RECEIVED };
 	public static final String WAITING = 'Waiting';
 	public static final String SUCCEEDED = 'Succeeded';
 	public static final String SKIPPED = 'Skipped';
@@ -59,7 +65,7 @@ public without sharing class ConnectorRunStore {
 				Is_Test__c
 			FROM Connector_Run__c
 			WHERE
-				Status__c = :QUEUED
+				Status__c IN :READY
 				AND Ran_As__c IN :runAs
 				AND (Is_Test__c = TRUE
 				OR Recipe__r.Status__c IN :runnable)
@@ -79,7 +85,7 @@ public without sharing class ConnectorRunStore {
 				SELECT COUNT()
 				FROM Connector_Run__c
 				WHERE
-					Status__c = :QUEUED
+					Status__c IN :READY
 					AND Ran_As__c IN :runAs
 					AND (Is_Test__c = TRUE
 					OR Recipe__r.Status__c IN :runnable)
@@ -111,7 +117,7 @@ public without sharing class ConnectorRunStore {
 	 * Waiting or Queued run it may run.
 	 */
 	public static Boolean clockNeeded(Set<String> runAs) {
-		Set<String> open = new Set<String>{ QUEUED, WAITING };
+		Set<String> open = new Set<String>{ QUEUED, RECEIVED, WAITING };
 		return [
 				SELECT COUNT()
 				FROM Connector_Recipe__c
@@ -357,11 +363,79 @@ public without sharing class ConnectorRunStore {
 			SELECT COUNT()
 			FROM Connector_Run__c
 			WHERE
-				Status__c = :QUEUED
+				Status__c IN :READY
 				AND LastModifiedDate < :before
 				AND (Is_Test__c = TRUE
 				OR Recipe__r.Status__c = :ACTIVE)
 			WITH SYSTEM_MODE
 		];
+	}
+
+	// ---------------------------------------------------------------------------------------
+	// The webhook receiver (R-CR10): the Site guest has no object access
+	// ---------------------------------------------------------------------------------------
+
+	/** A published Webhook recipe by its token hash, or null. */
+	public static Connector_Recipe__c webhookRecipe(String tokenHash) {
+		for (Connector_Recipe__c recipe : [
+			SELECT Id, Name, Run_As__c, Version__c, Definition_JSON__c, Webhook_Hourly_Cap__c
+			FROM Connector_Recipe__c
+			WHERE
+				Webhook_Token_Hash__c = :tokenHash
+				AND Trigger_Kind__c = :ConnectorWebhooks.WEBHOOK
+				AND Status__c != :ConnectorRecipes.DRAFT
+			WITH SYSTEM_MODE
+			LIMIT 1
+		]) {
+			return recipe;
+		}
+		return null;
+	}
+
+	/** Posts stored for a recipe since a time, counted up to `most`. */
+	public static Integer webhookPostsSince(Id recipeId, Datetime since, Integer most) {
+		return [
+			SELECT COUNT()
+			FROM Connector_Run__c
+			WHERE Recipe__c = :recipeId AND Started_By__c = :ConnectorWebhooks.WEBHOOK AND CreatedDate > :since
+			WITH SYSTEM_MODE
+			LIMIT :most
+		];
+	}
+
+	/** Whether the receiver already wrote an Error Log entry about this recipe since a time. */
+	public static Boolean loggedSince(String context, Id recipeId, Datetime since) {
+		String reference = String.valueOf(recipeId);
+		return [
+				SELECT COUNT()
+				FROM Error_Log__c
+				WHERE Context__c = :context AND Record_Reference__c = :reference AND CreatedDate > :since
+				WITH SYSTEM_MODE
+				LIMIT 1
+			] > 0;
+	}
+
+	/**
+	 * Stores a Received run. Returns its Reference, or, when its Event Key was stored before (a
+	 * resend), the first run's Reference and stores nothing.
+	 */
+	public static String storeReceived(Connector_Run__c run) {
+		Database.SaveResult saved = Database.insert(run, false, AccessLevel.SYSTEM_MODE);
+		if (saved.isSuccess()) {
+			return run.Reference__c;
+		}
+		if (run.Event_Key__c == null || saved.getErrors()[0].getStatusCode() != StatusCode.DUPLICATE_VALUE) {
+			throw new DmlException(BarnHelp.text('Connector', 'Connector_Log_WebhookStore'));
+		}
+		for (Connector_Run__c first : [
+			SELECT Reference__c
+			FROM Connector_Run__c
+			WHERE Event_Key__c = :run.Event_Key__c
+			WITH SYSTEM_MODE
+			LIMIT 1
+		]) {
+			return first.Reference__c;
+		}
+		return '';
 	}
 }

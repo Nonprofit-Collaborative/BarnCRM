@@ -173,6 +173,45 @@ describe('c/connectorRecipeRules', () => {
     expect(one(callStep({ bodyInput: 'nowhere' }))).toEqual(['Connector_Recipe_ErrorMap']);
   });
 
+  it('takes a Call an App address from the data, alone, and lets Send to Webhook post to the base (CN-04)', () => {
+    const one = (step) => keys({ ...newDocument(), steps: [step] });
+    expect(one(callStep({ urlFrom: 'trigger.resource_url', path: '' }))).toEqual([]);
+    expect(one(callStep({ urlFrom: 'not a path', path: '' }))).toEqual([
+      'Connector_Recipe_ErrorRequestPath'
+    ]);
+    expect(one(callStep({ urlFrom: 'trigger.url', path: '/orders' }))).toEqual([
+      'Connector_Recipe_ErrorRequestPath'
+    ]);
+    const send = {
+      ...newStep(newDocument(), 'sendWebhook'),
+      id: 'send1',
+      connection: 'BarnConn_rest_a'
+    };
+    expect(send.kind).toBe('sendWebhook');
+    expect(one({ ...send, path: '' })).toEqual([]);
+    expect(one({ ...send, path: '//evil' })).toEqual(['Connector_Recipe_ErrorRequestPath']);
+    expect(one({ ...send, connection: '' })).toEqual(['Connector_Recipe_ErrorConnection']);
+    expect(one(callStep({ path: '' }))).toEqual(['Connector_Recipe_ErrorRequestPath']);
+  });
+
+  it('checks a Webhook trigger: event id path, reply status, body and challenge field (R-CR10)', () => {
+    const hook = setTrigger(newDocument(), 'webhook').trigger;
+    expect(hook.kind).toBe('webhook');
+    expect(hook.reply.status).toBe(202);
+    expect(triggerProblem(hook)).toBeNull();
+    expect(triggerProblem({ ...hook, eventId: 'trigger.id' })).toBeNull();
+    const bad = 'Connector_Recipe_ErrorWebhook';
+    expect(triggerProblem({ ...hook, eventId: 'not a path' })).toBe(bad);
+    expect(triggerProblem({ ...hook, reply: { status: 201 } })).toBe(bad);
+    expect(triggerProblem({ ...hook, reply: { status: 200, body: '{not json' } })).toBe(bad);
+    expect(triggerProblem({ ...hook, reply: { body: '{"a":"' + 'x'.repeat(4000) + '"}' } })).toBe(
+      bad
+    );
+    expect(triggerProblem({ ...hook, reply: { challenge: 'token' } })).toBe(bad);
+    expect(triggerProblem({ ...hook, reply: { challenge: 'hub.challenge' } })).toBeNull();
+    expect(triggerKindKey('Webhook')).toBe('Connector_Trigger_Webhook');
+  });
+
   it('limits nesting and the number of steps', () => {
     const deep = {
       ...newDocument(),
@@ -278,7 +317,7 @@ describe('c/connectorRecipeRules', () => {
       'Connector_Recipe_ErrorSchedule'
     );
     expect(triggerProblem({ kind: 'schedule', every: '15m' })).toBeNull();
-    expect(triggerProblem({ kind: 'webhook' })).toBe('Connector_Recipe_ErrorTrigger');
+    expect(triggerProblem({ kind: 'poll' })).toBe('Connector_Recipe_ErrorTrigger');
     expect(
       keys({ ...newDocument(), trigger: { kind: 'schedule', every: 'week', at: '09:00' } })
     ).toContain('Connector_Recipe_ErrorSchedule');

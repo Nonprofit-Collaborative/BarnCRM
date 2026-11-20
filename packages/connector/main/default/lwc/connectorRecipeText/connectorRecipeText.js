@@ -812,6 +812,31 @@ const TEXTS = {
   },
   get Connector_User_Steps() {
     return helpText('Connector', 'Connector_User_Steps');
+  },
+  // Webhooks in and data sent back (CN-04).
+  get Connector_Editor_UrlFrom() {
+    return helpText('Connector', 'Connector_Editor_UrlFrom');
+  },
+  get Connector_Editor_UrlFromHelp() {
+    return helpText('Connector', 'Connector_Editor_UrlFromHelp');
+  },
+  get Connector_Editor_WebhookPathHelp() {
+    return helpText('Connector', 'Connector_Editor_WebhookPathHelp');
+  },
+  get Connector_Editor_WhenWebhook() {
+    return helpText('Connector', 'Connector_Editor_WhenWebhook');
+  },
+  get Connector_Recipe_ErrorWebhook() {
+    return helpText('Connector', 'Connector_Recipe_ErrorWebhook');
+  },
+  get Connector_Runs_Reference() {
+    return helpText('Connector', 'Connector_Runs_Reference');
+  },
+  get Connector_Step_SendWebhook() {
+    return helpText('Connector', 'Connector_Step_SendWebhook');
+  },
+  get Connector_Trigger_Webhook() {
+    return helpText('Connector', 'Connector_Trigger_Webhook');
   }
 };
 

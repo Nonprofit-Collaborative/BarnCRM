@@ -128,13 +128,69 @@ are never offered.
 | Run Now or a flow | **Run Now** on the recipe, with data you paste (optional), or the Flow action **Run a BarnCRM Connector Recipe** (see [Flow Actions](#flow-actions)). |
 | Schedule | The recipe clock, every 15 minutes, every hour, every day at a time, or every week on a day at a time. Times are in your org's time zone. The steps read the time it was due as `trigger.scheduledAt`. |
 | Record Change | Records of an object created, or created or changed, that match a saved Find query (see [Find](find.md)). The clock looks every 15 minutes. **One Run per Record** starts a run for each record (`trigger.recordId`, `trigger.record.LastName`); **One Run for All** starts one run with them all (`trigger.recordIds`, `trigger.records[0].LastName`). **Most Records per Look** is 1 to 200 (200 when blank). |
+| Another App Sends Data | Another app posts to the recipe's webhook address (see [Webhooks: Data Sent In](#webhooks-data-sent-in)). The steps read the posted JSON under `trigger`, such as `trigger.amount` or `trigger.donor.email`. |
 
 A Record Change recipe starts from the moment you publish it: records changed before then are
 not run. It reads the fields the saved query lists, sees imports and bulk updates, and carries on
 where it stopped after a pause or an outage; it does not see deleted records. **Ignore Own
 Changes** (on by default, in **Run Settings**) skips records last changed by a recipe, so a
-recipe that updates the records it watches does not start itself again. Webhooks and app polling
-come in later releases.
+recipe that updates the records it watches does not start itself again. App polling comes in a
+later release.
+
+### Webhooks: Data Sent In
+
+A webhook recipe gives another app (a giving form, an event tool, a survey) an address to post
+data to. BarnCRM only stores each post and answers at once; the recipe's steps run moments later,
+as the recipe's Run As, never as the visitor or the app.
+
+**Once per org: a Site.** The address is on a Salesforce Site, because an app posting data has
+no Salesforce login. Experience Cloud is not needed. Any active Site works, such as the one
+Payments or Forms already uses:
+
+1. If your org has no Site: in Setup, **Sites**, register a domain if asked, then select **New**,
+   give the Site a label and name, leave the home page as it is, tick **Active** and save.
+2. Open **Health Check**. **Site Guest Missing Webhook Access** lists each Site whose guest user
+   does not yet hold **BarnCRM Connector Webhook Guest**; select **Give Webhook Access**. (In
+   Setup you can instead open the Site, **Public Access Settings**, **View Users**, the guest
+   user, and add that permission set.)
+
+The guest set gives the receiver class and nothing else: no object, field, record, connection
+or key.
+
+**Per recipe:**
+
+1. Choose **Another App Sends Data** as the recipe's **When** and save the draft.
+2. On the **Webhook** card, select **New Webhook Token**. The token appears once, with the
+   address and both ways to send it; copy them now. BarnCRM keeps only a fingerprint of the
+   token, so nobody, you included, can see it again. **New Webhook Token** again replaces it, and
+   the old token stops working at once.
+3. In the other app, set the webhook address and, where the app allows custom headers, a header
+   named `X-BarnCRM-Token` holding the token. Use the address ending in `?token=` only for an app
+   that cannot send headers: an address can be written to the app's logs.
+4. Paste an example of the app's post into the recipe's sample data, so value paths such as
+   `trigger.amount` are offered, then build the steps, test and publish.
+
+| Setting | Default | What it does |
+|---|---|---|
+| Event Id | Blank | A value path to the post's own id, such as `trigger.id`. When the app sends the same post again, it is answered as before and not run twice. |
+| Reply Status | 202 | 200 or 202, sent to the app at once. |
+| Reply Body | `{"received": true, "reference": "{reference}"}` | Fixed JSON, at most 4,000 characters. `{reference}` becomes the run's reference, which Run History shows, so the app and BarnCRM can be matched. It can never hold a record or a result, because nothing has run yet. |
+| Challenge Field | Blank | For an app that confirms a new address by sending a value and expecting it back: the name of that field (in the posted JSON or the address). Its value is sent back as plain text. |
+| Webhook Hourly Cap | 500 | 1 to 5,000 posts kept in any hour. More are refused with 429, which apps treat as "try again later", and one Error Log warning an hour names the recipe. |
+
+**What the receiver refuses, with an empty answer:** a post with no token, a wrong token or a
+recipe never published (404, nothing kept); a body over 131,072 characters (413); a body that is
+neither JSON nor form fields (415, or 400 when unreadable); a post past the hourly cap (429). A
+Paused recipe still keeps posts, up to its cap, and runs them when you select **Resume**.
+
+**Keep a stolen token from doing harm.** Anyone with the token can post data, so a post is
+untrusted: it can only do what the recipe's steps do, and a value holding a Salesforce merge
+field fails any step that would send it. When the app has an API, prefer **fetch back**: make
+the first step a **Call an App** GET over a connection to that app, using the post's id in the
+path (such as `/orders/{id}` with `trigger.id`) or, when the post carries the item's own API
+address (such as Eventbrite's `api_url`), **Address From the Data**. The recipe then writes what
+the app itself says, not what was posted. Apps that insist on a signed handshake (such as Zoom)
+cannot use a webhook recipe; use a Schedule recipe that calls the app instead.
 
 ### The Recipe Clock
 
@@ -174,7 +230,8 @@ reads an earlier step's result, or the run's own data, by a **value path**:
 | Create a Record | Builds one record through a saved record map (see [Mapper](mapper.md)) and inserts it. | The map; the value path it reads (blank is the run's data). |
 | Update a Record | Builds the map's fields and updates the record whose Id the value path gives. | The map; the record Id's value path; the value path it reads. |
 | Create or Update a Record | Finds the existing record through the map's **Match** (by record Id, a field or an external Id) and updates it, or creates one. | The map; the value path it reads. |
-| Call an App | Sends one request over a connection and keeps the app's answer. | The connection; GET, POST, PUT, PATCH or DELETE; the path after the connection's base URL, such as `/contacts/{id}`; a value for each `{slot}`; query parameters; extra headers; a body map (a map that builds JSON) and the value path it reads; the status codes that count as success (blank is any 2xx); whether a 404 is all right. |
+| Call an App | Sends one request over a connection and keeps the app's answer. | The connection; GET, POST, PUT, PATCH or DELETE; the path after the connection's base URL, such as `/contacts/{id}`; a value for each `{slot}`; query parameters; extra headers; a body map (a map that builds JSON) and the value path it reads; the status codes that count as success (blank is any 2xx); whether a 404 is all right. Or, in place of the path, **Address From the Data**: a value path to a full address on the connection's own host, for fetch back. |
+| Send to Webhook | Posts JSON to another app's webhook over a connection and keeps the app's answer (see [Sending Data Back](#sending-data-back)). | The connection; a path (blank posts to the connection's own address) or **Address From the Data** for a callback address the app sent; extra headers; the body map and the value path it reads; the status codes that count as success. |
 | Load Rows with an Import Template | Hands rows to Super Importer with one of its templates, runs the dry run, and commits only when the dry run is inside the limits you set. See [Scheduled Imports](#scheduled-imports-load-rows-with-an-import-template). | The template; the value path that holds the rows; Most Rows, Most Rejected Rows, Most New Records and Most Updated Records. |
 | If | Runs its **Then** steps when its conditions hold, otherwise its **Otherwise** steps. | Up to 10 conditions (value path, operator, value), all or any. An If can hold one more If, no deeper. |
 | Stop | Ends the run as Succeeded, Skipped or Failed, with a message. | The outcome and message. |
@@ -189,6 +246,26 @@ cannot add a path segment or a parameter. Authorization and the other sign-in he
 the connection, never from a step. Any value that holds a Salesforce merge field (an opening
 brace followed by an exclamation mark), whether typed in the recipe, sent by an app or read from a
 record, fails the step and nothing is sent: a recipe can never make Salesforce insert a key.
+The same rules hold for Send to Webhook. An **Address From the Data** is used only when it is
+`https`, holds no user name, is on the connection's exact host and port and starts with the
+connection's own path; only its path and query are sent, through the connection. Any other
+address, such as `https://api.example.com.attacker.net` or `https://api.example.com@attacker.net`,
+fails the step and nothing is sent.
+
+### Sending Data Back
+
+A recipe sends data back to an app in two ways:
+
+- **At once, to the app that posted:** the webhook's reply (see
+  [Webhooks: Data Sent In](#webhooks-data-sent-in)): a fixed status and body with the run's
+  reference. Nothing the recipe works out can go in it, because the steps have not run yet.
+- **After the steps run, through a connection:** **Send to Webhook** posts JSON built by a body
+  map to the app's webhook (a Secret URL connection for an address that is itself the secret,
+  such as a Slack incoming webhook or a Microsoft Teams Workflows address; a Generic REST
+  connection otherwise). When the post carried a reply address (such as `response_url`), set
+  **Address From the Data** to it, with a connection to that app's host. **Call an App** can also
+  update the item that started the run through the app's API. These steps run when the runner
+  reaches them, normally within a minute of the post, and are retried like any call.
 
 ### Scheduled Imports: Load Rows with an Import Template
 
@@ -316,10 +393,10 @@ Importer.
 
 ## Run History
 
-**Run History** lists the latest 50 runs, newest first, with the recipe, status (Queued,
-Waiting, Succeeded, Skipped, Failed), what started it (Manual, Flow, Test, Schedule, Record
-Change), Run As, version, records written, the failed step and, for a Waiting run, when it is
-tried next. Open a run to see each step: its outcome, how long it took, the
+**Run History** lists the latest 50 runs, newest first, with the recipe, status (Received,
+Queued, Waiting, Succeeded, Skipped, Failed), what started it (Manual, Flow, Test, Schedule,
+Record Change, Webhook), Run As, version, records written, the failed step and, for a Waiting run,
+when it is tried next. A webhook run also shows the reference its app was given. Open a run to see each step: its outcome, how long it took, the
 records it wrote, the app's status code and, for a failed Call an App, the first 2,000 characters
 of the app's answer. A Test run also shows what each step would have written or sent. No request
 header and no key is ever kept.
@@ -355,6 +432,7 @@ object you ask about, and the Mapper warns before you change a map a recipe link
 |---|---|
 | BarnCRM Connector Admin | The BarnCRM Connector app, the Super Connector tab, Manage BarnCRM Connector and every recipe and run. Give it only to system administrators: whoever holds it decides where your data goes. |
 | BarnCRM Connector Viewer | The BarnCRM Connector app and the Super Connector tab, to see recipes and Run History without changing them. |
+| BarnCRM Connector Webhook Guest | For a Site's guest user only: the webhook receiver and nothing else (no object, record, connection or key). Health Check's **Give Webhook Access** assigns it. |
 | BarnCRM Connections | Created by BarnCRM in your org, not part of the package. It holds each connection's principal access and is given only to Connector admins when they create or check a connection, to the Automated Process user when you save Recipe Access, and to the integration user when you choose it. Do not add other permissions to it: Health Check warns when it holds anything else. |
 
 ## Health Check
@@ -374,7 +452,10 @@ With the module installed, Health Check reports:
 - runs Queued for more than 30 minutes, for example after a subscriber change not yet applied
   with Suspend and Resume;
 - recipes Paused by Failures, and Active recipes whose Owner of New Records is inactive;
-- Pause All Recipes on.
+- Pause All Recipes on;
+- while a published recipe receives webhooks: no active Site, and **Site Guest Missing Webhook
+  Access** for each Site whose guest user lacks BarnCRM Connector Webhook Guest, with **Give
+  Webhook Access**.
 
 ## Removing It
 
@@ -382,4 +463,5 @@ Delete each recipe, then each connection, on **Super Connector** first, so no cr
 in Setup, then uninstall the module from the [Module Manager](module-manager.md). Delete the
 **BarnCRM Connections** permission set in Setup afterwards if you no longer need it, and remove
 the Recipe Access sets from the Automated Process user if you want them gone. Before
-uninstalling, save **Integration User** with no user, so the subscriber setting is removed.
+uninstalling, save **Integration User** with no user, so the subscriber setting is removed, and
+remove **BarnCRM Connector Webhook Guest** from each Site guest user that holds it.

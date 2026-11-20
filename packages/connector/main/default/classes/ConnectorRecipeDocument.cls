@@ -6,26 +6,30 @@
  *
  * Release 1.31 (CN-02) builds the Manual trigger (Run Now and the Flow action) and the steps
  * Find, Create, Update, Create or Update, Call an App, If and Stop; release 1.32 (CN-03) the
- * Schedule and Record Change triggers (`ConnectorTriggers`) and CN-09 Load Rows with an Import
- * Template (`ConnectorImportStep`). Any other kind is refused.
+ * Schedule and Record Change triggers (`ConnectorTriggers`), CN-09 Load Rows with an Import
+ * Template (`ConnectorImportStep`), and CN-04 the Webhook trigger and the Send to Webhook step
+ * (`ConnectorWebhooks`). Any other kind is refused.
  */
 public with sharing class ConnectorRecipeDocument {
 	public static final Integer MAX_STEPS = 25;
 	public static final Integer MAX_DEPTH = 2;
 	public static final Integer MAX_LENGTH = 100000;
 	public static final Integer MAX_CONDITIONS = 10;
-	public static final Set<String> TRIGGERS = new Set<String>{ 'manual', 'schedule', 'record' };
+	public static final Set<String> TRIGGERS = new Set<String>{ 'manual', 'schedule', 'record', 'webhook' };
 	public static final Set<String> STEP_KINDS = new Set<String>{
 		'find',
 		'create',
 		'update',
 		'upsert',
 		'callApp',
+		'sendWebhook',
 		'if',
 		'stop',
 		'importRows'
 	};
 	public static final Set<String> RECORD_KINDS = new Set<String>{ 'create', 'update', 'upsert' };
+	/** The steps that make a request through a connection (F1, F4). */
+	public static final Set<String> CALL_KINDS = new Set<String>{ 'callApp', 'sendWebhook' };
 	public static final Set<String> METHODS = new Set<String>{ 'GET', 'POST', 'PUT', 'PATCH', 'DELETE' };
 	public static final Set<String> OPERATORS = new Set<String>{
 		'equals',
@@ -111,7 +115,7 @@ public with sharing class ConnectorRecipeDocument {
 				found.add(BarnHelp.text('Connector', 'Connector_Recipe_ErrorStepKind', at));
 				continue;
 			}
-			String problem = kind == 'callApp' ? callProblem(step, at) : stepProblem(kind, step, at);
+			String problem = CALL_KINDS.contains(kind) ? callProblem(step, at) : stepProblem(kind, step, at);
 			if (problem != null) {
 				found.add(problem);
 			}
@@ -168,17 +172,30 @@ public with sharing class ConnectorRecipeDocument {
 			: BarnHelp.text('Connector', 'Connector_Recipe_ErrorStop', at);
 	}
 
-	/** Call an App's request rules (F1, F4): connection, method, path, slots, query, headers, codes. */
+	/**
+	 * Call an App's and Send to Webhook's request rules (F1, F4): connection, method, path or an
+	 * address read from the data (`urlFrom`, R-CR11), slots, query, headers, codes.
+	 */
 	private static String callProblem(Map<String, Object> step, List<Object> at) {
 		String connection = textOf(step.get('connection'));
 		if (!connection.startsWith(ConnectorConnections.PREFIX) || !Pattern.matches('[A-Za-z0-9_]{1,80}', connection)) {
 			return BarnHelp.text('Connector', 'Connector_Recipe_ErrorConnection', at);
 		}
-		if (!METHODS.contains(textOf(step.get('method')))) {
+		String kind = textOf(step.get('kind'));
+		if (kind == 'callApp' && !METHODS.contains(textOf(step.get('method')))) {
 			return BarnHelp.text('Connector', 'Connector_Recipe_ErrorMethod', at);
 		}
 		String path = textOf(step.get('path'));
-		if (pathProblem(path)) {
+		String urlFrom = textOf(step.get('urlFrom'));
+		Boolean fromData = String.isNotBlank(urlFrom);
+		if (
+			fromData
+				? !isPath(urlFrom) ||
+				  String.isNotBlank(path) ||
+				  !listOf(step.get('pathValues')).isEmpty() ||
+				  !listOf(step.get('query')).isEmpty()
+				: requestPathProblem(kind, path)
+		) {
 			return BarnHelp.text('Connector', 'Connector_Recipe_ErrorRequestPath', at);
 		}
 		Set<String> slots = new Set<String>();
@@ -254,6 +271,11 @@ public with sharing class ConnectorRecipeDocument {
 			path.contains('?') ||
 			path.contains('#') ||
 			Pattern.matches('.*\\s.*', path);
+	}
+
+	/** As `pathProblem`, but Send to Webhook may leave the path blank to post to the connection's own address. */
+	public static Boolean requestPathProblem(String kind, String path) {
+		return kind == 'sendWebhook' && String.isBlank(path) ? false : pathProblem(path);
 	}
 
 	/** True for a value no header, path or query may carry: `{!`, CR or LF (F1, F4). */

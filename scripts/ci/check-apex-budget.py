@@ -99,7 +99,11 @@ CAPS = {
     # optional packages; the seams, @NamespaceAccessible marks and getters they need stay.
     # 2,201,145 measured before, 1,970,388 after, plus about 0.1%: Core is under the 2.0M
     # target.
-    "core": 1_972_400,
+    # Raised 2026-11-20 for landing batch Q: the Mapper and saved maps (MAP-01 to MAP-04:
+    # MapController, Where Used and Saved Transform additions, 22,853) and the Connector seams
+    # (CN-01 to CN-04, CN-09: the module catalog, Health Check and Where Used registrations,
+    # 346); 1,993,587 measured, plus about 0.1%: still under the 2.0M target.
+    "core": 1_995_600,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured
@@ -404,7 +408,10 @@ CAPS = {
     # Raised 2026-11-20 for CN-09 Load Rows with an Import Template (ConnectorImportStep: rows
     # from records, lists or CSV handed to Super Importer, the wait, the limit check; C-38):
     # 170,634 measured on the CN-03 head, 183,913 with CN-09, plus about 2%.
-    "connector": 187_600,
+    # Raised 2026-11-20 for CN-04 webhooks in and sending data back (the receiver, the Webhook
+    # card's controller, Send to Webhook, Address From the Data, the guest Health Check fix):
+    # 205,718 measured with CN-09 and CN-04 merged (landing batch Q), plus about 2%.
+    "connector": 209_900,
     # Mirror: the NPSP gifts migration kit's extension (MIG-05), 187,295 measured, then the
     # Nonprofit Cloud gifts kit's (MIG-04), 195,957 measured, then the Nonprofit Cloud
     # relationships kit's (MIG-02), about 200,500 combined, plus about 1%.

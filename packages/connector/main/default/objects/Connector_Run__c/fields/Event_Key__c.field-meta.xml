@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Event_Key__c</fullName>
+  <caseSensitive>true</caseSensitive>
+  <description>The recipe Id and the posted event id, for a webhook recipe that names one (canonical model R-CR10). Unique, so a post the app sends again is not stored twice.</description>
+  <externalId>true</externalId>
+  <inlineHelpText>Which post this run came from, so a resent post is not run twice.</inlineHelpText>
+  <label>Event Key</label>
+  <length>255</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>true</unique>
+</CustomField>
