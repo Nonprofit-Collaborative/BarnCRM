@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    Create, check, replace the key of, disconnect and delete BarnCRM Connector connections (the
+    key writes also need Customize Application or Manage Named Credentials). In BarnCRM Connector
+    Admin only.
+  </description>
+  <isLicensed>false</isLicensed>
+  <label>Manage BarnCRM Connector</label>
+</CustomPermission>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>State_JSON__c</fullName>
+  <description>The completed step ids and their results, so a continued or retried run never repeats a step (R-RUN4). Never holds a secret or a header (R-RUN3).</description>
+  <inlineHelpText>What the run has done so far.</inlineHelpText>
+  <label>State</label>
+  <length>131072</length>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>5</visibleLines>
+</CustomField>

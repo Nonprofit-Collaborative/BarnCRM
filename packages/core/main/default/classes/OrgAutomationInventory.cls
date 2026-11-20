@@ -59,6 +59,8 @@ public with sharing class OrgAutomationInventory {
 	 */
 	@TestVisible
 	private static final Set<String> BARN_EVENT_TRIGGERS = new Set<String>{
+		'ConnectorStartTrigger',
+		'ConnectorStartUserTrigger',
 		'ErrorLogEventTrigger',
 		'MergeSettlementReadyTrigger',
 		'RollupQueueReadyTrigger',

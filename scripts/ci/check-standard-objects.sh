@@ -107,7 +107,7 @@ DIRS=(packages/core packages/rollups packages/giving packages/volunteers package
   packages/logicmodels packages/funders packages/forms packages/contactpoints
   packages/events packages/portal packages/corporatehub packages/payments packages/lwcbuilder packages/scholarships packages/territory packages/memberships
   packages/projects packages/addressverification packages/reporting packages/migration
-  packages/orgoptimizer packages/sampledata)
+  packages/orgoptimizer packages/sampledata packages/connector)
 
 PATTERN='\b(Opportunity|OpportunityContactRole|Campaign|CampaignMember|Lead|Case|PersonAccount|IsPersonAccount|GiftTransaction)\b|__dlm\b'
 

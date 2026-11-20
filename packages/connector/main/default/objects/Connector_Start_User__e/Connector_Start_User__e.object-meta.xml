@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <deploymentStatus>Deployed</deploymentStatus>
+  <description>
+    Says that BarnCRM Connector work for Integration User recipes is waiting. Its trigger runs as
+    the chosen integration user through the PlatformEventSubscriberConfig BarnCRM writes, and starts
+    that user's runner chain and recipe clock (canonical model R-CR4, R-CR6, D-215). Carries no data.
+  </description>
+  <eventType>HighVolume</eventType>
+  <label>Connector Start User</label>
+  <pluralLabel>Connector Start User Events</pluralLabel>
+  <publishBehavior>PublishAfterCommit</publishBehavior>
+</CustomObject>

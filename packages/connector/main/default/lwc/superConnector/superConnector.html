@@ -1,0 +1,66 @@
+<template>
+    <c-barn-page-shell title={labels.title} purpose={labels.intro} icon-name={icons.page} data-id="shell">
+        <div class="slds-is-relative">
+            <template lwc:if={loading}>
+                <lightning-spinner alternative-text={labels.title} size="small" data-id="loading"></lightning-spinner>
+            </template>
+            <lightning-tabset active-tab-value={activeTab} data-id="tabs">
+                <lightning-tab label={labels.recipesTab} value="recipes" data-id="tab-recipes">
+                    <c-connector-recipes open-recipe-id={openRecipeId} data-id="recipes"></c-connector-recipes>
+                </lightning-tab>
+                <lightning-tab label={labels.runsTab} value="runs" data-id="tab-runs">
+                    <c-connector-runs can-manage={loaded} data-id="runs"></c-connector-runs>
+                </lightning-tab>
+                <lightning-tab label={labels.connections} value="connections" data-id="tab-connections">
+                    <template lwc:if={message}>
+                        <c-barn-notice class="slds-var-m-bottom_medium" variant={messageVariant} message={message} data-id="message"></c-barn-notice>
+                    </template>
+                    <template lwc:if={error}>
+                        <c-barn-notice class="slds-var-m-bottom_medium" variant="error" message={error} data-id="error"></c-barn-notice>
+                    </template>
+                    <template lwc:if={loaded}>
+                        <section aria-labelledby="connections-heading">
+                            <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_small">
+                                <h2 id="connections-heading" class="slds-text-heading_medium slds-col">{labels.connections}</h2>
+                                <template lwc:if={canWrite}>
+                                    <lightning-button variant="brand" label={labels.newConnection} disabled={formOpen} onclick={handleNew} data-id="new"></lightning-button>
+                                </template>
+                            </div>
+                            <template lwc:if={noWriteShown}>
+                                <c-barn-notice class="slds-var-m-bottom_small" variant="info" message={labels.noWrite} data-id="no-write"></c-barn-notice>
+                            </template>
+                            <template lwc:if={formOpen}>
+                                <c-connector-key-form mode={formMode} connection={formConnection} onsaved={handleSaved} onfailed={handleFailed} oncancel={handleCancel} data-id="key-form"></c-connector-key-form>
+                            </template>
+                            <template lwc:if={empty}>
+                                <p class="slds-var-m-vertical_medium" data-id="empty">{labels.empty}</p>
+                            </template>
+                            <ul class="slds-has-dividers_bottom-space">
+                                <template for:each={rows} for:item="row">
+                                    <li key={row.name} class="slds-item" data-id={row.name}>
+                                        <h3 class="slds-text-heading_small">{row.label}</h3>
+                                        <p class="slds-text-body_small slds-var-m-bottom_x-small">{row.detail}</p>
+                                        <c-barn-notice variant={row.statusVariant} message={row.statusText} data-id={row.statusId}></c-barn-notice>
+                                        <template lwc:if={row.showSteps}>
+                                            <p class="slds-var-m-top_x-small slds-text-body_small" data-id={row.stepsId}>{row.steps}</p>
+                                        </template>
+                                        <div class="slds-var-m-top_small">
+                                            <lightning-button class="slds-var-m-right_small" label={row.checkLabel} data-name={row.name} disabled={busy} onclick={handleCheck} data-id={row.checkId}></lightning-button>
+                                            <template lwc:if={canWrite}>
+                                                <lightning-button class="slds-var-m-right_small" label={labels.replaceKey} data-name={row.name} disabled={busy} onclick={handleReplace} data-id={row.replaceId}></lightning-button>
+                                                <template lwc:if={row.canDisconnect}>
+                                                    <lightning-button class="slds-var-m-right_small" label={labels.disconnect} data-name={row.name} disabled={busy} onclick={handleDisconnect} data-id={row.disconnectId}></lightning-button>
+                                                </template>
+                                                <lightning-button variant="destructive-text" label={labels.delete} data-name={row.name} disabled={busy} onclick={handleDelete} data-id={row.deleteId}></lightning-button>
+                                            </template>
+                                        </div>
+                                    </li>
+                                </template>
+                            </ul>
+                        </section>
+                    </template>
+                </lightning-tab>
+            </lightning-tabset>
+        </div>
+    </c-barn-page-shell>
+</template>

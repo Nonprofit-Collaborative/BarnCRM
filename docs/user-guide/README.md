@@ -88,6 +88,10 @@ Every BarnCRM module is in Beta right now: a **Beta** badge beside a module's na
 
 - [Advanced Reporting](advanced-reporting.md): dashboard templates and their filters, building a report across related records, totals and charts, saving, sharing and exporting, building a dashboard.
 
+### BarnCRM Connector
+
+- [BarnCRM Connector](connector.md): what the module does, why there is nothing for staff to do yet, and keeping keys with your admin.
+
 ### Project Management
 
 - [Projects](projects.md): Projects Home, new projects from templates, tasks and milestones, logging time, health and status updates.

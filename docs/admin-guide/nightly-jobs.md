@@ -33,6 +33,7 @@ without a switch runs whenever its module is on):
 | 1:35 | Gift Transaction mirror | Fundraising | Gift Transaction mirror page, while the mirror is on |
 | 1:40 | Cases Sent to a Service Provider: makes sure the hourly check (**BarnCRM Mirror: Case requests hourly**, at a quarter past each hour, working only while a request or a Case of the chosen Type is open) is scheduled, and checks once | Mirror | **Nightly Jobs** panel, while **Send Cases to a service provider** is on; switching it off stops the hourly check (see [Cases Sent to a Service Provider](mirror-case-requests.md)) |
 | 2:00 (the **Time of the Nightly Run** setting) | Rollup recalculation | Rollup Builder | Rollups page |
+| 2:40 | Connector cleanup: deletes finished recipe runs older than each recipe's Keep Runs Days and restarts a recipe clock that stopped (see [BarnCRM Connector](connector.md#the-recipe-clock)) | Connector | **Nightly Jobs** panel (on unless switched off) |
 | 2:45 | Acknowledgment emails | Fundraising | Acknowledgments page (off until switched on) |
 | 3:00 | Volunteer schedules | Volunteers | No switch |
 | 3:15 | Pledge reminders | Fundraising | Pledge Reminders page (off until switched on) |
@@ -53,7 +54,7 @@ full recalculation** setting says otherwise) and over what changed on the other 
 The donor levels pass writes a donor only when its level or scores changed.
 
 Modules add their own jobs to the same run when they are installed (Rollup Builder, Fundraising,
-Mirror, Volunteers, Logic Models, Grants). The Nightly Jobs panel lists every job your org has.
+Mirror, Volunteers, Logic Models, Grants, Connector). The Nightly Jobs panel lists every job your org has.
 
 ## Where to Find It
 

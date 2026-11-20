@@ -1,0 +1,49 @@
+<template>
+    <article class="slds-card slds-is-relative" aria-labelledby="clock-heading">
+        <template lwc:if={working}>
+            <lightning-spinner alternative-text={labels.working} size="small" data-id="working"></lightning-spinner>
+        </template>
+        <div class="slds-card__body slds-card__body_inner">
+            <h3 id="clock-heading" class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.heading}</h3>
+            <p class="slds-var-m-bottom_small slds-text-body_small">{labels.intro}</p>
+            <template lwc:if={message}>
+                <c-barn-notice class="slds-var-m-bottom_small" variant="success" message={message} data-id="message"></c-barn-notice>
+            </template>
+            <template lwc:if={error}>
+                <c-barn-notice class="slds-var-m-bottom_small" variant="error" message={error} data-id="error"></c-barn-notice>
+            </template>
+            <template lwc:if={loaded}>
+                <template lwc:if={paused}>
+                    <c-barn-notice class="slds-var-m-bottom_small" variant="warning" message={labels.pausedNotice} data-id="paused"></c-barn-notice>
+                </template>
+                <template lwc:if={automationPausedShown}>
+                    <c-barn-notice class="slds-var-m-bottom_small" variant="warning" message={labels.automationPaused} data-id="automation-paused"></c-barn-notice>
+                </template>
+                <ul class="slds-var-m-bottom_small">
+                    <template for:each={lanes} for:item="lane">
+                        <li key={lane.key} class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_xx-small" data-id={lane.dataId}>
+                            <span class="slds-var-m-right_small">{lane.name}</span>
+                            <c-barn-status-badge status={lane.tone} label={lane.state}></c-barn-status-badge>
+                        </li>
+                    </template>
+                </ul>
+                <lightning-input type="toggle" label={labels.pauseAll} checked={paused} field-level-help={labels.pauseAllHelp} disabled={working} onchange={handlePauseAll} data-id="pause-all"></lightning-input>
+                <lightning-button class="slds-var-m-top_x-small" label={labels.restart} disabled={working} onclick={handleRestart} data-id="restart"></lightning-button>
+
+                <section class="slds-var-m-top_medium" aria-labelledby="user-heading">
+                    <h4 id="user-heading" class="slds-text-title_bold slds-var-m-bottom_x-small">{labels.userHeading}</h4>
+                    <p class="slds-var-m-bottom_small slds-text-body_small">{labels.userIntro}</p>
+                    <template for:each={userNotices} for:item="notice">
+                        <c-barn-notice key={notice.key} class="slds-var-m-bottom_small" variant={notice.variant} message={notice.message} data-id={notice.key}></c-barn-notice>
+                    </template>
+                    <lightning-record-picker label={labels.userPick} object-api-name="User" value={pickedUserId} onchange={handlePickUser} data-id="user-picker"></lightning-record-picker>
+                    <lightning-button class="slds-var-m-top_x-small" variant="brand" label={labels.userSave} disabled={saveDisabled} onclick={handleSaveUser} data-id="user-save"></lightning-button>
+                    <p class="slds-var-m-top_small slds-text-body_small" data-id="user-steps">{labels.userSteps}</p>
+                    <template lwc:if={lastWrite}>
+                        <p class="slds-text-body_small" data-id="last-write">{lastWrite}</p>
+                    </template>
+                </section>
+            </template>
+        </div>
+    </article>
+</template>

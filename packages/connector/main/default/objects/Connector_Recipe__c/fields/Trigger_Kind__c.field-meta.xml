@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Trigger_Kind__c</fullName>
+  <description>What starts the recipe, copied from its definition for list views (R-CR1).</description>
+  <externalId>false</externalId>
+  <inlineHelpText>What starts the recipe.</inlineHelpText>
+  <label>Trigger Kind</label>
+  <required>true</required>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Schedule</fullName>
+        <default>false</default>
+        <label>Schedule</label>
+      </value>
+      <value>
+        <fullName>RecordChange</fullName>
+        <default>false</default>
+        <label>Record Change</label>
+      </value>
+      <value>
+        <fullName>Webhook</fullName>
+        <default>false</default>
+        <label>Webhook</label>
+      </value>
+      <value>
+        <fullName>AppPoll</fullName>
+        <default>false</default>
+        <label>App Poll</label>
+      </value>
+      <value>
+        <fullName>Manual</fullName>
+        <default>true</default>
+        <label>Manual</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

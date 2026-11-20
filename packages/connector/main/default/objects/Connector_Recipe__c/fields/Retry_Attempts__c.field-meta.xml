@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Retry_Attempts__c</fullName>
+  <defaultValue>3</defaultValue>
+  <description>How many times a run that failed for a passing reason (app busy or down, no answer) is tried again (canonical model R-CR7), 0 to 4; blank or out of range reads as 3.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>Tries again after 15 minutes, 1 hour, 4 hours and 12 hours, up to this many times.</inlineHelpText>
+  <label>Retry Attempts</label>
+  <precision>3</precision>
+  <required>false</required>
+  <scale>0</scale>
+  <trackTrending>false</trackTrending>
+  <type>Number</type>
+  <unique>false</unique>
+</CustomField>

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Kind__c</fullName>
-  <description>Which admin tool wrote the row: Merge (one merge, undone from it), Scan (a read of the org's automation), Deactivation (a run of Deactivate Org Flows and Validation Rules), Migration (one administrator's progress through a Migration Kit) or Household Adoption (one Account adopted as a household). Every query reads one kind.</description>
+  <description
+  >Which admin tool wrote the row: Merge (one merge, undone from it), Scan (a read of the org's automation), Deactivation (a run of Deactivate Org Flows and Validation Rules), Migration (one administrator's progress through a Migration Kit), Household Adoption (one Account adopted as a household) or Connection (one key replaced on a BarnCRM Connector connection). Every query reads one kind.</description>
   <label>Kind</label>
   <required>false</required>
   <trackTrending>false</trackTrending>
@@ -34,6 +35,11 @@
         <fullName>Household Adoption</fullName>
         <default>false</default>
         <label>Household Adoption</label>
+      </value>
+      <value>
+        <fullName>Connection</fullName>
+        <default>false</default>
+        <label>Connection</label>
       </value>
     </valueSetDefinition>
   </valueSet>

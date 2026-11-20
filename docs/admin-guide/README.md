@@ -301,6 +301,12 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 |---|---|---|
 | O-02 Advanced Reporting (beta): install, access, where reports and dashboards are kept and how sharing works, large data volumes, the dashboard templates, how it relates to Salesforce reports, Grid and Analytics, troubleshooting | [advanced-reporting.md](advanced-reporting.md) | BarnCRM Advanced Reporting |
 
+### BarnCRM Connector
+
+| Feature | Page | Package |
+|---|---|---|
+| CN-01 Connections (beta): install, the four sign-in kinds, the Secret URL notice, the one Setup step and Check Again, Check Connection, Replace Key, Disconnect and Delete, access, Health Check, removing it | [connector.md](connector.md) | BarnCRM Connector |
+
 ### Project Management
 
 | Feature | Page | Package |

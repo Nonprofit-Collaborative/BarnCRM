@@ -60,6 +60,7 @@ SOURCES = [
     "packages/projects/main/**/*.cls",
     "packages/addressverification/main/**/*.cls",
     "packages/reporting/main/**/*.cls",
+    "packages/connector/main/**/*.cls",
     "packages/mirror/main/**/*.cls",
     "packages/migration/main/**/*.cls",
     "packages/orgoptimizer/main/**/*.cls",

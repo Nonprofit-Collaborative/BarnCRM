@@ -1,0 +1,92 @@
+<template>
+    <section class="slds-is-relative" aria-labelledby="runs-heading">
+        <template lwc:if={working}>
+            <lightning-spinner alternative-text={labels.heading} size="small" data-id="working"></lightning-spinner>
+        </template>
+        <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_small">
+            <h2 id="runs-heading" class="slds-text-heading_medium slds-col">{labels.heading}</h2>
+            <lightning-button label={labels.refresh} onclick={handleRefresh} data-id="refresh"></lightning-button>
+        </div>
+        <p class="slds-var-m-bottom_small slds-text-body_small">{labels.intro}</p>
+        <template lwc:if={message}>
+            <c-barn-notice class="slds-var-m-bottom_small" variant="success" message={message} data-id="message"></c-barn-notice>
+        </template>
+        <template lwc:if={error}>
+            <c-barn-notice class="slds-var-m-bottom_small" variant="error" message={error} data-id="error"></c-barn-notice>
+        </template>
+
+        <template lwc:if={openedRow}>
+            <article class="slds-card" aria-labelledby="run-heading" data-id="opened">
+                <div class="slds-card__body slds-card__body_inner">
+                    <div class="slds-grid slds-grid_vertical-align-center slds-wrap slds-var-m-bottom_x-small">
+                        <h3 id="run-heading" class="slds-text-heading_small slds-var-m-right_small">{openedRow.recipeName}: {openedRow.name}</h3>
+                        <c-barn-status-badge status={openedRow.statusTone} label={openedRow.statusLabel}></c-barn-status-badge>
+                        <div class="slds-col_bump-left">
+                            <template lwc:if={openedRow.canRetry}>
+                                <lightning-button class="slds-var-m-right_small" variant="brand" label={labels.retry} data-run={openedRow.id} onclick={handleRetry} data-id="opened-retry"></lightning-button>
+                            </template>
+                            <lightning-button label={labels.back} onclick={handleBack} data-id="back"></lightning-button>
+                        </div>
+                    </div>
+                    <p class="slds-text-body_small">{openedRow.when}</p>
+                    <p class="slds-text-body_small slds-var-m-bottom_x-small">{openedRow.detail}</p>
+                    <template lwc:if={openedRow.failure}>
+                        <c-barn-notice class="slds-var-m-bottom_small" variant="error" message={openedRow.failure} data-id="opened-failure"></c-barn-notice>
+                    </template>
+                    <h4 class="slds-text-title_bold slds-var-m-bottom_x-small">{labels.steps}</h4>
+                    <ul class="slds-has-dividers_bottom-space">
+                        <template for:each={openedSteps} for:item="entry">
+                            <li key={entry.key} class="slds-item" data-id={entry.key}>
+                                <p class="slds-text-body_small">{entry.step} ({entry.kind}): {entry.outcome}, {entry.ms} ms</p>
+                                <template lwc:if={entry.status}>
+                                    <p class="slds-text-body_small">HTTP {entry.status}</p>
+                                </template>
+                                <template lwc:if={entry.ids}>
+                                    <p class="slds-text-body_small">{entry.ids}</p>
+                                </template>
+                                <template lwc:if={entry.message}>
+                                    <p class="slds-text-body_small">{entry.message}</p>
+                                </template>
+                                <template lwc:if={entry.response}>
+                                    <p class="slds-text-body_small">{labels.response}</p>
+                                    <pre class="slds-text-body_small">{entry.response}</pre>
+                                </template>
+                                <template lwc:if={entry.preview}>
+                                    <p class="slds-text-body_small">{labels.wouldDo}</p>
+                                    <pre class="slds-text-body_small">{entry.preview}</pre>
+                                </template>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </article>
+        </template>
+        <template lwc:else>
+            <template lwc:if={empty}>
+                <p class="slds-var-m-vertical_medium" data-id="empty">{labels.empty}</p>
+            </template>
+            <ul class="slds-has-dividers_bottom-space">
+                <template for:each={rows} for:item="row">
+                    <li key={row.id} class="slds-item" data-id={row.id}>
+                        <div class="slds-grid slds-grid_vertical-align-center slds-wrap">
+                            <h3 class="slds-text-heading_small slds-var-m-right_small">{row.recipeName}: {row.name}</h3>
+                            <c-barn-status-badge status={row.statusTone} label={row.statusLabel}></c-barn-status-badge>
+                        </div>
+                        <p class="slds-text-body_small">{row.when}</p>
+                        <p class="slds-text-body_small slds-var-m-bottom_x-small">{row.detail}</p>
+                        <template lwc:if={row.nextAttempt}>
+                            <p class="slds-text-body_small slds-var-m-bottom_x-small" data-id={row.nextId}>{row.nextAttempt}</p>
+                        </template>
+                        <template lwc:if={row.failure}>
+                            <p class="slds-text-body_small slds-var-m-bottom_x-small">{row.failure}</p>
+                        </template>
+                        <lightning-button class="slds-var-m-right_small" label={labels.open} data-run={row.id} onclick={handleOpen} data-id={row.openId}></lightning-button>
+                        <template lwc:if={row.canRetry}>
+                            <lightning-button label={labels.retry} data-run={row.id} onclick={handleRetry} data-id={row.retryId}></lightning-button>
+                        </template>
+                    </li>
+                </template>
+            </ul>
+        </template>
+    </section>
+</template>

@@ -391,6 +391,20 @@ CAPS = {
     # server with the multi-currency refusal, checked lookup names: 30,239 measured 2026-11-19,
     # raised by 2,200 (what the fixes added).
     "reporting": 30_900,
+    # BarnCRM Connector (CN-01, D-210, D-216, ADR-NEXT integration module): Connections on
+    # External and Named Credentials (page-entered keys, the F2 refusal, redacted logs, the
+    # Connections access set), its Health Check extension and post-install, 31,084 measured
+    # 2026-11-20, plus about 2%.
+    # Raised 2026-11-20 for CN-02 Recipes and Runs (document rules, the runner and step runner,
+    # map runtime, Recipe Access, run store, Where Used and Health Check additions) and CN-06
+    # Flow actions (Run a Recipe 3,317, Apply a Saved Map 5,000): 122,190 measured, plus about 2%.
+    # Raised 2026-11-20 for CN-03 the recipe clock (the lane heartbeat, Schedule and Record Change
+    # triggers, retries with backoff and auto-pause, the integration user and its subscriber
+    # write, Health Check findings, the nightly cleanup): 140,100 measured, plus about 2%.
+    # Raised 2026-11-20 for CN-09 Load Rows with an Import Template (ConnectorImportStep: rows
+    # from records, lists or CSV handed to Super Importer, the wait, the limit check; C-38):
+    # 170,634 measured on the CN-03 head, 183,913 with CN-09, plus about 2%.
+    "connector": 187_600,
     # Mirror: the NPSP gifts migration kit's extension (MIG-05), 187,295 measured, then the
     # Nonprofit Cloud gifts kit's (MIG-04), 195,957 measured, then the Nonprofit Cloud
     # relationships kit's (MIG-02), about 200,500 combined, plus about 1%.
