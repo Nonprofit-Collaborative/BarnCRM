@@ -791,7 +791,7 @@ This subsection is the schedule for every open, approved item. Where Sections 6.
 | M | 1.26 | Patch brand (ADR-0224, D-207): new logo assets per app, Barn Navy app headers, Patch Rust for decoration only, Patch welcome on the Home page. Landed 2026-11-14: squash `33ca62f30`, PR #1323 (#1322 closed as landed); incremental gate 168 of 168 on `barn-platform`; Core deployed to `mwdbdevsb` at `33ca62f30` (validation 0AfWF00000HRiZR0A1, 2,742 of 2,742 tests; quick deploy 0AfWF00000HRkWP0A1; D-192) |
 | N | 1.27, 1.28 | Owner decisions of 2026-11-14 (D-208): Grants rename everywhere, Memberships and Scholarships apps, org-wide Core dates, admin-only Form delete, Error Log grouping key, address match-key warning, Health Check Run Remaining Checks, quick link help in BarnHelp JSON, Mirror without nonprofit modules, hourly case status pull (1.27); fewer custom objects without losing function (1.28). Landed 2026-11-19 with batch O: squash `8c772d5d4`, PR #1327; release gate at `32c252100` passed on `barn-sales` and `barn-platform` (6,167 of 6,167 tests each, 93% coverage, 0 classes under the floor), then incremental gates 6,166 of 6,166 on `barn-sales` for three CI fixes; Core deployed to `mwdbdevsb` at `8c772d5d4` (validation 0AfWF00000HZDlN0AX, 2,759 of 2,759 tests, removed BarnCRM objects destroyed; quick deploy 0AfWF00000HZGo50AH; D-192) |
 | O | 1.29 | Apex character trim pass plus the Advanced Reporting module (D-202, D-208), after all current and pending work. Landed 2026-11-19 with batch N |
-| P | 1.30 | S11 Migration package, D-213 naming, Org Optimizer module, Sample Data package (D-213, D-215, D-216) |
+| P | 1.30 | S11 Migration package, D-213 naming, Org Optimizer module, Sample Data package (D-213, D-215, D-216). Landed 2026-11-20: squash `f0eae0b38`, PR #1341 (#1334, #1335, #1338 closed as landed); incremental gate at `f24a9f7aa` 6126 of 6126 on `barn-sales`, 6125 of 6125 on `barn-platform` |
 | Q | 1.31, 1.32 | The Mapper and BarnCRM Connector: Connections, Recipes and Runs, console app, Flow actions, recipe clock, inbound and outbound webhooks, scheduled imports (C-38), importable templates (D-214 to D-216) |
 | R | 1.33 | The Mapper everywhere (Super Importer, Super Transformer, gift mirrors), app polling, erasure path (D-214) |
 
@@ -1324,14 +1324,14 @@ Status (2026-11-19): Landed with batch N (squash `8c772d5d4`). Brandon's earlier
 
 #### Release 1.30 (Batch P): owner answers of 2026-11-20
 
-Status (2026-11-20): built on branches, landing batch P next.
+Status (2026-11-20): landed in batch P (squash `f0eae0b38`, PR #1341), after the pre-batch review (Core Health Check seam tests, guide paths, test-only hooks). Next: `mwdbdevsb` deploy (Org Optimizer module there needs Brandon's approval), then e2e and QA.
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| P-01 | S11 optional, uninstallable BarnCRM Migration package (Migration Assistant and NPSP household adoption out of Core; kits stay in their modules; ADR-0232, amends ADR-0197 and ADR-0155; the household writer seam exception approved) | Major | Built (#1335) | D-213, D-216 |
-| P-02 | Naming and wording: Scholarships and Outbound Grants settings section, Component Builder, tab and page names matched, Stewardship Plan Templates, Copy Existing People, Gifts That Need Attention, Turn On Recommended Rules, Served Without Enrollment, Automation page cards, single New on empty pipelines; ADR-0227 Accepted | Minor | Built (#1334) | D-213 |
-| P-03 | BarnCRM Org Optimizer module holding Org Optimizer and Health Check (reverses their D-101 Core placement) | Major | Building | D-215 |
-| P-04 | BarnCRM Sample Data package (the sample data loader out of Core) | Minor | Building | D-215 |
+| P-01 | S11 optional, uninstallable BarnCRM Migration package (Migration Assistant and NPSP household adoption out of Core; kits stay in their modules; ADR-0232, amends ADR-0197 and ADR-0155; the household writer seam exception approved) | Major | Landed (#1341) | D-213, D-216 |
+| P-02 | Naming and wording: Scholarships and Outbound Grants settings section, Component Builder, tab and page names matched, Stewardship Plan Templates, Copy Existing People, Gifts That Need Attention, Turn On Recommended Rules, Served Without Enrollment, Automation page cards, single New on empty pipelines; ADR-0227 Accepted | Minor | Landed (#1341) | D-213 |
+| P-03 | BarnCRM Org Optimizer module holding Org Optimizer and Health Check (reverses their D-101 Core placement; ADR-0233) | Major | Landed (#1341) | D-215 |
+| P-04 | BarnCRM Sample Data package (the sample data loader out of Core; ADR-0233) | Minor | Landed (#1341) | D-215 |
 
 #### Release 1.31 (Batch Q): the Mapper and BarnCRM Connector
 
@@ -1339,12 +1339,12 @@ Design: `docs/architecture/integration-hub-design.md`, the reusable mapper ADR a
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| MAP-01/02 | The Mapper: one mapping screen (source with samples, target sentences, live preview, auto-match, plain-language steps, drag and drop, Check Before Running) on the map document (import mapping document v4) | Major | Planned | D-214 |
-| CN-01 | BarnCRM Connector module with its own console app (Super Connector), Connections (page-entered keys under F1 to F13), Connector Admin | Major | Planned | D-214, D-216 |
-| CN-02 | Recipes and Runs: When and Then steps, Run As (BarnCRM Automation default, System, Integration User), Run History, Retry, test run | Major | Planned | D-214, D-215 |
-| MAP-03 | Saved Maps (Saved_Transform__c Kind Map) with Where Used | Minor | Planned | D-214 |
-| MAP-04 | Super Importer Save as Map and Use a Saved Map | Minor | Planned | D-214 |
-| CN-06 | Flow actions: run a recipe, apply a saved map | Minor | Planned | D-214 |
+| MAP-01/02 | The Mapper: one mapping screen (source with samples, target sentences, live preview, auto-match, plain-language steps, drag and drop, Check Before Running) on the map document (import mapping document v4) | Major | Built (#1336) | D-214 |
+| CN-01 | BarnCRM Connector module with its own console app (Super Connector), Connections (page-entered keys under F1 to F13), Connector Admin | Major | Built (#1337) | D-214, D-216 |
+| CN-02 | Recipes and Runs: When and Then steps, Run As (BarnCRM Automation default, System, Integration User), Run History, Retry, test run | Major | Built (#1339; Integration User lane in CN-03) | D-214, D-215 |
+| MAP-03 | Saved Maps (Saved_Transform__c Kind Map) with Where Used | Minor | Built (#1336, access tightened in #1340) | D-214 |
+| MAP-04 | Super Importer Save as Map and Use a Saved Map | Minor | Built (#1336) | D-214 |
+| CN-06 | Flow actions: run a recipe, apply a saved map | Minor | Built (#1339) | D-214 |
 
 #### Release 1.32 (Batch Q): recipes that run on their own and send data back
 
