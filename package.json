@@ -50,7 +50,7 @@
     "husky": "9.1.7",
     "lint-staged": "17.6.0",
     "prettier": "3.9.10",
-    "prettier-plugin-apex": "2.3.0",
+    "prettier-plugin-apex": "2.4.0",
     "yaml": "2.9.1"
   }
 }
