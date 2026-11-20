@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Opportunity_Mirror_Map__c</fullName>
+  <description>
+    Gifts to Opportunities only: the name of a saved map from Gift to Opportunity whose columns
+    copy extra fields to each gift's Opportunity (canonical model R-OM12). Empty means none.
+  </description>
+  <externalId>false</externalId>
+  <inlineHelpText>
+    The name of a map from Gift to Opportunity, made in the Mapper. Empty copies no extra field.
+  </inlineHelpText>
+  <label>Opportunity Mirror Map</label>
+  <length>80</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

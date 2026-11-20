@@ -18,7 +18,8 @@ Open the **Super Transformer** tab and work down the five steps.
    - **Set To**: type or pick the new value. Picklists show a list, dates a calendar,
      checkboxes True or False, and lookups a search.
    - **Clear**: empty the field.
-   - **Copy From Another Field**: take the value of another field on the same record.
+   - **Copy From Another Field**: take the value of another field on the same record. Add
+     steps under it to change the copied value on its way, for example **All capitals**.
    - **Change With Steps**: tidy each record's own value, for example find and replace.
    - **Fix Name Capitals**: a ready-made set of steps that removes extra spaces and capitalizes
      each word, so `ana  GARCIA` becomes `Ana Garcia`.
@@ -26,7 +27,9 @@ Open the **Super Transformer** tab and work down the five steps.
      `(555) 123-4567`, dropping a leading `1` and keeping an extension as ` x12`. A value that
      does not fit, such as a seven-digit number, is left as it is.
 
-   Press **Add a Field** to change more than one field (up to five).
+   Press **Add a Field** to change more than one field (up to five). When your admin has saved
+   a map for this kind of record, **Apply a Map** fills the changes in from it: choose the map
+   and press **Apply Map**, then check the rows before you preview.
 4. **Preview**: press **Preview**. The table shows up to 25 matching records with each field's
    old value, an arrow and the new value. Shaded cells will change; the rest already hold
    the new value. A red message in a cell means that record cannot take the value and will be

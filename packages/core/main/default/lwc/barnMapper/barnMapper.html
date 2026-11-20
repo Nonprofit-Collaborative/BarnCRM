@@ -1,6 +1,7 @@
 <template>
     <template lwc:if={helpReady}>
         <div class="barn-mapper" data-id="mapper">
+            <template lwc:if={notImporting}>
             <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_small" data-id="setup">
                 <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
                     <lightning-combobox
@@ -87,6 +88,7 @@
                     ></c-barn-notice>
                 </template>
             </div>
+            </template>
 
             <template lwc:if={loadError}>
                 <c-barn-notice
@@ -157,6 +159,18 @@
                                 >
                                     <p class="slds-text-title_bold">{source.label}</p>
                                     <p class="slds-text-body_small slds-text-color_weak">{source.exampleText}</p>
+                                    <template lwc:if={source.canCreate}>
+                                        <lightning-button
+                                            variant="base"
+                                            label={text.createField}
+                                            aria-label={source.createLabel}
+                                            data-source={source.name}
+                                            onpointerdown={handleCreateKey}
+                                            onkeydown={handleCreateKey}
+                                            onclick={handleCreateField}
+                                            data-id="create-field"
+                                        ></lightning-button>
+                                    </template>
                                 </li>
                             </template>
                         </ul>
@@ -311,6 +325,7 @@
                                                             data-id="steps"
                                                         ></c-import-column-transforms>
                                                     </template>
+                                                    <template lwc:if={notImporting}>
                                                     <lightning-input
                                                         label={text.alwaysUse}
                                                         value={row.fixedValue}
@@ -326,6 +341,18 @@
                                                         onchange={handleDefault}
                                                         data-id="default"
                                                     ></lightning-input>
+                                                    </template>
+                                                    <template lwc:elseif={row.mapped}>
+                                                        <lightning-input
+                                                            type="checkbox"
+                                                            class="slds-show slds-var-m-top_x-small"
+                                                            label={text.blankClears}
+                                                            checked={row.blankClears}
+                                                            data-target={row.target}
+                                                            onchange={handleBlankClears}
+                                                            data-id="blank-clears"
+                                                        ></lightning-input>
+                                                    </template>
                                                     <template lwc:if={isToJson}>
                                                         <lightning-input
                                                             type="checkbox"
@@ -340,7 +367,9 @@
                                                     </template>
                                                     <template lwc:if={row.isLookup}>
                                                         <template lwc:if={row.mapped}>
-                                                            <p class="slds-var-m-top_small" data-id="lookup-sentence">{row.lookupSentence}</p>
+                                                            <template lwc:if={row.lookupSentence}>
+                                                                <p class="slds-var-m-top_small" data-id="lookup-sentence">{row.lookupSentence}</p>
+                                                            </template>
                                                             <lightning-combobox
                                                                 label={text.lookupField}
                                                                 value={row.lookupField}
@@ -349,14 +378,16 @@
                                                                 onchange={handleLookupField}
                                                                 data-id="lookup-field"
                                                             ></lightning-combobox>
-                                                            <lightning-combobox
-                                                                label={text.lookupNotFound}
-                                                                value={row.notFound}
-                                                                options={notFoundOptions}
-                                                                data-target={row.target}
-                                                                onchange={handleNotFound}
-                                                                data-id="lookup-not-found"
-                                                            ></lightning-combobox>
+                                                            <template lwc:if={notImporting}>
+                                                                <lightning-combobox
+                                                                    label={text.lookupNotFound}
+                                                                    value={row.notFound}
+                                                                    options={notFoundOptions}
+                                                                    data-target={row.target}
+                                                                    onchange={handleNotFound}
+                                                                    data-id="lookup-not-found"
+                                                                ></lightning-combobox>
+                                                            </template>
                                                         </template>
                                                     </template>
                                                 </div>
@@ -373,7 +404,7 @@
                         </p>
                     </template>
 
-                    <template lwc:if={isToRecord}>
+                    <template lwc:if={showMatch}>
                         <div class="barn-mapper-details slds-var-p-around_small slds-var-m-top_medium" data-id="match-card">
                             <h4 class="slds-text-heading_small slds-var-m-bottom_x-small">{text.matchHeading}</h4>
                             <lightning-combobox

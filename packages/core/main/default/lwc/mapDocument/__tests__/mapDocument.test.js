@@ -22,6 +22,9 @@ import {
   sourcesFromRecord,
   sourcesFromRows,
   summarize,
+  fromImportColumns,
+  toImportColumns,
+  toChanges,
   MAX_COLUMNS,
   VERSION
 } from 'c/mapDocument';
@@ -445,5 +448,133 @@ describe('Super Importer: Save as Map and Use a Saved Map', () => {
       'Record.AccountId': ['Code__c']
     });
     expect(offered.columns[1].lookupField).toBe('Code__c');
+  });
+});
+
+describe("Super Importer's Check Columns drawn by the Mapper (MAP-05)", () => {
+  const file = [
+    { key: 'Email', source: 'Email', target: 'Record.Email', guessed: true, examples: [] },
+    { key: 'Notes', source: 'Notes', target: 'Ignore', transforms: [{ op: 'trim' }] },
+    { key: 'Org', source: 'Org', target: 'Record.AccountId', lookupField: 'Name' },
+    { key: 'Id', source: 'Id', target: 'Record.Id', lookupField: 'Id', blankClears: true }
+  ];
+
+  it('reads the columns as a map, guesses kept and Do Not Load left out', () => {
+    const map = fromImportColumns(file, 'Contact', ['Ignore']);
+    expect(map.to).toEqual({ kind: 'record', object: 'Contact' });
+    expect(map.columns).toEqual([
+      { source: 'Email', target: 'Record.Email', guessed: true },
+      { source: 'Org', target: 'Record.AccountId', lookupField: 'Name' },
+      { source: 'Id', target: 'Record.Id', blankClears: true }
+    ]);
+    // The Mapper reads it back with the guess still to check; what is stored leaves it out.
+    expect(parseMap(map).document.columns[0].guessed).toBe(true);
+    expect(JSON.parse(serialize(map)).columns[0].guessed).toBeUndefined();
+  });
+
+  it('writes the map back: a column it does not name is Do Not Load', () => {
+    const columns = toImportColumns(
+      file,
+      { columns: [{ source: 'notes', target: 'Record.Description', blankClears: true }] },
+      'Ignore'
+    );
+    expect(columns.map((column) => column.target)).toEqual([
+      'Ignore',
+      'Record.Description',
+      'Ignore',
+      'Ignore'
+    ]);
+    expect(columns[1]).toEqual({
+      key: 'Notes',
+      source: 'Notes',
+      target: 'Record.Description',
+      transforms: [],
+      lookupField: undefined,
+      blankClears: true,
+      guessed: false
+    });
+    expect(columns[0].guessed).toBe(false);
+  });
+});
+
+describe("Super Transformer's Apply a Map (MAP-06)", () => {
+  const map = (columns, defaults = []) => ({
+    version: 4,
+    from: { kind: 'record', object: 'Contact' },
+    to: { kind: 'record', object: 'Contact' },
+    columns,
+    defaults
+  });
+  const FIELDS = ['Title', 'Department', 'Description', 'AccountId'];
+
+  it('turns each column into the change Super Transformer makes', () => {
+    const result = toChanges(
+      map(
+        [
+          { value: 'Volunteer', target: 'Record.Title' },
+          { source: 'Description', target: 'Record.Department', transforms: [{ op: 'trim' }] },
+          { source: 'Title', target: 'Record.Description' },
+          { source: 'Department', target: 'Record.department', transforms: [{ op: 'upper' }] }
+        ],
+        [{ target: 'Record.Description', value: 'None' }]
+      ),
+      'Contact',
+      FIELDS,
+      5
+    );
+    expect(result).toEqual({
+      changes: [
+        { field: 'Title', action: 'set', value: 'Volunteer' },
+        {
+          field: 'Department',
+          action: 'copy',
+          source: 'Description',
+          transforms: [{ op: 'trim' }]
+        },
+        {
+          field: 'Description',
+          action: 'copy',
+          source: 'Title',
+          transforms: [{ op: 'ifBlank', value: 'None' }]
+        },
+        { field: 'Department', action: 'transform', transforms: [{ op: 'upper' }] }
+      ],
+      skipped: 0,
+      wrongKind: false
+    });
+  });
+
+  it('leaves out what it cannot change and counts it, past five changes too', () => {
+    const result = toChanges(
+      map(
+        [
+          { source: 'Account.Name', target: 'Record.Title' },
+          { source: 'Name', target: 'Record.AccountId', lookupField: 'Name' },
+          { source: 'Title', target: 'Record.Title' },
+          { source: 'Title', target: 'Record.OwnerId' },
+          { value: 'a', target: 'Record.Title' },
+          { value: 'b', target: 'Record.Department' }
+        ],
+        [
+          { target: 'Record.Description', value: 'None' },
+          { target: 'Record.Fax', value: '0' }
+        ]
+      ),
+      'contact',
+      FIELDS,
+      2
+    );
+    expect(result.changes).toEqual([
+      { field: 'Title', action: 'set', value: 'a' },
+      { field: 'Department', action: 'set', value: 'b' }
+    ]);
+    expect(result.skipped).toBe(6);
+  });
+
+  it('refuses a map from or to another kind of record', () => {
+    expect(toChanges({ ...map([]), to: { kind: 'json' } }, 'Contact', FIELDS, 5).wrongKind).toBe(
+      true
+    );
+    expect(toChanges(map([]), 'Account', FIELDS, 5).wrongKind).toBe(true);
   });
 });

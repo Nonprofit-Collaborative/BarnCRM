@@ -209,6 +209,33 @@ private class BulkUpdateTransformTest {
 	}
 
 	@IsTest
+	static void aCopyWithStepsStartsFromTheSourceAndKeepsItsSteps() {
+		System.runAs(TestUsers.admin()) {
+			makeVolunteers(3);
+			String changes = JSON.serialize(
+				new List<Object>{
+					new Map<String, Object>{
+						'field' => 'Description',
+						'action' => BulkUpdateService.ACTION_COPY,
+						'source' => 'LastName',
+						'transforms' => new List<Object>{ step(DataTransform.OP_UPPER) }
+					}
+				}
+			);
+			Map<String, Object> kept = BulkUpdateService.plan(VOLUNTEERS, changes).changes[0].toMap();
+			System.Assert.areEqual('LastName', kept.get('source'), 'The source is kept in the job');
+			System.Assert.isNotNull(kept.get('transforms'), 'So are its steps');
+
+			Import_Batch__c job = run(changes, 3);
+
+			System.Assert.areEqual(ImportBatchService.STATUS_COMPLETE, job.Status__c, job.Run_Log__c);
+			for (Contact person : [SELECT LastName, Description FROM Contact]) {
+				System.Assert.areEqual(person.LastName.toUpperCase(), person.Description, 'From the source');
+			}
+		}
+	}
+
+	@IsTest
 	static void previewShowsEachRecordsResultAndWhyOneCannotBeSaved() {
 		System.runAs(TestUsers.admin()) {
 			List<Contact> people = makeVolunteers(5);

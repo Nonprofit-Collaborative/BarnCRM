@@ -8417,6 +8417,7 @@ stop Mirror installing on an org without Opportunity (ADR-0013).
 |---|---|---|---|
 | `Opportunity_Mirror_Direction__c` | text | Off | `GiftsToOpportunities`, `OpportunitiesToGifts` or `Off`, shown as Gifts to Opportunities, Opportunities to Gifts and Off. Empty reads as Off (R-OM1). |
 | `Opportunity_Mirror_Start__c` | datetime | empty | Opportunities to Gifts only: an Opportunity becomes a gift only when its Close Date is on or after this date, read as a date in the org's default time zone. Empty means no Opportunity becomes a gift (R-OM7). |
+| `Opportunity_Mirror_Map__c` | text | empty | Gifts to Opportunities only: the name of a saved map (R-ST5) from Gift to Opportunity whose columns copy extra fields (R-OM12). Empty means none. |
 | `Opportunity_Mirror_Record_Types__c` | text | empty | Opportunities to Gifts only: the record types, by API name and separated by commas, whose won Opportunities become gifts. Empty means every record type (R-OM7). |
 | `Opportunity_Mirror_Last_Run__c` | datetime | empty | Written by the runs, not by an administrator: when the last completed run started (R-OM8). |
 | `Opportunity_Mirror_Last_Summary__c` | text | empty | Written by the runs: one sentence saying what the last completed run did (R-OM8). |
@@ -8452,7 +8453,7 @@ otherwise its first active won stage by order; the lost stage is found the same 
 `Closed Lost`. On creation only, the Opportunity is named from the donor and the gift date, and
 takes the record type `Donation` when the org has one the saver may use; a Donation record type
 whose sales process lacks the chosen stage makes the insert fail, which is logged as R-OM6
-describes. Nothing else is written.
+describes. Nothing else is written, except the extra fields of R-OM12.
 A copied field changed by hand on the Opportunity is overwritten the next time its gift changes
 in one of these attributes.
 
@@ -8545,6 +8546,20 @@ Opportunities it offers **Copy these gifts again**, a run over every gift in the
 or not, which puts right what R-OM3 copies. In Opportunities to Gifts the differences are shown
 only, because a gift is never edited from its Opportunity.
 
+**R-OM12 Extra fields through a map (MAP-07).** In Gifts to Opportunities, an administrator may
+name a saved map (R-ST5) in `Opportunity_Mirror_Map__c`: a map from the record Gift to the record
+Opportunity, built in the Mapper. Each of its columns copies one more field: a field of the gift
+(no parent field, no path) or a fixed value, changed by the column's steps (R-IT15) and its When
+Blank, Use value, into an Opportunity field. It adds, never replaces: a column for a field R-OM3
+writes (Amount, Close Date, Stage, Account, Campaign, Name, Record Type), a lookup column, a gift
+field the saver cannot read and an Opportunity field the saver cannot create and edit are left
+out, so the copy never shows the saver a value they cannot see and never fails for want of
+access. A value the field cannot take leaves that field out for that gift. A change to a gift
+field the map reads starts a copy (R-OM4), and the comparison of R-OM4 includes the extra
+fields. The map is read once per transaction in system mode, as a setting is; a name that finds
+no map, or a map from or to another kind of record, copies no extra field. The map is copied by
+name, so editing the map changes what the next copy writes.
+
 ### Salesforce implementation
 
 - **Attribute on `Gift__c`, shipped by Fundraising** (`packages/giving`):
@@ -8560,6 +8575,7 @@ only, because a gift is never edited from its Opportunity.
 | Opportunity Mirror Direction | `Opportunity_Mirror_Direction__c` | Text(40) |
 | Opportunity Mirror Start | `Opportunity_Mirror_Start__c` | Date/Time |
 | Opportunity Mirror Record Types | `Opportunity_Mirror_Record_Types__c` | Text(255) |
+| Opportunity Mirror Map | `Opportunity_Mirror_Map__c` | Text(80) |
 | Opportunity Mirror Last Run | `Opportunity_Mirror_Last_Run__c` | Date/Time |
 | Opportunity Mirror Last Summary | `Opportunity_Mirror_Last_Summary__c` | Text(255) |
 
@@ -9199,6 +9215,9 @@ permission and, because every bulk update starts from a Find query, `Find_And_Ex
 
 **R-BU7 Change with steps.** A change whose action is `transform` carries `transforms`, a list
 of steps in the transform document of R-IT15 (ADR-0081), and changes each record's own value.
+A `copy` change may carry `transforms` too (MAP-06, Super Transformer's Apply a Map): the steps
+then start from the source field's value as text instead of the target's, the source may be of
+any type the person may read, and everything below applies as it does to `transform`.
 For each record the job reads the target's value as text and applies the steps with
 `DataTransform.apply`; an `append` step names fields of the same record by API name, each a
 field of the query's object the person may read, read with the record and passed to the engine
@@ -11197,7 +11216,10 @@ or record the person cannot reach.
 **R-ST5 Maps.** A row of Kind Map holds a map document (R-MAP1) in Definition, and Object Name is
 its target object (blank for a JSON target or a people map). Its name is unique among maps. It is
 created, changed, renamed and deleted by people with Manage BarnCRM Settings, read in user mode
-by every tool that uses it, and never run by Super Transformer's Saved Step Lists card, which
+by every tool a person runs with it (Super Importer, Super Transformer's Apply a Map), in the
+run's access mode by a Connector recipe, and in system mode by the Opportunity mirror, which
+reads the map its setting names as it reads the setting (R-OM12); it is never run by Super
+Transformer's Saved Step Lists card, which
 lists, loads, renames and deletes Step List rows only (a row with no Kind reads as Step List). A
 map is changed in place, because a tool may link it by its record ID; a tool that copies a map
 (Super Importer's Use a Saved Map) keeps its own copy. Where Used lists a map that names a field

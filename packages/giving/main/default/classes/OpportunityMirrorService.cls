@@ -35,11 +35,11 @@ public with sharing class OpportunityMirrorService {
 	private static final String LOST_STAGE = 'Closed Lost';
 
 	/**
-	 * What one copy costs at most: seven reads (the linked Opportunities, the appeals' Campaigns,
-	 * contact and account names, person contacts, stages and contact roles), and two Opportunity
-	 * and two role writes.
+	 * What one copy costs at most: eight reads (the linked Opportunities, the appeals' Campaigns,
+	 * contact and account names, person contacts, stages, contact roles and the extra-fields map
+	 * of R-OM12, once per transaction), and two Opportunity and two role writes.
 	 */
-	private static final Integer QUERIES_NEEDED = 7;
+	private static final Integer QUERIES_NEEDED = 8;
 	private static final Integer DML_STATEMENTS_NEEDED = 4;
 	/**
 	 * The org's own Opportunity automation runs inside the gift's save and its cost is unknown
@@ -324,6 +324,12 @@ public with sharing class OpportunityMirrorService {
 			return true;
 		}
 		for (Schema.SObjectField field : WATCHED) {
+			if (!MirrorSync.same(gift.get(field), old.get(field))) {
+				return true;
+			}
+		}
+		// A gift field an extra-fields map reads (R-OM12).
+		for (String field : OpportunityMirrorMap.current().sourceFields()) {
 			if (!MirrorSync.same(gift.get(field), old.get(field))) {
 				return true;
 			}

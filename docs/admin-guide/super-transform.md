@@ -17,7 +17,12 @@ query first. It is the top of the **Super Transformer** tab, and it walks you do
    choice for a checkbox, a search for a lookup), **Clear**, **Copy From Another Field**, or
    **Change With Steps** (the transform steps of [Super Transformer runs and undo](bulk-update.md), section 6).
    Two ready-made step lists are offered on text fields: **Fix Name Capitals** and, on phone
-   and short text fields, **Format Phone Number** (section 6).
+   and short text fields, **Format Phone Number** (section 6). **Copy From Another Field**
+   shows the same step list under it, empty to start: add steps to change the copied value on
+   its way, for example **All capitals**. With steps, the source may be a field of any type
+   you may read, and the result is saved as the field's type, as **Change With Steps** does.
+   **Apply a Map**, above the rows when a saved map fills this kind of record, fills them in
+   from a map made in the Mapper ([The Mapper and Saved Maps](mapper.md), section 6).
 4. **Preview**: the first 25 matching records, each changed field shown as its old value and
    its new value, with the cells that change highlighted. A line under the table says how many
    of the records shown already hold the new values, and so will not be saved.

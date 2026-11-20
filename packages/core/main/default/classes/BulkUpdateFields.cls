@@ -12,8 +12,10 @@
  *
  * This decides what may be offered and checked. Every write is still in user mode.
  */
+@NamespaceAccessible
 public with sharing class BulkUpdateFields {
 	/** Raised for anything the person can fix; the message is for them. */
+	@NamespaceAccessible
 	public class BulkUpdateException extends Exception {
 	}
 
@@ -309,6 +311,7 @@ public with sharing class BulkUpdateFields {
 	 * reads), and a number without exponent. Decided by the field's type, never by
 	 * `instanceof`, because in Apex a Date is also an instance of Datetime. Null stays null.
 	 */
+	@NamespaceAccessible
 	public static String toText(Schema.DescribeFieldResult field, Object value) {
 		if (value == null) {
 			return null;
@@ -340,6 +343,7 @@ public with sharing class BulkUpdateFields {
 	 * naming the field and the value, so the record is journaled as Failed rather than saved
 	 * wrong. That includes a checkbox result that is none of those words.
 	 */
+	@NamespaceAccessible
 	public static Object fromText(Schema.DescribeFieldResult field, String text) {
 		Schema.DisplayType kind = field.getType();
 		if (kind == Schema.DisplayType.BOOLEAN) {

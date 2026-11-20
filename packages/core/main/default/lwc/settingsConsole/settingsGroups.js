@@ -187,6 +187,7 @@ const PAGE_GROUPS = {
         'Opportunity_Mirror_Direction__c',
         'Opportunity_Mirror_Start__c',
         'Opportunity_Mirror_Record_Types__c',
+        'Opportunity_Mirror_Map__c',
         'Mirror_Opportunity_Mirror',
         'Gift_Transaction_Mirror_Direction__c',
         'Gift_Transaction_Mirror_Status__c',

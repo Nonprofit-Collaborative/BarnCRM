@@ -7,6 +7,7 @@ import { dragMessages } from 'c/barnDragText';
 import { suggestFields } from 'c/importFieldPicker';
 import suggestedHeading from '@salesforce/label/c.Core_Import_SuggestedFields';
 import { toCsv, saveBlob } from 'c/findCsv';
+import { fromImportColumns, toImportColumns, MAX_COLUMNS, MAX_SAMPLES } from 'c/mapDocument';
 import { isXlsx, XLSX_ERRORS } from './xlsx';
 import { readFileSheets } from './fileSource';
 import {
@@ -2024,6 +2025,91 @@ export default class ImportWizard extends LightningElement {
       ...column,
       lookupField: column.lookupField || LOOKUP_BY_ID
     }));
+  }
+
+  // ---- MAP-05: the Check Columns step drawn by the Mapper, where it does all the table does.
+
+  /** Show as Table: the person's choice for this session. */
+  columnsAsTable = false;
+  mapperSetupCache;
+
+  /**
+   * The Mapper draws the step for a mapping of one object whose fields are its own: not people
+   * (Contact1, Organization entities, C-49c), not several objects (R-IT20), not a related
+   * record's fields (R-IT17), and not more columns than a map holds. Anything else is the table.
+   */
+  get canDrawMapper() {
+    return this.loadsSingleObject && !this.loadsRelated && this.headers.length <= MAX_COLUMNS;
+  }
+
+  get drawsMapper() {
+    return this.canDrawMapper && !this.columnsAsTable;
+  }
+
+  get drawsTable() {
+    return !this.drawsMapper;
+  }
+
+  get viewToggleLabel() {
+    return this.columnsAsTable
+      ? helpText('Core', 'Core_Import_ShowInMapper')
+      : helpText('Core', 'Core_Import_ShowAsTable');
+  }
+
+  handleViewToggle() {
+    this.columnsAsTable = !this.columnsAsTable;
+    this.editingSource = undefined;
+  }
+
+  get mapperValue() {
+    return JSON.stringify(
+      fromImportColumns(this.columns, this.selectedTemplate.targetObject, this.savedMapIgnored)
+    );
+  }
+
+  /** Kept while the file and the fields are the same, so the Mapper is not set up again. */
+  get mapperSetup() {
+    const key = [
+      this.headers,
+      this.records,
+      this.objectFields,
+      this.canCreateFields,
+      this.templateId
+    ];
+    const kept = this.mapperSetupCache;
+    if (kept && kept.key.every((part, index) => part === key[index])) {
+      return kept.setup;
+    }
+    const lookupChoices = {};
+    this.loadFields
+      .filter((field) => field.isLookup)
+      .forEach((field) => {
+        lookupChoices[field.value] = (field.lookupFields || []).map((each) => ({
+          label: each.label,
+          value: each.value
+        }));
+      });
+    const setup = {
+      objectName: this.selectedTemplate.targetObject,
+      headers: this.headers,
+      rows: this.records.slice(0, MAX_SAMPLES),
+      targets: this.loadFields.map((field) => ({ value: field.value, label: field.label })),
+      lookupChoices,
+      canCreateFields: this.newFieldObjects.length > 0
+    };
+    this.mapperSetupCache = { key, setup };
+    return setup;
+  }
+
+  /** The Mapper's columns become the wizard's; a file column it leaves out is Do not load. */
+  handleMapperChange(event) {
+    this.columns = toImportColumns(this.columns, { columns: event.detail.columns }, IGNORE).map(
+      (column) => ({ ...column, lookupField: column.lookupField || LOOKUP_BY_ID })
+    );
+  }
+
+  handleMapperCreateField(event) {
+    this.openNewField(event.detail.source);
   }
 
   /** Skip rows where and One row per, from the rows to load panel (R-IT18). */

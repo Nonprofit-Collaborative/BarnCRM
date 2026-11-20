@@ -25,6 +25,7 @@ import opLast from '@salesforce/label/c.Core_Import_StepsOpLast';
 import opShiftDate from '@salesforce/label/c.Core_Import_StepsOpShiftDate';
 import opToday from '@salesforce/label/c.Core_Import_StepsOpToday';
 import opDigits from '@salesforce/label/c.Core_Import_StepsOpDigits';
+import BLANK_CLEARS from '@salesforce/label/c.Core_Import_BlankClearsLabel';
 import { parseCsv, detectDelimiter, toRecords } from 'c/csvParser';
 import { createDragController } from 'c/barnDrag';
 import { dragMessages, dragInstructions } from 'c/barnDragText';
@@ -115,15 +116,63 @@ export default class BarnMapper extends LightningElement {
     const { document, skipped } = parseMap(input);
     this.document = document;
     this.skipped = skipped;
-    this.autoMatched = document.columns.length > 0;
+    this.autoMatched = Boolean(this.importing) || document.columns.length > 0;
     const sample = document.from.sample;
     if (sample) {
       this.samples = [sample];
       this.jsonText = JSON.stringify(sample, null, 2);
     }
-    if (this.connected) {
+    if (this.importing) {
+      // Super Importer hands its columns back after each change: same file, same fields.
+      this.schedulePreview();
+    } else if (this.connected) {
       this.loadSchema();
     }
+  }
+
+  /**
+   * Super Importer's Check Columns step drawn by the Mapper (MAP-05; admin guide importing.md
+   * section 3): `{ objectName, headers, rows, targets: [{ value, label }], lookupChoices:
+   * { target: [{ label, value }] }, canCreateFields }`. The file and the template's record are
+   * fixed, the fields offered are the template's, a column fills one field, and matching, fixed
+   * values and defaults stay with the template's own steps. Each change fires `change` with the
+   * columns, guesses kept; Create Field fires `createfield` with `{ source }`.
+   */
+  @api
+  get importSetup() {
+    return this.importing;
+  }
+
+  set importSetup(setup) {
+    const objectChanged =
+      !this.importing || !setup || this.importing.objectName !== setup.objectName;
+    this.importing = setup || undefined;
+    if (!setup) {
+      return;
+    }
+    this.headers = setup.headers || [];
+    this.samples = setup.rows || [];
+    this.autoMatched = true;
+    this.document = {
+      ...this.document,
+      from: { kind: 'columns' },
+      to: { kind: 'record', object: setup.objectName }
+    };
+    if (this.connected && objectChanged) {
+      this.loadSchema();
+    } else {
+      this.schedulePreview();
+    }
+  }
+
+  importing;
+
+  get notImporting() {
+    return !this.importing;
+  }
+
+  get showMatch() {
+    return this.isToRecord && !this.importing;
   }
 
   document = parseMap({ version: 4 }).document;
@@ -208,7 +257,9 @@ export default class BarnMapper extends LightningElement {
       accept: GUESS_ACCEPT,
       acceptAll: GUESS_ACCEPT_ALL,
       fieldColumn: helpText('Core', 'Core_Mapper_FieldColumn'),
-      valueColumn: helpText('Core', 'Core_Mapper_ValueColumn')
+      valueColumn: helpText('Core', 'Core_Mapper_ValueColumn'),
+      blankClears: BLANK_CLEARS,
+      createField: helpText('Core', 'Core_Mapper_CreateField')
     };
   }
 
@@ -271,7 +322,9 @@ export default class BarnMapper extends LightningElement {
         return true;
       }
     });
-    this.loadObjects();
+    if (!this.importing) {
+      this.loadObjects();
+    }
     this.loadSchema();
   }
 
@@ -298,7 +351,7 @@ export default class BarnMapper extends LightningElement {
     try {
       const toObject = this.toObject;
       this.targetFields =
-        this.isToRecord && toObject ? await getTargetFields({ objectName: toObject }) : [];
+        this.isToRecord && toObject ? (await getTargetFields({ objectName: toObject })) || [] : [];
       const fromObject = this.fromObject;
       const info =
         this.isFromRecord && fromObject ? await getObjectInfo({ objectApiName: fromObject }) : null;
@@ -526,8 +579,12 @@ export default class BarnMapper extends LightningElement {
 
   get sourceRows() {
     const dragging = this.dragState && this.dragState.active ? this.dragState.itemId : null;
+    const used = new Set(this.usedSources.map(lower));
+    const canCreate = Boolean(this.importing && this.importing.canCreateFields);
     return this.sources.map((source) => ({
       ...source,
+      canCreate: canCreate && !used.has(lower(source.name)),
+      createLabel: format(helpText('Core', 'Core_Mapper_CreateFieldFor'), source.label),
       exampleText: source.examples.join(', '),
       itemClass: `barn-mapper-source slds-var-p-around_x-small${source.name === dragging ? ' barn-mapper-dragging' : ''}`
     }));
@@ -558,16 +615,37 @@ export default class BarnMapper extends LightningElement {
   /** Field information by target (`Record.Email`), for the preview's checks. */
   get fieldsByTarget() {
     const byTarget = {};
-    this.targetFields.forEach((field) => {
+    this.offeredFields.forEach((field) => {
       byTarget[`${RECORD}.${field.apiName}`] = field;
     });
     return byTarget;
   }
 
+  /**
+   * The fields the To pane offers: the object's, or in Super Importer the template's, in its
+   * order. A field created a moment ago, not yet in the cached describe, is offered as text.
+   */
+  get offeredFields() {
+    if (!this.importing) {
+      return this.targetFields;
+    }
+    const byTarget = new Map(
+      this.targetFields.map((field) => [lower(`${RECORD}.${field.apiName}`), field])
+    );
+    return (this.importing.targets || []).map(
+      (target) =>
+        byTarget.get(lower(target.value)) || {
+          apiName: String(target.value).slice(RECORD.length + 1),
+          label: target.label,
+          dataType: 'string'
+        }
+    );
+  }
+
   /** Every target the To pane lists: the object's fields, or a JSON body's keys. */
   get targets() {
     if (this.isToRecord) {
-      return this.targetFields.map((field) => ({
+      return this.offeredFields.map((field) => ({
         value: `${RECORD}.${field.apiName}`,
         label: field.label,
         name: field.apiName,
@@ -679,10 +757,12 @@ export default class BarnMapper extends LightningElement {
       columnRequired: Boolean(column && column.required),
       isLookup,
       lookupObject: field.referenceTo,
-      lookupField: lookup.field || 'Id',
+      lookupField: (this.importing ? column && column.lookupField : lookup.field) || 'Id',
       notFound: lookup.notFound || 'reject',
-      lookupFieldOptions: isLookup && isOpen ? this.lookupFieldOptions(field.referenceTo) : [],
-      lookupSentence: isLookup && column ? this.lookupSentence(field, column) : '',
+      lookupFieldOptions: isLookup && isOpen ? this.lookupOptionsFor(target.value, field) : [],
+      lookupSentence:
+        isLookup && column && !this.importing ? this.lookupSentence(field, column) : '',
+      blankClears: Boolean(column && column.blankClears),
       rowClass: `barn-mapper-target slds-var-p-around_x-small${dragging === target.value ? ' barn-mapper-drop' : ''}`
     };
     return row;
@@ -716,6 +796,14 @@ export default class BarnMapper extends LightningElement {
       this.sourceLabel(column.source) || column.value,
       notFound
     );
+  }
+
+  /** Super Importer offers the parent fields the template allows (R-IT13). */
+  lookupOptionsFor(target, field) {
+    if (this.importing) {
+      return (this.importing.lookupChoices || {})[target] || [];
+    }
+    return this.lookupFieldOptions(field.referenceTo);
   }
 
   lookupFieldOptions(objectName) {
@@ -777,6 +865,10 @@ export default class BarnMapper extends LightningElement {
   setSource(target, source) {
     const existing = this.columnFor(target);
     let columns = this.document.columns.filter((column) => lower(column.target) !== lower(target));
+    if (source && source !== NONE && this.importing) {
+      // A file column loads into one field (R-IT1): it moves here from any other.
+      columns = columns.filter((column) => lower(column.source) !== lower(source));
+    }
     if (source && source !== NONE) {
       const next = { ...(existing || {}), source, target };
       delete next.guessed;
@@ -902,7 +994,45 @@ export default class BarnMapper extends LightningElement {
   }
 
   handleLookupField(event) {
-    this.changeLookup(event.currentTarget.dataset.target, { field: event.detail.value });
+    const target = event.currentTarget.dataset.target;
+    const field = event.detail.value;
+    if (!this.importing) {
+      this.changeLookup(target, { field });
+      return;
+    }
+    // Super Importer keeps the parent's field as `lookupField` (R-IT13).
+    this.changeColumn(target, (column) => {
+      const next = { ...column, lookupField: field };
+      if (!field || field === 'Id') {
+        delete next.lookupField;
+      }
+      return column.source ? next : null;
+    });
+  }
+
+  /** Whether an empty cell clears the field (R-IT19, Super Importer only). */
+  handleBlankClears(event) {
+    const checked = event.detail.checked;
+    this.changeColumn(event.currentTarget.dataset.target, (column) => {
+      const next = { ...column, blankClears: true };
+      if (!checked) {
+        delete next.blankClears;
+      }
+      return column.source ? next : null;
+    });
+  }
+
+  /** Create Field on a source not yet loaded (C-49d): Super Importer opens its dialog. */
+  handleCreateField(event) {
+    event.stopPropagation();
+    this.dispatchEvent(
+      new CustomEvent('createfield', { detail: { source: event.currentTarget.dataset.source } })
+    );
+  }
+
+  /** Keeps a press on Create Field from picking the source up to drag. */
+  handleCreateKey(event) {
+    event.stopPropagation();
   }
 
   handleNotFound(event) {
@@ -1017,6 +1147,7 @@ export default class BarnMapper extends LightningElement {
       new CustomEvent('change', {
         detail: {
           document: serialize(this.document),
+          columns: this.document.columns,
           pendingGuesses: this.pendingGuesses,
           problems: problems(this.document).length
         }
