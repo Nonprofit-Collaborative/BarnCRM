@@ -121,7 +121,6 @@ export function outcomeOf(result) {
     replaced: ['Connector_Outcome_Replaced', 'success'],
     disconnected: ['Connector_Outcome_Disconnected', 'success'],
     deleted: ['Connector_Outcome_Deleted', 'success'],
-    deleteInSetup: ['Connector_Outcome_DeleteInSetup', 'warning'],
     calloutsOff: ['Connector_Outcome_CalloutsOff', 'warning'],
     accessAdded: ['Connector_Outcome_AccessAdded', 'info'],
     accessMissing: ['Connector_Outcome_AccessMissing', 'warning'],

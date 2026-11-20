@@ -125,7 +125,6 @@ export default class SuperConnector extends LightningElement {
         steps: !connection.calloutsEnabled
           ? text('Connector_Row_CalloutSteps', connection.label)
           : text('Connector_Row_AccessSteps', connection.name),
-        canReplace: connection.authKind !== SECRET_URL,
         checkLabel:
           connection.calloutsEnabled && connection.accessGranted
             ? text('Connector_Page_Check')

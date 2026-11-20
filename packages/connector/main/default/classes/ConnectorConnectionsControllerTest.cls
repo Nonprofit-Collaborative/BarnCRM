@@ -79,16 +79,14 @@ private class ConnectorConnectionsControllerTest {
 			pairs.get(name).keyStored = false;
 		}
 
-		/** True as an org whose ConnectApi can delete credentials; false as BarnCRM's real seam. */
-		Boolean canRemove = true;
+		Boolean refuseRemove = false;
 
-		public override Boolean remove(String name) {
-			if (!canRemove) {
-				return false;
+		public override void remove(String name, Boolean namedToo) {
+			if (refuseRemove) {
+				throw new FakeException('Refused');
 			}
 			removed.add(name);
 			pairs.remove(name);
-			return true;
 		}
 
 		public override void record(ConnectApi.CredentialInput input, Boolean isUpdate) {
@@ -340,7 +338,7 @@ private class ConnectorConnectionsControllerTest {
 	}
 
 	@IsTest
-	static void anInsecureUrlAHeaderAuthorizationAndANewSecretUrlAreRefused() {
+	static void anInsecureUrlAHeaderAuthorizationAndAHostChangeAreRefused() {
 		System.runAs(dana()) {
 			FakeOrg fake = useFake();
 			fake.add('BarnConn_rest_bbbbbb', ConnectorConnections.SECRET_URL, SECRET_URL, true, true);
@@ -389,21 +387,21 @@ private class ConnectorConnectionsControllerTest {
 			} catch (AuraHandledException e) {
 				refusals.add(refusal(e));
 			}
-			try {
-				ConnectorConnectionsController.replaceKey('BarnConn_rest_bbbbbb', null, SECRET_URL + 'new');
-			} catch (AuraHandledException e) {
-				refusals.add(refusal(e));
-			}
+			Assert.areEqual(7, refusals.size(), 'Five unsafe URLs, a reserved header and a host change (F4)');
+			Assert.areEqual(BarnHelp.text('Connector', 'Connector_Error_HostChanged'), refusals[6], 'Host stays');
+			Assert.isTrue(fake.named.isEmpty(), 'Nothing was written for the other host');
 
-			Assert.areEqual(8, refusals.size(), 'Five unsafe URLs, a reserved header and two new addresses (F4)');
-			Assert.areEqual(
-				BarnHelp.text('Connector', 'Connector_Error_SecretUrlReplace'),
-				refusals[6],
-				'Another host is a new connection'
+			ConnectorConnectionsController.Result replaced = ConnectorConnectionsController.replaceKey(
+				'BarnConn_rest_bbbbbb',
+				null,
+				SECRET_URL + 'new'
 			);
-			Assert.areEqual(refusals[6], refusals[7], 'So is the same host');
-			Assert.isTrue(fake.named.isEmpty(), 'Nothing was written');
-			Assert.areEqual(SECRET_URL, fake.pairs.get('BarnConn_rest_bbbbbb').url, 'The address is unchanged');
+
+			Assert.areEqual('replaced', replaced.outcome, 'A same-host address replaces it');
+			Assert.areEqual(1, fake.named.size(), 'One Named Credential update');
+			Assert.areEqual(SECRET_URL + 'new', fake.pairs.get('BarnConn_rest_bbbbbb').url, 'The new address is kept');
+			Assert.isFalse(fake.named[0].calloutOptions.allowMergeFieldsInBody, 'Formulas stay off in the body');
+			Assert.isFalse(JSON.serialize(replaced).contains('/services/'), 'The new address is not returned (F5)');
 		}
 	}
 
@@ -546,20 +544,29 @@ private class ConnectorConnectionsControllerTest {
 	}
 
 	@IsTest
-	static void deleteRemovesTheKeyAndShowsTheSetupStepWhereApexCannotDelete() {
+	static void aHalfMadeConnectionThatCannotBeRemovedIsNamedInTheErrorLog() {
 		System.runAs(dana()) {
 			FakeOrg fake = useFake();
-			fake.canRemove = false;
-			fake.add('BarnConn_rest_hhhhhh', ConnectorConnections.BEARER, 'https://api.example.com', true, true);
+			fake.echoKeyOnWrite = true;
+			fake.refuseRemove = true;
 
-			ConnectorConnectionsController.Result deleted = ConnectorConnectionsController.deleteConnection(
-				'BarnConn_rest_hhhhhh'
-			);
+			Test.startTest();
+			try {
+				create(ConnectorConnections.BEARER, null, KEY);
+			} catch (AuraHandledException e) {
+				Assert.areEqual(BarnHelp.text('Connector', 'Connector_Error_SaveFailed'), refusal(e), 'Fixed message');
+			}
+			Test.stopTest();
 
-			Assert.areEqual('deleteInSetup', deleted.outcome, 'The page shows the Setup step');
-			Assert.areEqual(new List<String>{ 'BarnConn_rest_hhhhhh' }, fake.keysDeleted, 'The key is removed first');
-			Assert.isFalse(deleted.page.connections[0].keyStored, 'Until Setup finishes it, it reads Disconnected');
-			Assert.isFalse(new ConnectorOrg().remove('BarnConn_rest_hhhhhh'), 'The real seam cannot delete yet');
+			List<Error_Log__c> left = [
+				SELECT Message__c
+				FROM Error_Log__c
+				WHERE Context__c = 'ConnectorConnectionsController.undo'
+				WITH SYSTEM_MODE
+			];
+			Assert.areEqual(1, left.size(), 'The leftover credentials are named for Setup');
+			Assert.isTrue(left[0].Message__c.contains('BarnConn_rest_'), 'By their name');
+			Assert.isFalse(left[0].Message__c.contains(KEY), 'Never with the key');
 		}
 	}
 

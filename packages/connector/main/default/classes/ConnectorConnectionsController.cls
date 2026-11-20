@@ -48,6 +48,7 @@ public with sharing class ConnectorConnectionsController {
 	) {
 		String name;
 		Boolean externalMade = false;
+		Boolean namedMade = false;
 		try {
 			ConnectorConnections.requireWriter();
 			String kind = ConnectorConnections.checkedKind(authKind);
@@ -77,6 +78,7 @@ public with sharing class ConnectorConnectionsController {
 			} else {
 				ConnectApi.NamedCredentials.createNamedCredential(named);
 			}
+			namedMade = true;
 			if (kind != ConnectorConnections.SECRET_URL) {
 				ConnectApi.CredentialInput credential = ConnectorConnections.credentialInput(name, kind);
 				if (kind == ConnectorConnections.BASIC) {
@@ -106,7 +108,7 @@ public with sharing class ConnectorConnectionsController {
 				}
 			}
 			ConnectorConnections.logRedacted(CONTEXT + '.createConnection', failure.getTypeName(), detail);
-			undo(name, externalMade);
+			undo(name, externalMade, namedMade);
 			throw UserErrors.message(BarnHelp.text('Connector', 'Connector_Error_SaveFailed'));
 		}
 		Result result = new Result();
@@ -120,8 +122,8 @@ public with sharing class ConnectorConnectionsController {
 	}
 
 	/**
-	 * Writes a new key over the old one, then one Admin Journal row (F11). A Secret URL is
-	 * refused: a new address is a new connection. The name must be BarnCRM's own (F2) before anything is written.
+	 * Writes a new key over the old one (or a new Secret URL on the same host, F4), then one
+	 * Admin Journal row (F11). The name must be BarnCRM's own (F2) before anything is written.
 	 */
 	@AuraEnabled
 	public static Result replaceKey(String name, String userName, String secret) {
@@ -131,11 +133,24 @@ public with sharing class ConnectorConnectionsController {
 			pair = ConnectorConnections.owned(name);
 			ConnectorOrg org = ConnectorConnections.store();
 			if (pair.principal == ConnectorConnections.SECRET_URL) {
-				// A Secret URL is the Named Credential's URL, which Apex cannot change (no update
-				// in ConnectApi 67.0), so a new address is a new connection (R-CN4, F4).
-				throw new ConnectorConnections.ConnectorException(
-					BarnHelp.text('Connector', 'Connector_Error_SecretUrlReplace')
+				String url = ConnectorConnections.checkedUrl(secret);
+				if (!ConnectorConnections.sameHost(pair.url, url)) {
+					throw new ConnectorConnections.ConnectorException(
+						BarnHelp.text('Connector', 'Connector_Error_HostChanged')
+					);
+				}
+				ConnectApi.NamedCredentialInput named = ConnectorConnections.namedInput(
+					pair.name,
+					pair.label,
+					pair.principal,
+					null
 				);
+				named.calloutUrl = url;
+				if (org.fake) {
+					org.record(named, true);
+				} else {
+					ConnectApi.NamedCredentials.updateNamedCredential(pair.name, named);
+				}
 			} else {
 				if (String.isBlank(secret)) {
 					throw new ConnectorConnections.ConnectorException(
@@ -251,21 +266,15 @@ public with sharing class ConnectorConnectionsController {
 		}
 	}
 
-	/**
-	 * Removes the key, then both credentials where Apex can (R-CN8); otherwise the page shows the
-	 * Setup step that finishes it, and the connection reads Disconnected until then.
-	 */
+	/** Removes both credentials and the key (R-CN8). */
 	@AuraEnabled
 	public static Result deleteConnection(String name) {
 		try {
 			ConnectorConnections.requireWriter();
 			ConnectorOrg.Pair pair = ConnectorConnections.owned(name);
-			ConnectorOrg org = ConnectorConnections.store();
-			if (pair.principal != ConnectorConnections.SECRET_URL && pair.keyStored) {
-				org.deleteKey(pair.name, pair.principal);
-			}
+			ConnectorConnections.store().remove(pair.name, true);
 			Result result = new Result();
-			result.outcome = org.remove(pair.name) ? 'deleted' : 'deleteInSetup';
+			result.outcome = 'deleted';
 			result.page = ConnectorConnections.page();
 			return result;
 		} catch (Exception failure) {
@@ -274,21 +283,16 @@ public with sharing class ConnectorConnectionsController {
 	}
 
 	/**
-	 * Best effort: takes away what a failed create made, so no half connection is left; where
-	 * Apex cannot, the Error Log names the credentials to delete in Setup. No key was stored: the
-	 * key is the last write.
+	 * Best effort: takes away what a failed create made, so no half connection is left; if that
+	 * fails too, the Error Log names the credentials to delete in Setup.
 	 */
-	private static void undo(String name, Boolean externalMade) {
+	private static void undo(String name, Boolean externalMade, Boolean namedMade) {
 		if (!externalMade) {
 			return;
 		}
-		Boolean removed = false;
 		try {
-			removed = ConnectorConnections.store().remove(name);
+			ConnectorConnections.store().remove(name, namedMade);
 		} catch (Exception leftOver) {
-			removed = false;
-		}
-		if (!removed) {
 			ErrorLogger.logMessage(
 				BarnHelp.text('Connector', 'Connector_Log_UndoFailed', new List<Object>{ name }),
 				CONTEXT + '.undo',

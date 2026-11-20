@@ -19013,7 +19013,7 @@ run synchronously as that person; a key is never queued, stored in a field, logg
 Every key parameter is written with `encrypted = true`; only User Name is `false`.
 **R-CN4 Hosts do not move.** The Base URL is `https`, with no user information. A stored
 connection's scheme and host never change: a different host is a new connection. A Secret URL
-is never replaced in place: a new address is a new connection. A template may lock the host to a
+connection's replacement URL keeps the same host and port. A template may lock the host to a
 pattern (Mailchimp: `^[a-z]{2}[0-9]{1,3}$` for its data center).
 **R-CN5 Secret URLs are configuration.** A Secret URL is stored as the Named Credential's URL,
 which administrators who can view Setup can read; the page says so. It is never returned to the
@@ -19027,15 +19027,14 @@ assigns it only to the person creating or checking a connection, who must hold
 `BarnCRM_Connector_Admin` (and, from CN-03, to the recipe identities). User Ids never come from
 the browser. Health Check warns when it holds anything but External Credential principal access.
 **R-CN8 Delete and Disconnect.** Disconnect removes the principal's key and keeps the
-connection; Delete removes the key, then both credentials where Apex can (from CN-02, refused
-while a recipe uses it). The `ConnectApi` BarnCRM compiles against (API 67.0) has no delete or
-update for a Named or External Credential, so until an org test confirms one, Delete ends with
-a Setup step and the connection reads Disconnected until the admin deletes the credentials.
+connection; Delete removes both credentials, the Named Credential first (from CN-02, refused
+while a recipe uses it).
 
 ### Salesforce implementation
 
 - **Object:** none. External and Named Credentials (developer name `BarnConn_`, no namespace)
-  created and read only through `ConnectApi.NamedCredentials`, never SOQL; the named
+  created, read, updated and deleted only through `ConnectApi.NamedCredentials` (Apex cannot
+  query `ExternalCredential`); the named
   principal's Id from `ConnectApi` is the setup entity of its principal access;
   `SetupEntityAccess` (principal access in `BarnCRM_Connections`), `PermissionSetAssignment`.
 - **Custom permission:** `Manage_BarnCRM_Connector`, granted only by `BarnCRM_Connector_Admin`.

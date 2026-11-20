@@ -125,14 +125,14 @@ public virtual with sharing class ConnectorOrg {
 	}
 
 	/**
-	 * Removes both credentials (Delete, R-CN8) where Apex can, and answers whether it did. The
-	 * `ConnectApi.NamedCredentials` BarnCRM compiles against (API 67.0, as the offline compile
-	 * check knows it) has no delete for a Named or External Credential, so this answers false
-	 * and the page shows the Setup step. Once an org test confirms a delete method, it goes here
-	 * and nothing else changes.
+	 * Removes both credentials and with them the key (Delete, R-CN8), the Named Credential first;
+	 * `namedToo` is false when a failed create never made it.
 	 */
-	public virtual Boolean remove(String name) {
-		return false;
+	public virtual void remove(String name, Boolean namedToo) {
+		if (namedToo) {
+			ConnectApi.NamedCredentials.deleteNamedCredential(name);
+		}
+		ConnectApi.NamedCredentials.deleteExternalCredential(name);
 	}
 
 	/** Records a key write in a test; never called when `fake` is false. */

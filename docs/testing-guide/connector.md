@@ -58,7 +58,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 |---|---|---|
 | 1 | Create a connection with Base URL `http://example.org`, then `https://user:pw@example.org`, then `https://example.org/?key=1`, then `https://example.org/{!$Credential.X}`. | Each refused with the address message; no new Named Credential in Setup. |
 | 2 | Run in Anonymous Apex as an admin: `ConnectorConnectionsController.deleteConnection('Barn_Org_Connection');` | Refused with `That is not a BarnCRM connection`; Core's `Barn_Org_Connection` is unchanged. |
-| 3 | Look at the Secret URL connection's buttons; then run in Anonymous Apex `ConnectorConnectionsController.replaceKey('<its BarnConn_rest_ name>', null, 'https://attacker.example.net/x');` | No **Replace Key** button; the call is refused with `A Secret URL cannot be changed in place`, and the Named Credential URL is unchanged. |
+| 3 | Select **Replace Key** on the Secret URL connection and enter an address on another host. Then do it again with an address on the same host and another path. | The other host is refused: the host must stay the same. The same host is saved (`Key replaced`), the row still shows only the host and the new last four characters, and the Named Credential URL in Setup is the new address. |
 
 **Cleanup:** None.
 
@@ -72,8 +72,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 1 | On **Echo Test** select **Replace Key**, enter `test-key-5678` and save. | `Key replaced`; Check Connection sends the new key. The Admin Journal has a **Connection** row, **Key Replaced**, with your name and the connection, without the key. |
 | 2 | Open **Health Check**. | `Connection Keys Replaced This Week` names Echo Test. |
 | 3 | Select **Disconnect**, **Cancel**, then **Disconnect** and confirm. | Cancel changes nothing; confirming shows **Disconnected**. |
-| 4 | Select **Delete** and confirm on each test connection. | A warning names the last step in Setup and the row shows **Disconnected**; the key is gone from the principal. |
-| 5 | Follow the step: in Setup delete each `BarnConn_rest_...` Named Credential, then its External Credential, and reload Super Connector. | The rows are gone, and no `BarnConn_rest_...` credential is left. |
+| 4 | Select **Delete** and confirm on each test connection. | `Connection deleted`; each row goes, and in Setup no `BarnConn_rest_...` Named or External Credential is left. |
 
 **Cleanup:** None.
 

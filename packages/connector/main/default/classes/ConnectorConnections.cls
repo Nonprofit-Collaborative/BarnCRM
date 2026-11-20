@@ -204,6 +204,23 @@ public with sharing class ConnectorConnections {
 		return text;
 	}
 
+	/** Same scheme, host (ignoring capitals) and port (F4: a host never moves). */
+	public static Boolean sameHost(String first, String second) {
+		try {
+			Url a = new Url(first);
+			Url b = new Url(second);
+			return a.getProtocol() == b.getProtocol() &&
+				a.getHost().toLowerCase() == b.getHost().toLowerCase() &&
+				port(a) == port(b);
+		} catch (Exception malformed) {
+			return false;
+		}
+	}
+
+	private static Integer port(Url address) {
+		return address.getPort() == -1 ? address.getDefaultPort() : address.getPort();
+	}
+
 	/**
 	 * Whether a host fits a template's locked host (R-CN4), such as `{dc}.api.mailchimp.com`
 	 * with `dc` held to `^[a-z]{2}[0-9]{1,3}$`. Every part outside a placeholder must match

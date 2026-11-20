@@ -100,9 +100,6 @@ const TEXTS = {
   get Connector_Outcome_Deleted() {
     return helpText('Connector', 'Connector_Outcome_Deleted');
   },
-  get Connector_Outcome_DeleteInSetup() {
-    return helpText('Connector', 'Connector_Outcome_DeleteInSetup');
-  },
   get Connector_Outcome_CalloutsOff() {
     return helpText('Connector', 'Connector_Outcome_CalloutsOff');
   },

@@ -84,13 +84,10 @@ select **Check Again**.
   which still shows the address is reachable.
 - **Replace Key** writes a new key over the old one. Each replacement is recorded in the Admin
   Journal (who and when, never the key), and Health Check lists keys replaced in the last 7 days,
-  so a key swapped to another account is noticed. A Secret URL cannot be replaced: create a new
-  connection with the new address, then delete the old one.
+  so a key swapped to another account is noticed. For a Secret URL, the new address must keep the
+  same host.
 - **Disconnect** removes the key and keeps the connection, to be given a new key later.
-- **Delete** removes the key at once. Salesforce does not yet let BarnCRM delete the credentials
-  themselves, so the page then shows the last step: in **Setup**, **Named Credentials**, delete
-  the named credential with the connection's name, then the external credential of the same
-  name. Until then the connection shows **Disconnected**.
+- **Delete** removes the connection and its key from Salesforce.
 
 ## Access
 
@@ -110,6 +107,6 @@ With the module installed, Health Check reports:
 
 ## Removing It
 
-Delete each connection on **Super Connector** first and finish each in Setup as the page shows,
-so no credential is left, then uninstall the module from the [Module Manager](module-manager.md). Delete the **BarnCRM
+Delete each connection on **Super Connector** first, so no credential is left in Setup, then
+uninstall the module from the [Module Manager](module-manager.md). Delete the **BarnCRM
 Connections** permission set in Setup afterwards if you no longer need it.

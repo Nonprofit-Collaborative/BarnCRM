@@ -166,16 +166,13 @@ describe('c-super-connector', () => {
     expect(find(element, 'message').message).toBe('c.Connector_Outcome_Deleted');
   });
 
-  it('offers no Replace Key for a Secret URL and shows the Setup step after Delete', async () => {
-    BarnConfirmModal.open = jest.fn().mockResolvedValue(true);
-    deleteConnection.mockResolvedValue({ outcome: 'deleteInSetup', page: PAGE });
+  it('offers Replace Key for a Secret URL too, asking for the new address', async () => {
     const element = await render();
-    expect(find(element, `replace-${READY.name}`)).not.toBeNull();
-    expect(find(element, `replace-${WAITING.name}`)).toBeNull();
-    find(element, `delete-${READY.name}`).click();
+    find(element, `replace-${WAITING.name}`).click();
     await flush();
-    expect(find(element, 'message').message).toBe('c.Connector_Outcome_DeleteInSetup');
-    expect(find(element, 'message').variant).toBe('warning');
+    const form = find(element, 'key-form');
+    expect(form.mode).toBe('replace');
+    expect(form.connection.authKind).toBe('SecretUrl');
   });
 
   it('shows a load failure', async () => {

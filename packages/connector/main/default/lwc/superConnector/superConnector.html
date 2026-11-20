@@ -39,9 +39,7 @@
                                 <div class="slds-var-m-top_small">
                                     <lightning-button class="slds-var-m-right_small" label={row.checkLabel} data-name={row.name} disabled={busy} onclick={handleCheck} data-id={row.checkId}></lightning-button>
                                     <template lwc:if={canWrite}>
-                                        <template lwc:if={row.canReplace}>
-                                            <lightning-button class="slds-var-m-right_small" label={labels.replaceKey} data-name={row.name} disabled={busy} onclick={handleReplace} data-id={row.replaceId}></lightning-button>
-                                        </template>
+                                        <lightning-button class="slds-var-m-right_small" label={labels.replaceKey} data-name={row.name} disabled={busy} onclick={handleReplace} data-id={row.replaceId}></lightning-button>
                                         <template lwc:if={row.canDisconnect}>
                                             <lightning-button class="slds-var-m-right_small" label={labels.disconnect} data-name={row.name} disabled={busy} onclick={handleDisconnect} data-id={row.disconnectId}></lightning-button>
                                         </template>
