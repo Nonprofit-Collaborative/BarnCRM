@@ -5,13 +5,13 @@
                 <lightning-spinner alternative-text={labels.title} size="small" data-id="loading"></lightning-spinner>
             </template>
             <lightning-tabset active-tab-value={activeTab} data-id="tabs">
-                <lightning-tab label={labels.recipesTab} value="recipes" data-id="tab-recipes">
-                    <c-connector-recipes open-recipe-id={openRecipeId} data-id="recipes"></c-connector-recipes>
+                <lightning-tab label={labels.recipesTab} value="recipes" onactive={handleTabActive} data-id="tab-recipes">
+                    <c-connector-recipes open-recipe-id={openRecipeId} open-draft={openDraft} data-id="recipes"></c-connector-recipes>
                 </lightning-tab>
-                <lightning-tab label={labels.runsTab} value="runs" data-id="tab-runs">
+                <lightning-tab label={labels.runsTab} value="runs" onactive={handleTabActive} data-id="tab-runs">
                     <c-connector-runs can-manage={loaded} data-id="runs"></c-connector-runs>
                 </lightning-tab>
-                <lightning-tab label={labels.connections} value="connections" data-id="tab-connections">
+                <lightning-tab label={labels.connections} value="connections" onactive={handleTabActive} data-id="tab-connections">
                     <template lwc:if={message}>
                         <c-barn-notice class="slds-var-m-bottom_medium" variant={messageVariant} message={message} data-id="message"></c-barn-notice>
                     </template>
@@ -30,7 +30,7 @@
                                 <c-barn-notice class="slds-var-m-bottom_small" variant="info" message={labels.noWrite} data-id="no-write"></c-barn-notice>
                             </template>
                             <template lwc:if={formOpen}>
-                                <c-connector-key-form mode={formMode} connection={formConnection} onsaved={handleSaved} onfailed={handleFailed} oncancel={handleCancel} data-id="key-form"></c-connector-key-form>
+                                <c-connector-key-form mode={formMode} connection={formConnection} prefill={formPrefill} onsaved={handleSaved} onfailed={handleFailed} oncancel={handleCancel} data-id="key-form"></c-connector-key-form>
                             </template>
                             <template lwc:if={empty}>
                                 <p class="slds-var-m-vertical_medium" data-id="empty">{labels.empty}</p>
@@ -59,6 +59,9 @@
                             </ul>
                         </section>
                     </template>
+                </lightning-tab>
+                <lightning-tab label={labels.templatesTab} value="templates" onactive={handleTabActive} data-id="tab-templates">
+                    <c-connector-templates onconnection={handleTemplateConnection} onopendraft={handleOpenDraft} data-id="templates"></c-connector-templates>
                 </lightning-tab>
             </lightning-tabset>
         </div>

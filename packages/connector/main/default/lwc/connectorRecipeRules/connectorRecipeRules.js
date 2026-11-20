@@ -19,8 +19,44 @@ export const STEP_KINDS = [
   { value: 'sendWebhook', key: 'Connector_Step_SendWebhook' },
   { value: 'importRows', key: 'Connector_Step_ImportRows' },
   { value: 'if', key: 'Connector_Step_If' },
-  { value: 'stop', key: 'Connector_Step_Stop' }
+  { value: 'stop', key: 'Connector_Step_Stop' },
+  { value: 'forEach', key: 'Connector_Step_ForEach' },
+  { value: 'wait', key: 'Connector_Step_Wait' },
+  { value: 'transform', key: 'Connector_Step_Transform' }
 ];
+
+/** Steps a For Each may not hold, at any depth (R-CR12). */
+export const NOT_IN_LOOP = ['forEach', 'wait', 'importRows'];
+/** The keys that hold nested steps: an If's branches and a For Each's steps. */
+export const BRANCHES = ['then', 'otherwise', 'do'];
+export const WAIT_UNITS = ['minutes', 'hours', 'days'];
+const UNIT_MINUTES = { minutes: 1, hours: 60, days: 1440 };
+const LEAST_WAIT = 5;
+const MOST_WAIT = 43200;
+
+/** A Wait's length in minutes, 5 minutes to 30 days, or null (the server's twin). */
+export function waitMinutes(step) {
+  const amount = step && step.amount;
+  const unit = UNIT_MINUTES[step && step.unit];
+  if (!Number.isInteger(amount) || !unit || amount < 1) {
+    return null;
+  }
+  const minutes = amount * unit;
+  return minutes < LEAST_WAIT || minutes > MOST_WAIT ? null : minutes;
+}
+
+/** A copy of a step with a key taken off the blanks an import left (R-CR13). */
+export function filled(step, key) {
+  if (!step || !Array.isArray(step.fill) || !step.fill.includes(key)) {
+    return step;
+  }
+  const fill = step.fill.filter((entry) => entry !== key);
+  const next = { ...step, fill };
+  if (!fill.length) {
+    delete next.fill;
+  }
+  return next;
+}
 
 /**
  * Load Rows limits (CN-09, R-CR9) in the order the editor shows them, each with its default and
@@ -81,7 +117,7 @@ export const MODES = ['each', 'batch'];
 export const MAX_POLLED = 200;
 const AT = /^([01][0-9]|2[0-3]):[0-5][0-9]$/;
 const STEP_ID = /^[A-Za-z0-9_]{1,20}$/;
-const PILL = /^(trigger|steps)(\.[A-Za-z0-9_-]+(\[[0-9]{1,3}\])?){0,10}$/;
+const PILL = /^(trigger|steps|loop)(\.[A-Za-z0-9_-]+(\[[0-9]{1,3}\])?){0,10}$/;
 const SLOT = /\{([A-Za-z0-9_]{1,40})\}/g;
 const QUERY_NAME = /^[A-Za-z0-9_.[\]-]{1,100}$/;
 const HEADER_NAME = /^[A-Za-z0-9-]{1,64}$/;
@@ -228,8 +264,7 @@ export function allSteps(document) {
   const collect = (steps) => {
     (steps || []).forEach((step) => {
       found.push(step);
-      collect(step.then);
-      collect(step.otherwise);
+      BRANCHES.forEach((branch) => collect(step[branch]));
     });
   };
   collect(document && document.steps);
@@ -288,6 +323,12 @@ export function newStep(document, kind) {
       bodyInput: 'trigger',
       success: []
     });
+  } else if (kind === 'forEach') {
+    Object.assign(step, { items: '', do: [] });
+  } else if (kind === 'wait') {
+    Object.assign(step, { amount: 1, unit: 'hours' });
+  } else if (kind === 'transform') {
+    Object.assign(step, { map: '', input: 'trigger' });
   } else if (kind === 'if') {
     Object.assign(step, {
       match: 'all',
@@ -320,6 +361,9 @@ export function flatten(document) {
       if (step.kind === 'if') {
         walk(step.then, here, depth + 1, 'then');
         walk(step.otherwise, here, depth + 1, 'otherwise');
+      }
+      if (step.kind === 'forEach') {
+        walk(step.do, here, depth + 1, 'do');
       }
     });
   };
@@ -481,6 +525,17 @@ function stepProblem(step, label) {
       return OUTCOMES.includes(step.outcome) && String(step.message || '').length <= 255
         ? null
         : { key: 'Connector_Recipe_ErrorStop', args: at };
+    case 'forEach':
+      return isPill(step.items) ? null : { key: 'Connector_Recipe_ErrorItems', args: at };
+    case 'wait':
+      return waitMinutes(step) === null ? { key: 'Connector_Recipe_ErrorWait', args: at } : null;
+    case 'transform':
+      if (!step.map) {
+        return { key: 'Connector_Recipe_ErrorMap', args: at };
+      }
+      return step.input && !isPill(step.input)
+        ? { key: 'Connector_Recipe_ErrorPath', args: at }
+        : null;
     default:
       return { key: 'Connector_Recipe_ErrorStepKind', args: at };
   }
@@ -563,7 +618,7 @@ export function problems(document) {
   }
   const ids = new Set();
   let count = 0;
-  const check = (steps, depth) => {
+  const check = (steps, depth, inLoop) => {
     (steps || []).forEach((step) => {
       count++;
       const label = step.id || String(count);
@@ -576,16 +631,22 @@ export function problems(document) {
       if (problem) {
         found.push(problem);
       }
-      if (step.kind === 'if') {
+      if (Array.isArray(step.fill) && step.fill.length) {
+        found.push({ key: 'Connector_Recipe_ErrorFill', args: [label] });
+      }
+      if (inLoop && NOT_IN_LOOP.includes(step.kind)) {
+        found.push({ key: 'Connector_Recipe_ErrorInLoop', args: [label] });
+      }
+      if (step.kind === 'if' || step.kind === 'forEach') {
         if (depth > MAX_DEPTH) {
           found.push({ key: 'Connector_Recipe_ErrorNesting', args: [label] });
         }
-        check(step.then, depth + 1);
-        check(step.otherwise, depth + 1);
+        const looped = inLoop || step.kind === 'forEach';
+        BRANCHES.forEach((branch) => check(step[branch], depth + 1, looped));
       }
     });
   };
-  check(document && document.steps, 1);
+  check(document && document.steps, 1, false);
   if (!count) {
     found.push({ key: 'Connector_Recipe_ErrorNoSteps', args: [] });
   }
@@ -616,6 +677,10 @@ function triggerPaths(trigger) {
  */
 export function pathSuggestions(document, beforeStep) {
   const found = ['trigger', ...triggerPaths((document && document.trigger) || {})];
+  const row = document && flatten(document).find((entry) => entry.step === beforeStep);
+  if (row && row.address.some((pair) => pair[1] === 'do')) {
+    found.push('loop.item', 'loop.index');
+  }
   const sample = document && document.trigger && document.trigger.sample;
   if (sample && typeof sample === 'object' && !Array.isArray(sample)) {
     Object.keys(sample).forEach((key) => {
@@ -642,6 +707,10 @@ export function pathSuggestions(document, beforeStep) {
       found.push(`${base}.status`, `${base}.body`);
     } else if (step.kind === 'importRows') {
       found.push(`${base}.batch`, `${base}.created`, `${base}.updated`, `${base}.rejected`);
+    } else if (step.kind === 'forEach') {
+      found.push(`${base}.count`);
+    } else if (step.kind === 'transform') {
+      found.push(base);
     }
   }
   return found;

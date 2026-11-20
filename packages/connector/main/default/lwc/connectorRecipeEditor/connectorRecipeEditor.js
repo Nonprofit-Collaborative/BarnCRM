@@ -10,7 +10,12 @@ import saveRecipeSettings from '@salesforce/apex/ConnectorRecipesController.save
 import pauseRecipe from '@salesforce/apex/ConnectorRecipesController.pauseRecipe';
 import resumeRecipe from '@salesforce/apex/ConnectorRecipesController.resumeRecipe';
 import retryAllFailed from '@salesforce/apex/ConnectorRecipesController.retryAllFailed';
+import rollBack from '@salesforce/apex/ConnectorRecipesController.rollBack';
+import discardDraft from '@salesforce/apex/ConnectorRecipesController.discardDraft';
+import exportRecipe from '@salesforce/apex/ConnectorRecipesController.exportRecipe';
 import BarnConfirmModal from 'c/barnConfirmModal';
+import { saveBlob } from 'c/findCsv';
+import { exportName } from 'c/connectorFileRules';
 import {
   TRIGGERS,
   EVERY,
@@ -43,11 +48,28 @@ import {
   readCodes,
   stepRows,
   statusVariant,
-  importLimits
+  importLimits,
+  NOT_IN_LOOP,
+  WAIT_UNITS,
+  filled
 } from 'c/connectorRecipeRules';
 import { say as text } from 'c/connectorRecipeText';
 
 const LIST_FIELDS = ['values', 'pathValues', 'query', 'headers', 'conditions'];
+/** The label key of each step key an import can leave blank (R-CR13). */
+const FILL_LABELS = {
+  connection: 'Connector_Editor_Connection',
+  map: 'Connector_Editor_Map',
+  bodyMap: 'Connector_Editor_BodyMap',
+  template: 'Connector_Editor_Template',
+  pathValues: 'Connector_Editor_Path',
+  headers: 'Connector_Editor_Headers'
+};
+const BRANCH_LABELS = {
+  then: 'Connector_Editor_InThen',
+  otherwise: 'Connector_Editor_InOtherwise',
+  do: 'Connector_Editor_InForEach'
+};
 
 /**
  * The recipe editor of Super Connector (CN-02, CN-03; canonical model R-CR1 to R-CR7; design
@@ -88,6 +110,11 @@ export default class ConnectorRecipeEditor extends LightningElement {
   }
 
   set recipe(value) {
+    this.load(value);
+  }
+
+  /** Shows a recipe as saved: its draft, sample and Run Settings. */
+  load(value) {
     this._recipe = value;
     this.recipeId = value ? value.id : undefined;
     this.name = value ? value.name : '';
@@ -411,8 +438,68 @@ export default class ConnectorRecipeEditor extends LightningElement {
     },
     get working() {
       return text('Connector_Editor_Working');
+    },
+    get items() {
+      return text('Connector_Editor_Items');
+    },
+    get itemsHelp() {
+      return text('Connector_Editor_ItemsHelp');
+    },
+    get addInside() {
+      return text('Connector_Editor_AddInside');
+    },
+    get waitAmount() {
+      return text('Connector_Editor_WaitAmount');
+    },
+    get waitUnit() {
+      return text('Connector_Editor_WaitUnit');
+    },
+    get waitHelp() {
+      return text('Connector_Editor_WaitHelp');
+    },
+    get transformHelp() {
+      return text('Connector_Editor_TransformHelp');
+    },
+    get rollBack() {
+      return text('Connector_Editor_RollBack');
+    },
+    get discard() {
+      return text('Connector_Editor_Discard');
+    },
+    get exportRecipe() {
+      return text('Connector_Editor_Export');
     }
   };
+
+  get canRollBack() {
+    return this.canManage && Boolean(this._recipe && this._recipe.id && this._recipe.canRollBack);
+  }
+
+  get canDiscard() {
+    return (
+      this.canManage &&
+      Boolean(this._recipe && this._recipe.id && this._recipe.published && this._recipe.unpublished)
+    );
+  }
+
+  get loopAddOptions() {
+    return this.addOptions.filter((option) => !NOT_IN_LOOP.includes(option.value));
+  }
+
+  get unitOptions() {
+    return WAIT_UNITS.map((value) => ({ label: text(`Connector_Unit_${value}`), value }));
+  }
+
+  /** The blanks an import left on a step, named, or blank when it has none (R-CR13). */
+  fillText(step) {
+    const fill = Array.isArray(step.fill) ? step.fill : [];
+    return fill.length
+      ? text(
+          'Connector_Editor_FillHint',
+          fill.map((key) => (FILL_LABELS[key] ? text(FILL_LABELS[key]) : key)).join(', ')
+        )
+      : '';
+  }
 
   get title() {
     return this.recipeId ? this.name : this.labels.newTitle;
@@ -628,12 +715,12 @@ export default class ConnectorRecipeEditor extends LightningElement {
         step,
         indentClass: `slds-var-m-bottom_small slds-box slds-box_x-small connector-depth-${row.depth}`,
         heading: text('Connector_Editor_StepHeading', kind ? text(kind.key) : step.kind, step.id),
-        branchLabel:
-          row.depth > 0
-            ? text(
-                row.branch === 'then' ? 'Connector_Editor_InThen' : 'Connector_Editor_InOtherwise'
-              )
-            : '',
+        branchLabel: row.depth > 0 ? text(BRANCH_LABELS[row.branch]) : '',
+        isForEach: step.kind === 'forEach',
+        isWait: step.kind === 'wait',
+        isTransform: step.kind === 'transform',
+        fillText: this.fillText(step),
+        fillId: `fill-${step.id}`,
         isFind: step.kind === 'find',
         isRecord: RECORD_KINDS.includes(step.kind),
         isUpdate: step.kind === 'update',
@@ -659,7 +746,7 @@ export default class ConnectorRecipeEditor extends LightningElement {
               }))
             : [],
         canNest: step.kind === 'if' && row.depth < 1,
-        maps: CALL_KINDS.includes(step.kind) ? jsonMaps : recordMaps,
+        maps: CALL_KINDS.includes(step.kind) || step.kind === 'transform' ? jsonMaps : recordMaps,
         hints: hints.join(', '),
         findConditions: this.findConditions(step),
         pathValues: list('pathValues'),
@@ -836,7 +923,19 @@ export default class ConnectorRecipeEditor extends LightningElement {
     if (field === 'urlFrom' && value) {
       Object.assign(changes, { path: '', pathValues: [], query: [] });
     }
-    this.document = updateStep(this.document, address, changes);
+    if (field === 'amount') {
+      changes.amount = value === '' || value === null || value === undefined ? null : Number(value);
+    }
+    this.document = updateStep(this.document, address, this.withFilled(address, field, changes));
+  }
+
+  /** The changes, with the key taken off the blanks an import left when the step had any. */
+  withFilled(address, key, changes) {
+    const step = this.stepAt(address);
+    if (step && Array.isArray(step.fill)) {
+      changes.fill = filled(step, key).fill || [];
+    }
+    return changes;
   }
 
   /** One Load Rows limit: data-limit names it; a blank keeps the default (R-CR9). */
@@ -908,7 +1007,11 @@ export default class ConnectorRecipeEditor extends LightningElement {
       entry[field] = event.detail.value;
     }
     entries[Number(index)] = entry;
-    this.document = updateStep(this.document, address, { [list]: entries });
+    this.document = updateStep(
+      this.document,
+      address,
+      this.withFilled(address, list, { [list]: entries })
+    );
   }
 
   handleAddEntry(event) {
@@ -1077,6 +1180,47 @@ export default class ConnectorRecipeEditor extends LightningElement {
     return this.work(async () => {
       const run = await runNow({ recipeId: this.recipeId, inputJson: this.runInput });
       this.message = text('Connector_Editor_RunQueued', run.name);
+    });
+  }
+
+  /** Roll Back (R-CR13), after asking: the version before the last Publish is published again. */
+  async handleRollBack() {
+    if (await this.ask('Connector_Editor_RollBackTitle', 'Connector_Editor_RollBackMessage')) {
+      await this.work(async () => {
+        const updated = await rollBack({ recipeId: this.recipeId });
+        this._recipe = updated;
+        this.changed(updated.id, text('Connector_Editor_RolledBack', updated.version));
+      });
+    }
+  }
+
+  /** Discard Draft Changes (R-CR13), after asking: the draft starts again from the published one. */
+  async handleDiscard() {
+    if (await this.ask('Connector_Editor_DiscardTitle', 'Connector_Editor_DiscardMessage')) {
+      await this.work(async () => {
+        const updated = await discardDraft({ recipeId: this.recipeId });
+        this.load(updated);
+        this.changed(updated.id, text('Connector_Editor_Discarded'));
+      });
+    }
+  }
+
+  /** Export Recipe (R-CR13): the file Apex builds, saved by the browser; nothing is kept. */
+  handleExport() {
+    return this.work(async () => {
+      const fileText = await exportRecipe({ recipeId: this.recipeId });
+      saveBlob(new Blob([fileText], { type: 'application/json' }), exportName(this.name), 1000);
+      this.message = text('Connector_Editor_Exported');
+    });
+  }
+
+  ask(titleKey, messageKey) {
+    return BarnConfirmModal.open({
+      size: 'small',
+      label: text(titleKey, this.name),
+      message: text(messageKey, this.name),
+      confirmLabel: text(titleKey.replace('Title', 'Button')),
+      cancelLabel: text('Connector_Editor_Close')
     });
   }
 

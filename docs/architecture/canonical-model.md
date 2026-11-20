@@ -19161,7 +19161,8 @@ Appendix A.3). Holds no record data beyond what its definition names.
 "kind", ... } ] }` with the trigger kinds and step kinds of the design Sections 3.2 and 3.4; at
 most 25 steps in all, nesting at most 2, at most 100,000 characters. Steps name connections by
 developer name, maps by record Id, and values by paths (R-MAP2) rooted at `trigger` (the run's
-Input) or `steps.<id>` (an earlier step's result). A webhook trigger may carry `reply` (status 200
+Input), `steps.<id>` (an earlier step's result) or, inside a For Each, `loop` (`loop.item`, the
+item, and `loop.index`, its place from 0). A webhook trigger may carry `reply` (status 200
 or 202, a fixed body of at most 4,000 characters with no `{!`, an optional challenge field name;
 design Section 3.3a), which the receiver reads with the recipe it already finds by token hash.
 Step ids are 1 to 20 letters, digits or underscores, unique in the recipe. No string anywhere in
@@ -19183,6 +19184,13 @@ The kinds release 1.31 (CN-02) and 1.32 (CN-03: `schedule` and `record`; CN-04: 
 | `if` | `conditions` (`[{ "path", "operator", "value" }]`, R-R2 operator names: equals, not equals, contains, does not contain, starts with, greater than, less than, is null, is not null), `match` (`all` or `any`), `then`, `otherwise` | `{ "branch" }` |
 | `stop` | `outcome` (Succeeded, Skipped or Failed), `message` | none |
 | `importRows` (CN-09) | `template` (an active Import Template's Id, not a delete by file), `rows` (a path to a list of objects keyed by column name, a list of lists whose first list holds the column names, or CSV text with a header row), `limits` (`rows` 1 to 4,000, default 1,000; `rejected` default 0; `created` and `updated` default 1,000; each 0 to 4,000) | `{ "batchId", "batch", "rows", "created", "updated", "matched", "rejected" }` (R-CR9) |
+| `forEach` (CN-05) | `items` (a path to a list), `do` (the steps run for each item: no For Each, Wait or Load Rows among them, nesting counted as for If) | `{ "count" }` (R-CR12) |
+| `wait` (CN-05) | `amount` (a whole number), `unit` (`minutes`, `hours` or `days`); 5 minutes to 30 days in all | `{ "until" }` (R-CR12) |
+| `transform` (CN-05) | `map` (a saved map's Id, `to.kind` json), `input` (the path the map reads from; blank is `trigger`) | the object the map builds, so later steps read `steps.<id>.<key>` |
+
+Any step may carry `fill`, a list of the step's keys an import left blank because this org has
+no match (R-CR13); while it holds any, the step is a problem, so a recipe with blanks can be
+neither saved nor published, and filling a key in the editor takes it off the list.
 
 A `callApp` path starts with one `/`, and neither the path nor any value put into it, a query
 value or a header holds `@`, `\`, `{!`, a carriage return or a line feed; each value put into the
@@ -19298,6 +19306,63 @@ and starts with the connection's own path; then only its remaining path and quer
 to `callout:<connection>`, under R-CR1's path rules. Anything else fails the step; the posted
 address is never the endpoint. `sendWebhook` always POSTs a JSON body built from its map and
 retries as Call an App does (R-CR7).
+**R-CR12 For Each, Wait and Change Data** (CN-05, release 1.32). For Each reads its `items` list
+once per pass, refuses more than 1,000 items (the step fails, naming the count), and runs `do`
+for each item with `loop.item` and `loop.index`; its progress (the next item) is kept in the
+run's State, so a run continued after a checkpoint or retried after a failure carries on at the
+item and step it reached, never repeating a finished item. The run checkpoints (continues in a
+new transaction) every 200 items and whenever the transaction nears its limits. Steps inside
+log only failures; the For Each logs one entry with the item count. The results of the steps
+inside are kept for the current item only. A Test run runs the first item only and keeps its
+results. Wait makes the run Waiting with Next Attempt At at the end of the wait (the recipe
+clock wakes it, 5 minutes at the finest, R-CR6) and counts no attempt; a Test run does not wait.
+Change Data applies a saved map with `to.kind` json to its input and gives the object it builds
+to later steps; it writes nothing. Publish checks that its map exists and builds JSON.
+**R-CR13 Versions, Export and Import Recipe** (CN-08, release 1.32). Publish copies Definition to
+Previous Definition before Definition takes the Draft. Roll Back (offered while Previous
+Definition is filled) checks Previous Definition as Publish checks a draft, then swaps it with
+Definition and adds one to Version, so a second Roll Back returns to where it was; the Draft is
+left as it is. Discard Draft Changes copies Definition to Draft. Export Recipe gives a file
+`{ "barnRecipe": 1, "name", "description", "recipe", "names" }`: the published definition (the
+draft before the first Publish) without the trigger's sample data, and `names`, the name of
+each saved map, import template and connection label it names, so another org can match them.
+No Run As, record owner, run, token or key is exported. Import Recipe reads such a file (or
+pasted text), at most 400,000 characters: it is refused when it holds `{!` anywhere (F1), a key
+named like a secret (R-CR15) or a problem other than a blank; each map, import template and
+connection is matched by name in this org (connections by label), Find and Record Change saved
+query links are dropped (the query stays in the step), and each one with no match is blanked
+and listed in the step's `fill`. The checks Publish makes (R-CR2) run on the result and are
+shown as what to fix before Publish. Nothing is saved: the recipe opens in the editor as a new
+draft, and Save checks it as any save does.
+**R-CR14 Templates** (CN-08, D-216, release 1.32). A template is a JSON file an admin imports,
+from a file or pasted, on Super Connector's Templates section; no template is shipped, stored or
+kept. Its keys: `key`, `label`, `version` (1), `description`, `auth` (`kind`, one of the built-in
+kinds ApiKeyHeader, BearerToken, BasicAuth, SecretUrl; `headerName` for ApiKeyHeader; `params`,
+labels and help for the boxes the admin fills), `baseUrl` (`https`, with `{name}` placeholders
+in the host only), `urlParams` (`name`, `label`, `pattern`, a regular expression each value must
+match, and optional `fromParam` and `after`, a non-secret part of the key read in the browser),
+`check` (`method` GET, `path`), `actions` (`key`, `label`, `method`, `path`, `query`), `pollers`,
+`webhook` (kept for later slices, checked only for `{!` and secrets), `requires` (object API
+names the recipes need) and `recipes` (`name`, `description`, `draft`, a recipe document whose
+Call an App steps may name an `action`). Import checks the schema in the browser and again in
+Apex and refuses any other key, `{!` anywhere, any auth header template or formula option (a key
+`header`, `headerValue`, `headerTemplate`, `formula`, `allowMergeFieldsInBody` or
+`allowMergeFieldsInHeader`), a secret (R-CR15), an `http` or malformed base URL, a placeholder
+without a pattern, and a recipe document with a problem other than a blank. When an object in
+`requires` is missing, import says which and offers nothing. Otherwise it offers a New
+Connection form filled with the label, auth kind, header name and base URL, the host locked to
+the template's pattern (only the placeholders are typed), and each recipe to open as a new draft:
+an `action` is copied into the step (method, path and query; each path slot left blank) and the
+step's connection is blank and listed in `fill`. The admin pastes the key as for any
+connection.
+**R-CR15 No secret in a file.** An exported recipe holds none, and an imported recipe or
+template is refused when any key, at any depth, is named `password`, `secret`, `clientSecret`,
+`token`, `accessToken`, `refreshToken`, `apiKey`, `apiSecret`, `authorization`, `credential`,
+`privateKey` or `secretUrl` (ignoring capitals, hyphens and underscores), when any text is a
+Bearer or Basic credential (the word, then 12 or more token characters holding a digit), or
+when a header whose name holds `key`, `token`, `secret`, `auth`, `password`, `signature` or
+`session` has a typed value. Export blanks such a header's value and lists it in the step's
+`fill`.
 
 ### Salesforce implementation
 
@@ -19901,6 +19966,7 @@ mirrors the primary member).
 | 1.76 | 2026-11-20 | BarnCRM Connector recipe clock (CN-03, D-215, release 1.32). Connector Recipe gains `Watermark__c`, `Next_Run_At__c`, `Consecutive_Failures__c`, `Pause_After_Failures__c`, `Retry_Attempts__c`, `Keep_Runs_Days__c` and `Ignore_Own_Changes__c`; Connector Run gains `Next_Attempt_At__c`. New custom setting Section 29CN4 Connector Settings (`Connector_Settings__c`, R-CS1) and platform event `Connector_Start_User__e`. R-CR1 adds the `schedule` and `record` triggers, R-CR4 the Integration User lane, and new R-CR6 (clock), R-CR7 (retries and pause) and R-CR8 (Health Check). No object added (custom settings are not counted). |
 | 1.77 | 2026-11-20 | BarnCRM Connector Load Rows with an Import Template (CN-09, C-38, D-215, release 1.32). R-CR1 adds the `importRows` step; new R-CR9 (a scheduled dry run that commits only inside the step's limits) and R-IB18 (a data job a recipe starts, through Super Importer's own entry points). R-CR7: waking a run that waits on a data job counts no attempt. No object or field added. |
 | 1.78 | 2026-11-20 | BarnCRM Connector webhooks in and sending data back (CN-04, D-216, release 1.32). Connector Recipe gains `Webhook_Token_Hash__c` and `Webhook_Hourly_Cap__c`; Connector Run gains `Event_Key__c` and `Reference__c` (all defined in CN-02). R-CR1 adds the `webhook` trigger, the `sendWebhook` step and `urlFrom`; new R-CR10 (the receiver) and R-CR11 (fetch back and callback addresses). New permission set `BarnCRM_Connector_Webhook_Guest`. No object added. |
+| 1.79 | 2026-11-20 | BarnCRM Connector steps and versions (CN-05, CN-08, D-215, D-216, release 1.32). R-CR1 adds the `forEach`, `wait` and `transform` steps, the `loop` path root and the `fill` list an import leaves; new R-CR12 (For Each, Wait and Change Data), R-CR13 (Previous Definition, Roll Back, Discard Draft Changes, Export and Import Recipe), R-CR14 (template import, nothing shipped or kept) and R-CR15 (no secret in a file). Connector Recipe ships `Previous_JSON__c`, defined in v1.75. No object added. |
 
 ---
 ## 32. Entity ownership by package

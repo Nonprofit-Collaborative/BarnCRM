@@ -3,7 +3,7 @@
 ## What It Does
 
 The optional **BarnCRM Connector** module (Beta) connects BarnCRM to the other apps your
-organization uses, without Flow Builder, Apex or a paid integration service. It has three parts,
+organization uses, without Flow Builder, Apex or a paid integration service. It has four parts,
 each a tab of **Super Connector**:
 
 - **Recipes**: "when this happens, then do these steps" automations that find, create and update
@@ -14,9 +14,12 @@ each a tab of **Super Connector**:
 - **Connections**: a saved, checked sign-in to another app's REST API. Each connection keeps its
   key in Salesforce's own credential store (an External Credential and a Named Credential), never
   in a BarnCRM record, and BarnCRM never shows a key again once it is saved.
+- **Templates**: import a template file for an app, or a recipe exported from another org (see
+  [Templates and Moving Recipes](#templates-and-moving-recipes)).
 
 Connections are generic: any app with an HTTPS REST API works, with one of four sign-in kinds.
-Nothing for a particular app is preloaded into your org.
+Nothing for a particular app is preloaded into your org: an app's template is a file you import
+when you want it, and nothing of it is kept afterwards except the connection and recipes you save.
 
 ## Before You Install
 
@@ -223,6 +226,8 @@ reads an earlier step's result, or the run's own data, by a **value path**:
 | `steps.findDonor.records[0].Id` | The first record a Find step found. |
 | `steps.makeGift.id` | The record a Create or Update step saved. |
 | `steps.askApp.body.id` | A value in the JSON an app answered with. |
+| `loop.item.email` | Inside a For Each: the `email` value of the item being worked on (`loop.index` is its place, from 0). |
+| `steps.reshape.fullName` | A value of the data a Change Data step built. |
 
 | Step | What it does | What you choose |
 |---|---|---|
@@ -235,6 +240,16 @@ reads an earlier step's result, or the run's own data, by a **value path**:
 | Load Rows with an Import Template | Hands rows to Super Importer with one of its templates, runs the dry run, and commits only when the dry run is inside the limits you set. See [Scheduled Imports](#scheduled-imports-load-rows-with-an-import-template). | The template; the value path that holds the rows; Most Rows, Most Rejected Rows, Most New Records and Most Updated Records. |
 | If | Runs its **Then** steps when its conditions hold, otherwise its **Otherwise** steps. | Up to 10 conditions (value path, operator, value), all or any. An If can hold one more If, no deeper. |
 | Stop | Ends the run as Succeeded, Skipped or Failed, with a message. | The outcome and message. |
+| For Each | Runs its own steps once for each item of a list, such as the records a Find step found or a list an app sent, up to 1,000 items. | The value path of the list; the steps to run, which read the item as `loop.item`. A For Each cannot hold another For Each, a Wait or a Load Rows step. |
+| Wait | Pauses the run, then carries on with the next step. | A number and minutes, hours or days: 5 minutes to 30 days. The recipe clock wakes the run, so a wait can end up to 5 minutes late. |
+| Change Data | Builds new data from the run's data through a saved map that builds JSON (see [Mapper](mapper.md)), for later steps to read. Writes nothing. | The map; the value path it reads (blank is the run's data). |
+
+A For Each works through 200 items, then continues in a new transaction, so a long list never
+runs into Salesforce's limits; a retried run carries on at the item and step that failed and never
+repeats an item that finished. Run History shows one line for the For Each with the number of
+items, and a line for any step inside that failed. The results of the steps inside a For Each can
+be read only inside it, for the item being worked on. A waiting run shows **Waiting** on Run
+History with the time it carries on, and does not use a retry.
 
 A recipe holds at most 25 steps. Records created by a recipe are owned by the **Owner of New
 Records** you choose on the recipe, or by the Automated Process user when blank.
@@ -366,6 +381,9 @@ the recipe again from its failed step, up to 200 at a time.
 
 ### Test, Publish and Run Now
 
+The editor's buttons, in order: **Save Draft**, **Publish**, **Roll Back**, **Discard Draft
+Changes**, **Export Recipe** and **Delete**; Test and Run Now have their own sections below.
+
 1. **Save Draft** keeps your changes without affecting the published recipe. A draft is checked
    on every save: step names, value paths, Call an App paths and headers, and merge fields.
 2. **Test** runs the draft once on the sample data in **When** (or on a record Id you enter).
@@ -379,7 +397,27 @@ the recipe again from its failed step, up to 200 at a time.
 4. **Run Now** queues a run of the published version with the JSON you paste (blank is `{}`).
    Runs start within moments and appear on **Run History**.
 
+Test runs only the first item of a For Each and does not wait at a Wait step.
+
 Delete removes a recipe and its runs.
+
+### Versions: Roll Back and Discard Draft Changes
+
+Each Publish keeps the version it replaces. **Roll Back** puts that version back: it is checked as
+Publish checks a draft (connections, maps, access), becomes the published version with the next
+version number, and the version it replaced is kept in turn, so selecting Roll Back again returns
+to where you were. Your draft is not changed by Roll Back. **Discard Draft Changes** throws away
+the draft's unpublished changes and starts the draft again from the published version. Both ask
+before they act.
+
+### Export Recipe
+
+**Export Recipe** saves the recipe as a JSON file, to import in another org (a sandbox to
+production, for example). It holds the published version (the draft when the recipe was never
+published), with the names of the maps, import templates and connections it uses, so the other
+org can find its own. It never holds a key, a Run As choice, an owner, runs or the sample data
+under **When**.
+
 
 ### Limits
 
@@ -390,6 +428,82 @@ or 140 saves in one transaction) and continues where it stopped; a step that alr
 run again. A run's data, kept between steps, is limited to about 130,000 characters, which also
 bounds the rows one Load Rows step can take from an earlier step; larger loads belong in Super
 Importer.
+
+## Templates and Moving Recipes
+
+The **Templates** tab imports two kinds of JSON file, chosen from your computer or pasted:
+
+- **A template** for an app (from the BarnCRM website or repository, or one you wrote): the
+  app's connection settings and ready-made recipes.
+- **A recipe file** made by **Export Recipe** in another org.
+
+BarnCRM ships no templates and keeps none: nothing is stored when you import, and the file is not
+kept. Only the connection and the recipes you then save stay in your org.
+
+**What import checks.** A file is refused, and nothing is offered, when it:
+
+- holds a Salesforce merge field (an opening brace followed by an exclamation mark) anywhere;
+- holds anything that looks like a key, token, password or secret address, or a Bearer or Basic
+  sign-in value (a template never carries one: you paste the key yourself);
+- tries to set a sign-in header or turn on formulas in a request (only BarnCRM's four built-in
+  sign-in kinds are used);
+- has a base address that is not `https`, or a recipe with a problem Save would refuse;
+- needs a BarnCRM module or object your org does not have (the message names it).
+
+Then the checks Publish makes run on each recipe, and what they find is listed as what to fix
+before you publish.
+
+**Importing a template.** Select **Import** and review what the template offers:
+
+1. **Create Connection** opens **New Connection** filled in with the template's name, sign-in
+   kind, header name and address. The address's host is locked to the template's: you type only
+   the parts it asks for (such as a data center), checked against the template's pattern. Paste
+   your key and save as for any connection, then do [The One Setup Step](#the-one-setup-step).
+2. **Open as Draft** opens each of the template's recipes in the recipe editor as a new, unsaved
+   draft. Each blank you must fill (the connection of each Call an App step, a map or an import
+   template this org does not have, a path slot) is highlighted on its step. Fill them, then
+   **Save Draft**, **Test** and **Publish**.
+
+**Importing a recipe file.** BarnCRM matches each map, import template and connection the
+recipe names by name (a connection by its label) in this org. Anything without a match is left
+blank and highlighted. **Open as Draft** opens the recipe as a new draft; it is saved only when
+you select **Save Draft**, with **BarnCRM Automation** as its Run As (choose another after
+saving). An imported recipe never starts running by itself: it is a draft until you publish it.
+
+**Writing a template.** A template is one JSON object (the full rules are R-CR14 in the canonical
+model). This one offers a Mailchimp connection whose data center is typed, or read from the end
+of the key at saving, and one recipe:
+
+```json
+{
+  "key": "mailchimp",
+  "label": "Mailchimp",
+  "version": 1,
+  "auth": { "kind": "BasicAuth", "params": [{ "name": "Password", "label": "API key" }] },
+  "baseUrl": "https://{dc}.api.mailchimp.com/3.0",
+  "urlParams": [
+    { "name": "dc", "label": "Data center", "pattern": "^[a-z]{2}[0-9]{1,3}$", "fromParam": "Password", "after": "-" }
+  ],
+  "check": { "method": "GET", "path": "/ping" },
+  "actions": [
+    { "key": "upsertMembers", "label": "Add or update subscribers", "method": "POST", "path": "/lists/{listId}" }
+  ],
+  "recipes": [
+    {
+      "name": "Add New People",
+      "draft": {
+        "version": 1,
+        "trigger": { "kind": "manual" },
+        "steps": [{ "id": "send", "kind": "callApp", "action": "upsertMembers" }]
+      }
+    }
+  ]
+}
+```
+
+A Call an App step that names an `action` gets the action's method, path and query on import,
+with each path slot left to fill. `auth.kind` is one of `ApiKeyHeader` (with `headerName`),
+`BearerToken`, `BasicAuth` or `SecretUrl`. A key `requires` lists the objects the recipes need.
 
 ## Run History
 

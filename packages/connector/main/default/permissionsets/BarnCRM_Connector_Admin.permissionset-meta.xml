@@ -43,6 +43,11 @@
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
+    <editable>true</editable>
+    <field>Connector_Recipe__c.Previous_JSON__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
     <editable>false</editable>
     <field>Connector_Recipe__c.Last_Run_At__c</field>
     <readable>true</readable>

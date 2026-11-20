@@ -27,6 +27,168 @@ const TEXTS = {
   get Connector_Access_Sets() {
     return helpText('Connector', 'Connector_Access_Sets');
   },
+  get Connector_Step_ForEach() {
+    return helpText('Connector', 'Connector_Step_ForEach');
+  },
+  get Connector_Step_Wait() {
+    return helpText('Connector', 'Connector_Step_Wait');
+  },
+  get Connector_Step_Transform() {
+    return helpText('Connector', 'Connector_Step_Transform');
+  },
+  get Connector_Unit_minutes() {
+    return helpText('Connector', 'Connector_Unit_minutes');
+  },
+  get Connector_Unit_hours() {
+    return helpText('Connector', 'Connector_Unit_hours');
+  },
+  get Connector_Unit_days() {
+    return helpText('Connector', 'Connector_Unit_days');
+  },
+  get Connector_Recipe_ErrorFill() {
+    return helpText('Connector', 'Connector_Recipe_ErrorFill');
+  },
+  get Connector_Recipe_ErrorInLoop() {
+    return helpText('Connector', 'Connector_Recipe_ErrorInLoop');
+  },
+  get Connector_Recipe_ErrorItems() {
+    return helpText('Connector', 'Connector_Recipe_ErrorItems');
+  },
+  get Connector_Recipe_ErrorWait() {
+    return helpText('Connector', 'Connector_Recipe_ErrorWait');
+  },
+  get Connector_Editor_InForEach() {
+    return helpText('Connector', 'Connector_Editor_InForEach');
+  },
+  get Connector_Editor_Items() {
+    return helpText('Connector', 'Connector_Editor_Items');
+  },
+  get Connector_Editor_ItemsHelp() {
+    return helpText('Connector', 'Connector_Editor_ItemsHelp');
+  },
+  get Connector_Editor_AddInside() {
+    return helpText('Connector', 'Connector_Editor_AddInside');
+  },
+  get Connector_Editor_WaitAmount() {
+    return helpText('Connector', 'Connector_Editor_WaitAmount');
+  },
+  get Connector_Editor_WaitUnit() {
+    return helpText('Connector', 'Connector_Editor_WaitUnit');
+  },
+  get Connector_Editor_WaitHelp() {
+    return helpText('Connector', 'Connector_Editor_WaitHelp');
+  },
+  get Connector_Editor_TransformHelp() {
+    return helpText('Connector', 'Connector_Editor_TransformHelp');
+  },
+  get Connector_Editor_FillHint() {
+    return helpText('Connector', 'Connector_Editor_FillHint');
+  },
+  get Connector_Editor_RollBack() {
+    return helpText('Connector', 'Connector_Editor_RollBack');
+  },
+  get Connector_Editor_RollBackTitle() {
+    return helpText('Connector', 'Connector_Editor_RollBackTitle');
+  },
+  get Connector_Editor_RollBackMessage() {
+    return helpText('Connector', 'Connector_Editor_RollBackMessage');
+  },
+  get Connector_Editor_RollBackButton() {
+    return helpText('Connector', 'Connector_Editor_RollBackButton');
+  },
+  get Connector_Editor_RolledBack() {
+    return helpText('Connector', 'Connector_Editor_RolledBack');
+  },
+  get Connector_Editor_Discard() {
+    return helpText('Connector', 'Connector_Editor_Discard');
+  },
+  get Connector_Editor_DiscardTitle() {
+    return helpText('Connector', 'Connector_Editor_DiscardTitle');
+  },
+  get Connector_Editor_DiscardMessage() {
+    return helpText('Connector', 'Connector_Editor_DiscardMessage');
+  },
+  get Connector_Editor_DiscardButton() {
+    return helpText('Connector', 'Connector_Editor_DiscardButton');
+  },
+  get Connector_Editor_Discarded() {
+    return helpText('Connector', 'Connector_Editor_Discarded');
+  },
+  get Connector_Editor_Export() {
+    return helpText('Connector', 'Connector_Editor_Export');
+  },
+  get Connector_Editor_Exported() {
+    return helpText('Connector', 'Connector_Editor_Exported');
+  },
+  get Connector_Templates_Heading() {
+    return helpText('Connector', 'Connector_Templates_Heading');
+  },
+  get Connector_Templates_Intro() {
+    return helpText('Connector', 'Connector_Templates_Intro');
+  },
+  get Connector_Templates_ChooseFile() {
+    return helpText('Connector', 'Connector_Templates_ChooseFile');
+  },
+  get Connector_Templates_Paste() {
+    return helpText('Connector', 'Connector_Templates_Paste');
+  },
+  get Connector_Templates_PasteHelp() {
+    return helpText('Connector', 'Connector_Templates_PasteHelp');
+  },
+  get Connector_Templates_Import() {
+    return helpText('Connector', 'Connector_Templates_Import');
+  },
+  get Connector_Templates_NothingKept() {
+    return helpText('Connector', 'Connector_Templates_NothingKept');
+  },
+  get Connector_Templates_Connection() {
+    return helpText('Connector', 'Connector_Templates_Connection');
+  },
+  get Connector_Templates_ConnectionDetail() {
+    return helpText('Connector', 'Connector_Templates_ConnectionDetail');
+  },
+  get Connector_Templates_CreateConnection() {
+    return helpText('Connector', 'Connector_Templates_CreateConnection');
+  },
+  get Connector_Templates_Recipes() {
+    return helpText('Connector', 'Connector_Templates_Recipes');
+  },
+  get Connector_Templates_NoRecipes() {
+    return helpText('Connector', 'Connector_Templates_NoRecipes');
+  },
+  get Connector_Templates_BeforePublish() {
+    return helpText('Connector', 'Connector_Templates_BeforePublish');
+  },
+  get Connector_Templates_OpenDraft() {
+    return helpText('Connector', 'Connector_Templates_OpenDraft');
+  },
+  get Connector_Templates_OpenNamed() {
+    return helpText('Connector', 'Connector_Templates_OpenNamed');
+  },
+  get Connector_Templates_TemplateHeading() {
+    return helpText('Connector', 'Connector_Templates_TemplateHeading');
+  },
+  get Connector_Templates_RecipeHeading() {
+    return helpText('Connector', 'Connector_Templates_RecipeHeading');
+  },
+  get Connector_Templates_Blanks() {
+    return helpText('Connector', 'Connector_Templates_Blanks');
+  },
+  get Connector_Import_ErrorSize() {
+    return helpText('Connector', 'Connector_Import_ErrorSize');
+  },
+  get Connector_Import_ErrorUnreadable() {
+    return helpText('Connector', 'Connector_Import_ErrorUnreadable');
+  },
+  get Connector_Import_ErrorMergeField() {
+    return helpText('Connector', 'Connector_Import_ErrorMergeField');
+  },
+  get Connector_Import_ErrorSecret() {
+    return helpText('Connector', 'Connector_Import_ErrorSecret');
+  },
+  get Connector_Import_ErrorFormula() {
+    return helpText('Connector', 'Connector_Import_ErrorFormula');
+  },
   get Connector_Editor_AddEntry() {
     return helpText('Connector', 'Connector_Editor_AddEntry');
   },

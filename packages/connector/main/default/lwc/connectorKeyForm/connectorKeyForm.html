@@ -5,7 +5,10 @@
             <lightning-input label={labels.name} value={label} max-length="80" required data-field="label" data-id="label" onchange={handleField}></lightning-input>
             <lightning-combobox label={labels.kind} value={authKind} options={kindOptions} required data-field="authKind" data-id="kind" onchange={handleField}></lightning-combobox>
             <template lwc:if={showBaseUrl}>
-                <lightning-input type="url" label={labels.baseUrl} value={baseUrl} field-level-help={labels.baseUrlHelp} required data-field="baseUrl" data-id="base-url" onchange={handleField}></lightning-input>
+                <lightning-input type="url" label={labels.baseUrl} value={baseUrl} field-level-help={labels.baseUrlHelp} required read-only={locked} data-field="baseUrl" data-id="base-url" onchange={handleField}></lightning-input>
+                <template for:each={urlParamRows} for:item="param">
+                    <lightning-input key={param.key} label={param.label} value={param.value} field-level-help={param.help} data-name={param.name} data-id={param.key} onchange={handleUrlPart}></lightning-input>
+                </template>
             </template>
             <template lwc:if={showHeaderName}>
                 <lightning-input label={labels.headerName} value={headerName} max-length="64" required data-field="headerName" data-id="header-name" onchange={handleField}></lightning-input>

@@ -30,6 +30,10 @@ Recipe** to a flow, such as one behind a button. The recipe still runs as BarnCR
 it can do only what your admin allowed recipes to do, and its run shows in Run History as started
 by Flow.
 
+**Some recipes wait or repeat.** A recipe can work through a list one item at a time, or wait
+(for example two days) before its next step. A waiting run shows as **Waiting** in Run History,
+with when it carries on; that is normal and needs nothing from you.
+
 **Keys stay with your admin.** A connection's key is kept in Salesforce's credential store and
 never shown again, not even to the admin who saved it. If another app asks you for a BarnCRM key
 or password, do not give one: tell your admin.
