@@ -43,6 +43,23 @@ stop mattering once BarnCRM is on AppExchange.
 Measured 2026-11-04; the Mirror and Fundraising rows 2026-11-14. The install pre-check below measures the release you are installing,
 against your org.
 
+**BarnCRM Migration** is optional and needs Core only: the Migration Assistant and the NPSP and
+Nonprofit Cloud household tools, about 56,500 characters of Apex (comments left out), 10 custom
+labels and no custom objects. Install it only while you are moving records in from another
+product in the same org, then uninstall it (see
+[Migration Assistant](migration-assistant.md#when-you-are-done)).
+
+**BarnCRM Org Optimizer** is optional and needs Core only: the Org Optimizer page and every
+section on it (Data Quality, Field Utilization, Access Explorer, Field Access Manager and the
+rest) and Health Check, about 215,000 characters of Apex (comments left out), 63 custom labels
+and no custom objects. Without it there is no Org Optimizer tab and no Health Check; the rest
+of BarnCRM works as before (see [Org Optimizer](org-optimizer.md#2-where-it-comes-from)).
+
+**BarnCRM Sample Data** is optional and needs Core only: the Sample Data tab and the sample
+records it loads, about 30,000 characters of Apex and no custom labels or objects. Install it
+in a sandbox, scratch org or demo org; a production org does not need it (see
+[Sample Data](sample-data.md)).
+
 **More room for Apex code.** If the pre-check says your Apex code will not fit, install fewer
 modules, or ask Salesforce for a higher limit: open a case with Salesforce Support from the
 Help menu, asking to increase the Apex code character limit (Salesforce Help article "Increase
@@ -92,7 +109,10 @@ stages and runs their setup steps:
 scripts/org/deploy-packages.sh myorg
 ```
 
-Add `--core-only` for Core alone (the Standard Edition).
+Add `--core-only` for Core alone. Without it the command also deploys BarnCRM Migration,
+BarnCRM Org Optimizer and BarnCRM Sample Data; uninstall BarnCRM Migration from Setup,
+**Installed Packages** when you have nothing to migrate, and BarnCRM Sample Data when you no
+longer need sample records.
 
 **In a production org**, validate first, then deploy what was validated. Production runs
 Apex tests on every deploy that carries code. By default those are all the tests in your org,
@@ -119,7 +139,8 @@ sf org assign permset --name BarnCRM_Admin --target-org myorg
 echo 'CorePostInstall.runAsSourceDeploy();' | sf apex run --target-org myorg
 ```
 
-Then open **Health Check** in **Org Optimizer** ([Health Check](health-check.md)). Its **Settings**
+Then, with BarnCRM Org Optimizer installed, open **Health Check** in **Org Optimizer**
+([Health Check](health-check.md)). Its **Settings**
 finding, **Setup never ran for**, names Core and every module whose setup steps have not run;
 choose **Finish Setup** there to run them for all of them at once. The same button is on each
 module's row in **BarnCRM Settings**, **Modules**

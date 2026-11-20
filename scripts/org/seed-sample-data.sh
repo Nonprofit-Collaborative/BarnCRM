@@ -5,6 +5,10 @@
 # connections and affiliations, and the Giving gifts where Giving is installed) into the
 # target org and waits for it to actually finish.
 #
+# The loader is the optional BarnCRM Sample Data package (packages/sampledata, ADR-NEXT
+# org optimizer and sample data modules). A source-deployed org without it (a --core-only
+# build) gets it deployed here first, since it depends on Core alone.
+#
 # SampleDataLoader.load() runs as Batch Apex (SampleDataStageBatch, one stage per execute:
 # the accounts, each chunk of contacts, the connections, then each module's stages in a
 # batch of their own), so the Apex call returns as soon as the batch is queued, not once
@@ -44,7 +48,7 @@ if [[ -n "$NAMESPACE" && -f "$APEX_FILE" ]]; then
   trap 'rm -f "$APEX_FILE"' EXIT
   printf '%s.BarnInstallCheck.loadSampleData();\n' "$NAMESPACE" >"$APEX_FILE"
 fi
-SAMPLE_JSON="$REPO_ROOT/packages/core/main/default/staticresources/SampleData.json"
+SAMPLE_JSON="$REPO_ROOT/packages/sampledata/main/default/staticresources/SampleData.json"
 POLL_INTERVAL_SECONDS=5
 # The chain is longer than it was: five contact chunks, the connection stage, and then the
 # Giving stages (reference data plus one job per hundred gifts), each waiting its turn in
@@ -80,6 +84,16 @@ count_query() {
   "
 }
 
+if [[ -z "$NAMESPACE" ]]; then
+  LOADERS="$(count_query "SELECT COUNT() FROM ApexClass WHERE Name = 'SampleDataLoader' AND NamespacePrefix = null")"
+  if [[ "$LOADERS" -eq 0 ]]; then
+    echo "The Sample Data package is not in ${ALIAS} yet; deploying packages/sampledata..."
+    sf project deploy start --target-org "$ALIAS" --source-dir "$REPO_ROOT/packages/sampledata" --wait 30
+    printf '%s\n' 'new SampleDataPostInstall().runSetup(UserInfo.getUserId());' |
+      sf apex run --target-org "$ALIAS" >/dev/null
+  fi
+fi
+
 echo "Starting the sample data load in ${ALIAS} (runs in the background as Batch Apex)..."
 sf apex run --target-org "$ALIAS" --file "$APEX_FILE"
 
@@ -109,5 +123,5 @@ while [[ "$ELAPSED" -lt "$MAX_WAIT_SECONDS" ]]; do
 done
 
 echo "Sample data load did not finish within ${MAX_WAIT_SECONDS}s." >&2
-echo "Check Setup > Apex Jobs, or open BarnCRM Settings > Sample Data in the org, for progress." >&2
+echo "Check Setup > Apex Jobs, or open the Sample Data tab in the org, for progress." >&2
 exit 1

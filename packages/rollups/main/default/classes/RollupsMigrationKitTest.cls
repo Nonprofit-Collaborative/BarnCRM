@@ -23,7 +23,7 @@ private class RollupsMigrationKitTest {
 		System.runAs(maria()) {
 			RollupDlrsFake.use(new List<RollupDlrs.Definition>{ RollupDlrsFake.activeOn('Account', COUNT_FIELD) });
 			RollupsMigrationKit kit = new RollupsMigrationKit();
-			Assert.isNull(kit.rows('copy', new List<SObject>()), 'No rows: the step is a tool');
+			Assert.isNull(kit.rows('copy', new List<Map<String, Object>>()), 'No rows: the step is a tool');
 
 			MigrationCheck before = kit.verify('copy');
 			Assert.areEqual(1, before.source, 'One active DLRS rollup');

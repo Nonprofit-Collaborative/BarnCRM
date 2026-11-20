@@ -11,6 +11,7 @@
  * running job is read from its AsyncApexJob in system mode, filtered by the job identifier the
  * job record holds.
  */
+@NamespaceAccessible
 public with sharing class BulkDeleteController {
 	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
 		null,
@@ -210,6 +211,7 @@ public with sharing class BulkDeleteController {
 	}
 
 	/** Whether the running user may bulk delete: both permissions (R-BD6). */
+	@NamespaceAccessible
 	public static Boolean hasPermission() {
 		return FeatureManagement.checkPermission(PERMISSION) &&
 			FeatureManagement.checkPermission(FindController.PERMISSION);

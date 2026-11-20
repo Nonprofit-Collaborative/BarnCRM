@@ -49,11 +49,10 @@ Each product shows:
   honestly. Where it says "not yet tested", it means exactly that.
 - **Learn More**, which opens the product's own page in a new tab. The page has no install
   links: find and install a product from its own page.
-- **Start Migration**, when the product is installed and BarnCRM has a migration kit for it,
-  shown to people with Manage BarnCRM Settings. It opens the
-  [Migration Assistant](migration-assistant.md) for that product in place of the list;
-  **Back to Integrations** returns. Today the kits are DLRS Rollups and NPSP Customizable
-  Rollups.
+- **Start Migration**, when the product is installed, BarnCRM has a migration kit for it and
+  the optional BarnCRM Migration package is installed, shown to people with Manage BarnCRM
+  Settings. One button per kit, each with the kit's name. It opens that kit on the
+  [Migration Assistant](migration-assistant.md) tab.
 
 The alternatives include **Nonprofit Success Pack (NPSP)** and **Nonprofit Cloud Fundraising**,
 each listed only when installed, with a note on running BarnCRM beside it.

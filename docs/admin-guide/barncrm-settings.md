@@ -120,7 +120,6 @@ to the people who should see them, shows its settings, and starts its automation
 |---|---|---|
 | Data Manager | Data Manager, Import, Find and Super Transformer | Those four tabs and the Import section |
 | Duplicate Matching | Duplicate suggestions, review and matching logic | The Duplicate Matching tab and the Duplicate Matching section |
-| Org Optimizer and Health Check | The Org Optimizer tab and Health Check | The Org Optimizer tab, the Health section and the Org Optimizer section (its three thresholds) |
 | Households | Creating, naming and tidying households | Its three automations and the household naming and tidy-up rows |
 | Addresses | Address capture, the primary address, and the addresses of deleted records | Its five automations, the Addresses section and the Addresses card on every record page that shows it (D-185) |
 | Relationships | Keeping both sides of a relationship in step | Its automation, the Relationships box on People and Households, the Relationships card on a person's Connections tab, the Relationships tile on the Sample Data card (D-185), the Relationship types list in Custom Metadata, and import mappings that load relationships (in Data Manager and the Import wizard; kept, and listed again when it is turned back on) |
@@ -135,8 +134,8 @@ single automation for fine-grained control; that is not turning the feature off.
 grants it, and an app cannot hide a tab any other way. So each feature tab has its own small
 packaged permission set (for example **BarnCRM Auto: Find Tab**) that grants only that tab, and
 BarnCRM gives it, once the feature is on, to the people who should see the tab: whoever holds
-a role or extra permission that used to include the tab (BarnCRM Admin for all five, Find and
-Export, Bulk Update or Bulk Delete for Find, Data Manager and Org Optimizer, Bulk Update or
+a role or extra permission that used to include the tab (BarnCRM Admin for all four, Find and
+Export, Bulk Update or Bulk Delete for Find and Data Manager, Bulk Update or
 Bulk Delete for Super Transformer). BarnCRM keeps these in step when a feature is turned on, when a role or extra
 permission is given or removed on the Access page, after every upgrade, and every hour (for
 roles given in Setup or by user access policies). A large org may take a few minutes to catch
@@ -288,14 +287,16 @@ section's name.
 
 ### Health and Error Log
 
-Health Check and the Errors list each have one home, Org Optimizer. For someone who can open
-Org Optimizer (Find and Export, or Manage BarnCRM Settings), the **Health** section holds an
+Health Check and the Errors list each have one home, Org Optimizer, from the optional BarnCRM
+Org Optimizer package. While it is installed, the **Health** section holds an
 **Open Health Check** button that opens Org Optimizer on its **Health Check** section, with
 the last run and a way to run it again, and the **Error Log** section starts with an **Open
 the Error Log** button that opens Org Optimizer on its **Errors** section; the rest of the
-Error Log section is the error settings (the digest and how long entries are kept). Someone
-who cannot open Org Optimizer still sees the Health Check report itself in the **Health**
-section, and no Error Log button.
+Error Log section is the error settings (the digest and how long entries are kept). The
+package gives Staff and Read Only holders the Org Optimizer tab, so they read Health Check
+there; the Error Log button shows to someone with **Manage BarnCRM Settings** or **Find and
+Export Records**. Without the package the two sections hold
+only their settings.
 
 ### Setting Names
 

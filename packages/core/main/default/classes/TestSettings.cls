@@ -5,6 +5,7 @@
  * These helpers put those fields back to a never-set-up org inside the test; the change rolls
  * back with the test. Call them inside `System.runAs(TestUsers.admin())`.
  */
+@NamespaceAccessible
 @IsTest
 public class TestSettings {
 	/** An org that never saved an edition, a feature list or checklist progress. */
@@ -15,6 +16,7 @@ public class TestSettings {
 	}
 
 	/** A new install: never set up, with the feature list marked as awaiting first-run setup. */
+	@NamespaceAccessible
 	public static void newInstall() {
 		neverSetUp();
 		FeatureSwitchService.markNewInstall();

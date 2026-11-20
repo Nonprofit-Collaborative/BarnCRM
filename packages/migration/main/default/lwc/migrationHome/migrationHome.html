@@ -1,0 +1,53 @@
+<template>
+  <template lwc:if={helpReady}>
+    <c-barn-page-shell data-id="shell" icon-name="custom:custom98" title={labels.title} purpose={labels.purpose}>
+      <template lwc:if={kitKey}>
+        <c-migration-assistant kit-key={kitKey} onback={handleBack} data-id="assistant"></c-migration-assistant>
+      </template>
+      <template lwc:else>
+        <template lwc:if={errorMessage}>
+          <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="error" message={errorMessage} data-id="error"></c-barn-notice>
+        </template>
+
+        <section class="slds-var-m-bottom_medium" data-id="kits">
+          <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.kitsHeading}</h2>
+          <template lwc:if={hasKits}>
+            <ul class="slds-has-dividers_bottom-space">
+              <template for:each={kits} for:item="kit">
+                <li key={kit.key} class="slds-item slds-var-p-vertical_small" data-kit-row={kit.key}>
+                  <p class="slds-text-title_bold" data-id="kit-label">{kit.label}</p>
+                  <p class="slds-text-body_small" data-id="kit-description">{kit.description}</p>
+                  <lightning-button
+                    class="slds-show slds-var-m-top_x-small"
+                    variant="brand"
+                    label={labels.start}
+                    data-kit={kit.key}
+                    data-id="start-kit"
+                    onclick={handleStart}
+                  ></lightning-button>
+                </li>
+              </template>
+            </ul>
+          </template>
+          <template lwc:else>
+            <c-barn-empty-state data-id="no-kits" illustration="no-data" size="compact" heading={labels.noKits}></c-barn-empty-state>
+          </template>
+        </section>
+
+        <template lwc:if={showHouseholds}>
+          <section class="slds-var-m-bottom_medium" data-id="households">
+            <h2 class="slds-text-heading_small">{labels.householdsHeading}</h2>
+            <template lwc:if={showNpsp}>
+              <c-npsp-household-adoption source="NPSP" data-id="npsp-households"></c-npsp-household-adoption>
+            </template>
+            <template lwc:if={showNpc}>
+              <c-npsp-household-adoption source="NPC" data-id="npc-households"></c-npsp-household-adoption>
+            </template>
+          </section>
+        </template>
+
+        <p class="slds-text-body_small slds-text-color_weak" data-id="uninstall">{labels.uninstall}</p>
+      </template>
+    </c-barn-page-shell>
+  </template>
+</template>

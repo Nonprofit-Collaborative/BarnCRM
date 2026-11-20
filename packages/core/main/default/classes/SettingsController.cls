@@ -169,6 +169,12 @@ public with sharing class SettingsController {
 		}
 	}
 
+	/** `getConsoleModel` for another package (see save). */
+	@NamespaceAccessible
+	public static ConsoleModel consoleModel() {
+		return getConsoleModel();
+	}
+
 	/**
 	 * `saveSettings` for another package (ConsoleSaveAcrossModulesTest): the platform rejects
 	 * `@NamespaceAccessible` on an `@AuraEnabled` method.
@@ -641,28 +647,12 @@ public with sharing class SettingsController {
 		return hiddenByFeature.contains(definition.DeveloperName);
 	}
 
-	/** The row that adopts NPSP households (X-05), shown only where NPSP applies (ADR-0062). */
+	/**
+	 * Rows that open an Org Optimizer section only some people may open (admin-14). Health Check
+	 * reads for everyone the Org Optimizer module gives its tab, so its link is not here.
+	 */
 	@TestVisible
-	private static final String NPSP_ADOPTION_ROW = 'NPSP_Household_Adoption';
-
-	/** The row that converts Nonprofit Cloud households (MIG-02b), shown only where it applies. */
-	@TestVisible
-	private static final String NPC_CONVERSION_ROW = 'NPC_Household_Conversion';
-
-	private static Boolean isHiddenByProduct(Setting_Definition__mdt definition) {
-		return NPSP_ADOPTION_ROW.equals(definition.DeveloperName) && !NpspHouseholdAdoptionService.isOffered() ||
-			NPC_CONVERSION_ROW.equals(definition.DeveloperName) && !NpspHouseholdAdoptionService.isNpcOffered();
-	}
-
-	/** Rows that open Org Optimizer, for those who can open it (admin-14). */
-	@TestVisible
-	private static final Set<String> OPTIMIZER_LINK_ROWS = new Set<String>{
-		'Health_Check_Optimizer_Link',
-		'Error_Log_Optimizer_Link'
-	};
-	/** The Health Check report itself, kept for those who cannot open Org Optimizer. */
-	@TestVisible
-	private static final String HEALTH_CHECK_PANEL_ROW = 'Health_Check';
+	private static final Set<String> OPTIMIZER_LINK_ROWS = new Set<String>{ 'Error_Log_Optimizer_Link' };
 
 	@TestVisible
 	private static Boolean canOpenOptimizerOverride;
@@ -682,19 +672,11 @@ public with sharing class SettingsController {
 	}
 
 	private static Boolean isHiddenByAccess(Setting_Definition__mdt definition) {
-		if (OPTIMIZER_LINK_ROWS.contains(definition.DeveloperName)) {
-			return !canOpenOptimizer();
-		}
-		return HEALTH_CHECK_PANEL_ROW.equals(definition.DeveloperName) && canOpenOptimizer();
+		return OPTIMIZER_LINK_ROWS.contains(definition.DeveloperName) && !canOpenOptimizer();
 	}
 
 	private static SettingModel toSetting(Setting_Definition__mdt definition) {
-		if (
-			!isVisible(definition) ||
-			isHiddenByFeature(definition) ||
-			isHiddenByProduct(definition) ||
-			isHiddenByAccess(definition)
-		) {
+		if (!isVisible(definition) || isHiddenByFeature(definition) || isHiddenByAccess(definition)) {
 			return null;
 		}
 		Boolean isComponent = TYPE_COMPONENT.equalsIgnoreCase(definition.Data_Type__c);

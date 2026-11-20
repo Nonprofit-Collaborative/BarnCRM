@@ -59,14 +59,13 @@ private class TabAccessServiceTest {
 			Assert.isFalse(more, 'A small org is done in one pass');
 			Assert.isTrue(held.contains(TabAccessService.FIND_TAB), 'Find and Export sees Find');
 			Assert.isTrue(held.contains(TabAccessService.DATA_MANAGER_TAB), 'And the Data Manager hub');
-			Assert.isTrue(held.contains(TabAccessService.DATA_HYGIENE_TAB), 'And Org Optimizer');
 			Assert.isFalse(held.contains(TabAccessService.IMPORT_TAB), 'But not Import');
 			Assert.isFalse(held.contains(TabAccessService.BULK_UPDATE_TAB), 'Nor Bulk Update');
 			Assert.isFalse(held.contains(TabAccessService.DUPLICATE_MATCHING_TAB), 'Nor Duplicate Matching');
 			Assert.areEqual(
-				6,
+				5,
 				tabSetsOf(UserInfo.getUserId()).size(),
-				'An upgraded org has every feature on, so the admin keeps all six tabs'
+				'An upgraded org has every feature on, so the admin keeps all five tabs'
 			);
 		}
 	}
@@ -83,7 +82,6 @@ private class TabAccessServiceTest {
 
 			Set<String> held = tabSetsOf(ola);
 			Assert.isTrue(held.contains(TabAccessService.FIND_TAB), 'It includes Find and Export');
-			Assert.isTrue(held.contains(TabAccessService.DATA_HYGIENE_TAB), 'So Org Optimizer');
 			Assert.isTrue(held.contains(TabAccessService.BULK_UPDATE_TAB), 'And its own tab');
 			Assert.isFalse(held.contains(TabAccessService.IMPORT_TAB), 'But not Import');
 		}
@@ -159,13 +157,15 @@ private class TabAccessServiceTest {
 		}
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
-			FeatureSwitchService.turnOn(FeatureSwitchService.ORG_OPTIMIZER);
+			FeatureSwitchService.turnOn(FeatureSwitchService.DUPLICATE_REVIEW);
+			Assert.isTrue(tabSetsOf(userId(PRIYA)).isEmpty(), 'Duplicate Matching is not a tab Priya sees');
+			FeatureSwitchService.turnOn(FeatureSwitchService.DATA_MANAGER);
 			Test.stopTest();
 
 			Assert.areEqual(
-				new Set<String>{ TabAccessService.DATA_HYGIENE_TAB },
+				new Set<String>{ TabAccessService.DATA_MANAGER_TAB, TabAccessService.FIND_TAB },
 				tabSetsOf(userId(PRIYA)),
-				'Turning Org Optimizer on gives the Org Optimizer tab, and Data Manager stays hidden'
+				'Turning Data Manager on gives the Data Manager tabs her permission set shows'
 			);
 		}
 	}
@@ -390,7 +390,7 @@ private class TabAccessServiceTest {
 			Assert.areEqual(first, second, 'Starting it again finds the same job');
 			Assert.isTrue(TabAccessScheduler.isScheduled(), 'It is scheduled');
 			Assert.areEqual(
-				6,
+				5,
 				tabSetsOf(UserInfo.getUserId()).size(),
 				'The queued sync ran and gave the admin the tabs'
 			);

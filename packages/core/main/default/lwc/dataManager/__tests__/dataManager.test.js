@@ -47,7 +47,16 @@ jest.mock(
   },
   { virtual: true }
 );
+jest.mock(
+  '@salesforce/apex/DataManagerController.orgOptimizerInstalled',
+  () => {
+    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
+  { virtual: true }
+);
 import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
+import orgOptimizerInstalled from '@salesforce/apex/DataManagerController.orgOptimizerInstalled';
 
 // eslint-disable-next-line @lwc/lwc/no-async-operation
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
@@ -64,9 +73,10 @@ function select(element, name) {
   one(element, 'tools').dispatchEvent(new CustomEvent('select', { detail: { name } }));
 }
 
-async function render() {
+async function render(optimizerInstalled = true) {
   const element = createElement('c-data-manager', { is: DataManager });
   document.body.appendChild(element);
+  orgOptimizerInstalled.emit(optimizerInstalled);
   await flush();
   return element;
 }
@@ -145,6 +155,13 @@ describe('c-data-manager', () => {
     expect(titles.find).toBe('c.Core_Find_Title');
     expect(titles.duplicates).toBe('c.Core_DuplicateMatching_Title');
     expect(titles.backup).toBe('c.Core_DataManager_BackupTitle');
+  });
+
+  it('leaves the Org Optimizer tile out until the Org Optimizer module is installed', async () => {
+    const element = await render(false);
+
+    expect(tiles(element).map((tile) => tile.name)).not.toContain('optimizer');
+    expect(tiles(element).map((tile) => tile.name)).toContain('duplicates');
   });
 
   it('opens Backup Sets on this page, with a way back to the hub', async () => {

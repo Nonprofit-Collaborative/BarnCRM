@@ -1,7 +1,8 @@
 # Adopting Your NPSP Households
 
 **Feature:** X-05 Adopt NPSP households
-**Package:** Core
+**Package:** BarnCRM Migration (the adoption tool and its undo); Core (NPSP detection and the
+Households guard)
 **Iteration:** release 0.17
 
 This page applies only to an org with the Nonprofit Success Pack (NPSP). In any other org,
@@ -33,13 +34,16 @@ a whole adoption later.
 
 ## How to Turn It On
 
-There is nothing to turn on. The **Adopt NPSP Households** section appears on the **General**
-page of BarnCRM Settings when BarnCRM detects NPSP in your org, when the coexistence mode is
-NPSP coexistence, or when households were adopted before (so an undo is never hidden).
+Install the optional **BarnCRM Migration** package (see [Installing](installing.md)). The
+**Adopt NPSP Households** section then appears under **Households** on the **Migration
+Assistant** tab when BarnCRM detects NPSP in your org, when the coexistence mode is NPSP
+coexistence, or when households were adopted before (so an undo is never hidden). Keep the
+package installed for as long as you may want to undo an adoption (see
+[Migration Assistant](migration-assistant.md#when-you-are-done)).
 
 Before you adopt:
 
-1. **Set Household membership to Contact** (BarnCRM Settings, **General**). NPSP keeps people
+1. **Set Household membership to Contact** (BarnCRM Settings, **People and Households**). NPSP keeps people
    on their contact's account, which is BarnCRM's Contact membership. Adoption is refused while
    membership is set to membership records, and the section says so.
 2. **Turn off NPSP's automatic household naming** (NPSP Settings, **People**, **Households**,
@@ -56,10 +60,9 @@ There is nothing to do in Salesforce Setup.
 Maria's org has had NPSP for six years and holds 3,214 household accounts. She has just
 installed BarnCRM.
 
-1. Maria opens the **BarnCRM Admin** app, clicks the **BarnCRM Settings** tab, and chooses
-   **General** in the left navigation.
-2. Coexistence mode shows **NPSP coexistence**. Below it, the **Adopt NPSP Households** section
-   says **3,214 NPSP households can be adopted** and lists the first ten: each household's name,
+1. Maria installs BarnCRM Migration, opens the **BarnCRM Admin** app and clicks the
+   **Migration Assistant** tab.
+2. Under **Households**, the **Adopt NPSP Households** section says **3,214 NPSP households can be adopted** and lists the first ten: each household's name,
    its NPSP formal and informal greetings, its primary contact and how many contacts it has.
 3. **Keep NPSP's names and greetings** is ticked. Maria leaves it ticked: her team has typed
    many greetings by hand over the years.
@@ -101,7 +104,8 @@ When you are ready for BarnCRM to keep your households:
 An org upgraded with Households already on keeps it on, and its row shows the same
 explanation until both are done, so you know to finish them. Health Check also watches for it:
 if Households is on and NPSP households come into use afterwards, it reports **NPSP and
-BarnCRM Both Make Households** with a button to this panel.
+BarnCRM Both Make Households** with a button to this panel (with BarnCRM Migration installed)
+or to **General** (without it).
 
 ## Names and Greetings
 
@@ -147,6 +151,9 @@ more; run it again for the rest. Each run is undone on its own.
 
 **Expecting it in an org without NPSP.** The section is not shown, and there is nothing to
 adopt.
+
+**Uninstalling BarnCRM Migration too soon.** The adopted households stay BarnCRM households,
+but undo goes with the package. Keep it installed until you are sure.
 
 ## What Cannot Be Proven Without NPSP
 

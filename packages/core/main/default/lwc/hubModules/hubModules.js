@@ -35,7 +35,8 @@ function logoUrl(name) {
 // A module with no logo shows its main tab's icon, so the icon here matches the tab (D-170):
 // Portal Builder its Portals tab, Contact Point Sync its page tab, Payments its Payments tab,
 // Memberships its Memberships tab, Project Management its Projects Home tab, Address Verification its setup page tab,
-// Advanced Reporting its Advanced Reporting tab. Others keep the apps icon.
+// Advanced Reporting its Advanced Reporting tab, Migration its Migration Assistant tab. Others keep
+// the apps icon.
 const FALLBACK_TABS = {
   Portal: 'Portal__c',
   ContactPoints: 'Contact_Point_Sync',
@@ -47,7 +48,8 @@ const FALLBACK_TABS = {
   Memberships: 'Membership_Term__c',
   Projects: 'Projects_Home',
   AddressVerification: 'Address_Verification_Setup',
-  Reporting: 'Advanced_Reporting'
+  Reporting: 'Advanced_Reporting',
+  Migration: 'Migration_Assistant'
 };
 const DEFAULT_ICON = 'standard:apps';
 

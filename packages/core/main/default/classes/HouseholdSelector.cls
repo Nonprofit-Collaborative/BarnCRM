@@ -44,8 +44,9 @@ public with sharing class HouseholdSelector {
 	 * Set only by tests, so the collision count can be exercised on an org where the native
 	 * object does not exist. Production code always runs the probe.
 	 */
+	@NamespaceAccessible
 	@TestVisible
-	private static Integer nativeHouseholdCollisionCountOverride;
+	public static Integer nativeHouseholdCollisionCountOverride;
 
 	/**
 	 * Set only by tests, so that both outcomes of the delete guard are exercised on an org

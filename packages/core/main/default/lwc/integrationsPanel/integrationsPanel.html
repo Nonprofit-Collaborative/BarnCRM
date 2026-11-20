@@ -1,8 +1,5 @@
 <template>
-    <template lwc:if={migrationKit}>
-        <c-migration-assistant kit-key={migrationKit} onback={handleMigrationBack} data-id="assistant"></c-migration-assistant>
-    </template>
-    <template lwc:elseif={helpReady}>
+    <template lwc:if={helpReady}>
     <template lwc:if={errorMessage}>
         <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="error" message={errorMessage} data-id="error"></c-barn-notice>
     </template>

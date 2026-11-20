@@ -43,7 +43,7 @@ private class EssentialsMigrationKitTest {
 	static void levelAndTermStepsAreRefusedWithoutEssentials() {
 		for (String key : new List<String>{ 'levels', 'terms' }) {
 			try {
-				Assert.isNotNull(new EssentialsMigrationKit().rows(key, new List<SObject>()), key);
+				Assert.isNotNull(new EssentialsMigrationKit().rows(key, new List<Map<String, Object>>()), key);
 			} catch (Exception refused) {
 				Assert.isTrue(
 					refused.getMessage().contains('this org does not have'),

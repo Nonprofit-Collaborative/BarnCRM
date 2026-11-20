@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+  <hasActivationRequired>false</hasActivationRequired>
+  <label>Org Optimizer Admin</label>
+  <description>
+    Opens the Org Optimizer tab with every section: Health Check and its fixes, field and
+    setup reviews, Access Explorer and Field Access Manager. Most sections also need Manage
+    BarnCRM Settings. Given to BarnCRM Admin holders.
+  </description>
+  <classAccesses>
+    <apexClass>AccessExplorerController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>DataDictionaryController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>DataHygieneController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>FieldAccessController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>FieldUtilizationController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>HealthCheckController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>OrgOptimizerSetupController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>OrgOptimizerStorageController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>ReportSubscriptions</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>SetupChangeController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <tabSettings>
+    <tab>Data_Hygiene</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+</PermissionSet>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Adopt NPSP Households, or with source NPC Convert Nonprofit Cloud Households, on the
+    Migration Assistant tab: a preview, a run and its undo after a typed count, and the
+    newest run's counts.
+  </description>
+  <isExposed>false</isExposed>
+  <masterLabel>Adopt NPSP Households</masterLabel>
+</LightningComponentBundle>

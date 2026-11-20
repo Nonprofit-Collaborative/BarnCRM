@@ -29,7 +29,11 @@
  *   they are refused.
  * - Everything a person types (a contact, a membership row, a move) is saved elsewhere in
  *   user mode, and everything a screen reads is read in user mode.
+ *
+ * Only saveAdoptionChanges is namespace accessible: the Migration package's household adoption
+ * calls it (ADR-NEXT migration package), and every other writer stays Core's own.
  */
+@NamespaceAccessible
 public with sharing class HouseholdWriter {
 	/**
 	 * Test seam: true sends each new household with a name one character too long for the
@@ -91,6 +95,7 @@ public with sharing class HouseholdWriter {
 	 * Every record is of the Household record type: one with no record type is given it, and
 	 * one of another record type is refused. Answers one save result per record, in order.
 	 */
+	@NamespaceAccessible
 	public static List<Database.SaveResult> createHouseholdsForUser(
 		List<Account> households,
 		Set<Id> touchedHouseholdIds
@@ -99,6 +104,7 @@ public with sharing class HouseholdWriter {
 	}
 
 	/** The same, saved with the caller's options (an import's duplicate rules, all or none). */
+	@NamespaceAccessible
 	public static List<Database.SaveResult> createHouseholdsForUser(
 		List<Account> households,
 		Set<Id> touchedHouseholdIds,
@@ -213,6 +219,7 @@ public with sharing class HouseholdWriter {
 	 * created household is. Answers the refused Accounts with the platform's reason; each
 	 * refusal is logged.
 	 */
+	@NamespaceAccessible
 	public static Map<Id, String> saveAdoptionChanges(List<Account> accounts) {
 		Map<Id, String> refused = new Map<Id, String>();
 		if (accounts == null || accounts.isEmpty()) {

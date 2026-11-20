@@ -2,8 +2,9 @@
  * The Volunteers for Salesforce Migration Kit's rows (MIG-03, canonical model R-MK1), named by
  * the kit `V4S_Volunteers`. A V4S shift has a start and a length in hours; a BarnCRM shift has a
  * start and an end, and a status. Every other step keeps the default rows. V4S is read by
- * describe only: its field names are text here, never a compile-time reference. Core builds this
- * class by name, so it and its constructor are namespace-accessible (ADR-0017).
+ * describe only: its field names are text here, never a compile-time reference. The Migration
+ * Assistant builds this class by name, so it and its constructor are namespace-accessible
+ * (ADR-0017).
  */
 @NamespaceAccessible
 public with sharing class V4sMigrationKit implements MigrationKitExtension {
@@ -27,14 +28,10 @@ public with sharing class V4sMigrationKit implements MigrationKitExtension {
 	}
 
 	@NamespaceAccessible
-	public List<Map<String, Object>> rows(String stepKey, List<SObject> records) {
+	public List<Map<String, Object>> rows(String stepKey, List<Map<String, Object>> rows) {
 		if (stepKey != SHIFTS) {
 			return null;
 		}
-		MigrationKitService.Source source = new MigrationKitService.Source(
-			MigrationKitService.stepNamed(MigrationKitService.kitNamed(KIT), stepKey)
-		);
-		List<Map<String, Object>> rows = source.rows(records);
 		shapeShifts(rows);
 		return rows;
 	}

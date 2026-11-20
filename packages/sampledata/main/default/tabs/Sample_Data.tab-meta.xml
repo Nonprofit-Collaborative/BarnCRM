@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    Load or remove the BarnCRM sample data set, for scratch orgs, sandboxes and demos. Uninstall
+    the Sample Data package once it is no longer needed.
+  </description>
+  <label>Sample Data</label>
+  <lwcComponent>sampleDataManager</lwcComponent>
+  <motif>Custom13: Box</motif>
+</CustomTab>

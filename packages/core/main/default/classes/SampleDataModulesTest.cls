@@ -13,6 +13,42 @@ private class SampleDataModulesTest {
 		TestUsers.adminWithInstalledModules();
 	}
 
+	/** Stands in for the Sample Data package, which Core cannot compile against. */
+	private class StubHost implements SampleDataHost {
+		private final StubStages removeStages = new StubStages();
+		private Integer finishedCalls = 0;
+
+		public void load() {
+			// Nothing to load: the tests check only what Core hands to the host.
+		}
+
+		public SampleDataStages coreRemoveStages() {
+			return removeStages;
+		}
+
+		public void notifyLoadFinished() {
+			finishedCalls++;
+		}
+	}
+
+	private class StubStages implements SampleDataStages {
+		public String name() {
+			return 'Stub stages';
+		}
+
+		public Integer stageCount() {
+			return 1;
+		}
+
+		public void runStage(Integer stage) {
+			// One empty stage.
+		}
+
+		public void finish() {
+			// Nothing follows.
+		}
+	}
+
 	private class StubModule implements SampleDataModule {
 		private final String name;
 		private Integer loaded;
@@ -146,11 +182,14 @@ private class SampleDataModulesTest {
 			RollupEngineExtensions.noneForTest = true;
 			StubModule only = new StubModule('Only', 3);
 			SampleDataModules.moduleOverride = new List<SampleDataModule>{ only };
+			StubHost host = new StubHost();
+			SampleDataModules.hostOverride = host;
 
 			Test.startTest();
 			SampleDataModules.startAfter('Only');
 			Test.stopTest();
 
+			System.assertEquals(1, host.finishedCalls, 'the host says the whole load is in');
 			System.assertEquals(
 				0,
 				[SELECT COUNT() FROM Error_Log__c],
@@ -197,6 +236,8 @@ private class SampleDataModulesTest {
 			StubModule first = new StubModule('First', 3);
 			StubModule second = new StubModule('Second', 5);
 			SampleDataModules.moduleOverride = new List<SampleDataModule>{ first, second };
+			StubHost host = new StubHost();
+			SampleDataModules.hostOverride = host;
 
 			SampleDataModules.removeAfter('Second');
 			System.assertEquals(1, first.removeCalls, 'the module before the named one goes next');
@@ -208,9 +249,19 @@ private class SampleDataModulesTest {
 
 			System.assertEquals(1, SampleDataStageBatch.started.size(), 'Core\'s removal starts');
 			System.assert(
-				SampleDataStageBatch.started[0] instanceof SampleDataRemoveStages,
-				'after the first module, the batch is Core\'s own removal stages'
+				SampleDataStageBatch.started[0] === host.removeStages,
+				'after the first module, the batch is Core\'s own removal stages, from the host'
 			);
+		}
+	}
+
+	@IsTest
+	static void theHostIsTheSampleDataPackagesWhenThereIsOne() {
+		System.runAs(TestUsers.adminWithInstalledModules()) {
+			StubHost host = new StubHost();
+			SampleDataModules.hostOverride = host;
+
+			System.assert(SampleDataModules.requireHost() === host, 'the package host loads the set');
 		}
 	}
 
@@ -232,7 +283,7 @@ private class SampleDataModulesTest {
 		System.runAs(TestUsers.adminWithInstalledModules()) {
 			SampleDataModules.moduleOverride = new List<SampleDataModule>{ new StubModule('Giving', 709) };
 
-			List<SampleDataLoader.ModuleCount> counts = SampleDataModules.counts();
+			List<SampleDataModules.ModuleCount> counts = SampleDataModules.counts();
 
 			System.assertEquals(1, counts.size(), 'one installed module is one count');
 			System.assertEquals('Giving', counts[0].name);

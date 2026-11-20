@@ -1,13 +1,28 @@
 import { createElement } from 'lwc';
 import IntegrationsPanel from 'c/integrationsPanel';
 import getApps from '@salesforce/apex/IntegrationController.getApps';
-import getKit from '@salesforce/apex/MigrationController.getKit';
 import { setHelpTextForTest } from 'c/barnHelpText';
 
+const mockNavigate = jest.fn();
+jest.mock(
+  'lightning/navigation',
+  () => {
+    const Navigate = Symbol('Navigate');
+    const NavigationMixin = (Base) =>
+      class extends Base {
+        [Navigate](...args) {
+          mockNavigate(...args);
+        }
+      };
+    NavigationMixin.Navigate = Navigate;
+    return { NavigationMixin, CurrentPageReference: null, __esModule: true };
+  },
+  { virtual: true }
+);
 jest.mock('@salesforce/apex/IntegrationController.getApps', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock('@salesforce/apex/MigrationController.getKit', () => ({ default: jest.fn() }), {
+jest.mock('@salesforce/apex/NamespaceUtil.tabApiNames', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock('@salesforce/customPermission/Manage_BarnCRM_Settings', () => ({ default: true }), {
@@ -217,27 +232,23 @@ describe('c-integrations-panel', () => {
     );
   });
 
-  it('opens the Migration Assistant in place for a detected app with a kit, and comes back', async () => {
+  it('opens the kit on the Migration Assistant tab for a detected app with a kit', async () => {
     getApps.mockResolvedValue([
       app('kit', 'Alternative', true, { migrationKits: [{ key: 'Test_Kit', label: 'Test Kit' }] }),
       app('plain', 'Alternative', true)
     ]);
-    getKit.mockResolvedValue({ key: 'Test_Kit', label: 'Test Kit', steps: [], checklist: [] });
     const element = await build();
 
     expect(row(element, 'plain').querySelector('[data-id="start-migration"]')).toBeNull();
     row(element, 'kit').querySelector('[data-id="start-migration"]').click();
     await settle();
 
-    const assistant = element.shadowRoot.querySelector('[data-id="assistant"]');
-    expect(assistant.kitKey).toBe('Test_Kit');
-    expect(row(element, 'kit')).toBeNull();
-
-    assistant.dispatchEvent(new CustomEvent('back'));
-    await settle();
-    expect(element.shadowRoot.querySelector('[data-id="assistant"]')).toBeNull();
+    expect(mockNavigate).toHaveBeenLastCalledWith({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'Migration_Assistant' },
+      state: { c__kit: 'Test_Kit' }
+    });
     expect(row(element, 'kit')).not.toBeNull();
-    expect(getApps).toHaveBeenCalledTimes(2);
   });
 
   it('shows one button per kit, named by the kit, when a product has several', async () => {
@@ -249,7 +260,6 @@ describe('c-integrations-panel', () => {
         ]
       })
     ]);
-    getKit.mockResolvedValue({ key: 'Kit_Two', label: 'Gifts', steps: [], checklist: [] });
     setHelpTextForTest({ Core_Migration_StartKit: 'Start Migration: {0}' });
     const element = await build();
 
@@ -259,6 +269,8 @@ describe('c-integrations-panel', () => {
     expect(buttons[1].label).toContain('Gifts');
     buttons[1].click();
     await settle();
-    expect(element.shadowRoot.querySelector('[data-id="assistant"]').kitKey).toBe('Kit_Two');
+    expect(mockNavigate.mock.calls[mockNavigate.mock.calls.length - 1][0].state).toEqual({
+      c__kit: 'Kit_Two'
+    });
   });
 });

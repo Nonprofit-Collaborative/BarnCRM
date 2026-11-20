@@ -21,11 +21,10 @@ private class FeatureControllerTest {
 			Test.stopTest();
 
 			Assert.isTrue(model.canEdit, 'Maria may turn features on');
-			Assert.areEqual(8, model.features.size(), 'Three tools and five groups');
+			Assert.areEqual(7, model.features.size(), 'Two tools and five groups');
 			Map<String, String> labelNames = new Map<String, String>{
 				'DataManager' => System.Label.Core_DataManager_Title,
 				'DuplicateReview' => System.Label.Core_DuplicateMatching_Title,
-				'OrgOptimizer' => System.Label.Core_Feature_OrgOptimizer_Name,
 				'HouseholdUpkeep' => System.Label.Core_SettingsGroup_Households,
 				'Addresses' => System.Label.Core_Feature_Addresses_Name,
 				'Relationships' => System.Label.Core_Feature_Relationships_Name,

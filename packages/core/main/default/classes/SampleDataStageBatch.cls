@@ -14,7 +14,7 @@
  * chain failed. The status card then shows what did load, and Remove Sample Data clears it.
  *
  * An Apex test may run only one execute of a batch, so inside a test start() returns the first
- * stage alone (SampleDataLoader.mayQueueNextStage), and finish() then starts nothing because
+ * stage alone (mayQueueNextStage), and finish() then starts nothing because
  * not every stage ran. A limit the platform cannot catch (CPU time) fails that stage's
  * transaction outright; the later stages still run, but that stage never counts as done, so
  * finish() starts nothing after it either. Tests drive the
@@ -29,18 +29,21 @@ public virtual with sharing class SampleDataStageBatch implements Database.Batch
 	public static final Integer SCOPE_SIZE = 1;
 
 	/** The load each start() call handed to a new batch this transaction, for the tests. */
+	@NamespaceAccessible
 	@TestVisible
-	private static List<SampleDataStages> started = new List<SampleDataStages>();
+	public static List<SampleDataStages> started = new List<SampleDataStages>();
 
 	/** Set by a test that calls start() directly to read the whole stage order. */
+	@NamespaceAccessible
 	@TestVisible
-	private static Boolean everyStageInTest = false;
+	public static Boolean everyStageInTest = false;
 
 	private final SampleDataStages stages;
 	private Integer stageTotal = 0;
 	private Integer stagesDone = 0;
+	@NamespaceAccessible
 	@TestVisible
-	private Boolean stopped = false;
+	public Boolean stopped = false;
 
 	@NamespaceAccessible
 	public SampleDataStageBatch(SampleDataStages stages) {
@@ -71,12 +74,13 @@ public virtual with sharing class SampleDataStageBatch implements Database.Batch
 		for (Integer stage = 0; stage < stageTotal; stage++) {
 			order.add(stage);
 		}
-		if (!SampleDataLoader.mayQueueNextStage() && !everyStageInTest && order.size() > 1) {
+		if (!mayQueueNextStage() && !everyStageInTest && order.size() > 1) {
 			return new List<Integer>{ order[0] };
 		}
 		return order;
 	}
 
+	@NamespaceAccessible
 	public void execute(Database.BatchableContext context, List<Integer> scope) {
 		for (Integer stage : scope) {
 			runStage(stage);
@@ -103,6 +107,7 @@ public virtual with sharing class SampleDataStageBatch implements Database.Batch
 	 * Hands over to whatever loads next, once every stage has run. A load that stopped part way
 	 * starts nothing, so a module never loads against people that are not there.
 	 */
+	@NamespaceAccessible
 	public void finish(Database.BatchableContext context) {
 		if (stopped || stagesDone < stageTotal) {
 			return;
@@ -117,7 +122,7 @@ public virtual with sharing class SampleDataStageBatch implements Database.Batch
 	private void stop(Exception failed, Integer stage) {
 		stopped = true;
 		// Logged here because nothing else sees an asynchronous failure; the synchronous entry
-		// points leave logging to SampleDataController.
+		// points leave logging to the Sample Data page's controller.
 		ErrorLogger.logWithMessage(
 			failed,
 			stages.name() + (stage == null ? '' : ', stage ' + stage),
@@ -127,8 +132,24 @@ public virtual with sharing class SampleDataStageBatch implements Database.Batch
 		notifyStopped();
 	}
 
-	/** Tells the user the run stopped part way; the removal batch says it about its own run. */
+	/** Tells the user the run stopped part way (Q-04); the removal batch says it about its own run. */
 	protected virtual void notifyStopped() {
-		SampleDataLoader.notifyLoadStopped();
+		JobNotifier.aboutSettings(
+			UserInfo.getUserId(),
+			Label.Core_JobNotice_SampleData,
+			true,
+			Label.Core_JobNotice_SampleDataStoppedBody,
+			JobNotifier.SECTION_GENERAL
+		);
+	}
+
+	/**
+	 * Whether the load may run past its first stage. An Apex test may run only one execute
+	 * of a batch, so there the stage batch runs the first stage alone, and each stage and
+	 * hand-off is tested by calling it directly. Everywhere else every stage runs.
+	 */
+	@NamespaceAccessible
+	public static Boolean mayQueueNextStage() {
+		return !Test.isRunningTest();
 	}
 }

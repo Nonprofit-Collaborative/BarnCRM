@@ -11,6 +11,13 @@
 public with sharing class ImportBatchService {
 	@NamespaceAccessible
 	public static final String STATUS_DRAFT = 'Draft';
+	/**
+	 * The operation of a Field Access Manager change (R-FA1), recorded as a data job by the Org
+	 * Optimizer module's `FieldAccessService`: Data Jobs lists it, and Import's retry and undo
+	 * leave it to that page.
+	 */
+	@NamespaceAccessible
+	public static final String OPERATION_ACCESS = 'Access';
 	@NamespaceAccessible
 	public static final String STATUS_PARSING = 'Parsing';
 	@NamespaceAccessible
@@ -308,7 +315,7 @@ public with sharing class ImportBatchService {
 		Boolean dataJob =
 			BulkUpdateService.OPERATION_UPDATE.equals(batch.Operation__c) ||
 			BulkDeleteService.OPERATION_DELETE.equals(batch.Operation__c) ||
-			FieldAccessService.OPERATION_ACCESS.equals(batch.Operation__c);
+			OPERATION_ACCESS.equals(batch.Operation__c);
 		if (dataJob || !(complete || open) || isRunning(batch)) {
 			return BarnHelp.text('Core', 'Core_Import_ErrorRetryNotOpen');
 		}

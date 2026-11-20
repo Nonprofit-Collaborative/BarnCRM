@@ -50,8 +50,9 @@ public with sharing class AccountKinds {
 	private static List<Candidate> candidatesOverride;
 
 	/** Injected by the tests, in place of whether the running user can use the record type. */
+	@NamespaceAccessible
 	@TestVisible
-	private static Boolean usableOverride;
+	public static Boolean usableOverride;
 
 	private static String cachedDetection;
 

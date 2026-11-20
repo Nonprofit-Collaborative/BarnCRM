@@ -177,6 +177,21 @@ public with sharing class FindController {
 		}
 	}
 
+	/**
+	 * The rows `runQuery` answers, for another package: the platform rejects
+	 * `@NamespaceAccessible` on an `@AuraEnabled` method.
+	 */
+	@NamespaceAccessible
+	public static List<SObject> rowsFor(String queryJson) {
+		return runQuery(queryJson).rows;
+	}
+
+	/** `saveQuery` for another package (see rowsFor). */
+	@NamespaceAccessible
+	public static void saveFor(String recordId, String name, String queryJson, Boolean shared) {
+		saveQuery(recordId, name, queryJson, shared);
+	}
+
 	/** The address and location fields of an object a radius can use (C-69, R-SQ13). */
 	@AuraEnabled(cacheable=true)
 	public static List<FindRadius.FieldOption> listRadiusFields(String objectApiName) {
@@ -501,6 +516,7 @@ public with sharing class FindController {
 	}
 
 	/** Whether an object is offered for querying; field utilization offers objects by it too. */
+	@NamespaceAccessible
 	public static Boolean isOffered(Schema.DescribeSObjectResult objectDescribe) {
 		return objectDescribe.isAccessible() &&
 			objectDescribe.isQueryable() &&

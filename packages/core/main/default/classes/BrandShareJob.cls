@@ -16,6 +16,7 @@
  * Queries run in system mode: the job works for the whole org, not for what the person who
  * saved can see. Writes go through `BrandShareWriter`.
  */
+@NamespaceAccessible
 public with sharing class BrandShareJob implements Queueable {
 	public static final String GROUP_PREFIX = 'BarnCRM_Brand_';
 	private static final Integer PAGE = 500;
@@ -288,6 +289,7 @@ public with sharing class BrandShareJob implements Queueable {
 	}
 
 	/** Health Check (ADR-0202 decision 5): visibility restricts nothing until Accounts are Private. */
+	@NamespaceAccessible
 	public with sharing class VisibilityCheck implements HealthCheckService.Check {
 		public HealthCheckService.Finding run() {
 			if (!BrandService.visibilityOn()) {

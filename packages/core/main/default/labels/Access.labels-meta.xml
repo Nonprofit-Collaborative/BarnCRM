@@ -84,7 +84,7 @@
         <fullName>Core_Access_PageTitle</fullName>
         <categories>Access</categories>
         <language>en_US</language>
-        <protected>true</protected>
+        <protected>false</protected>
         <shortDescription>Access page: page heading</shortDescription>
         <value>Access</value>
     </labels>

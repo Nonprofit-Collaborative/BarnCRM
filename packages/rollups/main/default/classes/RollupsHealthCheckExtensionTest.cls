@@ -70,8 +70,13 @@ private class RollupsHealthCheckExtensionTest {
 		);
 	}
 
+	/**
+	 * A finding from a run of every installed module's checks, the way Core reaches this module
+	 * (`HealthCheckService.extensionFindings`). Core's own checks are the Org Optimizer module's
+	 * runner, which this package does not depend on.
+	 */
 	private static HealthCheckService.Finding find(String key) {
-		return find(HealthCheckService.run(), key);
+		return find(HealthCheckService.extensionFindings(), key);
 	}
 
 	private static HealthCheckService.Finding find(HealthCheckService.Report report, String key) {
@@ -91,12 +96,19 @@ private class RollupsHealthCheckExtensionTest {
 		return null;
 	}
 
-	/** Presses a fix the way the panel does: with the scope the finding carried. */
+	/**
+	 * Presses a fix the way the panel does, with the scope the finding carried, through Core's
+	 * `HealthCheckFixes`, and reads the module checks again, as the re-run report would.
+	 */
 	private static HealthCheckService.Report press(HealthCheckService.Finding finding) {
-		return HealthCheckController.applyFixFor(
+		return press(
 			finding.getFixTarget().substring(HealthCheckService.FIX_ACTION_PREFIX.length()),
 			finding.getFixScope()
 		);
+	}
+
+	private static HealthCheckService.Report press(String fixKey, List<String> scope) {
+		return HealthCheckFixes.applyForModules(fixKey, scope);
 	}
 
 	/** Presses a fix again with the scope it was first pressed with, and expects a refusal. */
@@ -270,7 +282,7 @@ private class RollupsHealthCheckExtensionTest {
 
 			System.runAs(maria) {
 				RollupService.ensureDefaults();
-				List<HealthCheckService.Finding> found = HealthCheckService.run();
+				List<HealthCheckService.Finding> found = HealthCheckService.extensionFindings();
 				HealthCheckService.Finding finding = find(found, 'nightly_rollups_not_scheduled');
 				Assert.isNotNull(finding, 'A rollup waiting on a run nobody scheduled is reported.');
 				Assert.areEqual(
@@ -280,7 +292,18 @@ private class RollupsHealthCheckExtensionTest {
 				);
 				Assert.isNull(finding.getFixTarget(), 'One cause, one button: the nightly jobs fix.');
 
-				HealthCheckService.Finding jobs = find(found, 'nightly_jobs_not_scheduled');
+				// Core's nightly jobs finding, as the Org Optimizer module's runner reports it: its fix
+				// and the scope Core computes for it.
+				String jobsKey = HealthCheckService.FIX_KEY_SCHEDULE_NIGHTLY_JOBS;
+				HealthCheckService.Finding jobs = new HealthCheckService.Finding(
+						'nightly_jobs_not_scheduled',
+						'',
+						'',
+						HealthCheckService.SEVERITY_WARNING,
+						HealthCheckService.CATEGORY_SETTINGS
+					)
+					.withFix('', HealthCheckService.FIX_ACTION_PREFIX + jobsKey)
+					.withScope(HealthCheckService.fixScope(jobsKey));
 				Assert.isTrue(
 					jobs.getFixScope().contains(System.Label.Core_NightlyJobs_Title),
 					'The nightly jobs finding names the nightly run, which does the rollups.'
@@ -353,7 +376,7 @@ private class RollupsHealthCheckExtensionTest {
 			System.runAs(priya) {
 				Assert.isNull(find('shipped_rollups_missing'), 'Only somebody who can press the fix is told about it.');
 				try {
-					HealthCheckController.applyFixFor(
+					HealthCheckFixes.apply(
 						RollupsHealthCheckExtension.FIX_KEY_RESTORE_ROLLUPS,
 						new List<String>{ 'Household member count' }
 					);
@@ -375,7 +398,7 @@ private class RollupsHealthCheckExtensionTest {
 			System.runAs(maria) {
 				try {
 					// The panel read one missing total; the org now has two missing.
-					HealthCheckController.applyFixFor(
+					HealthCheckFixes.apply(
 						RollupsHealthCheckExtension.FIX_KEY_RESTORE_ROLLUPS,
 						new List<String>{ 'Household member count' }
 					);

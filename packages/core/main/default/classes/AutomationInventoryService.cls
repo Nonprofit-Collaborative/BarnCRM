@@ -9,12 +9,14 @@
  * covered; the page and the guide say so. Flows that are not triggered by a record (screen flows,
  * scheduled flows) belong to no object and are not listed.
  */
+@NamespaceAccessible
 public with sharing class AutomationInventoryService {
 	/** The most triggers, and the most flows, listed for one object. */
 	@TestVisible
 	private static final Integer MAX_PER_TYPE = 200;
 
 	public static final String TYPE_TRIGGER = 'ApexTrigger';
+	@NamespaceAccessible
 	public static final String TYPE_FLOW = 'Flow';
 
 	/** The events a trigger runs on, by the field that says so, in the order Apex lists them. */
@@ -44,28 +46,42 @@ public with sharing class AutomationInventoryService {
 	};
 
 	/** One trigger or flow that runs on the object. */
+	@NamespaceAccessible
 	public class Item {
+		@NamespaceAccessible
 		public String automationType;
+		@NamespaceAccessible
 		public String name;
+		@NamespaceAccessible
 		public String apiName;
+		@NamespaceAccessible
 		public String status;
+		@NamespaceAccessible
 		public String detail;
+		@NamespaceAccessible
 		public Integer apiVersion;
 	}
 
+	@NamespaceAccessible
 	public class Result {
+		@NamespaceAccessible
 		public List<Item> items = new List<Item>();
 		/** True when the triggers (or the flows) could not be read. */
+		@NamespaceAccessible
 		public Boolean triggersFailed = false;
+		@NamespaceAccessible
 		public Boolean flowsFailed = false;
 		/** True when a type stopped at MAX_PER_TYPE. */
+		@NamespaceAccessible
 		public Boolean truncated = false;
 	}
 
 	/** Test hook: a query kind (trigger or flow) made to fail. */
+	@NamespaceAccessible
 	@TestVisible
-	private static String failType;
+	public static String failType;
 
+	@NamespaceAccessible
 	public static Result forObject(Schema.DescribeSObjectResult described) {
 		Result result = new Result();
 		Map<String, Object> binds = new Map<String, Object>{

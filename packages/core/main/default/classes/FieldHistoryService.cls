@@ -8,6 +8,7 @@
  * `Field_History__c` row per changed record, written in system mode: the person saving need not
  * see the history. Nothing stops the save: a failure goes to the Error Log.
  */
+@NamespaceAccessible
 public with sharing class FieldHistoryService {
 	/** The longest text value kept whole; a longer one is cut, marked, and cannot be restored. */
 	public static final Integer MAX_VALUE = 1000;
@@ -229,6 +230,7 @@ public with sharing class FieldHistoryService {
 	}
 
 	/** Health Check: on, but no field chosen, or a chosen field that can no longer be kept. */
+	@NamespaceAccessible
 	public class HealthCheck implements HealthCheckService.Check {
 		public HealthCheckService.Finding run() {
 			if (SettingsService.getSettings().Field_History_Enabled__c != true) {

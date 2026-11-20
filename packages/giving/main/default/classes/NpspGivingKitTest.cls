@@ -4,7 +4,7 @@
  * and names only columns the step reads, and both recurring steps make recurring commitments.
  * NPSP itself is not needed: the kit holds its names as data.
  */
-@IsTest(testFor='ApexClass:NpspGivingKit, ApexClass:MigrationKitService')
+@IsTest(testFor='ApexClass:NpspGivingKit')
 private class NpspGivingKitTest {
 	private static final String KIT = 'NPSP_Giving_Setup';
 	private static final Map<String, String> TARGET_BY_STEP = new Map<String, String>{
@@ -33,11 +33,11 @@ private class NpspGivingKitTest {
 	@IsTest
 	static void eachStepHasItsTemplateAndLoadsItsGivingObject() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Migration_Kit__mdt kit = MigrationKitService.kitNamed(KIT);
+			String kit = KIT;
 			ImportTemplateService.materializeDefaults();
 			for (String key : TARGET_BY_STEP.keySet()) {
-				MigrationKitService.Step step = MigrationKitService.stepNamed(kit, key);
-				Assert.areEqual(MigrationKitService.KIND_IMPORT, step.kind, key + ' loads');
+				MigrationKitSteps.Step step = MigrationKitSteps.step(kit, key);
+				Assert.areEqual('import', step.kind, key + ' loads');
 				Import_Template__c template = [
 					SELECT Column_Mapping_JSON__c, Target_Object__c
 					FROM Import_Template__c
@@ -76,7 +76,7 @@ private class NpspGivingKitTest {
 		Assert.areEqual('Monthly', NpspGivingKit.frequencyOf('Monthly', null), 'every month');
 		Assert.areEqual('Weekly', NpspGivingKit.frequencyOf('Weekly', '2'), 'kept');
 		NpspGivingKit extension = new NpspGivingKit();
-		Assert.isNull(extension.rows('funds', new List<SObject>()), 'default rows');
+		Assert.isNull(extension.rows('funds', new List<Map<String, Object>>()), 'default rows');
 		Assert.isNull(extension.verify('levels'), 'counts are compared');
 	}
 
@@ -142,7 +142,7 @@ private class NpspGivingKitTest {
 			NpspGivingKit extension = new NpspGivingKit();
 			for (String key : new List<String>{ 'recurringPeople', 'recurringOrganizations', 'planSteps' }) {
 				try {
-					Assert.isNotNull(extension.rows(key, new List<SObject>()), key);
+					Assert.isNotNull(extension.rows(key, new List<Map<String, Object>>()), key);
 				} catch (Exception refused) {
 					Assert.isTrue(
 						refused.getMessage().contains('this org does not have'),
@@ -172,7 +172,7 @@ private class NpspGivingKitTest {
 	@IsTest
 	static void theParityStepCountsNothingWithoutNpsp() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			MigrationKitService.Step step = MigrationKitService.stepNamed(MigrationKitService.kitNamed(KIT), 'parity');
+			MigrationKitSteps.Step step = MigrationKitSteps.step(KIT, 'parity');
 			Assert.areEqual('tool', step.kind, 'a tool step');
 			MigrationCheck check = new NpspGivingKit().verify('parity');
 			Assert.areEqual(0, check.source, 'no NPSP levels or plans in a test org');

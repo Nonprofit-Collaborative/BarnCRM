@@ -237,6 +237,7 @@ public with sharing class ModuleSetups {
 	 * The Health Check finding: packages here whose setup never ran, with Finish Setup as its
 	 * fix. Asked only for a viewer who may manage settings, who alone can press it.
 	 */
+	@NamespaceAccessible
 	public class SetupCheck implements HealthCheckService.Check {
 		public HealthCheckService.Finding run() {
 			if (Test.isRunningTest() && checkInTests != true) {

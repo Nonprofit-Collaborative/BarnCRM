@@ -81,6 +81,12 @@ public with sharing class DataManagerController {
 		return NamespaceUtil.stateKey('tool');
 	}
 
+	/** Whether the Org Optimizer module is installed, so its card shows only when it opens. */
+	@AuraEnabled(cacheable=true)
+	public static Boolean orgOptimizerInstalled() {
+		return ModuleDetectionService.isInstalled(ModuleDetectionService.MODULE_ORG_OPTIMIZER);
+	}
+
 	/**
 	 * The Loads column for one mapping. A one-object mapping names its object by its plural
 	 * label from describe (the API name only when the object is not in this org); a people

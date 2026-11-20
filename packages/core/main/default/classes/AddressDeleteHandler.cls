@@ -12,7 +12,9 @@
  * triggers, so their addresses are taken with it. System mode, as package upkeep of rows that
  * depend on the deleted record (ADR-0021); a failure is logged and never blocks the delete.
  */
+@NamespaceAccessible
 public with sharing class AddressDeleteHandler extends TriggerHandler {
+	@NamespaceAccessible
 	public static final String KEEP = 'Keep';
 	private static final String PROPAGATION = 'Address_Default_Propagation';
 	private static final List<Schema.SObjectField> OWNERS = new List<Schema.SObjectField>{

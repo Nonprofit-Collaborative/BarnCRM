@@ -16,7 +16,7 @@ packages/**/lwc/**/*.html
 
 # Generated data, kept minified by scripts/data/generate-sample-data.py to control file
 # size (see data/sample/README.md); not hand-authored source.
-packages/core/main/default/staticresources/SampleData.json
+packages/sampledata/main/default/staticresources/SampleData.json
 packages/giving/main/default/staticresources/GivingSampleData.json
 
 # Permission set deltas keep one line per entry, the shape generate.py --bootstrap writes

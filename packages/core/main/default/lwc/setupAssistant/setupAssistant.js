@@ -45,6 +45,8 @@ const AUTOMATIC_ACCESS_GUIDE =
 // The tabs the assistant opens, by page reference rather than by URL, so the links keep
 // working on the mobile app and once a namespace is assigned (Decision D-01).
 const IMPORT_TAB = 'Import';
+// The BarnCRM Sample Data package's tab, opened once that package is installed.
+const SAMPLE_DATA_TAB = 'Sample_Data';
 
 /**
  * The guided Setup Assistant in the SLDS Setup Assistant layout: every step listed with a
@@ -69,7 +71,6 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
   activeIndex = 0;
   errorMessage;
   namingType;
-  sampleDataType;
   importsTried = false;
   focusStepHeading = false;
   showSampleData = false;
@@ -175,17 +176,16 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
     return index < 0 ? 0 : index;
   }
 
-  // The two panels Core itself ships are imported by name, written out literally so the
-  // compiler can see the specifier (ADR-0020). A build without one shows that step's notice
-  // rather than an empty panel. A module's own screen is reached by navigation instead,
-  // because Core cannot import from a package that depends on it.
+  // The panel Core itself ships is imported by name, written out literally so the compiler
+  // can see the specifier (ADR-0020). A build without it shows that step's notice rather than
+  // an empty panel. A module's own screen, such as Sample Data, is reached by navigation
+  // instead, because Core cannot import from a package that depends on it.
   async importComponents() {
     if (this.importsTried) {
       return;
     }
     this.importsTried = true;
     this.namingType = await this.tryImport(() => import('c/householdNamingSettings'));
-    this.sampleDataType = await this.tryImport(() => import('c/sampleDataManager'));
   }
 
   async tryImport(loader) {
@@ -384,12 +384,8 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
     return Boolean(this.namingType);
   }
 
-  get showSampleDataPanel() {
-    return this.showSampleData && Boolean(this.sampleDataType);
-  }
-
   get sampleDataUnavailable() {
-    return this.showSampleData && !this.sampleDataType;
+    return this.showSampleData && !(this.state && this.state.sampleDataAvailable);
   }
 
   /** Opens the step whose name was clicked, in place. */
@@ -527,7 +523,12 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
     );
   }
 
-  handleShowSampleData() {
+  /** Opens the Sample Data tab, or says how to get it when its package is not installed. */
+  async handleShowSampleData() {
+    if (this.state && this.state.sampleDataAvailable) {
+      this[NavigationMixin.Navigate](await tabPageReference(SAMPLE_DATA_TAB));
+      return;
+    }
     this.showSampleData = true;
   }
 

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+  <hasActivationRequired>false</hasActivationRequired>
+  <label>Migration Admin</label>
+  <description>
+    Opens the Migration Assistant tab: runs Migration Kits and adopts NPSP or Nonprofit Cloud
+    households. Every step also needs Manage BarnCRM Settings. Given to BarnCRM Admin holders.
+  </description>
+  <classAccesses>
+    <apexClass>MigrationController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>NpspHouseholdAdoptionController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Import_Batch__c.Migration_Journal__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Import_Batch__c.Migration_Step__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Merge_Journal__c.Kit__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <tabSettings>
+    <tab>Migration_Assistant</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+</PermissionSet>

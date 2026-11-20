@@ -50,11 +50,7 @@ public with sharing class AdminDigestSummary {
 			throw new QueryException('Simulated failure.');
 		}
 		Summary summary = new Summary();
-		for (
-			OrgOptimizerStorageController.LimitUse use : OrgOptimizerStorageController.limitsAtOrAbove(
-				LIMIT_THRESHOLD_PERCENT
-			)
-		) {
+		for (OrgLimitReader.LimitUse use : OrgLimitReader.atOrAbove(LIMIT_THRESHOLD_PERCENT)) {
 			summary.limits.add(
 				String.format(
 					System.Label.Core_AdminDigest_LimitLine,

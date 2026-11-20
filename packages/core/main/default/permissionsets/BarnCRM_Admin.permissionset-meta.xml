@@ -11,10 +11,6 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
-    <apexClass>AccessExplorerController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
     <apexClass>AddressMoveController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -47,14 +43,6 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
-    <apexClass>DataDictionaryController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>DataHygieneController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
     <apexClass>DataManagerController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -83,15 +71,7 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
-    <apexClass>FieldAccessController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
     <apexClass>FieldHistoryController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>FieldUtilizationController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -123,10 +103,6 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
-    <apexClass>HealthCheckController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
     <apexClass>HouseholdController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -155,23 +131,7 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
-    <apexClass>MigrationController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>NpspHouseholdAdoptionController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
     <apexClass>OrgAutomationController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>OrgOptimizerSetupController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>OrgOptimizerStorageController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -215,14 +175,6 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
-    <apexClass>ReportSubscriptions</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>SampleDataController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
     <apexClass>SeasonalAddressController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -232,10 +184,6 @@
   </classAccesses>
   <classAccesses>
     <apexClass>SetupAssistantController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>SetupChangeController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -529,16 +477,6 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Field_Utilization_Snapshot__c.Taken_At__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>true</editable>
-    <field>Import_Batch__c.Migration_Journal__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>true</editable>
-    <field>Import_Batch__c.Migration_Step__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -1439,11 +1377,6 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Merge_Journal__c.Kind__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>true</editable>
-    <field>Merge_Journal__c.Kit__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>

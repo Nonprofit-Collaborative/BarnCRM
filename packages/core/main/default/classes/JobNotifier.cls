@@ -19,12 +19,14 @@ public with sharing class JobNotifier {
 	public static final String TYPE_NAME = 'BarnCRM_Job_Finished';
 
 	/** The Error Log context a refused send is written under. */
+	@NamespaceAccessible
 	public static final String LOG_CONTEXT = 'Job notification';
 
 	/**
 	 * The settings console sections a notification can open, as the console names them. A
 	 * sub-section name opens its page scrolled to that box (P1).
 	 */
+	@NamespaceAccessible
 	public static final String SECTION_GENERAL = 'General';
 	/** Where the duplicate scan's panel is: the Duplicate Matching page (ADR-0139). */
 	public static final String SECTION_DUPLICATE_MATCHING = SettingSections.DUPLICATE_MATCHING;
@@ -46,8 +48,9 @@ public with sharing class JobNotifier {
 	private static String typeName = TYPE_NAME;
 
 	/** Every notification handed to the platform this transaction, in order, for the tests. */
+	@NamespaceAccessible
 	@TestVisible
-	private static List<Notice> sent = new List<Notice>();
+	public static List<Notice> sent = new List<Notice>();
 
 	/** Set by a test to have the next send refused, as the platform may refuse one. */
 	@TestVisible

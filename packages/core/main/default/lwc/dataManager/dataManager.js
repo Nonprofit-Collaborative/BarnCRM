@@ -8,6 +8,7 @@ import canReviewDuplicates from '@salesforce/customPermission/Review_Duplicate_S
 import canManageMetadata from '@salesforce/customPermission/Manage_BarnCRM_Metadata';
 import getMappings from '@salesforce/apex/DataManagerController.getMappings';
 import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
+import orgOptimizerInstalled from '@salesforce/apex/DataManagerController.orgOptimizerInstalled';
 import BarnConfirmModal from 'c/barnConfirmModal';
 
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
@@ -215,6 +216,14 @@ export default class DataManager extends NavigationMixin(LightningElement) {
     }
   }
 
+  /** The Org Optimizer card shows only once the Org Optimizer module is installed. */
+  optimizerInstalled = false;
+
+  @wire(orgOptimizerInstalled)
+  wiredOptimizerInstalled({ data }) {
+    this.optimizerInstalled = data === true;
+  }
+
   /** The tool tiles, grouped, for the tools the person may use. Empty groups are left out. */
   get toolGroups() {
     const bringIn = [];
@@ -273,7 +282,7 @@ export default class DataManager extends NavigationMixin(LightningElement) {
       );
     }
     const check = [];
-    if (canFind || canManageSettings) {
+    if (this.optimizerInstalled && (canFind || canManageSettings)) {
       check.push(
         tile(
           'optimizer',

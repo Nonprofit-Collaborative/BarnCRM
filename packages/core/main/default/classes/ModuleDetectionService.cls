@@ -7,6 +7,7 @@
  * has shipped Setting Definition rows naming itself (ADR-0017), which is how a module that
  * Core knows nothing else about announces itself to the settings console.
  */
+@NamespaceAccessible
 public with sharing class ModuleDetectionService {
 	// detection-only: Giving package is optional
 	private static final String GIVING_FUND_OBJECT = 'Fund__c';
@@ -22,7 +23,9 @@ public with sharing class ModuleDetectionService {
 	private static final String DOCS_BASE = 'https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/packages/';
 
 	/** The two editions the Setup Assistant's first step offers, as `Suite__c` stores them (C-30). */
+	@NamespaceAccessible
 	public static final String SUITE_STANDARD = 'Standard';
+	@NamespaceAccessible
 	public static final String SUITE_NONPROFIT = 'Nonprofit';
 
 	/**
@@ -41,6 +44,26 @@ public with sharing class ModuleDetectionService {
 
 	/** A Lightning app by its developer name, relative to the org's own domain. */
 	private static final String APP_PATH = '/lightning/app/';
+
+	/** The catalog names of the optional tools Core points to when they are installed. */
+	public static final String MODULE_ORG_OPTIMIZER = 'OrgOptimizer';
+	public static final String MODULE_SAMPLE_DATA = 'SampleData';
+
+	/** Stands in for whether a module is installed, by catalog name, in Core's tests. */
+	@TestVisible
+	private static Map<String, Boolean> installedOverride = new Map<String, Boolean>();
+
+	/**
+	 * True when the module with this catalog name is installed here: a module announces itself
+	 * with the Setting Definition rows it ships (`Module__c`).
+	 */
+	@NamespaceAccessible
+	public static Boolean isInstalled(String moduleName) {
+		if (installedOverride.containsKey(moduleName)) {
+			return installedOverride.get(moduleName);
+		}
+		return announcedModules().contains(moduleName.toLowerCase());
+	}
 
 	/**
 	 * Stands in for the shipped module catalog (`BarnCRM_Module__mdt`) in tests. The catalog
@@ -255,6 +278,7 @@ public with sharing class ModuleDetectionService {
 	}
 
 	/** True when the catalog says the chosen edition (Standard before one is chosen) offers it. */
+	@NamespaceAccessible
 	public static Boolean isOffered(String moduleName) {
 		String edition = chosenSuite() == null ? SUITE_STANDARD : chosenSuite();
 		return offeredIn(catalogRow(moduleName), edition);

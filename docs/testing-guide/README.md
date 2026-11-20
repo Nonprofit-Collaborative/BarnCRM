@@ -47,7 +47,7 @@ page, even if that puts it out of reading order.
 | [Settings and Module Manager](settings-and-module-manager.md) | SET | 36 | BarnCRM Settings console, Access, Module Manager, editions, automation control, the Automation tab, its inventory, scan and deactivate tool, home page, organization address, values from Setup, Integrations, People and Households and boxes, keeping a shown default, Finish Setup, save cues, Health and Error Log links, narrow screens, name pattern parts |
 | [Setup Assistant](setup-assistant.md) | SA | 11 | First-run setup, edition choice, Setup Assistant steps, sample data load and remove |
 | [Imports](imports.md) | IMP | 26 | Import wizard, templates, row rules, matching (including match sources), several sheets, two-part headings, best guesses for near spellings, several objects in one file, new fields from a column, undo, row retention, correcting and retrying rows, the field picker, Import Files from a zip |
-| [Migration Assistant](migration-assistant.md) | MIG | 10 | Detected apps and Start Migration on the Integrations page (one button per kit), a kit's steps in order, tool steps, verification, retire checklist, administrators only, NPSP detection, the NPSP People and Addresses kit, the NPSP Gifts and Soft Credits kit, the Nonprofit Cloud Gifts and Soft Credits kit, the Nonprofit Cloud Relationships and Affiliations kit |
+| [Migration Assistant](migration-assistant.md) | MIG | 12 | The Migration Assistant tab of the optional Migration package and Core without it, detected apps and Start Migration on the Integrations page (one button per kit), a kit's steps in order, tool steps, verification, retire checklist, administrators only, NPSP detection, the NPSP People and Addresses kit, the NPSP Gifts and Soft Credits kit, the Nonprofit Cloud Gifts and Soft Credits kit, the Nonprofit Cloud Relationships and Affiliations kit, the Nonprofit Cloud Households kit |
 | [Find](find.md) | FIND | 11 | Query builder, typed queries, export, saved queries, summaries, Show More, distance from a place |
 | [Grid](grid.md) | GRID | 3 | The Grid tile, a saved query in editable tables, edit and undo, related record tables, saved and shared grids |
 | [Data Manager and job history](data-manager-and-job-history.md) | DM | 14 | Data Manager, data jobs and undo, data quality checks, Field Use, picklist value usage and its snapshot history |
@@ -118,7 +118,7 @@ steps 1 and 2 need a staff user, so run steps 3 to 8 only.
 | 11 | [T-BULK-01](bulk-update-and-delete.md) | Super Transformer run from Find |
 | 12 | [T-BULK-02](bulk-update-and-delete.md) | Undo a Super Transformer run |
 | 13 | [T-DUP-01](duplicates.md) | Duplicate scan |
-| 14 | [T-HC-03](org-optimizer-and-health-check.md) | Health Check report (skipped install steps add findings: see the script) |
+| 14 | [T-HC-03](org-optimizer-and-health-check.md) | Health Check report (skipped install steps add findings: see the script). Needs BarnCRM Org Optimizer: in a Core-only sandbox, Skipped unless that package was deployed too |
 | 15 | [T-ERASE-02](erase-a-person.md) | Erase a person (in a real-org sandbox: only Luis Zztest, with **BarnCRM Erase People** given for this script only) |
 | 16 | [T-GIFT-01](giving-gifts-funds-batches.md) | Default fund (later Fundraising scripts need it) |
 | 17 | [T-GIFT-04](giving-gifts-funds-batches.md) | Quick Gift Entry |

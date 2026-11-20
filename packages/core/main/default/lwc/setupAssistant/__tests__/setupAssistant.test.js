@@ -475,9 +475,10 @@ describe('c-setup-assistant', () => {
     expect(element.shadowRoot.querySelector('[data-id="naming-panel"]')).not.toBeNull();
   });
 
-  it('shows the sample data panel now that C-10 ships it', async () => {
+  it('opens the Sample Data tab when the Sample Data package is installed', async () => {
     getState.mockResolvedValue(
       state({
+        sampleDataAvailable: true,
         completedKeys: ['coexistence', 'naming', 'moduledefaults', 'access', 'identity', 'modules']
       })
     );
@@ -488,7 +489,27 @@ describe('c-setup-assistant', () => {
     await settle();
 
     expect(element.shadowRoot.querySelector('[data-id="sample-missing"]')).toBeNull();
-    expect(element.shadowRoot.querySelector('[data-id="sample-panel"]')).not.toBeNull();
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'Sample_Data' }
+    });
+  });
+
+  it('says how to get sample data when the Sample Data package is not installed', async () => {
+    getState.mockResolvedValue(
+      state({
+        sampleDataAvailable: false,
+        completedKeys: ['coexistence', 'naming', 'moduledefaults', 'access', 'identity', 'modules']
+      })
+    );
+    const element = build();
+    await settle();
+
+    click(element, 'load-sample');
+    await settle();
+
+    expect(element.shadowRoot.querySelector('[data-id="sample-missing"]')).not.toBeNull();
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 
   it('shows the button a module adds to the last step', async () => {

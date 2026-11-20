@@ -99,7 +99,7 @@ module.exports = [
   {
     // sampleDataManager (C-10) polls SampleDataController.getStatus while a load runs;
     // setInterval/clearInterval is the standard, supported way to do that in an LWC.
-    files: ['packages/core/main/default/lwc/sampleDataManager/sampleDataManager.js'],
+    files: ['packages/sampledata/main/default/lwc/sampleDataManager/sampleDataManager.js'],
     rules: {
       '@lwc/lwc/no-async-operation': 'off'
     }
@@ -116,7 +116,7 @@ module.exports = [
     // Test-only timer helpers: a real setTimeout to flush promises, and a microtask
     // drain loop used under jest.useFakeTimers().
     files: [
-      'packages/core/main/default/lwc/sampleDataManager/__tests__/*.js',
+      'packages/sampledata/main/default/lwc/sampleDataManager/__tests__/*.js',
       'packages/core/main/default/lwc/importWizard/__tests__/*.js'
     ],
     rules: {

@@ -50,6 +50,7 @@ NpspHouseholdAdoptionController # admin only: NPSP household adoption, a one-tim
 NpspHouseholdAdoptionService # admin only: called only by the NPSP household adoption tool
 OpportunityMirrorReconciliation # not yet
 OrgAutomationDeactivation # admin only: Automation page deactivation, an admin console
+OrgLimitReader # admin only: read by the admin digest and Org Optimizer storage, both admin only
 OrgOptimizerSetupController # admin only: Org Optimizer, needs Manage BarnCRM Settings
 OrgOptimizerStorageController # admin only: Org Optimizer storage, needs Manage BarnCRM Settings
 PersonErasureController # not yet

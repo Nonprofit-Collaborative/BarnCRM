@@ -22,15 +22,16 @@ households are in use.
 
 When NPSP is installed in the same org as BarnCRM, you do not need files at all. The
 [Migration Assistant](migration-assistant.md) reads NPSP's records directly, step by step, with
-the same preview, results and undo as a file import, and checks that the numbers match. Open
-**BarnCRM Settings**, **Integrations**, find **Nonprofit Success Pack (NPSP)** and click the
-kit's **Start Migration** button. Run the kits in the order listed.
+the same preview, results and undo as a file import, and checks that the numbers match. Install
+the optional BarnCRM Migration package, open the **Migration Assistant** tab and click **Start**
+on a kit (or, on **BarnCRM Settings**, **Integrations**, **Nonprofit Success Pack (NPSP)**, the
+kit's **Start Migration** button). Run the kits in the order listed.
 
-**NPSP People and Addresses** (BarnCRM Core):
+**NPSP People and Addresses** (BarnCRM Migration):
 
 | Step | What it does |
 |---|---|
-| Adopt NPSP Households | Opens BarnCRM Settings, where **Adopt NPSP Households** makes your NPSP household accounts BarnCRM households in place ([Adopting Your NPSP Households](npsp-households.md)). Click **Mark Done** when it has finished. |
+| Adopt NPSP Households | Done with **Adopt NPSP Households**, under **Households** on the same tab, which makes your NPSP household accounts BarnCRM households in place ([Adopting Your NPSP Households](npsp-households.md)). Click **Back to Migration Kits**, adopt, then open this kit again and click **Mark Done**. |
 | Relationships | Copies each NPSP relationship once. NPSP keeps both sides of a relationship as two records; the kit reads only the side a person entered and leaves the other side to BarnCRM, which creates it for you. Both people are the same contacts. NPSP types become BarnCRM's (Husband and Wife become Spouse, Coworker becomes Colleague, Employer and Employee become Employer contact); a type BarnCRM does not have becomes Other. |
 | Affiliations | Copies each link between a person and an organization, with its role, status, dates, description and primary. |
 | Household Addresses | Copies each NPSP address onto its household, both street lines in one, with its type (Vacation becomes Seasonal), default, seasonal months and days, and verified. |

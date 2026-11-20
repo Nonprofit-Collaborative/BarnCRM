@@ -196,6 +196,33 @@
       "versionNumber": "1.21.0.NEXT",
       "postInstallScript": "MirrorPostInstall",
       "dependencies": [{ "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" }]
+    },
+    {
+      "path": "packages/migration",
+      "default": false,
+      "package": "BarnCRM Migration",
+      "versionName": "v1.21",
+      "versionNumber": "1.21.0.NEXT",
+      "postInstallScript": "MigrationPostInstall",
+      "dependencies": [{ "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" }]
+    },
+    {
+      "path": "packages/orgoptimizer",
+      "default": false,
+      "package": "BarnCRM Org Optimizer",
+      "versionName": "v1.21",
+      "versionNumber": "1.21.0.NEXT",
+      "postInstallScript": "OrgOptimizerPostInstall",
+      "dependencies": [{ "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" }]
+    },
+    {
+      "path": "packages/sampledata",
+      "default": false,
+      "package": "BarnCRM Sample Data",
+      "versionName": "v1.21",
+      "versionNumber": "1.21.0.NEXT",
+      "postInstallScript": "SampleDataPostInstall",
+      "dependencies": [{ "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" }]
     }
   ],
   "packageAliases": {}

@@ -23,8 +23,8 @@ private class SetupObjectSelectorTest {
 
 	@IsTest
 	static void readsAShippedStaticResource() {
-		Assert.isNotNull(SetupObjectSelector.staticResource('SampleData'), 'Core ships it');
-		Assert.isTrue(SetupObjectSelector.staticResourceBody('SampleData').startsWith('{'), 'Its JSON body');
+		Assert.isNotNull(SetupObjectSelector.staticResource('BarnHelp_Core'), 'Core ships it');
+		Assert.isTrue(SetupObjectSelector.staticResourceBody('BarnHelp_Core').startsWith('{'), 'Its JSON body');
 		Assert.isNull(SetupObjectSelector.staticResourceBody('No_Such_Barn_Resource'), 'None');
 	}
 

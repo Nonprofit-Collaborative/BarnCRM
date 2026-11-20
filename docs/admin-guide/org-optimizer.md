@@ -1,7 +1,8 @@
 # Org Optimizer
 
-**Package:** Core
-**Decision:** ADR-0103 `0103-org-optimizer-and-data-manager-pages.md`
+**Package:** BarnCRM Org Optimizer (optional, both editions)
+**Decision:** ADR-0103 `0103-org-optimizer-and-data-manager-pages.md`, ADR-NEXT
+`NEXT-org-optimizer-and-sample-data-modules.md`
 
 ## 1. What It Does
 
@@ -28,7 +29,7 @@ the section, so a screen reader reads its name and you can Tab straight into it.
 | **Field Use** | How often each field of a kind of record is filled in, by record type, with saved counts for trends. See [Field Use](field-utilization.md). | Administrators |
 | **Data Dictionary** | Every field you can see on the kinds of record you choose, with type, length, required, unique, picklist values, help text and formula, and optionally a fill rate, as a table and a CSV download. See [Data Dictionary](data-dictionary.md). | Administrators |
 | **AI-Readiness Export** | One zip for an AI tool you choose: a plain-language README, a schema.json of your kinds of record, fields and relationships, the data dictionary, data quality notes and, if you want, record files with sensitive fields left out or masked. BarnCRM calls no AI service. See [AI-Readiness Export](ai-readiness-export.md). | Administrators |
-| **Health Check** | Whether BarnCRM is set up the way it should be, with a fix for some findings. Runs only when you ask: opening it shows the last full run (when it ran and its counts, with **Run Again**), or **Run Health Check** when it has never run. See [Health Check](health-check.md). | Administrators |
+| **Health Check** | Whether BarnCRM is set up the way it should be, with a fix for some findings. Runs only when you ask: opening it shows the last full run (when it ran and its counts, with **Run Again**), or **Run Health Check** when it has never run. See [Health Check](health-check.md). | Everyone who can open the page; only someone with **Manage BarnCRM Settings** can run a fix |
 | **Errors** | How many Error Log entries nobody has read, the most recent ones, **Mark Acknowledged**, and a link to the full Error Log. See [Error Log](error-log.md). | Administrators |
 | **Storage and Limits** | How much of your org's data and file storage, daily API requests, background jobs and single emails are used, each as a bar with a **Near Limit** badge at 80% or more, and how many records BarnCRM keeps for imports, undo, errors, saved field counts and Setup changes, at about 2 KB a record. Read only. For a holder of **BarnCRM Bulk Delete**, **Archive Records** opens Find ready to [archive](archive-by-query.md) old records to a file and free storage. | Administrators |
 | **Unused Setup** | Setup nobody seems to use: active users who have not logged in for 90 days, permission sets nobody is assigned, reports not run for 365 days, email templates never used, flows left inactive, scheduled jobs owned by inactive users, objects near their custom field limit, and record types no record uses. Each line gives a count, up to five names and **Open in Setup**. Read only: you decide what to remove, in Setup. See section 5. | Administrators |
@@ -65,18 +66,21 @@ not start a new one.
 and closed after that; open it again whenever you like. Your choice is kept in your browser
 only.
 
-## 2. How to Turn It On
+## 2. Where It Comes From
 
-On a new install the **Org Optimizer and Health Check** feature is off until you turn it on:
-choose **Turn On** in that row in **BarnCRM Settings**, **General** (or leave it ticked in
-first-run setup); see [BarnCRM Settings](barncrm-settings.md). While it is off its tab is
-hidden for everyone.
+Org Optimizer and Health Check are the optional **BarnCRM Org Optimizer** package, offered in
+both editions and needing Core only (see [Installing](installing.md) and
+[Module Manager](module-manager.md)). Installing it turns them on; there is no separate switch.
+Without it there is no **Org Optimizer** tab, Data Manager has no **Org Optimizer** card, and
+**BarnCRM Settings** shows no **Open Health Check** or **Open the Error Log** link. Everything
+else works as before: the Error Log, Field History and the nightly jobs are Core's.
 
 1. Open the **BarnCRM Admin** app and choose the **Org Optimizer** tab. **Data Manager** also opens it
    from its **Org Optimizer** card.
-2. The **BarnCRM Admin** role and the **BarnCRM Find and Export** permission set each give
-   the tab. Staff with Find and Export see **Overview** and **Data Quality**; administrators
-   see every section.
+2. The package gives the tab by role: BarnCRM Admin holders get every section; BarnCRM Staff,
+   Read Only, Find and Export, Bulk Update and Bulk Delete holders get the tab with
+   **Overview** and **Health Check** to read, and **Data Quality** when they also have **Find
+   and Export Records**.
 
 Duplicates are not a section here: they are on the **Duplicate Matching** tab, which
 the **Duplicate Matching** section of **BarnCRM Settings** opens.

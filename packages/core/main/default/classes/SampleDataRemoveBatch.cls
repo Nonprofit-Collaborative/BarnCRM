@@ -1,5 +1,5 @@
 /**
- * Runs a sample data removal's stages (SampleDataRemoveStages, and each module's own) the way
+ * Runs a sample data removal's stages (each module's own, then Core's records) the way
  * SampleDataStageBatch runs a load's: one stage per transaction, in order, with no cap on how
  * many batches follow each other (ADMIN-3).
  *
@@ -21,7 +21,14 @@ public with sharing class SampleDataRemoveBatch extends SampleDataStageBatch {
 		return Database.executeBatch(new SampleDataRemoveBatch(stages), SampleDataStageBatch.SCOPE_SIZE);
 	}
 
+	/** Tells the person who removed the sample data that a stage of the removal stopped (Q-04). */
 	protected override void notifyStopped() {
-		SampleDataLoader.notifyRemoveStopped();
+		JobNotifier.aboutSettings(
+			UserInfo.getUserId(),
+			Label.Core_JobNotice_SampleDataRemove,
+			true,
+			Label.Core_JobNotice_SampleDataRemoveStoppedBody,
+			JobNotifier.SECTION_GENERAL
+		);
 	}
 }

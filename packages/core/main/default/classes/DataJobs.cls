@@ -6,6 +6,7 @@
  * everyone's, to look after a job someone else started. Jobs are read in user mode; a running
  * job's AsyncApexJob is read once, in system mode, by the identifier the job record holds.
  */
+@NamespaceAccessible
 public with sharing class DataJobs {
 	/** Who may see and undo every person's jobs: whoever manages BarnCRM Settings. */
 	public static final String EVERYONE_PERMISSION = 'Manage_BarnCRM_Settings';
@@ -44,6 +45,7 @@ public with sharing class DataJobs {
 	 * Jobs of one operation, newest first, read as the person: their own, or everyone's when
 	 * asked for and allowed.
 	 */
+	@NamespaceAccessible
 	public static List<Import_Batch__c> read(
 		String fields,
 		String operation,
@@ -135,6 +137,7 @@ public with sharing class DataJobs {
 	 * A whole-number setting from BarnCRM Settings, held between `lowest` and `highest`; the
 	 * fallback when it is empty or unreadable.
 	 */
+	@NamespaceAccessible
 	public static Integer wholeNumberSetting(String key, Integer fallback, Integer lowest, Integer highest) {
 		Decimal value = SettingsService.storedNumber(key);
 		return value == null ? fallback : Math.max(lowest, Math.min(value.intValue(), highest));

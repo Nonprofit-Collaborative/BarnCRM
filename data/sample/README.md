@@ -18,8 +18,9 @@ triggers a real import would (automatic household naming, greetings, member coun
 default allocations, installment schedules, automatic household soft credits), and so that
 "remove sample data" is a single in-app action rather than a manual delete:
 
-- `packages/core/main/default/staticresources/SampleData.json`, read by `SampleDataLoader`:
-  households, people, organizations, connections, affiliations.
+- `packages/sampledata/main/default/staticresources/SampleData.json`, read by `SampleDataLoader`
+  in the optional BarnCRM Sample Data package: households, people, organizations, connections,
+  affiliations.
 - `packages/giving/main/default/staticresources/GivingSampleData.json`, read by
   `GivingSampleData` in the Fundraising package: funds, appeals, gifts with their allocations,
   commitments, soft credits, tributes. It ships with Fundraising, so an org without Fundraising never
@@ -41,8 +42,8 @@ default allocations, installment schedules, automatic household soft credits), a
 - `FormsSampleData.json`, `PortalSampleData.json` and `TerritorySampleData.json` (release 1.25):
   three example forms with versions and submissions; one Inactive, invite-only portal with its
   accesses; three state territories with rules and a member.
-- `packages/core/main/default/staticresources/CoreSampleData.json`, in the same generic format
-  (module `Core`), loaded first after Core's own set: three saved Find queries (one a Backup
+- `packages/sampledata/main/default/staticresources/CoreSampleData.json`, in the same generic
+  format (module `Core`), loaded first after Core's own set: three saved Find queries (one a Backup
   Set), two seasonal addresses and three interaction notes on Core's sample records. Hand
   written, not generated.
 

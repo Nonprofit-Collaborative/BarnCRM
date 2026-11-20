@@ -39,7 +39,6 @@ public with sharing class TabAccessService {
 	public static final String IMPORT_TAB = 'BarnCRM_Tab_Import';
 	public static final String FIND_TAB = 'BarnCRM_Tab_Find';
 	public static final String BULK_UPDATE_TAB = 'BarnCRM_Tab_Bulk_Update';
-	public static final String DATA_HYGIENE_TAB = 'BarnCRM_Tab_Data_Hygiene';
 	public static final String DUPLICATE_MATCHING_TAB = 'BarnCRM_Tab_Duplicate_Matching';
 
 	/** Shows the Households tab only, no record type; carried by Household Upkeep (ADR-0141). */
@@ -83,7 +82,6 @@ public with sharing class TabAccessService {
 		IMPORT_TAB => new List<String>{ ADMIN },
 		FIND_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT, BULK_UPDATE, BULK_DELETE },
 		BULK_UPDATE_TAB => new List<String>{ ADMIN, BULK_UPDATE, BULK_DELETE },
-		DATA_HYGIENE_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT, BULK_UPDATE, BULK_DELETE },
 		DUPLICATE_MATCHING_TAB => new List<String>{ ADMIN, DUPLICATE_REVIEW, METADATA_ADMIN },
 		HOUSEHOLDS_SET => new List<String>{ ADMIN, STAFF, READ_ONLY },
 		ORGANIZATIONS_TAB => new List<String>{ ADMIN, STAFF, READ_ONLY },

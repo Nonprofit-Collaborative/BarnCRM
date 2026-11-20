@@ -33,8 +33,9 @@ Manager**. **BarnCRM Console** has the same, plus **Addresses**, **Relationships
 the standard **Accounts** tab instead, you see **Accounts** in place of **Households** and
 **Organizations**: open its list view menu for **Households** or **Organizations** (or both
 kinds of tab, if your admin chose Both). The admin apps
-have **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matching**,
-**Automation** and **Error Log**. You see only the tabs your access allows, so your menu may be shorter. **Find**,
+have **BarnCRM Settings**, **Data Manager**, **Duplicate Matching**, **Automation** and
+**Error Log**, plus **Org Optimizer** and **Sample Data** where your admin installed those
+optional packages. You see only the tabs your access allows, so your menu may be shorter. **Find**,
 **Super Importer** and **Super Transformer** are not in the navigation: open them from their
 cards on the **Data Manager** tab. A finished import's **See Every Row** link opens the list
 of its rows, which has no tab of its own in the admin apps. Every tab, including those Fundraising, Volunteers and Programs add,
@@ -142,9 +143,10 @@ If someone has paused automation (for example during a large import), a warning 
 welcome says "BarnCRM automation is paused. Households and greetings are not being updated
 until it resumes." It goes away by itself. Admins also see **Resume Automation** in the warning.
 
-Admins also see the setup checklist, a Health Check summary and status tiles with a badge
+Admins also see the setup checklist and status tiles with a badge
 each (for example **All Clear**, **Not Run Yet** or **Overdue**). See
-[The BarnCRM Apps and Navigation](../admin-guide/barncrm-app.md) and [Health Check](../admin-guide/health-check.md).
+[The BarnCRM Apps and Navigation](../admin-guide/barncrm-app.md). Health Check, with the optional
+Org Optimizer package, is on the **Org Optimizer** tab ([Health Check](../admin-guide/health-check.md)).
 
 ## To Read In-App Tips
 

@@ -8,7 +8,9 @@
  * which is the same test the relationship and affiliation domains refuse a save on. Reads run
  * in user mode and stop at the cap they are given. Detection only; nothing here writes.
  */
+@NamespaceAccessible
 public with sharing class PersonLinkOrphanSelector {
+	@NamespaceAccessible
 	public static Integer countRelationships(Integer cap) {
 		return [
 			SELECT COUNT()
@@ -23,6 +25,7 @@ public with sharing class PersonLinkOrphanSelector {
 		];
 	}
 
+	@NamespaceAccessible
 	public static List<Relationship__c> relationships(Integer howMany) {
 		return [
 			SELECT Id, Name
@@ -38,6 +41,7 @@ public with sharing class PersonLinkOrphanSelector {
 		];
 	}
 
+	@NamespaceAccessible
 	public static Integer countAffiliations(Integer cap) {
 		return [
 			SELECT COUNT()
@@ -48,6 +52,7 @@ public with sharing class PersonLinkOrphanSelector {
 		];
 	}
 
+	@NamespaceAccessible
 	public static List<Affiliation__c> affiliations(Integer howMany) {
 		return [
 			SELECT Id, Name

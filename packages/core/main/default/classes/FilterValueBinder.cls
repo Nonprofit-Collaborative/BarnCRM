@@ -8,10 +8,13 @@
  * person typed is ever concatenated into the query (plan Section 4.9, ADR-0047). It also keeps a
  * display rendering, with the values written in, which is only ever shown, never run.
  */
+@NamespaceAccessible
 public with sharing class FilterValueBinder {
 	/** The where clause with bind names, set by RollupFilterParser.toBoundClause. */
+	@NamespaceAccessible
 	public String clause;
 	/** The bind values by name, for Database.queryWithBinds. */
+	@NamespaceAccessible
 	public Map<String, Object> binds = new Map<String, Object>();
 
 	private static final String BIND_PREFIX = 'fb';

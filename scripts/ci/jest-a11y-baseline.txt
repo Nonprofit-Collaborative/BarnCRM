@@ -151,7 +151,6 @@ matchSourceModal
 membershipActions
 migrationAssistant
 moduleManager
-npcHouseholdConversion
 npspHouseholdAdoption
 opportunityMirror
 optimizerSetup

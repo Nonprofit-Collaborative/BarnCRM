@@ -35,8 +35,10 @@
  * `0109-relationship-mirror-upkeep-in-system-mode.md`): the side the person saved has already
  * been authorized in user mode, and the other side often belongs to somebody else.
  */
+@NamespaceAccessible
 public with sharing class RelationshipService {
 	/** The maintenance registry row this feature ships, and the name its bypass is keyed on. */
+	@NamespaceAccessible
 	public static final String AUTOMATION_NAME = 'Relationship_Reciprocal';
 
 	/**
@@ -45,6 +47,7 @@ public with sharing class RelationshipService {
 	 * keep the checks (see the registry descriptions), but the package's own writes are exempt
 	 * from both.
 	 */
+	@NamespaceAccessible
 	public static final String VALIDATION_AUTOMATION_NAME = 'Relationship_Validation';
 
 	@TestVisible
@@ -86,6 +89,7 @@ public with sharing class RelationshipService {
 	 * turned off on the Custom Metadata page, with no other active row for the same type
 	 * (ADR-0170).
 	 */
+	@NamespaceAccessible
 	public static Boolean isTurnedOff(String type) {
 		return String.isNotBlank(type) && turnedOffTypes().contains(type.toLowerCase());
 	}

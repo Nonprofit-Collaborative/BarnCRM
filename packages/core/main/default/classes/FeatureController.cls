@@ -97,9 +97,6 @@ public with sharing class FeatureController {
 			when 'DuplicateReview' {
 				return System.Label.Core_DuplicateMatching_Title;
 			}
-			when 'OrgOptimizer' {
-				return System.Label.Core_Feature_OrgOptimizer_Name;
-			}
 			when 'HouseholdUpkeep' {
 				return System.Label.Core_SettingsGroup_Households;
 			}
@@ -128,9 +125,6 @@ public with sharing class FeatureController {
 			}
 			when 'DuplicateReview' {
 				return BarnHelp.text('Core', 'Core_Feature_DuplicateReview_Description');
-			}
-			when 'OrgOptimizer' {
-				return BarnHelp.text('Core', 'Core_Feature_OrgOptimizer_Description');
 			}
 			when 'HouseholdUpkeep' {
 				return BarnHelp.text('Core', 'Core_Feature_HouseholdUpkeep_Description');

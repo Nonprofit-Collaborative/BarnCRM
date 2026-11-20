@@ -6,8 +6,8 @@
  * An engagement plan task gets the step order and assignment BarnCRM needs, and the parity step
  * counts NPSP levels and engagement plans against their BarnCRM counterparts.
  * Every other step keeps the default rows. NPSP is read by describe only: its field names are
- * text here. Core builds this class by name, so it and its constructor are namespace-accessible
- * (ADR-0017).
+ * text here. The Assistant builds this class by name, so it and its constructor are
+ * namespace-accessible (ADR-0017).
  */
 @NamespaceAccessible
 public with sharing class NpspGivingKit implements MigrationKitExtension {
@@ -32,14 +32,10 @@ public with sharing class NpspGivingKit implements MigrationKitExtension {
 	}
 
 	@NamespaceAccessible
-	public List<Map<String, Object>> rows(String stepKey, List<SObject> records) {
+	public List<Map<String, Object>> rows(String stepKey, List<Map<String, Object>> rows) {
 		if (!stepKey.startsWith('recurring') && stepKey != 'planSteps') {
 			return null;
 		}
-		MigrationKitService.Source source = new MigrationKitService.Source(
-			MigrationKitService.stepNamed(MigrationKitService.kitNamed(KIT), stepKey)
-		);
-		List<Map<String, Object>> rows = source.rows(records);
 		shapeRows(stepKey, rows);
 		return rows;
 	}

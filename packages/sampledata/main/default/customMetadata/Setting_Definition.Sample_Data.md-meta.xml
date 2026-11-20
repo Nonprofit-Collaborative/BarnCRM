@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Sample Data</label>
+  <protected>false</protected>
+  <values>
+    <field>Setting_Key__c</field>
+    <value xsi:type="xsd:string">Sample_Data</value>
+  </values>
+  <values>
+    <field>Section__c</field>
+    <value xsi:type="xsd:string">General</value>
+  </values>
+  <values>
+    <field>Module__c</field>
+    <value xsi:type="xsd:string">SampleData</value>
+  </values>
+  <values>
+    <field>Data_Type__c</field>
+    <value xsi:type="xsd:string">Component</value>
+  </values>
+  <values>
+    <field>Picklist_Values__c</field>
+    <value xsi:nil="true" />
+  </values>
+  <values>
+    <field>Component__c</field>
+    <value xsi:nil="true" />
+  </values>
+  <values>
+    <field>Navigation_Target__c</field>
+    <value xsi:type="xsd:string">Sample_Data</value>
+  </values>
+  <values>
+    <field>Navigation_Label__c</field>
+    <value xsi:type="xsd:string">Sample Data</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string" xml:space="preserve">Loads or removes the sample data set (200 households, 440 contacts, 25 organizations, 60 connections, 80 affiliations, and sample records for each installed module). For scratch orgs, sandboxes, and demos, never production.</value>
+  </values>
+  <values>
+    <field>Help_Path__c</field>
+    <value xsi:type="xsd:string">sample-data.md</value>
+  </values>
+  <values>
+    <field>Sort_Order__c</field>
+    <value xsi:type="xsd:double">90</value>
+  </values>
+  <values>
+    <field>Settings_Object__c</field>
+    <value xsi:type="xsd:string">BarnCRM_Settings__c</value>
+  </values>
+</CustomMetadata>

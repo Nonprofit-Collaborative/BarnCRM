@@ -24,7 +24,7 @@ import LOADING_ROLES from '@salesforce/label/c.Core_Access_LoadingRoles';
 import PAGE_TITLE from '@salesforce/label/c.Core_Access_PageTitle';
 import OPEN_ACCESS_EXPLORER from '@salesforce/label/c.Core_Access_OpenAccessExplorer';
 import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
-import getOpenLink from '@salesforce/apex/AccessExplorerController.getOpenLink';
+import getAccessExplorerUrl from '@salesforce/apex/AccessController.getAccessExplorerUrl';
 import REMOVE_BUTTON from '@salesforce/label/c.Core_Find_Remove';
 import ROLE_LABEL from '@salesforce/label/c.Core_Access_RoleLabel';
 import ROLE_PICKER_PLACEHOLDER from '@salesforce/label/c.Core_Access_RolePickerPlaceholder';
@@ -161,12 +161,15 @@ export default class AccessManager extends LightningElement {
   overviewResult;
   pendingSearchTerm;
 
-  /** Org Optimizer opened on Access Explorer (C-53); only for people who can open it. */
+  /**
+   * Org Optimizer opened on Access Explorer (C-53); only for people who can open it, and only
+   * while the Org Optimizer module is installed.
+   */
   accessExplorerUrl;
 
-  @wire(getOpenLink)
+  @wire(getAccessExplorerUrl)
   wiredOpenLink({ data }) {
-    this.accessExplorerUrl = data && canManageSettings ? data.url : undefined;
+    this.accessExplorerUrl = data && canManageSettings ? data : undefined;
   }
 
   @wire(getAccessOverview)
