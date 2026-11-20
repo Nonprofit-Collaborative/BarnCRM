@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Saved Maps on Super Importer's Check Columns step: Use a Saved Map copies a map onto the file's
+    columns, and Save as Map saves the columns as a new map.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

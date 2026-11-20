@@ -1,0 +1,57 @@
+<template>
+    <template lwc:if={helpReady}>
+        <section class="slds-var-m-top_medium" aria-labelledby="saved-map-heading" data-id="saved-map">
+            <h3 id="saved-map-heading" class="slds-text-heading_small">{labels.heading}</h3>
+            <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
+                <template lwc:if={hasMaps}>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-grid slds-grid_vertical-align-end">
+                        <lightning-combobox
+                            class="slds-col"
+                            label={labels.useLabel}
+                            placeholder={labels.choose}
+                            options={mapOptions}
+                            value={chosen}
+                            onchange={handleChoose}
+                            data-id="choose"
+                        ></lightning-combobox>
+                        <lightning-button
+                            class="slds-var-m-left_x-small"
+                            label={labels.use}
+                            disabled={useDisabled}
+                            onclick={handleUse}
+                            data-id="use"
+                        ></lightning-button>
+                    </div>
+                </template>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-grid slds-grid_vertical-align-end">
+                    <lightning-input
+                        class="slds-col"
+                        label={labels.nameLabel}
+                        value={name}
+                        max-length="80"
+                        onchange={handleName}
+                        data-id="name"
+                    ></lightning-input>
+                    <lightning-button
+                        class="slds-var-m-left_x-small"
+                        label={labels.save}
+                        disabled={saveDisabled}
+                        onclick={handleSave}
+                        data-id="save"
+                    ></lightning-button>
+                </div>
+            </div>
+            <template lwc:if={message}>
+                <p class="slds-text-body_small slds-var-m-top_x-small" role="status" data-id="message">{message}</p>
+            </template>
+            <template lwc:if={errorMessage}>
+                <c-barn-notice
+                    class="slds-show slds-var-m-top_x-small"
+                    variant="error"
+                    message={errorMessage}
+                    data-id="error"
+                ></c-barn-notice>
+            </template>
+        </section>
+    </template>
+</template>

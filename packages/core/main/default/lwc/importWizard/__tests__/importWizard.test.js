@@ -865,6 +865,41 @@ describe('the import wizard', () => {
     expect(sent.columns[2]).toEqual({ source: 'Notes', target: 'Contact1.Phone' });
   });
 
+  it('takes the columns a saved map fills, keeping the mapping step as it is', async () => {
+    const element = await open();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element);
+    const savedMap = element.shadowRoot.querySelector('c-import-saved-map');
+    expect(savedMap).not.toBeNull();
+    expect(savedMap.allowedTargets).toContain('Contact1.Phone');
+    const columns = savedMap.columns.map((column) => {
+      if (column.source !== 'Notes') {
+        return column;
+      }
+      return {
+        ...column,
+        target: 'Contact1.Phone',
+        transforms: [{ op: 'trim' }],
+        lookupField: undefined
+      };
+    });
+    savedMap.dispatchEvent(new CustomEvent('apply', { detail: { columns } }));
+    await flush();
+    expect(element.shadowRoot.querySelectorAll('[data-id="column-row"]')).toHaveLength(3);
+    click(element, 'next');
+    await flush();
+    click(element, 'dry-run');
+    await flush();
+
+    const sent = JSON.parse(createBatch.mock.calls[0][0].mappingDocument);
+    expect(sent.columns[2]).toEqual({
+      source: 'Notes',
+      target: 'Contact1.Phone',
+      transforms: [{ op: 'trim' }]
+    });
+  });
+
   it('commits only after the dry run has completed', async () => {
     const element = await open();
     click(element, 'next');
