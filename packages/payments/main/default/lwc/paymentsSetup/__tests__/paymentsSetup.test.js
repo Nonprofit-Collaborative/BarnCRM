@@ -153,16 +153,28 @@ describe('c-payments-setup', () => {
     const element = await render(SETUP);
     clearKeys.mockRejectedValue({ body: { message: 'Not allowed.' } });
     BarnConfirmModal.open.mockResolvedValue(true);
-    find(element, 'clear-paypal').click();
+    find(element, 'clear-stripe').click();
     await flush();
-    expect(clearKeys).toHaveBeenCalledWith({ processor: 'PayPal' });
+    expect(clearKeys).toHaveBeenCalledWith({ processor: 'Stripe' });
     expect(find(element, 'error').message).toBe('Not allowed.');
+  });
+
+  it('offers Disconnect only where there is something to forget', async () => {
+    let element = await render(SETUP);
+    expect(find(element, 'clear-stripe')).not.toBeNull();
+    expect(find(element, 'clear-paypal')).toBeNull();
+    document.body.removeChild(element);
+    element = await render({
+      ...SETUP,
+      keys: [{ name: 'payPalWebhookId', processor: 'PayPal', lastFour: 'AB12' }]
+    });
+    expect(find(element, 'clear-paypal')).not.toBeNull();
   });
 
   it('disconnects only after the admin confirms', async () => {
     const element = await render(SETUP);
     BarnConfirmModal.open.mockResolvedValue(false);
-    find(element, 'clear-paypal').click();
+    find(element, 'clear-stripe').click();
     await flush();
     expect(BarnConfirmModal.open).toHaveBeenCalledWith(
       expect.objectContaining({ confirmVariant: 'destructive' })
