@@ -40,6 +40,9 @@ const TEXTS = {
   get Connector_Page_RunsTab() {
     return helpText('Connector', 'Connector_Page_RunsTab');
   },
+  get Connector_Page_TemplatesTab() {
+    return helpText('Connector', 'Connector_Page_TemplatesTab');
+  },
   get Connector_Page_Check() {
     return helpText('Connector', 'Connector_Page_Check');
   },
@@ -177,6 +180,12 @@ const TEXTS = {
   },
   get Connector_Form_DebugNotice() {
     return helpText('Connector', 'Connector_Form_DebugNotice');
+  },
+  get Connector_Form_ErrorLockedUrl() {
+    return helpText('Connector', 'Connector_Form_ErrorLockedUrl');
+  },
+  get Connector_Form_UrlPartFromKey() {
+    return helpText('Connector', 'Connector_Form_UrlPartFromKey');
   },
   get Connector_Form_NewTitle() {
     return helpText('Connector', 'Connector_Form_NewTitle');

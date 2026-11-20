@@ -6,8 +6,10 @@
  *
  * Release 1.31 (CN-02) builds the Manual trigger (Run Now and the Flow action) and the steps
  * Find, Create, Update, Create or Update, Call an App, If and Stop; release 1.32 (CN-03) the
- * Schedule and Record Change triggers (`ConnectorTriggers`) and CN-09 Load Rows with an Import
- * Template (`ConnectorImportStep`). Any other kind is refused.
+ * Schedule and Record Change triggers (`ConnectorTriggers`), CN-09 Load Rows with an Import
+ * Template (`ConnectorImportStep`) and CN-05 For Each, Wait and Change Data
+ * (`ConnectorControlSteps`). Any other kind is refused. A step's `fill` lists keys an import left
+ * blank (R-CR11): while it holds any, the step is a problem.
  */
 public with sharing class ConnectorRecipeDocument {
 	public static final Integer MAX_STEPS = 25;
@@ -23,7 +25,10 @@ public with sharing class ConnectorRecipeDocument {
 		'callApp',
 		'if',
 		'stop',
-		'importRows'
+		'importRows',
+		'forEach',
+		'wait',
+		'transform'
 	};
 	public static final Set<String> RECORD_KINDS = new Set<String>{ 'create', 'update', 'upsert' };
 	public static final Set<String> METHODS = new Set<String>{ 'GET', 'POST', 'PUT', 'PATCH', 'DELETE' };
@@ -41,7 +46,7 @@ public with sharing class ConnectorRecipeDocument {
 	public static final Set<String> OUTCOMES = new Set<String>{ 'Succeeded', 'Skipped', 'Failed' };
 	private static final Pattern STEP_ID = Pattern.compile('[A-Za-z0-9_]{1,20}');
 	private static final Pattern PILL_PATH = Pattern.compile(
-		'(trigger|steps)(\\.[A-Za-z0-9_-]+(\\[[0-9]{1,3}\\])?){0,10}'
+		'(trigger|steps|loop)(\\.[A-Za-z0-9_-]+(\\[[0-9]{1,3}\\])?){0,10}'
 	);
 	private static final Pattern SLOT_NAME = Pattern.compile('\\{([A-Za-z0-9_]{1,40})\\}');
 	private static final Pattern QUERY_NAME = Pattern.compile('[A-Za-z0-9_.\\[\\]-]{1,100}');
@@ -85,7 +90,7 @@ public with sharing class ConnectorRecipeDocument {
 			found.add(ConnectorTriggers.problem(starter));
 		}
 		Set<String> ids = new Set<String>();
-		Integer count = checkSteps(listOf(document.get('steps')), 1, ids, found);
+		Integer count = checkSteps(listOf(document.get('steps')), 1, false, ids, found);
 		if (count == 0) {
 			found.add(BarnHelp.text('Connector', 'Connector_Recipe_ErrorNoSteps'));
 		}
@@ -95,7 +100,13 @@ public with sharing class ConnectorRecipeDocument {
 		return found;
 	}
 
-	private static Integer checkSteps(List<Object> steps, Integer depth, Set<String> ids, List<String> found) {
+	private static Integer checkSteps(
+		List<Object> steps,
+		Integer depth,
+		Boolean inLoop,
+		Set<String> ids,
+		List<String> found
+	) {
 		Integer count = 0;
 		for (Object raw : steps) {
 			Map<String, Object> step = mapOf(raw);
@@ -115,13 +126,21 @@ public with sharing class ConnectorRecipeDocument {
 			if (problem != null) {
 				found.add(problem);
 			}
-			if (kind == 'if') {
-				// An If inside an If is the deepest allowed (design Section 3.4).
+			if (!listOf(step.get('fill')).isEmpty()) {
+				found.add(BarnHelp.text('Connector', 'Connector_Recipe_ErrorFill', at));
+			}
+			if (inLoop && ConnectorControlSteps.NOT_IN_LOOP.contains(kind)) {
+				found.add(BarnHelp.text('Connector', 'Connector_Recipe_ErrorInLoop', at));
+			}
+			if (kind == 'if' || kind == 'forEach') {
+				// An If or For Each inside another is the deepest allowed (design Section 3.4).
 				if (depth > MAX_DEPTH) {
 					found.add(BarnHelp.text('Connector', 'Connector_Recipe_ErrorNesting', at));
 				}
-				count += checkSteps(listOf(step.get('then')), depth + 1, ids, found);
-				count += checkSteps(listOf(step.get('otherwise')), depth + 1, ids, found);
+				Boolean looped = inLoop || kind == 'forEach';
+				for (String branch : BRANCHES) {
+					count += checkSteps(listOf(step.get(branch)), depth + 1, looped, ids, found);
+				}
 			}
 		}
 		return count;
@@ -131,6 +150,9 @@ public with sharing class ConnectorRecipeDocument {
 	private static String stepProblem(String kind, Map<String, Object> step, List<Object> at) {
 		if (kind == 'importRows') {
 			return ConnectorImportStep.problem(step, at);
+		}
+		if (ConnectorControlSteps.KINDS.contains(kind)) {
+			return ConnectorControlSteps.problem(kind, step, at);
 		}
 		if (kind == 'find') {
 			if (mapOf(step.get('query')).get('object') == null) {
@@ -296,12 +318,16 @@ public with sharing class ConnectorRecipeDocument {
 		return found;
 	}
 
+	/** The keys that hold nested steps: an If's two branches and a For Each's steps. */
+	public static final List<String> BRANCHES = new List<String>{ 'then', 'otherwise', 'do' };
+
 	private static void collect(List<Object> steps, List<Map<String, Object>> found) {
 		for (Object raw : steps) {
 			Map<String, Object> step = mapOf(raw);
 			found.add(step);
-			collect(listOf(step.get('then')), found);
-			collect(listOf(step.get('otherwise')), found);
+			for (String branch : BRANCHES) {
+				collect(listOf(step.get(branch)), found);
+			}
 		}
 	}
 

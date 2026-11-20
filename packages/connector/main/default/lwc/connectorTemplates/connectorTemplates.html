@@ -1,0 +1,52 @@
+<template>
+    <section class="slds-is-relative" aria-labelledby="templates-heading">
+        <template lwc:if={working}>
+            <lightning-spinner alternative-text={labels.heading} size="small" data-id="working"></lightning-spinner>
+        </template>
+        <h2 id="templates-heading" class="slds-text-heading_medium slds-var-m-bottom_small">{labels.heading}</h2>
+        <p class="slds-var-m-bottom_small slds-text-body_small">{labels.intro}</p>
+        <template lwc:if={error}>
+            <c-barn-notice class="slds-var-m-bottom_small" variant="error" message={error} data-id="error"></c-barn-notice>
+        </template>
+        <lightning-input type="file" label={labels.chooseFile} accept=".json,application/json" onchange={handleFile} data-id="file"></lightning-input>
+        <lightning-textarea label={labels.paste} value={pasted} field-level-help={labels.pasteHelp} onchange={handlePaste} data-id="paste"></lightning-textarea>
+        <lightning-button class="slds-var-m-top_x-small" variant="brand" label={labels.importButton} disabled={working} onclick={handleImport} data-id="import"></lightning-button>
+
+        <template lwc:if={imported}>
+            <article class="slds-card slds-var-m-top_medium" aria-labelledby="imported-heading" data-id="imported">
+                <div class="slds-card__body slds-card__body_inner">
+                    <h3 id="imported-heading" class="slds-text-heading_small">{importedHeading}</h3>
+                    <template lwc:if={imported.description}>
+                        <p class="slds-text-body_small slds-var-m-vertical_x-small">{imported.description}</p>
+                    </template>
+                    <p class="slds-text-body_small slds-var-m-bottom_small">{labels.nothingKept}</p>
+                    <template lwc:if={connection}>
+                        <section class="slds-var-m-bottom_small" aria-labelledby="connection-heading">
+                            <h4 id="connection-heading" class="slds-text-title_bold">{labels.connectionHeading}</h4>
+                            <p class="slds-text-body_small slds-var-m-vertical_x-small" data-id="connection-detail">{connectionDetail}</p>
+                            <lightning-button label={labels.createConnection} onclick={handleConnection} data-id="create-connection"></lightning-button>
+                        </section>
+                    </template>
+                    <h4 class="slds-text-title_bold slds-var-m-bottom_x-small">{labels.recipesHeading}</h4>
+                    <template lwc:if={noRecipes}>
+                        <p class="slds-text-body_small" data-id="no-recipes">{labels.noRecipes}</p>
+                    </template>
+                    <ul class="slds-has-dividers_bottom-space">
+                        <template for:each={recipeRows} for:item="row">
+                            <li key={row.key} class="slds-item" data-id={row.key}>
+                                <p class="slds-text-heading_small">{row.name}</p>
+                                <template lwc:if={row.blanksText}>
+                                    <c-barn-notice class="slds-var-m-vertical_x-small" variant="warning" message={row.blanksText}></c-barn-notice>
+                                </template>
+                                <template lwc:if={row.problemsText}>
+                                    <c-barn-notice class="slds-var-m-vertical_x-small" variant="info" title={labels.beforePublish} message={row.problemsText}></c-barn-notice>
+                                </template>
+                                <lightning-button label={labels.openDraft} title={row.openLabel} data-index={row.index} onclick={handleOpenDraft} data-id={row.openId}></lightning-button>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </article>
+        </template>
+    </section>
+</template>

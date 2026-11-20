@@ -74,6 +74,8 @@ public inherited sharing class ConnectorStepRunner {
 	private Map<String, Object> data = new Map<String, Object>();
 	private List<Object> log = new List<Object>();
 	private Integer written = 0;
+	/** Above 0 inside a For Each: steps there log only failures (R-CR10). */
+	private Integer looping = 0;
 
 	public ConnectorStepRunner(Connector_Run__c run, Budget budget) {
 		this.run = run;
@@ -154,6 +156,10 @@ public inherited sharing class ConnectorStepRunner {
 				continue;
 			}
 			String kind = ConnectorRecipeDocument.textOf(step.get('kind'));
+			if (kind == 'forEach') {
+				loop(step, id);
+				continue;
+			}
 			if (kind == 'if') {
 				Map<String, Object> chosen = ConnectorRecipeDocument.mapOf(outputs.get(id));
 				if (chosen.isEmpty()) {
@@ -226,8 +232,73 @@ public inherited sharing class ConnectorStepRunner {
 			'ms' => ms,
 			'message' => message
 		};
-		log.add(logged);
+		if (looping == 0 || isTest || outcome == 'failed') {
+			log.add(logged);
+		}
 		return logged;
+	}
+
+	/**
+	 * For Each (R-CR10): its steps once per item, with `loop.item` and `loop.index`. The next
+	 * item is kept as the step's progress before each item, so a checkpoint or a retry carries on
+	 * there; finished items' step results are cleared, so the next item runs them afresh. Every
+	 * 200 items, or near the limits, the run continues in a new transaction. A Test runs the
+	 * first item only and keeps its results.
+	 */
+	private void loop(Map<String, Object> step, String id) {
+		List<Object> inside = ConnectorRecipeDocument.listOf(step.get('do'));
+		Set<String> innerIds = new Set<String>();
+		for (
+			Map<String, Object> each : ConnectorRecipeDocument.allSteps(new Map<String, Object>{ 'steps' => inside })
+		) {
+			innerIds.add(ConnectorRecipeDocument.textOf(each.get('id')));
+		}
+		List<Object> items;
+		try {
+			items = ConnectorControlSteps.itemsOf(pill(step.get('items')));
+		} catch (StepFailureException failed) {
+			run.Failed_Step__c = id;
+			entry(id, 'forEach', 'failed', 0, failed.getMessage());
+			throw failed;
+		}
+		if (isTest && items.size() > 1) {
+			items = new List<Object>{ items[0] };
+		}
+		Object next = ConnectorRecipeDocument.mapOf(outputs.get(id)).get('next');
+		Integer index = next == null ? 0 : Integer.valueOf(next);
+		Integer pass = 0;
+		looping++;
+		try {
+			while (index < items.size()) {
+				outputs.put(id, new Map<String, Object>{ 'next' => index });
+				data.put('loop', new Map<String, Object>{ 'item' => items[index], 'index' => index });
+				walk(inside);
+				index++;
+				pass++;
+				if (!isTest) {
+					done.removeAll(innerIds);
+					for (String each : innerIds) {
+						outputs.remove(each);
+					}
+				}
+				if (index < items.size() && (pass >= ConnectorControlSteps.CHECKPOINT_ITEMS || budget.low())) {
+					outputs.put(id, new Map<String, Object>{ 'next' => index });
+					throw new CheckpointException();
+				}
+			}
+		} finally {
+			looping--;
+			data.remove('loop');
+		}
+		outputs.put(id, new Map<String, Object>{ 'count' => items.size() });
+		done.add(id);
+		entry(
+			id,
+			'forEach',
+			isTest ? 'tested' : 'succeeded',
+			0,
+			BarnHelp.text('Connector', 'Connector_Run_ForEachDone', new List<Object>{ items.size() })
+		);
 	}
 
 	private Object perform(String kind, Map<String, Object> step) {
@@ -250,6 +321,17 @@ public inherited sharing class ConnectorStepRunner {
 			);
 			written += ConnectorImportStep.written(loaded);
 			return loaded;
+		}
+		if (kind == 'wait') {
+			return ConnectorControlSteps.waitFor(
+				step,
+				ConnectorRecipeDocument.mapOf(outputs.get(ConnectorRecipeDocument.textOf(step.get('id')))),
+				isTest
+			);
+		}
+		if (kind == 'transform') {
+			String input = ConnectorRecipeDocument.textOf(step.get('input'));
+			return ConnectorControlSteps.transform(step, pill(String.isBlank(input) ? 'trigger' : input), access);
 		}
 		StoppedException stop = new StoppedException(ConnectorRecipeDocument.textOf(step.get('message')));
 		stop.outcome = ConnectorRecipeDocument.textOf(step.get('outcome'));

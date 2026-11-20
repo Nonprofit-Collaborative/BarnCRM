@@ -3,6 +3,7 @@ import createConnection from '@salesforce/apex/ConnectorConnectionsController.cr
 import replaceKey from '@salesforce/apex/ConnectorConnectionsController.replaceKey';
 import { KINDS, API_KEY, BASIC, SECRET_URL, formProblems } from 'c/connectorRules';
 import { say as text } from 'c/connectorText';
+import { lockedUrl, partOfKey } from 'c/connectorFileRules';
 
 /**
  * New Connection and Replace Key on Super Connector (CN-01). This form alone calls the two Apex
@@ -17,6 +18,28 @@ export default class ConnectorKeyForm extends LightningElement {
   /** For Replace Key: the connection's name, label and auth kind (no key). */
   @api connection;
 
+  /**
+   * A template's connection (CN-08, R-CR12): label, auth kind, header name and base URL, never a
+   * key. Its host is locked: only the URL parts the template names are typed, each checked
+   * against the template's pattern (F4).
+   */
+  @api
+  get prefill() {
+    return this._prefill;
+  }
+  set prefill(value) {
+    this._prefill = value;
+    this.urlValues = {};
+    if (value) {
+      this.label = value.label || '';
+      this.authKind = value.authKind || this.authKind;
+      this.baseUrl = value.baseUrl || '';
+      this.headerName = value.headerName || '';
+    }
+  }
+
+  _prefill;
+  urlValues = {};
   label = '';
   authKind = 'BearerToken';
   baseUrl = '';
@@ -105,23 +128,61 @@ export default class ConnectorKeyForm extends LightningElement {
     this[event.target.dataset.field] = event.detail.value;
   }
 
+  /** True when a template set the address: the host is fixed, only its parts are typed. */
+  get locked() {
+    return this.creating && Boolean(this._prefill && this._prefill.baseUrl);
+  }
+
+  get urlParamRows() {
+    return ((this._prefill && this._prefill.urlParams) || []).map((param) => ({
+      ...param,
+      key: `url-${param.name}`,
+      value: this.urlValues[param.name] || '',
+      help: param.fromParam ? text('Connector_Form_UrlPartFromKey', param.help || '') : param.help
+    }));
+  }
+
+  handleUrlPart(event) {
+    this.urlValues = { ...this.urlValues, [event.target.dataset.name]: event.detail.value };
+  }
+
+  /**
+   * The template's address with its parts filled, or null. A part the template reads from the
+   * key (Mailchimp's data center) is taken from the key box at this moment when left blank, and
+   * is never kept (F10).
+   */
+  lockedBaseUrl(box) {
+    const params = (this._prefill && this._prefill.urlParams) || [];
+    const values = { ...this.urlValues };
+    params.forEach((param) => {
+      if (!values[param.name] && param.fromParam && param.after) {
+        values[param.name] = partOfKey(box && box.value, param.after);
+      }
+    });
+    return lockedUrl(this._prefill.baseUrl, params, values);
+  }
+
   get secretBox() {
     return this.template.querySelector('[data-id="secret"]');
   }
 
   async handleSave() {
     const box = this.secretBox;
+    const baseUrl = this.locked ? this.lockedBaseUrl(box) : this.baseUrl;
     this.problems = formProblems(
       {
         label: this.label,
         authKind: this.kind,
-        baseUrl: this.baseUrl,
+        baseUrl: baseUrl || '',
         headerName: this.headerName,
         userName: this.userName,
         hasSecret: Boolean(box && box.value)
       },
       !this.creating
     );
+    if (this.locked && !baseUrl) {
+      this.problems = [...this.problems, 'Connector_Form_ErrorLockedUrl'];
+    }
     if (this.problems.length) {
       return;
     }
@@ -131,7 +192,7 @@ export default class ConnectorKeyForm extends LightningElement {
         ? await createConnection({
             label: this.label,
             authKind: this.authKind,
-            baseUrl: this.baseUrl,
+            baseUrl,
             headerName: this.headerName,
             userName: this.userName,
             secret: box.value

@@ -1,6 +1,6 @@
 # BarnCRM Connector
 
-Scripts for the optional BarnCRM Connector module, release 1.31: creating Connections of each sign-in kind, the one Setup step with Check Again, checking, replacing, disconnecting and deleting, the refusals that keep keys safe, access and Health Check (CN-01, T-CN-01 to T-CN-06); Recipe Access, recipes, Test, Publish, Run Now, Run History, Retry, Run As and the merge-field guard (CN-02, T-CN-07 to T-CN-12); the Flow actions and Where Used (CN-06, T-CN-13 and T-CN-14); the recipe clock, Schedule and Record Change triggers, retries, pausing, the integration user, Health Check and the nightly cleanup (CN-03, release 1.32, T-CN-15 to T-CN-20); scheduled imports through Load Rows with an Import Template (CN-09, release 1.32, T-CN-21 and T-CN-22). Setup detail: [BarnCRM Connector](../admin-guide/connector.md).
+Scripts for the optional BarnCRM Connector module, release 1.31: creating Connections of each sign-in kind, the one Setup step with Check Again, checking, replacing, disconnecting and deleting, the refusals that keep keys safe, access and Health Check (CN-01, T-CN-01 to T-CN-06); Recipe Access, recipes, Test, Publish, Run Now, Run History, Retry, Run As and the merge-field guard (CN-02, T-CN-07 to T-CN-12); the Flow actions and Where Used (CN-06, T-CN-13 and T-CN-14); the recipe clock, Schedule and Record Change triggers, retries, pausing, the integration user, Health Check and the nightly cleanup (CN-03, release 1.32, T-CN-15 to T-CN-20); scheduled imports through Load Rows with an Import Template (CN-09, release 1.32, T-CN-21 and T-CN-22); For Each, Wait and Change Data (CN-05, release 1.32, T-CN-30 to T-CN-32); versions, Roll Back, Export Recipe and the Templates tab (CN-08, release 1.32, T-CN-33 to T-CN-35). Setup detail: [BarnCRM Connector](../admin-guide/connector.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core and BarnCRM Connector deployed, and an HTTPS test endpoint that echoes requests (for example a free request bin you control). Use made-up keys such as `test-key-1234`; never a real one.
 
@@ -316,3 +316,83 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 3 | Set Most Rows to 1 and Run Now with two rows. | The run fails at once saying 2 rows arrived, more than the 1 the step allows; no data job is created. |
 | 4 | In Recipe Access, untick BarnCRM Admin and save. Publish. | Publish refuses: recipes cannot create data jobs. Tick it again. |
 | 5 | Retry the failed run from step 1 after raising Most Rejected Rows to 1 and publishing. | A new data job is staged and dry run, then committed; the run Succeeds. |
+
+## T-CN-30: For Each Over a List
+
+**Purpose:** confirm For Each runs its steps once per item, continues past 200 items without repeating one, and refuses more than 1,000.
+**Prerequisites:** admin; a saved record map onto Contact with source columns `last` (Last Name) and `mail` (Email), matched by Email.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Create a recipe with **When** Run Now and a **For Each** step. Leave List to Work Through blank. | Save refuses: choose the list to work through. |
+| 2 | Set List to Work Through to `trigger.people`. From **Add Step Inside**, add **Create or Update a Record** with the map and Input `loop.item`. | The inner step shows one level in, under "For each item"; the value path hints offer `loop.item` and `loop.index`. Add Step Inside offers no For Each, Wait or Load Rows. |
+| 3 | Paste sample `{"people":[{"last":"Test1","mail":"t1@example.org"},{"last":"Test2","mail":"t2@example.org"}]}`. Select **Test**. | Succeeded; the For Each line reads "Worked through 1 items." and the inner step shows what it would write. No contact is created. |
+| 4 | Publish, then Run Now with the same JSON. | Succeeded after up to 5 minutes; Records Written is 2 and both contacts exist. Run History shows one line for the For Each, not one per item. |
+| 5 | Run Now with a list of 250 people (build it with a spreadsheet formula). | Succeeded with 250 contacts; the run may show Queued between passes; none is written twice. |
+| 6 | Run Now with a list of 1,001 people. | Failed at the For Each: "The list holds 1001 items. For Each works through at most 1000 in a run." Nothing written. |
+
+## T-CN-31: Wait
+
+**Purpose:** confirm Wait makes a run Waiting without using a retry, and the recipe clock carries it on.
+**Prerequisites:** admin; the recipe clock running (Recipe Clock shows a heartbeat).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Create a recipe with **When** Run Now, a **Wait** step and a **Stop** step (Succeeded). Set Wait For to 2 and Unit to Minutes. | Save refuses: wait from 5 minutes to 30 days. Set 31 Days: refused the same way. |
+| 2 | Set Wait For to 5, Unit Minutes. Select **Test**. | Succeeded at once; the Wait line reads "Would wait 5 minutes. A test does not wait." |
+| 3 | Publish and Run Now. Open Run History. | The run is Waiting, tried next about 5 minutes on; Attempt shows no retry used. |
+| 4 | Wait up to 10 minutes and refresh. | The run is Succeeded, the Stop step after the Wait ran. |
+| 5 | Try to put a Wait inside a For Each by editing the steps. | Save refuses: a For Each cannot hold a For Each, Wait or Load Rows step. |
+
+## T-CN-32: Change Data
+
+**Purpose:** confirm Change Data builds data later steps read and writes nothing.
+**Prerequisites:** admin; a saved JSON map (to JSON) with source `last` and target `fullName`.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Create a recipe with **When** Run Now, a **Change Data** step named `reshape` with that map and Input `trigger`, then an **If** with condition `steps.reshape.fullName` equals `Lovelace`, Otherwise a Stop (Failed). | The If condition's hints offer `steps.reshape`. Choosing a record map for Change Data is refused at Publish. |
+| 2 | Paste sample `{"last":"Lovelace"}` and select **Test**. | Succeeded; the Change Data step shows `fullName` Lovelace. |
+| 3 | Publish and Run Now with `{"last":"Lovelace"}`. | Succeeded; Records Written is 0. |
+
+## T-CN-33: Versions, Roll Back and Discard Draft Changes
+
+**Purpose:** confirm Publish keeps the version before, and Roll Back and Discard Draft Changes work and ask first.
+**Prerequisites:** admin; a recipe never published.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the recipe. | No Roll Back or Discard Draft Changes button. |
+| 2 | Publish (version 1). Change a step, Save Draft, Publish (version 2). | Roll Back shows. |
+| 3 | Change a step and Save Draft. Select **Roll Back**, then Cancel. | Nothing changes. Select it again and confirm: "Rolled back. The earlier version is published as version 3." The draft keeps your change. |
+| 4 | Select **Roll Back** again and confirm. | Version 4 is the version 2 definition again. |
+| 5 | Select **Discard Draft Changes** and confirm. | The editor shows the published steps; Unpublished changes is gone. |
+| 6 | As a Viewer, open the recipe. | No Roll Back, Discard Draft Changes or Export Recipe. |
+
+## T-CN-34: Export and Import a Recipe
+
+**Purpose:** confirm Export Recipe carries no key or sample, and Import opens an unsaved draft matched by name with blanks highlighted.
+**Prerequisites:** admin; a recipe with a Call an App step on connection "Test App", a body map, a header `X-Api-Key` with a typed value and sample data.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Select **Export Recipe**. Open the downloaded file in a text editor. | The file holds the recipe, the map and connection by name; the `X-Api-Key` value is blank; no sample, Run As or owner. |
+| 2 | Open the **Templates** tab, choose the file and select **Import**. | "Recipe: <name>" with Open as Draft, the step listed as having blanks, and "Nothing has been saved." No recipe is added to the list. |
+| 3 | Select **Open as Draft**. | The editor opens a new draft: map and connection filled in; the step shows "The import left these blank ... headers". Save refuses until the header value is filled. |
+| 4 | Fill it and Save Draft. | The recipe is saved as a Draft; Publish works as for any draft. |
+| 5 | Rename the body map and import the file again. | The body map is blank and listed to fill. |
+
+## T-CN-35: Import a Template and Refusals
+
+**Purpose:** confirm a template fills a connection form with its host locked, never preloads or keeps anything, and files holding secrets or formulas are refused whole.
+**Prerequisites:** admin; a template file such as the Mailchimp example in [Templates and Moving Recipes](../admin-guide/connector.md#templates-and-moving-recipes).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the Templates tab before importing. | No template is listed; there is nothing preloaded. |
+| 2 | Paste the template and select **Import**. | "Template: Mailchimp" with the connection (name, sign-in kind, address) and its recipes. |
+| 3 | Select **Create Connection**. | The New Connection form opens filled in; the base URL cannot be edited and a Data center box shows. Type `evil.example.com` there and save: refused, fill in each part matching its pattern. |
+| 4 | Clear the Data center box, paste a key ending in `-us21` and save. | The connection saves with base URL `https://us21.api.mailchimp.com/3.0`; the key is never shown. |
+| 5 | Edit the template text to add `"apiKey":"abc"` and import. | Refused: the file holds what looks like a key ... (apiKey). Nothing imported. |
+| 6 | Instead add `{!$Credential.X.Y}` in a description, or `"headerTemplate":"x"` under auth, or `"allowMergeFieldsInBody":true`, or set baseUrl to `http://...`, or a description `Bearer abcdef1234567890`. Import each. | Each is refused whole and the message never repeats the value. |
+| 7 | Add `"requires":["No_Such_Object__c"]`. | Refused: install the module first. |

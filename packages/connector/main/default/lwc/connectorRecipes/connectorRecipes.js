@@ -26,6 +26,24 @@ export default class ConnectorRecipes extends LightningElement {
     }
   }
 
+  /**
+   * A recipe imported on the Templates tab (CN-08, R-CR11), `{ name, description, draftJson }`:
+   * opened in the editor as a new, unsaved draft.
+   */
+  @api
+  get openDraft() {
+    return this.importedDraft;
+  }
+  set openDraft(value) {
+    if (value && value.draftJson) {
+      this.clear();
+      this.selectedId = undefined;
+      this.importedDraft = { ...value, status: 'Draft' };
+      this.creating = true;
+    }
+  }
+
+  importedDraft;
   requestedId;
   page;
   selectedId;
@@ -134,7 +152,9 @@ export default class ConnectorRecipes extends LightningElement {
   }
 
   get selected() {
-    return this.selectedId ? this.rows.find((row) => row.id === this.selectedId) : undefined;
+    return this.selectedId
+      ? this.rows.find((row) => row.id === this.selectedId)
+      : this.importedDraft;
   }
 
   get listShown() {
@@ -144,12 +164,14 @@ export default class ConnectorRecipes extends LightningElement {
   handleNew() {
     this.clear();
     this.selectedId = undefined;
+    this.importedDraft = undefined;
     this.creating = true;
   }
 
   handleOpen(event) {
     this.clear();
     this.creating = false;
+    this.importedDraft = undefined;
     this.selectedId = event.target.dataset.recipe;
   }
 
@@ -158,12 +180,14 @@ export default class ConnectorRecipes extends LightningElement {
     const detail = event.detail || {};
     await this.load();
     this.creating = false;
+    this.importedDraft = undefined;
     this.selectedId = detail.deleted ? undefined : detail.recipeId || this.selectedId;
     this.message = detail.message;
   }
 
   handleClose() {
     this.creating = false;
+    this.importedDraft = undefined;
     this.selectedId = undefined;
   }
 

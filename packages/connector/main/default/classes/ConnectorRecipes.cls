@@ -90,6 +90,12 @@ public with sharing class ConnectorRecipes {
 		public Boolean ignoreOwnChanges;
 		@AuraEnabled
 		public Integer consecutiveFailures;
+		/** True while the definition before the last Publish is kept, for Roll Back (R-CR11). */
+		@AuraEnabled
+		public Boolean canRollBack;
+		/** True once published: Discard Draft Changes has a definition to go back to. */
+		@AuraEnabled
+		public Boolean published;
 	}
 
 	/** A saved map or saved query a step can use. */
@@ -203,7 +209,8 @@ public with sharing class ConnectorRecipes {
 				Pause_After_Failures__c,
 				Keep_Runs_Days__c,
 				Ignore_Own_Changes__c,
-				Consecutive_Failures__c
+				Consecutive_Failures__c,
+				Previous_JSON__c
 			FROM Connector_Recipe__c
 			WITH USER_MODE
 			ORDER BY Name
@@ -278,6 +285,8 @@ public with sharing class ConnectorRecipes {
 		result.keepRunsDays = keepDays(row);
 		result.ignoreOwnChanges = row.Ignore_Own_Changes__c != false;
 		result.consecutiveFailures = row.Consecutive_Failures__c == null ? 0 : row.Consecutive_Failures__c.intValue();
+		result.canRollBack = String.isNotBlank(row.Previous_JSON__c);
+		result.published = String.isNotBlank(row.Definition_JSON__c);
 		return result;
 	}
 
@@ -293,7 +302,8 @@ public with sharing class ConnectorRecipes {
 				Draft_JSON__c,
 				Record_Owner_Id__c,
 				Trigger_Kind__c,
-				Watermark__c
+				Watermark__c,
+				Previous_JSON__c
 			FROM Connector_Recipe__c
 			WHERE Id = :recipeId
 			WITH USER_MODE
@@ -368,7 +378,77 @@ public with sharing class ConnectorRecipes {
 	public static Recipe publish(Id recipeId) {
 		ConnectorConnections.requireManager();
 		Connector_Recipe__c row = recipe(recipeId);
-		Map<String, Object> document = ConnectorRecipeDocument.parse(row.Draft_JSON__c);
+		return makeLive(row, row.Draft_JSON__c);
+	}
+
+	/**
+	 * Roll Back (R-CR11): the definition before the last Publish, checked as Publish checks a
+	 * draft, swaps with the published one and the version goes up; the draft is left alone.
+	 */
+	public static Recipe rollBack(Id recipeId) {
+		ConnectorConnections.requireManager();
+		Connector_Recipe__c row = recipe(recipeId);
+		if (String.isBlank(row.Previous_JSON__c)) {
+			throw new ConnectorConnections.ConnectorException(
+				BarnHelp.text('Connector', 'Connector_Recipe_ErrorNoPrevious')
+			);
+		}
+		return makeLive(row, row.Previous_JSON__c);
+	}
+
+	/** Discard Draft Changes (R-CR11): the draft starts again from the published definition. */
+	public static Recipe discardDraft(Id recipeId) {
+		ConnectorConnections.requireManager();
+		Connector_Recipe__c row = recipe(recipeId);
+		if (String.isBlank(row.Definition_JSON__c)) {
+			throw new ConnectorConnections.ConnectorException(
+				BarnHelp.text('Connector', 'Connector_Recipe_ErrorNotPublished')
+			);
+		}
+		Database.update(
+			new Connector_Recipe__c(Id = row.Id, Draft_JSON__c = row.Definition_JSON__c),
+			AccessLevel.USER_MODE
+		);
+		return shown(reread(row.Id));
+	}
+
+	/**
+	 * Makes a definition the published one: checked (R-CR2), the one it replaces kept as Previous
+	 * Definition (R-CR11), the version up, the recipe Active and its clock started.
+	 */
+	private static Recipe makeLive(Connector_Recipe__c row, String source) {
+		Map<String, Object> document = ConnectorRecipeDocument.parse(source);
+		refuseProblems(publishProblems(document, row.Run_As__c));
+		Map<String, Object> starter = ConnectorRecipeDocument.mapOf(document.get('trigger'));
+		Connector_Recipe__c published = new Connector_Recipe__c(
+			Id = row.Id,
+			Definition_JSON__c = source,
+			Previous_JSON__c = source == row.Definition_JSON__c ? row.Previous_JSON__c : row.Definition_JSON__c,
+			Version__c = (row.Version__c == null ? 0 : row.Version__c) + 1,
+			Status__c = ConnectorRunStore.ACTIVE,
+			Trigger_Kind__c = kindOf(document)
+		);
+		started(
+			published,
+			published.Trigger_Kind__c,
+			starter,
+			String.isBlank(row.Definition_JSON__c) ||
+				String.isBlank(row.Watermark__c) ||
+				row.Trigger_Kind__c != published.Trigger_Kind__c
+		);
+		Database.update(published, AccessLevel.USER_MODE);
+		if (ConnectorRunStore.CLOCK_KINDS.contains(published.Trigger_Kind__c)) {
+			ConnectorClock.publish(new Set<String>{ ConnectorClock.laneOf(row.Run_As__c) });
+		}
+		return shown(reread(row.Id));
+	}
+
+	/**
+	 * Every problem Publish refuses (R-CR2): the save checks, each connection ready, a Record
+	 * Change query, and each step's map, query or template against the identity's access. Import
+	 * shows the same list as what to fix before Publish (R-CR11).
+	 */
+	public static List<String> publishProblems(Map<String, Object> document, String runAs) {
 		List<String> found = ConnectorRecipeDocument.problems(document);
 		Map<String, ConnectorConnections.Connection> ready = new Map<String, ConnectorConnections.Connection>();
 		for (ConnectorConnections.Connection connection : ConnectorConnections.page().connections) {
@@ -387,31 +467,11 @@ public with sharing class ConnectorRecipes {
 				found.add(problem);
 			}
 		}
-		Id identity = identityFor(row.Run_As__c);
+		Id identity = identityFor(runAs);
 		for (Map<String, Object> step : ConnectorRecipeDocument.allSteps(document)) {
-			found.addAll(stepPublishProblems(step, row.Run_As__c, identity));
+			found.addAll(stepPublishProblems(step, runAs, identity));
 		}
-		refuseProblems(found);
-		Connector_Recipe__c published = new Connector_Recipe__c(
-			Id = row.Id,
-			Definition_JSON__c = row.Draft_JSON__c,
-			Version__c = (row.Version__c == null ? 0 : row.Version__c) + 1,
-			Status__c = ConnectorRunStore.ACTIVE,
-			Trigger_Kind__c = kindOf(document)
-		);
-		started(
-			published,
-			published.Trigger_Kind__c,
-			starter,
-			String.isBlank(row.Definition_JSON__c) ||
-				String.isBlank(row.Watermark__c) ||
-				row.Trigger_Kind__c != published.Trigger_Kind__c
-		);
-		Database.update(published, AccessLevel.USER_MODE);
-		if (ConnectorRunStore.CLOCK_KINDS.contains(published.Trigger_Kind__c)) {
-			ConnectorClock.publish(new Set<String>{ ConnectorClock.laneOf(row.Run_As__c) });
-		}
-		return shown(reread(row.Id));
+		return found;
 	}
 
 	/**
@@ -455,7 +515,9 @@ public with sharing class ConnectorRecipes {
 				QueryCompiler.compile(JSON.serialize(step.get('query')));
 			}
 			if (kind == 'importRows') {
-				return importProblems(step, id, identity);
+				return String.isBlank(ConnectorRecipeDocument.textOf(step.get('template')))
+					? found
+					: importProblems(step, id, identity);
 			}
 			String mapId = ConnectorRecipeDocument.textOf(step.get(kind == 'callApp' ? 'bodyMap' : 'map'));
 			if (String.isBlank(mapId)) {
@@ -463,7 +525,7 @@ public with sharing class ConnectorRecipes {
 			}
 			ConnectorMapRuntime.SavedMap saved = ConnectorMapRuntime.load(mapId, AccessLevel.USER_MODE);
 			String objectName = ConnectorMapRuntime.objectOf(saved.document);
-			Boolean wantsRecord = kind != 'callApp';
+			Boolean wantsRecord = kind != 'callApp' && kind != 'transform';
 			if (wantsRecord == String.isBlank(objectName)) {
 				found.add(BarnHelp.text('Connector', 'Connector_Publish_MapKind', new List<Object>{ id, saved.name }));
 				return found;
@@ -857,7 +919,8 @@ public with sharing class ConnectorRecipes {
 				Pause_After_Failures__c,
 				Keep_Runs_Days__c,
 				Ignore_Own_Changes__c,
-				Consecutive_Failures__c
+				Consecutive_Failures__c,
+				Previous_JSON__c
 			FROM Connector_Recipe__c
 			WHERE Id = :recipeId
 			WITH USER_MODE

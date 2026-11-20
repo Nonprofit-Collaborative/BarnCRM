@@ -10,11 +10,14 @@ ships **Recipes** and **Runs** (29CN2, 29CN3): a When and Then steps that find, 
 saved map and call apps, run as BarnCRM Automation or System. CN-06 ships two Flow actions.
 CN-03 ships the **recipe clock**: Schedule and Record Change triggers, retries, pausing, the
 Integration User Run As and the nightly cleanup (R-CR6 to R-CR8, 29CN4 Connector Settings).
+CN-05 ships the For Each, Wait and Change Data steps (R-CR10); CN-08 ships versions, Roll Back,
+Export Recipe and the Templates tab, importing templates and recipe files that are never
+preloaded or kept (R-CR11 to R-CR13, D-216).
 Setup and use: [Admin Guide, BarnCRM Connector](../../docs/admin-guide/connector.md).
 
 ## First ships in
 
-Release **1.31** (CN-01, CN-02, CN-06); release **1.32** adds CN-03. Beta, offered in both
+Release **1.31** (CN-01, CN-02, CN-06); release **1.32** adds CN-03, CN-05, CN-08 and CN-09. Beta, offered in both
 editions, not installed by default.
 
 ## Depends on
@@ -49,6 +52,10 @@ editions, not installed by default.
   catalog row). Platform events `Connector_Start__e` (BarnCRM Automation and System lane) and
   `Connector_Start_User__e` (Integration User lane, trigger `ConnectorStartUserTrigger`);
   protected hierarchy setting `Connector_Settings__c`. `c/connectorRecipeClock`.
+- Steps and versions (CN-05, CN-08): `ConnectorControlSteps` (For Each items, Wait, Change
+  Data), `ConnectorRecipeFiles` (Export Recipe and the import of templates and recipe files,
+  storing nothing), field `Previous_JSON__c` for Roll Back. `c/connectorTemplates` (the
+  Templates tab) and `c/connectorFileRules` (framework-free file checks).
 - `ConnectorHealthCheckExtension` (registered in Core's `HealthCheckExtensions`),
   `ConnectorWhereUsedExtension` (registered in Core's `WhereUsedExtensions`) and
   `ConnectorPostInstall`.

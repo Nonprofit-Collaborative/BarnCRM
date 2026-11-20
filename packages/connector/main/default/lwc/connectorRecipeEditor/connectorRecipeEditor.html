@@ -73,6 +73,32 @@
                             </template>
                         </div>
                         <lightning-input label={labels.stepName} value={row.step.id} max-length="20" read-only={readOnly} data-address={row.address} data-field="id" onchange={handleField}></lightning-input>
+                        <template lwc:if={row.fillText}>
+                            <c-barn-notice class="slds-var-m-vertical_x-small" variant="warning" message={row.fillText} data-id={row.fillId}></c-barn-notice>
+                        </template>
+
+                        <template lwc:if={row.isForEach}>
+                            <lightning-input label={labels.items} value={row.step.items} field-level-help={labels.itemsHelp} read-only={readOnly} data-address={row.address} data-field="items" onchange={handleField}></lightning-input>
+                            <template lwc:if={canManage}>
+                                <lightning-button-menu class="slds-var-m-top_x-small" label={labels.addInside} alternative-text={labels.addInside} data-address={row.address} data-branch="do" onselect={handleAddInside}>
+                                    <template for:each={loopAddOptions} for:item="option">
+                                        <lightning-menu-item key={option.value} label={option.label} value={option.value}></lightning-menu-item>
+                                    </template>
+                                </lightning-button-menu>
+                            </template>
+                        </template>
+
+                        <template lwc:if={row.isWait}>
+                            <div class="slds-grid slds-gutters_x-small slds-wrap">
+                                <lightning-input class="slds-col" type="number" label={labels.waitAmount} value={row.step.amount} min="1" step="1" required field-level-help={labels.waitHelp} read-only={readOnly} data-address={row.address} data-field="amount" onchange={handleField}></lightning-input>
+                                <lightning-combobox class="slds-col" label={labels.waitUnit} options={unitOptions} value={row.step.unit} read-only={readOnly} data-address={row.address} data-field="unit" onchange={handleField}></lightning-combobox>
+                            </div>
+                        </template>
+
+                        <template lwc:if={row.isTransform}>
+                            <lightning-combobox label={labels.map} options={row.maps} value={row.step.map} field-level-help={labels.transformHelp} read-only={readOnly} data-address={row.address} data-field="map" onchange={handleField}></lightning-combobox>
+                            <lightning-input label={labels.input} value={row.step.input} read-only={readOnly} data-address={row.address} data-field="input" onchange={handleField}></lightning-input>
+                        </template>
 
                         <template lwc:if={row.isFind}>
                             <lightning-combobox label={labels.savedQuery} options={queryOptions} value={row.step.savedQuery} read-only={readOnly} data-address={row.address} onchange={handleQuery}></lightning-combobox>
@@ -244,6 +270,15 @@
                 <div class="slds-var-m-bottom_medium">
                     <lightning-button class="slds-var-m-right_small" label={labels.save} disabled={working} onclick={handleSave} data-id="save"></lightning-button>
                     <lightning-button class="slds-var-m-right_small" variant="brand" label={labels.publish} disabled={hasProblems} onclick={handlePublish} data-id="publish"></lightning-button>
+                    <template lwc:if={canRollBack}>
+                        <lightning-button class="slds-var-m-right_small" label={labels.rollBack} disabled={working} onclick={handleRollBack} data-id="roll-back"></lightning-button>
+                    </template>
+                    <template lwc:if={canDiscard}>
+                        <lightning-button class="slds-var-m-right_small" label={labels.discard} disabled={working} onclick={handleDiscard} data-id="discard"></lightning-button>
+                    </template>
+                    <template lwc:if={saved}>
+                        <lightning-button class="slds-var-m-right_small" label={labels.exportRecipe} disabled={working} onclick={handleExport} data-id="export"></lightning-button>
+                    </template>
                     <template lwc:if={saved}>
                         <lightning-button variant="destructive-text" label={labels.deleteLabel} disabled={working} onclick={handleDelete} data-id="delete"></lightning-button>
                     </template>

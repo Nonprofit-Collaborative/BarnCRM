@@ -27,7 +27,11 @@ export default class SuperConnector extends LightningElement {
   working = false;
   formMode;
   formConnection;
+  /** A template's connection settings for New Connection (CN-08, R-CR12); never a key. */
+  formPrefill;
   openRecipeId;
+  /** A recipe imported on the Templates tab, opened as a new draft on Recipes (R-CR11). */
+  openDraft;
   activeTab = 'recipes';
   message;
   messageVariant = 'success';
@@ -66,8 +70,31 @@ export default class SuperConnector extends LightningElement {
     },
     get runsTab() {
       return text('Connector_Page_RunsTab');
+    },
+    get templatesTab() {
+      return text('Connector_Page_TemplatesTab');
     }
   };
+
+  /** Keeps the shown tab, so moving to Recipes or Connections from Templates works every time. */
+  handleTabActive(event) {
+    this.activeTab = event.target.value;
+  }
+
+  /** Create Connection on an imported template: New Connection, filled in, host locked. */
+  handleTemplateConnection(event) {
+    this.clearMessages();
+    this.formConnection = undefined;
+    this.formPrefill = event.detail.prefill;
+    this.formMode = 'create';
+    this.activeTab = 'connections';
+  }
+
+  /** Open as Draft on an imported recipe: the Recipes tab opens it unsaved. */
+  handleOpenDraft(event) {
+    this.openDraft = { ...event.detail };
+    this.activeTab = 'recipes';
+  }
 
   @wire(CurrentPageReference)
   handlePageReference(pageReference) {
@@ -169,6 +196,7 @@ export default class SuperConnector extends LightningElement {
   handleNew() {
     this.clearMessages();
     this.formConnection = undefined;
+    this.formPrefill = undefined;
     this.formMode = 'create';
   }
 
@@ -180,10 +208,12 @@ export default class SuperConnector extends LightningElement {
 
   handleCancel() {
     this.formMode = undefined;
+    this.formPrefill = undefined;
   }
 
   handleSaved(event) {
     this.formMode = undefined;
+    this.formPrefill = undefined;
     this.show(event.detail.result);
   }
 

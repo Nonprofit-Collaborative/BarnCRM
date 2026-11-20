@@ -42,6 +42,43 @@ public with sharing class ConnectorRecipesController {
 		}
 	}
 
+	/** Roll Back, Discard Draft Changes, Export Recipe and file import (CN-08, R-CR11, R-CR12). */
+	@AuraEnabled
+	public static ConnectorRecipes.Recipe rollBack(Id recipeId) {
+		try {
+			return ConnectorRecipes.rollBack(recipeId);
+		} catch (Exception failure) {
+			throw shown(failure, 'rollBack');
+		}
+	}
+
+	@AuraEnabled
+	public static ConnectorRecipes.Recipe discardDraft(Id recipeId) {
+		try {
+			return ConnectorRecipes.discardDraft(recipeId);
+		} catch (Exception failure) {
+			throw shown(failure, 'discardDraft');
+		}
+	}
+
+	@AuraEnabled
+	public static String exportRecipe(Id recipeId) {
+		try {
+			return ConnectorRecipeFiles.export(recipeId);
+		} catch (Exception failure) {
+			throw shown(failure, 'exportRecipe');
+		}
+	}
+
+	@AuraEnabled
+	public static ConnectorRecipeFiles.Imported importFile(String fileText) {
+		try {
+			return ConnectorRecipeFiles.read(fileText);
+		} catch (Exception failure) {
+			throw shown(failure, 'importFile');
+		}
+	}
+
 	@AuraEnabled
 	public static ConnectorRecipes.Recipe setRunAs(Id recipeId, String runAs, Boolean confirmed) {
 		try {
@@ -231,7 +268,8 @@ public with sharing class ConnectorRecipesController {
 	private static AuraHandledException shown(Exception failure, String method) {
 		if (
 			failure instanceof ConnectorConnections.ConnectorException ||
-			failure instanceof ConnectorRecipeDocument.DocumentException
+			failure instanceof ConnectorRecipeDocument.DocumentException ||
+			failure instanceof ConnectorRecipeFiles.FileException
 		) {
 			return UserErrors.message(failure.getMessage());
 		}

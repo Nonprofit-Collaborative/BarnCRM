@@ -395,7 +395,10 @@ CAPS = {
     # Raised 2026-11-20 for CN-09 Load Rows with an Import Template (ConnectorImportStep: rows
     # from records, lists or CSV handed to Super Importer, the wait, the limit check; C-38):
     # 170,634 measured on the CN-03 head, 183,913 with CN-09, plus about 2%.
-    "connector": 187_600,
+    # Raised 2026-11-20 for CN-05 and CN-08 (ConnectorControlSteps: For Each, Wait, Change Data;
+    # ConnectorRecipeFiles: Export Recipe and the template and recipe import with its secret
+    # scan; Roll Back): 189,420 measured with both, plus about 2%.
+    "connector": 193_200,
     # Mirror: the NPSP gifts migration kit's extension (MIG-05), 187,295 measured, then the
     # Nonprofit Cloud gifts kit's (MIG-04), 195,957 measured, then the Nonprofit Cloud
     # relationships kit's (MIG-02), about 200,500 combined, plus about 1%.
