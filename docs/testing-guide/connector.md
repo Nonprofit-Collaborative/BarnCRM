@@ -1,6 +1,6 @@
 # BarnCRM Connector
 
-Scripts for the optional BarnCRM Connector module, release 1.31 (CN-01): creating Connections of each sign-in kind, the one Setup step with Check Again, checking, replacing, disconnecting and deleting, the refusals that keep keys safe, access and Health Check. Setup detail: [BarnCRM Connector](../admin-guide/connector.md).
+Scripts for the optional BarnCRM Connector module, release 1.31: creating Connections of each sign-in kind, the one Setup step with Check Again, checking, replacing, disconnecting and deleting, the refusals that keep keys safe, access and Health Check (CN-01, T-CN-01 to T-CN-06); Recipe Access, recipes, Test, Publish, Run Now, Run History, Retry, Run As and the merge-field guard (CN-02, T-CN-07 to T-CN-12); the Flow actions and Where Used (CN-06, T-CN-13 and T-CN-14). Setup detail: [BarnCRM Connector](../admin-guide/connector.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core and BarnCRM Connector deployed, and an HTTPS test endpoint that echoes requests (for example a free request bin you control). Use made-up keys such as `test-key-1234`; never a real one.
 
@@ -89,3 +89,120 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 4 | In Setup add any object permission to **BarnCRM Connections**, then open Health Check. | `BarnCRM Connections Holds Extra Access`. Remove the permission; the finding goes. |
 
 **Cleanup:** Delete the test connection; remove BarnCRM Connector Admin from the test user.
+
+## T-CN-07: Recipe Access
+
+**Purpose:** confirm recipes get only the access the admin chooses, through the Automated Process user.
+**Prerequisites:** admin, after T-CN-02 (one connection with callouts on and Check Connection passing).
+**Smoke:** yes
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Super Connector**. | Three tabs: **Recipes** (open), **Run History** and **Connections**. Recipes says **No recipes yet.** |
+| 2 | Select **Recipe Access**. | A card lists permission sets with **BarnCRM Admin** and the installed module admin sets ticked, and a notice that Recipe Access has not been saved. BarnCRM Connector Admin and Viewer are not listed. |
+| 3 | Untick one module set and select **Save Access**. | **Recipe Access saved.** A query on PermissionSetAssignment for the user whose UserType is AutomatedProcess shows it holds the ticked sets and **BarnCRM Connections**, not the unticked one. |
+
+**Cleanup:** None (later scripts need Recipe Access saved).
+
+## T-CN-08: Build, Test and Publish a Recipe
+
+**Purpose:** confirm a recipe with Find, Create or Update and Call an App can be built, tested without writing, and published.
+**Prerequisites:** admin, after T-CN-07; a saved Find query on Contact with an Email condition; a record map **Contact by Email** (record, Contact, match by Email, column `email` to Email, `last` to LastName); a JSON map **Person Body** (`last` to `name`).
+**Smoke:** yes
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On **Recipes**, select **New Recipe**. Name it `Welcome Test`. In **Sample Data (JSON)** enter `{"email":"ada.test@example.org","last":"Lovelace"}`. | The editor opens with **No steps yet.**, **Save the draft to choose Run As.** and a problem saying the recipe has no steps. |
+| 2 | **Add Step**, **Create or Update a Record**. Choose map **Contact by Email**; leave **Reads From** as `trigger`. | Step `upsert1` appears; the value path hint lists `trigger.email` and `trigger.last`. |
+| 3 | **Add Step**, **Call an App**. Choose the connection, **POST**, path `/people/{id}`, slot value `steps.upsert1.id`, body map **Person Body**. | Step `callApp1`; the problems notice is gone. |
+| 4 | Type `/people/{id}?x=1` in **Path**. | A problem names step `callApp1`'s path. Put back `/people/{id}`. |
+| 5 | Select **Save Draft**, then **Test**. Wait a moment and select **Check Result**. | **Draft saved.** then **The test was queued.** The result shows Succeeded with both steps; `upsert1` shows the fields it would write; `callApp1` shows the POST it would send. No Contact was created and the echo endpoint got nothing. |
+| 6 | Select **Publish**. | **Published as version 1. The recipe is Active.** The list shows Active, Runs as BarnCRM Automation, version 1. |
+
+**Cleanup:** None (T-CN-09 uses the recipe).
+
+## T-CN-09: Run Now, Run History and Retry
+
+**Purpose:** confirm a run writes, calls the app after a checkpoint, and that a failed run is shown plainly and retried from its failed step.
+**Prerequisites:** admin, after T-CN-08.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open `Welcome Test`. In **Data for This Run (JSON)** enter `{"email":"ada.test@example.org","last":"Lovelace"}` and select **Run Now**. | **R-... was queued. See Run History.** |
+| 2 | Open **Run History** and **Refresh** until the run ends. | Succeeded, started by Run Now, ran as BarnCRM Automation, version 1, 1 record written. The Contact exists. The echo endpoint got one POST to `/people/<Contact Id>` with `{"name":"Lovelace"}` and the connection's sign-in, and no other header the recipe set. |
+| 3 | Open the run. | Each step with its outcome and time; `upsert1` lists the Contact Id; `callApp1` shows HTTP 200 (or the endpoint's code). |
+| 4 | Change the connection's base URL path or the recipe path so the app answers 404 or 500 (for example path `/missing/{id}`), publish, and Run Now again. | Run History shows Failed at step `callApp1` with a plain message; opening it shows the app's status and the first part of its answer. One Error Log entry names the recipe, run and step, with no key or header. |
+| 5 | Put the path back, publish, and select **Retry** on the failed run. | **R-... was queued again from its failed step.** The run ends Succeeded; `upsert1` was not run again (still one Contact, one write in the step log). **Retry** is no longer offered on it. |
+
+**Cleanup:** Delete the test Contact.
+
+## T-CN-10: Run As System and Health Check
+
+**Purpose:** confirm System needs confirmation, is recorded and listed by Health Check, and that BarnCRM Automation is checked against Recipe Access at Publish.
+**Prerequisites:** admin, after T-CN-08.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In Recipe Access, untick every set and save (only BarnCRM Connections stays). Publish a new recipe with one Create or Update a Record step using `Contact by Email`. | Publish is refused, naming Contact as the object Recipe Access does not grant. |
+| 2 | On that recipe choose **Run As**, **System**, then **Cancel** in the confirmation. | Run As stays BarnCRM Automation. |
+| 3 | Choose **System** again and confirm with **Run as System**. | **Run As saved.** and **Chosen by <you> on <date>.** Publish now succeeds. |
+| 4 | Open **Health Check**. | An info finding lists the recipe as running as System, with who chose it and when. |
+| 5 | Set Run As back to **BarnCRM Automation**, restore Recipe Access. | The Health Check finding is gone. |
+
+**Cleanup:** Delete the test recipe.
+
+## T-CN-11: Merge-Field and Path Guard (F1, F4)
+
+**Purpose:** confirm a recipe can never make Salesforce insert a key or reach another host.
+**Prerequisites:** admin, after T-CN-08.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On `Welcome Test`, add a header `X-Test` with value `{!$Credential.Password}` (type it exactly). | A problem: merge fields are refused. **Save Draft** is refused by the server with the same message. Remove the header. |
+| 2 | Set the path to `//evil.example/x`, then `/a@b`, then `/a b`. | Each is refused as an unsafe path. Put back `/people/{id}`. |
+| 3 | Add a header named `Authorization`. | Refused: sign-in headers come from the connection. Remove it. |
+| 4 | Run Now with data `{"email":"ada.test@example.org","last":"{!$Credential.Password}"}`. | The run fails at `callApp1` with a message that the value holds a merge field; the echo endpoint got nothing. The Error Log entry has no key and no request. |
+| 5 | Run Now with `{"email":"ada.test@example.org","last":"Lovelace / Ada?x=1"}` and a path slot reading `trigger.last`. | The endpoint gets `/people/Lovelace%20%2F%20Ada%3Fx%3D1`: one path segment, no query. |
+
+**Cleanup:** Delete the test Contact.
+
+## T-CN-12: Viewer Access
+
+**Purpose:** confirm Viewers see recipes and runs and change nothing.
+**Prerequisites:** admin, and a test user given **BarnCRM Connector Viewer** only.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the test user, open **Super Connector**, **Recipes**, and open `Welcome Test`. | The recipe shows read only: no **New Recipe**, **Recipe Access**, **Save Draft**, **Publish**, **Test**, **Run Now** or **Delete**. |
+| 2 | Open **Run History**. | Runs are listed and can be opened; no **Retry**. |
+| 3 | As the test user, open **Connections**. | A notice says managing connections needs BarnCRM Connector Admin; no connection is listed. |
+
+**Cleanup:** Remove BarnCRM Connector Viewer from the test user.
+
+## T-CN-13: Flow Actions
+
+**Purpose:** confirm a flow can queue a recipe and apply a saved map, each with the right identity.
+**Prerequisites:** admin, after T-CN-08; a test user with Contact access but no BarnCRM Connector set.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In Flow Builder, build a screen flow with an Action **Run a BarnCRM Connector Recipe** (Recipe Name `Welcome Test`, Data `{"email":"flow.test@example.org","last":"Flow"}`) and show its Message. Run it as the test user. | Queued is true and a run Id is returned. Run History shows the run started by Flow, ran as BarnCRM Automation, and it succeeds although the test user has no Connector access. |
+| 2 | Enter a Recipe Name that is Draft or does not exist. | Queued is false and the message says the recipe is not Active or not found; nothing is queued. |
+| 3 | Add an Action **Apply a Saved Map** (Map Name `Contact by Email`, Data `{"email":"flow.test@example.org","last":"Changed"}`) and run it as the test user. | Action is updated and the Contact's last name is Changed. |
+| 4 | Remove Contact edit from the test user and run step 3 again. | The action returns a plain message that the save was refused; nothing changes. |
+| 5 | Run **Apply a Saved Map** with `Person Body` (a JSON map). | Refused: only a record map can be applied. |
+
+**Cleanup:** Delete the flow and the test Contact; restore the test user's access.
+
+## T-CN-14: Where Used and Connection In Use
+
+**Purpose:** confirm recipes appear in Where Used and keep their connection from being deleted.
+**Prerequisites:** admin, after T-CN-08.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Add a **Find Records** step using the saved Contact query with the Email condition to `Welcome Test` and save. Open **Where Used** for Contact.Email. | `Welcome Test` is listed with its Find step (Step find1); its edit link opens Super Connector on that recipe. |
+| 2 | Open **Where Used** for the map `Contact by Email`. | `Welcome Test` is listed with Step upsert1, with a warning that changing the map changes what the recipe writes. |
+| 3 | On **Connections**, delete the connection `Welcome Test` calls. | Refused: the connection is used by a recipe. Delete the recipe first, then the connection deletes. |
+
+**Cleanup:** Delete the test recipe, then the test connection.

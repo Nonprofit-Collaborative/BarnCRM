@@ -91,7 +91,10 @@ CAPS = {
     # and warning, Run Remaining Checks): 2,274,807 measured, plus about 0.1%.
     # Batch O trim (O-01, D-207): 2,275,872 measured 2026-11-19 (upgrade-only code out, the
     # feature list fill in, DML statements); kept, since size plus 2% would raise it.
-    "core": 2_277_000,
+    # Raised 2026-11-20 by 200 for CN-02 (release 1.31): the Connector objects in the module
+    # catalog, ConnectorWhereUsedExtension registered and ConnectorStartTrigger named as an event
+    # trigger in OrgAutomationInventory (140 added); 2,277,060 measured.
+    "core": 2_277_200,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured
@@ -383,7 +386,10 @@ CAPS = {
     # External and Named Credentials (page-entered keys, the F2 refusal, redacted logs, the
     # Connections access set), its Health Check extension and post-install, 31,084 measured
     # 2026-11-20, plus about 2%.
-    "connector": 31_700,
+    # Raised 2026-11-20 for CN-02 Recipes and Runs (document rules, the runner and step runner,
+    # map runtime, Recipe Access, run store, Where Used and Health Check additions) and CN-06
+    # Flow actions (Run a Recipe 3,317, Apply a Saved Map 5,000): 122,190 measured, plus about 2%.
+    "connector": 124_600,
     # Mirror: the NPSP gifts migration kit's extension (MIG-05), 187,295 measured, then the
     # Nonprofit Cloud gifts kit's (MIG-04), 195,957 measured, then the Nonprofit Cloud
     # relationships kit's (MIG-02), about 200,500 combined, plus about 1%.

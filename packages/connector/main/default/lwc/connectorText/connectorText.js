@@ -34,6 +34,12 @@ const TEXTS = {
   get Connector_Page_Delete() {
     return helpText('Connector', 'Connector_Page_Delete');
   },
+  get Connector_Page_RecipesTab() {
+    return helpText('Connector', 'Connector_Page_RecipesTab');
+  },
+  get Connector_Page_RunsTab() {
+    return helpText('Connector', 'Connector_Page_RunsTab');
+  },
   get Connector_Page_Check() {
     return helpText('Connector', 'Connector_Page_Check');
   },

@@ -1,0 +1,7 @@
+.connector-depth-1 {
+  margin-left: var(--slds-g-spacing-5, 1.5rem);
+}
+
+.connector-depth-2 {
+  margin-left: var(--slds-g-spacing-8, 3rem);
+}

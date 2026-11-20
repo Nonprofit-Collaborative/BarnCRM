@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Step_Log_JSON__c</fullName>
+  <description>Each step's outcome, duration, record Ids written, HTTP status and, for a failed step only, the first 2,000 characters of the response. Never a header (R-RUN3).</description>
+  <inlineHelpText>What each step did.</inlineHelpText>
+  <label>Step Log</label>
+  <length>131072</length>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>5</visibleLines>
+</CustomField>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Input_JSON__c</fullName>
+  <description>The trigger data the run started with: record Ids from a flow, pasted JSON from Run Now or Test. May hold personal data; kept as long as the run.</description>
+  <inlineHelpText>The data the run started with.</inlineHelpText>
+  <label>Input</label>
+  <length>131072</length>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>5</visibleLines>
+</CustomField>

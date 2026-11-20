@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Run_As_Chosen_By__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <description>Who last set Run As (R-CR4); Health Check names them beside each System recipe.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>Who last chose Run As.</inlineHelpText>
+  <label>Run As Chosen By</label>
+  <referenceTo>User</referenceTo>
+  <relationshipName>Connector_Recipes_Run_As</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

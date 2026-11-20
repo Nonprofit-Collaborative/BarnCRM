@@ -119,4 +119,23 @@ private class ConnectorHealthCheckExtensionTest {
 			Assert.isTrue(new ConnectorHealthCheckExtension().findings().isEmpty(), 'A quiet report');
 		}
 	}
+
+	@IsTest
+	static void anActiveAutomationRecipeWithoutRecipeAccessIsAWarning() {
+		System.runAs(dana()) {
+			ConnectorConnections.org = new FakeOrg();
+			ConnectorIdentity.automatedProcessOverride = '005000000000000';
+			ConnectorRecipeTestData.recipe(
+				'Unready',
+				ConnectorRecipeTestData.document('[{"id":"end","kind":"stop","outcome":"Succeeded"}]'),
+				true,
+				ConnectorRecipes.RUN_AS_AUTOMATION
+			);
+
+			Set<String> found = keys(new ConnectorHealthCheckExtension().findings());
+
+			Assert.isTrue(found.contains('connector_recipe_access_unsaved'));
+			Assert.isFalse(found.contains('connector_system_recipes'), 'No recipe runs as System.');
+		}
+	}
 }

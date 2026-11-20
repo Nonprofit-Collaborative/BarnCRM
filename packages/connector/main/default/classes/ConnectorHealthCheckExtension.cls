@@ -7,7 +7,9 @@
  * - connections missing from the "BarnCRM Connections" permission set (warning);
  * - keys replaced in the last 7 days (info, F11), so a key swapped to another account shows;
  * - the "BarnCRM Connections" set giving access to anything but connection principals (warning,
- *   F12).
+ *   F12);
+ * - recipes that run as System, with who chose it and when (info, CN-02);
+ * - Active BarnCRM Automation recipes while Recipe Access was never saved (warning, CN-02).
  *
  * `@NamespaceAccessible`, public, with a public no-argument constructor, because Core resolves it
  * with `Type.forName` under ADR-0017.
@@ -93,8 +95,69 @@ public with sharing class ConnectorHealthCheckExtension implements HealthCheckEx
 					)
 				);
 			}
+			found.addAll(recipeFindings());
 		} catch (Exception e) {
 			found.add(HealthCheckService.checkFailed('connector', e));
+		}
+		return found;
+	}
+
+	/**
+	 * CN-02 (R-CR4): every recipe that runs as System, with who chose it and when (info), and
+	 * Active BarnCRM Automation recipes while Recipe Access has never been saved (warning).
+	 */
+	@TestVisible
+	private static List<HealthCheckService.Finding> recipeFindings() {
+		List<HealthCheckService.Finding> found = new List<HealthCheckService.Finding>();
+		List<String> systemRecipes = new List<String>();
+		Integer automationActive = 0;
+		for (Connector_Recipe__c recipe : [
+			SELECT Name, Status__c, Run_As__c, Run_As_Chosen_By__r.Name, Run_As_Chosen_At__c
+			FROM Connector_Recipe__c
+			WHERE Run_As__c = :ConnectorRecipes.RUN_AS_SYSTEM OR Status__c = :ConnectorRunStore.ACTIVE
+			WITH SYSTEM_MODE
+			ORDER BY Name
+			LIMIT 500
+		]) {
+			if (recipe.Run_As__c == ConnectorRecipes.RUN_AS_SYSTEM) {
+				systemRecipes.add(
+					BarnHelp.text(
+						'Connector',
+						'Connector_Health_SystemRecipe',
+						new List<Object>{
+							recipe.Name,
+							recipe.Run_As_Chosen_By__r?.Name,
+							recipe.Run_As_Chosen_At__c?.format()
+						}
+					)
+				);
+			} else if (recipe.Run_As__c == ConnectorRecipes.RUN_AS_AUTOMATION) {
+				automationActive++;
+			}
+		}
+		if (!systemRecipes.isEmpty()) {
+			found.add(
+				finding(
+					'connector_system_recipes',
+					BarnHelp.text('Connector', 'Connector_Health_SystemRecipes_Title'),
+					BarnHelp.text(
+						'Connector',
+						'Connector_Health_SystemRecipes_Detail',
+						new List<Object>{ String.join(systemRecipes, '; ') }
+					),
+					HealthCheckService.SEVERITY_INFO
+				)
+			);
+		}
+		if (automationActive > 0 && !ConnectorIdentity.accessSaved()) {
+			found.add(
+				finding(
+					'connector_recipe_access_unsaved',
+					BarnHelp.text('Connector', 'Connector_Health_RecipeAccess_Title'),
+					BarnHelp.text('Connector', 'Connector_Health_RecipeAccess_Detail'),
+					HealthCheckService.SEVERITY_WARNING
+				)
+			);
 		}
 		return found;
 	}

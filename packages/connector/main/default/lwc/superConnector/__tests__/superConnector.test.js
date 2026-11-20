@@ -5,6 +5,7 @@ import checkConnection from '@salesforce/apex/ConnectorConnectionsController.che
 import disconnect from '@salesforce/apex/ConnectorConnectionsController.disconnect';
 import deleteConnection from '@salesforce/apex/ConnectorConnectionsController.deleteConnection';
 import BarnConfirmModal from 'c/barnConfirmModal';
+import { CurrentPageReference } from 'lightning/navigation';
 import { expectAccessible } from 'barn/a11y';
 
 const fs = require('fs');
@@ -38,6 +39,23 @@ jest.mock(
 jest.mock(
   '@salesforce/apex/ConnectorConnectionsController.replaceKey',
   () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/apex/ConnectorRecipesController.getRecipes',
+  () => ({ default: jest.fn(() => Promise.resolve({ canManage: true, recipes: [] })) }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/apex/ConnectorRecipesController.getRecipeAccess',
+  () => ({
+    default: jest.fn(() => Promise.resolve({ ready: true, saved: true, options: [], chosen: [] }))
+  }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/apex/ConnectorRecipesController.getRuns',
+  () => ({ default: jest.fn(() => Promise.resolve([])) }),
   { virtual: true }
 );
 
@@ -84,6 +102,30 @@ describe('c-super-connector', () => {
       document.body.removeChild(document.body.firstChild);
     }
     jest.clearAllMocks();
+  });
+
+  it('shows Recipes, Run History and Connections tabs and opens a recipe from the page state', async () => {
+    const element = await render();
+    expect(find(element, 'tab-recipes').label).toBe('c.Connector_Page_RecipesTab');
+    expect(find(element, 'tab-runs').label).toBe('c.Connector_Page_RunsTab');
+    expect(find(element, 'tab-connections').label).toBe('c.Connector_Page_Connections');
+    expect(find(element, 'runs').canManage).toBe(true);
+    // A test wire adapter is emitted to on purpose: that is how a wired component is driven.
+    // eslint-disable-next-line @lwc/lwc/no-unexpected-wire-adapter-usages
+    CurrentPageReference.emit({ state: { c__recipe: 'a0B000000000001' } });
+    await flush();
+    expect(find(element, 'recipes').openRecipeId).toBe('a0B000000000001');
+    expect(find(element, 'tabs').activeTabValue).toBe('recipes');
+  });
+
+  it('keeps Recipes and Run History for a Viewer who cannot load connections, without Retry', async () => {
+    getConnections.mockRejectedValue({ body: { message: 'Needs BarnCRM Connector Admin.' } });
+    const element = createElement('c-super-connector', { is: SuperConnector });
+    document.body.appendChild(element);
+    await flush();
+    expect(find(element, 'recipes')).not.toBeNull();
+    expect(find(element, 'runs').canManage).toBe(false);
+    expect(find(element, 'error').message).toBe('Needs BarnCRM Connector Admin.');
   });
 
   it('lists connections with status and the Setup step, never a key', async () => {

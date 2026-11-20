@@ -1,0 +1,69 @@
+<template>
+    <section class="slds-is-relative" aria-labelledby="recipes-heading">
+        <template lwc:if={working}>
+            <lightning-spinner alternative-text={labels.loading} size="small" data-id="working"></lightning-spinner>
+        </template>
+        <template lwc:if={message}>
+            <c-barn-notice class="slds-var-m-bottom_medium" variant="success" message={message} data-id="message"></c-barn-notice>
+        </template>
+        <template lwc:if={error}>
+            <c-barn-notice class="slds-var-m-bottom_medium" variant="error" message={error} data-id="error"></c-barn-notice>
+        </template>
+        <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_small">
+            <h2 id="recipes-heading" class="slds-text-heading_medium slds-col">{labels.heading}</h2>
+            <template lwc:if={canManage}>
+                <lightning-button class="slds-var-m-right_small" label={labels.accessButton} onclick={handleAccessToggle} data-id="access-toggle"></lightning-button>
+                <lightning-button variant="brand" label={labels.newRecipe} disabled={editorOpen} onclick={handleNew} data-id="new"></lightning-button>
+            </template>
+        </div>
+        <p class="slds-var-m-bottom_small slds-text-body_small">{labels.intro}</p>
+
+        <template lwc:if={accessOpen}>
+            <article class="slds-card slds-var-m-bottom_medium" aria-labelledby="access-heading" data-id="access">
+                <div class="slds-card__body slds-card__body_inner">
+                    <h3 id="access-heading" class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.accessHeading}</h3>
+                    <p class="slds-var-m-bottom_small slds-text-body_small">{labels.accessIntro}</p>
+                    <template lwc:if={accessNotReadyShown}>
+                        <c-barn-notice class="slds-var-m-bottom_small" variant="warning" message={labels.accessNotReady} data-id="access-not-ready"></c-barn-notice>
+                    </template>
+                    <template lwc:if={accessNotSavedShown}>
+                        <c-barn-notice class="slds-var-m-bottom_small" variant="info" message={labels.accessNotSaved} data-id="access-not-saved"></c-barn-notice>
+                    </template>
+                    <lightning-checkbox-group label={labels.accessSets} options={accessOptions} value={picked} onchange={handlePicked} data-id="access-sets"></lightning-checkbox-group>
+                    <div class="slds-var-m-top_small">
+                        <lightning-button class="slds-var-m-right_small" label={labels.cancel} onclick={handleAccessToggle} data-id="access-cancel"></lightning-button>
+                        <lightning-button variant="brand" label={labels.accessSave} disabled={working} onclick={handleAccessSave} data-id="access-save"></lightning-button>
+                    </div>
+                </div>
+            </article>
+        </template>
+
+        <template lwc:if={editorOpen}>
+            <c-connector-recipe-editor recipe={selected} page={page} onchanged={handleChanged} onclose={handleClose} data-id="editor"></c-connector-recipe-editor>
+        </template>
+
+        <template lwc:if={listShown}>
+            <template lwc:if={empty}>
+                <p class="slds-var-m-vertical_medium" data-id="empty">{labels.empty}</p>
+            </template>
+            <ul class="slds-has-dividers_bottom-space">
+                <template for:each={rows} for:item="row">
+                    <li key={row.id} class="slds-item" data-id={row.id}>
+                        <div class="slds-grid slds-grid_vertical-align-center slds-wrap">
+                            <h3 class="slds-text-heading_small slds-var-m-right_small">{row.name}</h3>
+                            <c-barn-status-badge status={row.statusVariant} label={row.statusLabel}></c-barn-status-badge>
+                            <template lwc:if={row.showUnpublished}>
+                                <c-barn-status-badge class="slds-var-m-left_x-small" status="warning" label={row.unpublishedLabel}></c-barn-status-badge>
+                            </template>
+                        </div>
+                        <p class="slds-text-body_small slds-var-m-vertical_x-small">{row.detail}</p>
+                        <template lwc:if={row.description}>
+                            <p class="slds-text-body_small slds-var-m-bottom_x-small">{row.description}</p>
+                        </template>
+                        <lightning-button label={labels.open} title={row.openLabel} data-recipe={row.id} onclick={handleOpen} data-id={row.openId}></lightning-button>
+                    </li>
+                </template>
+            </ul>
+        </template>
+    </section>
+</template>

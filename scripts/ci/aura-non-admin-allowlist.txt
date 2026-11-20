@@ -4,6 +4,7 @@
 CampaignSyncController # not yet
 CertificationController # not yet
 CommitmentEntryController # not yet
+ConnectorIdentity # admin only: Recipe Access, needs Manage BarnCRM Connector and the Connector Admin set
 CustomMetadataManagerController # admin only: Custom Metadata Manager, needs Manage BarnCRM Metadata
 CustomMetadataManagerService # admin only: called only by CustomMetadataManagerController
 DonorLevelController # not yet

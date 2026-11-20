@@ -153,6 +153,7 @@ public with sharing class ModuleManagerService {
 			'Session_Rating__c'
 		},
 		'Portal' => new List<String>{ 'Portal__c', 'Portal_Access__c', 'Portal_Session__c' },
+		'Connector' => new List<String>{ 'Connector_Recipe__c', 'Connector_Run__c' },
 		'CorporateHub' => new List<String>{
 			'Agreement__c',
 			'Assessment_Answer__c',

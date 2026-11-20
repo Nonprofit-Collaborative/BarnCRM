@@ -19077,11 +19077,12 @@ Date say who and when. Health Check lists keys replaced in the last 7 days.
 **R-CN7 The Connections permission set.** BarnCRM creates one unpackaged permission set,
 `BarnCRM_Connections` ("BarnCRM Connections"), adds each connection's principal to it, and
 assigns it only to the person creating or checking a connection, who must hold
-`BarnCRM_Connector_Admin` (and, from CN-03, to the recipe identities). User Ids never come from
-the browser. Health Check warns when it holds anything but External Credential principal access.
+`BarnCRM_Connector_Admin`, and to the recipe identity, the Automated Process user, when an admin
+saves Recipe Access (R-CR4; the integration user from CN-03). User Ids never come from the
+browser. Health Check warns when it holds anything but External Credential principal access.
 **R-CN8 Delete and Disconnect.** Disconnect removes the principal's key and keeps the
-connection; Delete removes both credentials, the Named Credential first (from CN-02, refused
-while a recipe uses it).
+connection; Delete removes both credentials, the Named Credential first, and is refused while a
+recipe's definition or draft names the connection.
 
 ### Salesforce implementation
 
@@ -19092,6 +19093,188 @@ while a recipe uses it).
   `SetupEntityAccess` (principal access in `BarnCRM_Connections`), `PermissionSetAssignment`.
 - **Custom permission:** `Manage_BarnCRM_Connector`, granted only by `BarnCRM_Connector_Admin`.
 - **Admin Journal:** Kind `Connection`, Status `Key Replaced` (Section 10A).
+
+---
+
+## 29CN2. Connector Recipe
+
+### Definition
+
+A saved integration of the BarnCRM Connector module: a trigger and its steps, with the state its
+clock needs (CN-02, D-215, D-216; design `integration-hub-design.md` Sections 3.2 to 3.10,
+Appendix A.3). Holds no record data beyond what its definition names.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | The recipe's name, 1 to 80 characters, unique ignoring capitals. |
+| Description | long text | no | What it does, in the admin's words. |
+| Status | picklist(Draft, Active, Paused, Paused by Failures) | yes (defaults Draft) | Whether it runs. |
+| Trigger Kind | picklist(Schedule, Record Change, Webhook, App Poll, Manual) | yes | Copied from the definition for list views and the clock's query. |
+| Definition | long text | no | The published recipe document (R-CR1); blank until the first Publish. |
+| Draft | long text | no | The definition being edited; Publish copies it to Definition. |
+| Previous Definition | long text | no | The definition before the last Publish, for Roll Back. |
+| Version | integer | yes (defaults 0) | Increments on each Publish. |
+| Webhook Token Hash | text(64) | no | SHA-256 of the webhook token, hexadecimal; unique. |
+| Watermark | text(60) | no | The last stamp and Id a poll reached. |
+| Next Run At | datetime | no | When a schedule or poll is next due. |
+| Last Run At | datetime | no | When it last ran. |
+| Consecutive Failures | integer | yes (defaults 0) | Failed runs in a row; reset by a success. |
+| Pause After Failures | integer | yes (defaults 10) | Failures in a row that pause it (1 to 100). |
+| Retry Attempts | integer | yes (defaults 3) | Retries of a transient failure (0 to 4). |
+| Webhook Hourly Cap | integer | yes (defaults 500) | Posts stored per hour (1 to 5,000). |
+| Keep Runs Days | integer | yes (defaults 30) | Days runs are kept (7 to 365). |
+| Ignore Own Changes | boolean | yes (defaults true) | Record Change trigger skips records last changed by a recipe identity. |
+| Run As | picklist(BarnCRM Automation, System, Integration User) | yes (defaults BarnCRM Automation) | The identity and access mode its runs use (design Section 3.10). |
+| Run As Chosen By | reference(User) | computed | Who last set Run As; shown with System recipes in Health Check. |
+| Run As Chosen At | datetime | computed | When Run As was last set. |
+| Record Owner | text(18) | no | The user or queue Id given as owner of records the recipe creates; blank means the identity. |
+
+### Rules
+
+**R-CR1 The recipe document.** `{ "version": 1, "trigger": { "kind", ... }, "steps": [ { "id",
+"kind", ... } ] }` with the trigger kinds and step kinds of the design Sections 3.2 and 3.4; at
+most 25 steps in all, nesting at most 2, at most 100,000 characters. Steps name connections by
+developer name, maps by record Id, and values by paths (R-MAP2) rooted at `trigger` (the run's
+Input) or `steps.<id>` (an earlier step's result). A webhook trigger may carry `reply` (status 200
+or 202, a fixed body of at most 4,000 characters with no `{!`, an optional challenge field name;
+design Section 3.3a), which the receiver reads with the recipe it already finds by token hash.
+Step ids are 1 to 20 letters, digits or underscores, unique in the recipe. No string anywhere in
+the document may contain `{!` (security review F1).
+
+The kinds release 1.31 (CN-02) builds, the others arriving with their slices:
+
+| Kind | Keys | Result for later steps |
+|---|---|---|
+| trigger `manual` | `sample` (optional JSON object for the editor's data pills and Test) | Input: Run Now's pasted JSON; the Flow action's `{ "recordId", "recordIds", "data" }` |
+| `find` | `query` (an R-SQ1 document, copied from a saved query), `values` (`[{ "condition": <id>, "path" }]`, a path's value replaces that condition's value), `stopIfNone` | `{ "count", "records": [ {field: value} ] }`, at most 200 records |
+| `create`, `update`, `upsert` | `map` (a saved map's Id, `to.kind` record), `input` (the path the map reads from; blank is `trigger`); `update` also `recordId` (a path) | `{ "id", "action" }`, action created, updated or skipped |
+| `callApp` | `connection`, `method` (GET, POST, PUT, PATCH, DELETE), `path` (with `{name}` slots), `pathValues` and `query` (`[{ "name", "value" or "path" }]`), `headers` (`[{ "name", "value" or "path" }]`), `bodyMap` and `bodyInput` (a saved map with `to.kind` json), `success` (status codes; blank is 200 to 299), `notFoundOk` | `{ "status", "body" }`, the body parsed when it is JSON |
+| `if` | `conditions` (`[{ "path", "operator", "value" }]`, R-R2 operator names: equals, not equals, contains, does not contain, starts with, greater than, less than, is null, is not null), `match` (`all` or `any`), `then`, `otherwise` | `{ "branch" }` |
+| `stop` | `outcome` (Succeeded, Skipped or Failed), `message` | none |
+
+A `callApp` path starts with one `/`, and neither the path nor any value put into it, a query
+value or a header holds `@`, `\`, `{!`, a carriage return or a line feed; each value put into the
+path or the query is URL-encoded; a header is never `Authorization`, `Host`, `Cookie`,
+`Content-Length` or `Transfer-Encoding` (F1, F4). The request goes to `callout:<connection>` plus
+that path, never to a typed address.
+**R-CR2 Checked on Publish,** as the publisher and against the identity's access, and against
+the catalog; a recipe whose connection is disconnected or whose map is gone cannot be published.
+For BarnCRM Automation the identity's access is that of the permission sets assigned to the
+Automated Process user: each map's target object must be creatable (create, upsert) or editable
+(update, upsert) and each target field editable through one of them; System checks none.
+**R-CR3 Only Connector admins** (custom permission Manage BarnCRM Connector) create, publish,
+pause and delete recipes and set Run As; Connector viewers read recipes and runs.
+**R-CR4 Run As.** A run never executes as a staff member: BarnCRM Automation (Automated Process
+user, user mode with the picked permission sets), System (Automated Process user, system mode;
+set only through a confirmation that says so) or Integration User (the designated user, user
+mode; from CN-03). Changing Run As writes Run As Chosen By and Chosen At. Run Now, Test and the
+Flow action insert a Queued run and publish `Connector_Start__e`, whose trigger runs as the
+Automated Process user and starts the one runner chain, so every run keeps that identity.
+**Recipe Access** (on Super Connector, linked from BarnCRM Settings) picks the permission sets
+the Automated Process user holds, BarnCRM Admin and each installed module's admin set to start,
+and saving it assigns them, and BarnCRM Connections, to that user from Apex; no BarnCRM record
+keeps the choice, which is read back from the assignments.
+**R-CR5 Test.** A Test run executes the Draft on a pasted sample or a record Id, as the recipe's
+identity: Find and GET calls run; record steps report the fields they would write and save
+nothing; other methods report the request (method, path, query, body, header names) unless
+Send for Real was ticked. It is a run with Is Test set.
+
+### Salesforce implementation
+
+| Attribute | API name | Type |
+|---|---|---|
+| Description | `Description__c` | Long Text Area(32768) |
+| Status | `Status__c` | Picklist (restricted): `Draft` (default), `Active`, `Paused`, `PausedByFailures` |
+| Trigger Kind | `Trigger_Kind__c` | Picklist (restricted): `Schedule`, `RecordChange`, `Webhook`, `AppPoll`, `Manual` (default) |
+| Definition, Draft, Previous Definition | `Definition_JSON__c`, `Draft_JSON__c`, `Previous_JSON__c` | Long Text Area(131072) |
+| Version | `Version__c` | Number(6,0) |
+| Webhook Token Hash | `Webhook_Token_Hash__c` | Text(64), unique, external ID |
+| Watermark | `Watermark__c` | Text(60) |
+| Next Run At, Last Run At | `Next_Run_At__c`, `Last_Run_At__c` | Date/Time |
+| Consecutive Failures, Pause After Failures, Retry Attempts, Webhook Hourly Cap, Keep Runs Days | `Consecutive_Failures__c`, `Pause_After_Failures__c`, `Retry_Attempts__c`, `Webhook_Hourly_Cap__c`, `Keep_Runs_Days__c` | Number |
+| Ignore Own Changes | `Ignore_Own_Changes__c` | Checkbox |
+| Run As | `Run_As__c` | Picklist (restricted): `Automation` (default), `System`, `IntegrationUser` |
+| Run As Chosen By, Run As Chosen At | `Run_As_Chosen_By__c` (Lookup(User)), `Run_As_Chosen_At__c` | Lookup, Date/Time |
+| Record Owner | `Record_Owner_Id__c` | Text(18) |
+
+- **Fields by slice:** CN-02 ships `Description__c`, `Status__c`, `Trigger_Kind__c`,
+  `Definition_JSON__c`, `Draft_JSON__c`, `Version__c`, `Last_Run_At__c`, `Run_As__c`,
+  `Run_As_Chosen_By__c`, `Run_As_Chosen_At__c` and `Record_Owner_Id__c`. The clock, retry and
+  retention fields (`Watermark__c`, `Next_Run_At__c`, `Consecutive_Failures__c`,
+  `Pause_After_Failures__c`, `Retry_Attempts__c`, `Keep_Runs_Days__c`, `Ignore_Own_Changes__c`)
+  arrive with CN-03, the webhook fields (`Webhook_Token_Hash__c`, `Webhook_Hourly_Cap__c`) with
+  CN-04 and `Previous_JSON__c` with CN-08, each defined above before it ships.
+- **Object:** `Connector_Recipe__c`, private sharing; Name is the recipe's name (Text(80)).
+  `BarnCRM_Connector_Admin` full access with View All and Modify All, `BarnCRM_Connector_Viewer`
+  read with View All.
+- **Platform event:** `Connector_Start__e` (no fields, publish after commit): any Run Now, Test or
+  Flow action publishes it; its trigger, left at Salesforce's default running user (Automated
+  Process), starts the runner chain when none is running.
+- **Flow actions** (CN-06): Run a BarnCRM Connector Recipe (an Active Manual recipe by name, with
+  record Ids and optional JSON; queues one run per call) and Apply a Saved Map (a saved map by
+  name, from a record Id or JSON, creating or updating the map's target record as the flow's
+  running user, in user mode).
+- **Where Used** (C-59): recipes whose definition or draft names a saved map, or a field or
+  object in a Find step or a map they link.
+
+## 29CN3. Connector Run
+
+### Definition
+
+One time a recipe ran or was asked to run: its input, its progress and its result (CN-02; design
+Appendix A.4).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Recipe | reference(Connector Recipe) | yes | The recipe (master). |
+| Status | picklist(Received, Queued, Running, Waiting, Succeeded, Skipped, Failed, Rejected) | yes | Where the run stands. |
+| Started By | picklist(Schedule, Record Change, Webhook, App Poll, Manual, Flow, Test) | yes | What started it. |
+| Ran As | picklist(BarnCRM Automation, System, Integration User) | yes | The recipe's Run As when the run executed, for audit. |
+| Recipe Version | integer | yes | The version it ran. |
+| Input | long text | no | The trigger data (record Ids, webhook body or polled item). |
+| State | long text | no | Completed step Ids and the data later steps need. |
+| Step Log | long text | no | Each step's outcome, duration, Ids written, HTTP status, trimmed failed response. |
+| Event Key | text(255) | no | Recipe plus event id; unique, so a resend is dropped. |
+| Reference | text(20) | no | Opaque run reference returned in a webhook reply (design Section 3.3a); unique. |
+| Attempt | integer | yes (defaults 0) | Retries made. |
+| Next Attempt At | datetime | no | When a Waiting run resumes. |
+| Started At, Finished At | datetime | no | When it ran. |
+| Failed Step, Error Message | text | no | Where and why it failed, in plain words. |
+| Records Written | integer | no | Records created or updated. |
+| Is Test | boolean | yes (defaults false) | A Test run from the editor. |
+
+### Rules
+
+**R-RUN1 Written in system mode by the module only** (the guest's insert of Received runs, the
+runner's bookkeeping); nobody edits a run. **R-RUN2 Retention:** the nightly step deletes runs
+older than the recipe's Keep Runs Days (CN-03). **R-RUN3 No secret or header is ever stored.**
+**R-RUN4 Checkpoints and Retry.** A run's State holds the ids of completed steps and their
+results; a run continues in a new transaction (Queued again) before a callout that would follow
+a record write, and before 90 callouts, 100 seconds of callout time, 45 seconds of CPU, 180
+queries or 140 writes in one. Retry on a Failed run queues it again from the failed step; the
+completed steps are never repeated. A Step Log entry keeps a failed step's response, trimmed to
+2,000 characters, and never a header. A failed run writes one Error Log entry naming the recipe,
+the step and the plain message, never a request, a header or a response.
+
+### Salesforce implementation
+
+API names: `Recipe__c` (master-detail), `Status__c`, `Started_By__c`, `Ran_As__c`, `Recipe_Version__c`,
+`Input_JSON__c`, `State_JSON__c`, `Step_Log_JSON__c` (Long Text Area(131072)), `Event_Key__c`
+(Text(255), unique, external ID), `Reference__c` (Text(20), unique), `Attempt__c`, `Next_Attempt_At__c`, `Started_At__c`,
+`Finished_At__c`, `Failed_Step__c` (Text(40)), `Error_Message__c` (Long Text Area(1000): a
+Text field stops at 255), `Records_Written__c`, `Is_Test__c`. Picklist values: Status `Received`, `Queued`, `Running`,
+`Waiting`, `Succeeded`, `Skipped`, `Failed`, `Rejected`; Started By `Schedule`, `RecordChange`,
+`Webhook`, `AppPoll`, `Manual`, `Flow`, `Test`; Ran As as Run As.
+
+- **Fields by slice:** CN-02 ships every field above except `Next_Attempt_At__c` (CN-03, retries)
+  and `Event_Key__c` and `Reference__c` (CN-04, webhooks).
+- **Object:** `Connector_Run__c`, controlled by parent; autonumber Name `RUN-{000000}`. Read by
+  `BarnCRM_Connector_Admin` and `BarnCRM_Connector_Viewer` (View All); written only by the
+  module's `ConnectorRunStore` in system mode.
 
 ---
 
@@ -19553,6 +19736,7 @@ mirrors the primary member).
 | 1.70 | 2026-11-19 | Receiver token (pre-batch review M1; ADR-0229 amended). `Payments_Settings__c` gains `Webhook_Token__c` (Text(64)) and `Webhook_Cap_Hit_At__c` (DateTime): the receiver stores a post only when it carries the token in its address, and records the first refusal at the hourly cap each hour. No object added or removed. |
 | 1.71 | 2026-11-19 | Advanced Reporting (O-02, D-202, D-207, release 1.29; ADR-0231 `0231-advanced-reporting.md`). No object or field added. Section 29AR records the saved report and dashboard JSON formats and their storage as Salesforce Files (`.barnreport`, `.barndash`) shared through ContentDocumentLink, with rules R-AR1 to R-AR5. |
 | 1.72 | 2026-11-20 | BarnCRM Connector connections (CN-01, D-215, D-216, release 1.31; ADR-NEXT `NEXT-integration-module.md`). No object added (the suite stays at 197; Connector Recipe and Connector Run follow in CN-02). Section 29CN1 records a connection as an External Credential and Named Credential pair named `BarnConn_<connector>_<6 random>`, with rules R-CN1 to R-CN8. The Admin Journal's `Kind__c` gains Connection and `Status__c` gains Key Replaced (R-CN6). |
+| 1.73 | 2026-11-20 | BarnCRM Connector recipes and runs (CN-02, CN-06, D-215, release 1.31; design Appendix A.3 and A.4). Two objects added, 197 to 199 in the suite: Section 29CN2 Connector Recipe (`Connector_Recipe__c`, R-CR1 to R-CR5) and Section 29CN3 Connector Run (`Connector_Run__c`, R-RUN1 to R-RUN4), and the platform event `Connector_Start__e`. R-CN7 gives BarnCRM Connections to the Automated Process user through Recipe Access; R-CN8 refuses Delete of a connection a recipe names. |
 
 ---
 ## 32. Entity ownership by package
@@ -19784,6 +19968,8 @@ included; standard objects the packages extend are named by the entity that gove
 | Member Certification | Memberships | 1.17 (G-22e) | 29MEM6 |
 | Continuing Credit | Memberships | 1.17 (G-22e) | 29MEM7 |
 | Connection (External and Named Credentials, no object) | BarnCRM Connector | 1.31 (CN-01) | 29CN1 |
+| Connector Recipe | BarnCRM Connector | 1.31 (CN-02) | 29CN2 |
+| Connector Run | BarnCRM Connector | 1.31 (CN-02) | 29CN3 |
 | Address Verification Settings | Address Verification | 1.15 (C-46) | 29AV1 |
 
 **Components that are not entities (C-29, ADR-0059).** Core is the Standard Edition on its own,

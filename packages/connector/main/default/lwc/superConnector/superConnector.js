@@ -1,4 +1,5 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, wire } from 'lwc';
+import { CurrentPageReference } from 'lightning/navigation';
 import getConnections from '@salesforce/apex/ConnectorConnectionsController.getConnections';
 import checkConnection from '@salesforce/apex/ConnectorConnectionsController.checkConnection';
 import disconnect from '@salesforce/apex/ConnectorConnectionsController.disconnect';
@@ -10,9 +11,12 @@ import { kindKey, statusOf, outcomeOf, SECRET_URL } from 'c/connectorRules';
 import { say as text } from 'c/connectorText';
 
 const PKG = 'Connector';
+/** The page state parameter (c__recipe, prefixed once namespaced) a Where Used link opens a recipe by. */
+const RECIPE_STATE = '__recipe';
 
 /**
- * The Super Connector tab (CN-01): the Connections section. Lists the org's BarnCRM connections
+ * The Super Connector tab: Recipes (CN-02, c/connectorRecipes), Run History (c/connectorRuns) and
+ * Connections (CN-01). The Connections tab lists the org's BarnCRM connections
  * by name, kind, host and status (never a key or a Secret URL), shows the one Setup step a new
  * connection needs with Check Again, and offers Check Connection, Replace Key, Disconnect and
  * Delete. New Connection and Replace Key open c/connectorKeyForm, the only place a key is typed.
@@ -23,6 +27,8 @@ export default class SuperConnector extends LightningElement {
   working = false;
   formMode;
   formConnection;
+  openRecipeId;
+  activeTab = 'recipes';
   message;
   messageVariant = 'success';
   error;
@@ -54,8 +60,24 @@ export default class SuperConnector extends LightningElement {
     },
     get delete() {
       return text('Connector_Page_Delete');
+    },
+    get recipesTab() {
+      return text('Connector_Page_RecipesTab');
+    },
+    get runsTab() {
+      return text('Connector_Page_RunsTab');
     }
   };
+
+  @wire(CurrentPageReference)
+  handlePageReference(pageReference) {
+    const state = (pageReference && pageReference.state) || {};
+    const key = Object.keys(state).find((name) => name.endsWith(RECIPE_STATE));
+    if (key && state[key]) {
+      this.openRecipeId = state[key];
+      this.activeTab = 'recipes';
+    }
+  }
 
   icons = { page: iconFor('Super_Connector') };
 

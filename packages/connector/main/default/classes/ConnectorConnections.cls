@@ -401,6 +401,17 @@ public with sharing class ConnectorConnections {
 		return null;
 	}
 
+	/** The Connections set's Id, creating it once (R-CN7). */
+	public static Id ensureAccessSet() {
+		PermissionSet target = accessSet();
+		if (target == null) {
+			target = new PermissionSet(Name = ACCESS_SET, Label = ACCESS_SET_LABEL);
+			target.Description = BarnHelp.text('Connector', 'Connector_AccessSet_Description');
+			Database.insert(target, AccessLevel.SYSTEM_MODE);
+		}
+		return target.Id;
+	}
+
 	private static Set<Id> grantedPrincipals() {
 		PermissionSet existing = accessSet();
 		return existing == null ? new Set<Id>() : org.grantedEntities(existing.Id);
@@ -437,12 +448,7 @@ public with sharing class ConnectorConnections {
 		if (!holdsAdminSet()) {
 			throw new ConnectorException(BarnHelp.text('Connector', 'Connector_Error_NoManage'));
 		}
-		PermissionSet target = accessSet();
-		if (target == null) {
-			target = new PermissionSet(Name = ACCESS_SET, Label = ACCESS_SET_LABEL);
-			target.Description = BarnHelp.text('Connector', 'Connector_AccessSet_Description');
-			Database.insert(target, AccessLevel.SYSTEM_MODE);
-		}
+		PermissionSet target = new PermissionSet(Id = ensureAccessSet());
 		if (!holdsAccessSet()) {
 			Database.insert(
 				new PermissionSetAssignment(AssigneeId = UserInfo.getUserId(), PermissionSetId = target.Id),

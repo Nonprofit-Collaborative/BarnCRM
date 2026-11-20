@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <deploymentStatus>Deployed</deploymentStatus>
+  <description>
+    Says that a BarnCRM Connector run was queued (Run Now, Test or the Flow action). Its trigger
+    runs as the Automated Process user and starts the one runner chain, so no run executes as the
+    person who asked for it (canonical model R-CR4, D-215). Carries no data: the runs are records.
+  </description>
+  <eventType>HighVolume</eventType>
+  <label>Connector Start</label>
+  <pluralLabel>Connector Start Events</pluralLabel>
+  <publishBehavior>PublishAfterCommit</publishBehavior>
+</CustomObject>

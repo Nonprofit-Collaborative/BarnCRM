@@ -266,12 +266,15 @@ public with sharing class ConnectorConnectionsController {
 		}
 	}
 
-	/** Removes both credentials and the key (R-CN8). */
+	/** Removes both credentials and the key, unless a recipe names the connection (R-CN8). */
 	@AuraEnabled
 	public static Result deleteConnection(String name) {
 		try {
 			ConnectorConnections.requireWriter();
 			ConnectorOrg.Pair pair = ConnectorConnections.owned(name);
+			if (ConnectorRecipes.connectionInUse(pair.name)) {
+				throw new ConnectorConnections.ConnectorException(BarnHelp.text('Connector', 'Connector_Error_InUse'));
+			}
 			ConnectorConnections.store().remove(pair.name, true);
 			Result result = new Result();
 			result.outcome = 'deleted';
