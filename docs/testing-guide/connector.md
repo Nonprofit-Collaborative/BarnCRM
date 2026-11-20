@@ -1,6 +1,6 @@
 # BarnCRM Connector
 
-Scripts for the optional BarnCRM Connector module, release 1.31: creating Connections of each sign-in kind, the one Setup step with Check Again, checking, replacing, disconnecting and deleting, the refusals that keep keys safe, access and Health Check (CN-01, T-CN-01 to T-CN-06); Recipe Access, recipes, Test, Publish, Run Now, Run History, Retry, Run As and the merge-field guard (CN-02, T-CN-07 to T-CN-12); the Flow actions and Where Used (CN-06, T-CN-13 and T-CN-14); the recipe clock, Schedule and Record Change triggers, retries, pausing, the integration user, Health Check and the nightly cleanup (CN-03, release 1.32, T-CN-15 to T-CN-20); scheduled imports through Load Rows with an Import Template (CN-09, release 1.32, T-CN-21 and T-CN-22); webhooks in, their refusals, fetch back and Send to Webhook (CN-04, release 1.32, T-CN-23 to T-CN-25). Setup detail: [BarnCRM Connector](../admin-guide/connector.md).
+Scripts for the optional BarnCRM Connector module, release 1.31: creating Connections of each sign-in kind, the one Setup step with Check Again, checking, replacing, disconnecting and deleting, the refusals that keep keys safe, access and Health Check (CN-01, T-CN-01 to T-CN-06); Recipe Access, recipes, Test, Publish, Run Now, Run History, Retry, Run As and the merge-field guard (CN-02, T-CN-07 to T-CN-12); the Flow actions and Where Used (CN-06, T-CN-13 and T-CN-14); the recipe clock, Schedule and Record Change triggers, retries, pausing, the integration user, Health Check and the nightly cleanup (CN-03, release 1.32, T-CN-15 to T-CN-20); scheduled imports through Load Rows with an Import Template (CN-09, release 1.32, T-CN-21 and T-CN-22); webhooks in, their refusals, fetch back and Send to Webhook (CN-04, release 1.32, T-CN-23 to T-CN-25); watching an app for new items and erasing a person's runs (CN-13, CN-18, release 1.33, T-CN-40 to T-CN-42). Setup detail: [BarnCRM Connector](../admin-guide/connector.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core and BarnCRM Connector deployed, and an HTTPS test endpoint that echoes requests (for example a free request bin you control). Use made-up keys such as `test-key-1234`; never a real one.
 
@@ -366,3 +366,47 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 4 | Post `evt_10` with `resource_url` set to `https://evil.example/hooks/orders/9`, then to `http://<echo host>/hooks/orders/9`, then to `https://<echo host>/other/9`. | Each run Failed at the first step: **The address read from the data was not used, so nothing was sent...** Neither endpoint received anything for these runs. |
 
 **Cleanup:** Delete `Gifts In`, `Echo` and `Chat`.
+
+## T-CN-40: An App Has New Items
+
+**Purpose:** confirm an App Poll recipe notes the newest stamp on its first look, then starts runs only for items past its watermark, oldest first.
+**Prerequisites:** admin; a Generic REST connection `Lists` to an HTTPS test endpoint you control that answers GET `/lists/L1/members` with `{"members":[...]}`, each member holding `id`, `email` and `last_changed` (for example `2026-11-20T09:00:00Z`).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Create recipe `Unsubscribes`. Under **When**, choose **An App Has New Items**: connection `Lists`, path `/lists/{listId}/members` with `listId` = `L1`, query `status` = `unsubscribed` and `since` = `trigger.watermark`, Item List `members`, Item Id `id`, Item Stamp `last_changed`, **One Run per Item**, Most Items per Look `2`. | The form shows each field with its help text. |
+| 2 | Set Item Stamp blank and select Save Draft, then Publish. | Publish is refused: **Choose a connection, a list path starting with a slash, ...** Put `last_changed` back. |
+| 3 | Add a step that keeps `trigger.item.email` (for example Find a Contact by email). Have the endpoint answer two members, stamps 09:00 and 10:00. Publish. | Publish succeeds. |
+| 4 | Wait for the recipe clock (up to 15 minutes), then open Run History. | No item run. The endpoint received one GET `/lists/L1/members?status=unsubscribed` with no `since`. |
+| 5 | Add three members stamped 11:00, 12:00 and 12:00 and wait for the next look. | Three item runs, started by **App Poll**, oldest first; the 12:00 pair is kept together although the limit is 2. The request carried `since=2026-11-20T10%3A00%3A00Z`. No App Poll run remains. |
+| 6 | Wait for the next look with no new member. | Nothing new in Run History. |
+
+**Cleanup:** Keep `Unsubscribes` and `Lists` for T-CN-41.
+
+## T-CN-41: A Failing Look and Its Retry
+
+**Purpose:** confirm a failed look stays in Run History without a key, is retried when it may pass, and moves no watermark.
+**Prerequisites:** admin, after T-CN-40.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Make the endpoint answer 503 and wait for the next look. | One **Waiting** run started by **App Poll**, failed on the step `trigger`, showing when it is tried again. |
+| 2 | Make the endpoint answer 401 with a short error body. Wait for the retry. | The run is **Failed** with a plain message; the step log shows the answer trimmed. One Error Log entry. Neither shows the connection key. |
+| 3 | Make the endpoint answer `{"data":[]}` and select **Retry**. | Failed: **The answer from the app has no list of items at members. Check Item List under When.** |
+| 4 | Change the `since` value to the path `trigger.item.id` and select Publish. | Publish is refused: each value is fixed or `trigger.watermark`. |
+| 5 | Restore the endpoint and the value, publish, add a member stamped 13:00 and wait. | One item run for the 13:00 member only; nothing from before the failures runs twice. |
+
+**Cleanup:** Delete `Unsubscribes` and `Lists`.
+
+## T-CN-42: Erasing a Person Deletes Their Runs
+
+**Purpose:** confirm erasing a person deletes every Connector run that names them, lists the runs by Id and keeps the rest.
+**Prerequisites:** an admin who may erase people (BarnCRM Erase People) and holds no Connector permission set; a Connector admin; a webhook recipe from T-CN-23.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Create Contact `Ana Lee`, email `ana.lee@example.org`. As the Connector admin, post three webhook items: one with `"email":"Ana.Lee@example.org"`, one with Ana's record Id, one with `"email":"joana.lee@example.org"`. | Three Succeeded runs. |
+| 2 | Wait a few minutes. As the eraser, open Erase a Person for Ana and preview. | The preview lists **Connector Runs** under Deleted, with the first two runs. |
+| 3 | Erase Ana. | The first two runs are gone from Run History; the `joana.lee` run and the recipe stay. The Erasure record lists the two run Ids and no email address. |
+
+**Cleanup:** Delete the webhook recipe and its remaining run.

@@ -19167,8 +19167,8 @@ design Section 3.3a), which the receiver reads with the recipe it already finds 
 Step ids are 1 to 20 letters, digits or underscores, unique in the recipe. No string anywhere in
 the document may contain `{!` (security review F1).
 
-The kinds release 1.31 (CN-02) and 1.32 (CN-03: `schedule` and `record`; CN-04: `webhook` and
-`sendWebhook`) build, the others arriving with their slices:
+The kinds release 1.31 (CN-02), 1.32 (CN-03: `schedule` and `record`; CN-04: `webhook` and
+`sendWebhook`) and 1.33 (CN-13: `appPoll`) build, the others arriving with their slices:
 
 | Kind | Keys | Result for later steps |
 |---|---|---|
@@ -19176,6 +19176,7 @@ The kinds release 1.31 (CN-02) and 1.32 (CN-03: `schedule` and `record`; CN-04: 
 | trigger `schedule` | `every` (`15m`, `hour`, `day` or `week`), `at` (`HH:MM`, 24 hour, the org's time zone; `day` and `week`), `day` (`MON` to `SUN`; `week`), `sample` | Input: `{ "scheduledAt" }` (R-CR6) |
 | trigger `record` | `query` (an R-SQ1 document copied from a saved query: the object, at most 20 fields and an optional filter), `savedQuery`, `on` (`created` or `changed`), `mode` (`each` or `batch`), `limit` (1 to 200, default 200), `sample` | Input: `each` `{ "recordId", "record": {field: value} }`; `batch` `{ "recordIds", "records" }` (R-CR6) |
 | trigger `webhook` | `eventId` (optional path whose value names the post, for duplicates), `reply` (`status` 200 or 202, default 202; `body`, fixed JSON text of at most 4,000 characters, `{reference}` filled with the run's Reference; `challenge`, optional name of one top-level field or query parameter echoed back), `sample` | Input: the posted JSON object; a posted list is `{ "items": [...] }`; a form post is its fields as text (R-CR10) |
+| trigger `appPoll` | `connection`, `path` (with `{name}` slots), `pathValues`, `query` and `headers` (each value fixed, or the path `trigger.watermark`), `items` (where the list sits in the answer; blank is the answer itself), `id` and `stamp` (where each item keeps its id and the time or growing number it last changed), `mode` (`each` or `batch`), `limit` (1 to 200, default 200), `sample` | Input: `each` `{ "itemId", "item" }`; `batch` `{ "itemIds", "items" }` (R-CR20) |
 | `find` | `query` (an R-SQ1 document, copied from a saved query), `values` (`[{ "condition": <id>, "path" }]`, a path's value replaces that condition's value), `stopIfNone` | `{ "count", "records": [ {field: value} ] }`, at most 200 records |
 | `create`, `update`, `upsert` | `map` (a saved map's Id, `to.kind` record), `input` (the path the map reads from; blank is `trigger`); `update` also `recordId` (a path) | `{ "id", "action" }`, action created, updated or skipped |
 | `callApp` | `connection`, `method` (GET, POST, PUT, PATCH, DELETE), `path` (with `{name}` slots), `pathValues` and `query` (`[{ "name", "value" or "path" }]`), `headers` (`[{ "name", "value" or "path" }]`), `bodyMap` and `bodyInput` (a saved map with `to.kind` json), `success` (status codes; blank is 200 to 299), `notFoundOk`, `urlFrom` (optional path to an address in the data, used in place of `path` under R-CR11: fetch back) | `{ "status", "body" }`, the body parsed when it is JSON |
@@ -19298,6 +19299,36 @@ and starts with the connection's own path; then only its remaining path and quer
 to `callout:<connection>`, under R-CR1's path rules. Anything else fails the step; the posted
 address is never the endpoint. `sendWebhook` always POSTs a JSON body built from its map and
 retries as Call an App does (R-CR7).
+**R-CR20 Watching apps for new items** (CN-13, release 1.33; design Section 3.2, review F1, F4,
+F7). An Active `appPoll` recipe is due every 15 minutes (R-CR6). A beat cannot call out, so it
+queues one poll run instead: Started By App Poll, no Input, Event Key the recipe Id, `:poll:`
+and a time, and none while that recipe's poll run is still Queued, Running or Waiting. The
+runner, as the recipe's identity, sends the trigger's request as a GET `callApp` step under
+R-CR1's rules (only `callout:<connection>` and a checked path, values URL-encoded, no `{!`, no
+reserved header), with `trigger.watermark` the recipe's Watermark; a query value that reads it is
+left out while the Watermark is blank. A poll run never follows a record write in its
+transaction. From the answer's list at `items` it keeps the items with an `id` and a `stamp`
+after the Watermark (both numbers: compared as numbers; otherwise as text), oldest first, at most
+`limit`, plus any more sharing the last one's stamp, up to 1,000. While the Watermark is blank
+it queues no run and sets the Watermark to the newest stamp (the first look after Publish).
+Otherwise it queues one run per item (`each`) or one for them all, split under 120,000
+characters (`batch`), Started By App Poll, and moves the Watermark to the last stamp kept (at
+most 60 characters, else the poll fails). The spent poll run is deleted in the same save, so
+Run History lists item runs only. A poll that fails (the app's status, no list at `items`, a
+stamp too long) stays as a Failed run on the step `trigger`, with the trimmed response, waits
+and retries, counts toward Pause After Failures and writes one Error Log entry as any run
+(R-CR7, R-RUN4); the Watermark does not move. Publish sets Next Run At to now and, when the
+recipe was never published or had another trigger kind, a blank Watermark; Resume keeps it.
+A Test run uses the sample, never the app.
+**R-CR21 Runs in a person's erasure** (CN-18, release 1.33; R-ER8; design Section 5). Erasing a
+person (Section 29H) deletes, in the erasure's own transaction and whoever erases, every Run
+whose Input, State or Step Log holds the person's record Id (its 15 character form, capitals
+kept, which the 18 starts with) or one of the values of the person record's email fields, read
+before Core empties them, as a whole address ignoring capitals. Long text cannot be filtered in
+a query, so the candidates are the runs the org's search finds for those terms, at most 2,000,
+and every run changed in the last hour, which search may not hold yet; each is read and checked
+before it is deleted. The runs are listed as Deleted, by Id. When search finds 2,000 runs, the
+erasure is refused, so none is left behind. Recipes are kept; the preview deletes nothing.
 
 ### Salesforce implementation
 
@@ -19401,7 +19432,14 @@ Text field stops at 255), `Records_Written__c`, `Is_Test__c`. Picklist values: S
   Date/Time) and `Event_Key__c` and `Reference__c` (CN-04, webhooks).
 - **Object:** `Connector_Run__c`, controlled by parent; autonumber Name `RUN-{000000}`. Read by
   `BarnCRM_Connector_Admin` and `BarnCRM_Connector_Viewer` (View All); written only by the
-  module's `ConnectorRunStore` in system mode.
+  module's `ConnectorRunStore` in system mode. Search is allowed (`enableSearch`), so a
+  person's erasure finds the runs that name them (R-CR21); only users who may read runs see them
+  in search.
+- **Poll runs** (CN-13): `Event_Key__c` also marks an App Poll's poll run, `<recipe Id>:poll:<time>`
+  (R-CR20).
+- **Erasure** (CN-18): `ConnectorErasureExtension` implements `PersonErasureExtension` and
+  `PersonErasureStartExtension` (R-ER8), registered in Core's `PersonErasureExtensions` before
+  Contact Point Sync; it deletes runs through `ConnectorRunStore` (R-CR21).
 - **Retry All Failed** (CN-03) queues every Failed non-test run of one recipe again from its
   failed step, at most 200 at once.
 
@@ -19901,6 +19939,7 @@ mirrors the primary member).
 | 1.76 | 2026-11-20 | BarnCRM Connector recipe clock (CN-03, D-215, release 1.32). Connector Recipe gains `Watermark__c`, `Next_Run_At__c`, `Consecutive_Failures__c`, `Pause_After_Failures__c`, `Retry_Attempts__c`, `Keep_Runs_Days__c` and `Ignore_Own_Changes__c`; Connector Run gains `Next_Attempt_At__c`. New custom setting Section 29CN4 Connector Settings (`Connector_Settings__c`, R-CS1) and platform event `Connector_Start_User__e`. R-CR1 adds the `schedule` and `record` triggers, R-CR4 the Integration User lane, and new R-CR6 (clock), R-CR7 (retries and pause) and R-CR8 (Health Check). No object added (custom settings are not counted). |
 | 1.77 | 2026-11-20 | BarnCRM Connector Load Rows with an Import Template (CN-09, C-38, D-215, release 1.32). R-CR1 adds the `importRows` step; new R-CR9 (a scheduled dry run that commits only inside the step's limits) and R-IB18 (a data job a recipe starts, through Super Importer's own entry points). R-CR7: waking a run that waits on a data job counts no attempt. No object or field added. |
 | 1.78 | 2026-11-20 | BarnCRM Connector webhooks in and sending data back (CN-04, D-216, release 1.32). Connector Recipe gains `Webhook_Token_Hash__c` and `Webhook_Hourly_Cap__c`; Connector Run gains `Event_Key__c` and `Reference__c` (all defined in CN-02). R-CR1 adds the `webhook` trigger, the `sendWebhook` step and `urlFrom`; new R-CR10 (the receiver) and R-CR11 (fetch back and callback addresses). New permission set `BarnCRM_Connector_Webhook_Guest`. No object added. |
+| 1.85 | 2026-11-20 | BarnCRM Connector watching apps for new items and runs in the erasure path (CN-13, CN-18, release 1.33). R-CR1 adds the `appPoll` trigger; new R-CR20 (App Poll: poll runs, Watermark, item runs) and R-CR21 (erasing a person deletes the runs that name them). Connector Run allows search (`enableSearch`); `ConnectorErasureExtension` joins Core's erasure extensions. No object or field added. |
 
 ---
 ## 32. Entity ownership by package

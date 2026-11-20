@@ -7,7 +7,8 @@ service or a chat app. It is an optional module in beta, set up by your admin.
 apps and **Recipes** that move data between them, on the **Super Connector** tab. Recipes run on
 their own, never as you: as BarnCRM Automation, or as an integration user your admin chose. Some
 run on a schedule, some run when records change, about 15 minutes after the change, and some
-run when another app sends data, such as a gift made on a giving form, moments later. A record
+run when another app sends data, such as a gift made on a giving form, moments later, and some
+watch an app for new items, such as people who left a mailing list, a few minutes later. A record
 you save may therefore be updated by a recipe a little later; its history shows BarnCRM
 Automation (the Automated Process user) or the integration user as who changed it.
 
@@ -17,7 +18,12 @@ when it failed, the step that failed and why in plain words. A **Waiting** run f
 reason that may pass, such as the other app being down, and shows when it is tried again. Viewers
 cannot change, test, run or retry a recipe. If a run failed, tell your admin; they can fix the
 recipe and select **Retry**. A run started by **Webhook** also shows its **Reference**: the same
-reference the other app was given, so a post in that app can be matched to its run.
+reference the other app was given, so a post in that app can be matched to its run. A run started
+by **App Poll** is one look at the app: it is gone once its new items have their own runs, and
+stays only when the look failed.
+
+**Erasing a person erases their runs.** When an admin erases a person, every run that names
+them, by record or email address, is deleted with them.
 
 **Some recipes import rows.** A recipe can load a list from another app through a Super Importer
 template, for example every morning. It commits only when its dry run is inside the limits your

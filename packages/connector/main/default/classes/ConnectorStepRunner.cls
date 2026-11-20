@@ -456,6 +456,15 @@ public inherited sharing class ConnectorStepRunner {
 		return answer(step, response);
 	}
 
+	/**
+	 * One GET for the App Poll trigger (CN-13, `ConnectorAppPoll`), under Call an App's rules
+	 * (F1, F4), with `trigger` as the data its values read: `{ "status", "body" }` or a failure.
+	 */
+	public Object request(Map<String, Object> step, Object triggerData) {
+		data.put('trigger', triggerData);
+		return callApp('callApp', step);
+	}
+
 	/** The app's answer as the step's result, or a failure in plain words. */
 	private Object answer(Map<String, Object> step, HttpResponse response) {
 		Integer status = response.getStatusCode();

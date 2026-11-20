@@ -411,7 +411,10 @@ CAPS = {
     # Raised 2026-11-20 for CN-04 webhooks in and sending data back (the receiver, the Webhook
     # card's controller, Send to Webhook, Address From the Data, the guest Health Check fix):
     # 205,718 measured with CN-09 and CN-04 merged (landing batch Q), plus about 2%.
-    "connector": 209_900,
+    # Raised 2026-11-20 for CN-13 the App Poll trigger (ConnectorAppPoll: the poll run, item
+    # stamps, the watermark) and CN-18 runs in the erasure path (ConnectorErasureExtension and
+    # the run search in ConnectorRunStore): 210,563 measured, plus about 2%.
+    "connector": 214_800,
     # Mirror: the NPSP gifts migration kit's extension (MIG-05), 187,295 measured, then the
     # Nonprofit Cloud gifts kit's (MIG-04), 195,957 measured, then the Nonprofit Cloud
     # relationships kit's (MIG-02), about 200,500 combined, plus about 1%.

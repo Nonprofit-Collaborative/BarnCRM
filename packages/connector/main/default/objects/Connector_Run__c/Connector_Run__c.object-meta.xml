@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
   <deploymentStatus>Deployed</deploymentStatus>
-  <description>One time a BarnCRM Connector recipe ran or was asked to run, with each step's result (canonical model 29CN3, CN-02). Written by the module only.</description>
+  <description>One time a BarnCRM Connector recipe ran or was asked to run, with each step's result (canonical model 29CN3, CN-02). Written by the module only. Searchable so a person's erasure finds the runs that name them (CN-18).</description>
   <enableActivities>false</enableActivities>
   <enableBulkApi>true</enableBulkApi>
   <enableFeeds>false</enableFeeds>
   <enableHistory>false</enableHistory>
   <enableReports>true</enableReports>
-  <enableSearch>false</enableSearch>
+  <enableSearch>true</enableSearch>
   <enableSharing>true</enableSharing>
   <enableStreamingApi>true</enableStreamingApi>
   <label>Connector Run</label>

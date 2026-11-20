@@ -145,6 +145,9 @@ export default class ConnectorRecipeEditor extends LightningElement {
     get whenWebhook() {
       return text('Connector_Editor_WhenWebhook');
     },
+    get whenAppPoll() {
+      return text('Connector_Editor_WhenAppPoll');
+    },
     get urlFrom() {
       return text('Connector_Editor_UrlFrom');
     },
@@ -483,11 +486,15 @@ export default class ConnectorRecipeEditor extends LightningElement {
   }
 
   get isManual() {
-    return !this.isSchedule && !this.isRecordChange && !this.isWebhook;
+    return !this.isSchedule && !this.isRecordChange && !this.isWebhook && !this.isAppPoll;
   }
 
   get isWebhook() {
     return this.trigger.kind === 'webhook';
+  }
+
+  get isAppPoll() {
+    return this.trigger.kind === 'appPoll';
   }
 
   get isSchedule() {

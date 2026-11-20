@@ -52,6 +52,10 @@
                     <p class="slds-text-body_small slds-var-m-vertical_x-small">{labels.whenWebhook}</p>
                     <c-connector-webhook-setup recipe-id={recipeId} trigger={trigger} can-manage={canManage} ontriggerchange={handleTriggerChange} data-id="webhook"></c-connector-webhook-setup>
                 </template>
+                <template lwc:if={isAppPoll}>
+                    <p class="slds-text-body_small slds-var-m-vertical_x-small">{labels.whenAppPoll}</p>
+                    <c-connector-app-poll-setup trigger={trigger} connections={connectionOptions} read-only={readOnly} ontriggerchange={handleTriggerChange} data-id="app-poll"></c-connector-app-poll-setup>
+                </template>
                 <template lwc:if={nextRunText}>
                     <p class="slds-text-body_small slds-var-m-vertical_x-small" data-id="next-run">{nextRunText}</p>
                 </template>

@@ -6,7 +6,9 @@
  * object; the two exceptions are `runInSystemMode` and `pollInSystemMode`, through which only a
  * recipe an admin set to System runs its steps and polls its object. The webhook receiver's
  * Site guest, which has no object access, finds its recipe by token hash and stores a Received
- * run here (R-CR10), and reads its own Error Log warnings to write one an hour.
+ * run here (R-CR10), and reads its own Error Log warnings to write one an hour. An App Poll's
+ * runs are saved here (R-CR20), and a person's erasure, whoever erases, finds and deletes the
+ * runs that name them (R-CR21).
  */
 public without sharing class ConnectorRunStore {
 	public static final String QUEUED = 'Queued';
@@ -22,7 +24,7 @@ public without sharing class ConnectorRunStore {
 	public static final String PAUSED = 'Paused';
 	public static final String PAUSED_BY_FAILURES = 'PausedByFailures';
 	/** The trigger kinds the clock runs (R-CR6). */
-	public static final Set<String> CLOCK_KINDS = new Set<String>{ 'Schedule', 'RecordChange' };
+	public static final Set<String> CLOCK_KINDS = new Set<String>{ 'Schedule', 'RecordChange', 'AppPoll' };
 	/** Runs the nightly step may delete (R-RUN2). */
 	public static final Set<String> FINISHED = new Set<String>{ SUCCEEDED, SKIPPED, FAILED, 'Rejected' };
 	public static final Set<String> ALL_RUN_AS = new Set<String>{ 'Automation', 'System', 'IntegrationUser' };
@@ -52,8 +54,10 @@ public without sharing class ConnectorRunStore {
 				Recipe__r.Draft_JSON__c,
 				Recipe__r.Record_Owner_Id__c,
 				Recipe__r.Retry_Attempts__c,
+				Recipe__r.Watermark__c,
 				Status__c,
 				Started_By__c,
+				Event_Key__c,
 				Ran_As__c,
 				Recipe_Version__c,
 				Input_JSON__c,
@@ -437,5 +441,156 @@ public without sharing class ConnectorRunStore {
 			return first.Reference__c;
 		}
 		return '';
+	}
+
+	// ---------------------------------------------------------------------------------------
+	// App Poll (CN-13)
+	// ---------------------------------------------------------------------------------------
+
+	/** Whether an App Poll recipe's poll run is still Queued, Running or Waiting (R-CR20). */
+	public static Boolean pollPending(Id recipeId) {
+		String key = recipeId + ConnectorAppPoll.POLL_KEY + '%';
+		Set<String> pending = new Set<String>{ QUEUED, 'Running', WAITING };
+		return [
+				SELECT COUNT()
+				FROM Connector_Run__c
+				WHERE Event_Key__c LIKE :key AND Status__c IN :pending
+				WITH SYSTEM_MODE
+			] > 0;
+	}
+
+	/** A poll's item runs, the recipes' moved Watermarks, and the spent poll runs deleted (R-CR20). */
+	public static void pollSave(
+		List<Connector_Run__c> found,
+		List<Connector_Recipe__c> recipes,
+		List<Connector_Run__c> spent
+	) {
+		insert as system found;
+		update as system recipes;
+		delete as system spent;
+	}
+
+	// ---------------------------------------------------------------------------------------
+	// Erasing a person (CN-18)
+	// ---------------------------------------------------------------------------------------
+
+	/** Most runs an erasure's search may find; more refuses the erasure, so none is missed. */
+	public static final Integer MOST_SEARCHED = 2000;
+	/** Runs changed this recently are read as well: the search index may not hold them yet. */
+	public static final Integer RECENT_MINUTES = 60;
+	private static final String SEARCH_RESERVED = '\\?&|!{}[]()^~*:"\'+-';
+	private static final String LOCAL_PART = 'abcdefghijklmnopqrstuvwxyz0123456789._%+-\'';
+	private static final String DOMAIN_PART = 'abcdefghijklmnopqrstuvwxyz0123456789-_';
+
+	/**
+	 * The runs whose Input, State or Step Log names a person (R-CR21): their record Id, in its 15
+	 * or 18 character form, or one of their email addresses (lower case), as a whole address,
+	 * ignoring capitals. Long text cannot be filtered in a query, so the search index names the
+	 * runs to read, with every run changed in the last hour, and each is read and checked here.
+	 * Null when the search found its most, so some might be missed.
+	 */
+	public static List<Id> runsNaming(Id personId, List<String> emails) {
+		String id15 = String.valueOf(personId).left(15);
+		List<String> terms = new List<String>{ '"' + String.valueOf(personId) + '"', '"' + id15 + '"' };
+		for (String email : emails) {
+			terms.add('"' + searchEscaped(email) + '"');
+		}
+		List<List<SObject>> hits = Search.query(
+			'FIND {' +
+				String.join(terms, ' OR ') +
+				'} IN ALL FIELDS RETURNING Connector_Run__c(Id) LIMIT ' +
+				MOST_SEARCHED,
+			AccessLevel.SYSTEM_MODE
+		);
+		if (hits[0].size() >= MOST_SEARCHED) {
+			return null;
+		}
+		Set<Id> candidates = new Set<Id>();
+		for (SObject hit : hits[0]) {
+			candidates.add(hit.Id);
+		}
+		Datetime since = Datetime.now().addMinutes(-RECENT_MINUTES);
+		for (Connector_Run__c recent : [
+			SELECT Id
+			FROM Connector_Run__c
+			WHERE SystemModstamp >= :since
+			WITH SYSTEM_MODE
+			ORDER BY SystemModstamp DESC
+			LIMIT :MOST_SEARCHED
+		]) {
+			candidates.add(recent.Id);
+		}
+		List<Id> found = new List<Id>();
+		for (List<Connector_Run__c> page : [
+			SELECT Id, Input_JSON__c, State_JSON__c, Step_Log_JSON__c
+			FROM Connector_Run__c
+			WHERE Id IN :candidates
+			WITH SYSTEM_MODE
+		]) {
+			for (Connector_Run__c run : page) {
+				if (
+					names(run.Input_JSON__c, id15, emails) ||
+					names(run.State_JSON__c, id15, emails) ||
+					names(run.Step_Log_JSON__c, id15, emails)
+				) {
+					found.add(run.Id);
+				}
+			}
+		}
+		return found;
+	}
+
+	/** Deletes the runs an erasure found (R-CR21): module bookkeeping, past sharing (R-RUN1). */
+	public static void deleteRuns(List<Id> runIds) {
+		List<Connector_Run__c> runs = new List<Connector_Run__c>();
+		for (Id runId : runIds) {
+			runs.add(new Connector_Run__c(Id = runId));
+		}
+		delete as system runs;
+	}
+
+	/**
+	 * Whether text names the person: the 15 character Id (which the 18 starts with, capitals
+	 * kept), or an address with no address character just before it and no more of its domain
+	 * just after it, so `ann@example.org` is not found in `joann@example.org` or
+	 * `ann@example.org.uk`.
+	 */
+	@TestVisible
+	private static Boolean names(String text, String id15, List<String> emails) {
+		if (String.isBlank(text)) {
+			return false;
+		}
+		if (text.contains(id15)) {
+			return true;
+		}
+		String lower = text.toLowerCase();
+		for (String email : emails) {
+			Integer at = lower.indexOf(email);
+			while (at >= 0) {
+				Integer after = at + email.length();
+				Boolean starts = at == 0 || !LOCAL_PART.contains(lower.substring(at - 1, at));
+				Boolean ends =
+					after >= lower.length() ||
+					!(DOMAIN_PART.contains(lower.substring(after, after + 1)) ||
+					(lower.substring(after, after + 1) == '.' &&
+					after + 1 < lower.length() &&
+					DOMAIN_PART.contains(lower.substring(after + 1, after + 2))));
+				if (starts && ends) {
+					return true;
+				}
+				at = lower.indexOf(email, at + 1);
+			}
+		}
+		return false;
+	}
+
+	/** A search term with every character the search reads as an operator escaped. */
+	private static String searchEscaped(String term) {
+		String result = '';
+		for (Integer i = 0; i < term.length(); i++) {
+			String character = term.substring(i, i + 1);
+			result += SEARCH_RESERVED.contains(character) ? '\\' + character : character;
+		}
+		return result;
 	}
 }

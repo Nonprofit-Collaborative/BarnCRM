@@ -66,8 +66,13 @@ export const TRIGGERS = [
   { value: 'manual', key: 'Connector_Trigger_Manual' },
   { value: 'schedule', key: 'Connector_Trigger_Schedule' },
   { value: 'record', key: 'Connector_Trigger_Record' },
-  { value: 'webhook', key: 'Connector_Trigger_Webhook' }
+  { value: 'webhook', key: 'Connector_Trigger_Webhook' },
+  { value: 'appPoll', key: 'Connector_Trigger_AppPoll' }
 ];
+/** The one value path an App Poll request may read (R-CR20). */
+export const WATERMARK_PATH = 'trigger.watermark';
+const ITEM_PATH =
+  /^[A-Za-z0-9_-]{1,80}(\[[0-9]{1,3}\])?(\.[A-Za-z0-9_-]{1,80}(\[[0-9]{1,3}\])?){0,9}$/;
 /** The steps that make a request through a connection. */
 export const CALL_KINDS = ['callApp', 'sendWebhook'];
 /** A webhook trigger's reply when the recipe sets none (R-CR10). */
@@ -128,6 +133,19 @@ export function setTrigger(document, kind) {
       reply: { status: 202, body: DEFAULT_REPLY, challenge: '' },
       sample
     };
+  } else if (kind === 'appPoll') {
+    next.trigger = {
+      kind,
+      connection: '',
+      path: '',
+      pathValues: [],
+      query: [],
+      items: '',
+      id: 'id',
+      stamp: '',
+      mode: 'each',
+      sample
+    };
   } else {
     next.trigger = { kind: 'manual', sample };
   }
@@ -178,7 +196,42 @@ export function triggerProblem(trigger) {
   if (starter.kind === 'webhook') {
     return webhookProblem(starter) ? 'Connector_Recipe_ErrorWebhook' : null;
   }
+  if (starter.kind === 'appPoll') {
+    return appPollProblem(starter) ? 'Connector_Recipe_ErrorAppPoll' : null;
+  }
   return null;
+}
+
+/** True when an App Poll trigger breaks R-CR20 (the server's twin, `ConnectorAppPoll.problem`). */
+function appPollProblem(starter) {
+  const request = {
+    kind: 'callApp',
+    method: 'GET',
+    connection: starter.connection,
+    path: starter.path,
+    pathValues: starter.pathValues,
+    query: starter.query,
+    headers: starter.headers
+  };
+  const most = starter.limit;
+  const itemPath = (path, blankOk) => (path ? ITEM_PATH.test(path) : blankOk);
+  const fixedOrWatermark = [
+    ...(starter.pathValues || []),
+    ...(starter.query || []),
+    ...(starter.headers || [])
+  ].every((entry) => !entry.path || entry.path === WATERMARK_PATH);
+  return (
+    !String(starter.connection || '').startsWith('BarnConn_') ||
+    Boolean(callProblem(request, ['trigger'])) ||
+    !itemPath(starter.items, true) ||
+    !itemPath(starter.id, false) ||
+    !itemPath(starter.stamp, false) ||
+    (starter.mode !== undefined && !MODES.includes(starter.mode)) ||
+    (most !== undefined &&
+      most !== null &&
+      !(Number.isInteger(most) && most >= 1 && most <= MAX_POLLED)) ||
+    !fixedOrWatermark
+  );
 }
 
 /** True when a webhook trigger's event id path or reply breaks R-CR10 (the server's twin). */
@@ -218,6 +271,9 @@ export function triggerKindKey(kind) {
   }
   if (kind === 'Webhook') {
     return 'Connector_Trigger_Webhook';
+  }
+  if (kind === 'AppPoll') {
+    return 'Connector_Trigger_AppPoll';
   }
   return kind === 'RecordChange' ? 'Connector_Trigger_Record' : 'Connector_Trigger_Manual';
 }
@@ -599,6 +655,11 @@ export function problems(document) {
 function triggerPaths(trigger) {
   if (trigger.kind === 'schedule') {
     return ['trigger.scheduledAt'];
+  }
+  if (trigger.kind === 'appPoll') {
+    return trigger.mode === 'batch'
+      ? ['trigger.itemIds', 'trigger.items']
+      : ['trigger.itemId', 'trigger.item'];
   }
   if (trigger.kind !== 'record') {
     return [];

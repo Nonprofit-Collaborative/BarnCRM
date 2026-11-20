@@ -15,7 +15,7 @@ public with sharing class ConnectorRecipeDocument {
 	public static final Integer MAX_DEPTH = 2;
 	public static final Integer MAX_LENGTH = 100000;
 	public static final Integer MAX_CONDITIONS = 10;
-	public static final Set<String> TRIGGERS = new Set<String>{ 'manual', 'schedule', 'record', 'webhook' };
+	public static final Set<String> TRIGGERS = new Set<String>{ 'manual', 'schedule', 'record', 'webhook', 'appPoll' };
 	public static final Set<String> STEP_KINDS = new Set<String>{
 		'find',
 		'create',
@@ -172,6 +172,11 @@ public with sharing class ConnectorRecipeDocument {
 			: BarnHelp.text('Connector', 'Connector_Recipe_ErrorStop', at);
 	}
 
+	/** Call an App's request rules for a request that is not a step: the App Poll trigger's (CN-13). */
+	public static String callStepProblem(Map<String, Object> step) {
+		return callProblem(step, new List<Object>{ textOf(step.get('id')) });
+	}
+
 	/**
 	 * Call an App's and Send to Webhook's request rules (F1, F4): connection, method, path or an
 	 * address read from the data (`urlFrom`, R-CR11), slots, query, headers, codes.
@@ -303,6 +308,11 @@ public with sharing class ConnectorRecipeDocument {
 
 	public static Set<String> connections(Map<String, Object> document) {
 		Set<String> found = new Set<String>();
+		// The App Poll trigger's connection (CN-13).
+		String polled = textOf(mapOf(document.get('trigger')).get('connection'));
+		if (String.isNotBlank(polled)) {
+			found.add(polled);
+		}
 		for (Map<String, Object> step : allSteps(document)) {
 			if (String.isNotBlank(textOf(step.get('connection')))) {
 				found.add(textOf(step.get('connection')));
