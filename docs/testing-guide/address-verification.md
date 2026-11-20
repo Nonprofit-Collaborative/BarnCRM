@@ -18,7 +18,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 4 | In **Setup > Named Credentials > External Credentials**, open **BarnCRM Smarty**, edit the principal `Barn_Smarty_Key`, add `AuthId` and `AuthToken` with your Smarty secret key pair and save. On Address Verification Setup select **Check Connection** on the Smarty card. | `Smarty is connected.` with a note that one test lookup was made; the card reads **Connected**. |
 | 5 | Reload the page and look at the network responses. | No key appears anywhere. Health Check no longer lists the provider as not connected. |
 | 6 | In Setup, change `AuthToken` to `wrong` and select **Check Connection**. | A message that Smarty could not be reached (answer 401); **Not connected**, and a row in the **Error Log**. Put the right token back and check again: connected. |
-| 7 | Select **Disconnect** on the Smarty card, then **Cancel** in the dialog "Disconnect Smarty?". Select **Disconnect** again and confirm, then **Check Connection**. | Cancel changes nothing. Confirming leaves **Not connected**; checking again connects it. |
+| 7 | Select **Disconnect** on the Smarty card, then **Cancel** in the dialog "Disconnect Smarty?". Select **Disconnect** again and confirm, then **Check Connection**. | Cancel changes nothing. Confirming leaves **Not connected** with no **Disconnect** button; checking again connects it. |
 
 **Cleanup:** None (the connection is used below).
 

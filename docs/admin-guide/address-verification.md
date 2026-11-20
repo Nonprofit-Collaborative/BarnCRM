@@ -43,7 +43,7 @@ and every lookup counts against that account's allowance.
 
 Checking a connection, **Disconnect** and starting a check need the **Manage BarnCRM Settings**
 permission. **Disconnect** asks you to confirm, then marks one provider not connected, so nothing is looked up with it;
-its key stays on the External Credential until you remove it in Setup.
+its key stays on the External Credential until you remove it in Setup. It shows only on the connected provider.
 
 ### Entering the Key in Setup
 

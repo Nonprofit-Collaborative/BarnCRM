@@ -138,6 +138,12 @@ describe('c-address-verification-setup', () => {
     expect(find(element, 'error').message).toBe('Not allowed.');
   });
 
+  it('offers Disconnect only on the connected provider', async () => {
+    const element = await render(SETUP);
+    expect(find(element, 'clear-smarty')).not.toBeNull();
+    expect(find(element, 'clear-google')).toBeNull();
+  });
+
   it('disconnects only after the admin confirms', async () => {
     const element = await render(SETUP);
     BarnConfirmModal.open.mockResolvedValue(false);

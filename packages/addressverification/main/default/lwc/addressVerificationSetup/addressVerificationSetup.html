@@ -30,13 +30,16 @@
                                 disabled={locked}
                                 onclick={handleCheck}
                             ></lightning-button>
-                            <lightning-button
-                                label={labels.clear}
-                                data-provider={credential.provider}
-                                data-id={credential.clearId}
-                                disabled={locked}
-                                onclick={handleClear}
-                            ></lightning-button>
+                            <!-- Disconnect forgets a connection, so it shows only on the connected provider. -->
+                            <template lwc:if={credential.connected}>
+                                <lightning-button
+                                    label={labels.clear}
+                                    data-provider={credential.provider}
+                                    data-id={credential.clearId}
+                                    disabled={locked}
+                                    onclick={handleClear}
+                                ></lightning-button>
+                            </template>
                         </div>
                     </template>
                 </div>
