@@ -37,7 +37,8 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Grant Pipeline**. | Columns **Prospect**, **Letter of Inquiry**, **Invited to Apply**, **Applied**, each with a count and an amount. **Open Requests** counts both grants; **Amount Requested** is 35,000. |
+| 1 | Open **Grant Pipeline**. | Columns **Prospect**, **Letter of Inquiry**, **Invited to Apply**, **Applied**, each with a count and an amount. **Open Requests** counts both grants; **Amount Requested** is 35,000. The number of grants awarded shows as a badge inside the **Awarded This Fiscal Year** tile, not under the tiles. **New Grant** shows once, at the top of the page. |
+| 1a | In an org with no open grants, open **Grant Pipeline** as staff. | The empty state shows one **New Grant** button; the top of the page has none. |
 | 2 | Read **Upcoming Deadlines**. | `Arts Grant` first with a red `3 days overdue` badge; then `2027 Literacy Grant` with an amber `10 days left` badge. The `2027 Literacy Grant` card shows the same amber badge, its amount in larger type and the owner's initials. |
 | 3 | Choose **Mine**. | Only `2027 Literacy Grant` (the staff user owns it). |
 | 4 | Choose **Everyone**, then a card's menu, **Open**. | The grant's page opens. |

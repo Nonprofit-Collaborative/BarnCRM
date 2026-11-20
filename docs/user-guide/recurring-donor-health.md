@@ -14,9 +14,9 @@ payment that is overdue. Setup detail: [Recurring donor health](../admin-guide/r
 
 You see the recurring gifts you have access to, so your figures may differ from a colleague's.
 
-## To Save a Sustainer
+## To Follow Up on a Gift
 
-1. Under **Save the Sustainer**, each line shows the donor, the gift and why it is listed.
+1. Under **Gifts That Need Attention**, each line shows the donor, the gift and why it is listed.
 2. Choose **Create Follow-Up Task** to add a task for yourself, due today.
 3. Open the gift to see its **Failed Charges**, **Last Failed Charge**, **Card Expires** and
    **Cancelled at Processor**.

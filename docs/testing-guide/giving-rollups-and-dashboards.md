@@ -151,12 +151,12 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As admin, open **BarnCRM Fundraising**. | It opens on **Fundraising Home**, the first tab. The menu has thirteen tabs: **Fundraising Home**, **Quick Gift Entry**, **Contacts**, **Households**, **Organizations**, **Gifts**, **Commitments**, **Ask Pipeline**, **Gift Batches**, **Receipts**, **Stewardship Plans**, **Thank-Yous**, **Reports**. **Donor Level Ladder**, **Stewardship Plan Setup**, **Pledge Reminders**, **Receipt Letters**, **Asks**, **Scheduled Payments**, **Funds**, **Appeals**, **Tributes**, **Donor Segments**, **Recurring Donor Health** and **Dashboards** are not in the menu. |
+| 1 | As admin, open **BarnCRM Fundraising**. | It opens on **Fundraising Home**, the first tab. The menu has thirteen tabs: **Fundraising Home**, **Quick Gift Entry**, **Contacts**, **Households**, **Organizations**, **Gifts**, **Commitments**, **Ask Pipeline**, **Gift Batches**, **Receipts**, **Stewardship Plans**, **Thank-Yous**, **Reports**. **Donor Levels and Scores**, **Stewardship Plans**, **Pledge Reminders**, **Receipt Letters**, **Asks**, **Scheduled Payments**, **Funds**, **Appeals**, **Tributes**, **Donor Segments**, **Recurring Donor Health** and **Dashboards** are not in the menu. |
 | 2 | Read the figures. | Five bordered figures with their tab icons: **Gifts** (badge **To acknowledge**), **Scheduled Payments** (badge **Overdue**), **My Asks Due This Month**, **Gift Batches** (badge **Open**), **Stewardship Plans** (badge **Running**). A badge on a zero count is grey. |
 | 3 | Click **Scheduled Payments**. | The Scheduled Payments list view **Overdue** opens; its count matches the figure. Go back. |
 | 4 | Click **Gifts**. | The **Thank-Yous** page opens. Go back and click **My Asks Due This Month**: the Asks list view of that name opens. |
 | 5 | Click **Enter a Gift**. | Quick Gift Entry opens. |
-| 6 | On Fundraising Home, read **Fundraising Setup**. | Four tiles, each with its tab's icon and one line: **Donor Level Ladder**, **Stewardship Plan Setup**, **Pledge Reminders**, **Receipt Letters**. Click each: its page opens. |
+| 6 | On Fundraising Home, read **Fundraising Setup**. | Four tiles, each with its tab's icon and one line: **Donor Levels and Scores**, **Stewardship Plan Templates**, **Pledge Reminders**, **Receipt Letters**. Click each: its page opens. |
 | 7 | Read the charts. | **Giving by Month** (a column per month) and **Open Asks by Stage** (a bar per stage) show sample data, in Salesforce's own colors, and follow dark mode when it is on. Click one: its report opens from the **BarnCRM Fundraising** folder. |
 | 8 | As staff, open Fundraising Home. | The figures and **Enter a Gift** show. **Fundraising Setup** has **Pledge Reminders** and **Receipt Letters** only. |
 | 9 | As read-only, open Fundraising Home. | The figures show; **Enter a Gift** does not; **Fundraising Setup** has **Pledge Reminders** and **Receipt Letters**. |
@@ -170,13 +170,13 @@ For every script on this page:
 
 ## T-GRD-10: Recurring Donor Health
 
-**Purpose:** Confirm processor events match recurring gifts, update them and put them on the Save the Sustainer list, and that monthly recurring revenue counts each frequency. Setup detail: [Recurring donor health](../admin-guide/recurring-donor-health.md).
+**Purpose:** Confirm processor events match recurring gifts, update them and put them on the Gifts That Need Attention list, and that monthly recurring revenue counts each frequency. Setup detail: [Recurring donor health](../admin-guide/recurring-donor-health.md).
 **Prerequisites:** admin and staff users. Two donors with email addresses: donor A with an Active Recurring commitment of 25 Monthly and **Processor Subscription Id** `sub_test_1`; donor B with an Active Recurring commitment of 120 Yearly and no subscription id. **Card expiry warning days** at its default, 60.
 **Smoke:** no
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In the **BarnCRM Fundraising** app, on **Fundraising Home**, click **Recurring Donor Health** under **More**. | **Monthly Recurring Revenue** includes 35.00 for the two gifts (25 plus 120 / 12); **Active Recurring Gifts** counts both. **Save the Sustainer** lists neither. |
+| 1 | In the **BarnCRM Fundraising** app, on **Fundraising Home**, click **Recurring Donor Health** under **More**. | **Monthly Recurring Revenue** includes 35.00 for the two gifts (25 plus 120 / 12); **Active Recurring Gifts** counts both. **Gifts That Need Attention** lists neither. |
 | 2 | Open **Recurring Gift Events**, select **New**: Event Type **Charge Failed**, Subscription Id `SUB_TEST_1`, Detail "Card declined". Save. | Match Status **Matched**; Commitment is donor A's gift. On the gift, **Failed Charges** is 1 and **Last Failed Charge** is today. |
 | 3 | Back on Recurring Donor Health. | Donor A's gift is listed with a failed charges reason; **Monthly Revenue at Risk** is 25.00. |
 | 4 | Select **Create Follow-Up Task** on it. | A success message shows; a task due today, assigned to you, is on the gift and on donor A. |

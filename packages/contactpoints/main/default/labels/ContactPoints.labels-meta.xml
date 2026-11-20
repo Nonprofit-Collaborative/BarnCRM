@@ -13,7 +13,7 @@
         <categories>ContactPoints</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Run Backfill button</shortDescription>
-        <value>Run Backfill</value>
+        <shortDescription>Copy Existing People button</shortDescription>
+        <value>Copy Existing People</value>
     </labels>
 </CustomLabels>

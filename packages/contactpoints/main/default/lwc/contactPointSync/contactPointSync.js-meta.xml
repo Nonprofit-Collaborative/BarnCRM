@@ -3,7 +3,7 @@
   <apiVersion>67.0</apiVersion>
   <description>
     The Contact Point Sync page: whether each kind can be copied here, the preview count, the
-    last backfill, and Run Backfill.
+    last copy, and Copy Existing People.
   </description>
   <isExposed>true</isExposed>
   <masterLabel>Contact Point Sync</masterLabel>

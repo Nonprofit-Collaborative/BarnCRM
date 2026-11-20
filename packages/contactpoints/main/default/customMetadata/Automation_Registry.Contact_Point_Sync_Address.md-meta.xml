@@ -24,7 +24,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">Copies each current address to the Salesforce Contact Points of the person or household members it belongs to, after it is added, changed, deleted or restored. Switched off or paused, changes are not copied; run the backfill on the Contact Point Sync page once it is back on.</value>
+        <value xsi:type="xsd:string">Copies each current address to the Salesforce Contact Points of the person or household members it belongs to, after it is added, changed, deleted or restored. Switched off or paused, changes are not copied; press Copy Existing People on the Contact Point Sync page once it is back on.</value>
     </values>
     <values>
         <field>Module__c</field>

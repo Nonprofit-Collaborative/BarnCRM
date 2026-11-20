@@ -3,7 +3,7 @@
   <apiVersion>67.0</apiVersion>
   <description>
     Recurring donor health logic in plain JavaScript: monthly values by frequency, monthly
-    recurring revenue, Save the Sustainer reasons and twelve months of totals (G-27).
+    recurring revenue, attention reasons and twelve months of totals (G-27).
   </description>
   <isExposed>false</isExposed>
 </LightningComponentBundle>

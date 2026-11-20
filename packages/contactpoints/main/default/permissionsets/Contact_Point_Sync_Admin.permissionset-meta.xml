@@ -3,8 +3,8 @@
   <hasActivationRequired>false</hasActivationRequired>
   <label>Contact Point Sync Admin</label>
   <description>
-    Opens the Contact Point Sync page, previews and starts the backfill, and reads which Contact
-    Points BarnCRM manages. Starting the backfill also needs the Manage BarnCRM Settings
+    Opens the Contact Point Sync page, previews and starts Copy Existing People, and reads which Contact
+    Points BarnCRM manages. Starting it also needs the Manage BarnCRM Settings
     permission.
   </description>
   <classAccesses>

@@ -36,10 +36,15 @@ Which modules are listed depends on the edition chosen in first-run setup (see
 Core and the 17 modules both editions offer: BarnCRM Rollup Builder, BarnCRM Contact Point Sync,
 BarnCRM Event Management, BarnCRM Forms, BarnCRM Portal Builder, BarnCRM Address Verification,
 BarnCRM Payments, BarnCRM Corporate Hub, BarnCRM Memberships, BarnCRM Territory Management,
+<<<<<<< HEAD
 BarnCRM Mirror, BarnCRM LWC Builder, BarnCRM Project Management, BarnCRM Advanced Reporting,
 BarnCRM Org Optimizer (Org Optimizer and Health Check), BarnCRM Sample Data (for sandboxes and
 demo orgs) and BarnCRM Migration (the Migration Assistant, to install while migrating and
 uninstall after). The Nonprofit Edition lists all 24: those 18 plus BarnCRM Fundraising, BarnCRM Volunteers,
+=======
+BarnCRM Mirror, BarnCRM Component Builder, BarnCRM Project Management and BarnCRM Advanced Reporting.
+The Nonprofit Edition lists all 21: those 15 plus BarnCRM Fundraising, BarnCRM Volunteers,
+>>>>>>> origin/feature/d213-naming
 BarnCRM Programs, BarnCRM Logic Models, BarnCRM Grants and BarnCRM Scholarships and Outbound
 Grants. A module that is installed is always listed, whatever the edition. See
 [Editions](editions.md).

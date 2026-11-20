@@ -259,7 +259,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | L-06 Link outcomes to grant deliverables: the Logic Model Outcomes card on a requirement | [funders.md](funders.md#outcomes-a-requirement-reports-on) | BarnCRM Grants |
 | F-06 Funder report merge template: Funder Report Templates | [funders.md](funders.md#funder-report-templates) | BarnCRM Grants |
 | F-07 Board dashboard: the Board Dashboard tab | [funders.md](funders.md#the-board-dashboard-tab) | BarnCRM Grants |
-| C-45 Contact Point Sync: copying email, phone and addresses to Salesforce Contact Points, the settings, the backfill | [contact-point-sync.md](contact-point-sync.md) | BarnCRM Contact Point Sync |
+| C-45 Contact Point Sync: copying email, phone and addresses to Salesforce Contact Points, the settings, Copy Existing People | [contact-point-sync.md](contact-point-sync.md) | BarnCRM Contact Point Sync |
 | C-46 Address Verification: the org's own Smarty or Google key, checks on save and nightly, corrections, the nightly limit, Health Check | [address-verification.md](address-verification.md) | BarnCRM Address Verification |
 
 ### Forms
@@ -288,11 +288,11 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | PAY-01 Payments: install, roles, the Site, connecting Stripe and PayPal, Payments Setup and keys, test and live mode, processing, payment statuses and refunds, Health Check checks, the seam for module builders | [payments.md](payments.md) | BarnCRM Payments |
 | MIG-06 Online giving through Zapier: recipes for Givebutter, Donorbox and similar tools into Fundraising gifts | [online-giving-zapier.md](online-giving-zapier.md) | Fundraising |
 
-### LWC Builder
+### Component Builder
 
 | Feature | Page | Package |
 |---|---|---|
-| LB-01 to LB-06 LWC Builder: install, access, settings, the grid canvas builder, placing the packaged component, blocks, buttons, visibility rules, export as LWC source, moving components between orgs | [lwc-builder.md](lwc-builder.md) | BarnCRM LWC Builder |
+| LB-01 to LB-06 Component Builder: install, access, settings, the grid canvas builder, placing the packaged component, blocks, buttons, visibility rules, export as LWC source, moving components between orgs | [lwc-builder.md](lwc-builder.md) | BarnCRM Component Builder |
 
 ### Advanced Reporting
 

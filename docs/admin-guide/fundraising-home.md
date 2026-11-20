@@ -17,8 +17,8 @@ me today" in one look, so a fundraiser starts on one page rather than a menu of 
   - **Stewardship Plans** with **Running**: plans still under way. Opens the list view
     **Running Plans**.
 - **Enter a Gift**, which opens Quick Gift Entry.
-- **Fundraising Setup**: a tile for each setup page that left the app's menu (**Donor Level
-  Ladder**, **Stewardship Plan Setup**, **Pledge Reminders**, **Receipt Letters**). All four
+- **Fundraising Setup**: a tile for each setup page that left the app's menu (**Donor Levels
+  and Scores**, **Stewardship Plan Templates**, **Pledge Reminders**, **Receipt Letters**). All four
   are also tabs in **BarnCRM Admin** and **BarnCRM Admin Console**, before **Error Log**.
 - **More**: a tile for each list that left the app's menu in release 1.24 (D-200): **Asks**,
   **Scheduled Payments**, **Funds**, **Appeals**, **Tributes**, **Donor Segments**, **Recurring
@@ -35,8 +35,8 @@ figure is named by its list view. A badge turns to its color only when its count
 A figure counts at most 2,000 records and shows "2,000+" past that.
 
 Each figure, tile and button shows only to someone who can read the records behind it:
-**Enter a Gift** needs create access to gifts, the **Donor Level Ladder** and **Stewardship
-Plan Setup** tiles need the **Manage BarnCRM Settings** permission, and the other two setup
+**Enter a Gift** needs create access to gifts, the **Donor Levels and Scores** and **Stewardship
+Plan Templates** tiles need the **Manage BarnCRM Settings** permission, and the other two setup
 tiles need read access to pledge reminders or receipt runs. A **More** tile needs read access to
 its object (gifts, for Donor Segments and Recurring Donor Health). The first-run panel shows only
 to someone who can create gifts, and **Import a File** only to someone who can create import
@@ -50,8 +50,8 @@ Nothing to turn on. The page and its tab come with the Fundraising module, and t
 ## What Changed in the App's Menu
 
 The app's navigation now opens on **Fundraising Home** and adds **Scheduled Payments** after
-**Commitments**. Four setup pages left the default menu: **Donor Level Ladder**, **Stewardship
-Plan Setup**, **Pledge Reminders** and **Receipt Letters**. Nothing was removed: each is a tile
+**Commitments**. Four setup pages left the default menu: **Donor Levels and Scores**, **Stewardship
+Plan Templates**, **Pledge Reminders** and **Receipt Letters**. Nothing was removed: each is a tile
 under **Fundraising Setup** on Fundraising Home, is still in the App Launcher, and the first two
 are also in the BarnCRM Admin apps. Anyone can add one back to their own menu with the pencil
 icon at the end of the navigation bar.
@@ -91,7 +91,7 @@ region and pick a report). The figures and setup tiles are one component, **Fund
 1. Open **BarnCRM Fundraising**. It opens on **Fundraising Home**.
 2. Read the five figures. Click **Scheduled Payments** with **Overdue**: the Overdue list view opens.
 3. Go back and click **Enter a Gift**: Quick Gift Entry opens.
-4. As an administrator, open **Donor Level Ladder** from **Fundraising Setup**.
+4. As an administrator, open **Donor Levels and Scores** from **Fundraising Setup**.
 5. Under **More**, click **Funds**: the Funds list opens.
 6. Scroll to the charts and click one to open its report.
 

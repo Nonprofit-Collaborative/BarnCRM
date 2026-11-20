@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
   <deploymentStatus>Deployed</deploymentStatus>
-  <description>A component built in the LWC Builder: its layout and blocks as a JSON definition, shown on Lightning pages by the packaged BarnCRM Built Component (canonical model 29LB1).</description>
+  <description>A component built in the Component Builder: its layout and blocks as a JSON definition, shown on Lightning pages by the packaged BarnCRM Built Component (canonical model 29LB1).</description>
   <enableActivities>false</enableActivities>
   <enableBulkApi>true</enableBulkApi>
   <enableFeeds>false</enableFeeds>

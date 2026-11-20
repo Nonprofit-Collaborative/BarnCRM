@@ -93,8 +93,8 @@
         <categories>Core, Automation</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Automation page title</shortDescription>
-        <value>Automation</value>
+        <shortDescription>Automation page: title of the first card, the pause and catch-up controls</shortDescription>
+        <value>Pause and Catch Up</value>
     </labels>
     <labels>
         <fullName>Core_AutomationControl_TwentyFourHours</fullName>

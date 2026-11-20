@@ -45,6 +45,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **Ask Pipeline**, **Board**. Read the top. | **Open Asks** 2, **Open Ask Total** 7,000.00, **Won This Fiscal Year** 0, **Declined This Fiscal Year** 0. |
+| 1a | In an org with no asks, open **Ask Pipeline** as staff. | The empty state shows one **New Ask** button; the top of the page has none. |
 | 2 | Read the first column. | Count 2 and total 7,000.00. Each card shows donor, ask amount, target date, next step, assigned to and "0 days in this stage". |
 | 3 | Drag the Luis Garcia card to **Cultivating**. | The card moves. **Identified** shows 1 and 2,000.00; **Cultivating** shows 1 and 5,000.00. |
 | 4 | Open the Harper Garcia card's menu. | It offers **Move to** each other stage, **Open** and **Close Ask**. |

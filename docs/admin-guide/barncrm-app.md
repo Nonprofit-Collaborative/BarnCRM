@@ -96,7 +96,7 @@ need not switch apps. The modules with no app have their pages only here:
 | Module | Added to **BarnCRM** and **BarnCRM Console** | Added to **BarnCRM Admin** and **BarnCRM Admin Console** |
 |---|---|---|
 | Rollup Builder | | Rollup Builder |
-| Fundraising | Quick Gift Entry, Gifts, Commitments, Gift Batches | Accounting Periods, Donor Level Ladder, Stewardship Plan Setup, Pledge Reminders, Receipt Letters, Campaign Sync, Opportunity Mirror, Gift Transaction Mirror, Accounting Export |
+| Fundraising | Quick Gift Entry, Gifts, Commitments, Gift Batches | Accounting Periods, Donor Levels and Scores, Stewardship Plan Templates, Pledge Reminders, Receipt Letters, Campaign Sync, Opportunity Mirror, Gift Transaction Mirror, Accounting Export |
 | Volunteers | Volunteer Shifts, Volunteer Hours | |
 | Mirror | | Provider Requests |
 | Forms | Forms, Form Submissions | |

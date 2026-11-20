@@ -3,7 +3,7 @@
   <fullName>Source_Export__c</fullName>
   <defaultValue>true</defaultValue>
   <externalId>false</externalId>
-  <inlineHelpText>Whether the LWC Builder offers Export as LWC Source for developers. Default: on.</inlineHelpText>
+  <inlineHelpText>Whether the Component Builder offers Export as LWC Source for developers. Default: on.</inlineHelpText>
   <label>Allow source export</label>
   <trackTrending>false</trackTrending>
   <type>Checkbox</type>

@@ -59,7 +59,8 @@ export function rateFraction(figures) {
 
 /**
  * The tiles across the top, in order. Counts are numbers (the stat tile formats them for the
- * person's locale); the rate is a fraction shown as a percent, or the none label as text.
+ * person's locale); the rate is a fraction shown as a percent, 0% when there are no deliveries so the tile never
+ * shows words in metric-sized type.
  */
 export function tiles(dashboard, labels) {
   if (!dashboard || !dashboard.canSee) {
@@ -77,7 +78,7 @@ export function tiles(dashboard, labels) {
     {
       key: 'rate',
       label: labels.attendanceRate,
-      value: rate === null ? labels.noRate : rate,
+      value: rate === null ? 0 : rate,
       formatStyle: 'percent'
     }
   ].map((tile) => ({ formatStyle: 'decimal', ...tile }));

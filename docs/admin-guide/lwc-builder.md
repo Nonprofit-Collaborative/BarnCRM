@@ -1,8 +1,8 @@
-# LWC Builder
+# Component Builder
 
 ## What It Does
 
-BarnCRM LWC Builder is an optional module, in either edition, for building your own Lightning
+BarnCRM Component Builder is an optional module, in either edition, for building your own Lightning
 components without code:
 
 - **Grid canvas builder** (LB-01): lay out sections, rows and columns on a 12-column grid, drag
@@ -22,23 +22,23 @@ the page, so they never see a record or field they could not open anyway.
 
 ## Install and Turn On
 
-LWC Builder depends on BarnCRM Core only. Install it like any module, then turn it on in
+Component Builder depends on BarnCRM Core only. Install it like any module, then turn it on in
 BarnCRM Settings, **Modules** (it installs off). The install, and Finish Setup on the Modules
-page, gives you and every BarnCRM Admin holder LWC Builder Admin, and gives the module's Staff
+page, gives you and every BarnCRM Admin holder Component Builder Admin, and gives the module's Staff
 and Read Only sets to BarnCRM's other roles (see Access below). Installing changes no page: a
 built component shows only where you place it.
 
-The **LWC Builder** tab is added at the end of the BarnCRM and BarnCRM Console apps, for admins (in a package install
+The **Component Builder** tab is added at the end of the BarnCRM and BarnCRM Console apps, for admins (in a package install
 the admin adds it in App Manager; the Setup Assistant lists the tab names).
-LWC Builder has no app of its own.
+Component Builder has no app of its own.
 
 ## Access
 
 | Permission set | Who gets it automatically | What it allows |
 |---|---|---|
-| LWC Builder Admin | BarnCRM Admin holders | The LWC Builder tab; create, edit and delete built components; export source |
-| LWC Builder Staff | Team Member and Fundraising Staff holders | See built components placed on pages |
-| LWC Builder Read Only | Read Only holders | See built components placed on pages |
+| Component Builder Admin | BarnCRM Admin holders | The Component Builder tab; create, edit and delete built components; export source |
+| Component Builder Staff | Team Member and Fundraising Staff holders | See built components placed on pages |
+| Component Builder Read Only | Read Only holders | See built components placed on pages |
 
 Sets are given, never taken away. Someone with none of these sets sees nothing where a built
 component is placed. A built component never grants access: each block shows only what the
@@ -46,7 +46,7 @@ viewer's object, field and record access allow.
 
 ## Settings
 
-BarnCRM Settings, **LWC Builder**:
+BarnCRM Settings, **Component Builder**:
 
 | Setting | Default | What it does |
 |---|---|---|
@@ -56,7 +56,7 @@ BarnCRM Settings, **LWC Builder**:
 
 ## Five-Minute Walkthrough
 
-1. Open the **LWC Builder** tab and press **New Component**. Give it a name, for example
+1. Open the **Component Builder** tab and press **New Component**. Give it a name, for example
    *Donor Snapshot*; the key fills in from the name. Set **Object** to `Contact` so the preview
    and the field pickers know which record it is for.
 2. Press **Add Section** and title it *At a Glance*. In the section, press **Add Row** and pick
@@ -159,7 +159,7 @@ change set keeps finding its component.
 ## Common Mistakes
 
 - **Nothing shows on the page.** Check that the component is Active, that **Show built
-  components** is on, and that the viewer holds an LWC Builder set.
+  components** is on, and that the viewer holds an Component Builder set.
 - **A Record Fields block is empty on a home page.** It needs a record page.
 - **"This field is not on the object"** in a list block: a field was renamed or deleted; open
   the block and choose it again.

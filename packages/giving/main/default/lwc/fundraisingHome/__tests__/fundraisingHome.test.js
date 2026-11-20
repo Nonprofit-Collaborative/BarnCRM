@@ -57,7 +57,7 @@ const HOME = {
     }
   ],
   setupTiles: [
-    { name: 'Donor_Levels', label: 'Donor Level Ladder' },
+    { name: 'Donor_Levels', label: 'Donor Levels and Scores' },
     { name: 'Receipts', label: 'Receipt Letters' }
   ]
 };

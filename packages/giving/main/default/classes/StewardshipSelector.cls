@@ -169,7 +169,7 @@ public with sharing class StewardshipSelector {
 	}
 
 	/**
-	 * Every template with its steps, for the Stewardship Plans page in the settings console.
+	 * Every template with its steps, for the Stewardship Plan Templates page in the settings console.
 	 *
 	 * Read as the person looking at the page rather than in system mode: this is an
 	 * administrator's own configuration surface, so what the page shows is what she may see, and

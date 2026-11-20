@@ -7,8 +7,17 @@ import setEnabled from '@salesforce/apex/AutomationControlController.setEnabled'
 import { setHelpTextForTest } from 'c/barnHelpText';
 
 setHelpTextForTest({
-  Core_AutomationControl_ResumesItself: 'It turns itself back on then.'
+  Core_AutomationControl_ResumesItself: 'It turns itself back on then.',
+  Core_AutomationControl_ListTitle: 'Automations'
 });
+
+jest.mock(
+  '@salesforce/label/c.Core_AutomationControl_Title',
+  () => ({ default: 'Pause and Catch Up' }),
+  {
+    virtual: true
+  }
+);
 
 jest.mock(
   '@salesforce/apex/AutomationControlController.getPage',
@@ -119,6 +128,17 @@ describe('c-automation-control', () => {
     expect(toggles[0].disabled).toBe(false);
     expect(element.shadowRoot.querySelector('[data-id="paused-banner"]')).toBeNull();
     expect(element.shadowRoot.querySelector('[data-id="empty-state"]')).toBeNull();
+  });
+
+  it('names the first card for what it does, not for the page it sits on', async () => {
+    const element = createComponent();
+    getPage.emit(RUNNING_PAGE);
+    await flush();
+
+    expect(element.shadowRoot.querySelector('[data-id="pause-card"]').title).toBe(
+      'Pause and Catch Up'
+    );
+    expect(element.shadowRoot.querySelector('[data-id="list-card"]').title).toBe('Automations');
   });
 
   it('shows an automation that always runs as off, disabled, and says why', async () => {

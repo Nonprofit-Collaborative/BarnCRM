@@ -109,7 +109,7 @@ any real duplicates in it first.
 
 ## When Saving Says "This May Be Someone Already in BarnCRM"
 
-If your admin set up BarnCRM's recommended duplicate rules (the **Duplicate Rules Starter**),
+If your admin set up BarnCRM's recommended duplicate rules (**Turn On Recommended Rules**),
 saving a person or household that looks like one already there shows "This may be someone
 already in BarnCRM. Check the possible duplicates before saving." Look at the records it lists.
 If one is the same person or household, cancel and use that one; if not, save anyway. The save

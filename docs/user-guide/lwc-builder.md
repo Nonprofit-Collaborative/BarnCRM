@@ -1,7 +1,7 @@
 # Built Components
 
-Your admin can build components with the LWC Builder and place them on record, app and home
-pages. The setup is in the Admin Guide's [LWC Builder](../admin-guide/lwc-builder.md) page.
+Your admin can build components with the Component Builder and place them on record, app and home
+pages. The setup is in the Admin Guide's [Component Builder](../admin-guide/lwc-builder.md) page.
 
 ## What You See
 

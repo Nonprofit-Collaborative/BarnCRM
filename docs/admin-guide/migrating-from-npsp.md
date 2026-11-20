@@ -49,7 +49,7 @@ affiliations, household addresses and household names, so the two apps never bot
 | Recurring Donations of Organizations | The same for recurring donations of an organization, as a commitment of that account. |
 | Engagement Plans | Copies each NPSP engagement plan template as an active stewardship plan template with its name and description, started by hand (**Manual**). Loading again updates the same template. |
 | Engagement Plan Tasks | Copies each task of those templates as a step of its stewardship plan: the subject, days after the start (also the step order), priority (Medium becomes Normal), comments, and the assigned user (**Specific user**) or else the record owner. |
-| Levels, Engagement Plans and Rollups Parity | The parity report, done on the **Stewardship Plans** tab. Its check counts your active NPSP levels and engagement plan templates, and how many have a BarnCRM counterpart (a donor level of the same name, a stewardship plan template copied from it). Read the table below, set up what you still need, and click **Mark Done**. |
+| Levels, Engagement Plans and Rollups Parity | The parity report, done on the **Stewardship Plan Templates** tab. Its check counts your active NPSP levels and engagement plan templates, and how many have a BarnCRM counterpart (a donor level of the same name, a stewardship plan template copied from it). Read the table below, set up what you still need, and click **Mark Done**. |
 
 The kit does not copy NPSP's open installment Opportunities: BarnCRM schedules the payments of
 each commitment itself. Gifts already received come across with the next kit. The retire

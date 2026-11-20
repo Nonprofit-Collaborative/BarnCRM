@@ -27,7 +27,7 @@ const apexMeta = [
 /** The controller: list rows and report charts, every read in user mode. */
 export function apexController(name, bundle) {
   return `/**
- * Exported from the BarnCRM LWC Builder for the ${bundle} component: its list and chart reads.
+ * Exported from the BarnCRM Component Builder for the ${bundle} component: its list and chart reads.
  * Yours to change, deploy and maintain; it does not depend on BarnCRM. Every read runs as the
  * user (user mode), so object, field and record access apply.
  */
