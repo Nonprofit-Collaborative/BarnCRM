@@ -164,7 +164,7 @@ private class HealthCheckSeamTest {
 				assertRefusedAsStale(fixKey, scope);
 				Test.stopTest();
 
-				Assert.isTrue(report.getFixOutcome().contains('Test_Address_Sync'), report.getFixOutcome());
+				Assert.isTrue(report.getFixOutcome().contains('Test Address Sync'), report.getFixOutcome());
 				Assert.isTrue(HealthCheckService.fixScope(fixKey).isEmpty(), 'Every switch is back.');
 				Assert.areEqual(1, changesLogged(System.Label.Core_HealthCheck_SwitchesMissingFix), 'Recorded once.');
 			}
