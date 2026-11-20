@@ -1,13 +1,16 @@
 # ADR-NEXT: BarnCRM Connector: Recipes, Connections on Named Credentials, Polling and Webhook Triggers, Run History, and C-38 Started Inside It
 
-**Status:** Proposed
+**Status:** Accepted with amendments (D-216, 2026-11-20: decisions 1, 3, 5 and 12 to 14 as
+amended below)
 **Date:** 2026-11-20
 **Source:** Brandon, 2026-11-20 ("an integration/middleware module ... similar to Workato in
 capabilities and super easy for a non technical user to setup and use"); design in
 `docs/architecture/integration-hub-design.md` Sections 1 and 3 to 8; owner decisions D-215
 (2026-11-20: C-38, secrets subject to security review, names and two objects approved; running as
 the admin who turned recipes on rejected in favor of system, integration user or non-user runs)
-and the security review `docs/architecture/connector-secrets-security-review.md`. Starts C-38 (held by D-39)
+and the security review `docs/architecture/connector-secrets-security-review.md`; owner approval
+with exceptions D-216 (2026-11-20: a module console app, sending data back, importable templates
+instead of preloaded connectors, SFTP, databases and event-driven triggers later). Starts C-38 (held by D-39)
 and amends plan Section 4.9's C-38 scope; builds on ADR-0013, ADR-0057, ADR-0148 amendment A1,
 ADR-0165, ADR-0166, ADR-0184, ADR-0201, ADR-0227, ADR-0229 and MIG-06. Companion: ADR-NEXT
 `NEXT-reusable-mapper.md`.
@@ -25,8 +28,10 @@ budget (197 of 200) bound the design.
 ## Decision
 
 1. **A new optional module, BarnCRM Connector** (`packages/connector`, both editions, Beta,
-   depending on Core only), tab Super Connector. Concepts: Connections, Recipes (one When, up to 25
-   Then steps), Runs, Maps and Templates.
+   depending on Core only), tab Super Connector, with its own console app `BarnCRM_Connector`
+   (D-216; ADR-0223: its logo, the tab, Reports, Error Log last; left out of capped test orgs
+   through `LEFT_OUT` and `MODULE_APPS`, the tab still reaching the BarnCRM apps). Concepts:
+   Connections, Recipes (one When, up to 25 Then steps), Runs, Maps and Templates.
 2. **Connections are Salesforce credentials, not records.** BarnCRM creates an External Credential
    and a Named Credential per connection through `ConnectApi`, writes the pasted secret to the
    principal, adds the principal to one org-owned permission set, and guides the one Setup click
@@ -34,10 +39,15 @@ budget (197 of 200) bound the design.
    the Auth Provider (created by the admin in Setup) and the Authenticate click. Headers use
    `$Credential` merge formulas, so Apex never reads a secret. Page entry is approved (D-215)
    under the binding requirements of decision 11.
-3. **Connectors are JSON definitions** (auth kind, base URL, check call, actions, pollers, webhook
-   options, templates) run by one generic HTTP executor. Generic REST first; then Slack and Teams,
-   Mailchimp, Google Sheets, giving-tool webhooks, Eventbrite, Zoom, Constant Contact, QuickBooks
-   Online.
+3. **Only Generic REST is built in; app connectors are importable templates (D-216).** One generic
+   HTTP executor runs every connection. App connectors (Slack, Teams, Mailchimp, Google Sheets,
+   giving-tool webhooks, Eventbrite, Zoom, Constant Contact, QuickBooks Online, GoFundMe Pro and
+   more) are JSON template files (auth kind, base URL pattern, check call, actions, pollers,
+   webhook options, Draft recipes) imported on demand from a file or pasted, never preloaded and
+   never shipped as package metadata, static resources or records. Import (CN-08) checks the
+   schema in the browser and in Apex, fills in a Generic REST connection with its host locked to
+   the template's pattern, creates Draft recipes with the actions copied into their steps, and
+   keeps nothing else. The templates themselves are built later.
 4. **Triggers:** schedule; record created or changed by polling `SystemModstamp` past a watermark
    every 15 minutes (not the trigger framework, not Change Data Capture); inbound webhook; app
    polling; manual and the Flow action Run BarnCRM Recipe. The clock is not Scheduled Apex (which
@@ -49,8 +59,16 @@ budget (197 of 200) bound the design.
    otherwise, is kept only as its SHA-256 hash; body and hourly caps; idempotency by event key;
    optional fetch back through the connection under decision 11's F4 rules. No HMAC signatures
    (they need a readable secret); apps that require one are polled instead.
-6. **Steps:** Find, Create, Update, Create or Update (through a map), Call an App, Change Data, If,
-   For Each, Wait, Load Rows with an Import Template, Stop. Values are paths, never expressions.
+   **Sending data back (D-216):** the receiver's synchronous answer is fixed: a status code (200
+   or 202), a fixed JSON body typed on the recipe (no `{!`, at most 4,000 characters), an optional
+   echo of one named challenge field, and an opaque run reference; never record data or a step's
+   result, because the guest only stores. Results go back asynchronously, from the runner: the
+   **Send to Webhook** step POSTs a map-built body to a connection, or to a callback URL from the
+   post only when it matches that connection's exact host and port (F4, parsed as fetch back),
+   under the F1 guard; Call an App writes back to an app's API.
+6. **Steps:** Find, Create, Update, Create or Update (through a map), Call an App, Send to
+   Webhook, Change Data, If, For Each, Wait, Load Rows with an Import Template, Stop. Values are
+   paths, never expressions.
    Data steps run in user mode as the recipe's identity, or in system mode for a System recipe
    (decision 10); otherwise only the module's own rows are written in system mode.
 7. **Runs:** one Queueable runner chain processes many runs per execution and checkpoints before a
@@ -130,6 +148,17 @@ budget (197 of 200) bound the design.
       Check warns if it holds anything but principal access.
     - **F13** The header token above; payload values are subject to F1; the guest permission set
       holds only the REST class and create on the start event.
+12. **Release slots (D-216, BMemory plan):** 1.31 CN-01 (package, console app, Generic REST
+    connections with API key, Bearer, Basic and Secret URL kinds), CN-02 (the two objects,
+    recipes, runs, executor), CN-06; 1.32 CN-03, CN-04 with sending data back, CN-09 (C-38),
+    CN-05, CN-08 with versions and template import; 1.33 CN-13, CN-18.
+13. **Later, not in the first version (D-216):** the app templates; event-driven triggers in place
+    of 15-minute polling; SFTP and direct database connections, which need an HTTPS bridge since
+    Apex has no sockets (whether a free, self-service bridge exists is the first question when
+    slotted).
+14. **Auth kinds arrive with their first user:** OAuth client credentials, the token step and
+    OAuth browser sign-in (with the guided Auth Provider step, F9) are built with the first
+    template that needs each.
 
 ## Alternatives considered
 
@@ -186,4 +215,7 @@ budget (197 of 200) bound the design.
   fallback; if the Automated Process assignment is refused, Integration User becomes the
   recommended default and System stays an explicit choice.
 - Workato features left out (SFTP, databases, agents, streams, code steps, synchronous APIs) are
-  listed in the design with what to do instead.
+  listed in the design with what to do instead; SFTP, databases and event-driven triggers are on
+  the Later list (D-216).
+- An org holds no connector it did not import (D-216): nothing to retire or upgrade per app, and a
+  template fix reaches an org only when its admin imports the new file.

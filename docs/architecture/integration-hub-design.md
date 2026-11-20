@@ -1,7 +1,16 @@
 # Integration Hub Design: the Mapper and BarnCRM Connector
 
-**Status:** Proposed (design for the build to follow; nothing here is built yet)
+**Status:** Approved with amendments (D-216, 2026-11-20); the build follows Section 7
 **Date:** 2026-11-20
+**Approval (D-216):** Brandon, 2026-11-20: "The Mapper and Connector designs are approved with
+the excepts of: make a module specific console app for Connector, it needs to be able to send
+info back (such as through a webhook connection), and the premade system integrations should be
+templates that can easily be imported (but not already loaded into Salesforce in order to prevent
+unnecessary tech debt and solution bloat) and those templates can wait to be built until later.
+I'd also need some additional templates, such as GoFundMe Pro, and many others in the future. I'd
+also like SFTP and direct database connections in the future but it doesn't need to be in the
+first version. Event driven triggers (instead of every 15 minutes) should also be in a future
+release." Section 8 lists where each exception is applied.
 **Source:** Brandon, 2026-11-20: "I'd also like to create and integration/middleware module. I'd
 like it to be similar to Workato in capabilities and super easy for a non technical user to setup
 and use. Also, I'd like a UI feature to map objects and fields that can be reused for functions
@@ -79,8 +88,12 @@ pattern (ADR-0184) and the Super Importer engine are reused, not rebuilt.
   Providers do it.
 - No connector code SDK: a connector is a JSON definition; generic HTTP is the only executor.
 - No Change Data Capture, no Platform Event bus of our own, no Bulk API (Section 4.9 stands).
-- No synchronous "respond with data" webhook API, no callable sub-recipes, no lookup-table
-  object, no environment promotion beyond exporting and importing a recipe's JSON.
+- No synchronous "respond with data" webhook API (the receiver answers at once with a fixed
+  acknowledgement; anything computed is sent back afterwards by a step, Section 3.3a), no
+  callable sub-recipes, no lookup-table object, no environment promotion beyond exporting and
+  importing a recipe's JSON.
+- No app connectors shipped in the package (D-216): only Generic REST is built in; every app
+  connector is an importable JSON template, imported on demand (Section 3.6).
 - No AI step (no paid AI API, Brandon's rule).
 
 ---
@@ -214,10 +227,20 @@ How it beats Flow's assignment and transform screens for Maria:
 - **Run:** one time a recipe ran, with each step's result, so the admin sees what happened, why it
   failed and can retry it.
 - **Map:** the Mapper's saved map, used by steps that write a record or build a request body.
-- **Template:** a ready-made recipe to start from.
+- **Template:** a JSON file the admin imports (from a file or pasted) that fills in a new
+  connection and draft recipes for one app. Never preloaded (D-216, Section 3.6).
 
 Tab **Super Connector** with four sections (`barnTabs`): Recipes, Connections, Run History,
-Templates. The module's own app and Settings tab follow D-101 and ADR-0223.
+Templates (the import). Each section arrives with the slice that builds it; CN-01 ships
+Connections alone.
+
+**Its own console app (D-216).** The module ships the BarnCRM Connector console app
+(`BarnCRM_Connector`) in its own package, following ADR-0223: its logo, the Super Connector tab,
+Reports, and Error Log last (D-135); app visibility in `BarnCRM_Connector_Admin` (the module has
+no Staff set; Connector work is admin work, R-CR3). The Super Connector tab also joins the
+BarnCRM apps through the module's catalog row (ADR-0137, ADR-0192), so a capped test org, which
+leaves the app out through `LEFT_OUT` in `scripts/org/capped-org-apps.py` (`MODULE_APPS`), still
+reaches it. The catalog row's `App_Name__c` gives the Home hub's Open the App.
 
 ### 3.2 Triggers (the When)
 
@@ -245,8 +268,11 @@ Templates. The module's own app and Settings tab follow D-101 and ADR-0223.
 - *Loop guard:* "Ignore changes made by recipes" is on by default: records last changed by a
   recipe identity (Section 3.10) are skipped, so a recipe that writes to the object it watches
   does not trigger itself.
-- *Later, only if delay proves a problem:* an instant option through the ADR-0138 generated
-  trigger the admin deploys, publishing to the run queue.
+- *Event-driven triggers are a future release (D-216):* the first version polls. The owner wants
+  record changes to start recipes as they happen instead of every 15 minutes; that is on the
+  Later list (Section 7.2), designed when it is slotted. The likely shape is the ADR-0138
+  generated trigger the admin deploys per object, publishing to the run queue (callouts still
+  run in the runner), with Change Data Capture weighed against its five-entity allocation.
 
 **The recipe clock (no scheduled job, no person).** Scheduled Apex runs as the user who scheduled
 it and fails once that user is deactivated, so the clock is not a CronTrigger. Turn On Recipes
@@ -301,6 +327,47 @@ Endpoint: `POST <site URL>/services/apexrest/barncrm/connector/v1/hook?token=<64
   Payments or Forms have one); the Settings tab says how to create one.
 - **Logging:** the token never appears in a log, run or error message.
 
+### 3.3a Sending Data Back (D-216)
+
+The owner's condition: the Connector "needs to be able to send info back (such as through a
+webhook connection)". Two ways, split by what can be synchronous.
+
+**1. The reply to the app that posted (synchronous, fixed).** The receiver answers in the same
+request, inside the Site guest REST transaction (synchronous limits: 10 seconds of CPU, 6 MB of
+heap, and most senders' own timeouts of 3 to 30 seconds). Because the guest only stores (ADR-0184,
+Section 3.3), the reply can hold only what is known without processing:
+
+| Part | What the recipe can set | Default |
+|---|---|---|
+| Status code | 200 or 202 | 202 |
+| Body | A fixed JSON reply typed on the recipe (at most 4,000 characters, checked on save; `{!` refused, F1), with one optional placeholder for the run reference | `{"received": true, "reference": "<run reference>"}` |
+| Challenge echo | The name of one top-level field of the posted JSON (or query parameter) whose value is echoed back as the body, for apps that confirm an endpoint by echoing a value they sent (no secret involved) | Off |
+| Run reference | An opaque 20-character reference stored on the run, so the app and Run History can be matched | Always present |
+
+What it cannot do synchronously: return a record, a computed value or the result of a step.
+Refused inputs keep Section 3.3's answers (404 empty, 413, an hourly cap refusal as 429). The
+reply adds one small string to the response, so the receiver's cost is unchanged: one hash
+lookup, one insert, one event publish.
+
+**2. Sending results back after processing (asynchronous, through a connection).** Anything a
+recipe computes goes back by a step in the runner, never in the guest's request:
+
+- **Send to Webhook** (`sendWebhook`, new step, Section 3.4): POSTs a JSON body built from a map
+  to a connection. A webhook URL that is itself the secret is a Secret URL connection (F5); any
+  other webhook is a Generic REST connection. It runs under the same rules as Call an App: the
+  `{!` guard on every header, path, query and body value (F1), the path rules and URL encoding
+  (F4), the body serialized with `JSON.serialize`, transient failures retried (Section 3.7).
+- **Reply to a callback URL the caller sent.** Some apps put a reply address in the post (a
+  `response_url`). That URL is untrusted: Send to Webhook may use it only through a chosen
+  connection, parsed exactly as fetch back is (F4: `https`, no user info, the connection's exact
+  host and port, and only its path and query appended to `callout:`); any other host fails the
+  step. The posted URL is never the endpoint.
+- **Call an App** already writes back to an app's API (update the item that started the run).
+
+Timing: a reply step runs when the runner reaches it, normally within a minute of the post (the
+start event restarts the runner chain at once), and later under retries or backlog. An app that
+needs a synchronous computed answer is out of scope (Section 4.1).
+
 ### 3.4 Actions (the Then steps)
 
 | Step | Plain name | What it does |
@@ -308,6 +375,7 @@ Endpoint: `POST <site URL>/services/apexrest/barncrm/connector/v1/hook?token=<64
 | `find` | Find Records | A Find query document (R-R2) with values from earlier steps; returns up to 200 records; "stop if none" option |
 | `create`, `update`, `upsert` | Create, Update, or Create or Update a Record | Applies a map (linked or inline) to build the record; upsert uses the map's `match`; `Database` DML in user mode with partial success off per run |
 | `callApp` | Call an App | A connector action, or a custom request on a generic connection: method, path (F4 rules), query, non-secret headers (never `Authorization` or a `{!` value, F1), body built from a map (`to.kind` json, serialized with `JSON.serialize`, never by string substitution), expected success codes, "404 means not found" option |
+| `sendWebhook` | Send to Webhook | POSTs a JSON body built from a map to a connection, or to a callback URL from the trigger that matches that connection's exact host (Section 3.3a, F1, F4); expected success codes |
 | `transform` | Change Data | Applies a map with `to.kind` json to produce a new data object for later steps |
 | `if` | If | A condition (filter document over trigger and step data) with Then steps and optional Otherwise steps; nesting at most 2 levels |
 | `forEach` | For Each | Runs its steps once per item of a list from an earlier step, at most 1,000 items a run, checkpointing every 200 |
@@ -342,6 +410,10 @@ Authentication kinds, from the connector definition:
 | OAuth 2.0 client credentials | Paste client id and secret (External Credential's native flow) | Many server-to-server APIs |
 | Token step | Paste client id and secret; the connector's sign-in call returns a short-lived token held for one transaction (the PayPal pattern of ADR-0229) | Zoom Server-to-Server OAuth |
 | OAuth 2.0 browser sign-in | Create an app at the provider (BarnCRM shows the callback URL and the scopes to tick); create the Auth Provider in Setup, pasting the client id and secret into Setup's own form (guided, F9); BarnCRM then creates the External Credential and Named Credential that reference it (no secret involved); then one Authenticate click | Google Sheets, Constant Contact, QuickBooks Online |
+
+CN-01 builds API key in a header, Bearer token, Basic and Secret URL. OAuth client credentials,
+the token step and OAuth browser sign-in arrive with the first template that needs each
+(Section 7.2), so no unused kind ships.
 
 Headers use merge formulas (`{!$Credential.BarnConn_x.ApiKey}`, Allow Formulas in HTTP Header
 on), so Apex never reads a stored secret (ADR-0229 decision 1). The auth header template comes
@@ -450,9 +522,33 @@ URL for generic), **Replace Key**, **Disconnect** (deletes the principal's crede
 recipe definitions, pauses recipes that use it) and **Delete** (refused while a recipe uses it).
 What remains to confirm in an org is listed in Section 3.11.
 
-### 3.6 Connector Catalog (JSON)
+### 3.6 Built-in Generic REST and Importable App Templates (D-216)
 
-One JSON file per connector, shipped as a static resource and contributed as JSON only:
+**Only Generic REST is built in.** Its definition (the auth kinds of Section 3.5, each kind's
+principal, parameter names and auth header template) lives in the module's Apex, so the header
+template can never come from a client or a file (F1, F2); the form rules (base URL, header
+name, check path) live in a framework-free JS module the page and Jest share (plan 9.9).
+
+**App connectors are templates, imported on demand, never preloaded (D-216).** No app connector,
+template or catalog file is shipped as package metadata, static resource or record: an org holds
+only what its admin imported, so nothing unused sits in Salesforce. A template is one JSON file
+(downloadable from the BarnCRM website and repository, or pasted) that the Templates section
+imports (CN-08, release 1.32):
+
+1. The file is checked against the template schema (below) in the browser and again in Apex; a
+   template can carry no `{!` anywhere, no auth header template (the auth kind names one of the
+   built-in templates) and no Allow Formulas in HTTP Body option (F1).
+2. Import fills in a new Generic REST connection: label, auth kind, header name, base URL and
+   check path, with the base URL's host locked to the template's pattern (F4). The admin pastes
+   the key as for any connection; nothing secret is ever in a template.
+3. Import creates the template's recipes as Draft recipes with each blank highlighted (Section
+   3.8). Actions the recipes use are copied into their Call an App steps, so a recipe never
+   depends on the template file afterwards.
+4. Nothing else is stored: the template file is not kept. Importing the same template again
+   offers a new connection or reuse of an existing one.
+
+The templates themselves are built later, one at a time (Section 7.2); the import mechanism comes
+first. A template in the schema (the Mailchimp example):
 
 ```json
 {
@@ -471,7 +567,7 @@ One JSON file per connector, shipped as a static resource and contributed as JSO
       "query": { "status": "unsubscribed", "since_last_changed": "{{watermark}}" }, "items": "members", "id": "id", "stamp": "last_changed" }
   ],
   "webhook": { "eventId": "id", "fetchBack": null },
-  "templates": ["mailchimp-new-people"]
+  "recipes": [{ "name": "Add new people to an audience", "draft": { "version": 1, "trigger": {}, "steps": [] } }]
 }
 ```
 
@@ -479,11 +575,12 @@ One JSON file per connector, shipped as a static resource and contributed as JSO
 center suffix) is read: the page derives it in the browser before the key is sent, so Apex still
 never reads the key. Pickers (`pick`) call the app to list choices (audiences, events, sheets).
 
-**Generic REST first**, then, for small organizations, in this order (value for effort):
+**Template backlog** (built later, Section 7.2; value for effort for small organizations; more
+will be added as asked):
 
-| Order | Connector | Auth | First templates |
+| Order | Template | Auth | First recipes |
 |---|---|---|---|
-| 1 | Generic REST | Any kind above | Any |
+| 1 | Generic REST (built in, not a template) | Any kind above | Any |
 | 2 | Slack (bot token recommended; incoming webhook as the simpler alternative) and Microsoft Teams (Workflows webhook) | Bearer token; secret URL with the F5 disclosure | Post a message when a record matches (a large gift, a new volunteer) |
 | 3 | Mailchimp | API key | Add new or changed people to an audience; pull unsubscribes back |
 | 4 | Google Sheets (C-38 source) | OAuth browser (Auth Provider type Google) | Load a sheet daily through an import template |
@@ -492,6 +589,11 @@ never reads the key. Pickers (`pick`) call the app to list choices (audiences, e
 | 7 | Zoom | Token step (Server-to-Server OAuth) | Webinar registrants and attendance, by polling |
 | 8 | Constant Contact | OAuth browser | As Mailchimp |
 | 9 | QuickBooks Online | OAuth browser | Daily gift summary as a journal entry or sales receipts (needs Fundraising) |
+| 10 | GoFundMe Pro (owner's request, D-216) | API key or OAuth client credentials, per its API; webhooks with fetch back where offered | Donations and donors to gifts and people (needs Fundraising) |
+| Later | Others as organizations ask | Any built-in kind | Added as templates, never as package metadata |
+
+A recipe template whose steps need Fundraising, Event Management or another module says so on
+import and creates nothing when the module is missing.
 
 ### 3.7 Runs, Retries, Errors and Pause
 
@@ -523,8 +625,8 @@ never reads the key. Pickers (`pick`) call the app to list choices (audiences, e
   test result is a run marked Test. Test and Run Now run with the recipe's own identity and access
   mode (Section 3.10), so a test shows what the live recipe would be allowed to do, not what the
   person testing may do.
-- **Templates:** shipped as recipe JSON with placeholders for connections and choices; Use
-  Template opens the draft with each blank highlighted.
+- **Templates:** imported on demand from a file or pasted JSON (Section 3.6, D-216), never
+  shipped; import creates the connection form and Draft recipes, each blank highlighted.
 - **Versioning:** a recipe has a published definition and a draft. Publish checks the draft,
   increments the version and keeps the previous definition for one-click Roll Back. Export and
   Import Recipe (JSON) move a recipe between a sandbox and production.
@@ -669,16 +771,16 @@ Large one-off loads belong in Super Importer, which a recipe can call (`importRo
 
 | Capability | Why not in Salesforce Apex | Instead |
 |---|---|---|
-| SFTP, FTP, raw TCP | Apex has HTTP only, no sockets | Ask the source for an HTTPS export or API; drop files in Google Drive or Sheets; or a tool the organization already runs pushes to the webhook |
-| Direct database connections (SQL Server, MySQL) | No JDBC or sockets | The database's own REST layer, or a scheduled export to a sheet |
+| SFTP, FTP, raw TCP | Apex has HTTP only, no sockets | First version: ask the source for an HTTPS export or API; drop files in Google Drive or Sheets; or a tool the organization already runs pushes to the webhook. Wanted later (D-216, Section 7.2): needs an HTTPS bridge, designed when slotted |
+| Direct database connections (SQL Server, MySQL) | No JDBC or sockets | First version: the database's own REST layer, or a scheduled export to a sheet. Wanted later (D-216, Section 7.2), with the same bridge question |
 | On-premise agent | No agent can run inside Salesforce | Same as above |
 | Long-running jobs and streams (Kafka, long polling) | 60-second CPU and 120-second callout budget per transaction | Polling with watermarks and chained transactions |
 | Files over about 4 MB through a recipe | Heap and response size | Super Importer for big files; paging APIs |
 | Code steps (Ruby, JavaScript, Python) and formula mode | Evaluating admin-typed code is refused (ADR-0081) | The closed step list, conditions, maps; a new step is an ADR |
 | Webhooks with secret-based signatures or handshakes | Apex must not read secrets (ADR-0229) | Token plus fetch back, or polling |
-| Synchronous API endpoints (recipe answers the caller with data) | Guest only stores (ADR-0184) | The Inbound Gift API or a module's own REST resource |
-| Sub-minute polling and high concurrency | A delayed-Queueable heartbeat, one runner chain per identity | 15-minute polling; Flow action for immediate starts |
-| A thousand prebuilt connectors | A small project | Generic REST plus a short JSON catalog anyone can extend |
+| Synchronous API endpoints (recipe answers the caller with data) | Guest only stores (ADR-0184) | A fixed synchronous acknowledgement, then Send to Webhook or Call an App sends results back (Section 3.3a); the Inbound Gift API or a module's own REST resource for true request and response |
+| Sub-minute polling and high concurrency | A delayed-Queueable heartbeat, one runner chain per identity | 15-minute polling; Flow action for immediate starts; event-driven triggers later (D-216) |
+| A thousand prebuilt connectors | A small project | Generic REST plus importable JSON templates anyone can write (Section 3.6) |
 | Inbound email trigger | Possible (Email Services) but not needed now | A later trigger if asked |
 
 ---
@@ -746,7 +848,8 @@ Large one-off loads belong in Super Importer, which a recipe can call (`importRo
 | Connector | No settings object: every option is per recipe; the identity choices (picked permission sets, integration user) are read back from the permission set assignments and the event trigger's configuration | none | 0 |
 | Connector | `Connector_Start__e`, `Connector_Start_User__e` | Platform events (their own allocation, not custom objects, ADR-0227) | 0 |
 | Connector | Connections | External and Named Credentials created at run time, not objects | 0 |
-| Connector | Connector catalog and templates | JSON static resources | 0 |
+| Connector | Generic REST definition | Apex constants and a framework-free JS module; app templates are imported files, never shipped (D-216) | 0 |
+| Connector | `BarnCRM_Connector` console app | Custom application (ADR-0223; left out on capped orgs) | 0 |
 | Connector | `Connector_Webhook_Rest`, the runner, clock and controllers | Apex | 0 |
 | Connector | `BarnCRM_Connector_Admin`, `BarnCRM_Connector_Viewer`, `BarnCRM_Connector_Webhook_Guest` | Permission sets | 0 |
 | Core | `Saved_Transform__c.Kind__c` | Field (picklist Step List, Map) | 0 |
@@ -784,23 +887,24 @@ Connector module.
 | MAP-02 | `barnMapper` component: three panes, pick and drag, step editor, sample preview, Check Before Running | Core | Major |
 | MAP-03 | Saved Maps: `Kind__c`, save, load, rename, delete, Where Used for maps, Maps list in Data Manager | Core | Minor |
 | MAP-04 | Super Importer: Save as Map and Use a Saved Map | Core | Minor |
-| CN-01 | Package skeleton, two objects, permission sets, app, tab, Module Manager row, catalog loader, generic REST Connections (create, guided callout step, Check, Replace Key, Disconnect) with F2, F3, F5, F6, F7, F8, F10, F11, F12. Tests: an update, Disconnect or Delete naming `Barn_Stripe` (or any name not created by BarnCRM) is refused before ConnectApi; a user with the Connector set but without `ManageNamedCredentials` or Customize Application is refused; no credential write is queued; each auth kind writes secrets with `encrypted = true` and ids with `false`; list and edit responses carry no secret and no secret URL (host and last four only); a ConnectApi exception echoing the secret is logged with `****` and only a fixed message reaches the user; no `System.debug` in the module; `http://` base URLs and host changes without a new secret are refused; Mailchimp `{dc}` pattern; key replacement writes one Admin Journal entry; the Connections set is assigned only to Connector admins and identities, never to a client-supplied Id; Jest: the password input is cleared after success and failure and never stored | Module | Major |
-| CN-02 | Recipes and runs: editor (When and Then cards), manual and scheduled triggers, Find, Create, Update, Upsert, Call an App, If, Stop; run history; Test; map runtime; executor with F1 and F4. Tests: `{!$Credential.` text in a webhook payload value, a record field, a recipe header and a map literal fails the step or the save; Named Credentials are created with formulas in body off; paths with `//`, `@`, `\`, `{!`, CR or LF are refused and inserted values are URL-encoded; recipe headers cannot set `Authorization` | Module (may split into CN-02a model and history, CN-02b runner and steps) | Major |
+| CN-01 | Package skeleton, the BarnCRM Connector console app (D-216), the Super Connector tab (Connections section), Connector Admin permission set, Module Manager row, Health Check extension, Generic REST Connections with the built-in auth kinds API key in a header, Bearer token, Basic and Secret URL (create, guided Enabled for Callouts step with Check Again, Check Connection, Replace Key, Disconnect, Delete) with F2, F3, F4 (base URL and host lock), F5, F6, F7, F8, F10, F11, F12. The two objects move to CN-02, the first slice that reads or writes them (nothing in CN-01 does). Tests: an update, Disconnect or Delete naming `Barn_Stripe` (or any name not created by BarnCRM) is refused before ConnectApi; a user with the Connector set but without `ManageNamedCredentials` or Customize Application is refused; no credential write is queued; each auth kind writes secrets with `encrypted = true` and ids with `false`; list and edit responses carry no secret and no secret URL (host and last four only); a ConnectApi exception echoing the secret is logged with `****` and only a fixed message reaches the user; no `System.debug` in the module; `http://` base URLs and host changes without a new secret are refused; a host pattern such as Mailchimp's `{dc}` (`^[a-z]{2}[0-9]{1,3}$`) is enforced by the shared host-lock rule templates will use (tested with a fixture, no Mailchimp connector shipped); a secret-URL connection's URL is never returned to the client and page text carries the Setup-visibility disclosure (F5, moved from CN-07); key replacement writes one Admin Journal entry; the Connections set is assigned only to Connector admins and identities, never to a client-supplied Id; Jest: the password input is cleared after success and failure and never stored | Module | Major |
+| CN-02 | The two objects (Appendix A.3, A.4) and the Connector Viewer set; recipes and runs: editor (When and Then cards), manual and scheduled triggers, Find, Create, Update, Upsert, Call an App, If, Stop; run history; Test; map runtime; executor with F1 and F4. Tests: `{!$Credential.` text in a webhook payload value, a record field, a recipe header and a map literal fails the step or the save; Named Credentials are created with formulas in body off; paths with `//`, `@`, `\`, `{!`, CR or LF are refused and inserted values are URL-encoded; recipe headers cannot set `Authorization` | Module (may split into CN-02a model and history, CN-02b runner and steps) | Major |
 | CN-03 | Recipe clock (platform event heartbeat), Run As identities (BarnCRM Automation, System, Integration User), record-change polling, retries with backoff, pause and auto-pause, Error Log, Health Check, Nightly cleanup | Module | Major |
-| CN-04 | Inbound webhooks: receiver, token in `X-BarnCRM-Token` or the query, caps, idempotency, fetch back under F4 (F13). Tests: header and query token both accepted, wrong token 404 with empty body; fetch back refuses `http`, user info (`https://api.example.com@attacker.net`), a suffix host (`api.example.com.attacker.net`) and another port, and calls `callout:` with path and query only; the guest set holds only the REST class and create on the start event | Module | Major |
+| CN-04 | Inbound webhooks and sending data back (D-216): receiver, token in `X-BarnCRM-Token` or the query, caps, idempotency, fetch back under F4 (F13); the synchronous reply (status code, fixed body, challenge echo, run reference) and the Send to Webhook step, including a callback URL held to the connection's host (Section 3.3a). Tests: the reply body never carries record data and a `{!` reply is refused on save; Send to Webhook refuses a callback URL on another host, user info or port; header and query token both accepted, wrong token 404 with empty body; fetch back refuses `http`, user info (`https://api.example.com@attacker.net`), a suffix host (`api.example.com.attacker.net`) and another port, and calls `callout:` with path and query only; the guest set holds only the REST class and create on the start event | Module | Major |
 | CN-05 | For Each, Wait, Change Data steps | Module | Minor |
 | CN-06 | Flow actions "Run BarnCRM Recipe" and "Apply BarnCRM Map and Save"; Where Used extension | Module | Minor |
-| CN-07 | Slack (bot token recommended, incoming webhook alternative) and Teams connectors with templates (F5). Tests: a secret-URL connection's URL is never returned to the client or stored on a run; page text carries the Setup-visibility disclosure | Module | Minor |
-| CN-08 | Publish, draft, Roll Back, Export and Import Recipe; Templates section | Module | Minor |
+| CN-07 | Slack (bot token recommended, incoming webhook alternative) and Teams templates (F5). Later: a template file, not package metadata (D-216); the F5 tests moved to CN-01 | Template | Later |
+| CN-08 | Publish, draft, Roll Back, Export and Import Recipe; Templates section with template import from a file or pasted JSON (Section 3.6): schema check in the browser and in Apex, a prefilled connection with the host locked, Draft recipes; nothing preloaded or kept. Tests: a template with `{!`, an auth header template or a body-formula option is refused; import stores no template | Module | Minor |
 | CN-09 | Load Rows with an Import Template: scheduled dry run with commit limits (C-38), with the small Core staging seam | Module and Core | Major |
-| CN-10 | Google Sheets connector (OAuth browser) as an import source; the Auth Provider is created by the admin in Setup from the page's guidance, never by BarnCRM (F9), and this slice builds that guided step for CN-16 and CN-17 too. Tests: no code path creates an Auth Provider or accepts a client secret | Module | Major |
-| CN-11 | Mailchimp connector and templates | Module | Major |
-| CN-12 | Giving tool webhook templates (Givebutter, Donorbox, Zeffy) | Module (templates need Fundraising) | Minor |
+| CN-10 | OAuth browser sign-in auth kind with the guided Auth Provider step (F9; no code path creates an Auth Provider or accepts a client secret), built with the first template that needs it (Google Sheets as an import source) | Module, then a template | Later |
+| CN-11 | Mailchimp template | Template | Later |
+| CN-12 | Giving tool webhook templates (Givebutter, Donorbox, Zeffy) | Templates (need Fundraising) | Later |
 | CN-13 | App polling trigger (generic) | Module | Minor |
-| CN-14 | Eventbrite connector | Module | Minor |
-| CN-15 | Zoom connector (token step, polling) | Module | Minor |
-| CN-16 | Constant Contact connector | Module | Major |
-| CN-17 | QuickBooks Online connector (gift summary export) | Module | Major |
+| CN-14 | Eventbrite template | Template | Later |
+| CN-15 | Token step auth kind and the Zoom template (polling) | Module, then a template | Later |
+| CN-16 | Constant Contact template | Template | Later |
+| CN-17 | QuickBooks Online template (gift summary export) | Template | Later |
+| CN-19 | GoFundMe Pro template (owner's request, D-216); OAuth client credentials auth kind if its API needs it | Template | Later |
 | MAP-05 | Super Importer's Check Columns step rendered by the Mapper after the parity checklist | Core | Major |
 | MAP-06 | Super Transformer: Apply a Map | Core | Minor |
 | MAP-07 | Gift mirrors: extra field copies in the Mapper | Fundraising | Minor |
@@ -808,22 +912,35 @@ Connector module.
 
 ### 7.1 Releases (plan style: about 3 major and 3 to 6 minor each)
 
-- **Release 1.31 (Mapper and first connection):** MAP-01 and MAP-02 (one major: the Mapper),
-  CN-01 (major), CN-02 (major); MAP-03, MAP-04, CN-06 (minors). Useful on its own: an admin can
-  connect any REST app, run a recipe by hand or on a schedule, and save and reuse maps in Super
-  Importer and Flow.
-- **Release 1.32 (Automatic recipes):** CN-03 (major), CN-04 (major), CN-09 (major); CN-05,
-  CN-07, CN-08 (minors).
-- **Release 1.33 (Nonprofit connectors):** CN-10 (major), CN-11 (major), MAP-05 (major); CN-12,
-  CN-13, CN-14, MAP-06 (minors).
-- **Release 1.34 (More apps):** CN-16 (major), CN-17 (major); CN-15, MAP-07, CN-18 (minors).
+As slotted in the BMemory plan after D-216 (the plan is authoritative; the Mapper slices beyond
+MAP-04 are slotted there):
 
-All four are one or two landing batches per D-155; the build follows the batch rules (release gate,
-`barn-npc`, `mwdbdevsb` with approval).
+- **Release 1.31 (Mapper and first connection):** MAP-01 to MAP-04 (the Mapper, by its own
+  slices), CN-01 (major), CN-02 (major); CN-06 (minor). Useful on its own: an admin can connect
+  any REST app from the Connector's own app, run a recipe by hand or on a schedule, and save and
+  reuse maps in Super Importer and Flow.
+- **Release 1.32 (Automatic recipes and sending back):** CN-03 (major), CN-04 with sending data
+  back (major), CN-09 scheduled imports, C-38 (major); CN-05, CN-08 with versions and template
+  import (minors).
+- **Release 1.33:** CN-13 (app polling trigger), CN-18 (runs in the GDPR erasure path).
+
+The build follows the batch rules (release gate, `barn-npc`, `mwdbdevsb` with approval).
+
+### 7.2 Later (D-216, not in the first version)
+
+- **App templates,** built one at a time after the import mechanism (CN-08): Slack and Teams
+  (CN-07), Mailchimp (CN-11), giving-tool webhooks (CN-12), Eventbrite (CN-14), Zoom with the
+  token step (CN-15), Constant Contact (CN-16), QuickBooks Online (CN-17), Google Sheets with the
+  OAuth browser kind (CN-10), GoFundMe Pro (CN-19), and others as asked. Each ships as a file,
+  never as package metadata.
+- **Event-driven triggers** instead of 15-minute polling (Section 3.2).
+- **SFTP connections** and **direct database connections** (Section 4.1): Apex has no sockets,
+  so each needs an HTTPS bridge; whether that bridge can be free and self-service (no BarnCRM
+  service, nothing paid) is the first design question when they are slotted.
 
 ---
 
-## 8. Owner Decisions (D-215) and What Remains Open
+## 8. Owner Decisions (D-215, D-216) and What Remains Open
 
 Decided 2026-11-20 (plan D-215):
 
@@ -845,6 +962,22 @@ Decided 2026-11-20 (plan D-215):
    permissions or deactivated users." Replaced by Section 3.10.
 5. **Two new objects, suite at 199 of 200:** approved.
 
+Approved with exceptions 2026-11-20 (plan D-216, quoted in the header), applied here:
+
+6. **A module-specific console app:** Section 3.1 (`BarnCRM_Connector`, ADR-0223 pattern, left out
+   of capped orgs, Error Log last), Section 6.2, CN-01.
+7. **Sending information back:** Section 3.3a (a synchronous fixed reply to the posting app; a
+   Send to Webhook step and callback replies after processing, under F1 and F4), Section 3.4,
+   CN-04 in release 1.32.
+8. **Premade integrations are importable templates, not preloaded:** Section 3.6 (only Generic
+   REST built in; import from a file or pasted JSON fills a connection and Draft recipes and keeps
+   nothing else), Section 3.8, CN-08 in release 1.32; the templates themselves, GoFundMe Pro
+   added, are Later (Section 7.2).
+9. **SFTP and direct database connections:** Later (Sections 4.1 and 7.2), not in the first
+   version.
+10. **Event-driven triggers:** Later (Sections 3.2 and 7.2); the first version polls every 15
+    minutes.
+
 Still open:
 
 1. **Run As default.** **Recommendation:** BarnCRM Automation (the Automated Process user in user
@@ -858,9 +991,10 @@ Still open:
 
 ## Appendix A: Canonical Model Additions (Draft, Proposed)
 
-Drafted here in the canonical model's format; MAP-01 and CN-01 copy them into
-`canonical-model.md` (MAP-01 amends Sections 15 and 29X; CN-01 adds two new sections in a new
-Part for the Connector and a row in Section 32).
+Drafted here in the canonical model's format; MAP-01, CN-01 and CN-02 copy them into
+`canonical-model.md` (MAP-01 amends Sections 15 and 29X; CN-01 adds the Connector's Part with
+its Connection rules (no object) and a row in Section 32; CN-02 adds A.3 and A.4 with the two
+objects).
 
 ### A.1 Amendment to 29X. Saved Transform
 
@@ -926,7 +1060,9 @@ no record data beyond what its definition names.
 **R-CR1 The recipe document.** `{ "version": 1, "trigger": { "kind", ... }, "steps": [ { "id", "kind", ... } ] }`
 with the trigger kinds and step kinds of the design Sections 3.2 and 3.4; at most 25 steps in all,
 nesting at most 2, at most 100,000 characters. Steps name connections by developer name, maps by
-key or inline, and values by paths (R-MAP2).
+key or inline, and values by paths (R-MAP2). A webhook trigger may carry `reply` (status 200 or
+202, a fixed body of at most 4,000 characters with no `{!`, an optional challenge field name;
+design Section 3.3a), which the receiver reads with the recipe it already finds by token hash.
 **R-CR2 Checked on Publish,** as the publisher and against the identity's describe, and against
 the catalog; a recipe whose connection is disconnected or whose map is gone cannot be published.
 **R-CR3 Only Connector admins** (custom permission Manage BarnCRM Connector) create, publish,
@@ -969,6 +1105,7 @@ All and Modify All, `BarnCRM_Connector_Viewer` read with View All.
 | State | long text | no | Completed step Ids and the data later steps need. |
 | Step Log | long text | no | Each step's outcome, duration, Ids written, HTTP status, trimmed failed response. |
 | Event Key | text(255) | no | Recipe plus event id; unique, so a resend is dropped. |
+| Reference | text(20) | no | Opaque run reference returned in a webhook reply (design Section 3.3a); unique. |
 | Attempt | integer | yes (defaults 0) | Retries made. |
 | Next Attempt At | datetime | no | When a Waiting run resumes. |
 | Started At, Finished At | datetime | no | When it ran. |
@@ -982,6 +1119,6 @@ older than the recipe's Keep Runs Days. **R-RUN3 No secret or header is ever sto
 
 API names: `Recipe__c` (master-detail), `Status__c`, `Started_By__c`, `Ran_As__c`, `Recipe_Version__c`,
 `Input_JSON__c`, `State_JSON__c`, `Step_Log_JSON__c` (Long Text Area(131072)), `Event_Key__c`
-(Text(255), unique, external ID), `Attempt__c`, `Next_Attempt_At__c`, `Started_At__c`,
+(Text(255), unique, external ID), `Reference__c` (Text(20), unique), `Attempt__c`, `Next_Attempt_At__c`, `Started_At__c`,
 `Finished_At__c`, `Failed_Step__c` (Text(40)), `Error_Message__c` (Text(1000)),
 `Records_Written__c`, `Is_Test__c`. Object `Connector_Run__c`, controlled by parent.
