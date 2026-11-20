@@ -3,7 +3,7 @@
 ## Purpose
 
 Connects BarnCRM to other apps without Flow Builder, Apex or a paid integration service (plan
-6.1, D-210, D-216, ADR-NEXT integration module, `docs/architecture/integration-hub-design.md`).
+6.1, D-210, D-216, ADR-0235, `docs/architecture/integration-hub-design.md`).
 CN-01 ships **Connections**: a saved, checked sign-in to another app's REST API, its key held in
 an External Credential and a Named Credential and never returned (canonical model 29CN1). CN-02
 ships **Recipes** and **Runs** (29CN2, 29CN3): a When and Then steps that find, write through a

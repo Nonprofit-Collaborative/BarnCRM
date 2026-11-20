@@ -1,7 +1,7 @@
 # The Mapper and Saved Maps
 
 **Package:** Core
-**Decision:** ADR-NEXT `NEXT-reusable-mapper.md` (design: `docs/architecture/integration-hub-design.md`, Section 2)
+**Decision:** ADR-0234 `0234-reusable-mapper.md` (design: `docs/architecture/integration-hub-design.md`, Section 2)
 
 ## 1. What It Does
 

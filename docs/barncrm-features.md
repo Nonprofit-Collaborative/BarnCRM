@@ -1063,7 +1063,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 ## 18. BarnCRM Connector
 
-**Edition:** Both editions. Depends on Core only. Package `packages/connector` (BarnCRM Connector), beta, not installed by default, with its own console app BarnCRM Connector (left out on an org with capped apps, where the Super Connector tab is in the BarnCRM admin apps, ADR-0223). Objects Connector Recipe and Connector Run, the platform events Connector Start and Connector Start User, and the protected setting Connector Settings (canonical model 29CN2, 29CN3, 29CN4). Plan 6.1 (D-210, D-216, ADR-NEXT integration module, `docs/architecture/integration-hub-design.md`).
+**Edition:** Both editions. Depends on Core only. Package `packages/connector` (BarnCRM Connector), beta, not installed by default, with its own console app BarnCRM Connector (left out on an org with capped apps, where the Super Connector tab is in the BarnCRM admin apps, ADR-0223). Objects Connector Recipe and Connector Run, the platform events Connector Start and Connector Start User, and the protected setting Connector Settings (canonical model 29CN2, 29CN3, 29CN4). Plan 6.1 (D-210, D-216, ADR-0235, `docs/architecture/integration-hub-design.md`).
 
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|

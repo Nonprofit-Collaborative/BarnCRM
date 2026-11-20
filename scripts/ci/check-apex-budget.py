@@ -395,7 +395,7 @@ CAPS = {
     # server with the multi-currency refusal, checked lookup names: 30,239 measured 2026-11-19,
     # raised by 2,200 (what the fixes added).
     "reporting": 30_900,
-    # BarnCRM Connector (CN-01, D-210, D-216, ADR-NEXT integration module): Connections on
+    # BarnCRM Connector (CN-01, D-210, D-216, ADR-0235): Connections on
     # External and Named Credentials (page-entered keys, the F2 refusal, redacted logs, the
     # Connections access set), its Health Check extension and post-install, 31,084 measured
     # 2026-11-20, plus about 2%.

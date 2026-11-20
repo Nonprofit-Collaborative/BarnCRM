@@ -1,6 +1,6 @@
 /**
  * The map document of the Mapper (canonical model R-MAP1 to R-MAP4; integration hub design
- * Section 2.2; ADR-NEXT `NEXT-reusable-mapper.md`), without a framework (plan 9.9): no
+ * Section 2.2; ADR-0234 `0234-reusable-mapper.md`), without a framework (plan 9.9): no
  * lightning/* or @salesforce/* imports, so it ports to BarnCRM for WordPress as it is.
  *
  * A map document is the import mapping document of R-IT1 at version 4: `from` (columns of a

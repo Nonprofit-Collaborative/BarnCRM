@@ -982,7 +982,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   MODULES+=(addressverification)
   # Advanced Reporting depends on Core only; module objects are read by name (ADR-0231).
   MODULES+=(reporting)
-  # BarnCRM Connector depends on Core only (CN-01, ADR-NEXT integration module).
+  # BarnCRM Connector depends on Core only (CN-01, ADR-0235).
   MODULES+=(connector)
   # Mirror depends on Core only (N-09, ADR-0228); the gift mirrors are
   # Fundraising's (the giving package, deployed above).

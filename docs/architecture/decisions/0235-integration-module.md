@@ -1,4 +1,4 @@
-# ADR-NEXT: BarnCRM Connector: Recipes, Connections on Named Credentials, Polling and Webhook Triggers, Run History, and C-38 Started Inside It
+# ADR-0235: BarnCRM Connector: Recipes, Connections on Named Credentials, Polling and Webhook Triggers, Run History, and C-38 Started Inside It
 
 **Status:** Accepted with amendments (D-216, 2026-11-20: decisions 1, 3, 5 and 12 to 14 as
 amended below)
@@ -12,8 +12,8 @@ and the security review `docs/architecture/connector-secrets-security-review.md`
 with exceptions D-216 (2026-11-20: a module console app, sending data back, importable templates
 instead of preloaded connectors, SFTP, databases and event-driven triggers later). Starts C-38 (held by D-39)
 and amends plan Section 4.9's C-38 scope; builds on ADR-0013, ADR-0057, ADR-0148 amendment A1,
-ADR-0165, ADR-0166, ADR-0184, ADR-0201, ADR-0227, ADR-0229 and MIG-06. Companion: ADR-NEXT
-`NEXT-reusable-mapper.md`.
+ADR-0165, ADR-0166, ADR-0184, ADR-0201, ADR-0227, ADR-0229 and MIG-06. Companion: ADR-0234
+`0234-reusable-mapper.md`.
 
 ## Context
 

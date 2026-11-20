@@ -17,8 +17,8 @@ and use. Also, I'd like a UI feature to map objects and fields that can be reuse
 like data import, transformations, automations, and integrations. I'd like it to be as easy or
 easier/more intuitive to use as Salesforce's Flow/Data 360 transform screen. Please design,
 build, and start integrating these now."
-**Decisions:** ADR-NEXT `NEXT-reusable-mapper.md` (the Mapper and the map document) and ADR-NEXT
-`NEXT-integration-module.md` (the BarnCRM Connector module). Both cite this document.
+**Decisions:** ADR-0234 `0234-reusable-mapper.md` (the Mapper and the map document) and ADR-0235
+`0235-integration-module.md` (the BarnCRM Connector module). Both cite this document.
 **Builds on:** plan Section 1.3 (principles 1, 3, 4, 8), Section 4.2, Section 4.9, Section 9.9;
 C-37, C-38, C-49, C-50, C-59, MIG-06; D-101, D-150, D-209; ADR-0013, ADR-0057, ADR-0081, ADR-0148,
 ADR-0165, ADR-0166, ADR-0184, ADR-0197, ADR-0201, ADR-0227, ADR-0228, ADR-0229, ADR-0231.

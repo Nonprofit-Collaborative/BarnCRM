@@ -1,4 +1,4 @@
-# ADR-NEXT: A Reusable Mapper in Core: One Map Document and One Mapping Screen, Saved as a Kind of Saved Transform
+# ADR-0234: A Reusable Mapper in Core: One Map Document and One Mapping Screen, Saved as a Kind of Saved Transform
 
 **Status:** Proposed
 **Date:** 2026-11-20
@@ -7,8 +7,8 @@ functions like data import, transformations, automations, and integrations ... a
 easier/more intuitive to use as Salesforce's Flow/Data 360 transform screen"); design in
 `docs/architecture/integration-hub-design.md` Section 2 and Appendix A. Amends ADR-0081 (the
 transform document) and canonical model R-IT1 and 29X; builds on ADR-0227 (fewer objects),
-ADR-0231 (definitions as JSON), D-150 (fuzzy match badge) and plan 9.9. Companion: ADR-NEXT
-`NEXT-integration-module.md`.
+ADR-0231 (definitions as JSON), D-150 (fuzzy match badge) and plan 9.9. Companion: ADR-0235
+`0235-integration-module.md`.
 
 ## Context
 

@@ -4,7 +4,7 @@
 **Date:** 2026-11-20
 **Reviewer:** W2 R1.31 Security review
 **Scope:** `integration-hub-design.md` Sections 3.3, 3.5, 3.6 and 5, Section 8 Open Decision 2;
-ADR-NEXT `NEXT-integration-module.md`; ADR-0229 and ADR-0220; the current Payments and Address
+ADR-0235 `0235-integration-module.md`; ADR-0229 and ADR-0220; the current Payments and Address
 Verification credential code; Core `ErrorLogger`, `ErrorLogWriter`, `UserErrors`, the Admin
 Journal and `Setting_Change__c` / `Setup_Change__c`.
 
