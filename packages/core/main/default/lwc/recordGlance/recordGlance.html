@@ -16,19 +16,35 @@
               </div>
             </template>
           </div>
-        </div>
-        <div slot="actions">
-          <template for:each={card.actions} for:item="action">
-            <lightning-button
-              key={action.key}
-              label={action.label}
-              data-card={card.key}
-              data-action={action.key}
-              onclick={handleAction}
-              class="glance-action"
-            ></lightning-button>
+          <template lwc:if={card.actionsBelow}>
+            <div class="slds-grid slds-wrap slds-grid_align-end slds-var-m-top_x-small" data-id="actions-below">
+              <template for:each={card.actions} for:item="action">
+                <lightning-button
+                  key={action.key}
+                  label={action.label}
+                  data-card={card.key}
+                  data-action={action.key}
+                  onclick={handleAction}
+                  class="glance-action slds-var-m-left_x-small"
+                ></lightning-button>
+              </template>
+            </div>
           </template>
         </div>
+        <template lwc:if={card.actionsInHeader}>
+          <div slot="actions">
+            <template for:each={card.actions} for:item="action">
+              <lightning-button
+                key={action.key}
+                label={action.label}
+                data-card={card.key}
+                data-action={action.key}
+                onclick={handleAction}
+                class="glance-action"
+              ></lightning-button>
+            </template>
+          </div>
+        </template>
       </lightning-card>
     </template>
   </template>

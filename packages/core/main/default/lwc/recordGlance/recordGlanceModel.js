@@ -29,19 +29,25 @@ export { formatDate };
 
 /** The cards ready to draw: tiles without a value are left out, and actions keep their page reference. */
 export function cardViews(cards, locale) {
-  return (cards || []).map((card) => ({
-    key: card.key || card.title,
-    title: card.title,
-    iconName: card.iconName,
-    tiles: (card.tiles || [])
-      .map((tile, index) => tileView(tile, index, locale))
-      .filter((tile) => tile.value !== null && tile.value !== ''),
-    actions: (card.actions || []).map((action, index) => ({
+  return (cards || []).map((card) => {
+    const actions = (card.actions || []).map((action, index) => ({
       key: `${index}-${action.label}`,
       label: action.label,
       pageReference: parseReference(action.pageReference)
-    }))
-  }));
+    }));
+    return {
+      key: card.key || card.title,
+      title: card.title,
+      iconName: card.iconName,
+      tiles: (card.tiles || [])
+        .map((tile, index) => tileView(tile, index, locale))
+        .filter((tile) => tile.value !== null && tile.value !== ''),
+      actions,
+      // Two or more buttons in a narrow card's header cut its title short, so they go below the tiles.
+      actionsBelow: actions.length > 1,
+      actionsInHeader: actions.length === 1
+    };
+  });
 }
 
 function parseReference(json) {
