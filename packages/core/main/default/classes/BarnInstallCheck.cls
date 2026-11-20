@@ -25,7 +25,9 @@ global with sharing class BarnInstallCheck {
 		requireSetupAccess();
 		List<HealthCheckService.Finding> findings = HealthCheckService.runInstalled();
 		List<String> errors = new List<String>();
-		for (HealthCheckService.Finding finding : findings == null ? new List<HealthCheckService.Finding>() : findings) {
+		for (
+			HealthCheckService.Finding finding : findings == null ? new List<HealthCheckService.Finding>() : findings
+		) {
 			if (finding.severity == HealthCheckService.SEVERITY_ERROR) {
 				errors.add(finding.key + ': ' + finding.title);
 			}

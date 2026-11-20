@@ -28,10 +28,10 @@ public with sharing class HealthCheckLastRun {
 
 	/** Records the report's time and counts, when it ran for someone who sees every check. */
 	public static void record(HealthCheckService.Report report) {
-		if (report == null || report.canManageSettings != true) {
+		if (report == null || report.getCanManageSettings() != true) {
 			return;
 		}
-		List<Integer> counts = counts(report.findings);
+		List<Integer> counts = counts(report.getFindings());
 		save(counts[0], counts[1], counts[2]);
 	}
 
@@ -41,14 +41,14 @@ public with sharing class HealthCheckLastRun {
 	 * (a run that stops early again brings its own).
 	 */
 	public static void addRemaining(HealthCheckService.Report remaining) {
-		if (remaining == null || remaining.canManageSettings != true) {
+		if (remaining == null || remaining.getCanManageSettings() != true) {
 			return;
 		}
 		Summary stored = read();
 		if (stored.ranAt == null) {
 			return;
 		}
-		List<Integer> counts = counts(remaining.findings);
+		List<Integer> counts = counts(remaining.getFindings());
 		save(stored.errors + counts[0], Math.max(0, stored.warnings - 1) + counts[1], stored.infos + counts[2]);
 	}
 
@@ -56,9 +56,9 @@ public with sharing class HealthCheckLastRun {
 	private static List<Integer> counts(List<HealthCheckService.Finding> findings) {
 		List<Integer> counts = new List<Integer>{ 0, 0, 0 };
 		for (HealthCheckService.Finding finding : findings) {
-			if (HealthCheckService.SEVERITY_ERROR.equals(finding.severity)) {
+			if (HealthCheckService.SEVERITY_ERROR.equals(finding.getSeverity())) {
 				counts[0]++;
-			} else if (HealthCheckService.SEVERITY_WARNING.equals(finding.severity)) {
+			} else if (HealthCheckService.SEVERITY_WARNING.equals(finding.getSeverity())) {
 				counts[1]++;
 			} else {
 				counts[2]++;

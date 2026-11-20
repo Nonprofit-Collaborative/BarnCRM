@@ -25,11 +25,11 @@ private class HealthCheckServiceTest {
 			HealthCheckService.Finding orgShape = find(findings, 'org_shape');
 			System.assertNotEquals(null, orgShape, 'The report always opens with the org shape.');
 			System.assert(
-				orgShape.detail.contains(System.Label.Core_HealthCheck_NpspDetected),
+				orgShape.getDetail().contains(System.Label.Core_HealthCheck_NpspDetected),
 				'An org with NPSP installed is told, in those words, that NPSP was detected.'
 			);
 			System.assert(
-				orgShape.detail.contains(System.Label.Core_CoexistenceMode_Npsp),
+				orgShape.getDetail().contains(System.Label.Core_CoexistenceMode_Npsp),
 				'The org shape finding names the mode it recommends.'
 			);
 			System.assertEquals(
@@ -49,15 +49,15 @@ private class HealthCheckServiceTest {
 
 			HealthCheckService.Finding orgShape = find(findings, 'org_shape');
 			System.assert(
-				orgShape.detail.contains(System.Label.Core_HealthCheck_PersonAccountsDetected),
+				orgShape.getDetail().contains(System.Label.Core_HealthCheck_PersonAccountsDetected),
 				'Person Accounts are named in the org shape card.'
 			);
 			System.assert(
-				orgShape.detail.contains(System.Label.Core_HealthCheck_IndustriesDetected),
+				orgShape.getDetail().contains(System.Label.Core_HealthCheck_IndustriesDetected),
 				'Nonprofit Cloud objects are named in the org shape card.'
 			);
 			System.assert(
-				orgShape.detail.contains(System.Label.Core_HealthCheck_SalesObjectsDetected),
+				orgShape.getDetail().contains(System.Label.Core_HealthCheck_SalesObjectsDetected),
 				'Standard Sales and Service Cloud objects are named too.'
 			);
 		}
@@ -71,7 +71,7 @@ private class HealthCheckServiceTest {
 			HealthCheckService.Finding orgShape = find(HealthCheckRunner.run(), 'org_shape');
 
 			System.assert(
-				orgShape.detail.contains(System.Label.Core_HealthCheck_NothingDetected),
+				orgShape.getDetail().contains(System.Label.Core_HealthCheck_NothingDetected),
 				'A fresh org is told it is a fresh org, not given an empty list.'
 			);
 		}
@@ -87,12 +87,12 @@ private class HealthCheckServiceTest {
 			System.assertNotEquals(null, finding, 'An unconfirmed mode is reported.');
 			System.assertEquals(
 				HealthCheckService.SEVERITY_WARNING,
-				finding.severity,
+				finding.getSeverity(),
 				'Not confirming a mode is worth knowing about, not an error.'
 			);
 			System.assertEquals(
 				HealthCheckService.FIX_APPLY_RECOMMENDED_MODE,
-				finding.fixTarget,
+				finding.getFixTarget(),
 				'The fix applies the recommendation.'
 			);
 		}
@@ -109,7 +109,7 @@ private class HealthCheckServiceTest {
 			System.assertNotEquals(null, finding, 'A mode that does not match the org is reported.');
 			System.assertEquals(
 				HealthCheckService.SEVERITY_WARNING,
-				finding.severity,
+				finding.getSeverity(),
 				'A mismatch may be deliberate, so it is a warning.'
 			);
 		}
@@ -124,7 +124,11 @@ private class HealthCheckServiceTest {
 			HealthCheckService.Finding finding = find(HealthCheckRunner.run(), 'coexistence_mode_match');
 
 			System.assertNotEquals(null, finding, 'Health Check says when something is right.');
-			System.assertEquals(HealthCheckService.SEVERITY_INFO, finding.severity, 'A matching mode is information.');
+			System.assertEquals(
+				HealthCheckService.SEVERITY_INFO,
+				finding.getSeverity(),
+				'A matching mode is information.'
+			);
 		}
 	}
 
@@ -143,12 +147,12 @@ private class HealthCheckServiceTest {
 			System.assertNotEquals(null, finding, 'This combination is always reported.');
 			System.assertEquals(
 				HealthCheckService.SEVERITY_ERROR,
-				finding.severity,
+				finding.getSeverity(),
 				'Contact membership in a Person Accounts org is broken, not merely untidy.'
 			);
 			System.assertEquals(
 				HealthCheckService.FIX_APPLY_JUNCTION_MEMBERSHIP,
-				finding.fixTarget,
+				finding.getFixTarget(),
 				'The fix switches household membership to the junction.'
 			);
 		}
@@ -193,17 +197,17 @@ private class HealthCheckServiceTest {
 			System.assertNotEquals(null, finding, 'Membership the mode cannot see is reported.');
 			System.assertEquals(
 				HealthCheckService.SEVERITY_ERROR,
-				finding.severity,
+				finding.getSeverity(),
 				'People vanishing from their households is broken, not untidy.'
 			);
 			System.assertEquals(
 				BarnHelp.text('Core', 'Core_HealthCheck_MembershipHiddenByContactDetailOne'),
-				finding.detail,
+				finding.getDetail(),
 				'The finding says how many people are affected, in the singular for one.'
 			);
 			System.assertEquals(
 				SettingSections.PEOPLE,
-				finding.fixTarget,
+				finding.getFixTarget(),
 				'The fix opens the People box, where the way of belonging lives.'
 			);
 		}
@@ -228,7 +232,7 @@ private class HealthCheckServiceTest {
 			System.assertNotEquals(null, finding, 'A person the mode cannot see is reported.');
 			System.assertEquals(
 				BarnHelp.text('Core', 'Core_HealthCheck_MembershipHiddenByJunctionDetailOne'),
-				finding.detail,
+				finding.getDetail(),
 				'The finding says how many people are affected, in the singular for one.'
 			);
 		}
@@ -278,17 +282,17 @@ private class HealthCheckServiceTest {
 			System.assertNotEquals(null, finding, 'The state is always reported.');
 			System.assertEquals(
 				HealthCheckService.SEVERITY_ERROR,
-				finding.severity,
+				finding.getSeverity(),
 				'Nobody is getting a household, which is broken rather than untidy.'
 			);
 			System.assertEquals(
 				HealthCheckService.CATEGORY_SETTINGS,
-				finding.category,
+				finding.getCategory(),
 				'It is a settings finding: the setting is what has to change.'
 			);
 			System.assertEquals(
 				HealthCheckService.FIX_ENABLE_AUTOMATIC_HOUSEHOLDS,
-				finding.fixTarget,
+				finding.getFixTarget(),
 				'And the fix turns automatic household creation on.'
 			);
 		}
@@ -355,12 +359,12 @@ private class HealthCheckServiceTest {
 			System.assertNotEquals(null, finding, 'The gift mirror is worth mentioning once.');
 			System.assertEquals(
 				HealthCheckService.SEVERITY_INFO,
-				finding.severity,
+				finding.getSeverity(),
 				'Nothing is broken, so this is information.'
 			);
 			System.assertEquals(
 				null,
-				finding.fixTarget,
+				finding.getFixTarget(),
 				'There is nothing to click: Mirror is a separate install in v0.6.'
 			);
 		}
@@ -403,7 +407,7 @@ private class HealthCheckServiceTest {
 	static void multiCurrencyIsAWarning() {
 		System.runAs(TestUsers.admin()) {
 			OrgShapeDetector.OrgShape orgShape = shape(false, false, false, false);
-			orgShape.isMultiCurrency = true;
+			orgShape.put('isMultiCurrency', true);
 			OrgShapeDetector.overrideShape = orgShape;
 
 			HealthCheckService.Finding finding = find(HealthCheckRunner.run(), 'multi_currency');
@@ -411,12 +415,12 @@ private class HealthCheckServiceTest {
 			System.assertNotEquals(null, finding, 'Multi-currency is detected and reported.');
 			System.assertEquals(
 				HealthCheckService.SEVERITY_WARNING,
-				finding.severity,
+				finding.getSeverity(),
 				'Multi-currency is unsupported in v1 but does not break anything.'
 			);
 			System.assertEquals(
 				HealthCheckService.CATEGORY_LICENSES,
-				finding.category,
+				finding.getCategory(),
 				'Currency belongs with the license findings.'
 			);
 		}
@@ -436,12 +440,12 @@ private class HealthCheckServiceTest {
 				System.assertNotEquals(null, finding, 'An org where nobody can administer BarnCRM is told so.');
 				System.assertEquals(
 					HealthCheckService.SEVERITY_ERROR,
-					finding.severity,
+					finding.getSeverity(),
 					'Nobody able to administer the app is an error.'
 				);
 				System.assertEquals(
 					HealthCheckService.SECTION_ACCESS,
-					finding.fixTarget,
+					finding.getFixTarget(),
 					'The fix opens the Access page.'
 				);
 			}
@@ -532,12 +536,12 @@ private class HealthCheckServiceTest {
 				);
 				System.assertEquals(
 					HealthCheckService.SEVERITY_WARNING,
-					finding.severity,
+					finding.getSeverity(),
 					'People who cannot see the app is a warning, not an error.'
 				);
 				System.assert(
-					finding.detail.contains('3'),
-					'The finding reports the number of people that were counted: ' + finding.detail
+					finding.getDetail().contains('3'),
+					'The finding reports the number of people that were counted: ' + finding.getDetail()
 				);
 			}
 
@@ -577,7 +581,7 @@ private class HealthCheckServiceTest {
 				);
 				System.assertEquals(
 					HealthCheckService.SEVERITY_INFO,
-					gate.severity,
+					gate.getSeverity(),
 					'Not being an administrator is information, not a fault.'
 				);
 				System.assertNotEquals(
@@ -606,7 +610,7 @@ private class HealthCheckServiceTest {
 			System.assertNotEquals(null, finding, 'A pause is always visible while it is on.');
 			System.assertEquals(
 				HealthCheckService.SEVERITY_INFO,
-				finding.severity,
+				finding.getSeverity(),
 				'Pausing is a normal thing to do during a load.'
 			);
 			System.assertEquals(
@@ -630,12 +634,12 @@ private class HealthCheckServiceTest {
 			Assert.isNotNull(finding, 'A pause with no automatic resume is reported.');
 			Assert.areEqual(
 				HealthCheckService.SEVERITY_WARNING,
-				finding.severity,
+				finding.getSeverity(),
 				'Nothing will record its end, so it is a warning.'
 			);
 			Assert.areEqual(
 				HealthCheckService.SECTION_AUTOMATION,
-				finding.fixTarget,
+				finding.getFixTarget(),
 				'The fix is the Automation page, where Resume is.'
 			);
 			Assert.isNull(find(findings, 'automation_paused'), 'One finding about the pause, not two.');
@@ -652,7 +656,7 @@ private class HealthCheckServiceTest {
 			HealthCheckService.Finding finding = find(HealthCheckRunner.run(), 'automation_paused_no_resume');
 
 			Assert.isNotNull(finding, 'No page pause ends this late, so the job is not its end.');
-			Assert.areEqual(HealthCheckService.SEVERITY_WARNING, finding.severity, 'A warning.');
+			Assert.areEqual(HealthCheckService.SEVERITY_WARNING, finding.getSeverity(), 'A warning.');
 		}
 	}
 
@@ -668,8 +672,8 @@ private class HealthCheckServiceTest {
 			HealthCheckService.Finding finding = find(HealthCheckRunner.run(), 'error_digest_stale');
 
 			Assert.isNotNull(finding, 'Scheduled, but silent for three days.');
-			Assert.areEqual(HealthCheckService.SEVERITY_WARNING, finding.severity, 'A warning.');
-			Assert.areEqual(SettingSections.ERROR_LOG, finding.fixTarget, 'Fixed where it is scheduled.');
+			Assert.areEqual(HealthCheckService.SEVERITY_WARNING, finding.getSeverity(), 'A warning.');
+			Assert.areEqual(SettingSections.ERROR_LOG, finding.getFixTarget(), 'Fixed where it is scheduled.');
 		}
 	}
 
@@ -705,7 +709,11 @@ private class HealthCheckServiceTest {
 				finding,
 				'Maria is told automation is running, so silence never has to be interpreted.'
 			);
-			System.assertEquals(HealthCheckService.SEVERITY_INFO, finding.severity, 'Working normally is information.');
+			System.assertEquals(
+				HealthCheckService.SEVERITY_INFO,
+				finding.getSeverity(),
+				'Working normally is information.'
+			);
 		}
 	}
 
@@ -751,10 +759,10 @@ private class HealthCheckServiceTest {
 				System.assertNotEquals(null, finding, 'A new error is surfaced where Maria will see it.');
 				System.assertEquals(
 					HealthCheckService.SEVERITY_WARNING,
-					finding.severity,
+					finding.getSeverity(),
 					'Unread errors are a warning.'
 				);
-				System.assert(finding.title.contains('1'), 'The title says how many there are.');
+				System.assert(finding.getTitle().contains('1'), 'The title says how many there are.');
 			}
 
 		}
@@ -796,10 +804,10 @@ private class HealthCheckServiceTest {
 					new List<Object>{ (150).format() }
 				);
 				System.assert(
-					finding.title.contains(counted),
-					'The title says "150 or more", not a number it did not count: ' + finding.title
+					finding.getTitle().contains(counted),
+					'The title says "150 or more", not a number it did not count: ' + finding.getTitle()
 				);
-				System.assert(finding.detail.contains(counted), 'So does the detail.');
+				System.assert(finding.getDetail().contains(counted), 'So does the detail.');
 				System.assert(
 					rowsSpent <= 151,
 					'The count read at most the cap plus one rows, not all 200: ' + rowsSpent
@@ -857,8 +865,8 @@ private class HealthCheckServiceTest {
 					new List<Object>{ (2).format() }
 				);
 				System.assert(
-					finding.title.contains(counted),
-					'Past the cap the full run says "2 or more": ' + finding.title
+					finding.getTitle().contains(counted),
+					'Past the cap the full run says "2 or more": ' + finding.getTitle()
 				);
 			}
 
@@ -885,12 +893,12 @@ private class HealthCheckServiceTest {
 				'permission sets gave, so the admin is told.'
 			);
 			System.assert(
-				finding.detail.contains(AccountKinds.organizationRecordTypeLabel()),
-				'The finding names the record type. Detail was: ' + finding.detail
+				finding.getDetail().contains(AccountKinds.organizationRecordTypeLabel()),
+				'The finding names the record type. Detail was: ' + finding.getDetail()
 			);
 			System.assertEquals(
 				HealthCheckService.SEVERITY_WARNING,
-				finding.severity,
+				finding.getSeverity(),
 				'A warning: organizations cannot be created until it is fixed.'
 			);
 		}
@@ -912,15 +920,15 @@ private class HealthCheckServiceTest {
 				'in whole years, so an org with a custom year is told the two can disagree.'
 			);
 			System.assert(
-				finding.detail.contains(FiscalYearSelector.monthName(7)),
-				'The finding names the month the totals start from. Detail was: ' + finding.detail
+				finding.getDetail().contains(FiscalYearSelector.monthName(7)),
+				'The finding names the month the totals start from. Detail was: ' + finding.getDetail()
 			);
 			System.assertEquals(
 				HealthCheckService.SEVERITY_INFO,
-				finding.severity,
+				finding.getSeverity(),
 				'Information: an org may keep its custom year on purpose.'
 			);
-			System.assertEquals(null, finding.fixTarget, 'Only Setup can change it, so there is no fix button.');
+			System.assertEquals(null, finding.getFixTarget(), 'Only Setup can change it, so there is no fix button.');
 		}
 	}
 
@@ -964,19 +972,19 @@ private class HealthCheckServiceTest {
 			HealthCheckService.Finding skipped = find(findings, 'not_checked');
 			Assert.isNotNull(skipped, 'The skipped checks are reported');
 			Assert.isTrue(
-				skipped.detail.contains(BarnHelp.text('Core', 'Core_HealthCheck_Step_OrgShape')),
-				'And named as an administrator reads them: ' + skipped.detail
+				skipped.getDetail().contains(BarnHelp.text('Core', 'Core_HealthCheck_Step_OrgShape')),
+				'And named as an administrator reads them: ' + skipped.getDetail()
 			);
 			Assert.isFalse(
-				skipped.detail.contains('org_shape') || skipped.detail.contains('household_ownership_skew'),
-				'Never by internal key: ' + skipped.detail
+				skipped.getDetail().contains('org_shape') || skipped.getDetail().contains('household_ownership_skew'),
+				'Never by internal key: ' + skipped.getDetail()
 			);
 			Assert.isTrue(
-				skipped.detail.contains('Address Verification'),
-				'A module extension by its module name: ' + skipped.detail
+				skipped.getDetail().contains('Address Verification'),
+				'A module extension by its module name: ' + skipped.getDetail()
 			);
-			Assert.isFalse(skipped.detail.contains('_extension'), 'Not by its key: ' + skipped.detail);
-			Assert.areEqual(HealthCheckService.SEVERITY_WARNING, skipped.severity);
+			Assert.isFalse(skipped.getDetail().contains('_extension'), 'Not by its key: ' + skipped.getDetail());
+			Assert.areEqual(HealthCheckService.SEVERITY_WARNING, skipped.getSeverity());
 		}
 	}
 
@@ -1001,24 +1009,24 @@ private class HealthCheckServiceTest {
 			);
 			HealthCheckService.queryBudget = -1;
 			HealthCheckService.Report first = HealthCheckRunner.buildReport();
-			Assert.isFalse(first.skippedChecks.isEmpty(), 'The first run left checks');
-			Assert.isTrue(first.skippedChecks.contains('org_shape'), 'By key, for the button');
+			Assert.isFalse(first.getSkippedChecks().isEmpty(), 'The first run left checks');
+			Assert.isTrue(first.getSkippedChecks().contains('org_shape'), 'By key, for the button');
 			HealthCheckLastRun.Summary stored = HealthCheckLastRun.read();
 			Assert.areEqual(1, stored.warnings, 'Stored with its Not Checked warning');
 
 			HealthCheckService.queryBudget = 80;
-			HealthCheckService.Report remaining = HealthCheckRunner.buildRemainingReport(first.skippedChecks);
+			HealthCheckService.Report remaining = HealthCheckRunner.buildRemainingReport(first.getSkippedChecks());
 
-			Assert.isTrue(remaining.skippedChecks.isEmpty(), 'Nothing left this time');
-			Assert.isNull(find(remaining.findings, 'not_checked'), 'No Not Checked warning');
+			Assert.isTrue(remaining.getSkippedChecks().isEmpty(), 'Nothing left this time');
+			Assert.isNull(find(remaining.getFindings(), 'not_checked'), 'No Not Checked warning');
 			Assert.isNotNull(
-				find(remaining.findings, 'fake_extension_finding'),
-				'A module check that was left runs too: ' + remaining.findings
+				find(remaining.getFindings(), 'fake_extension_finding'),
+				'A module check that was left runs too: ' + remaining.getFindings()
 			);
 			HealthCheckLastRun.Summary merged = HealthCheckLastRun.read();
 			Integer warnings = 0;
-			for (HealthCheckService.Finding finding : remaining.findings) {
-				if (finding.severity == HealthCheckService.SEVERITY_WARNING) {
+			for (HealthCheckService.Finding finding : remaining.getFindings()) {
+				if (finding.getSeverity() == HealthCheckService.SEVERITY_WARNING) {
 					warnings++;
 				}
 			}
@@ -1054,8 +1062,8 @@ private class HealthCheckServiceTest {
 			);
 			HealthCheckService.Report empty = HealthCheckRunner.buildRemainingReport(new List<String>());
 
-			Assert.isTrue(none.findings.isEmpty(), 'An unknown key runs nothing: ' + none.findings);
-			Assert.isTrue(empty.findings.isEmpty(), 'No keys, nothing to run');
+			Assert.isTrue(none.getFindings().isEmpty(), 'An unknown key runs nothing: ' + none.getFindings());
+			Assert.isTrue(empty.getFindings().isEmpty(), 'No keys, nothing to run');
 		}
 	}
 
@@ -1071,7 +1079,7 @@ private class HealthCheckServiceTest {
 			System.assertNotEquals(null, failed, 'The check that failed says so, by name.');
 			System.assertEquals(
 				HealthCheckService.SEVERITY_WARNING,
-				failed.severity,
+				failed.getSeverity(),
 				'One check failing is a warning about the report, not an error about the org.'
 			);
 			System.assertNotEquals(null, find(findings, 'org_shape'), 'The other eight answers are still there.');
@@ -1175,7 +1183,7 @@ private class HealthCheckServiceTest {
 			System.assertNotEquals(null, failed, 'A broken extension says so, by name.');
 			System.assertEquals(
 				HealthCheckService.SEVERITY_WARNING,
-				failed.severity,
+				failed.getSeverity(),
 				'The extension failing is a warning about the report, not an error about the org.'
 			);
 			System.assertNotEquals(
@@ -1252,20 +1260,20 @@ private class HealthCheckServiceTest {
 			OrgShapeDetector.overrideShape = shape(true, true, true, true);
 
 			for (HealthCheckService.Finding finding : HealthCheckRunner.run()) {
-				System.assertNotEquals(null, finding.key, 'Every finding has a key.');
-				System.assertNotEquals(null, finding.title, 'Every finding has a title.');
-				System.assertNotEquals(null, finding.detail, 'Every finding explains itself.');
+				System.assertNotEquals(null, finding.getKey(), 'Every finding has a key.');
+				System.assertNotEquals(null, finding.getTitle(), 'Every finding has a title.');
+				System.assertNotEquals(null, finding.getDetail(), 'Every finding explains itself.');
 				System.assert(
-					finding.severity == HealthCheckService.SEVERITY_INFO ||
-						finding.severity == HealthCheckService.SEVERITY_WARNING ||
-						finding.severity == HealthCheckService.SEVERITY_ERROR,
+					finding.getSeverity() == HealthCheckService.SEVERITY_INFO ||
+						finding.getSeverity() == HealthCheckService.SEVERITY_WARNING ||
+						finding.getSeverity() == HealthCheckService.SEVERITY_ERROR,
 					'Severity is one of the three the component knows how to draw.'
 				);
 				System.assert(
-					finding.category == HealthCheckService.CATEGORY_ORG_SHAPE ||
-						finding.category == HealthCheckService.CATEGORY_LICENSES ||
-						finding.category == HealthCheckService.CATEGORY_ACCESS ||
-						finding.category == HealthCheckService.CATEGORY_SETTINGS,
+					finding.getCategory() == HealthCheckService.CATEGORY_ORG_SHAPE ||
+						finding.getCategory() == HealthCheckService.CATEGORY_LICENSES ||
+						finding.getCategory() == HealthCheckService.CATEGORY_ACCESS ||
+						finding.getCategory() == HealthCheckService.CATEGORY_SETTINGS,
 					'Category is one of the four the component groups by.'
 				);
 			}
@@ -1281,25 +1289,25 @@ private class HealthCheckServiceTest {
 			HealthCheckService.Report report = HealthCheckRunner.buildReport();
 			Test.stopTest();
 
-			System.assertNotEquals(null, report.findings, 'The report carries the findings.');
+			System.assertNotEquals(null, report.getFindings(), 'The report carries the findings.');
 			System.assertEquals(
 				CoexistenceService.MODE_NPSP,
-				report.recommendedMode,
+				report.getRecommendedMode(),
 				'The report says what is recommended.'
 			);
 			System.assertEquals(
 				System.Label.Core_CoexistenceMode_Npsp,
-				report.recommendedModeLabel,
+				report.getRecommendedModeLabel(),
 				'The recommendation is labelled for a person to read.'
 			);
 			System.assertEquals(
 				true,
-				report.modeNeedsAttention,
+				report.getModeNeedsAttention(),
 				'An unconfirmed mode needs attention, which is what shows the button.'
 			);
 			System.assertNotEquals(
 				null,
-				report.orgShapeSummary,
+				report.getOrgShapeSummary(),
 				'The card summary is on the report, not rebuilt by the component.'
 			);
 		}
@@ -1367,16 +1375,16 @@ private class HealthCheckServiceTest {
 		Boolean hasSalesCloudObjects
 	) {
 		OrgShapeDetector.OrgShape orgShape = new OrgShapeDetector.OrgShape();
-		orgShape.hasNpsp = hasNpsp;
-		orgShape.hasPersonAccounts = hasPersonAccounts;
-		orgShape.hasIndustriesNonprofit = hasIndustriesNonprofit;
-		orgShape.hasSalesCloudObjects = hasSalesCloudObjects;
+		orgShape.put('hasNpsp', hasNpsp);
+		orgShape.put('hasPersonAccounts', hasPersonAccounts);
+		orgShape.put('hasIndustriesNonprofit', hasIndustriesNonprofit);
+		orgShape.put('hasSalesCloudObjects', hasSalesCloudObjects);
 		return orgShape;
 	}
 
 	private static HealthCheckService.Finding find(List<HealthCheckService.Finding> findings, String key) {
 		for (HealthCheckService.Finding finding : findings) {
-			if (key.equals(finding.key)) {
+			if (key.equals(finding.getKey())) {
 				return finding;
 			}
 		}
@@ -1393,8 +1401,8 @@ private class HealthCheckServiceTest {
 	static void anOrgWithNativeHouseholdsReportsHowManyInformationally() {
 		System.runAs(TestUsers.admin()) {
 			OrgShapeDetector.OrgShape orgShape = shape(false, false, false, false);
-			orgShape.hasNativeHouseholdGroups = true;
-			orgShape.nativeHouseholdGroupCount = 3;
+			orgShape.put('hasNativeHouseholdGroups', true);
+			orgShape.put('nativeHouseholdGroupCount', 3);
 			OrgShapeDetector.overrideShape = orgShape;
 			HouseholdSelector.nativeHouseholdCollisionCountOverride = 0;
 
@@ -1406,10 +1414,10 @@ private class HealthCheckServiceTest {
 			System.assertNotEquals(null, finding, 'The native households finding is reported');
 			System.assertEquals(
 				HealthCheckService.SEVERITY_INFO,
-				finding.severity,
+				finding.getSeverity(),
 				'A native household is not a problem, it is mutual exclusion working'
 			);
-			System.assert(finding.detail.contains('3'), 'The finding names how many were found');
+			System.assert(finding.getDetail().contains('3'), 'The finding names how many were found');
 		}
 	}
 
@@ -1420,8 +1428,8 @@ private class HealthCheckServiceTest {
 	static void anOrgWithNoNativeHouseholdsReportsNothing() {
 		System.runAs(TestUsers.admin()) {
 			OrgShapeDetector.OrgShape orgShape = shape(false, false, false, false);
-			orgShape.hasNativeHouseholdGroups = false;
-			orgShape.nativeHouseholdGroupCount = 0;
+			orgShape.put('hasNativeHouseholdGroups', false);
+			orgShape.put('nativeHouseholdGroupCount', 0);
 			OrgShapeDetector.overrideShape = orgShape;
 			HouseholdSelector.nativeHouseholdCollisionCountOverride = 0;
 
@@ -1445,8 +1453,8 @@ private class HealthCheckServiceTest {
 	static void anAccountCarryingBothHouseholdModelsIsReportedAsAWarning() {
 		System.runAs(TestUsers.admin()) {
 			OrgShapeDetector.OrgShape orgShape = shape(false, false, false, false);
-			orgShape.hasNativeHouseholdGroups = true;
-			orgShape.nativeHouseholdGroupCount = 1;
+			orgShape.put('hasNativeHouseholdGroups', true);
+			orgShape.put('nativeHouseholdGroupCount', 1);
 			OrgShapeDetector.overrideShape = orgShape;
 			HouseholdSelector.nativeHouseholdCollisionCountOverride = 1;
 
@@ -1458,10 +1466,10 @@ private class HealthCheckServiceTest {
 			System.assertNotEquals(null, finding, 'The collision finding is reported');
 			System.assertEquals(
 				HealthCheckService.SEVERITY_WARNING,
-				finding.severity,
+				finding.getSeverity(),
 				'A collision is a problem, an administrator should look at'
 			);
-			System.assert(finding.detail.contains('1'), 'The finding names how many Accounts collide');
+			System.assert(finding.getDetail().contains('1'), 'The finding names how many Accounts collide');
 		}
 	}
 
@@ -1472,8 +1480,8 @@ private class HealthCheckServiceTest {
 	static void noCollisionMeansNoWarning() {
 		System.runAs(TestUsers.admin()) {
 			OrgShapeDetector.OrgShape orgShape = shape(false, false, false, false);
-			orgShape.hasNativeHouseholdGroups = true;
-			orgShape.nativeHouseholdGroupCount = 2;
+			orgShape.put('hasNativeHouseholdGroups', true);
+			orgShape.put('nativeHouseholdGroupCount', 2);
 			OrgShapeDetector.overrideShape = orgShape;
 			HouseholdSelector.nativeHouseholdCollisionCountOverride = 0;
 
@@ -1503,8 +1511,8 @@ private class HealthCheckServiceTest {
 			Assert.areEqual('3', HealthCheckOrgShapeChecks.cappedCount(3), 'Under');
 
 			OrgShapeDetector.OrgShape orgShape = shape(false, false, false, false);
-			orgShape.hasNativeHouseholdGroups = true;
-			orgShape.nativeHouseholdGroupCount = cap + 1;
+			orgShape.put('hasNativeHouseholdGroups', true);
+			orgShape.put('nativeHouseholdGroupCount', cap + 1);
 			OrgShapeDetector.overrideShape = orgShape;
 			HouseholdSelector.nativeHouseholdCollisionCountOverride = 0;
 
@@ -1513,8 +1521,8 @@ private class HealthCheckServiceTest {
 			Test.stopTest();
 
 			Assert.isTrue(
-				finding.detail.contains(moreThan),
-				'The native households finding says more than the cap: ' + finding.detail
+				finding.getDetail().contains(moreThan),
+				'The native households finding says more than the cap: ' + finding.getDetail()
 			);
 		}
 	}

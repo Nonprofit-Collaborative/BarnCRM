@@ -15,11 +15,11 @@ private class HealthCheckLastRunTest {
 
 	private static HealthCheckService.Report reportWithOneOfEach(Boolean canManage) {
 		HealthCheckService.Report report = new HealthCheckService.Report();
-		report.canManageSettings = canManage;
-		report.findings.add(finding('a', HealthCheckService.SEVERITY_ERROR));
-		report.findings.add(finding('b', HealthCheckService.SEVERITY_WARNING));
-		report.findings.add(finding('c', HealthCheckService.SEVERITY_WARNING));
-		report.findings.add(finding('d', HealthCheckService.SEVERITY_INFO));
+		report.put('canManageSettings', canManage);
+		report.getFindings().add(finding('a', HealthCheckService.SEVERITY_ERROR));
+		report.getFindings().add(finding('b', HealthCheckService.SEVERITY_WARNING));
+		report.getFindings().add(finding('c', HealthCheckService.SEVERITY_WARNING));
+		report.getFindings().add(finding('d', HealthCheckService.SEVERITY_INFO));
 		return report;
 	}
 
@@ -104,7 +104,7 @@ private class HealthCheckLastRunTest {
 
 				Integer total = shown.errors + shown.warnings + shown.infos;
 				Assert.isNotNull(shown.ranAt, 'Her full run is kept');
-				Assert.areEqual(report.findings.size(), total, 'with every finding counted once');
+				Assert.areEqual(report.getFindings().size(), total, 'with every finding counted once');
 			}
 		}
 	}

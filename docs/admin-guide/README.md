@@ -114,7 +114,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | Plan 6.1 item 9 Custom metadata (CMDT Manager) | [custom-metadata.md](custom-metadata.md) | Core |
 | C-06 Access | [access.md](access.md) | Core (the Fundraising Staff role comes with Fundraising) |
 | Q-09 Automatic access | [automatic-access.md](automatic-access.md) | Core, with policies for Fundraising |
-| C-10 Sample data loader | [sample-data.md](sample-data.md) | Core |
+| C-10 Sample data loader | [sample-data.md](sample-data.md) | BarnCRM Sample Data |
 | C-08 Record pages | [record-pages.md](record-pages.md) | Core |
 | C-27 What's new after an upgrade | [whats-new.md](whats-new.md) | Core, with notes from any module |
 | Q-10 In-app tips | [in-app-guidance.md](in-app-guidance.md) | Core |
@@ -156,18 +156,18 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-67 Archive by Query (save old records to a file in Files, then delete them; optionally empty the Recycle Bin) | [archive-by-query.md](archive-by-query.md) | Core |
 | C-66 Backup Sets (saved Find queries saved to files in Files on demand; restore through Load one object) | [backup-sets.md](backup-sets.md) | Core |
 | C-70 Import Files (a zip with a manifest loaded into Files linked to records, with dry run and undo) | [files-import.md](files-import.md) | Core |
-| Org Optimizer (Data Quality, Field Use, Data Dictionary, Health Check, Errors, Storage and Limits, Unused Setup, Setup Changes, Access Explorer) | [org-optimizer.md](org-optimizer.md) | Core |
-| C-28 Data Quality (the Data Quality section of Org Optimizer) | [data-hygiene.md](data-hygiene.md) | Core |
+| Org Optimizer (Data Quality, Field Use, Data Dictionary, Health Check, Errors, Storage and Limits, Unused Setup, Setup Changes, Access Explorer) | [org-optimizer.md](org-optimizer.md) | BarnCRM Org Optimizer |
+| C-28 Data Quality (the Data Quality section of Org Optimizer) | [data-hygiene.md](data-hygiene.md) | BarnCRM Org Optimizer |
 | C-20 Duplicates (the Duplicate Matching tab: review and matching logic) | [duplicates.md](duplicates.md) | Core |
-| Field Use | [field-utilization.md](field-utilization.md) | Core |
-| C-52 Data Dictionary (the Data Dictionary section of Org Optimizer) | [data-dictionary.md](data-dictionary.md) | Core |
-| C-53 and C-53b Access Explorer, with Compare Two and the Modify All Report (a section of Org Optimizer) | [access-explorer.md](access-explorer.md) | Core |
-| C-65 Field Access Manager (give or remove Read and Edit across permission sets, with a preview and undo; Access Explorer's Change Field Access view) | [field-access-manager.md](field-access-manager.md) | Core |
-| C-56 Setup Changes (who changed what in Setup, kept beyond 180 days; the Setup Changes section of Org Optimizer) | [setup-changes.md](setup-changes.md) | Core |
+| Field Use | [field-utilization.md](field-utilization.md) | BarnCRM Org Optimizer |
+| C-52 Data Dictionary (the Data Dictionary section of Org Optimizer) | [data-dictionary.md](data-dictionary.md) | BarnCRM Org Optimizer |
+| C-53 and C-53b Access Explorer, with Compare Two and the Modify All Report (a section of Org Optimizer) | [access-explorer.md](access-explorer.md) | BarnCRM Org Optimizer |
+| C-65 Field Access Manager (give or remove Read and Edit across permission sets, with a preview and undo; Access Explorer's Change Field Access view) | [field-access-manager.md](field-access-manager.md) | BarnCRM Org Optimizer |
+| C-56 Setup Changes (who changed what in Setup, kept beyond 180 days; the Setup Changes section of Org Optimizer) | [setup-changes.md](setup-changes.md) | BarnCRM Org Optimizer (the nightly copy is Core's) |
 | C-55 Record Inspector (every readable field of one record, on a page of its own opened from record pages) | [record-inspector.md](record-inspector.md) | Core |
 | C-59 Where Used and Retire a Field (which BarnCRM setup uses a field or object; from the Data Dictionary, Field Use and the Record Inspector) | [where-used.md](where-used.md) | Core |
 | C-68 Field History (changes to chosen fields of BarnCRM's own objects, beyond 20 fields, with restore) | [field-history.md](field-history.md) | Core |
-| AIR-01 AI-Readiness Export (the AI-Readiness Export section of Org Optimizer) | [ai-readiness-export.md](ai-readiness-export.md) | Core |
+| AIR-01 AI-Readiness Export (the AI-Readiness Export section of Org Optimizer) | [ai-readiness-export.md](ai-readiness-export.md) | BarnCRM Org Optimizer |
 
 ### Automation, Totals and Health
 
@@ -177,7 +177,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | ADR-0040 Your own version of an automation | [flow-templates.md](flow-templates.md) | Core |
 | C-13 Rollups | [rollups.md](rollups.md) | BarnCRM Rollup Builder (Core until ADR-0125) |
 | C-05, C-23 Error Log and error digest | [error-log.md](error-log.md) | Core |
-| C-11, C-21 Health Check | [health-check.md](health-check.md) | Core, with findings from Fundraising, Mirror, Rollup Builder and Volunteers |
+| C-11, C-21 Health Check | [health-check.md](health-check.md) | BarnCRM Org Optimizer, with findings from Core, Fundraising, Mirror, Rollup Builder and Volunteers |
 | Q-04 Job notifications | [job-notifications.md](job-notifications.md) | Core |
 | RT-10 Nightly jobs | [nightly-jobs.md](nightly-jobs.md) | Core, with jobs from every module |
 | X-03, Q-14 Using BarnCRM actions with your own AI assistant | [using-barncrm-actions-with-ai.md](using-barncrm-actions-with-ai.md) | Core, Fundraising |

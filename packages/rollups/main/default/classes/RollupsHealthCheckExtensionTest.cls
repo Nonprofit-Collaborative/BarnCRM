@@ -101,7 +101,10 @@ private class RollupsHealthCheckExtensionTest {
 	 * `HealthCheckFixes`, and reads the module checks again, as the re-run report would.
 	 */
 	private static HealthCheckService.Report press(HealthCheckService.Finding finding) {
-		return press(finding.getFixTarget().substring(HealthCheckService.FIX_ACTION_PREFIX.length()), finding.getFixScope());
+		return press(
+			finding.getFixTarget().substring(HealthCheckService.FIX_ACTION_PREFIX.length()),
+			finding.getFixScope()
+		);
 	}
 
 	private static HealthCheckService.Report press(String fixKey, List<String> scope) {

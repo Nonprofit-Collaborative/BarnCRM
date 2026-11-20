@@ -231,7 +231,7 @@ private class FieldAccessServiceTest {
 			Assert.isTrue(listed[0].canUndo, 'A complete change inside its window can be undone.');
 			Assert.areEqual(
 				BarnHelp.text('Core', 'Core_Import_UndoErrorAccessChange'),
-				ImportUndoService.preview(job.Id).reason,
+				ImportUndoService.preview(job.Id).getReason(),
 				'The import undo refuses an access change.'
 			);
 			FieldAccessController.Outcome undone = FieldAccessController.undo(job.Id);

@@ -5,7 +5,7 @@ import { createHelpStore } from 'c/barnHelpCatalog';
 const fs = require('fs');
 
 const PAGES = [
-  'packages/core/main/default/lwc/orgOptimizer/orgOptimizer.js',
+  'packages/orgoptimizer/main/default/lwc/orgOptimizer/orgOptimizer.js',
   'packages/core/main/default/lwc/importWizard/importWizard.js',
   'packages/rollups/main/default/lwc/rollupWizard/rollupWizard.js'
 ];

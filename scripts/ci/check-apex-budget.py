@@ -94,7 +94,12 @@ CAPS = {
     # Lowered 2026-11-20 for S11 (D-213, ADR-NEXT migration package): the Migration Assistant and
     # the NPSP and Nonprofit Cloud household adoption moved into the optional Migration package,
     # about 54,500 out: 2,200,764 measured, plus about 0.1%.
-    "core": 2_203_000,
+    # Lowered 2026-11-20 for D-215 (ADR-NEXT org optimizer and sample data modules): Org
+    # Optimizer with Health Check, and the sample data loader with its set, moved into two
+    # optional packages; the seams, @NamespaceAccessible marks and getters they need stay.
+    # 2,201,145 measured before, 1,970,388 after, plus about 0.1%: Core is under the 2.0M
+    # target.
+    "core": 1_972_400,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured
@@ -413,6 +418,14 @@ CAPS = {
     # the staging job, its controller) and the NPSP and Nonprofit Cloud household adoption and
     # undo, moved out of Core, with the post-install: 56,490 measured 2026-11-20, plus about 2%.
     "migration": 57_700,
+    # Org Optimizer (D-215, ADR-NEXT org optimizer and sample data modules): Health Check's
+    # runner, checks, controller and last run, and every Org Optimizer section's controllers
+    # and services, moved out of Core, with the post-install: 215,159 measured 2026-11-20,
+    # plus about 2%.
+    "orgoptimizer": 219_500,
+    # Sample Data (D-215): the loader, its stages, selector and controller, the package host
+    # and the post-install, moved out of Core: 29,516 measured 2026-11-20, plus about 2%.
+    "sampledata": 30_200,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}
 

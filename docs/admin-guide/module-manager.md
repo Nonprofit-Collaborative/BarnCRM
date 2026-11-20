@@ -33,12 +33,13 @@ Settings** permission to install, turn on, turn off, or check what an uninstall 
 
 Which modules are listed depends on the edition chosen in first-run setup (see
 [BarnCRM Settings, First-run setup](barncrm-settings.md#first-run-setup)). The Standard Edition (or no edition chosen yet) lists
-Core and the 15 modules both editions offer: BarnCRM Rollup Builder, BarnCRM Contact Point Sync,
+Core and the 17 modules both editions offer: BarnCRM Rollup Builder, BarnCRM Contact Point Sync,
 BarnCRM Event Management, BarnCRM Forms, BarnCRM Portal Builder, BarnCRM Address Verification,
 BarnCRM Payments, BarnCRM Corporate Hub, BarnCRM Memberships, BarnCRM Territory Management,
-BarnCRM Mirror, BarnCRM LWC Builder, BarnCRM Project Management, BarnCRM Advanced Reporting and
-BarnCRM Migration (the Migration Assistant, to install while migrating and uninstall after).
-The Nonprofit Edition lists all 22: those 16 plus BarnCRM Fundraising, BarnCRM Volunteers,
+BarnCRM Mirror, BarnCRM LWC Builder, BarnCRM Project Management, BarnCRM Advanced Reporting,
+BarnCRM Org Optimizer (Org Optimizer and Health Check), BarnCRM Sample Data (for sandboxes and
+demo orgs) and BarnCRM Migration (the Migration Assistant, to install while migrating and
+uninstall after). The Nonprofit Edition lists all 24: those 18 plus BarnCRM Fundraising, BarnCRM Volunteers,
 BarnCRM Programs, BarnCRM Logic Models, BarnCRM Grants and BarnCRM Scholarships and Outbound
 Grants. A module that is installed is always listed, whatever the edition. See
 [Editions](editions.md).

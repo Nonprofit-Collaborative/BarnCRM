@@ -13,7 +13,7 @@ private class OrgOptimizerSettingsTest {
 	/** The console's keys by section, read as JSON so the test needs no Core model types. */
 	private static Map<String, Set<String>> keysBySection() {
 		Map<String, Object> model = (Map<String, Object>) JSON.deserializeUntyped(
-			JSON.serialize(SettingsController.getConsoleModel())
+			JSON.serialize(SettingsController.consoleModel())
 		);
 		Map<String, Set<String>> keys = new Map<String, Set<String>>();
 		for (Object entry : (List<Object>) model.get('sections')) {

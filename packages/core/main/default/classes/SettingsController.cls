@@ -159,7 +159,6 @@ public with sharing class SettingsController {
 
 	// Not cacheable: the console calls it again after a save, and a cached answer would show
 	// the values from before the save (ADR-0093, record reads through Lightning Data Service).
-	@NamespaceAccessible
 	@AuraEnabled
 	public static ConsoleModel getConsoleModel() {
 		try {
@@ -168,6 +167,12 @@ public with sharing class SettingsController {
 			ErrorLogger.log(e, ERROR_CONTEXT);
 			throw UserErrors.message(BarnHelp.text('Core', 'Core_Settings_LoadErrorMessage'));
 		}
+	}
+
+	/** `getConsoleModel` for another package (see save). */
+	@NamespaceAccessible
+	public static ConsoleModel consoleModel() {
+		return getConsoleModel();
 	}
 
 	/**

@@ -29,16 +29,24 @@ public with sharing class OrgLimitReader {
 	/** One org limit. */
 	@NamespaceAccessible
 	public class LimitUse {
-		@NamespaceAccessible
 		@AuraEnabled
 		public String name;
 		@AuraEnabled
 		public Integer used;
 		@AuraEnabled
 		public Integer max;
-		@NamespaceAccessible
 		@AuraEnabled
 		public Integer percent;
+
+		@NamespaceAccessible
+		public String getName() {
+			return name;
+		}
+
+		@NamespaceAccessible
+		public Integer getPercent() {
+			return percent;
+		}
 	}
 
 	/** Every limit read, in the order shown. */

@@ -5,7 +5,7 @@
  * Both methods require the Find and Export Records custom permission (R-SQ5): the console is a
  * way into Find and grants nothing of its own. Counts run in user mode (DataHygieneService).
  * "Open in Find" saves the check's query as the person's own unshared Saved Query through
- * FindController.saveQuery, so it is compiled, checked and stored exactly as Find stores one.
+ * FindController.saveFor, so it is compiled, checked and stored exactly as Find stores one.
  */
 public with sharing class DataHygieneController {
 	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(null, 'Core', 'Core_DataHygiene_CheckFailed');
@@ -50,7 +50,7 @@ public with sharing class DataHygieneController {
 			String document = DataHygieneService.queryDocument(checkKey);
 			String name = DataHygieneService.savedQueryName(checkKey);
 			Id existing = ownSavedQueryNamed(name);
-			FindController.saveQuery(existing, name, document, false);
+			FindController.saveFor(existing, name, document, false);
 			OpenInFind target = new OpenInFind();
 			// The query just updated, or, when there was none, the one just created: read
 			// back by owner and name, not picked from Find's list, which is cut at 500 and

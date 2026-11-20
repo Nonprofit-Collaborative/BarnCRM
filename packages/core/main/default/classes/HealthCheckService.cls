@@ -234,32 +234,24 @@ public with sharing class HealthCheckService {
 	/** One thing Health Check has to say about this org. */
 	@NamespaceAccessible
 	public class Finding {
-		@NamespaceAccessible
 		@AuraEnabled
 		public String key;
-		@NamespaceAccessible
 		@AuraEnabled
 		public String title;
-		@NamespaceAccessible
 		@AuraEnabled
 		public String detail;
-		@NamespaceAccessible
 		@AuraEnabled
 		public String severity;
 		@AuraEnabled
 		public String fixLabel;
-		@NamespaceAccessible
 		@AuraEnabled
 		public String fixTarget;
-		@NamespaceAccessible
 		@AuraEnabled
 		public String category;
 		/** What the fix would change, as fixScope computed it for this report. */
-		@NamespaceAccessible
 		@AuraEnabled
 		public List<String> fixScope;
 		/** Records the finding is about, to open one by one. Never a fix. */
-		@NamespaceAccessible
 		@AuraEnabled
 		public List<Link> links;
 
@@ -315,12 +307,26 @@ public with sharing class HealthCheckService {
 		public List<String> getFixScope() {
 			return fixScope;
 		}
+
+		@NamespaceAccessible
+		public String getTitle() {
+			return title;
+		}
+
+		@NamespaceAccessible
+		public String getCategory() {
+			return category;
+		}
+
+		@NamespaceAccessible
+		public List<Link> getLinks() {
+			return links;
+		}
 	}
 
 	/** One record a finding names, with where to open it. */
 	@NamespaceAccessible
 	public class Link {
-		@NamespaceAccessible
 		@AuraEnabled
 		public String label;
 		@AuraEnabled
@@ -331,36 +337,37 @@ public with sharing class HealthCheckService {
 			this.label = String.valueOf(record.get('Name'));
 			this.url = '/lightning/r/' + record.getSObjectType().getDescribe().getName() + '/' + record.Id + '/view';
 		}
+
+		@NamespaceAccessible
+		public String getLabel() {
+			return label;
+		}
+
+		@NamespaceAccessible
+		public String getUrl() {
+			return url;
+		}
 	}
 
 	/** Everything the panel needs in one round trip. */
 	@NamespaceAccessible
 	public class Report {
-		@NamespaceAccessible
 		@AuraEnabled
 		public List<Finding> findings;
-		@NamespaceAccessible
 		@AuraEnabled
 		public OrgShapeDetector.OrgShape orgShape;
-		@NamespaceAccessible
 		@AuraEnabled
 		public String orgShapeSummary;
-		@NamespaceAccessible
 		@AuraEnabled
 		public String currentMode;
-		@NamespaceAccessible
 		@AuraEnabled
 		public String currentModeLabel;
-		@NamespaceAccessible
 		@AuraEnabled
 		public String recommendedMode;
-		@NamespaceAccessible
 		@AuraEnabled
 		public String recommendedModeLabel;
-		@NamespaceAccessible
 		@AuraEnabled
 		public Boolean modeNeedsAttention;
-		@NamespaceAccessible
 		@AuraEnabled
 		public Boolean canManageSettings;
 
@@ -375,14 +382,12 @@ public with sharing class HealthCheckService {
 		@AuraEnabled
 		public String sectionStateKey;
 		/** After a fix: what it created or scheduled, and what it left out. Null otherwise. */
-		@NamespaceAccessible
 		@AuraEnabled
 		public String fixOutcome;
 		/**
 		 * The keys of the checks this run left because it stopped early to stay inside the
 		 * limits, for Run Remaining Checks; empty when every check ran (D-208, N-07).
 		 */
-		@NamespaceAccessible
 		@AuraEnabled
 		public List<String> skippedChecks;
 
@@ -404,6 +409,98 @@ public with sharing class HealthCheckService {
 		@NamespaceAccessible
 		public String getFixOutcome() {
 			return fixOutcome;
+		}
+
+		@NamespaceAccessible
+		public List<String> getSkippedChecks() {
+			return skippedChecks;
+		}
+
+		@NamespaceAccessible
+		public Boolean getCanManageSettings() {
+			return canManageSettings;
+		}
+
+		@NamespaceAccessible
+		public OrgShapeDetector.OrgShape getOrgShape() {
+			return orgShape;
+		}
+
+		@NamespaceAccessible
+		public String getOrgShapeSummary() {
+			return orgShapeSummary;
+		}
+
+		@NamespaceAccessible
+		public String getCurrentMode() {
+			return currentMode;
+		}
+
+		@NamespaceAccessible
+		public String getCurrentModeLabel() {
+			return currentModeLabel;
+		}
+
+		@NamespaceAccessible
+		public String getRecommendedMode() {
+			return recommendedMode;
+		}
+
+		@NamespaceAccessible
+		public String getRecommendedModeLabel() {
+			return recommendedModeLabel;
+		}
+
+		@NamespaceAccessible
+		public Boolean getModeNeedsAttention() {
+			return modeNeedsAttention;
+		}
+
+		/**
+		 * Sets one field by its name, for the Org Optimizer runner that fills the report: an
+		 * `@AuraEnabled` field cannot also be `@NamespaceAccessible`.
+		 */
+		@NamespaceAccessible
+		public Report put(String field, Object value) {
+			switch on field {
+				when 'findings' {
+					findings = (List<Finding>) value;
+				}
+				when 'skippedChecks' {
+					skippedChecks = (List<String>) value;
+				}
+				when 'canManageSettings' {
+					canManageSettings = (Boolean) value;
+				}
+				when 'orgShape' {
+					orgShape = (OrgShapeDetector.OrgShape) value;
+				}
+				when 'orgShapeSummary' {
+					orgShapeSummary = (String) value;
+				}
+				when 'currentMode' {
+					currentMode = (String) value;
+				}
+				when 'currentModeLabel' {
+					currentModeLabel = (String) value;
+				}
+				when 'recommendedMode' {
+					recommendedMode = (String) value;
+				}
+				when 'recommendedModeLabel' {
+					recommendedModeLabel = (String) value;
+				}
+				when 'modeNeedsAttention' {
+					modeNeedsAttention = (Boolean) value;
+				}
+				when 'fixOutcome' {
+					fixOutcome = (String) value;
+				}
+				when else {
+					throw new IllegalArgumentException('Unknown Health Check report field: ' + field);
+				}
+			}
+			return this;
 		}
 	}
 

@@ -101,7 +101,7 @@ public with sharing class DataHygieneService {
 			result.canOpenInFind = true;
 			// A household that is also a Nonprofit Cloud household keeps its members there, so
 			// it reads as empty here, and deleting it would delete its native group (ADR-0036).
-			if (key == HOUSEHOLDS_WITHOUT_MEMBERS && OrgShapeDetector.detect().hasNativeHouseholdGroups == true) {
+			if (key == HOUSEHOLDS_WITHOUT_MEMBERS && OrgShapeDetector.detect().getHasNativeHouseholdGroups() == true) {
 				result.note = BarnHelp.text('Core', 'Core_DataHygiene_NativeHouseholdsListed');
 			}
 			result.countLabel = countLabel(result.count);

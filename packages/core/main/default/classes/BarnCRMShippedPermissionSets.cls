@@ -83,6 +83,7 @@ public with sharing class BarnCRMShippedPermissionSets {
 		'Rollup_Builder_Admin',
 		'Rollup_Builder_User',
 		'Salesforce_Records_Sync',
+		'Sample_Data',
 		'Scholarships_Admin',
 		'Scholarships_Read_Only',
 		'Scholarships_Staff',

@@ -20,7 +20,7 @@ private class HealthCheckHouseholdChecksTest {
 
 	private static void platformOnlyShape() {
 		OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
-		shape.hasNativeHouseholdGroups = false;
+		shape.put('hasNativeHouseholdGroups', false);
 		OrgShapeDetector.overrideShape = shape;
 	}
 
@@ -53,7 +53,7 @@ private class HealthCheckHouseholdChecksTest {
 		Map<String, HealthCheckService.Finding> byKey = new Map<String, HealthCheckService.Finding>();
 		System.runAs(maria) {
 			for (HealthCheckService.Finding finding : HealthCheckRunner.run()) {
-				byKey.put(finding.key, finding);
+				byKey.put(finding.getKey(), finding);
 			}
 		}
 		return byKey;
@@ -95,15 +95,15 @@ private class HealthCheckHouseholdChecksTest {
 
 			Assert.isNotNull(finding, 'Contacts with no account are reported.');
 			Assert.isTrue(
-				finding.title.startsWith('2 '),
-				'Two of them: the organization contact belongs to its organization. ' + finding.title
+				finding.getTitle().startsWith('2 '),
+				'Two of them: the organization contact belongs to its organization. ' + finding.getTitle()
 			);
-			Assert.areEqual(HealthCheckService.SEVERITY_WARNING, finding.severity, 'A warning.');
-			Assert.isNull(finding.fixTarget, 'Detection only: there is no fix button.');
-			Assert.areEqual(2, finding.links.size(), 'Each one is linked.');
+			Assert.areEqual(HealthCheckService.SEVERITY_WARNING, finding.getSeverity(), 'A warning.');
+			Assert.isNull(finding.getFixTarget(), 'Detection only: there is no fix button.');
+			Assert.areEqual(2, finding.getLinks().size(), 'Each one is linked.');
 			Assert.areEqual(
 				'/lightning/r/Contact/' + orphans[0].Id + '/view',
-				finding.links[0].url,
+				finding.getLinks()[0].getUrl(),
 				'To its record page, oldest first.'
 			);
 		}
@@ -126,16 +126,16 @@ private class HealthCheckHouseholdChecksTest {
 			Assert.isNotNull(finding, 'A household with nobody in it is reported.');
 			Assert.areEqual(
 				System.Label.Core_HealthCheck_EmptyHouseholdsTitleOne,
-				finding.title,
+				finding.getTitle(),
 				'Only the empty one, said in the singular.'
 			);
 			Assert.isTrue(
-				finding.detail.contains(System.Label.Core_HealthCheck_OrphansLinkedOnly),
-				'Not "the first 1 are linked": ' + finding.detail
+				finding.getDetail().contains(System.Label.Core_HealthCheck_OrphansLinkedOnly),
+				'Not "the first 1 are linked": ' + finding.getDetail()
 			);
-			Assert.areEqual(HealthCheckService.SEVERITY_INFO, finding.severity, 'Information.');
-			Assert.isNull(finding.fixTarget, 'Detection only.');
-			Assert.areEqual('The Empty Family', finding.links[0].label, 'It is linked by name.');
+			Assert.areEqual(HealthCheckService.SEVERITY_INFO, finding.getSeverity(), 'Information.');
+			Assert.isNull(finding.getFixTarget(), 'Detection only.');
+			Assert.areEqual('The Empty Family', finding.getLinks()[0].getLabel(), 'It is linked by name.');
 		}
 	}
 
@@ -197,11 +197,11 @@ private class HealthCheckHouseholdChecksTest {
 
 			Assert.isNotNull(finding, 'Ann is still reported.');
 			Assert.isTrue(
-				finding.title.startsWith('1 '),
-				'Erasing Bo took him out of his household on purpose (R-ER9). ' + finding.title
+				finding.getTitle().startsWith('1 '),
+				'Erasing Bo took him out of his household on purpose (R-ER9). ' + finding.getTitle()
 			);
-			Assert.areEqual(1, finding.links.size(), 'Only Ann is linked.');
-			Assert.isTrue(finding.links[0].url.contains(orphans[0].Id), 'And it is Ann.');
+			Assert.areEqual(1, finding.getLinks().size(), 'Only Ann is linked.');
+			Assert.isTrue(finding.getLinks()[0].getUrl().contains(orphans[0].Id), 'And it is Ann.');
 		}
 	}
 
@@ -251,15 +251,15 @@ private class HealthCheckHouseholdChecksTest {
 
 			Assert.isNotNull(finding, 'People with no current membership are reported.');
 			Assert.isTrue(
-				finding.title.startsWith('3 '),
+				finding.getTitle().startsWith('3 '),
 				'No account, an organization contact, and a membership that ended: three. A ' +
 					'current member is in a household, and a contact linked straight to one is ' +
 					'the membership check to report. ' +
-					finding.title
+					finding.getTitle()
 			);
 			Set<String> named = new Set<String>();
-			for (HealthCheckService.Link link : finding.links) {
-				named.add(link.label);
+			for (HealthCheckService.Link link : finding.getLinks()) {
+				named.add(link.getLabel());
 			}
 			Assert.isTrue(named.contains('Ida Left'), 'An ended membership is not a household (R-M2).');
 			Assert.isFalse(named.contains('Jo Kept'), 'A current member is not an orphan.');
@@ -285,15 +285,15 @@ private class HealthCheckHouseholdChecksTest {
 			HealthCheckService.Finding finding = runAsMaria(HOUSEHOLDS);
 
 			Assert.isNotNull(finding, 'A household with only ended memberships is reported.');
-			Assert.isTrue(finding.title.startsWith('1 '), 'Only that one. ' + finding.title);
+			Assert.isTrue(finding.getTitle().startsWith('1 '), 'Only that one. ' + finding.getTitle());
 			Assert.areEqual(
 				'/lightning/r/Account/' + ended.Id + '/view',
-				finding.links[0].url,
+				finding.getLinks()[0].getUrl(),
 				'It is the one linked.'
 			);
 			Assert.areEqual(
 				'The Ended Family',
-				finding.links[0].label,
+				finding.getLinks()[0].getLabel(),
 				'A household nobody is in keeps its name, so the list says which family (R-H4).'
 			);
 		}
@@ -311,8 +311,8 @@ private class HealthCheckHouseholdChecksTest {
 			itsContact.AccountId = storedAsAccount.Id;
 			insertWithoutAutomaticHouseholds(new List<Contact>{ itsContact });
 			OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
-			shape.hasNativeHouseholdGroups = false;
-			shape.hasPersonAccounts = true;
+			shape.put('hasNativeHouseholdGroups', false);
+			shape.put('hasPersonAccounts', true);
 			shape.personAccountRecordTypeIds = new Set<Id>{ organizationRecordTypeId() };
 			OrgShapeDetector.overrideShape = shape;
 
@@ -320,11 +320,11 @@ private class HealthCheckHouseholdChecksTest {
 
 			Assert.isNotNull(finding, 'A person stored as an account with no membership is reported.');
 			Assert.isTrue(
-				finding.title.startsWith('1 '),
-				'Counted once, as the account, and not again as its contact. ' + finding.title
+				finding.getTitle().startsWith('1 '),
+				'Counted once, as the account, and not again as its contact. ' + finding.getTitle()
 			);
 			Assert.isTrue(
-				finding.links[0].url.startsWith('/lightning/r/Account/'),
+				finding.getLinks()[0].getUrl().startsWith('/lightning/r/Account/'),
 				'Linked to the account that is the person.'
 			);
 		}
@@ -349,10 +349,9 @@ private class HealthCheckHouseholdChecksTest {
 			HealthCheckService.Finding finding = runAsMaria(PEOPLE);
 
 			Assert.isTrue(
-				finding.title.startsWith(
-					String.format(System.Label.Core_HealthCheck_OrphansMoreThan, new List<Object>{ '2' })
-				),
-				'Past the cap the count is not taken: it says more than. ' + finding.title
+				finding.getTitle()
+					.startsWith(String.format(System.Label.Core_HealthCheck_OrphansMoreThan, new List<Object>{ '2' })),
+				'Past the cap the count is not taken: it says more than. ' + finding.getTitle()
 			);
 		}
 	}
@@ -367,7 +366,7 @@ private class HealthCheckHouseholdChecksTest {
 			HealthCheckService.Finding finding = runAsMaria(PEOPLE);
 
 			Assert.isTrue(
-				finding.detail.contains(BarnHelp.text('Core', 'Core_HealthCheck_OrphansNativeNote')),
+				finding.getDetail().contains(BarnHelp.text('Core', 'Core_HealthCheck_OrphansNativeNote')),
 				'BarnCRM cannot see native membership, and says so (R-H12).'
 			);
 		}
@@ -383,8 +382,8 @@ private class HealthCheckHouseholdChecksTest {
 
 			System.runAs(priya) {
 				for (HealthCheckService.Finding finding : HealthCheckRunner.run()) {
-					Assert.areNotEqual(PEOPLE, finding.key, 'A count from her access would be wrong.');
-					Assert.areNotEqual(HOUSEHOLDS, finding.key, 'So neither is shown.');
+					Assert.areNotEqual(PEOPLE, finding.getKey(), 'A count from her access would be wrong.');
+					Assert.areNotEqual(HOUSEHOLDS, finding.getKey(), 'So neither is shown.');
 				}
 			}
 

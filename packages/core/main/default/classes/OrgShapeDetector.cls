@@ -33,19 +33,14 @@ public with sharing class OrgShapeDetector {
 	 */
 	@NamespaceAccessible
 	public class OrgShape {
-		@NamespaceAccessible
 		@AuraEnabled
 		public Boolean hasNpsp;
-		@NamespaceAccessible
 		@AuraEnabled
 		public Boolean hasPersonAccounts;
-		@NamespaceAccessible
 		@AuraEnabled
 		public Boolean hasIndustriesNonprofit;
-		@NamespaceAccessible
 		@AuraEnabled
 		public Boolean hasSalesCloudObjects;
-		@NamespaceAccessible
 		@AuraEnabled
 		public Boolean isMultiCurrency;
 		@AuraEnabled
@@ -58,7 +53,6 @@ public with sharing class OrgShapeDetector {
 		 * OrgShapeSelector.nativeHouseholdGroupCount and ADR-0036. An org without the object
 		 * at all is a definite zero, not an unknown (ADR-0130).
 		 */
-		@NamespaceAccessible
 		@AuraEnabled
 		public Boolean hasNativeHouseholdGroups;
 
@@ -67,7 +61,6 @@ public with sharing class OrgShapeDetector {
 		 * Null is the honest answer to an unanswerable question, and Health Check says so
 		 * rather than showing a zero it does not have.
 		 */
-		@NamespaceAccessible
 		@AuraEnabled
 		public Integer nativeHouseholdGroupCount;
 
@@ -91,6 +84,68 @@ public with sharing class OrgShapeDetector {
 			this.hasNativeHouseholdGroups = true;
 			this.nativeHouseholdGroupCount = null;
 			this.personAccountRecordTypeIds = new Set<Id>();
+		}
+
+		// For other packages: an `@AuraEnabled` field cannot also be `@NamespaceAccessible`.
+		@NamespaceAccessible
+		public Boolean getHasNpsp() {
+			return hasNpsp;
+		}
+		@NamespaceAccessible
+		public Boolean getHasPersonAccounts() {
+			return hasPersonAccounts;
+		}
+		@NamespaceAccessible
+		public Boolean getHasIndustriesNonprofit() {
+			return hasIndustriesNonprofit;
+		}
+		@NamespaceAccessible
+		public Boolean getHasSalesCloudObjects() {
+			return hasSalesCloudObjects;
+		}
+		@NamespaceAccessible
+		public Boolean getIsMultiCurrency() {
+			return isMultiCurrency;
+		}
+		@NamespaceAccessible
+		public Boolean getHasNativeHouseholdGroups() {
+			return hasNativeHouseholdGroups;
+		}
+		@NamespaceAccessible
+		public Integer getNativeHouseholdGroupCount() {
+			return nativeHouseholdGroupCount;
+		}
+
+		/** Sets one flag by its field name, for another package's test shape. */
+		@NamespaceAccessible
+		public OrgShape put(String flag, Object value) {
+			switch on flag {
+				when 'hasNpsp' {
+					hasNpsp = (Boolean) value;
+				}
+				when 'hasPersonAccounts' {
+					hasPersonAccounts = (Boolean) value;
+				}
+				when 'hasIndustriesNonprofit' {
+					hasIndustriesNonprofit = (Boolean) value;
+				}
+				when 'hasSalesCloudObjects' {
+					hasSalesCloudObjects = (Boolean) value;
+				}
+				when 'isMultiCurrency' {
+					isMultiCurrency = (Boolean) value;
+				}
+				when 'hasNativeHouseholdGroups' {
+					hasNativeHouseholdGroups = (Boolean) value;
+				}
+				when 'nativeHouseholdGroupCount' {
+					nativeHouseholdGroupCount = (Integer) value;
+				}
+				when else {
+					throw new IllegalArgumentException('Unknown org shape flag: ' + flag);
+				}
+			}
+			return this;
 		}
 	}
 

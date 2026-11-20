@@ -103,7 +103,7 @@ public with sharing class HealthCheckController {
 		String outcome = HealthCheckFixes.apply(fixKey, expectedScope);
 		try {
 			HealthCheckService.Report report = HealthCheckRunner.buildReport();
-			report.fixOutcome = outcome;
+			report.put('fixOutcome', outcome);
 			return report;
 		} catch (Exception e) {
 			throw loadFailed(e);

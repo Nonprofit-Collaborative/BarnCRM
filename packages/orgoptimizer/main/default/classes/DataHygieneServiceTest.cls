@@ -23,7 +23,7 @@ private class DataHygieneServiceTest {
 
 	private static void platformOnlyShape() {
 		OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
-		shape.hasNativeHouseholdGroups = false;
+		shape.put('hasNativeHouseholdGroups', false);
 		OrgShapeDetector.overrideShape = shape;
 	}
 
@@ -58,7 +58,7 @@ private class DataHygieneServiceTest {
 	private static Integer findRows(User person, String key) {
 		Integer rows;
 		System.runAs(person) {
-			rows = FindController.runQuery(DataHygieneService.queryDocument(key)).rows.size();
+			rows = FindController.rowsFor(DataHygieneService.queryDocument(key)).size();
 		}
 		return rows;
 	}
@@ -404,7 +404,7 @@ private class DataHygieneServiceTest {
 			User maria = maria();
 			DataHygieneService.CheckResult platformOnly = runAs(maria, DataHygieneService.HOUSEHOLDS_WITHOUT_MEMBERS);
 			OrgShapeDetector.OrgShape nativeShape = new OrgShapeDetector.OrgShape();
-			nativeShape.hasNativeHouseholdGroups = true;
+			nativeShape.put('hasNativeHouseholdGroups', true);
 			OrgShapeDetector.overrideShape = nativeShape;
 
 			Test.startTest();

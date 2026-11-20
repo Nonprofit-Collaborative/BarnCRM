@@ -73,16 +73,24 @@ public with sharing class ImportNewFieldService {
 
 	@NamespaceAccessible
 	public class Connection {
-		@NamespaceAccessible
 		@AuraEnabled
 		public Boolean canCreate = false;
 		/** Set up and enabled for callouts: a field can be created. */
-		@NamespaceAccessible
 		@AuraEnabled
 		public Boolean connected = false;
 		/** Set up, but Enabled for Callouts is off: the admin turns it on in Setup. */
 		@AuraEnabled
 		public Boolean calloutsOff = false;
+
+		@NamespaceAccessible
+		public Boolean getCanCreate() {
+			return canCreate;
+		}
+
+		@NamespaceAccessible
+		public Boolean getConnected() {
+			return connected;
+		}
 	}
 
 	public class Outcome {

@@ -31,7 +31,7 @@ packages/territory/main/default/classes/TerritoryRunBatch.cls 1
 # save; each has its own fallback (a nightly catch-up, a queue row, a retry).
 packages/addressverification/main/default/classes/AddressVerificationHandler.cls 1
 packages/contactpoints/main/default/classes/ContactPointSyncService.cls 1
-packages/core/main/default/classes/FieldAccessRecordJob.cls 2
+packages/orgoptimizer/main/default/classes/FieldAccessRecordJob.cls 2
 packages/core/main/default/classes/MergeSettlement.cls 2
 packages/core/main/default/classes/ModuleAccessSyncs.cls 2
 packages/core/main/default/classes/PersonErasure.cls 1

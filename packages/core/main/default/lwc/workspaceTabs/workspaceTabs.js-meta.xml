@@ -6,5 +6,5 @@
     refreshes a tab after an action. Does nothing outside a console app, so callers keep their
     usual navigation there. Imported by Core components.
   </description>
-  <isExposed>false</isExposed>
+  <isExposed>true</isExposed>
 </LightningComponentBundle>

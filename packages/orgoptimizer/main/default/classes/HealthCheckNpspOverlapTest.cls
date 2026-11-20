@@ -50,7 +50,7 @@ private class HealthCheckNpspOverlapTest {
 
 	private static HealthCheckService.Finding overlapFinding() {
 		for (HealthCheckService.Finding finding : HealthCheckRunner.run()) {
-			if ('npsp_upkeep_overlap'.equals(finding.key)) {
+			if ('npsp_upkeep_overlap'.equals(finding.getKey())) {
 				return finding;
 			}
 		}
@@ -75,15 +75,15 @@ private class HealthCheckNpspOverlapTest {
 			Test.stopTest();
 
 			Assert.isNotNull(finding, 'Both packages would make households, so it is reported');
-			Assert.areEqual(HealthCheckService.SEVERITY_WARNING, finding.severity, 'A warning');
+			Assert.areEqual(HealthCheckService.SEVERITY_WARNING, finding.getSeverity(), 'A warning');
 			Assert.areEqual(
 				HealthCheckService.SECTION_GENERAL,
-				finding.fixTarget,
+				finding.getFixTarget(),
 				'Without the Migration package it links to the General page, to turn Households off'
 			);
 			Assert.areEqual(
 				'/lightning/n/' + NamespaceUtil.qualify(HealthCheckOrgShapeChecks.MIGRATION_TAB),
-				withMigration.fixTarget,
+				withMigration.getFixTarget(),
 				'With it, the Migration Assistant tab, where Adopt NPSP Households is'
 			);
 		}

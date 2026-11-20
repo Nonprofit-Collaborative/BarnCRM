@@ -11075,9 +11075,9 @@ digest. If reading the admin summary fails, the failure is logged to the Error L
 digest still goes, without the summary. The nightly copy does not start while a copy started by
 hand is still waiting or running.
 
-**R-SU8 Off with Org Optimizer.** While the Org Optimizer feature is off, a run (nightly or
-Copy New Changes Now) copies nothing, deletes nothing and logs nothing; kept rows stay as they
-are until it is turned on.
+**R-SU8 Off without Org Optimizer.** While the BarnCRM Org Optimizer package is not installed, a
+run (nightly or Copy New Changes Now) copies nothing, deletes nothing and logs nothing; kept
+rows stay as they are until it is installed.
 
 ### Salesforce implementation
 
@@ -19438,6 +19438,7 @@ mirrors the primary member).
 | 1.70 | 2026-11-19 | Receiver token (pre-batch review M1; ADR-0229 amended). `Payments_Settings__c` gains `Webhook_Token__c` (Text(64)) and `Webhook_Cap_Hit_At__c` (DateTime): the receiver stores a post only when it carries the token in its address, and records the first refusal at the hourly cap each hour. No object added or removed. |
 | 1.71 | 2026-11-19 | Advanced Reporting (O-02, D-202, D-207, release 1.29; ADR-0231 `0231-advanced-reporting.md`). No object or field added. Section 29AR records the saved report and dashboard JSON formats and their storage as Salesforce Files (`.barnreport`, `.barndash`) shared through ContentDocumentLink, with rules R-AR1 to R-AR5. |
 | 1.72 | 2026-11-20 | Migration package (S11, D-213, release 1.30; ADR-NEXT `NEXT-migration-package.md`). No object added or removed. The optional BarnCRM Migration package (`packages/migration`) ships Admin Journal's Kit (`Kit__c`) and Import Batch's Migration Run (`Migration_Journal__c`) and Migration Step (`Migration_Step__c`), the Migration Assistant (29ZS) and the NPSP and Nonprofit Cloud household adoption (29ZQ), kit `NPSP_People` with its three templates, and a Migration Assistant tab. Core keeps `Migration_Kit__mdt`, the extension seam (`MigrationKitExtension` now receives the rows the Assistant read) and `NpspHouseholdSource`. The settings rows `NPSP_Household_Adoption` and `NPC_Household_Conversion` are removed; Setting Definition `Migration_Assistant_Page` (Integrations) and `BarnCRM_Module.Migration` are added. |
+| 1.73 | 2026-11-20 | Org Optimizer and Sample Data modules (D-215, release 1.30; ADR-NEXT `NEXT-org-optimizer-and-sample-data-modules.md`). No object or field added or removed. The optional BarnCRM Org Optimizer package (`packages/orgoptimizer`) ships the Org Optimizer page (app page `Data_Hygiene`) with every section's classes and components, and Health Check's runner, checks, controller, last run and panel; `Setup_Change__c`, `Field_Utilization_Snapshot__c`, the Org Optimizer and Health Check keys of `BarnCRM_Settings__c`, the Health Check vocabulary and seams (new `HealthCheckRun`, `HealthCheckFixes`) stay in Core. The optional BarnCRM Sample Data package (`packages/sampledata`) ships the loader, the Core sample set and a Sample Data tab; the framework every module's set runs on stays in Core, with a new seam `SampleDataHost`. Setting Definitions `Error_Log_Optimizer_Link`, `Health_Check_Optimizer_Link`, `Field_Utilization_Retention_Days`, `Old_Api_Version`, `Setup_Change_Retention_Days`, `Stale_Record_Years`, `Unused_Login_Days` and `Unused_Report_Days` ship in the Org Optimizer package and `Sample_Data` in the Sample Data package; `Health_Check` (the Settings panel) is removed; `BarnCRM_Module.OrgOptimizer` and `BarnCRM_Module.SampleData` are added. R-SU8 follows the package, not a feature switch. |
 
 ---
 ## 32. Entity ownership by package

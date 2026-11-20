@@ -1,6 +1,6 @@
 # Setup Changes
 
-**Package:** Core
+**Package:** BarnCRM Org Optimizer (optional; the nightly copy and its records are Core's)
 **Feature:** C-56 (plan Section 6.0a release 0.12, decision D-156)
 
 ## What It Does

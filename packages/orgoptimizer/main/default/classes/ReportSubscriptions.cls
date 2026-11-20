@@ -62,9 +62,9 @@ public with sharing class ReportSubscriptions {
 		try {
 			SubscriptionView view = new SubscriptionView();
 			ImportNewFieldService.Connection connection = ImportNewFieldService.connection();
-			view.canUseConnection = connection.canCreate;
-			view.connected = connection.connected;
-			view.canSubscribe = connection.canCreate && connection.connected;
+			view.canUseConnection = connection.getCanCreate();
+			view.connected = connection.getConnected();
+			view.canSubscribe = connection.getCanCreate() && connection.getConnected();
 			for (Report each : [
 				SELECT Id, Name, FolderName, Description
 				FROM Report
@@ -91,12 +91,12 @@ public with sharing class ReportSubscriptions {
 	public static Id subscribe(String scheduleJson) {
 		try {
 			ImportNewFieldService.Connection connection = ImportNewFieldService.connection();
-			if (!connection.canCreate) {
+			if (!connection.getCanCreate()) {
 				throw new SubscriptionException(
 					BarnHelp.text('Core', 'Core_AutomationInventory_NoConnectionPermission')
 				);
 			}
-			if (!connection.connected) {
+			if (!connection.getConnected()) {
 				throw new SubscriptionException(BarnHelp.text('Core', 'Core_ReportSubscriptions_ConnectionNeeded'));
 			}
 			Choice chosen = (Choice) JSON.deserialize(scheduleJson, Choice.class);

@@ -198,6 +198,6 @@ public with sharing class HealthCheckHouseholdChecks {
 
 	private static Boolean hasNativeHouseholds() {
 		OrgShapeDetector.OrgShape shape = OrgShapeDetector.detect();
-		return shape != null && shape.hasNativeHouseholdGroups == true;
+		return shape != null && shape.getHasNativeHouseholdGroups() == true;
 	}
 }

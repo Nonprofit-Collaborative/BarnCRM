@@ -46,7 +46,8 @@ is the answer to that question. You start in **BarnCRM** (or **BarnCRM Console**
 |---|---|
 | People, households, organizations | **BarnCRM** or **BarnCRM Console** |
 | Find, Import and Super Transformer | The **Data Manager** tab, in any BarnCRM app |
-| Setup checklist, Health Check, What's new | The **Home** tab of **BarnCRM** or **BarnCRM Console** |
+| Setup checklist, What's new | The **Home** tab of **BarnCRM** or **BarnCRM Console** |
+| Health Check | The **Org Optimizer** tab, with the optional BarnCRM Org Optimizer package |
 | BarnCRM Settings, Access, Module Manager, Features | **BarnCRM Settings** tab in **BarnCRM Admin** or **BarnCRM Admin Console** |
 | Org Optimizer, Duplicate Matching, Automation, Error Log | **BarnCRM Admin** or **BarnCRM Admin Console** |
 | Record Inspector | The **Inspect This Record** button at the top of the right column on Contact and Account pages (it has no tab in the apps, D-183) |
@@ -313,7 +314,9 @@ you can move, remove, or add tiles in the Lightning App Builder without any code
 1. Open the home page, click the gear icon, then **Edit Page**.
 2. Drag a tile to another region, or select it and click the delete icon to remove it.
    The BarnCRM tiles are listed under **Custom** with names that start with
-   **BarnCRM Home**, plus **Health Check**.
+   **BarnCRM Home**. With BarnCRM Org Optimizer installed, **Health Check** is listed too: add
+   it and tick **Show the last result first** for the last run's summary with **Run Health
+   Check**.
 3. To add something of your own, drag in a standard component: **List View** (for example
    your households), **Report Chart**, or **Rich Text** for a note to your team.
 4. To show a tile only to some people, select it and use **Set Component Visibility**. The

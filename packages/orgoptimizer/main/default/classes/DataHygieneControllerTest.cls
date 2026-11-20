@@ -20,7 +20,7 @@ private class DataHygieneControllerTest {
 		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 		HouseholdTestDataFactory.save(settings);
 		OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
-		shape.hasNativeHouseholdGroups = false;
+		shape.put('hasNativeHouseholdGroups', false);
 		OrgShapeDetector.overrideShape = shape;
 	}
 

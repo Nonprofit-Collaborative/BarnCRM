@@ -118,7 +118,7 @@ steps 1 and 2 need a staff user, so run steps 3 to 8 only.
 | 11 | [T-BULK-01](bulk-update-and-delete.md) | Super Transformer run from Find |
 | 12 | [T-BULK-02](bulk-update-and-delete.md) | Undo a Super Transformer run |
 | 13 | [T-DUP-01](duplicates.md) | Duplicate scan |
-| 14 | [T-HC-03](org-optimizer-and-health-check.md) | Health Check report (skipped install steps add findings: see the script) |
+| 14 | [T-HC-03](org-optimizer-and-health-check.md) | Health Check report (skipped install steps add findings: see the script). Needs BarnCRM Org Optimizer: in a Core-only sandbox, Skipped unless that package was deployed too |
 | 15 | [T-ERASE-02](erase-a-person.md) | Erase a person (in a real-org sandbox: only Luis Zztest, with **BarnCRM Erase People** given for this script only) |
 | 16 | [T-GIFT-01](giving-gifts-funds-batches.md) | Default fund (later Fundraising scripts need it) |
 | 17 | [T-GIFT-04](giving-gifts-funds-batches.md) | Quick Gift Entry |

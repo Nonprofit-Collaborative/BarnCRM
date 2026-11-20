@@ -151,16 +151,16 @@ public with sharing class HealthCheckOrgShapeChecks {
 		}
 
 		List<String> detected = new List<String>();
-		if (shape.hasPersonAccounts == true) {
+		if (shape.getHasPersonAccounts() == true) {
 			detected.add(System.Label.Core_HealthCheck_PersonAccountsDetected);
 		}
-		if (shape.hasIndustriesNonprofit == true) {
+		if (shape.getHasIndustriesNonprofit() == true) {
 			detected.add(System.Label.Core_HealthCheck_IndustriesDetected);
 		}
-		if (shape.hasNpsp == true) {
+		if (shape.getHasNpsp() == true) {
 			detected.add(System.Label.Core_HealthCheck_NpspDetected);
 		}
-		if (shape.hasSalesCloudObjects == true) {
+		if (shape.getHasSalesCloudObjects() == true) {
 			detected.add(System.Label.Core_HealthCheck_SalesObjectsDetected);
 		}
 		if (detected.isEmpty()) {
@@ -248,7 +248,7 @@ public with sharing class HealthCheckOrgShapeChecks {
 	 * people cannot join a household the simple way.
 	 */
 	private static HealthCheckService.Finding membershipModeFinding(OrgShapeDetector.OrgShape shape) {
-		if (shape == null || shape.hasPersonAccounts != true) {
+		if (shape == null || shape.getHasPersonAccounts() != true) {
 			return null;
 		}
 		if (CoexistenceService.MEMBERSHIP_JUNCTION.equals(CoexistenceService.getMembershipMode())) {
@@ -372,15 +372,15 @@ public with sharing class HealthCheckOrgShapeChecks {
 	 * households alone rather than renaming, re-greeting, or re-addressing them.
 	 */
 	private static HealthCheckService.Finding nativeHouseholdsFinding(OrgShapeDetector.OrgShape shape) {
-		if (shape == null || shape.hasNativeHouseholdGroups != true) {
+		if (shape == null || shape.getHasNativeHouseholdGroups() != true) {
 			return null;
 		}
-		String detail = shape.nativeHouseholdGroupCount != null
+		String detail = shape.getNativeHouseholdGroupCount() != null
 			? HealthCheckService.forCount(
-					shape.nativeHouseholdGroupCount,
+					shape.getNativeHouseholdGroupCount(),
 					BarnHelp.text('Core', 'Core_HealthCheck_NativeHouseholdsDetailOne'),
 					BarnHelp.text('Core', 'Core_HealthCheck_NativeHouseholdsDetail'),
-					new List<Object>{ cappedCount(shape.nativeHouseholdGroupCount) }
+					new List<Object>{ cappedCount(shape.getNativeHouseholdGroupCount()) }
 			  )
 			: BarnHelp.text('Core', 'Core_HealthCheck_NativeHouseholdsUnknownDetail');
 		return new HealthCheckService.Finding(
@@ -425,7 +425,7 @@ public with sharing class HealthCheckOrgShapeChecks {
 	}
 
 	private static HealthCheckService.Finding mirrorModuleFinding(OrgShapeDetector.OrgShape shape) {
-		if (shape == null || shape.hasIndustriesNonprofit != true) {
+		if (shape == null || shape.getHasIndustriesNonprofit() != true) {
 			return null;
 		}
 		// Only an edition whose module catalog offers the gift mirrors is told about them (ADR-0124).
@@ -459,7 +459,7 @@ public with sharing class HealthCheckOrgShapeChecks {
 	}
 
 	private static HealthCheckService.Finding multiCurrencyFinding(OrgShapeDetector.OrgShape shape) {
-		if (shape == null || shape.isMultiCurrency != true) {
+		if (shape == null || shape.getIsMultiCurrency() != true) {
 			return null;
 		}
 

@@ -1,6 +1,6 @@
 # Access Explorer
 
-**Package:** Core
+**Package:** BarnCRM Org Optimizer (optional)
 **Feature:** C-53 (plan Section 6.1.1 item 7, decision D-154)
 
 ## What It Does

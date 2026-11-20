@@ -675,7 +675,6 @@ public with sharing class AccessExplorerController {
 		}
 	}
 
-
 	/** Whether the viewer holds View All Users, after muting, as Salesforce evaluates it. */
 	private static Boolean seesAllUsers() {
 		List<UserPermissionAccess> access = [

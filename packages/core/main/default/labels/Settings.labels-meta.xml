@@ -84,7 +84,7 @@
         <fullName>Core_Settings_NoRecordType</fullName>
         <categories>Core</categories>
         <language>en_US</language>
-        <protected>true</protected>
+        <protected>false</protected>
         <shortDescription>Settings console: the choice for accounts with no record type</shortDescription>
         <value>No record type</value>
     </labels>
@@ -140,7 +140,7 @@
         <fullName>Core_Settings_RecentChangesHeading</fullName>
         <categories>Core</categories>
         <language>en_US</language>
-        <protected>true</protected>
+        <protected>false</protected>
         <shortDescription>Settings console: heading above the audit list</shortDescription>
         <value>Recent Changes</value>
     </labels>
@@ -148,7 +148,7 @@
         <fullName>Core_Settings_SectionsHeading</fullName>
         <categories>Core</categories>
         <language>en_US</language>
-        <protected>true</protected>
+        <protected>false</protected>
         <shortDescription>Settings console: heading above the left navigation</shortDescription>
         <value>Sections</value>
     </labels>

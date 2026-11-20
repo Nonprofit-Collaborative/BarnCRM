@@ -70,7 +70,7 @@ private class HealthCheckFixesTest {
 
 	private static HealthCheckService.Finding find(String key) {
 		for (HealthCheckService.Finding finding : HealthCheckRunner.run()) {
-			if (key.equals(finding.key)) {
+			if (key.equals(finding.getKey())) {
 				return finding;
 			}
 		}
@@ -78,8 +78,8 @@ private class HealthCheckFixesTest {
 	}
 
 	private static HealthCheckService.Finding find(HealthCheckService.Report report, String key) {
-		for (HealthCheckService.Finding finding : report.findings) {
-			if (key.equals(finding.key)) {
+		for (HealthCheckService.Finding finding : report.getFindings()) {
+			if (key.equals(finding.getKey())) {
 				return finding;
 			}
 		}
@@ -89,8 +89,8 @@ private class HealthCheckFixesTest {
 	/** Presses a fix the way the panel does: with the scope the finding carried. */
 	private static HealthCheckService.Report press(HealthCheckService.Finding finding) {
 		return HealthCheckController.applyFix(
-			finding.fixTarget.substring(HealthCheckService.FIX_ACTION_PREFIX.length()),
-			finding.fixScope
+			finding.getFixTarget().substring(HealthCheckService.FIX_ACTION_PREFIX.length()),
+			finding.getFixScope()
 		);
 	}
 
@@ -132,7 +132,7 @@ private class HealthCheckFixesTest {
 				Test.stopTest();
 
 				Assert.areEqual(1, fixer.timesRun, 'Pressing twice runs the fix once.');
-				Assert.areEqual('Created Stub thing.', report.fixOutcome, 'In its own words.');
+				Assert.areEqual('Created Stub thing.', report.getFixOutcome(), 'In its own words.');
 				Assert.isNull(find(report, 'stub_things_missing'), 'The re-run report is clear.');
 			}
 			Set<String> names = new Set<String>();
@@ -209,8 +209,8 @@ private class HealthCheckFixesTest {
 			System.runAs(maria) {
 				HealthCheckService.Finding finding = find('automation_switches_missing');
 				Assert.isNotNull(finding, 'Automations with no switch are reported.');
-				Assert.areEqual(2, finding.fixScope.size(), 'Two automations have no switch.');
-				Assert.isTrue(finding.title.contains('2'), 'The title counts them.');
+				Assert.areEqual(2, finding.getFixScope().size(), 'Two automations have no switch.');
+				Assert.isTrue(finding.getTitle().contains('2'), 'The title counts them.');
 
 				Test.startTest();
 				HealthCheckService.Report report = press(finding);
@@ -328,17 +328,18 @@ private class HealthCheckFixesTest {
 				HealthCheckService.Report report = HealthCheckController.applyFix(fixKey, scope);
 
 				Assert.isTrue(
-					report.fixOutcome.contains(NightlyJobs.jobName()),
-					'A job Health Check schedules is said to be scheduled: ' + report.fixOutcome
+					report.getFixOutcome().contains(NightlyJobs.jobName()),
+					'A job Health Check schedules is said to be scheduled: ' + report.getFixOutcome()
 				);
 				Assert.isTrue(
-					report.fixOutcome.contains(
-						String.format(
-							BarnHelp.text('Core', 'Core_HealthCheck_FixStoppedOnly'),
-							new List<Object>{ otherJob }
-						)
-					),
-					'A job it never schedules is said to be stopped only: ' + report.fixOutcome
+					report.getFixOutcome()
+						.contains(
+							String.format(
+								BarnHelp.text('Core', 'Core_HealthCheck_FixStoppedOnly'),
+								new List<Object>{ otherJob }
+							)
+						),
+					'A job it never schedules is said to be stopped only: ' + report.getFixOutcome()
 				);
 				Assert.areEqual(
 					1,
@@ -389,19 +390,21 @@ private class HealthCheckFixesTest {
 				HealthCheckService.Report report = HealthCheckController.applyFix(fixKey, scope);
 
 				Assert.isTrue(
-					report.fixOutcome.contains(
-						String.format(System.Label.Core_HealthCheck_FixScheduled, new List<Object>{ orgJob })
-					),
-					'The org\'s own job Health Check knows is scheduled again: ' + report.fixOutcome
+					report.getFixOutcome()
+						.contains(
+							String.format(System.Label.Core_HealthCheck_FixScheduled, new List<Object>{ orgJob })
+						),
+					'The org\'s own job Health Check knows is scheduled again: ' + report.getFixOutcome()
 				);
 				Assert.isTrue(
-					report.fixOutcome.contains(
-						String.format(
-							BarnHelp.text('Core', 'Core_HealthCheck_FixStoppedOnly'),
-							new List<Object>{ otherJob }
-						)
-					),
-					'The one it never schedules is said to be stopped only: ' + report.fixOutcome
+					report.getFixOutcome()
+						.contains(
+							String.format(
+								BarnHelp.text('Core', 'Core_HealthCheck_FixStoppedOnly'),
+								new List<Object>{ otherJob }
+							)
+						),
+					'The one it never schedules is said to be stopped only: ' + report.getFixOutcome()
 				);
 			}
 			ScheduledJobSelector.ownerOverride = null;

@@ -27,7 +27,6 @@ public with sharing class ImportUndoService {
 		@AuraEnabled
 		public Boolean allowed = false;
 		/** Why an undo is refused, in a sentence an administrator can act on. */
-		@NamespaceAccessible
 		@AuraEnabled
 		public String reason;
 		@AuraEnabled
@@ -53,6 +52,11 @@ public with sharing class ImportUndoService {
 		@NamespaceAccessible
 		public Integer getTotal() {
 			return total;
+		}
+
+		@NamespaceAccessible
+		public String getReason() {
+			return reason;
 		}
 	}
 

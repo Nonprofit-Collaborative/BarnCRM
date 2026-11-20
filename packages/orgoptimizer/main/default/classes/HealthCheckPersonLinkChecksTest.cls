@@ -27,7 +27,7 @@ private class HealthCheckPersonLinkChecksTest {
 		Test.startTest();
 		System.runAs(maria) {
 			for (HealthCheckService.Finding finding : HealthCheckRunner.run()) {
-				byKey.put(finding.key, finding);
+				byKey.put(finding.getKey(), finding);
 			}
 		}
 		Test.stopTest();
@@ -58,17 +58,17 @@ private class HealthCheckPersonLinkChecksTest {
 			HealthCheckService.Finding finding = runAsMaria().get(RELATIONSHIP_KEY);
 
 			Assert.isNotNull(finding, 'A relationship with nobody on one side is reported.');
-			Assert.isTrue(finding.title.startsWith('1 '), 'One of the two: ' + finding.title);
-			Assert.areEqual(HealthCheckService.SEVERITY_WARNING, finding.severity, 'A warning.');
-			Assert.isNull(finding.fixTarget, 'Detection only: there is no fix button.');
-			Assert.areEqual(1, finding.links.size(), 'It is linked.');
+			Assert.isTrue(finding.getTitle().startsWith('1 '), 'One of the two: ' + finding.getTitle());
+			Assert.areEqual(HealthCheckService.SEVERITY_WARNING, finding.getSeverity(), 'A warning.');
+			Assert.isNull(finding.getFixTarget(), 'Detection only: there is no fix button.');
+			Assert.areEqual(1, finding.getLinks().size(), 'It is linked.');
 			Assert.areEqual(
 				'/lightning/r/Relationship__c/' + rows[0].Id + '/view',
-				finding.links[0].url,
+				finding.getLinks()[0].getUrl(),
 				'To the relationship record page.'
 			);
 			Assert.isTrue(
-				finding.detail.contains(BarnHelp.text('Core', 'Core_HealthCheck_RelationshipsNoPersonDetailOne')),
+				finding.getDetail().contains(BarnHelp.text('Core', 'Core_HealthCheck_RelationshipsNoPersonDetailOne')),
 				'It says what to do next.'
 			);
 		}
@@ -87,7 +87,7 @@ private class HealthCheckPersonLinkChecksTest {
 			HealthCheckService.Finding finding = runAsMaria().get(RELATIONSHIP_KEY);
 
 			Assert.isNotNull(finding, 'A blank person on the owner side is reported too.');
-			Assert.isTrue(finding.title.startsWith('1 '), finding.title);
+			Assert.isTrue(finding.getTitle().startsWith('1 '), finding.getTitle());
 		}
 	}
 
@@ -135,14 +135,14 @@ private class HealthCheckPersonLinkChecksTest {
 			HealthCheckService.Finding finding = runAsMaria().get(AFFILIATION_KEY);
 
 			Assert.isNotNull(finding, 'An affiliation with no person is reported.');
-			Assert.isTrue(finding.title.startsWith('1 '), finding.title);
+			Assert.isTrue(finding.getTitle().startsWith('1 '), finding.getTitle());
 			Assert.areEqual(
 				'/lightning/r/Affiliation__c/' + rows[0].Id + '/view',
-				finding.links[0].url,
+				finding.getLinks()[0].getUrl(),
 				'To the affiliation record page.'
 			);
 			Assert.isTrue(
-				finding.detail.contains(BarnHelp.text('Core', 'Core_HealthCheck_AffiliationsNoPersonDetailOne')),
+				finding.getDetail().contains(BarnHelp.text('Core', 'Core_HealthCheck_AffiliationsNoPersonDetailOne')),
 				'It says what to do next.'
 			);
 		}
@@ -169,10 +169,10 @@ private class HealthCheckPersonLinkChecksTest {
 			HealthCheckService.Finding relationships = findings.get(RELATIONSHIP_KEY);
 			HealthCheckService.Finding affiliationFinding = findings.get(AFFILIATION_KEY);
 
-			Assert.isTrue(relationships.title.startsWith('200 '), relationships.title);
-			Assert.areEqual(5, relationships.links.size(), 'Five are linked.');
-			Assert.isTrue(affiliationFinding.title.startsWith('200 '), affiliationFinding.title);
-			Assert.areEqual(5, affiliationFinding.links.size(), 'Five are linked.');
+			Assert.isTrue(relationships.getTitle().startsWith('200 '), relationships.getTitle());
+			Assert.areEqual(5, relationships.getLinks().size(), 'Five are linked.');
+			Assert.isTrue(affiliationFinding.getTitle().startsWith('200 '), affiliationFinding.getTitle());
+			Assert.areEqual(5, affiliationFinding.getLinks().size(), 'Five are linked.');
 		}
 	}
 
@@ -193,10 +193,9 @@ private class HealthCheckPersonLinkChecksTest {
 			HealthCheckService.Finding finding = runAsMaria().get(AFFILIATION_KEY);
 
 			Assert.isTrue(
-				finding.title.startsWith(
-					String.format(System.Label.Core_HealthCheck_OrphansMoreThan, new List<Object>{ '2' })
-				),
-				'Past the cap it says more than: ' + finding.title
+				finding.getTitle()
+					.startsWith(String.format(System.Label.Core_HealthCheck_OrphansMoreThan, new List<Object>{ '2' })),
+				'Past the cap it says more than: ' + finding.getTitle()
 			);
 		}
 	}
@@ -214,8 +213,8 @@ private class HealthCheckPersonLinkChecksTest {
 			Test.startTest();
 			System.runAs(priya) {
 				for (HealthCheckService.Finding finding : HealthCheckRunner.run()) {
-					Assert.areNotEqual(RELATIONSHIP_KEY, finding.key, 'Hidden from her.');
-					Assert.areNotEqual(AFFILIATION_KEY, finding.key, 'Hidden from her.');
+					Assert.areNotEqual(RELATIONSHIP_KEY, finding.getKey(), 'Hidden from her.');
+					Assert.areNotEqual(AFFILIATION_KEY, finding.getKey(), 'Hidden from her.');
 				}
 			}
 			Test.stopTest();

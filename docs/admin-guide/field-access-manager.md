@@ -1,6 +1,6 @@
 # Field Access Manager
 
-**Package:** Core
+**Package:** BarnCRM Org Optimizer (optional)
 **Feature:** C-65 (release 0.17, decision D-157, ADR-0156)
 
 ## What It Does

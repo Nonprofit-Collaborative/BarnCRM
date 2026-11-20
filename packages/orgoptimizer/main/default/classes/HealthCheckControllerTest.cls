@@ -29,15 +29,15 @@ private class HealthCheckControllerTest {
 				Test.stopTest();
 
 				System.assertNotEquals(null, report, 'The report is readable without any permission.');
-				System.assertNotEquals(null, report.findings, 'It carries its findings.');
+				System.assertNotEquals(null, report.getFindings(), 'It carries its findings.');
 				System.assertEquals(
 					CoexistenceService.MODE_NPSP,
-					report.recommendedMode,
+					report.getRecommendedMode(),
 					'It says what this org shape calls for.'
 				);
 				System.assertEquals(
 					false,
-					report.canManageSettings,
+					report.getCanManageSettings(),
 					'Priya has not been given the permission, and the report says so.'
 				);
 			}
@@ -111,7 +111,7 @@ private class HealthCheckControllerTest {
 
 				System.assertEquals(
 					true,
-					report.canManageSettings,
+					report.getCanManageSettings(),
 					'Maria holds the permission, so she sees the fix buttons.'
 				);
 				System.assertEquals(
@@ -121,7 +121,7 @@ private class HealthCheckControllerTest {
 				);
 				System.assertEquals(
 					false,
-					report.modeNeedsAttention,
+					report.getModeNeedsAttention(),
 					'Once applied, the mode no longer needs attention.'
 				);
 			}
@@ -299,13 +299,13 @@ private class HealthCheckControllerTest {
 
 	private static OrgShapeDetector.OrgShape npspShape() {
 		OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
-		shape.hasNpsp = true;
+		shape.put('hasNpsp', true);
 		return shape;
 	}
 
 	private static OrgShapeDetector.OrgShape personAccountsShape() {
 		OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
-		shape.hasPersonAccounts = true;
+		shape.put('hasPersonAccounts', true);
 		return shape;
 	}
 }

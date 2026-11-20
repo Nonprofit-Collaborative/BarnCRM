@@ -105,7 +105,9 @@ private class ScheduledJobSelectorTest {
 			ScheduledJobSelector.ownerOverride = gone;
 			ScheduledJobSelector.forget();
 			List<String> afterLeaving = ScheduledJobSelector.namesOwnedByInactiveUsers();
-			List<String> fixScope = HealthCheckService.fixScope(HealthCheckService.FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS);
+			List<String> fixScope = HealthCheckService.fixScope(
+				HealthCheckService.FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS
+			);
 			Test.stopTest();
 
 			Assert.isFalse(whileActive.contains(OTHER_JOB), 'A job of an active owner is not named');

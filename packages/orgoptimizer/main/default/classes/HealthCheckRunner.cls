@@ -306,25 +306,27 @@ public with sharing class HealthCheckRunner implements HealthCheckRun {
 	 */
 	public static HealthCheckService.Report buildReport() {
 		HealthCheckService.Report report = new HealthCheckService.Report();
-		report.findings = run();
-		report.skippedChecks = lastSkipped;
-		report.canManageSettings = HealthCheckService.canManageSettings();
+		report.put('findings', run());
+		report.put('skippedChecks', lastSkipped);
+		report.put('canManageSettings', HealthCheckService.canManageSettings());
 
 		try {
-			report.orgShape = OrgShapeDetector.detect();
-			report.orgShapeSummary = detectedSummary(report.orgShape);
-			report.recommendedMode = OrgShapeDetector.recommendedCoexistenceMode();
-			report.recommendedModeLabel = HealthCheckService.modeLabel(report.recommendedMode);
+			report.put('orgShape', OrgShapeDetector.detect());
+			report.put('orgShapeSummary', detectedSummary(report.getOrgShape()));
+			report.put('recommendedMode', OrgShapeDetector.recommendedCoexistenceMode());
+			report.put('recommendedModeLabel', HealthCheckService.modeLabel(report.getRecommendedMode()));
 		} catch (Exception e) {
 			logQuietly(e);
 		}
 
 		try {
-			report.currentMode = CoexistenceService.getCurrentMode();
-			report.currentModeLabel = HealthCheckService.modeLabel(report.currentMode);
-			report.modeNeedsAttention =
-				String.isBlank(report.currentMode) ||
-				(report.recommendedMode != null && !report.recommendedMode.equals(report.currentMode));
+			report.put('currentMode', CoexistenceService.getCurrentMode());
+			report.put('currentModeLabel', HealthCheckService.modeLabel(report.getCurrentMode()));
+			report.put(
+				'modeNeedsAttention',
+				String.isBlank(report.getCurrentMode()) ||
+				(report.getRecommendedMode() != null && !report.getRecommendedMode().equals(report.getCurrentMode()))
+			);
 		} catch (Exception e) {
 			logQuietly(e);
 		}
@@ -346,12 +348,12 @@ public with sharing class HealthCheckRunner implements HealthCheckRun {
 	 */
 	public static HealthCheckService.Report buildRemainingReport(List<String> keys) {
 		HealthCheckService.Report report = new HealthCheckService.Report();
-		report.canManageSettings = HealthCheckService.canManageSettings();
+		report.put('canManageSettings', HealthCheckService.canManageSettings());
 		if (keys == null || keys.isEmpty()) {
 			return report;
 		}
-		report.findings = run(new Set<String>(keys));
-		report.skippedChecks = lastSkipped;
+		report.put('findings', run(new Set<String>(keys)));
+		report.put('skippedChecks', lastSkipped);
 		try {
 			HealthCheckLastRun.addRemaining(report);
 		} catch (Exception e) {

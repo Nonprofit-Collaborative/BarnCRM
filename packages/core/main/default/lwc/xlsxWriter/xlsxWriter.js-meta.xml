@@ -5,5 +5,5 @@
     Writes one sheet of values as an Excel workbook in the browser, with no third-party code
     (canonical model R-SQ11). Imported by findRecords.
   </description>
-  <isExposed>false</isExposed>
+  <isExposed>true</isExposed>
 </LightningComponentBundle>

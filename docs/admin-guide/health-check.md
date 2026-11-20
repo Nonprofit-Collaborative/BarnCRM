@@ -15,13 +15,13 @@ button works** below).
 
 Run it after you install, after you add people, and any time something feels wrong.
 
-## How to Turn It On
+## Where It Comes From
 
-Health Check belongs to the **Org Optimizer and Health Check** feature, which on a new
-install is off until you turn it on: choose **Turn On** in that row in **BarnCRM Settings**,
-**General** (or leave it ticked in first-run setup); see
-[BarnCRM Settings](barncrm-settings.md). Once it is on there is nothing else to enable and
-nothing to configure.
+Health Check is part of the optional **BarnCRM Org Optimizer** package, offered in both
+editions (see [Org Optimizer](org-optimizer.md#2-where-it-comes-from)). Installing the package
+turns it on; there is nothing else to enable and nothing to configure. Without the package
+there is no Health Check, and BarnCRM's install check reports it as not available rather than
+reporting a clean org.
 
 Health Check's one home is **Org Optimizer**:
 
@@ -32,24 +32,13 @@ Health Check's one home is **Org Optimizer**:
    **Run Again** whenever you want a fresh look.
 
 **BarnCRM Settings**, **Health** keeps Health Check's settings and an **Open Health Check**
-link that opens this section.
+link that opens this section. The **Overview** tile shows a summary of the last result: a
+badge (**Needs Fixing: 2**, **Worth Knowing: 3**, **All Clear**, or **Not Run Yet**, in the
+same words as the report's findings). A run by someone without the **Manage BarnCRM
+Settings** permission is not kept as the last result, because it skips the access checks.
 
-An administrator also finds Health Check on the BarnCRM home page, under the setup
-checklist. Home does not run every check each time it opens, because a full run reads a lot
-of your org and Home is the page everyone opens first. Instead it shows a summary of the last
-result: a badge (**Needs Fixing: 2**, **Worth Knowing: 3**, **All Clear**, or **Not Run
-Yet**, the same badge as the Health Check tile in Org Optimizer, in the same words as the
-report's findings), when Health Check last ran in full for an
-administrator, and how many findings it had to fix, to be aware of and for your information.
-Click **Run Health Check** to run it in full there and see the whole report, with each finding as a
-row (the same component, and the same rows, as Org Optimizer's Health Check section); after
-that the button reads **Run Again**. Until
-Health Check has run once, Home says so and offers **Run Health Check**. A run by
-someone without the **Manage BarnCRM Settings** permission is not kept as the last result,
-because it skips the access checks.
-
-Org Optimizer is the way in that always works, including for an org where someone removed
-the home page copy from the page.
+Staff, Read Only, Find and Export, Bulk Update and Bulk Delete holders get the Org Optimizer
+tab from the package too, so they can read Health Check.
 
 To act on a finding you need the **Manage BarnCRM Settings** permission, which the
 BarnCRM Admin role includes. Without it you can still read most of the report: the page says
@@ -146,7 +135,7 @@ Nothing is broken today.
 | Settings | Whether one user who has a role owns more than 10,000 households (**One User Owns Too Many Accounts**, a warning), and with Fundraising the same for gifts. A role or sharing change then recalculates access to all of those records at once, which can lock them and slow saves. Give some of them to other owners or to a user with no role. Health Check samples the owners of the newest 200 records and counts at most three of them, the ones who own the most of that sample first, so a very large org is checked without reading every record. |
 | Settings | With Fundraising: whether any fund or appeal has more than 10,000 gifts (**Funds or Appeals With Very Many Gifts**, information only), read from their Gift Count totals. Each gift saved against one briefly locks it, so load their gifts serially or in smaller batches. |
 | Settings | Whether addresses saved before version 1.22 still lack their Match Key (**Match Keys Not Filled**, information only). Until they have one, the duplicate scan and import matching search every street to compare addresses. **Fill Match Keys** gives every address its key in the background and changes nothing else; see [Duplicates](duplicates.md). |
-| Settings | **Not Checked, Run Again** (a warning): Health Check stopped early to stay inside the limits Salesforce sets on one request, and names the checks it left. The findings above it are still accurate. A **Run Remaining Checks** button then appears next to **Run Again**: it runs only the checks that were left, adds what they find to the same report, and removes this warning (if it has to stop early again, the warning comes back naming what is still left, and so does the button). The last result BarnCRM Home shows counts the added findings. **Run Again** still runs everything from the start. A very large org may see this every time for its last few checks. |
+| Settings | **Not Checked, Run Again** (a warning): Health Check stopped early to stay inside the limits Salesforce sets on one request, and names the checks it left. The findings above it are still accurate. A **Run Remaining Checks** button then appears next to **Run Again**: it runs only the checks that were left, adds what they find to the same report, and removes this warning (if it has to stop early again, the warning comes back naming what is still left, and so does the button). The last result on the Overview tile counts the added findings. **Run Again** still runs everything from the start. A very large org may see this every time for its last few checks. |
 
 Five of those need a module: the Override Receipt Lock permission, the failed receipts, the
 unposted gifts in a closed period (all with Fundraising), and the stalled Opportunity and Gift

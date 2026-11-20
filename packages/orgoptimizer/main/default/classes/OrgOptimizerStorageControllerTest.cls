@@ -57,7 +57,7 @@ private class OrgOptimizerStorageControllerTest {
 			Test.stopTest();
 
 			for (OrgLimitReader.LimitUse use : storage.limits) {
-				Assert.isTrue(use.percent >= 0 && use.percent <= 100, 'A percentage: ' + use.name);
+				Assert.isTrue(use.getPercent() >= 0 && use.getPercent() <= 100, 'A percentage: ' + use.getName());
 			}
 		}
 	}
