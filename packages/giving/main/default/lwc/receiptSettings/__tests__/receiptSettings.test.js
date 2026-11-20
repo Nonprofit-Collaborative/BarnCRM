@@ -211,6 +211,18 @@ describe('c-receipt-settings', () => {
     expect(byId(element, 'editor').disabled).toBe(true);
   });
 
+  it('explains the disabled restore button when there are no letters and no permission', async () => {
+    const element = build();
+    getTemplates.emit([]);
+    getRuns.emit([]);
+    getCanManageTemplates.emit(false);
+    await flush();
+
+    expect(byId(element, 'no-templates')).not.toBeNull();
+    expect(byId(element, 'read-only').variant).toBe('info');
+    expect(byId(element, 'restore').disabled).toBe(true);
+  });
+
   it('starts a run for the year the settings name', async () => {
     const element = await loaded(true);
     getDefaultStatementYear.emit(2026);

@@ -92,6 +92,9 @@ export default class AutomationControl extends LightningElement {
     pauseLength: PAUSE_LENGTH,
     pausedBanner: PAUSED_BANNER,
     readOnly: READ_ONLY,
+    get noControlRows() {
+      return helpText('Core', 'Core_AutomationControl_NoControlRows');
+    },
     get empty() {
       return helpText('Core', 'Core_AutomationControl_Empty');
     },
@@ -242,6 +245,10 @@ export default class AutomationControl extends LightningElement {
 
   get bypassLabel() {
     return this.page ? this.page.bypassLabel : undefined;
+  }
+
+  get noControlRows() {
+    return !(this.page && this.page.controlRows && this.page.controlRows.length);
   }
 
   /** The org default first (named Whole Organization), then profiles and users. */

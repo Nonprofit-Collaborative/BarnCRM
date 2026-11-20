@@ -119,7 +119,7 @@ describe('c-data-manager', () => {
       expect.objectContaining({
         import: 'custom:custom18',
         files: 'standard:file',
-        backup: 'standard:archive',
+        backup: 'standard:database',
         find: 'custom:custom39',
         optimizer: 'custom:custom94',
         duplicates: 'custom:custom90'

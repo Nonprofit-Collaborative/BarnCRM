@@ -257,7 +257,7 @@ export default class DataManager extends NavigationMixin(LightningElement) {
             'backup',
             helpText('Core', 'Core_DataManager_BackupTitle'),
             helpText('Core', 'Core_DataManager_BackupText'),
-            'standard:archive'
+            'standard:database'
           )
         );
       }

@@ -189,7 +189,10 @@
                 {labels.peopleTitle}
             </h2>
             <p class="slds-text-body_small slds-var-m-bottom_small">{labels.peopleHelp}</p>
-            <div>
+            <template lwc:if={noControlRows}>
+                <p class="slds-text-color_weak" data-id="no-control-rows">{labels.noControlRows}</p>
+            </template>
+            <div lwc:else>
                 <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked" data-id="control-table">
                     <thead>
                         <tr class="slds-line-height_reset">
