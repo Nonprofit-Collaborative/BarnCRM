@@ -204,6 +204,8 @@
                 ></lightning-record-picker>
             </div>
 
+            <!-- Drawn once the defaults are in: their field labels name the tribute and match fields. -->
+            <template lwc:if={defaults}>
             <lightning-accordion
                 class="slds-show slds-var-m-top_small"
                 allow-multiple-sections-open
@@ -301,6 +303,7 @@
                     </lightning-accordion-section>
                 </template>
             </lightning-accordion>
+            </template>
 
             <div class="slds-var-m-top_medium slds-grid slds-grid_vertical-align-center slds-wrap">
                 <lightning-button
