@@ -791,6 +791,9 @@ This subsection is the schedule for every open, approved item. Where Sections 6.
 | M | 1.26 | Patch brand (ADR-0224, D-207): new logo assets per app, Barn Navy app headers, Patch Rust for decoration only, Patch welcome on the Home page. Landed 2026-11-14: squash `33ca62f30`, PR #1323 (#1322 closed as landed); incremental gate 168 of 168 on `barn-platform`; Core deployed to `mwdbdevsb` at `33ca62f30` (validation 0AfWF00000HRiZR0A1, 2,742 of 2,742 tests; quick deploy 0AfWF00000HRkWP0A1; D-192) |
 | N | 1.27, 1.28 | Owner decisions of 2026-11-14 (D-208): Grants rename everywhere, Memberships and Scholarships apps, org-wide Core dates, admin-only Form delete, Error Log grouping key, address match-key warning, Health Check Run Remaining Checks, quick link help in BarnHelp JSON, Mirror without nonprofit modules, hourly case status pull (1.27); fewer custom objects without losing function (1.28). Landed 2026-11-19 with batch O: squash `8c772d5d4`, PR #1327; release gate at `32c252100` passed on `barn-sales` and `barn-platform` (6,167 of 6,167 tests each, 93% coverage, 0 classes under the floor), then incremental gates 6,166 of 6,166 on `barn-sales` for three CI fixes; Core deployed to `mwdbdevsb` at `8c772d5d4` (validation 0AfWF00000HZDlN0AX, 2,759 of 2,759 tests, removed BarnCRM objects destroyed; quick deploy 0AfWF00000HZGo50AH; D-192) |
 | O | 1.29 | Apex character trim pass plus the Advanced Reporting module (D-202, D-208), after all current and pending work. Landed 2026-11-19 with batch N |
+| P | 1.30 | S11 Migration package, D-213 naming, Org Optimizer module, Sample Data package (D-213, D-215, D-216). Landed 2026-11-20: squash `f0eae0b38`, PR #1341 (#1334, #1335, #1338 closed as landed); incremental gate at `f24a9f7aa` 6126 of 6126 on `barn-sales`, 6125 of 6125 on `barn-platform` |
+| Q | 1.31, 1.32 | The Mapper and BarnCRM Connector: Connections, Recipes and Runs, console app, Flow actions, recipe clock, inbound and outbound webhooks, scheduled imports (C-38), importable templates (D-214 to D-216) |
+| R | 1.33 | The Mapper everywhere (Super Importer, Super Transformer, gift mirrors), app polling, erasure path (D-214) |
 
 Portals into Batch C (Brandon, 2026-11-04, "Yes", D-178): C-46 Address Verification is no longer a Portal Builder or Corporate Hub prerequisite, so Portal Builder (PB-01) and the volunteer, speaker and donor portal templates (PB-03, PB-07, PB-08) are in release 1.3. PB-01 still starts only after the item 30 terms check confirms option B; if it does not, the Portal Builder items are re-slotted.
 
@@ -1250,7 +1253,7 @@ Added 2026-11-12 (D-196). Built now on their own branches, outside the Batch D t
 
 #### Releases 1.21 to 1.24 (landing/batch-k): pilot readiness (D-199, D-200, D-201)
 
-Status (2026-11-13): built and integrated on `landing/batch-k` with release 1.20; release gate passed on `barn-platform` (Developer Edition, every package: 6,060 of 6,060 tests, 93% coverage, at 0014e4726) after gate fixes and the pre-batch QA and UX fixes. `barn-sales` and `oi-test` (Enterprise) cannot take the full suite: 203 custom objects against Enterprise's 200 (decision pending). S11 deferred until after M-2 (proposed, Brandon to confirm). Earlier (2026-11-12): building on branches off `landing/batch-k`; tested and deployed together after all four are built. Item codes are the 2026-11-12 whole-solution review's (QA Q, UX R, Namespace N, Performance P, Simplify S).
+Status (2026-11-13): built and integrated on `landing/batch-k` with release 1.20; release gate passed on `barn-platform` (Developer Edition, every package: 6,060 of 6,060 tests, 93% coverage, at 0014e4726) after gate fixes and the pre-batch QA and UX fixes. `barn-sales` and `oi-test` (Enterprise) cannot take the full suite: 203 custom objects against Enterprise's 200 (decision pending). S11 building now (D-213, 2026-11-20; was deferred until after M-2 under D-209). Earlier (2026-11-12): building on branches off `landing/batch-k`; tested and deployed together after all four are built. Item codes are the 2026-11-12 whole-solution review's (QA Q, UX R, Namespace N, Performance P, Simplify S).
 
 | Release | Items | Size |
 |---|---|---|
@@ -1319,9 +1322,59 @@ Status (2026-11-19): Landed with batch N (squash `8c772d5d4`). Brandon's earlier
 | O-01 | Apex character trim pass (suite regrew to about 4.99M characters by release 1.25; AR-03 budget). Upgrade-only code removed (ADR-0230) and Apex formatted at printWidth 120 (D-212): suite 4,985,543 characters, Core 2,254,017 against its 2,000,000 target; the two remaining options (Data Manager in its own package, about 666K; unused `@NamespaceAccessible` markers, about 10.6K) await Brandon | Major | Landed | D-208, AR-03, D-212 |
 | O-02 | Advanced Reporting module (Section 6.1 item 22; ADR-0231) | Major | Landed | D-202, D-208 (item 49) |
 
+#### Release 1.30 (Batch P): owner answers of 2026-11-20
+
+Status (2026-11-20): landed in batch P (squash `f0eae0b38`, PR #1341), after the pre-batch review (Core Health Check seam tests, guide paths, test-only hooks). Next: `mwdbdevsb` deploy (Org Optimizer module there needs Brandon's approval), then e2e and QA.
+
+| ID | Item | Size | Status | Source |
+|---|---|---|---|---|
+| P-01 | S11 optional, uninstallable BarnCRM Migration package (Migration Assistant and NPSP household adoption out of Core; kits stay in their modules; ADR-0232, amends ADR-0197 and ADR-0155; the household writer seam exception approved) | Major | Landed (#1341) | D-213, D-216 |
+| P-02 | Naming and wording: Scholarships and Outbound Grants settings section, Component Builder, tab and page names matched, Stewardship Plan Templates, Copy Existing People, Gifts That Need Attention, Turn On Recommended Rules, Served Without Enrollment, Automation page cards, single New on empty pipelines; ADR-0227 Accepted | Minor | Landed (#1341) | D-213 |
+| P-03 | BarnCRM Org Optimizer module holding Org Optimizer and Health Check (reverses their D-101 Core placement; ADR-0233) | Major | Landed (#1341) | D-215 |
+| P-04 | BarnCRM Sample Data package (the sample data loader out of Core; ADR-0233) | Minor | Landed (#1341) | D-215 |
+
+#### Release 1.31 (Batch Q): the Mapper and BarnCRM Connector
+
+Design: `docs/architecture/integration-hub-design.md`, the reusable mapper ADR and the integration module ADR (numbers assigned at merge), security review F1 to F13 binding (D-214, D-215, D-216).
+
+| ID | Item | Size | Status | Source |
+|---|---|---|---|---|
+| MAP-01/02 | The Mapper: one mapping screen (source with samples, target sentences, live preview, auto-match, plain-language steps, drag and drop, Check Before Running) on the map document (import mapping document v4) | Major | Built (#1336) | D-214 |
+| CN-01 | BarnCRM Connector module with its own console app (Super Connector), Connections (page-entered keys under F1 to F13), Connector Admin | Major | Built (#1337) | D-214, D-216 |
+| CN-02 | Recipes and Runs: When and Then steps, Run As (BarnCRM Automation default, System, Integration User), Run History, Retry, test run | Major | Built (#1339; Integration User lane in CN-03) | D-214, D-215 |
+| MAP-03 | Saved Maps (Saved_Transform__c Kind Map) with Where Used | Minor | Built (#1336, access tightened in #1340) | D-214 |
+| MAP-04 | Super Importer Save as Map and Use a Saved Map | Minor | Built (#1336) | D-214 |
+| CN-06 | Flow actions: run a recipe, apply a saved map | Minor | Built (#1339) | D-214 |
+
+#### Release 1.32 (Batch Q): recipes that run on their own and send data back
+
+| ID | Item | Size | Status | Source |
+|---|---|---|---|---|
+| CN-03 | Recipe clock (every 15 minutes) with record-change checks, retries with backoff and automatic pause | Major | Planned | D-214 |
+| CN-04 | Data sent in by other apps (inbound webhooks, F13) and sending data back: a reply to the calling app and a Send to Webhook step | Major | Planned | D-214, D-216 |
+| CN-09 | Scheduled imports with dry run and admin-set limits (C-38, taken off hold) | Major | Planned | D-215 |
+| CN-05 | For each, wait and change data steps | Minor | Planned | D-214 |
+| CN-08 | Recipe versions, and importable recipe and connector templates (JSON files imported on demand; nothing preloaded) | Minor | Planned | D-214, D-216 |
+
+#### Release 1.33 (Batch R): the Mapper everywhere
+
+| ID | Item | Size | Status | Source |
+|---|---|---|---|---|
+| MAP-05 | Super Importer's mapping step drawn by the Mapper once it matches everything the current step does | Major | Planned | D-214 |
+| MAP-06 | Super Transformer Apply a Map | Minor | Planned | D-214 |
+| MAP-07 | Extra copied fields for gift mirrors through maps | Minor | Planned | D-214 |
+| CN-13 | Watching apps for new items (polling) | Minor | Planned | D-214 |
+| CN-18 | Connector runs in the GDPR erasure path | Minor | Planned | D-214 |
+
+#### Later: Connector templates and future connections (D-216)
+
+- Importable connector and recipe templates, built later and imported on demand, never preloaded: Slack and Teams, Mailchimp, Google Sheets, giving-tool webhooks, Eventbrite, Zoom, Constant Contact, QuickBooks Online, GoFundMe Pro, and more over time.
+- Event-driven triggers (record changes acted on as they happen, not every 15 minutes).
+- SFTP and direct database connections (Apex cannot open them; needs its own design).
+
 #### Held
 
-- C-38 scheduled imports and connections to other systems: on hold until Brandon starts it (D-39). The Google Sheets source for Super Importer waits with it (Brandon: "later"; it plugs in behind the C-49 file source).
+- Nothing held. C-38 was taken off hold on 2026-11-20 (D-215) and is built inside BarnCRM Connector as CN-09.
 
 #### Later items from Batch B (plan notes, 2026-11-02; D-168)
 
@@ -2425,6 +2478,10 @@ Findings and decisions about the modules (Giving, Mirror, Volunteers, Programs, 
 | D-210 | Mirror for Giving folds into Giving, and Giving is renamed Fundraising (Brandon, 2026-11-14: "Can Mirror for Giving just be included in Giving? And I'd prefer Fundraising over Giving"). The gift mirrors (Opportunity, Gift Transaction, Campaign sync, accounting export, inbound gifts, NPSP and NPC gift kits) move from the interim `packages/mirrorgiving` into `packages/giving`, off by default, with only dynamic references to standard and NPC objects so Fundraising still installs and runs on Platform-only and non-NPC orgs; their settings move from Mirror_Settings__c to Giving's settings; Mirror stays Core-only (Case requests, NPC household kits). The module is shown as "BarnCRM Fundraising" everywhere visible; API names and the `giving` folder stay. Amends ADR-0013's standard-object rule (Mirror and, dynamic only, Fundraising) and the N-09 ADR | A separate Mirror for Giving package | One fewer package for admins; the code already has no static standard-object references |
 | D-211 | Every module is in Beta for now (Brandon, 2026-11-14: "All the modules should be considered as in Beta right now"). The product marks each module Beta wherever modules are listed (Module Manager, Setup Assistant, Home Modules, module apps' descriptions), driven by one catalog flag so a module leaves Beta by changing data; the guides, feature catalog and website say Beta for each module. Core is not a module and is not marked. Slotted in release 1.27 (N-14) | Per-module status wording ("being tested for the pilot", "still in testing and review") | Owner decision |
 | D-212 | Owner decisions of 2026-11-18 and 2026-11-19 (Brandon). No history references: "None of this has been rolled out to the public so there doesnt need to be any reference to old features/setup on the solution, documentation, or the website" (product, guides, help and website describe only current BarnCRM; ADRs, changelogs and this decision log keep history). "mwd cleanup approved, just don't remove anything that wasn't part of BarnCRM" (removed BarnCRM objects destroyed on `mwdbdevsb`; the org's own objects kept). "Change to Fund ID" (Memberships field label). "Reformat Apex to 120 character lines is approved" (printWidth 120 for Apex, part of O-01). Removing unused `@NamespaceAccessible` markers was asked about, not approved (recommendation: keep them) | Keep history notes; keep printWidth 100 | Owner decisions |
+| D-213 | Owner answers of 2026-11-20 (Brandon). 1 "Approved": the QA fixes (#1329, #1331, #1332) deploy to `mwdbdevsb` (Core, check-only first) and the Playwright suite runs there. S11 "approved and I'm fine with it happening now as this feature is not yet being used by anyone and will not be until after namespacing": the optional, uninstallable Migration package is built now, not after M-2 (amends D-209; reverses the "no separate migration package" part of ADR-0197 and amends ADR-0155 through a new ADR). 2 Approved: Settings "Scholarships and Grants" becomes "Scholarships and Outbound Grants". 3 ADR-0227 (fewer custom objects) Accepted. 4 Yes: Addresses and Relationships are turned off on `mwdbdevsb`. 5 `@NamespaceAccessible` markers kept. 6 Data Manager stays in Core ("one of the most beneficial features"); other ways to make Core smaller are welcome (LWC Builder is already its own module). 8 The #1327 sign-off email is left as is. 9 All naming changes approved: LWC Builder becomes Component Builder (picker empty choice "Choose a Component"); tab and page names match (Donor Level Ladder and Donor Levels and Scores; Stewardship Plan Setup and Stewardship Plans); "Run Backfill" becomes "Copy Existing People"; plainer "Save the Sustainer"; "Duplicate Rules Starter" becomes "Turn On Recommended Rules"; "Counted Without Names" becomes "Served Without Enrollment"; jargon removed from the Automation page; Ask Pipeline and Grant Pipeline show New once while empty | Defer S11 until after M-2; move Data Manager out of Core | Owner decisions |
+| D-214 | Owner request of 2026-11-20 (Brandon): "I'd also like to create and integration/middleware module. I'd like it to be similar to Workato in capabilities and super easy for a non technical user to setup and use. Also, I'd like a UI feature to map objects and fields that can be reused for functions like data import, transformations, automations, and integrations. I'd like it to be as easy or easier/more intuitive to use as Salesforce's Flow/Data 360 transform screen. Please design, build, and start integrating these now." Design first (an ADR for the reusable mapper and for the integration module, on `feature/integration-design`); the build mechanisms go to Brandon for sign-off under the right-sizing gate before code. Likely starts C-38 (scheduled imports and external sources, held under D-39); to be confirmed with the design | Keep C-38 on hold; rely on Zapier recipes (MIG-06) | Owner request |
+| D-215 | Owner answers of 2026-11-20 (Brandon) on the D-214 design and Core size. C-38 taken off hold: "Yes", built inside BarnCRM Connector (scheduled imports with dry run and limits, Google Sheets; no SFTP or database sources). Pasting a connection's secret on BarnCRM's page through `ConnectApi`: "Please review this more in depth for security vulnerabilities with this approach but I'm good with approving this if the results of that review say it's secure" (approved subject to a passing security review). Names approved: module "BarnCRM Connector", tab "Super Connector", Core feature "the Mapper" with saved "Maps". Run identity: "I'd rather recipes being able to be ran as system, integration user, or non-user specific to avoid disruptions due to changed permissions or deactivated users" (replaces the proposal that unattended runs act as the admin who turned recipes on; design amended). Two new objects (`Connector_Recipe__c`, `Connector_Run__c`) approved. Core size: "Moving Org Optimizer to a module with Health Check in that module" (a new module holding Org Optimizer and Health Check, reversing their place in Core under D-101) and B "Approved" (the sample data loader as a small optional package). Stewardship setup tab naming left to the integrator's recommendation. Design sign-off (D-214) pending the restated design. Follow-up 2026-11-20: the security review (docs/architecture/connector-secrets-security-review.md on `feature/integration-design`) found page entry "secure with required mitigations" (F1 to F13, binding in the integration ADR; OAuth Auth Providers only through a guided Setup step), so page-entered secrets are approved on those terms; Run As redesigned as BarnCRM Automation (Automated Process user with chosen permission sets, recommended default; permission set assignment to Automated Process verified on `barn-sales`), System (explicit, recorded, listed by Health Check) or Integration User (free Integration license, PlatformEventSubscriberConfig) | Recipes run as the admin who turned them on; Org Optimizer and Health Check stay Core features; sample data stays in Core | Owner decisions |
+| D-216 | Owner approval of 2026-11-20 (Brandon): "The Mapper and Connector designs are approved with the excepts of: make a module specific console app for Connector, it needs to be able to send info back (such as through a webhook connection), and the premade system integrations should be templates that can easily be imported (but not already loaded into Salesforce in order to prevent unnecessary tech debt and solution bloat) and those templates can wait to be built until later. I'd also need some additional templates, such as GoFundMe Pro, and many others in the future. I'd also like SFTP and direct database connections in the future but it doesn't need to be in the first version. Event driven triggers (instead of every 15 minutes) should also be in a future release. S11 exception approved." Result: D-214 design approved; BarnCRM Connector ships its own console app; recipes can send data back (reply to the calling app, Send to Webhook step); app connectors are importable JSON templates, imported on demand and never preloaded, built later (GoFundMe Pro added); SFTP, direct database connections and event-driven triggers are later items; the S11 household writer seam exception to ADR-0155 is accepted. Releases 1.30 to 1.33 and the Later list record the slots | Ship app connectors in the package; poll only | Owner decisions |
 
 ---
 
@@ -2446,4 +2503,3 @@ Findings and decisions about the modules (Giving, Mirror, Volunteers, Programs, 
 ---
 
 *End of document. Everything above is intended to be enough to begin. When in doubt, return to Section 1.3 and ask which principle the decision serves.*
-

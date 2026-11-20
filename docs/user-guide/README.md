@@ -1,6 +1,6 @@
 # User Guide
 
-Applies to: BarnCRM main at 58de9750d (releases 1.26 to 1.29). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM main at f0eae0b38 (releases 1.26 to 1.30). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 ## Who This Is For
 
