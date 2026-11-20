@@ -1,0 +1,153 @@
+<template>
+    <template lwc:if={helpReady}>
+        <section data-id="saved-maps">
+            <h2 class="slds-text-heading_medium">{labels.title}</h2>
+            <p class="slds-var-m-vertical_x-small">{labels.intro}</p>
+            <template lwc:if={errorMessage}>
+                <c-barn-notice variant="error" message={errorMessage} data-id="error"></c-barn-notice>
+            </template>
+            <template lwc:if={noticeMessage}>
+                <c-barn-notice variant="success" message={noticeMessage} data-id="notice"></c-barn-notice>
+            </template>
+
+            <template lwc:if={isEditing}>
+                <div class="slds-grid slds-grid_vertical-align-end slds-wrap slds-var-m-vertical_small" data-id="editor-bar">
+                    <lightning-input
+                        class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3 slds-var-m-right_small"
+                        label={labels.name}
+                        value={editing.name}
+                        max-length="80"
+                        required
+                        onchange={handleName}
+                        data-id="name"
+                    ></lightning-input>
+                    <lightning-button
+                        variant="brand"
+                        label={labels.save}
+                        disabled={saveBlocked}
+                        onclick={handleSave}
+                        data-id="save"
+                    ></lightning-button>
+                    <lightning-button
+                        class="slds-var-m-left_x-small"
+                        label={labels.cancel}
+                        onclick={handleCancel}
+                        data-id="cancel"
+                    ></lightning-button>
+                </div>
+                <template lwc:if={blockedText}>
+                    <p class="slds-text-body_small slds-var-m-bottom_small" role="status" data-id="blocked">{blockedText}</p>
+                </template>
+                <template lwc:if={hasUsers}>
+                    <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="info" message={usersText} data-id="users">
+                        <ul class="slds-list_dotted">
+                            <template for:each={userLines} for:item="line">
+                                <li key={line.key}>{line.text}</li>
+                            </template>
+                        </ul>
+                    </c-barn-notice>
+                </template>
+                <c-barn-mapper value={editing.value} onchange={handleMapChange} data-id="mapper"></c-barn-mapper>
+            </template>
+            <template lwc:else>
+                <lightning-button
+                    class="slds-show slds-var-m-vertical_small"
+                    variant="brand"
+                    label={labels.newMap}
+                    onclick={handleNew}
+                    data-id="new"
+                ></lightning-button>
+                <template lwc:if={loading}>
+                    <lightning-spinner size="small" alternative-text={labels.title}></lightning-spinner>
+                </template>
+                <template lwc:elseif={hasMaps}>
+                    <table
+                        class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked"
+                        aria-label={labels.title}
+                        data-id="maps"
+                    >
+                        <thead>
+                            <tr class="slds-line-height_reset">
+                                <th scope="col">{labels.nameColumn}</th>
+                                <th scope="col">{labels.fillsColumn}</th>
+                                <th scope="col">{labels.actionsColumn}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={rows} for:item="entry">
+                                <tr key={entry.recordId} data-id="map-row">
+                                    <td data-label={labels.nameColumn} class="slds-cell-wrap">
+                                        <template lwc:if={entry.isRenaming}>
+                                            <lightning-input
+                                                label={labels.name}
+                                                value={renameValue}
+                                                max-length="80"
+                                                onchange={handleRenameInput}
+                                                data-id="rename-input"
+                                            ></lightning-input>
+                                            <lightning-button
+                                                class="slds-var-m-top_x-small"
+                                                variant="brand"
+                                                label={labels.saveName}
+                                                disabled={busy}
+                                                onclick={handleRenameSave}
+                                                data-id="rename-save"
+                                            ></lightning-button>
+                                            <lightning-button
+                                                class="slds-var-m-left_x-small slds-var-m-top_x-small"
+                                                label={labels.cancel}
+                                                onclick={handleRenameCancel}
+                                                data-id="rename-cancel"
+                                            ></lightning-button>
+                                        </template>
+                                        <template lwc:else>{entry.name}</template>
+                                    </td>
+                                    <td data-label={labels.fillsColumn} class="slds-cell-wrap">{entry.fills}</td>
+                                    <td data-label={labels.actionsColumn}>
+                                        <lightning-button
+                                            variant="base"
+                                            label={labels.open}
+                                            title={entry.openLabel}
+                                            data-record-id={entry.recordId}
+                                            disabled={busy}
+                                            onclick={handleOpen}
+                                            data-id="open"
+                                        ></lightning-button>
+                                        <lightning-button
+                                            class="slds-var-m-left_small"
+                                            variant="base"
+                                            label={labels.rename}
+                                            title={entry.renameLabel}
+                                            data-record-id={entry.recordId}
+                                            disabled={busy}
+                                            onclick={handleRenameStart}
+                                            data-id="rename"
+                                        ></lightning-button>
+                                        <lightning-button
+                                            class="slds-var-m-left_small"
+                                            variant="base"
+                                            label={labels.remove}
+                                            title={entry.deleteLabel}
+                                            data-record-id={entry.recordId}
+                                            disabled={busy}
+                                            onclick={handleDelete}
+                                            data-id="delete"
+                                        ></lightning-button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </template>
+                <template lwc:else>
+                    <c-barn-empty-state
+                        data-id="empty"
+                        illustration="no-data"
+                        heading={labels.none}
+                        message={labels.noneHint}
+                    ></c-barn-empty-state>
+                </template>
+            </template>
+        </section>
+    </template>
+</template>
