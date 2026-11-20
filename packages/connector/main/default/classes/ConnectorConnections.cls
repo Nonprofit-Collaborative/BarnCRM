@@ -426,7 +426,8 @@ public with sharing class ConnectorConnections {
 		return holds(UserInfo.getUserId(), ACCESS_SET, null);
 	}
 
-	private static Boolean holds(Id userId, String setName, String namespace) {
+	/** Whether the user holds the named permission set (`namespace` null for an org's own). */
+	public static Boolean holds(Id userId, String setName, String namespace) {
 		return [
 				SELECT COUNT()
 				FROM PermissionSetAssignment

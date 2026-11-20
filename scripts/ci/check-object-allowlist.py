@@ -136,6 +136,7 @@ ALLOWED = {
     "ValidationRule": "the org's validation rules on the Automation tab (R-AS3), and the ones Deactivate Org Flows and Validation Rules turns off and restores (R-AS4 to R-AS8). Tooling API, every edition with API access.",
     "FlowDefinition": "a flow's active version, saved before Deactivate Org Flows and Validation Rules turns it off and put back by Restore (R-AS4 to R-AS8). Tooling API, every edition with API access.",
     "WorkflowRule": "the org's workflow rules on the Automation tab (R-AS3). Tooling API, every edition with API access.",
+    "PlatformEventSubscriberConfig": "the running user of the Connector Integration User lane's event trigger, written when an admin chooses the integration user (CN-03, R-CR4). Tooling API text only, never compiled; every edition with platform events and API access.",
     "SetupAuditTrail":"the Setup changes the nightly Setup Changes copy keeps beyond 180 days (C-56, R-SC1). Platform setup object, every edition; queried dynamically, read only.",
     "Site": "the org's active Salesforce Sites and their guest users, for public forms' Health Check and links (C-42b). Setup object in every edition BarnCRM supports, read only.",
     "SiteDetail": "a Salesforce Site's secure address, for public form links (C-42b). Setup object in every edition BarnCRM supports, read only.",

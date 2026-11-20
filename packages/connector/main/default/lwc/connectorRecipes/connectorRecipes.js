@@ -2,13 +2,15 @@ import { LightningElement, api } from 'lwc';
 import getRecipes from '@salesforce/apex/ConnectorRecipesController.getRecipes';
 import getRecipeAccess from '@salesforce/apex/ConnectorRecipesController.getRecipeAccess';
 import saveRecipeAccess from '@salesforce/apex/ConnectorRecipesController.saveRecipeAccess';
-import { statusVariant } from 'c/connectorRecipeRules';
+import { statusVariant, runAsKey, triggerKindKey } from 'c/connectorRecipeRules';
 import { say as text } from 'c/connectorRecipeText';
 
 /**
- * The Recipes tab of Super Connector (CN-02; canonical model R-CR1 to R-CR4): the recipes with
- * their status, Run As and version, New Recipe, the editor for the one opened, and Recipe Access
- * (the permission sets BarnCRM Automation recipes run with). Viewers see the list only.
+ * The Recipes tab of Super Connector (CN-02, CN-03; canonical model R-CR1 to R-CR4, R-CR6): the
+ * recipes with their trigger, status, Run As and version, New Recipe, the editor for the one
+ * opened, Recipe Access (the permission sets BarnCRM Automation recipes run with) and Recipe
+ * Clock (c/connectorRecipeClock: the lanes, Pause All Recipes and the integration user). Viewers
+ * see the list only.
  */
 export default class ConnectorRecipes extends LightningElement {
   /** A recipe Id to open, from the page state (a Where Used link); it may arrive after load. */
@@ -30,6 +32,7 @@ export default class ConnectorRecipes extends LightningElement {
   creating = false;
   access;
   accessOpen = false;
+  clockOpen = false;
   picked = [];
   working = false;
   message;
@@ -53,6 +56,9 @@ export default class ConnectorRecipes extends LightningElement {
     },
     get accessButton() {
       return text('Connector_Access_Heading');
+    },
+    get clockButton() {
+      return text('Connector_Clock_Heading');
     },
     get accessHeading() {
       return text('Connector_Access_Heading');
@@ -108,9 +114,8 @@ export default class ConnectorRecipes extends LightningElement {
       statusVariant: statusVariant(recipe.status),
       detail: text(
         'Connector_Recipes_Detail',
-        recipe.runAs === 'System'
-          ? text('Connector_RunAs_System')
-          : text('Connector_RunAs_Automation'),
+        text(triggerKindKey(recipe.triggerKind)),
+        text(runAsKey(recipe.runAs)),
         recipe.version
       ),
       showUnpublished: recipe.unpublished === true && recipe.status !== 'Draft',
@@ -160,6 +165,16 @@ export default class ConnectorRecipes extends LightningElement {
   handleClose() {
     this.creating = false;
     this.selectedId = undefined;
+  }
+
+  handleClockToggle() {
+    this.clear();
+    this.clockOpen = !this.clockOpen;
+  }
+
+  /** The integration user changed: reload, so Run As offers it. */
+  handleClockChanged() {
+    return this.load();
   }
 
   async handleAccessToggle() {

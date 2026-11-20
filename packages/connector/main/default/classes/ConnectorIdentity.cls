@@ -185,12 +185,12 @@ public with sharing class ConnectorIdentity {
 	}
 
 	/**
-	 * What a BarnCRM Automation recipe's identity cannot do with a record map (R-CR2), in words,
+	 * What a recipe identity (the Automated Process user for BarnCRM Automation, the integration
+	 * user for Integration User) cannot do with a record map (R-CR2), in words,
 	 * from the object and field permissions of the sets it holds; empty when it can.
 	 */
-	public static List<String> mapProblems(String kind, String objectName, List<String> fieldNames) {
+	public static List<String> mapProblems(Id identity, String kind, String objectName, List<String> fieldNames) {
 		List<String> found = new List<String>();
-		Id identity = automatedProcessId();
 		Set<Id> sets = held(identity);
 		Boolean creating = kind != 'update';
 		Boolean editing = kind != 'create';

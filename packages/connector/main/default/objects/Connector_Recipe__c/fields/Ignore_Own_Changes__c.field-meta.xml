@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Ignore_Own_Changes__c</fullName>
+  <defaultValue>true</defaultValue>
+  <description>A Record Change recipe skips records last changed by a recipe identity (the Automated Process user or the integration user), so a recipe that writes to the object it watches does not start itself (canonical model R-CR6).</description>
+  <externalId>false</externalId>
+  <inlineHelpText>Skip records that a recipe changed last.</inlineHelpText>
+  <label>Ignore Own Changes</label>
+  <trackTrending>false</trackTrending>
+  <type>Checkbox</type>
+</CustomField>

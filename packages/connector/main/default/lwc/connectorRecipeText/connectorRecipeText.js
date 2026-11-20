@@ -530,6 +530,243 @@ const TEXTS = {
   },
   get Connector_Step_Upsert() {
     return helpText('Connector', 'Connector_Step_Upsert');
+  },
+  get Connector_Clock_AutomationPaused() {
+    return helpText('Connector', 'Connector_Clock_AutomationPaused');
+  },
+  get Connector_Clock_Going() {
+    return helpText('Connector', 'Connector_Clock_Going');
+  },
+  get Connector_Clock_Heading() {
+    return helpText('Connector', 'Connector_Clock_Heading');
+  },
+  get Connector_Clock_Idle() {
+    return helpText('Connector', 'Connector_Clock_Idle');
+  },
+  get Connector_Clock_Intro() {
+    return helpText('Connector', 'Connector_Clock_Intro');
+  },
+  get Connector_Clock_PauseAll() {
+    return helpText('Connector', 'Connector_Clock_PauseAll');
+  },
+  get Connector_Clock_PauseAllHelp() {
+    return helpText('Connector', 'Connector_Clock_PauseAllHelp');
+  },
+  get Connector_Clock_PausedNotice() {
+    return helpText('Connector', 'Connector_Clock_PausedNotice');
+  },
+  get Connector_Clock_PausedOff() {
+    return helpText('Connector', 'Connector_Clock_PausedOff');
+  },
+  get Connector_Clock_PausedOn() {
+    return helpText('Connector', 'Connector_Clock_PausedOn');
+  },
+  get Connector_Clock_Restart() {
+    return helpText('Connector', 'Connector_Clock_Restart');
+  },
+  get Connector_Clock_Restarted() {
+    return helpText('Connector', 'Connector_Clock_Restarted');
+  },
+  get Connector_Clock_Stopped() {
+    return helpText('Connector', 'Connector_Clock_Stopped');
+  },
+  get Connector_Day_FRI() {
+    return helpText('Connector', 'Connector_Day_FRI');
+  },
+  get Connector_Day_MON() {
+    return helpText('Connector', 'Connector_Day_MON');
+  },
+  get Connector_Day_SAT() {
+    return helpText('Connector', 'Connector_Day_SAT');
+  },
+  get Connector_Day_SUN() {
+    return helpText('Connector', 'Connector_Day_SUN');
+  },
+  get Connector_Day_THU() {
+    return helpText('Connector', 'Connector_Day_THU');
+  },
+  get Connector_Day_TUE() {
+    return helpText('Connector', 'Connector_Day_TUE');
+  },
+  get Connector_Day_WED() {
+    return helpText('Connector', 'Connector_Day_WED');
+  },
+  get Connector_Editor_At() {
+    return helpText('Connector', 'Connector_Editor_At');
+  },
+  get Connector_Editor_Day() {
+    return helpText('Connector', 'Connector_Editor_Day');
+  },
+  get Connector_Editor_Every() {
+    return helpText('Connector', 'Connector_Editor_Every');
+  },
+  get Connector_Editor_Failures() {
+    return helpText('Connector', 'Connector_Editor_Failures');
+  },
+  get Connector_Editor_IgnoreOwn() {
+    return helpText('Connector', 'Connector_Editor_IgnoreOwn');
+  },
+  get Connector_Editor_IgnoreOwnHelp() {
+    return helpText('Connector', 'Connector_Editor_IgnoreOwnHelp');
+  },
+  get Connector_Editor_KeepDays() {
+    return helpText('Connector', 'Connector_Editor_KeepDays');
+  },
+  get Connector_Editor_KeepDaysHelp() {
+    return helpText('Connector', 'Connector_Editor_KeepDaysHelp');
+  },
+  get Connector_Editor_Limit() {
+    return helpText('Connector', 'Connector_Editor_Limit');
+  },
+  get Connector_Editor_LimitHelp() {
+    return helpText('Connector', 'Connector_Editor_LimitHelp');
+  },
+  get Connector_Editor_Mode() {
+    return helpText('Connector', 'Connector_Editor_Mode');
+  },
+  get Connector_Editor_NextRun() {
+    return helpText('Connector', 'Connector_Editor_NextRun');
+  },
+  get Connector_Editor_On() {
+    return helpText('Connector', 'Connector_Editor_On');
+  },
+  get Connector_Editor_Pause() {
+    return helpText('Connector', 'Connector_Editor_Pause');
+  },
+  get Connector_Editor_PauseAfter() {
+    return helpText('Connector', 'Connector_Editor_PauseAfter');
+  },
+  get Connector_Editor_PauseAfterHelp() {
+    return helpText('Connector', 'Connector_Editor_PauseAfterHelp');
+  },
+  get Connector_Editor_Paused() {
+    return helpText('Connector', 'Connector_Editor_Paused');
+  },
+  get Connector_Editor_Resume() {
+    return helpText('Connector', 'Connector_Editor_Resume');
+  },
+  get Connector_Editor_Resumed() {
+    return helpText('Connector', 'Connector_Editor_Resumed');
+  },
+  get Connector_Editor_RetriedAll() {
+    return helpText('Connector', 'Connector_Editor_RetriedAll');
+  },
+  get Connector_Editor_RetryAll() {
+    return helpText('Connector', 'Connector_Editor_RetryAll');
+  },
+  get Connector_Editor_RetryAttempts() {
+    return helpText('Connector', 'Connector_Editor_RetryAttempts');
+  },
+  get Connector_Editor_RetryAttemptsHelp() {
+    return helpText('Connector', 'Connector_Editor_RetryAttemptsHelp');
+  },
+  get Connector_Editor_RunAsHelp() {
+    return helpText('Connector', 'Connector_Editor_RunAsHelp');
+  },
+  get Connector_Editor_RunSettings() {
+    return helpText('Connector', 'Connector_Editor_RunSettings');
+  },
+  get Connector_Editor_SaveSettings() {
+    return helpText('Connector', 'Connector_Editor_SaveSettings');
+  },
+  get Connector_Editor_SettingsSaved() {
+    return helpText('Connector', 'Connector_Editor_SettingsSaved');
+  },
+  get Connector_Editor_TriggerKind() {
+    return helpText('Connector', 'Connector_Editor_TriggerKind');
+  },
+  get Connector_Editor_WhenRecord() {
+    return helpText('Connector', 'Connector_Editor_WhenRecord');
+  },
+  get Connector_Editor_WhenSchedule() {
+    return helpText('Connector', 'Connector_Editor_WhenSchedule');
+  },
+  get Connector_Every_15m() {
+    return helpText('Connector', 'Connector_Every_15m');
+  },
+  get Connector_Every_day() {
+    return helpText('Connector', 'Connector_Every_day');
+  },
+  get Connector_Every_hour() {
+    return helpText('Connector', 'Connector_Every_hour');
+  },
+  get Connector_Every_week() {
+    return helpText('Connector', 'Connector_Every_week');
+  },
+  get Connector_Lane_Automation() {
+    return helpText('Connector', 'Connector_Lane_Automation');
+  },
+  get Connector_Lane_IntegrationUser() {
+    return helpText('Connector', 'Connector_Lane_IntegrationUser');
+  },
+  get Connector_Mode_batch() {
+    return helpText('Connector', 'Connector_Mode_batch');
+  },
+  get Connector_Mode_each() {
+    return helpText('Connector', 'Connector_Mode_each');
+  },
+  get Connector_On_changed() {
+    return helpText('Connector', 'Connector_On_changed');
+  },
+  get Connector_On_created() {
+    return helpText('Connector', 'Connector_On_created');
+  },
+  get Connector_RunAs_IntegrationUser() {
+    return helpText('Connector', 'Connector_RunAs_IntegrationUser');
+  },
+  get Connector_Runs_NextAttempt() {
+    return helpText('Connector', 'Connector_Runs_NextAttempt');
+  },
+  get Connector_Trigger_Manual() {
+    return helpText('Connector', 'Connector_Trigger_Manual');
+  },
+  get Connector_Trigger_Record() {
+    return helpText('Connector', 'Connector_Trigger_Record');
+  },
+  get Connector_Trigger_Schedule() {
+    return helpText('Connector', 'Connector_Trigger_Schedule');
+  },
+  get Connector_User_Cleared() {
+    return helpText('Connector', 'Connector_User_Cleared');
+  },
+  get Connector_User_Confirmed() {
+    return helpText('Connector', 'Connector_User_Confirmed');
+  },
+  get Connector_User_Heading() {
+    return helpText('Connector', 'Connector_User_Heading');
+  },
+  get Connector_User_Inactive() {
+    return helpText('Connector', 'Connector_User_Inactive');
+  },
+  get Connector_User_Intro() {
+    return helpText('Connector', 'Connector_User_Intro');
+  },
+  get Connector_User_LastWrite() {
+    return helpText('Connector', 'Connector_User_LastWrite');
+  },
+  get Connector_User_NoConnections() {
+    return helpText('Connector', 'Connector_User_NoConnections');
+  },
+  get Connector_User_None() {
+    return helpText('Connector', 'Connector_User_None');
+  },
+  get Connector_User_NotConfirmed() {
+    return helpText('Connector', 'Connector_User_NotConfirmed');
+  },
+  get Connector_User_OrgConnection() {
+    return helpText('Connector', 'Connector_User_OrgConnection');
+  },
+  get Connector_User_Pick() {
+    return helpText('Connector', 'Connector_User_Pick');
+  },
+  get Connector_User_Save() {
+    return helpText('Connector', 'Connector_User_Save');
+  },
+  get Connector_User_Saved() {
+    return helpText('Connector', 'Connector_User_Saved');
+  },
+  get Connector_User_Steps() {
+    return helpText('Connector', 'Connector_User_Steps');
   }
 };
 

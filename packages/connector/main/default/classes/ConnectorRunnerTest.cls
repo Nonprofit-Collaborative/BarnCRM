@@ -362,6 +362,8 @@ private class ConnectorRunnerTest {
 				WHERE Id = :run.Id AND Status__c = :ConnectorRunStore.QUEUED
 				WITH SYSTEM_MODE
 			];
+			// The start event's trigger runs as the Automated Process user.
+			ConnectorClock.laneForTest = ConnectorClock.LANE_AUTOMATION;
 			Test.getEventBus().deliver();
 			Test.stopTest();
 

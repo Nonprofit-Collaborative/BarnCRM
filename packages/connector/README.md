@@ -8,11 +8,14 @@ CN-01 ships **Connections**: a saved, checked sign-in to another app's REST API,
 an External Credential and a Named Credential and never returned (canonical model 29CN1). CN-02
 ships **Recipes** and **Runs** (29CN2, 29CN3): a When and Then steps that find, write through a
 saved map and call apps, run as BarnCRM Automation or System. CN-06 ships two Flow actions.
+CN-03 ships the **recipe clock**: Schedule and Record Change triggers, retries, pausing, the
+Integration User Run As and the nightly cleanup (R-CR6 to R-CR8, 29CN4 Connector Settings).
 Setup and use: [Admin Guide, BarnCRM Connector](../../docs/admin-guide/connector.md).
 
 ## First ships in
 
-Release **1.31** (CN-01, CN-02, CN-06). Beta, offered in both editions, not installed by default.
+Release **1.31** (CN-01, CN-02, CN-06); release **1.32** adds CN-03. Beta, offered in both
+editions, not installed by default.
 
 ## Depends on
 
@@ -38,6 +41,14 @@ Release **1.31** (CN-01, CN-02, CN-06). Beta, offered in both editions, not inst
   `c/connectorRecipeRules` (framework-free) and `c/connectorRecipeText`.
 - Flow actions (CN-06): `ConnectorRunRecipeAction` (Run a BarnCRM Connector Recipe) and
   `ConnectorApplyMapAction` (Apply a Saved Map).
+- Recipe clock (CN-03): `ConnectorClock` (each lane's heartbeat Queueable, Pause All Recipes),
+  `ConnectorTriggers` (schedule times and the Record Change poll), `ConnectorIntegrationUser`
+  (the chosen user, its `PlatformEventSubscriberConfig` written through the org connection, the
+  BarnCRM Connections move), `ConnectorClockChecks` (Health Check) and
+  `ConnectorNightlyJobProvider` (the Connector Cleanup step, registered on Core's Connector
+  catalog row). Platform events `Connector_Start__e` (BarnCRM Automation and System lane) and
+  `Connector_Start_User__e` (Integration User lane, trigger `ConnectorStartUserTrigger`);
+  protected hierarchy setting `Connector_Settings__c`. `c/connectorRecipeClock`.
 - `ConnectorHealthCheckExtension` (registered in Core's `HealthCheckExtensions`),
   `ConnectorWhereUsedExtension` (registered in Core's `WhereUsedExtensions`) and
   `ConnectorPostInstall`.

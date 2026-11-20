@@ -39,6 +39,10 @@
     <value xsi:type="xsd:string">BarnCRM_Connector_Admin=BarnCRM_Admin</value>
   </values>
   <values>
+    <field>Extensions__c</field>
+    <value xsi:type="xsd:string">NightlyStepProvider: ConnectorNightlyJobProvider</value>
+  </values>
+  <values>
     <field>Beta__c</field>
     <value xsi:type="xsd:boolean">true</value>
   </values>

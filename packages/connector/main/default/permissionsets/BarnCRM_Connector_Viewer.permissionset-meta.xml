@@ -51,6 +51,41 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Connector_Recipe__c.Watermark__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Connector_Recipe__c.Next_Run_At__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Connector_Recipe__c.Consecutive_Failures__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Connector_Recipe__c.Retry_Attempts__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Connector_Recipe__c.Pause_After_Failures__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Connector_Recipe__c.Keep_Runs_Days__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Connector_Recipe__c.Ignore_Own_Changes__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Connector_Run__c.Input_JSON__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -92,6 +127,11 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Connector_Run__c.Is_Test__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Connector_Run__c.Next_Attempt_At__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <objectPermissions>

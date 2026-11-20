@@ -5,14 +5,15 @@
  * `c/connectorRecipeRules`; this class is the one that counts.
  *
  * Release 1.31 (CN-02) builds the Manual trigger (Run Now and the Flow action) and the steps
- * Find, Create, Update, Create or Update, Call an App, If and Stop; any other kind is refused.
+ * Find, Create, Update, Create or Update, Call an App, If and Stop; release 1.32 (CN-03) the
+ * Schedule and Record Change triggers (`ConnectorTriggers`). Any other kind is refused.
  */
 public with sharing class ConnectorRecipeDocument {
 	public static final Integer MAX_STEPS = 25;
 	public static final Integer MAX_DEPTH = 2;
 	public static final Integer MAX_LENGTH = 100000;
 	public static final Integer MAX_CONDITIONS = 10;
-	public static final Set<String> TRIGGERS = new Set<String>{ 'manual' };
+	public static final Set<String> TRIGGERS = new Set<String>{ 'manual', 'schedule', 'record' };
 	public static final Set<String> STEP_KINDS = new Set<String>{
 		'find',
 		'create',
@@ -75,8 +76,11 @@ public with sharing class ConnectorRecipeDocument {
 			found.add(BarnHelp.text('Connector', 'Connector_Recipe_ErrorUnreadable'));
 			return found;
 		}
-		if (!TRIGGERS.contains(textOf(mapOf(document.get('trigger')).get('kind')))) {
+		Map<String, Object> starter = mapOf(document.get('trigger'));
+		if (!TRIGGERS.contains(textOf(starter.get('kind')))) {
 			found.add(BarnHelp.text('Connector', 'Connector_Recipe_ErrorTrigger'));
+		} else if (ConnectorTriggers.problem(starter) != null) {
+			found.add(ConnectorTriggers.problem(starter));
 		}
 		Set<String> ids = new Set<String>();
 		Integer count = checkSteps(listOf(document.get('steps')), 1, ids, found);

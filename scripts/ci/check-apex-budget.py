@@ -389,7 +389,10 @@ CAPS = {
     # Raised 2026-11-20 for CN-02 Recipes and Runs (document rules, the runner and step runner,
     # map runtime, Recipe Access, run store, Where Used and Health Check additions) and CN-06
     # Flow actions (Run a Recipe 3,317, Apply a Saved Map 5,000): 122,190 measured, plus about 2%.
-    "connector": 124_600,
+    # Raised 2026-11-20 for CN-03 the recipe clock (the lane heartbeat, Schedule and Record Change
+    # triggers, retries with backoff and auto-pause, the integration user and its subscriber
+    # write, Health Check findings, the nightly cleanup): 140,100 measured, plus about 2%.
+    "connector": 142_900,
     # Mirror: the NPSP gifts migration kit's extension (MIG-05), 187,295 measured, then the
     # Nonprofit Cloud gifts kit's (MIG-04), 195,957 measured, then the Nonprofit Cloud
     # relationships kit's (MIG-02), about 200,500 combined, plus about 1%.

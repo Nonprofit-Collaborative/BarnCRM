@@ -9,7 +9,8 @@
  * - the "BarnCRM Connections" set giving access to anything but connection principals (warning,
  *   F12);
  * - recipes that run as System, with who chose it and when (info, CN-02);
- * - Active BarnCRM Automation recipes while Recipe Access was never saved (warning, CN-02).
+ * - Active BarnCRM Automation recipes while Recipe Access was never saved (warning, CN-02);
+ * - the CN-03 clock checks of canonical model R-CR8 (`ConnectorClockChecks`).
  *
  * `@NamespaceAccessible`, public, with a public no-argument constructor, because Core resolves it
  * with `Type.forName` under ADR-0017.
@@ -96,6 +97,7 @@ public with sharing class ConnectorHealthCheckExtension implements HealthCheckEx
 				);
 			}
 			found.addAll(recipeFindings());
+			found.addAll(ConnectorClockChecks.findings());
 		} catch (Exception e) {
 			found.add(HealthCheckService.checkFailed('connector', e));
 		}

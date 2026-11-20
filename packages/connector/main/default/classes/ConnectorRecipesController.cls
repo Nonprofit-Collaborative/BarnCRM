@@ -1,7 +1,8 @@
 /**
- * The Recipes and Run History sections of Super Connector, and Recipe Access (CN-02; canonical
- * model R-CR1 to R-CR5, R-RUN4). Thin: the rules live in `ConnectorRecipes`, `ConnectorIdentity`
- * and `ConnectorRecipeDocument`. Granted by BarnCRM Connector Admin and Viewer; every change
+ * The Recipes and Run History sections of Super Connector, Recipe Access, the Recipe Clock and
+ * the Integration User (CN-02, CN-03; canonical model R-CR1 to R-CR8, R-RUN4, R-CS1). Thin: the
+ * rules live in `ConnectorRecipes`, `ConnectorIdentity`, `ConnectorClock`,
+ * `ConnectorIntegrationUser` and `ConnectorRecipeDocument`. Granted by BarnCRM Connector Admin and Viewer; every change
  * needs Manage BarnCRM Connector, which only the Admin set holds (R-CR3). Nothing is cacheable,
  * so a page always shows the runs as they are.
  */
@@ -126,6 +127,103 @@ public with sharing class ConnectorRecipesController {
 			return ConnectorIdentity.save(permissionSetIds);
 		} catch (Exception failure) {
 			throw shown(failure, 'saveRecipeAccess');
+		}
+	}
+
+	@AuraEnabled
+	public static ConnectorRecipes.Recipe saveRecipeSettings(
+		Id recipeId,
+		Integer retryAttempts,
+		Integer pauseAfterFailures,
+		Integer keepRunsDays,
+		Boolean ignoreOwnChanges
+	) {
+		try {
+			return ConnectorRecipes.saveSettings(
+				recipeId,
+				retryAttempts,
+				pauseAfterFailures,
+				keepRunsDays,
+				ignoreOwnChanges
+			);
+		} catch (Exception failure) {
+			throw shown(failure, 'saveRecipeSettings');
+		}
+	}
+
+	@AuraEnabled
+	public static ConnectorRecipes.Recipe pauseRecipe(Id recipeId) {
+		try {
+			return ConnectorRecipes.pause(recipeId);
+		} catch (Exception failure) {
+			throw shown(failure, 'pauseRecipe');
+		}
+	}
+
+	@AuraEnabled
+	public static ConnectorRecipes.Recipe resumeRecipe(Id recipeId) {
+		try {
+			return ConnectorRecipes.resume(recipeId);
+		} catch (Exception failure) {
+			throw shown(failure, 'resumeRecipe');
+		}
+	}
+
+	@AuraEnabled
+	public static Integer retryAllFailed(Id recipeId) {
+		try {
+			return ConnectorRecipes.retryAllFailed(recipeId);
+		} catch (Exception failure) {
+			throw shown(failure, 'retryAllFailed');
+		}
+	}
+
+	/** The Recipe Clock card (CN-03, R-CR6). */
+	@AuraEnabled
+	public static ConnectorClock.Status getClock() {
+		try {
+			ConnectorConnections.requireManager();
+			return ConnectorClock.status();
+		} catch (Exception failure) {
+			throw shown(failure, 'getClock');
+		}
+	}
+
+	@AuraEnabled
+	public static ConnectorClock.Status setRecipesPaused(Boolean paused) {
+		try {
+			return ConnectorClock.setPaused(paused);
+		} catch (Exception failure) {
+			throw shown(failure, 'setRecipesPaused');
+		}
+	}
+
+	@AuraEnabled
+	public static ConnectorClock.Status restartClock() {
+		try {
+			return ConnectorClock.restart();
+		} catch (Exception failure) {
+			throw shown(failure, 'restartClock');
+		}
+	}
+
+	/** The Integration User card (CN-03, R-CR4, R-CS1). */
+	@AuraEnabled
+	public static ConnectorIntegrationUser.View getIntegrationUser() {
+		try {
+			ConnectorConnections.requireManager();
+			return ConnectorIntegrationUser.view();
+		} catch (Exception failure) {
+			throw shown(failure, 'getIntegrationUser');
+		}
+	}
+
+	@AuraEnabled
+	public static ConnectorIntegrationUser.View chooseIntegrationUser(String userId) {
+		try {
+			return ConnectorIntegrationUser.choose(userId);
+		} catch (Exception failure) {
+			throw shown(failure, 'chooseIntegrationUser');
 		}
 	}
 

@@ -8,9 +8,46 @@
 public with sharing class ConnectorRecipes {
 	public static final String RUN_AS_AUTOMATION = 'Automation';
 	public static final String RUN_AS_SYSTEM = 'System';
+	public static final String RUN_AS_USER = 'IntegrationUser';
 	public static final String DRAFT = 'Draft';
 	public static final String MANUAL = 'Manual';
+	public static final String SCHEDULE = 'Schedule';
+	public static final String RECORD_CHANGE = 'RecordChange';
 	public static final Integer MAX_RUNS = 50;
+	/** Failed runs Retry All Failed queues at once. */
+	public static final Integer MAX_RETRIED = 200;
+	private static final Map<String, String> KIND_BY_TRIGGER = new Map<String, String>{
+		'manual' => MANUAL,
+		'schedule' => SCHEDULE,
+		'record' => RECORD_CHANGE
+	};
+
+	/** Pause After Failures, 1 to 100; blank or out of range is 10 (R-CR7). */
+	public static Integer pauseAfter(Connector_Recipe__c recipe) {
+		return bounded(recipe?.Pause_After_Failures__c, 1, 100, 10);
+	}
+
+	/** Retry Attempts, 0 to 4; blank or out of range is 3 (R-CR7). */
+	public static Integer retryAttempts(Connector_Recipe__c recipe) {
+		return bounded(recipe?.Retry_Attempts__c, 0, 4, 3);
+	}
+
+	/** Keep Runs Days, 7 to 365; blank or out of range is 30 (R-RUN2). */
+	public static Integer keepDays(Connector_Recipe__c recipe) {
+		return bounded(recipe?.Keep_Runs_Days__c, 7, 365, 30);
+	}
+
+	private static Integer bounded(Decimal value, Integer least, Integer most, Integer otherwise) {
+		return value == null || value < least || value > most ? otherwise : value.intValue();
+	}
+
+	/** The Trigger Kind a document's trigger is listed under. */
+	public static String kindOf(Map<String, Object> document) {
+		String kind = KIND_BY_TRIGGER.get(
+			ConnectorRecipeDocument.textOf(ConnectorRecipeDocument.mapOf(document.get('trigger')).get('kind'))
+		);
+		return kind == null ? MANUAL : kind;
+	}
 
 	/** One recipe in the list and the editor. */
 	public class Recipe {
@@ -39,6 +76,20 @@ public with sharing class ConnectorRecipes {
 		public String draftJson;
 		@AuraEnabled
 		public String recordOwnerId;
+		@AuraEnabled
+		public String triggerKind;
+		@AuraEnabled
+		public Datetime nextRunAt;
+		@AuraEnabled
+		public Integer retryAttempts;
+		@AuraEnabled
+		public Integer pauseAfterFailures;
+		@AuraEnabled
+		public Integer keepRunsDays;
+		@AuraEnabled
+		public Boolean ignoreOwnChanges;
+		@AuraEnabled
+		public Integer consecutiveFailures;
 	}
 
 	/** A saved map or saved query a step can use. */
@@ -59,6 +110,9 @@ public with sharing class ConnectorRecipes {
 	public class RecipesPage {
 		@AuraEnabled
 		public Boolean canManage;
+		/** Whether an active integration user is chosen (Run As Integration User may be set). */
+		@AuraEnabled
+		public Boolean integrationUserReady;
 		@AuraEnabled
 		public List<Recipe> recipes = new List<Recipe>();
 		@AuraEnabled
@@ -101,6 +155,9 @@ public with sharing class ConnectorRecipes {
 		public Boolean isTest;
 		@AuraEnabled
 		public Integer attempt;
+		/** When a Waiting run is tried again (R-CR7). */
+		@AuraEnabled
+		public Datetime nextAttemptAt;
 		/** Opened only: the step log and, for a Test run, what each step would have done. */
 		@AuraEnabled
 		public String stepLogJson;
@@ -122,6 +179,7 @@ public with sharing class ConnectorRecipes {
 		requireViewer();
 		RecipesPage result = new RecipesPage();
 		result.canManage = ConnectorConnections.canManage();
+		result.integrationUserReady = ConnectorIntegrationUser.ready();
 		for (Connector_Recipe__c row : [
 			SELECT
 				Id,
@@ -135,7 +193,14 @@ public with sharing class ConnectorRecipes {
 				Last_Run_At__c,
 				Definition_JSON__c,
 				Draft_JSON__c,
-				Record_Owner_Id__c
+				Record_Owner_Id__c,
+				Trigger_Kind__c,
+				Next_Run_At__c,
+				Retry_Attempts__c,
+				Pause_After_Failures__c,
+				Keep_Runs_Days__c,
+				Ignore_Own_Changes__c,
+				Consecutive_Failures__c
 			FROM Connector_Recipe__c
 			WITH USER_MODE
 			ORDER BY Name
@@ -195,12 +260,29 @@ public with sharing class ConnectorRecipes {
 		result.unpublished = row.Draft_JSON__c != row.Definition_JSON__c;
 		result.draftJson = row.Draft_JSON__c;
 		result.recordOwnerId = row.Record_Owner_Id__c;
+		result.triggerKind = row.Trigger_Kind__c;
+		result.nextRunAt = row.Next_Run_At__c;
+		result.retryAttempts = retryAttempts(row);
+		result.pauseAfterFailures = pauseAfter(row);
+		result.keepRunsDays = keepDays(row);
+		result.ignoreOwnChanges = row.Ignore_Own_Changes__c != false;
+		result.consecutiveFailures = row.Consecutive_Failures__c == null ? 0 : row.Consecutive_Failures__c.intValue();
 		return result;
 	}
 
 	private static Connector_Recipe__c recipe(Id recipeId) {
 		List<Connector_Recipe__c> rows = [
-			SELECT Id, Name, Status__c, Run_As__c, Version__c, Definition_JSON__c, Draft_JSON__c, Record_Owner_Id__c
+			SELECT
+				Id,
+				Name,
+				Status__c,
+				Run_As__c,
+				Version__c,
+				Definition_JSON__c,
+				Draft_JSON__c,
+				Record_Owner_Id__c,
+				Trigger_Kind__c,
+				Watermark__c
 			FROM Connector_Recipe__c
 			WHERE Id = :recipeId
 			WITH USER_MODE
@@ -220,7 +302,8 @@ public with sharing class ConnectorRecipes {
 	public static Recipe saveDraft(Id recipeId, String name, String description, String draftJson, String ownerId) {
 		ConnectorConnections.requireManager();
 		String checkedName = ConnectorConnections.checkedLabel(name);
-		refuseProblems(ConnectorRecipeDocument.problems(ConnectorRecipeDocument.parse(draftJson)));
+		Map<String, Object> draft = ConnectorRecipeDocument.parse(draftJson);
+		refuseProblems(ConnectorRecipeDocument.problems(draft));
 		if (String.isNotBlank(description) && description.contains('{!')) {
 			throw new ConnectorConnections.ConnectorException(
 				BarnHelp.text('Connector', 'Connector_Recipe_ErrorMergeField')
@@ -243,13 +326,17 @@ public with sharing class ConnectorRecipes {
 				BarnHelp.text('Connector', 'Connector_Recipe_ErrorOwner')
 			);
 		}
+		Connector_Recipe__c stored = recipeId == null ? null : recipe(recipeId);
 		Connector_Recipe__c row = recipeId == null
 			? new Connector_Recipe__c(Status__c = DRAFT, Run_As__c = RUN_AS_AUTOMATION, Version__c = 0)
-			: new Connector_Recipe__c(Id = recipe(recipeId).Id);
+			: new Connector_Recipe__c(Id = stored.Id);
 		row.Name = checkedName;
 		row.Description__c = description;
 		row.Draft_JSON__c = draftJson;
-		row.Trigger_Kind__c = MANUAL;
+		// The clock reads Trigger Kind, so a published recipe keeps its definition's until Publish.
+		if (stored == null || String.isBlank(stored.Definition_JSON__c)) {
+			row.Trigger_Kind__c = kindOf(draft);
+		}
 		row.Record_Owner_Id__c = owner == null ? null : String.valueOf(Id.valueOf(owner));
 		if (recipeId == null) {
 			row.Run_As_Chosen_By__c = UserInfo.getUserId();
@@ -282,24 +369,73 @@ public with sharing class ConnectorRecipes {
 				found.add(BarnHelp.text('Connector', 'Connector_Publish_Connection', new List<Object>{ name }));
 			}
 		}
+		Map<String, Object> starter = ConnectorRecipeDocument.mapOf(document.get('trigger'));
+		if (ConnectorRecipeDocument.textOf(starter.get('kind')) == 'record') {
+			String problem = ConnectorTriggers.publishProblem(starter);
+			if (problem != null) {
+				found.add(problem);
+			}
+		}
+		Id identity = identityFor(row.Run_As__c);
 		for (Map<String, Object> step : ConnectorRecipeDocument.allSteps(document)) {
-			found.addAll(stepPublishProblems(step, row.Run_As__c));
+			found.addAll(stepPublishProblems(step, row.Run_As__c, identity));
 		}
 		refuseProblems(found);
-		Database.update(
-			new Connector_Recipe__c(
-				Id = row.Id,
-				Definition_JSON__c = row.Draft_JSON__c,
-				Version__c = (row.Version__c == null ? 0 : row.Version__c) + 1,
-				Status__c = ConnectorRunStore.ACTIVE
-			),
-			AccessLevel.USER_MODE
+		Connector_Recipe__c published = new Connector_Recipe__c(
+			Id = row.Id,
+			Definition_JSON__c = row.Draft_JSON__c,
+			Version__c = (row.Version__c == null ? 0 : row.Version__c) + 1,
+			Status__c = ConnectorRunStore.ACTIVE,
+			Trigger_Kind__c = kindOf(document)
 		);
+		started(
+			published,
+			published.Trigger_Kind__c,
+			starter,
+			String.isBlank(row.Definition_JSON__c) ||
+				String.isBlank(row.Watermark__c) ||
+				row.Trigger_Kind__c != published.Trigger_Kind__c
+		);
+		Database.update(published, AccessLevel.USER_MODE);
+		if (ConnectorRunStore.CLOCK_KINDS.contains(published.Trigger_Kind__c)) {
+			ConnectorClock.publish(new Set<String>{ ConnectorClock.laneOf(row.Run_As__c) });
+		}
 		return shown(reread(row.Id));
 	}
 
+	/**
+	 * The clock's starting point for a Schedule or Record Change recipe (R-CR6): its next time,
+	 * and for Record Change a Watermark at now when it has none or its trigger kind changed, so
+	 * the first poll looks only at changes from here on. The caller publishes the lane's start
+	 * event, so the heartbeat starts after commit.
+	 */
+	private static void started(Connector_Recipe__c row, String kind, Map<String, Object> starter, Boolean fresh) {
+		Datetime now = Datetime.now();
+		if (kind == SCHEDULE) {
+			row.Next_Run_At__c = ConnectorTriggers.nextAt(starter, now);
+		} else if (kind == RECORD_CHANGE) {
+			row.Next_Run_At__c = now;
+			if (fresh) {
+				row.Watermark__c = ConnectorTriggers.watermark(now, null);
+			}
+		}
+	}
+
+	/** The user whose permission sets a recipe's Publish checks are made against (R-CR2). */
+	private static Id identityFor(String runAs) {
+		if (runAs != RUN_AS_USER) {
+			return ConnectorIdentity.automatedProcessId();
+		}
+		if (!ConnectorIntegrationUser.ready()) {
+			throw new ConnectorConnections.ConnectorException(
+				BarnHelp.text('Connector', 'Connector_RunAs_ErrorNoUser')
+			);
+		}
+		return ConnectorIntegrationUser.chosenId();
+	}
+
 	/** One step's Publish checks: its map and its Find query (R-CR2). */
-	private static List<String> stepPublishProblems(Map<String, Object> step, String runAs) {
+	private static List<String> stepPublishProblems(Map<String, Object> step, String runAs, Id identity) {
 		List<String> found = new List<String>();
 		String kind = ConnectorRecipeDocument.textOf(step.get('kind'));
 		String id = ConnectorRecipeDocument.textOf(step.get('id'));
@@ -337,7 +473,7 @@ public with sharing class ConnectorRecipes {
 							.removeStart('Record.')
 					);
 				}
-				found.addAll(ConnectorIdentity.mapProblems(kind, objectName, fields));
+				found.addAll(ConnectorIdentity.mapProblems(identity, kind, objectName, fields));
 			}
 		} catch (Exception refused) {
 			found.add(id + ': ' + refused.getMessage());
@@ -348,9 +484,14 @@ public with sharing class ConnectorRecipes {
 	/** Sets Run As (R-CR4): System only with the confirmation; who and when are recorded. */
 	public static Recipe setRunAs(Id recipeId, String runAs, Boolean confirmed) {
 		ConnectorConnections.requireManager();
-		if (runAs != RUN_AS_AUTOMATION && runAs != RUN_AS_SYSTEM) {
+		if (runAs != RUN_AS_AUTOMATION && runAs != RUN_AS_SYSTEM && runAs != RUN_AS_USER) {
 			throw new ConnectorConnections.ConnectorException(
 				BarnHelp.text('Connector', 'Connector_RunAs_ErrorChoice')
+			);
+		}
+		if (runAs == RUN_AS_USER && !ConnectorIntegrationUser.ready()) {
+			throw new ConnectorConnections.ConnectorException(
+				BarnHelp.text('Connector', 'Connector_RunAs_ErrorNoUser')
 			);
 		}
 		if (runAs == RUN_AS_SYSTEM && confirmed != true) {
@@ -368,6 +509,97 @@ public with sharing class ConnectorRecipes {
 			),
 			AccessLevel.USER_MODE
 		);
+		if (row.Status__c == ConnectorRunStore.ACTIVE) {
+			// The recipe moves to the other lane's clock.
+			ConnectorClock.publish(new Set<String>{ ConnectorClock.laneOf(runAs) });
+		}
+		return shown(reread(row.Id));
+	}
+
+	/**
+	 * Saves a recipe's run settings (R-CR6, R-CR7, R-RUN2): Retry Attempts 0 to 4, Pause After
+	 * Failures 1 to 100, Keep Runs Days 7 to 365 and Ignore Own Changes.
+	 */
+	public static Recipe saveSettings(
+		Id recipeId,
+		Integer retries,
+		Integer pauseAfterFailures,
+		Integer keepRunsDays,
+		Boolean ignoreOwnChanges
+	) {
+		ConnectorConnections.requireManager();
+		if (
+			retries == null ||
+			retries < 0 ||
+			retries > 4 ||
+			pauseAfterFailures == null ||
+			pauseAfterFailures < 1 ||
+			pauseAfterFailures > 100 ||
+			keepRunsDays == null ||
+			keepRunsDays < 7 ||
+			keepRunsDays > 365
+		) {
+			throw new ConnectorConnections.ConnectorException(
+				BarnHelp.text('Connector', 'Connector_Settings_ErrorRange')
+			);
+		}
+		Connector_Recipe__c row = recipe(recipeId);
+		Database.update(
+			new Connector_Recipe__c(
+				Id = row.Id,
+				Retry_Attempts__c = retries,
+				Pause_After_Failures__c = pauseAfterFailures,
+				Keep_Runs_Days__c = keepRunsDays,
+				Ignore_Own_Changes__c = ignoreOwnChanges != false
+			),
+			AccessLevel.USER_MODE
+		);
+		return shown(reread(row.Id));
+	}
+
+	/** Pauses an Active recipe (R-CR7): it neither polls nor runs; its queued runs wait. */
+	public static Recipe pause(Id recipeId) {
+		ConnectorConnections.requireManager();
+		Connector_Recipe__c row = recipe(recipeId);
+		if (row.Status__c != ConnectorRunStore.ACTIVE) {
+			throw new ConnectorConnections.ConnectorException(
+				BarnHelp.text('Connector', 'Connector_Run_ErrorNotActive')
+			);
+		}
+		Database.update(
+			new Connector_Recipe__c(Id = row.Id, Status__c = ConnectorRunStore.PAUSED),
+			AccessLevel.USER_MODE
+		);
+		return shown(reread(row.Id));
+	}
+
+	/**
+	 * Resumes a Paused or Paused by Failures recipe (R-CR7): its failures in a row start again
+	 * from 0, a schedule takes its next time, a Record Change carries on from its Watermark, and
+	 * its lane's runner and clock start.
+	 */
+	public static Recipe resume(Id recipeId) {
+		ConnectorConnections.requireManager();
+		Connector_Recipe__c row = recipe(recipeId);
+		if (row.Status__c != ConnectorRunStore.PAUSED && row.Status__c != ConnectorRunStore.PAUSED_BY_FAILURES) {
+			throw new ConnectorConnections.ConnectorException(
+				BarnHelp.text('Connector', 'Connector_Recipe_ErrorNotPaused')
+			);
+		}
+		Connector_Recipe__c resumed = new Connector_Recipe__c(
+			Id = row.Id,
+			Status__c = ConnectorRunStore.ACTIVE,
+			Consecutive_Failures__c = 0
+		);
+		started(
+			resumed,
+			row.Trigger_Kind__c,
+			ConnectorRecipeDocument.mapOf(ConnectorRecipeDocument.parse(row.Definition_JSON__c).get('trigger')),
+			String.isBlank(row.Watermark__c)
+		);
+		Database.update(resumed, AccessLevel.USER_MODE);
+		// Runs that waited while it was paused start now.
+		ConnectorClock.publish(new Set<String>{ ConnectorClock.laneOf(row.Run_As__c) });
 		return shown(reread(row.Id));
 	}
 
@@ -472,7 +704,7 @@ public with sharing class ConnectorRecipes {
 		String query =
 			'SELECT Id, Name, Recipe__c, Recipe__r.Name, Status__c, Started_By__c, Ran_As__c, ' +
 			'Recipe_Version__c, CreatedDate, Finished_At__c, Records_Written__c, Failed_Step__c, ' +
-			'Error_Message__c, Is_Test__c, Attempt__c' +
+			'Error_Message__c, Is_Test__c, Attempt__c, Next_Attempt_At__c' +
 			(runId == null ? '' : ', Step_Log_JSON__c, State_JSON__c') +
 			' FROM Connector_Run__c' +
 			(runId != null ? ' WHERE Id = :runId' : (recipeId != null ? ' WHERE Recipe__c = :recipeId' : '')) +
@@ -509,6 +741,7 @@ public with sharing class ConnectorRecipes {
 		result.errorMessage = row.Error_Message__c;
 		result.isTest = row.Is_Test__c;
 		result.attempt = row.Attempt__c == null ? 0 : row.Attempt__c.intValue();
+		result.nextAttemptAt = row.Next_Attempt_At__c;
 		if (opened) {
 			result.stepLogJson = row.Step_Log_JSON__c;
 			// A Test run shows what each step would have written or sent (R-CR5).
@@ -523,7 +756,7 @@ public with sharing class ConnectorRecipes {
 	public static Run retry(Id runId) {
 		ConnectorConnections.requireManager();
 		List<Connector_Run__c> rows = [
-			SELECT Id, Recipe__c, Status__c, Attempt__c, Is_Test__c
+			SELECT Id, Recipe__c, Status__c, Attempt__c, Is_Test__c, Ran_As__c
 			FROM Connector_Run__c
 			WHERE Id = :runId
 			WITH USER_MODE
@@ -536,6 +769,24 @@ public with sharing class ConnectorRecipes {
 		}
 		ConnectorRunStore.retry(rows[0]);
 		return runs(null, runId)[0];
+	}
+
+	/** Queues every Failed run of a recipe again from its failed step, at most 200; returns how many. */
+	public static Integer retryAllFailed(Id recipeId) {
+		ConnectorConnections.requireManager();
+		Connector_Recipe__c row = recipe(recipeId);
+		List<Connector_Run__c> failed = [
+			SELECT Id, Recipe__c, Status__c, Attempt__c, Is_Test__c, Ran_As__c
+			FROM Connector_Run__c
+			WHERE Recipe__c = :row.Id AND Status__c = :ConnectorRunStore.FAILED AND Is_Test__c = FALSE
+			WITH USER_MODE
+			ORDER BY CreatedDate
+			LIMIT :MAX_RETRIED
+		];
+		if (!failed.isEmpty()) {
+			ConnectorRunStore.retry(failed);
+		}
+		return failed.size();
 	}
 
 	// ---------------------------------------------------------------------------------------
@@ -556,7 +807,14 @@ public with sharing class ConnectorRecipes {
 				Last_Run_At__c,
 				Definition_JSON__c,
 				Draft_JSON__c,
-				Record_Owner_Id__c
+				Record_Owner_Id__c,
+				Trigger_Kind__c,
+				Next_Run_At__c,
+				Retry_Attempts__c,
+				Pause_After_Failures__c,
+				Keep_Runs_Days__c,
+				Ignore_Own_Changes__c,
+				Consecutive_Failures__c
 			FROM Connector_Recipe__c
 			WHERE Id = :recipeId
 			WITH USER_MODE

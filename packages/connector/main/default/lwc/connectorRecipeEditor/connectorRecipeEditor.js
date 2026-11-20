@@ -6,8 +6,21 @@ import deleteRecipe from '@salesforce/apex/ConnectorRecipesController.deleteReci
 import runNow from '@salesforce/apex/ConnectorRecipesController.runNow';
 import testRecipe from '@salesforce/apex/ConnectorRecipesController.testRecipe';
 import getRun from '@salesforce/apex/ConnectorRecipesController.getRun';
+import saveRecipeSettings from '@salesforce/apex/ConnectorRecipesController.saveRecipeSettings';
+import pauseRecipe from '@salesforce/apex/ConnectorRecipesController.pauseRecipe';
+import resumeRecipe from '@salesforce/apex/ConnectorRecipesController.resumeRecipe';
+import retryAllFailed from '@salesforce/apex/ConnectorRecipesController.retryAllFailed';
 import BarnConfirmModal from 'c/barnConfirmModal';
 import {
+  TRIGGERS,
+  EVERY,
+  DAYS,
+  STAMPS,
+  MODES,
+  RUN_AS_USER,
+  setTrigger,
+  updateTrigger,
+  runAsKey,
   STEP_KINDS,
   RECORD_KINDS,
   METHODS,
@@ -35,11 +48,14 @@ import { say as text } from 'c/connectorRecipeText';
 const LIST_FIELDS = ['values', 'pathValues', 'query', 'headers', 'conditions'];
 
 /**
- * The recipe editor of Super Connector (CN-02; canonical model R-CR1 to R-CR5; design Sections
- * 3.3, 3.4, 3.8 and 3.10). When (Run Now or a flow, with sample data), Then (the steps, nested
- * If steps shown in one list by c/connectorRecipeRules), Settings (Run As, with System behind a
- * confirmation), Test, Publish, Run Now and Delete. Every rule is checked here as you type and
- * again on the server; a value that holds a merge field is refused (F1).
+ * The recipe editor of Super Connector (CN-02, CN-03; canonical model R-CR1 to R-CR7; design
+ * Sections 3.2, 3.3, 3.4, 3.7, 3.8 and 3.10). When (Run Now or a flow, a Schedule, or a Record
+ * Change through a saved Find query, with sample data), Then (the steps, nested If steps shown in
+ * one list by c/connectorRecipeRules), Settings (Run As, with System behind a confirmation and
+ * Integration User once one is chosen), Run Settings (retries, auto-pause, run cleanup, the loop
+ * guard), Pause, Resume, Retry All Failed, Test, Publish, Run Now and Delete. Every rule is
+ * checked here as you type and again on the server; a value that holds a merge field is refused
+ * (F1).
  */
 export default class ConnectorRecipeEditor extends LightningElement {
   @api page;
@@ -56,6 +72,10 @@ export default class ConnectorRecipeEditor extends LightningElement {
   testRecordId = '';
   sendForReal = false;
   testRun;
+  retryAttempts = 3;
+  pauseAfterFailures = 10;
+  keepRunsDays = 30;
+  ignoreOwnChanges = true;
   working = false;
   message;
   error;
@@ -74,6 +94,19 @@ export default class ConnectorRecipeEditor extends LightningElement {
     this.runAs = value ? value.runAs || RUN_AS_AUTOMATION : RUN_AS_AUTOMATION;
     this.document = readDocument(value && value.draftJson);
     this.sampleText = JSON.stringify(this.document.trigger.sample || {}, null, 2);
+    this.readSettings(value);
+  }
+
+  /** Run Settings as saved, with the defaults the server applies to a blank. */
+  readSettings(value) {
+    const pick = (field, fallback) => {
+      const saved = value ? value[field] : undefined;
+      return saved === undefined || saved === null ? fallback : saved;
+    };
+    this.retryAttempts = pick('retryAttempts', 3);
+    this.pauseAfterFailures = pick('pauseAfterFailures', 10);
+    this.keepRunsDays = pick('keepRunsDays', 30);
+    this.ignoreOwnChanges = pick('ignoreOwnChanges', true);
   }
 
   labels = {
@@ -100,6 +133,78 @@ export default class ConnectorRecipeEditor extends LightningElement {
     },
     get whenManual() {
       return text('Connector_Editor_WhenManual');
+    },
+    get whenSchedule() {
+      return text('Connector_Editor_WhenSchedule');
+    },
+    get whenRecord() {
+      return text('Connector_Editor_WhenRecord');
+    },
+    get triggerKind() {
+      return text('Connector_Editor_TriggerKind');
+    },
+    get every() {
+      return text('Connector_Editor_Every');
+    },
+    get at() {
+      return text('Connector_Editor_At');
+    },
+    get day() {
+      return text('Connector_Editor_Day');
+    },
+    get on() {
+      return text('Connector_Editor_On');
+    },
+    get mode() {
+      return text('Connector_Editor_Mode');
+    },
+    get limit() {
+      return text('Connector_Editor_Limit');
+    },
+    get limitHelp() {
+      return text('Connector_Editor_LimitHelp');
+    },
+    get runAsHelp() {
+      return text('Connector_Editor_RunAsHelp');
+    },
+    get runSettings() {
+      return text('Connector_Editor_RunSettings');
+    },
+    get retryAttempts() {
+      return text('Connector_Editor_RetryAttempts');
+    },
+    get retryAttemptsHelp() {
+      return text('Connector_Editor_RetryAttemptsHelp');
+    },
+    get pauseAfter() {
+      return text('Connector_Editor_PauseAfter');
+    },
+    get pauseAfterHelp() {
+      return text('Connector_Editor_PauseAfterHelp');
+    },
+    get keepDays() {
+      return text('Connector_Editor_KeepDays');
+    },
+    get keepDaysHelp() {
+      return text('Connector_Editor_KeepDaysHelp');
+    },
+    get ignoreOwn() {
+      return text('Connector_Editor_IgnoreOwn');
+    },
+    get ignoreOwnHelp() {
+      return text('Connector_Editor_IgnoreOwnHelp');
+    },
+    get saveSettings() {
+      return text('Connector_Editor_SaveSettings');
+    },
+    get pause() {
+      return text('Connector_Editor_Pause');
+    },
+    get resume() {
+      return text('Connector_Editor_Resume');
+    },
+    get retryAll() {
+      return text('Connector_Editor_RetryAll');
     },
     get sample() {
       return text('Connector_Editor_Sample');
@@ -327,11 +432,89 @@ export default class ConnectorRecipeEditor extends LightningElement {
     return STEP_KINDS.map((kind) => ({ label: text(kind.key), value: kind.value }));
   }
 
+  /** Integration User is offered once a user is chosen and active, or while it is the choice. */
   get runAsOptions() {
-    return [
-      { label: text('Connector_RunAs_Automation'), value: RUN_AS_AUTOMATION },
-      { label: text('Connector_RunAs_System'), value: RUN_AS_SYSTEM }
-    ];
+    const values = [RUN_AS_AUTOMATION, RUN_AS_SYSTEM];
+    if ((this.page && this.page.integrationUserReady) || this.runAs === RUN_AS_USER) {
+      values.push(RUN_AS_USER);
+    }
+    return values.map((value) => ({ label: text(runAsKey(value)), value }));
+  }
+
+  // -------------------------------------------------------------------------------------------
+  // When: the trigger
+  // -------------------------------------------------------------------------------------------
+
+  get trigger() {
+    return this.document.trigger || {};
+  }
+
+  get triggerOptions() {
+    return TRIGGERS.map((entry) => ({ label: text(entry.key), value: entry.value }));
+  }
+
+  get isManual() {
+    return !this.isSchedule && !this.isRecordChange;
+  }
+
+  get isSchedule() {
+    return this.trigger.kind === 'schedule';
+  }
+
+  get isRecordChange() {
+    return this.trigger.kind === 'record';
+  }
+
+  get everyOptions() {
+    return EVERY.map((value) => ({ label: text(`Connector_Every_${value}`), value }));
+  }
+
+  get dayOptions() {
+    return DAYS.map((value) => ({ label: text(`Connector_Day_${value}`), value }));
+  }
+
+  get stampOptions() {
+    return STAMPS.map((value) => ({ label: text(`Connector_On_${value}`), value }));
+  }
+
+  get modeOptions() {
+    return MODES.map((value) => ({ label: text(`Connector_Mode_${value}`), value }));
+  }
+
+  get timed() {
+    return this.trigger.every === 'day' || this.trigger.every === 'week';
+  }
+
+  get weekly() {
+    return this.trigger.every === 'week';
+  }
+
+  /** The time input works in HH:mm:ss.SSS; the document keeps HH:mm. */
+  get atValue() {
+    return this.trigger.at ? `${this.trigger.at}:00.000` : '';
+  }
+
+  get nextRunText() {
+    const recipe = this._recipe;
+    return recipe && recipe.status === 'Active' && recipe.nextRunAt
+      ? text('Connector_Editor_NextRun', new Date(recipe.nextRunAt).toLocaleString())
+      : '';
+  }
+
+  get failuresText() {
+    const count = this._recipe ? this._recipe.consecutiveFailures : 0;
+    return count ? text('Connector_Editor_Failures', count) : '';
+  }
+
+  get canPause() {
+    return this.active;
+  }
+
+  get canResume() {
+    return Boolean(
+      this._recipe &&
+      (this._recipe.status === 'Paused' || this._recipe.status === 'PausedByFailures')
+    );
   }
 
   get queryOptions() {
@@ -508,6 +691,45 @@ export default class ConnectorRecipeEditor extends LightningElement {
     if (sample !== undefined) {
       this.document = { ...this.document, trigger: { ...this.document.trigger, sample } };
     }
+  }
+
+  handleTriggerKind(event) {
+    this.document = setTrigger(this.document, event.detail.value);
+  }
+
+  /** A trigger field: data-field names it; the time arrives as HH:mm:ss.SSS. */
+  handleTriggerField(event) {
+    const field = event.target.dataset.field;
+    let value = event.detail.value;
+    if (field === 'at') {
+      value = String(value || '').slice(0, 5);
+    }
+    if (field === 'limit') {
+      value = value === '' || value === null || value === undefined ? undefined : Number(value);
+    }
+    this.document = updateTrigger(this.document, { [field]: value });
+  }
+
+  /** A Record Change trigger's saved Find query: its document is copied into the trigger. */
+  handleTriggerQuery(event) {
+    const chosen = ((this.page && this.page.queries) || []).find(
+      (query) => query.value === event.detail.value
+    );
+    let query = null;
+    try {
+      query = chosen ? JSON.parse(chosen.document) : null;
+    } catch {
+      query = null;
+    }
+    this.document = updateTrigger(this.document, { savedQuery: event.detail.value, query });
+  }
+
+  handleSetting(event) {
+    const field = event.target.dataset.field;
+    this[field] =
+      event.target.type === 'checkbox' || event.target.type === 'toggle'
+        ? event.target.checked
+        : event.detail.value;
   }
 
   handleAdd(event) {
@@ -711,6 +933,44 @@ export default class ConnectorRecipeEditor extends LightningElement {
       this._recipe = updated;
       this.runAs = updated.runAs;
       this.changed(updated.id, text('Connector_Editor_RunAsSaved'));
+    });
+  }
+
+  handleSaveSettings() {
+    return this.work(async () => {
+      const updated = await saveRecipeSettings({
+        recipeId: this.recipeId,
+        retryAttempts: Number(this.retryAttempts),
+        pauseAfterFailures: Number(this.pauseAfterFailures),
+        keepRunsDays: Number(this.keepRunsDays),
+        ignoreOwnChanges: this.ignoreOwnChanges !== false
+      });
+      this._recipe = updated;
+      this.readSettings(updated);
+      this.changed(updated.id, text('Connector_Editor_SettingsSaved'));
+    });
+  }
+
+  handlePause() {
+    return this.work(async () => {
+      const updated = await pauseRecipe({ recipeId: this.recipeId });
+      this._recipe = updated;
+      this.changed(updated.id, text('Connector_Editor_Paused', this.name));
+    });
+  }
+
+  handleResume() {
+    return this.work(async () => {
+      const updated = await resumeRecipe({ recipeId: this.recipeId });
+      this._recipe = updated;
+      this.changed(updated.id, text('Connector_Editor_Resumed', this.name));
+    });
+  }
+
+  handleRetryAll() {
+    return this.work(async () => {
+      const count = await retryAllFailed({ recipeId: this.recipeId });
+      this.message = text('Connector_Editor_RetriedAll', count);
     });
   }
 

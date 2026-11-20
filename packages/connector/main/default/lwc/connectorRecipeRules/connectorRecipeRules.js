@@ -36,7 +36,20 @@ export const OPERATORS = [
 export const OUTCOMES = ['Succeeded', 'Skipped', 'Failed'];
 export const RUN_AS_AUTOMATION = 'Automation';
 export const RUN_AS_SYSTEM = 'System';
+export const RUN_AS_USER = 'IntegrationUser';
 
+/** The triggers a recipe may start on (R-CR1), with the help key of each. */
+export const TRIGGERS = [
+  { value: 'manual', key: 'Connector_Trigger_Manual' },
+  { value: 'schedule', key: 'Connector_Trigger_Schedule' },
+  { value: 'record', key: 'Connector_Trigger_Record' }
+];
+export const EVERY = ['15m', 'hour', 'day', 'week'];
+export const DAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+export const STAMPS = ['created', 'changed'];
+export const MODES = ['each', 'batch'];
+export const MAX_POLLED = 200;
+const AT = /^([01][0-9]|2[0-3]):[0-5][0-9]$/;
 const STEP_ID = /^[A-Za-z0-9_]{1,20}$/;
 const PILL = /^(trigger|steps)(\.[A-Za-z0-9_-]+(\[[0-9]{1,3}\])?){0,10}$/;
 const SLOT = /\{([A-Za-z0-9_]{1,40})\}/g;
@@ -65,6 +78,83 @@ export function readDocument(text) {
     // A new document below.
   }
   return newDocument();
+}
+
+/**
+ * A copy with the trigger changed to a kind, with that kind's starting values (R-CR1). The
+ * sample data stays, since Test reads it whatever starts the recipe.
+ */
+export function setTrigger(document, kind) {
+  const next = copy(document);
+  const sample = (next.trigger && next.trigger.sample) || {};
+  if (kind === 'schedule') {
+    next.trigger = { kind, every: 'day', at: '08:00', sample };
+  } else if (kind === 'record') {
+    next.trigger = { kind, query: null, savedQuery: '', on: 'changed', mode: 'each', sample };
+  } else {
+    next.trigger = { kind: 'manual', sample };
+  }
+  return next;
+}
+
+/** A copy with fields of the trigger changed. */
+export function updateTrigger(document, changes) {
+  const next = copy(document);
+  next.trigger = { ...next.trigger, ...changes };
+  if (next.trigger.every !== 'week') {
+    delete next.trigger.day;
+  } else if (!next.trigger.day) {
+    next.trigger.day = 'MON';
+  }
+  if (next.trigger.kind !== 'schedule') {
+    delete next.trigger.day;
+  }
+  return next;
+}
+
+/** What is wrong with a document's trigger, as a help key, or null (the server's twin). */
+export function triggerProblem(trigger) {
+  const starter = trigger || {};
+  if (!TRIGGERS.some((entry) => entry.value === starter.kind)) {
+    return 'Connector_Recipe_ErrorTrigger';
+  }
+  if (starter.kind === 'schedule') {
+    const timed = starter.every === 'day' || starter.every === 'week';
+    const bad =
+      !EVERY.includes(starter.every) ||
+      (timed && !AT.test(starter.at || '')) ||
+      (starter.every === 'week' && !DAYS.includes(starter.day));
+    return bad ? 'Connector_Recipe_ErrorSchedule' : null;
+  }
+  if (starter.kind === 'record') {
+    const most = starter.limit;
+    const bad =
+      !starter.query ||
+      !starter.query.object ||
+      !STAMPS.includes(starter.on) ||
+      (starter.mode !== undefined && !MODES.includes(starter.mode)) ||
+      (most !== undefined &&
+        most !== null &&
+        !(Number.isInteger(most) && most >= 1 && most <= MAX_POLLED));
+    return bad ? 'Connector_Recipe_ErrorRecordTrigger' : null;
+  }
+  return null;
+}
+
+/** The help key naming a Run As value. */
+export function runAsKey(runAs) {
+  if (runAs === RUN_AS_SYSTEM) {
+    return 'Connector_RunAs_System';
+  }
+  return runAs === RUN_AS_USER ? 'Connector_RunAs_IntegrationUser' : 'Connector_RunAs_Automation';
+}
+
+/** The help key naming a recipe's Trigger Kind (Manual, Schedule, RecordChange). */
+export function triggerKindKey(kind) {
+  if (kind === 'Schedule') {
+    return 'Connector_Trigger_Schedule';
+  }
+  return kind === 'RecordChange' ? 'Connector_Trigger_Record' : 'Connector_Trigger_Manual';
 }
 
 /** Every step, nested ones included, in document order. */
@@ -355,6 +445,10 @@ export function problems(document) {
     return [{ key: 'Connector_Recipe_ErrorMergeField', args: [] }];
   }
   const found = [];
+  const starter = triggerProblem(document && document.trigger);
+  if (starter) {
+    found.push({ key: starter, args: [] });
+  }
   const ids = new Set();
   let count = 0;
   const check = (steps, depth) => {
@@ -389,12 +483,27 @@ export function problems(document) {
   return found;
 }
 
+/** What a Schedule or Record Change trigger gives its run, as value paths (R-CR6). */
+function triggerPaths(trigger) {
+  if (trigger.kind === 'schedule') {
+    return ['trigger.scheduledAt'];
+  }
+  if (trigger.kind !== 'record') {
+    return [];
+  }
+  const fields = ['Id', ...((trigger.query && trigger.query.fields) || [])];
+  return trigger.mode === 'batch'
+    ? ['trigger.recordIds', ...fields.map((field) => `trigger.records[0].${field}`)]
+    : ['trigger.recordId', ...fields.map((field) => `trigger.record.${field}`)];
+}
+
 /**
- * The value paths a step may read, for the editor's hints: the sample's keys under `trigger`
- * (one level down), then each earlier step's usual results.
+ * The value paths a step may read, for the editor's hints: what a Schedule or Record Change
+ * trigger gives, the sample's keys under `trigger` (one level down), then each earlier step's
+ * usual results.
  */
 export function pathSuggestions(document, beforeStep) {
-  const found = ['trigger'];
+  const found = ['trigger', ...triggerPaths((document && document.trigger) || {})];
   const sample = document && document.trigger && document.trigger.sample;
   if (sample && typeof sample === 'object' && !Array.isArray(sample)) {
     Object.keys(sample).forEach((key) => {
@@ -457,6 +566,7 @@ export function statusVariant(status) {
       Draft: 'neutral',
       Queued: 'info',
       Running: 'info',
+      Waiting: 'warning',
       Failed: 'error',
       Paused: 'warning',
       PausedByFailures: 'warning'

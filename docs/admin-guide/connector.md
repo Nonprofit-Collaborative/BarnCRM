@@ -125,8 +125,34 @@ are never offered.
 | When | What starts a run |
 |---|---|
 | Run Now or a flow | **Run Now** on the recipe, with data you paste (optional), or the Flow action **Run a BarnCRM Connector Recipe** (see [Flow Actions](#flow-actions)). |
+| Schedule | The recipe clock, every 15 minutes, every hour, every day at a time, or every week on a day at a time. Times are in your org's time zone. The steps read the time it was due as `trigger.scheduledAt`. |
+| Record Change | Records of an object created, or created or changed, that match a saved Find query (see [Find](find.md)). The clock looks every 15 minutes. **One Run per Record** starts a run for each record (`trigger.recordId`, `trigger.record.LastName`); **One Run for All** starts one run with them all (`trigger.recordIds`, `trigger.records[0].LastName`). **Most Records per Look** is 1 to 200 (200 when blank). |
 
-Clock schedules, record changes, webhooks and app polling come in later releases.
+A Record Change recipe starts from the moment you publish it: records changed before then are
+not run. It reads the fields the saved query lists, sees imports and bulk updates, and carries on
+where it stopped after a pause or an outage; it does not see deleted records. **Ignore Own
+Changes** (on by default, in **Run Settings**) skips records last changed by a recipe, so a
+recipe that updates the records it watches does not start itself again. Webhooks and app polling
+come in later releases.
+
+### The Recipe Clock
+
+Schedule and Record Change recipes need no Scheduled Apex and no person. Each Run As lane has a
+heartbeat: a short job that starts every 5 minutes while the lane has work, runs or polls each
+recipe that is due, queues again the runs waiting for a retry and starts the runner. It runs as
+the lane's identity (the Automated Process user, or the integration user), so it never stops
+because someone left. The nightly run (see [Nightly Jobs](nightly-jobs.md); step **Connector
+Cleanup**, on by default at 2:40) restarts a heartbeat that stopped and deletes old runs (see
+[Run History](#run-history)).
+
+**Recipe Clock** (on the Recipes tab) shows each lane, whether it has work and whether its
+heartbeat is going, with:
+
+- **Pause All Recipes**: the clock and the runners stop starting runs, org-wide, until you turn
+  it off. Queued runs wait; Test runs from the editor still run. BarnCRM's own pause in
+  [Automation Control](automation-control.md) pauses recipes too.
+- **Restart Clock**: starts the heartbeat of each lane with work. Health Check sends you here
+  when a lane stopped.
 
 ### Then: the Steps
 
@@ -168,8 +194,50 @@ record, fails the step and nothing is sent: a recipe can never make Salesforce i
 |---|---|
 | BarnCRM Automation (the default) | What the Recipe Access sets allow, with field-level security and sharing. Publish checks every record map against those sets and refuses a map whose object or fields they do not grant. |
 | System | Everything, without permission or sharing checks. Choosing it asks you to confirm; who chose it and when are shown on the recipe, and Health Check lists every System recipe. Use it only when Recipe Access cannot be widened. |
+| Integration User | What the user you choose in **Integration User** may do, with field-level security and sharing. Use it when an app or your audit needs records changed by a named user, or when a recipe needs access the Automated Process user cannot hold. Publish checks every record map against that user's access. |
 
-Both run as the Automated Process user. The Integration User choice comes in a later release.
+BarnCRM Automation and System run as the Automated Process user; Integration User runs as the
+user you choose. Who started a run never matters.
+
+### Integration User
+
+Salesforce lets a platform event trigger run as a chosen user only through a subscriber setting
+Setup shows but cannot edit, so BarnCRM writes it for you:
+
+1. Create or pick a user for recipes only, such as "BarnCRM Integration", with a Salesforce
+   license that lets it edit what your recipes write. Give it the permission sets your
+   Integration User recipes need. Keep it active.
+2. On **Super Connector**, open **Recipes**, then **Recipe Clock**. Under **Integration User**,
+   choose the user and select **Save User**. BarnCRM saves the choice org-wide, writes the
+   subscriber setting **BarnCRM_Connector_Start_User** through the org connection
+   (`Barn_Org_Connection`, set up as in [Creating a New Field From an
+   Import](import-new-fields.md)), and gives the user **BarnCRM Connections**, taking it from the
+   user chosen before unless that user is a Connector admin.
+3. In Setup, open **Platform Events**, then **Connector Start User**. Under **Subscriptions**,
+   select **Suspend** on the trigger's row, then **Resume**. The new user takes effect at once.
+4. Back on Recipe Clock, the card shows **Confirmed** once a job has run as the user.
+
+Integration User recipes can be chosen only while a user is chosen and active. When the user is
+deactivated, those recipes stop: Health Check reports **Integration User Inactive** with the
+recipes it stops. Choose another user, then Suspend and Resume again. Saving with no user clears
+the subscriber setting. The card shows the last write's job status; a refused write is in the
+Error Log, and the user's access stays as it was.
+
+### Run Settings, Retries and Pausing
+
+Each saved recipe has **Run Settings**:
+
+| Setting | Default | What it does |
+|---|---|---|
+| Retry Attempts | 3 | 0 to 4. A run that failed for a reason that may pass (the app could not be reached, or answered 408, 429, 500, 502, 503 or 504) waits and is tried again from its failed step: after 15 minutes, 1 hour, 4 hours and 12 hours. When the app sends `Retry-After`, the run waits that long instead, at most a day. Test runs are never retried. |
+| Pause After Failures | 10 | 1 to 100. A recipe whose runs fail this many times in a row is **Paused by Failures**: it neither polls nor runs, and one Error Log entry says so. |
+| Keep Runs Days | 30 | 7 to 365. The nightly step deletes the recipe's finished runs older than this, at most 9,000 a night. Waiting and Queued runs are kept. |
+| Ignore Own Changes | On | For Record Change: skip records last changed by a recipe identity. |
+
+**Pause** stops an Active recipe; its queued runs wait. **Resume** makes a Paused or Paused by
+Failures recipe Active again, counts its failures from 0, gives a schedule its next time and lets
+a Record Change carry on from where it stopped. **Retry All Failed** queues every failed run of
+the recipe again from its failed step, up to 200 at a time.
 
 ### Test, Publish and Run Now
 
@@ -199,15 +267,17 @@ run again. A run's data, kept between steps, is limited to about 130,000 charact
 ## Run History
 
 **Run History** lists the latest 50 runs, newest first, with the recipe, status (Queued,
-Succeeded, Skipped, Failed), what started it (Manual, Flow, Test), Run As, version, records
-written and the failed step. Open a run to see each step: its outcome, how long it took, the
+Waiting, Succeeded, Skipped, Failed), what started it (Manual, Flow, Test, Schedule, Record
+Change), Run As, version, records written, the failed step and, for a Waiting run, when it is
+tried next. Open a run to see each step: its outcome, how long it took, the
 records it wrote, the app's status code and, for a failed Call an App, the first 2,000 characters
 of the app's answer. A Test run also shows what each step would have written or sent. No request
 header and no key is ever kept.
 
 **Retry** (BarnCRM Connector Admin only) queues a failed run again from its failed step: steps
 that already succeeded are not repeated. Each failed run also writes one Error Log entry naming
-the recipe, run, step and plain message, never the request.
+the recipe, run, step and plain message, never the request. The nightly step deletes finished
+runs older than each recipe's **Keep Runs Days**.
 
 ## Flow Actions
 
@@ -235,7 +305,7 @@ object you ask about, and the Mapper warns before you change a map a recipe link
 |---|---|
 | BarnCRM Connector Admin | The BarnCRM Connector app, the Super Connector tab, Manage BarnCRM Connector and every recipe and run. Give it only to system administrators: whoever holds it decides where your data goes. |
 | BarnCRM Connector Viewer | The BarnCRM Connector app and the Super Connector tab, to see recipes and Run History without changing them. |
-| BarnCRM Connections | Created by BarnCRM in your org, not part of the package. It holds each connection's principal access and is given only to Connector admins when they create or check a connection, and to the Automated Process user when you save Recipe Access. Do not add other permissions to it: Health Check warns when it holds anything else. |
+| BarnCRM Connections | Created by BarnCRM in your org, not part of the package. It holds each connection's principal access and is given only to Connector admins when they create or check a connection, to the Automated Process user when you save Recipe Access, and to the integration user when you choose it. Do not add other permissions to it: Health Check warns when it holds anything else. |
 
 ## Health Check
 
@@ -246,11 +316,20 @@ With the module installed, Health Check reports:
 - keys replaced in the last 7 days, by connection;
 - the BarnCRM Connections permission set holding anything other than connection access;
 - every recipe that runs as System, with who chose it and when;
-- Active BarnCRM Automation recipes while Recipe Access has never been saved.
+- Active BarnCRM Automation recipes while Recipe Access has never been saved;
+- a lane with Schedule, Record Change or waiting runs whose heartbeat is not going, with **Open
+  Super Connector** to restart it;
+- **Integration User Inactive**: Active Integration User recipes while no user is chosen or the
+  user is inactive (an error), or the user lacks BarnCRM Connections (a warning);
+- runs Queued for more than 30 minutes, for example after a subscriber change not yet applied
+  with Suspend and Resume;
+- recipes Paused by Failures, and Active recipes whose Owner of New Records is inactive;
+- Pause All Recipes on.
 
 ## Removing It
 
 Delete each recipe, then each connection, on **Super Connector** first, so no credential is left
 in Setup, then uninstall the module from the [Module Manager](module-manager.md). Delete the
 **BarnCRM Connections** permission set in Setup afterwards if you no longer need it, and remove
-the Recipe Access sets from the Automated Process user if you want them gone.
+the Recipe Access sets from the Automated Process user if you want them gone. Before
+uninstalling, save **Integration User** with no user, so the subscriber setting is removed.

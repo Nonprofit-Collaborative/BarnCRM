@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Keep_Runs_Days__c</fullName>
+  <defaultValue>30</defaultValue>
+  <description>Days the recipe's finished runs are kept before the nightly step deletes them (canonical model R-RUN2), 7 to 365; blank or out of range reads as 30.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>Finished runs older than this many days are deleted each night.</inlineHelpText>
+  <label>Keep Runs Days</label>
+  <precision>3</precision>
+  <required>false</required>
+  <scale>0</scale>
+  <trackTrending>false</trackTrending>
+  <type>Number</type>
+  <unique>false</unique>
+</CustomField>

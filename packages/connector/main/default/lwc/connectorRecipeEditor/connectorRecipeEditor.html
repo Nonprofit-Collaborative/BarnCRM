@@ -27,7 +27,30 @@
 
             <section class="slds-var-m-bottom_medium" aria-labelledby="when-heading">
                 <h4 id="when-heading" class="slds-text-title_bold slds-var-m-bottom_x-small">{labels.when}</h4>
-                <p class="slds-text-body_small slds-var-m-bottom_x-small">{labels.whenManual}</p>
+                <lightning-radio-group label={labels.triggerKind} options={triggerOptions} value={trigger.kind} type="button" disabled={readOnly} onchange={handleTriggerKind} data-id="trigger-kind"></lightning-radio-group>
+                <template lwc:if={isManual}>
+                    <p class="slds-text-body_small slds-var-m-vertical_x-small">{labels.whenManual}</p>
+                </template>
+                <template lwc:if={isSchedule}>
+                    <p class="slds-text-body_small slds-var-m-vertical_x-small">{labels.whenSchedule}</p>
+                    <lightning-combobox label={labels.every} options={everyOptions} value={trigger.every} read-only={readOnly} data-field="every" onchange={handleTriggerField} data-id="every"></lightning-combobox>
+                    <template lwc:if={timed}>
+                        <lightning-input type="time" label={labels.at} value={atValue} read-only={readOnly} data-field="at" onchange={handleTriggerField} data-id="at"></lightning-input>
+                    </template>
+                    <template lwc:if={weekly}>
+                        <lightning-combobox label={labels.day} options={dayOptions} value={trigger.day} read-only={readOnly} data-field="day" onchange={handleTriggerField} data-id="day"></lightning-combobox>
+                    </template>
+                </template>
+                <template lwc:if={isRecordChange}>
+                    <p class="slds-text-body_small slds-var-m-vertical_x-small">{labels.whenRecord}</p>
+                    <lightning-combobox label={labels.savedQuery} options={queryOptions} value={trigger.savedQuery} read-only={readOnly} onchange={handleTriggerQuery} data-id="trigger-query"></lightning-combobox>
+                    <lightning-radio-group label={labels.on} options={stampOptions} value={trigger.on} disabled={readOnly} data-field="on" onchange={handleTriggerField} data-id="on"></lightning-radio-group>
+                    <lightning-radio-group label={labels.mode} options={modeOptions} value={trigger.mode} disabled={readOnly} data-field="mode" onchange={handleTriggerField} data-id="mode"></lightning-radio-group>
+                    <lightning-input type="number" label={labels.limit} value={trigger.limit} min="1" max="200" step="1" field-level-help={labels.limitHelp} read-only={readOnly} data-field="limit" onchange={handleTriggerField} data-id="limit"></lightning-input>
+                </template>
+                <template lwc:if={nextRunText}>
+                    <p class="slds-text-body_small slds-var-m-vertical_x-small" data-id="next-run">{nextRunText}</p>
+                </template>
                 <lightning-textarea label={labels.sample} value={sampleText} field-level-help={labels.sampleHelp} read-only={readOnly} onchange={handleSample} data-id="sample"></lightning-textarea>
             </section>
 
@@ -171,8 +194,31 @@
                 <h4 id="settings-heading" class="slds-text-title_bold slds-var-m-bottom_x-small">{labels.settings}</h4>
                 <template lwc:if={saved}>
                     <lightning-radio-group label={labels.runAs} options={runAsOptions} value={runAs} disabled={readOnly} onchange={handleRunAs} data-id="run-as"></lightning-radio-group>
+                    <p class="slds-text-body_small slds-var-m-bottom_x-small">{labels.runAsHelp}</p>
                     <template lwc:if={runAsChosen}>
                         <p class="slds-text-body_small" data-id="run-as-chosen">{runAsChosen}</p>
+                    </template>
+                    <h4 class="slds-text-title_bold slds-var-m-top_small slds-var-m-bottom_x-small">{labels.runSettings}</h4>
+                    <template lwc:if={failuresText}>
+                        <p class="slds-text-body_small" data-id="failures">{failuresText}</p>
+                    </template>
+                    <div class="slds-grid slds-gutters_x-small slds-wrap">
+                        <lightning-input class="slds-col" type="number" label={labels.retryAttempts} value={retryAttempts} min="0" max="4" step="1" required field-level-help={labels.retryAttemptsHelp} read-only={readOnly} data-field="retryAttempts" onchange={handleSetting} data-id="retry-attempts"></lightning-input>
+                        <lightning-input class="slds-col" type="number" label={labels.pauseAfter} value={pauseAfterFailures} min="1" max="100" step="1" required field-level-help={labels.pauseAfterHelp} read-only={readOnly} data-field="pauseAfterFailures" onchange={handleSetting} data-id="pause-after"></lightning-input>
+                        <lightning-input class="slds-col" type="number" label={labels.keepDays} value={keepRunsDays} min="7" max="365" step="1" required field-level-help={labels.keepDaysHelp} read-only={readOnly} data-field="keepRunsDays" onchange={handleSetting} data-id="keep-days"></lightning-input>
+                    </div>
+                    <lightning-input type="checkbox" label={labels.ignoreOwn} checked={ignoreOwnChanges} field-level-help={labels.ignoreOwnHelp} disabled={readOnly} data-field="ignoreOwnChanges" onchange={handleSetting} data-id="ignore-own"></lightning-input>
+                    <template lwc:if={canManage}>
+                        <div class="slds-var-m-top_x-small">
+                            <lightning-button class="slds-var-m-right_small" label={labels.saveSettings} disabled={working} onclick={handleSaveSettings} data-id="save-settings"></lightning-button>
+                            <template lwc:if={canPause}>
+                                <lightning-button class="slds-var-m-right_small" label={labels.pause} disabled={working} onclick={handlePause} data-id="pause"></lightning-button>
+                            </template>
+                            <template lwc:if={canResume}>
+                                <lightning-button class="slds-var-m-right_small" variant="brand" label={labels.resume} disabled={working} onclick={handleResume} data-id="resume"></lightning-button>
+                            </template>
+                            <lightning-button label={labels.retryAll} disabled={working} onclick={handleRetryAll} data-id="retry-all"></lightning-button>
+                        </div>
                     </template>
                 </template>
                 <template lwc:else>

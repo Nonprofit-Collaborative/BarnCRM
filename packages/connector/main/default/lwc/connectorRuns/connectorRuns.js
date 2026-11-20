@@ -2,7 +2,7 @@ import { LightningElement, api } from 'lwc';
 import getRuns from '@salesforce/apex/ConnectorRecipesController.getRuns';
 import getRun from '@salesforce/apex/ConnectorRecipesController.getRun';
 import retryRun from '@salesforce/apex/ConnectorRecipesController.retryRun';
-import { stepRows, statusVariant } from 'c/connectorRecipeRules';
+import { stepRows, statusVariant, runAsKey } from 'c/connectorRecipeRules';
 import { say as text } from 'c/connectorRecipeText';
 
 /**
@@ -86,12 +86,14 @@ export default class ConnectorRuns extends LightningElement {
       detail: text(
         'Connector_Runs_Detail',
         text(`Connector_StartedBy_${run.startedBy}`),
-        run.ranAs === 'System'
-          ? text('Connector_RunAs_System')
-          : text('Connector_RunAs_Automation'),
+        text(runAsKey(run.ranAs)),
         run.version,
         run.recordsWritten
       ),
+      nextAttempt:
+        run.status === 'Waiting' && run.nextAttemptAt
+          ? text('Connector_Runs_NextAttempt', new Date(run.nextAttemptAt).toLocaleString())
+          : '',
       failure:
         run.status === 'Failed'
           ? text('Connector_Runs_Failure', run.failedStep || '-', run.errorMessage || '')
@@ -99,6 +101,7 @@ export default class ConnectorRuns extends LightningElement {
       when: run.createdAt ? new Date(run.createdAt).toLocaleString() : '',
       canRetry: this.canManage && run.status === 'Failed',
       openId: `open-${run.id}`,
+      nextId: `next-${run.id}`,
       retryId: `retry-${run.id}`
     };
   }

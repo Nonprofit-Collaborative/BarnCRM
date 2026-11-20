@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Recipe Access and Clock</label>
+    <protected>true</protected>
+    <values>
+        <field>Setting_Key__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Settings_Object__c</field>
+        <value xsi:type="xsd:string">Connector_Settings__c</value>
+    </values>
+    <values>
+        <field>Module__c</field>
+        <value xsi:type="xsd:string">Connector</value>
+    </values>
+    <values>
+        <field>Section__c</field>
+        <value xsi:type="xsd:string">Integrations</value>
+    </values>
+    <values>
+        <field>Data_Type__c</field>
+        <value xsi:type="xsd:string">Component</value>
+    </values>
+    <values>
+        <field>Component__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Navigation_Target__c</field>
+        <value xsi:type="xsd:string">Super_Connector</value>
+    </values>
+    <values>
+        <field>Navigation_Label__c</field>
+        <value xsi:type="xsd:string">Super Connector</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value xsi:type="xsd:string">Choose who recipes run as: the permission sets BarnCRM Automation recipes use, and the integration user for Integration User recipes. See whether the recipe clock is running and restart it. Open Super Connector, Recipes, then Recipe Access or Recipe Clock.</value>
+    </values>
+    <values>
+        <field>Sort_Order__c</field>
+        <value xsi:type="xsd:double">20</value>
+    </values>
+    <values>
+        <field>Help_Path__c</field>
+        <value xsi:type="xsd:string">connector.md</value>
+    </values>
+</CustomMetadata>

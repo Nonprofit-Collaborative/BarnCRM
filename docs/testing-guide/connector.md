@@ -1,6 +1,6 @@
 # BarnCRM Connector
 
-Scripts for the optional BarnCRM Connector module, release 1.31: creating Connections of each sign-in kind, the one Setup step with Check Again, checking, replacing, disconnecting and deleting, the refusals that keep keys safe, access and Health Check (CN-01, T-CN-01 to T-CN-06); Recipe Access, recipes, Test, Publish, Run Now, Run History, Retry, Run As and the merge-field guard (CN-02, T-CN-07 to T-CN-12); the Flow actions and Where Used (CN-06, T-CN-13 and T-CN-14). Setup detail: [BarnCRM Connector](../admin-guide/connector.md).
+Scripts for the optional BarnCRM Connector module, release 1.31: creating Connections of each sign-in kind, the one Setup step with Check Again, checking, replacing, disconnecting and deleting, the refusals that keep keys safe, access and Health Check (CN-01, T-CN-01 to T-CN-06); Recipe Access, recipes, Test, Publish, Run Now, Run History, Retry, Run As and the merge-field guard (CN-02, T-CN-07 to T-CN-12); the Flow actions and Where Used (CN-06, T-CN-13 and T-CN-14); the recipe clock, Schedule and Record Change triggers, retries, pausing, the integration user, Health Check and the nightly cleanup (CN-03, release 1.32, T-CN-15 to T-CN-20). Setup detail: [BarnCRM Connector](../admin-guide/connector.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core and BarnCRM Connector deployed, and an HTTPS test endpoint that echoes requests (for example a free request bin you control). Use made-up keys such as `test-key-1234`; never a real one.
 
@@ -206,3 +206,86 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 3 | On **Connections**, delete the connection `Welcome Test` calls. | Refused: the connection is used by a recipe. Delete the recipe first, then the connection deletes. |
 
 **Cleanup:** Delete the test recipe, then the test connection.
+
+## T-CN-15: A Schedule Recipe and the Recipe Clock
+
+**Purpose:** confirm a Schedule recipe runs on the clock as the Automated Process user, with no Scheduled Apex.
+**Prerequisites:** admin, after T-CN-07 (Recipe Access saved).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Select **New Recipe**, name it `Clock Test`. Under **When**, choose **Schedule**, **Every** **15 Minutes**. Add a **Stop** step (Succeeded). Save and **Publish**. | The recipe is Active; the editor shows **Next run** about 15 minutes ahead in your time zone. The list shows Schedule, runs as BarnCRM Automation. |
+| 2 | Select **Recipe Clock** on the Recipes tab. | The BarnCRM Automation and System lane shows **Going** (or **Stopped** for a moment before the first beat); Integration User shows **No Work**. |
+| 3 | In Setup, open **Scheduled Jobs**, then **Apex Jobs**. | No Scheduled Apex job for Connector. Apex Jobs lists `ConnectorClock` Queueable jobs submitted by the Automated Process user. |
+| 4 | Wait until the next run time, then open **Run History** and **Refresh**. | A run started by Schedule, ran as BarnCRM Automation, Succeeded. The recipe's next run moved on 15 minutes. |
+| 5 | Change **Every** to **Week**, a time a few minutes ahead and today's day. Save and Publish. | **Next run** is that time today. After it passes, one Schedule run appears. |
+
+**Cleanup:** Keep `Clock Test` for T-CN-17.
+
+## T-CN-16: A Record Change Recipe
+
+**Purpose:** confirm a Record Change recipe runs for new and changed records only, once each, and does not start itself.
+**Prerequisites:** admin, after T-CN-08 (the `Contact by Email` map); a saved Find query on Contact with LastName and Email.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | New recipe `Watch Contacts`: **When** **Record Change**, the saved Contact query, **New and Changed Records**, **One Run per Record**. One **Update a Record** step using `Contact by Email`, record `trigger.recordId`, reading `trigger.record`. Publish. | Publish succeeds. The value path hints list `trigger.recordId` and `trigger.record.LastName`. |
+| 2 | Create two Contacts by hand, then wait up to 20 minutes and refresh Run History. | Two runs started by Record Change, one per Contact, Succeeded. A Contact created before Publish has no run. |
+| 3 | Wait another 20 minutes. | No new runs: the recipe's own update is skipped (Ignore Own Changes), and nothing is run twice. |
+| 4 | Change **Runs** to **One Run for All**, publish, and update both Contacts. | After the next look, one run whose data holds `recordIds` with both Ids. |
+| 5 | Import 50 Contacts with the Data Import Wizard. | Runs appear for them within the next looks, at most 200 records per look. |
+
+**Cleanup:** Delete `Watch Contacts` and the test Contacts.
+
+## T-CN-17: Retries, Pause After Failures and Pause All
+
+**Purpose:** confirm a failure that may pass waits and is retried, a recipe that keeps failing pauses itself, and Pause All stops every recipe but Test.
+**Prerequisites:** admin, after T-CN-15; an echo endpoint you can make answer 503.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Add a **Call an App** GET step to `Clock Test` against the endpoint, set it to answer 503, and publish. | After the next run, Run History shows the run **Waiting** with **Tried again at** about 15 minutes later. |
+| 2 | Wait 15 minutes. | The run was tried again (Attempt 1) and waits again about 1 hour. |
+| 3 | In **Run Settings**, set **Retry Attempts** 0 and **Pause After Failures** 2, then **Save Run Settings**. Wait for two runs. | Both runs are Failed. The recipe is **Paused by Failures**; one Error Log entry says it was paused after 2 failures in a row. Health Check lists it under Recipes Paused by Failures. |
+| 4 | Make the endpoint answer 200. Select **Retry All Failed**, then **Resume**. | **Failed runs queued again: 2.** They end Succeeded. The recipe is Active and its failures in a row are 0. |
+| 5 | On **Recipe Clock**, turn on **Pause All Recipes**. Wait past the next run time. In the editor, select **Test**. | No new Schedule run; the Test run still runs. Health Check shows All Recipes Paused. |
+| 6 | Turn **Pause All Recipes** off. | **Pause All Recipes is off.** The next Schedule run appears on time. |
+
+**Cleanup:** Delete `Clock Test`.
+
+## T-CN-18: The Integration User
+
+**Purpose:** confirm the integration user is written as the lane's running user, its recipes run as that user, and an inactive user is reported.
+**Prerequisites:** admin; the org connection set up (see the Admin Guide page Creating a New Field From an Import); a spare active user with a Salesforce license and Contact access, here `Integrator`.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On a saved recipe, open **Run As**. | Only BarnCRM Automation and System are offered. |
+| 2 | On **Recipe Clock**, under **Integration User**, choose a user with a Customer Community or other non-Salesforce license and **Save User**. | Refused: **Choose an active user with a Salesforce license.** |
+| 3 | Choose `Integrator` and **Save User**. | **Saved. BarnCRM is writing the subscriber setting...**. Reopen Recipe Clock: `Integrator` is shown, the last write is Completed, and `Integrator` holds **BarnCRM Connections** (Setup, the user's permission set assignments). |
+| 4 | In Setup, open **Platform Events**, **Connector Start User**, **Subscriptions**. | The trigger row shows **Running User** `Integrator`. Select **Suspend**, then **Resume**. |
+| 5 | Set a Schedule recipe's Run As to **Integration User** and publish. | Its runs show ran as Integration User; records it writes show `Integrator` as Last Modified By. Recipe Clock shows **Confirmed**. |
+| 6 | Deactivate `Integrator` (or, if it must stay, freeze it). Open **Health Check**. | An error **Integration User Inactive** names `Integrator` and the recipe. The recipe's runs stay Queued; after 30 minutes Health Check also shows Recipe Runs Waiting to Start. |
+| 7 | Reactivate `Integrator`, then on Recipe Clock choose no user and **Save User**. | The subscriber setting is gone from the Subscriptions list after Suspend and Resume; `Integrator` no longer holds BarnCRM Connections. |
+
+**Cleanup:** Set the recipe back to BarnCRM Automation, or delete it.
+
+## T-CN-19: Health Check and Restart Clock
+
+**Purpose:** confirm a stopped lane is reported with a way to restart it.
+**Prerequisites:** admin, an Active Schedule recipe.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In Setup, **Apex Jobs**, abort every queued `ConnectorClock` job. Open **Health Check**. | A warning **Recipe Clock Stopped** names the BarnCRM Automation and System lane, with **Open Super Connector**. |
+| 2 | Select **Open Super Connector**, open **Recipes**, **Recipe Clock**, and select **Restart Clock**. | **The clock was restarted for each lane with work.** The lane shows **Going**; Health Check no longer reports it. |
+
+## T-CN-20: The Nightly Cleanup
+
+**Purpose:** confirm old finished runs are deleted on the nightly run and a stopped clock restarts.
+**Prerequisites:** admin, a recipe with runs.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open BarnCRM Settings, **Nightly Jobs**. | **Connector Cleanup** at 2:40, switched on. |
+| 2 | Set the recipe's **Keep Runs Days** to 7. The next morning, open Run History. | Finished runs older than 7 days are gone; Queued and Waiting runs and newer runs remain. If the clock was stopped, it is going again. |

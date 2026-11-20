@@ -7,6 +7,10 @@ import deleteRecipe from '@salesforce/apex/ConnectorRecipesController.deleteReci
 import runNow from '@salesforce/apex/ConnectorRecipesController.runNow';
 import testRecipe from '@salesforce/apex/ConnectorRecipesController.testRecipe';
 import getRun from '@salesforce/apex/ConnectorRecipesController.getRun';
+import saveRecipeSettings from '@salesforce/apex/ConnectorRecipesController.saveRecipeSettings';
+import pauseRecipe from '@salesforce/apex/ConnectorRecipesController.pauseRecipe';
+import resumeRecipe from '@salesforce/apex/ConnectorRecipesController.resumeRecipe';
+import retryAllFailed from '@salesforce/apex/ConnectorRecipesController.retryAllFailed';
 import BarnConfirmModal from 'c/barnConfirmModal';
 import { expectAccessible } from 'barn/a11y';
 
@@ -39,6 +43,30 @@ jest.mock(
 jest.mock('@salesforce/apex/ConnectorRecipesController.getRun', () => ({ default: jest.fn() }), {
   virtual: true
 });
+jest.mock(
+  '@salesforce/apex/ConnectorRecipesController.saveRecipeSettings',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/apex/ConnectorRecipesController.pauseRecipe',
+  () => ({ default: jest.fn() }),
+  {
+    virtual: true
+  }
+);
+jest.mock(
+  '@salesforce/apex/ConnectorRecipesController.resumeRecipe',
+  () => ({ default: jest.fn() }),
+  {
+    virtual: true
+  }
+);
+jest.mock(
+  '@salesforce/apex/ConnectorRecipesController.retryAllFailed',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
 
 const PAGE = {
   canManage: true,
@@ -288,6 +316,76 @@ describe('c-connector-recipe-editor', () => {
     await flush();
     expect(deleteRecipe).toHaveBeenCalledWith({ recipeId: SAVED.id });
     expect(changed.mock.calls[0][0].detail.deleted).toBe(true);
+  });
+
+  it('builds a weekly schedule and a Record Change from a saved query', async () => {
+    const element = await render(undefined);
+    find(element, 'trigger-kind').dispatchEvent(
+      new CustomEvent('change', { detail: { value: 'schedule' } })
+    );
+    await flush();
+    expect(find(element, 'at')).not.toBeNull();
+    change(find(element, 'every'), 'week');
+    await flush();
+    change(find(element, 'at'), '18:30:00.000');
+    await flush();
+    expect(find(element, 'day').value).toBe('MON');
+
+    find(element, 'trigger-kind').dispatchEvent(
+      new CustomEvent('change', { detail: { value: 'record' } })
+    );
+    await flush();
+    expect(find(element, 'every')).toBeNull();
+    change(find(element, 'trigger-query'), 'a0Q000000000001');
+    change(find(element, 'limit'), '50');
+    await flush();
+    expect(find(element, 'mode')).not.toBeNull();
+    // Only the missing step remains to fix.
+    expect(find(element, 'problems').message).toBe('c.Connector_Recipe_ErrorNoSteps');
+  });
+
+  it('offers Integration User only once one is chosen', async () => {
+    const element = await render(SAVED);
+    const values = () => find(element, 'run-as').options.map((option) => option.value);
+    expect(values()).toEqual(['Automation', 'System']);
+    element.page = { ...PAGE, integrationUserReady: true };
+    await flush();
+    expect(values()).toEqual(['Automation', 'System', 'IntegrationUser']);
+  });
+
+  it('saves run settings, pauses, resumes and retries every failed run', async () => {
+    const active = { ...SAVED, status: 'Active', retryAttempts: 3, consecutiveFailures: 2 };
+    saveRecipeSettings.mockResolvedValue({ ...active, retryAttempts: 1 });
+    pauseRecipe.mockResolvedValue({ ...active, status: 'Paused' });
+    resumeRecipe.mockResolvedValue(active);
+    retryAllFailed.mockResolvedValue(4);
+    const element = await render(active);
+    expect(find(element, 'failures')).not.toBeNull();
+    expect(find(element, 'resume')).toBeNull();
+
+    change(find(element, 'retry-attempts'), '1');
+    find(element, 'save-settings').click();
+    await flush();
+    expect(saveRecipeSettings).toHaveBeenCalledWith({
+      recipeId: SAVED.id,
+      retryAttempts: 1,
+      pauseAfterFailures: 10,
+      keepRunsDays: 30,
+      ignoreOwnChanges: true
+    });
+
+    find(element, 'pause').click();
+    await flush();
+    expect(pauseRecipe).toHaveBeenCalledWith({ recipeId: SAVED.id });
+    expect(find(element, 'pause')).toBeNull();
+    find(element, 'resume').click();
+    await flush();
+    expect(resumeRecipe).toHaveBeenCalledWith({ recipeId: SAVED.id });
+
+    find(element, 'retry-all').click();
+    await flush();
+    expect(retryAllFailed).toHaveBeenCalledWith({ recipeId: SAVED.id });
+    expect(find(element, 'message').message).toBe('c.Connector_Editor_RetriedAll');
   });
 
   it('is read only for a Viewer', async () => {

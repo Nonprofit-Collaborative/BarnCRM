@@ -32,7 +32,17 @@ public inherited sharing class ConnectorStepRunner {
 	public class StepFailureException extends Exception {
 		public Integer status;
 		public String response;
+		/** True for a failure that may pass: no answer, or 408, 429, 500, 502, 503, 504 (R-CR7). */
+		public Boolean passing = false;
+		/** The app's `Retry-After`, in seconds, when it sent one. */
+		public Integer retryAfter;
 	}
+
+	/** HTTP statuses a later try may get past (R-CR7). */
+	public static final Set<Integer> PASSING = new Set<Integer>{ 408, 429, 500, 502, 503, 504 };
+
+	/** Set when the run failed on a step a later try may get past, for the runner's retry. */
+	public StepFailureException passingFailure;
 
 	/** What one transaction has spent across runs (design Section 4). */
 	public class Budget {
@@ -101,6 +111,7 @@ public inherited sharing class ConnectorStepRunner {
 		} catch (StepFailureException failed) {
 			status = ConnectorRunStore.FAILED;
 			run.Error_Message__c = failed.getMessage().left(1000);
+			passingFailure = failed.passing ? failed : null;
 		} catch (ConnectorRecipeDocument.DocumentException refused) {
 			status = ConnectorRunStore.FAILED;
 			run.Error_Message__c = refused.getMessage().left(1000);
@@ -269,7 +280,8 @@ public inherited sharing class ConnectorStepRunner {
 		return new Map<String, Object>{ 'count' => records.size(), 'records' => records };
 	}
 
-	private static Object withoutAttributes(Object raw) {
+	/** A record as untyped JSON without Salesforce's `attributes`; also the clock's polled rows. */
+	public static Object withoutAttributes(Object raw) {
 		if (raw instanceof Map<String, Object>) {
 			Map<String, Object> row = (Map<String, Object>) raw;
 			row.remove('attributes');
@@ -387,13 +399,15 @@ public inherited sharing class ConnectorStepRunner {
 		try {
 			response = new Http().send(request);
 		} catch (CalloutException unreachable) {
-			throw failure(
+			StepFailureException failed = failure(
 				BarnHelp.text(
 					'Connector',
 					'Connector_Run_ErrorUnreachable',
 					new List<Object>{ unreachable.getTypeName() }
 				)
 			);
+			failed.passing = true;
+			throw failed;
 		} finally {
 			budget.calloutMs += System.currentTimeMillis() - started;
 		}
@@ -428,6 +442,13 @@ public inherited sharing class ConnectorStepRunner {
 			StepFailureException failed = failure(message);
 			failed.status = status;
 			failed.response = text;
+			failed.passing = PASSING.contains(status);
+			String wait = response.getHeader('Retry-After');
+			failed.retryAfter = String.isNotBlank(wait) &&
+				wait.trim().isNumeric() &&
+				wait.trim().length() < 7
+				? Integer.valueOf(wait.trim())
+				: null;
 			throw failed;
 		}
 		Object parsedBody = text;

@@ -21,6 +21,8 @@ connector/ConnectorApplyMapAction.cls | global class Result
 connector/ConnectorApplyMapAction.cls | global static List<Result> apply(List<Request>)
 connector/ConnectorHealthCheckExtension.cls | public ConnectorHealthCheckExtension()
 connector/ConnectorHealthCheckExtension.cls | public class ConnectorHealthCheckExtension
+connector/ConnectorNightlyJobProvider.cls | public ConnectorNightlyJobProvider()
+connector/ConnectorNightlyJobProvider.cls | public class ConnectorNightlyJobProvider
 connector/ConnectorPostInstall.cls | public ConnectorPostInstall()
 connector/ConnectorPostInstall.cls | public class ConnectorPostInstall
 connector/ConnectorRunRecipeAction.cls | global Boolean queued

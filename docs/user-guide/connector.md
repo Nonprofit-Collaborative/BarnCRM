@@ -5,12 +5,17 @@ service or a chat app. It is an optional module in beta, set up by your admin.
 
 **Is there anything for you to do?** Usually not. Your admin sets up **Connections** to other
 apps and **Recipes** that move data between them, on the **Super Connector** tab. Recipes run on
-their own, as BarnCRM Automation rather than as you.
+their own, never as you: as BarnCRM Automation, or as an integration user your admin chose. Some
+run on a schedule, and some run when records change, about 15 minutes after the change. A record
+you save may therefore be updated by a recipe a little later; its history shows BarnCRM
+Automation (the Automated Process user) or the integration user as who changed it.
 
 **If your admin gave you BarnCRM Connector Viewer,** you can open **Super Connector** to see the
 recipes and **Run History**: each run's status, what started it, how many records it wrote and,
-when it failed, the step that failed and why in plain words. Viewers cannot change, test, run or
-retry a recipe. If a run failed, tell your admin; they can fix the recipe and select **Retry**.
+when it failed, the step that failed and why in plain words. A **Waiting** run failed for a
+reason that may pass, such as the other app being down, and shows when it is tried again. Viewers
+cannot change, test, run or retry a recipe. If a run failed, tell your admin; they can fix the
+recipe and select **Retry**.
 
 **A flow may run a recipe for you.** Your admin can add the action **Run a BarnCRM Connector
 Recipe** to a flow, such as one behind a button. The recipe still runs as BarnCRM Automation, so

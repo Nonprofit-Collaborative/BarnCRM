@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Next_Run_At__c</fullName>
+  <description>When a Schedule or Record Change recipe is next due (canonical model R-CR6); the recipe clock runs it at the first beat after this time.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>When the recipe next runs or next checks for changed records.</inlineHelpText>
+  <label>Next Run At</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>DateTime</type>
+</CustomField>

@@ -1,10 +1,15 @@
 /**
- * The one runner chain of BarnCRM Connector (canonical model R-CR4, R-RUN4; design Sections 3.2,
- * 3.7 and 4). `Connector_Start__e`'s trigger calls `start`, so the job runs as the Automated
- * Process user, never as the person who pressed Run Now (D-215); asynchronous Apex keeps that
- * identity in every job it chains. Each job takes the oldest queued runs, runs them until the
- * transaction nears its limits or a callout would follow a record write, saves them all at the
- * end (a callout cannot follow uncommitted DML) and chains the next job while runs wait.
+ * The runner chains of BarnCRM Connector, one per lane (canonical model R-CR4, R-CR7, R-RUN4;
+ * design Sections 3.2, 3.7 and 4). A lane's start event trigger calls `start`, so the job runs as
+ * that lane's identity (the Automated Process user, or the integration user), never as the person
+ * who pressed Run Now (D-215); asynchronous Apex keeps that identity in every job it chains. Each
+ * job takes its lane's oldest queued runs, runs them until the transaction nears its limits or a
+ * callout would follow a record write, saves them all at the end (a callout cannot follow
+ * uncommitted DML) and chains the next job while runs wait.
+ *
+ * A run that fails for a reason that may pass waits and is retried at 15 minutes, 1 hour, 4 hours
+ * and 12 hours, up to its recipe's Retry Attempts (R-CR7). A recipe that fails Pause After
+ * Failures times in a row pauses itself.
  *
  * A Transaction Finalizer marks the run that was going when the job died (a limit the code
  * cannot catch) as failed and starts the chain again, so one run cannot stall the rest.
@@ -12,7 +17,9 @@
 public with sharing class ConnectorRunner implements Queueable, Database.AllowsCallouts {
 	@TestVisible
 	private static final Integer BATCH = 20;
-	private static final Set<String> RUNNING = new Set<String>{ 'Queued', 'Preparing', 'Processing', 'Holding' };
+	/** Minutes before each retry (R-CR7). */
+	public static final List<Integer> BACKOFF_MINUTES = new List<Integer>{ 15, 60, 240, 720 };
+	private static final Integer LONGEST_WAIT_SECONDS = 86400;
 	/** Tests run one job; the chain is checked through `chained`. */
 	@TestVisible
 	private static Boolean chained = false;
@@ -20,30 +27,39 @@ public with sharing class ConnectorRunner implements Queueable, Database.AllowsC
 	@TestVisible
 	private static Boolean skipIdentityCheck = false;
 
-	/** Starts the chain unless a job of it is already queued or running. */
+	/** Starts the running identity's chain unless a job of it is already queued or running. */
 	public static void start() {
 		if (Limits.getQueueableJobs() >= Limits.getLimitQueueableJobs()) {
 			return;
 		}
+		Id me = UserInfo.getUserId();
 		Integer going = [
 			SELECT COUNT()
 			FROM AsyncApexJob
-			WHERE JobType = 'Queueable' AND ApexClass.Name = 'ConnectorRunner' AND Status IN :RUNNING
+			WHERE
+				JobType = 'Queueable'
+				AND ApexClass.Name = 'ConnectorRunner'
+				AND Status IN :ConnectorClock.GOING
+				AND CreatedById = :me
 			WITH SYSTEM_MODE
 		];
 		if (going == 0) {
 			try {
 				AsyncStarter.queue(new ConnectorRunner(), 'ConnectorRunner.start');
 			} catch (Exception busy) {
-				// The runs stay Queued; the next start event (any queue or retry) starts them.
+				// The runs stay Queued; the lane's heartbeat publishes its start event again.
 				ErrorLogger.log(busy, 'ConnectorRunner.start');
 			}
 		}
 	}
 
 	public void execute(QueueableContext context) {
-		if (!skipIdentityCheck && UserInfo.getUserType() != 'AutomatedProcess') {
-			// Only the start event's trigger may run recipes (R-CR4): never as a staff member.
+		String lane = ConnectorClock.runningLane();
+		if (lane == null && skipIdentityCheck) {
+			lane = ConnectorClock.LANE_AUTOMATION;
+		}
+		if (lane == null) {
+			// Only a lane's start event may run recipes (R-CR4): never as a staff member.
 			ErrorLogger.logMessage(
 				BarnHelp.text('Connector', 'Connector_Log_WrongIdentity'),
 				'ConnectorRunner.execute',
@@ -55,8 +71,13 @@ public with sharing class ConnectorRunner implements Queueable, Database.AllowsC
 		if (!Test.isRunningTest()) {
 			System.attachFinalizer(guard);
 		}
-		process(ConnectorRunStore.queued(BATCH), guard);
-		if (ConnectorRunStore.anyQueued()) {
+		Set<String> runAs = ConnectorClock.runAsOf(lane);
+		// Paused (R-CR7): only Test runs from the editor still run.
+		Boolean testsOnly = ConnectorClock.paused();
+		guard.runAs = runAs;
+		guard.testsOnly = testsOnly;
+		process(ConnectorRunStore.queued(BATCH, runAs, testsOnly), guard);
+		if (ConnectorRunStore.anyQueued(runAs, testsOnly)) {
 			chain();
 		}
 	}
@@ -88,15 +109,17 @@ public with sharing class ConnectorRunner implements Queueable, Database.AllowsC
 			}
 		}
 		guard.current = null;
-		ConnectorRunStore.save(touched, lastRuns);
+		List<String> paused = ConnectorRunStore.save(touched, lastRuns);
 		// After every callout of the transaction: an Error Log write is DML.
 		ErrorLogger.logMessages(failures, failedRuns, 'ConnectorRunner', ErrorLogger.SEVERITY_ERROR);
+		ErrorLogger.logMessages(paused, 'ConnectorRunner', ErrorLogger.SEVERITY_ERROR);
 	}
 
 	private static Connector_Run__c runOne(Connector_Run__c run, ConnectorStepRunner.Budget budget) {
 		ConnectorStepRunner steps = new ConnectorStepRunner(run, budget);
+		Connector_Run__c result;
 		try {
-			return run.Ran_As__c == ConnectorRecipes.RUN_AS_SYSTEM
+			result = run.Ran_As__c == ConnectorRecipes.RUN_AS_SYSTEM
 				? ConnectorRunStore.runInSystemMode(steps)
 				: steps.execute();
 		} catch (Exception unexpected) {
@@ -109,6 +132,35 @@ public with sharing class ConnectorRunner implements Queueable, Database.AllowsC
 			run.Finished_At__c = Datetime.now();
 			return run;
 		}
+		return waitIfPassing(result, steps.passingFailure);
+	}
+
+	/**
+	 * A failure that may pass waits for its next try (R-CR7): at the backoff for this attempt, or
+	 * later when the app's `Retry-After` says so, at most a day; Test runs never wait.
+	 */
+	@TestVisible
+	private static Connector_Run__c waitIfPassing(
+		Connector_Run__c run,
+		ConnectorStepRunner.StepFailureException passing
+	) {
+		Integer made = run.Attempt__c == null ? 0 : run.Attempt__c.intValue();
+		if (
+			passing == null ||
+			run.Status__c != ConnectorRunStore.FAILED ||
+			run.Is_Test__c == true ||
+			made >= ConnectorRecipes.retryAttempts(run.Recipe__r)
+		) {
+			return run;
+		}
+		Integer seconds = BACKOFF_MINUTES[Math.min(made, BACKOFF_MINUTES.size() - 1)] * 60;
+		if (passing.retryAfter != null && passing.retryAfter > seconds) {
+			seconds = Math.min(passing.retryAfter, LONGEST_WAIT_SECONDS);
+		}
+		run.Status__c = ConnectorRunStore.WAITING;
+		run.Next_Attempt_At__c = Datetime.now().addSeconds(seconds);
+		run.Finished_At__c = null;
+		return run;
 	}
 
 	/**
@@ -139,6 +191,8 @@ public with sharing class ConnectorRunner implements Queueable, Database.AllowsC
 	/** Fails the run a dead job was on, then starts the chain again for the rest. */
 	public with sharing class Guard implements Finalizer {
 		public Id current;
+		public Set<String> runAs;
+		public Boolean testsOnly = false;
 
 		public void execute(FinalizerContext context) {
 			if (context.getResult() != ParentJobResult.UNHANDLED_EXCEPTION) {
@@ -154,7 +208,7 @@ public with sharing class ConnectorRunner implements Queueable, Database.AllowsC
 					)
 				);
 			}
-			if (ConnectorRunStore.anyQueued()) {
+			if (ConnectorRunStore.anyQueued(runAs, testsOnly)) {
 				chain();
 			}
 		}

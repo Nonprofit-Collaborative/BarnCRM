@@ -21,6 +21,11 @@ import {
   readCodes,
   statusVariant,
   stepRows,
+  setTrigger,
+  updateTrigger,
+  triggerProblem,
+  runAsKey,
+  triggerKindKey,
   MAX_STEPS
 } from 'c/connectorRecipeRules';
 
@@ -248,5 +253,71 @@ describe('c/connectorRecipeRules', () => {
     expect(rows[0].ids).toBe('a, b');
     expect(rows[0].preview).toContain('POST');
     expect(stepRows('bad', 'bad')).toEqual([]);
+    expect(statusVariant('Waiting')).toBe('warning');
+  });
+
+  it('switches triggers keeping the sample, and checks a schedule as the server does', () => {
+    const start = readDocument(JSON.stringify({ trigger: { kind: 'manual', sample: { a: 1 } } }));
+    const scheduled = setTrigger(start, 'schedule');
+    expect(scheduled.trigger).toEqual({
+      kind: 'schedule',
+      every: 'day',
+      at: '08:00',
+      sample: { a: 1 }
+    });
+    expect(start.trigger.kind).toBe('manual');
+    expect(triggerProblem(scheduled.trigger)).toBeNull();
+
+    const weekly = updateTrigger(scheduled, { every: 'week' });
+    expect(weekly.trigger.day).toBe('MON');
+    expect(updateTrigger(weekly, { every: 'hour' }).trigger.day).toBeUndefined();
+    expect(triggerProblem({ kind: 'schedule', every: 'day', at: '25:00' })).toBe(
+      'Connector_Recipe_ErrorSchedule'
+    );
+    expect(triggerProblem({ kind: 'schedule', every: 'month' })).toBe(
+      'Connector_Recipe_ErrorSchedule'
+    );
+    expect(triggerProblem({ kind: 'schedule', every: '15m' })).toBeNull();
+    expect(triggerProblem({ kind: 'webhook' })).toBe('Connector_Recipe_ErrorTrigger');
+    expect(
+      keys({ ...newDocument(), trigger: { kind: 'schedule', every: 'week', at: '09:00' } })
+    ).toContain('Connector_Recipe_ErrorSchedule');
+  });
+
+  it('checks a Record Change trigger and suggests what it gives the steps', () => {
+    const watching = setTrigger(newDocument(), 'record');
+    expect(triggerProblem(watching.trigger)).toBe('Connector_Recipe_ErrorRecordTrigger');
+    const ready = updateTrigger(watching, {
+      query: { version: 1, object: 'Contact', fields: ['LastName'] },
+      savedQuery: 'a0Q000000000001'
+    });
+    expect(triggerProblem(ready.trigger)).toBeNull();
+    expect(triggerProblem({ ...ready.trigger, limit: 201 })).toBe(
+      'Connector_Recipe_ErrorRecordTrigger'
+    );
+    expect(triggerProblem({ ...ready.trigger, on: 'deleted' })).toBe(
+      'Connector_Recipe_ErrorRecordTrigger'
+    );
+    expect(triggerProblem({ ...ready.trigger, limit: 50, mode: 'batch' })).toBeNull();
+
+    expect(pathSuggestions(ready, null)).toEqual(
+      expect.arrayContaining(['trigger.recordId', 'trigger.record.Id', 'trigger.record.LastName'])
+    );
+    const batch = updateTrigger(ready, { mode: 'batch' });
+    expect(pathSuggestions(batch, null)).toEqual(
+      expect.arrayContaining(['trigger.recordIds', 'trigger.records[0].LastName'])
+    );
+    expect(pathSuggestions(setTrigger(newDocument(), 'schedule'), null)).toContain(
+      'trigger.scheduledAt'
+    );
+  });
+
+  it('names Run As values and trigger kinds by help key', () => {
+    expect(runAsKey('IntegrationUser')).toBe('Connector_RunAs_IntegrationUser');
+    expect(runAsKey('System')).toBe('Connector_RunAs_System');
+    expect(runAsKey(undefined)).toBe('Connector_RunAs_Automation');
+    expect(triggerKindKey('Schedule')).toBe('Connector_Trigger_Schedule');
+    expect(triggerKindKey('RecordChange')).toBe('Connector_Trigger_Record');
+    expect(triggerKindKey('Manual')).toBe('Connector_Trigger_Manual');
   });
 });

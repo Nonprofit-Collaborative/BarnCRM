@@ -19143,11 +19143,14 @@ design Section 3.3a), which the receiver reads with the recipe it already finds 
 Step ids are 1 to 20 letters, digits or underscores, unique in the recipe. No string anywhere in
 the document may contain `{!` (security review F1).
 
-The kinds release 1.31 (CN-02) builds, the others arriving with their slices:
+The kinds release 1.31 (CN-02) and 1.32 (CN-03: `schedule` and `record`) build, the others
+arriving with their slices:
 
 | Kind | Keys | Result for later steps |
 |---|---|---|
 | trigger `manual` | `sample` (optional JSON object for the editor's data pills and Test) | Input: Run Now's pasted JSON; the Flow action's `{ "recordId", "recordIds", "data" }` |
+| trigger `schedule` | `every` (`15m`, `hour`, `day` or `week`), `at` (`HH:MM`, 24 hour, the org's time zone; `day` and `week`), `day` (`MON` to `SUN`; `week`), `sample` | Input: `{ "scheduledAt" }` (R-CR6) |
+| trigger `record` | `query` (an R-SQ1 document copied from a saved query: the object, at most 20 fields and an optional filter), `savedQuery`, `on` (`created` or `changed`), `mode` (`each` or `batch`), `limit` (1 to 200, default 200), `sample` | Input: `each` `{ "recordId", "record": {field: value} }`; `batch` `{ "recordIds", "records" }` (R-CR6) |
 | `find` | `query` (an R-SQ1 document, copied from a saved query), `values` (`[{ "condition": <id>, "path" }]`, a path's value replaces that condition's value), `stopIfNone` | `{ "count", "records": [ {field: value} ] }`, at most 200 records |
 | `create`, `update`, `upsert` | `map` (a saved map's Id, `to.kind` record), `input` (the path the map reads from; blank is `trigger`); `update` also `recordId` (a path) | `{ "id", "action" }`, action created, updated or skipped |
 | `callApp` | `connection`, `method` (GET, POST, PUT, PATCH, DELETE), `path` (with `{name}` slots), `pathValues` and `query` (`[{ "name", "value" or "path" }]`), `headers` (`[{ "name", "value" or "path" }]`), `bodyMap` and `bodyInput` (a saved map with `to.kind` json), `success` (status codes; blank is 200 to 299), `notFoundOk` | `{ "status", "body" }`, the body parsed when it is JSON |
@@ -19163,15 +19166,30 @@ that path, never to a typed address.
 the catalog; a recipe whose connection is disconnected or whose map is gone cannot be published.
 For BarnCRM Automation the identity's access is that of the permission sets assigned to the
 Automated Process user: each map's target object must be creatable (create, upsert) or editable
-(update, upsert) and each target field editable through one of them; System checks none.
+(update, upsert) and each target field editable through one of them; for Integration User,
+those of the sets the chosen integration user holds, and Publish is refused while none is
+chosen or it is inactive; System checks none. A `record` trigger's query compiles as the
+publisher and its object must have the stamp field `on` names.
 **R-CR3 Only Connector admins** (custom permission Manage BarnCRM Connector) create, publish,
 pause and delete recipes and set Run As; Connector viewers read recipes and runs.
 **R-CR4 Run As.** A run never executes as a staff member: BarnCRM Automation (Automated Process
 user, user mode with the picked permission sets), System (Automated Process user, system mode;
-set only through a confirmation that says so) or Integration User (the designated user, user
-mode; from CN-03). Changing Run As writes Run As Chosen By and Chosen At. Run Now, Test and the
-Flow action insert a Queued run and publish `Connector_Start__e`, whose trigger runs as the
-Automated Process user and starts the one runner chain, so every run keeps that identity.
+set only through a confirmation that says so) or Integration User (the chosen integration
+user, user mode with its own permission sets; CN-03). Changing Run As writes Run As Chosen By
+and Chosen At. Run Now, Test and the Flow action insert a Queued run and publish its lane's
+start event: `Connector_Start__e` for BarnCRM Automation and System, whose trigger keeps
+Salesforce's default running user, the Automated Process user; `Connector_Start_User__e` for
+Integration User, whose trigger runs as the integration user through a
+`PlatformEventSubscriberConfig` BarnCRM writes. Each trigger starts its lane's one runner chain
+and heartbeat, so every run keeps its identity. A runner or heartbeat job that finds itself
+running as anyone else does nothing and writes one Error Log warning.
+**Integration User** (on Super Connector, Recipe Access) is one active standard user a Connector
+admin picks, stored in Connector Settings (29CN4). Saving it assigns BarnCRM Connections to that
+user (and removes it from the previous one unless that user is a Connector admin) and queues a
+job, as the admin, that writes the `PlatformEventSubscriberConfig`
+`BarnCRM_Connector_Start_User` (consumer `ConnectorStartUserTrigger`, that user) through the
+org connection (ADR-0148, Tooling API). The admin then suspends and resumes the subscription
+in Setup so the change takes effect at once.
 **Recipe Access** (on Super Connector, linked from BarnCRM Settings) picks the permission sets
 the Automated Process user holds, BarnCRM Admin and each installed module's admin set to start,
 and saving it assigns them, and BarnCRM Connections, to that user from Apex; no BarnCRM record
@@ -19180,6 +19198,38 @@ keeps the choice, which is read back from the assignments.
 identity: Find and GET calls run; record steps report the fields they would write and save
 nothing; other methods report the request (method, path, query, body, header names) unless
 Send for Real was ticked. It is a run with Is Test set.
+**R-CR6 The recipe clock** (CN-03; no Scheduled Apex, no person). Each lane (the Automated
+Process user; the integration user) has one heartbeat, a Queueable that its start event's
+trigger starts and that queues itself again 5 minutes later while its lane has an Active
+Schedule or Record Change recipe, a Waiting run or a Queued run. Each beat, in its lane:
+Waiting runs whose Next Attempt At has passed become Queued; each Active recipe whose Next Run
+At has passed is run: a `schedule` recipe queues one run (Started By Schedule) and moves Next
+Run At to its next time in the org's time zone; a `record` recipe polls its query for records
+whose stamp (`CreatedDate` for `created`, `SystemModstamp` for `changed`) is after its
+Watermark (stamp then Id), at most `limit`, ordered by stamp then Id, skipping records last
+changed by a recipe identity when Ignore Own Changes is on, queues one run per record (`each`)
+or one run for all (`batch`) (Started By Record Change), stores the last stamp and Id as the
+Watermark and sets Next Run At 15 minutes on. Publish and Resume set the first Next Run At
+(now for `record`, whose Watermark starts at the publish time) and start the heartbeat. When
+Queued runs wait, the beat publishes its lane's start event, which starts the runner (a run
+left Queued because the org was busy is picked up this way). A Transaction Finalizer queues a
+beat that failed again; the nightly step and any start event start a missing one. A beat
+stops early, leaving the rest due, near 150 queries, 120 writes or 40 seconds of CPU.
+**R-CR7 Retries and pause.** A run that fails on a callout exception or an HTTP 408, 429, 500,
+502, 503 or 504 waits (Status Waiting, Next Attempt At) and is retried from the failed step at
+15 minutes, 1 hour, 4 hours and 12 hours, up to Retry Attempts (0 to 4), or later when the
+app's `Retry-After` (seconds) says so, capped at 24 hours. Test runs never wait. A finished
+non-test run resets Consecutive Failures (Succeeded or Skipped) or adds one (Failed); at Pause
+After Failures the recipe becomes Paused by Failures and one Error Log entry says so. A Paused
+or Paused by Failures recipe neither polls nor runs; its Queued runs wait for Resume, which
+clears Consecutive Failures. Pause All Recipes (Connector Settings) and BarnCRM Automation
+Control's timed pause or Pause All stop every recipe the same way; Test runs still run.
+**R-CR8 Health Check** (CN-03, beside CN-01's and CN-02's): a lane that needs its heartbeat and
+has none (warning, with Open Super Connector); Integration User recipes while no integration
+user is chosen, or it is inactive (error, "Integration User inactive"), or it lacks BarnCRM
+Connections (warning); runs Queued for more than 30 minutes (warning); recipes Paused by
+Failures (warning); Active recipes whose Record Owner is inactive (warning); Pause All Recipes
+on (info).
 
 ### Salesforce implementation
 
@@ -19204,14 +19254,23 @@ Send for Real was ticked. It is a run with Is Test set.
   `Run_As_Chosen_By__c`, `Run_As_Chosen_At__c` and `Record_Owner_Id__c`. The clock, retry and
   retention fields (`Watermark__c`, `Next_Run_At__c`, `Consecutive_Failures__c`,
   `Pause_After_Failures__c`, `Retry_Attempts__c`, `Keep_Runs_Days__c`, `Ignore_Own_Changes__c`)
-  arrive with CN-03, the webhook fields (`Webhook_Token_Hash__c`, `Webhook_Hourly_Cap__c`) with
-  CN-04 and `Previous_JSON__c` with CN-08, each defined above before it ships.
+  ship with CN-03 (Consecutive Failures, Pause After Failures, Retry Attempts and Keep Runs
+  Days as Number(3,0) with defaults 0, 10, 3 and 30; Ignore Own Changes defaulting true), the
+  webhook fields (`Webhook_Token_Hash__c`, `Webhook_Hourly_Cap__c`) with CN-04 and
+  `Previous_JSON__c` with CN-08, each defined above before it ships. A blank or out of range
+  number reads as its default.
 - **Object:** `Connector_Recipe__c`, private sharing; Name is the recipe's name (Text(80)).
   `BarnCRM_Connector_Admin` full access with View All and Modify All, `BarnCRM_Connector_Viewer`
   read with View All.
-- **Platform event:** `Connector_Start__e` (no fields, publish after commit): any Run Now, Test or
-  Flow action publishes it; its trigger, left at Salesforce's default running user (Automated
-  Process), starts the runner chain when none is running.
+- **Platform events:** `Connector_Start__e` and `Connector_Start_User__e` (no fields, publish
+  after commit, R-CR4): a queued run, a retry, Publish, Resume, Restart, the heartbeat and the
+  nightly step publish them; `ConnectorStartTrigger` keeps Salesforce's default running user
+  (Automated Process) and `ConnectorStartUserTrigger` runs as the integration user through the
+  `PlatformEventSubscriberConfig` `BarnCRM_Connector_Start_User`. Each starts its lane's runner
+  chain and heartbeat (`ConnectorClock`) when none is going.
+- **Nightly step** (ADR-0166, key `Connector`, 2:40 AM, switch ships on): deletes finished runs
+  older than their recipe's Keep Runs Days (R-RUN2), at most 9,000 a night, and publishes the
+  start events when a lane needs its heartbeat.
 - **Flow actions** (CN-06): Run a BarnCRM Connector Recipe (an Active Manual recipe by name, with
   record Ids and optional JSON; queues one run per call) and Apply a Saved Map (a saved map by
   name, from a record Id or JSON, creating or updating the map's target record as the flow's
@@ -19270,11 +19329,43 @@ Text field stops at 255), `Records_Written__c`, `Is_Test__c`. Picklist values: S
 `Waiting`, `Succeeded`, `Skipped`, `Failed`, `Rejected`; Started By `Schedule`, `RecordChange`,
 `Webhook`, `AppPoll`, `Manual`, `Flow`, `Test`; Ran As as Run As.
 
-- **Fields by slice:** CN-02 ships every field above except `Next_Attempt_At__c` (CN-03, retries)
-  and `Event_Key__c` and `Reference__c` (CN-04, webhooks).
+- **Fields by slice:** CN-02 ships every field above except `Next_Attempt_At__c` (CN-03, retries,
+  Date/Time) and `Event_Key__c` and `Reference__c` (CN-04, webhooks).
 - **Object:** `Connector_Run__c`, controlled by parent; autonumber Name `RUN-{000000}`. Read by
   `BarnCRM_Connector_Admin` and `BarnCRM_Connector_Viewer` (View All); written only by the
   module's `ConnectorRunStore` in system mode.
+- **Retry All Failed** (CN-03) queues every Failed non-test run of one recipe again from its
+  failed step, at most 200 at once.
+
+## 29CN4. Connector Settings
+
+### Definition
+
+BarnCRM Connector's own org-wide settings (CN-03; ADR-0017 gives each package its own settings
+object). Edited on Super Connector's Recipe Access card; Pause All Recipes also in the BarnCRM
+Settings console.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Recipes Paused | boolean | yes (defaults false) | Pause All Recipes: no recipe polls, runs or retries until it is off (R-CR7). |
+| Integration User | text(18) | no | The Id of the user Integration User recipes run as (R-CR4); blank means none chosen, and those recipes wait. |
+
+### Rules
+
+**R-CS1 Saved only by a Connector admin,** on Super Connector, org-wide. The Integration User is
+an active user of type Standard, never the Automated Process user, and is checked again on
+every save; the browser's value is never assigned anything before those checks (security review
+F12). Turning Pause All Recipes off publishes both start events.
+
+### Salesforce implementation
+
+- **Custom setting:** `Connector_Settings__c`, hierarchy, protected. Fields `Recipes_Paused__c`
+  (Checkbox, default false) and `Integration_User_Id__c` (Text(18)).
+- **Setting Definition row:** `Connector_Recipes_Paused` (Checkbox, Module `Connector`). The
+  Integration User has none: choosing one also assigns a permission set and writes the
+  subscriber configuration, which only Super Connector does.
 
 ---
 
@@ -19737,6 +19828,7 @@ mirrors the primary member).
 | 1.71 | 2026-11-19 | Advanced Reporting (O-02, D-202, D-207, release 1.29; ADR-0231 `0231-advanced-reporting.md`). No object or field added. Section 29AR records the saved report and dashboard JSON formats and their storage as Salesforce Files (`.barnreport`, `.barndash`) shared through ContentDocumentLink, with rules R-AR1 to R-AR5. |
 | 1.72 | 2026-11-20 | BarnCRM Connector connections (CN-01, D-215, D-216, release 1.31; ADR-NEXT `NEXT-integration-module.md`). No object added (the suite stays at 197; Connector Recipe and Connector Run follow in CN-02). Section 29CN1 records a connection as an External Credential and Named Credential pair named `BarnConn_<connector>_<6 random>`, with rules R-CN1 to R-CN8. The Admin Journal's `Kind__c` gains Connection and `Status__c` gains Key Replaced (R-CN6). |
 | 1.73 | 2026-11-20 | BarnCRM Connector recipes and runs (CN-02, CN-06, D-215, release 1.31; design Appendix A.3 and A.4). Two objects added, 197 to 199 in the suite: Section 29CN2 Connector Recipe (`Connector_Recipe__c`, R-CR1 to R-CR5) and Section 29CN3 Connector Run (`Connector_Run__c`, R-RUN1 to R-RUN4), and the platform event `Connector_Start__e`. R-CN7 gives BarnCRM Connections to the Automated Process user through Recipe Access; R-CN8 refuses Delete of a connection a recipe names. |
+| 1.74 | 2026-11-20 | BarnCRM Connector recipe clock (CN-03, D-215, release 1.32). Connector Recipe gains `Watermark__c`, `Next_Run_At__c`, `Consecutive_Failures__c`, `Pause_After_Failures__c`, `Retry_Attempts__c`, `Keep_Runs_Days__c` and `Ignore_Own_Changes__c`; Connector Run gains `Next_Attempt_At__c`. New custom setting Section 29CN4 Connector Settings (`Connector_Settings__c`, R-CS1) and platform event `Connector_Start_User__e`. R-CR1 adds the `schedule` and `record` triggers, R-CR4 the Integration User lane, and new R-CR6 (clock), R-CR7 (retries and pause) and R-CR8 (Health Check). No object added (custom settings are not counted). |
 
 ---
 ## 32. Entity ownership by package
@@ -19970,6 +20062,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Connection (External and Named Credentials, no object) | BarnCRM Connector | 1.31 (CN-01) | 29CN1 |
 | Connector Recipe | BarnCRM Connector | 1.31 (CN-02) | 29CN2 |
 | Connector Run | BarnCRM Connector | 1.31 (CN-02) | 29CN3 |
+| Connector Settings | BarnCRM Connector | 1.32 (CN-03) | 29CN4 |
 | Address Verification Settings | Address Verification | 1.15 (C-46) | 29AV1 |
 
 **Components that are not entities (C-29, ADR-0059).** Core is the Standard Edition on its own,

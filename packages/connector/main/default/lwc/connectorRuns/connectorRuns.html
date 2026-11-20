@@ -74,6 +74,9 @@
                         </div>
                         <p class="slds-text-body_small">{row.when}</p>
                         <p class="slds-text-body_small slds-var-m-bottom_x-small">{row.detail}</p>
+                        <template lwc:if={row.nextAttempt}>
+                            <p class="slds-text-body_small slds-var-m-bottom_x-small" data-id={row.nextId}>{row.nextAttempt}</p>
+                        </template>
                         <template lwc:if={row.failure}>
                             <p class="slds-text-body_small slds-var-m-bottom_x-small">{row.failure}</p>
                         </template>
