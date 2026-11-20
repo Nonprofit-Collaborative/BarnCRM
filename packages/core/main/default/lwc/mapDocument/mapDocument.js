@@ -170,7 +170,7 @@ export function samplesFromJson(json) {
   let parsed;
   try {
     parsed = JSON.parse(json);
-  } catch (e) {
+  } catch {
     return { samples: [], error: 'unreadable' };
   }
   const list = Array.isArray(parsed) ? parsed : [parsed];
@@ -393,7 +393,7 @@ function parsedInput(input) {
   }
   try {
     return JSON.parse(input);
-  } catch (e) {
+  } catch {
     return null;
   }
 }

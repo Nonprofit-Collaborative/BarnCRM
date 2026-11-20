@@ -76,6 +76,13 @@ public with sharing class BulkUpdateFields {
 		public String referenceTo;
 		@AuraEnabled
 		public List<QueryFieldCatalog.PicklistOption> picklistValues;
+		/** For the Mapper's checks (R-MAP4): the longest text, whether a new record needs it, an external ID. */
+		@AuraEnabled
+		public Integer length;
+		@AuraEnabled
+		public Boolean required;
+		@AuraEnabled
+		public Boolean externalId;
 	}
 
 	/** The object, or a refusal naming it when no bulk update may write its records. */
@@ -121,6 +128,9 @@ public with sharing class BulkUpdateFields {
 			target.label = field.getLabel();
 			target.dataType = String.valueOf(field.getType()).toLowerCase();
 			target.nillable = field.isNillable();
+			target.length = field.getLength();
+			target.required = !field.isNillable() && field.isCreateable() && !field.isDefaultedOnCreate();
+			target.externalId = field.isExternalId();
 			List<Schema.SObjectType> parents = field.getReferenceTo();
 			target.referenceTo = parents.size() == 1
 				? parents[0].getDescribe(SObjectDescribeOptions.DEFERRED).getName()

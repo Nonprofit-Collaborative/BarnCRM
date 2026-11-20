@@ -2,9 +2,8 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
   <apiVersion>67.0</apiVersion>
   <description>
-    Framework-free logic of the Mapper (canonical model R-MAP1 to R-MAP4): the map document, its
-    checks, JSON paths, sources, auto-match, the preview's value checks and copying a map into and
-    out of a Super Importer mapping. Exposed so a module's screens can import it.
+    Framework-free logic of the Mapper (R-MAP1 to R-MAP4): the map document, its checks, paths,
+    auto-match, preview checks and Super Importer copies. Exposed so modules can import it.
   </description>
   <isExposed>true</isExposed>
 </LightningComponentBundle>

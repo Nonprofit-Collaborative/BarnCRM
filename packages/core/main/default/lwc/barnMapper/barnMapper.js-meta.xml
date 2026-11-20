@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The Mapper: where each value from a file, a record or JSON goes in a record or a JSON body,
+    with auto-match, steps, a preview and Check Before Running. Exposed so modules can embed it.
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>BarnCRM Mapper</masterLabel>
+</LightningComponentBundle>

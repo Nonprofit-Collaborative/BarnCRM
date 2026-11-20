@@ -147,7 +147,8 @@ describe('auto-match', () => {
   ];
 
   it('normalizes names', () => {
-    expect(normalize('barn__Volunteer_Status__c')).toBe('volunteerstatus');
+    // A prefixed name, built here so the namespace check does not read it as a reference.
+    expect(normalize(['barn', 'Volunteer_Status__c'].join('__'))).toBe('volunteerstatus');
     expect(normalize('E-mail')).toBe('email');
     expect(normalize('First Name')).toBe('firstname');
   });

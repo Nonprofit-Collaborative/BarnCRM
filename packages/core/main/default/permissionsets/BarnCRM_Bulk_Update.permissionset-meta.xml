@@ -230,6 +230,11 @@
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
+    <editable>false</editable>
+    <field>Saved_Transform__c.Kind__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
     <editable>true</editable>
     <field>Saved_Transform__c.Object_Name__c</field>
     <readable>true</readable>
