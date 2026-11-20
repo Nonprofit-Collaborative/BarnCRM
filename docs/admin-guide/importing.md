@@ -148,7 +148,14 @@ pipes) or an Excel workbook (.xlsx). A small one is best for the first run: five
    usual columns, the picker lists your org's own fields on people and organizations that
    you may edit (for example "Person: Member Since"), and each one's Salesforce record ID
    (section 8). **Change Values** beside a column tidies its values as they load, for
-   example names in capitals or dates written day first (section 10).
+   example names in capitals or dates written day first (section 10). Under the table,
+   **Saved Maps** has **Use a Saved Map** (choose a map and press **Use Map**: each column
+   whose heading the map names takes the map's field, changes and lookup, and the other
+   columns keep their choice) and **Save as Map** (type a name and press **Save as Map** to
+   keep these columns as a map other tools can use). A message says how many columns a map set
+   and how many of its columns this file or template could not use. The template keeps its own
+   copy, so a map changed later never changes it. Maps are made and changed in the Mapper
+   ([The Mapper and Saved Maps](mapper.md)).
 4. Choose how rows are matched. **Email exact** is the safe default for people. Read the
    sentence under each rule before you change it: **Name plus postal code** will treat two
    different people who share a name at one address as the same person. If the file has

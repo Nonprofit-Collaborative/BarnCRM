@@ -453,6 +453,16 @@
                             ondone={handleChangesDone}
                         ></c-import-column-transforms>
                     </template>
+                    <c-import-saved-map
+                        data-id="saved-map"
+                        columns={columns}
+                        mapping-document={mappingDocument}
+                        object-name={savedMapObject}
+                        allowed-targets={savedMapTargets}
+                        lookup-choices={savedMapLookups}
+                        ignored-values={savedMapIgnored}
+                        onapply={handleSavedMapApply}
+                    ></c-import-saved-map>
                     <c-import-row-rules
                         data-id="row-rules"
                         column-names={headers}

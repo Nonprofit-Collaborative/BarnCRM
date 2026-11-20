@@ -3313,6 +3313,41 @@ shipped-default rows, not new attributes. One template reads one export shape, b
 import saves the file's own columns back to the template it used (admin guide, "Migrating
 from Nonprofit Cloud", section 5).
 
+**R-MAP1 Map document.** The R-IT1 document, version 4, may carry `from`, `to` and `match` and,
+per column, `value`, `required` and `lookup`, as defined in the integration hub design Section
+2.2 (ADR-NEXT `NEXT-reusable-mapper.md`). A version 1 to 3 document is a version 4 document with
+`from.kind` columns and `to.kind` record. Super Importer reads `columns`, `defaults`, `transforms`
+and `lookup` (as `lookupField` when `lookup.object` is the field's own reference target), and
+ignores `from`, `to` and `match`, which a template keeps in its own fields (R-IT2, R-IT9, R-IT12).
+
+| Key | Values |
+|---|---|
+| `from` | `{ "kind": "columns" }` (the default), `{ "kind": "record", "object" }` or `{ "kind": "json", "label", "sample" }`; `sample` at most 20,000 characters as JSON |
+| `to` | `{ "kind": "record", "object" }` (the default) or `{ "kind": "json" }` |
+| `columns[]` | `source` (a column name, a field API name with at most one lookup hop, or an R-MAP2 path) or `value` (literal text, at most 255), `target` (`Entity.Attribute`, or an R-MAP2 path for a JSON target), `transforms` (R-IT15), `required` (boolean), `lookup` (`{ "object", "field", "notFound": "reject" or "leaveEmpty" }`) |
+| `defaults[]` | `{ "target", "value" }` as R-IT1 |
+| `match` | `by`: `id`, `field`, `externalId` or `duplicateRules`; `field`; `several`: `reject` or `newest`; `none`: `create`, `skip` or `reject` (R-IT2, R-IT8, R-IT9, R-IT16 semantics) |
+
+A target appears in at most one column. A map holds at most 200 columns and 50 defaults.
+**R-MAP2 Paths.** A source or JSON target path is at most 10 parts of letters, digits,
+underscores and hyphens joined by dots, each part optionally followed by `[n]` (n from 0 to 999).
+A path that finds nothing gives a blank value. Nothing in a path is evaluated.
+**R-MAP3 Checked on save, forgiving on read, checked as the person on use** (as R-IT1, R-IT15 and
+R-ST3). A save is refused when the document is not JSON, is over 100,000 characters, is not
+version 1 to 4, names an unknown `from.kind`, `to.kind`, `match` value or `notFound` value, has
+more than 200 columns or 50 defaults, has a column with neither a source nor a value, a path that
+breaks R-MAP2, a target used twice, or steps `DataTransform.problems` names a problem with. A
+record target's object must be one a bulk update may write (R-BU1). On read a broken column is
+skipped and the screen says how many. Field names are checked against describe as the person
+when a map is loaded, previewed and used, never trusted from the document. The browser half of
+these rules is the framework-free module `mapDocument` (plan 9.9); its Jest tests and
+`MapControllerTest` share the fixture `MapDocumentFixture.json`.
+**R-MAP4 Preview and Check Before Running.** A preview applies each column's steps and lookups to
+at most 200 samples (file rows, a chosen record, or the items of a pasted JSON list) on the
+server, as the person, and saves nothing. The Mapper then flags, value by value: required and
+blank, too long for the field, not a number, not a date, not a yes or no, a picklist value not in
+the list, and a lookup that finds no record (or several).
+
 ### Salesforce implementation
 
 - **Object:** `Import_Template__c`.
@@ -11103,7 +11138,9 @@ A named, reusable Super Transformer step list (plan feature C-50f1): the object,
 (a Find filter document) and up to five field changes, kept as one documented JSON document so
 that a person can load it on the Super Transformer page later, rename it or delete it. It is
 org-wide: everyone who may use Super Transformer sees and manages every list. It holds no
-records and grants access to none. Neutral: it names no nonprofit concept and is in Core.
+records and grants access to none. Neutral: it names no nonprofit concept and is in Core. A row
+of Kind Map is a saved map instead (the Mapper, R-ST5), so maps need no object of their own
+(ADR-0227).
 
 ### Attributes
 
@@ -11112,6 +11149,7 @@ records and grants access to none. Neutral: it names no nonprofit concept and is
 | Name | text | yes | The list's name, 1 to 80 characters, unique among lists ignoring capitals. |
 | Object Name | text | yes | The API name of the object the list changes, copied from the definition when it is saved. |
 | Definition | long text | yes | The list as a version 1 JSON document (R-ST1). |
+| Kind | picklist(Step List, Map) | yes (defaults Step List) | Step List is a Super Transformer step list (R-ST1); Map is a saved map document (R-MAP1). |
 
 ### Rules
 
@@ -11138,6 +11176,15 @@ the list, because dropping a condition, with or without `logic`, would match mor
 runs on a load, and a preview, the confirmation and the
 run check everything as the person (R-BU1 to R-BU7). A list is therefore no way past a field
 or record the person cannot reach.
+**R-ST5 Maps.** A row of Kind Map holds a map document (R-MAP1) in Definition, and Object Name is
+its target object (blank for a JSON target or a people map). Its name is unique among maps. It is
+created, changed, renamed and deleted by people with Manage BarnCRM Settings, read in user mode
+by every tool that uses it, and never run by Super Transformer's Saved Step Lists card, which
+lists, loads, renames and deletes Step List rows only (a row with no Kind reads as Step List). A
+map is changed in place, because a tool may link it by its record ID; a tool that copies a map
+(Super Importer's Use a Saved Map) keeps its own copy. Where Used lists a map that names a field
+or object, and the Mapper lists the tools that link a map (the `WhereUsedExtension` seam asked
+with a map target) before a change is saved.
 **R-ST4 Org-wide, one set of permissions.** Every list is visible to, and may be renamed or
 deleted by, everyone who holds Bulk Update Records and Find and Export Records (the permission
 set `BarnCRM_Bulk_Update` grants Read, Create, Edit, Delete, View All and Modify All, the last
@@ -11153,13 +11200,19 @@ mode. Rename changes only the name; a list is saved new, never overwritten.
 | Attribute | API name | Type | Notes |
 |---|---|---|---|
 | Object Name | `Object_Name__c` | Text(255) | |
-| Definition | `Definition_JSON__c` | Long Text Area(131072) | Written only by Super Transformer. |
+| Definition | `Definition_JSON__c` | Long Text Area(131072) | Written by Super Transformer (a step list) or the Mapper (a map). |
+| Kind | `Kind__c` | Picklist (restricted): `StepList` (default), `Map` | Every existing row reads as Step List. |
 
-- **Service:** `SavedTransformService` (list, load, save, rename, delete, document checks) and
-  five `@AuraEnabled` methods on `BulkUpdateController` (`getSavedLists`, `loadSavedList`,
-  `saveSavedList`, `renameSavedList`, `deleteSavedList`), each requiring Bulk Update Records and
-  Find and Export Records. The page is the `superTransform` component, whose Saved Step Lists
-  card is the only place a list is made or used.
+- **Service:** `SavedTransformService` (list, load, save, rename, delete, document checks for
+  both kinds) and five `@AuraEnabled` methods on `BulkUpdateController` (`getSavedLists`,
+  `loadSavedList`, `saveSavedList`, `renameSavedList`, `deleteSavedList`), each requiring Bulk
+  Update Records and Find and Export Records. The page is the `superTransform` component, whose
+  Saved Step Lists card is the only place a list is made or used.
+- **Maps:** `MapController` (`listMaps`, `loadMap`, `saveMap`, `renameMap`, `deleteMap`,
+  `mapUsers`, `getTargetFields`, `previewMap`); every change needs Manage BarnCRM Settings, and
+  listing and loading need read access to Saved Transform. The screen is the `barnMapper`
+  component, opened from the Maps tile of Data Manager (`savedMaps`); Super Importer's Check
+  Columns step offers Use a Saved Map and Save as Map (`importSavedMap`).
 
 ---
 

@@ -147,6 +147,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | Data Manager (one place to start a data task, and every job's Undo) | [data-manager.md](data-manager.md) | Core |
 | C-14, C-19, C-32, C-33 Importing, import undo, matching rules and Load one object | [importing.md](importing.md) | Core |
 | C-49d Creating a new field from an import | [import-new-fields.md](import-new-fields.md) | Core |
+| MAP-01 to MAP-04 The Mapper and Saved Maps (one mapping screen; maps reused by Super Importer and the Connector) | [mapper.md](mapper.md) | Core |
 | C-49b Super Importer rows: browse, correct and retry import rows | [import-rows.md](import-rows.md) | Core |
 | C-34, C-36 Find and export | [find.md](find.md) | Core |
 | C-41, C-41b Grid and saved grids | [grid.md](grid.md) | Core |

@@ -3,8 +3,11 @@ import usedLabel from '@salesforce/label/c.Core_CmdtManager_StatusInUse';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { buildModel, selectedText, stepIndex } from './fieldPickerModel';
 
-/** For the Check Columns step: the fields worth suggesting for columns not yet matched. */
-export { suggestFields } from './fieldSuggest';
+/**
+ * For the Check Columns step: the fields worth suggesting for columns not yet matched. For the
+ * Mapper (c/barnMapper): the likeness score its best guesses use (C-49e).
+ */
+export { suggestFields, score } from './fieldSuggest';
 
 const OPTION = 'slds-media slds-listbox__option slds-listbox__option_plain slds-media_small';
 
