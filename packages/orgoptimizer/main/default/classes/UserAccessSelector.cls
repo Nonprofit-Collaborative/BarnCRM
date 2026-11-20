@@ -5,12 +5,10 @@
  * Queries run in user mode: Health Check reports what the person running it can see, and the
  * admin guide says so.
  */
-@NamespaceAccessible
 public with sharing class UserAccessSelector {
 	/**
 	 * The ids of users holding any of the named packaged permission set groups.
 	 */
-	@NamespaceAccessible
 	public static Set<Id> getAssignedUserIds(Set<String> groupDeveloperNames) {
 		Set<Id> assignees = new Set<Id>();
 		if (groupDeveloperNames == null || groupDeveloperNames.isEmpty()) {
@@ -34,7 +32,6 @@ public with sharing class UserAccessSelector {
 	 * how the Access page does it, but it does give a person the app, so Health Check counts
 	 * it as access rather than reporting the person as locked out.
 	 */
-	@NamespaceAccessible
 	public static Set<Id> getPermissionSetAssigneeIds(Set<String> permissionSetNames) {
 		Set<Id> assignees = new Set<Id>();
 		if (permissionSetNames == null || permissionSetNames.isEmpty()) {
@@ -55,7 +52,6 @@ public with sharing class UserAccessSelector {
 	/**
 	 * How many active people hold any of the named packaged permission set groups.
 	 */
-	@NamespaceAccessible
 	public static Integer countActiveAssignees(Set<String> groupDeveloperNames) {
 		if (groupDeveloperNames == null || groupDeveloperNames.isEmpty()) {
 			return 0;
@@ -72,7 +68,6 @@ public with sharing class UserAccessSelector {
 	/**
 	 * How many active people hold any of the named packaged permission sets directly.
 	 */
-	@NamespaceAccessible
 	public static Integer countActiveDirectAssignees(Set<String> permissionSetNames) {
 		if (permissionSetNames == null || permissionSetNames.isEmpty()) {
 			return 0;
@@ -90,7 +85,6 @@ public with sharing class UserAccessSelector {
 	 * How many active standard users hold none of the packaged roles. Counted rather than
 	 * listed: an org can have more users than a list would hold.
 	 */
-	@NamespaceAccessible
 	public static Integer countActiveStandardUsersExcluding(Set<Id> excludedUserIds) {
 		Set<Id> excluded = excludedUserIds == null ? new Set<Id>() : excludedUserIds;
 

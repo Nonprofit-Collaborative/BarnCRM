@@ -54,7 +54,7 @@ and Read Only holders read Health Check.
 4. **A new optional package, `packages/sampledata` (BarnCRM Sample Data), in both editions,
    depending on Core only.** It holds `SampleDataLoader`, its stages, selector and controller,
    the `SampleData` and `CoreSampleData` sets, the `sampleDataManager` component on a new
-   Sample Data tab, and the `Sample_Data` permission set (Admin, Staff and Read Only holders;
+   Sample Data tab, and the `Sample_Data` permission set (Admin holders, amended below;
    loading and removing also need Manage BarnCRM Settings).
 5. **The sample data framework stays in Core.** `SampleDataModules`, `SampleDataStageBatch`,
    `SampleDataRemoveBatch`, `SampleDataStages`, `SampleDataModule`, `SampleDataFile` and
@@ -92,3 +92,21 @@ and Read Only holders read Health Check.
 - Labels and Help catalog entries the packages read stay in Core's files for now, because Core
   and other modules share many of them; moving the rest is a follow-up.
 - Each package is a tab, a catalog row and a post-install like the Migration package.
+
+## Amendment, 2026-11-20 (D-217, release 1.33): follow-ups
+
+- **Decision 3, Home:** Core's Home page places its own **Health Check** tile again
+  (`hubHealthCheck`, for Manage BarnCRM Settings holders, as ADR-0106 had it). It shows the
+  last result the package stored in Core's two `BarnCRM_Settings__c` keys (its badge, when it
+  ran, the counts by severity) and opens the package's Health Check section, and it shows only
+  while the package is installed (`ModuleDetectionService.isInstalled`). The tab comes from the
+  catalog row (`ModuleDetectionService.firstAdminTab`), so Core names nothing in the package.
+  The badge (`healthCheckBadge`) moves to Core, so the tile and the package's page share it.
+  Run Health Check stays on the package's page and panel.
+- **Decision 4, Sample Data access:** the `Sample_Data` permission set and tab go to BarnCRM
+  Admin holders only; Staff and Read Only holders no longer get them.
+- **Decision 1, what moves:** `PicklistUsageService`, `AutomationInventoryService`,
+  `UserAccessSelector` and `PersonLinkOrphanSelector`, which only this package calls, move
+  with it.
+- **One kit reference (ADR-0232):** the Migration package reads Core's `IntegrationAppService`
+  kit query and `KitRef` type instead of its own copies.

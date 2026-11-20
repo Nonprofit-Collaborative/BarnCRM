@@ -364,4 +364,40 @@ private class HubControllerTest {
 			Assert.isFalse(model.seasonalAddressStale, 'or a missed run');
 		}
 	}
+
+	/**
+	 * The Health Check tile (D-217, OO-01): the stored last run and the Org Optimizer tab from
+	 * its catalog row, only while that module is installed.
+	 */
+	@IsTest
+	static void showsTheLastHealthCheckOnlyWhileOrgOptimizerIsInstalled() {
+		System.runAs(TestUsers.admin()) {
+			SetupAssistantTestExtension.useNone();
+			Datetime ranAt = Datetime.now().addHours(-2);
+			OrgSettingsSystemWriter.save(
+				new Map<Schema.SObjectField, Object>{
+					BarnCRM_Settings__c.Health_Check_Last_Run__c => ranAt,
+					BarnCRM_Settings__c.Health_Check_Last_Result__c => '1,2,3'
+				}
+			);
+			String moduleName = ModuleDetectionService.MODULE_ORG_OPTIMIZER;
+
+			Test.startTest();
+			ModuleDetectionService.installedOverride.put(moduleName, false);
+			HubController.HomeModel absent = HubController.getHomeModel();
+			ModuleDetectionService.installedOverride.put(moduleName, true);
+			HubController.HomeModel installed = HubController.getHomeModel();
+			Test.stopTest();
+
+			Assert.isNull(absent.healthCheckTab, 'No module, no tile');
+			Assert.isNull(absent.healthCheckLastResult, 'and no result read');
+			Assert.areEqual(
+				NamespaceUtil.qualify(ModuleDetectionService.firstAdminTab(moduleName)),
+				installed.healthCheckTab,
+				'The tab comes from the catalog row'
+			);
+			Assert.areEqual(ranAt, installed.healthCheckRanAt, 'When it last ran');
+			Assert.areEqual('1,2,3', installed.healthCheckLastResult, 'And its counts');
+		}
+	}
 }

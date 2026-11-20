@@ -21,7 +21,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 5 | Choose **Health Check**. | Where the tile said **Not Run Yet**: an illustration, **Health Check Runs When You Ask**, **Health Check reads your org's setup, which can take a few seconds, so it runs only when you ask.** and **Run Health Check**. Where the tile showed a result: the same badge, **Last run** with a date and time, **{n} to fix, {n} to be aware of, {n} for your information.** matching the tile, and **Run Again**. Either way no check runs and no findings show yet. |
 | 6 | Click **Run Health Check** (or **Run Again**). | **Reading your org**, then the Health Check report with **What We Found in Your Org** and grouped findings. The button now reads **Run Again**. |
 | 7 | Choose **Overview**, then **Health Check** again. | On **Overview** the **Health Check** tile shows the run's result in the report's own words (**Needs Fixing: {n}**, **Worth Knowing: {n}** or **All Clear**). Back on **Health Check**, the same report shows without running again. |
-| 7a | Run Health Check from the Health Check component on BarnCRM Home (added in T-HC-07), then reload **Org Optimizer**. | The **Health Check** tile shows that run's result, and the **Health Check** section shows the same run under **Last run**, never **Health Check Runs When You Ask** beside a tile with a result (owner QA, 2026-10-31). |
+| 7a | Run Health Check from the Health Check component added to BarnCRM Home (T-HC-07, step 5), then reload **Org Optimizer** and Home. | The Org Optimizer **Health Check** tile shows that run's result, the **Health Check** section shows the same run under **Last run**, never **Health Check Runs When You Ask** beside a tile with a result (owner QA, 2026-10-31), and Home's **Health Check** tile shows the same badge and counts. |
 | 7b | Open `/lightning/n/Data_Hygiene?c__section=healthCheck`, then `/lightning/n/Data_Hygiene?c__section=errors`. | The page opens straight at **Health Check** (the stored run, nothing runs), then at **Errors**. `c__section=nothing` opens on **Overview**. |
 | 8 | Choose **Data Quality**, then **Storage and Limits**, then **Overview**. | **Data Quality** has **{n} Need Attention** or **All Clear**; **Storage and Limits** has **Data Storage {n}%**. Reload the page: **About This Tool** is now closed. |
 
@@ -105,15 +105,17 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 ## T-HC-07: Health Check's Last Result on Home
 
-**Purpose:** Confirm the Health Check component, added to Home in the Lightning App Builder, shows the last full run instead of running each time, and Run Health Check (Run Again after the first run) refreshes it.
-**Prerequisites:** admin.
+**Purpose:** Confirm BarnCRM Home's own **Health Check** tile shows the last full run without running it, opens Health Check in Org Optimizer, and shows only to administrators while the Org Optimizer package is installed; and that the Health Check component, added to Home in the Lightning App Builder, still runs it in place.
+**Prerequisites:** admin; a staff user; for step 6, an org without BarnCRM Org Optimizer (Core only).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 0 | Open the BarnCRM home page, then the gear icon, **Edit Page**. | BarnCRM Home has no Health Check tile of its own. **Health Check** is listed under **Custom**. Drag it onto the page, tick **Show the last result first**, save and go back. |
-| 1 | Open the BarnCRM home page. | The Health Check tile shows **Last Run** with a date and time and **N to fix, N to be aware of, N for your information.**, and **Run Again**, or **Health Check has not run yet. Click Run Health Check to check this org.** and **Run Health Check**. |
-| 2 | Click **Run Health Check** (or **Run Again**). | **Reading your org**, then the whole report in the tile. |
-| 3 | Reload the home page. | **Last Run** shows the time of step 2, with its counts. |
+| 1 | As admin, open the BarnCRM home page. | A **Health Check** tile with a badge (**Needs Fixing: {n}**, **Worth Knowing: {n}**, **All Clear**, or **Not Run Yet**), then **Last run** with a date and time and **{n} to fix, {n} to be aware of, {n} for your information.**, or **Health Check has not run yet. Open it to check this org.** No check runs. |
+| 2 | Click **Open Health Check**. | The **Org Optimizer** tab opens at its **Health Check** section, showing the same badge and last run. |
+| 3 | Click **Run Again** (or **Run Health Check**), then go back to Home and reload. | The tile shows the time of that run and its counts, with the same badge as the Org Optimizer **Health Check** tile. |
+| 4 | As staff, open the BarnCRM home page. | No **Health Check** tile. |
+| 5 | As admin, open the home page, then the gear icon, **Edit Page**. | **BarnCRM Home: Health Check** and **Health Check** are both listed under **Custom**. Drag **Health Check** onto the page, tick **Show the last result first**, save and go back: it shows the last run with **Run Again**, and clicking it shows the whole report in place. Remove it again and save. |
+| 6 | In the Core-only org, open the home page as admin. | No **Health Check** tile and no error. |
 
 **Cleanup:** None.
 

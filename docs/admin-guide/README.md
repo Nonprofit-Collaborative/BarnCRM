@@ -1,6 +1,6 @@
 # Admin Guide
 
-Applies to: BarnCRM main at f0eae0b38 (releases 1.26 to 1.30). Pre-release: no package version exists yet; this tracks the newest code on main. The page list is in the [Index](#index).
+Applies to: BarnCRM main at 3b7d72840 (releases 1.26 to 1.30, with release 1.33's Org Optimizer follow-ups). Pre-release: no package version exists yet; this tracks the newest code on main. The page list is in the [Index](#index).
 
 > **Not for production orgs:** BarnCRM is in pilot. We do not recommend installing pilot or testing versions in a production Salesforce org. Use a sandbox, a free Developer Edition org or a scratch org.
 

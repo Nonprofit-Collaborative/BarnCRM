@@ -15,7 +15,7 @@ public with sharing class MigrationController {
 	/** What the tab offers here: the kits and the two household tools. */
 	public class Home {
 		@AuraEnabled
-		public List<MigrationKitService.KitRef> kits;
+		public List<IntegrationAppService.KitRef> kits;
 		/** Adopt NPSP Households applies here (NPSP detected, or a run to undo). */
 		@AuraEnabled
 		public Boolean npspHouseholds;

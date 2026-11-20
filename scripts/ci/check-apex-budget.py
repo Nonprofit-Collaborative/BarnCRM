@@ -99,11 +99,11 @@ CAPS = {
     # optional packages; the seams, @NamespaceAccessible marks and getters they need stay.
     # 2,201,145 measured before, 1,970,388 after, plus about 0.1%: Core is under the 2.0M
     # target.
-    # Raised 2026-11-20 for landing batch Q: the Mapper and saved maps (MAP-01 to MAP-04:
-    # MapController, Where Used and Saved Transform additions, 22,853) and the Connector seams
-    # (CN-01 to CN-04, CN-09: the module catalog, Health Check and Where Used registrations,
-    # 346); 1,993,587 measured, plus about 0.1%: still under the 2.0M target.
-    "core": 1_995_600,
+    # Lowered 2026-11-20 for D-217 (OO-01 to OO-04): PicklistUsageService,
+    # AutomationInventoryService, UserAccessSelector and PersonLinkOrphanSelector moved into
+    # Org Optimizer, the Migration package reads Core's one kit query, and Home gained the
+    # Health Check tile. 1,971,740 measured before, 1,955,421 after, plus about 0.1%.
+    "core": 1_957_400,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured
@@ -443,7 +443,9 @@ CAPS = {
     # runner, checks, controller and last run, and every Org Optimizer section's controllers
     # and services, moved out of Core, with the post-install: 215,159 measured 2026-11-20,
     # plus about 2%.
-    "orgoptimizer": 219_500,
+    # Raised 2026-11-20 for D-217 (OO-03): the four Org Optimizer services and selectors only
+    # it called moved out of Core: 231,414 measured, plus about 2%.
+    "orgoptimizer": 236_000,
     # Sample Data (D-215): the loader, its stages, selector and controller, the package host
     # and the post-install, moved out of Core: 29,516 measured 2026-11-20, plus about 2%.
     "sampledata": 30_200,
