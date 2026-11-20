@@ -52,7 +52,7 @@ const GROUPS = [
     sections: [
       ['Fundraising', 'utility:moneybag'],
       ['Receipts', 'utility:email'],
-      ['Grants', 'utility:trophy'],
+      ['Grants', 'utility:ribbon'],
       ['Scholarships and Grants', 'utility:education']
     ]
   },
