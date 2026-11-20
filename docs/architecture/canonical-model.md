@@ -1130,7 +1130,7 @@ lists, undoes or deletes another's rows.
 | Items | `Items__c` | Long Text Area(131072) | Scan, Deactivation: JSON. |
 | Message | `Message__c` | Long Text Area(32768) | Scan, Deactivation. |
 | Restored At | `Restored_At__c` | DateTime | Deactivation. |
-| Kit | `Kit__c` | Text(80), external id | Migration: the Migration Kit DeveloperName. |
+| Kit | `Kit__c` | Text(80), external id | Migration: the Migration Kit DeveloperName. Ships in the Migration package (ADR-0232 `0232-migration-package.md`), so it exists only while that package is installed. |
 | State | `State_JSON__c` | Long Text Area(32768) | Migration: JSON of tool steps done and checklist items ticked. |
 | Account ID | `Account_Id__c` | Text(18), external id, not unique, read-only to the role | Household Adoption. Text, not a lookup, so the journal adds no child relationship to Account and never keeps a household from the tidy-up (R-H12a) or a delete. |
 | Previous Record Type ID | `Previous_Record_Type_Id__c` | Text(18), read-only to the role | Household Adoption. |
@@ -1859,7 +1859,11 @@ the module it fills) shows one button per kit, named by the kit's label, in Sort
 product in the same org into BarnCRM, read as shipped and never materialized. A kit ships in the
 module that owns the destination records (Mirror when the source is a standard object), so a
 row exists only where that module is installed. The Migration Assistant offers a kit only when
-its Source App is detected (Integration App Detection Objects, by describe).
+its Source App is detected (Integration App Detection Objects, by describe). The type, the
+extension seam (`MigrationKitExtension`, `MigrationCheck`) and Integration App's kit listing are
+Core's; the Assistant that runs a kit is the optional Migration package's (`packages/migration`,
+ADR-0232 `0232-migration-package.md`), and the Integrations page offers Start Migration only
+while that package is installed.
 
 | Field | API name | Type | Definition |
 |---|---|---|---|
@@ -1869,7 +1873,7 @@ its Source App is detected (Integration App Detection Objects, by describe).
 | Description | `Description__c` | long text (1000) | One or two sentences: what moves, into which BarnCRM module, and what stays. Plain text. |
 | Steps | `Steps_JSON__c` | long text (32768) | The steps in run order, a JSON array (R-MK1). |
 | Retire Checklist | `Retire_Checklist_JSON__c` | long text (32768) | The old product's automations to switch off once the steps are done, a JSON array of `{"key": "...", "text": "..."}`. Empty means none. |
-| Extension Class | `Extension_Class__c` | text (80) | Optional. A class implementing Core's `MigrationKitExtension`, found by name (ADR-0057), that reshapes an import step's rows or checks a step. Empty means none. |
+| Extension Class | `Extension_Class__c` | text (80) | Optional. A class implementing Core's `MigrationKitExtension`, found by name (ADR-0057), that reshapes the rows the Assistant read for an import step (it is handed them as name and value maps) or checks a step. Empty means none. |
 | Sort Order | `Sort_Order__c` | number | The order kits are listed in, lowest first. |
 
 **R-MK1 Steps.** Each step is an object with `key` (unique in the kit), `label` (Title Case)
@@ -3411,8 +3415,8 @@ unchanged.
 | Rows Deleted | integer | computed | How many records a bulk delete deleted (R-BD3); empty for any other data job. |
 | Trial Rows | integer | computed | How many of the file's first rows a trial import committed (R-IB16); empty when the file was committed whole. |
 | Retry After Row | integer | computed | While a retry of the import's rejected rows is open, the highest row number before it: the fixed rows are numbered after it, and the retry's dry run and commit read only them (R-IB17). Empty otherwise. |
-| Migration Run | reference(Migration Run) | no | The Migration Assistant run this batch is a step of (Section 29ZS); empty for a file import. |
-| Migration Step | text | no | The key of the kit step this batch loads (R-MK1); empty for a file import. |
+| Migration Run | reference(Migration Run) | no | The Migration Assistant run this batch is a step of (Section 29ZS); empty for a file import. Ships in the Migration package. |
+| Migration Step | text | no | The key of the kit step this batch loads (R-MK1); empty for a file import. Ships in the Migration package. |
 
 ### Relationships
 
@@ -3797,6 +3801,9 @@ them (R-IB8, R-IB9).
 | Retry After Row | `Retry_After_Row__c` | Number (9, 0) |
 | Migration Run | `Migration_Journal__c` | Lookup(Admin Journal, `Merge_Journal__c`, a row of Kind Migration; relationship `Data_Jobs`), cleared when the run is deleted. Named `Migration_Run__c` until N-11, when runs moved into the Admin Journal. |
 | Migration Step | `Migration_Step__c` | Text (80) |
+
+Migration Run and Migration Step ship in the Migration package (ADR-0232
+`0232-migration-package.md`); no Core code reads them.
 
 - **Batch tag on other objects:** `Created_By_Import_Batch__c`, a Lookup to
   `Import_Batch__c`, on Account (households and organizations), on Contact, and on
@@ -11068,9 +11075,9 @@ digest. If reading the admin summary fails, the failure is logged to the Error L
 digest still goes, without the summary. The nightly copy does not start while a copy started by
 hand is still waiting or running.
 
-**R-SU8 Off with Org Optimizer.** While the Org Optimizer feature is off, a run (nightly or
-Copy New Changes Now) copies nothing, deletes nothing and logs nothing; kept rows stay as they
-are until it is turned on.
+**R-SU8 Off without Org Optimizer.** While the BarnCRM Org Optimizer package is not installed, a
+run (nightly or Copy New Changes Now) copies nothing, deletes nothing and logs nothing; kept
+rows stay as they are until it is installed.
 
 ### Salesforce implementation
 
@@ -12233,7 +12240,7 @@ person, so counts of unnamed people are never mistaken for, or added to, named p
 Service Delivery Log adds a row for each count entered, and every total adds the rows.
 
 **R-SC3 Counted apart from named people.** The Programs Dashboard shows the sum of People Served
-in the period as Counted Without Names, per program and in total. It is never added to People
+in the period as Served Without Enrollment, per program and in total. It is never added to People
 Served (named people with a Present delivery).
 
 **R-SC4 No person, so no privacy or erasure rule.** A count names no one, so organization-wide
@@ -13588,10 +13595,13 @@ stop being one.
   `npo02__Informal_Greeting__c`, `npe01__One2OneContact__c`, `npo02__SYSTEM_CUSTOM_NAMING__c`,
   and the Account record type `HH_Account`; for R-HA6, NPSP's hierarchy setting
   `npe01__Contacts_And_Orgs_Settings__c` and its `npe01__Account_Processor__c` (org default only).
-- **Classes:** `NpspHouseholdSource` (describe-only reads of NPSP, the test seam),
-  `NpspHouseholdAdoptionService` (preview, start, undo, status), `NpspHouseholdAdoptionBatch`
-  (adopt and undo chunks), `NpspHouseholdAdoptionController` (thin, plain JSON shapes). The
-  panel is `npspHouseholdAdoption`, shown on the General page of BarnCRM Settings only when
+- **Classes:** Core's `NpspHouseholdSource` (describe-only reads of NPSP, the test seam, and
+  the R-HA6 guard a running org keeps) and `HouseholdWriter.saveAdoptionChanges` (the one
+  writer of the record type, ADR-0141). The Migration package (ADR-0232
+  `0232-migration-package.md`) holds `NpspHouseholdAdoptionService` (preview, start, undo,
+  status), `NpspHouseholdAdoptionBatch` (adopt and undo chunks) and
+  `NpspHouseholdAdoptionController` (thin, plain JSON shapes). The panel is
+  `npspHouseholdAdoption`, under Households on the Migration Assistant tab, shown only when
   NPSP is detected, the coexistence mode is NPSP, or rows exist.
 - **Nonprofit Cloud source (R-HA7):** Mirror's `NpcHouseholdSource` extends
   `NpspHouseholdSource` and is also the extension of Mirror's kit `NPC_Households`, whose one
@@ -13600,8 +13610,8 @@ stop being one.
   names read as text, never written: `PartyRelationshipGroup` (`AccountId`, `Type`) and
   `AccountContactRelation`
   (`AccountId`, `ContactId`, `IsPrimaryMember`, `Roles`, `IsActive`, `StartDate`, `EndDate`). The
-  same panel with the NPC source is the General settings row `NPC_Household_Conversion`, shown
-  only when that source is available or NPC rows exist.
+  same panel with the NPC source is Convert Nonprofit Cloud Households on the Migration
+  Assistant tab, shown only when that source is available or NPC rows exist.
 
 ---
 
@@ -13755,10 +13765,13 @@ writes, switches off or uninstalls the product migrated from.
   a run was the object `Migration_Run__c` (`MR-{0000}`), and
   the Import Batch lookup had that name.
 
-- **Classes:** `MigrationKitService` (catalog, run state, order, verification),
-  `MigrationStageBatch` (reads the source, stages rows, starts the dry run),
-  `MigrationKitExtension` (the seam), `MigrationController` (thin, plain JSON shapes). The panel
-  is `migrationAssistant`, opened from Start Migration on the Integrations page.
+- **Classes:** in the Migration package (ADR-0232 `0232-migration-package.md`),
+  `MigrationKitService` (catalog, run state, order, verification), `MigrationStageBatch` (reads
+  the source, stages rows, starts the dry run) and `MigrationController` (thin, plain JSON
+  shapes); in Core, `MigrationKitExtension` and `MigrationCheck` (the seam a module's kit
+  implements). The page is the Migration Assistant tab (`migrationHome`), which lists the
+  offered kits and opens one in `migrationAssistant`; Start Migration on the Integrations page
+  opens the same tab at that kit.
 
 ---
 
@@ -17711,11 +17724,11 @@ A condition the recipient must meet before payment, or a progress or final repor
 
 ### Definition
 
-The module's org-wide settings, edited in the Scholarships and Grants section of BarnCRM Settings.
+The module's org-wide settings, edited in the Scholarships and Outbound Grants section of BarnCRM Settings.
 
 ### Rules
 
-- **Setting Definitions:** `Scholarships_Reminders_Enabled`, `Scholarships_Reminder_Days`, `Scholarships_Email_Recipients`, section Scholarships and Grants, module `Scholarships`.
+- **Setting Definitions:** `Scholarships_Reminders_Enabled`, `Scholarships_Reminder_Days`, `Scholarships_Email_Recipients`, section Scholarships and Outbound Grants, module `Scholarships`.
 
 ### Salesforce implementation
 
@@ -19424,6 +19437,8 @@ mirrors the primary member).
 | 1.69 | 2026-11-18 | Beta badge on every module (D-211, N-14, release 1.27). `BarnCRM_Module__mdt` gains Beta (`Beta__c`, Checkbox, default false), ticked on every shipped module record: the Module Manager, the Setup Assistant's modules step and the Home Modules card show a Beta badge beside the module name. No object added or removed. |
 | 1.70 | 2026-11-19 | Receiver token (pre-batch review M1; ADR-0229 amended). `Payments_Settings__c` gains `Webhook_Token__c` (Text(64)) and `Webhook_Cap_Hit_At__c` (DateTime): the receiver stores a post only when it carries the token in its address, and records the first refusal at the hourly cap each hour. No object added or removed. |
 | 1.71 | 2026-11-19 | Advanced Reporting (O-02, D-202, D-207, release 1.29; ADR-0231 `0231-advanced-reporting.md`). No object or field added. Section 29AR records the saved report and dashboard JSON formats and their storage as Salesforce Files (`.barnreport`, `.barndash`) shared through ContentDocumentLink, with rules R-AR1 to R-AR5. |
+| 1.72 | 2026-11-20 | Migration package (S11, D-213, release 1.30; ADR-0232 `0232-migration-package.md`). No object added or removed. The optional BarnCRM Migration package (`packages/migration`) ships Admin Journal's Kit (`Kit__c`) and Import Batch's Migration Run (`Migration_Journal__c`) and Migration Step (`Migration_Step__c`), the Migration Assistant (29ZS) and the NPSP and Nonprofit Cloud household adoption (29ZQ), kit `NPSP_People` with its three templates, and a Migration Assistant tab. Core keeps `Migration_Kit__mdt`, the extension seam (`MigrationKitExtension` now receives the rows the Assistant read) and `NpspHouseholdSource`. The settings rows `NPSP_Household_Adoption` and `NPC_Household_Conversion` are removed; Setting Definition `Migration_Assistant_Page` (Integrations) and `BarnCRM_Module.Migration` are added. |
+| 1.73 | 2026-11-20 | Org Optimizer and Sample Data modules (D-215, release 1.30; ADR-0233 `0233-org-optimizer-and-sample-data-modules.md`). No object or field added or removed. The optional BarnCRM Org Optimizer package (`packages/orgoptimizer`) ships the Org Optimizer page (app page `Data_Hygiene`) with every section's classes and components, and Health Check's runner, checks, controller, last run and panel; `Setup_Change__c`, `Field_Utilization_Snapshot__c`, the Org Optimizer and Health Check keys of `BarnCRM_Settings__c`, the Health Check vocabulary and seams (new `HealthCheckRun`, `HealthCheckFixes`) stay in Core. The optional BarnCRM Sample Data package (`packages/sampledata`) ships the loader, the Core sample set and a Sample Data tab; the framework every module's set runs on stays in Core, with a new seam `SampleDataHost`. Setting Definitions `Error_Log_Optimizer_Link`, `Health_Check_Optimizer_Link`, `Field_Utilization_Retention_Days`, `Old_Api_Version`, `Setup_Change_Retention_Days`, `Stale_Record_Years`, `Unused_Login_Days` and `Unused_Report_Days` ship in the Org Optimizer package and `Sample_Data` in the Sample Data package; `Health_Check` (the Settings panel) is removed; `BarnCRM_Module.OrgOptimizer` and `BarnCRM_Module.SampleData` are added. R-SU8 follows the package, not a feature switch. |
 
 ---
 ## 32. Entity ownership by package
@@ -19535,9 +19550,9 @@ included; standard objects the packages extend are named by the entity that gove
 | Logic Model Link | Logic Models | 0.14 (L-01) | 29ZE |
 | Indicator | Logic Models | 0.14 (L-02) | 29ZF |
 | Indicator Period | Logic Models | 0.14 (L-02) | 29ZG |
-| Household Adoption (Admin Journal rows since 1.65) | Core | 0.17 (X-05) | 29ZQ |
+| Household Adoption (Admin Journal rows since 1.65) | Core rows; the adoption tool is BarnCRM Migration's | 0.17 (X-05) | 29ZQ |
 | Nightly Job | Core | v1.0 (architect review RT-10) | 29ZR |
-| Migration Run (Admin Journal rows since 1.65) | Core | 1.4 (MIG-01) | 29ZS |
+| Migration Run (Admin Journal rows since 1.65) | Core rows; Kit, Import Batch Migration Run and Migration Step are BarnCRM Migration's | 1.4 (MIG-01) | 29ZS |
 | Migration Kit (shipped default) | Core type; rows in the owning module | 1.4 (MIG-01) | 13 |
 | Form | Forms | release 1.1 (C-42a) | 29ZW |
 | Form Version | Forms | release 1.1 (C-42a) | 29ZX |

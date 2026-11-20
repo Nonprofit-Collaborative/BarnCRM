@@ -22,15 +22,16 @@ households are in use.
 
 When NPSP is installed in the same org as BarnCRM, you do not need files at all. The
 [Migration Assistant](migration-assistant.md) reads NPSP's records directly, step by step, with
-the same preview, results and undo as a file import, and checks that the numbers match. Open
-**BarnCRM Settings**, **Integrations**, find **Nonprofit Success Pack (NPSP)** and click the
-kit's **Start Migration** button. Run the kits in the order listed.
+the same preview, results and undo as a file import, and checks that the numbers match. Install
+the optional BarnCRM Migration package, open the **Migration Assistant** tab and click **Start**
+on a kit (or, on **BarnCRM Settings**, **Integrations**, **Nonprofit Success Pack (NPSP)**, the
+kit's **Start Migration** button). Run the kits in the order listed.
 
-**NPSP People and Addresses** (BarnCRM Core):
+**NPSP People and Addresses** (BarnCRM Migration):
 
 | Step | What it does |
 |---|---|
-| Adopt NPSP Households | Opens BarnCRM Settings, where **Adopt NPSP Households** makes your NPSP household accounts BarnCRM households in place ([Adopting Your NPSP Households](npsp-households.md)). Click **Mark Done** when it has finished. |
+| Adopt NPSP Households | Done with **Adopt NPSP Households**, under **Households** on the same tab, which makes your NPSP household accounts BarnCRM households in place ([Adopting Your NPSP Households](npsp-households.md)). Click **Back to Migration Kits**, adopt, then open this kit again and click **Mark Done**. |
 | Relationships | Copies each NPSP relationship once. NPSP keeps both sides of a relationship as two records; the kit reads only the side a person entered and leaves the other side to BarnCRM, which creates it for you. Both people are the same contacts. NPSP types become BarnCRM's (Husband and Wife become Spouse, Coworker becomes Colleague, Employer and Employee become Employer contact); a type BarnCRM does not have becomes Other. |
 | Affiliations | Copies each link between a person and an organization, with its role, status, dates, description and primary. |
 | Household Addresses | Copies each NPSP address onto its household, both street lines in one, with its type (Vacation becomes Seasonal), default, seasonal months and days, and verified. |
@@ -48,7 +49,7 @@ affiliations, household addresses and household names, so the two apps never bot
 | Recurring Donations of Organizations | The same for recurring donations of an organization, as a commitment of that account. |
 | Engagement Plans | Copies each NPSP engagement plan template as an active stewardship plan template with its name and description, started by hand (**Manual**). Loading again updates the same template. |
 | Engagement Plan Tasks | Copies each task of those templates as a step of its stewardship plan: the subject, days after the start (also the step order), priority (Medium becomes Normal), comments, and the assigned user (**Specific user**) or else the record owner. |
-| Levels, Engagement Plans and Rollups Parity | The parity report, done on the **Stewardship Plans** tab. Its check counts your active NPSP levels and engagement plan templates, and how many have a BarnCRM counterpart (a donor level of the same name, a stewardship plan template copied from it). Read the table below, set up what you still need, and click **Mark Done**. |
+| Levels, Engagement Plans and Rollups Parity | The parity report, done on the **Stewardship Plan Templates** tab. Its check counts your active NPSP levels and engagement plan templates, and how many have a BarnCRM counterpart (a donor level of the same name, a stewardship plan template copied from it). Read the table below, set up what you still need, and click **Mark Done**. |
 
 The kit does not copy NPSP's open installment Opportunities: BarnCRM schedules the payments of
 each commitment itself. Gifts already received come across with the next kit. The retire
@@ -110,8 +111,8 @@ it off instead if you do not want it in the list.
 
 If one is missing (an install that logged a problem, for example), add it from Health Check:
 
-1. Open the **BarnCRM Admin** app, click **BarnCRM Settings** and choose **Health**.
-2. The report opens (click **Re-Run** if it is from earlier). A finding reads "3 shipped
+1. Open the **BarnCRM Admin** app, click the **Org Optimizer** tab and choose **Health Check**.
+2. The last run opens (click **Run Again** if it is from earlier). A finding reads "3 shipped
    import templates are missing" (a higher number if other shipped templates are missing too)
    and names them.
 3. Select **Restore Import Templates**. Your own templates, and any shipped template you have

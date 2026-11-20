@@ -33,6 +33,31 @@ private class IntegrationControllerTest {
 	}
 
 	@IsTest
+	static void staffSeeTheListWithNoMigrationWhileTheMigrationPackageIsAbsent() {
+		System.runAs(TestUsers.standardUserWith('IntegrationsStaff', new List<String>{ 'BarnCRM_Staff' })) {
+			IntegrationAppService.catalogOverride = new List<Integration_App__mdt>{
+				new Integration_App__mdt(
+					DeveloperName = 'One',
+					MasterLabel = 'One',
+					Category__c = 'Complement',
+					Description__c = 'x',
+					Link_Url__c = 'https://example.invalid',
+					Compatibility__c = 'x'
+				)
+			};
+			IntegrationAppService.objectNamesOverride = new Set<String>();
+			IntegrationAppService.migrationInstalledOverride = false;
+
+			Test.startTest();
+			List<IntegrationAppService.AppInfo> apps = IntegrationController.getApps();
+			Test.stopTest();
+
+			Assert.areEqual(1, apps.size(), 'Staff read the same list');
+			Assert.isTrue(apps[0].migrationKits.isEmpty(), 'No migration is offered without the package');
+		}
+	}
+
+	@IsTest
 	static void aFailureReadingTheListIsLoggedAndSaidInPlainWords() {
 		System.runAs(TestUsers.admin()) {
 			// A row the service cannot read: a null row in the catalog.

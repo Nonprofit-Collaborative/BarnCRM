@@ -5,7 +5,7 @@
  * award row carries its own Id twice, once to link to its parent. Outbound Funds itself is not
  * needed: the kit holds its names as data.
  */
-@IsTest(testFor='ApexClass:OutboundFundsKit, ApexClass:MigrationKitService')
+@IsTest(testFor='ApexClass:OutboundFundsKit')
 private class OutboundFundsKitTest {
 	@TestSetup
 	static void createTestUser() {
@@ -24,11 +24,11 @@ private class OutboundFundsKitTest {
 	@IsTest
 	static void eachStepHasItsTemplateAndLoadsItsScholarshipsObject() {
 		System.runAs(TestUsers.adminWith(ScholarshipsTestData.ADMIN_SET)) {
-			Migration_Kit__mdt kit = MigrationKitService.kitNamed(OutboundFundsKit.KIT);
+			String kit = OutboundFundsKit.KIT;
 			ImportTemplateService.materializeDefaults();
 			for (String key : TARGET_BY_STEP.keySet()) {
-				MigrationKitService.Step step = MigrationKitService.stepNamed(kit, key);
-				Assert.areEqual(MigrationKitService.KIND_IMPORT, step.kind, key + ' loads');
+				MigrationKitSteps.Step step = MigrationKitSteps.step(kit, key);
+				Assert.areEqual('import', step.kind, key + ' loads');
 				Import_Template__c template = [
 					SELECT Column_Mapping_JSON__c, Target_Object__c
 					FROM Import_Template__c
@@ -67,7 +67,7 @@ private class OutboundFundsKitTest {
 		System.runAs(TestUsers.adminWith(ScholarshipsTestData.ADMIN_SET)) {
 			for (String key : new List<String>{ 'cycles', 'awards' }) {
 				try {
-					List<Map<String, Object>> rows = new OutboundFundsKit().rows(key, new List<SObject>());
+					List<Map<String, Object>> rows = new OutboundFundsKit().rows(key, new List<Map<String, Object>>());
 					Assert.isTrue(rows.isEmpty(), key + ': no records, no rows');
 				} catch (Exception refused) {
 					Assert.isTrue(
@@ -83,11 +83,11 @@ private class OutboundFundsKitTest {
 	static void aCycleRowKeepsItsIdAndLinksToItsProgram() {
 		// runs-as: deploying user (no record is read; an empty page stages no rows)
 		OutboundFundsKit extension = new OutboundFundsKit();
-		Assert.isNull(extension.rows('programs', new List<SObject>()), 'default rows');
+		Assert.isNull(extension.rows('programs', new List<Map<String, Object>>()), 'default rows');
 		Assert.isNull(extension.verify('awards'), 'counts are compared');
-		Migration_Kit__mdt kit = MigrationKitService.kitNamed(OutboundFundsKit.KIT);
+		String kit = OutboundFundsKit.KIT;
 		for (String key : new List<String>{ 'cycles', 'awards' }) {
-			MigrationKitService.Step step = MigrationKitService.stepNamed(kit, key);
+			MigrationKitSteps.Step step = MigrationKitSteps.step(kit, key);
 			Assert.isTrue(
 				JSON.serialize(step.links).contains('"' + OutboundFundsKit.PARENT_COLUMN + '"'),
 				key + ' links its parent column'

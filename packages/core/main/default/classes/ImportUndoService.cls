@@ -53,6 +53,11 @@ public with sharing class ImportUndoService {
 		public Integer getTotal() {
 			return total;
 		}
+
+		@NamespaceAccessible
+		public String getReason() {
+			return reason;
+		}
 	}
 
 	/** How many records of one module object carry the batch's tag. */
@@ -88,7 +93,7 @@ public with sharing class ImportUndoService {
 			return view;
 		}
 		// A field access change puts permission rows back, on the Field Access Manager (R-FA1).
-		if (FieldAccessService.OPERATION_ACCESS.equals(batch.Operation__c)) {
+		if (ImportBatchService.OPERATION_ACCESS.equals(batch.Operation__c)) {
 			view.reason = BarnHelp.text('Core', 'Core_Import_UndoErrorAccessChange');
 			return view;
 		}

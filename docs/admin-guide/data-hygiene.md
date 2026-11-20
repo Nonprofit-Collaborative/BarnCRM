@@ -1,7 +1,7 @@
 # Data Quality
 
 **Feature:** C-28 Data Quality checks (in Org Optimizer)
-**Package:** Core
+**Package:** BarnCRM Org Optimizer (optional)
 **Iteration:** v0.7
 
 ## 1. What It Does

@@ -5,7 +5,9 @@
  * ADR-0082 A2), then gives BarnCRM's permission sets access with `FieldPermissions` rows. The
  * wizard polls `check` until the field is in describe.
  */
+@NamespaceAccessible
 public with sharing class ImportNewFieldService {
+	@NamespaceAccessible
 	public static final String CONNECTION = 'Barn_Org_Connection';
 	public static final String API_VERSION = '67.0';
 	public static final String LOG_CONTEXT = 'Import: create field ';
@@ -44,6 +46,7 @@ public with sharing class ImportNewFieldService {
 		'BarnCRM_Read_Only' => false
 	};
 
+	/** Stands in for "the user holds the system permissions" in tests. */
 	@TestVisible
 	private static Boolean systemPermissionOverride;
 	/** Stands in for "the Named Credential exists" in tests. */
@@ -53,6 +56,20 @@ public with sharing class ImportNewFieldService {
 	@TestVisible
 	private static String calloutStatusOverride;
 	private static final String ENABLED = 'Enabled';
+
+	/**
+	 * Has a module's test stand in for the system permissions, the Named Credential and its
+	 * callout status, where `@TestVisible` does not reach once the packages are separate. Each
+	 * null reads the org. Does nothing outside a test.
+	 */
+	@NamespaceAccessible
+	public static void overrideForTest(Boolean systemPermission, Boolean connected, String calloutStatus) {
+		if (Test.isRunningTest()) {
+			systemPermissionOverride = systemPermission;
+			connectedOverride = connected;
+			calloutStatusOverride = calloutStatus;
+		}
+	}
 
 	/** The field the admin asked for. `apiName` is without `__c`. */
 	public class FieldRequest {
@@ -66,6 +83,7 @@ public with sharing class ImportNewFieldService {
 		public Id permissionSetId;
 	}
 
+	@NamespaceAccessible
 	public class Connection {
 		@AuraEnabled
 		public Boolean canCreate = false;
@@ -75,6 +93,16 @@ public with sharing class ImportNewFieldService {
 		/** Set up, but Enabled for Callouts is off: the admin turns it on in Setup. */
 		@AuraEnabled
 		public Boolean calloutsOff = false;
+
+		@NamespaceAccessible
+		public Boolean getCanCreate() {
+			return canCreate;
+		}
+
+		@NamespaceAccessible
+		public Boolean getConnected() {
+			return connected;
+		}
 	}
 
 	public class Outcome {

@@ -1,6 +1,6 @@
 # Data Dictionary
 
-**Package:** Core
+**Package:** BarnCRM Org Optimizer (optional)
 **Feature:** C-52 (plan Section 6.1.1 item 13, decision D-154)
 
 ## What It Does

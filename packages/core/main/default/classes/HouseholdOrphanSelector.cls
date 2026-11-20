@@ -19,6 +19,7 @@
  * A person who has been erased is never counted as having no household: erasing them takes
  * them out of it on purpose (canonical model R-ER9).
  */
+@NamespaceAccessible
 public with sharing class HouseholdOrphanSelector {
 	/** The most erased people left out; erasures are rare, and the ids are never shown. */
 	private static final Integer ERASED_READ_CAP = 10000;
@@ -52,6 +53,7 @@ public with sharing class HouseholdOrphanSelector {
 	 * Health Check and Data Quality both count them. Stops at `cap`: the person
 	 * accounts are not counted once the contacts alone reach it.
 	 */
+	@NamespaceAccessible
 	public static Integer countPeopleWithoutMembership(Id householdRecordTypeId, Integer cap) {
 		Set<Id> personTypes = OrgShapeDetector.personRecordTypeIds();
 		Set<Id> excluded = new Set<Id>(personTypes);
@@ -66,6 +68,7 @@ public with sharing class HouseholdOrphanSelector {
 	}
 
 	/** Contact mode: contacts with no account at all. */
+	@NamespaceAccessible
 	public static Integer countContactsWithoutAccount(Integer cap) {
 		return [
 			SELECT COUNT()
@@ -76,6 +79,7 @@ public with sharing class HouseholdOrphanSelector {
 		];
 	}
 
+	@NamespaceAccessible
 	public static List<Contact> contactsWithoutAccount(Integer howMany) {
 		return [
 			SELECT Id, Name
@@ -114,6 +118,7 @@ public with sharing class HouseholdOrphanSelector {
 		];
 	}
 
+	@NamespaceAccessible
 	public static List<Contact> contactsWithoutMembership(Set<Id> excludedAccountTypes, Integer howMany) {
 		Date today = OrgDate.today();
 		return [
@@ -246,6 +251,7 @@ public with sharing class HouseholdOrphanSelector {
 		];
 	}
 
+	@NamespaceAccessible
 	public static List<Account> personAccountsWithoutMembership(Set<Id> personRecordTypeIds, Integer howMany) {
 		Date today = OrgDate.today();
 		return [
@@ -266,6 +272,7 @@ public with sharing class HouseholdOrphanSelector {
 	}
 
 	/** Contact mode: households no contact's account points at. */
+	@NamespaceAccessible
 	public static Integer countHouseholdsWithoutContacts(Id householdRecordTypeId, Integer cap) {
 		return [
 			SELECT COUNT()
@@ -278,6 +285,7 @@ public with sharing class HouseholdOrphanSelector {
 		];
 	}
 
+	@NamespaceAccessible
 	public static List<Account> householdsWithoutContacts(Id householdRecordTypeId, Integer howMany) {
 		return [
 			SELECT Id, Name
@@ -292,6 +300,7 @@ public with sharing class HouseholdOrphanSelector {
 	}
 
 	/** Junction mode: households no current membership row that names somebody points at. */
+	@NamespaceAccessible
 	public static Integer countHouseholdsWithoutMembers(Id householdRecordTypeId, Integer cap) {
 		Date today = OrgDate.today();
 		return [
@@ -309,6 +318,7 @@ public with sharing class HouseholdOrphanSelector {
 		];
 	}
 
+	@NamespaceAccessible
 	public static List<Account> householdsWithoutMembers(Id householdRecordTypeId, Integer howMany) {
 		Date today = OrgDate.today();
 		return [

@@ -1,6 +1,6 @@
 <template>
     <template lwc:if={helpReady}>
-    <lightning-card title={labels.title} icon-name="custom:custom32">
+    <lightning-card title={labels.title} icon-name="custom:custom32" data-id="pause-card">
         <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium">
             <p class="slds-var-m-bottom_small">{labels.intro}</p>
 
@@ -109,7 +109,16 @@
                     ></c-barn-notice>
                 </template>
             </div>
+        </div>
+    </lightning-card>
 
+    <lightning-card
+        title={labels.listTitle}
+        icon-name="custom:custom32"
+        class="slds-show slds-var-m-top_small"
+        data-id="list-card"
+    >
+        <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium">
             <template lwc:if={isEmpty}>
                 <c-barn-empty-state
                     data-id="empty-state"

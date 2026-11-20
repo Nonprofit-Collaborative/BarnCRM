@@ -1,5 +1,8 @@
 # Sample Data
 
+**Package:** BarnCRM Sample Data (optional, both editions)
+**Decision:** ADR-0233 `0233-org-optimizer-and-sample-data-modules.md`
+
 ## 1. What It Does
 
 Sample data fills your org with a realistic demo dataset. Use it to see BarnCRM working
@@ -172,11 +175,16 @@ core sample people are not there.
 
 ## 2. How to Turn It On
 
-1. Open **BarnCRM Settings**.
-2. In the **General** section, find **Sample Data** and open it. If you do not see it,
-   type "sample" in the settings search box.
-3. Read the warning, then select **Load Sample Data**.
-4. Confirm in the dialog. Loading runs in the background; the card shows progress and
+Sample data comes with the optional **BarnCRM Sample Data** package, offered in both editions
+and needing Core only (see [Installing](installing.md)). Install it in a sandbox, scratch org
+or demo org; uninstall it when you no longer need sample records. The sample sets of the
+other modules (Fundraising, Volunteers and the rest) ship in those modules and load through
+this package.
+
+1. Open the **Sample Data** tab. **BarnCRM Settings**, **General**, **Sample Data** opens it
+   too; type "sample" in the settings search box if you do not see it.
+2. Read the warning, then select **Load Sample Data**.
+3. Confirm in the dialog. Loading runs in the background; the card shows progress and
    updates automatically until it finishes. With Fundraising installed there are several
    thousand records to write, so allow a few minutes rather than one. The load runs as
    background batch jobs (Setup > Apex Jobs lists them as SampleDataStageBatch), one step
@@ -184,15 +192,15 @@ core sample people are not there.
    If a step stops on an error, the load stops there: the card shows what did load, the
    error is in the [Error Log](error-log.md), and **Remove Sample Data** clears it for
    another try.
-5. With Fundraising installed: when it says **Loaded**, give the totals a few minutes. Giving
+4. With Fundraising installed: when it says **Loaded**, give the totals a few minutes. Giving
    totals (total giving, this year, largest gift, fund and appeal totals) are shipped in
    **Both** mode, so they are worked out in the background queue as the gifts are saved, and
    a bulk load like this one catches up within minutes. If a total is still empty after that,
    open **BarnCRM Settings > Rollups** and select **Recalculate**; the nightly run would also
    correct it tonight.
 
-If you came here from the Setup Assistant, the same **Sample data** step takes you to
-this screen. Loading sample data is entirely optional; skipping it does not block any
+If you came here from the Setup Assistant, its **Sample data** step opens this tab when
+the package is installed, and otherwise says how to get it. Loading sample data is entirely optional; skipping it does not block any
 other step.
 
 You need the **Manage BarnCRM Settings** permission to load or remove sample data.
@@ -212,7 +220,7 @@ household records, names, greetings, member counts, and Members panel.
 
 ## 3. A Five-Minute Walkthrough (as Maria)
 
-1. Open **BarnCRM Settings**, go to **Sample Data**, and select **Load Sample Data**.
+1. Open the **Sample Data** tab and select **Load Sample Data**.
    Confirm the dialog. Wait for the card to show **Loaded**, with counts for households,
    contacts, organizations, connections, affiliations, and, with Fundraising installed, gifts.
 2. Open the **Households** tab. Use the list view search to find "Garcia" and open
@@ -242,7 +250,7 @@ household records, names, greetings, member counts, and Members panel.
 8. With Fundraising installed, open the **Giving Overview** dashboard. If the numbers are empty, go to **BarnCRM
    Settings > Rollups** and select **Recalculate**: the totals are worked out by the rollup
    run rather than as each gift is saved.
-9. Return to **BarnCRM Settings**, **Sample Data**, and select **Remove Sample Data**.
+9. Return to the **Sample Data** tab and select **Remove Sample Data**.
    Confirm the dialog. The card shows **Removing** while it deletes the set in steps of
    about a hundred records, the same way it loaded, then returns to **Not loaded**. Every
    record the loader created is gone: households, contacts, organizations, connections, affiliations, the

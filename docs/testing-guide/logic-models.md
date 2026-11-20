@@ -238,7 +238,7 @@ periods `2026 Q2` (1 April to 30 June 2026, target 30, result 25), `2026 Q3`, `2
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Sample Data**, select **Load Sample Data** and wait for **Loaded**. | The card lists **Logic models** with 2, after **Program enrollments**. |
+| 1 | On the **Sample Data** tab, select **Load Sample Data** and wait for **Loaded**. | The card lists **Logic models** with 2, after **Program enrollments**. |
 | 2 | Open the **Logic Models** tab, list view **All**. | **After-school tutoring logic model** and **Food pantry logic model** are listed beside your own model. |
 | 3 | Open **After-school tutoring logic model**. | **For** shows **After-school tutoring**. Every column has parts: 4 inputs, 3 activities, 3 outputs, 2 short term, 1 intermediate term and 1 long term outcome, and 1 impact. **Things to Look At** shows the green all-clear. |
 | 4 | Select `Students read with more confidence`. | Under **Comes From**, two arrows with their assumptions; the arrow from `Tutoring hours delivered` shows **Assumption Evidence (2)**, one Strong with a source link and one Moderate. Its indicator `Students who say they enjoy reading` has a baseline of 42 and three periods: First term (Met), Second term (a percent) and Third term (a target only). |

@@ -79,7 +79,7 @@ Every BarnCRM module is in Beta right now: a **Beta** badge beside a module's na
 
 - [Payments](payments.md): finding a payment taken online, what its status means, and how refunds are made.
 
-### LWC Builder
+### Component Builder
 
 - [Built Components](lwc-builder.md): what a component your admin built shows, its buttons, and why a block or a record can be missing.
 

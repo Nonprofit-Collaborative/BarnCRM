@@ -8,8 +8,10 @@
  * names no object here: the object arrives as text, so the same catalog serves an org with or
  * without the standard objects (ADR-0013).
  */
+@NamespaceAccessible
 public with sharing class QueryFieldCatalog {
 	/** Raised when an object or field is not one the running user can see. */
+	@NamespaceAccessible
 	public class QueryFieldCatalogException extends Exception {
 	}
 

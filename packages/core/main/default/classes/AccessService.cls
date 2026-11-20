@@ -9,6 +9,7 @@
  * a message from a Custom Label, so the component always has something it can show to a
  * person rather than a platform stack trace.
  */
+@NamespaceAccessible
 public with sharing class AccessService {
 	/** The DeveloperName of the group that grants BarnCRM Settings. */
 	public static final String ADMIN_ROLE = 'BarnCRM_Admin_Group';
@@ -17,6 +18,7 @@ public with sharing class AccessService {
 	public static final String ADMIN_PERMISSION_SET = 'BarnCRM_Admin';
 
 	/** The packaged roles the page offers, in the order it shows them. */
+	@NamespaceAccessible
 	public static final List<String> ROLE_DEVELOPER_NAMES = new List<String>{
 		ADMIN_ROLE,
 		'Fundraising_Staff',
@@ -35,6 +37,7 @@ public with sharing class AccessService {
 	 * These and the registered rows are the whole allowlist: the page never assigns an
 	 * arbitrary permission set.
 	 */
+	@NamespaceAccessible
 	public static final List<String> ADD_ON_PERMISSION_SETS = new List<String>{
 		'BarnCRM_Find_And_Export',
 		'BarnCRM_Bulk_Update',
@@ -494,6 +497,7 @@ public with sharing class AccessService {
 	 *
 	 * @return the API names, without a namespace prefix
 	 */
+	@NamespaceAccessible
 	public static List<String> addOnNames() {
 		List<String> names = new List<String>(ADD_ON_PERMISSION_SETS);
 		names.addAll(moduleAddOns().keySet());

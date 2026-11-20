@@ -11,6 +11,7 @@
  * and deleted in system mode and without sharing (ADR-0021): a delete that skipped rows its user
  * cannot see would keep them for ever. It changes nothing but `Setup_Change__c` rows.
  */
+@NamespaceAccessible
 public without sharing class SetupChangeCopyJob implements Schedulable, Database.Batchable<SObject> {
 	/** The name the job was scheduled under, now its step's key (1:30 in the nightly run). */
 	public static final String JOB_NAME = 'BarnCRM Setup Changes Copy';
@@ -35,6 +36,17 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
 	@TestVisible
 	private static Boolean chainPurge = true;
 
+	/**
+	 * Sets that from a module's test, where `@TestVisible` does not reach once the packages are
+	 * separate. Does nothing outside a test.
+	 */
+	@NamespaceAccessible
+	public static void chainPurgeForTest(Boolean chain) {
+		if (Test.isRunningTest()) {
+			chainPurge = chain;
+		}
+	}
+
 	public SetupChangeCopyJob() {
 		this.purging = false;
 	}
@@ -57,16 +69,18 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
 	}
 
 	/** Makes sure the nightly run, which does the copy, is scheduled. */
+	@NamespaceAccessible
 	public static Id start() {
 		return NightlyJobs.start();
 	}
 
 	/** True when the nightly run, which does the copy, is scheduled. */
+	@NamespaceAccessible
 	public static Boolean isScheduled() {
 		return NightlyJobs.isScheduled();
 	}
 
-	/** The copy as a step of the nightly run, while Org Optimizer is on (R-SU8). */
+	/** The copy as a step of the nightly run, while Org Optimizer is installed (R-SU8). */
 	public static NightlyStep step() {
 		return new NightlyStep(JOB_NAME, System.Label.Core_HealthCheck_JobSetupChanges, 1, 30, new SetupChangeCopyJob())
 			.activeWhen(featureOn());
@@ -76,6 +90,7 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
 	 * Whether a copy or delete pass is waiting or running, whoever started it. Read in system
 	 * mode, as the duplicate scan guard is: without View Setup a person sees only their own jobs.
 	 */
+	@NamespaceAccessible
 	public static Boolean isRunning() {
 		return [
 				SELECT COUNT()
@@ -86,6 +101,7 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
 	}
 
 	/** Starts one copy now, as the running user, unless one is already waiting or running. */
+	@NamespaceAccessible
 	public static Boolean runNow() {
 		if (isRunning()) {
 			return false;
@@ -94,12 +110,13 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
 		return true;
 	}
 
-	/** Whether the Org Optimizer feature, which owns Setup Changes, is on (R-SU8). */
+	/** Whether the Org Optimizer module, which shows Setup Changes, is installed (R-SU8). */
 	public static Boolean featureOn() {
-		return FeatureSwitchService.isOn(FeatureSwitchService.ORG_OPTIMIZER);
+		return ModuleDetectionService.isInstalled(ModuleDetectionService.MODULE_ORG_OPTIMIZER);
 	}
 
 	/** Days to Keep Setup Changes: empty or unreadable reads as 730, out of range as the nearest end. */
+	@NamespaceAccessible
 	public static Integer retentionDays() {
 		return DataJobs.wholeNumberSetting(
 			'Setup_Change_Retention_Days__c',
@@ -113,9 +130,10 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
 	// Batch
 	// -------------------------------------------------------------------------------------
 
+	@NamespaceAccessible
 	public Database.QueryLocator start(Database.BatchableContext context) {
 		if (!featureOn()) {
-			// R-SU8: while Org Optimizer is off, the run copies and deletes nothing, quietly.
+			// R-SU8: while Org Optimizer is not installed, the run copies and deletes nothing, quietly.
 			return Database.getQueryLocator('SELECT Id FROM Setup_Change__c WHERE Id = null', AccessLevel.SYSTEM_MODE);
 		}
 		if (purging) {

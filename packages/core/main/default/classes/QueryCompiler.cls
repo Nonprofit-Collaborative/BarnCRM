@@ -23,7 +23,9 @@ public with sharing class QueryCompiler {
 	}
 
 	public static final Integer MAX_FIELDS = 20;
+	@NamespaceAccessible
 	public static final Integer MAX_ROWS = 2000;
+	@NamespaceAccessible
 	public static final Integer DEFAULT_ROWS = 200;
 	@NamespaceAccessible
 	public static final Integer EXPORT_PAGE_SIZE = 2000;
@@ -31,10 +33,14 @@ public with sharing class QueryCompiler {
 	private static final Pattern FIELD_PATH = Pattern.compile('^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)*$');
 
 	/** The query document, read and checked. */
+	@NamespaceAccessible
 	public class QueryDocument {
 		public String objectName;
+		@NamespaceAccessible
 		public List<String> fields = new List<String>();
+		@NamespaceAccessible
 		public String filter;
+		@NamespaceAccessible
 		public String orderField;
 		public String orderDirection;
 		public Integer rowLimit = DEFAULT_ROWS;
@@ -68,6 +74,7 @@ public with sharing class QueryCompiler {
 	}
 
 	/** Reads a query document; refuses one that is not a version 1 document within limits. */
+	@NamespaceAccessible
 	public static QueryDocument parse(String queryJson) {
 		Map<String, Object> raw;
 		try {

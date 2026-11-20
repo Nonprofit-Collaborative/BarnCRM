@@ -15,8 +15,9 @@ public with sharing class AutomationRegistrySelector {
 	 * Custom metadata cannot be inserted by a test, so tests put in-memory records here and
 	 * every read in the package sees them.
 	 */
+	@NamespaceAccessible
 	@TestVisible
-	private static List<Automation_Registry__mdt> registryOverride;
+	public static List<Automation_Registry__mdt> registryOverride;
 
 	private static Map<String, List<Automation_Registry__mdt>> byObjectName;
 

@@ -10,6 +10,7 @@
  *
  * The global describe is read once per transaction.
  */
+@NamespaceAccessible
 public with sharing class IntegrationAppService {
 	public static final String CATEGORY_COMPLEMENT = 'Complement';
 	public static final String CATEGORY_IN_DEVELOPMENT = 'InDevelopment';
@@ -58,12 +59,46 @@ public with sharing class IntegrationAppService {
 		/** True when one of the product's objects is in this org. */
 		@AuraEnabled
 		public Boolean installed;
-		/** The Migration Kits that move this installed product into BarnCRM (MIG-10), or empty. */
+		/**
+		 * The Migration Kits that move this installed product into BarnCRM (MIG-10), or empty,
+		 * also empty while the Migration package that runs them is not installed.
+		 */
 		@AuraEnabled
-		public List<MigrationKitService.KitRef> migrationKits = new List<MigrationKitService.KitRef>();
+		public List<KitRef> migrationKits = new List<KitRef>();
+	}
+
+	/** A kit a product offers, as the page names it on its Start Migration button. */
+	public class KitRef {
+		@AuraEnabled
+		public String key;
+		@AuraEnabled
+		public String label;
+	}
+
+	/** The module catalog key of the Migration package, which runs the kits (ADR-0232). */
+	@TestVisible
+	private static final String MIGRATION_MODULE = 'Migration';
+
+	/** Stands in for whether the Migration package is installed, in tests. */
+	@NamespaceAccessible
+	@TestVisible
+	public static Boolean migrationInstalledOverride;
+
+	/**
+	 * Test seam for the Migration package's tests, where `@TestVisible` does not reach: the
+	 * catalog rows and the org's object names, lower case, that detection reads.
+	 */
+	@TestVisible
+	@NamespaceAccessible
+	public static void useCatalogForTest(List<Integration_App__mdt> rows, Set<String> objectNames) {
+		if (Test.isRunningTest()) {
+			catalogOverride = rows;
+			objectNamesOverride = objectNames;
+		}
 	}
 
 	/** The keys of the catalog's products detected in this org, listed or not. */
+	@NamespaceAccessible
 	public static Set<String> detectedKeys() {
 		Set<String> keys = new Set<String>();
 		for (Integration_App__mdt row : catalog()) {
@@ -81,7 +116,7 @@ public with sharing class IntegrationAppService {
 	 */
 	public static List<AppInfo> getApps() {
 		List<AppInfo> apps = new List<AppInfo>();
-		Map<String, List<MigrationKitService.KitRef>> kits = MigrationKitService.kitsByApp();
+		Map<String, List<KitRef>> kits = kitsByApp();
 		for (Integration_App__mdt row : catalog()) {
 			Boolean installed = isDetected(row);
 			if (row.Show_Only_When_Installed__c == true && !installed) {
@@ -106,6 +141,44 @@ public with sharing class IntegrationAppService {
 			apps.add(info);
 		}
 		return apps;
+	}
+
+	/**
+	 * The kits for each product key, in Sort Order, when the Migration package is installed: a
+	 * kit row ships with the package that owns its records, and the Assistant that runs it with
+	 * the Migration package, so without it no kit can start.
+	 */
+	private static Map<String, List<KitRef>> kitsByApp() {
+		Map<String, List<KitRef>> byApp = new Map<String, List<KitRef>>();
+		if (!migrationInstalled()) {
+			return byApp;
+		}
+		// A query, not getAll(): the rows are few and only these two fields are needed.
+		for (Migration_Kit__mdt kit : [
+			SELECT DeveloperName, MasterLabel, Source_App__c
+			FROM Migration_Kit__mdt
+			WHERE Source_App__c != NULL
+			WITH SYSTEM_MODE
+			ORDER BY Sort_Order__c, DeveloperName
+		]) {
+			if (!byApp.containsKey(kit.Source_App__c)) {
+				byApp.put(kit.Source_App__c, new List<KitRef>());
+			}
+			KitRef ref = new KitRef();
+			ref.key = kit.DeveloperName;
+			ref.label = kit.MasterLabel;
+			byApp.get(kit.Source_App__c).add(ref);
+		}
+		return byApp;
+	}
+
+	/** Whether the Migration package (the Migration Assistant tab) is installed. */
+	@NamespaceAccessible
+	public static Boolean migrationInstalled() {
+		if (migrationInstalledOverride != null) {
+			return migrationInstalledOverride;
+		}
+		return ModuleDetectionService.isInstalled(MIGRATION_MODULE);
 	}
 
 	/** The row's category, or Complement when it is blank or none of the three. */

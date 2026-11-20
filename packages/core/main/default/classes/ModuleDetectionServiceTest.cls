@@ -569,7 +569,8 @@ private class ModuleDetectionServiceTest {
 				'LwcBuilder',
 				'Scholarships',
 				'Territory',
-				'Projects'
+				'Projects',
+				'Migration'
 			};
 			for (String announcing : announcingModules) {
 				Assert.isNull(

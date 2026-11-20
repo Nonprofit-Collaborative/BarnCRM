@@ -34,7 +34,12 @@
         </template>
 
         <template lwc:if={isEmpty}>
-          <c-barn-empty-state data-id="empty-state" illustration="setup" message={labels.empty}>
+          <c-barn-empty-state
+            data-id="empty-state"
+            illustration="setup"
+            heading={labels.emptyHeading}
+            message={labels.empty}
+          >
           </c-barn-empty-state>
         </template>
 

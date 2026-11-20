@@ -19,12 +19,14 @@ public with sharing class JobNotifier {
 	public static final String TYPE_NAME = 'BarnCRM_Job_Finished';
 
 	/** The Error Log context a refused send is written under. */
+	@NamespaceAccessible
 	public static final String LOG_CONTEXT = 'Job notification';
 
 	/**
 	 * The settings console sections a notification can open, as the console names them. A
 	 * sub-section name opens its page scrolled to that box (P1).
 	 */
+	@NamespaceAccessible
 	public static final String SECTION_GENERAL = 'General';
 	/** Where the duplicate scan's panel is: the Duplicate Matching page (ADR-0139). */
 	public static final String SECTION_DUPLICATE_MATCHING = SettingSections.DUPLICATE_MATCHING;
@@ -70,9 +72,12 @@ public with sharing class JobNotifier {
 		/** The record it opens, or null when it opens a settings page. */
 		@NamespaceAccessible
 		public Id targetId;
-		/** The settings console section it opens, or null when it opens a record. */
+		/** The settings console section it opens, or null when it opens a record or a tab. */
 		@NamespaceAccessible
 		public String section;
+		/** The tab it opens, or null when it opens a record or a settings section. */
+		@NamespaceAccessible
+		public String tab;
 	}
 
 	private class RefusedException extends Exception {
@@ -121,6 +126,24 @@ public with sharing class JobNotifier {
 	public static void aboutSettings(Id recipientId, String jobName, Boolean stopped, String body, String section) {
 		Notice notice = notice(recipientId, jobName, stopped, body);
 		notice.section = section;
+		send(notice);
+	}
+
+	/**
+	 * Tells `recipientId` that a sample data load or removal is over and opens the Sample Data
+	 * tab (the module catalog's admin tab for it), or the settings console's General section
+	 * where the Sample Data module is not installed.
+	 */
+	@NamespaceAccessible
+	public static void aboutSampleData(Id recipientId, String jobName, Boolean stopped, String body) {
+		Notice notice = notice(recipientId, jobName, stopped, body);
+		String moduleName = ModuleDetectionService.MODULE_SAMPLE_DATA;
+		if (ModuleDetectionService.isInstalled(moduleName)) {
+			notice.tab = ModuleDetectionService.firstAdminTab(moduleName);
+		}
+		if (notice.tab == null) {
+			notice.section = SECTION_GENERAL;
+		}
 		send(notice);
 	}
 
@@ -206,6 +229,8 @@ public with sharing class JobNotifier {
 			notification.setBody(notice.body.abbreviate(BODY_LIMIT));
 			if (notice.targetId != null) {
 				notification.setTargetId(notice.targetId);
+			} else if (notice.tab != null) {
+				notification.setTargetPageRef(tabPageReference(notice.tab));
 			} else {
 				notification.setTargetPageRef(pageReference(notice.section));
 			}
@@ -250,6 +275,17 @@ public with sharing class JobNotifier {
 				'type' => 'standard__navItemPage',
 				'attributes' => new Map<String, Object>{ 'apiName' => NamespaceUtil.qualify(SETTINGS_TAB) },
 				'state' => new Map<String, Object>{ NamespaceUtil.stateKey('section') => section }
+			}
+		);
+	}
+
+	/** One packaged tab, as the page reference a notification opens. */
+	@TestVisible
+	private static String tabPageReference(String tab) {
+		return JSON.serialize(
+			new Map<String, Object>{
+				'type' => 'standard__navItemPage',
+				'attributes' => new Map<String, Object>{ 'apiName' => NamespaceUtil.qualify(tab) }
 			}
 		);
 	}

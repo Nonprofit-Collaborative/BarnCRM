@@ -105,8 +105,10 @@ Do these in order.
    match a real person, and never choose a real record in a merge, move, erase or relationship
    step.
 7. **Scripts to skip** (record Skipped, "Core-only real-org sandbox"): every script on the
-   Fundraising (gift mirrors included), Mirror, Volunteers and Rollup Builder pages; T-SA-02 (needs a fresh org) and T-SA-07
-   to T-SA-09 (sample data); T-HH-14 (needs a person account); and the whole smoke list from
+   Fundraising (gift mirrors included), Mirror, Volunteers, Rollup Builder and Migration Assistant pages (except T-MIG-12 steps 4 to 6, which check Core without BarnCRM Migration); T-SA-02 (needs a fresh org) and T-SA-07
+   to T-SA-09 (sample data); T-HH-14 (needs a person account); every script on the Org
+   Optimizer and Health Check page, smoke item 14 included, unless BarnCRM Org Optimizer was
+   deployed too (`--core-only` leaves it out); and the whole smoke list from
    item 16 on. Run smoke items 1 to 15 ([Smoke list](README.md#smoke-list-every-build-about-one-hour)).
    On the full list, skip any other step that names sample data or a module; do not change real
    records to make it work.
@@ -144,7 +146,8 @@ Scratch orgs only. Never in a real-org sandbox: use the fixture in
 scripts/org/seed-sample-data.sh <alias>
 ```
 
-It loads 200 households, their contacts, 25 organizations, connections and affiliations, and,
+It deploys BarnCRM Sample Data first when the org does not have it (an org without a
+namespace), then loads 200 households, their contacts, 25 organizations, connections and affiliations, and,
 with the modules deployed, gifts, funds, appeals, commitments and volunteer records. It waits
 until every background job has finished, which takes a few minutes with Fundraising installed.
 Loading twice is refused; remove the set first (script T-SA-07 in

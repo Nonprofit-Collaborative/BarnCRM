@@ -284,7 +284,7 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Sample Data**, and load the sample data with Fundraising installed. | The load finishes. |
+| 1 | Open the **Sample Data** tab and load the sample data with Fundraising installed. | The load finishes. |
 | 2 | Open the **Funds** tab, list view **All Funds**. | One **General Fund** (yours, still the default) and seven sample funds, 8 in all. |
 | 3 | Open **General Fund** and its gifts. | Sample gifts are allocated to it. |
 | 4 | Select **Remove Sample Data** and confirm. | The removal finishes. |
@@ -445,6 +445,6 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 | 1 | In the kit, run and load **Engagement Plans**. | An active stewardship plan template New Donor Welcome, started **Manual**. **Verified**. |
 | 2 | Run and load **Engagement Plan Tasks**. | Two steps: Call to thank, 3 days, Normal, **Specific user** you; Send impact report, 30 days, **Record owner**. **Verified**. |
 | 3 | Read **Verification** under **Levels, Engagement Plans and Rollups Parity**. | **In the other app now** counts the two active levels and one plan (3); **Done** is 2 (Friend and New Donor Welcome); **Check this step**. |
-| 4 | Create a BarnCRM donor level Patron, then **Refresh**. | **Done** is 3 and the step says **Verified**. Click **Open Stewardship Plans**: the tab opens. Click **Mark Done**. |
+| 4 | Create a BarnCRM donor level Patron, then **Refresh**. | **Done** is 3 and the step says **Verified**. Click **Open Stewardship Plan Templates**: the tab opens. Click **Mark Done**. |
 
 **Cleanup:** undo the two plan steps in reverse order; delete the Patron donor level.

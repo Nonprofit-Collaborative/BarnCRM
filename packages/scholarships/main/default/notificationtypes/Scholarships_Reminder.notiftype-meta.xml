@@ -4,7 +4,7 @@
   <description>
     Reminds the program owner before a recipient report or condition is due, and a reviewer of
     applications assigned to them. Sent by Scholarships and Outbound Grants; turned off in BarnCRM
-    Settings, Scholarships and Grants.
+    Settings, Scholarships and Outbound Grants.
   </description>
   <desktop>true</desktop>
   <masterLabel>Scholarships reminder</masterLabel>

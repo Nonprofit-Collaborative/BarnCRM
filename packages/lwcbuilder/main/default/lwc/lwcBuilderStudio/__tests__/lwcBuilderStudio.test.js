@@ -2,6 +2,14 @@ import { createElement } from 'lwc';
 import LwcBuilderStudio from 'c/lwcBuilderStudio';
 import getStudio from '@salesforce/apex/LwcBuilderController.getStudio';
 import saveComponent from '@salesforce/apex/LwcBuilderController.saveComponent';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+const HELP = require('../../../staticresources/BarnHelp_LwcBuilder.json').texts;
+
+setHelpTextForTest({
+  LwcBuilder_Studio_Title: HELP.LwcBuilder_Studio_Title,
+  LwcBuilder_Studio_Choose: HELP.LwcBuilder_Studio_Choose
+});
 
 jest.mock('@salesforce/apex/LwcBuilderController.getStudio', () => ({ default: jest.fn() }), {
   virtual: true
@@ -150,6 +158,12 @@ describe('c-lwc-builder-studio', () => {
     );
     expect(sent.definition.sections[0].rows[0].columns[0].blocks[0].type).toBe('text');
     expect(getStudio).toHaveBeenCalledTimes(2);
+  });
+
+  it('titles the page Component Builder and asks to choose a component', async () => {
+    const element = await mount();
+    expect(find(element, 'card').title).toBe('Component Builder');
+    expect(find(element, 'pick').placeholder).toBe('Choose a Component');
   });
 
   it('opens a saved component and exports it as three files', async () => {

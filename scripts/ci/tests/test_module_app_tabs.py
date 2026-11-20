@@ -290,7 +290,7 @@ class CoreAppsTest(unittest.TestCase):
             app = ET.parse(os.path.join(root, CORE, "applications", app_name + ".app-meta.xml")).getroot()
             tabs = [tab.text for tab in app.findall("m:tabs", NS)]
             self.assertIn("Duplicate_Matching", tabs, app_name)
-            self.assertLess(tabs.index("Data_Hygiene"), tabs.index("Duplicate_Matching"), app_name)
+            self.assertLess(tabs.index("Data_Manager"), tabs.index("Duplicate_Matching"), app_name)
 
 
 def read(path):

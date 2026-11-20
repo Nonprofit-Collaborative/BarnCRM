@@ -275,7 +275,7 @@ public with sharing class NpcHouseholdSource extends NpspHouseholdSource impleme
 
 	/** The kit's only step is a tool step, so there are no rows to shape. */
 	@NamespaceAccessible
-	public List<Map<String, Object>> rows(String stepKey, List<SObject> records) {
+	public List<Map<String, Object>> rows(String stepKey, List<Map<String, Object>> rows) {
 		return null;
 	}
 

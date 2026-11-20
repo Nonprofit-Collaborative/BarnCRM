@@ -8,13 +8,19 @@
  */
 @NamespaceAccessible
 public with sharing class CoexistenceService {
+	@NamespaceAccessible
 	public static final String MODE_STANDALONE = 'Standalone';
+	@NamespaceAccessible
 	public static final String MODE_NPSP = 'NPSP';
+	@NamespaceAccessible
 	public static final String MODE_NONPROFIT_CLOUD = 'NonprofitCloud';
 
+	@NamespaceAccessible
 	public static final String MEMBERSHIP_CONTACT = 'Contact';
+	@NamespaceAccessible
 	public static final String MEMBERSHIP_JUNCTION = 'Junction';
 
+	@NamespaceAccessible
 	public static final String KEY_COEXISTENCE_MODE = 'Coexistence_Mode__c';
 	public static final String KEY_MEMBERSHIP_MODE = 'Household_Membership_Mode__c';
 
@@ -23,6 +29,7 @@ public with sharing class CoexistenceService {
 	/**
 	 * The mode this org is running in, or null when nobody has confirmed one yet.
 	 */
+	@NamespaceAccessible
 	public static String getCurrentMode() {
 		BarnCRM_Settings__c settings = SettingsService.getSettings();
 		String mode = settings == null ? null : settings.Coexistence_Mode__c;
@@ -32,6 +39,7 @@ public with sharing class CoexistenceService {
 	/**
 	 * How household membership is stored, defaulting to contact mode when unset.
 	 */
+	@NamespaceAccessible
 	public static String getMembershipMode() {
 		BarnCRM_Settings__c settings = SettingsService.getSettings();
 		String mode = settings == null ? null : settings.Household_Membership_Mode__c;
@@ -42,6 +50,7 @@ public with sharing class CoexistenceService {
 	 * Whether somebody has chosen how people belong to a household. Blank is the shipped
 	 * default, read as contact mode, and it is the only state detection is allowed to change.
 	 */
+	@NamespaceAccessible
 	public static Boolean membershipModeChosen() {
 		BarnCRM_Settings__c settings = SettingsService.getSettings();
 		return settings != null && String.isNotBlank(settings.Household_Membership_Mode__c);
@@ -58,6 +67,7 @@ public with sharing class CoexistenceService {
 	 * membership half is only proposed, like the rest: an administrator who already chose the
 	 * simple way keeps it, and Health Check says so if people stored as accounts appear.
 	 */
+	@NamespaceAccessible
 	public static String applyRecommendedIfUnset() {
 		String current = getCurrentMode();
 		if (String.isNotBlank(current)) {
@@ -72,6 +82,7 @@ public with sharing class CoexistenceService {
 	/**
 	 * Set the mode explicitly, as the settings console and Health Check do.
 	 */
+	@NamespaceAccessible
 	public static void setMode(String mode) {
 		if (String.isBlank(mode) || !VALID_MODES.contains(mode)) {
 			throw new CoexistenceException(
@@ -160,6 +171,7 @@ public with sharing class CoexistenceService {
 	 * Existing households are not touched: this changes how the next one is built. Refused,
 	 * with the reason, when people are linked straight to a household and would be stranded.
 	 */
+	@NamespaceAccessible
 	public static void applyJunctionMembership() {
 		save(new Map<String, Object>{ KEY_MEMBERSHIP_MODE => MEMBERSHIP_JUNCTION });
 	}
@@ -225,6 +237,7 @@ public with sharing class CoexistenceService {
 	 */
 
 	/** People who belong to a household today through a membership record. */
+	@NamespaceAccessible
 	public static Integer countPeopleWithMembershipRecords() {
 		Date today = OrgDate.today();
 		return [
@@ -240,6 +253,7 @@ public with sharing class CoexistenceService {
 	 * record joining them to any household. Nobody to count when the org has no household
 	 * record type at all.
 	 */
+	@NamespaceAccessible
 	public static Integer countPeopleLinkedWithoutMembershipRecords() {
 		Id householdRecordTypeId = HouseholdService.householdRecordTypeId();
 		if (householdRecordTypeId == null) {
@@ -261,6 +275,7 @@ public with sharing class CoexistenceService {
 	 * Stops at `cap` when one is given, so that Health Check on an org with a great many person
 	 * accounts does not count every one of them against the query row limit.
 	 */
+	@NamespaceAccessible
 	public static Integer countPeopleStoredAsAccounts(Integer cap) {
 		Set<Id> personTypes = OrgShapeDetector.personRecordTypeIds();
 		if (personTypes.isEmpty()) {
@@ -297,6 +312,7 @@ public with sharing class CoexistenceService {
 	}
 
 	/** Raised when a value that is not a coexistence mode is offered as one. */
+	@NamespaceAccessible
 	public class CoexistenceException extends Exception {
 	}
 }

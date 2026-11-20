@@ -88,7 +88,7 @@ Nothing else has to be done. If you have just switched a job on and do not want 
 for tonight, choose **Run Now** on its row: the top up, the overdue pass and both reminder
 passes (each reminder pass only while its setting is on) start immediately, and the row shows
 what it did once it finishes. (Donor levels have their own **Recalculate Now** button on the
-Donor Levels page.)
+**Donor Levels and Scores** page.)
 
 ### Checking They Are Running
 

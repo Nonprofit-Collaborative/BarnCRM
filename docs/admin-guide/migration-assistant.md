@@ -1,5 +1,8 @@
 # Migration Assistant
 
+**Package:** BarnCRM Migration (optional; the Assistant, its tab and the household tools); kits
+ship in the module that receives their records.
+
 ## What It Does
 
 The Migration Assistant moves your records and setup from another app in the same Salesforce
@@ -18,7 +21,7 @@ org. These kits ship:
 - **DLRS Rollups** (Rollup Builder): copies your DLRS rollups into Rollup Builder.
 - **NPSP Customizable Rollups** (Rollup Builder): copies your NPSP customizable rollups into
   Rollup Builder.
-- **NPSP People and Addresses** (Core): adopts NPSP households in place, then copies NPSP
+- **NPSP People and Addresses** (Migration): adopts NPSP households in place, then copies NPSP
   relationships, affiliations and household addresses. See
   [Migrating From NPSP](migrating-from-npsp.md#in-org-migration-kits).
 - **PMM Programs and Services** (Programs): copies Program Management Module programs, cohorts,
@@ -43,9 +46,9 @@ org. These kits ship:
 - **NPC Relationships and Affiliations** (Mirror): copies relationships between
   people and links to organizations (not households). See
   [Migrating From Nonprofit Cloud](migrating-from-nonprofit-cloud.md#the-nonprofit-cloud-relationships-and-affiliations-kit).
-- **NPC Households** (Mirror): one step, **Convert Nonprofit Cloud Households** on BarnCRM
-  Settings, **General**, which makes each Nonprofit Cloud household a BarnCRM household on the
-  same account, with its members, and can be undone there. See
+- **NPC Households** (Mirror): one step, **Convert Nonprofit Cloud Households** under
+  **Households** on the Migration Assistant tab, which makes each Nonprofit Cloud household a
+  BarnCRM household on the same account, with its members, and can be undone there. See
   [Nonprofit Cloud Households](nonprofit-cloud-households.md).
 
 An app can have several kits, one for each BarnCRM module that receives its records. Its
@@ -59,22 +62,31 @@ file.
 
 ## How to Turn It On
 
-There is nothing to turn on. You need **Manage BarnCRM Settings**, and for a step that loads
-records also the permission to import (the **BarnCRM Admin** role has both).
+Install the **BarnCRM Migration** package (see [Installing](installing.md)). It is optional:
+install it when you have something to move, and uninstall it when you are done (see
+[When You Are Done](#when-you-are-done)). Its post-install gives the **Migration Admin**
+permission set to everyone who holds the BarnCRM Admin role. You need **Manage BarnCRM
+Settings**, and for a step that loads records also the permission to import (the **BarnCRM
+Admin** role has both).
 
 1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM Admin**.
-2. Click **BarnCRM Settings**, then **Integrations** in the left navigation.
-3. Find the app you are moving from. When BarnCRM has a kit for it, the listing shows
-   **Start Migration**. Click it.
+2. Open the **Migration Assistant** tab. It lists a kit for each app installed in your org that
+   BarnCRM has a kit for, each with **Start**, and, under **Households**, the household tools
+   that apply to your org.
+3. Click **Start** on the kit you want.
 
-If you do not see **Start Migration**, either the app is not detected in your org (the listing
-says **Not installed**, or is not shown at all), there is no kit for it yet, or you do not have
-Manage BarnCRM Settings.
+You can also start from **BarnCRM Settings**, **Integrations**: a detected app with a kit shows
+**Start Migration**, which opens the same kit on the Migration Assistant tab.
+
+If a kit you expect is not listed, either the app is not detected in your org (on Integrations
+the listing says **Not installed**, or is not shown at all), the module that ships the kit is
+not installed, or you do not have Manage BarnCRM Settings. Without the BarnCRM Migration
+package, Integrations shows no **Start Migration** button at all.
 
 ## Running a Kit
 
-The Assistant opens in place of the list, with **Back to Integrations** at the top. It shows the
-kit's name, what it moves, and its steps in order. Each step shows its status:
+The kit opens on the tab, with **Back to Migration Kits** at the top. It shows the kit's name,
+what it moves, and its steps in order. Each step shows its status:
 
 - **Not Started**, **Waiting** (an earlier step is not done yet), **Running** (records are being
   read, previewed, loaded or undone), **Ready to Review** (the preview is done), **Done**,
@@ -132,6 +144,21 @@ undoing a step reopens it.
 Keep the old app installed until you have checked your data in BarnCRM. Uninstall it from Setup,
 **Installed Packages**, when you no longer need it.
 
+## Households
+
+Under **Households**, the tab shows **Adopt NPSP Households** where NPSP is detected (see
+[NPSP Households](npsp-households.md)) and **Convert Nonprofit Cloud Households** where
+Nonprofit Cloud households are found and BarnCRM Mirror is installed (see
+[Nonprofit Cloud Households](nonprofit-cloud-households.md)). Each stays listed while an
+earlier run can still be undone.
+
+## When You Are Done
+
+When every migration is done and you no longer need to undo a step or an adoption, uninstall
+**BarnCRM Migration** from Setup, **Installed Packages**. The records it moved stay. Its tab,
+the kits' runs, Start Migration on Integrations and every undo go with it. You can install it
+again later to run another kit.
+
 ## The Rollup Kits
 
 Both rollup kits have one step, done on the **Rollup Builder** tab:
@@ -147,7 +174,8 @@ Customizable Rollups.
 
 ## For Contributors: Adding a Kit
 
-A kit is data plus, only when needed, one small class. It needs no change to Core.
+A kit is data plus, only when needed, one small class. It needs no change to Core or to the
+Migration package, and the module that ships it does not depend on the Migration package.
 
 1. Add a **Migration Kit** custom metadata record (`Migration_Kit__mdt`) to the module that owns
    the destination records (Mirror when the source is a standard object such as Opportunity):
@@ -182,11 +210,14 @@ A kit is data plus, only when needed, one small class. It needs no change to Cor
    BarnCRM fields as for any file. The template's matching, file values and row rules all apply.
 3. Only if rows need reshaping (one source record to several rows) or a step needs its own
    check, set **Extension Class** to a class implementing `MigrationKitExtension` (Core):
-   `rows(stepKey, records)` returns the rows for a page of source records, or null to keep the
-   default; `verify(stepKey)` returns a source count and a done count, or null. For a loading
+   `rows(stepKey, rows)` receives the rows the Assistant read for a page of source records (one
+   map of column to value per record) and returns the rows to stage, or null to keep them;
+   `verify(stepKey)` returns a source count and a done count, or null. A kit's Apex test reads
+   its step definition with Core's `MigrationKitSteps.step(kitKey, stepKey)`. For a loading
    step, a check the extension returns replaces the comparison of the row counts (reshaped rows
    need not match the source count); a rejected row still stops **Verified**.
 4. Document the kit in its module's admin guide and add test rows to the Testing Guide.
 
-See ADR-0197 `0197-migration-assistant.md` for the design and the canonical model Section 29ZS
-and R-MK1 for the rules.
+See ADR-0197 `0197-migration-assistant.md` and ADR-0232
+`0232-migration-package.md` for the design and the canonical model Section 29ZS and R-MK1 for
+the rules.

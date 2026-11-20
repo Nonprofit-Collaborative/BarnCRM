@@ -42,6 +42,11 @@ private class SetupChangeCopyJobTest {
 		];
 	}
 
+	/** Whether the Org Optimizer module, which shows the copies, reads as installed. */
+	private static void orgOptimizerInstalled(Boolean installed) {
+		ModuleDetectionService.installedOverride.put(ModuleDetectionService.MODULE_ORG_OPTIMIZER, installed);
+	}
+
 	private static void keepFor(Integer days) {
 		BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
 		settings.Setup_Change_Retention_Days__c = days;
@@ -97,6 +102,7 @@ private class SetupChangeCopyJobTest {
 	@IsTest
 	static void theDeletePassRemovesOnlyChangesPastTheRetention() {
 		keepFor(365);
+		orgOptimizerInstalled(true);
 		insert as system new List<Setup_Change__c>{
 			new Setup_Change__c(Audit_Trail_Id__c = 'old', Changed_At__c = Datetime.now().addDays(-400)),
 			new Setup_Change__c(Audit_Trail_Id__c = 'new', Changed_At__c = Datetime.now().addDays(-300))
@@ -113,11 +119,11 @@ private class SetupChangeCopyJobTest {
 	}
 
 	@IsTest
-	static void aRunWhileOrgOptimizerIsOffCopiesAndDeletesNothing() {
-		TestSettings.newInstall();
+	static void aRunWithoutOrgOptimizerCopiesAndDeletesNothing() {
+		orgOptimizerInstalled(false);
 		insert as system new Setup_Change__c(Audit_Trail_Id__c = 'old', Changed_At__c = Datetime.now().addDays(-4000));
 		System.runAs(TestUsers.admin()) {
-			Assert.isFalse(SetupChangeCopyJob.featureOn(), 'A new install starts with it off.');
+			Assert.isFalse(SetupChangeCopyJob.featureOn(), 'Without the module the copy is off.');
 			Test.startTest();
 			// A copy that ran would read the trail; a delete that ran would take the old row.
 			Database.executeBatch(new SetupChangeCopyJob(true), SetupChangeCopyJob.CHUNK_SIZE);

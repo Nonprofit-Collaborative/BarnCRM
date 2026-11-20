@@ -1,5 +1,7 @@
 import { LightningElement, api } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
 import getApps from '@salesforce/apex/IntegrationController.getApps';
+import { loadTabNames, tabApiName } from 'c/barnTabs';
 
 import GROUP_COMPLEMENT from '@salesforce/label/c.Core_Integrations_GroupComplement';
 import GROUP_IN_DEVELOPMENT from '@salesforce/label/c.Core_Integrations_GroupInDevelopment';
@@ -58,6 +60,9 @@ function groupOf(app) {
     : GROUPS[0].category;
 }
 
+/** The Migration package's tab, where a kit runs (ADR-0232). */
+const MIGRATION_TAB = 'Migration_Assistant';
+
 /** A label with one {0} placeholder filled in. */
 function fill(label, value) {
   return label.replace('{0}', value);
@@ -70,16 +75,14 @@ function fill(label, value) {
  * on any of the products. A group with no product is not drawn, so an org without a product
  * that matches a BarnCRM module sees no heading for it.
  *
- * A detected product with a Migration Kit offers Start Migration (MIG-10), which shows the
- * Migration Assistant in place of the list; Back returns to it.
+ * A detected product with a Migration Kit offers Start Migration (MIG-10) while the Migration
+ * package is installed; the button opens that kit on the package's Migration Assistant tab.
  */
-export default class IntegrationsPanel extends LightningElement {
+export default class IntegrationsPanel extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded('Core');
 
   apps;
   errorMessage;
-  /** The Migration Kit open in the Assistant, or undefined while the list shows. */
-  migrationKit;
 
   labels = {
     get intro() {
@@ -141,13 +144,20 @@ export default class IntegrationsPanel extends LightningElement {
     return this.load();
   }
 
-  handleStartMigration(event) {
-    this.migrationKit = event.target.dataset.kit;
-  }
-
-  handleMigrationBack() {
-    this.migrationKit = undefined;
-    return this.load();
+  /**
+   * Opens the kit on the Migration Assistant tab. The page state key carries the tab's own
+   * namespace prefix (`c__kit` without one), as every packaged tab's state does.
+   */
+  async handleStartMigration(event) {
+    const kit = event.target.dataset.kit;
+    await loadTabNames([MIGRATION_TAB]);
+    const apiName = tabApiName(MIGRATION_TAB);
+    const prefix = apiName.includes('__') ? apiName.split('__')[0] : 'c';
+    this[NavigationMixin.Navigate]({
+      type: 'standard__navItemPage',
+      attributes: { apiName },
+      state: { [`${prefix}__kit`]: kit }
+    });
   }
 
   get isEmpty() {

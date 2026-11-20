@@ -63,7 +63,7 @@ private class GiftMirrorHealthChecksTest {
 				OpportunityMirrorSchedulable.schedule();
 				Assert.isFalse(reported(GiftMirrorHealthChecks.findings()), 'Just scheduled: nothing to say yet.');
 				GiftMirrorHealthChecks.nowForTest = System.now().addDays(3);
-				Assert.isTrue(reported(HealthCheckService.run()), 'Core finds Fundraising by name.');
+				Assert.isTrue(reported(HealthCheckService.extensionFindings()), 'Core finds Fundraising by name.');
 				MirrorSettingsWriter.recordOpportunityMirrorRun(System.now().addDays(2), 'Ran');
 				Assert.isFalse(reported(GiftMirrorHealthChecks.findings()), 'A run completed a day ago.');
 			}

@@ -49,6 +49,7 @@ public class HouseholdTestDataFactory {
 	 * already read the settings in the same transaction is silently ignored: SettingsService
 	 * holds the first answer for the rest of the transaction.
 	 */
+	@NamespaceAccessible
 	public static BarnCRM_Settings__c save(BarnCRM_Settings__c record) {
 		upsert record;
 		SettingsService.clearCaches();
@@ -211,6 +212,7 @@ public class HouseholdTestDataFactory {
 		}
 	}
 
+	@NamespaceAccessible
 	public static List<Contact> manyContacts(Integer howMany, String lastName) {
 		List<Contact> result = new List<Contact>();
 		for (Integer i = 0; i < howMany; i++) {

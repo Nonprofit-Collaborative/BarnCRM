@@ -91,7 +91,15 @@ CAPS = {
     # and warning, Run Remaining Checks): 2,274,807 measured, plus about 0.1%.
     # Batch O trim (O-01, D-207): 2,275,872 measured 2026-11-19 (upgrade-only code out, the
     # feature list fill in, DML statements); kept, since size plus 2% would raise it.
-    "core": 2_277_000,
+    # Lowered 2026-11-20 for S11 (D-213, ADR-0232): the Migration Assistant and
+    # the NPSP and Nonprofit Cloud household adoption moved into the optional Migration package,
+    # about 54,500 out: 2,200,764 measured, plus about 0.1%.
+    # Lowered 2026-11-20 for D-215 (ADR-0233): Org
+    # Optimizer with Health Check, and the sample data loader with its set, moved into two
+    # optional packages; the seams, @NamespaceAccessible marks and getters they need stay.
+    # 2,201,145 measured before, 1,970,388 after, plus about 0.1%: Core is under the 2.0M
+    # target.
+    "core": 1_972_400,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured
@@ -319,7 +327,9 @@ CAPS = {
     # leftovers (D-200 S8b, S8c): 50,290 measured, plus about 2%.
     # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
     # catalog data): 49,228 measured, plus about 2%.
-    "scholarships": 50_300,
+    # Lowered for S11 (D-213: a kit gets its default rows from the Migration Assistant):
+    # 48,804 measured 2026-11-20, plus about 2%.
+    "scholarships": 49_800,
     # Territory Management (C-40, C-40b, ADR-0205 territory management module): the model PR
     # ships no Apex (0 measured). The Apex PR: access sync, post-install, routing, the run
     # batch, the page controller and the nightly step, 31,041 measured, plus about 2%.
@@ -336,7 +346,9 @@ CAPS = {
     # about 0.5 percent.
     # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
     # catalog data): 45,390 measured, plus about 2%.
-    "memberships": 46_300,
+    # Lowered for S11 (D-213: a kit gets its default rows from the Migration Assistant):
+    # 44,796 measured 2026-11-20, plus about 2%.
+    "memberships": 45_700,
     # Project Management (PM-01 to PM-05, ADR-0208 project management module): access sync,
     # post-install, health, templates, reporting and the page controller, 32,637 measured,
     # plus about 2%. PSA model (D-197, ADR-0219 projects PSA): the PSA settings accessors,
@@ -370,7 +382,7 @@ CAPS = {
     # Pre-batch review M2: no lookup is queued for a saver without principal access, and the
     # missing access is logged once a day, 25,364 measured 2026-11-19; raised by 850.
     "addressverification": 25_400,
-    # Advanced Reporting (O-02, D-202, D-207, ADR-NEXT advanced reporting): one query service
+    # Advanced Reporting (O-02, D-202, D-207, ADR-0231): one query service
     # (allow-listed by describe, user mode, binds only, aggregates and keyset pages), the library
     # of saved reports and dashboards as Files with their sharing, and post-install, 28,060
     # measured 2026-11-19, plus about 2%.
@@ -398,7 +410,22 @@ CAPS = {
     # into the giving package, above). Mirror keeps the Case bridge, now hourly (N-10:
     # CaseProviderRequestsHourly and the guard), the Nonprofit Cloud household and relationships
     # kits and the drift finding: 31,483 measured, plus about 2%.
+    # S11 (D-213): its kits get their default rows from the Migration Assistant, 31,580 measured
+    # 2026-11-20; kept, as are Giving's (851,800), Volunteers' (229,585) and Rollups' (394,571),
+    # since size plus 2% would raise each.
     "mirror": 32_100,
+    # Migration (S11, D-213, ADR-0232): the Migration Assistant (kits, runs,
+    # the staging job, its controller) and the NPSP and Nonprofit Cloud household adoption and
+    # undo, moved out of Core, with the post-install: 56,490 measured 2026-11-20, plus about 2%.
+    "migration": 57_700,
+    # Org Optimizer (D-215, ADR-0233): Health Check's
+    # runner, checks, controller and last run, and every Org Optimizer section's controllers
+    # and services, moved out of Core, with the post-install: 215,159 measured 2026-11-20,
+    # plus about 2%.
+    "orgoptimizer": 219_500,
+    # Sample Data (D-215): the loader, its stages, selector and controller, the package host
+    # and the post-install, moved out of Core: 29,516 measured 2026-11-20, plus about 2%.
+    "sampledata": 30_200,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}
 

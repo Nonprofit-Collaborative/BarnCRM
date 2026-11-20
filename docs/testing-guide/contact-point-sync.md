@@ -1,10 +1,10 @@
 # Contact Point Sync
 
-Scripts for the optional BarnCRM Contact Point Sync module: copying a person's email addresses, phone numbers and current addresses to Salesforce Contact Points, the backfill page, and orgs without the objects. Setup detail: [Contact Point Sync](../admin-guide/contact-point-sync.md).
+Scripts for the optional BarnCRM Contact Point Sync module: copying a person's email addresses, phone numbers and current addresses to Salesforce Contact Points, the Copy Existing People page, and orgs without the objects. Setup detail: [Contact Point Sync](../admin-guide/contact-point-sync.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core and Contact Point Sync deployed and sample data loaded. In Setup, **Data Protection and Privacy**, tick **Make data protection details available in records** so the Individual object is on (T-CPS-07 needs it off). To see the copies, open the App Launcher and search **Contact Point Emails**, **Contact Point Phones** and **Contact Point Addresses**, or add the Individual's related lists.
 
-## T-CPS-01: The Page and the Backfill
+## T-CPS-01: The Page and Copy Existing People
 
 **Purpose:** confirm the page explains each kind, previews the count and copies everyone already in the org.
 **Prerequisites:** admin (BarnCRM Admin, which gives Contact Point Sync Admin).
@@ -12,9 +12,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **BarnCRM Admin** app and the **Contact Point Sync** tab. | The page shows three lines, Email, Phone and Address, each `copied after every save.` A count line starts `The backfill will check` with the number of people in the org. |
-| 2 | Click **Run Backfill**. | The button greys out and `The backfill is running. Refresh the page later to see what it did.` shows. |
-| 3 | Wait a minute and reload. | `Last backfill finished` with a time and `Created ...` counts. The managed count is above 0. |
+| 1 | Open the **BarnCRM Admin** app and the **Contact Point Sync** tab. | The page shows three lines, Email, Phone and Address, each `copied after every save.` A count line starts `This will check` with the number of people in the org. |
+| 2 | Click **Copy Existing People**. | The button greys out and `Copying existing people now. Refresh the page later to see what it did.` shows. |
+| 3 | Wait a minute and reload. | `Existing people were last copied` with a time and `Created ...` counts. The managed count is above 0. |
 | 4 | Open a sample person with a personal email and a home phone, then their Individual. | One Contact Point Email with that address and one Contact Point Phone with that number, type Home. |
 
 **Cleanup:** None.
@@ -58,7 +58,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 2 | Change a person's **Home Phone** and save. | Their Contact Point Phone keeps the old number. |
 | 3 | Tick **Sync phones** again and save. Open the **Automation** page. | Four rows, **Contact Point Sync: People**, **Addresses**, **Person Accounts** and **Household Moves**, all on. |
 | 4 | Click **Pause All**. Change the person's **Personal Email** and save. | Their Contact Point Email keeps the old address. |
-| 5 | Resume automation, then run the backfill from the Contact Point Sync page. | After the backfill, the phone and the email match the person. |
+| 5 | Resume automation, then press **Copy Existing People** on the Contact Point Sync page. | Once it finishes, the phone and the email match the person. |
 
 **Cleanup:** Make sure automation is resumed.
 
@@ -84,19 +84,19 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 |---|---|---|
 | 1 | Insert the 10 people. Open one of them. | Their Contact Point Email is there straight away. |
 | 2 | Insert the 60 people. Wait about a minute, then open one of them. | Their Contact Point Email is there. In Setup, **Apex Jobs**, a `ContactPointSyncService.Job` (or `Job`) row has Completed. The Error Log has no Contact Point Sync warning. |
-| 3 | On the **Automation** page, switch off **Contact Point Sync: People**. Insert 60 more people. | No Contact Point Email is made for them, and no new sync job appears. Switch the row back on and run the backfill: they are copied. |
+| 3 | On the **Automation** page, switch off **Contact Point Sync: People**. Insert 60 more people. | No Contact Point Email is made for them, and no new sync job appears. Switch the row back on and press **Copy Existing People**: they are copied. |
 
 **Cleanup:** Delete the test people; make sure **Contact Point Sync: People** is on.
 
 ## T-CPS-07: An Org Without the Individual Object, and a Person Without the Permission
 
-**Purpose:** confirm the module explains instead of failing, and the backfill needs Manage BarnCRM Settings.
+**Purpose:** confirm the module explains instead of failing, and Copy Existing People needs Manage BarnCRM Settings.
 **Prerequisites:** admin; a second user with the Staff role, given **Contact Point Sync Admin** through **BarnCRM Settings**, **Access**, **Extra Permissions**, and without **Manage BarnCRM Settings**.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In Setup, **Data Protection and Privacy**, untick **Make data protection details available in records**. Open the Contact Point Sync page. | Each kind says `the Individual object is turned off, so nothing is copied.` **Run Backfill** is greyed out. |
+| 1 | In Setup, **Data Protection and Privacy**, untick **Make data protection details available in records**. Open the Contact Point Sync page. | Each kind says `the Individual object is turned off, so nothing is copied.` **Copy Existing People** is greyed out. |
 | 2 | Create a person with an email. | The save succeeds. |
-| 3 | Tick the Setup option again. Log in as the second user and open the page. | `Running the backfill needs the Manage BarnCRM Settings permission.` **Run Backfill** is greyed out. |
+| 3 | Tick the Setup option again. Log in as the second user and open the page. | `Copying existing people needs the Manage BarnCRM Settings permission.` **Copy Existing People** is greyed out. |
 
 **Cleanup:** Log back in as admin.

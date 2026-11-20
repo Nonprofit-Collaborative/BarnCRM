@@ -1,6 +1,8 @@
 # ADR-0155: NPSP Household Adoption Lives in Core, Converts Accounts in Place, and Is Undone From a Journal
 
 **Status:** Proposed
+**Amended by:** ADR-0232 `0232-migration-package.md` (D-213, 2026-11-20): the adoption tool moves
+into the optional Migration package; decision 1 is amended (note at the end).
 **Date:** 2026-11-02
 **Source:** release 0.17 item X-05 (plan Section 6.0a, Section 4.5 NPSP coexistence row,
 Section 6.3). Builds on ADR-0141 (the Household record type is given to nobody), ADR-0062
@@ -99,3 +101,15 @@ Three questions were open:
   type id; widening it touches the guards, the tidy-up, merge, naming and every selector.
 - **Reuse the import journal undo.** It restores in user mode, which cannot clear the Household
   record type (ADR-0141).
+
+## Amendment, 2026-11-20 (D-213, S11, release 1.30): the tool ships in the Migration package
+
+ADR-0232 `0232-migration-package.md` amends decision 1. Adoption and conversion
+(`NpspHouseholdAdoptionService`, `NpspHouseholdAdoptionBatch`,
+`NpspHouseholdAdoptionController`, the `npspHouseholdAdoption` panel) ship in the optional
+BarnCRM Migration package, which depends on Core only, and the panels appear under Households
+on its Migration Assistant tab rather than on the General settings page. Detection and the
+Household Upkeep guard (`NpspHouseholdSource`, R-HA6) and the record type writer stay in Core.
+`HouseholdWriter.saveAdoptionChanges` becomes `@NamespaceAccessible` so the package can call it:
+the one cross-package seam into `HouseholdWriter` this ADR's Mirror alternative avoided, kept to
+that one method inside BarnCRM's namespace, with the same caller-checked edit access.

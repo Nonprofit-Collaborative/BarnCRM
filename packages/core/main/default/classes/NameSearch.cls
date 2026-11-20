@@ -8,6 +8,7 @@
  * characters are escaped, so what a user types is only ever searched for, never parsed.
  * Terms under two characters are not searched: the index needs at least two.
  */
+@NamespaceAccessible
 public inherited sharing class NameSearch {
 	private static final String RESERVED = '\\?&|!{}[]()^~*:"\'+-';
 
@@ -17,6 +18,7 @@ public inherited sharing class NameSearch {
 	 * @param text what the user typed
 	 * @return the text to search for, or null when under two characters
 	 */
+	@NamespaceAccessible
 	public static String prefixTerm(String text) {
 		String trimmed = text == null ? '' : text.trim();
 		if (trimmed.length() < 2) {
@@ -35,6 +37,7 @@ public inherited sharing class NameSearch {
 	 * @param returning the RETURNING clause, for example Contact(Id, Name LIMIT 10)
 	 * @return one list per object in the RETURNING clause
 	 */
+	@NamespaceAccessible
 	public static List<List<SObject>> find(String searchText, String returning) {
 		return Search.query('FIND {' + searchText + '} IN NAME FIELDS RETURNING ' + returning, AccessLevel.USER_MODE);
 	}

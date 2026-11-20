@@ -19,8 +19,9 @@ public with sharing class OrgShapeDetector {
 	private static final String INDUSTRIES_GIFT_OBJECT = 'GiftTransaction'; // detection-only: describe key
 	private static final String SALES_CLOUD_OBJECT = 'Opportunity'; // detection-only: describe key, reported only
 
+	@NamespaceAccessible
 	@TestVisible
-	private static OrgShape overrideShape;
+	public static OrgShape overrideShape;
 
 	private static OrgShape cachedShape;
 
@@ -30,6 +31,7 @@ public with sharing class OrgShapeDetector {
 	 * cannot be detected reliably from inside a managed package, so Health Check says so
 	 * rather than guessing.
 	 */
+	@NamespaceAccessible
 	public class OrgShape {
 		@AuraEnabled
 		public Boolean hasNpsp;
@@ -67,8 +69,10 @@ public with sharing class OrgShapeDetector {
 		 * Person Accounts are enabled. HouseholdService reads this set, so it is computed
 		 * dynamically and never from a static record type reference.
 		 */
+		@NamespaceAccessible
 		public Set<Id> personAccountRecordTypeIds;
 
+		@NamespaceAccessible
 		public OrgShape() {
 			this.hasNpsp = false;
 			this.hasPersonAccounts = false;
@@ -81,9 +85,72 @@ public with sharing class OrgShapeDetector {
 			this.nativeHouseholdGroupCount = null;
 			this.personAccountRecordTypeIds = new Set<Id>();
 		}
+
+		// For other packages: an `@AuraEnabled` field cannot also be `@NamespaceAccessible`.
+		@NamespaceAccessible
+		public Boolean getHasNpsp() {
+			return hasNpsp;
+		}
+		@NamespaceAccessible
+		public Boolean getHasPersonAccounts() {
+			return hasPersonAccounts;
+		}
+		@NamespaceAccessible
+		public Boolean getHasIndustriesNonprofit() {
+			return hasIndustriesNonprofit;
+		}
+		@NamespaceAccessible
+		public Boolean getHasSalesCloudObjects() {
+			return hasSalesCloudObjects;
+		}
+		@NamespaceAccessible
+		public Boolean getIsMultiCurrency() {
+			return isMultiCurrency;
+		}
+		@NamespaceAccessible
+		public Boolean getHasNativeHouseholdGroups() {
+			return hasNativeHouseholdGroups;
+		}
+		@NamespaceAccessible
+		public Integer getNativeHouseholdGroupCount() {
+			return nativeHouseholdGroupCount;
+		}
+
+		/** Sets one flag by its field name, for another package's test shape. */
+		@NamespaceAccessible
+		public OrgShape put(String flag, Object value) {
+			switch on flag {
+				when 'hasNpsp' {
+					hasNpsp = (Boolean) value;
+				}
+				when 'hasPersonAccounts' {
+					hasPersonAccounts = (Boolean) value;
+				}
+				when 'hasIndustriesNonprofit' {
+					hasIndustriesNonprofit = (Boolean) value;
+				}
+				when 'hasSalesCloudObjects' {
+					hasSalesCloudObjects = (Boolean) value;
+				}
+				when 'isMultiCurrency' {
+					isMultiCurrency = (Boolean) value;
+				}
+				when 'hasNativeHouseholdGroups' {
+					hasNativeHouseholdGroups = (Boolean) value;
+				}
+				when 'nativeHouseholdGroupCount' {
+					nativeHouseholdGroupCount = (Integer) value;
+				}
+				when else {
+					throw new IllegalArgumentException('Unknown org shape flag: ' + flag);
+				}
+			}
+			return this;
+		}
 	}
 
 	/** Account record types that are person types. Empty unless Person Accounts are enabled. */
+	@NamespaceAccessible
 	public static Set<Id> personRecordTypeIds() {
 		// The cheap read: no full detect(), and never null.
 		Set<Id> personTypes = personAccountRecordTypeIds();
@@ -93,6 +160,7 @@ public with sharing class OrgShapeDetector {
 	/**
 	 * What this org looks like, computed once per transaction.
 	 */
+	@NamespaceAccessible
 	public static OrgShape detect() {
 		if (overrideShape != null) {
 			return overrideShape;
@@ -152,6 +220,25 @@ public with sharing class OrgShapeDetector {
 				.containsKey(PERSON_ACCOUNT_FIELD.toLowerCase());
 		}
 		return cachedHasPersonAccounts;
+	}
+
+	/** Whether NPSP is installed, for other packages (see hasPersonAccounts). */
+	@NamespaceAccessible
+	public static Boolean hasNpsp() {
+		OrgShape shape = detect();
+		return shape != null && shape.hasNpsp == true;
+	}
+
+	/**
+	 * Makes detect() answer a shape with only hasNpsp set, from another package's test, where
+	 * `@TestVisible` does not reach. Does nothing outside a test.
+	 */
+	@NamespaceAccessible
+	public static void useNpspForTest(Boolean hasNpsp) {
+		if (Test.isRunningTest()) {
+			overrideShape = new OrgShape();
+			overrideShape.hasNpsp = hasNpsp == true;
+		}
 	}
 
 	/** Every Account record type that is a person type; empty, with no query, without them. */
@@ -235,11 +322,13 @@ public with sharing class OrgShapeDetector {
 	 * Accounts and neither product is Standalone; its people still get junction membership
 	 * (CoexistenceService.withMembership).
 	 */
+	@NamespaceAccessible
 	public static String recommendedCoexistenceMode() {
 		return recommendedCoexistenceMode(detect());
 	}
 
 	/** The same rule for a given shape, so the Setup Assistant can ask it of its own. */
+	@NamespaceAccessible
 	public static String recommendedCoexistenceMode(OrgShape shape) {
 		if (shape != null && shape.hasIndustriesNonprofit == true) {
 			return CoexistenceService.MODE_NONPROFIT_CLOUD;

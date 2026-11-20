@@ -189,7 +189,9 @@ Models; the outcomes and results shown follow each person's own Logic Models acc
 The **Grant Pipeline** tab is where most people work:
 
 - **Totals** at the top as tiles: open requests and the amount requested, and the amount awarded
-  this fiscal year, with the number of grants awarded under them.
+  this fiscal year, with the number of grants awarded in a badge on that tile. With no open grants
+  the page shows **No Grants** and one **New Grant** button; once there is a grant, **New Grant**
+  moves to the top of the page.
 - **Board**: one column per open stage, each with its count and amount, and a card per grant
   showing its name (a link that opens the grant), the amount requested, the funder, the deadline
   and the owner. A deadline within 14 days shows a **Due in** badge (amber), a past one an

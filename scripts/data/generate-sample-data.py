@@ -21,7 +21,7 @@ Usage:
     python3 scripts/data/generate-sample-data.py
 
 Writes:
-    packages/core/main/default/staticresources/SampleData.json
+    packages/sampledata/main/default/staticresources/SampleData.json
     packages/giving/main/default/staticresources/GivingSampleData.json
 
 See data/sample/README.md for the JSON structure and regeneration notes.
@@ -38,7 +38,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 OUTPUT_PATH = (
     REPO_ROOT
     / "packages"
-    / "core"
+    / "sampledata"
     / "main"
     / "default"
     / "staticresources"

@@ -894,8 +894,9 @@ before the first production pilot, as a sandbox-only managed beta. Until the nam
    dependency order (`sf package install --wait --publish-wait --security-type AdminsOnly
    --no-prompt`).
 3. Checks N-1 as the installing admin: the installed versions (`sf package installed list`),
-   Health Check with no error finding (`health-check.apex`), and no Error Log row since the org
-   was created.
+   Health Check with no error finding (`health-check.apex`; it fails when Org Optimizer is among
+   the packages and Health Check did not run, and logs Skipped when it is not), and no Error Log
+   row since the org was created.
 4. Loads the sample data (`scripts/org/seed-sample-data.sh <alias> --namespace <ns>`) and
    records the counts of the records it writes (households and contacts, members,
    relationships, affiliations, gifts, allocations, funds, volunteer hours and jobs).

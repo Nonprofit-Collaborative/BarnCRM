@@ -1,6 +1,6 @@
 # AI-Readiness Export
 
-**Package:** Core
+**Package:** BarnCRM Org Optimizer (optional)
 **Feature:** AIR-01 (plan Section 6.1 item 7, release 0.13, decision D-154, ADR-0152)
 
 ## What It Does

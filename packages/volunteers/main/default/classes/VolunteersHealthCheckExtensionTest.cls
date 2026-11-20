@@ -177,7 +177,7 @@ private class VolunteersHealthCheckExtensionTest {
 			Volunteer_Job__c pantry = VolunteersTestData.job('Pantry');
 			insert VolunteersTestData.newShift(pantry.Id, Datetime.now().addDays(-10), 3);
 
-			Map<String, Object> all = byKey(HealthCheckService.run());
+			Map<String, Object> all = byKey(HealthCheckService.extensionFindings());
 
 			Assert.isTrue(
 				all.containsKey('volunteer_past_shifts_open'),

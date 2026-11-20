@@ -85,6 +85,16 @@ private class SetupAssistantControllerTest {
 	}
 
 	@IsTest
+	static void saysWhetherTheSampleDataPackageIsInstalled() {
+		System.runAs(TestUsers.admin()) {
+			ModuleDetectionService.installedOverride.put(ModuleDetectionService.MODULE_SAMPLE_DATA, false);
+			Assert.isFalse(SetupAssistantController.getState().sampleDataAvailable, 'Not installed');
+			ModuleDetectionService.installedOverride.put(ModuleDetectionService.MODULE_SAMPLE_DATA, true);
+			Assert.isTrue(SetupAssistantController.getState().sampleDataAvailable, 'Installed');
+		}
+	}
+
+	@IsTest
 	static void personAccountsAloneAreOfferedStandaloneOnly() {
 		System.runAs(TestUsers.admin()) {
 			OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();

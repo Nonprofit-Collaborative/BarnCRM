@@ -14,7 +14,7 @@
     <field>Steps_JSON__c</field>
     <value
       xsi:type="xsd:string"
-    >[{"key":"households","label":"Convert Nonprofit Cloud Households","kind":"tool","help":"On BarnCRM Settings, General, use Convert Nonprofit Cloud Households: preview, confirm the number and run it. Each household account becomes a BarnCRM household in place, and with household membership set to membership records each member joins it. Then come back here and click Mark Done.","tab":"BarnCRM_Settings","toolLabel":"Open BarnCRM Settings"}]</value>
+    >[{"key":"households","label":"Convert Nonprofit Cloud Households","kind":"tool","help":"Click Back, then under Households use Convert Nonprofit Cloud Households: preview, confirm the number and run it. Each household account becomes a BarnCRM household in place, and with household membership set to membership records each member joins it. Then open this kit again and click Mark Done."}]</value>
   </values>
   <values>
     <field>Retire_Checklist_JSON__c</field>

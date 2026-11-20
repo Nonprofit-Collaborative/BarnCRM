@@ -113,7 +113,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Sample Data**, select **Load Sample Data** and wait for **Loaded**. | The card lists **Program enrollments** with 18. |
+| 1 | On the **Sample Data** tab, select **Load Sample Data** and wait for **Loaded**. | The card lists **Program enrollments** with 18. |
 | 2 | Open **Programs**, list view **All Programs**. | **After-school tutoring** and **Food pantry** (Active) and **Summer reading** (Completed) are listed. |
 | 3 | Open **After-school tutoring**. | The roster shows **Applied** 1, **Enrolled** 4, **Withdrawn** 1, and the services Tutoring hour and Homework club session. Open **Tutoring hour**: its **Service Deliveries** list shows 8 deliveries of 2. The **Cohorts** tab lists **Fall homework club** (Active) with 4 members and 3 sessions: Homework club 1 and 2 Held, each with 4 attendance marks (one Excused Absence among them), and Homework club 3 Scheduled, plus the Scheduled sessions of the session schedule **Homework club twice a week** (active, Tuesdays and Thursdays, from tomorrow), which appear within a minute of the load. **Summer reading** has the cohort **Summer reading circle** (Completed) with its 4 members. The **Goals** tab lists 6 goals, each assigned to you with 2 steps: 4 "Read one grade level higher" (In Progress, one of them under **Reviews Due**), "Finish five books from the summer list" (Achieved, both steps Done) and "Apply for SNAP benefits" (In Progress, in the food pantry). |
 | 4 | Create a contact "Rita Real" and enroll her in **Food pantry**. | Accepted. |
@@ -233,9 +233,9 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As the admin, open the **BarnCRM Programs** app. | **Programs Dashboard** is the first tab. |
-| 2 | Open **Programs Dashboard**. | Period **This Month**; seven tiles (Active Programs, Open Enrollments, New Enrollments, People Served, Counted Without Names, Services Delivered, Attendance Rate), a **Tools** row with a tile for each Programs tab (each opens its list), and a **By Program** table listing every Active program by name, the rate shown as a bar and a percent. |
+| 2 | Open **Programs Dashboard**. | Period **This Month**; seven tiles (Active Programs, Open Enrollments, New Enrollments, People Served, Served Without Enrollment, Services Delivered, Attendance Rate), a **Tools** row with a tile for each Programs tab (each opens its list), and a **By Program** table listing every Active program by name, the rate shown as a bar and a percent. |
 | 3 | Compare the program's row with its **Program Roster** panel and today's log. | Open Enrollments matches the roster's Applied plus Enrolled; Services Delivered counts the Present delivery only; Attendance Rate is 50%; People Served is 1. |
-| 4 | Pick **Last Year**. | The figures reload for last year; a program with no activity then shows 0 and "None yet" for the rate. |
+| 4 | Pick **Last Year**. | The figures reload for last year; a program with no activity then shows 0 and "None yet" for the rate in its row, and the **Attendance Rate** tile shows 0%. |
 | 5 | Click a program's name. | The program opens. |
 | 6 | Open the test person who attended, in the BarnCRM Programs app. | The **Programs** card starts with "Last service:" today's date and "(1 attended in all)". |
 | 7 | Open the test person who was absent. | No Last service line (an absence is not a service). |
@@ -287,7 +287,7 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 4 | Change the **Date** to yesterday. | The total reads 0. Change it back to today. |
 | 5 | Open the **Service Counts** tab. | Two rows for today (12 and 8) in **All Service Counts**; **This Week** lists them too. |
 | 6 | Edit one row to -3 and save. | Refused: People Served cannot be negative. |
-| 7 | Open the **Programs Dashboard**, period **This Month**. | **Counted Without Names** shows 20 (more if earlier counts exist this month); **People Served** is unchanged and counts only named people. The program's row shows the same 20 in its own column. |
+| 7 | Open the **Programs Dashboard**, period **This Month**. | **Served Without Enrollment** shows 20 (more if earlier counts exist this month); **People Served** is unchanged and counts only named people. The program's row shows the same 20 in its own column. |
 | 8 | As a Read Only user, open the program and the dashboard. | The log shows the total without the input and button; the dashboard shows the figure. |
 | 9 | As the admin, try to delete the service. | Refused: a service with counts is kept. |
 

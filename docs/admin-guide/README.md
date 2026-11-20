@@ -109,12 +109,12 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-30 Editions | [editions.md](editions.md) | Core |
 | C-24 Module Manager | [module-manager.md](module-manager.md) | Core |
 | Integrations roadmap page, detected apps and migration links (MIG-10) | [integrations.md](integrations.md) | Core |
-| MIG-01 Migration Assistant: kits from another app in the same org, ordered steps, verification, undo, retire checklist; adding a kit | [migration-assistant.md](migration-assistant.md) | Core, kits in modules |
+| MIG-01 Migration Assistant: the optional Migration package and its tab, kits from another app in the same org, ordered steps, verification, undo, retire checklist, uninstalling when done; adding a kit | [migration-assistant.md](migration-assistant.md) | BarnCRM Migration, kits in modules |
 | C-03 BarnCRM Settings console | [barncrm-settings.md](barncrm-settings.md) | Core |
 | Plan 6.1 item 9 Custom metadata (CMDT Manager) | [custom-metadata.md](custom-metadata.md) | Core |
 | C-06 Access | [access.md](access.md) | Core (the Fundraising Staff role comes with Fundraising) |
 | Q-09 Automatic access | [automatic-access.md](automatic-access.md) | Core, with policies for Fundraising |
-| C-10 Sample data loader | [sample-data.md](sample-data.md) | Core |
+| C-10 Sample data loader | [sample-data.md](sample-data.md) | BarnCRM Sample Data |
 | C-08 Record pages | [record-pages.md](record-pages.md) | Core |
 | C-27 What's new after an upgrade | [whats-new.md](whats-new.md) | Core, with notes from any module |
 | Q-10 In-app tips | [in-app-guidance.md](in-app-guidance.md) | Core |
@@ -129,8 +129,8 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-02 Household names and greetings | [household-naming.md](household-naming.md) | Core |
 | C-09 Household merge and split | [household-merge-split.md](household-merge-split.md) | Core |
 | C-07 Coexistence mode | [coexistence-mode.md](coexistence-mode.md) | Core |
-| X-09 Nonprofit Cloud households, MIG-02b Household Model and conversion | [nonprofit-cloud-households.md](nonprofit-cloud-households.md) | Core (guards, Household Model, the conversion section) and Mirror (conversion source, kit, drift report), only in an org with Nonprofit Cloud |
-| X-05 Adopt NPSP households | [npsp-households.md](npsp-households.md) | Core, only in an org with NPSP |
+| X-09 Nonprofit Cloud households, MIG-02b Household Model and conversion | [nonprofit-cloud-households.md](nonprofit-cloud-households.md) | Core (guards, Household Model), BarnCRM Migration (the conversion section) and Mirror (conversion source, kit, drift report), only in an org with Nonprofit Cloud |
+| X-05 Adopt NPSP households | [npsp-households.md](npsp-households.md) | BarnCRM Migration (Core detects NPSP), only in an org with NPSP |
 | C-15 Relationships | [relationships.md](relationships.md) | Core |
 | C-16 Affiliations | [affiliations.md](affiliations.md) | Core |
 | C-17, C-18 Addresses and seasonal addresses | [addresses.md](addresses.md) | Core |
@@ -156,18 +156,18 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-67 Archive by Query (save old records to a file in Files, then delete them; optionally empty the Recycle Bin) | [archive-by-query.md](archive-by-query.md) | Core |
 | C-66 Backup Sets (saved Find queries saved to files in Files on demand; restore through Load one object) | [backup-sets.md](backup-sets.md) | Core |
 | C-70 Import Files (a zip with a manifest loaded into Files linked to records, with dry run and undo) | [files-import.md](files-import.md) | Core |
-| Org Optimizer (Data Quality, Field Use, Data Dictionary, Health Check, Errors, Storage and Limits, Unused Setup, Setup Changes, Access Explorer) | [org-optimizer.md](org-optimizer.md) | Core |
-| C-28 Data Quality (the Data Quality section of Org Optimizer) | [data-hygiene.md](data-hygiene.md) | Core |
+| Org Optimizer (Data Quality, Field Use, Data Dictionary, Health Check, Errors, Storage and Limits, Unused Setup, Setup Changes, Access Explorer) | [org-optimizer.md](org-optimizer.md) | BarnCRM Org Optimizer |
+| C-28 Data Quality (the Data Quality section of Org Optimizer) | [data-hygiene.md](data-hygiene.md) | BarnCRM Org Optimizer |
 | C-20 Duplicates (the Duplicate Matching tab: review and matching logic) | [duplicates.md](duplicates.md) | Core |
-| Field Use | [field-utilization.md](field-utilization.md) | Core |
-| C-52 Data Dictionary (the Data Dictionary section of Org Optimizer) | [data-dictionary.md](data-dictionary.md) | Core |
-| C-53 and C-53b Access Explorer, with Compare Two and the Modify All Report (a section of Org Optimizer) | [access-explorer.md](access-explorer.md) | Core |
-| C-65 Field Access Manager (give or remove Read and Edit across permission sets, with a preview and undo; Access Explorer's Change Field Access view) | [field-access-manager.md](field-access-manager.md) | Core |
-| C-56 Setup Changes (who changed what in Setup, kept beyond 180 days; the Setup Changes section of Org Optimizer) | [setup-changes.md](setup-changes.md) | Core |
+| Field Use | [field-utilization.md](field-utilization.md) | BarnCRM Org Optimizer |
+| C-52 Data Dictionary (the Data Dictionary section of Org Optimizer) | [data-dictionary.md](data-dictionary.md) | BarnCRM Org Optimizer |
+| C-53 and C-53b Access Explorer, with Compare Two and the Modify All Report (a section of Org Optimizer) | [access-explorer.md](access-explorer.md) | BarnCRM Org Optimizer |
+| C-65 Field Access Manager (give or remove Read and Edit across permission sets, with a preview and undo; Access Explorer's Change Field Access view) | [field-access-manager.md](field-access-manager.md) | BarnCRM Org Optimizer |
+| C-56 Setup Changes (who changed what in Setup, kept beyond 180 days; the Setup Changes section of Org Optimizer) | [setup-changes.md](setup-changes.md) | BarnCRM Org Optimizer (the nightly copy is Core's) |
 | C-55 Record Inspector (every readable field of one record, on a page of its own opened from record pages) | [record-inspector.md](record-inspector.md) | Core |
 | C-59 Where Used and Retire a Field (which BarnCRM setup uses a field or object; from the Data Dictionary, Field Use and the Record Inspector) | [where-used.md](where-used.md) | Core |
 | C-68 Field History (changes to chosen fields of BarnCRM's own objects, beyond 20 fields, with restore) | [field-history.md](field-history.md) | Core |
-| AIR-01 AI-Readiness Export (the AI-Readiness Export section of Org Optimizer) | [ai-readiness-export.md](ai-readiness-export.md) | Core |
+| AIR-01 AI-Readiness Export (the AI-Readiness Export section of Org Optimizer) | [ai-readiness-export.md](ai-readiness-export.md) | BarnCRM Org Optimizer |
 
 ### Automation, Totals and Health
 
@@ -177,7 +177,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | ADR-0040 Your own version of an automation | [flow-templates.md](flow-templates.md) | Core |
 | C-13 Rollups | [rollups.md](rollups.md) | BarnCRM Rollup Builder (Core until ADR-0125) |
 | C-05, C-23 Error Log and error digest | [error-log.md](error-log.md) | Core |
-| C-11, C-21 Health Check | [health-check.md](health-check.md) | Core, with findings from Fundraising, Mirror, Rollup Builder and Volunteers |
+| C-11, C-21 Health Check | [health-check.md](health-check.md) | BarnCRM Org Optimizer, with findings from Core, Fundraising, Mirror, Rollup Builder and Volunteers |
 | Q-04 Job notifications | [job-notifications.md](job-notifications.md) | Core |
 | RT-10 Nightly jobs | [nightly-jobs.md](nightly-jobs.md) | Core, with jobs from every module |
 | X-03, Q-14 Using BarnCRM actions with your own AI assistant | [using-barncrm-actions-with-ai.md](using-barncrm-actions-with-ai.md) | Core, Fundraising |
@@ -259,7 +259,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | L-06 Link outcomes to grant deliverables: the Logic Model Outcomes card on a requirement | [funders.md](funders.md#outcomes-a-requirement-reports-on) | BarnCRM Grants |
 | F-06 Funder report merge template: Funder Report Templates | [funders.md](funders.md#funder-report-templates) | BarnCRM Grants |
 | F-07 Board dashboard: the Board Dashboard tab | [funders.md](funders.md#the-board-dashboard-tab) | BarnCRM Grants |
-| C-45 Contact Point Sync: copying email, phone and addresses to Salesforce Contact Points, the settings, the backfill | [contact-point-sync.md](contact-point-sync.md) | BarnCRM Contact Point Sync |
+| C-45 Contact Point Sync: copying email, phone and addresses to Salesforce Contact Points, the settings, Copy Existing People | [contact-point-sync.md](contact-point-sync.md) | BarnCRM Contact Point Sync |
 | C-46 Address Verification: the org's own Smarty or Google key, checks on save and nightly, corrections, the nightly limit, Health Check | [address-verification.md](address-verification.md) | BarnCRM Address Verification |
 
 ### Forms
@@ -288,11 +288,11 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | PAY-01 Payments: install, roles, the Site, connecting Stripe and PayPal, Payments Setup and keys, test and live mode, processing, payment statuses and refunds, Health Check checks, the seam for module builders | [payments.md](payments.md) | BarnCRM Payments |
 | MIG-06 Online giving through Zapier: recipes for Givebutter, Donorbox and similar tools into Fundraising gifts | [online-giving-zapier.md](online-giving-zapier.md) | Fundraising |
 
-### LWC Builder
+### Component Builder
 
 | Feature | Page | Package |
 |---|---|---|
-| LB-01 to LB-06 LWC Builder: install, access, settings, the grid canvas builder, placing the packaged component, blocks, buttons, visibility rules, export as LWC source, moving components between orgs | [lwc-builder.md](lwc-builder.md) | BarnCRM LWC Builder |
+| LB-01 to LB-06 Component Builder: install, access, settings, the grid canvas builder, placing the packaged component, blocks, buttons, visibility rules, export as LWC source, moving components between orgs | [lwc-builder.md](lwc-builder.md) | BarnCRM Component Builder |
 
 ### Advanced Reporting
 

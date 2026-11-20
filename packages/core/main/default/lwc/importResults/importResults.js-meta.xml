@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
   <apiVersion>67.0</apiVersion>
-  <isExposed>false</isExposed>
+  <description>
+    A data job's results: counts, run log and rejected rows. Shown by Import and by the
+    Migration Assistant; exposed so the Migration package can use it.
+  </description>
+  <isExposed>true</isExposed>
 </LightningComponentBundle>

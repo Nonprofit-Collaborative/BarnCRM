@@ -313,6 +313,8 @@ describe('c-ask-pipeline', () => {
   it('says so when there are no open asks, and shows a load failure', async () => {
     const empty = await render({ ...BOARD, stageTotals: [], cards: [], openCount: 0 });
     expect(one(empty, '[data-id="empty-state"]')).not.toBeNull();
+    expect(one(empty, '[data-id="empty-new-ask"]')).not.toBeNull();
+    expect(one(empty, '[data-id="new-ask"]')).toBeNull();
     document.body.removeChild(empty);
 
     getBoard.mockRejectedValue({ body: { message: 'Could not load' } });

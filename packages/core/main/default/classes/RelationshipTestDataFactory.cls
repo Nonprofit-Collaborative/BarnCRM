@@ -36,6 +36,7 @@ public class RelationshipTestDataFactory {
 	}
 
 	/** People held as contacts, inserted. */
+	@NamespaceAccessible
 	public static List<Contact> contacts(Integer howMany, String lastName) {
 		List<Contact> people = new List<Contact>();
 		for (Integer i = 0; i < howMany; i++) {
@@ -61,6 +62,7 @@ public class RelationshipTestDataFactory {
 	}
 
 	/** Organizations, inserted. */
+	@NamespaceAccessible
 	public static List<Account> organizations(Integer howMany, String prefix) {
 		List<Account> orgs = new List<Account>();
 		for (Integer i = 0; i < howMany; i++) {
@@ -71,6 +73,7 @@ public class RelationshipTestDataFactory {
 	}
 
 	/** A relationship between two people held as contacts, not yet inserted. */
+	@NamespaceAccessible
 	public static Relationship__c between(Contact person, Contact other, String type) {
 		return new Relationship__c(
 			Contact__c = person.Id,
@@ -82,6 +85,7 @@ public class RelationshipTestDataFactory {
 	}
 
 	/** A relationship between two people held as accounts, not yet inserted. */
+	@NamespaceAccessible
 	public static Relationship__c between(Account person, Account other, String type) {
 		return new Relationship__c(
 			Person_Account__c = person.Id,
@@ -93,6 +97,7 @@ public class RelationshipTestDataFactory {
 	}
 
 	/** A relationship from a person held as a contact to one held as an account. */
+	@NamespaceAccessible
 	public static Relationship__c between(Contact person, Account other, String type) {
 		return new Relationship__c(
 			Contact__c = person.Id,
@@ -104,6 +109,7 @@ public class RelationshipTestDataFactory {
 	}
 
 	/** An affiliation from a person held as a contact, not yet inserted. */
+	@NamespaceAccessible
 	public static Affiliation__c affiliation(Contact person, Account organization, String role) {
 		return new Affiliation__c(
 			Contact__c = person.Id,
@@ -114,6 +120,7 @@ public class RelationshipTestDataFactory {
 	}
 
 	/** An affiliation from a person held as an account, not yet inserted. */
+	@NamespaceAccessible
 	public static Affiliation__c affiliation(Account person, Account organization, String role) {
 		return new Affiliation__c(
 			Person_Account__c = person.Id,

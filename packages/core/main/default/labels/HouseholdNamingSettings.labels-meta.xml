@@ -4,7 +4,7 @@
         <fullName>Core_HouseholdNamingSettings_ColumnFormal</fullName>
         <categories>Households</categories>
         <language>en_US</language>
-        <protected>true</protected>
+        <protected>false</protected>
         <shortDescription>Preview column heading</shortDescription>
         <value>Formal Greeting</value>
     </labels>
@@ -12,7 +12,7 @@
         <fullName>Core_HouseholdNamingSettings_ColumnInformal</fullName>
         <categories>Households</categories>
         <language>en_US</language>
-        <protected>true</protected>
+        <protected>false</protected>
         <shortDescription>Preview column heading</shortDescription>
         <value>Informal Greeting</value>
     </labels>

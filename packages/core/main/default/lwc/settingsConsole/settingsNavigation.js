@@ -53,7 +53,7 @@ const GROUPS = [
       ['Fundraising', 'utility:moneybag'],
       ['Receipts', 'utility:email'],
       ['Grants', 'utility:ribbon'],
-      ['Scholarships and Grants', 'utility:education']
+      ['Scholarships and Outbound Grants', 'utility:education']
     ]
   },
   {

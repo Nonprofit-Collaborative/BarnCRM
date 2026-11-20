@@ -98,12 +98,12 @@ public with sharing class SettingSections {
 	/** The Payments module's processor, mode and currency, and the link to Payments Setup. */
 	@NamespaceAccessible
 	public static final String PAYMENTS = 'Payments';
-	/** The LWC Builder module's built component settings. */
+	/** The Component Builder module's built component settings. */
 	@NamespaceAccessible
-	public static final String LWC_BUILDER = 'LWC Builder';
+	public static final String LWC_BUILDER = 'Component Builder';
 	/** The Scholarships and Outbound Grants module's reminder settings. */
 	@NamespaceAccessible
-	public static final String SCHOLARSHIPS = 'Scholarships and Grants';
+	public static final String SCHOLARSHIPS = 'Scholarships and Outbound Grants';
 	/** The Territory Management module's row, which opens its Territory Management tab. */
 	@NamespaceAccessible
 	public static final String TERRITORY = 'Territory Management';

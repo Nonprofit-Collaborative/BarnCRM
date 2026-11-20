@@ -1,10 +1,10 @@
-# LWC Builder
+# Component Builder
 
-Scripts for the optional BarnCRM LWC Builder module: the grid canvas builder, the packaged
+Scripts for the optional BarnCRM Component Builder module: the grid canvas builder, the packaged
 component on Lightning pages, its blocks, buttons, visibility rules and source export. Setup
-detail: [LWC Builder](../admin-guide/lwc-builder.md).
+detail: [Component Builder](../admin-guide/lwc-builder.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core and LWC Builder
+Before you start: an org from [Before you test](before-you-test.md), with Core and Component Builder
 deployed and the module turned on in BarnCRM Settings, **Modules**. You need an admin (BarnCRM
 Admin) and a second user with the Team Member role, called the staff user below, plus a contact
 with an email and phone, and a summary report (for example any shipped BarnCRM report grouped by
@@ -18,10 +18,10 @@ a field).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As admin, open the BarnCRM app. | An LWC Builder tab, at the end of the app (in a package install, add it in App Manager first). |
-| 2 | Open Setup, the staff user's permission set assignments. | LWC Builder Staff is assigned (within the hour, or after Finish Setup). |
-| 3 | As the staff user, open the BarnCRM app. | No LWC Builder tab. |
-| 4 | As admin, open BarnCRM Settings, **LWC Builder**. | Show built components On, Rows per list 10, Allow source export On. |
+| 1 | As admin, open the BarnCRM app. | An Component Builder tab, at the end of the app (in a package install, add it in App Manager first). |
+| 2 | Open Setup, the staff user's permission set assignments. | Component Builder Staff is assigned (within the hour, or after Finish Setup). |
+| 3 | As the staff user, open the BarnCRM app. | No Component Builder tab. |
+| 4 | As admin, open BarnCRM Settings, **Component Builder**. | Show built components On, Rows per list 10, Allow source export On. |
 
 **Cleanup:** None.
 
@@ -33,7 +33,7 @@ a field).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open LWC Builder, press **New Component**, name it *Donor Snapshot*, Object `Contact`. | The key shows `Donor_Snapshot`. |
+| 1 | Open Component Builder, press **New Component**, name it *Donor Snapshot*, Object `Contact`. | The key shows `Donor_Snapshot`. |
 | 2 | Press **Add Section**, title it *At a Glance*; press **Add Row**, layout **6 + 6**. | One section with two equal columns. |
 | 3 | Drag **Record Fields** into the left column; choose Email and Phone. | The block shows in the left column with its title. |
 | 4 | Drag **Text** into the right column, then drag the Text block onto the left column. | The Text block moves to the left column. |

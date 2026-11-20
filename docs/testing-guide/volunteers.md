@@ -512,7 +512,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | **BarnCRM Settings**, **Sample Data**, **Load Sample Data**, wait for it to finish. | The card shows a Volunteers count of `60` hours entries. |
+| 1 | Open the **Sample Data** tab, select **Load Sample Data**, wait for it to finish. | The card shows a Volunteers count of `60` hours entries. |
 | 2 | Open **Volunteer Jobs**. | **Food pantry sort**, **Front desk** and **Community garden** beside your own job. |
 | 3 | Open an upcoming **Front desk** shift. | Two sign-ups (one Confirmed, one Signed up), and **Suggested Volunteers** lists active sample volunteers with their reasons (for example "Available on Saturdays"); none of the two Inactive ones. |
 | 4 | Open a sample volunteer from a sign-up. | **Volunteer Status** Active, a **Volunteer Since** date, **Availability Days** and **Availability Times**. |

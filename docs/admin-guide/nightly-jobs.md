@@ -17,7 +17,7 @@ The jobs in the run, by time of night:
 |---|---|---|---|
 | 0:30 | Seasonal Address Swap | Core | **Turn On Seasonal Addresses**, Addresses section |
 | 1:20 | Record Cleanup | Core | Always on; how long each kind of history is kept is set as below (the staged rows of finished imports follow **Delete Import Rows**, Import section) |
-| 1:30 | Setup Changes Copy | Core | Org Optimizer on or off |
+| 1:30 | Setup Changes Copy | Core | Runs while BarnCRM Org Optimizer is installed |
 | 1:45 | Empty Household Tidy-Up | Core | **Delete Empty Households**, People and Households section |
 | 2:30 | Engagement Score | Core | **Turn on engagement score**, People and Households section (off until turned on); see [Engagement Score](engagement-score.md) |
 | 7:00 | Error Log digest | Core | **Schedule Daily Run** and **Stop Daily Run**, Error Log section |
@@ -81,7 +81,7 @@ People who can manage BarnCRM Settings also see, on each job's row:
 - **Run Now**, for a job that is safe to start by hand at any time (the Fundraising installment top
   up, installments overdue, pledge reminders and ask reminders). It starts the job's work now
   without waiting for tonight; the job still runs tonight as usual. Donor levels and
-  acknowledgment emails have no **Run Now** here: the Donor Levels page has its own
+  acknowledgment emails have no **Run Now** here: the **Donor Levels and Scores** page has its own
   **Recalculate Now**, and acknowledgments are sent from the Acknowledgments page.
 
 Every module's jobs, Fundraising's included, are on this one panel.

@@ -39,8 +39,47 @@ public with sharing class SampleDataModules {
 	};
 
 	/** Injected by the tests, which have no other package to resolve a real module from. */
+	@NamespaceAccessible
 	@TestVisible
-	private static List<SampleDataModule> moduleOverride;
+	public static List<SampleDataModule> moduleOverride;
+
+	/** Injected by the tests in place of the Sample Data package's host. */
+	@TestVisible
+	private static SampleDataHost hostOverride;
+
+	/** One module sample set's own number, as the status card shows it. */
+	@NamespaceAccessible
+	public class ModuleCount {
+		/** The module's stable name, for example 'Giving'. */
+		@AuraEnabled
+		public String name;
+		/** The module's own wording for what the number counts, for example 'Gifts'. */
+		@AuraEnabled
+		public String label;
+		@AuraEnabled
+		public Integer recordCount;
+	}
+
+	/**
+	 * The BarnCRM Sample Data package's host, found by the class name its catalog row gives
+	 * (ADR-0057), or null when the package is not installed.
+	 */
+	@NamespaceAccessible
+	public static SampleDataHost host() {
+		if (hostOverride != null) {
+			return hostOverride;
+		}
+		return (SampleDataHost) ModuleExtensions.first(SampleDataHost.class);
+	}
+
+	/** The host, or a SampleDataException that says to install the Sample Data package. */
+	public static SampleDataHost requireHost() {
+		SampleDataHost sampleHost = host();
+		if (sampleHost == null) {
+			throw new SampleDataException(BarnHelp.text('Core', 'Core_SampleData_PackageMissing'));
+		}
+		return sampleHost;
+	}
 
 	/** Each class looked up so far this transaction, null when it is not installed. */
 	private static Map<String, SampleDataModule> found = new Map<String, SampleDataModule>();
@@ -68,6 +107,7 @@ public with sharing class SampleDataModules {
 	}
 
 	/** Starts the first installed module's load, if there is one. */
+	@NamespaceAccessible
 	public static void startFirst() {
 		start(0);
 	}
@@ -92,6 +132,7 @@ public with sharing class SampleDataModules {
 	 * Modules go in the reverse of their load order, and Core's records last, because a
 	 * module's records point at the ones loaded before them (ADMIN-3).
 	 */
+	@NamespaceAccessible
 	public static void startRemoval() {
 		removeFrom(installed().size() - 1);
 	}
@@ -114,17 +155,22 @@ public with sharing class SampleDataModules {
 
 	private static void removeFrom(Integer index) {
 		if (index < 0) {
-			SampleDataRemoveBatch.startRemoval(new SampleDataRemoveStages());
+			// Core's own records go last, through the Sample Data package that loaded them.
+			SampleDataHost sampleHost = host();
+			if (sampleHost != null) {
+				SampleDataRemoveBatch.startRemoval(sampleHost.coreRemoveStages());
+			}
 			return;
 		}
 		installed()[index].enqueueRemove();
 	}
 
 	/** One count per installed module, for the status card. */
-	public static List<SampleDataLoader.ModuleCount> counts() {
-		List<SampleDataLoader.ModuleCount> counts = new List<SampleDataLoader.ModuleCount>();
+	@NamespaceAccessible
+	public static List<ModuleCount> counts() {
+		List<ModuleCount> counts = new List<ModuleCount>();
 		for (SampleDataModule module : installed()) {
-			SampleDataLoader.ModuleCount count = new SampleDataLoader.ModuleCount();
+			ModuleCount count = new ModuleCount();
 			count.name = module.moduleName();
 			count.label = module.countLabel();
 			count.recordCount = module.countLoaded();
@@ -137,6 +183,7 @@ public with sharing class SampleDataModules {
 	 * True while any installed module still has sample records, for example ones its removal
 	 * kept because the organization's own records point at them.
 	 */
+	@NamespaceAccessible
 	public static Boolean anyHasSampleRecords() {
 		for (SampleDataModule module : installed()) {
 			if (module.hasSampleRecords() == true) {
@@ -157,7 +204,10 @@ public with sharing class SampleDataModules {
 			if (engine != null) {
 				engine.startQueuedRecalculation();
 			}
-			SampleDataLoader.notifyLoadFinished();
+			SampleDataHost sampleHost = host();
+			if (sampleHost != null) {
+				sampleHost.notifyLoadFinished();
+			}
 			return;
 		}
 		if (index < 0) {

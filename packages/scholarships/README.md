@@ -30,5 +30,5 @@ referenced.
   visible through the Scholarships permission sets; left out of scratch and Developer Edition
   orgs (ADR-0223, module apps, and its 2026-11-14 amendment). The tabs also join BarnCRM and
   BarnCRM Console before Error Log through the catalog row's `Staff_Tabs__c`.
-- Settings in the Scholarships and Grants section of BarnCRM Settings; help text in
+- Settings in the Scholarships and Outbound Grants section of BarnCRM Settings; help text in
   `BarnHelp_Scholarships`.

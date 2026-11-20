@@ -60,7 +60,7 @@
         <fullName>Core_Households_NameSuffix</fullName>
         <categories>Households</categories>
         <language>en_US</language>
-        <protected>true</protected>
+        <protected>false</protected>
         <shortDescription>Word ending a household name when the surnames differ</shortDescription>
         <value>Household</value>
     </labels>

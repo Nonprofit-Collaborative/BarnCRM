@@ -9,7 +9,7 @@ public with sharing class RollupsMigrationKit implements MigrationKitExtension {
 	@TestVisible
 	private static final String NPSP_STEP = 'copy_npsp';
 
-	public List<Map<String, Object>> rows(String stepKey, List<SObject> records) {
+	public List<Map<String, Object>> rows(String stepKey, List<Map<String, Object>> rows) {
 		return null;
 	}
 

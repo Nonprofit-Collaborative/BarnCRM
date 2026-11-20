@@ -105,10 +105,10 @@ the list, not on every card. **Not a Duplicate** and **Merge Households** open t
 form inside the suggestion's own card. When nothing is waiting the list shows **No Possible
 Duplicates** with a reminder to scan after a large import.
 
-### Duplicate Rules Starter
+### Turn On Recommended Rules
 
 Salesforce's standard rules pair households on a shared city and miss people who share an
-email but not a company. The **Duplicate Rules Starter** writes BarnCRM's recommended rules
+email but not a company. **Turn On Recommended Rules** writes BarnCRM's recommended rules
 into your org instead:
 
 - **People** (Contact): the same first and last name, plus the same email, or the same mailing
@@ -121,7 +121,7 @@ Each is one matching rule and one duplicate rule, named **BarnCRM People Match**
 **BarnCRM People Duplicates** (and the Household pair). The duplicate rules allow the save,
 alert the person saving and report the pair, so imports and the scan keep working.
 
-1. On **Duplicate Matching**, **Review**, choose **Duplicate Rules Starter** under the rules
+1. On **Duplicate Matching**, **Review**, choose **Turn On Recommended Rules** under the rules
    box (BarnCRM Admin only).
 2. Each set shows the rule in words, your own duplicate rules on that object (always left as
    they are), and what **Set Up Rules** will do: create both rules, or repair BarnCRM's rules

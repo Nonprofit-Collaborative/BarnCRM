@@ -41,7 +41,7 @@ Two things to know:
 
 ## A Five-Minute Walkthrough
 
-Start with the sample data loaded (BarnCRM Settings, then Sample Data).
+Start with the sample data loaded (the **Sample Data** tab).
 
 1. Open the **BarnCRM Fundraising** app and its **Contacts** tab, and open a person who has given.
 2. On the **Details** tab, find the **Giving** section. **Total Giving**, **Last Gift Date**

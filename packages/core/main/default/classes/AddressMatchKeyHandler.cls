@@ -8,6 +8,7 @@
  * the first street word normalization leaves as written. An address with a street and a postal
  * code that normalize to nothing gets NO_KEY, so it is never read as still to be filled.
  */
+@NamespaceAccessible
 public with sharing class AddressMatchKeyHandler extends TriggerHandler {
 	/** Held by an address that has a street and postal code but no key; matches nothing. */
 	public static final String NO_KEY = '|';
@@ -44,6 +45,7 @@ public with sharing class AddressMatchKeyHandler extends TriggerHandler {
 	}
 
 	/** Health Check: Match Keys Not Filled, with a button that fills them (D-200 P6). */
+	@NamespaceAccessible
 	public class FilledCheck implements HealthCheckService.Check {
 		public HealthCheckService.Finding run() {
 			List<String> scope = HealthCheckService.fixScope(HealthCheckService.FIX_KEY_FILL_MATCH_KEYS);

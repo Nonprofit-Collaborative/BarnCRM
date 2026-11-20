@@ -4,7 +4,7 @@
  * object, names only columns the step reads, and keeps one row per Id where a later step links
  * to it. PMM itself is not needed: the kit holds its names as data.
  */
-@IsTest(testFor='ApexClass:MigrationKitService, ApexClass:ImportTemplateService')
+@IsTest(testFor='ApexClass:ImportTemplateService')
 private class PmmMigrationKitTest {
 	private static final String KIT = 'PMM_Programs';
 	private static final List<String> STEPS = new List<String>{
@@ -18,16 +18,14 @@ private class PmmMigrationKitTest {
 	@IsTest
 	static void eachStepHasItsTemplateAndLinksBackwards() {
 		System.runAs(TestUsers.adminWith('Programs_Admin')) {
-			Migration_Kit__mdt kit = MigrationKitService.kitNamed(KIT);
+			String kit = KIT;
 			ImportTemplateService.materializeDefaults();
 			Set<String> earlier = new Set<String>();
 			for (String key : STEPS) {
-				MigrationKitService.Step step = MigrationKitService.stepNamed(kit, key);
-				Assert.areEqual(MigrationKitService.KIND_IMPORT, step.kind, key + ' loads');
+				MigrationKitSteps.Step step = MigrationKitSteps.step(kit, key);
+				Assert.areEqual('import', step.kind, key + ' loads');
 				for (
-					MigrationKitService.Link link : step.links == null
-						? new List<MigrationKitService.Link>()
-						: step.links
+					MigrationKitSteps.Link link : step.links == null ? new List<MigrationKitSteps.Link>() : step.links
 				) {
 					Assert.isTrue(earlier.contains(link.step), key + ' links an earlier step');
 					Assert.isTrue(step.fields.contains(link.column), key + ' reads the column');

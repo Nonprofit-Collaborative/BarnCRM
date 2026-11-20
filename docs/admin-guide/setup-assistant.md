@@ -325,14 +325,15 @@ installed. She makes a note to read about Volunteers this afternoon.
 
 Two buttons, and you may use either, both, or neither:
 
-- **Load the Sample Data** puts about two hundred realistic households, people, and
-  organizations in your org so you can practise on something that is not your real data.
-  You can remove it again from the same panel.
+- **Load the Sample Data** opens the **Sample Data** tab, where one action puts about two
+  hundred realistic households, people, and organizations in your org so you can practise on
+  something that is not your real data. You can remove it again from the same tab. The tab
+  comes with the optional BarnCRM Sample Data package ([Sample Data](sample-data.md)).
 - **Open Super Importer** opens Super Importer, where you upload your file, map your
   columns, run a preview, and see what would happen before anything is created.
 
 If Super Importer is not in your org yet, the step says so rather than sending you to a
-page that does not exist, and the same is true of the sample data loader.
+page that does not exist. Without BarnCRM Sample Data the step says how to get it.
 
 **What Maria sees:** both buttons. She loads the sample data, because her real export is
 still being cleaned up.

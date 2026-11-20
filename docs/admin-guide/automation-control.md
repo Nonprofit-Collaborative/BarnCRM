@@ -28,8 +28,9 @@ ever missing, the automation still runs, and Health Check names it and offers to
 You will find it in these places:
 
 - **The Automation tab** in **BarnCRM Admin** and **BarnCRM Admin Console** (BarnCRM Admin
-  only, D-184). This is the full page: the list of every automation with its on and off
-  switch, the pause button, **Catch Up Now**, the people and profiles that pause or bypass
+  only, D-184). This is the full page. Its first card, **Pause and Catch Up**, holds the pause
+  button and **Catch Up Now**. Its second card, **Automations**, holds the list of every
+  automation with its on and off switch, the people and profiles that pause or bypass
   automation, and your own flows.
 - **BarnCRM Settings, then Automation.** The same panel, kept where admins already look for it.
 - **The BarnCRM home page.** While automation is paused, a banner appears at the top
@@ -49,7 +50,7 @@ the records in first and the automatic housekeeping to happen afterwards, so not
 1. Open the **BarnCRM Admin** app and click **BarnCRM Settings**.
 2. In the left navigation, click **Automation**. You see a list of every piece of
    automation BarnCRM ships, each with a plain-language description and a switch.
-3. At the top of the page, choose **2 hours** in the **How long** list, then click
+3. In the **Pause and Catch Up** card, choose **2 hours** in the **How long** list, then click
    **Pause All Automation**. The page now shows a yellow bar: "Automation is paused until
    3:40 PM. Paused by Maria Lopez. It turns itself back on then." with a **Resume
    Automation** button inside it. **How long** and **Pause All Automation** are hidden while
@@ -163,7 +164,8 @@ use the **BarnCRM Automation Control** setting. It has two boxes, and each can b
 whole organization, for a profile, or for one user. The value that applies to a save is the
 saving person's own, else their profile's, else the organization's.
 
-- **Bypass**: for an integration user (or its profile) and a migration consultant. Their saves
+- **Bypass**: for a user (or profile) that another system signs in as, and for a migration
+  consultant. Their saves
   skip BarnCRM automation, while everyone else's run as normal.
 - **Pause All**: the long pause. Set for the whole organization, it stops automation for
   everyone until you turn it off, for a migration that takes longer than the 24-hour pause.

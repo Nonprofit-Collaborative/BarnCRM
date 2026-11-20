@@ -143,6 +143,17 @@ public with sharing class ScheduledJobSelector {
 	@TestVisible
 	private static Id ownerOverride;
 
+	/**
+	 * Sets that owner from a module's test, where `@TestVisible` does not reach once the
+	 * packages are separate; null reads each job's own owner again. Does nothing outside a test.
+	 */
+	@NamespaceAccessible
+	public static void overrideOwnerForTest(Id ownerId) {
+		if (Test.isRunningTest()) {
+			ownerOverride = ownerId;
+		}
+	}
+
 	private static CronTrigger triggerByName(String jobName) {
 		if (String.isBlank(jobName)) {
 			return null;

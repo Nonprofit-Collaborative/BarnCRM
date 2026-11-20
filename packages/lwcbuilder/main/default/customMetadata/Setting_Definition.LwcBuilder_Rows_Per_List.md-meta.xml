@@ -4,7 +4,7 @@
     <protected>true</protected>
     <values><field>Setting_Key__c</field><value xsi:type="xsd:string">Rows_Per_List__c</value></values>
     <values><field>Settings_Object__c</field><value xsi:type="xsd:string">LWC_Builder_Settings__c</value></values>
-    <values><field>Section__c</field><value xsi:type="xsd:string">LWC Builder</value></values>
+    <values><field>Section__c</field><value xsi:type="xsd:string">Component Builder</value></values>
     <values><field>Module__c</field><value xsi:type="xsd:string">LwcBuilder</value></values>
     <values><field>Data_Type__c</field><value xsi:type="xsd:string">Number</value></values>
     <values><field>Min_Value__c</field><value xsi:type="xsd:double">1</value></values>

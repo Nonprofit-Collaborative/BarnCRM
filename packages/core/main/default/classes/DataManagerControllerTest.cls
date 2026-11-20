@@ -191,4 +191,14 @@ private class DataManagerControllerTest {
 			Assert.isTrue(key.endsWith('__tool'), 'The key ends in __tool.');
 		}
 	}
+
+	@IsTest
+	static void saysWhetherOrgOptimizerIsInstalled() {
+		System.runAs(TestUsers.admin()) {
+			ModuleDetectionService.installedOverride.put(ModuleDetectionService.MODULE_ORG_OPTIMIZER, false);
+			Assert.isFalse(DataManagerController.orgOptimizerInstalled(), 'No module, no card.');
+			ModuleDetectionService.installedOverride.put(ModuleDetectionService.MODULE_ORG_OPTIMIZER, true);
+			Assert.isTrue(DataManagerController.orgOptimizerInstalled(), 'Installed, the card shows.');
+		}
+	}
 }

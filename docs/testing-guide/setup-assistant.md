@@ -90,7 +90,7 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 |---|---|---|
 | 1 | Go to step 7, **Choose Which Modules to Turn On**. | Core, BarnCRM Rollup Builder, BarnCRM Fundraising, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Logic Models, BarnCRM Grants and BarnCRM Mirror, each **Present** or **Not installed** with **What this module does**. Then "To turn an installed module off or on, or to see what uninstalling one would delete, open the Modules section of BarnCRM Settings." |
 | 2 | Click **Next**. | Step 8, **Bring In Your Data**, with **Load the Sample Data** and **Open Super Importer**. Step 7 shows as done. |
-| 3 | Click **Load the Sample Data**. | The **Sample Data** card opens inside the step with status **Loaded** and **Load Sample Data** disabled. |
+| 3 | Click **Load the Sample Data**. | The **Sample Data** tab opens with status **Loaded** and **Load Sample Data** disabled. Go back to **Home**. In an org without BarnCRM Sample Data the step instead says "Sample data comes in the BarnCRM Sample Data package, which is not installed in this org. Install it from Module Manager to load the sample set, import your own spreadsheet instead, or skip this step and come back." |
 | 4 | Click **Open Super Importer**. | Super Importer opens. Go back to **Home**. |
 | 5 | Click **Next** on step 8. | Step 8 shows as done. Step 9, **Check That Everything Works**, opens. With Fundraising, an **Enter Your First Gift** control is offered. The forward button reads **Finish**. |
 
@@ -113,12 +113,12 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 
 ## T-SA-07: Remove Sample Data (the Undo)
 
-**Purpose:** confirm removal deletes every sample record and leaves records you entered.
+**Purpose:** confirm removal deletes every sample record and leaves records you entered. Needs BarnCRM Sample Data (`seed-sample-data.sh` deploys it).
 **Prerequisites:** admin user. Sample data loaded. Create one contact of your own: **First Name** `Rita`, **Last Name** `Real`.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **General**, **Sample Data**. | Status **Loaded**, a warning "Sample data is for scratch orgs, sandboxes, and demos. Never load it into a production org.", tiles for **Households**, **Contacts**, **Organizations**, **Relationships** and **Affiliations**. **Load Sample Data** is disabled; **Remove Sample Data** is enabled. |
+| 1 | Open **BarnCRM Settings**, **General**, **Sample Data**. | The **Sample Data** tab opens: status **Loaded**, a warning "Sample data is for scratch orgs, sandboxes, and demos. Never load it into a production org.", tiles for **Households**, **Contacts**, **Organizations**, **Relationships** and **Affiliations**. **Load Sample Data** is disabled; **Remove Sample Data** is enabled. |
 | 2 | Click **Remove Sample Data**. | A dialog "Remove Sample Data?": "This permanently deletes every household, contact, and organization created by the sample data loader. Records you entered yourself are not affected." with **Confirm** and **Cancel**. |
 | 3 | Click **Cancel**. | Nothing changes. |
 | 4 | Click **Remove Sample Data** and **Confirm**. | Status **Removing**; both buttons are disabled. The card refreshes by itself. |
@@ -126,7 +126,7 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 | 6 | Open **Households** and search for `Garcia`, then `Staff Household`. | Neither is found. |
 | 7 | Search **Contacts** for `Rita Real`. | Rita Real is still there. |
 | 8 | With Fundraising, open the **Gifts** tab, **All** list view. | No sample gifts remain. |
-| 9 | Run **Health Check** in **BarnCRM Settings** and look for addresses with no owner. | No address is reported without a person, household or organization; no sample address is left behind. An address you gave Rita Real is still there. |
+| 9 | With BarnCRM Org Optimizer, run **Health Check** on **Org Optimizer** and look for addresses with no owner. | No address is reported without a person, household or organization; no sample address is left behind. An address you gave Rita Real is still there. |
 
 **Cleanup:** run T-SA-08 to load the sample data again.
 
@@ -157,7 +157,7 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As read-only, open **BarnCRM Settings**, **General**, **Sample Data**. | The card shows its status and counts, and "You need the Manage BarnCRM Settings permission to load or remove sample data." There is no **Load Sample Data** or **Remove Sample Data**. |
+| 1 | As read-only, open the **Sample Data** tab. | The card shows its status and counts, and "You need the Manage BarnCRM Settings permission to load or remove sample data." There is no **Load Sample Data** or **Remove Sample Data**. |
 | 2 | Open **Home**. | No **Setup Checklist** and no **Setup Complete** tile. |
 | 3 | Repeat steps 1 and 2 as staff. | The same. |
 

@@ -141,6 +141,9 @@ export default class StewardshipPlans extends LightningElement {
     get readOnlyNotice() {
       return helpText('Giving', 'Giving_Stewardship_ReadOnlyNotice');
     },
+    get emptyHeading() {
+      return helpText('Giving', 'Giving_Stewardship_EmptyHeading');
+    },
     get empty() {
       return helpText('Giving', 'Giving_Stewardship_Empty');
     },

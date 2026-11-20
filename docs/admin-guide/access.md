@@ -240,8 +240,8 @@ Error Log when it works.
 
 ## Tabs That Follow a Feature
 
-Five tabs stay hidden for everyone until their feature is turned on in BarnCRM Settings,
-General, Features: Data Manager, Import, Find, Super Transformer and Org Optimizer. So no role or
+Four tabs stay hidden for everyone until their feature is turned on in BarnCRM Settings,
+General, Features: Data Manager, Import, Find and Super Transformer. So no role or
 extra permission grants them. Each comes from its own permission set, **BarnCRM Auto:
 (tab name) Tab**, which BarnCRM gives automatically to the people who should see it once its
 feature is on:
@@ -252,7 +252,6 @@ feature is on:
 | Import | BarnCRM Admin |
 | Find | BarnCRM Admin, Find and Export, Bulk Update, Bulk Delete |
 | Super Transformer | BarnCRM Admin, Bulk Update, Bulk Delete |
-| Org Optimizer | BarnCRM Admin, Find and Export, Bulk Update, Bulk Delete |
 | Duplicate Matching | BarnCRM Admin, Duplicate Review, Metadata Admin |
 
 This page keeps them in step when you give a role or extra permission. A role given in Setup or

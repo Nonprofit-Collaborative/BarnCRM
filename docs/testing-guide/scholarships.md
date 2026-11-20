@@ -20,7 +20,7 @@ two users with the Team Member role (reviewer A and reviewer B), and a public gr
 | 1 | Open the BarnCRM app. | Scholarships and Grants, Award Programs, Award Applications and Awards tabs, at the end of the app (in a package install, add them in App Manager first). |
 | 1a | Before any award program exists, open **Scholarships and Grants** as admin. | **Set Up Your First Award Program** shows. **New Award Program** opens the new program form. After the first program is saved and the page reloaded, the panel is gone. |
 | 2 | Open Setup, reviewer A's permission set assignments. | Scholarships Staff is assigned (within the hour, or after Finish Setup). |
-| 3 | Open BarnCRM Settings, Scholarships and Grants. | Send Scholarships reminders on, Days before to remind 14, Email recipients about reports off. |
+| 3 | Open BarnCRM Settings, Scholarships and Outbound Grants. | Send Scholarships reminders on, Days before to remind 14, Email recipients about reports off. |
 
 **Cleanup:** None.
 

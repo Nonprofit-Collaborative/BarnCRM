@@ -14,23 +14,28 @@
  * count covers what the person on the page can see; object and field names come only from
  * describe.
  */
+@NamespaceAccessible
 public with sharing class PicklistUsageService {
 	/** Fields one usage call may ask for: one aggregate query each. */
+	@NamespaceAccessible
 	public static final Integer CHUNK_SIZE = 20;
 
 	/** The most distinct values in the data one field returns; more are cut and marked. */
+	@NamespaceAccessible
 	public static final Integer MAX_VALUES = 500;
 
 	/**
 	 * The most query rows one usage call spends on reading dates with MAX, which is charged one
 	 * row per record read; a field whose dates would go over is left for lastUsed (R-FU12).
 	 */
+	@NamespaceAccessible
 	@TestVisible
-	private static Integer dateRowBudget = 40000;
+	public static Integer dateRowBudget = 40000;
 
 	/** The most records one lastUsed call reads: well under the 50,000 query-row limit. */
+	@NamespaceAccessible
 	@TestVisible
-	private static Integer maxScanRows = 20000;
+	public static Integer maxScanRows = 20000;
 
 	/** Records times fields one lastUsed call handles, which keeps its CPU time and heap low. */
 	public static final Integer SCAN_FIELD_VALUES = 100000;
@@ -38,27 +43,41 @@ public with sharing class PicklistUsageService {
 	/** The most distinct values per field one lastUsed call keeps; more mark the field cut. */
 	public static final Integer MAX_SCAN_VALUES = 1000;
 
+	@NamespaceAccessible
 	public static final String ACTIVE = 'Active';
+	@NamespaceAccessible
 	public static final String INACTIVE = 'Inactive';
+	@NamespaceAccessible
 	public static final String NEVER_USED = 'NeverUsed';
+	@NamespaceAccessible
 	public static final String NO_VALUE = 'NoValue';
 
 	/** One value of a picklist: how many records hold it and when they were last changed. */
+	@NamespaceAccessible
 	public class Usage {
+		@NamespaceAccessible
 		public String value;
+		@NamespaceAccessible
 		public String valueLabel;
+		@NamespaceAccessible
 		public String status;
+		@NamespaceAccessible
 		public Integer records;
+		@NamespaceAccessible
 		public Datetime lastUsed;
 	}
 
 	/** One field's values, and whether the values found in the data were cut at MAX_VALUES. */
+	@NamespaceAccessible
 	public class FieldResult {
+		@NamespaceAccessible
 		public List<Usage> values = new List<Usage>();
+		@NamespaceAccessible
 		public Boolean truncated = false;
 	}
 
 	/** The single-select picklist fields the person can read and group by, by label. */
+	@NamespaceAccessible
 	public static List<Schema.DescribeFieldResult> picklistFields(Schema.DescribeSObjectResult described) {
 		List<Schema.DescribeFieldResult> fields = new List<Schema.DescribeFieldResult>();
 		for (Schema.SObjectField token : described.fields.getMap().values()) {
@@ -72,6 +91,7 @@ public with sharing class PicklistUsageService {
 	}
 
 	/** The picklist fields keyed by API name, for checking names a page sent back. */
+	@NamespaceAccessible
 	public static Map<String, Schema.DescribeFieldResult> picklistFieldsByName(Schema.DescribeSObjectResult described) {
 		Map<String, Schema.DescribeFieldResult> byName = new Map<String, Schema.DescribeFieldResult>();
 		for (Schema.DescribeFieldResult field : picklistFields(described)) {
@@ -81,6 +101,7 @@ public with sharing class PicklistUsageService {
 	}
 
 	/** The object's record count, in user mode: one query. */
+	@NamespaceAccessible
 	public static Integer total(Schema.DescribeSObjectResult described) {
 		return Database.countQuery(
 			'SELECT COUNT() FROM ' + String.escapeSingleQuotes(described.getName()),
@@ -89,6 +110,7 @@ public with sharing class PicklistUsageService {
 	}
 
 	/** The date Last Used is read from: LastModifiedDate, else CreatedDate, else none. */
+	@NamespaceAccessible
 	public static String dateField(Schema.DescribeSObjectResult described) {
 		Map<String, Schema.SObjectField> known = described.fields.getMap();
 		return known.containsKey('lastmodifieddate')
@@ -97,6 +119,7 @@ public with sharing class PicklistUsageService {
 	}
 
 	/** How many records one lastUsed call reads for this many fields (R-FU12). */
+	@NamespaceAccessible
 	public static Integer scanRows(Integer fieldCount) {
 		Integer fields = fieldCount == null || fieldCount < 1 ? 1 : fieldCount;
 		return Math.min(maxScanRows, Math.max(1000, SCAN_FIELD_VALUES / fields));
@@ -106,21 +129,28 @@ public with sharing class PicklistUsageService {
 	 * True when one more usage query may read dates with MAX over total records in this call:
 	 * MAX is charged one query row per record, COUNT one per value (R-FU12).
 	 */
+	@NamespaceAccessible
 	public static Boolean datesFit(Integer total) {
 		return Limits.getQueryRows() + (total == null ? 0 : total) + MAX_VALUES + 1 <= dateRowBudget;
 	}
 
 	/** One chunk of Last Used dates: the newest date per field and value in the records read. */
+	@NamespaceAccessible
 	public class ScanResult {
 		/** Field API name to value ('' for no value) to the newest date among the records read. */
+		@NamespaceAccessible
 		public Map<String, Map<String, Datetime>> lastUsed = new Map<String, Map<String, Datetime>>();
 		/** Fields with more than MAX_SCAN_VALUES distinct values in the records read. */
+		@NamespaceAccessible
 		public Set<String> cut = new Set<String>();
 		/** The Id of the last record read: the next chunk starts after it. */
+		@NamespaceAccessible
 		public Id lastId;
 		/** How many records this chunk read. */
+		@NamespaceAccessible
 		public Integer read = 0;
 		/** True when this chunk reached the end of the records. */
+		@NamespaceAccessible
 		public Boolean done = false;
 	}
 
@@ -129,6 +159,7 @@ public with sharing class PicklistUsageService {
 	 * keeps the newest date per value of each field (R-FU12). One query in user mode, at most
 	 * scanRows records, so one call stays well under the query-row limit on any object size.
 	 */
+	@NamespaceAccessible
 	public static ScanResult lastUsed(
 		Schema.DescribeSObjectResult described,
 		List<Schema.DescribeFieldResult> fields,
@@ -208,6 +239,7 @@ public with sharing class PicklistUsageService {
 	 * withDates false the query holds only COUNT, charged one query row per value; with it true
 	 * it also reads the newest date per value, charged one query row per record (R-FU12).
 	 */
+	@NamespaceAccessible
 	public static FieldResult usage(
 		Schema.DescribeSObjectResult described,
 		Schema.DescribeFieldResult field,
@@ -242,8 +274,9 @@ public with sharing class PicklistUsageService {
 	 * Used, and records with no value are listed once as No Value. Values found in the data come
 	 * first, most used first; the never used values follow, by label.
 	 */
+	@NamespaceAccessible
 	@TestVisible
-	private static FieldResult combine(Map<String, String> activeLabels, Map<String, Usage> observed) {
+	public static FieldResult combine(Map<String, String> activeLabels, Map<String, Usage> observed) {
 		FieldResult result = new FieldResult();
 		List<Usage> found = new List<Usage>();
 		for (String value : observed.keySet()) {

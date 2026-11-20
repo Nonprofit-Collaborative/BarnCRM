@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>The Migration Assistant tab: the Migration Kits for products detected in this org, a kit's steps once started, and Adopt NPSP Households and Convert Nonprofit Cloud Households where they apply.</description>
+  <isExposed>true</isExposed>
+  <masterLabel>Migration Assistant</masterLabel>
+  <targets>
+    <target>lightning__AppPage</target>
+    <target>lightning__Tab</target>
+  </targets>
+</LightningComponentBundle>

@@ -120,7 +120,7 @@ private class LwcBuilderControllerTest {
 			Test.stopTest();
 
 			Assert.areEqual(true, shown.get('found'), 'Staff read built components');
-			Assert.isNotNull(refused, 'Only LWC Builder Admin holders create them');
+			Assert.isNotNull(refused, 'Only Component Builder Admin holders create them');
 			Assert.areEqual(
 				0,
 				[

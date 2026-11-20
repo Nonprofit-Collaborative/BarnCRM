@@ -34,7 +34,7 @@ private class FeatureSwitchServiceTest {
 			Set<String> stopped = FeatureSwitchService.automationsOff();
 			Test.stopTest();
 
-			Assert.areEqual(7, tabSets.size(), 'Every feature tab and the Households tab are on');
+			Assert.areEqual(6, tabSets.size(), 'Every feature tab and the Households tab are on');
 			Assert.isTrue(
 				tabSets.contains(TabAccessService.HOUSEHOLDS_SET),
 				'Household Upkeep carries the Households set'
@@ -158,7 +158,7 @@ private class FeatureSwitchServiceTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(3, FeatureSwitchService.tools().size(), 'Three tools');
+			Assert.areEqual(2, FeatureSwitchService.tools().size(), 'Two tools');
 			Assert.areEqual(5, FeatureSwitchService.featureGroups().size(), 'Five groups');
 		}
 	}

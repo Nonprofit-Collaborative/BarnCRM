@@ -246,7 +246,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Duplicate Rules Starter: section title and the button that opens it</shortDescription>
-        <value>Duplicate Rules Starter</value>
+        <value>Turn On Recommended Rules</value>
     </labels>
     <labels>
         <fullName>Core_DuplicateStarter_SetUp</fullName>

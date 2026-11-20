@@ -176,7 +176,8 @@ class CoreAppOrder(unittest.TestCase):
         # admin-22: the raw Import Rows tab opens from Super Importer's results, not the nav.
         self.assertNotIn("Import_Row__c", admin)
         # D-184: Automation is its own tab, before Error Log.
-        self.assertEqual(admin, ["BarnCRM_Settings", "Data_Manager", "Data_Hygiene", "Duplicate_Matching", "Automation", "Error_Log__c"])
+        # The Org Optimizer module adds its tab when installed (its catalog row's Admin_Tabs__c).
+        self.assertEqual(admin, ["BarnCRM_Settings", "Data_Manager", "Duplicate_Matching", "Automation", "Error_Log__c"])
         # D-183: the Record Inspector is button only; its tab stays for the button to open, not in the nav.
         self.assertNotIn("Record_Inspector", admin)
 

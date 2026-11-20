@@ -19,8 +19,9 @@ public with sharing class FiscalYearSelector {
 	@TestVisible
 	private static Integer startMonthOverride;
 
+	@NamespaceAccessible
 	@TestVisible
-	private static Boolean customFiscalYearsOverride;
+	public static Boolean customFiscalYearsOverride;
 
 	/** Read once per transaction: a rollup run asks once for every fiscal definition. */
 	@TestVisible
@@ -71,6 +72,7 @@ public with sharing class FiscalYearSelector {
 	 * org without the object still compiles, and in system mode for the reason given on
 	 * fiscalYearStartMonth.
 	 */
+	@NamespaceAccessible
 	public static Boolean usesCustomFiscalYears() {
 		if (customFiscalYearsOverride != null) {
 			return customFiscalYearsOverride;
@@ -90,6 +92,7 @@ public with sharing class FiscalYearSelector {
 	 * A month number as a person reads it, in their own language. Twelve labels would say the
 	 * same thing and would have to be translated again.
 	 */
+	@NamespaceAccessible
 	public static String monthName(Integer month) {
 		if (month == null || month < 1 || month > 12) {
 			return String.valueOf(month);

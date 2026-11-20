@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    Move records from another product in this org into BarnCRM, step by step, and adopt NPSP or
+    Nonprofit Cloud households. Uninstall the Migration package once done.
+  </description>
+  <label>Migration Assistant</label>
+  <lwcComponent>migrationHome</lwcComponent>
+  <motif>Custom98: Truck</motif>
+</CustomTab>

@@ -49,7 +49,7 @@ In the **BarnCRM Fundraising** app, the **Ask Pipeline** tab shows:
 - Totals at the top: **Open Asks** (count), **Open Ask Total**, **Won This Fiscal Year** (count and ask amount) and **Declined This Fiscal Year** (count). The fiscal year is your org's fiscal year from Setup, counted by **Closed Date**. The totals are always exact.
 - The **Board** (one column per stage with its count and total) and the **List**. The board draws up to 1,000 open ask cards and says so when there are more. A last **Recently Closed** column shows up to 50 asks closed in the last 30 days, each with its outcome, and its card menu has **Reopen Ask**.
 - Cards move by dragging (mouse, or touch with a press and hold), by keyboard (focus the card, Space to pick it up, arrow keys, Enter to drop, Escape to cancel), or by the card menu's **Move to**. Every move is read out to screen readers. Recently Closed and Not in Your Stage List cards cannot be dragged, and nothing can be dropped on those columns.
-- **Everyone's Asks** and **My Asks** filters, and a **New Ask** button.
+- **Everyone's Asks** and **My Asks** filters, and a **New Ask** button. While there are no asks the page shows its empty state with one **New Ask** button; the button at the top of the page returns once there is an ask.
 
 The **Asks** tab has the list views **Open Asks**, **My Open Asks** and **All Asks**. An **Asks** related list, with a **New** button, is on person, household and organization pages in the BarnCRM Fundraising app. The user guide page [The Ask Pipeline](../user-guide/ask-pipeline.md) covers the daily steps.
 

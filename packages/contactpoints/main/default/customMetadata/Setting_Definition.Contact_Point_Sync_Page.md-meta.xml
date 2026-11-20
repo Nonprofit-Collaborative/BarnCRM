@@ -10,7 +10,7 @@
     <values><field>Component__c</field><value xsi:nil="true" /></values>
     <values><field>Navigation_Target__c</field><value xsi:type="xsd:string">Contact_Point_Sync</value></values>
     <values><field>Navigation_Label__c</field><value xsi:type="xsd:string">Contact Point Sync</value></values>
-    <values><field>Description__c</field><value xsi:type="xsd:string">Whether each kind can be copied to Salesforce Contact Points in this org, how many people the backfill will check, the last backfill, and Run Backfill.</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">Whether each kind can be copied to Salesforce Contact Points in this org, how many people Copy Existing People will check, when it last ran, and the Copy Existing People button.</value></values>
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">10</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">contact-point-sync.md</value></values>
 </CustomMetadata>

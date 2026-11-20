@@ -31,8 +31,8 @@ that column on the column step. Columns the template does not name are ignored.
 
 There is nothing to turn on. Fundraising adds the six templates when it is installed, and an upgrade
 adds any template a later version ships, so the **Import** tab lists them. An upgrade never
-changes a template you have edited. If one is missing, open **BarnCRM Settings**, **Health**,
-and select **Restore Import Templates**. Switch off a template you do not need on the
+changes a template you have edited. If one is missing, open the **Org Optimizer** tab, **Health
+Check**, and select **Restore Import Templates**. Switch off a template you do not need on the
 **Import** tab's template list.
 
 Before loading gifts, create in BarnCRM every fund and appeal the file names, with the same

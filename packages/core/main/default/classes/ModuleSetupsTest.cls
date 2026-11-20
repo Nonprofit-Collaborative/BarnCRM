@@ -105,13 +105,10 @@ private class ModuleSetupsTest {
 		return stubs;
 	}
 
+	/** The check Health Check runs for this (the Org Optimizer module's runner asks it). */
 	private static HealthCheckService.Finding setupFinding() {
-		for (HealthCheckService.Finding finding : HealthCheckService.run()) {
-			if (finding.key == 'module_setup_not_run') {
-				return finding;
-			}
-		}
-		return null;
+		HealthCheckService.Finding finding = new ModuleSetups.SetupCheck().run();
+		return finding != null && finding.key == 'module_setup_not_run' ? finding : null;
 	}
 
 	private static ModuleManagerService.ModuleStatus row(ModuleManagerController.ManagerState state, String name) {
@@ -194,11 +191,12 @@ private class ModuleSetupsTest {
 				Assert.areEqual(2, finding.fixScope.size(), 'Core and Giving');
 
 				Test.startTest();
-				HealthCheckService.Report report = HealthCheckController.applyFix(
+				HealthCheckService.Report report = HealthCheckFixes.applyForModules(
 					ModuleSetups.FIX_KEY,
 					finding.fixScope
 				);
 				Test.stopTest();
+				Assert.isNull(setupFinding(), 'Checked again, nothing is left to set up');
 
 				Assert.areEqual(1, stubs.get(ModuleSetups.CORE).timesRun, 'Core setup ran');
 				Assert.areEqual(1, stubs.get('Giving').timesRun, 'Giving setup ran');
@@ -252,7 +250,7 @@ private class ModuleSetupsTest {
 
 			System.runAs(priya) {
 				try {
-					HealthCheckController.applyFix(ModuleSetups.FIX_KEY, new List<String>{ 'Core' });
+					HealthCheckFixes.apply(ModuleSetups.FIX_KEY, new List<String>{ 'Core' });
 					Assert.fail('Health Check refuses Priya');
 				} catch (AuraHandledException expected) {
 					Assert.isNotNull(expected.getMessage(), 'With a sentence');

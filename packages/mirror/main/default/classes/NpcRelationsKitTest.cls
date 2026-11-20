@@ -5,7 +5,7 @@
  * ways round is copied once; an affiliation with a household or a person account is skipped and
  * its roles read as text. Nonprofit Cloud itself is not needed: the kit holds its names as data.
  */
-@IsTest(testFor='ApexClass:NpcRelationsKit, ApexClass:MigrationKitService')
+@IsTest(testFor='ApexClass:NpcRelationsKit')
 private class NpcRelationsKitTest {
 	@TestSetup
 	static void createTestUser() {
@@ -15,15 +15,15 @@ private class NpcRelationsKitTest {
 	@IsTest
 	static void eachStepHasItsTemplateAndNamesOnlyWhatItReads() {
 		System.runAs(TestUsers.admin()) {
-			Migration_Kit__mdt kit = MigrationKitService.kitNamed(NpcRelationsKit.KIT);
+			String kit = NpcRelationsKit.KIT;
 			ImportTemplateService.materializeDefaults();
 			Map<String, String> targetByStep = new Map<String, String>{
 				'relationships' => 'Relationship__c',
 				'affiliations' => 'Affiliation__c'
 			};
 			for (String key : targetByStep.keySet()) {
-				MigrationKitService.Step step = MigrationKitService.stepNamed(kit, key);
-				Assert.areEqual(MigrationKitService.KIND_IMPORT, step.kind, key + ' loads');
+				MigrationKitSteps.Step step = MigrationKitSteps.step(kit, key);
+				Assert.areEqual('import', step.kind, key + ' loads');
 				Import_Template__c template = [
 					SELECT Column_Mapping_JSON__c, Target_Object__c
 					FROM Import_Template__c
@@ -70,7 +70,7 @@ private class NpcRelationsKitTest {
 			NpcRelationsKit extension = new NpcRelationsKit();
 			for (String key : new List<String>{ 'relationships', 'affiliations' }) {
 				try {
-					Assert.isNotNull(extension.rows(key, new List<SObject>()), key);
+					Assert.isNotNull(extension.rows(key, new List<Map<String, Object>>()), key);
 				} catch (Exception refused) {
 					Assert.isTrue(
 						refused.getMessage().contains('this org does not have'),

@@ -1,6 +1,6 @@
 # Org Optimizer and Health Check
 
-Scripts for the Org Optimizer page (its sections, Storage and Limits, Unused Setup) and Health Check (findings, fix buttons, read-only view, the Home tile). Setup detail: [Org Optimizer](../admin-guide/org-optimizer.md), [Health Check](../admin-guide/health-check.md).
+Scripts for the Org Optimizer page (its sections, Storage and Limits, Unused Setup) and Health Check (findings, fix buttons, read-only view, the Health Check component on Home). Both come with the optional BarnCRM Org Optimizer package: deploy it (`deploy-packages.sh` without `--core-only` does). Setup detail: [Org Optimizer](../admin-guide/org-optimizer.md), [Health Check](../admin-guide/health-check.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data, and the read-only reports (Health Check, storage, limits, Field Use) read the real org. Do not select a fix button that changes an org-wide setting. In **BarnCRM Settings**, **General**, the **Org Optimizer and Health Check** feature is **On**. Data Quality, Duplicates and Field Use have their own scripts in [Data Manager and job history](data-manager-and-job-history.md) and [Duplicates](duplicates.md).
 
@@ -21,7 +21,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 5 | Choose **Health Check**. | Where the tile said **Not Run Yet**: an illustration, **Health Check Runs When You Ask**, **Health Check reads your org's setup, which can take a few seconds, so it runs only when you ask.** and **Run Health Check**. Where the tile showed a result: the same badge, **Last run** with a date and time, **{n} to fix, {n} to be aware of, {n} for your information.** matching the tile, and **Run Again**. Either way no check runs and no findings show yet. |
 | 6 | Click **Run Health Check** (or **Run Again**). | **Reading your org**, then the Health Check report with **What We Found in Your Org** and grouped findings. The button now reads **Run Again**. |
 | 7 | Choose **Overview**, then **Health Check** again. | On **Overview** the **Health Check** tile shows the run's result in the report's own words (**Needs Fixing: {n}**, **Worth Knowing: {n}** or **All Clear**). Back on **Health Check**, the same report shows without running again. |
-| 7a | Run Health Check from BarnCRM Home's Health Check tile, then reload **Org Optimizer**. | The **Health Check** tile shows that run's result, and the **Health Check** section shows the same run under **Last run**, never **Health Check Runs When You Ask** beside a tile with a result (owner QA, 2026-10-31). |
+| 7a | Run Health Check from the Health Check component on BarnCRM Home (added in T-HC-07), then reload **Org Optimizer**. | The **Health Check** tile shows that run's result, and the **Health Check** section shows the same run under **Last run**, never **Health Check Runs When You Ask** beside a tile with a result (owner QA, 2026-10-31). |
 | 7b | Open `/lightning/n/Data_Hygiene?c__section=healthCheck`, then `/lightning/n/Data_Hygiene?c__section=errors`. | The page opens straight at **Health Check** (the stored run, nothing runs), then at **Errors**. `c__section=nothing` opens on **Overview**. |
 | 8 | Choose **Data Quality**, then **Storage and Limits**, then **Overview**. | **Data Quality** has **{n} Need Attention** or **All Clear**; **Storage and Limits** has **Data Storage {n}%**. Reload the page: **About This Tool** is now closed. |
 
@@ -96,20 +96,21 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As read-only, open **BarnCRM Settings** and choose **Health**. | The report shows with **You can read this report but not change anything. Ask your BarnCRM admin for the Manage BarnCRM Settings permission.** |
+| 1 | As read-only, open **BarnCRM Settings**, choose **Health** and click **Open Health Check**, then **Run Health Check** (or **Run Again**). | **Org Optimizer** opens on **Health Check**, and the report shows with **You can read this report but not change anything. Ask your BarnCRM admin for the Manage BarnCRM Settings permission.** |
 | 2 | Look under **Access**. | **Only a BarnCRM Admin Can See the Access Checks**, instead of the admin and user counts. |
 | 3 | Find **Nightly Jobs Are Not Scheduled**. | It is not shown (only administrators see it), and no finding has a fix button. |
-| 4 | Check the app's navigation. | No **Org Optimizer** tab. |
+| 4 | Look at Org Optimizer's section list. | **Overview** and **Health Check** only: no **Data Quality** (that needs **Find and Export Records**) and no administrator section. |
 
 **Cleanup:** As admin, run **Schedule All Nightly Jobs** again.
 
 ## T-HC-07: Health Check's Last Result on Home
 
-**Purpose:** Confirm Home shows the last full run instead of running each time, and Run Health Check (Run Again after the first run) refreshes it.
+**Purpose:** Confirm the Health Check component, added to Home in the Lightning App Builder, shows the last full run instead of running each time, and Run Health Check (Run Again after the first run) refreshes it.
 **Prerequisites:** admin.
 
 | Step | Action | Expected result |
 |---|---|---|
+| 0 | Open the BarnCRM home page, then the gear icon, **Edit Page**. | BarnCRM Home has no Health Check tile of its own. **Health Check** is listed under **Custom**. Drag it onto the page, tick **Show the last result first**, save and go back. |
 | 1 | Open the BarnCRM home page. | The Health Check tile shows **Last Run** with a date and time and **N to fix, N to be aware of, N for your information.**, and **Run Again**, or **Health Check has not run yet. Click Run Health Check to check this org.** and **Run Health Check**. |
 | 2 | Click **Run Health Check** (or **Run Again**). | **Reading your org**, then the whole report in the tile. |
 | 3 | Reload the home page. | **Last Run** shows the time of step 2, with its counts. |
@@ -357,14 +358,15 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 ## T-HC-21: Households On While NPSP Households Are in Use
 
 **Purpose:** Confirm Health Check reports both packages making households and links the adoption panel.
-**Prerequisites:** admin; an org with NPSP installed (Account Model **Household Account**) and Households turned on before NPSP's model was set that way (for example turn Households on with Account Model **One-to-One**, then set it back to **Household Account**).
+**Prerequisites:** admin; an org with NPSP installed (Account Model **Household Account**) and Households turned on before NPSP's model was set that way (for example turn Households on with Account Model **One-to-One**, then set it back to **Household Account**); BarnCRM Migration installed.
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | On **Org Optimizer**, **Health Check**, click **Run Again**. | **NPSP and BarnCRM Both Make Households**, **Warning**, saying Households is on while NPSP households are in use, with the button **Open NPSP Household Adoption**. |
-| 2 | Click **Open NPSP Household Adoption**. | **BarnCRM Settings** opens on **General**, with the **Adopt NPSP Households** panel. |
+| 2 | Click **Open NPSP Household Adoption**. | The **Migration Assistant** tab opens, with **Adopt NPSP Households** under **Households**. |
 | 3 | Adopt every NPSP household and set NPSP's **Account Model** to **One-to-One**, then **Run Again**. | The finding is gone. |
 | 4 | In an org without NPSP, **Run Again**. | No such finding. |
+| 5 | In the NPSP org of step 1 without BarnCRM Migration installed, **Run Again** with the finding showing. | The button reads **Open General Settings** and opens **BarnCRM Settings** on **General**. |
 
 **Cleanup:** Put NPSP's Account Model back to what you want.
 
