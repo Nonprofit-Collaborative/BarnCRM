@@ -196,7 +196,7 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    left and the first section showing on the right. The page name shows once, in the page
    header. The sections are listed in groups: **Organization** (General, Organization),
    **People** (People and Households, Addresses, Contact Points, Forms, Portals), **Data** (Import,
-   Duplicate Matching, Rollups, Org Optimizer), **Fundraising** (Fundraising, Receipts, Grants),
+   Duplicate Matching, Rollups, Org Optimizer, Advanced Reporting), **Fundraising** (Fundraising, Receipts, Grants),
    **Programs** (Programs, Logic Models, Volunteers, Events) and
    **System** (Modules, Access, Automation, Integrations, Health, Error Log). A section a
    module adds that is not in these groups is listed under **More**, before System, so Error

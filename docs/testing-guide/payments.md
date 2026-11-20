@@ -44,7 +44,7 @@ Open the debug log and copy the `checkoutUrl` value into a browser.
 | 4 | Reload Payments Setup and look at the page's network responses. | No secret appears anywhere. |
 | 5 | In **BarnCRM Settings**, set **Mode** to Live. Open **Health Check**. | `Stripe Key Does Not Match the Mode`. Set **Mode** back to Test: the finding is gone. |
 | 6 | In Setup, change `SecretKey` to `sk_test_wrong` and open **Health Check**. | `Payment Processor Connection Failed`. Put the right key back; select **Check Connection**: connected again, and the finding is gone. |
-| 7 | Select **Disconnect** on the Stripe card. | **Not connected**; Health Check shows `Payment Processor Is Not Connected`. Select **Check Connection** to connect again. |
+| 7 | Select **Disconnect** on the Stripe card. Select **Cancel** in the dialog "Disconnect Stripe?", then select **Disconnect** again and confirm. | Cancel changes nothing and the card stays connected. After confirming: **Not connected**; Health Check shows `Payment Processor Is Not Connected`. Select **Check Connection** to connect again. |
 
 **Cleanup:** None (Stripe stays connected for T-PAY-03).
 

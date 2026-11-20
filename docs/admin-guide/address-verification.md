@@ -42,7 +42,7 @@ and every lookup counts against that account's allowance.
    limit, in the background.
 
 Checking a connection, **Disconnect** and starting a check need the **Manage BarnCRM Settings**
-permission. **Disconnect** marks one provider not connected, so nothing is looked up with it;
+permission. **Disconnect** asks you to confirm, then marks one provider not connected, so nothing is looked up with it;
 its key stays on the External Credential until you remove it in Setup.
 
 ### Entering the Key in Setup

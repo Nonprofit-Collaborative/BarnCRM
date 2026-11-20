@@ -17,7 +17,7 @@ Admin) and a second user with the Team Member role, called the staff user below.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the BarnCRM app. | Corporate Hub, Library Documents, Compliance Obligations and Agreements tabs, before Error Log. |
+| 1 | Open the BarnCRM app. | Corporate Hub, Library Documents, Compliance Obligations and Agreements tabs, at the end of the app (in a package install, add them in App Manager first). |
 | 1a | Before any board or committee exists, open the **Corporate Hub** page as admin. | **Set Up Your Board** shows. **New Board or Committee** opens the new record form. After the first board is saved and the page reloaded, the panel is gone. |
 | 2 | Open Setup, the staff user's permission set assignments. | Corporate Hub Staff is assigned (within the hour, or after Finish Setup). |
 | 3 | Open the Compliance Obligations tab, All. | Eight template obligations, each Status Off, including Annual tax return (US: IRS Form 990 series) and the two Data Protection ones. |

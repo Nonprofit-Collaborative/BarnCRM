@@ -238,9 +238,27 @@ describe('c-reporting-builder', () => {
     expect(find(element, 'error').message).toBe('c.Reporting_Error_Title');
     change(find(element, 'title'), { value: 'Named' });
     await flush();
-    find(element, 'save-as').click();
+    find(element, 'save').click();
     await flush();
     expect(find(element, 'error').message).toBe('Saving needs a permission set.');
+  });
+
+  it('shows Save As only on a report that has been saved', async () => {
+    const fresh = await mount({ start: { object: 'Contact', columns: [{ path: 'Name' }] } });
+    expect(find(fresh, 'save')).not.toBeNull();
+    expect(find(fresh, 'save-as')).toBeNull();
+  });
+
+  it('words the read only notice by whether the person can save', async () => {
+    load.mockResolvedValue({ ...SAVED_ROW, mine: false, canEdit: false });
+    const element = await mount({ documentId: '069000000000001AAA' });
+    expect(find(element, 'read-only').message).toBe('c.Reporting_Builder_ReadOnly');
+    const viewer = await mount({
+      documentId: '069000000000001AAA',
+      context: { canSave: false, canExport: true }
+    });
+    expect(find(viewer, 'read-only').message).toBe('c.Reporting_Builder_ReadOnlyNoSave');
+    expect(find(viewer, 'save-as')).toBeNull();
   });
 
   it('edits a widget report and hands it back with Done', async () => {

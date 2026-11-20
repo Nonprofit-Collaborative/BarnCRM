@@ -129,8 +129,9 @@ Total time: about five minutes, plus the conversion's own run.
 **Undo This Conversion** under **Last conversion** puts each household back: its record type,
 Household Model, name setting, greetings and primary contact as they were, and it removes the
 household member records the conversion added. Type the number to confirm. A household that has
-gained another member since, or that you can no longer edit, is not put back; the reason is on
-its Admin Journal record (Kind Household Adoption). Remove that member and undo again.
+gained another member since, or that you can no longer edit, is not put back; the reasons are
+written to the Error Log when the undo finishes, one Warning entry per reason with how many
+households it covers. Remove that member and undo again.
 
 ## The Drift Report
 

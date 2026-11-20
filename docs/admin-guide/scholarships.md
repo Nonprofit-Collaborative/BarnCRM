@@ -31,8 +31,9 @@ Migration Assistant (see [Moving From Outbound Funds](#moving-from-outbound-fund
 
 1. Deploy or install the `BarnCRM Scholarships and Outbound Grants` package after Core.
 2. In BarnCRM Settings, **Modules**, turn on **Scholarships and Outbound Grants**. It ships off.
-3. The Scholarships and Grants, Award Programs, Award Applications and Awards tabs appear in the
-   BarnCRM and BarnCRM Console apps, before Error Log, and in the module's own app, **BarnCRM
+3. The Scholarships and Grants, Award Programs, Award Applications and Awards tabs are added at the
+   end of the BarnCRM and BarnCRM Console apps (in a package install the admin adds them in App
+   Manager; the Setup Assistant lists the tab names), and appear in the module's own app, **BarnCRM
    Scholarships** (with Reports, Dashboards and Error Log), shown to everyone with a Scholarships
    permission set. A scratch or Developer Edition org gets the tabs only.
 

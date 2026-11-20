@@ -12,10 +12,10 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Fundraising**, and open **Campaign Sync**. | The **Campaign Sync** card says `Campaign sync is off. Switch on Copy appeals to Campaigns in the Giving section of BarnCRM Settings, then come back to sync your appeals.` No **Sync All Appeals** button shows. |
+| 1 | Open **BarnCRM Settings**, **Fundraising**, and open **Campaign Sync**. | The **Campaign Sync** card says `Campaign sync is off. Switch on Copy appeals to Campaigns in the Fundraising section of BarnCRM Settings, then come back to sync your appeals.` No **Sync All Appeals** button shows. |
 | 2 | In **Fundraising**, tick **Copy appeals to campaigns** and save. | The setting saves. |
 | 3 | Open **Campaign Sync** again. | `Campaign sync is on. Saving an appeal creates or updates its Campaign.` and `0 of 7 appeals have a Campaign.` **Sync All Appeals** is enabled. |
-| 4 | Click **Sync All Appeals**. | `Sync all appeals is running in the background. Reload this page in a minute to see new counts. Anything that could not be copied is in the Error Log.` |
+| 4 | Click **Sync All Appeals**. | `Sync All Appeals is running in the background. Reload this page in a minute to see new counts. Anything that could not be copied is in the Error Log.` |
 | 5 | Wait a minute and reload the page. | `7 of 7 appeals have a Campaign.` |
 | 6 | Open the App Launcher, search **Campaigns**, and open the list. | Seven Campaigns named after the appeals. **Spring Appeal** shows **Annual Fund** as its Parent Campaign. |
 | 7 | Open the **Appeals** tab and choose the **Appeals and Their Campaigns** list view. | Every appeal has a **Campaign ID** starting `701`. |
@@ -62,7 +62,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the App Launcher and the **Opportunity Mirror** tab. | `The Opportunity mirror is off. Choose a direction in BarnCRM Settings, Giving, Opportunity mirror direction.` |
+| 1 | Open the App Launcher and the **Opportunity Mirror** tab. | `The Opportunity mirror is off. Choose a direction in BarnCRM Settings, Fundraising, Opportunity mirror direction.` |
 | 2 | In **BarnCRM Settings**, **Fundraising**, set **Opportunity mirror direction** to **Gifts to Opportunities** and save. | The setting saves. |
 | 3 | Reopen **Opportunity Mirror**. | `Direction: Gifts to Opportunities. Every gift in the totals gets a matching Opportunity.`, `The nightly run is not scheduled.` and `No run has completed yet.` |
 | 4 | Click **Run Now**. | `The run has started. Its summary is written to the Error Log when it ends.` |

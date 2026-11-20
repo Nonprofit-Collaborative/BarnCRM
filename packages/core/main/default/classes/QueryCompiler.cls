@@ -309,7 +309,7 @@ public with sharing class QueryCompiler {
 		List<String> fields = new List<String>{ 'Id' };
 		Set<String> seen = new Set<String>{ 'id' };
 		for (String path : document.fields) {
-			resolve(objectName, path);
+			resolveColumn(objectName, path);
 			if (seen.add(path.toLowerCase())) {
 				fields.add(path);
 			}
@@ -388,6 +388,28 @@ public with sharing class QueryCompiler {
 		compiled.soql = selectFrom + (whereParts.isEmpty() ? '' : ' WHERE ' + String.join(whereParts, ' AND '));
 		compiled.display = selectFrom + (shownParts.isEmpty() ? '' : ' WHERE ' + String.join(shownParts, ' AND '));
 		return compiled;
+	}
+
+	/**
+	 * A shown column checked as `resolve` checks it, but a field the user cannot read is refused
+	 * with the column wording, not the filter wording.
+	 */
+	private static void resolveColumn(String objectName, String path) {
+		try {
+			resolve(objectName, path);
+		} catch (QueryCompilerException refused) {
+			String unknown = BarnHelp.text('Core', 'Core_Filter_ErrorUnknownField');
+			String shown = String.valueOf(path);
+			if (
+				refused.getMessage() != String.format(unknown, new List<Object>{ shown }) &&
+				refused.getMessage() != String.format(unknown, new List<Object>{ shown.abbreviate(80) })
+			) {
+				throw refused;
+			}
+			throw new QueryCompilerException(
+				String.format(BarnHelp.text('Core', 'Core_Find_ErrorUnknownColumn'), new List<Object>{ shown.abbreviate(80) })
+			);
+		}
 	}
 
 	/**

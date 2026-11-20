@@ -164,7 +164,9 @@ export default class ReportingBuilder extends LightningElement {
   }
 
   get canSaveAs() {
-    return !this.forWidget && !!(this.context && this.context.canSave) && this.hasObject;
+    return (
+      !this.forWidget && !!(this.context && this.context.canSave) && !!this.saved && this.hasObject
+    );
   }
 
   get isOwner() {
@@ -453,7 +455,12 @@ export default class ReportingBuilder extends LightningElement {
       delete: helpText('Reporting', 'Reporting_Delete'),
       result: helpText('Reporting', 'Reporting_Builder_Result'),
       runFirst: helpText('Reporting', 'Reporting_Builder_RunFirst'),
-      readOnly: helpText('Reporting', 'Reporting_Builder_ReadOnly'),
+      readOnly: helpText(
+        'Reporting',
+        this.context && this.context.canSave
+          ? 'Reporting_Builder_ReadOnly'
+          : 'Reporting_Builder_ReadOnlyNoSave'
+      ),
       done: helpText('Reporting', 'Reporting_Done')
     };
   }

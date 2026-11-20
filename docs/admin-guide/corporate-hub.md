@@ -45,8 +45,9 @@ page, does three things, each safe to run again:
 3. Loads the shipped templates that your org does not have yet (see Templates).
 
 The **Corporate Hub**, **Library Documents**, **Compliance Obligations**, **Agreements**,
-**Boards and Committees** and **Board Meetings** tabs join the BarnCRM and BarnCRM Console apps
-before Error Log. Corporate Hub also has its own app, **BarnCRM Corporate Hub**, shown to
+**Boards and Committees** and **Board Meetings** tabs are added at the end of the BarnCRM and
+BarnCRM Console apps (in a package install the admin adds them in App Manager; the Setup Assistant
+lists the tab names). Corporate Hub also has its own app, **BarnCRM Corporate Hub**, shown to
 everyone with a Corporate Hub permission set: those six tabs, then **Processing Activities**,
 **Data Subject Requests**, **Data Breaches**, **Reports**, **Dashboards** and **Error Log**.
 The three data protection tabs are not added to the BarnCRM apps' menus (most organizations

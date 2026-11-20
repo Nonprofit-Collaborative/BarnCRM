@@ -3,6 +3,7 @@ import getSetup from '@salesforce/apex/AddressVerificationController.getSetup';
 import checkConnection from '@salesforce/apex/AddressVerificationController.checkConnection';
 import clearKeys from '@salesforce/apex/AddressVerificationController.clearKeys';
 import verifyWaiting from '@salesforce/apex/AddressVerificationController.verifyWaiting';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { iconFor } from 'c/barnIcons';
 
@@ -138,8 +139,25 @@ export default class AddressVerificationSetup extends LightningElement {
     });
   }
 
-  handleClear(event) {
+  /** Disconnecting stops verification with the provider, so it asks first. */
+  async handleClear(event) {
     const provider = event.target.dataset.provider;
+    const confirmed = await BarnConfirmModal.open({
+      size: 'small',
+      label: fill(helpText('AddressVerification', 'AddressVerification_Setup_DisconnectTitle'), [
+        provider
+      ]),
+      message: fill(
+        helpText('AddressVerification', 'AddressVerification_Setup_DisconnectConfirm'),
+        [provider]
+      ),
+      confirmLabel: this.labels.clear,
+      confirmVariant: 'destructive',
+      cancelLabel: helpText('AddressVerification', 'AddressVerification_Setup_Cancel')
+    });
+    if (!confirmed) {
+      return undefined;
+    }
     return this.run(async () => {
       this.setup = await clearKeys({ provider });
       return this.labels.saved;

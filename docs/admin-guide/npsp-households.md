@@ -121,7 +121,9 @@ setting. It does not put back the member count, which NPSP does not use.
 
 A household is not put back when it was deleted since, when it is no longer a BarnCRM household,
 or when you cannot edit it. Each adopted account has an **Admin Journal** record of Kind **Household
-Adoption** (BarnCRM Admin can report on them), which says **Undone** or **Not Restored** with the reason.
+Adoption** (BarnCRM Admin can report on them), which says **Undone** or **Not Restored**. When an undo
+finishes, the Error Log has one Warning entry per reason a household was not put back, with how many
+households it covers.
 
 ## Common Mistakes
 

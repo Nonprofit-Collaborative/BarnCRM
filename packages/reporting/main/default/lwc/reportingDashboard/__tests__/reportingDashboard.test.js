@@ -294,5 +294,16 @@ describe('c-reporting-dashboard', () => {
     expect(find(element, 'edit')).toBeNull();
     expect(find(element, 'save')).toBeNull();
     expect(find(element, 'save-as')).not.toBeNull();
+    expect(find(element, 'read-only').message).toBe('c.Reporting_Dash_ReadOnly');
+  });
+
+  it('words the read only notice without Save As for a person who cannot save', async () => {
+    load.mockResolvedValue({ ...SAVED_ROW, mine: false, canEdit: false });
+    const element = await mount({
+      documentId: '069000000000009AAA',
+      context: { canSave: false, canExport: true }
+    });
+    expect(find(element, 'read-only').message).toBe('c.Reporting_Dash_ReadOnlyNoSave');
+    expect(find(element, 'save-as')).toBeNull();
   });
 });
