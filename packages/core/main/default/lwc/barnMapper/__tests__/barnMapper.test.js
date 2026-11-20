@@ -334,4 +334,120 @@ describe('c-barn-mapper', () => {
     expect(find(element, 'load-error').message).toBe('You cannot edit Contacts.');
     expect(find(element, 'no-targets')).not.toBeNull();
   });
+
+  describe("drawing Super Importer's Check Columns step (MAP-05)", () => {
+    const SETUP = {
+      objectName: 'Contact',
+      headers: ['E-mail', 'Surname', 'Org'],
+      rows: [{ 'E-mail': 'pat@example.org', Surname: 'Lee', Org: 'Riverbend' }],
+      targets: [
+        { value: 'Record.Email', label: 'Email' },
+        { value: 'Record.LastName', label: 'Last Name' },
+        { value: 'Record.AccountId', label: 'Account ID' },
+        { value: 'Record.Grade__c', label: 'Grade' }
+      ],
+      lookupChoices: {
+        'Record.AccountId': [
+          { label: 'Salesforce record ID', value: 'Id' },
+          { label: 'Account Name', value: 'Name' }
+        ]
+      },
+      canCreateFields: true
+    };
+
+    function createImporting(columns) {
+      const element = createElement('c-barn-mapper', { is: BarnMapper });
+      element.importSetup = SETUP;
+      element.value = {
+        version: 4,
+        from: { kind: 'columns' },
+        to: { kind: 'record', object: 'Contact' },
+        columns
+      };
+      document.body.appendChild(element);
+      return element;
+    }
+
+    it('fixes the file and the fields, and leaves matching and fixed values to the template', async () => {
+      const element = createImporting([
+        { source: 'E-mail', target: 'Record.Email' },
+        { source: 'Surname', target: 'Record.LastName', guessed: true }
+      ]);
+      await settle();
+
+      expect(getObjects).not.toHaveBeenCalled();
+      expect(find(element, 'setup')).toBeNull();
+      expect(find(element, 'match-card')).toBeNull();
+      expect(findAll(element, 'source').map((item) => item.dataset.dragId)).toEqual([
+        'E-mail',
+        'Surname',
+        'Org'
+      ]);
+      // Only the template's fields, in its order; one created a moment ago reads as text.
+      const targets = findAll(element, 'target').map((row) => row.dataset.target);
+      expect(targets).toEqual(expect.arrayContaining(SETUP.targets.map((t) => t.value)));
+      expect(targets).not.toContain('Record.Birthdate');
+      // Nothing is matched again on open, and the template's best guess still waits.
+      expect(JSON.parse(element.value).columns).toHaveLength(2);
+      expect(
+        targetRow(element, 'Record.LastName').querySelector('[data-id="guess"]')
+      ).not.toBeNull();
+      // Create Field only on a column not yet loaded.
+      expect(findAll(element, 'create-field').map((button) => button.dataset.source)).toEqual([
+        'Org'
+      ]);
+      await expectAccessible(element);
+    });
+
+    it('moves a column to one field, keeps its lookup field and empty-cell choice, and asks for a new field', async () => {
+      const element = createImporting([
+        { source: 'E-mail', target: 'Record.Email' },
+        { source: 'Org', target: 'Record.AccountId' }
+      ]);
+      const changes = [];
+      element.addEventListener('change', (event) => changes.push(event.detail));
+      const created = [];
+      element.addEventListener('createfield', (event) => created.push(event.detail.source));
+      await settle();
+
+      targetRow(element, 'Record.Grade__c').querySelector('[data-id="pick"]').click();
+      await settle();
+      targetRow(element, 'Record.Grade__c')
+        .querySelector('[data-id="picker"]')
+        .dispatchEvent(new CustomEvent('change', { detail: { value: 'E-mail' } }));
+      await settle();
+      let columns = changes[changes.length - 1].columns;
+      expect(columns.filter((column) => column.source === 'E-mail')).toEqual([
+        { source: 'E-mail', target: 'Record.Grade__c' }
+      ]);
+
+      targetRow(element, 'Record.AccountId').querySelector('[data-id="details"]').click();
+      await settle();
+      const row = targetRow(element, 'Record.AccountId');
+      expect(row.querySelector('[data-id="lookup-not-found"]')).toBeNull();
+      expect(row.querySelector('[data-id="fixed"]')).toBeNull();
+      expect(row.querySelector('[data-id="lookup-field"]').options.map((o) => o.value)).toEqual([
+        'Id',
+        'Name'
+      ]);
+      row
+        .querySelector('[data-id="lookup-field"]')
+        .dispatchEvent(new CustomEvent('change', { detail: { value: 'Name' } }));
+      await settle();
+      targetRow(element, 'Record.AccountId')
+        .querySelector('[data-id="blank-clears"]')
+        .dispatchEvent(new CustomEvent('change', { detail: { checked: true } }));
+      await settle();
+      columns = changes[changes.length - 1].columns;
+      expect(columns.find((column) => column.source === 'Org')).toEqual({
+        source: 'Org',
+        target: 'Record.AccountId',
+        lookupField: 'Name',
+        blankClears: true
+      });
+
+      find(element, 'create-field').click();
+      expect(created).toEqual(['Surname']);
+    });
+  });
 });

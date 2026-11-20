@@ -571,3 +571,20 @@ ana.rowe@example.org,Rivergate Library,Volunteer,true,2026-03-01
 | 7 | Open **Data Manager**, **Maps**, open **Contact list**, change it and save. Re-open the template's import. | The template is unchanged: it kept its own copy. |
 
 **Cleanup:** Delete the **Contact list** map.
+
+## T-IMP-28: Check Columns Drawn by the Mapper
+
+**Purpose:** Confirm a one-object template's **Check Columns** step is drawn by the Mapper, that every choice made there is the one the table shows, and that the table stays the only view where the Mapper cannot do everything (MAP-05). Setup detail: [Importing](../admin-guide/importing.md), section 3, [The Mapper and Saved Maps](../admin-guide/mapper.md), section 5.
+**Prerequisites:** admin; `import-test-1.csv`; a one-object template that loads **Contact**; the People template.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Start an import with the one-object Contact template and upload `import-test-1.csv`. | **Check Columns** shows the Mapper: the file's columns with their first values in **From**, the template's fields in **To**, and a **Preview**. **Show as Table** is above it. There is no **Matching** card and no **Always Use** or **When Blank, Use**. |
+| 2 | Note a field marked **Best Guess, Check It**, then select **Next**. | **Next** asks you to check the guesses first, as in the table. Press **Accept** on each and continue back to **Check Columns**. |
+| 3 | Drag the **Email** column onto **Description**. | **Description** now gets **Email**, and the field **Email** had is no longer filled: a column fills one field. |
+| 4 | On **Email**, select **Changes** and add **All lower case**. Tick **Empty cells clear the field (updates)**. | The sentence and the preview show the lower-case value. |
+| 5 | Select **Show as Table**. | The table shows the same choices: Email into Description with **All lower case** and empty cells clearing the field. **Show in the Mapper** switches back. |
+| 6 | In the Mapper, on a column no field uses, select **Create Field**. | Super Importer's **Create New Field** dialog opens for that column. Cancel it. |
+| 7 | Start an import with the People template and upload the file. | **Check Columns** shows the table only, with no **Show in the Mapper**. |
+
+**Cleanup:** none.

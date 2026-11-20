@@ -14,10 +14,22 @@ import loadSavedList from '@salesforce/apex/BulkUpdateController.loadSavedList';
 import saveSavedList from '@salesforce/apex/BulkUpdateController.saveSavedList';
 import renameSavedList from '@salesforce/apex/BulkUpdateController.renameSavedList';
 import deleteSavedList from '@salesforce/apex/BulkUpdateController.deleteSavedList';
+import listMaps from '@salesforce/apex/MapController.listMaps';
+import loadMap from '@salesforce/apex/MapController.loadMap';
 import * as navigation from 'lightning/navigation';
 import { setHelpTextForTest } from 'c/barnHelpText';
 
+jest.mock('@salesforce/apex/MapController.listMaps', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/MapController.loadMap', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+
 setHelpTextForTest({
+  Core_SuperTransform_MapApplied: 'Used the map {0}: {1} change(s).',
+  Core_SuperTransform_MapAppliedSome: 'Used the map {0}: {1} change(s); {2} left out.',
+  Core_SuperTransform_MapNone: 'The map {0} has nothing for this kind of record.',
   Core_SuperTransform_SavedSaved: 'Saved the list {0}.',
   Core_SuperTransform_SavedLoaded: 'Loaded the list {0}.',
   Core_SuperTransform_SavedSkipped: 'Loaded the list {0}. {1} change(s) were left out.',
@@ -174,6 +186,55 @@ describe('c-super-transform', () => {
       document.body.removeChild(document.body.firstChild);
     }
     jest.clearAllMocks();
+  });
+
+  it('applies a saved map from this kind of record to itself as the changes (MAP-06)', async () => {
+    listMaps.mockResolvedValue([
+      { recordId: 'a0M1', name: 'Tidy contacts', objectName: 'Contact' },
+      { recordId: 'a0M2', name: 'Accounts', objectName: 'Account' }
+    ]);
+    loadMap.mockResolvedValue({
+      name: 'Tidy contacts',
+      definitionJson: JSON.stringify({
+        version: 4,
+        from: { kind: 'record', object: 'Contact' },
+        to: { kind: 'record', object: 'Contact' },
+        columns: [
+          { source: 'Description', target: 'Record.Title', transforms: [{ op: 'trim' }] },
+          { value: 'Web', target: 'Record.Contact_Kind__c' },
+          { source: 'Account.Name', target: 'Record.Department' }
+        ]
+      })
+    });
+    getCopySources.mockResolvedValue([{ label: 'Department', value: 'Department' }]);
+    const element = mount();
+    await flush();
+    await chooseContact(element);
+
+    const pick = q(element, 'map-pick');
+    expect(pick.options).toEqual([{ label: 'Tidy contacts', value: 'a0M1' }]);
+    expect(q(element, 'map-apply').disabled).toBe(true);
+    pick.dispatchEvent(new CustomEvent('change', { detail: { value: 'a0M1' } }));
+    await flush();
+    q(element, 'map-apply').click();
+    await flush();
+    await flush();
+
+    expect(loadMap).toHaveBeenCalledWith({ recordId: 'a0M1' });
+    expect(q(element, 'notice-message').message).toBe(
+      'Used the map Tidy contacts: 2 change(s); 1 left out.'
+    );
+    // A copy with steps keeps them, and its source is listed although not of the same type.
+    const sources = qa(element, 'source');
+    expect(sources[0].value).toBe('Description');
+    expect(sources[0].options.map((o) => o.value)).toContain('Description');
+    expect(qa(element, 'steps')).toHaveLength(1);
+    q(element, 'preview').click();
+    await flush();
+    expect(JSON.parse(previewSample.mock.calls[0][0].changesJson)).toEqual([
+      { field: 'Title', action: 'copy', source: 'Description', transforms: [{ op: 'trim' }] },
+      { field: 'Contact_Kind__c', action: 'set', value: 'Web' }
+    ]);
   });
 
   it('says so, with no error, to a person without the permissions', async () => {

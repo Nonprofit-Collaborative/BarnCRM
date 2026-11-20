@@ -54,10 +54,10 @@ public with sharing class BulkUpdateService {
 					BarnHelp.text('Core', 'Core_BulkUpdate_ErrorHouseholdName')
 				);
 			}
-			if (action == ACTION_COPY) {
+			if (action == ACTION_COPY && steps == null) {
 				return record.get(source.getName());
 			}
-			if (action == ACTION_TRANSFORM) {
+			if (steps != null) {
 				Map<String, String> others = new Map<String, String>();
 				for (Schema.DescribeFieldResult other : otherFields) {
 					others.put(
@@ -65,9 +65,11 @@ public with sharing class BulkUpdateService {
 						BulkUpdateFields.toText(other, record.get(other.getName()))
 					);
 				}
+				// A copy with steps (MAP-06) starts from the source; a transform from the field.
+				Schema.DescribeFieldResult start = source == null ? target : source;
 				String result = DataTransform.apply(
 					steps,
-					BulkUpdateFields.toText(target, record.get(target.getName())),
+					BulkUpdateFields.toText(start, record.get(start.getName())),
 					others
 				);
 				return BulkUpdateFields.fromText(target, result);
@@ -92,7 +94,7 @@ public with sharing class BulkUpdateService {
 			if (action == ACTION_COPY) {
 				result.put('source', source.getName());
 			}
-			if (action == ACTION_TRANSFORM) {
+			if (steps != null) {
 				result.put('transforms', JSON.deserializeUntyped(JSON.serialize(steps, true)));
 			}
 			return result;
@@ -253,9 +255,11 @@ public with sharing class BulkUpdateService {
 		}
 		if (change.action == ACTION_COPY) {
 			change.source = BulkUpdateFields.ownField(type, raw.get('source'));
+			// With steps (MAP-06) the result is text typed for the field, as a transform's is.
+			Object steps = raw.get('transforms');
 			if (
 				change.source.getName() == change.target.getName() ||
-				!BulkUpdateFields.compatible(change.target, change.source)
+				(steps == null && !BulkUpdateFields.compatible(change.target, change.source))
 			) {
 				throw new BulkUpdateFields.BulkUpdateException(
 					String.format(
@@ -264,7 +268,7 @@ public with sharing class BulkUpdateService {
 					)
 				);
 			}
-			return change;
+			return steps == null ? change : withSteps(type, change, steps);
 		}
 		if (change.action == ACTION_SET) {
 			change.rawValue = raw.get('value');

@@ -163,6 +163,10 @@ core/BrandShareJob.cls | public class BrandShareJob
 core/BrandShareJob.cls | public class VisibilityCheck
 core/BulkDeleteController.cls | public class BulkDeleteController
 core/BulkDeleteController.cls | public static Boolean hasPermission()
+core/BulkUpdateFields.cls | public class BulkUpdateException
+core/BulkUpdateFields.cls | public class BulkUpdateFields
+core/BulkUpdateFields.cls | public static Object fromText(Schema.DescribeFieldResult,String)
+core/BulkUpdateFields.cls | public static String toText(Schema.DescribeFieldResult,Object)
 core/CheckAutomationAction.cls | global Boolean run
 core/CheckAutomationAction.cls | global String automationName
 core/CheckAutomationAction.cls | global String reason

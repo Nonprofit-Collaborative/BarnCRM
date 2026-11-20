@@ -156,6 +156,17 @@ pipes) or an Excel workbook (.xlsx). A small one is best for the first run: five
    and how many of its columns this file or template could not use. The template keeps its own
    copy, so a map changed later never changes it. Maps are made and changed in the Mapper
    ([The Mapper and Saved Maps](mapper.md)).
+   For a template that loads one kind of record (section 9) into its own fields, this step is
+   drawn by the **Mapper** instead of the table: **From** lists the file's columns with their
+   first values, **To** lists the template's fields as sentences, and **Preview** shows the record
+   the first rows would make. Everything the table does is there: pick or drag a column onto a
+   field (a column fills one field, so placing it again moves it), accept a best guess, open
+   **Changes** on a field for its steps, **Find the Parent By** on a lookup, **Empty cells clear
+   the field (updates)**, and **Create Field** beside a column not yet loaded. A column on no field is **Do
+   not load**. **Show as Table** above it switches to the table and **Show in the Mapper** back;
+   both show the same choices. The table stays the only view for people templates, several kinds
+   of record in one upload, a template whose rows also create a related record, and a file with
+   more than 200 columns.
 4. Choose how rows are matched. **Email exact** is the safe default for people. Read the
    sentence under each rule before you change it: **Name plus postal code** will treat two
    different people who share a name at one address as the same person. If the file has

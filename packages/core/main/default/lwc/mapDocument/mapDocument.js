@@ -367,6 +367,10 @@ function cleanColumn(raw, fromKind, toKind) {
   if (raw.blankClears === true) {
     column.blankClears = true;
   }
+  // A best guess still to check (D-150); `serialize` leaves it out of what is stored.
+  if (raw.guessed === true) {
+    column.guessed = true;
+  }
   return column;
 }
 
@@ -777,4 +781,141 @@ export function applyToColumns(fileColumns, document, allowedTargets, lookupChoi
   });
   const missing = Array.from(bySource.keys()).filter((key) => !usedSources.has(key)).length;
   return { columns, applied, missing, unusable };
+}
+
+/**
+ * Check Columns drawn by the Mapper (MAP-05): Super Importer's columns as a map from the file to
+ * the template's record. Do Not Load columns (`ignored` targets) are left out; best guesses,
+ * steps, lookups and empty-cell clearing are kept.
+ */
+export function fromImportColumns(fileColumns, objectName, ignored) {
+  const skip = new Set((ignored || []).map(lower));
+  const columns = (fileColumns || [])
+    .filter(
+      (each) => nonBlank(each.source) && nonBlank(each.target) && !skip.has(lower(each.target))
+    )
+    .map((each) => {
+      const column = { source: each.source, target: each.target };
+      if (Array.isArray(each.transforms) && each.transforms.length > 0) {
+        column.transforms = each.transforms;
+      }
+      if (nonBlank(each.lookupField) && each.lookupField !== 'Id') {
+        column.lookupField = each.lookupField;
+      }
+      if (each.blankClears === true) {
+        column.blankClears = true;
+      }
+      if (each.guessed === true) {
+        column.guessed = true;
+      }
+      return column;
+    });
+  return {
+    version: VERSION,
+    from: { kind: 'columns' },
+    to: { kind: 'record', object: objectName },
+    columns,
+    defaults: []
+  };
+}
+
+/**
+ * The Mapper's columns back onto Super Importer's (MAP-05): each file column takes the map
+ * column whose source names it; a file column no map column names is Do Not Load
+ * (`ignoreValue`). Each file column keeps its key and examples.
+ */
+export function toImportColumns(fileColumns, document, ignoreValue) {
+  const bySource = new Map();
+  ((document && document.columns) || []).forEach((column) => {
+    if (nonBlank(column.source) && !bySource.has(lower(column.source))) {
+      bySource.set(lower(column.source), column);
+    }
+  });
+  return (fileColumns || []).map((fileColumn) => {
+    const mapped = bySource.get(lower(fileColumn.source));
+    if (!mapped) {
+      return { ...fileColumn, target: ignoreValue, guessed: false };
+    }
+    return {
+      ...fileColumn,
+      target: mapped.target,
+      transforms: mapped.transforms || [],
+      lookupField: mapped.lookupField,
+      blankClears: mapped.blankClears === true,
+      guessed: mapped.guessed === true
+    };
+  });
+}
+
+const FIELD_NAME = /^[A-Za-z0-9_]+$/;
+
+/**
+ * Super Transformer's Apply a Map (MAP-06): a map from a kind of record to the same kind of
+ * record as Super Transformer's changes, at most `max` (R-BU1). `fields` are the API names the
+ * person may change. A fixed value becomes Set; a field into itself with steps, Change With
+ * Steps; another field, Copy From with the column's steps; When Blank, Use, a last Value When
+ * Empty step. A source that is not a field of the record (a parent's field or a path), a lookup,
+ * a field not offered, a field copied into itself unchanged and any change past `max` are left
+ * out and counted. Returns { changes, skipped, wrongKind }.
+ */
+export function toChanges(document, objectName, fields, max) {
+  const doc = document || {};
+  const from = doc.from || {};
+  const to = doc.to || {};
+  const same = (name) => lower(name) === lower(objectName);
+  if (from.kind !== 'record' || to.kind !== 'record' || !same(from.object) || !same(to.object)) {
+    return { changes: [], skipped: 0, wrongKind: true };
+  }
+  const offered = new Map((fields || []).map((name) => [lower(name), name]));
+  const prefix = `${lower(RECORD)}.`;
+  const fieldOf = (target) => {
+    const path = lower(target);
+    return path.startsWith(prefix) ? offered.get(path.slice(prefix.length)) : undefined;
+  };
+  const fallbacks = new Map();
+  (doc.defaults || [])
+    .filter((entry) => nonBlank(entry.value))
+    .forEach((entry) => fallbacks.set(lower(entry.target), entry));
+  const changes = [];
+  let skipped = 0;
+  const add = (change) => {
+    if (changes.length < max) {
+      changes.push(change);
+    } else {
+      skipped += 1;
+    }
+  };
+  (doc.columns || []).forEach((column) => {
+    const field = fieldOf(column.target);
+    const fallback = fallbacks.get(lower(column.target));
+    fallbacks.delete(lower(column.target));
+    const steps = (column.transforms || []).concat(
+      fallback ? [{ op: 'ifBlank', value: fallback.value }] : []
+    );
+    const source = String(column.source || '');
+    if (!field || column.lookup || column.lookupField) {
+      skipped += 1;
+    } else if (typeof column.value === 'string' && !nonBlank(source)) {
+      add({ field, action: 'set', value: column.value });
+    } else if (!FIELD_NAME.test(source) || (lower(source) === lower(field) && !steps.length)) {
+      skipped += 1;
+    } else if (lower(source) === lower(field)) {
+      add({ field, action: 'transform', transforms: steps });
+    } else {
+      add(
+        steps.length
+          ? { field, action: 'copy', source, transforms: steps }
+          : { field, action: 'copy', source }
+      );
+    }
+  });
+  fallbacks.forEach((entry) => {
+    const field = fieldOf(entry.target);
+    if (field) {
+      add({ field, action: 'transform', transforms: [{ op: 'ifBlank', value: entry.value }] });
+    } else {
+      skipped += 1;
+    }
+  });
+  return { changes, skipped, wrongKind: false };
 }

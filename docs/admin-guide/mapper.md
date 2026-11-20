@@ -8,9 +8,12 @@
 The **Mapper** is one screen for saying where each value goes: from the columns of a file, the
 fields of a record, or a piece of JSON data another app sends, into the fields of a kind of
 record or the keys of a JSON body. A finished map is saved as a **Map** with a name, and any
-BarnCRM tool that understands maps can use it: today **Super Importer** (copy a map in with
-**Use a Saved Map**, or save a template's columns with **Save as Map**), and the tools of the
-BarnCRM Connector module when it is installed.
+BarnCRM tool that understands maps can use it: **Super Importer** (copy a map in with **Use a
+Saved Map**, or save a template's columns with **Save as Map**; its **Check Columns** step is
+drawn by the Mapper for a template of one kind of record), **Super Transformer** (**Apply a
+Map** from a kind of record to itself), the **Opportunity mirror** of the Fundraising module
+(extra fields copied to each gift's Opportunity), and the tools of the BarnCRM Connector module
+when it is installed.
 
 The screen has three panes side by side on a wide screen and one under the other on a phone:
 
@@ -119,7 +122,57 @@ On Super Importer's **Check Columns** step (see [Importing](importing.md), secti
   load**) are saved as a new map, with their changes and lookups. Row rules, matching and values
   for every row stay with the template.
 
-## 6. Common Mistakes
+For a template that loads one kind of record into its own fields, the **Check Columns** step
+itself is drawn by the Mapper, with the file's columns in **From** and the template's fields in
+**To** (see [Importing](importing.md), section 3). In that view the file and the kind of record
+are fixed, a column fills one field (placing it again moves it), and matching, **Always Use** and
+**When Blank, Use** are left out, because the template sets matching and values for every row on
+its own steps. A lookup offers the parent fields the template allows, a filled field offers
+**Empty cells clear the field (updates)**, and **Create Field** beside a column not yet loaded
+opens Super Importer's Create New Field dialog. **Show as Table** switches to the table.
+
+The table stays the only view where the Mapper cannot yet do everything it does:
+
+| Template | Why the table stays |
+|---|---|
+| People (and organizations) | Its fields are grouped by person and organization, with record ID and matching columns, which the Mapper does not show |
+| Several kinds of record in one upload | Each sheet loads its own kind of record |
+| One kind of record whose rows also create a related record | The related record's fields are not the kind of record's own |
+| A file with more than 200 columns | A map holds 200 columns at most |
+
+## 6. Super Transformer: Apply a Map
+
+In Super Transformer's **What to Change** card, **Apply a Map** lists the saved maps whose
+target is the kind of record you chose. Choose one and press **Apply Map**: its lines take the
+place of the changes on the page, five at most, and nothing runs until **Preview** and **Run**.
+
+| Map line | Super Transformer change |
+|---|---|
+| **Always Use** a value | **Set to** that value |
+| A field into another field | **Copy From** that field, with the line's changes as steps |
+| A field into itself, with changes | **Change With Steps** |
+| **When Blank, Use** | A last **Value when empty** step on that field |
+
+Use a map made **From** a record of the same kind **To** a record of the same kind. A line from
+a parent's field, a lookup, a field you cannot change, a field copied into itself with no change
+and every line past the fifth are left out, and a message says how many. A map from or to
+another kind of record is refused with a message. Super Transformer keeps its own copy of the
+changes: changing the map later does not change a saved step list.
+
+## 7. Opportunity Mirror: Extra Fields
+
+With the Fundraising module and **Gifts to Opportunities** chosen, the Opportunity mirror can
+copy more fields than its own (see [Opportunity Mirror](opportunity-mirror.md)). Make a map
+**From** a record of kind **Gift** **To** a record of kind **Opportunity**, save it, and type its
+name in **BarnCRM Settings**, **Gift Mirrors and Exports**, **Opportunity Mirror Map**. Each line
+copies one gift field or a fixed value, with its changes and **When Blank, Use**. The mirror
+never lets a map replace what it writes itself (Amount, Close Date, Stage, Account, Campaign,
+Name, Record Type), and leaves out lookups, gift fields the person saving cannot read and
+Opportunity fields they cannot edit. Where Used lists the setting under the map, so the Mapper
+warns before the map is changed. The setting names the map: after renaming the map, type the
+new name in the setting too.
+
+## 8. Common Mistakes
 
 - **"A map named ... already exists."** Names are unique among maps. Choose another, or open the
   existing map and change it.

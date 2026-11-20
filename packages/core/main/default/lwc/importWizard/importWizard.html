@@ -295,6 +295,25 @@
                             </ul>
                         </c-barn-notice>
                     </template>
+                    <template lwc:if={canDrawMapper}>
+                        <lightning-button
+                            class="slds-show slds-var-m-bottom_small"
+                            variant="base"
+                            label={viewToggleLabel}
+                            data-id="columns-view"
+                            onclick={handleViewToggle}
+                        ></lightning-button>
+                    </template>
+                    <template lwc:if={drawsMapper}>
+                        <c-barn-mapper
+                            data-id="columns-mapper"
+                            import-setup={mapperSetup}
+                            value={mapperValue}
+                            onchange={handleMapperChange}
+                            oncreatefield={handleMapperCreateField}
+                        ></c-barn-mapper>
+                    </template>
+                    <template lwc:else>
                     <template lwc:if={hasGuesses}>
                         <div
                             class="slds-var-m-bottom_small slds-grid slds-grid_vertical-align-center slds-wrap"
@@ -452,6 +471,7 @@
                             onchange={handleChangesChange}
                             ondone={handleChangesDone}
                         ></c-import-column-transforms>
+                    </template>
                     </template>
                     <c-import-saved-map
                         data-id="saved-map"

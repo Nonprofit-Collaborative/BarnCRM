@@ -443,7 +443,7 @@ public with sharing class SavedTransformService {
 					)
 				);
 			}
-			if (change.get('action') == BulkUpdateService.ACTION_TRANSFORM) {
+			if (change.get('action') == BulkUpdateService.ACTION_TRANSFORM || change.get('transforms') != null) {
 				checkSteps((String) change.get('field'), change.get('transforms'));
 			}
 		}

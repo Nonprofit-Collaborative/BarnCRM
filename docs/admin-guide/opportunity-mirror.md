@@ -27,6 +27,15 @@ remembers its Opportunity in its **Opportunity ID**, whichever side came first.
 | Appeal (its Campaign, when Campaign sync gave it one and you can see Campaigns and the appeal's Campaign ID; otherwise the Opportunity's Campaign is left as it is) | Campaign |
 | Donor | Primary Contact Role, with Role Donor |
 
+**Extra fields.** To copy more, make a map in the Mapper **From** a record of kind **Gift** **To**
+a record of kind **Opportunity** (for example Payment Reference to Description, or a fixed Lead
+Source), and type its name in **BarnCRM Settings**, **Gift Mirrors and Exports**, **Opportunity
+Mirror Map**. Each line of the map copies one gift field or a fixed value, with its changes,
+and a change to a gift field the map reads copies the gift again. A map never replaces the
+fields above; lookups, gift fields the person saving cannot read and Opportunity fields they
+cannot edit are left out, and a value the Opportunity field cannot take is left out for that
+gift ([The Mapper and Saved Maps](mapper.md), section 7). Empty copies no extra field.
+
 A new Opportunity is named after the donor and the date, and uses the Donation record type
 when your org has one. If that record type's sales process does not include your won or lost
 stage, Salesforce refuses the Opportunity and the Error Log says so: add the stage to the sales
@@ -129,7 +138,14 @@ cause, then click **Run Now**.
 
 **The Opportunity was changed by hand.** The next time the gift changes, its values replace
 yours. Edit the gift instead. Fields that are not copied, such as Description, Next Step or your
-own fields, are never touched.
+own fields, are never touched, unless the Opportunity Mirror Map copies them.
+
+**An extra field is not copied.** Check that **Opportunity Mirror Map** holds the map's name
+exactly (after renaming a map, type its new name there), that the map is **From** Gift **To**
+Opportunity, that its line names a gift field (not a parent's field) and an Opportunity field
+other than the ones the mirror writes itself, and that the person saving can read the gift field
+and edit the Opportunity field. A value the field cannot take, such as text in a number field, is
+left out for that gift: add a step to the line in the Mapper.
 
 **A won Opportunity with no gift visible to you, in Gifts to Opportunities.** It was not made by
 the mirror: it was entered directly, came from another tool, or its gift was deleted. Or its gift
