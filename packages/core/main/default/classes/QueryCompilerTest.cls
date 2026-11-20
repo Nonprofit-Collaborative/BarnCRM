@@ -221,6 +221,25 @@ private class QueryCompilerTest {
 	}
 
 	@IsTest
+	static void anUnknownColumnIsRefusedWithTheColumnWording() {
+		System.runAs(TestUsers.admin()) {
+			try {
+				QueryCompiler.compile('{"version": 1, "object": "Error_Log__c", "fields": ["No_Such__c"]}');
+				System.Assert.fail('An unknown column is refused');
+			} catch (QueryCompiler.QueryCompilerException refused) {
+				System.Assert.areEqual(
+					String.format(
+						BarnHelp.text('Core', 'Core_Find_ErrorUnknownColumn'),
+						new List<Object>{ 'No_Such__c' }
+					),
+					refused.getMessage(),
+					'A column is named as a column, not a filter'
+				);
+			}
+		}
+	}
+
+	@IsTest
 	static void refusesDocumentsOutsideTheRules() {
 		System.runAs(TestUsers.admin()) {
 			Map<String, String> refused = new Map<String, String>{

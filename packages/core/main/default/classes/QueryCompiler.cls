@@ -407,7 +407,10 @@ public with sharing class QueryCompiler {
 				throw refused;
 			}
 			throw new QueryCompilerException(
-				String.format(BarnHelp.text('Core', 'Core_Find_ErrorUnknownColumn'), new List<Object>{ shown.abbreviate(80) })
+				String.format(
+					BarnHelp.text('Core', 'Core_Find_ErrorUnknownColumn'),
+					new List<Object>{ shown.abbreviate(80) }
+				)
 			);
 		}
 	}
