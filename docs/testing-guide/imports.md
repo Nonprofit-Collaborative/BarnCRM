@@ -554,3 +554,20 @@ ana.rowe@example.org,Rivergate Library,Volunteer,true,2026-03-01
 | 7 | Choose a zip whose manifest is inside a folder. | The panel says the zip has no manifest.csv at its top. |
 
 **Cleanup:** delete B's kept file.
+
+## T-IMP-27: Use a Saved Map and Save as Map on Check Columns
+
+**Purpose:** Confirm Super Importer fills columns from a saved map and saves its columns as a map, keeping the rest of the step as it is (MAP-04). Setup detail: [Importing](../admin-guide/importing.md), [The Mapper and Saved Maps](../admin-guide/mapper.md).
+**Prerequisites:** admin; `import-test-1.csv`; a one-object template that loads **Contact**.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Start an import with the one-object Contact template and upload `import-test-1.csv`. | **Check Columns** shows the columns and, under them, **Saved Maps** with **Save as Map** (and **Use a Saved Map** once any map exists). |
+| 2 | On the **Email** column, add the change **All lower case**. Type `Contact list` in **Save as Map** and select **Save as Map**. | "Saved Contact list with N columns. Find it under Maps in Data Manager." Columns set to not load are left out. |
+| 3 | Start the same import again and upload the file. Set **Email** to not load. | The **Email** column is not mapped. |
+| 4 | In **Use a Saved Map** choose **Contact list** and select **Use Map**. | **Email** is mapped again with **All lower case**; a line says how many columns were filled from **Contact list**. The other columns keep their choices. |
+| 5 | Upload a copy of the file with the **Email** column renamed `E-mail address`, and use the map again. | The line also says how many lines of the map did not fit this file and were left out. |
+| 6 | Continue to **Preview**. | The preview uses the columns as shown; matching, row rules and the rest of the import are as before. |
+| 7 | Open **Data Manager**, **Maps**, open **Contact list**, change it and save. Re-open the template's import. | The template is unchanged: it kept its own copy. |
+
+**Cleanup:** Delete the **Contact list** map.

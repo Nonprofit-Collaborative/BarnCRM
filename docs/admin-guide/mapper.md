@@ -20,11 +20,11 @@ The screen has three panes side by side on a wide screen and one under the other
 2. **To**: the fields of the kind of record the map fills, in three groups: **Required** (a new
    record needs them), **Suggested** (fields that look like one of your sources) and **All
    Fields**. A filled field reads as one sentence, for example "Email gets profile, email, then
-   Trim Spaces, then Lower Case."
+   remove extra spaces, then all lower case."
 3. **Preview**: the record (or JSON body) your sample would produce, value by value. A value
-   with a problem has a badge: **Required and blank**, **Too long**, **Not a number**, **Not a
-   date**, **Not yes or no**, **Not in the picklist**, **No record found** or **Several records
-   found**.
+   with a problem has a badge: **required but empty**, **too long**, **not a number**, **not a
+   date**, **not true or false**, **not in the picklist**, **no parent found** or **several
+   parents found**.
 
 What makes it quick:
 
@@ -37,16 +37,18 @@ What makes it quick:
   Space, move with the arrow keys and press Space again on the field. Dragging is never the only
   way.
 - **Changes in plain words.** **Changes** on a field opens the same steps Super Importer and
-  Super Transformer use: Trim Spaces, Capitalize Words, Replace, If Blank Use, Map Values, If
-  Then, Take Part, First or Last Characters, Read Dates As, Shift Date, Today and Format Phone.
-  There is no formula language.
+  Super Transformer use: remove extra spaces, all capitals, all lower case, capitalize each
+  word, find and replace, value when empty, add other columns, read as a date, map values, if
+  then, keep part, first characters, last characters, shift a date, today's date and format
+  digits. There is no formula language.
 - **Fixed values and defaults.** **Always Use** puts the same text in a field for every record;
   **When Blank, Use** fills a field only when the source is blank.
-- **Lookups in one sentence.** On a lookup field: "Find the **Account** whose **Name** is
-  **order, company**; if none, **leave it empty**" (or **reject the record**).
-- **Matching in one sentence** (when the map fills a record): "This is an existing record when
-  **Email** matches; if several match, **reject the record**; if none match, **create a
-  record**", followed by what that choice risks.
+- **Lookups in one sentence.** On a lookup field, choose **Find the Parent By** and **When No
+  Parent Is Found**: "Finds the Account whose Name equals order, company; when none is found:
+  leave it empty" (or **Reject the row**).
+- **Matching in one sentence** (when the map fills a record), under **Matching**: "When Email
+  matches, the record is updated; when several match, reject the row; when none match, create
+  a record", followed by what that choice risks.
 - **Check Before Running** runs the map over up to 200 samples on the server (every file row up
   to 200, the chosen record, or each item of a pasted JSON list) and lists the problems by
   field, with how many samples have each and which ones. Nothing is saved.
@@ -76,14 +78,15 @@ Maria gets a JSON export of event sign-ups and wants it to fill Contacts.
 4. Under **To**, keep **A Record** and choose **Contact**. The Mapper matches what it can:
    **Email** gets **profile, email**; **Last Name** gets **profile, last_name** with the badge
    **Best Guess, Check It**. Press **Accept** beside it.
-5. On **Email**, press **Changes**, add **Trim Spaces** and **Lower Case**. The sentence now
-   reads "Email gets profile, email, then Trim Spaces, then Lower Case." The **Preview** shows
-   the email as it will be saved.
+5. On **Email**, press **Changes**, add **Remove extra spaces** and **All lower case**. The
+   sentence now reads "Email gets profile, email, then remove extra spaces, then all lower
+   case." The **Preview** shows the email as it will be saved.
 6. On **Lead Source**, type `Event sign-up` in **Always Use**.
-7. Under **Matching**, choose **A field matches**, then **Email**; keep **Reject the record**
-   when several match and **Create a record** when none do.
-8. Press **Check Before Running**. It reports, for example, "Mailing Postal Code: Too long in 2
-   samples (3, 7)". Add a **First or Last Characters** step to fix it, and check again.
+7. Under **Matching**, set **Match Existing Records By** to **A field** and **Field to Match
+   By** to **Email**; keep **Reject the row** when several match and **Create a record** when
+   none match.
+8. Press **Check Before Running**. It reports, for example, "Mailing Postal Code: too long in
+   2 samples (samples 3, 7)." Add a **First characters** step to fix it, and check again.
 9. Press **Save Map**.
 
 ## 4. Managing Maps
