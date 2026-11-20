@@ -4,6 +4,7 @@ import getSetup from '@salesforce/apex/AddressVerificationController.getSetup';
 import checkConnection from '@salesforce/apex/AddressVerificationController.checkConnection';
 import clearKeys from '@salesforce/apex/AddressVerificationController.clearKeys';
 import verifyWaiting from '@salesforce/apex/AddressVerificationController.verifyWaiting';
+import BarnConfirmModal from 'c/barnConfirmModal';
 
 jest.mock(
   '@salesforce/apex/AddressVerificationController.getSetup',
@@ -130,10 +131,22 @@ describe('c-address-verification-setup', () => {
   it('disconnects one provider and shows a refusal', async () => {
     const element = await render(SETUP);
     clearKeys.mockRejectedValue({ body: { message: 'Not allowed.' } });
+    BarnConfirmModal.open.mockResolvedValue(true);
     find(element, 'clear-smarty').click();
     await flush();
     expect(clearKeys).toHaveBeenCalledWith({ provider: 'Smarty' });
     expect(find(element, 'error').message).toBe('Not allowed.');
+  });
+
+  it('disconnects only after the admin confirms', async () => {
+    const element = await render(SETUP);
+    BarnConfirmModal.open.mockResolvedValue(false);
+    find(element, 'clear-smarty').click();
+    await flush();
+    expect(BarnConfirmModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({ confirmVariant: 'destructive' })
+    );
+    expect(clearKeys).not.toHaveBeenCalled();
   });
 
   it('starts the check of waiting addresses and shows what happened', async () => {

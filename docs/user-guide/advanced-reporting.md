@@ -60,7 +60,7 @@ faster. On a dashboard, such widgets are read one after another.
 
 ## Save, Share and Export
 
-- **Save** keeps the report or dashboard as yours. **Save As** keeps a copy under a new name.
+- **Save** keeps the report or dashboard as yours. **Save As** keeps a copy under a new name, and shows once the report or dashboard has been saved.
 - **Share** (owner only): find people or Public Groups and choose **Can View** or **Can Edit**.
   People you share with see the records their own access allows, not yours. A Public Group is
   shared with its direct members as they are now (not members of groups inside it); share again

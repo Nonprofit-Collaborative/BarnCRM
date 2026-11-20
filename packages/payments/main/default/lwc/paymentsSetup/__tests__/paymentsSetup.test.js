@@ -152,10 +152,22 @@ describe('c-payments-setup', () => {
   it('disconnects one processor and shows a refusal', async () => {
     const element = await render(SETUP);
     clearKeys.mockRejectedValue({ body: { message: 'Not allowed.' } });
+    BarnConfirmModal.open.mockResolvedValue(true);
     find(element, 'clear-paypal').click();
     await flush();
     expect(clearKeys).toHaveBeenCalledWith({ processor: 'PayPal' });
     expect(find(element, 'error').message).toBe('Not allowed.');
+  });
+
+  it('disconnects only after the admin confirms', async () => {
+    const element = await render(SETUP);
+    BarnConfirmModal.open.mockResolvedValue(false);
+    find(element, 'clear-paypal').click();
+    await flush();
+    expect(BarnConfirmModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({ confirmVariant: 'destructive' })
+    );
+    expect(clearKeys).not.toHaveBeenCalled();
   });
 
   it('says processing is not scheduled and schedules it on the click', async () => {

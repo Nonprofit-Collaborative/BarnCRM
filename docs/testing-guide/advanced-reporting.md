@@ -20,7 +20,7 @@ T-AR-03 if it is not already.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As admin, open the BarnCRM app. | An Advanced Reporting tab, before Error Log. |
+| 1 | As admin, open the BarnCRM app. | An Advanced Reporting tab, at the end of the app (in a package install, add it in App Manager first). |
 | 2 | Open Setup, staff user A's permission set assignments. | Advanced Reporting Staff is assigned (within the hour, or after Finish Setup). |
 | 3 | Open Setup, the read only user's assignments. | Advanced Reporting Read Only is assigned. |
 | 4 | As admin, open BarnCRM Settings. | An **Advanced Reporting** row that opens the tab. |
@@ -58,7 +58,7 @@ T-AR-03 if it is not already.
 | 3 | Select **Show Table**. | A table of month and amount; **Show Chart** returns. |
 | 4 | Add a second grouping Fund; Show As Column Chart, tick **Stacked**. Run. | Stacked columns with a legend of funds. |
 | 5 | Remove both groupings; Show As Metric. Run. | One tile with the total. |
-| 6 | Save as "My Gifts Total". Sign in as staff user B and build the same metric. | Each user's total covers only the gifts they can see. |
+| 6 | Name it "My Gifts Total" and select **Save** (a report that was never saved has no **Save As**). Sign in as staff user B and build the same metric. | Each user's total covers only the gifts they can see. |
 | 7 | Show As Donut with grouping Appeal, Top Groups 3. Run. | At most 3 slices, the total in the middle; with more than 3 appeals, the note "Showing the top 3 groups." |
 
 **Cleanup:** None.

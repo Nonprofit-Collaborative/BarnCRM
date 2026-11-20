@@ -317,7 +317,12 @@ export default class ReportingDashboard extends LightningElement {
       filterObject: helpText('Reporting', 'Reporting_Dash_FilterObject'),
       filterLabel: helpText('Reporting', 'Reporting_Dash_FilterLabel'),
       bindings: helpText('Reporting', 'Reporting_Widget_Bindings'),
-      readOnly: helpText('Reporting', 'Reporting_Dash_ReadOnly'),
+      readOnly: helpText(
+        'Reporting',
+        this.context && this.context.canSave
+          ? 'Reporting_Dash_ReadOnly'
+          : 'Reporting_Dash_ReadOnlyNoSave'
+      ),
       layout: helpText('Reporting', 'Reporting_Dash_Layout')
     };
   }

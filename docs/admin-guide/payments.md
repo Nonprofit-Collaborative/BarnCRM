@@ -170,7 +170,7 @@ It shows the address to give each processor and, for each processor, a card with
   the addresses the first time you opened this page. Regenerating replaces it, so the addresses
   already given to Stripe and PayPal stop working until you paste in the new ones. Use it if an
   address may have been shared.
-- **Disconnect**: marks the processor not connected (and, for PayPal, clears the webhook id).
+- **Disconnect**: after you confirm, marks the processor not connected (and, for PayPal, clears the webhook id).
   The secrets stay on the External Credential until you remove them in Setup.
 
 BarnCRM never shows a secret: it cannot read one.

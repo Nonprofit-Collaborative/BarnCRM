@@ -202,8 +202,29 @@ export default class PaymentsSetup extends LightningElement {
     return this.run(() => regenerateToken());
   }
 
-  handleClear(event) {
-    return this.run(() => clearKeys({ processor: event.target.dataset.processor }));
+  /** Disconnecting stops use of the processor (PayPal also loses its saved Webhook ID), so it asks first. */
+  async handleClear(event) {
+    const processor = event.target.dataset.processor;
+    const confirmed = await BarnConfirmModal.open({
+      size: 'small',
+      label: fill(helpText('Payments', 'Payments_Setup_DisconnectTitle'), [processor]),
+      message: fill(
+        helpText(
+          'Payments',
+          processor === 'PayPal'
+            ? 'Payments_Setup_DisconnectConfirmPayPal'
+            : 'Payments_Setup_DisconnectConfirm'
+        ),
+        [processor]
+      ),
+      confirmLabel: this.labels.clear,
+      confirmVariant: 'destructive',
+      cancelLabel: helpText('Payments', 'Payments_Setup_Cancel')
+    });
+    if (!confirmed) {
+      return undefined;
+    }
+    return this.run(() => clearKeys({ processor }));
   }
 
   handleCheck(event) {

@@ -33,14 +33,17 @@ Settings** permission to install, turn on, turn off, or check what an uninstall 
 
 Which modules are listed depends on the edition chosen in first-run setup (see
 [BarnCRM Settings, First-run setup](barncrm-settings.md#first-run-setup)). The Standard Edition (or no edition chosen yet) lists
-Core, BarnCRM Rollup Builder, BarnCRM Forms, BarnCRM Contact Point Sync, BarnCRM Event
-Management, BarnCRM Portal Builder and BarnCRM Mirror. The Nonprofit Edition lists all twelve: Core, BarnCRM Rollup Builder, BarnCRM Forms,
-BarnCRM Contact Point Sync, BarnCRM Event Management, BarnCRM Portal Builder, BarnCRM Mirror, BarnCRM Fundraising, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Logic Models and
-BarnCRM Grants. A module that is installed is always listed, whatever the edition. See
+Core and the 14 modules both editions offer: BarnCRM Rollup Builder, BarnCRM Contact Point Sync,
+BarnCRM Event Management, BarnCRM Forms, BarnCRM Portal Builder, BarnCRM Address Verification,
+BarnCRM Payments, BarnCRM Corporate Hub, BarnCRM Memberships, BarnCRM Territory Management,
+BarnCRM Mirror, BarnCRM LWC Builder, BarnCRM Project Management and BarnCRM Advanced Reporting.
+The Nonprofit Edition lists all 21: those 15 plus BarnCRM Fundraising, BarnCRM Volunteers,
+BarnCRM Programs, BarnCRM Logic Models, BarnCRM Grants and BarnCRM Scholarships and Outbound
+Grants. A module that is installed is always listed, whatever the edition. See
 [Editions](editions.md).
 
-The modules that only the Nonprofit Edition offers (Fundraising, Volunteers, Programs, Logic Models
-and Grants; the module catalog decides, not a fixed list) are grouped in their own section at the
+The modules that only the Nonprofit Edition offers (Fundraising, Volunteers, Programs, Logic Models,
+Grants and Scholarships and Outbound Grants; the module catalog decides, not a fixed list) are grouped in their own section at the
 bottom of the list, titled **Nonprofit Modules**. Core and the modules both editions offer come
 first. The section has a **Show Nonprofit Modules** checkbox, ticked by default. Clear it and
 the nonprofit modules are hidden from the list; the checkbox stays so you can tick it again.

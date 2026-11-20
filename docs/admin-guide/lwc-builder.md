@@ -28,7 +28,8 @@ page, gives you and every BarnCRM Admin holder LWC Builder Admin, and gives the 
 and Read Only sets to BarnCRM's other roles (see Access below). Installing changes no page: a
 built component shows only where you place it.
 
-The **LWC Builder** tab joins the BarnCRM and BarnCRM Console apps before Error Log, for admins.
+The **LWC Builder** tab is added at the end of the BarnCRM and BarnCRM Console apps, for admins (in a package install
+the admin adds it in App Manager; the Setup Assistant lists the tab names).
 LWC Builder has no app of its own.
 
 ## Access

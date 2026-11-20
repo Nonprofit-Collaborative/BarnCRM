@@ -85,9 +85,10 @@ private class AddressMatchKeyTest {
 			];
 			Assert.areEqual(1, warnings.size(), 'One warning for the run');
 			Assert.areEqual(ErrorLogger.SEVERITY_WARNING, warnings[0].Severity__c);
-			Assert.isTrue(
-				warnings[0].Message__c.contains('1 addresses'),
-				'It says how many: ' + warnings[0].Message__c
+			Assert.areEqual(
+				BarnHelp.text('Core', 'Core_HealthCheck_MatchKeysLeftOne').left(warnings[0].Message__c.length()),
+				warnings[0].Message__c,
+				'One address left reads in the singular'
 			);
 		}
 	}

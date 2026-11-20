@@ -18,7 +18,7 @@ a field).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As admin, open the BarnCRM app. | An LWC Builder tab, before Error Log. |
+| 1 | As admin, open the BarnCRM app. | An LWC Builder tab, at the end of the app (in a package install, add it in App Manager first). |
 | 2 | Open Setup, the staff user's permission set assignments. | LWC Builder Staff is assigned (within the hour, or after Finish Setup). |
 | 3 | As the staff user, open the BarnCRM app. | No LWC Builder tab. |
 | 4 | As admin, open BarnCRM Settings, **LWC Builder**. | Show built components On, Rows per list 10, Allow source export On. |

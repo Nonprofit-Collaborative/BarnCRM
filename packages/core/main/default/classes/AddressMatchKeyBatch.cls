@@ -101,7 +101,9 @@ public without sharing class AddressMatchKeyBatch implements Database.Batchable<
 		Integer left = countUnfilled();
 		SettingsService.saveBookkeeping(new Map<String, Object>{ 'Match_Keys_Filled__c' => true });
 		ErrorLogger.logMessage(
-			BarnHelp.text('Core', 'Core_HealthCheck_MatchKeysLeft', new List<Object>{ left }),
+			left == 1
+				? BarnHelp.text('Core', 'Core_HealthCheck_MatchKeysLeftOne')
+				: BarnHelp.text('Core', 'Core_HealthCheck_MatchKeysLeft', new List<Object>{ left }),
 			CONTEXT,
 			ErrorLogger.SEVERITY_WARNING
 		);

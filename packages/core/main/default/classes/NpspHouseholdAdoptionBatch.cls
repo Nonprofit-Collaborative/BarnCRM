@@ -43,6 +43,8 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
 	private Integer done = 0;
 	private Integer skipped = 0;
 	private Integer refused = 0;
+	/** Each reason a household was not put back, with how many (written to the Error Log at the end). */
+	private Map<String, Integer> refusedReasons = new Map<String, Integer>();
 
 	private NpspHouseholdAdoptionBatch(String runId, Boolean undoing, Boolean keepNames, Integer runLimit) {
 		this.runId = runId;
@@ -400,6 +402,10 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
 		row.Status__c = NpspHouseholdAdoptionService.STATUS_NOT_RESTORED;
 		row.Notes__c = note == null ? null : note.left(255);
 		refused++;
+		if (note != null) {
+			String reason = note.left(255);
+			refusedReasons.put(reason, (refusedReasons.containsKey(reason) ? refusedReasons.get(reason) : 0) + 1);
+		}
 	}
 
 	/** The Account as it was before adoption: its record type and the four saved fields. */
@@ -448,5 +454,16 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
 			undoing ? new List<Object>{ done, refused } : new List<Object>{ done, skipped, refused }
 		);
 		ErrorLogger.logMessage(summary, Label.Core_NpspAdoption_ErrorContext, ErrorLogger.SEVERITY_INFO);
+		for (String reason : refusedReasons.keySet()) {
+			ErrorLogger.logMessage(
+				BarnHelp.text(
+					'Core',
+					'Core_NpspAdoption_UndoReason',
+					new List<Object>{ refusedReasons.get(reason), reason }
+				),
+				Label.Core_NpspAdoption_ErrorContext,
+				ErrorLogger.SEVERITY_WARNING
+			);
+		}
 	}
 }
