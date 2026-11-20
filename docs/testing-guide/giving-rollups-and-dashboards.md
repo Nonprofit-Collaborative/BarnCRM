@@ -156,7 +156,7 @@ For every script on this page:
 | 3 | Click **Scheduled Payments**. | The Scheduled Payments list view **Overdue** opens; its count matches the figure. Go back. |
 | 4 | Click **Gifts**. | The **Thank-Yous** page opens. Go back and click **My Asks Due This Month**: the Asks list view of that name opens. |
 | 5 | Click **Enter a Gift**. | Quick Gift Entry opens. |
-| 6 | On Fundraising Home, read **Fundraising Setup**. | Four tiles, each with its tab's icon and one line: **Donor Levels and Scores**, **Stewardship Plans**, **Pledge Reminders**, **Receipt Letters**. Click each: its page opens. |
+| 6 | On Fundraising Home, read **Fundraising Setup**. | Four tiles, each with its tab's icon and one line: **Donor Levels and Scores**, **Stewardship Plan Templates**, **Pledge Reminders**, **Receipt Letters**. Click each: its page opens. |
 | 7 | Read the charts. | **Giving by Month** (a column per month) and **Open Asks by Stage** (a bar per stage) show sample data, in Salesforce's own colors, and follow dark mode when it is on. Click one: its report opens from the **BarnCRM Fundraising** folder. |
 | 8 | As staff, open Fundraising Home. | The figures and **Enter a Gift** show. **Fundraising Setup** has **Pledge Reminders** and **Receipt Letters** only. |
 | 9 | As read-only, open Fundraising Home. | The figures show; **Enter a Gift** does not; **Fundraising Setup** has **Pledge Reminders** and **Receipt Letters**. |

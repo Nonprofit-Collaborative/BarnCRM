@@ -194,7 +194,7 @@ describe('c-stewardship-plans', () => {
 
     const empty = element.shadowRoot.querySelector('[data-id="empty-state"]');
     expect(empty).not.toBeNull();
-    expect(empty.heading).toBe('No Plans Yet');
+    expect(empty.heading).toBe('No Templates Yet');
   });
 
   it('shows a plan its steps in order once it is chosen', async () => {

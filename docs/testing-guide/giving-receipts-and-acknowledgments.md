@@ -193,7 +193,7 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Fundraising**, on **Stewardship Plans** select **Open Stewardship Plans**. With no plans yet the page shows **No Plans Yet**. Select **New Plan**: **Plan name** `First gift welcome`, **What Starts It** Manual, **Smallest gift that starts it** 100. **Save**. | Refused: "A minimum amount applies only to the First gift and Gift received events. Clear it, or choose one of those events." |
+| 1 | In **BarnCRM Settings**, **Fundraising**, on **Stewardship Plan Templates** select **Open Stewardship Plan Templates**. With no templates yet the page shows **No Templates Yet**. Select **New Plan**: **Plan name** `First gift welcome`, **What Starts It** Manual, **Smallest gift that starts it** 100. **Save**. | Refused: "A minimum amount applies only to the First gift and Gift received events. Clear it, or choose one of those events." |
 | 2 | Change **What Starts It** to **First gift**, clear the minimum, leave **On** off. **Save**. | "Saved." The plan is listed with **On** Off, **Steps** 0, **Running Now** 0. |
 | 3 | Select the plan, then **Add Step**: **Subject** `Call to say thank you`, **Days after start** 1, **Assign to** Specific user, no **Assigned user**. **Save**. | Refused: "Choose the person this task goes to, or change Assign To." |
 | 4 | Change **Assign to** to **Record owner**, **Save**. Add `Send the welcome packet`, 7 days, Record owner. | Two steps listed in order; **Move Up** and **Move Down**, dragging a step by its handle, and Space, arrow keys and Enter on a focused step each reorder them, and each move is announced ("... is now step 1 of 2."). |
@@ -202,7 +202,7 @@ For every script on this page:
 | 7 | Open **Stewardship Plans** in the BarnCRM Fundraising app, list view **Running Plans**. Open the new plan. | **Plan Template** `First gift welcome`, **Status** Running, **Started Date** today, **Contact** Valentina Singh. Its activity shows two open tasks due tomorrow and in 7 days, assigned to the contact's owner. |
 | 8 | Enter a second gift from Valentina Singh for 50. Reopen **Running Plans**. | Still one plan for her: the same plan does not start twice while running. |
 | 9 | Open Valentina Singh in the BarnCRM Fundraising app. | Her **Stewardship Plans** list shows the one running plan. |
-| 10 | As read-only, open the Stewardship Plans page. | "You can read the plans here. Changing them needs the Manage BarnCRM Settings permission." **New Plan** is disabled. |
+| 10 | As read-only, open the Stewardship Plan Templates page. | "You can read the plans here. Changing them needs the Manage BarnCRM Settings permission." **New Plan** is disabled. |
 | 11 | As the admin, open the running plan, select **Edit**, set **Status** to **Complete** and leave **Completed Date** empty. **Save**. | Saved, with no error. **Completed Date** is today. |
 | 12 | Edit the plan again and set **Status** back to **Running**. **Save**. | Saved. **Completed Date** is empty. |
 
@@ -215,7 +215,7 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Fundraising**, on **Stewardship Plans** select **Open Stewardship Plans**. **New Plan**: `After a meeting`, **What Starts It** Manual, a **description** `Use after a donor meeting`. **Save**, add one step `Send a note`, 2 days, Record owner, then **Turn On**. | The plan is listed with **On** On. |
+| 1 | In **BarnCRM Settings**, **Fundraising**, on **Stewardship Plan Templates** select **Open Stewardship Plan Templates**. **New Plan**: `After a meeting`, **What Starts It** Manual, a **description** `Use after a donor meeting`. **Save**, add one step `Send a note`, 2 days, Record owner, then **Turn On**. | The plan is listed with **On** On. |
 | 2 | As staff, open **Harper Garcia** in the BarnCRM Fundraising app and select **Start Stewardship Plan**. | The **Start a Stewardship Plan** window lists the plans that are on, including `After a meeting`. |
 | 3 | Select **Start Plan** without choosing. | Toast "Choose the plan to start." Nothing starts. |
 | 4 | Choose `After a meeting`. | "Use after a donor meeting" shows under the list. Select **Start Plan**. Toast "The plan has started. Its tasks are in the task lists of the people they are assigned to." |
