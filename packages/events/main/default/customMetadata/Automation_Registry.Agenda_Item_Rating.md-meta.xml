@@ -24,7 +24,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">Sends an attendee's rating of a session from their agenda as one Session Rating that names no one, once the session has started, and refuses a change after it was sent. This automation enforces a rule rather than doing work for you, so it cannot be switched off here and pausing automation does not suspend it.</value>
+        <value xsi:type="xsd:string">Sends an attendee's rating of a session from their agenda as one Session Rating that names no one, once the session has started, and refuses a change after it was sent.</value>
     </values>
     <values>
         <field>Module__c</field>

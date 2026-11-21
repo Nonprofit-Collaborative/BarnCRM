@@ -24,7 +24,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">Fills a new submission's Form Name and Version Number from the form version it answers, so the submission still names its form if a Forms administrator deletes the form. A submission without them could not be traced, so this automation cannot be switched off here and pausing automation does not suspend it.</value>
+        <value xsi:type="xsd:string">Fills a new submission's Form Name and Version Number from the form version it answers, so the submission still names its form if a Forms administrator deletes the form. A submission without them could not be traced.</value>
     </values>
     <values>
         <field>Module__c</field>

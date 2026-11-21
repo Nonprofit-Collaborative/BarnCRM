@@ -21,7 +21,7 @@ If you never choose a preferred phone, nothing changes: the ordinary Phone box k
 you type in it. The copying only starts on a person once you choose one.
 
 The copy belongs to the **Preferred Email and Phone** feature (BarnCRM Settings, General) and has
-its own switch on the Automation page: **Copy preferred phone on a person**. It is on by default
+its own switch on the Automation page: **Contact: copy preferred phone**. It is on by default
 and separate from the household automations. Switch it off only if you want the ordinary Phone box left
 exactly as typed.
 

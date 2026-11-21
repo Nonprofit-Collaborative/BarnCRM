@@ -498,7 +498,7 @@ optional **Cohort**, the **Days of the Week**, **Repeat Every (Weeks)**, a **Sta
 - **Access.** Programs Admin creates, edits and deletes schedules; Programs Staff create and
   edit them; Programs Read Only reads them. A service or cohort with schedules cannot be deleted
   until its schedules are.
-- **Automation.** The **Session schedule: create its sessions** row on the Automation page can
+- **Automation.** The **Session Schedule: create its sessions** row on the Automation page can
   be switched off; sessions then appear with the nightly run or **Create Sessions Now**.
 
 ### Taking Attendance on a Session

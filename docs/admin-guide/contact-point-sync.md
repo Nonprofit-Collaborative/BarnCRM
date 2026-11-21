@@ -72,8 +72,8 @@ In **BarnCRM Settings**, **Contact Points** section:
 Turning a kind off stops copying it and leaves the copies already made as they are. **Open
 Contact Point Sync** opens the module's page.
 
-The four automations, **Contact Point Sync: People**, **Contact Point Sync: Addresses**,
-**Contact Point Sync: Person Accounts** and **Contact Point Sync: Household Moves**, are on the
+The four automations, **Contact Point Sync: people**, **Contact Point Sync: addresses**,
+**Contact Point Sync: person accounts** and **Contact Point Sync: household moves**, are on the
 **Automation** page, where you can switch each off or pause all automation. With Household Moves
 off, a moved person's addresses catch up at their next save or when you press **Copy Existing People**.
 

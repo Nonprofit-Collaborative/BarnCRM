@@ -24,7 +24,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">Lets only a Forms administrator (Manage Forms) delete a form that has submissions, and keeps the submissions with the form's name and version number; anyone else is told to close the form instead. Without it a form's submissions could be lost, so this automation cannot be switched off here and pausing automation does not suspend it.</value>
+        <value xsi:type="xsd:string">Lets only a Forms administrator (Manage Forms) delete a form that has submissions, and keeps the submissions with the form's name and version number; anyone else is told to close the form instead. Without it a form's submissions could be lost.</value>
     </values>
     <values>
         <field>Module__c</field>
