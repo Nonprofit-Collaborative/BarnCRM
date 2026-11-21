@@ -207,6 +207,12 @@ public with sharing class AutomationControlController {
 			if (setting.Automation_Name__c != null) {
 				listed.add(setting.Automation_Name__c.toLowerCase());
 			}
+			// A row a removed module left behind (its object is gone from this org, as the
+			// Rollup Builder's was on mwdbdevsb) cannot run: it is not listed, rather than shown
+			// as "Runs on Rollup_Definition__c".
+			if (!objectInOrg(setting.Object_Name__c)) {
+				continue;
+			}
 			AutomationView view = new AutomationView();
 			view.recordId = setting.Id;
 			view.automationName = setting.Automation_Name__c;
@@ -242,6 +248,19 @@ public with sharing class AutomationControlController {
 			return described == null ? apiName : described.getLabel();
 		} catch (Exception notAnObject) {
 			return apiName;
+		}
+	}
+
+	/** True for no object named, or an object this org has. */
+	@TestVisible
+	private static Boolean objectInOrg(String apiName) {
+		if (String.isBlank(apiName)) {
+			return true;
+		}
+		try {
+			return NamespaceUtil.describe(apiName) != null;
+		} catch (Exception notAnObject) {
+			return false;
 		}
 	}
 

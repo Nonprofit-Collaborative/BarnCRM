@@ -12,7 +12,7 @@
  * - Active BarnCRM Automation recipes while Recipe Access was never saved (warning, CN-02);
  * - the CN-03 clock checks of canonical model R-CR8 (`ConnectorClockChecks`);
  * - while a recipe receives webhooks (CN-04): no active Site, and Site guest users without
- *   `BarnCRM_Connector_Webhook_Guest` (fix: assign it) (`ConnectorWebhooks`).
+ *   `Connector_Webhook_Guest` (fix: assign it) (`ConnectorWebhooks`).
  *
  * `@NamespaceAccessible`, public, with a public no-argument constructor, because Core resolves it
  * with `Type.forName` under ADR-0017.

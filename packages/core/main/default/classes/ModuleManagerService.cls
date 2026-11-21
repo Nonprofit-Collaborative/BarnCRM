@@ -240,7 +240,7 @@ public with sharing class ModuleManagerService {
 		'Memberships' => 'Memberships_Admin',
 		'Projects' => 'Projects_Admin',
 		'AddressVerification' => 'Address_Verification_Admin',
-		'Connector' => 'BarnCRM_Connector_Admin',
+		'Connector' => 'Connector_Admin',
 		'Reporting' => 'Reporting_Admin',
 		'Migration' => 'Migration_Admin'
 	};

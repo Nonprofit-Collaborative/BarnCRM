@@ -104,14 +104,18 @@ General, Features. Its row stays in the list, with its own switch as you left it
 the description reads "Stopped: its feature is turned off in BarnCRM Settings, General, Features.
 It runs again when the feature is turned on."
 
+An automation on an object your org does not have, such as one a module you removed left
+behind, is not listed: it has nothing to run on.
+
 ## Automations That Always Run
 
 Pause stops BarnCRM filling things in for you. It never stops BarnCRM refusing
 something. An automation whose job is to refuse a change, rather than to save you typing,
 is marked as always running, and neither the pause nor its own switch turns it off.
 
-In the list you can tell one at a glance: its switch sits at **Off** and is greyed out even
-when you hold the Manage BarnCRM Settings permission, and underneath the description is
+In the list you can tell one at a glance: its switch sits at **Off**, is greyed out even
+when you hold the Manage BarnCRM Settings permission and reads **Always Runs** beneath it,
+and underneath the description is
 the line "This automation enforces a rule, so it always runs. It cannot be switched off
 here and a pause does not suspend it." Clicking the switch does nothing, and if a change
 somehow reaches the server it is refused with the same explanation.
