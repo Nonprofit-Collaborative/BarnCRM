@@ -45,7 +45,14 @@ function moreDescription(name) {
  * charts beside it are standard Report Chart components on the same page (vis-core-18).
  */
 export default class FundraisingHome extends NavigationMixin(LightningElement) {
-  labels = { enterGift: ENTER_GIFT, loading: LOADING };
+  labels = {
+    get title() {
+      return helpText('Giving', 'Giving_FundraisingHome_Title');
+    },
+    enterGift: ENTER_GIFT,
+    loading: LOADING
+  };
+  icon = iconFor('Fundraising_Home');
   helpReady = isHelpLoaded('Giving');
   loading = true;
   failed = false;
@@ -75,6 +82,20 @@ export default class FundraisingHome extends NavigationMixin(LightningElement) {
 
   get canEnterGift() {
     return Boolean(this.home && this.home.canEnterGift);
+  }
+
+  /** The first-run panel carries its own Enter a Gift button, so the header keeps one only after. */
+  get showHeaderEnterGift() {
+    return this.canEnterGift && !this.firstRun;
+  }
+
+  get purpose() {
+    return helpText('Giving', 'Giving_FundraisingHome_Purpose');
+  }
+
+  /** The Report Chart components cannot say "nothing yet", so the page does it for them. */
+  get chartsNote() {
+    return helpText('Giving', 'Giving_FundraisingHome_ChartsNote');
   }
 
   get showError() {

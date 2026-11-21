@@ -48,6 +48,8 @@ export default class GrantFinder extends LightningElement {
           title: helpText('Funders', 'Funders_Finder_Title'),
           intro: helpText('Funders', 'Funders_Finder_Intro'),
           off: helpText('Funders', 'Funders_Finder_Off'),
+          offHeading: helpText('Funders', 'Funders_Finder_OffHeading'),
+          emptyHeading: helpText('Funders', 'Funders_Finder_EmptyHeading'),
           search: helpText('Funders', 'Funders_Finder_Search'),
           show: helpText('Funders', 'Funders_Finder_Show'),
           empty: helpText('Funders', 'Funders_Finder_Empty'),

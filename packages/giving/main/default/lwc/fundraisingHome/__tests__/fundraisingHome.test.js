@@ -214,6 +214,21 @@ describe('c-fundraising-home', () => {
     });
   });
 
+  it('offers Enter a Gift once: in the first-run panel, then in the header', async () => {
+    let element = await render({ ...HOME, firstRun: true, canImport: true });
+    expect(element.shadowRoot.querySelector('[data-id="enter-gift"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="first-run-gift"]')).not.toBeNull();
+    document.body.removeChild(element);
+
+    element = await render(HOME);
+    expect(element.shadowRoot.querySelector('[data-id="enter-gift"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="first-run-gift"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="shell"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="charts-note"]').textContent.trim()).toBe(
+      'c.Giving_FundraisingHome_ChartsNote'
+    );
+  });
+
   it('leaves Import a File out for someone who cannot import, and the panel out once gifts exist', async () => {
     let element = await render({ ...HOME, firstRun: true, canImport: false });
     expect(element.shadowRoot.querySelector('[data-id="first-run"]')).not.toBeNull();

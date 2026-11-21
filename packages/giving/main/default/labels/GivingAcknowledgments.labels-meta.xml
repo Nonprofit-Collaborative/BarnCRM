@@ -22,7 +22,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments page: the email queue count</shortDescription>
-    <value>Emails ready to send</value>
+    <value>Emails Ready to Send</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_LetterQueue</fullName>
@@ -30,7 +30,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments page: the letter queue count</shortDescription>
-    <value>Letters ready to merge</value>
+    <value>Letters Ready to Merge</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_Unmatched</fullName>
@@ -38,7 +38,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments page: gifts in the queue that no rule matches</shortDescription>
-    <value>Waiting, matched by no rule</value>
+    <value>Waiting, Matched by No Rule</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_WithoutRecipient</fullName>
@@ -46,7 +46,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments page: gifts with no email recipient</shortDescription>
-    <value>Could not be sent, nobody to email</value>
+    <value>Could Not Be Sent, Nobody to Email</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_OptedOut</fullName>
@@ -54,7 +54,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments page: email gifts whose donor opted out of email</shortDescription>
-    <value>Opted out of email, sent by letter</value>
+    <value>Opted Out of Email, Sent by Letter</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_SendEmails</fullName>
@@ -86,7 +86,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments page: the nightly schedule toggle</shortDescription>
-    <value>Send emails nightly</value>
+    <value>Send Emails Nightly</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_NextRun</fullName>
@@ -94,7 +94,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments page: when the nightly send is next due</shortDescription>
-    <value>Next run</value>
+    <value>Next Run</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_RulesHeading</fullName>
@@ -134,7 +134,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments page: field, the email template a rule sends</shortDescription>
-    <value>Email template</value>
+    <value>Email Template</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_TemplatePlaceholder</fullName>

@@ -51,7 +51,7 @@ When a payment arrives, enter it as a gift and link it to the payment.
 
 1. Open [Quick Gift Entry](gifts.md#to-pay-a-scheduled-payment) and choose the donor.
 2. Type the **Amount** and **Gift Date**.
-3. In **Pays a scheduled payment**, check the chosen payment, or pick the right one. Choose **None: a new gift on its own** if the gift is not for the pledge.
+3. In **Pays a Scheduled Payment**, check the chosen payment, or pick the right one. Choose **None: a new gift on its own** if the gift is not for the pledge.
 4. Click **Save**.
 
 You should see: on the commitment, the payment's **Status** turns **Paid** (or **Partially paid** if less came in), **Paid To Date** goes up and **Balance** goes down. The gift appears in the commitment's **Gifts** list, on its **Related** tab. For a stack of checks, use the **Pays** column in a [gift batch](gift-batches.md#to-mark-a-check-as-a-scheduled-payment-pays).
@@ -103,7 +103,7 @@ If your organization has turned on pledge reminders, donors with a payment comin
 - "Day of month is a day between 1 and 31, or empty to use the day of the start date." A 31 falls on the last day of a shorter month.
 - "This commitment cannot be deleted because a gift has been received against one of its payments. Cancel it instead." Use **Cancel Commitment**.
 - "This record is the donor of an active or paused pledge or recurring gift, so it cannot be deleted." Cancel the commitment, or change its donor, first. Merging a duplicate still works.
-- "That payment is no longer open, or is not this donor's. Nothing was saved." Choose again in **Pays a scheduled payment**, or None.
+- "That payment is no longer open, or is not this donor's. Nothing was saved." Choose again in **Pays a Scheduled Payment**, or None.
 - "A gift of goods cannot pay a scheduled payment. Choose None." In-kind gifts never pay a pledge.
 - The **Overdue** list is empty. Payments turn Overdue in a nightly job your admin switches on ([Commitments](../admin-guide/commitments.md)).
 - You cannot find a pledge a colleague entered. Commitments are private, like gifts: you see your own and those your role or sharing gives you. Ask your admin ([Access](../admin-guide/access.md)).

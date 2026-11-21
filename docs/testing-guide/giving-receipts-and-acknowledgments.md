@@ -133,12 +133,12 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Fundraising**, turn on **Send Gift Acknowledgments** and select **Save**. On the **Acknowledgments** row select **Open Thank-Yous**. | The **Thank-Yous** page opens with **Waiting to Go**, then **Recent Runs**, then **Rules (Admin)**, which is open for an admin. |
-| 2 | Select **New Rule**. **Rule Name**: `Test email`, **Order** 10, **Active** on, **Channel** Email, **Email template** **BarnCRM: thank you for your gift**, **Minimum Amount** 7777, **Maximum Amount** 7777. Select **Save**. | Toast "The rule has been saved." The rule is listed with **Matches** "7777 and up, up to 7777". |
-| 3 | Select **New Rule**, **Channel** Email, leave **Email template** at **Choose a template**, select **Save**. | Refused: "An email rule needs an email template. Choose one from the list." Select **Cancel**. |
+| 1 | In **BarnCRM Settings**, **Fundraising**, turn on **Send Thank-Yous** and select **Save**. On the **Acknowledgments** row select **Open Thank-Yous**. | The **Thank-Yous** page opens with **Waiting to Go**, then **Recent Runs**, then **Rules (Admin)**, which is open for an admin. |
+| 2 | Select **New Rule**. **Rule Name**: `Test email`, **Order** 10, **Active** on, **Channel** Email, **Email Template** **BarnCRM: thank you for your gift**, **Minimum Amount** 7777, **Maximum Amount** 7777. Select **Save**. | Toast "The rule has been saved." The rule is listed with **Matches** "7777 and up, up to 7777". |
+| 3 | Select **New Rule**, **Channel** Email, leave **Email Template** at **Choose a template**, select **Save**. | Refused: "An email rule needs an email template. Choose one from the list." Select **Cancel**. |
 | 4 | Open **Susan Ortiz**. Set **Work Email** to `susan.work@example.org`, **Preferred Email** to **Work**, select **Save**. | The ordinary **Email** now reads `susan.work@example.org` ([Email addresses](../admin-guide/emails.md)). |
 | 5 | As staff, enter a gift from **Susan Ortiz** for 7777. Open the gift. | **Acknowledgment Status** is **To acknowledge**. |
-| 6 | Open the **Thank-Yous** tab in the BarnCRM Fundraising app. | **Emails ready to send** is at least 1. |
+| 6 | Open the **Thank-Yous** tab in the BarnCRM Fundraising app. | **Emails Ready to Send** is at least 1. |
 | 7 | Select **Send Emails Now**. | "The email send has started. The run below shows how it goes." After a refresh, a run under **Recent Runs** with **Sent** 1 and **Did Not Go** 0. |
 | 8 | Open the gift again, then the newest row in its **Acknowledgments** list. | The gift's **Acknowledgment Status** is **Acknowledged** with today's **Acknowledgment Date**. The acknowledgment has **Status** Sent, **Recipient Email** `susan.work@example.org`. |
 
@@ -152,12 +152,12 @@ For every script on this page:
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | On the Thank-Yous page select **New Rule**: `Test letter`, **Order** 5, **Channel** Letter, **Minimum Amount** 8888, **Maximum Amount** 8888. **Save**. | The rule is listed first (lowest order). |
-| 2 | As staff, enter a gift from **Rosa Hall** for 8888. Open the Thank-Yous page. | **Letters ready to merge** is at least 1. **Rules (Admin)** is closed; opened, it shows no **New Rule**, **Edit**, **Move Up** or **Move Down** buttons and no drag handles for staff. |
+| 2 | As staff, enter a gift from **Rosa Hall** for 8888. Open the Thank-Yous page. | **Letters Ready to Merge** is at least 1. **Rules (Admin)** is closed; opened, it shows no **New Rule**, **Edit**, **Move Up** or **Move Down** buttons and no drag handles for staff. |
 | 3 | Select **Download Letters to Merge**. | "The letter file is ready on the run below. Merge it, print it, and then choose Mark as Sent." The run shows **Download File** and **Mark as Sent**. |
 | 4 | Select **Download File**. | A CSV with a row for the 8888 gift: donor name, greeting, address, amount, gift date, appeal, fund. |
 | 5 | Select **Mark as Sent**. | "Those letters are recorded as sent." The 8888 gift's **Acknowledgment Status** is **Acknowledged**. |
 | 6 | Select **Download Letters to Merge** again (or note it is disabled). | The 8888 gift is not in a new file: a thanked gift never returns to the queue by itself. |
-| 7 | As read-only, open the Thank-Yous page. | The queue counts show. **Send Emails Now**, **Download Letters to Merge** and **Send emails nightly** are disabled; no **New Rule** or **Edit**. |
+| 7 | As read-only, open the Thank-Yous page. | The queue counts show. **Send Emails Now**, **Download Letters to Merge** and **Send Emails Nightly** are disabled; no **New Rule** or **Edit**. |
 | 8 | As staff, set Rosa Hall's mailing street to `=1+1`, enter another 8888 gift from her, select **Download Letters to Merge** and open the file in a spreadsheet. | The street cell reads `'=1+1` as text, not `2`. On the run, **Files** shows the CSV; in Setup, the file's sharing lists the run with **Internal users** where the org has a site or portal (otherwise **All users**). |
 
 | 9 | As admin, in **Rules (Admin)** select **Move Down** on `Test letter`. | It is listed second, and "Test letter is now rule 2 of 2." is shown. |
@@ -250,11 +250,11 @@ For every script on this page:
 |---|---|---|
 | 1 | On the Thank-Yous page, **Edit** `Test email` and tick **Active**. Select **Save**. | The rule is listed as active (Email, 7777 to 7777). |
 | 2 | Open **Rosa Hall**, tick **Email Opt Out**, select **Save**. | Saved. |
-| 3 | As staff, enter a gift from **Rosa Hall** for 7777. Open the Thank-Yous page. | **Opted out of email, sent by letter** is at least 1, and **Letters ready to merge** counts it too. **Emails ready to send** does not. |
+| 3 | As staff, enter a gift from **Rosa Hall** for 7777. Open the Thank-Yous page. | **Opted Out of Email, Sent by Letter** is at least 1, and **Letters Ready to merge** counts it too. **Emails ready to send** does not. |
 | 4 | If **Send Emails Now** is enabled, select it and refresh after the run finishes (it is greyed out when Rosa's gift is the only email gift waiting). | Any new run shows **Did Not Go** 0. The 7777 gift has no row in its **Acknowledgments** list and its **Acknowledgment Status** is still **To acknowledge**. Rosa receives no email. |
 | 5 | Select **Download Letters to Merge**, then **Download File**. | The CSV has a row for Rosa's 7777 gift, with **Rule** `Test email`. |
 | 6 | Select **Mark as Sent** on that run. | The 7777 gift's **Acknowledgment Status** is **Acknowledged**; its acknowledgment row has **Channel** Letter. |
-| 7 | Open an organization with a primary contact, tick **Email Opt Out** on that contact, and enter a 7777 gift from the organization. Open the Thank-Yous page. | The gift is counted under **Opted out of email, sent by letter**: an organization's thank-you follows its primary contact's opt-out. |
+| 7 | Open an organization with a primary contact, tick **Email Opt Out** on that contact, and enter a 7777 gift from the organization. Open the Thank-Yous page. | The gift is counted under **Opted Out of Email, Sent by Letter**: an organization's thank-you follows its primary contact's opt-out. |
 
 **Cleanup:** As admin, **Edit** `Test email` and clear **Active**. Clear **Email Opt Out** on Rosa Hall and the primary contact, and mark the step 7 gift **Do not acknowledge**.
 

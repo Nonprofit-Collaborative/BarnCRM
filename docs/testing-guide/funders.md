@@ -40,8 +40,8 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | 1 | Open **Grant Pipeline**. | Columns **Prospect**, **Letter of Inquiry**, **Invited to Apply**, **Applied**, each with a count and an amount. **Open Requests** counts both grants; **Amount Requested** is 35,000. The number of grants awarded shows as a badge inside the **Awarded This Fiscal Year** tile, not under the tiles. **New Grant** shows once, at the top of the page. |
 | 1a | In an org with no open grants, open **Grant Pipeline** as staff. | The empty state shows one **New Grant** button; the top of the page has none. |
 | 2 | Read **Upcoming Deadlines**. | `Arts Grant` first with a red `3 days overdue` badge; then `2027 Literacy Grant` with an amber `10 days left` badge. The `2027 Literacy Grant` card shows the same amber badge, its amount in larger type and the owner's initials. |
-| 3 | Choose **Mine**. | Only `2027 Literacy Grant` (the staff user owns it). |
-| 4 | Choose **Everyone**, then a card's menu, **Open**. | The grant's page opens. |
+| 3 | Choose **My Grants**. | Only `2027 Literacy Grant` (the staff user owns it). |
+| 4 | Choose **Everyone's Grants**, then a card's menu, **Open**. | The grant's page opens. |
 | 5 | Back on the board, click a card's grant name. | The grant's page opens. The totals are tiles; the intro reads `Click a grant to open it`. |
 
 **Cleanup:** None.
@@ -205,8 +205,8 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | 3a | Click **Print**. | The print preview shows the month without the app's header, navigation or buttons. |
 | 4 | Click the payment, then go back and click `Calendar Test`. | Each opens its record. |
 | 5 | Mark the payment **Received** and return to the calendar. | It is gone: only expected payments show. |
-| 6 | Choose **Mine**. | Only `Calendar Test` and requirements assigned to staff or on staff's grants. |
-| 7 | As read-only, open **Grant Calendar**. | The same entries for **Everyone**; nothing to change. |
+| 6 | Choose **My Grants**. | Only `Calendar Test` and requirements assigned to staff or on staff's grants. |
+| 7 | As read-only, open **Grant Calendar**. | The same entries for **Everyone's Grants**; nothing to change. |
 | 8 | Narrow the window to phone width (or use the Salesforce mobile app). | Only days with entries are listed, one under another, with no sideways scrolling. |
 | 9 | With a screen reader, step through the calendar. | The month is announced; each entry is a button that says what it is. |
 | 10 | Set `Calendar Test`'s **Application Deadline** to 3 days ago and reload **Grant Calendar** on this month. | The entry shows a warning icon, the word **Overdue** (in its hover text and read out by a screen reader) and bold text, not red text alone. |
@@ -290,7 +290,7 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As staff with Fundraising access, open the **BarnCRM Grants** app. | It opens on **Board Dashboard**. Tiles: **Revenue This Fiscal Year** 100,000, **Awarded This Fiscal Year** 50,000, **Gifts to funds** 50,000. A **Tools** group has a tile per Grants tab staff can open (no Funder Report Templates); each opens its tab. **Revenue Mix**: a bar per line, `Gifts to funds` 50,000 (50%), `Federal` 30,000 (30%), `Not set` 20,000 (20%). `Old award` is not counted. |
+| 1 | As staff with Fundraising access, open the **BarnCRM Grants** app. | It opens on **Board Dashboard**. Tiles: **Revenue This Fiscal Year** 100,000, **Awarded This Fiscal Year** 50,000, **Gifts to Funds** 50,000. A **Tools** group has a tile per Grants tab staff can open (no Funder Report Templates); each opens its tab. **Revenue Mix**: a bar per line, `Gifts to Funds` 50,000 (50%), `Federal` 30,000 (30%), `Not set` 20,000 (20%). `Old award` is not counted. |
 | 2 | Read **Concentration**. | `Lakeside Foundation` 35,000 (35%) first, then `State Agency`, each with a bar; one amber notice holding the two warnings: Lakeside gives 35% (above 25 percent), and the five largest give more than half. |
 | 3 | Read **Restricted Balances**. | Under **Restricted Funds: Raised This Fiscal Year**, `Scholarships` 12,000; the unrestricted fund is not listed. |
 | 4 | As staff without Fundraising access, open the tab. | Revenue Mix shows `Federal` and `Not set` only, total 50,000; Restricted Balances says `Nothing to show for this fiscal year yet.` |
