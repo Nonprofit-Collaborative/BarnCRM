@@ -70,11 +70,14 @@ takes the apps in a queued job: wait a minute and reload before checking the App
 |---|---|---|
 | 1 | Open **BarnCRM Settings**. | The page header shows a gear, as do the console tab and the settings card. No airplane. |
 | 2 | Open **Data Manager**. | Building blocks in the page header. The name **Data Manager** shows once, in the page header; below it the first line is "Start a data task, or see and undo what changed." with no second **Data Manager** title. |
-| 3 | On **Data Manager**, click the **Super Importer** tile. | The **Super Importer** page header shows a form (a document), not an alarm clock. The page name shows once; the wizard starts straight under the header. |
+| 3 | On **Data Manager**, click the **Super Importer** tile. | The **Super Importer** page header shows a form (a document), not an alarm clock. The page name shows once, followed by "Load records from a spreadsheet, preview them first, and undo an import if needed." and then the wizard. |
 | 4 | Back on **Data Manager**, click the **Find** tile, then go back and click the **Super Transformer** tile. | The first opens **Find**, with a telescope in the page header and the name **Find** once, followed by its purpose line. The second opens **Super Transformer**, its name once, followed by "Change many records at once, without a file, and undo it if needed." |
 | 5 | Open **Org Optimizer**, then **Duplicate Matching**. | A stethoscope, then scales, in the page header. Each name shows once, followed by its purpose line and then the tabs. |
 | 6 | Open **Error Log**. | A bell in the page header, not a trophy. **Error Log** is the last tab in the navigation menu. |
 | 7 | Open **BarnCRM Console**, then **Households**, **Organizations** and an address. | People for households, a building for organizations, a map for the address. |
+| 8 | In **BarnCRM Admin Console**, open **Automation**. | The name **Automation** shows once, followed by its purpose line "Everything BarnCRM does for you in the background. ..." in the same page header style as Data Manager; the **Pause and Catch Up** card follows, without that line repeated in it. |
+| 9 | Open a sample Contact and click **Inspect This Record**. | The **Record Inspector** page opens with the page header: the large title **Record Inspector**, the line "See every field you can read on any record, with its API name and value." and **Refresh** on the right. No small card title. |
+| 10 | Open the **BarnCRM** app, **Home** tab. | The top of the page is the same page header style: Patch (on a wide screen), the large title **Welcome to BarnCRM**, the welcome line under it, and **New Person** and **New Household** on the right. The other Home tiles stay cards. |
 
 **Cleanup:** none.
 

@@ -2,7 +2,6 @@ import { LightningElement, api, wire } from 'lwc';
 import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
 import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
 import pageLink from '@salesforce/apex/RecordInspectorController.pageLink';
-import { iconFor } from 'c/barnIcons';
 import { tabPageReference } from 'c/barnTabs';
 import { fieldSetupPath } from 'c/setupLinks';
 // Bare, and correctly so: a custom permission defined in the same package resolves without a
@@ -76,7 +75,6 @@ export default class RecordInspector extends NavigationMixin(LightningElement) {
   pageInput = '';
   /** The Record Inspector tab and state key, qualified for the org (Apex). */
   link;
-  iconName = iconFor('Record_Inspector');
 
   @wire(pageLink)
   wiredPageLink({ data }) {
@@ -123,6 +121,11 @@ export default class RecordInspector extends NavigationMixin(LightningElement) {
 
   get canInspect() {
     return !!this.targetId;
+  }
+
+  /** The page header's purpose line, on the Record Inspector page only. */
+  get pagePurpose() {
+    return this.onPage ? helpText('Core', 'Core_RecordInspector_PagePurpose') : undefined;
   }
 
   get introText() {

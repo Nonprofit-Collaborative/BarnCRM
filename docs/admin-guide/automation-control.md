@@ -28,7 +28,8 @@ ever missing, the automation still runs, and Health Check names it and offers to
 You will find it in these places:
 
 - **The Automation tab** in **BarnCRM Admin** and **BarnCRM Admin Console** (BarnCRM Admin
-  only, D-184). This is the full page. Its first card, **Pause and Catch Up**, holds the pause
+  only, D-184). This is the full page. It opens with the page header every BarnCRM page shares,
+  saying what the page is for. Its first card, **Pause and Catch Up**, holds the pause
   button and **Catch Up Now**. Its second card, **Automations**, holds the list of every
   automation with its on and off switch, the people and profiles that pause or bypass
   automation, and your own flows.

@@ -28,8 +28,10 @@ one: a gear for **BarnCRM Settings**, building blocks for **Data Manager**, a st
 **Org Optimizer**, scales for **Duplicate Matching**, a factory for **Automation**, a bell
 for **Error Log**, a telescope for
 **Find** and a form for **Import**. **Households** show people, **Organizations** a building,
-**Addresses** a map. On Data Manager, Org Optimizer, Duplicate Matching, Find and Import the
-page name appears once, in the page header, and the tool below it starts with what it is for.
+**Addresses** a map. Every BarnCRM page opens with the same page header: on Data Manager, Org
+Optimizer, Duplicate Matching, Find, Import, Super Transformer, Automation and Record Inspector
+the page name appears once, followed by a line saying what the page is for. On the home page the
+header is the welcome. Sections further down a page are cards.
 
 Module tabs follow the same rule: every Fundraising, Volunteers, Programs, Logic Models, Rollup
 Builder and Mirror tab has its own icon, never one shared with another BarnCRM tab (for
@@ -233,8 +235,9 @@ Maria has just installed BarnCRM and has the sample data loaded. She has the Bar
 Admin role.
 
 1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM** (or **BarnCRM Console**). The home page
-   opens with the heading **Welcome to BarnCRM** and the sentence "Start with the setup
-   checklist below.", with Patch waving hello beside it (on a wide screen).
+   opens with the page header **Welcome to BarnCRM** and the sentence "Start with the setup
+   checklist below.", with Patch waving hello beside it (on a wide screen) and **New Person**
+   and **New Household** on the right.
 2. Read the **Setup Checklist**. It lists every step with a progress ring and a **Done**,
    **Skipped** or **To Do** badge, opens the first step you have not finished, and counts how
    far you have got, for example "3 of 9 steps done" (eight steps with Core alone, nine with

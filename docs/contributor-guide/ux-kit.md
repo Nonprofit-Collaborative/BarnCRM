@@ -52,7 +52,7 @@ Help and guidance prose (an intro, a description, an explanation, an empty-state
 
 | Component | Use it for | Main properties |
 |---|---|---|
-| `c-barn-page-shell` | The page of an admin tool: one header, About This Tool help, body, footer | `icon-name`, `title`, `purpose`, `title-hidden`, `help-label`, `help-storage-key`, `status-message`; slots `actions`, `help`, `footer` and the default body |
+| `c-barn-page-shell` | The page of an admin tool: one header, About This Tool help, body, footer | `icon-name`, `title`, `purpose`, `title-hidden`, `help-label`, `help-storage-key`, `status-message`; slots `actions`, `help`, `footer`, `figure` (an image beside the title in place of the icon, as Patch on the Home welcome) and the default body. Every Core page opens with it (Q-02) |
 | `c-barn-tool-grid` | A hub of tools in groups (Data Manager, the Org Optimizer overview, Home) | `groups` (each with `name`, `label`, `tiles`), `heading-level`; fires `select` with `detail.name` |
 | `c-barn-tool-tile` | One tool on a hub; the whole tile is one link or button | `name`, `label`, `description`, `icon-name`, `href`, `new-tab`, `badge-label`, `badge-variant`, `disabled`, `disabled-reason`; fires `select` |
 | `c-barn-empty-state` | Any "nothing here yet" | `illustration` (`no-data`, `setup`, `all-clear`), `heading`, `message`, `size` (`small`, `large`, `compact`), `heading-level`; default slot for the action |

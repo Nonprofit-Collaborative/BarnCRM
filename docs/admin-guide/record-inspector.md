@@ -29,7 +29,9 @@ as fields of their own). A value longer than 2,000 characters is cut there and m
 
 The Record Inspector is button only (D-183): it has no tab in the BarnCRM Admin apps. Click the
 **Inspect This Record** button on a record page and the Record Inspector page opens on that
-record and reads it at once. Once there, paste another record's ID or the address of its page
+record and reads it at once. The page opens with the page header every BarnCRM page shares:
+its name, a line saying what it is for, and the button that reads the record again on the
+right. Once there, paste another record's ID or the address of its page
 to inspect that one. (The page itself still exists, so an admin can also find **Record
 Inspector** under **All Items** in the App Launcher.)
 
