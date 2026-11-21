@@ -109,6 +109,12 @@ export default class ReceiptSettings extends LightningElement {
   ];
 
   labels = {
+    get pageTitle() {
+      return helpText('Giving', 'Giving_Receipt_PageTitle');
+    },
+    get pageIntro() {
+      return helpText('Giving', 'Giving_Receipt_PageIntro');
+    },
     templatesTab: TEMPLATES_TAB,
     statementsTab: STATEMENTS_TAB,
     get noTemplates() {

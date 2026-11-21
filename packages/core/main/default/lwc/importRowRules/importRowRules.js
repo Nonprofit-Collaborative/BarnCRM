@@ -6,7 +6,7 @@ import addRule from '@salesforce/label/c.Core_Import_RowRulesAddRule';
 import removeRule from '@salesforce/label/c.Core_Import_RowRulesRemoveRule';
 import columnLabel from '@salesforce/label/c.Core_ImportRow_ColumnHeader';
 import testLabel from '@salesforce/label/c.Core_Import_RowRulesTest';
-import textLabel from '@salesforce/label/c.Core_Import_RowRulesText';
+import textLabel from '@salesforce/label/c.Core_ImportNewField_TypeText';
 import testEquals from '@salesforce/label/c.Core_Filter_OpEquals';
 import testContains from '@salesforce/label/c.Core_Filter_OpContains';
 import testBlank from '@salesforce/label/c.Core_Import_RowRulesTestBlank';

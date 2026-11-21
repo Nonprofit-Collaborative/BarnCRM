@@ -1,6 +1,6 @@
 <template>
-  <lightning-card title={t.title} icon-name={icon} data-id="card">
-    <div class="slds-var-p-horizontal_medium">
+  <c-barn-page-shell title={t.title} purpose={t.intro} icon-name={icon} data-id="card">
+    <div>
       <template lwc:if={isLoading}>
         <lightning-spinner alternative-text={t.title} size="small"></lightning-spinner>
       </template>
@@ -8,10 +8,14 @@
         <p role="alert" data-id="error-message" class="slds-text-color_error">{errorMessage}</p>
       </template>
       <template lwc:if={isOff}>
-        <p data-id="off" class="slds-text-body_regular">{t.off}</p>
+        <c-barn-empty-state
+          data-id="off"
+          illustration="no-data"
+          heading={t.offHeading}
+          message={t.off}
+        ></c-barn-empty-state>
       </template>
       <template lwc:if={isOn}>
-        <p class="slds-text-body_small slds-var-m-bottom_small">{t.intro}</p>
         <div class="slds-grid slds-wrap slds-grid_vertical-align-end slds-gutters_x-small">
           <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
             <lightning-input
@@ -43,7 +47,13 @@
           </div>
         </div>
         <template lwc:if={noResults}>
-          <p data-id="empty" class="slds-var-m-top_medium slds-text-body_regular">{t.empty}</p>
+          <c-barn-empty-state
+            data-id="empty"
+            class="slds-show slds-var-m-top_medium"
+            illustration="no-data"
+            heading={t.emptyHeading}
+            message={t.empty}
+          ></c-barn-empty-state>
         </template>
         <ul class="slds-has-dividers_bottom-space slds-var-m-top_medium">
           <template for:each={rows} for:item="row">
@@ -81,5 +91,5 @@
         </ul>
       </template>
     </div>
-  </lightning-card>
+  </c-barn-page-shell>
 </template>

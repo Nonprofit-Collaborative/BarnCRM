@@ -3,8 +3,9 @@
 Every top-level Apex class that BarnCRM ships `without sharing`, what it reaches past sharing
 for, and the decision that allows it. Architect review RT-14; checked by
 `scripts/ci/check-without-sharing-register.py`, which fails when a class here is missing from
-the code or a `without sharing` class is missing here. Inner classes take their outer class's
-entry. Test classes are not listed.
+the code or a `without sharing` class is missing here. An inner class of a `without sharing`
+class takes its outer class's entry; an inner `without sharing` class of a `with sharing` or
+`inherited sharing` class has its own row, as `Outer.Inner`. Test classes are not listed.
 
 The default is `with sharing` or `inherited sharing` and user-mode queries and DML (plan Section
 4.13). ADR-0021 (system mode writes for package owned data) and its extensions (ADR-0027 for
@@ -32,6 +33,7 @@ into six kinds:
 | EmptyHouseholdTidyBatch | Org job | Every empty household, read and deleted as the scheduler, with the dependents check reaching every child record | ADR-0021, ADR-0036 |
 | ErrorDigestWriter | Platform | The digest run record on the protected org settings | ADR-0021, ADR-0027 |
 | ErrorLogEventHandler | Upkeep | Writes the Error Log entry from the event, whoever raised it | ADR-0021 |
+| HouseholdSelector.OccupancyReader | Integrity | Which households any contact points at, whoever can see that contact, before an emptied household is deleted in contact mode; returns household ids only, never who is in them | ADR-0021 category 2 |
 | ErrorLogWriter | Upkeep | Writes the Error Log entry even when the user cannot create one | ADR-0021 |
 | HouseholdMergeWriter | Upkeep | The platform account merge, which needs delete access to the household that goes away, once BarnCRM has authorized the merge | ADR-0021, ADR-0134 |
 | OrgSettingsSystemWriter | Platform | Saves keys on the protected org-level settings record for the named system writers | ADR-0021, ADR-0027 |
@@ -68,6 +70,7 @@ into six kinds:
 | AskDonorDateSync | Org figure | The donor's next ask date from every open ask, private ones included | ADR-0021 |
 | AskReminderWriter | Upkeep | Reminder tasks assigned to the donor's owner | ADR-0021 |
 | DonorLevelWriter | Upkeep | The two donor level fields | ADR-0021 |
+| GiftLookupSelector.HouseholdsWithGifts | Integrity | Which of the households whose membership changed hold any gift, private gifts included, so their credits are put right; returns household ids only | ADR-0021 |
 | GiftImportIntegritySelector | Integrity | A gift already loaded under an external ID, or a receipt that keeps a gift on undo | ADR-0021, ADR-0052 |
 | GivingDonationPage | Platform | A Site guest user or the API's integration user reads one active appeal staff marked Donation Page: its name, description, goal and donation form key; never a gift, a donor or a total. It starts the hosted checkout through Payments and writes nothing itself | ADR-0190 public event pages, ADR-0211 online donation pages |
 | GivingEngagementSignal | Org figure | Each person's Received gift total for the nightly engagement score, private gifts included; returns totals only | ADR-0021, ADR-0212 engagement score |
@@ -86,6 +89,8 @@ into six kinds:
 | VolunteerErasureSelector | Integrity | Every Volunteers record naming a person being erased, so erasure refuses rather than leaves one | ADR-0021 |
 | VolunteerHealthCheckSelector | Org figure | Private volunteer hours for Health Check's counts | ADR-0021, ADR-0057 |
 | VolunteerIntegritySelector | Integrity | Hours, sign-ups and attendance entries another staff member made | ADR-0021 |
+| VolunteerPersonDeleteHandler.Purge | Upkeep | The requirement rows and volunteer skills of a person the user has just deleted, which a Team Member holds no permission on; only Volunteers objects, by the ids the selector found | ADR-0021 |
+| VolunteersErasureExtension.LetterRemover | Upkeep | The generated volunteer letters of a person being erased, which belong to whoever generated them; only files identified exactly as generated letters, after the Volunteers access check | ADR-0021, ADR-0193 erasure start seam |
 | VolunteerNudgeSelector | Org job | Every unfilled shift and the email address of each volunteer who has helped on its job, for the morning nudges | ADR-0021 |
 | VolunteerPublicPage | Platform | A Site guest user or the API's integration user reads the Open shifts still to come of jobs staff marked Show on Public Page (job name, description and location, shift times and place, places left as a count), and, only behind a signed claim the host checked, one person's own upcoming bookings, approved hours and last ten entries; never who else is booked, the coordinator or notes | ADR-0190 public event pages, ADR-0198 volunteer self-service |
 | VolunteerReminderSelector | Org job | Every booking and email address for the morning reminders | ADR-0021 |
@@ -136,19 +141,9 @@ into six kinds:
 |---|---|---|---|
 | EventsEngagementSignal | Org figure | How many events each person attended, for the nightly engagement score, whatever the scheduling user can see; returns counts only | ADR-0021, ADR-0212 engagement score |
 | EventPublicPage | Platform | A Site guest user or the API's integration user reads one event staff marked Public Page (Open or Closed only): its public fields, active tickets, confirmed sessions, seat counts with Show Seats Left, and confirmed speakers' names, headlines and bios with Show Speakers; never the online link, codes, registrations, attendees or other person fields | ADR-0190 public event pages |
-
-Three inner classes of `with sharing` classes also run without sharing (the register check counts only
-top-level classes, so it is listed here rather than as a row): `EventSurveyService.AttendeeFormReader`, kind
-Platform. A Site guest user, once a survey link's signed claim has matched, reads which form the
-Attended attendee's event names; it returns only that form identifier, never a record value
-(ADR-0188 decision 3). `EventSessionRatings.SessionFormReader` (kind Platform) does the same for a
-session's rating link: the guest reads which form the session's event names for ratings, and
-nothing else (ADR-0207 `0207-events-paid-registration-proposals-ratings.md`, decision 14).
-`EventOperationsHandler.ScanReader` (kinds Integrity and Upkeep) resolves a sponsor's badge scan
-whoever saves it, usually the sponsor portal's integration user: it reads the scanned attendee,
-the scanner's sponsorships and the leads already saved, keeps the attendee's details only when
-they share them, and writes the one anonymous Session Rating an agenda rating sends (ADR-0215
-`0215-events-attendee-app-operations-portal-templates.md`, decisions 9 and 13).
+| EventSurveyService.AttendeeFormReader | Platform | A Site guest user, once a survey link's signed claim has matched, reads which form the Attended attendee's event names; it returns only that form identifier, never a record value | ADR-0188 decision 3 |
+| EventSessionRatings.SessionFormReader | Platform | The same for a session's rating link: the guest reads which form the session's event names for ratings, and nothing else | ADR-0207 decision 14 |
+| EventOperationsHandler.ScanReader | Integrity | Resolves a sponsor's badge scan whoever saves it, usually the sponsor portal's integration user: reads the scanned attendee, the scanner's sponsorships and the leads already saved, keeps the attendee's details only when they share them, and writes the one anonymous Session Rating an agenda rating sends (also Upkeep) | ADR-0215 decisions 9 and 13 |
 
 ## Portal Builder
 
@@ -157,10 +152,12 @@ they share them, and writes the one anonymous Session Rating an agenda rating se
 | PortalAuth | Portal | Portals, accesses and sessions, and the one Contact an email names, to send and check sign-in codes and resolve sessions; only hashes are stored | ADR-0021, ADR-0185 portal builder |
 | PortalData | Portal | The verified person's own Contact and the records a template names, filtered by that person or the catalog's fixed tests; only `edit` fields are written | ADR-0021, ADR-0185 portal builder |
 
-## Event Management
+## Portal Extensions (Scholarships, Event Management, Corporate Hub, Memberships, Projects)
 
 | Class | Kind | What it reaches past sharing for | Authority |
 |---|---|---|---|
+| MembershipsPortalExtension.Member | Portal | The membership term a portal person pays dues on, read only when it is that person's own; the integration user has no record access | ADR-0185 decision 9 |
+| ProjectRequestHandler.Elevated | Portal | The Contacts and comments a portal request save needs, only for the requests being saved; the integration user has no access to Contact or comments | ADR-0185 decision 8, ADR-0221 |
 | ScholarshipsPortalExtension | Portal | The open cycle a portal person applies to, and that person's own application to withdraw and own Offered award to accept; the integration user has no object access, and each write names only the person Portal Builder verified | ADR-0021, ADR-0204 scholarships outbound grants module |
 | EventsPortalExtension | Portal | The open event a portal person proposes a talk for and that person's own proposal to withdraw; the integration user has no object access, and each write names only the person Portal Builder verified | ADR-0021, ADR-0191 portal templates |
 | EventAttendeeApp | Portal | The attendee app's actions, reached only through EventsPortalExtension: the other attendee's row at an event the person attends (opted in only), the person's own connection rows and their pair's other row, messages to or from the person, and the person's own agenda picks; contact details are copied only on accept, and every write names only the verified person and the other side of their own connection | ADR-0021, ADR-0215 events attendee app operations portal templates |
@@ -171,6 +168,18 @@ they share them, and writes the one anonymous Session Rating an agenda rating se
 | Class | Kind | What it reaches past sharing for | Authority |
 |---|---|---|---|
 | MirrorSettingsWriter | Platform | Each mirror's run record on the protected org settings | ADR-0021, ADR-0038 |
+
+## Payments
+
+| Class | Kind | What it reaches past sharing for | Authority |
+|---|---|---|---|
+| PaymentPayPal.PlanReader | Platform | One shared PayPal plan id by its key, so a donor page's guest or a portal person can start a checkout; no other payment is read | ADR-0201 payments module |
+
+## Projects
+
+| Class | Kind | What it reaches past sharing for | Authority |
+|---|---|---|---|
+| ProjectRequestApi.Intake | Platform | The request intake API, called by another organization's integration user that holds only the API class: the Active Request Connection naming that user and org, and that connection's own requests to create or report on | ADR-0221 decision 6, ADR-0185 decision 8 |
 
 ## BarnCRM Connector
 

@@ -676,7 +676,7 @@ public with sharing class MigrationKitService {
 	 * query that reads it in the running user's access, and a record as a staged row keyed by
 	 * the field names as the step writes them. Holds only text, so a batch job can keep it.
 	 */
-	public class Source {
+	public with sharing class Source {
 		private String objectName;
 		private List<String> written = new List<String>{ 'Id' };
 		private List<String> paths = new List<String>{ 'Id' };

@@ -64,7 +64,8 @@ settings are in the **Volunteers** section of **BarnCRM Settings**.
 **Hours This Month**, hours waiting for approval, which opens **Approve Hours** for a
 coordinator, and **Shifts Needing Volunteers**), then the **Approved Hours This Year by Job**
 chart. A figure the person cannot read is left out; counts stop at 2,000 and show "2,000+".
-To change the chart, edit the page in the Lightning App Builder.
+When all three figures are 0, a note under them explains that the charts stay empty ("No chart
+data.") until hours are approved. To change the chart, edit the page in the Lightning App Builder.
 
 Until the org has a volunteer job, **Volunteers Home** opens on **Set Up Your First Volunteer
 Job** instead of empty figures (D-200 R4), for anyone who may create jobs. It offers **New

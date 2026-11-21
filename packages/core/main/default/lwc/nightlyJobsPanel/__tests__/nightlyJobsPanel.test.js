@@ -111,9 +111,9 @@ describe('c-nightly-jobs-panel', () => {
     expect(rows[1].querySelector('[data-id="missed"]').label).toBe('c.Core_NightlyJobs_Missed');
 
     const turnOff = rows[1].querySelector('[data-id="switch"]');
-    expect(turnOff.label).toBe('c.Core_NightlyJobs_TurnOff');
+    expect(turnOff.label).toBe('c.Core_ModuleManager_TurnOffButton');
     // Each row's buttons name the job they act on, for a screen reader.
-    expect(turnOff.title).toBe('c.Core_NightlyJobs_TurnOff: Installment top up');
+    expect(turnOff.title).toBe('c.Core_ModuleManager_TurnOffButton: Installment top up');
     expect(rows[1].querySelector('[data-id="run-now"]').title).toBe(
       'c.Core_NightlyJobs_RunNow: Installment top up'
     );
@@ -130,7 +130,9 @@ describe('c-nightly-jobs-panel', () => {
       'c.Core_NightlyJobs_SwitchSaved'
     );
     const turnOn = element.shadowRoot.querySelectorAll('tbody tr')[1];
-    expect(turnOn.querySelector('[data-id="switch"]').label).toBe('c.Core_NightlyJobs_TurnOn');
+    expect(turnOn.querySelector('[data-id="switch"]').label).toBe(
+      'c.Core_ModuleManager_TurnOnButton'
+    );
 
     runStep.mockResolvedValue({ ...PANEL, scheduled: true, steps: [giving] });
     turnOn.querySelector('[data-id="run-now"]').click();

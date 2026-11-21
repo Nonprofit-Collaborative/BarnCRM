@@ -56,7 +56,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, **Contact Points**. Untick **Sync phones** and save. | The setting saves. The Contact Point Sync page says Phone is `turned off in BarnCRM Settings, Contact Points.` |
 | 2 | Change a person's **Home Phone** and save. | Their Contact Point Phone keeps the old number. |
-| 3 | Tick **Sync phones** again and save. Open the **Automation** page. | Four rows, **Contact Point Sync: People**, **Addresses**, **Person Accounts** and **Household Moves**, all on. |
+| 3 | Tick **Sync phones** again and save. Open the **Automation** page. | Four rows, **Contact Point Sync: people**, **Contact Point Sync: addresses**, **Contact Point Sync: person accounts** and **Contact Point Sync: household moves**, all on. |
 | 4 | Click **Pause All**. Change the person's **Personal Email** and save. | Their Contact Point Email keeps the old address. |
 | 5 | Resume automation, then press **Copy Existing People** on the Contact Point Sync page. | Once it finishes, the phone and the email match the person. |
 
@@ -70,7 +70,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Move the person to the second household (change their membership, or their account, to the second household). Do not save the person again. | Their Individual's Contact Point Address now shows the second household's street and no longer the first's. |
-| 2 | On the **Automation** page, switch off **Contact Point Sync: Household Moves**. Move the person back. | The Contact Point Address does not change yet. Switch the row back on and save the person: it catches up. |
+| 2 | On the **Automation** page, switch off **Contact Point Sync: household moves**. Move the person back. | The Contact Point Address does not change yet. Switch the row back on and save the person: it catches up. |
 | 3 | Create a person account with an email and a home address; change the email. | Their Individual has the Contact Point Email and Address; the email follows the change. Deleting the person account removes the copies. |
 
 **Cleanup:** Switch **Household Moves** back on; delete the test people.
@@ -84,9 +84,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 |---|---|---|
 | 1 | Insert the 10 people. Open one of them. | Their Contact Point Email is there straight away. |
 | 2 | Insert the 60 people. Wait about a minute, then open one of them. | Their Contact Point Email is there. In Setup, **Apex Jobs**, a `ContactPointSyncService.Job` (or `Job`) row has Completed. The Error Log has no Contact Point Sync warning. |
-| 3 | On the **Automation** page, switch off **Contact Point Sync: People**. Insert 60 more people. | No Contact Point Email is made for them, and no new sync job appears. Switch the row back on and press **Copy Existing People**: they are copied. |
+| 3 | On the **Automation** page, switch off **Contact Point Sync: people**. Insert 60 more people. | No Contact Point Email is made for them, and no new sync job appears. Switch the row back on and press **Copy Existing People**: they are copied. |
 
-**Cleanup:** Delete the test people; make sure **Contact Point Sync: People** is on.
+**Cleanup:** Delete the test people; make sure **Contact Point Sync: people** is on.
 
 ## T-CPS-07: An Org Without the Individual Object, and a Person Without the Permission
 

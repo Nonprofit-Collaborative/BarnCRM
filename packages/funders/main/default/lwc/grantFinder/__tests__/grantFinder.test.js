@@ -57,7 +57,7 @@ describe('c-grant-finder', () => {
 
   it('says it is off, with no search, when the setting is off', async () => {
     const element = await render({ enabled: false, canSave: true });
-    expect(element.shadowRoot.querySelector('[data-id="off"]').textContent).toBe(
+    expect(element.shadowRoot.querySelector('[data-id="off"]').message).toBe(
       'c.Funders_Finder_Off'
     );
     expect(element.shadowRoot.querySelector('[data-id="search"]')).toBeNull();

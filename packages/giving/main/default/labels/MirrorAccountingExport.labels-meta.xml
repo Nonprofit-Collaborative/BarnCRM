@@ -24,14 +24,6 @@
     <shortDescription>Accounting export page: payment method left empty</shortDescription>
     <value>All payment methods</value>
   </labels>
-  <labels>
-    <fullName>Mirror_AccountingExport_Download</fullName>
-    <categories>Mirror, Accounting Export</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Accounting export page: download button</shortDescription>
-    <value>Download File</value>
-  </labels>
     <labels>
         <fullName>Mirror_AccountingExport_OnlyUnposted</fullName>
         <categories>Mirror, Accounting Export</categories>

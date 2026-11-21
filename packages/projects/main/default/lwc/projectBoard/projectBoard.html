@@ -90,11 +90,11 @@
                   <li key={task.id} class="slds-item slds-grid slds-wrap slds-grid_vertical-align-center" data-id="task">
                     <span class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
                       <a href={task.href}>{task.name}</a>
-                      <template lwc:if={task.milestone}><span class="slds-badge slds-var-m-left_x-small">{labels.milestone}</span></template>
+                      <template lwc:if={task.milestone}><lightning-badge class="slds-var-m-left_x-small" label={labels.milestone}></lightning-badge></template>
                       <span class="slds-text-color_weak slds-var-m-left_x-small">{task.owner}</span>
                     </span>
                     <span class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
-                      <template lwc:if={task.late}><span class="slds-text-color_error">{task.dueDate}</span></template>
+                      <template lwc:if={task.late}><span class="slds-text-color_error">{task.dueDate}</span><c-barn-status-badge class="slds-var-m-left_x-small" status="overdue" label={labels.overdue} data-id="overdue"></c-barn-status-badge></template>
                       <template lwc:else>{task.dueDate}</template>
                     </span>
                     <lightning-combobox class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4" label={labels.status} variant="label-hidden" value={task.status} options={task.options} data-task={task.id} onchange={handleStatus} disabled={isWorking}></lightning-combobox>

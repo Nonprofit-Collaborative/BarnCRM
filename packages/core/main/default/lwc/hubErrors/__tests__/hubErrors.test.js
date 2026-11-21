@@ -74,6 +74,18 @@ describe('c-hub-errors', () => {
     expect(byId(element, 'error-count').value).toBe('999+');
   });
 
+  it('says Error under a count of one and Errors otherwise', async () => {
+    const element = build();
+    getHomeModel.emit({ newErrorCount: 1 });
+    await settle();
+    // The help text mock returns the key; the singular lives in BarnHelp_Core.json.
+    expect(byId(element, 'error-count').label).toBe('c.Core_HubHome_ErrorOne');
+
+    getHomeModel.emit({ newErrorCount: 2 });
+    await settle();
+    expect(byId(element, 'error-count').label).toBe('c.Core_OrgOptimizer_Errors');
+  });
+
   it('says the tile could not load rather than showing zero', async () => {
     const element = build();
     getHomeModel.error();

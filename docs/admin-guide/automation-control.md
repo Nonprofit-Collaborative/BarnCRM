@@ -28,7 +28,8 @@ ever missing, the automation still runs, and Health Check names it and offers to
 You will find it in these places:
 
 - **The Automation tab** in **BarnCRM Admin** and **BarnCRM Admin Console** (BarnCRM Admin
-  only, D-184). This is the full page. Its first card, **Pause and Catch Up**, holds the pause
+  only, D-184). This is the full page. It opens with the page header every BarnCRM page shares,
+  saying what the page is for. Its first card, **Pause and Catch Up**, holds the pause
   button and **Catch Up Now**. Its second card, **Automations**, holds the list of every
   automation with its on and off switch, the people and profiles that pause or bypass
   automation, and your own flows.
@@ -65,9 +66,9 @@ the records in first and the automatic housekeeping to happen afterwards, so not
    record anyone saves. If you forget this step, nothing breaks: automation turns itself
    back on at the two hour mark, and the change is recorded like any other (see "How long
    a pause lasts" below).
-7. Now switch off a single automation instead. Find **Household upkeep when a person
-   changes** in the list and click its switch to **Off**. Only that one stops running. For a
-   few seconds a line next to the switch says "Households when a person changes is
+7. Now switch off a single automation instead. Find **Contact: keep households in
+   step** in the list and click its switch to **Off**. Only that one stops running. For a
+   few seconds a line next to the switch says "Contact: keep households in step is
    off. Turn it back on here." (a screen reader announces it).
    Everything else carries on.
 8. Switch it back **On**. Every change you make here is recorded with your name, the time,
@@ -104,21 +105,25 @@ General, Features. Its row stays in the list, with its own switch as you left it
 the description reads "Stopped: its feature is turned off in BarnCRM Settings, General, Features.
 It runs again when the feature is turned on."
 
+An automation on an object your org does not have, such as one a module you removed left
+behind, is not listed: it has nothing to run on.
+
 ## Automations That Always Run
 
 Pause stops BarnCRM filling things in for you. It never stops BarnCRM refusing
 something. An automation whose job is to refuse a change, rather than to save you typing,
 is marked as always running, and neither the pause nor its own switch turns it off.
 
-In the list you can tell one at a glance: its switch sits at **Off** and is greyed out even
-when you hold the Manage BarnCRM Settings permission, and underneath the description is
+In the list you can tell one at a glance: its switch sits at **Off**, is greyed out even
+when you hold the Manage BarnCRM Settings permission and reads **Always Runs** beneath it,
+and underneath the description is
 the line "This automation enforces a rule, so it always runs. It cannot be switched off
 here and a pause does not suspend it." Clicking the switch does nothing, and if a change
 somehow reaches the server it is refused with the same explanation.
 
 Core ships one, which keeps something correct rather than refusing anything:
 
-- **Address match key** keeps each address's Match Key in step with its street and postal
+- **Address: fill the match key** keeps each address's Match Key in step with its street and postal
   code, so duplicate matching finds addresses through an index. A key a pause left stale
   would hide a duplicate, so it always runs. See [Duplicates](duplicates.md).
 

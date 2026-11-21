@@ -123,6 +123,17 @@ describe('c-grant-calendar', () => {
     expect(one(element, '[data-id="legend-overdue"]')).not.toBeNull();
   });
 
+  it('says what puts entries on the calendar when the month has none', async () => {
+    getCalendar.mockResolvedValue(CALENDAR);
+    const full = await render();
+    expect(one(full, '[data-id="empty-month"]')).toBeNull();
+    document.body.removeChild(full);
+
+    getCalendar.mockResolvedValue({ ...CALENDAR, rows: [] });
+    const empty = await render();
+    expect(one(empty, '[data-id="empty-month"]').message).toBe('c.Funders_Calendar_Empty');
+  });
+
   it('moves a month at a time and switches to Mine', async () => {
     getCalendar.mockResolvedValue({ ...CALENDAR, rows: [] });
     const element = await render();

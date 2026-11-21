@@ -307,7 +307,7 @@ public with sharing class TriggerDispatcher {
 	}
 
 	/** One trigger run: its handlers over its records, and what to do when one fails. */
-	private class TriggerRun {
+	private with sharing class TriggerRun {
 		private final String logContext;
 		private final Context context;
 		private final List<Registered> handlers;

@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Funders_GrantTab_Overview</fullName>
-        <categories>GrantPage</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Grant page tab: details, program and fund</shortDescription>
-        <value>Overview</value>
-    </labels>
-    <labels>
         <fullName>Funders_GrantTab_Money</fullName>
         <categories>GrantPage</categories>
         <language>en_US</language>
@@ -62,7 +54,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Scope choice: all open grants</shortDescription>
-        <value>Everyone</value>
+        <value>Everyone's Grants</value>
     </labels>
     <labels>
         <fullName>Funders_Pipeline_ScopeMine</fullName>
@@ -70,7 +62,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Scope choice: grants the person owns</shortDescription>
-        <value>Mine</value>
+        <value>My Grants</value>
     </labels>
     <labels>
         <fullName>Funders_Pipeline_NewGrant</fullName>

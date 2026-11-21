@@ -48,7 +48,7 @@ Do this as David, on a phone, starting from the sample data.
 4. In **Amount**, type `50`.
 5. Leave **Gift Date** as today.
 6. In **Payment Method**, choose **Check**.
-7. In **Check or reference number**, type the number printed on the check, for example
+7. In **Check or Reference Number**, type the number printed on the check, for example
    `1042`. This is the field Jen uses when she reconciles with the bank, so it is worth
    the two seconds.
 8. Confirm **Appeal** says Spring Appeal. If it does not, tap it and pick Spring Appeal.
@@ -66,7 +66,7 @@ Five gifts take about a minute once the rhythm is there. Nothing here needs a la
 ## Paying a Pledge or a Recurring Gift
 
 When the donor you pick still owes payments on a pledge or a recurring gift, a list called
-**Pays a scheduled payment** appears under **Gift Date**. It holds that donor's payments that
+**Pays a Scheduled Payment** appears under **Gift Date**. It holds that donor's payments that
 are scheduled, overdue or partly paid, on pledges and recurring gifts that are active or
 paused, including the ones made in the name of the donor's household. Each choice names the
 pledge, the payment's due date and the amount expected.
@@ -230,11 +230,11 @@ For the person building a report later, these are the fields the form writes.
 | Donor, person | Donor Contact, or Donor Account in an org where people are accounts |
 | Donor, organization | Donor Account |
 | Amount | Amount |
-| Gift date | Gift Date |
-| Payment method | Payment Method |
+| Gift Date | Gift Date |
+| Payment Method | Payment Method |
 | Appeal | Appeal |
 | Fund | the gift's single allocation |
-| Check or reference number | Payment Reference |
-| Pays a scheduled payment | Installment, and that payment's pledge in Commitment |
+| Check or Reference Number | Payment Reference |
+| Pays a Scheduled Payment | Installment, and that payment's pledge in Commitment |
 | This Gift Honors Someone | a Tribute on the gift: Type, Honoree Contact (or Honoree Account) or Honoree Name, Notification Recipient Contact (or Account) or Notification Recipient Name |
 | Matches an Employee's Gift | Matched Gift, on both gifts of the pair |

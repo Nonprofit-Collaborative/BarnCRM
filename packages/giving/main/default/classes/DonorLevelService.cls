@@ -241,12 +241,12 @@ public with sharing class DonorLevelService {
 	}
 
 	/**
-	 * The real API name of each field this class touches on one object, whether or not a
-	 * namespace is in front of it. The settings hold a bare field name and a packaged org's
-	 * describe keys carry a prefix, which is the same problem `SettingsService.typeByName`
-	 * solves for objects.
+	 * The real API name of each field on one object by its local name, whether or not a
+	 * namespace is in front of it (donor levels here, donor scores in `DonorScoreService`). The
+	 * settings hold a bare field name and a packaged org's describe keys carry a prefix, which is
+	 * the same problem `SettingsService.typeByName` solves for objects.
 	 */
-	private static Map<String, String> fieldNames(Schema.SObjectType type) {
+	public static Map<String, String> fieldNames(Schema.SObjectType type) {
 		String key = String.valueOf(type);
 		if (cachedFieldNames.containsKey(key)) {
 			return cachedFieldNames.get(key);

@@ -2,6 +2,7 @@ import { createElement } from 'lwc';
 import Toast from 'lightning/toast';
 import BarnConfirmModal from 'c/barnConfirmModal';
 import SampleDataManager from 'c/sampleDataManager';
+import { CurrentPageReference } from 'lightning/navigation';
 import getStatus from '@salesforce/apex/SampleDataController.getStatus';
 import loadSampleData from '@salesforce/apex/SampleDataController.loadSampleData';
 import removeSampleData from '@salesforce/apex/SampleDataController.removeSampleData';
@@ -99,6 +100,28 @@ describe('c-sample-data-manager', () => {
     while (document.body.firstChild) {
       document.body.removeChild(document.body.firstChild);
     }
+  });
+
+  it('shows the page header on the tab or when the App Page property is on, not on Home', async () => {
+    canManageSampleData.mockResolvedValue(true);
+    getStatus.mockResolvedValue(NOT_LOADED_STATUS);
+
+    const home = createManager();
+    await flushPromises();
+    expect(home.shadowRoot.querySelector('[data-id="shell"]')).toBeNull();
+    expect(home.shadowRoot.querySelector('lightning-card').title).toBeTruthy();
+
+    const page = createElement('c-sample-data-manager', { is: SampleDataManager });
+    page.pageHeader = true;
+    document.body.appendChild(page);
+    await flushPromises();
+    expect(page.shadowRoot.querySelector('[data-id="shell"]').title).toBeTruthy();
+    expect(page.shadowRoot.querySelector('lightning-card').title).toBeUndefined();
+
+    // eslint-disable-next-line @lwc/lwc/no-unexpected-wire-adapter-usages
+    CurrentPageReference.emit({ type: 'standard__navItemPage', state: {} });
+    await flushPromises();
+    expect(home.shadowRoot.querySelector('[data-id="shell"]')).not.toBeNull();
   });
 
   it('shows the read-only message when the user cannot manage sample data', async () => {

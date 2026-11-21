@@ -4,6 +4,8 @@ import getStudio from '@salesforce/apex/LwcBuilderController.getStudio';
 import saveComponent from '@salesforce/apex/LwcBuilderController.saveComponent';
 import { messageFrom, saveBlob } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { createDragController } from 'c/barnDrag';
+import { dragInstructions, dragMessages } from 'c/barnDragText';
 import {
   BLOCK_TYPES,
   LAYOUTS,
@@ -26,7 +28,10 @@ import {
   validate
 } from 'c/lwcBuilderModel';
 
-const HELP_PACKAGES = ['LwcBuilder'];
+const HELP_PACKAGES = ['LwcBuilder', 'Core'];
+/** The block list is a drop zone so a block can be picked up from it; nothing is dropped on it. */
+const PALETTE_ZONE = 'palette';
+const PALETTE_PREFIX = 'palette:';
 const NEW = '';
 
 function typeLabel(type) {
@@ -115,7 +120,11 @@ export default class LwcBuilderStudio extends LightningElement {
   previewing = false;
   previewRecordId = '';
   exportFiles;
-  dragging;
+  /** The drag in progress, from c/barnDrag, for the highlight. */
+  dragState;
+  /** What the canvas last announced to a screen reader. */
+  liveText = '';
+  drag;
   problems = [];
   errorMessage;
   isSaving = false;
@@ -126,7 +135,32 @@ export default class LwcBuilderStudio extends LightningElement {
         this.helpReady = true;
       });
     }
+    this.drag = createDragController({
+      root: this.template,
+      layout: 'columns',
+      // Read when spoken, not now: the help catalog may still be on its way.
+      messages: {
+        pickedUp: (name) => dragMessages().pickedUp(name),
+        position: (zone, position, count) => dragMessages().position(zone, position, count),
+        dropped: (name, zone) => dragMessages().dropped(name, zone),
+        cancelled: (name) => dragMessages().cancelled(name)
+      },
+      announce: (text) => {
+        this.liveText = text;
+      },
+      onChange: (state) => {
+        this.dragState = state;
+      },
+      canDrop: (itemId, fromZone, toZone) => toZone !== PALETTE_ZONE,
+      onDrop: (drop) => this.applyDrop(drop)
+    });
     this.refresh();
+  }
+
+  disconnectedCallback() {
+    if (this.drag) {
+      this.drag.destroy();
+    }
   }
 
   blankDetails() {
@@ -232,7 +266,11 @@ export default class LwcBuilderStudio extends LightningElement {
   }
 
   get palette() {
-    return BLOCK_TYPES.map((type) => ({ type, label: typeLabel(type) }));
+    return BLOCK_TYPES.map((type) => ({
+      type,
+      label: typeLabel(type),
+      dragId: `${PALETTE_PREFIX}${type}`
+    }));
   }
 
   get ruleOptions() {
@@ -267,6 +305,7 @@ export default class LwcBuilderStudio extends LightningElement {
   // The canvas
 
   get canvas() {
+    const dragging = Boolean(this.dragState && this.dragState.active);
     return this.definition.sections.map((section, sectionIndex, sections) => ({
       id: section.id,
       title: section.title,
@@ -282,7 +321,9 @@ export default class LwcBuilderStudio extends LightningElement {
           zoneLabel: helpText('LwcBuilder', 'LwcBuilder_Studio_ColumnLabel', columnIndex + 1),
           isSelected: column.id === this.selectedColumnId,
           css: `slds-col slds-size_${column.width}-of-12 slds-var-p-around_xx-small`,
-          zoneCss: `slds-box slds-box_x-small lb-zone${column.id === this.selectedColumnId ? ' lb-zone_selected' : ''}`,
+          zoneCss: `slds-box slds-box_x-small lb-zone${column.id === this.selectedColumnId ? ' lb-zone_selected' : ''}${
+            dragging && this.dragState.overZone === column.id ? ' lb-zone_target' : ''
+          }`,
           isEmpty: column.blocks.length === 0,
           blocks: column.blocks.map((block) => ({
             id: block.id,
@@ -293,7 +334,7 @@ export default class LwcBuilderStudio extends LightningElement {
               block.visibility && block.visibility.type && block.visibility.type !== 'always',
             css: `slds-box slds-box_xx-small slds-var-m-bottom_xx-small lb-block${
               block.id === this.selectedBlockId ? ' lb-block_selected' : ''
-            }`
+            }${dragging && this.dragState.itemId === block.id ? ' lb-block_dragging' : ''}`
           }))
         }))
       }))
@@ -486,48 +527,47 @@ export default class LwcBuilderStudio extends LightningElement {
     this.change(added.definition);
   }
 
-  // Drag and drop: the state is kept here, so it works whatever the browser lets dataTransfer carry.
+  // Drag and drop (c/barnDrag): pointer, touch and keyboard. Every column is a drop zone and so
+  // is the block list; the buttons and the properties panel stay as the other ways to do it.
 
-  handlePaletteDrag(event) {
-    this.dragging = { type: event.currentTarget.dataset.type };
-    this.markDrag(event);
+  handleDragPointerDown(event) {
+    this.drag.pointerDown(event);
   }
 
-  handleBlockDrag(event) {
-    event.stopPropagation();
-    this.dragging = { id: event.currentTarget.dataset.block };
-    this.markDrag(event);
+  handleDragKeyDown(event) {
+    this.drag.keyDown(event);
   }
 
-  markDrag(event) {
-    if (event.dataTransfer) {
-      event.dataTransfer.effectAllowed = 'move';
-      event.dataTransfer.setData('text/plain', JSON.stringify(this.dragging));
+  /** The block a drop lands before: the one now at that place in the column, not counting the carried block. */
+  blockAt(columnId, itemId, index) {
+    const place = locate(this.definition, columnId);
+    if (!place || place.kind !== 'column') {
+      return undefined;
     }
+    const next = place.item.blocks.filter((block) => block.id !== itemId)[index];
+    return next ? next.id : undefined;
   }
 
-  handleDragOver(event) {
-    event.preventDefault();
-  }
-
-  handleDrop(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    const { column, block } = event.currentTarget.dataset;
-    const dragging = this.dragging;
-    this.dragging = undefined;
-    if (!dragging || !column) {
-      return;
+  applyDrop({ itemId, toZone, toIndex }) {
+    const place = toZone && toZone !== PALETTE_ZONE ? locate(this.definition, toZone) : null;
+    if (!place || place.kind !== 'column') {
+      return false;
     }
-    if (dragging.id) {
-      this.change(moveBlock(this.definition, dragging.id, column, block));
-      this.selectedBlockId = dragging.id;
-    } else {
-      const added = addBlock(this.definition, column, dragging.type, block);
+    const before = this.blockAt(toZone, itemId, toIndex);
+    if (itemId.startsWith(PALETTE_PREFIX)) {
+      const added = addBlock(this.definition, toZone, itemId.slice(PALETTE_PREFIX.length), before);
       this.selectedBlockId = added.id;
       this.change(added.definition);
+    } else {
+      this.change(moveBlock(this.definition, itemId, toZone, before));
+      this.selectedBlockId = itemId;
     }
-    this.selectedColumnId = column;
+    this.selectedColumnId = toZone;
+    return true;
+  }
+
+  get dragHelp() {
+    return dragInstructions();
   }
 
   // The properties form

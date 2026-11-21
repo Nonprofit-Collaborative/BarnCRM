@@ -13,7 +13,7 @@ public with sharing class ConnectorWebhooks {
 	public static final String HEADER = 'X-BarnCRM-Token';
 	public static final String RECEIVER_PATH = '/services/apexrest/barncrm/connector/v1/hook';
 	public static final String WEBHOOK = 'Webhook';
-	public static final String GUEST_SET = 'BarnCRM_Connector_Webhook_Guest';
+	public static final String GUEST_SET = 'Connector_Webhook_Guest';
 	public static final String FIX_GUEST = 'connector_webhook_guest';
 	public static final Integer MAX_REPLY = 4000;
 	public static final Integer MAX_ECHO = 1000;

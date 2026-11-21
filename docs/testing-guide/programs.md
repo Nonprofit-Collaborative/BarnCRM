@@ -161,7 +161,7 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 5 | Click **New** for a contact who is not enrolled in Food pantry, with **Hot meal**. | Saved with no enrollment. |
 | 6 | In **BarnCRM Settings**, open **Automation** and find **Service Delivery: absences, enrollment**. | Listed as always on, with no switch. |
 | 7 | Open **Hot meal** and try to delete it. | Refused: the service has deliveries. |
-| 8 | In the **BarnCRM Programs** app, open an Enrolled Food pantry person and click **Record Service**. | A form with **Person** filled in, **Service** listing every active service as "Program: Service", **Delivery Date** today, **Attendance** Present and **Quantity** 1. There is no Contact or Account field. |
+| 8 | In the **BarnCRM Programs** app, open an Enrolled Food pantry person and click **Record Service**. (The **Record Service** tab, by contrast, opens with the shared page header and its purpose line.) | A form with **Person** filled in, **Service** listing every active service as "Program: Service", **Delivery Date** today, **Attendance** Present and **Quantity** 1. There is no Contact or Account field. |
 | 9 | Pick **Grocery bag** and click **Save**. | "Service recorded." The form closes; the new delivery has the person as **Contact** and their Food pantry enrollment filled in. |
 | 10 | Open that person's Food pantry enrollment and click **Record Service**. Set **Attendance** to **Excused Absence**. | **Person** and the enrollment's services are filled in (one service is chosen for you); **Quantity** is greyed out. Save: the delivery has quantity 0 and is linked to the enrollment. |
 | 11 | On the same enrollment, click **Record Service**, change **Person** to someone else and save. | Saved for the other person, not linked to this enrollment. |
@@ -235,7 +235,7 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 1 | As the admin, open the **BarnCRM Programs** app. | **Programs Dashboard** is the first tab. |
 | 2 | Open **Programs Dashboard**. | Period **This Month**; seven tiles (Active Programs, Open Enrollments, New Enrollments, People Served, Served Without Enrollment, Services Delivered, Attendance Rate), a **Tools** row with a tile for each Programs tab (each opens its list), and a **By Program** table listing every Active program by name, the rate shown as a bar and a percent. |
 | 3 | Compare the program's row with its **Program Roster** panel and today's log. | Open Enrollments matches the roster's Applied plus Enrolled; Services Delivered counts the Present delivery only; Attendance Rate is 50%; People Served is 1. |
-| 4 | Pick **Last Year**. | The figures reload for last year; a program with no activity then shows 0 and "None yet" for the rate in its row, and the **Attendance Rate** tile shows 0%. |
+| 4 | Pick **Last Year**. | The figures reload for last year; a program with no activity then shows 0 and "None yet" for the rate in its row, and the **Attendance Rate** tile shows a dash with its label reading "Attendance Rate: None yet". |
 | 5 | Click a program's name. | The program opens. |
 | 6 | Open the test person who attended, in the BarnCRM Programs app. | The **Programs** card starts with "Last service:" today's date and "(1 attended in all)". |
 | 7 | Open the test person who was absent. | No Last service line (an absence is not a service). |

@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Board Dashboard revenue mix line for Giving gifts</shortDescription>
-        <value>Gifts to funds</value>
+        <value>Gifts to Funds</value>
     </labels>
     <labels>
         <fullName>Funders_Board_Concentration</fullName>

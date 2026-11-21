@@ -157,6 +157,7 @@
             illustration={emptyIllustration}
             size="small"
             heading={labels.empty}
+            message={labels.emptyNext}
           ></c-barn-empty-state>
         </template>
 
@@ -233,16 +234,18 @@
           </table>
         </template>
 
-        <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-var-m-vertical_small">
-          <lightning-button
-            data-id="previous"
-            label={labels.previous}
-            disabled={previousDisabled}
-            onclick={handlePrevious}
-          ></lightning-button>
-          <span data-id="page-text" tabindex="-1" class="slds-text-body_small">{pageText}</span>
-          <lightning-button data-id="next" label={labels.next} disabled={nextDisabled} onclick={handleNext}></lightning-button>
-        </div>
+        <template lwc:if={showPager}>
+          <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-var-m-vertical_small">
+            <lightning-button
+              data-id="previous"
+              label={labels.previous}
+              disabled={previousDisabled}
+              onclick={handlePrevious}
+            ></lightning-button>
+            <span data-id="page-text" tabindex="-1" class="slds-text-body_small">{pageText}</span>
+            <lightning-button data-id="next" label={labels.next} disabled={nextDisabled} onclick={handleNext}></lightning-button>
+          </div>
+        </template>
       </div>
     </c-barn-page-shell>
   </template>

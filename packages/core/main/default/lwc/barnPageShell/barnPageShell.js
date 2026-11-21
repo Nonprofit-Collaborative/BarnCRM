@@ -9,8 +9,9 @@ const STORAGE_PREFIX = 'barnPageShell.help.';
  * the body, and a footer for Back, Cancel and the primary action. One card level, so a tool
  * never puts a card inside a card.
  *
- * Slots: default (body), "actions" (header buttons), "help" (the long explanation), "footer".
- * The help region and the footer show only when their slot has content.
+ * Slots: default (body), "actions" (header buttons), "help" (the long explanation), "footer",
+ * and "figure" (an image beside the title in place of the icon, as Patch on the Home welcome).
+ * The figure, the help region and the footer show only when their slot has content.
  *
  * On a Lightning App Page the platform already prints the page name above the component, so
  * pass `title-hidden`: the h1 stays for screen readers and the header leads with the purpose.
@@ -34,6 +35,7 @@ export default class BarnPageShell extends LightningElement {
 
   hasHelp = false;
   hasFooter = false;
+  hasFigure = false;
   helpOpen = true;
 
   connectedCallback() {
@@ -77,6 +79,10 @@ export default class BarnPageShell extends LightningElement {
     return this.helpOpen ? 'utility:chevrondown' : 'utility:chevronright';
   }
 
+  get figureClass() {
+    return this.hasFigure ? 'slds-media__figure' : 'slds-hide';
+  }
+
   get footerClass() {
     return this.hasFooter ? 'slds-card__footer slds-text-align_left' : 'slds-hide';
   }
@@ -88,6 +94,10 @@ export default class BarnPageShell extends LightningElement {
 
   handleHelpSlotChange(event) {
     this.hasHelp = event.target.assignedNodes().length > 0;
+  }
+
+  handleFigureSlotChange(event) {
+    this.hasFigure = event.target.assignedNodes().length > 0;
   }
 
   handleFooterSlotChange(event) {

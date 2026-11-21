@@ -7,6 +7,10 @@
   <flexiPageRegions>
     <itemInstances>
       <componentInstance>
+        <componentInstanceProperties>
+          <name>pageHeader</name>
+          <value>true</value>
+        </componentInstanceProperties>
         <componentName>automationControl</componentName>
         <identifier>automationControl1</identifier>
       </componentInstance>

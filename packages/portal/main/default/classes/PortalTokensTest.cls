@@ -33,28 +33,16 @@ private class PortalTokensTest {
 			Long step = at.getTime() / 1000 / 30;
 
 			Test.startTest();
-			Boolean now = PortalTokens.authenticatorCodeMatches(
-				RFC_SECRET,
-				PortalTokens.authenticatorCode(RFC_SECRET, step),
-				at
-			);
-			Boolean drift = PortalTokens.authenticatorCodeMatches(
-				RFC_SECRET,
-				PortalTokens.authenticatorCode(RFC_SECRET, step + 1),
-				at
-			);
-			Boolean far = PortalTokens.authenticatorCodeMatches(
-				RFC_SECRET,
-				PortalTokens.authenticatorCode(RFC_SECRET, step + 5),
-				at
-			);
-			Boolean junk = PortalTokens.authenticatorCodeMatches(RFC_SECRET, 'abc', at);
+			Long now = PortalTokens.matchedStep(RFC_SECRET, PortalTokens.authenticatorCode(RFC_SECRET, step), at);
+			Long drift = PortalTokens.matchedStep(RFC_SECRET, PortalTokens.authenticatorCode(RFC_SECRET, step + 1), at);
+			Long far = PortalTokens.matchedStep(RFC_SECRET, PortalTokens.authenticatorCode(RFC_SECRET, step + 5), at);
+			Long junk = PortalTokens.matchedStep(RFC_SECRET, 'abc', at);
 			Test.stopTest();
 
-			Assert.isTrue(now, 'The current code matches');
-			Assert.isTrue(drift, 'One step of clock drift is allowed');
-			Assert.isFalse(far, 'A code minutes away does not');
-			Assert.isFalse(junk, 'Letters never match');
+			Assert.areEqual(step, now, 'The current code matches, at its own step');
+			Assert.areEqual(step + 1, drift, 'One step of clock drift is allowed');
+			Assert.isNull(far, 'A code minutes away does not');
+			Assert.isNull(junk, 'Letters never match');
 		}
 	}
 

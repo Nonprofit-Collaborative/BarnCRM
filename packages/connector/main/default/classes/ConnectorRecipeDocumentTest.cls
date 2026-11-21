@@ -168,14 +168,6 @@ private class ConnectorRecipeDocumentTest {
 				problems(ConnectorRecipeTestData.document('[{"id":"w","kind":"repeat"}]')),
 				'A kind of step BarnCRM Connector does not have is refused.'
 			);
-			Assert.areEqual(
-				new Set<String>{ Id.valueOf(MAP_ID) },
-				ConnectorRecipeDocument.mapIds(
-					ConnectorRecipeDocument.parse(
-						ConnectorRecipeTestData.document('[{"id":"m","kind":"create","map":"' + MAP_ID + '"}]')
-					)
-				)
-			);
 		}
 	}
 

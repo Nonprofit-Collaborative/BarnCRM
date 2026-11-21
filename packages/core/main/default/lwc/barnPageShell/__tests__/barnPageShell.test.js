@@ -59,6 +59,14 @@ describe('c-barn-page-shell', () => {
     // No help and no footer content: both stay hidden.
     expect(one(element, 'help-section').className).toContain('slds-hide');
     expect(one(element, 'footer').className).toBe('slds-hide');
+    expect(one(element, 'figure').className).toBe('slds-hide');
+  });
+
+  it('story: an image beside the title shows once the figure slot has content', async () => {
+    const element = render({ title: 'Welcome to BarnCRM' }, { figure: 'Patch' });
+    expect(one(element, 'figure').className).toBe('slds-hide');
+    await fillSlot(element, 'figure');
+    expect(one(element, 'figure').className).toBe('slds-media__figure');
   });
 
   it('story: under an App Page header, the title is kept for screen readers only', () => {

@@ -24,7 +24,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">Fills a new membership's dues from its level, a start date of today when it is Current, the end date from the level's term and Member Since from the membership it renews. A membership with no end date would never lapse, so this automation cannot be switched off here and pausing automation does not suspend it.</value>
+        <value xsi:type="xsd:string">Fills a new membership's dues from its level, a start date of today when it is Current, the end date from the level's term and Member Since from the membership it renews. A membership with no end date would never lapse.</value>
     </values>
     <values>
         <field>Module__c</field>

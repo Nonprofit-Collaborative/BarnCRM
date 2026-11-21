@@ -78,7 +78,7 @@ Setup under **Users**, **Permission Set Assignments**.
 
 Grants are shared with everyone who has a Grants set (Public Read/Write), because a small team
 works one pipeline together. To keep each person's grants to themselves, set **Grant** to
-Private in Setup, **Sharing Settings**; the board's **Everyone** view then shows only the grants
+Private in Setup, **Sharing Settings**; the board's **Everyone's Grants** view then shows only the grants
 each person can see.
 
 ## Grants
@@ -204,7 +204,7 @@ The **Grant Pipeline** tab is where most people work:
   Awarded** (the amount requested is filled in), **Award Start Date**, **Award End Date** and
   **Restricted**, all optional. On save a message links to the grant, where the Award Schedule
   card builds the payments.
-- **Everyone** or **Mine**: all open grants, or only those you own.
+- **Everyone's Grants** or **My Grants**: all open grants, or only those you own.
 - **Upcoming Deadlines**: every open grant whose application deadline is past or within the next
   60 days, and every open requirement due in that time or overdue, soonest first, with due soon
   and overdue ones badged. A requirement row has a **Mark Submitted** button; after it, an
@@ -218,7 +218,7 @@ Submitted** only to people who can change requirements.
 The **Board Dashboard** tab is the Grants app's home and answers the questions a board asks
 about money, for the current fiscal year. Everyone with a Grants set sees it; it only reads, and
 it stores nothing. At the top, tiles show **Revenue This Fiscal Year**, **Awarded This Fiscal
-Year**, with Fundraising **Gifts to funds**, and, with restricted fund tracking, **Restricted Grants:
+Year**, with Fundraising **Gifts to Funds**, and, with restricted fund tracking, **Restricted Grants:
 Balance**. Under them, a tile for each Grants tab the person can open (Grant Pipeline, Grant
 Calendar, Grants, Grant Requirements, Grant Answers and, for admins, Funder Report Templates).
 
@@ -476,7 +476,7 @@ After that, change a payment's date or amount, add one, or cancel one in the gra
 list. **Mark Received** on the card sets a payment Received; its **Received Date** fills in with
 today unless you typed one, and the card offers **Undo** while it is open: the payment goes back
 to Expected with its earlier Received Date, and the Received ledger entry it wrote is removed,
-unless the payment was changed since. That is the automation **Grant payment received** on the
+unless the payment was changed since. That is the automation **Grant: payment received** on the
 **Automation** page; switch it off while you import past payments.
 
 ## Restricted Funds
@@ -500,7 +500,7 @@ On a restricted grant, marking a payment **Received** adds its **Received** entr
 entry follows the payment: a changed amount or date changes it, and setting the payment back to
 Expected or Cancelled, or deleting it, removes it. Entries you type yourself are never changed.
 Ticking **Restricted** after payments came in adds no entries for them: add those yourself. The
-automation is **Grant payment received** on the **Automation** page; switch it off while you
+automation is **Grant: payment received** on the **Automation** page; switch it off while you
 import past payments and entries.
 
 ### The Fund a Grant Is Booked To
@@ -516,8 +516,8 @@ grant's restricted ledger counts its entries, so nothing is counted twice.
 The **Grant Calendar** tab shows a month at a time: application deadlines of open grants not yet
 submitted, due dates of open requirements, and expected payments, each on its day and linked to
 its grant. An overdue item shows a warning icon, the word Overdue (in its hover text and for screen readers) and bold text, not red alone. A key under the month heading names the border colours: Application (blue), Grant Requirement (orange), Grant Payment (green), plus the Overdue mark. Use **Previous**, **Next** and **Today** to move between
-months, and **Everyone** or **Mine** as on the Grant Pipeline (Mine: grants you own and
-requirements assigned to you). It shows the same deadlines as the pipeline's **Upcoming
+months, and **Everyone's Grants** or **My Grants** as on the Grant Pipeline (My Grants: grants you own and
+requirements assigned to you). A month with nothing due says so and what puts entries there. It shows the same deadlines as the pipeline's **Upcoming
 Deadlines**, plus payments with their amounts in your currency. **Print** prints the month
 without the app's header and navigation.
 

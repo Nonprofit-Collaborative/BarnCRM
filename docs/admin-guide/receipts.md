@@ -71,7 +71,7 @@ Still in the Receipts section:
 ### 4. Write Your Two Letters
 
 Also in the Receipts section, **Receipt Letters and Year End Statements** opens the Receipt
-Letters page (the **Receipt Letters** tab), which has two tabs. It opens as its own page rather than inside the settings console,
+Letters page (the **Receipt Letters** tab, which opens with the page header **Receipt Letters**), which has two tabs. It opens as its own page rather than inside the settings console,
 which is how every page the Fundraising module adds behaves. On the **Receipt Templates** tab,
 BarnCRM ships one letter of each kind:
 

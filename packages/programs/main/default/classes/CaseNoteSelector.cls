@@ -46,27 +46,6 @@ public without sharing class CaseNoteSelector {
 		];
 	}
 
-	/**
-	 * The sample enrollments (a sample person in a sample program) that carry a case note,
-	 * whoever wrote it. System mode because notes are private to their authors: sample removal
-	 * must skip every such enrollment, not only those whose notes the remover can see, or the
-	 * note's lookup refuses the delete. Only enrollment ids leave this method.
-	 */
-	public static Set<Id> sampleEnrollmentsWithNotes() {
-		Set<Id> enrollmentIds = new Set<Id>();
-		for (AggregateResult row : [
-			SELECT Enrollment__c enrollment
-			FROM Case_Note__c
-			WHERE Enrollment__r.Program__r.Sample_Data__c = TRUE AND Enrollment__r.Contact__r.Sample_Data__c = TRUE
-			WITH SYSTEM_MODE
-			GROUP BY Enrollment__c
-			LIMIT 2000
-		]) {
-			enrollmentIds.add((Id) row.get('enrollment'));
-		}
-		return enrollmentIds;
-	}
-
 	/** The contact ids that are this person: itself, or a person account's own contact. */
 	private static Set<Id> contactsOf(Id personId) {
 		Set<Id> contactIds = new Set<Id>{ personId };

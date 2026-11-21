@@ -36,7 +36,7 @@ someone with Manage BarnCRM Settings can reorder rules.
 Everything is in the app, with one exception noted at step 3.
 
 1. Open **BarnCRM Settings**, then **Fundraising**, then **Acknowledgments**.
-2. Turn on **Send gift acknowledgments**. Nothing is queued until you do, because a thank you sent
+2. Turn on **Send Thank-Yous**. Nothing is queued until you do, because a thank you sent
    with the wrong wording cannot be recalled.
 3. Decide what your emailed thank you says. The wording lives in a standard Salesforce email
    template, which means you get the normal editor, the preview, and the test send.
@@ -64,7 +64,7 @@ Everything is in the app, with one exception noted at step 3.
    address instead. For brand-specific wording, add a rule per brand (match on the appeal) with
    its own template.
 6. If you want emailed thank yous to go out overnight without anybody pressing anything,
-   turn on **Send emails nightly** on the same page. That switches on the acknowledgments step
+   turn on **Send Emails Nightly** on the same page. That switches on the acknowledgments step
    of [BarnCRM Nightly Jobs](nightly-jobs.md), the one nightly run, at 2:45 in the morning. Leave
    it off if you would rather look at the queue first, which is what most organizations do
    for the first month.
@@ -74,7 +74,7 @@ Everything is in the app, with one exception noted at step 3.
 Start with the sample data loaded (see [sample-data.md](sample-data.md)).
 
 1. Open **BarnCRM Settings**, then **Fundraising**, then **Acknowledgments**. Turn on
-   **Send gift acknowledgments**.
+   **Send Thank-Yous**.
 2. Choose **New Rule**. Name it `Everything else`, order `100`, channel `Email`, and choose
    **BarnCRM: thank you for your gift** as the email template. Save.
 3. Choose **New Rule** again. Name it `Major gifts`, order `10`, channel `Letter`, minimum
@@ -124,9 +124,9 @@ rule that sends organization gifts by letter.
 **Email Opt Out** is ticked. For a person's gift that is the donor; for an organization or
 household gift it is the account's primary contact, the person the email would have gone to.
 The gift is left in the queue with no acknowledgment record and no error, and the
-Thank-Yous page counts it on its own line, **Opted out of email, sent by letter**. Those
-gifts are also counted in **Letters ready to merge**, and the next **Download letters to
-merge** puts them in the file, so the donor is still thanked. If you do not send letters,
+Thank-Yous page counts it on its own line, **Opted Out of Email, Sent by Letter**. Those
+gifts are also counted in **Letters Ready to Merge**, and the next **Download Letters to
+Merge** puts them in the file, so the donor is still thanked. If you do not send letters,
 they wait in the queue until you do, or until someone sets the gift's acknowledgment status
 by hand.
 

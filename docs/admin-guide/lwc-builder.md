@@ -73,7 +73,9 @@ BarnCRM Settings, **Component Builder**:
    *Donor Snapshot*, save and activate the page.
 
 You can also move a block without dragging: select it and use the arrow buttons in its
-properties (up, down, previous column, next column).
+properties (up, down, previous column, next column). Dragging works with a mouse, with a finger
+(press and hold a moment, then drag) and from the keyboard: focus a block, press Space to pick
+it up, use the arrow keys to move it, then Space or Enter to drop it, or Escape to cancel.
 
 ## Blocks
 

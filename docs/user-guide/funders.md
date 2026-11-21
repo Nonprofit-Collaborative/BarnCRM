@@ -47,7 +47,7 @@ or **Withdrawn**, an empty **Decision Date** becomes today. A date you typed is 
 1. Click the **Grant Pipeline** tab.
 2. Read the tiles at the top: **Open Requests**, **Amount Requested** on them, and **Awarded This
    Fiscal Year**.
-3. Choose **Everyone** for every open grant, or **Mine** for the ones you own.
+3. Choose **Everyone's Grants** for every open grant, or **My Grants** for the ones you own.
 
 You should see: one column per open stage, each with its count and amount, and a card for each
 grant showing its name, amount requested, funder, deadline, next step and owner. A deadline in
@@ -93,7 +93,7 @@ is an amber badge, overdue a red one. Click a grant's name to open it.
 
 Open the **Grant Calendar** tab. Each day shows its application deadlines, requirements due and
 payments expected. An overdue item shows a warning icon, the word **Overdue** and bold text (not red alone). A key under the month heading names the border colours: **Application** (blue), **Grant Requirement** (orange) and **Grant Payment** (green), plus the **Overdue** mark. Click one to open it. Use **Previous Month** and
-**Next Month** to move, and **Mine** to see only your grants and the requirements assigned to
+**Next Month** to move, and **My Grants** to see only your grants and the requirements assigned to
 you. Click **Print** to print the month without the app's header and navigation.
 
 ## To Show the Board Where the Money Comes From

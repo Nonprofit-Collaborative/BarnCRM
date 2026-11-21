@@ -15,7 +15,7 @@ import fund from '@salesforce/label/c.Giving_GiftBatch_ColumnFund';
 import allFunds from '@salesforce/label/c.Mirror_AccountingExport_AllFunds';
 import paymentMethod from '@salesforce/label/c.Giving_QuickGiftEntry_TypeLabel';
 import allMethods from '@salesforce/label/c.Mirror_AccountingExport_AllMethods';
-import download from '@salesforce/label/c.Mirror_AccountingExport_Download';
+import download from '@salesforce/label/c.Giving_Acknowledgments_DownloadFile';
 import onlyUnposted from '@salesforce/label/c.Mirror_AccountingExport_OnlyUnposted';
 import markPostedLabel from '@salesforce/label/c.Mirror_AccountingExport_MarkPosted';
 import { BYTE_ORDER_MARK, bodyMessage, saveBlob } from 'c/findCsv';

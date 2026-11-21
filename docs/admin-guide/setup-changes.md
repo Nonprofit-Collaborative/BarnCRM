@@ -20,7 +20,7 @@ it), so a change made last year can still be found.
 | **Changed By** | The user who made it. Blank for some automatic Salesforce processes. |
 | **Logged In As** | The username of the person who was logged in as that user, when someone was (for example a Salesforce support agent or another administrator) |
 | **Section** | The Setup area, such as Customize Accounts or Manage Users |
-| **What Changed** | Salesforce's own sentence for the change. In a sentence about a BarnCRM Connector connection (a name starting `BarnConn_`), every web address is kept with its host only, such as `https://hooks.example.com/****`: a Secret URL connection's address is its key. |
+| **What Changed** | Salesforce's own sentence for the change. In a sentence about any Named or External Credential (a credentials section, a URL parameter, or a BarnCRM Connector connection named `BarnConn_...`), every web address is kept with its host only, such as `https://hooks.example.com/****`: a credential's address can hold its key, and a Secret URL connection's always does. |
 
 It is read only toward Setup: it never changes a setting, and nobody edits the copied rows.
 

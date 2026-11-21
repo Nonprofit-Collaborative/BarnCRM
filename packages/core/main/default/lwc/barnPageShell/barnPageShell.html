@@ -9,6 +9,9 @@
                                 <lightning-icon icon-name={iconName} size="medium" data-id="icon"></lightning-icon>
                             </div>
                         </template>
+                        <div class={figureClass} data-id="figure">
+                            <slot name="figure" onslotchange={handleFigureSlotChange}></slot>
+                        </div>
                         <div class="slds-media__body">
                             <h1 class={titleClass} data-id="title">{title}</h1>
                             <template lwc:if={purpose}>

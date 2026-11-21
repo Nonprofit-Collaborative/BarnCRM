@@ -354,21 +354,12 @@ public without sharing class RollupChanges {
 			return further;
 		}
 		for (SObject intermediate : intermediates) {
-			Object value = valueAt(intermediate, expression);
+			Object value = RollupAggregator.valueAt(intermediate, expression);
 			if (value != null) {
 				further.add((Id) value);
 			}
 		}
 		return further;
-	}
-
-	private static Object valueAt(SObject row, String path) {
-		List<String> parts = path.split('\\.');
-		SObject current = row;
-		for (Integer i = 0; i < parts.size() - 1 && current != null; i++) {
-			current = current.getSObject(parts[i]);
-		}
-		return current == null ? null : current.get(parts[parts.size() - 1]);
 	}
 
 	// ------------------------------------------------------------------------------- attributes

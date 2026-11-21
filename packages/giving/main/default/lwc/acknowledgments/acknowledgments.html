@@ -1,9 +1,12 @@
 <template>
   <template lwc:if={helpReady}>
-    <lightning-card title={labels.title} icon-name={icons.page}>
-      <div class="slds-var-p-horizontal_medium">
-        <p class="slds-text-body_regular slds-var-m-bottom_small">{labels.intro}</p>
-
+    <c-barn-page-shell
+      title={labels.title}
+      purpose={labels.intro}
+      icon-name={icons.page}
+      data-id="shell"
+    >
+      <div>
         <div class="slds-assistive-text" aria-live="polite" data-id="live">{liveMessage}</div>
         <span id="rule-drag-help" class="slds-assistive-text">{labels.dragInstructions}</span>
 
@@ -84,12 +87,18 @@
             </div>
           </div>
 
-          <dl class="slds-dl_horizontal slds-var-m-bottom_small">
-            <dt class="slds-dl_horizontal__label">{labels.lastRun}</dt>
-            <dd data-id="last-run" class="slds-dl_horizontal__detail">{lastRunText}</dd>
-            <dt class="slds-dl_horizontal__label">{labels.nextRun}</dt>
-            <dd data-id="next-run" class="slds-dl_horizontal__detail">{nextRunText}</dd>
-          </dl>
+          <div class="slds-var-m-bottom_small">
+            <p>
+              <span class="slds-text-title_bold">{labels.lastRun}</span>
+              <!-- LWC drops the space between the two elements, so the margin keeps them apart. -->
+              <span data-id="last-run" class="slds-var-m-left_xx-small">{lastRunText}</span>
+            </p>
+            <p>
+              <span class="slds-text-title_bold">{labels.nextRun}</span>
+              <!-- LWC drops the space between the two elements, so the margin keeps them apart. -->
+              <span data-id="next-run" class="slds-var-m-left_xx-small">{nextRunText}</span>
+            </p>
+          </div>
 
           <template lwc:if={showQueueCapped}>
             <c-barn-notice
@@ -387,6 +396,6 @@
           </lightning-accordion-section>
         </lightning-accordion>
       </div>
-    </lightning-card>
+    </c-barn-page-shell>
   </template>
 </template>

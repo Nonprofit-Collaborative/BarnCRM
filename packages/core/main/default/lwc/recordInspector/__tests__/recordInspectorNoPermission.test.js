@@ -39,6 +39,6 @@ describe('c-record-inspector without Manage BarnCRM Settings', () => {
     element.recordId = '003000000000001AAA';
     document.body.appendChild(element);
 
-    expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="shell"]')).toBeNull();
   });
 });

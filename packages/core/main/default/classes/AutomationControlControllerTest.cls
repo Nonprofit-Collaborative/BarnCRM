@@ -75,6 +75,41 @@ private class AutomationControlControllerTest {
 	}
 
 	@IsTest
+	static void aRowOnAnObjectThisOrgLacksIsNotListed() {
+		System.runAs(TestUsers.admin()) {
+			insert new List<Automation_Setting__c>{
+				new Automation_Setting__c(
+					Name = 'Check something gone',
+					Automation_Name__c = 'Gone_Module_Check',
+					Object_Name__c = 'Not_An_Object__c',
+					Enabled__c = true
+				),
+				new Automation_Setting__c(
+					Name = 'Check contacts',
+					Automation_Name__c = 'Contact_Check',
+					Object_Name__c = 'Contact',
+					Enabled__c = true
+				)
+			};
+			AutomationControl.clearCache();
+			User maria = barnCrmAdmin();
+
+			AutomationControlController.AutomationPageView page;
+			System.runAs(maria) {
+				page = AutomationControlController.getPage();
+			}
+
+			Set<String> names = new Set<String>();
+			for (AutomationControlController.AutomationView view : page.automations) {
+				names.add(view.automationName);
+			}
+			Assert.isTrue(names.contains('Contact_Check'), 'A row on an object here is listed');
+			Assert.isFalse(names.contains('Gone_Module_Check'), 'A row a removed module left is not');
+			Assert.isTrue(AutomationControlController.objectInOrg(null), 'No object named is kept');
+		}
+	}
+
+	@IsTest
 	static void anAlwaysRunsAutomationIsListedOffDisabledAndRefused() {
 		System.runAs(TestUsers.admin()) {
 			insert new Automation_Setting__c(

@@ -466,7 +466,8 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
 		finish(null);
 	}
 
-	private static Integer stoppedChunks(Database.BatchableContext context) {
+	/** The chunks of this batch job that failed, which the nightly run counts too. */
+	public static Integer stoppedChunks(Database.BatchableContext context) {
 		if (context == null) {
 			return 0;
 		}

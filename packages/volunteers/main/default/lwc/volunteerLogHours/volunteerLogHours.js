@@ -108,6 +108,19 @@ export default class VolunteerLogHours extends NavigationMixin(LightningElement)
     }
   }
 
+  /** The page header shows on the tab only; the quick-action window keeps the bare form. */
+  get showShell() {
+    return this.onTab;
+  }
+
+  get showTitle() {
+    return !this.showShell;
+  }
+
+  get pageIntro() {
+    return helpText('Volunteers', 'Volunteers_LogHours_PageIntro');
+  }
+
   get isLoading() {
     return !this.context && !this.loadFailed;
   }

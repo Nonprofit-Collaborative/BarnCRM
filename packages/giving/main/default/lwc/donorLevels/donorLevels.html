@@ -1,9 +1,12 @@
 <template>
     <template lwc:if={helpReady}>
-  <lightning-card title={labels.title} icon-name="custom:custom65">
-    <div class="slds-var-p-horizontal_medium">
-      <p class="slds-text-body_regular slds-var-m-bottom_small">{labels.intro}</p>
-
+  <c-barn-page-shell
+    title={labels.title}
+    purpose={labels.intro}
+    icon-name="custom:custom65"
+    data-id="shell"
+  >
+    <div>
       <template lwc:if={hasError}>
         <c-barn-notice
           class="slds-show slds-var-m-bottom_small"
@@ -115,6 +118,6 @@
         ></lightning-button>
       </div>
     </div>
-  </lightning-card>
+  </c-barn-page-shell>
     </template>
 </template>

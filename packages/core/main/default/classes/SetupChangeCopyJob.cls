@@ -28,6 +28,8 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
 	private static final String TRAIL_FIELDS = 'Id, Action, Section, Display, CreatedDate, CreatedBy.Name, DelegateUser';
 	/** The name every BarnCRM Connector credential starts with. */
 	private static final String CONNECTOR_PREFIX = 'BarnConn_';
+	/** How Salesforce describes a credential's URL parameter in the trail. */
+	private static final String URL_PARAMETER = 'Parameter Type: URL';
 	/** A web address's path, query or fragment, and a `)` closing the sentence's bracket. */
 	private static final Pattern ADDRESS_PATH = Pattern.compile('(https?://[^/\\s?#]+)[/?#]\\S*?(\\)?)(?=\\s|$)');
 	private static final List<String> UNFINISHED = new List<String>{ 'Holding', 'Queued', 'Preparing', 'Processing' };
@@ -211,7 +213,7 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
 					Delegate_User__c = cut((String) row.get('DelegateUser'), 80),
 					Section__c = cut((String) row.get('Section'), 40),
 					Action__c = cut((String) row.get('Action'), 120),
-					Display__c = cut(masked((String) row.get('Display')), 1000)
+					Display__c = cut(masked((String) row.get('Section'), (String) row.get('Display')), 1000)
 				)
 			);
 		}
@@ -270,16 +272,24 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
 	}
 
 	/**
-	 * A sentence about a BarnCRM Connector connection (`BarnConn_`) with every web address cut to
-	 * its host: a Secret URL connection's address is its key (review F5), and Salesforce writes
-	 * it into the trail in clear. Any other sentence is kept as it is.
+	 * A sentence about any Named or External Credential with every web address cut to its host:
+	 * a credential's address can hold its key (a Secret URL connection's always does, review F5),
+	 * and Salesforce writes it into the trail in clear. A credential row is one whose section
+	 * names credentials, whose sentence describes a URL parameter, or that names a BarnCRM
+	 * Connector credential (`BarnConn_`). Any other sentence is kept as it is.
 	 */
 	@TestVisible
-	private static String masked(String display) {
-		if (display == null || !display.contains(CONNECTOR_PREFIX)) {
+	private static String masked(String section, String display) {
+		if (display == null || !aboutCredential(section, display)) {
 			return display;
 		}
 		return ADDRESS_PATH.matcher(display).replaceAll('$1/****$2');
+	}
+
+	private static Boolean aboutCredential(String section, String display) {
+		return display.contains(CONNECTOR_PREFIX) ||
+			display.containsIgnoreCase(URL_PARAMETER) ||
+			(section != null && section.containsIgnoreCase('Credential'));
 	}
 
 	private static String cut(String value, Integer length) {

@@ -9,7 +9,7 @@
 	testFor='ApexClass:ConnectorWebhooks, ApexClass:ConnectorWebhooksController, ApexClass:ConnectorRecipeDocument, ApexClass:ConnectorStepRunner'
 )
 private class ConnectorWebhooksTest {
-	private static final String VIEWER_SET = 'BarnCRM_Connector_Viewer';
+	private static final String VIEWER_SET = 'Connector_Viewer';
 	private static final String BASE = 'https://api.example.com/v3';
 
 	@TestSetup

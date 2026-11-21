@@ -100,6 +100,21 @@ export default class GrantCalendar extends NavigationMixin(LightningElement) {
     }).format(new Date(Date.UTC(this.year, this.month - 1, 1)));
   }
 
+  /** A month with nothing due says what puts entries here, rather than showing bare cells. */
+  get showEmptyMonth() {
+    return (
+      this.helpReady &&
+      !this.isLoading &&
+      !this.errorMessage &&
+      this.weeks.length > 0 &&
+      this.weeks.every((week) => week.days.every((day) => day.items.length === 0))
+    );
+  }
+
+  get emptyMonthMessage() {
+    return helpText('Funders', 'Funders_Calendar_Empty');
+  }
+
   /** What each border colour means, and the overdue mark (vis-modules-9). */
   get legend() {
     return [

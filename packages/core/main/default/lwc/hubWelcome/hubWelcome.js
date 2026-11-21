@@ -8,7 +8,6 @@ import NEW_PERSON from '@salesforce/label/c.Core_HubHomeActions_NewPerson';
 import RESUME from '@salesforce/label/c.Core_AutomationControl_ResumeButton';
 import getSettingsLink from '@salesforce/apex/SettingsController.getSettingsLink';
 import PATCH_WELCOME from '@salesforce/resourceUrl/BarnPatchWelcome';
-import { iconFor } from 'c/barnIcons';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const AUTOMATION_SECTION = 'Automation';
@@ -36,7 +35,6 @@ export default class HubWelcome extends NavigationMixin(LightningElement) {
     newPerson: NEW_PERSON
   };
 
-  iconName = iconFor('BarnCRM_Home');
   // Patch, the BarnCRM mascot, waving beside the welcome (ADR-0224); hidden on small screens.
   patchUrl = PATCH_WELCOME;
   helpReady = isHelpLoaded('Core');
@@ -69,6 +67,11 @@ export default class HubWelcome extends NavigationMixin(LightningElement) {
    * "Start with the setup checklist" only to the person who can finish it, and only while
    * there is something left to finish. Everyone else is told what the page is for.
    */
+  /** The page header's purpose line: the welcome message, once the help text has loaded. */
+  get purpose() {
+    return this.helpReady ? this.welcomeMessage : undefined;
+  }
+
   get welcomeMessage() {
     const model = this.model;
     const setupPending =

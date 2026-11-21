@@ -337,12 +337,13 @@ describe('the import wizard', () => {
     jest.clearAllMocks();
   });
 
-  it('leaves the page name to the App Page header, keeping it for screen readers', async () => {
+  it('shows the page name in the shell, since an App Page prints no header', async () => {
     const element = await open();
 
     const shell = element.shadowRoot.querySelector('[data-id="shell"]');
-    expect(shell.titleHidden).toBe(true);
+    expect(shell.titleHidden).toBeFalsy();
     expect(shell.title).toBe('c.Core_DataJobs_KindImport');
+    expect(shell.purpose).toBeTruthy();
     expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();
   });
 
@@ -380,7 +381,7 @@ describe('the import wizard', () => {
       'c.Core_Import_StepUpload',
       'c.Core_Import_StepColumns',
       'c.Core_Import_StepMatching',
-      'c.Core_Import_StepPreview',
+      'c.Core_BulkUpdate_Preview',
       'c.Core_Find_Results'
     ]);
     expect(flow.currentStep).toBe('1');

@@ -7,7 +7,7 @@
  */
 @IsTest(testFor='ApexClass:ConnectorRecipeFiles, ApexClass:ConnectorRecipes, ApexClass:ConnectorRecipesController')
 private class ConnectorRecipeFilesTest {
-	private static final String VIEWER_SET = 'BarnCRM_Connector_Viewer';
+	private static final String VIEWER_SET = 'Connector_Viewer';
 
 	@TestSetup
 	static void createTestUser() {
