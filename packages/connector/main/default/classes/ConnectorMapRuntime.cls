@@ -246,9 +246,7 @@ public inherited sharing class ConnectorMapRuntime {
 	 */
 	public static Built buildRecord(Map<String, Object> document, Object input, AccessLevel access, Boolean creating) {
 		String objectName = objectOf(document);
-		List<Schema.DescribeSObjectResult> described = String.isBlank(objectName)
-			? new List<Schema.DescribeSObjectResult>()
-			: Schema.describeSObjects(new List<String>{ objectName }, SObjectDescribeOptions.DEFERRED);
+		List<Schema.DescribeSObjectResult> described = describe(objectName);
 		if (described.isEmpty()) {
 			throw new MapException(BarnHelp.text('Connector', 'Connector_Run_ErrorMapObject'));
 		}
@@ -296,24 +294,27 @@ public inherited sharing class ConnectorMapRuntime {
 	private static String lookUp(Map<String, Object> lookup, String value, AccessLevel access, String label) {
 		String objectName = ConnectorRecipeDocument.textOf(lookup.get('object'));
 		String fieldName = ConnectorRecipeDocument.textOf(lookup.get('field'));
-		List<Schema.DescribeSObjectResult> described = Pattern.matches('[A-Za-z0-9_]{1,80}', objectName)
-			? Schema.describeSObjects(new List<String>{ objectName }, SObjectDescribeOptions.DEFERRED)
-			: new List<Schema.DescribeSObjectResult>();
-		Schema.SObjectField token = described.isEmpty()
+		List<Schema.DescribeSObjectResult> described = describe(objectName);
+		Schema.SObjectField token = described.isEmpty() || String.isBlank(fieldName)
 			? null
 			: described[0].fields.getMap().get(fieldName.toLowerCase());
 		if (token == null || !token.getDescribe().isFilterable()) {
 			throw new MapException(BarnHelp.text('Connector', 'Connector_Run_ErrorLookup', new List<Object>{ label }));
 		}
-		List<SObject> rows = Database.queryWithBinds(
-			'SELECT Id FROM ' +
-				described[0].getName() +
-				' WHERE ' +
-				token.getDescribe().getName() +
-				' = :value LIMIT 2',
-			new Map<String, Object>{ 'value' => value },
-			access
-		);
+		// A value that is not a record Id matches no record by Id; asked as is, the query
+		// would fail with the platform's "invalid ID field" instead of the map's own answer.
+		Boolean notAnId = token.getDescribe().getType() == Schema.DisplayType.ID && !(value instanceof Id);
+		List<SObject> rows = notAnId
+			? new List<SObject>()
+			: Database.queryWithBinds(
+					'SELECT Id FROM ' +
+						described[0].getName() +
+						' WHERE ' +
+						token.getDescribe().getName() +
+						' = :value LIMIT 2',
+					new Map<String, Object>{ 'value' => value },
+					access
+			  );
 		if (rows.size() == 1) {
 			return rows[0].Id;
 		}
@@ -326,6 +327,18 @@ public inherited sharing class ConnectorMapRuntime {
 				? BarnHelp.text('Connector', 'Connector_Run_ErrorLookupNone', named)
 				: BarnHelp.text('Connector', 'Connector_Run_ErrorLookupSeveral', named)
 		);
+	}
+
+	/**
+	 * The object's describe, or none when the name is not an object of this org (one a removed
+	 * module left in a map). `Schema.describeSObjects` throws for an unknown name, and for a
+	 * packaged object named without its prefix once the namespace exists; NamespaceUtil does not.
+	 */
+	private static List<Schema.DescribeSObjectResult> describe(String objectName) {
+		Schema.DescribeSObjectResult found = String.isBlank(objectName) ? null : NamespaceUtil.describe(objectName);
+		return found == null
+			? new List<Schema.DescribeSObjectResult>()
+			: new List<Schema.DescribeSObjectResult>{ found };
 	}
 
 	/** Text as the field's type; a value that does not fit is refused with the field's label. */

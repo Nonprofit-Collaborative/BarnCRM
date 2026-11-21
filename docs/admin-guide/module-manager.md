@@ -65,8 +65,8 @@ Outbound Grants each have an app of their own (**BarnCRM Forms**, **BarnCRM Even
 Portal Builder**, **BarnCRM Corporate Hub**, **BarnCRM Projects**, **BarnCRM Memberships**,
 **BarnCRM Scholarships**), and their tabs are also in the everyday **BarnCRM** apps (Portal
 Builder's in the **BarnCRM Admin** apps); a scratch or Developer Edition org gets the tabs
-only. Volunteers has a Settings tab in its app, where its settings live; the
-BarnCRM Fundraising app has no Settings tab, and Mirror has no app of its own. (Some module settings
+only. No module app has a Settings tab: Volunteers' settings are the **Volunteers** section of
+BarnCRM Settings, the BarnCRM Fundraising app has no Settings tab, and Mirror has no app of its own. (Some module settings
 still show in BarnCRM Settings for now; they move to the module's app in a later release.) Core's own
 features are turned on in General instead (see
 [BarnCRM Settings, Features](barncrm-settings.md#features-general)).
