@@ -8,6 +8,7 @@
 @IsTest(testFor='ApexClass:ConnectorRecipesController, ApexClass:ConnectorRecipes, ApexClass:ConnectorIdentity')
 private class ConnectorRecipesControllerTest {
 	private static final String VIEWER_SET = 'Connector_Viewer';
+	private static final String STOP_STEPS = '[{"id":"end","kind":"stop","outcome":"Succeeded"}]';
 
 	@TestSetup
 	static void createTestUsers() {
@@ -320,6 +321,392 @@ private class ConnectorRecipesControllerTest {
 			Assert.isTrue(runs.isEmpty(), 'Sam may read Run History.');
 			Assert.isTrue(page.connections.isEmpty(), 'Only an admin sees connections and maps.');
 			Assert.areEqual(BarnHelp.text('Connector', 'Connector_Error_NoManage'), refused);
+		}
+	}
+
+	/** A well-formed Id no recipe or run holds. */
+	private static Id gone() {
+		return Id.valueOf(Connector_Recipe__c.SObjectType.getDescribe().getKeyPrefix() + '000000000001');
+	}
+
+	/** What the controller says when the running user calls the named action, or null when it answers. */
+	private static String refusal(String action) {
+		try {
+			switch on action {
+				when 'rollBack' {
+					ConnectorRecipesController.rollBack(gone());
+				}
+				when 'discardDraft' {
+					ConnectorRecipesController.discardDraft(gone());
+				}
+				when 'exportRecipe' {
+					ConnectorRecipesController.exportRecipe(gone());
+				}
+				when 'importFile' {
+					ConnectorRecipesController.importFile('{}');
+				}
+				when 'deleteRecipe' {
+					ConnectorRecipesController.deleteRecipe(gone());
+				}
+				when 'pauseRecipe' {
+					ConnectorRecipesController.pauseRecipe(gone());
+				}
+				when 'resumeRecipe' {
+					ConnectorRecipesController.resumeRecipe(gone());
+				}
+				when 'retryAllFailed' {
+					ConnectorRecipesController.retryAllFailed(gone());
+				}
+				when 'getRecipeAccess' {
+					ConnectorRecipesController.getRecipeAccess();
+				}
+				when 'saveRecipeAccess' {
+					ConnectorRecipesController.saveRecipeAccess(new List<String>());
+				}
+				when 'getClock' {
+					ConnectorRecipesController.getClock();
+				}
+				when 'setRecipesPaused' {
+					ConnectorRecipesController.setRecipesPaused(true);
+				}
+				when 'restartClock' {
+					ConnectorRecipesController.restartClock();
+				}
+				when 'getIntegrationUser' {
+					ConnectorRecipesController.getIntegrationUser();
+				}
+				when 'chooseIntegrationUser' {
+					ConnectorRecipesController.chooseIntegrationUser(null);
+				}
+				when 'getRuns' {
+					ConnectorRecipesController.getRuns(gone());
+				}
+				when 'getRun' {
+					ConnectorRecipesController.getRun(gone());
+				}
+				when 'getRecipes' {
+					ConnectorRecipesController.getRecipes();
+				}
+				when else {
+					Assert.fail('Unknown action ' + action);
+				}
+			}
+		} catch (AuraHandledException refused) {
+			return message(refused);
+		}
+		return null;
+	}
+
+	@IsTest
+	static void samIsRefusedEveryChangeAndEveryAdminCardInWords() {
+		List<String> changes = new List<String>{
+			'rollBack',
+			'discardDraft',
+			'exportRecipe',
+			'importFile',
+			'deleteRecipe',
+			'pauseRecipe',
+			'resumeRecipe',
+			'retryAllFailed',
+			'getRecipeAccess',
+			'saveRecipeAccess',
+			'getClock',
+			'setRecipesPaused',
+			'restartClock',
+			'getIntegrationUser',
+			'chooseIntegrationUser'
+		};
+		System.runAs(TestUsers.standardUserWith('Sam', new List<String>{ VIEWER_SET })) {
+			Test.startTest();
+			Map<String, String> refused = new Map<String, String>();
+			for (String action : changes) {
+				refused.put(action, refusal(action));
+			}
+			String runsOfGone = refusal('getRuns');
+			Test.stopTest();
+
+			for (String action : changes) {
+				Assert.areEqual(
+					BarnHelp.text('Connector', 'Connector_Error_NoManage'),
+					refused.get(action),
+					action + ' needs Manage BarnCRM Connector.'
+				);
+			}
+			Assert.isNull(runsOfGone, 'A viewer reads Run History, here of a recipe with none.');
+		}
+	}
+
+	@IsTest
+	static void aUserWithNoConnectorAccessIsToldSoWhereverRecipesAreRead() {
+		System.runAs(TestUsers.standardUser('Nobody')) {
+			Test.startTest();
+			String recipes = refusal('getRecipes');
+			String runs = refusal('getRuns');
+			String run = refusal('getRun');
+			Test.stopTest();
+
+			String expected = BarnHelp.text('Connector', 'Connector_Error_NoView');
+			Assert.areEqual(expected, recipes);
+			Assert.areEqual(expected, runs);
+			Assert.areEqual(expected, run);
+		}
+	}
+
+	@IsTest
+	static void danaIsToldInWordsWhyAnActionCannotBeDoneToARecipe() {
+		System.runAs(admin()) {
+			ConnectorRecipeTestData.noConnections();
+			ConnectorIdentity.automatedProcessOverride = '005000000000000';
+			ConnectorRecipes.Recipe saved = ConnectorRecipesController.saveDraft(
+				null,
+				'Plain Stop',
+				'Does nothing',
+				ConnectorRecipeTestData.document(STOP_STEPS),
+				null
+			);
+
+			Test.startTest();
+			String goneText = BarnHelp.text('Connector', 'Connector_Recipe_ErrorGone');
+			Assert.areEqual(goneText, refusal('exportRecipe'));
+			Assert.areEqual(goneText, refusal('deleteRecipe'));
+			Assert.areEqual(goneText, refusal('pauseRecipe'));
+			String noPrevious;
+			try {
+				ConnectorRecipesController.rollBack(saved.id);
+			} catch (AuraHandledException refused) {
+				noPrevious = message(refused);
+			}
+			String notPublished;
+			try {
+				ConnectorRecipesController.discardDraft(saved.id);
+			} catch (AuraHandledException refused) {
+				notPublished = message(refused);
+			}
+			String notActive;
+			try {
+				ConnectorRecipesController.pauseRecipe(saved.id);
+			} catch (AuraHandledException refused) {
+				notActive = message(refused);
+			}
+			String notPaused;
+			try {
+				ConnectorRecipesController.resumeRecipe(saved.id);
+			} catch (AuraHandledException refused) {
+				notPaused = message(refused);
+			}
+			String unreadable = refusal('importFile');
+			Integer retried = ConnectorRecipesController.retryAllFailed(saved.id);
+			Test.stopTest();
+
+			Assert.areEqual(BarnHelp.text('Connector', 'Connector_Recipe_ErrorNoPrevious'), noPrevious);
+			Assert.areEqual(BarnHelp.text('Connector', 'Connector_Recipe_ErrorNotPublished'), notPublished);
+			Assert.areEqual(BarnHelp.text('Connector', 'Connector_Run_ErrorNotActive'), notActive);
+			Assert.areEqual(BarnHelp.text('Connector', 'Connector_Recipe_ErrorNotPaused'), notPaused);
+			Assert.isNotNull(unreadable, 'A file with no recipe in it is refused in words.');
+			Assert.areEqual(0, retried, 'A recipe that never ran has no failed runs.');
+		}
+	}
+
+	@IsTest
+	static void danaPausesResumesDiscardsExportsAndDeletesARecipe() {
+		System.runAs(admin()) {
+			ConnectorRecipeTestData.noConnections();
+			ConnectorIdentity.automatedProcessOverride = '005000000000000';
+			ConnectorRecipes.Recipe saved = ConnectorRecipesController.saveDraft(
+				null,
+				'Plain Stop',
+				'Does nothing',
+				ConnectorRecipeTestData.document(STOP_STEPS),
+				null
+			);
+
+			Test.startTest();
+			ConnectorRecipes.Recipe published = ConnectorRecipesController.publish(saved.id);
+			ConnectorRecipes.Recipe paused = ConnectorRecipesController.pauseRecipe(saved.id);
+			ConnectorRecipes.Recipe resumed = ConnectorRecipesController.resumeRecipe(saved.id);
+			ConnectorRecipes.Recipe discarded = ConnectorRecipesController.discardDraft(saved.id);
+			String exported = ConnectorRecipesController.exportRecipe(saved.id);
+			ConnectorRecipesController.deleteRecipe(saved.id);
+			Test.stopTest();
+
+			Assert.areEqual(ConnectorRunStore.ACTIVE, published.status);
+			Assert.areEqual(ConnectorRunStore.PAUSED, paused.status);
+			Assert.areEqual(ConnectorRunStore.ACTIVE, resumed.status);
+			Assert.isFalse(discarded.unpublished, 'The draft is the published definition again.');
+			Assert.isTrue(exported.contains('Plain Stop'), 'The file carries the recipe.');
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Connector_Recipe__c WHERE Id = :saved.id WITH SYSTEM_MODE],
+				'Delete removes it.'
+			);
+		}
+	}
+
+	@IsTest
+	static void danaPausesAndRestartsTheClockAndSeesWhoRunsIntegrationUserRecipes() {
+		System.runAs(admin()) {
+			Test.startTest();
+			ConnectorClock.Status running = ConnectorRecipesController.getClock();
+			ConnectorClock.Status paused = ConnectorRecipesController.setRecipesPaused(true);
+			ConnectorClock.Status resumed = ConnectorRecipesController.setRecipesPaused(false);
+			ConnectorClock.Status restarted = ConnectorRecipesController.restartClock();
+			ConnectorIntegrationUser.View user = ConnectorRecipesController.getIntegrationUser();
+			Test.stopTest();
+
+			Assert.isFalse(running.paused);
+			Assert.isTrue(paused.paused, 'Pause All Recipes is on.');
+			Assert.isFalse(resumed.paused);
+			Assert.isNotNull(restarted.lanes);
+			Assert.isNull(user.id, 'No integration user is chosen yet.');
+		}
+	}
+
+	// ---------------------------------------------------------------------------------------
+	// Recipe Access on the Automated Process user, and what a recipe identity may map
+	// ---------------------------------------------------------------------------------------
+
+	private static ConnectorIdentity.Choice choiceNamed(ConnectorIdentity.Access access, String name) {
+		for (ConnectorIdentity.Choice choice : access.choices) {
+			if (choice.name == name) {
+				return choice;
+			}
+		}
+		return null;
+	}
+
+	@IsTest
+	static void beforeAFirstSaveBarnCrmAdminAndTheModuleAdminSetsAreTicked() {
+		User identity = TestUsers.standardUser('Autopilot');
+		System.runAs(admin()) {
+			ConnectorIdentity.automatedProcessOverride = identity.Id;
+
+			Test.startTest();
+			ConnectorIdentity.Access access = ConnectorIdentity.access();
+			Test.stopTest();
+
+			Assert.isTrue(access.ready);
+			Assert.isFalse(access.saved, 'The user holds none of the sets on offer.');
+			Assert.isFalse(ConnectorIdentity.accessSaved());
+			ConnectorIdentity.Choice core = choiceNamed(access, 'BarnCRM_Admin');
+			Assert.isNotNull(core, 'BarnCRM Admin is offered.');
+			Assert.isTrue(core.picked, 'And ticked to start.');
+			Assert.isNull(choiceNamed(access, 'Connector_Viewer'), 'Connector sets are never offered.');
+			for (ConnectorIdentity.Choice choice : access.choices) {
+				Assert.areEqual(
+					choice.name == 'BarnCRM_Admin' ||
+					(choice.name.endsWith('_Admin') &&
+					choice.name != 'BarnCRM_App_Admin_Console' &&
+					choice.name != 'BarnCRM_App_Admin_Standard' &&
+					choice.name != 'BarnCRM_Metadata_Admin' &&
+					choice.name != ConnectorConnections.ADMIN_SET),
+					choice.picked,
+					'Only admin sets are ticked to start: ' + choice.name
+				);
+			}
+		}
+	}
+
+	@IsTest
+	static void savingAssignsOnlyTheNewPicksAndDroppingARecipeAccessSetRemovesIt() {
+		User identity = TestUsers.standardUser('Autopilot');
+		System.runAs(admin()) {
+			ConnectorIdentity.automatedProcessOverride = identity.Id;
+			String coreAdmin = choiceNamed(ConnectorIdentity.access(), 'BarnCRM_Admin').id;
+
+			Test.startTest();
+			ConnectorIdentity.Access saved = ConnectorIdentity.save(new List<String>{ coreAdmin });
+			Boolean heldAfterSave =
+				[
+					SELECT COUNT()
+					FROM PermissionSetAssignment
+					WHERE AssigneeId = :identity.Id AND PermissionSetId = :coreAdmin
+					WITH SYSTEM_MODE
+				] == 1;
+			Boolean savedAgain = ConnectorIdentity.save(new List<String>{ coreAdmin }).saved;
+			ConnectorIdentity.Access dropped = ConnectorIdentity.save(null);
+			Test.stopTest();
+
+			Assert.isTrue(saved.saved);
+			Assert.isTrue(choiceNamed(saved, 'BarnCRM_Admin').picked);
+			Assert.isTrue(heldAfterSave, 'The picked set is assigned.');
+			Assert.isTrue(savedAgain, 'Saving the same picks again changes nothing.');
+			Assert.isFalse(dropped.saved, 'Nothing picked leaves no offered set.');
+			Assert.areEqual(
+				0,
+				[
+					SELECT COUNT()
+					FROM PermissionSetAssignment
+					WHERE AssigneeId = :identity.Id AND PermissionSetId = :coreAdmin
+					WITH SYSTEM_MODE
+				],
+				'The set no longer picked is removed.'
+			);
+		}
+	}
+
+	@IsTest
+	static void aRecipeIdentityMayMapOnlyWhatItsSetsGrantObjectAndFieldByField() {
+		User identity = TestUsers.minimumAccessUserWith('Mapper', new List<String>());
+		User bare = TestUsers.minimumAccessUserWith('Bare', new List<String>());
+		PermissionSet granting = new PermissionSet(Name = 'Connector_Map_Check', Label = 'Connector Map Check');
+		insert as system granting;
+		insert as system new ObjectPermissions(
+			ParentId = granting.Id,
+			SobjectType = 'Contact',
+			PermissionsRead = true,
+			PermissionsEdit = true
+		);
+		insert as system new PermissionSetAssignment(AssigneeId = identity.Id, PermissionSetId = granting.Id);
+		System.runAs(admin()) {
+			Test.startTest();
+			List<String> noSets = ConnectorIdentity.mapProblems(
+				bare.Id,
+				'create',
+				'Contact',
+				new List<String>{ 'Title' }
+			);
+			List<String> cannotCreate = ConnectorIdentity.mapProblems(
+				identity.Id,
+				'create',
+				'Contact',
+				new List<String>{ 'Title' }
+			);
+			List<String> noFieldEdit = ConnectorIdentity.mapProblems(
+				identity.Id,
+				'update',
+				'Contact',
+				new List<String>{ 'Title', 'No_Such_Field__c' }
+			);
+			insert as system new FieldPermissions(
+				ParentId = granting.Id,
+				SobjectType = 'Contact',
+				Field = 'Contact.Title',
+				PermissionsRead = true,
+				PermissionsEdit = true
+			);
+			List<String> allowed = ConnectorIdentity.mapProblems(
+				identity.Id,
+				'update',
+				'Contact',
+				new List<String>{ 'Title', 'No_Such_Field__c' }
+			);
+			Test.stopTest();
+
+			String objectAccess = BarnHelp.text(
+				'Connector',
+				'Connector_Publish_ObjectAccess',
+				new List<Object>{ 'Contact' }
+			);
+			Assert.areEqual(new List<String>{ objectAccess }, noSets, 'No set, no object access.');
+			Assert.areEqual(new List<String>{ objectAccess }, cannotCreate, 'Edit is not Create.');
+			Assert.areEqual(
+				new List<String>{
+					BarnHelp.text('Connector', 'Connector_Publish_FieldAccess', new List<Object>{ 'Contact.Title' })
+				},
+				noFieldEdit,
+				'Title needs its own field permission; a field that is not there is not blamed on the sets.'
+			);
+			Assert.isTrue(allowed.isEmpty(), 'Object Edit and the field permission are enough to update.');
 		}
 	}
 }

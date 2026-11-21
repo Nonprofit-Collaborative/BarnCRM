@@ -496,6 +496,223 @@ private class ConnectorWebhooksTest {
 		}
 	}
 
+	// ---------------------------------------------------------------------------------------
+	// Replies, references, caps and the real Site and credential reads
+	// ---------------------------------------------------------------------------------------
+
+	@IsTest
+	static void aNumberIsEchoedAsTextAndAnUnusableChallengeFallsBackToTheFixedReply() {
+		System.runAs(admin()) {
+			Map<String, Object> starter = new Map<String, Object>{
+				'kind' => 'webhook',
+				'reply' => new Map<String, Object>{ 'challenge' => 'n' }
+			};
+
+			ConnectorWebhooks.Reply asInteger = ConnectorWebhooks.reply(
+				starter,
+				new Map<String, Object>{ 'n' => 42 },
+				null,
+				'r1'
+			);
+			ConnectorWebhooks.Reply asLong = ConnectorWebhooks.reply(
+				starter,
+				new Map<String, Object>{ 'n' => 9000000000L },
+				null,
+				'r1'
+			);
+			ConnectorWebhooks.Reply asDecimal = ConnectorWebhooks.reply(
+				starter,
+				new Map<String, Object>{ 'n' => 4.5 },
+				null,
+				'r1'
+			);
+			ConnectorWebhooks.Reply tooLong = ConnectorWebhooks.reply(
+				starter,
+				new Map<String, Object>{ 'n' => 'x'.repeat(ConnectorWebhooks.MAX_ECHO + 1) },
+				null,
+				'r2'
+			);
+			ConnectorWebhooks.Reply blank = ConnectorWebhooks.reply(
+				starter,
+				new Map<String, Object>{ 'n' => '' },
+				null,
+				'r3'
+			);
+			ConnectorWebhooks.Reply notScalar = ConnectorWebhooks.reply(
+				starter,
+				new Map<String, Object>{ 'n' => new List<Object>{ 1 } },
+				null,
+				'r4'
+			);
+			ConnectorWebhooks.Reply noReference = ConnectorWebhooks.reply(
+				new Map<String, Object>{ 'kind' => 'webhook' },
+				null,
+				null,
+				null
+			);
+
+			Assert.areEqual('42', asInteger.body);
+			Assert.areEqual('9000000000', asLong.body);
+			Assert.areEqual('4.5', asDecimal.body);
+			for (ConnectorWebhooks.Reply echoed : new List<ConnectorWebhooks.Reply>{ asInteger, asLong, asDecimal }) {
+				Assert.areEqual(200, echoed.status);
+				Assert.areEqual('text/plain', echoed.contentType);
+			}
+			Assert.areEqual(202, tooLong.status, 'A value past the echo limit is never echoed.');
+			Assert.areEqual('{"received": true, "reference": "r2"}', tooLong.body);
+			Assert.areEqual('{"received": true, "reference": "r3"}', blank.body);
+			Assert.areEqual('{"received": true, "reference": "r4"}', notScalar.body);
+			Assert.areEqual('{"received": true, "reference": ""}', noReference.body, 'No reference leaves it empty.');
+		}
+	}
+
+	@IsTest
+	static void tokensAreHashedAsLowerCaseHexAndReferencesAreOpaqueAndNew() {
+		String token = 'ab'.repeat(32);
+
+		String hashed = ConnectorWebhooks.hashOf(token);
+		String first = ConnectorWebhooks.newReference();
+		String second = ConnectorWebhooks.newReference();
+
+		Assert.isTrue(Pattern.matches('[0-9a-f]{64}', hashed));
+		Assert.areNotEqual(token, hashed);
+		Assert.areEqual(
+			hashed,
+			ConnectorWebhooks.hashOf(' ' + token.toUpperCase() + ' '),
+			'Upper or lower case and spaces do not matter.'
+		);
+		Assert.isNull(ConnectorWebhooks.hashOf(null));
+		Assert.isNull(ConnectorWebhooks.hashOf('not a token'));
+		Assert.isNull(ConnectorWebhooks.hashOf('ab'.repeat(31)), 'Too short.');
+		Assert.isTrue(Pattern.matches('[0-9a-f]{20}', first));
+		Assert.areNotEqual(first, second);
+		Assert.areEqual(500, ConnectorWebhooks.hourlyCap(null));
+		Assert.areEqual(500, ConnectorWebhooks.hourlyCap(new Connector_Recipe__c(Webhook_Hourly_Cap__c = 0)));
+		Assert.areEqual(500, ConnectorWebhooks.hourlyCap(new Connector_Recipe__c(Webhook_Hourly_Cap__c = 5001)));
+		Assert.areEqual(5000, ConnectorWebhooks.hourlyCap(new Connector_Recipe__c(Webhook_Hourly_Cap__c = 5000)));
+	}
+
+	@IsTest
+	static void aRecipeThatIsGoneHasNoWebhookCardTokenOrCap() {
+		Id gone = Id.valueOf(Connector_Recipe__c.SObjectType.getDescribe().getKeyPrefix() + '000000000001');
+		System.runAs(admin()) {
+			ConnectorWebhooks.testSites = new List<ConnectorWebhooks.SiteInfo>();
+			Integer refused = 0;
+			String goneText = BarnHelp.text('Connector', 'Connector_Recipe_ErrorGone');
+			try {
+				ConnectorWebhooks.view(gone);
+			} catch (ConnectorConnections.ConnectorException e) {
+				Assert.areEqual(goneText, e.getMessage());
+				refused++;
+			}
+			try {
+				ConnectorWebhooks.newToken(gone);
+			} catch (ConnectorConnections.ConnectorException e) {
+				Assert.areEqual(goneText, e.getMessage());
+				refused++;
+			}
+			try {
+				ConnectorWebhooks.saveCap(gone, 10);
+			} catch (ConnectorConnections.ConnectorException e) {
+				Assert.areEqual(goneText, e.getMessage());
+				refused++;
+			}
+			Assert.areEqual(3, refused, 'Each is refused in words.');
+		}
+	}
+
+	@IsTest
+	static void theOrgsRealSitesAreListedWithTheirAddressesAndAGuestCheckNamesOnlyThem() {
+		System.runAs(admin()) {
+			List<ConnectorWebhooks.SiteInfo> listed = ConnectorWebhooks.sites();
+			List<String> unguarded = ConnectorWebhooks.sitesWithoutGuestAccess();
+
+			Assert.isNotNull(listed, 'A list, empty when the org has no active Site.');
+			Set<String> names = new Set<String>();
+			for (ConnectorWebhooks.SiteInfo info : listed) {
+				names.add(info.name);
+				Assert.isTrue(info.url == null || !info.url.endsWith('/'), 'An address has no trailing slash.');
+			}
+			Assert.isTrue(names.containsAll(unguarded), 'Only listed Sites can lack guest access.');
+		}
+	}
+
+	@IsTest
+	static void anAddressIsRefusedWhenTheConnectionHasNoNamedCredentialToHoldItTo() {
+		System.runAs(admin()) {
+			String refusal = BarnHelp.text('Connector', 'Connector_Run_ErrorDataAddress');
+			Integer refused = 0;
+			for (Integer attempt = 0; attempt < 2; attempt++) {
+				try {
+					ConnectorWebhooks.calloutAddress('https://api.example.com/v3/x', 'BarnConn_Rest_NoSuchConnection');
+				} catch (ConnectorRecipeDocument.DocumentException e) {
+					Assert.areEqual(refusal, e.getMessage());
+					refused++;
+				}
+			}
+			Assert.areEqual(2, refused, 'There is no host to compare with, so nothing is called, on every read.');
+		}
+	}
+
+	@IsTest
+	static void healthCheckNamesASiteWhoseGuestLacksTheReceiverAndLeavesOnesThatHoldIt() {
+		User bare = TestUsers.standardUser('GuestBare');
+		User covered = TestUsers.standardUserWith('GuestCovered', new List<String>{ ConnectorWebhooks.GUEST_SET });
+		System.runAs(admin()) {
+			Connector_Recipe__c recipe = ConnectorRecipeTestData.recipe(
+				'Hooked',
+				webhookDocument('{}', STOP),
+				true,
+				ConnectorRecipes.RUN_AS_AUTOMATION
+			);
+			recipe.Trigger_Kind__c = ConnectorWebhooks.WEBHOOK;
+			update as system recipe;
+			ConnectorWebhooks.SiteInfo open = site('Open Site', 'https://open.example.org');
+			open.guestUserId = bare.Id;
+			ConnectorWebhooks.SiteInfo ready = site('Ready Site', 'https://ready.example.org');
+			ready.guestUserId = covered.Id;
+			ConnectorWebhooks.testSites = new List<ConnectorWebhooks.SiteInfo>{ open, ready };
+
+			List<HealthCheckService.Finding> found = ConnectorWebhooks.findings();
+
+			Assert.areEqual(1, found.size());
+			Assert.areEqual(ConnectorWebhooks.FIX_GUEST, found[0].getKey());
+			Assert.isTrue(found[0].getDetail().contains('Open Site'), 'The Site without access is named.');
+			Assert.isFalse(found[0].getDetail().contains('Ready Site'), 'One that holds the set is not.');
+			Assert.areEqual(new List<String>{ 'Open Site' }, ConnectorWebhooks.sitesWithoutGuestAccess());
+		}
+	}
+
+	@IsTest
+	static void theFixGivesTheReceiversSetToTheNamedSitesGuestsOnly() {
+		User named = TestUsers.standardUser('GuestNamed');
+		User other = TestUsers.standardUser('GuestOther');
+		System.runAs(admin()) {
+			ConnectorWebhooks.SiteInfo first = site('Named Site', 'https://named.example.org');
+			first.guestUserId = named.Id;
+			ConnectorWebhooks.SiteInfo second = site('Other Site', 'https://other.example.org');
+			second.guestUserId = other.Id;
+			ConnectorWebhooks.SiteInfo noGuest = site('Guestless Site', 'https://none.example.org');
+			ConnectorWebhooks.testSites = new List<ConnectorWebhooks.SiteInfo>{ first, second, noGuest };
+
+			Test.startTest();
+			String done = ConnectorWebhooks.grantGuestAccess(new List<String>{ 'Named Site', 'Guestless Site' });
+			Test.stopTest();
+
+			Assert.isTrue(done.contains('Named Site'), 'The message names what was done.');
+			Assert.areEqual(new List<String>{ 'Other Site' }, ConnectorWebhooks.sitesWithoutGuestAccess());
+			Assert.areEqual(
+				1,
+				[
+					SELECT COUNT()
+					FROM PermissionSetAssignment
+					WHERE AssigneeId = :named.Id AND PermissionSet.Name = :ConnectorWebhooks.GUEST_SET
+					WITH SYSTEM_MODE
+				]
+			);
+		}
+	}
+
 	private static ConnectorWebhooks.SiteInfo site(String name, String url) {
 		ConnectorWebhooks.SiteInfo info = new ConnectorWebhooks.SiteInfo();
 		info.name = name;
