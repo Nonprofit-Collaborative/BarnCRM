@@ -10,7 +10,7 @@ public with sharing class ConnectorIdentity {
 	/** Packaged sets never offered: Connector's own, and app or tab sets that grant no data. */
 	private static final Set<String> NEVER = new Set<String>{
 		ConnectorConnections.ADMIN_SET,
-		'BarnCRM_Connector_Viewer',
+		'Connector_Viewer',
 		ConnectorConnections.ACCESS_SET
 	};
 	private static final Set<String> NOT_DEFAULT = new Set<String>{

@@ -55,6 +55,13 @@ export default class HubErrors extends NavigationMixin(LightningElement) {
     return this.loaded && this.newErrorCount === 0;
   }
 
+  /** "Error" under a count of exactly one, "Errors" otherwise. */
+  get errorCountLabel() {
+    return this.newErrorCount === 1 && !this.newErrorCountCapped
+      ? helpText('Core', 'Core_HubHome_ErrorOne')
+      : this.labels.errors;
+  }
+
   /** The tile's figure: the count, or the cap with a plus once there are more than it counts. */
   get errorCountValue() {
     return this.newErrorCountCapped ? `${this.newErrorCount}+` : this.newErrorCount;

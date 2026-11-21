@@ -61,5 +61,5 @@ editions, not installed by default.
   `ConnectorWhereUsedExtension` (registered in Core's `WhereUsedExtensions`) and
   `ConnectorPostInstall`.
 - App `BarnCRM_Connector` (console; left out on capped orgs, ADR-0223), tab `Super_Connector`,
-  custom permission `Manage_BarnCRM_Connector`, permission sets `BarnCRM_Connector_Admin` and
-  `BarnCRM_Connector_Viewer`, help texts `BarnHelp_Connector`.
+  custom permission `Manage_BarnCRM_Connector`, permission sets `Connector_Admin` and
+  `Connector_Viewer`, help texts `BarnHelp_Connector`.

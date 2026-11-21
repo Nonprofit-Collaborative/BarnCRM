@@ -114,7 +114,7 @@ budget (197 of 200) bound the design.
     - **F3** Credential writes check `Manage_BarnCRM_Connector` and `ManageNamedCredentials` or
       Customize Application first, and call ConnectApi synchronously as that user; a secret is
       never queued, scheduled, published or passed to a recipe identity. The controller is in
-      `BarnCRM_Connector_Admin` only and is never exposed through Visualforce or REST.
+      `Connector_Admin` only and is never exposed through Visualforce or REST.
     - **F4** Base URLs are `https`; scheme and host cannot change while a secret is stored (a new
       connection, or URL and secret replaced together); catalog hosts are locked to their pattern
       (Mailchimp `{dc}` matches `^[a-z]{2}[0-9]{1,3}$`); appended paths start with one `/` and
@@ -144,7 +144,7 @@ budget (197 of 200) bound the design.
       account the check call returns where available, and Health Check lists keys changed in the
       last 7 days.
     - **F12** The "BarnCRM Connections" permission set is assigned only to holders of
-      `BarnCRM_Connector_Admin` and the recipe identities, never to client-supplied Ids, and Health
+      `Connector_Admin` and the recipe identities, never to client-supplied Ids, and Health
       Check warns if it holds anything but principal access.
     - **F13** The header token above; payload values are subject to F1; the guest permission set
       holds only the REST class and create on the start event.
@@ -192,7 +192,7 @@ budget (197 of 200) bound the design.
 - Recipes survive staff leaving and staff permission changes. Created By and Last Modified By show
   Automated Process or the integration user; Run History ties each written record to its recipe,
   version and publisher. Anyone who can publish recipes acts with the chosen identity's access, so
-  publishing and Run As are limited to `BarnCRM_Connector_Admin`.
+  publishing and Run As are limited to `Connector_Admin`.
 - A deactivated integration user stops its recipes until another is chosen, and a deactivated
   record owner makes creates fail; Health Check reports both.
 - The suite reaches 199 of 200 objects; the next object anywhere needs a cut.

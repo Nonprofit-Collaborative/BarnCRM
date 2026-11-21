@@ -25,7 +25,7 @@ const VIEW = {
       folder: 'BarnCRM Giving',
       description: 'Gave last year'
     },
-    { id: '00O000000000002AAA', name: 'Errors by Day', folder: 'BarnCRM Admin' }
+    { id: '00O000000000002AAA', name: 'Errors Logged by Day', folder: 'BarnCRM Admin' }
   ]
 };
 

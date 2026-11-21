@@ -30,6 +30,9 @@ import PAUSED_PREFIX from '@salesforce/label/c.Core_AutomationControl_PausedPref
 import PAUSED_BY from '@salesforce/label/c.Core_AutomationControl_PausedBy';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Automation_UnexpectedError';
 import ALWAYS_RUNS from '@salesforce/label/c.Core_Automation_AlwaysRuns';
+import ALWAYS_RUNS_SHORT from '@salesforce/label/c.Core_OrgAutomation_AlwaysRuns';
+import SWITCH_ACTIVE from '@salesforce/label/c.Core_MatchLogic_Active';
+import SWITCH_INACTIVE from '@salesforce/label/c.Core_MatchLogic_Inactive';
 import PEOPLE_TITLE from '@salesforce/label/c.Core_AutomationControl_PeopleTitle';
 import FLOWS_TITLE from '@salesforce/label/c.Core_AutomationControl_FlowsTitle';
 import CATCH_UP_BUTTON from '@salesforce/label/c.Core_AutomationControl_CatchUpButton';
@@ -215,6 +218,10 @@ export default class AutomationControl extends LightningElement {
         alwaysRuns: automation.alwaysRuns === true,
         featureOff: automation.featureOff === true,
         toggleDisabled: this.controlsDisabled || automation.alwaysRuns === true,
+        // The switch of an automation that always runs is shown off (ADR-0024); under it,
+        // "Always Runs" rather than "Inactive", which read as if it did not run.
+        switchActiveText: SWITCH_ACTIVE,
+        switchOffText: automation.alwaysRuns === true ? ALWAYS_RUNS_SHORT : SWITCH_INACTIVE,
         removable: automation.removable === true,
         removeTitle: `${REMOVE}: ${automation.label}`,
         statusLine:

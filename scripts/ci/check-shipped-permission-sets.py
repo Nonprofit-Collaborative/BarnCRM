@@ -51,12 +51,31 @@ def render(names):
     return "\n".join(lines)
 
 
+def module_sets_named_like_core():
+    """A module's set named `BarnCRM_...`: Core treats that prefix as its own (TabAccessService
+    refuses to give such a set from a module sync), so the module's access sync throws in every
+    org (the Connector's sets did, mwdbdevsb 2026-11-21). Module sets use the module's name."""
+    found = []
+    for path in glob.glob(os.path.join("packages", "*", "**", "*" + SUFFIX), recursive=True):
+        package = path.split(os.sep)[1]
+        name = os.path.basename(path)[: -len(SUFFIX)]
+        if package != "core" and name.lower().startswith("barncrm_"):
+            found.append(path)
+    return sorted(found)
+
+
 def main():
     names = shipped()
     expected = render(names)
     if "--print" in sys.argv[1:]:
         sys.stdout.write(expected)
         return 0
+    misnamed = module_sets_named_like_core()
+    if misnamed:
+        for path in misnamed:
+            print(path + ": a module permission set must not start with BarnCRM_ (Core's own sets do).")
+        print("check-shipped-permission-sets.py: FAILED")
+        return 1
     try:
         with open(CLASS, encoding="utf-8") as handle:
             actual = handle.read()
