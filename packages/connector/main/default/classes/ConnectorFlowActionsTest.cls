@@ -96,8 +96,8 @@ private class ConnectorFlowActionsTest {
 	@IsTest
 	static void aSavedMapReadsASourceRecordAndUpdatesTheRecordGiven() {
 		System.runAs(admin()) {
-			Contact source = new Contact(LastName = 'Source', Email = 'source@example.org');
-			Contact target = new Contact(LastName = 'Target');
+			Contact source = TestDataFactory.person(new Contact(LastName = 'Source', Email = 'source@example.org'));
+			Contact target = TestDataFactory.person(new Contact(LastName = 'Target'));
 			insert as system new List<Contact>{ source, target };
 			ConnectorRecipeTestData.saveMap(
 				'Copy Name',

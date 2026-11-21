@@ -204,22 +204,31 @@ public with sharing class ConnectorWebhooks {
 		);
 	}
 
-	/** A connection's Named Credential address, read in system mode, server side only (F5). */
+	/**
+	 * A connection's Named Credential address, read in system mode, server side only (F5), once
+	 * per transaction: a For Each may fetch back an address for every item.
+	 */
 	private static String endpointOf(String connection) {
 		if (testEndpoints != null) {
 			return testEndpoints.get(connection);
 		}
-		for (NamedCredential named : [
-			SELECT Endpoint
-			FROM NamedCredential
-			WHERE DeveloperName = :connection AND NamespacePrefix = NULL
-			WITH SYSTEM_MODE
-			LIMIT 1
-		]) {
-			return named.Endpoint;
+		if (!endpoints.containsKey(connection)) {
+			String found;
+			for (NamedCredential named : [
+				SELECT Endpoint
+				FROM NamedCredential
+				WHERE DeveloperName = :connection AND NamespacePrefix = NULL
+				WITH SYSTEM_MODE
+				LIMIT 1
+			]) {
+				found = named.Endpoint;
+			}
+			endpoints.put(connection, found);
 		}
-		return null;
+		return endpoints.get(connection);
 	}
+
+	private static Map<String, String> endpoints = new Map<String, String>();
 
 	// ---------------------------------------------------------------------------------------
 	// The Webhook card: addresses, token, hourly cap (R-CR3, R-CR10)

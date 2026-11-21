@@ -68,7 +68,7 @@ public class ConnectorRecipeTestData {
 			Is_Test__c = isTest
 		);
 		ConnectorRunStore.queue(new List<Connector_Run__c>{ run });
-		for (Connector_Run__c queued : ConnectorRunStore.queued(50)) {
+		for (Connector_Run__c queued : ConnectorRunStore.queued(50, ConnectorRunStore.ALL_RUN_AS, false)) {
 			if (queued.Id == run.Id) {
 				return queued;
 			}
@@ -78,7 +78,10 @@ public class ConnectorRecipeTestData {
 
 	/** Runs every queued run the way the runner's job does, in this transaction. */
 	public static Connector_Run__c runAll(Id runId) {
-		ConnectorRunner.process(ConnectorRunStore.queued(50), new ConnectorRunner.Guard());
+		ConnectorRunner.process(
+			ConnectorRunStore.queued(50, ConnectorRunStore.ALL_RUN_AS, false),
+			new ConnectorRunner.Guard()
+		);
 		return [
 			SELECT
 				Id,
@@ -100,13 +103,22 @@ public class ConnectorRecipeTestData {
 		ConnectorConnections.org = new FakeOrg();
 	}
 
+	/** A faked credential store with no connection, so no test reads the org's own. */
+	public static void noConnections() {
+		FakeOrg empty = new FakeOrg();
+		empty.labels = new Map<String, String>();
+		ConnectorConnections.org = empty;
+	}
+
 	public class FakeOrg extends ConnectorOrg {
+		public Map<String, String> labels = new Map<String, String>{ CONNECTION => 'Test App' };
+
 		public FakeOrg() {
 			fake = true;
 		}
 
 		public override Map<String, String> labelsByName() {
-			return new Map<String, String>{ CONNECTION => 'Test App' };
+			return labels;
 		}
 
 		public override ConnectorOrg.Pair read(String name, String label) {
@@ -119,10 +131,6 @@ public class ConnectorRecipeTestData {
 			pair.calloutsEnabled = true;
 			pair.keyStored = true;
 			return pair;
-		}
-
-		public override Map<String, Id> principalIds() {
-			return new Map<String, Id>();
 		}
 
 		public override Set<Id> grantedEntities(Id permissionSetId) {

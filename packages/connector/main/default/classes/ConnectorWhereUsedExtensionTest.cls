@@ -26,9 +26,18 @@ private class ConnectorWhereUsedExtensionTest {
 				true,
 				ConnectorRecipes.RUN_AS_AUTOMATION
 			);
+			ConnectorRecipeTestData.recipe(
+				'Watches Titles',
+				'{"version":1,"trigger":{"kind":"record","on":"changed","mode":"each","query":{"version":1,' +
+					'"object":"Contact","fields":["LastName"],"filter":{"version":1,"conditions":' +
+					'[{"id":1,"field":"Title","operator":"is not null"}]}}},"steps":[]}',
+				true,
+				ConnectorRecipes.RUN_AS_AUTOMATION
+			);
 			ConnectorWhereUsedExtension extension = new ConnectorWhereUsedExtension();
 
 			Test.startTest();
+			List<WhereUsedService.Reference> title = extension.references(WhereUsedService.target('Contact', 'Title'));
 			List<WhereUsedService.Reference> email = extension.references(WhereUsedService.target('Contact', 'Email'));
 			List<WhereUsedService.Reference> phone = extension.references(WhereUsedService.target('Contact', 'Phone'));
 			List<WhereUsedService.Reference> contact = extension.references(WhereUsedService.target('Contact', null));
@@ -44,7 +53,13 @@ private class ConnectorWhereUsedExtensionTest {
 			);
 			Assert.isTrue(email[0].getEditTab().endsWith('Super_Connector'));
 			Assert.isTrue(phone.isEmpty());
-			Assert.areEqual(1, contact.size());
+			Assert.areEqual(1, title.size(), 'A Record Change trigger that filters on the field is listed.');
+			Assert.areEqual('Watches Titles', title[0].getName());
+			Assert.areEqual(
+				new List<String>{ BarnHelp.text('Connector', 'Connector_WhereUsed_Trigger') },
+				title[0].getParts()
+			);
+			Assert.areEqual(2, contact.size(), 'The Find step and the trigger both name Contact.');
 			Assert.areEqual(1, mapUsers.size(), 'The Mapper warns before a linked map changes.');
 			Assert.areEqual(
 				new List<String>{ BarnHelp.text('Connector', 'Connector_WhereUsed_Step', new List<Object>{ 'make' }) },

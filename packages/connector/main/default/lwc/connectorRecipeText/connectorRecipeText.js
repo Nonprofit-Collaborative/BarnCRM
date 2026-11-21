@@ -279,11 +279,11 @@ const TEXTS = {
   get Connector_Editor_Method() {
     return helpText('Connector', 'Connector_Editor_Method');
   },
-  get Connector_Editor_MoveDown() {
-    return helpText('Connector', 'Connector_Editor_MoveDown');
+  get Connector_Editor_MoveDownStep() {
+    return helpText('Connector', 'Connector_Editor_MoveDownStep');
   },
-  get Connector_Editor_MoveUp() {
-    return helpText('Connector', 'Connector_Editor_MoveUp');
+  get Connector_Editor_MoveUpStep() {
+    return helpText('Connector', 'Connector_Editor_MoveUpStep');
   },
   get Connector_Editor_Name() {
     return helpText('Connector', 'Connector_Editor_Name');
@@ -333,8 +333,11 @@ const TEXTS = {
   get Connector_Editor_RecordId() {
     return helpText('Connector', 'Connector_Editor_RecordId');
   },
-  get Connector_Editor_Remove() {
-    return helpText('Connector', 'Connector_Editor_Remove');
+  get Connector_Editor_RemoveEntry() {
+    return helpText('Connector', 'Connector_Editor_RemoveEntry');
+  },
+  get Connector_Editor_RemoveStep() {
+    return helpText('Connector', 'Connector_Editor_RemoveStep');
   },
   get Connector_Editor_RunAs() {
     return helpText('Connector', 'Connector_Editor_RunAs');
@@ -645,6 +648,18 @@ const TEXTS = {
   get Connector_Runs_Steps() {
     return helpText('Connector', 'Connector_Runs_Steps');
   },
+  get Connector_Runs_Attempts() {
+    return helpText('Connector', 'Connector_Runs_Attempts');
+  },
+  get Connector_Runs_Tested() {
+    return helpText('Connector', 'Connector_Runs_Tested');
+  },
+  get Connector_Runs_VersionStep() {
+    return helpText('Connector', 'Connector_Runs_VersionStep');
+  },
+  get Connector_Recipe_ErrorSignInHeader() {
+    return helpText('Connector', 'Connector_Recipe_ErrorSignInHeader');
+  },
   get Connector_Runs_WouldDo() {
     return helpText('Connector', 'Connector_Runs_WouldDo');
   },
@@ -698,9 +713,6 @@ const TEXTS = {
   },
   get Connector_Status_Received() {
     return helpText('Connector', 'Connector_Status_Received');
-  },
-  get Connector_Status_Rejected() {
-    return helpText('Connector', 'Connector_Status_Rejected');
   },
   get Connector_Status_Running() {
     return helpText('Connector', 'Connector_Status_Running');

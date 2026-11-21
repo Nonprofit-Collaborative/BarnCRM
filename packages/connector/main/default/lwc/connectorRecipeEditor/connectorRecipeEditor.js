@@ -265,15 +265,6 @@ export default class ConnectorRecipeEditor extends LightningElement {
     get stepName() {
       return text('Connector_Editor_StepName');
     },
-    get moveUp() {
-      return text('Connector_Editor_MoveUp');
-    },
-    get moveDown() {
-      return text('Connector_Editor_MoveDown');
-    },
-    get remove() {
-      return text('Connector_Editor_Remove');
-    },
     get pathsHint() {
       return text('Connector_Editor_PathsHint');
     },
@@ -714,7 +705,12 @@ export default class ConnectorRecipeEditor extends LightningElement {
           index,
           key: `${row.key}-${field}-${index}`,
           shown: entry.path || entry.value || '',
-          valueShown: !/null/.test(entry.operator || '')
+          valueShown: !/null/.test(entry.operator || ''),
+          removeLabel: text(
+            'Connector_Editor_RemoveEntry',
+            entry.name || entry.path || index + 1,
+            step.id
+          )
         }));
       return {
         key: row.key,
@@ -722,6 +718,9 @@ export default class ConnectorRecipeEditor extends LightningElement {
         step,
         indentClass: `slds-var-m-bottom_small slds-box slds-box_x-small connector-depth-${row.depth}`,
         heading: text('Connector_Editor_StepHeading', kind ? text(kind.key) : step.kind, step.id),
+        moveUpLabel: text('Connector_Editor_MoveUpStep', step.id),
+        moveDownLabel: text('Connector_Editor_MoveDownStep', step.id),
+        removeLabel: text('Connector_Editor_RemoveStep', step.id),
         branchLabel: row.depth > 0 ? text(BRANCH_LABELS[row.branch]) : '',
         isForEach: step.kind === 'forEach',
         isWait: step.kind === 'wait',

@@ -7,7 +7,6 @@
 private class ConnectorHealthCheckExtensionTest {
 	private class FakeOrg extends ConnectorOrg {
 		Map<String, ConnectorOrg.Pair> pairs = new Map<String, ConnectorOrg.Pair>();
-		Map<String, Id> principals = new Map<String, Id>();
 		Set<Id> granted = new Set<Id>();
 
 		FakeOrg() {
@@ -24,8 +23,8 @@ private class ConnectorHealthCheckExtensionTest {
 			pair.calloutsEnabled = calloutsOn;
 			pair.keyStored = true;
 			pairs.put(name, pair);
-			Id principal = Id.valueOf('001' + String.valueOf(principals.size() + 1).leftPad(12, '0'));
-			principals.put(name, principal);
+			Id principal = Id.valueOf('001' + String.valueOf(pairs.size()).leftPad(12, '0'));
+			pair.principalId = principal;
 			if (accessOn) {
 				granted.add(principal);
 			}
@@ -41,10 +40,6 @@ private class ConnectorHealthCheckExtensionTest {
 
 		public override ConnectorOrg.Pair read(String name, String label) {
 			return pairs.get(name);
-		}
-
-		public override Map<String, Id> principalIds() {
-			return principals.clone();
 		}
 
 		public override Set<Id> grantedEntities(Id permissionSetId) {

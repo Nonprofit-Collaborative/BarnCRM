@@ -9,9 +9,12 @@
                     <c-connector-recipes open-recipe-id={openRecipeId} open-draft={openDraft} data-id="recipes"></c-connector-recipes>
                 </lightning-tab>
                 <lightning-tab label={labels.runsTab} value="runs" onactive={handleTabActive} data-id="tab-runs">
-                    <c-connector-runs can-manage={loaded} data-id="runs"></c-connector-runs>
+                    <c-connector-runs can-manage={canManage} data-id="runs"></c-connector-runs>
                 </lightning-tab>
                 <lightning-tab label={labels.connections} value="connections" onactive={handleTabActive} data-id="tab-connections">
+                    <template lwc:if={viewerOnly}>
+                        <c-barn-notice class="slds-var-m-bottom_medium" variant="info" message={labels.viewerNotice} data-id="viewer-notice"></c-barn-notice>
+                    </template>
                     <template lwc:if={message}>
                         <c-barn-notice class="slds-var-m-bottom_medium" variant={messageVariant} message={message} data-id="message"></c-barn-notice>
                     </template>

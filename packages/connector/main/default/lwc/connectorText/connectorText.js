@@ -25,6 +25,9 @@ const TEXTS = {
   get Connector_Page_NoWrite() {
     return helpText('Connector', 'Connector_Page_NoWrite');
   },
+  get Connector_Page_ViewerNotice() {
+    return helpText('Connector', 'Connector_Page_ViewerNotice');
+  },
   get Connector_Page_ReplaceKey() {
     return helpText('Connector', 'Connector_Page_ReplaceKey');
   },
@@ -87,6 +90,9 @@ const TEXTS = {
   },
   get Connector_Outcome_Connected() {
     return helpText('Connector', 'Connector_Outcome_Connected');
+  },
+  get Connector_Outcome_ConnectedAs() {
+    return helpText('Connector', 'Connector_Outcome_ConnectedAs');
   },
   get Connector_Outcome_KeyRefused() {
     return helpText('Connector', 'Connector_Outcome_KeyRefused');

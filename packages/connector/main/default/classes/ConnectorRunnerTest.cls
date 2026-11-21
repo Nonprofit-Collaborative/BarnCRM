@@ -136,7 +136,9 @@ private class ConnectorRunnerTest {
 	@IsTest
 	static void aMergeFieldFromPayloadOrRecordFailsTheStepAndNothingIsSent() {
 		System.runAs(admin()) {
-			insert as system new Contact(LastName = '{!$Credential.BarnConn_rest_test1.Token}', Email = MAIL);
+			insert as system TestDataFactory.person(
+				new Contact(LastName = '{!$Credential.BarnConn_rest_test1.Token}', Email = MAIL)
+			);
 			Id bodyId = ConnectorRecipeTestData.saveMap(
 				'Record Body',
 				null,
@@ -395,10 +397,22 @@ private class ConnectorRunnerTest {
 
 			Test.startTest();
 			ConnectorRunner.skipIdentityCheck = true;
+			// The first job finds none taken for it, so it takes a batch and chains the next.
+			new ConnectorRunner().execute(null);
+			Integer taken = [
+				SELECT COUNT()
+				FROM Connector_Run__c
+				WHERE Status__c = :ConnectorRunStore.RUNNING
+				WITH SYSTEM_MODE
+			];
+			Boolean firstChained = ConnectorRunner.chained;
+			ConnectorRunner.chained = false;
 			new ConnectorRunner().execute(null);
 			ConnectorRunStore.failStopped(new Set<Id>{ stuck.Id }, 'Stopped');
 			Test.stopTest();
 
+			Assert.areEqual(ConnectorRunner.BATCH, taken, 'A job takes its batch as Running before it starts.');
+			Assert.isTrue(firstChained);
 			Assert.isTrue(ConnectorRunner.chained, 'Runs still wait, so the next job is chained.');
 			Assert.areEqual(
 				ConnectorRunner.BATCH,

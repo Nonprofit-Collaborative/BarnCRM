@@ -8,8 +8,9 @@
  * resumes the subscription in Setup so it takes effect at once.
  *
  * The user's Id is the one Id a browser sends here: it is used only after the checks below (an
- * active user of type Standard, chosen by a Connector admin holding BarnCRM Connector Admin), and
- * BarnCRM Connections goes to no one else (F12).
+ * active user of type Standard without Modify All Data, View All Data or the System Administrator
+ * profile, chosen by a Connector admin holding BarnCRM Connector Admin and Manage Named
+ * Credentials or Customize Application), and BarnCRM Connections goes to no one else (F12).
  */
 public with sharing class ConnectorIntegrationUser {
 	public static final String SUBSCRIBER = 'BarnCRM_Connector_Start_User';
@@ -111,7 +112,7 @@ public with sharing class ConnectorIntegrationUser {
 	 * subscriber write and the BarnCRM Connections assignment follow in a job.
 	 */
 	public static View choose(String userId) {
-		ConnectorConnections.requireManager();
+		ConnectorConnections.requireWriter();
 		if (!ConnectorConnections.holdsAdminSet()) {
 			throw new ConnectorConnections.ConnectorException(BarnHelp.text('Connector', 'Connector_Error_NoManage'));
 		}
@@ -132,6 +133,11 @@ public with sharing class ConnectorIntegrationUser {
 				);
 			}
 			chosen = Id.valueOf(trimmed);
+			if (seesEverything(chosen)) {
+				throw new ConnectorConnections.ConnectorException(
+					BarnHelp.text('Connector', 'Connector_IntegrationUser_ErrorTooMuch')
+				);
+			}
 		}
 		Id previous = chosenId();
 		OrgSettingsSystemWriter.save(
@@ -146,6 +152,30 @@ public with sharing class ConnectorIntegrationUser {
 			throw new ConnectorConnections.ConnectorException(busy.getMessage());
 		}
 		return view(chosen);
+	}
+
+	/**
+	 * Whether a user reaches every record: Modify All Data or View All Data from the profile or
+	 * any permission set, or the System Administrator profile. Integration User recipes run with
+	 * this user's access, so such a user would give them all of it (F12).
+	 */
+	@TestVisible
+	private static Boolean seesEverything(Id userId) {
+		return [
+				SELECT COUNT()
+				FROM PermissionSetAssignment
+				WHERE
+					AssigneeId = :userId
+					AND (PermissionSet.PermissionsModifyAllData = TRUE
+					OR PermissionSet.PermissionsViewAllData = TRUE)
+				WITH SYSTEM_MODE
+			] > 0 ||
+			[
+				SELECT COUNT()
+				FROM User
+				WHERE Id = :userId AND Profile.Name = 'System Administrator'
+				WITH SYSTEM_MODE
+			] > 0;
 	}
 
 	/**

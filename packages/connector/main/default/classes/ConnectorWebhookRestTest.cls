@@ -136,7 +136,10 @@ private class ConnectorWebhookRestTest {
 
 			Assert.areEqual(202, receive(request).statusCode);
 			Assert.areEqual(1, runs().size());
-			Assert.isTrue(ConnectorRunStore.queued(50).isEmpty(), 'Not run until Resume.');
+			Assert.isTrue(
+				ConnectorRunStore.queued(50, ConnectorRunStore.ALL_RUN_AS, false).isEmpty(),
+				'Not run until Resume.'
+			);
 		}
 	}
 
@@ -234,7 +237,10 @@ private class ConnectorWebhookRestTest {
 			receive(request);
 
 			Test.startTest();
-			ConnectorRunner.process(ConnectorRunStore.queued(50), new ConnectorRunner.Guard());
+			ConnectorRunner.process(
+				ConnectorRunStore.queued(50, ConnectorRunStore.ALL_RUN_AS, false),
+				new ConnectorRunner.Guard()
+			);
 			Test.stopTest();
 
 			Assert.areEqual(ConnectorRunStore.SUCCEEDED, runs()[0].Status__c);

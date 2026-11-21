@@ -532,6 +532,17 @@ export function headerNameOk(name) {
   );
 }
 
+/** A header name that says it signs in (R-CR15). */
+export const SIGN_IN_HEADER = /(key|token|secret|auth|password|signature|session)/i;
+
+/**
+ * True for a sign-in-looking header with a typed value: every Connector viewer can read a recipe,
+ * so Save refuses it; a value read from the data (a path) is fine.
+ */
+export function literalSignIn(header) {
+  return Boolean(header && SIGN_IN_HEADER.test(header.name || '') && !header.path && header.value);
+}
+
 function valueOk(entry) {
   if (entry && entry.path) {
     return isPill(entry.path);
@@ -649,6 +660,10 @@ function callProblem(step, at) {
   }
   if (!(step.headers || []).every((header) => headerNameOk(header.name) && valueOk(header))) {
     return { key: 'Connector_Recipe_ErrorHeader', args: at };
+  }
+  const signIn = (step.headers || []).find(literalSignIn);
+  if (signIn) {
+    return { key: 'Connector_Recipe_ErrorSignInHeader', args: [at[0], signIn.name] };
   }
   if (!(step.success || []).every((code) => Number.isInteger(code) && code >= 100 && code <= 599)) {
     return { key: 'Connector_Recipe_ErrorCodes', args: at };
@@ -819,7 +834,19 @@ export function statusVariant(status) {
   );
 }
 
-/** A run's step log as rows to show, oldest first; blank or unreadable is none. */
+/** Step log kinds that are not steps: an App Poll's look and a version note. */
+const LOG_KINDS = { appPoll: 'Connector_Trigger_AppPoll', version: 'Connector_Runs_VersionStep' };
+/** Each step log outcome's help key. */
+const OUTCOME_KEYS = {
+  succeeded: 'Connector_Status_Succeeded',
+  failed: 'Connector_Status_Failed',
+  tested: 'Connector_Runs_Tested'
+};
+
+/**
+ * A run's step log as rows to show, oldest first, each with the help keys of its kind and
+ * outcome; blank or unreadable is none.
+ */
 export function stepRows(stepLogJson, resultsJson) {
   let log = [];
   let results = {};
@@ -836,11 +863,14 @@ export function stepRows(stepLogJson, resultsJson) {
   return (Array.isArray(log) ? log : []).map((entry, index) => {
     const result = results[entry.step];
     const preview = result && (result.wouldWrite || result.request);
+    const stepKind = STEP_KINDS.find((each) => each.value === entry.kind);
     return {
       key: `${entry.step}-${index}`,
       step: entry.step,
       kind: entry.kind,
+      kindKey: stepKind ? stepKind.key : LOG_KINDS[entry.kind] || '',
       outcome: entry.outcome,
+      outcomeKey: OUTCOME_KEYS[entry.outcome] || '',
       ms: entry.ms,
       message: entry.message,
       status: entry.status,

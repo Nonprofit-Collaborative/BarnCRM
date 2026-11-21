@@ -18,6 +18,11 @@ public virtual with sharing class ConnectorOrg {
 		public String label;
 		/** The principal's name, which is the auth kind (R-CN2). */
 		public String principal;
+		/**
+		 * The Id `ConnectApi` gives the named principal: the setup entity a permission set's
+		 * principal access names.
+		 */
+		public Id principalId;
 		/** The Named Credential's URL. Server side only: never returned to the browser (F5). */
 		public String url;
 		public Boolean linked = false;
@@ -59,32 +64,12 @@ public virtual with sharing class ConnectorOrg {
 			for (ConnectApi.ExternalCredentialPrincipal principal : external.principals) {
 				pair.principal = principal.principalName;
 				pair.keyStored = String.valueOf(principal.authenticationStatus) == 'Configured';
+				pair.principalId = String.isNotBlank(principal.id) ? Id.valueOf(principal.id) : null;
 			}
 			return pair;
 		} catch (Exception unreadable) {
 			return null;
 		}
-	}
-
-	/**
-	 * The Ids of the `BarnConn_` principals by credential name: the Id `ConnectApi` gives a named
-	 * principal, which is the setup entity a permission set's principal access names.
-	 */
-	public virtual Map<String, Id> principalIds() {
-		Map<String, Id> found = new Map<String, Id>();
-		for (String name : labelsByName().keySet()) {
-			try {
-				ConnectApi.ExternalCredential external = ConnectApi.NamedCredentials.getExternalCredential(name);
-				for (ConnectApi.ExternalCredentialPrincipal principal : external.principals) {
-					if (String.isNotBlank(principal.id)) {
-						found.put(name, Id.valueOf(principal.id));
-					}
-				}
-			} catch (Exception unreadable) {
-				continue;
-			}
-		}
-		return found;
 	}
 
 	/** The setup entities the permission set gives access to, by Id. */

@@ -36,10 +36,6 @@ public with sharing class ConnectorRecipeFiles {
 		'allowmergefieldsinbody',
 		'allowmergefieldsinheader'
 	};
-	/** A header whose name says it signs in: its literal value is never exported or imported. */
-	private static final Pattern SIGN_IN_HEADER = Pattern.compile(
-		'(?i).*(key|token|secret|auth|password|signature|session).*'
-	);
 	/** A Bearer or Basic sign-in value: the word, then a run of 12 or more token characters with a digit. */
 	private static final Pattern SIGN_IN_VALUE = Pattern.compile(
 		'(?i)\\s*(bearer|basic)\\s+(?=[A-Za-z._~+/=-]*[0-9])[A-Za-z0-9._~+/=-]{12,}\\s*'
@@ -116,6 +112,9 @@ public with sharing class ConnectorRecipeFiles {
 		public String baseUrl;
 		@AuraEnabled
 		public List<UrlParam> urlParams = new List<UrlParam>();
+		/** The template's check path, which Check Connection asks for (e1); blank is the base URL. */
+		@AuraEnabled
+		public String checkPath;
 	}
 
 	public class UrlParam {
@@ -256,9 +255,7 @@ public with sharing class ConnectorRecipeFiles {
 	}
 
 	private static Boolean signInHeader(Map<String, Object> header) {
-		return SIGN_IN_HEADER.matcher(ConnectorRecipeDocument.textOf(header.get('name'))).matches() &&
-			String.isBlank(ConnectorRecipeDocument.textOf(header.get('path'))) &&
-			String.isNotBlank(ConnectorRecipeDocument.textOf(header.get('value')));
+		return ConnectorRecipeDocument.literalSignIn(header);
 	}
 
 	// ---------------------------------------------------------------------------------------
@@ -269,7 +266,7 @@ public with sharing class ConnectorRecipeFiles {
 	public static Imported read(String source) {
 		ConnectorConnections.requireManager();
 		if (String.isBlank(source) || source.length() > MAX_FILE) {
-			throw refusal('Connector_Import_ErrorSize', null);
+			throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorSize', detail(null)));
 		}
 		Object raw;
 		try {
@@ -278,11 +275,11 @@ public with sharing class ConnectorRecipeFiles {
 			raw = null;
 		}
 		if (!(raw instanceof Map<String, Object>)) {
-			throw refusal('Connector_Import_ErrorUnreadable', null);
+			throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorUnreadable', detail(null)));
 		}
 		// Serialized again, so a `{!` written with JSON escapes is caught as well (F1).
 		if (JSON.serialize(raw).contains('{!')) {
-			throw refusal('Connector_Import_ErrorMergeField', null);
+			throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorMergeField', detail(null)));
 		}
 		scan(raw);
 		Map<String, Object> file = (Map<String, Object>) raw;
@@ -297,16 +294,22 @@ public with sharing class ConnectorRecipeFiles {
 			for (String key : entries.keySet()) {
 				String plain = key.toLowerCase().replace('-', '').replace('_', '');
 				if (SECRET_KEYS.contains(plain)) {
-					throw refusal('Connector_Import_ErrorSecret', key);
+					throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorSecret', detail(key)));
 				}
 				if (FORMULA_KEYS.contains(plain)) {
-					throw refusal('Connector_Import_ErrorFormula', key);
+					throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorFormula', detail(key)));
 				}
 				scan(entries.get(key));
 			}
 			for (Object header : ConnectorRecipeDocument.listOf(entries.get('headers'))) {
 				if (signInHeader(ConnectorRecipeDocument.mapOf(header))) {
-					throw refusal('Connector_Import_ErrorSecret', ConnectorRecipeDocument.mapOf(header).get('name'));
+					throw refusal(
+						BarnHelp.text(
+							'Connector',
+							'Connector_Import_ErrorSecret',
+							detail(ConnectorRecipeDocument.mapOf(header).get('name'))
+						)
+					);
 				}
 			}
 		} else if (value instanceof List<Object>) {
@@ -314,14 +317,20 @@ public with sharing class ConnectorRecipeFiles {
 				scan(item);
 			}
 		} else if (value instanceof String && SIGN_IN_VALUE.matcher((String) value).matches()) {
-			throw refusal('Connector_Import_ErrorSecret', ((String) value).trim().substringBefore(' '));
+			throw refusal(
+				BarnHelp.text(
+					'Connector',
+					'Connector_Import_ErrorSecret',
+					detail(((String) value).trim().substringBefore(' '))
+				)
+			);
 		}
 	}
 
 	private static Imported recipeFile(Map<String, Object> file) {
 		refuseUnknown(file, ENVELOPE_KEYS);
 		if (file.get('barnRecipe') != 1 || !(file.get('recipe') instanceof Map<String, Object>)) {
-			throw refusal('Connector_Import_ErrorUnreadable', null);
+			throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorUnreadable', detail(null)));
 		}
 		Imported result = new Imported();
 		result.kind = RECIPE;
@@ -341,6 +350,7 @@ public with sharing class ConnectorRecipeFiles {
 
 	private static Imported template(Map<String, Object> file) {
 		refuseUnknown(file, TEMPLATE_KEYS);
+		refuseNotYet(file, new List<String>{ 'pollers', 'webhook' });
 		String label = ConnectorRecipeDocument.textOf(file.get('label'));
 		if (
 			file.get('version') != 1 ||
@@ -348,7 +358,7 @@ public with sharing class ConnectorRecipeFiles {
 			label.trim().length() < 1 ||
 			label.length() > 80
 		) {
-			throw refusal('Connector_Import_ErrorUnreadable', null);
+			throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorUnreadable', detail(null)));
 		}
 		List<String> missing = new List<String>();
 		for (Object name : ConnectorRecipeDocument.listOf(file.get('requires'))) {
@@ -357,7 +367,9 @@ public with sharing class ConnectorRecipeFiles {
 			}
 		}
 		if (!missing.isEmpty()) {
-			throw refusal('Connector_Import_ErrorMissing', String.join(missing, ', '));
+			throw refusal(
+				BarnHelp.text('Connector', 'Connector_Import_ErrorMissing', detail(String.join(missing, ', ')))
+			);
 		}
 		Imported result = new Imported();
 		result.kind = TEMPLATE;
@@ -367,13 +379,13 @@ public with sharing class ConnectorRecipeFiles {
 		Map<String, Map<String, Object>> actions = actions(file);
 		List<Object> recipes = ConnectorRecipeDocument.listOf(file.get('recipes'));
 		if (recipes.size() > MAX_TEMPLATE_RECIPES) {
-			throw refusal('Connector_Import_ErrorUnreadable', null);
+			throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorUnreadable', detail(null)));
 		}
 		for (Object raw : recipes) {
 			Map<String, Object> recipe = ConnectorRecipeDocument.mapOf(raw);
 			refuseUnknown(recipe, TEMPLATE_RECIPE_KEYS);
 			if (!(recipe.get('draft') instanceof Map<String, Object>)) {
-				throw refusal('Connector_Import_ErrorUnreadable', null);
+				throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorUnreadable', detail(null)));
 			}
 			result.recipes.add(
 				prepared(
@@ -396,7 +408,7 @@ public with sharing class ConnectorRecipeFiles {
 		result.label = label;
 		result.authKind = ConnectorRecipeDocument.textOf(auth.get('kind'));
 		if (!ConnectorConnections.KINDS.contains(result.authKind)) {
-			throw refusal('Connector_Import_ErrorAuth', result.authKind);
+			throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorAuth', detail(result.authKind)));
 		}
 		for (Object raw : ConnectorRecipeDocument.listOf(auth.get('params'))) {
 			refuseUnknown(ConnectorRecipeDocument.mapOf(raw), PARAM_KEYS);
@@ -404,7 +416,7 @@ public with sharing class ConnectorRecipeFiles {
 		if (result.authKind == ConnectorConnections.API_KEY) {
 			result.headerName = ConnectorRecipeDocument.textOf(auth.get('headerName'));
 			if (!ConnectorRecipeDocument.headerNameOk(result.headerName)) {
-				throw refusal('Connector_Import_ErrorAuth', result.headerName);
+				throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorAuth', detail(result.headerName)));
 			}
 		}
 		Map<String, UrlParam> params = new Map<String, UrlParam>();
@@ -419,7 +431,7 @@ public with sharing class ConnectorRecipeFiles {
 			param.fromParam = ConnectorRecipeDocument.textOf(entry.get('fromParam'));
 			param.after = ConnectorRecipeDocument.textOf(entry.get('after')).left(1);
 			if (String.isBlank(param.pattern) || param.pattern.length() > 100 || !compiles(param.pattern)) {
-				throw refusal('Connector_Import_ErrorParam', param.name);
+				throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorParam', detail(param.name)));
 			}
 			params.put(param.name, param);
 		}
@@ -435,26 +447,65 @@ public with sharing class ConnectorRecipeFiles {
 			(ConnectorRecipeDocument.textOf(check.get('method')) != 'GET' ||
 			ConnectorRecipeDocument.pathProblem(ConnectorRecipeDocument.textOf(check.get('path'))))
 		) {
-			throw refusal('Connector_Import_ErrorAction', 'check');
+			throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorAction', detail('check')));
 		}
+		result.checkPath = check.isEmpty() ? null : ConnectorRecipeDocument.textOf(check.get('path'));
 		return result;
+	}
+
+	/**
+	 * Refuses a template part BarnCRM does not import yet (pollers, a webhook, action inputs or
+	 * body), so the author is told instead of the part being dropped.
+	 */
+	private static void refuseNotYet(Map<String, Object> source, List<String> parts) {
+		for (String part : parts) {
+			Object given = source.get(part);
+			Boolean empty =
+				given == null ||
+				(given instanceof List<Object> && ((List<Object>) given).isEmpty()) ||
+				(given instanceof Map<String, Object> && ((Map<String, Object>) given).isEmpty());
+			if (!empty) {
+				throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorNotYet', detail(part)));
+			}
+		}
+	}
+
+	/**
+	 * A template's entry values (query, path values, headers): `{{watermark}}` in an App Poll
+	 * trigger becomes the value path `trigger.watermark`; any other `{{...}}` is refused, since
+	 * nothing would fill it.
+	 */
+	private static void templateValues(List<Object> entries, Boolean pollTrigger) {
+		for (Object raw : entries) {
+			Map<String, Object> entry = ConnectorRecipeDocument.mapOf(raw);
+			String value = ConnectorRecipeDocument.textOf(entry.get('value'));
+			if (!value.contains('{{')) {
+				continue;
+			}
+			if (pollTrigger && value.trim() == '{{watermark}}') {
+				entry.remove('value');
+				entry.put('path', ConnectorAppPoll.WATERMARK_PATH);
+			} else {
+				throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorNotYet', detail(value)));
+			}
+		}
 	}
 
 	/** An `https` base URL whose placeholders sit in the host and each have a pattern (F4). */
 	private static void urlProblem(String url, Map<String, UrlParam> params) {
 		if (!BASE_URL.matcher(url).matches()) {
-			throw refusal('Connector_Import_ErrorUrl', url);
+			throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorUrl', detail(url)));
 		}
 		String host = url.removeStart('https://').substringBefore('/');
 		String rest = url.removeStart('https://').removeStart(host);
 		Matcher slot = PLACEHOLDER.matcher(url);
 		while (slot.find()) {
 			if (!params.containsKey(slot.group(1))) {
-				throw refusal('Connector_Import_ErrorParam', slot.group(1));
+				throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorParam', detail(slot.group(1))));
 			}
 		}
 		if (rest.contains('{') || rest.contains('}')) {
-			throw refusal('Connector_Import_ErrorUrl', url);
+			throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorUrl', detail(url)));
 		}
 		ConnectorConnections.checkedUrl(PLACEHOLDER.matcher(url).replaceAll('x'));
 	}
@@ -464,13 +515,14 @@ public with sharing class ConnectorRecipeFiles {
 		for (Object raw : ConnectorRecipeDocument.listOf(file.get('actions'))) {
 			Map<String, Object> action = ConnectorRecipeDocument.mapOf(raw);
 			refuseUnknown(action, ACTION_KEYS);
+			refuseNotYet(action, new List<String>{ 'inputs', 'body' });
 			String key = ConnectorRecipeDocument.textOf(action.get('key'));
 			if (
 				String.isBlank(key) ||
 				!ConnectorRecipeDocument.METHODS.contains(ConnectorRecipeDocument.textOf(action.get('method'))) ||
 				ConnectorRecipeDocument.pathProblem(ConnectorRecipeDocument.textOf(action.get('path')))
 			) {
-				throw refusal('Connector_Import_ErrorAction', key);
+				throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorAction', detail(key)));
 			}
 			found.put(key, action);
 		}
@@ -501,6 +553,14 @@ public with sharing class ConnectorRecipeFiles {
 		Draft result = new Draft();
 		result.name = name;
 		result.description = description;
+		if (actions != null) {
+			for (String entries : new List<String>{ 'query', 'pathValues' }) {
+				templateValues(
+					ConnectorRecipeDocument.listOf(starter.get(entries)),
+					starter.get('kind') == ConnectorAppPoll.KIND
+				);
+			}
+		}
 		if (starter.get('kind') == ConnectorAppPoll.KIND && triggerBlanked(starter, names, matches)) {
 			result.blanks.add('trigger');
 			String problem = ConnectorTriggers.problem(starter);
@@ -512,6 +572,9 @@ public with sharing class ConnectorRecipeFiles {
 			step.remove('savedQuery');
 			if (actions != null) {
 				copyAction(step, actions);
+				for (String entries : new List<String>{ 'query', 'pathValues', 'headers' }) {
+					templateValues(ConnectorRecipeDocument.listOf(step.get(entries)), false);
+				}
 			}
 			for (String key : new List<String>{ 'map', 'bodyMap', 'template' }) {
 				String given = ConnectorRecipeDocument.textOf(step.get(key));
@@ -552,7 +615,13 @@ public with sharing class ConnectorRecipeFiles {
 			}
 		}
 		if (!refused.isEmpty()) {
-			throw refusal('Connector_Import_ErrorRecipe', name + ': ' + String.join(refused, ' '));
+			throw refusal(
+				BarnHelp.text(
+					'Connector',
+					'Connector_Import_ErrorRecipe',
+					detail(name + ': ' + String.join(refused, ' '))
+				)
+			);
 		}
 		List<String> later;
 		try {
@@ -582,7 +651,8 @@ public with sharing class ConnectorRecipeFiles {
 		for (Object raw : ConnectorRecipeDocument.listOf(starter.get('headers'))) {
 			Map<String, Object> header = ConnectorRecipeDocument.mapOf(raw);
 			blanked |=
-				SIGN_IN_HEADER.matcher(ConnectorRecipeDocument.textOf(header.get('name'))).matches() &&
+				ConnectorRecipeDocument.SIGN_IN_HEADER.matcher(ConnectorRecipeDocument.textOf(header.get('name')))
+					.matches() &&
 				String.isBlank(ConnectorRecipeDocument.textOf(header.get('path'))) &&
 				String.isBlank(ConnectorRecipeDocument.textOf(header.get('value')));
 		}
@@ -591,30 +661,37 @@ public with sharing class ConnectorRecipeFiles {
 
 	/** The problems Save reports for the keys an import left blank, which the editor fills. */
 	private static Set<String> blankProblems(Set<String> blanks, List<Object> at) {
-		Map<String, String> keys = new Map<String, String>{
-			'connection' => 'Connector_Recipe_ErrorConnection',
-			'map' => 'Connector_Recipe_ErrorMap',
-			'bodyMap' => 'Connector_Recipe_ErrorMap',
-			'template' => 'Connector_Recipe_ErrorTemplate',
-			'pathValues' => 'Connector_Recipe_ErrorSlot'
-		};
 		Set<String> found = new Set<String>();
 		for (String blank : blanks) {
-			if (keys.containsKey(blank)) {
-				found.add(BarnHelp.text('Connector', keys.get(blank), at));
+			switch on blank {
+				when 'connection' {
+					found.add(BarnHelp.text('Connector', 'Connector_Recipe_ErrorConnection', at));
+				}
+				when 'map', 'bodyMap' {
+					found.add(BarnHelp.text('Connector', 'Connector_Recipe_ErrorMap', at));
+				}
+				when 'template' {
+					found.add(BarnHelp.text('Connector', 'Connector_Recipe_ErrorTemplate', at));
+				}
+				when 'pathValues' {
+					found.add(BarnHelp.text('Connector', 'Connector_Recipe_ErrorSlot', at));
+				}
 			}
 		}
 		return found;
 	}
 
-	/** A template action named by a Call an App step: its method, path and query, each slot blank. */
+	/**
+	 * A template action named by a Call an App step: its method, path and query, each slot blank.
+	 * Its query values are checked by `templateValues` after the copy.
+	 */
 	private static void copyAction(Map<String, Object> step, Map<String, Map<String, Object>> actions) {
 		if (step.get('kind') != 'callApp' || !step.containsKey('action')) {
 			return;
 		}
 		Map<String, Object> action = actions.get(ConnectorRecipeDocument.textOf(step.remove('action')));
 		if (action == null) {
-			throw refusal('Connector_Import_ErrorAction', step.get('id'));
+			throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorAction', detail(step.get('id'))));
 		}
 		String path = ConnectorRecipeDocument.textOf(action.get('path'));
 		step.put('method', action.get('method'));
@@ -690,7 +767,7 @@ public with sharing class ConnectorRecipeFiles {
 	private static void refuseUnknown(Map<String, Object> entries, Set<String> allowed) {
 		for (String key : entries.keySet()) {
 			if (!allowed.contains(key)) {
-				throw refusal('Connector_Import_ErrorKey', key);
+				throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorKey', detail(key)));
 			}
 		}
 	}
@@ -716,9 +793,12 @@ public with sharing class ConnectorRecipeFiles {
 		}
 	}
 
-	private static FileException refusal(String key, Object detail) {
-		return new FileException(
-			BarnHelp.text('Connector', key, new List<Object>{ detail == null ? '' : String.valueOf(detail).left(80) })
-		);
+	private static FileException refusal(String text) {
+		return new FileException(text);
+	}
+
+	/** The one value a refusal names, cut short so a file cannot fill the message. */
+	private static List<Object> detail(Object value) {
+		return new List<Object>{ value == null ? '' : String.valueOf(value).left(80) };
 	}
 }

@@ -75,9 +75,9 @@
                         <div class="slds-grid slds-grid_vertical-align-center slds-wrap">
                             <h5 class="slds-text-heading_small slds-col">{row.heading}</h5>
                             <template lwc:if={canManage}>
-                                <lightning-button-icon icon-name="utility:arrowup" alternative-text={labels.moveUp} data-address={row.address} data-delta="-1" onclick={handleMove}></lightning-button-icon>
-                                <lightning-button-icon class="slds-var-m-left_xx-small" icon-name="utility:arrowdown" alternative-text={labels.moveDown} data-address={row.address} data-delta="1" onclick={handleMove}></lightning-button-icon>
-                                <lightning-button-icon class="slds-var-m-left_xx-small" icon-name="utility:delete" alternative-text={labels.remove} data-address={row.address} onclick={handleRemove}></lightning-button-icon>
+                                <lightning-button-icon icon-name="utility:arrowup" alternative-text={row.moveUpLabel} data-address={row.address} data-delta="-1" onclick={handleMove}></lightning-button-icon>
+                                <lightning-button-icon class="slds-var-m-left_xx-small" icon-name="utility:arrowdown" alternative-text={row.moveDownLabel} data-address={row.address} data-delta="1" onclick={handleMove}></lightning-button-icon>
+                                <lightning-button-icon class="slds-var-m-left_xx-small" icon-name="utility:delete" alternative-text={row.removeLabel} data-address={row.address} onclick={handleRemove}></lightning-button-icon>
                             </template>
                         </div>
                         <lightning-input label={labels.stepName} value={row.step.id} max-length="20" read-only={readOnly} data-address={row.address} data-field="id" onchange={handleField}></lightning-input>
@@ -141,7 +141,7 @@
                                         <lightning-input class="slds-col" label={labels.entryName} value={pair.name} read-only={readOnly} data-address={row.address} data-list="query" data-index={pair.index} data-field="name" onchange={handleEntry}></lightning-input>
                                         <lightning-input class="slds-col" label={labels.entryValue} value={pair.shown} field-level-help={labels.valueHelp} read-only={readOnly} data-address={row.address} data-list="query" data-index={pair.index} data-field="shown" onchange={handleEntry}></lightning-input>
                                         <template lwc:if={canManage}>
-                                            <lightning-button-icon class="slds-align-bottom" icon-name="utility:close" alternative-text={labels.remove} data-address={row.address} data-list="query" data-index={pair.index} onclick={handleRemoveEntry}></lightning-button-icon>
+                                            <lightning-button-icon class="slds-align-bottom" icon-name="utility:close" alternative-text={pair.removeLabel} data-address={row.address} data-list="query" data-index={pair.index} onclick={handleRemoveEntry}></lightning-button-icon>
                                         </template>
                                     </div>
                                 </template>
@@ -156,7 +156,7 @@
                                         <lightning-input class="slds-col" label={labels.entryName} value={header.name} read-only={readOnly} data-address={row.address} data-list="headers" data-index={header.index} data-field="name" onchange={handleEntry}></lightning-input>
                                         <lightning-input class="slds-col" label={labels.entryValue} value={header.shown} field-level-help={labels.valueHelp} read-only={readOnly} data-address={row.address} data-list="headers" data-index={header.index} data-field="shown" onchange={handleEntry}></lightning-input>
                                         <template lwc:if={canManage}>
-                                            <lightning-button-icon class="slds-align-bottom" icon-name="utility:close" alternative-text={labels.remove} data-address={row.address} data-list="headers" data-index={header.index} onclick={handleRemoveEntry}></lightning-button-icon>
+                                            <lightning-button-icon class="slds-align-bottom" icon-name="utility:close" alternative-text={header.removeLabel} data-address={row.address} data-list="headers" data-index={header.index} onclick={handleRemoveEntry}></lightning-button-icon>
                                         </template>
                                     </div>
                                 </template>
@@ -198,7 +198,7 @@
                                             <lightning-input class="slds-col" label={labels.value} value={condition.value} read-only={readOnly} data-address={row.address} data-list="conditions" data-index={condition.index} data-field="value" onchange={handleEntry}></lightning-input>
                                         </template>
                                         <template lwc:if={canManage}>
-                                            <lightning-button-icon class="slds-align-bottom" icon-name="utility:close" alternative-text={labels.remove} data-address={row.address} data-list="conditions" data-index={condition.index} onclick={handleRemoveEntry}></lightning-button-icon>
+                                            <lightning-button-icon class="slds-align-bottom" icon-name="utility:close" alternative-text={condition.removeLabel} data-address={row.address} data-list="conditions" data-index={condition.index} onclick={handleRemoveEntry}></lightning-button-icon>
                                         </template>
                                     </div>
                                 </template>

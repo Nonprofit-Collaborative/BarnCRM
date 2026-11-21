@@ -108,7 +108,7 @@ public inherited sharing class ConnectorControlSteps {
 	 * access mode; nothing is written. A record map is refused.
 	 */
 	public static Map<String, Object> transform(Map<String, Object> step, Object input, AccessLevel access) {
-		ConnectorMapRuntime.SavedMap saved = ConnectorMapRuntime.load(
+		ConnectorMapRuntime.SavedMap saved = ConnectorMapRuntime.loadForRun(
 			ConnectorRecipeDocument.textOf(step.get('map')),
 			access
 		);

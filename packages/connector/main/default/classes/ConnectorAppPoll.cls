@@ -24,7 +24,6 @@ public with sharing class ConnectorAppPoll {
 	public static final Integer MOST_STAMP = 60;
 	/** Items sharing the last stamp are kept together past the limit, up to this many in all. */
 	public static final Integer MOST_ITEMS = 1000;
-	private static final Integer BATCH_TEXT = 120000;
 	private static final Pattern ITEM_PATH = Pattern.compile(
 		'[A-Za-z0-9_-]{1,80}(\\[[0-9]{1,3}\\])?(\\.[A-Za-z0-9_-]{1,80}(\\[[0-9]{1,3}\\])?){0,9}'
 	);
@@ -136,7 +135,7 @@ public with sharing class ConnectorAppPoll {
 		Long started = System.currentTimeMillis();
 		try {
 			Map<String, Object> starter = ConnectorRecipeDocument.mapOf(
-				ConnectorRecipeDocument.parse(run.Recipe__r.Definition_JSON__c).get('trigger')
+				ConnectorRecipeDocument.parse(ConnectorRunStore.definitionOf(run)).get('trigger')
 			);
 			String mark = run.Recipe__r.Watermark__c;
 			Map<String, Object> answer = (Map<String, Object>) new ConnectorStepRunner(run, budget)
@@ -162,7 +161,7 @@ public with sharing class ConnectorAppPoll {
 		} catch (Exception problem) {
 			ConnectorStepRunner.StepFailureException failed = problem instanceof ConnectorStepRunner.StepFailureException
 				? (ConnectorStepRunner.StepFailureException) problem
-				: new ConnectorStepRunner.StepFailureException(plain(problem));
+				: new ConnectorStepRunner.StepFailureException(ConnectorStepRunner.plain(problem));
 			passingFailure = failed.passing ? failed : null;
 			run.Status__c = ConnectorRunStore.FAILED;
 			run.Failed_Step__c = 'trigger';
@@ -274,22 +273,18 @@ public with sharing class ConnectorAppPoll {
 			}
 			return runs;
 		}
-		List<Object> ids = new List<Object>();
-		List<Object> chunk = new List<Object>();
-		Integer size = 0;
+		List<Object> data = new List<Object>();
 		for (Item item : items) {
-			Integer length = JSON.serialize(item.data).length();
-			if (!chunk.isEmpty() && size + length > BATCH_TEXT) {
-				runs.add(itemRun(recipe, new Map<String, Object>{ 'itemIds' => ids, 'items' => chunk }));
-				ids = new List<Object>();
-				chunk = new List<Object>();
-				size = 0;
-			}
-			ids.add(item.id);
-			chunk.add(item.data);
-			size += length;
+			data.add(item.data);
 		}
-		runs.add(itemRun(recipe, new Map<String, Object>{ 'itemIds' => ids, 'items' => chunk }));
+		Integer next = 0;
+		for (List<Object> chunk : ConnectorRunStore.chunks(data, ConnectorRunStore.BATCH_TEXT)) {
+			List<Object> ids = new List<Object>();
+			for (Integer i = 0; i < chunk.size(); i++) {
+				ids.add(items[next++].id);
+			}
+			runs.add(itemRun(recipe, new Map<String, Object>{ 'itemIds' => ids, 'items' => chunk }));
+		}
 		return runs;
 	}
 
@@ -301,14 +296,6 @@ public with sharing class ConnectorAppPoll {
 			);
 		}
 		return ConnectorTriggers.newRun(recipe, APP_POLL, inputJson);
-	}
-
-	/** A fixed message naming only the exception type (F7): a raw message could echo a request. */
-	private static String plain(Exception problem) {
-		if (problem instanceof ConnectorRecipeDocument.DocumentException) {
-			return problem.getMessage();
-		}
-		return BarnHelp.text('Connector', 'Connector_Run_ErrorUnexpected', new List<Object>{ problem.getTypeName() });
 	}
 
 	private static String text(Object value) {

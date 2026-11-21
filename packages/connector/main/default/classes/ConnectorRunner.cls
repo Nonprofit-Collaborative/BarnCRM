@@ -3,16 +3,19 @@
  * design Sections 3.2, 3.7 and 4). A lane's start event trigger calls `start`, so the job runs as
  * that lane's identity (the Automated Process user, or the integration user), never as the person
  * who pressed Run Now (D-215); asynchronous Apex keeps that identity in every job it chains. Each
- * job takes its lane's oldest queued runs, runs them until the transaction nears its limits or a
- * callout would follow a record write, saves them all at the end (a callout cannot follow
- * uncommitted DML) and chains the next job while runs wait.
+ * job runs the runs taken for it (Running, `ConnectorRunStore.claim`) until the transaction nears
+ * its limits or a callout would follow a record write, saves them all at the end (a callout
+ * cannot follow uncommitted DML), then takes the lane's next oldest Queued runs and chains the
+ * next job for them. The start event's trigger takes the first job's runs.
  *
  * A run that fails for a reason that may pass waits and is retried at 15 minutes, 1 hour, 4 hours
  * and 12 hours, up to its recipe's Retry Attempts (R-CR7). A recipe that fails Pause After
  * Failures times in a row pauses itself.
  *
- * A Transaction Finalizer marks the run that was going when the job died (a limit the code
- * cannot catch) as failed and starts the chain again, so one run cannot stall the rest.
+ * A Transaction Finalizer fails every run the job had begun when it died (a limit the code cannot
+ * catch): their writes were undone but their callouts were sent, so they are not run again
+ * unasked; Retry continues each from its saved state. The runs it had not begun stay Running for
+ * the next job, which the Finalizer chains.
  */
 public with sharing class ConnectorRunner implements Queueable, Database.AllowsCallouts {
 	@TestVisible
@@ -27,8 +30,11 @@ public with sharing class ConnectorRunner implements Queueable, Database.AllowsC
 	@TestVisible
 	private static Boolean skipIdentityCheck = false;
 
-	/** Starts the running identity's chain unless a job of it is already queued or running. */
-	public static void start() {
+	/**
+	 * Starts the lane's chain, as its identity, unless a job of it is already queued or running:
+	 * takes the first job's runs, then queues it.
+	 */
+	public static void start(String lane) {
 		if (Limits.getQueueableJobs() >= Limits.getLimitQueueableJobs()) {
 			return;
 		}
@@ -43,7 +49,7 @@ public with sharing class ConnectorRunner implements Queueable, Database.AllowsC
 				AND CreatedById = :me
 			WITH SYSTEM_MODE
 		];
-		if (going == 0) {
+		if (going == 0 && ConnectorRunStore.claim(BATCH, ConnectorClock.runAsOf(lane), ConnectorClock.paused())) {
 			try {
 				AsyncStarter.queue(new ConnectorRunner(), 'ConnectorRunner.start');
 			} catch (Exception busy) {
@@ -76,8 +82,9 @@ public with sharing class ConnectorRunner implements Queueable, Database.AllowsC
 		Boolean testsOnly = ConnectorClock.paused();
 		guard.runAs = runAs;
 		guard.testsOnly = testsOnly;
-		process(ConnectorRunStore.queued(BATCH, runAs, testsOnly), guard);
-		if (ConnectorRunStore.anyQueued(runAs, testsOnly)) {
+		process(ConnectorRunStore.running(BATCH, runAs, testsOnly), guard);
+		// After every callout: the next job's runs are taken, then it is chained.
+		if (ConnectorRunStore.claim(BATCH, runAs, testsOnly)) {
 			chain();
 		}
 	}
@@ -91,11 +98,13 @@ public with sharing class ConnectorRunner implements Queueable, Database.AllowsC
 		List<String> failures = new List<String>();
 		List<Id> failedRuns = new List<Id>();
 		ConnectorAppPoll polls = new ConnectorAppPoll();
+		ConnectorRunStore.loadRecipes(runs);
 		for (Connector_Run__c run : runs) {
 			if (budget.low()) {
 				break;
 			}
 			guard.current = run.Id;
+			guard.begun.add(run.Id);
 			Connector_Run__c result;
 			if (ConnectorAppPoll.isPoll(run)) {
 				// An App Poll's poll run (R-CR16): spent once its items are found.
@@ -200,9 +209,11 @@ public with sharing class ConnectorRunner implements Queueable, Database.AllowsC
 		System.enqueueJob(new ConnectorRunner());
 	}
 
-	/** Fails the run a dead job was on, then starts the chain again for the rest. */
+	/** Fails the runs a dead job had begun, then starts the chain again for the rest. */
 	public with sharing class Guard implements Finalizer {
 		public Id current;
+		/** Every run the job began, the one it was on included. */
+		public Set<Id> begun = new Set<Id>();
 		public Set<String> runAs;
 		public Boolean testsOnly = false;
 
@@ -210,9 +221,9 @@ public with sharing class ConnectorRunner implements Queueable, Database.AllowsC
 			if (context.getResult() != ParentJobResult.UNHANDLED_EXCEPTION) {
 				return;
 			}
-			if (current != null) {
+			if (!begun.isEmpty()) {
 				ConnectorRunStore.failStopped(
-					new Set<Id>{ current },
+					begun,
 					BarnHelp.text(
 						'Connector',
 						'Connector_Run_ErrorStopped',
@@ -220,7 +231,7 @@ public with sharing class ConnectorRunner implements Queueable, Database.AllowsC
 					)
 				);
 			}
-			if (ConnectorRunStore.anyQueued(runAs, testsOnly)) {
+			if (ConnectorRunStore.claim(BATCH, runAs, testsOnly)) {
 				chain();
 			}
 		}

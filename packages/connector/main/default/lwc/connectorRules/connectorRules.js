@@ -102,13 +102,23 @@ export function statusOf(connection) {
   return { key: 'Connector_Status_Ready', variant: 'success' };
 }
 
-/** What a write or check did, as a help key, a notice variant and the app's status if any. */
+/**
+ * What a write or check did, as a help key, a notice variant, the app's status if any and the
+ * account the app's answer names, if any (F11).
+ */
 export function outcomeOf(result) {
   const outcome = result && result.outcome;
   const status = result && result.status;
   if (outcome === 'answered') {
     if (status >= 200 && status < 300) {
-      return { key: 'Connector_Outcome_Connected', variant: 'success', status };
+      return result.account
+        ? {
+            key: 'Connector_Outcome_ConnectedAs',
+            variant: 'success',
+            status,
+            account: result.account
+          }
+        : { key: 'Connector_Outcome_Connected', variant: 'success', status };
     }
     if (status === 401 || status === 403) {
       return { key: 'Connector_Outcome_KeyRefused', variant: 'error', status };

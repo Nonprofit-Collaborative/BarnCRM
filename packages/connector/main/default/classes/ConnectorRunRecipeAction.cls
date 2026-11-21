@@ -81,13 +81,19 @@ global with sharing class ConnectorRunRecipeAction {
 					continue;
 				}
 			}
+			String inputJson = JSON.serialize(input);
+			if (inputJson.length() > ConnectorRunStore.MAX_TEXT) {
+				// Only this request is refused; the others are queued.
+				result.message = BarnHelp.text('Connector', 'Connector_Run_ErrorTooLarge');
+				continue;
+			}
 			runs.add(
 				new Connector_Run__c(
 					Recipe__c = recipe.Id,
 					Started_By__c = 'Flow',
 					Ran_As__c = recipe.Run_As__c,
 					Recipe_Version__c = recipe.Version__c,
-					Input_JSON__c = JSON.serialize(input)
+					Input_JSON__c = inputJson
 				)
 			);
 			queuedResults.add(result);

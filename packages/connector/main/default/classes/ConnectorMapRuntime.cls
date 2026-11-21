@@ -36,6 +36,21 @@ public inherited sharing class ConnectorMapRuntime {
 		public List<String> fields = new List<String>();
 	}
 
+	/** The maps the runner's steps read in this transaction, by Id and access mode. */
+	private static Map<String, SavedMap> runLoaded = new Map<String, SavedMap>();
+
+	/**
+	 * A saved map for a run's step, read once per transaction in each access mode: a For Each
+	 * would otherwise read it once per item.
+	 */
+	public static SavedMap loadForRun(String mapId, AccessLevel access) {
+		String key = mapId + '|' + String.valueOf(access);
+		if (!runLoaded.containsKey(key)) {
+			runLoaded.put(key, load(mapId, access));
+		}
+		return runLoaded.get(key);
+	}
+
 	/** A saved map by Id (R-ST5: read in the run's access mode); refused when gone. */
 	public static SavedMap load(String mapId, AccessLevel access) {
 		List<Saved_Transform__c> rows = ConnectorRecipeDocument.isId(mapId)

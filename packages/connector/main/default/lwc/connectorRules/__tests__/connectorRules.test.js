@@ -109,6 +109,12 @@ describe('c/connectorRules', () => {
 
   it('turns an answer into an outcome', () => {
     expect(outcomeOf({ outcome: 'answered', status: 200 }).key).toBe('Connector_Outcome_Connected');
+    expect(outcomeOf({ outcome: 'answered', status: 200, account: 'Barn Rescue' })).toEqual({
+      key: 'Connector_Outcome_ConnectedAs',
+      variant: 'success',
+      status: 200,
+      account: 'Barn Rescue'
+    });
     expect(outcomeOf({ outcome: 'answered', status: 401 }).key).toBe(
       'Connector_Outcome_KeyRefused'
     );

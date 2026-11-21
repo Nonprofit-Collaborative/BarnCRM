@@ -87,6 +87,9 @@ jobs:
       - name: Check background work starts through AsyncStarter
         run: python3 scripts/ci/check-async-starter.py
 
+      - name: Check every help text key is used and present
+        run: python3 scripts/ci/check-help-text.py
+
       - name: Check help texts filled in by String.format have no lone apostrophe
         run: python3 scripts/ci/check-help-text-apostrophes.py
 

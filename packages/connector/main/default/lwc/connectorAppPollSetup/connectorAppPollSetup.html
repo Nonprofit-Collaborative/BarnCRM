@@ -12,7 +12,7 @@
                     <lightning-input class="slds-col" label={labels.entryName} value={pair.name} read-only={readOnly} data-list="query" data-index={pair.index} data-field="name" onchange={handleEntry}></lightning-input>
                     <lightning-input class="slds-col" label={labels.entryValue} value={pair.shown} field-level-help={labels.valueHelp} read-only={readOnly} data-list="query" data-index={pair.index} data-field="shown" onchange={handleEntry}></lightning-input>
                     <template lwc:if={canEdit}>
-                        <lightning-button-icon class="slds-align-bottom" icon-name="utility:close" alternative-text={labels.remove} data-index={pair.index} onclick={handleRemoveQuery}></lightning-button-icon>
+                        <lightning-button-icon class="slds-align-bottom" icon-name="utility:close" alternative-text={pair.removeLabel} data-index={pair.index} onclick={handleRemoveQuery}></lightning-button-icon>
                     </template>
                 </div>
             </template>

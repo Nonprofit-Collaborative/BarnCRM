@@ -171,7 +171,10 @@ private class ConnectorClockTest {
 			);
 			recipe.Watermark__c = ConnectorTriggers.watermark(Datetime.now().addMinutes(-10), null);
 			update as system recipe;
-			insert as system new List<Contact>{ new Contact(LastName = 'Lovelace'), new Contact(LastName = 'Hopper') };
+			insert as system new List<Contact>{
+				TestDataFactory.person(new Contact(LastName = 'Lovelace')),
+				TestDataFactory.person(new Contact(LastName = 'Hopper'))
+			};
 			Map<String, Object> each = (Map<String, Object>) JSON.deserializeUntyped(recordTrigger('each'));
 			Map<String, Object> batch = (Map<String, Object>) JSON.deserializeUntyped(recordTrigger('batch'));
 			Connector_Recipe__c copy = recipe.clone(true);
@@ -421,12 +424,23 @@ private class ConnectorClockTest {
 			} catch (ConnectorConnections.ConnectorException expected) {
 				refused = expected.getMessage();
 			}
+			String tooMuch;
+			try {
+				ConnectorIntegrationUser.choose(UserInfo.getUserId());
+			} catch (ConnectorConnections.ConnectorException expected) {
+				tooMuch = expected.getMessage();
+			}
 
 			Test.startTest();
 			ConnectorIntegrationUser.View chosen = ConnectorRecipesController.chooseIntegrationUser(integrator.Id);
 			Test.stopTest();
 
 			Assert.areEqual(BarnHelp.text('Connector', 'Connector_IntegrationUser_ErrorChoice'), refused);
+			Assert.areEqual(
+				BarnHelp.text('Connector', 'Connector_IntegrationUser_ErrorTooMuch'),
+				tooMuch,
+				'An administrator would give Integration User recipes every record.'
+			);
 			Assert.areEqual(String.valueOf(integrator.Id), chosen.id);
 			Assert.areEqual(integrator.Id, ConnectorIntegrationUser.chosenId(), 'Saved org-wide.');
 			Assert.isTrue(ConnectorIntegrationUser.ready());
@@ -467,11 +481,22 @@ private class ConnectorClockTest {
 				ConnectorRecipes.SCHEDULE,
 				ConnectorRecipes.RUN_AS_AUTOMATION
 			);
-			ConnectorRecipeTestData.recipe(
+			Connector_Recipe__c integrated = ConnectorRecipeTestData.recipe(
 				'As The Integrator',
 				ConnectorRecipeTestData.document(STOP_STEPS),
 				true,
 				ConnectorRecipes.RUN_AS_USER
+			);
+			String neverRuns;
+			try {
+				ConnectorRecipes.runNow(integrated.Id, null);
+			} catch (ConnectorConnections.ConnectorException refused) {
+				neverRuns = refused.getMessage();
+			}
+			Assert.areEqual(
+				BarnHelp.text('Connector', 'Connector_RunAs_ErrorNoUser'),
+				neverRuns,
+				'Run Now waits for an integration user instead of queuing a run that never starts.'
 			);
 			Connector_Recipe__c failing = ConnectorRecipeTestData.recipe(
 				'Gave Up',

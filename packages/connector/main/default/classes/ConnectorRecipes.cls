@@ -439,7 +439,8 @@ public with sharing class ConnectorRecipes {
 			starter,
 			String.isBlank(row.Definition_JSON__c) ||
 				String.isBlank(row.Watermark__c) ||
-				row.Trigger_Kind__c != published.Trigger_Kind__c
+				row.Trigger_Kind__c != published.Trigger_Kind__c ||
+				watchedObject(ConnectorRecipeDocument.parse(row.Definition_JSON__c)) != watchedObject(document)
 		);
 		Database.update(published, AccessLevel.USER_MODE);
 		if (ConnectorRunStore.CLOCK_KINDS.contains(published.Trigger_Kind__c)) {
@@ -479,9 +480,16 @@ public with sharing class ConnectorRecipes {
 		return found;
 	}
 
+	/** The object a Record Change trigger watches, or blank for any other trigger. */
+	private static String watchedObject(Map<String, Object> document) {
+		Map<String, Object> starter = ConnectorRecipeDocument.mapOf(document.get('trigger'));
+		return ConnectorRecipeDocument.textOf(ConnectorRecipeDocument.mapOf(starter.get('query')).get('object'));
+	}
+
 	/**
 	 * The clock's starting point for a Schedule or Record Change recipe (R-CR6): its next time,
-	 * and for Record Change a Watermark at now when it has none or its trigger kind changed, so
+	 * and for Record Change a Watermark at now when it has none, its trigger kind changed or it
+	 * watches another object, so
 	 * the first poll looks only at changes from here on. The caller publishes the lane's start
 	 * event, so the heartbeat starts after commit.
 	 */
@@ -802,7 +810,13 @@ public with sharing class ConnectorRecipes {
 		throw new ConnectorConnections.ConnectorException(BarnHelp.text('Connector', 'Connector_Run_ErrorInput'));
 	}
 
+	/** A Run Now or Test run; an Integration User recipe needs its user ready, or it never runs. */
 	private static Run queued(Connector_Recipe__c row, String startedBy, String inputJson, Boolean isTest) {
+		if (row.Run_As__c == RUN_AS_USER && !ConnectorIntegrationUser.ready()) {
+			throw new ConnectorConnections.ConnectorException(
+				BarnHelp.text('Connector', 'Connector_RunAs_ErrorNoUser')
+			);
+		}
 		Connector_Run__c run = new Connector_Run__c(
 			Recipe__c = row.Id,
 			Started_By__c = startedBy,

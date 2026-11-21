@@ -424,7 +424,10 @@ private class ConnectorWebhooksTest {
 			}
 
 			Test.startTest();
-			ConnectorRunner.process(ConnectorRunStore.queued(50), new ConnectorRunner.Guard());
+			ConnectorRunner.process(
+				ConnectorRunStore.queued(50, ConnectorRunStore.ALL_RUN_AS, false),
+				new ConnectorRunner.Guard()
+			);
 			Test.stopTest();
 
 			for (Connector_Run__c run : [

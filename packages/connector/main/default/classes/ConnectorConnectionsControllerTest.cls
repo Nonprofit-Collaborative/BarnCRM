@@ -13,7 +13,7 @@ private class ConnectorConnectionsControllerTest {
 	private class FakeOrg extends ConnectorOrg {
 		Map<String, ConnectorOrg.Pair> pairs = new Map<String, ConnectorOrg.Pair>();
 		Map<String, String> kinds = new Map<String, String>();
-		Map<String, Id> principals = new Map<String, Id>();
+		Integer principalCount = 0;
 		Map<Id, Set<Id>> granted = new Map<Id, Set<Id>>();
 		List<ConnectApi.CredentialInput> credentials = new List<ConnectApi.CredentialInput>();
 		List<ConnectApi.NamedCredentialInput> named = new List<ConnectApi.NamedCredentialInput>();
@@ -36,7 +36,7 @@ private class ConnectorConnectionsControllerTest {
 			pair.calloutsEnabled = calloutsOn;
 			pair.keyStored = keyStored;
 			pairs.put(name, pair);
-			principals.put(name, Id.valueOf('001' + String.valueOf(principals.size() + 1).leftPad(12, '0')));
+			pair.principalId = Id.valueOf('001' + String.valueOf(++principalCount).leftPad(12, '0'));
 			return pair;
 		}
 
@@ -50,10 +50,6 @@ private class ConnectorConnectionsControllerTest {
 
 		public override ConnectorOrg.Pair read(String name, String label) {
 			return pairs.get(name);
-		}
-
-		public override Map<String, Id> principalIds() {
-			return principals.clone();
 		}
 
 		public override Set<Id> grantedEntities(Id permissionSetId) {
@@ -117,6 +113,7 @@ private class ConnectorConnectionsControllerTest {
 	private class Answer implements HttpCalloutMock {
 		Integer status;
 		String endpoint;
+		String body;
 		Answer(Integer status) {
 			this.status = status;
 		}
@@ -124,6 +121,9 @@ private class ConnectorConnectionsControllerTest {
 			endpoint = request.getEndpoint();
 			HttpResponse response = new HttpResponse();
 			response.setStatusCode(status);
+			if (body != null) {
+				response.setBody(body);
+			}
 			return response;
 		}
 	}
@@ -402,27 +402,18 @@ private class ConnectorConnectionsControllerTest {
 			Assert.areEqual(SECRET_URL + 'new', fake.pairs.get('BarnConn_rest_bbbbbb').url, 'The new address is kept');
 			Assert.isFalse(fake.named[0].calloutOptions.allowMergeFieldsInBody, 'Formulas stay off in the body');
 			Assert.isFalse(JSON.serialize(replaced).contains('/services/'), 'The new address is not returned (F5)');
-		}
-	}
 
-	@IsTest
-	static void aTemplateHostLockHoldsTheDataCenterToItsPattern() {
-		System.runAs(dana()) {
-			Map<String, String> parts = new Map<String, String>{ 'dc' => '^[a-z]{2}[0-9]{1,3}$' };
-			String template = '{dc}.api.mailchimp.com';
-
-			Assert.isTrue(ConnectorConnections.hostFitsTemplate('us21.api.mailchimp.com', template, parts), 'Fits');
-			Assert.isTrue(ConnectorConnections.hostFitsTemplate('US21.API.mailchimp.com', template, parts), 'Any case');
-			Assert.isFalse(
-				ConnectorConnections.hostFitsTemplate('us21.api.mailchimp.com.attacker.net', template, parts),
-				'No suffix host'
+			String disconnectRefusal;
+			try {
+				ConnectorConnectionsController.disconnect('BarnConn_rest_bbbbbb');
+			} catch (AuraHandledException e) {
+				disconnectRefusal = refusal(e);
+			}
+			Assert.areEqual(
+				BarnHelp.text('Connector', 'Connector_Error_DisconnectSecretUrl'),
+				disconnectRefusal,
+				'A Secret URL has no key to remove, so Disconnect says so'
 			);
-			Assert.isFalse(ConnectorConnections.hostFitsTemplate('attacker.net', template, parts), 'No other host');
-			Assert.isFalse(
-				ConnectorConnections.hostFitsTemplate('x.y.api.mailchimp.com', template, parts),
-				'The data center keeps its pattern'
-			);
-			Assert.isFalse(ConnectorConnections.hostFitsTemplate('us21.api.mailchimp.com', template, null), 'Locked');
 		}
 	}
 
@@ -520,6 +511,45 @@ private class ConnectorConnectionsControllerTest {
 			Assert.areEqual('answered', result.outcome, 'The app answered');
 			Assert.areEqual(200, result.status, 'With its status');
 			Assert.areEqual('callout:BarnConn_rest_ffffff', answer.endpoint, 'Through the Named Credential only');
+			Assert.isNull(result.account, 'An answer naming no account shows none');
+		}
+	}
+
+	@IsTest
+	static void aTemplateCheckPathIsAskedForAndTheAccountShown() {
+		System.runAs(dana()) {
+			FakeOrg fake = useFake();
+			ConnectorOrg.Pair pair = fake.add(
+				'BarnConn_rest_kkkkkk',
+				ConnectorConnections.BEARER,
+				'https://api.example.com',
+				true,
+				true
+			);
+			Answer answer = new Answer(200);
+			answer.body = '{"account":{"account_name":"Barn Rescue","id":"x1"},"health":"ok"}';
+			Test.setMock(HttpCalloutMock.class, answer);
+			String refused;
+			try {
+				ConnectorConnectionsController.saveCheckPath(pair.name, '/ping?x=1');
+			} catch (AuraHandledException e) {
+				refused = refusal(e);
+			}
+			ConnectorConnectionsController.saveCheckPath(pair.name, '/ping');
+			ConnectorConnectionsController.checkConnection(pair.name);
+
+			Test.startTest();
+			ConnectorConnectionsController.Result result = ConnectorConnectionsController.checkConnection(pair.name);
+			Test.stopTest();
+
+			Assert.areEqual(BarnHelp.text('Connector', 'Connector_Error_CheckPath'), refused, 'A query is refused');
+			Assert.areEqual('callout:BarnConn_rest_kkkkkk/ping', answer.endpoint, 'The template check path');
+			Assert.areEqual('Barn Rescue', result.account, 'The account the app names (F11)');
+			Assert.isNull(ConnectorConnectionsController.accountOf('[1,2]'), 'A list names no account');
+			Assert.isNull(ConnectorConnectionsController.accountOf('not json'), 'Nor does plain text');
+
+			ConnectorConnectionsController.deleteConnection(pair.name);
+			Assert.isNull(ConnectorConnections.checkPathOf(pair.name), 'Delete forgets the check path');
 		}
 	}
 

@@ -2,7 +2,7 @@
 
 Scripts for the optional BarnCRM Connector module, release 1.31: creating Connections of each sign-in kind, the one Setup step with Check Again, checking, replacing, disconnecting and deleting, the refusals that keep keys safe, access and Health Check (CN-01, T-CN-01 to T-CN-06); Recipe Access, recipes, Test, Publish, Run Now, Run History, Retry, Run As and the merge-field guard (CN-02, T-CN-07 to T-CN-12); the Flow actions and Where Used (CN-06, T-CN-13 and T-CN-14); the recipe clock, Schedule and Record Change triggers, retries, pausing, the integration user, Health Check and the nightly cleanup (CN-03, release 1.32, T-CN-15 to T-CN-20); scheduled imports through Load Rows with an Import Template (CN-09, release 1.32, T-CN-21 and T-CN-22); webhooks in, their refusals, fetch back and Send to Webhook (CN-04, release 1.32, T-CN-23 to T-CN-25); For Each, Wait and Change Data (CN-05, release 1.32, T-CN-26 to T-CN-28); versions, Roll Back, Export Recipe and the Templates tab (CN-08, release 1.32, T-CN-29 to T-CN-31); watching an app for new items and erasing a person's runs (CN-13, CN-18, release 1.33, T-CN-32 to T-CN-34). Setup detail: [BarnCRM Connector](../admin-guide/connector.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core and BarnCRM Connector deployed, and an HTTPS test endpoint that echoes requests (for example a free request bin you control). Use made-up keys such as `test-key-1234`; never a real one.
+Before you start: an org from [Before you test](before-you-test.md), with Core and BarnCRM Connector deployed, and an HTTPS test endpoint that echoes requests (for example a free request bin you control). Use made-up keys such as `test-key-1234`; never a real one. In a Developer Edition or trial org, Salesforce stops a chain of queued jobs after 5 links, so many runs queued at once (more than about 5 batches of 50, or a long run that continues across many transactions) may stop partway: the rest wait for the next start, and Health Check may show runs waiting. That is the org's limit, not a fault; a sandbox or production org has no such cap.
 
 ## T-CN-01: Install, App and Access
 
@@ -71,7 +71,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 |---|---|---|
 | 1 | On **Echo Test** select **Replace Key**, enter `test-key-5678` and save. | `Key replaced`; Check Connection sends the new key. The Admin Journal has a **Connection** row, **Key Replaced**, with your name and the connection, without the key. |
 | 2 | Open **Health Check**. | `Connection Keys Replaced This Week` names Echo Test. |
-| 3 | Select **Disconnect**, **Cancel**, then **Disconnect** and confirm. | Cancel changes nothing; confirming shows **Disconnected**. |
+| 3 | Select **Disconnect**, **Cancel**, then **Disconnect** and confirm. | Cancel changes nothing; confirming shows **Disconnected**. A Secret URL connection offers no Disconnect. |
 | 4 | Select **Delete** and confirm on each test connection. | `Connection deleted`; each row goes, and in Setup no `BarnConn_rest_...` Named or External Credential is left. |
 
 **Cleanup:** None.
@@ -161,6 +161,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 1 | On `Welcome Test`, add a header `X-Test` with value `{!$Credential.Password}` (type it exactly). | A problem: merge fields are refused. **Save Draft** is refused by the server with the same message. Remove the header. |
 | 2 | Set the path to `//evil.example/x`, then `/a@b`, then `/a b`. | Each is refused as an unsafe path. Put back `/people/{id}`. |
 | 3 | Add a header named `Authorization`. | Refused: sign-in headers come from the connection. Remove it. |
+| 3a | Add a header `X-Api-Key` with the typed value `abc123`, and **Save Draft**. Then set its value from the trigger (`trigger.key`) and save. | The typed value is refused: the header looks like a sign-in header, so keys belong on the connection. The value from the trigger saves. Remove the header. |
 | 4 | Run Now with data `{"email":"ada.test@example.org","last":"{!$Credential.Password}"}`. | The run fails at `callApp1` with a message that the value holds a merge field; the echo endpoint got nothing. The Error Log entry has no key and no request. |
 | 5 | Run Now with `{"email":"ada.test@example.org","last":"Lovelace / Ada?x=1"}` and a path slot reading `trigger.last`. | The endpoint gets `/people/Lovelace%20%2F%20Ada%3Fx%3D1`: one path segment, no query. |
 
@@ -175,7 +176,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 |---|---|---|
 | 1 | As the test user, open **Super Connector**, **Recipes**, and open `Welcome Test`. | The recipe shows read only: no **New Recipe**, **Recipe Access**, **Save Draft**, **Publish**, **Test**, **Run Now** or **Delete**. |
 | 2 | Open **Run History**. | Runs are listed and can be opened; no **Retry**. |
-| 3 | As the test user, open **Connections**. | A notice says managing connections needs BarnCRM Connector Admin; no connection is listed. |
+| 3 | As the test user, open **Connections**. | A notice says Connector admins manage connections; no connection is listed and no error shows. |
 
 **Cleanup:** Remove BarnCRM Connector Viewer from the test user.
 
@@ -204,6 +205,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 1 | Add a **Find Records** step using the saved Contact query with the Email condition to `Welcome Test` and save. Open **Where Used** for Contact.Email. | `Welcome Test` is listed with its Find step (Step find1); its edit link opens Super Connector on that recipe. |
 | 2 | Open **Where Used** for the map `Contact by Email`. | `Welcome Test` is listed with Step upsert1, with a warning that changing the map changes what the recipe writes. |
 | 3 | On **Connections**, delete the connection `Welcome Test` calls. | Refused: the connection is used by a recipe. Delete the recipe first, then the connection deletes. |
+| 4 | Create a Record Change recipe on Contact whose condition is Title is not blank, and save it. Open **Where Used** for Contact.Title. | The recipe is listed with **Trigger**. |
 
 **Cleanup:** Delete the test recipe, then the test connection.
 
@@ -262,6 +264,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 |---|---|---|
 | 1 | On a saved recipe, open **Run As**. | Only BarnCRM Automation and System are offered. |
 | 2 | On **Recipe Clock**, under **Integration User**, choose a user with a Customer Community or other non-Salesforce license and **Save User**. | Refused: **Choose an active user with a Salesforce license.** |
+| 2a | Choose yourself (a System Administrator) and **Save User**. | Refused: the user must not be a System Administrator or hold Modify All Data or View All Data. |
+| 2b | On an Integration User recipe, before any user is saved, select **Run Now**. | Refused: **Choose an active integration user on Recipe Clock first.** No run is queued. |
 | 3 | Choose `Integrator` and **Save User**. | **Saved. BarnCRM is writing the subscriber setting...**. Reopen Recipe Clock: `Integrator` is shown, the last write is Completed, and `Integrator` holds **BarnCRM Connections** (Setup, the user's permission set assignments). |
 | 4 | In Setup, open **Platform Events**, **Connector Start User**, **Subscriptions**. | The trigger row shows **Running User** `Integrator`. Select **Suspend**, then **Resume**. |
 | 5 | Set a Schedule recipe's Run As to **Integration User** and publish. | Its runs show ran as Integration User; records it writes show `Integrator` as Last Modified By. Recipe Clock shows **Confirmed**. |
@@ -445,6 +449,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 5 | Edit the template text to add `"apiKey":"abc"` and import. | Refused: the file holds what looks like a key ... (apiKey). Nothing imported. |
 | 6 | Instead add `{!$Credential.X.Y}` in a description, or `"headerTemplate":"x"` under auth, or `"allowMergeFieldsInBody":true`, or set baseUrl to `http://...`, or a description `Bearer abcdef1234567890`. Import each. | Each is refused whole and the message never repeats the value. |
 | 7 | Add `"requires":["No_Such_Object__c"]`. | Refused: install the module first. |
+| 8 | Add `"pollers":[{"key":"unsubscribes"}]`, then instead a `"body"` on the action, then instead a query value `"{{list}}"` on the action. Import each. | Each is refused: **The template uses pollers** (then **body**, then **{{list}}**), **which BarnCRM cannot import yet**. Nothing imported. |
+| 9 | Add a second recipe whose trigger is an App Poll with the query value `{{watermark}}` and import. | It opens as a draft whose trigger query value is `trigger.watermark`. |
+| 10 | Make your endpoint answer GET `/ping` with `{"account_name":"Test Org"}`. On the connection made in step 4, after the Setup step, select **Check Connection**. | The endpoint got GET `/3.0/ping`; the page shows **Connected as Test Org**. |
 
 ## T-CN-32: An App Has New Items
 

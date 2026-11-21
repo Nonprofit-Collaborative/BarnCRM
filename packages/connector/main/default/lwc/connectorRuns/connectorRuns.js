@@ -99,6 +99,7 @@ export default class ConnectorRuns extends LightningElement {
         run.status === 'Failed'
           ? text('Connector_Runs_Failure', run.failedStep || '-', run.errorMessage || '')
           : '',
+      attempts: run.attempt > 0 ? text('Connector_Runs_Attempts', run.attempt) : '',
       when: run.createdAt ? new Date(run.createdAt).toLocaleString() : '',
       canRetry: this.canManage && run.status === 'Failed',
       openId: `open-${run.id}`,
@@ -116,7 +117,13 @@ export default class ConnectorRuns extends LightningElement {
   }
 
   get openedSteps() {
-    return this.opened ? stepRows(this.opened.stepLogJson, this.opened.resultsJson) : [];
+    return this.opened
+      ? stepRows(this.opened.stepLogJson, this.opened.resultsJson).map((row) => ({
+          ...row,
+          kind: (row.kindKey && text(row.kindKey)) || row.kind,
+          outcome: (row.outcomeKey && text(row.outcomeKey)) || row.outcome
+        }))
+      : [];
   }
 
   async handleOpen(event) {

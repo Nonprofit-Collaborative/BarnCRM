@@ -69,6 +69,7 @@ private class ConnectorRecipesControllerTest {
 	@IsTest
 	static void publishRefusesAnAppThatIsNotReadyAndADraftCannotRun() {
 		System.runAs(admin()) {
+			ConnectorRecipeTestData.noConnections();
 			ConnectorRecipes.Recipe saved = ConnectorRecipesController.saveDraft(
 				null,
 				'Not Ready',
@@ -120,6 +121,7 @@ private class ConnectorRecipesControllerTest {
 	@IsTest
 	static void automationIsCheckedAgainstItsIdentityAndSystemNeedsAConfirmation() {
 		System.runAs(admin()) {
+			ConnectorRecipeTestData.noConnections();
 			Id mapId = ConnectorRecipeTestData.contactMap('Contact For Publish');
 			ConnectorIdentity.automatedProcessOverride = '005000000000000';
 			ConnectorRecipes.Recipe saved = ConnectorRecipesController.saveDraft(

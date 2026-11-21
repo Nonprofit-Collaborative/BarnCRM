@@ -19070,17 +19070,18 @@ without a namespace.
 - **Static resource:** `BarnReporting_Templates` (four dashboard definitions, each with the
   objects it requires).
 
-## 29CN1. Connection (no object)
+## 29CN1. Connection
 
 ### Definition
 
 A saved, checked sign-in to another app for the BarnCRM Connector module (CN-01, D-215, D-216;
 ADR-0235 `0235-integration-module.md`; design `integration-hub-design.md` Section 3.5; security
-review `connector-secrets-security-review.md`, F1 to F13). Not a custom object: each connection
-is one External Credential and one Named Credential of the same developer name, created by
-BarnCRM at run time through `ConnectApi.NamedCredentials`. The secret lives only in the External
-Credential's principal, never in a BarnCRM record. Only Generic REST is built in; app templates
-are imported files (D-216) that prefill this same shape.
+review `connector-secrets-security-review.md`, F1 to F13). Each connection is one External
+Credential and one Named Credential of the same developer name, created by BarnCRM at run time
+through `ConnectApi.NamedCredentials`. The secret lives only in the External Credential's
+principal, never in a BarnCRM record. What a credential has no field for (a template's check
+path) is kept in a Connector Connection row named by the connection (R-CN9). Only Generic REST
+is built in; app templates are imported files (D-216) that prefill this same shape.
 
 ### Attributes
 
@@ -19096,6 +19097,7 @@ are imported files (D-216) that prefill this same shape.
 | Callouts Enabled | boolean | computed | The Named Credential's Enabled for Callouts, read through `ConnectApi`; set by the admin in Setup. |
 | Key Stored | boolean | computed | Whether the principal holds a credential (Disconnect removes it). |
 | Access Granted | boolean | computed | Whether the principal is in the "BarnCRM Connections" permission set (R-CN7). |
+| Check Path | text | no | What follows the Base URL for Check Connection, such as `/ping`, from the template the connection was made from (R-CN9). Blank checks the Base URL. |
 
 ### Rules
 
@@ -19132,16 +19134,30 @@ assigns it only to the person creating or checking a connection, who must hold
 saves Recipe Access (R-CR4; the integration user from CN-03). User Ids never come from the
 browser. Health Check warns when it holds anything but External Credential principal access.
 **R-CN8 Delete and Disconnect.** Disconnect removes the principal's key and keeps the
-connection; Delete removes both credentials, the Named Credential first, and is refused while a
-recipe's definition or draft names the connection.
+connection, and is refused for a Secret URL, which has no key apart from its address; Delete
+removes both credentials, the Named Credential first, and its Connector Connection row, and is
+refused while a recipe's definition or draft names the connection.
+**R-CN9 Check path and account.** A connection made from a template keeps the template's check
+path (one slash first, no query, slot, space, at sign, backslash or hash) in a Connector
+Connection row, written by a person who may write keys (R-CN3) in a call of its own after the
+create, since the create writes permission sets. Check Connection GETs the check path, or the
+Base URL when there is none, and when a 2xx answer names the account (`account_name`,
+`accountName`, `login`, `username`, `email`, `account`, `name` or `company`, at the top or under
+`account`, `user` or `data`), shows it, 80 characters at most (F11). The row holds no key.
+**R-CN10 Integration user.** Choosing the integration user (R-CR4) needs the same permissions
+as writing a key (R-CN3), and refuses a user who is a System Administrator or holds Modify All
+Data or View All Data.
 
 ### Salesforce implementation
 
-- **Object:** none. External and Named Credentials (developer name `BarnConn_`, no namespace)
+- **Credentials:** External and Named Credentials (developer name `BarnConn_`, no namespace)
   created, read, updated and deleted only through `ConnectApi.NamedCredentials` (Apex cannot
   query `ExternalCredential`); the named
   principal's Id from `ConnectApi` is the setup entity of its principal access;
   `SetupEntityAccess` (principal access in `BarnCRM_Connections`), `PermissionSetAssignment`.
+- **Object:** `Connector_Connection__c` (Connector Connection), private, no tab, report or
+  search; Name (Text(80)) is the connection's developer name; `Check_Path__c` (Text(255)).
+  Written and read by the module only, in system mode; granted by no permission set.
 - **Custom permission:** `Manage_BarnCRM_Connector`, granted only by `BarnCRM_Connector_Admin`.
 - **Admin Journal:** Kind `Connection`, Status `Key Replaced` (Section 10A).
 
@@ -19481,7 +19497,7 @@ Appendix A.4).
 | Attribute | Type | Required | Definition |
 |---|---|---|---|
 | Recipe | reference(Connector Recipe) | yes | The recipe (master). |
-| Status | picklist(Received, Queued, Running, Waiting, Succeeded, Skipped, Failed, Rejected) | yes | Where the run stands. |
+| Status | picklist(Received, Queued, Running, Waiting, Succeeded, Skipped, Failed) | yes | Where the run stands. Running: claimed for the next runner job (R-RUN4). |
 | Started By | picklist(Schedule, Record Change, Webhook, App Poll, Manual, Flow, Test) | yes | What started it. |
 | Ran As | picklist(BarnCRM Automation, System, Integration User) | yes | The recipe's Run As when the run executed, for audit. |
 | Recipe Version | integer | yes | The version it ran. |
@@ -19508,7 +19524,12 @@ a record write, and before 90 callouts, 100 seconds of callout time, 45 seconds 
 queries or 140 writes in one. Retry on a Failed run queues it again from the failed step; the
 completed steps are never repeated. A Step Log entry keeps a failed step's response, trimmed to
 2,000 characters, and never a header. A failed run writes one Error Log entry naming the recipe,
-the step and the plain message, never a request, a header or a response.
+the step and the plain message, never a request, a header or a response. A runner job works
+only on runs already Running: the job that starts the chain, and each job as it ends, marks up
+to one batch of Queued runs Running for the next job, since a job may not write before its
+callouts. A job that dies leaves its started runs Failed through its finalizer, which then
+claims and chains the next batch. A run that continues on a newer published version says so in
+its Step Log. A step whose results would not fit the run's State fails plainly.
 
 ### Salesforce implementation
 
@@ -19517,7 +19538,7 @@ API names: `Recipe__c` (master-detail), `Status__c`, `Started_By__c`, `Ran_As__c
 (Text(255), unique, external ID), `Reference__c` (Text(20), unique), `Attempt__c`, `Next_Attempt_At__c`, `Started_At__c`,
 `Finished_At__c`, `Failed_Step__c` (Text(40)), `Error_Message__c` (Long Text Area(1000): a
 Text field stops at 255), `Records_Written__c`, `Is_Test__c`. Picklist values: Status `Received`, `Queued`, `Running`,
-`Waiting`, `Succeeded`, `Skipped`, `Failed`, `Rejected`; Started By `Schedule`, `RecordChange`,
+`Waiting`, `Succeeded`, `Skipped`, `Failed`; Started By `Schedule`, `RecordChange`,
 `Webhook`, `AppPoll`, `Manual`, `Flow`, `Test`; Ran As as Run As.
 
 - **Fields by slice:** CN-02 ships every field above except `Next_Attempt_At__c` (CN-03, retries,
@@ -20034,6 +20055,7 @@ mirrors the primary member).
 | 1.79 | 2026-11-20 | BarnCRM Connector steps and versions (CN-05, CN-08, D-215, D-216, release 1.32). R-CR1 adds the `forEach`, `wait` and `transform` steps, the `loop` path root and the `fill` list an import leaves; new R-CR12 (For Each, Wait and Change Data), R-CR13 (Previous Definition, Roll Back, Discard Draft Changes, Export and Import Recipe), R-CR14 (template import, nothing shipped or kept) and R-CR15 (no secret in a file). Connector Recipe ships `Previous_JSON__c`, defined in v1.75. No object added. |
 | 1.80 | 2026-11-20 | BarnCRM Connector watching apps for new items and runs in the erasure path (CN-13, CN-18, release 1.33). R-CR1 adds the `appPoll` trigger; new R-CR16 (App Poll: poll runs, Watermark, item runs) and R-CR17 (erasing a person deletes the runs that name them). Connector Run allows search (`enableSearch`); `ConnectorErasureExtension` joins Core's erasure extensions. No object or field added. |
 | 1.81 | 2026-11-20 | The Mapper and saved maps (MAP-01 to MAP-07, releases 1.31 to 1.33). `Saved_Transform__c` gains `Kind__c` (Step List, the default, or Map); new R-MAP1 to R-MAP4 (map document, paths, checks, preview) and R-ST5 (maps). `Giving_Settings__c` gains `Opportunity_Mirror_Map__c`, a Saved Transform record ID chosen with a record picker (a map name is read too); new R-OM12 (extra fields through a map). No object added. |
+| 1.82 | 2026-11-20 | BarnCRM Connector pre-batch review fixes (release 1.33). One object added, 199 to 200 in the suite: Connector Connection (`Connector_Connection__c`, `Check_Path__c`), which keeps a template's check path beside a connection (29CN1, new R-CN9: Check Connection asks for it and shows the account an answer names). New R-CN10: choosing the integration user needs the key-writing permissions and refuses an all-seeing user. R-CN8: Disconnect refuses a Secret URL. Connector Run's Status loses Rejected; Running marks runs claimed for the next runner job (R-RUN4). |
 
 ---
 ## 32. Entity ownership by package
@@ -20264,7 +20286,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Certification | Memberships | 1.17 (G-22e) | 29MEM5 |
 | Member Certification | Memberships | 1.17 (G-22e) | 29MEM6 |
 | Continuing Credit | Memberships | 1.17 (G-22e) | 29MEM7 |
-| Connection (External and Named Credentials, no object) | BarnCRM Connector | 1.31 (CN-01) | 29CN1 |
+| Connection (External and Named Credentials, and `Connector_Connection__c` for its check path) | BarnCRM Connector | 1.31 (CN-01) | 29CN1 |
 | Connector Recipe | BarnCRM Connector | 1.31 (CN-02) | 29CN2 |
 | Connector Run | BarnCRM Connector | 1.31 (CN-02) | 29CN3 |
 | Connector Settings | BarnCRM Connector | 1.32 (CN-03) | 29CN4 |

@@ -221,31 +221,6 @@ public with sharing class ConnectorConnections {
 		return address.getPort() == -1 ? address.getDefaultPort() : address.getPort();
 	}
 
-	/**
-	 * Whether a host fits a template's locked host (R-CN4), such as `{dc}.api.mailchimp.com`
-	 * with `dc` held to `^[a-z]{2}[0-9]{1,3}$`. Every part outside a placeholder must match
-	 * exactly; a placeholder without a pattern never matches.
-	 */
-	public static Boolean hostFitsTemplate(String host, String template, Map<String, String> partPatterns) {
-		if (String.isBlank(host) || String.isBlank(template)) {
-			return false;
-		}
-		String regex = '';
-		Matcher placeholder = Pattern.compile('\\{([a-zA-Z]+)\\}').matcher(template);
-		Integer last = 0;
-		while (placeholder.find()) {
-			String part = partPatterns == null ? null : partPatterns.get(placeholder.group(1));
-			if (String.isBlank(part)) {
-				return false;
-			}
-			regex += Pattern.quote(template.substring(last, placeholder.start()));
-			regex += '(?:' + part.removeStart('^').removeEnd('$') + ')';
-			last = placeholder.end();
-		}
-		regex += Pattern.quote(template.substring(last));
-		return Pattern.matches(regex, host.toLowerCase());
-	}
-
 	/** The host of an address, or blank. */
 	public static String hostOf(String address) {
 		try {
@@ -340,16 +315,81 @@ public with sharing class ConnectorConnections {
 	public static ConnectionsPage page() {
 		ConnectionsPage result = new ConnectionsPage();
 		result.canWrite = canWrite();
-		Map<String, Id> principals = org.principalIds();
 		Set<Id> granted = grantedPrincipals();
 		Map<String, String> labels = org.labelsByName();
 		for (String name : labels.keySet()) {
 			ConnectorOrg.Pair pair = org.read(name, labels.get(name));
 			if (pair != null && pair.linked && KINDS.contains(pair.principal)) {
-				result.connections.add(shown(pair, granted.contains(principals.get(name))));
+				result.connections.add(shown(pair, pair.principalId != null && granted.contains(pair.principalId)));
 			}
 		}
 		return result;
+	}
+
+	/**
+	 * The path Check Connection asks for (R-CN9): the check path of the template the connection
+	 * was made from, or null for the base URL. Read in system mode: the row holds no key.
+	 */
+	public static String checkPathOf(String name) {
+		for (Connector_Connection__c row : [
+			SELECT Check_Path__c
+			FROM Connector_Connection__c
+			WHERE Name = :name
+			WITH SYSTEM_MODE
+			LIMIT 1
+		]) {
+			return row.Check_Path__c;
+		}
+		return null;
+	}
+
+	/**
+	 * Keeps a template's check path with the connection (R-CN9). Its own call after the create,
+	 * since that one writes permission sets and a record write may not share it.
+	 */
+	public static void saveCheckPath(String name, String path) {
+		requireWriter();
+		ConnectorOrg.Pair pair = owned(name);
+		String checked = String.isBlank(path) ? null : path.trim();
+		if (
+			checked != null &&
+			(checked.length() > 255 ||
+			checked.contains('{') ||
+			ConnectorRecipeDocument.pathProblem(checked))
+		) {
+			throw new ConnectorException(BarnHelp.text('Connector', 'Connector_Error_CheckPath'));
+		}
+		List<Connector_Connection__c> rows = [
+			SELECT Id
+			FROM Connector_Connection__c
+			WHERE Name = :pair.name
+			WITH SYSTEM_MODE
+			LIMIT 1
+		];
+		Connector_Connection__c row = rows.isEmpty() ? new Connector_Connection__c(Name = pair.name) : rows[0];
+		row.Check_Path__c = checked;
+		Database.upsert(row, AccessLevel.SYSTEM_MODE);
+	}
+
+	/** Removes what was kept beside a deleted connection (R-CN9). */
+	public static void forget(String name) {
+		Database.delete(
+			[SELECT Id FROM Connector_Connection__c WHERE Name = :name WITH SYSTEM_MODE LIMIT 10],
+			AccessLevel.SYSTEM_MODE
+		);
+	}
+
+	/** The principal Ids of every `BarnConn_` connection, one read each. */
+	public static Set<Id> principalIds() {
+		Set<Id> found = new Set<Id>();
+		Map<String, String> labels = org.labelsByName();
+		for (String name : labels.keySet()) {
+			ConnectorOrg.Pair pair = org.read(name, labels.get(name));
+			if (pair != null && pair.principalId != null) {
+				found.add(pair.principalId);
+			}
+		}
+		return found;
 	}
 
 	/** Names and status only: the URL becomes a host, a Secret URL its host and last four. */
@@ -456,7 +496,8 @@ public with sharing class ConnectorConnections {
 				AccessLevel.SYSTEM_MODE
 			);
 		}
-		Id principal = org.principalIds().get(name);
+		ConnectorOrg.Pair pair = org.read(name, null);
+		Id principal = pair == null ? null : pair.principalId;
 		if (principal == null) {
 			return false;
 		}
