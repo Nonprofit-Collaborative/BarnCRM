@@ -99,9 +99,9 @@ export default class VolunteersHome extends NavigationMixin(LightningElement) {
   get showChartsNote() {
     return Boolean(
       this.helpReady &&
-        this.hasTiles &&
-        !this.loading &&
-        this.tiles.every((tile) => tile.value === 0)
+      this.hasTiles &&
+      !this.loading &&
+      this.tiles.every((tile) => tile.value === 0)
     );
   }
 

@@ -78,7 +78,9 @@ export function tiles(dashboard, labels) {
     rate === null
       ? {
           key: 'rate',
-          label: labels.noRate ? `${labels.attendanceRate}: ${labels.noRate}` : labels.attendanceRate,
+          label: labels.noRate
+            ? `${labels.attendanceRate}: ${labels.noRate}`
+            : labels.attendanceRate,
           value: '-',
           formatStyle: 'percent'
         }
