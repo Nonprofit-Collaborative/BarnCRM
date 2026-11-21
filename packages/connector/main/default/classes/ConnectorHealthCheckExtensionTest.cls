@@ -74,7 +74,8 @@ private class ConnectorHealthCheckExtensionTest {
 			fake.add('BarnConn_rest_aaaaaa', false, true);
 			fake.add('BarnConn_rest_bbbbbb', true, false);
 			ConnectorConnections.org = fake;
-			insert as system new PermissionSet(Name = ConnectorConnections.ACCESS_SET, Label = 'BarnCRM Connections');
+			// The org's own set when the Connector was already used there (setup rows are seen).
+			ConnectorConnections.ensureAccessSet();
 			insert as system new Merge_Journal__c(
 				Kind__c = 'Connection',
 				Status__c = 'Key Replaced',
@@ -97,7 +98,8 @@ private class ConnectorHealthCheckExtensionTest {
 			fake.add('BarnConn_rest_aaaaaa', true, true);
 			fake.granted.add(UserInfo.getUserId());
 			ConnectorConnections.org = fake;
-			insert as system new PermissionSet(Name = ConnectorConnections.ACCESS_SET, Label = 'BarnCRM Connections');
+			// The org's own set when the Connector was already used there (setup rows are seen).
+			ConnectorConnections.ensureAccessSet();
 
 			Set<String> found = keys(new ConnectorHealthCheckExtension().findings());
 

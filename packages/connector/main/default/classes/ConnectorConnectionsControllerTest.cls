@@ -146,15 +146,22 @@ private class ConnectorConnectionsControllerTest {
 		return TestUsers.adminWith(ConnectorConnections.ADMIN_SET);
 	}
 
+	/** What the page does: create the connection, then save its key in a call of its own. */
 	private static ConnectorConnectionsController.Result create(String kind, String userName, String secret) {
-		return ConnectorConnectionsController.createConnection(
+		ConnectorConnectionsController.Result made = ConnectorConnectionsController.createConnection(
 			'Mailing list',
 			kind,
 			'https://API.example.com/v2/',
 			'X-Api-Key',
+			null
+		);
+		ConnectorConnectionsController.Result keyed = ConnectorConnectionsController.saveFirstKey(
+			made.name,
 			userName,
 			secret
 		);
+		made.page = keyed.page;
+		return made;
 	}
 
 	private static String refusal(Exception refused) {
@@ -202,7 +209,6 @@ private class ConnectorConnectionsControllerTest {
 			ConnectorConnectionsController.Result result = ConnectorConnectionsController.createConnection(
 				'Team channel',
 				ConnectorConnections.SECRET_URL,
-				null,
 				null,
 				null,
 				SECRET_URL
@@ -326,7 +332,7 @@ private class ConnectorConnectionsControllerTest {
 			List<Error_Log__c> logged = [
 				SELECT Message__c, Technical_Detail__c
 				FROM Error_Log__c
-				WHERE Context__c = 'ConnectorConnectionsController.createConnection'
+				WHERE Context__c = 'ConnectorConnectionsController.saveFirstKey'
 				WITH SYSTEM_MODE
 			];
 			Assert.areEqual(1, logged.size(), 'The failure is logged once');
@@ -354,14 +360,7 @@ private class ConnectorConnectionsControllerTest {
 				}
 			) {
 				try {
-					ConnectorConnectionsController.createConnection(
-						'A',
-						ConnectorConnections.BEARER,
-						url,
-						null,
-						null,
-						KEY
-					);
+					ConnectorConnectionsController.createConnection('A', ConnectorConnections.BEARER, url, null, null);
 				} catch (AuraHandledException e) {
 					refusals.add(refusal(e));
 				}
@@ -372,8 +371,7 @@ private class ConnectorConnectionsControllerTest {
 					ConnectorConnections.API_KEY,
 					'https://api.example.com',
 					'Authorization',
-					null,
-					KEY
+					null
 				);
 			} catch (AuraHandledException e) {
 				refusals.add(refusal(e));
@@ -466,9 +464,15 @@ private class ConnectorConnectionsControllerTest {
 			Assert.isTrue(ConnectorConnections.grantAccess('BarnConn_rest_dddddd'), 'Principal access added');
 
 			PermissionSet target = ConnectorConnections.accessSet();
+			// Counted for this test's users only: an org that used the Connector has holders already.
 			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM PermissionSetAssignment WHERE PermissionSetId = :target.Id WITH SYSTEM_MODE],
+				0,
+				[
+					SELECT COUNT()
+					FROM PermissionSetAssignment
+					WHERE PermissionSetId = :target.Id AND AssigneeId = :reader.Id
+					WITH SYSTEM_MODE
+				],
 				'Given to the admin pressing the button, nobody else'
 			);
 			Assert.isTrue(ConnectorConnections.holdsAccessSet(), 'Dana holds it');

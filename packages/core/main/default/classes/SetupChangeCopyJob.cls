@@ -26,6 +26,10 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
 
 	private static final String LOG_CONTEXT = 'SetupChangeCopyJob';
 	private static final String TRAIL_FIELDS = 'Id, Action, Section, Display, CreatedDate, CreatedBy.Name, DelegateUser';
+	/** The name every BarnCRM Connector credential starts with. */
+	private static final String CONNECTOR_PREFIX = 'BarnConn_';
+	/** A web address's path, query or fragment, and a `)` closing the sentence's bracket. */
+	private static final Pattern ADDRESS_PATH = Pattern.compile('(https?://[^/\\s?#]+)[/?#]\\S*?(\\)?)(?=\\s|$)');
 	private static final List<String> UNFINISHED = new List<String>{ 'Holding', 'Queued', 'Preparing', 'Processing' };
 
 	/** True for the delete pass, false for the copy pass. */
@@ -207,7 +211,7 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
 					Delegate_User__c = cut((String) row.get('DelegateUser'), 80),
 					Section__c = cut((String) row.get('Section'), 40),
 					Action__c = cut((String) row.get('Action'), 120),
-					Display__c = cut((String) row.get('Display'), 1000)
+					Display__c = cut(masked((String) row.get('Display')), 1000)
 				)
 			);
 		}
@@ -263,6 +267,19 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
 			LIMIT 1
 		];
 		return newest.isEmpty() ? null : newest[0].Changed_At__c;
+	}
+
+	/**
+	 * A sentence about a BarnCRM Connector connection (`BarnConn_`) with every web address cut to
+	 * its host: a Secret URL connection's address is its key (review F5), and Salesforce writes
+	 * it into the trail in clear. Any other sentence is kept as it is.
+	 */
+	@TestVisible
+	private static String masked(String display) {
+		if (display == null || !display.contains(CONNECTOR_PREFIX)) {
+			return display;
+		}
+		return ADDRESS_PATH.matcher(display).replaceAll('$1/****$2');
 	}
 
 	private static String cut(String value, Integer length) {

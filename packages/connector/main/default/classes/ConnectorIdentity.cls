@@ -47,15 +47,30 @@ public with sharing class ConnectorIdentity {
 		public List<Choice> choices = new List<Choice>();
 	}
 
-	/** The Automated Process user, or null. */
+	/**
+	 * The Automated Process user, or null. Orgs hold more than one user of that type (Data.com
+	 * Clean, `automatedclean@`, beside `autoproc@`; barn-platform, 2026-11-21), and a platform
+	 * event trigger runs as `autoproc@`, so that one is chosen when it is there.
+	 */
 	public static Id automatedProcessId() {
 		if (automatedProcessOverride != null) {
 			return automatedProcessOverride;
 		}
-		for (User row : [SELECT Id FROM User WHERE UserType = 'AutomatedProcess' WITH SYSTEM_MODE LIMIT 1]) {
-			return row.Id;
+		Id found = null;
+		for (User row : [
+			SELECT Id, Username
+			FROM User
+			WHERE UserType = 'AutomatedProcess'
+			WITH SYSTEM_MODE
+			ORDER BY CreatedDate
+			LIMIT 10
+		]) {
+			if (row.Username != null && row.Username.startsWithIgnoreCase('autoproc@')) {
+				return row.Id;
+			}
+			found = found == null ? row.Id : found;
 		}
-		return null;
+		return found;
 	}
 
 	/** The sets on offer, each ticked when the user holds it, or by default before a first save. */

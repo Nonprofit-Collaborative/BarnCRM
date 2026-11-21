@@ -121,4 +121,31 @@ private class ConnectorFlowActionsTest {
 			Assert.areEqual('Source', [SELECT LastName FROM Contact WHERE Id = :target.Id WITH SYSTEM_MODE].LastName);
 		}
 	}
+
+	@IsTest
+	static void aBulkFlowStopsBeforeTheQueryLimitAndSaysWhy() {
+		System.runAs(admin()) {
+			ConnectorRecipeTestData.contactMap('Flow Contact');
+			List<ConnectorApplyMapAction.Request> requests = new List<ConnectorApplyMapAction.Request>();
+			for (Integer i = 0; i < 120; i++) {
+				ConnectorApplyMapAction.Request request = new ConnectorApplyMapAction.Request();
+				request.mapName = 'Flow Contact';
+				request.dataJson = '{"last":"Bulk' + i + '","mail":"bulk' + i + '@example.org"}';
+				requests.add(request);
+			}
+
+			Test.startTest();
+			List<ConnectorApplyMapAction.Result> results = ConnectorApplyMapAction.apply(requests);
+			Integer queries = Limits.getQueries();
+			Test.stopTest();
+
+			Assert.areEqual('created', results[0].action, 'Message: ' + results[0].message);
+			Assert.areEqual(
+				BarnHelp.text('Connector', 'Connector_Flow_TooMany'),
+				results[119].message,
+				'The requests past the limit are not saved, each saying why.'
+			);
+			Assert.isTrue(queries <= Limits.getLimitQueries(), 'No limit was passed.');
+		}
+	}
 }

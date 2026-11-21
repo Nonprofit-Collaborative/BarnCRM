@@ -3,6 +3,7 @@ import ConnectorKeyForm from 'c/connectorKeyForm';
 import createConnection from '@salesforce/apex/ConnectorConnectionsController.createConnection';
 import replaceKey from '@salesforce/apex/ConnectorConnectionsController.replaceKey';
 import saveCheckPath from '@salesforce/apex/ConnectorConnectionsController.saveCheckPath';
+import saveFirstKey from '@salesforce/apex/ConnectorConnectionsController.saveFirstKey';
 import { expectAccessible } from 'barn/a11y';
 
 jest.mock(
@@ -17,6 +18,11 @@ jest.mock(
 );
 jest.mock(
   '@salesforce/apex/ConnectorConnectionsController.saveCheckPath',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/apex/ConnectorConnectionsController.saveFirstKey',
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
@@ -69,9 +75,10 @@ describe('c-connector-key-form', () => {
     await expectAccessible(element);
   });
 
-  it('sends the key once, empties the box and never puts the key in the event (F10)', async () => {
-    const result = { outcome: 'created', page: { canWrite: true, connections: [] } };
-    createConnection.mockResolvedValue(result);
+  it('creates, then sends the key once in its own call, empties the box and never puts the key in the event (F10)', async () => {
+    const page = { canWrite: true, connections: [{ name: 'BarnConn_rest_abc123' }] };
+    createConnection.mockResolvedValue({ outcome: 'created', name: 'BarnConn_rest_abc123' });
+    saveFirstKey.mockResolvedValue({ outcome: 'keySaved', page });
     const element = render();
     await flush();
     await fillBearer(element);
@@ -79,18 +86,47 @@ describe('c-connector-key-form', () => {
     element.addEventListener('saved', saved);
     find(element, 'save').click();
     await flush();
+    await flush();
     expect(createConnection).toHaveBeenCalledWith({
       label: 'Mailing List',
       authKind: 'BearerToken',
       baseUrl: 'https://api.example.org/v2',
       headerName: '',
+      secretUrl: null
+    });
+    expect(saveFirstKey).toHaveBeenCalledWith({
+      name: 'BarnConn_rest_abc123',
       userName: '',
       secret: SECRET
     });
     expect(find(element, 'secret').value).toBe('');
     expect(saved).toHaveBeenCalledTimes(1);
+    expect(saved.mock.calls[0][0].detail.result).toEqual({
+      outcome: 'created',
+      name: 'BarnConn_rest_abc123',
+      page
+    });
     expect(JSON.stringify(saved.mock.calls[0][0].detail)).not.toContain(SECRET);
     expect(JSON.stringify(Object.values(element))).not.toContain(SECRET);
+  });
+
+  it('sends a Secret URL with the create and no second call (F5)', async () => {
+    createConnection.mockResolvedValue({ outcome: 'created', name: 'BarnConn_rest_abc123' });
+    const element = render({
+      prefill: { label: 'Team Channel', authKind: 'SecretUrl', urlParams: [] }
+    });
+    await flush();
+    find(element, 'secret').value = 'https://hooks.example.org/services/abc';
+    find(element, 'save').click();
+    await flush();
+    await flush();
+    expect(createConnection).toHaveBeenCalledWith(
+      expect.objectContaining({
+        authKind: 'SecretUrl',
+        secretUrl: 'https://hooks.example.org/services/abc'
+      })
+    );
+    expect(saveFirstKey).not.toHaveBeenCalled();
   });
 
   it('keeps a template check path with the new connection in its own call (R-CN9)', async () => {
@@ -110,6 +146,7 @@ describe('c-connector-key-form', () => {
     const saved = jest.fn();
     element.addEventListener('saved', saved);
     find(element, 'save').click();
+    await flush();
     await flush();
     expect(saveCheckPath).toHaveBeenCalledWith({
       name: 'BarnConn_rest_abc123',
