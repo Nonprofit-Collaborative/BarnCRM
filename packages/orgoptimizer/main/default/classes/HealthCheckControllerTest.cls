@@ -297,6 +297,48 @@ private class HealthCheckControllerTest {
 		}
 	}
 
+	@IsTest
+	static void anyoneCanRunTheRemainingChecksAndNoKeysRunNothing() {
+		System.runAs(TestUsers.admin()) {
+			User priya = HealthCheckTestHelper.priyaWithoutManageSettings();
+
+			System.runAs(priya) {
+				OrgShapeDetector.overrideShape = npspShape();
+
+				HealthCheckService.Report none = HealthCheckController.runRemaining(null);
+				HealthCheckService.Report some = HealthCheckController.runRemaining(new List<String>{ 'org_shape' });
+
+				Assert.areEqual(false, none.getCanManageSettings(), 'Priya has not been given the permission');
+				Assert.isTrue(none.getFindings().isEmpty(), 'No keys, nothing to run');
+				Assert.areEqual(false, some.getCanManageSettings(), 'Reading needs none');
+				Assert.isTrue(some.getSkippedChecks().isEmpty(), 'The named check ran, so nothing is left');
+				for (HealthCheckService.Finding finding : some.getFindings()) {
+					Assert.areNotEqual('not_checked', finding.getKey(), 'Nothing was left for another run');
+				}
+			}
+		}
+	}
+
+	/**
+	 * Every load path (the report, Run Remaining Checks, the last run, the report after a fix)
+	 * turns an unexpected failure into one plain message and an Error Log row. The calls inside
+	 * those paths guard themselves, so the shared helper is checked directly.
+	 */
+	@IsTest
+	static void aFailedLoadShowsThePlainMessageAndIsLogged() {
+		System.runAs(TestUsers.admin()) {
+			Test.startTest();
+			AuraHandledException shown = HealthCheckController.loadFailed(new DmlException('Raw detail'));
+			Test.stopTest();
+
+			Assert.isFalse(shown.getMessage().contains('Raw detail'), 'The raw detail stays out of the message.');
+			Assert.isTrue(
+				shown.getMessage().contains(BarnHelp.text('Core', 'Core_HealthCheck_LoadFailed')),
+				'The person sees the load failure text.'
+			);
+		}
+	}
+
 	private static OrgShapeDetector.OrgShape npspShape() {
 		OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
 		shape.put('hasNpsp', true);
