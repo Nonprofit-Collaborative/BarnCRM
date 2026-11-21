@@ -152,7 +152,7 @@ const ICONS = Object.freeze({
   Gift_Transaction_Mirror: 'custom:custom31',
   Opportunity_Mirror: 'custom:custom30',
   // Programs
-  Case_Note__c: 'custom:custom12',
+  Case_Note__c: 'custom:custom55',
   Cohort__c: 'custom:custom50',
   Enrollment__c: 'custom:custom60',
   Goal__c: 'custom:custom96',
@@ -161,7 +161,7 @@ const ICONS = Object.freeze({
   Programs_Settings: 'custom:custom73',
   Record_Service: 'custom:custom8',
   Referral__c: 'custom:custom85',
-  Service_Count__c: 'custom:custom6',
+  Service_Count__c: 'custom:custom79',
   Service_Delivery__c: 'custom:custom16',
   Session__c: 'custom:custom20',
   // Rollups
