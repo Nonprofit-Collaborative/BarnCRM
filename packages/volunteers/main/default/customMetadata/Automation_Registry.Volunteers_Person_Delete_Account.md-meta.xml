@@ -26,7 +26,7 @@
         <field>Description__c</field>
         <value
       xsi:type="xsd:string"
-    >Deleting a person account, household or organization deletes the volunteer requirements and volunteer skills that name it or any of its contacts, whoever deletes it, so a background check never outlives its person. Merging a duplicate keeps them: the merge moves them to the record kept. Restoring from the Recycle Bin does not bring them back. This automation enforces a rule, so it cannot be switched off here and pausing automation does not suspend it.</value>
+    >Deleting a person account, household or organization deletes the volunteer requirements and volunteer skills that name it or any of its contacts, whoever deletes it, so a background check never outlives its person. Merging a duplicate keeps them: the merge moves them to the record kept. Restoring from the Recycle Bin does not bring them back.</value>
     </values>
     <values>
         <field>Module__c</field>
