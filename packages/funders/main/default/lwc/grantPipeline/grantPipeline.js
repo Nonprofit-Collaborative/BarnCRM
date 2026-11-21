@@ -327,6 +327,11 @@ export default class GrantPipeline extends NavigationMixin(LightningElement) {
       : null;
   }
 
+  /** A green badge means something was awarded: with none, the badge stays neutral. */
+  get awardedBadgeVariant() {
+    return this.board && this.board.awardedCount > 0 ? 'success' : 'neutral';
+  }
+
   get awardedDetail() {
     return this.board ? format(AWARDED_DETAIL, this.board.awardedCount) : '';
   }

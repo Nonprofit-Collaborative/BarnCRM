@@ -388,6 +388,15 @@ describe('c-grant-pipeline', () => {
     expect(one(element, '[data-id="new-grant"]')).not.toBeNull();
   });
 
+  it('keeps the awarded badge green only when something was awarded', async () => {
+    const element = await render();
+    expect(one(element, '[data-id="awarded-amount"]').badgeVariant).toBe('success');
+    document.body.removeChild(element);
+
+    const none = await render({ ...BOARD, awardedCount: 0, awardedAmount: 0 });
+    expect(one(none, '[data-id="awarded-amount"]').badgeVariant).toBe('neutral');
+  });
+
   it('shows the reason when the board cannot load', async () => {
     getBoard.mockRejectedValue({ body: { message: 'No access' } });
     const element = createElement('c-grant-pipeline', { is: GrantPipeline });

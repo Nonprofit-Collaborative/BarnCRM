@@ -13,7 +13,7 @@ setHelpTextForTest({
   Giving_Acknowledgments_LettersMarkedSent: 'Those letters are recorded as sent.',
   Giving_Acknowledgments_NeverRun: 'Nothing has been sent yet.',
   Giving_Acknowledgments_Off:
-    'Acknowledging gifts is switched off, so nothing is joining the queue. Turn on Acknowledge gifts in BarnCRM Settings, under Giving.'
+    'Thank-yous are switched off, so nothing is joining the queue. Turn on Send Thank-Yous in BarnCRM Settings, under Fundraising.'
 });
 
 jest.mock(
@@ -238,6 +238,12 @@ describe('c-acknowledgments', () => {
 
     expect(element.shadowRoot.querySelector('[data-id="last-run"]').textContent).toContain(
       'Emailed thank yous: 12 sent, 0 did not go.'
+    );
+    expect(element.shadowRoot.querySelector('[data-id="last-run"]').textContent).toContain(
+      '. Emailed thank yous'
+    );
+    expect(element.shadowRoot.querySelector('[data-id="last-run"]').textContent).not.toContain(
+      ': Emailed'
     );
     expect(element.shadowRoot.querySelector('[data-id="next-run"]').textContent.trim()).toBe(
       'c.Giving_Acknowledgments_NotScheduled'

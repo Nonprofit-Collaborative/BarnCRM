@@ -26,8 +26,14 @@ me today" in one look, so a fundraiser starts on one page rather than a menu of 
   Launcher.
 - **Record Your First Gift**: until the org has a gift, a first-run panel replaces the empty
   figures with two actions, **Enter a Gift** and **Import a File** (the Import tab, for a file of
-  past gifts). It goes away by itself once the first gift is saved.
-- Two report charts: **Giving by Month** and **Open Asks by Stage**.
+  past gifts). It goes away by itself once the first gift is saved. The **Enter a Gift** button
+  in the page header shows only after that, so the page never offers it twice.
+- Two report charts: **Giving by Month** and **Open Asks by Stage**. A short note under the page
+  says the charts fill in as gifts and asks are saved, because a Salesforce report chart with
+  nothing to draw can only say "No chart data".
+
+The page uses the same header as the other BarnCRM tool pages: a title, a one-line purpose and the
+page's actions on the right.
 
 Each figure's name is the object's own label and its status word is the picklist value's label,
 so a renamed object or status shows its new name here with nothing else to change. The asks

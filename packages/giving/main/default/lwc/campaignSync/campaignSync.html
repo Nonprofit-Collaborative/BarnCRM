@@ -1,8 +1,12 @@
 <template>
     <template lwc:if={helpReady}>
-    <lightning-card title={labels.title} icon-name={icons.campaignSync}>
-        <div class="slds-var-p-horizontal_medium">
-            <p class="slds-var-m-bottom_medium" data-id="intro">{labels.intro}</p>
+    <c-barn-page-shell
+        title={labels.title}
+        purpose={labels.intro}
+        icon-name={icons.campaignSync}
+        data-id="shell"
+    >
+        <div>
             <c-settings-setup-notes notes={setupNotes}></c-settings-setup-notes>
             <template lwc:if={unavailableShown}>
                 <c-barn-notice class="slds-var-m-bottom_medium" variant="warning" message={labels.unavailable} data-id="unavailable"></c-barn-notice>
@@ -44,6 +48,6 @@
                 <c-barn-notice class="slds-var-m-bottom_medium" variant="error" message={error} data-id="error"></c-barn-notice>
             </template>
         </div>
-    </lightning-card>
+    </c-barn-page-shell>
     </template>
 </template>

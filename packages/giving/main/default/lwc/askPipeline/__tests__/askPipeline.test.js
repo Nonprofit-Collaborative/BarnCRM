@@ -310,6 +310,16 @@ describe('c-ask-pipeline', () => {
     expect(moveStage).not.toHaveBeenCalled();
   });
 
+  it('uses the shared page header and keeps the won badge green only when an ask was won', async () => {
+    const element = await render();
+    expect(one(element, '[data-id="shell"]')).not.toBeNull();
+    expect(one(element, '[data-id="won-amount"]').badgeVariant).toBe('success');
+    document.body.removeChild(element);
+
+    const none = await render({ ...BOARD, wonCount: 0, wonAmount: 0 });
+    expect(one(none, '[data-id="won-amount"]').badgeVariant).toBe('neutral');
+  });
+
   it('says so when there are no open asks, and shows a load failure', async () => {
     const empty = await render({ ...BOARD, stageTotals: [], cards: [], openCount: 0 });
     expect(one(empty, '[data-id="empty-state"]')).not.toBeNull();
