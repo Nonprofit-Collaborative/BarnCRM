@@ -91,7 +91,7 @@ public with sharing class OpportunityMirrorMap {
 		Map<String, Object> document = rows.isEmpty() ? null : asMap(parsed(rows[0].Definition_JSON__c));
 		if (
 			document == null ||
-			!names(document.get('from'), Gift__c.SObjectType.getDescribe()) ||
+			!names(document.get('from'), Gift__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)) ||
 			!names(document.get('to'), opportunity.getDescribe())
 		) {
 			return;
@@ -103,7 +103,8 @@ public with sharing class OpportunityMirrorMap {
 				fallbacks.put(((String) entry.get('target')).toLowerCase(), (String) entry.get('value'));
 			}
 		}
-		Map<String, Schema.SObjectField> giftFields = Gift__c.SObjectType.getDescribe().fields.getMap();
+		Map<String, Schema.SObjectField> giftFields = Gift__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+			.fields.getMap();
 		Map<String, Schema.SObjectField> opportunityFields = opportunity.getDescribe().fields.getMap();
 		for (Object each : asList(document.get('columns'))) {
 			Copy copy = copyOf(asMap(each), giftFields, opportunityFields);

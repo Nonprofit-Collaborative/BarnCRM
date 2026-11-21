@@ -600,7 +600,7 @@ public with sharing class ConnectorRecipes {
 			ConnectorIdentity.mapProblems(
 				identity,
 				'create',
-				Import_Batch__c.SObjectType.getDescribe().getName(),
+				Import_Batch__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName(),
 				new List<String>()
 			)
 		);
@@ -800,13 +800,14 @@ public with sharing class ConnectorRecipes {
 	}
 
 	private static Object sample(String source) {
+		Object parsed;
 		try {
-			Object parsed = JSON.deserializeUntyped(source);
-			if (parsed instanceof Map<String, Object> || parsed instanceof List<Object>) {
-				return parsed;
-			}
+			parsed = JSON.deserializeUntyped(source);
 		} catch (Exception unreadable) {
-			// Refused below.
+			parsed = null; // Refused below.
+		}
+		if (parsed instanceof Map<String, Object> || parsed instanceof List<Object>) {
+			return parsed;
 		}
 		throw new ConnectorConnections.ConnectorException(BarnHelp.text('Connector', 'Connector_Run_ErrorInput'));
 	}

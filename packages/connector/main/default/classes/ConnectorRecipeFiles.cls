@@ -787,7 +787,7 @@ public with sharing class ConnectorRecipeFiles {
 			return false;
 		}
 		try {
-			return !Schema.describeSObjects(new List<String>{ name }).isEmpty();
+			return !Schema.describeSObjects(new List<String>{ name }, SObjectDescribeOptions.DEFERRED).isEmpty();
 		} catch (Exception missing) {
 			return false;
 		}

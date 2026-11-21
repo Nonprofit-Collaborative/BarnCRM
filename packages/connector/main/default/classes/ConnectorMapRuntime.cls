@@ -248,7 +248,7 @@ public inherited sharing class ConnectorMapRuntime {
 		String objectName = objectOf(document);
 		List<Schema.DescribeSObjectResult> described = String.isBlank(objectName)
 			? new List<Schema.DescribeSObjectResult>()
-			: Schema.describeSObjects(new List<String>{ objectName });
+			: Schema.describeSObjects(new List<String>{ objectName }, SObjectDescribeOptions.DEFERRED);
 		if (described.isEmpty()) {
 			throw new MapException(BarnHelp.text('Connector', 'Connector_Run_ErrorMapObject'));
 		}
@@ -297,7 +297,7 @@ public inherited sharing class ConnectorMapRuntime {
 		String objectName = ConnectorRecipeDocument.textOf(lookup.get('object'));
 		String fieldName = ConnectorRecipeDocument.textOf(lookup.get('field'));
 		List<Schema.DescribeSObjectResult> described = Pattern.matches('[A-Za-z0-9_]{1,80}', objectName)
-			? Schema.describeSObjects(new List<String>{ objectName })
+			? Schema.describeSObjects(new List<String>{ objectName }, SObjectDescribeOptions.DEFERRED)
 			: new List<Schema.DescribeSObjectResult>();
 		Schema.SObjectField token = described.isEmpty()
 			? null

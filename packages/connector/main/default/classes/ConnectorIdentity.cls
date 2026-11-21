@@ -223,7 +223,10 @@ public with sharing class ConnectorIdentity {
 		]) {
 			editable.add(row.Field.toLowerCase());
 		}
-		Map<String, Schema.SObjectField> fieldMap = Schema.describeSObjects(new List<String>{ objectName })[0]
+		Map<String, Schema.SObjectField> fieldMap = Schema.describeSObjects(
+				new List<String>{ objectName },
+				SObjectDescribeOptions.DEFERRED
+			)[0]
 			.fields.getMap();
 		for (String field : fieldNames) {
 			Schema.SObjectField token = fieldMap.get(field.toLowerCase());
