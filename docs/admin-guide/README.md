@@ -1,6 +1,6 @@
 # Admin Guide
 
-Applies to: BarnCRM main at 678dfe553 (releases 1.26 to 1.33). Pre-release: no package version exists yet; this tracks the newest code on main. The page list is in the [Index](#index).
+Applies to: BarnCRM main at bf3dfb580 (releases 1.26 to 1.33 and batch R). Pre-release: no package version exists yet; this tracks the newest code on main. The page list is in the [Index](#index).
 
 > **Not for production orgs:** BarnCRM is in pilot. We do not recommend installing pilot or testing versions in a production Salesforce org. Use a sandbox, a free Developer Edition org or a scratch org.
 
