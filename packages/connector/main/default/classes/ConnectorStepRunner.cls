@@ -18,6 +18,10 @@ public inherited sharing class ConnectorStepRunner {
 	public static final Integer MAX_RESPONSE = 4000000;
 	public static final Integer TRIMMED = 2000;
 	public static final Integer TIMEOUT_MS = 30000;
+	/** What the step results may take of a run's State, leaving room for the list of done steps. */
+	private static final Integer STATE_ROOM = 125000;
+	/** Steps whose result can be large: an app's answer, found records, built data. */
+	private static final Set<String> LARGE_KINDS = new Set<String>{ 'callApp', 'sendWebhook', 'find', 'transform' };
 
 	/** Stop this run here and continue it in a new transaction. */
 	public class CheckpointException extends Exception {
@@ -55,9 +59,11 @@ public inherited sharing class ConnectorStepRunner {
 		public Long calloutMs = 0;
 		public Boolean wrote = false;
 
+		/** True near a limit; another call may still take its whole timeout within the 120 seconds. */
 		public Boolean low() {
 			return Limits.getCallouts() >= 90 ||
-				calloutMs >= 100000 ||
+				calloutMs + TIMEOUT_MS > 120000 ||
+				Limits.getHeapSize() > Limits.getLimitHeapSize() * 0.6 ||
 				Limits.getCpuTime() >= 45000 ||
 				Limits.getQueries() >= 180 ||
 				Limits.getDmlStatements() >= 140;
@@ -105,8 +111,26 @@ public inherited sharing class ConnectorStepRunner {
 		data.put('trigger', input == null ? new Map<String, Object>() : input);
 		data.put('steps', outputs);
 		String status = ConnectorRunStore.SUCCEEDED;
+		Decimal version = ConnectorRunStore.versionOf(run);
+		if (!isTest && version != null && version != run.Recipe_Version__c) {
+			// Retried or resumed after a Publish: it goes on with the version now published.
+			if (!done.isEmpty()) {
+				entry(
+					'-',
+					'version',
+					'succeeded',
+					0,
+					BarnHelp.text(
+						'Connector',
+						'Connector_Run_VersionChanged',
+						new List<Object>{ whole(run.Recipe_Version__c), whole(version) }
+					)
+				);
+			}
+			run.Recipe_Version__c = version;
+		}
 		try {
-			String source = isTest ? run.Recipe__r.Draft_JSON__c : run.Recipe__r.Definition_JSON__c;
+			String source = ConnectorRunStore.definitionOf(run);
 			if (String.isBlank(source)) {
 				throw failure(BarnHelp.text('Connector', 'Connector_Run_ErrorNoDefinition'));
 			}
@@ -177,6 +201,13 @@ public inherited sharing class ConnectorStepRunner {
 			Long started = System.currentTimeMillis();
 			try {
 				outputs.put(id, perform(kind, step));
+				// A State past what a run keeps would be lost with every step before it, so Retry
+				// would repeat them all: the run fails here instead, the earlier steps kept.
+				if (LARGE_KINDS.contains(kind) && JSON.serialize(outputs).length() > STATE_ROOM) {
+					throw failure(
+						BarnHelp.text('Connector', 'Connector_Run_ErrorStepTooLarge', new List<Object>{ id })
+					);
+				}
 			} catch (StoppedException stop) {
 				done.add(id);
 				entry(id, kind, 'succeeded', 0, null);
@@ -407,7 +438,7 @@ public inherited sharing class ConnectorStepRunner {
 	// ---------------------------------------------------------------------------------------
 
 	private Object saveRecord(String kind, Map<String, Object> step) {
-		ConnectorMapRuntime.SavedMap saved = ConnectorMapRuntime.load(
+		ConnectorMapRuntime.SavedMap saved = ConnectorMapRuntime.loadForRun(
 			ConnectorRecipeDocument.textOf(step.get('map')),
 			access
 		);
@@ -494,7 +525,7 @@ public inherited sharing class ConnectorStepRunner {
 		}
 		String body;
 		if (String.isNotBlank(ConnectorRecipeDocument.textOf(step.get('bodyMap')))) {
-			ConnectorMapRuntime.SavedMap saved = ConnectorMapRuntime.load(
+			ConnectorMapRuntime.SavedMap saved = ConnectorMapRuntime.loadForRun(
 				ConnectorRecipeDocument.textOf(step.get('bodyMap')),
 				access
 			);
@@ -704,13 +735,16 @@ public inherited sharing class ConnectorStepRunner {
 		return new StepFailureException(message);
 	}
 
+	private static Integer whole(Decimal value) {
+		return value == null ? 0 : value.intValue();
+	}
+
 	/**
-	 * An exception as words for the run: messages written for a person as they are, a save's
-	 * first error, and otherwise a fixed message naming only the exception type (F7: no raw
-	 * message, which could echo a request).
+	 * An exception as words for the run (also an App Poll's): messages written for a person as
+	 * they are, a save's first error, and otherwise a fixed message naming only the exception type
+	 * (F7: no raw message, which could echo a request).
 	 */
-	@TestVisible
-	private static String plain(Exception problem) {
+	public static String plain(Exception problem) {
 		if (
 			problem instanceof ConnectorMapRuntime.MapException ||
 			problem instanceof QueryCompiler.QueryCompilerException ||

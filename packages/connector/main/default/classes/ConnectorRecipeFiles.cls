@@ -36,10 +36,6 @@ public with sharing class ConnectorRecipeFiles {
 		'allowmergefieldsinbody',
 		'allowmergefieldsinheader'
 	};
-	/** A header whose name says it signs in: its literal value is never exported or imported. */
-	private static final Pattern SIGN_IN_HEADER = Pattern.compile(
-		'(?i).*(key|token|secret|auth|password|signature|session).*'
-	);
 	/** A Bearer or Basic sign-in value: the word, then a run of 12 or more token characters with a digit. */
 	private static final Pattern SIGN_IN_VALUE = Pattern.compile(
 		'(?i)\\s*(bearer|basic)\\s+(?=[A-Za-z._~+/=-]*[0-9])[A-Za-z0-9._~+/=-]{12,}\\s*'
@@ -256,9 +252,7 @@ public with sharing class ConnectorRecipeFiles {
 	}
 
 	private static Boolean signInHeader(Map<String, Object> header) {
-		return SIGN_IN_HEADER.matcher(ConnectorRecipeDocument.textOf(header.get('name'))).matches() &&
-			String.isBlank(ConnectorRecipeDocument.textOf(header.get('path'))) &&
-			String.isNotBlank(ConnectorRecipeDocument.textOf(header.get('value')));
+		return ConnectorRecipeDocument.literalSignIn(header);
 	}
 
 	// ---------------------------------------------------------------------------------------
@@ -602,7 +596,8 @@ public with sharing class ConnectorRecipeFiles {
 		for (Object raw : ConnectorRecipeDocument.listOf(starter.get('headers'))) {
 			Map<String, Object> header = ConnectorRecipeDocument.mapOf(raw);
 			blanked |=
-				SIGN_IN_HEADER.matcher(ConnectorRecipeDocument.textOf(header.get('name'))).matches() &&
+				ConnectorRecipeDocument.SIGN_IN_HEADER.matcher(ConnectorRecipeDocument.textOf(header.get('name')))
+					.matches() &&
 				String.isBlank(ConnectorRecipeDocument.textOf(header.get('path'))) &&
 				String.isBlank(ConnectorRecipeDocument.textOf(header.get('value')));
 		}

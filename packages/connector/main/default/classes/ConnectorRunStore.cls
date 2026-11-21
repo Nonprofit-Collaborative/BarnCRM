@@ -16,6 +16,11 @@ public without sharing class ConnectorRunStore {
 	public static final String RECEIVED = 'Received';
 	/** The statuses the runner takes. */
 	public static final Set<String> READY = new Set<String>{ QUEUED, RECEIVED };
+	/**
+	 * Taken by a runner job before it starts (a write cannot come before a callout in the job
+	 * itself): the next job runs it, and a job that dies fails the ones it had begun.
+	 */
+	public static final String RUNNING = 'Running';
 	public static final String WAITING = 'Waiting';
 	public static final String SUCCEEDED = 'Succeeded';
 	public static final String SKIPPED = 'Skipped';
@@ -26,23 +31,37 @@ public without sharing class ConnectorRunStore {
 	/** The trigger kinds the clock runs (R-CR6). */
 	public static final Set<String> CLOCK_KINDS = new Set<String>{ 'Schedule', 'RecordChange', 'AppPoll' };
 	/** Runs the nightly step may delete (R-RUN2). */
-	public static final Set<String> FINISHED = new Set<String>{ SUCCEEDED, SKIPPED, FAILED, 'Rejected' };
+	public static final Set<String> FINISHED = new Set<String>{ SUCCEEDED, SKIPPED, FAILED };
 	public static final Set<String> ALL_RUN_AS = new Set<String>{ 'Automation', 'System', 'IntegrationUser' };
 	/** The longest a run's input, state or step log may be (Long Text Area 131072). */
 	public static final Integer MAX_TEXT = 131072;
 	/** Runs the nightly step deletes at most in one night. */
 	public static final Integer MOST_DELETED = 9000;
+	/** A batch run's input stays well under the 131,072 a run's Input holds. */
+	public static final Integer BATCH_TEXT = 120000;
 
-	/** Every lane's queued runs, oldest first. */
-	public static List<Connector_Run__c> queued(Integer most) {
-		return queued(most, ALL_RUN_AS, false);
-	}
+	/** Each recipe a job's runs need, read once per job (definition, or draft for Test runs). */
+	private static Map<Id, Connector_Recipe__c> recipes = new Map<Id, Connector_Recipe__c>();
 
 	/**
-	 * A lane's queued runs, oldest first, with what the runner needs of their recipes: Test runs,
-	 * and runs of Active recipes unless `testsOnly` (paused, R-CR7).
+	 * A lane's Queued runs, oldest first, with what the runner needs of them: Test runs, and runs
+	 * of Active recipes unless `testsOnly` (paused, R-CR7).
 	 */
 	public static List<Connector_Run__c> queued(Integer most, Set<String> runAs, Boolean testsOnly) {
+		return runsIn(READY, most, runAs, testsOnly);
+	}
+
+	/** The runs a runner job of the lane took before it started (`claim`), oldest first. */
+	public static List<Connector_Run__c> running(Integer most, Set<String> runAs, Boolean testsOnly) {
+		return runsIn(new Set<String>{ RUNNING }, most, runAs, testsOnly);
+	}
+
+	private static List<Connector_Run__c> runsIn(
+		Set<String> statuses,
+		Integer most,
+		Set<String> runAs,
+		Boolean testsOnly
+	) {
 		Set<String> runnable = runnableStatuses(testsOnly);
 		return [
 			SELECT
@@ -50,8 +69,6 @@ public without sharing class ConnectorRunStore {
 				Name,
 				Recipe__c,
 				Recipe__r.Name,
-				Recipe__r.Definition_JSON__c,
-				Recipe__r.Draft_JSON__c,
 				Recipe__r.Record_Owner_Id__c,
 				Recipe__r.Retry_Attempts__c,
 				Recipe__r.Watermark__c,
@@ -69,7 +86,7 @@ public without sharing class ConnectorRunStore {
 				Is_Test__c
 			FROM Connector_Run__c
 			WHERE
-				Status__c IN :READY
+				Status__c IN :statuses
 				AND Ran_As__c IN :runAs
 				AND (Is_Test__c = TRUE
 				OR Recipe__r.Status__c IN :runnable)
@@ -79,23 +96,110 @@ public without sharing class ConnectorRunStore {
 		];
 	}
 
-	public static Boolean anyQueued() {
-		return anyQueued(ALL_RUN_AS, false);
-	}
-
+	/** Whether the lane has runs to run: Queued, or Running and not yet run. */
 	public static Boolean anyQueued(Set<String> runAs, Boolean testsOnly) {
 		Set<String> runnable = runnableStatuses(testsOnly);
+		Set<String> open = new Set<String>{ QUEUED, RECEIVED, RUNNING };
 		return [
 				SELECT COUNT()
 				FROM Connector_Run__c
 				WHERE
-					Status__c IN :READY
+					Status__c IN :open
 					AND Ran_As__c IN :runAs
 					AND (Is_Test__c = TRUE
 					OR Recipe__r.Status__c IN :runnable)
 				WITH SYSTEM_MODE
 				LIMIT 1
 			] > 0;
+	}
+
+	/**
+	 * Takes the lane's oldest Queued runs for the next runner job, up to `most` Running in all,
+	 * and says whether that job has any. Called only where a write may follow every callout: the
+	 * start event's trigger and the end of a job.
+	 */
+	public static Boolean claim(Integer most, Set<String> runAs, Boolean testsOnly) {
+		Integer taken = running(most, runAs, testsOnly).size();
+		List<Connector_Run__c> next = taken >= most
+			? new List<Connector_Run__c>()
+			: queued(most - taken, runAs, testsOnly);
+		for (Connector_Run__c run : next) {
+			run.Status__c = RUNNING;
+		}
+		update as system next;
+		return taken + next.size() > 0;
+	}
+
+	/** Reads, once, the recipes a job's runs need: the published definition, or the draft for a Test. */
+	public static void loadRecipes(List<Connector_Run__c> runs) {
+		Set<Id> live = new Set<Id>();
+		Set<Id> tested = new Set<Id>();
+		for (Connector_Run__c run : runs) {
+			if (run.Is_Test__c == true) {
+				tested.add(run.Recipe__c);
+			} else {
+				live.add(run.Recipe__c);
+			}
+		}
+		for (Connector_Recipe__c row : [
+			SELECT Id, Version__c, Definition_JSON__c
+			FROM Connector_Recipe__c
+			WHERE Id IN :live
+			WITH SYSTEM_MODE
+		]) {
+			recipes.put(row.Id, row);
+		}
+		for (Connector_Recipe__c row : [
+			SELECT Id, Version__c, Definition_JSON__c, Draft_JSON__c
+			FROM Connector_Recipe__c
+			WHERE Id IN :tested
+			WITH SYSTEM_MODE
+		]) {
+			recipes.put(row.Id, row);
+		}
+	}
+
+	/** The recipe document a run runs: its draft for a Test, else the published definition. */
+	public static String definitionOf(Connector_Run__c run) {
+		Connector_Recipe__c recipe = recipeOf(run);
+		return recipe == null ? null : (run.Is_Test__c == true ? recipe.Draft_JSON__c : recipe.Definition_JSON__c);
+	}
+
+	/** The recipe's current version, the one a run now runs. */
+	public static Decimal versionOf(Connector_Run__c run) {
+		Connector_Recipe__c recipe = recipeOf(run);
+		return recipe == null ? null : recipe.Version__c;
+	}
+
+	private static Connector_Recipe__c recipeOf(Connector_Run__c run) {
+		Connector_Recipe__c recipe = recipes.get(run.Recipe__c);
+		if (recipe == null || (run.Is_Test__c == true && !recipe.isSet('Draft_JSON__c'))) {
+			loadRecipes(new List<Connector_Run__c>{ run });
+			recipe = recipes.get(run.Recipe__c);
+		}
+		return recipe;
+	}
+
+	/**
+	 * Items in order, in chunks whose JSON stays under `room` characters (a batch run's input):
+	 * a single item over it is a chunk of its own.
+	 */
+	public static List<List<Object>> chunks(List<Object> items, Integer room) {
+		List<List<Object>> found = new List<List<Object>>();
+		List<Object> chunk = new List<Object>();
+		Integer size = 0;
+		for (Object item : items) {
+			Integer length = JSON.serialize(item).length();
+			if (!chunk.isEmpty() && size + length > room) {
+				found.add(chunk);
+				chunk = new List<Object>();
+				size = 0;
+			}
+			chunk.add(item);
+			size += length;
+		}
+		found.add(chunk);
+		return found;
 	}
 
 	/** An Active recipe by name, for the Flow action, whoever runs the flow. */
@@ -190,6 +294,7 @@ public without sharing class ConnectorRunStore {
 				run.Attempt__c = (run.Attempt__c == null ? 0 : run.Attempt__c) + 1;
 			}
 			run.Failed_Step__c = null;
+			run.Error_Message__c = null;
 			run.Next_Attempt_At__c = null;
 		}
 		update as system due;
@@ -360,14 +465,15 @@ public without sharing class ConnectorRunStore {
 		return deleted;
 	}
 
-	/** How many runs it may run have waited Queued longer than the minutes given (R-CR8). */
+	/** How many runs it may run have waited Queued or Running longer than the minutes given (R-CR8). */
 	public static Integer queuedLongerThan(Integer minutes) {
 		Datetime before = Datetime.now().addMinutes(-minutes);
+		Set<String> open = new Set<String>{ QUEUED, RECEIVED, RUNNING };
 		return [
 			SELECT COUNT()
 			FROM Connector_Run__c
 			WHERE
-				Status__c IN :READY
+				Status__c IN :open
 				AND LastModifiedDate < :before
 				AND (Is_Test__c = TRUE
 				OR Recipe__r.Status__c = :ACTIVE)
@@ -450,7 +556,7 @@ public without sharing class ConnectorRunStore {
 	/** Whether an App Poll recipe's poll run is still Queued, Running or Waiting (R-CR16). */
 	public static Boolean pollPending(Id recipeId) {
 		String key = recipeId + ConnectorAppPoll.POLL_KEY + '%';
-		Set<String> pending = new Set<String>{ QUEUED, 'Running', WAITING };
+		Set<String> pending = new Set<String>{ QUEUED, RUNNING, WAITING };
 		return [
 				SELECT COUNT()
 				FROM Connector_Run__c
@@ -478,6 +584,8 @@ public without sharing class ConnectorRunStore {
 	public static final Integer MOST_SEARCHED = 2000;
 	/** Runs changed this recently are read as well: the search index may not hold them yet. */
 	public static final Integer RECENT_MINUTES = 60;
+	/** Runs read together while an erasure checks them. */
+	private static final Integer READ_CHUNK = 20;
 	private static final String SEARCH_RESERVED = '\\?&|!{}[]()^~*:"\'+-';
 	private static final String LOCAL_PART = 'abcdefghijklmnopqrstuvwxyz0123456789._%+-\'';
 	private static final String DOMAIN_PART = 'abcdefghijklmnopqrstuvwxyz0123456789-_';
@@ -486,8 +594,9 @@ public without sharing class ConnectorRunStore {
 	 * The runs whose Input, State or Step Log names a person (R-CR17): their record Id, in its 15
 	 * or 18 character form, or one of their email addresses (lower case), as a whole address,
 	 * ignoring capitals. Long text cannot be filtered in a query, so the search index names the
-	 * runs to read, with every run changed in the last hour, and each is read and checked here.
-	 * Null when the search found its most, so some might be missed.
+	 * runs to read, with every run changed in the last hour, and each is read and checked here, a
+	 * few at a time. Null when the search found its most, or there are more to read than one
+	 * transaction can, so some might be missed.
 	 */
 	public static List<Id> runsNaming(Id personId, List<String> emails) {
 		String id15 = String.valueOf(personId).left(15);
@@ -521,13 +630,26 @@ public without sharing class ConnectorRunStore {
 			candidates.add(recent.Id);
 		}
 		List<Id> found = new List<Id>();
-		for (List<Connector_Run__c> page : [
-			SELECT Id, Input_JSON__c, State_JSON__c, Step_Log_JSON__c
-			FROM Connector_Run__c
-			WHERE Id IN :candidates
-			WITH SYSTEM_MODE
-		]) {
-			for (Connector_Run__c run : page) {
+		List<Id> left = new List<Id>(candidates);
+		for (Integer start = 0; start < left.size(); start += READ_CHUNK) {
+			// A run's three texts may hold 393,216 characters, so a few are read at a time, and the
+			// erasure is refused, as for too many, before the transaction could run out.
+			if (
+				Limits.getHeapSize() > Limits.getLimitHeapSize() / 2 ||
+				Limits.getQueries() >= Limits.getLimitQueries() - 10
+			) {
+				return null;
+			}
+			List<Id> chunk = new List<Id>();
+			for (Integer i = start; i < Math.min(start + READ_CHUNK, left.size()); i++) {
+				chunk.add(left[i]);
+			}
+			for (Connector_Run__c run : [
+				SELECT Id, Input_JSON__c, State_JSON__c, Step_Log_JSON__c
+				FROM Connector_Run__c
+				WHERE Id IN :chunk
+				WITH SYSTEM_MODE
+			]) {
 				if (
 					names(run.Input_JSON__c, id15, emails) ||
 					names(run.State_JSON__c, id15, emails) ||

@@ -155,7 +155,7 @@ public with sharing class ConnectorClock implements Queueable {
 			);
 			return;
 		}
-		ConnectorRunner.start();
+		ConnectorRunner.start(lane);
 		ensure(lane);
 	}
 
@@ -226,12 +226,24 @@ public with sharing class ConnectorClock implements Queueable {
 				if (low()) {
 					break;
 				}
+				// Only what the beat moved is written back: the runner, an App Poll and an admin
+				// change the rest of the recipe meanwhile, and a stale copy would undo it.
+				Connector_Recipe__c slim = new Connector_Recipe__c(Id = recipe.Id);
+				String mark = recipe.Watermark__c;
 				try {
 					runs.addAll(dueRuns(recipe, identities, now));
+					if (recipe.Watermark__c != mark) {
+						slim.Watermark__c = recipe.Watermark__c;
+					}
 				} catch (Exception refused) {
 					problems.add(failedPoll(recipe, refused, now));
+					slim.Consecutive_Failures__c = recipe.Consecutive_Failures__c;
+					if (recipe.Status__c == ConnectorRunStore.PAUSED_BY_FAILURES) {
+						slim.Status__c = recipe.Status__c;
+					}
 				}
-				moved.add(recipe);
+				slim.Next_Run_At__c = recipe.Next_Run_At__c;
+				moved.add(slim);
 			}
 			ConnectorRunStore.clockSave(runs, moved);
 			ErrorLogger.logMessages(problems, 'ConnectorClock', ErrorLogger.SEVERITY_ERROR);

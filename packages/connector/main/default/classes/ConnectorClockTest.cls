@@ -424,12 +424,23 @@ private class ConnectorClockTest {
 			} catch (ConnectorConnections.ConnectorException expected) {
 				refused = expected.getMessage();
 			}
+			String tooMuch;
+			try {
+				ConnectorIntegrationUser.choose(UserInfo.getUserId());
+			} catch (ConnectorConnections.ConnectorException expected) {
+				tooMuch = expected.getMessage();
+			}
 
 			Test.startTest();
 			ConnectorIntegrationUser.View chosen = ConnectorRecipesController.chooseIntegrationUser(integrator.Id);
 			Test.stopTest();
 
 			Assert.areEqual(BarnHelp.text('Connector', 'Connector_IntegrationUser_ErrorChoice'), refused);
+			Assert.areEqual(
+				BarnHelp.text('Connector', 'Connector_IntegrationUser_ErrorTooMuch'),
+				tooMuch,
+				'An administrator would give Integration User recipes every record.'
+			);
 			Assert.areEqual(String.valueOf(integrator.Id), chosen.id);
 			Assert.areEqual(integrator.Id, ConnectorIntegrationUser.chosenId(), 'Saved org-wide.');
 			Assert.isTrue(ConnectorIntegrationUser.ready());

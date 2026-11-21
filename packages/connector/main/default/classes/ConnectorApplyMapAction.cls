@@ -56,11 +56,15 @@ global with sharing class ConnectorApplyMapAction {
 		for (Request request : requests == null ? new List<Request>() : requests) {
 			Result result = new Result();
 			results.add(result);
-			if (Limits.getDmlStatements() >= 140 || Limits.getQueries() >= 180) {
+			// In order, each save seeing the ones before it (a later request's match finds an
+			// earlier one's record); one statement each, so a bulk flow runs to the limits.
+			if (
+				Limits.getDmlStatements() >= Limits.getLimitDmlStatements() - 5 ||
+				Limits.getQueries() >= Limits.getLimitQueries() - 5
+			) {
 				result.message = BarnHelp.text('Connector', 'Connector_Flow_TooMany');
 				continue;
 			}
-			Savepoint before = Database.setSavepoint();
 			try {
 				String name = request.mapName == null ? '' : request.mapName.trim();
 				if (!maps.containsKey(name.toLowerCase())) {
@@ -79,6 +83,7 @@ global with sharing class ConnectorApplyMapAction {
 							: JSON.deserializeUntyped(request.dataJson));
 				Boolean matches = !ConnectorRecipeDocument.mapOf(saved.document.get('match')).isEmpty();
 				String kind = request.targetRecordId != null ? 'update' : (matches ? 'upsert' : 'create');
+				// One insert or update, atomic on its own: nothing to roll back when it is refused.
 				ConnectorMapRuntime.Saved done = ConnectorMapRuntime.save(
 					kind,
 					saved.document,
@@ -91,19 +96,19 @@ global with sharing class ConnectorApplyMapAction {
 				result.recordId = done.recordId;
 				result.action = done.action;
 			} catch (Exception refused) {
-				Database.rollback(before);
-				result.message = refused instanceof ConnectorMapRuntime.MapException || refused instanceof DmlException
-					? (refused instanceof DmlException
-							? ((DmlException) refused).getDmlMessage(0)
-							: refused.getMessage())
-					: BarnHelp.text(
-							'Connector',
-							'Connector_Run_ErrorUnexpected',
-							new List<Object>{ refused.getTypeName() }
-					  );
+				result.message = words(refused);
 			}
 		}
 		return results;
+	}
+
+	private static String words(Exception refused) {
+		if (refused instanceof DmlException) {
+			return ((DmlException) refused).getDmlMessage(0);
+		}
+		return refused instanceof ConnectorMapRuntime.MapException
+			? refused.getMessage()
+			: BarnHelp.text('Connector', 'Connector_Run_ErrorUnexpected', new List<Object>{ refused.getTypeName() });
 	}
 
 	/** A saved map by name, read as the person (R-ST5). */

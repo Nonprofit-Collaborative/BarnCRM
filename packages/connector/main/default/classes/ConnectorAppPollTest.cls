@@ -62,7 +62,10 @@ private class ConnectorAppPollTest {
 	/** Queues the recipe's poll run as the clock does, and runs the runner's job body once. */
 	private static void pollOnce(Connector_Recipe__c recipe) {
 		insert as system ConnectorAppPoll.pollRun(recipe);
-		ConnectorRunner.process(ConnectorRunStore.queued(50), new ConnectorRunner.Guard());
+		ConnectorRunner.process(
+			ConnectorRunStore.queued(50, ConnectorRunStore.ALL_RUN_AS, false),
+			new ConnectorRunner.Guard()
+		);
 	}
 
 	private static List<Connector_Run__c> runsOf(Id recipeId) {
@@ -362,7 +365,7 @@ private class ConnectorAppPollTest {
 		System.runAs(admin()) {
 			Connector_Recipe__c recipe = pollRecipe(starter(new Map<String, Object>()), null);
 			insert as system ConnectorAppPoll.pollRun(recipe);
-			Connector_Run__c run = ConnectorRunStore.queued(50)[0];
+			Connector_Run__c run = ConnectorRunStore.queued(50, ConnectorRunStore.ALL_RUN_AS, false)[0];
 			ConnectorStepRunner.Budget budget = new ConnectorStepRunner.Budget();
 			budget.wrote = true;
 

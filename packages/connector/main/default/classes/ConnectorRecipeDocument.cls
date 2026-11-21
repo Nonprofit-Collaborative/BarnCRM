@@ -250,6 +250,13 @@ public with sharing class ConnectorRecipeDocument {
 			if (!headerNameOk(textOf(header.get('name'))) || !valueOk(header)) {
 				return BarnHelp.text('Connector', 'Connector_Recipe_ErrorHeader', at);
 			}
+			if (literalSignIn(header)) {
+				return BarnHelp.text(
+					'Connector',
+					'Connector_Recipe_ErrorSignInHeader',
+					new List<Object>{ at[0], header.get('name') }
+				);
+			}
 		}
 		for (Object code : listOf(step.get('success'))) {
 			if (!(code instanceof Integer) || (Integer) code < 100 || (Integer) code > 599) {
@@ -263,6 +270,22 @@ public with sharing class ConnectorRecipeDocument {
 		}
 		return null;
 	}
+
+	/**
+	 * A header whose name says it signs in with a typed value (R-CR15): a recipe is readable by
+	 * every Connector viewer, so such a value is refused at Save, never exported and never
+	 * imported. A value read from the data (a path) stays allowed.
+	 */
+	public static Boolean literalSignIn(Map<String, Object> header) {
+		return SIGN_IN_HEADER.matcher(textOf(header.get('name'))).matches() &&
+			String.isBlank(textOf(header.get('path'))) &&
+			String.isNotBlank(textOf(header.get('value')));
+	}
+
+	/** A header name that says it signs in. */
+	public static final Pattern SIGN_IN_HEADER = Pattern.compile(
+		'(?i).*(key|token|secret|auth|password|signature|session).*'
+	);
 
 	/** A header a recipe may set: never `Authorization` or another the auth kind or Salesforce sets (F1). */
 	public static Boolean headerNameOk(String name) {

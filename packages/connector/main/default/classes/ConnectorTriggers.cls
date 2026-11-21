@@ -13,8 +13,6 @@ public inherited sharing class ConnectorTriggers {
 	public static final Set<String> STAMPS = new Set<String>{ 'created', 'changed' };
 	public static final Set<String> MODES = new Set<String>{ 'each', 'batch' };
 	public static final Integer MAX_POLLED = 200;
-	/** A batch run's input stays well under the 131,072 a run's Input holds. */
-	private static final Integer BATCH_TEXT = 120000;
 	private static final Pattern AT = Pattern.compile('([01][0-9]|2[0-3]):[0-5][0-9]');
 	/** 1 January 1900 was a Monday. */
 	private static final Date A_MONDAY = Date.newInstance(1900, 1, 1);
@@ -209,20 +207,13 @@ public inherited sharing class ConnectorTriggers {
 			}
 			return runs;
 		}
-		List<Object> chunk = new List<Object>();
-		Integer size = 0;
+		List<Object> plain = new List<Object>();
 		for (Object raw : records) {
-			Object record = ConnectorStepRunner.withoutAttributes(raw);
-			Integer length = JSON.serialize(record).length();
-			if (!chunk.isEmpty() && size + length > BATCH_TEXT) {
-				runs.add(batchRun(chunk));
-				chunk = new List<Object>();
-				size = 0;
-			}
-			chunk.add(record);
-			size += length;
+			plain.add(ConnectorStepRunner.withoutAttributes(raw));
 		}
-		runs.add(batchRun(chunk));
+		for (List<Object> chunk : ConnectorRunStore.chunks(plain, ConnectorRunStore.BATCH_TEXT)) {
+			runs.add(batchRun(chunk));
+		}
 		return runs;
 	}
 

@@ -182,8 +182,10 @@ public with sharing class ConnectorHealthCheckExtension implements HealthCheckEx
 	}
 
 	/**
-	 * Whether "BarnCRM Connections" grants anything besides `BarnConn_` principal access: an
-	 * object or field permission, or another setup entity (a class, a page, another credential).
+	 * Whether "BarnCRM Connections" grants anything besides `BarnConn_` principal access: a
+	 * system permission (Modify All Data, Author Apex, any other), an object, field or tab
+	 * setting, or another setup entity (a class, a page, another credential). The set goes to
+	 * every Connector admin and recipe identity, so anything more reaches them all (F12).
 	 */
 	@TestVisible
 	private static Boolean accessSetHoldsMore() {
@@ -195,8 +197,35 @@ public with sharing class ConnectorHealthCheckExtension implements HealthCheckEx
 		entities.removeAll(ConnectorConnections.store().principalIds().values());
 		Id setId = target.Id;
 		return !entities.isEmpty() ||
+			holdsSystemPermission(setId) ||
 			[SELECT COUNT() FROM ObjectPermissions WHERE ParentId = :setId WITH SYSTEM_MODE] > 0 ||
-			[SELECT COUNT() FROM FieldPermissions WHERE ParentId = :setId WITH SYSTEM_MODE] > 0;
+			[SELECT COUNT() FROM FieldPermissions WHERE ParentId = :setId WITH SYSTEM_MODE] > 0 ||
+			[SELECT COUNT() FROM PermissionSetTabSetting WHERE ParentId = :setId WITH SYSTEM_MODE] > 0;
+	}
+
+	/** Whether any of the set's system permission columns (every `Permissions...` box) is ticked. */
+	private static Boolean holdsSystemPermission(Id setId) {
+		List<String> boxes = new List<String>();
+		for (Schema.SObjectField field : Schema.SObjectType.PermissionSet.fields.getMap().values()) {
+			Schema.DescribeFieldResult described = field.getDescribe();
+			if (described.getName().startsWith('Permissions') && described.getType() == Schema.DisplayType.BOOLEAN) {
+				boxes.add(described.getName());
+			}
+		}
+		if (boxes.isEmpty()) {
+			return false;
+		}
+		SObject row = Database.queryWithBinds(
+			'SELECT ' + String.join(boxes, ', ') + ' FROM PermissionSet WHERE Id = :setId',
+			new Map<String, Object>{ 'setId' => setId },
+			AccessLevel.SYSTEM_MODE
+		)[0];
+		for (String box : boxes) {
+			if (row.get(box) == true) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static String joined(List<String> labels) {

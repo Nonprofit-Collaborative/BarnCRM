@@ -167,21 +167,37 @@ private class ConnectorRecipeFilesTest {
 				'","method":"POST","path":"/people","bodyMap":"' +
 				bodyId +
 				'","headers":[{"name":"X-Api-Key","value":"typed1234567890"},{"name":"Accept","value":"application/json"}]}]}';
-			ConnectorRecipes.Recipe saved = ConnectorRecipesController.saveDraft(
-				null,
+			String refusedOnSave;
+			try {
+				ConnectorRecipesController.saveDraft(null, 'Send People', 'Sends', document, null);
+			} catch (AuraHandledException refused) {
+				refusedOnSave = refused.getMessage();
+			}
+			// Stored directly, past Save's checks: Export still blanks the value.
+			Connector_Recipe__c saved = ConnectorRecipeTestData.recipe(
 				'Send People',
-				'Sends',
 				document,
-				null
+				false,
+				ConnectorRecipes.RUN_AS_AUTOMATION
 			);
 
 			Test.startTest();
-			String fileText = ConnectorRecipesController.exportRecipe(saved.id);
+			String fileText = ConnectorRecipesController.exportRecipe(saved.Id);
 			ConnectorRecipeFiles.Imported matched = ConnectorRecipesController.importFile(fileText);
 			delete as system new Saved_Transform__c(Id = bodyId);
 			ConnectorRecipeFiles.Imported unmatched = ConnectorRecipesController.importFile(fileText);
 			Test.stopTest();
 
+			Assert.isTrue(
+				refusedOnSave.contains(
+					BarnHelp.text(
+						'Connector',
+						'Connector_Recipe_ErrorSignInHeader',
+						new List<Object>{ 'send', 'X-Api-Key' }
+					)
+				),
+				'Save refuses a typed value in a sign-in header: viewers can read a recipe.'
+			);
 			Assert.isFalse(fileText.contains('typed1234567890'), 'A sign-in header value never leaves the org.');
 			Assert.isFalse(fileText.contains('Lovelace'), 'Sample data is not exported.');
 			Map<String, Object> file = (Map<String, Object>) JSON.deserializeUntyped(fileText);
@@ -216,16 +232,15 @@ private class ConnectorRecipeFilesTest {
 				'","path":"/members","items":"members","id":"id","stamp":"changed","mode":"each",' +
 				'"headers":[{"name":"X-Api-Key","value":"typed1234567890"}]},' +
 				'"steps":[{"id":"end","kind":"stop","outcome":"Succeeded"}]}';
-			ConnectorRecipes.Recipe saved = ConnectorRecipesController.saveDraft(
-				null,
+			Connector_Recipe__c saved = ConnectorRecipeTestData.recipe(
 				'Poll People',
-				'',
 				document,
-				null
+				false,
+				ConnectorRecipes.RUN_AS_AUTOMATION
 			);
 
 			Test.startTest();
-			String fileText = ConnectorRecipesController.exportRecipe(saved.id);
+			String fileText = ConnectorRecipesController.exportRecipe(saved.Id);
 			ConnectorRecipeFiles.Imported imported = ConnectorRecipesController.importFile(fileText);
 			Test.stopTest();
 
@@ -245,6 +260,7 @@ private class ConnectorRecipeFilesTest {
 	@IsTest
 	static void aTemplateOffersALockedConnectionAndDraftsAndStoresNothing() {
 		System.runAs(admin()) {
+			ConnectorRecipeTestData.noConnections();
 			Test.startTest();
 			ConnectorRecipeFiles.Imported result = ConnectorRecipesController.importFile(JSON.serialize(template()));
 			Test.stopTest();
@@ -269,6 +285,7 @@ private class ConnectorRecipeFilesTest {
 	@IsTest
 	static void importRefusesMergeFieldsSecretsFormulasAndUnsafeAddresses() {
 		System.runAs(admin()) {
+			ConnectorRecipeTestData.noConnections();
 			Map<String, Object> plainHttp = template();
 			plainHttp.put('baseUrl', 'http://{dc}.api.mailchimp.com/3.0');
 			Map<String, Object> hostInPath = template();

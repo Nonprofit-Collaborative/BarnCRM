@@ -94,10 +94,11 @@ public with sharing class ConnectorIdentity {
 	/**
 	 * Assigns the picked sets and BarnCRM Connections to the Automated Process user and removes
 	 * the offered sets no longer picked; assignments it does not offer are left alone. Only a
-	 * Connector admin holding BarnCRM Connector Admin may save it.
+	 * Connector admin holding BarnCRM Connector Admin and Manage Named Credentials or Customize
+	 * Application may save it: it gives recipes the reach of the sets picked (F3).
 	 */
 	public static Access save(List<String> pickedIds) {
-		ConnectorConnections.requireManager();
+		ConnectorConnections.requireWriter();
 		if (!ConnectorConnections.holdsAdminSet()) {
 			throw new ConnectorConnections.ConnectorException(BarnHelp.text('Connector', 'Connector_Error_NoManage'));
 		}

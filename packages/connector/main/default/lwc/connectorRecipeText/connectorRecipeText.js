@@ -645,6 +645,18 @@ const TEXTS = {
   get Connector_Runs_Steps() {
     return helpText('Connector', 'Connector_Runs_Steps');
   },
+  get Connector_Runs_Attempts() {
+    return helpText('Connector', 'Connector_Runs_Attempts');
+  },
+  get Connector_Runs_Tested() {
+    return helpText('Connector', 'Connector_Runs_Tested');
+  },
+  get Connector_Runs_VersionStep() {
+    return helpText('Connector', 'Connector_Runs_VersionStep');
+  },
+  get Connector_Recipe_ErrorSignInHeader() {
+    return helpText('Connector', 'Connector_Recipe_ErrorSignInHeader');
+  },
   get Connector_Runs_WouldDo() {
     return helpText('Connector', 'Connector_Runs_WouldDo');
   },
@@ -698,9 +710,6 @@ const TEXTS = {
   },
   get Connector_Status_Received() {
     return helpText('Connector', 'Connector_Status_Received');
-  },
-  get Connector_Status_Rejected() {
-    return helpText('Connector', 'Connector_Status_Rejected');
   },
   get Connector_Status_Running() {
     return helpText('Connector', 'Connector_Status_Running');
