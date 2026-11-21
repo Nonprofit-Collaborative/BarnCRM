@@ -1,6 +1,6 @@
 # User Guide
 
-Applies to: BarnCRM main at 3b7d72840 (releases 1.26 to 1.30, with release 1.33's Org Optimizer follow-ups). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM main at 678dfe553 (releases 1.26 to 1.33). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 ## Who This Is For
 

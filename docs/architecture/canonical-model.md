@@ -19280,7 +19280,8 @@ Send for Real was ticked. It is a run with Is Test set.
 **R-CR6 The recipe clock** (CN-03; no Scheduled Apex, no person). Each lane (the Automated
 Process user; the integration user) has one heartbeat, a Queueable that its start event's
 trigger starts and that queues itself again 5 minutes later while its lane has an Active
-Schedule or Record Change recipe, a Waiting run or a Queued run. Each beat, in its lane:
+Schedule or Record Change recipe, a Waiting run, a Queued run or a claimed Running run (a
+claimed Running run counts as Queued for the clock). Each beat, in its lane:
 Waiting runs whose Next Attempt At has passed become Queued; each Active recipe whose Next Run
 At has passed is run: a `schedule` recipe queues one run (Started By Schedule) and moves Next
 Run At to its next time in the org's time zone; a `record` recipe polls its query for records
@@ -20056,6 +20057,7 @@ mirrors the primary member).
 | 1.80 | 2026-11-20 | BarnCRM Connector watching apps for new items and runs in the erasure path (CN-13, CN-18, release 1.33). R-CR1 adds the `appPoll` trigger; new R-CR16 (App Poll: poll runs, Watermark, item runs) and R-CR17 (erasing a person deletes the runs that name them). Connector Run allows search (`enableSearch`); `ConnectorErasureExtension` joins Core's erasure extensions. No object or field added. |
 | 1.81 | 2026-11-20 | The Mapper and saved maps (MAP-01 to MAP-07, releases 1.31 to 1.33). `Saved_Transform__c` gains `Kind__c` (Step List, the default, or Map); new R-MAP1 to R-MAP4 (map document, paths, checks, preview) and R-ST5 (maps). `Giving_Settings__c` gains `Opportunity_Mirror_Map__c`, a Saved Transform record ID chosen with a record picker (a map name is read too); new R-OM12 (extra fields through a map). No object added. |
 | 1.82 | 2026-11-20 | BarnCRM Connector pre-batch review fixes (release 1.33). One object added, 199 to 200 in the suite: Connector Connection (`Connector_Connection__c`, `Check_Path__c`), which keeps a template's check path beside a connection (29CN1, new R-CN9: Check Connection asks for it and shows the account an answer names). New R-CN10: choosing the integration user needs the key-writing permissions and refuses an all-seeing user. R-CN8: Disconnect refuses a Secret URL. Connector Run's Status loses Rejected; Running marks runs claimed for the next runner job (R-RUN4). |
+| 1.83 | 2026-11-20 | R-CR6 the recipe clock: a claimed Running run counts as Queued for the clock, so the heartbeat keeps running while a lane has a Waiting run, a Queued run or a claimed Running run (batch Q gate fix). |
 
 ---
 ## 32. Entity ownership by package
