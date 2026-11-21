@@ -1,11 +1,10 @@
 <template>
     <template lwc:if={helpReady}>
-    <lightning-card title={labels.title} icon-name={iconName}>
-        <div class="slds-var-p-horizontal_medium slds-is-relative">
+    <c-barn-page-shell title={labels.title} purpose={labels.intro} icon-name={iconName} data-id="shell">
+        <div class="slds-is-relative">
             <template lwc:if={spinnerShown}>
                 <lightning-spinner alternative-text={labels.loading} size="small" data-id="spinner"></lightning-spinner>
             </template>
-            <p class="slds-var-m-bottom_medium" data-id="intro">{labels.intro}</p>
             <c-settings-setup-notes notes={setupNotes}></c-settings-setup-notes>
             <template lwc:if={view.unavailableShown}>
                 <c-barn-notice class="slds-var-m-bottom_medium" variant="warning" message={labels.unavailable} data-id="unavailable"></c-barn-notice>
@@ -139,6 +138,6 @@
                 </template>
             </template>
         </div>
-    </lightning-card>
+    </c-barn-page-shell>
     </template>
 </template>

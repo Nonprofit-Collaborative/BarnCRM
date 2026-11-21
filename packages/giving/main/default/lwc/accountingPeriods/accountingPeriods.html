@@ -1,8 +1,7 @@
 <template>
     <template lwc:if={helpReady}>
-    <div class="slds-var-p-around_medium">
-        <h2 class="slds-text-heading_small" data-id="title">{labels.title}</h2>
-        <p class="slds-text-body_small slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
+    <c-barn-page-shell title={labels.title} purpose={labels.intro} icon-name="custom:custom55" data-id="shell">
+    <div>
 
         <template lwc:if={errorMessage}>
             <c-barn-notice
@@ -73,5 +72,6 @@
             </div>
         </template>
     </div>
+    </c-barn-page-shell>
     </template>
 </template>

@@ -106,8 +106,8 @@
   <tabs>Volunteer_Letter_Template__c</tabs>
   <tabs>Skill__c</tabs>
   <tabs>Volunteer_Requirement__c</tabs>
-  <tabs>standard-Dashboard</tabs>
   <tabs>standard-report</tabs>
+  <tabs>standard-Dashboard</tabs>
   <uiType>Lightning</uiType>
   <workspaceConfig>
     <mappings>

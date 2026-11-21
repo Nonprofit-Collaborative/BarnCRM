@@ -31,7 +31,9 @@ for **Error Log**, a telescope for
 **Addresses** a map. Every BarnCRM page opens with the same page header: on Data Manager, Org
 Optimizer, Duplicate Matching, Find, Import, Super Transformer, Automation and Record Inspector
 the page name appears once, followed by a line saying what the page is for. On the home page the
-header is the welcome. Sections further down a page are cards.
+header is the welcome. Sections further down a page are cards. Module pages open with the same
+header, among them **Rollup Builder**, **Accounting Periods**, **Opportunity Mirror**, **Gift
+Transaction Mirror** and **Component Builder**.
 
 Module tabs follow the same rule: every Fundraising, Volunteers, Programs, Logic Models, Rollup
 Builder and Mirror tab has its own icon, never one shared with another BarnCRM tab (for

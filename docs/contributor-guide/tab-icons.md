@@ -191,7 +191,6 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | giving | tributeNotification | custom:custom5 | Tribute__c |
 | corporatehub | hubBoardPanel | custom:custom47 | Board__c |
 | corporatehub | hubMeetingPanel | custom:custom84 | Board_Meeting__c |
-| lwcbuilder | lwcBuilderStudio | custom:custom34 | LWC_Builder |
 | reporting | reportingHome | custom:custom84 | Advanced_Reporting |
 | migration | migrationHome | custom:custom98 | Migration_Assistant |
 | forms | formBuilder | custom:custom28 | Form__c |
@@ -206,8 +205,6 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | projects | projectsAtRisk | custom:custom62 | Project__c |
 | giving | accountingExport | custom:custom16 | Accounting_Export |
 | giving | campaignSync | custom:custom35 | Campaign_Sync |
-| giving | mirrorPage | custom:custom31 | Gift_Transaction_Mirror |
-| giving | mirrorPage | custom:custom30 | Opportunity_Mirror |
 | programs | cohortMembers | custom:custom50 | Cohort__c |
 | programs | personEnrollments | custom:custom60 | Enrollment__c |
 | programs | programDashboard | custom:custom9 | Programs_Dashboard |
@@ -217,7 +214,6 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | programs | servicePlan | custom:custom96 | Goal__c |
 | programs | sessionScheduler | custom:custom20 | Session__c |
 | programs | sessionScheduleSessions | custom:custom20 | Session__c |
-| rollups | rollupBuilder | custom:custom63 | Rollup_Builder |
 | rollups | rollupDefinitions | custom:custom63 | Rollup_Builder |
 | volunteers | shiftScheduleShifts | custom:custom74 | Volunteer_Shift__c |
 | volunteers | shiftSignups | custom:custom2 | Volunteer_Signup__c |
