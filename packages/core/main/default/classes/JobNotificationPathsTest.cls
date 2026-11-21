@@ -42,6 +42,25 @@ private class JobNotificationPathsTest {
 		}
 	}
 
+	/**
+	 * Stands in for the Sample Data package's host, which Core cannot compile against and an
+	 * org with Core alone does not have: it sends the finished notice the way the package's
+	 * SampleDataLoader.notifyLoadFinished does, whose own test covers that notice.
+	 */
+	private class NotifyingHost implements SampleDataHost {
+		public void load() {
+			// Nothing to load: these tests check only the notice at the end of the chain.
+		}
+
+		public SampleDataStages coreRemoveStages() {
+			return null;
+		}
+
+		public void notifyLoadFinished() {
+			JobNotifier.aboutSampleData(UserInfo.getUserId(), Label.Core_JobNotice_SampleData, false, 'Loaded');
+		}
+	}
+
 	/** Runs the one stage the way the stage batch does. */
 	private static void runOneStage(Boolean fails) {
 		SampleDataStageBatch batch = new SampleDataStageBatch(new OneStage(fails));
@@ -217,6 +236,7 @@ private class JobNotificationPathsTest {
 		System.runAs(TestUsers.admin()) {
 			notifications(true);
 			SampleDataModules.moduleOverride = new List<SampleDataModule>();
+			SampleDataModules.hostOverride = new NotifyingHost();
 			ModuleDetectionService.installedOverride.put(ModuleDetectionService.MODULE_SAMPLE_DATA, true);
 
 			SampleDataModules.startFirst();

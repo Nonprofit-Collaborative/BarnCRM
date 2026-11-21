@@ -825,6 +825,27 @@ private class SampleDataLoaderTest {
 	}
 
 	@IsTest
+	static void testLoadFinishedTellsTheLoaderAndOpensTheSampleDataTab() {
+		System.runAs(TestUsers.adminWithInstalledModules()) {
+			insert new BarnCRM_Settings__c(SetupOwnerId = UserInfo.getOrganizationId(), Job_Notifications__c = true);
+			SettingsService.clearCaches();
+
+			SampleDataLoader.notifyLoadFinished();
+
+			List<JobNotifier.Notice> sent = JobNotifier.sentNotices();
+			Assert.areEqual(1, sent.size(), 'One notice when the whole load is in');
+			Assert.areEqual(UserInfo.getUserId(), sent[0].recipientId, 'To the person who loaded it');
+			Assert.areEqual(
+				String.format(Label.Core_JobNotice_Finished, new List<Object>{ Label.Core_JobNotice_SampleData }),
+				sent[0].title,
+				'Saying the sample data load finished'
+			);
+			// Which tab is Core's to say; JobNotificationPathsTest checks it is the Sample Data tab.
+			Assert.isNotNull(sent[0].tab, 'Opening a tab, not a record or a settings section');
+		}
+	}
+
+	@IsTest
 	static void testRemoveStaysOfferedWhileAModuleKeptSampleRecords() {
 		System.runAs(TestUsers.adminWithInstalledModules()) {
 			loadEverything(buildJson(1, 1, false));
