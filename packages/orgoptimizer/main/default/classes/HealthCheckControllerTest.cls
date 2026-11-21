@@ -297,6 +297,28 @@ private class HealthCheckControllerTest {
 		}
 	}
 
+	@IsTest
+	static void anyoneCanRunTheRemainingChecksAndNoKeysRunNothing() {
+		System.runAs(TestUsers.admin()) {
+			User priya = HealthCheckTestHelper.priyaWithoutManageSettings();
+
+			System.runAs(priya) {
+				OrgShapeDetector.overrideShape = npspShape();
+
+				HealthCheckService.Report none = HealthCheckController.runRemaining(null);
+				HealthCheckService.Report some = HealthCheckController.runRemaining(new List<String>{ 'org_shape' });
+
+				Assert.areEqual(false, none.getCanManageSettings(), 'Priya has not been given the permission');
+				Assert.isTrue(none.getFindings().isEmpty(), 'No keys, nothing to run');
+				Assert.areEqual(false, some.getCanManageSettings(), 'Reading needs none');
+				Assert.isTrue(some.getSkippedChecks().isEmpty(), 'The named check ran, so nothing is left');
+				for (HealthCheckService.Finding finding : some.getFindings()) {
+					Assert.areNotEqual('not_checked', finding.getKey(), 'Nothing was left for another run');
+				}
+			}
+		}
+	}
+
 	private static OrgShapeDetector.OrgShape npspShape() {
 		OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
 		shape.put('hasNpsp', true);
