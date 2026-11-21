@@ -317,7 +317,7 @@ private class IndicatorResultsBatchTest {
 		}
 
 		Assert.areEqual(Label.LogicModels_NightlyJobs_ResultsName, step.label, 'Its name');
-		Assert.areEqual(210, step.minute, 'At half past three in the nightly run');
+		Assert.areEqual(220, step.minute, 'At 3:40 in the nightly run');
 		Assert.isNotNull(jobId, 'A run started');
 		Assert.areEqual(3, results(indicatorId).get('Month'), 'Worked out');
 	}

@@ -18852,7 +18852,7 @@ the setup page last succeeded; lookups run only while it is the chosen provider.
   `Address_Verification_Nightly_Limit`, `Address_Verification_Setup_Page`, section Addresses.
 - **Automation Registry:** `Address_Verification` on `Address__c`, handler
   `AddressVerificationHandler`, order 95, enabled by default.
-- **Nightly step:** key `AddressVerification`, 03:30, switch shipped on.
+- **Nightly step:** key `AddressVerification`, 03:50, switch shipped on.
 
 ---
 

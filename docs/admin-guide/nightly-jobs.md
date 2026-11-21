@@ -37,7 +37,8 @@ without a switch runs whenever its module is on):
 | 2:45 | Acknowledgment emails | Fundraising | Acknowledgments page (off until switched on) |
 | 3:00 | Volunteer schedules | Volunteers | No switch |
 | 3:15 | Pledge reminders | Fundraising | Pledge Reminders page (off until switched on) |
-| 3:30 | Indicator results | Logic Models | No switch |
+| 3:40 | Indicator results | Logic Models | No switch |
+| 3:50 | Address verification | Address Verification | **Nightly Jobs** panel (on unless switched off; runs only while a provider is connected and the Nightly Limit is above 0) |
 | 5:45 | Territory assignment (records with no territory yet) | Territory Management | **Nightly Jobs** panel (off until switched on) |
 | 6:00 | Grant reminders | Grants | No switch |
 | 7:00 | Volunteer shift reminders | Volunteers | No switch |

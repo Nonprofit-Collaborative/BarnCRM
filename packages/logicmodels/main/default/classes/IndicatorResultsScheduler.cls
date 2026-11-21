@@ -1,6 +1,6 @@
 /**
  * The Logic Models nightly job (L-03; ADR-0158 `0158-indicator-sources.md`, canonical model
- * R-IN5): at 3:30 AM it starts `IndicatorResultsBatch` for every computed indicator. Health
+ * R-IN5): at 3:40 AM it starts `IndicatorResultsBatch` for every computed indicator. Health
  * Check's "Schedule all nightly jobs" fix schedules it through `LogicModelsNightlyJobProvider`.
  *
  * A separate class from the batch, so a change to the batch deploys while the job is scheduled.
@@ -44,15 +44,15 @@ public with sharing class IndicatorResultsScheduler implements Schedulable {
 	}
 
 	/**
-	 * The job as a step of the nightly run (ADR-0166 nightly-job-dispatcher): half past three in
-	 * the morning, after the rollups and the volunteer schedules.
+	 * The job as a step of the nightly run (ADR-0166 nightly-job-dispatcher): 3:40 in the
+	 * morning, after the rollups, the volunteer schedules and the 3:30 ask reminders.
 	 */
 	public static NightlyStep step() {
 		return new NightlyStep(
 			jobNameInUse,
 			System.Label.LogicModels_NightlyJobs_ResultsName,
 			3,
-			30,
+			40,
 			new IndicatorResultsScheduler()
 		);
 	}
