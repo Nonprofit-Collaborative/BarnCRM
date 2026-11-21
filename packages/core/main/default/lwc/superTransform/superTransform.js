@@ -317,8 +317,11 @@ export default class SuperTransform extends LightningElement {
       this.allowed = Boolean(page && page.allowed);
       if (this.allowed) {
         this.maxChanges = page.maxChanges || this.maxChanges;
+        // Both reads start together (one round trip); each is still applied in turn.
+        const lists = getSavedLists();
+        lists.catch(() => {});
         this.objects = await getObjects();
-        this.savedLists = await getSavedLists();
+        this.savedLists = await lists;
       }
     });
     this.loaded = true;
