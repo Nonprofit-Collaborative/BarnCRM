@@ -30,7 +30,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Gift entry: label of the scheduled payment list</shortDescription>
-    <value>Pays a scheduled payment</value>
+    <value>Pays a Scheduled Payment</value>
   </labels>
   <labels>
     <fullName>Giving_GiftEntryPays_NoLongerOpen</fullName>

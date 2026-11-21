@@ -57,10 +57,10 @@ Pending and Cancelled gifts are left out.
    and **Payment Method** on Quick Gift Entry. On Quick Gift Entry the amount box
    disappears, because an in-kind gift has none; on the Gifts tab, leave **Amount** at zero.
 3. Describe what was given, written the way the donor should read it on their receipt. The
-   field is **In-kind Description** on the Gifts tab and **What was given** on Quick Gift
+   field is **In-kind Description** on the Gifts tab and **What Was Given** on Quick Gift
    Entry. "A used minibus in working order" is a description. "Vehicle" is not.
 4. Fill in the fair market value: what your organization values it at, for your own
-   reporting. The field is **Fair Market Value** on the Gifts tab and **Fair market value**
+   reporting. The field is **Fair Market Value** on the Gifts tab and **Fair Market Value**
    on Quick Gift Entry. Leave it empty if you do not have a figure yet, and add it later.
 
 BarnCRM refuses the entries that would produce a wrong record or a wrong receipt:
@@ -106,10 +106,10 @@ Start from the sample data (see `sample-data.md`), which includes about twenty i
    every household and person page).
 4. Choose the donor, leave the date at today, and set **Payment Method** to **In-kind**. The
    amount box disappears and two boxes take its place.
-5. In **What was given**, type what actually arrived, in the words you would be comfortable
+5. In **What Was Given**, type what actually arrived, in the words you would be comfortable
    seeing on the donor's receipt: `Sixteen folding tables, used, delivered to the community
    hall`. This text is printed on the receipt exactly as you type it.
-6. In **Fair market value**, type `800`. Read the note under the box: this figure is for your
+6. In **Fair Market Value**, type `800`. Read the note under the box: this figure is for your
    reporting and is never printed on the receipt. Leave it empty if you do not have a figure
    yet; you can add it later.
 7. Save. Open the gift. Amount is 0.00, and the description and value you typed are on the
@@ -171,6 +171,6 @@ market value stays editable at all times, because it is on no document.
 | What you want to report on | Object | Field |
 |---|---|---|
 | Which gifts were goods or services | Gift | Payment Method, value In-kind |
-| What was given | Gift | In-kind Description |
+| What Was Given | Gift | In-kind Description |
 | What your organization valued it at | Gift | Fair Market Value, never Amount, which is zero |
 | What a donor gave in goods over time | Household, Organization, Person | In-kind Value, In-kind Gift Count |

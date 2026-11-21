@@ -90,7 +90,7 @@ Before you run it:
   Access page (it lets you write each gift's Opportunity ID and each appeal's Campaign ID).
 - Leave **Opportunity mirror direction** at **Off** while the gifts load, so no Opportunity is
   written to. Switch it on afterwards if you want.
-- Switch **Send gift acknowledgments** off (BarnCRM Settings, Fundraising, Acknowledgments) so donors
+- Switch **Send Thank-Yous** off (BarnCRM Settings, Fundraising, Acknowledgments) so donors
   are not thanked again for old gifts, and switch it back on after the Gifts step is done.
 
 What the gifts step leaves to you, each shown in the preview so you can correct the row on

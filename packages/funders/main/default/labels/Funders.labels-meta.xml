@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Scope choice: all open grants</shortDescription>
-        <value>Everyone</value>
+        <value>Everyone's Grants</value>
     </labels>
     <labels>
         <fullName>Funders_Pipeline_ScopeMine</fullName>
@@ -70,7 +70,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Scope choice: grants the person owns</shortDescription>
-        <value>Mine</value>
+        <value>My Grants</value>
     </labels>
     <labels>
         <fullName>Funders_Pipeline_NewGrant</fullName>

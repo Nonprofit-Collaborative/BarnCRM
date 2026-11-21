@@ -426,6 +426,11 @@ export default class AskPipeline extends NavigationMixin(LightningElement) {
       : null;
   }
 
+  /** A green badge means something was won: with none, the badge stays neutral. */
+  get wonBadgeVariant() {
+    return this.board && this.board.wonCount > 0 ? 'success' : 'neutral';
+  }
+
   get wonDetail() {
     return this.board ? format(WON_DETAIL, this.board.wonCount) : '';
   }

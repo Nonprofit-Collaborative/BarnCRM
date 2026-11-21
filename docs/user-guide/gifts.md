@@ -9,27 +9,27 @@ Before you start: open the **BarnCRM Fundraising** app. You need the **Fundraisi
 Quick Gift Entry is the first tab of the BarnCRM Fundraising app. On a computer it is also in the utility bar at the bottom of the screen, so you can open it over whatever page you are on.
 
 1. Open the **Quick Gift Entry** tab, or click **Quick Gift Entry** in the utility bar.
-2. Under **Who gave this gift**, choose **Person** or **Organization**.
+2. Under **Who Gave This Gift**, choose **Person** or **Organization**.
 3. Search for the donor in **Donor** (or **Organization**). Each name in the list shows the person's email and city (an organization's city), so you can tell two people with the same name apart. If the person is not there, click **Not in the list? Add a new person**: a window asks for their name, email and address, and on **Save** the new person becomes the donor, with everything you already typed kept. If the window says someone with that name is already in BarnCRM, choose that person instead.
 4. Type the **Amount**.
 5. Check the **Gift Date**. It starts at today.
 6. Choose the **Payment Method** (for example **Check**, **Card** or **Cash**).
-7. Type the **Check or reference number** if there is one.
+7. Type the **Check or Reference Number** if there is one.
 8. Check **Appeal** and **Fund**. They start at your organization's defaults; change them if the donor said otherwise. To split the gift across two or more funds (for example half to the building fund), open **Split Across Funds** and add a row per fund; **Fund** is then turned off, and **Save** needs the rows to add up to the amount.
 9. Click **Save**, or **Save and New** to start the next gift straight away.
 
 You should see: a green notice with a check icon saying "Gift G-000123 saved" and an **Open This Gift** link. **Save and New** keeps the date, the appeal, the fund and the payment method, and clears the rest.
 
-If the donor still owes a pledge or recurring payment, a **Pays a scheduled payment** list appears. See [To pay a scheduled payment](#to-pay-a-scheduled-payment) below.
+If the donor still owes a pledge or recurring payment, a **Pays a Scheduled Payment** list appears. See [To pay a scheduled payment](#to-pay-a-scheduled-payment) below.
 
 When you choose the donor, an **About This Donor** panel opens under the donor box. It shows their household, total giving, last gift, their three most recent gifts, and any open pledges or recurring gifts with the balance left and the next payment due. Click a gift or pledge to open it in a new browser tab. The panel is only for looking; if it says it could not load, carry on and save the gift as usual.
 
 ## To Pay a Scheduled Payment
 
-When you choose a donor who has an active or paused pledge or recurring gift, Quick Gift Entry shows **Pays a scheduled payment**.
+When you choose a donor who has an active or paused pledge or recurring gift, Quick Gift Entry shows **Pays a Scheduled Payment**.
 
 1. Enter the donor, **Amount** and **Gift Date** as usual.
-2. Read the note under **Pays a scheduled payment**:
+2. Read the note under **Pays a Scheduled Payment**:
    - "Chosen because it is due near the gift date and expects this amount" means one payment matched and is already picked.
    - "2 payments could be this gift, so none was chosen" means you pick.
 3. Choose the right payment, or **None: a new gift on its own** if this gift is not for a pledge.
@@ -41,8 +41,8 @@ You should see: the payment on the commitment turn **Paid** (or **Partially paid
 
 1. In Quick Gift Entry, choose the donor and the **Gift Date**.
 2. Set **Payment Method** to **In-kind**. The **Amount** box goes away: a gift of goods has no amount.
-3. In **What was given**, describe the goods so a stranger would recognize them a year from now. This text is printed on the donor's receipt word for word.
-4. Type a **Fair market value** if you have one. It is for your reporting only, never printed on the receipt and never added to giving totals. Leave it empty if you do not know.
+3. In **What Was Given**, describe the goods so a stranger would recognize them a year from now. This text is printed on the donor's receipt word for word.
+4. Type a **Fair Market Value** if you have one. It is for your reporting only, never printed on the receipt and never added to giving totals. Leave it empty if you do not know.
 5. Click **Save**.
 
 You should see: the gift page shows an **In-kind Gift** section with **In-kind Description** and **Fair Market Value**. A gift that was part money and part goods is two gifts.
