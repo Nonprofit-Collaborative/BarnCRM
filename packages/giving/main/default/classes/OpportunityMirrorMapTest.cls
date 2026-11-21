@@ -18,11 +18,7 @@ private class OpportunityMirrorMapTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GivingTestDataFactory.ensureDefaultFund();
 			GivingTestDataFactory.insertHouseholdContact('The Garcia Household', 'Luis', 'Garcia');
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-			settings.Opportunity_Mirror_Direction__c = OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES;
-			settings.Opportunity_Mirror_Map__c = MAP_NAME;
-			upsert settings;
-			insert new Saved_Transform__c(
+			Saved_Transform__c chosen = new Saved_Transform__c(
 				Name = MAP_NAME,
 				Kind__c = 'Map',
 				Object_Name__c = 'Opportunity',
@@ -46,6 +42,11 @@ private class OpportunityMirrorMapTest {
 					}
 				)
 			);
+			insert chosen;
+			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
+			settings.Opportunity_Mirror_Direction__c = OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES;
+			settings.Opportunity_Mirror_Map__c = chosen.Id;
+			upsert settings;
 		}
 	}
 
@@ -104,7 +105,14 @@ private class OpportunityMirrorMapTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Saved_Transform__c row = [SELECT Id, Name FROM Saved_Transform__c LIMIT 1];
 			System.Assert.isFalse(WhereUsedService.mapUsers(row.Id, row.Name).isEmpty(), 'The mirror links it');
-			System.Assert.isTrue(WhereUsedService.mapUsers(row.Id, 'Another map').isEmpty(), 'Only by its name');
+			System.Assert.isFalse(
+				WhereUsedService.mapUsers(row.Id, 'Renamed').isEmpty(),
+				'By its record ID, so a new name keeps the link'
+			);
+			System.Assert.isTrue(OpportunityMirrorMap.links(MAP_NAME, row.Id, MAP_NAME), 'A value stored as a name');
+			System.Assert.isFalse(OpportunityMirrorMap.links(MAP_NAME, row.Id, 'Another map'));
+			System.Assert.isFalse(OpportunityMirrorMap.links(UserInfo.getUserId(), row.Id, MAP_NAME));
+			System.Assert.isFalse(OpportunityMirrorMap.links('', row.Id, MAP_NAME));
 		}
 	}
 
@@ -116,6 +124,10 @@ private class OpportunityMirrorMapTest {
 				'No map by that name'
 			);
 			Saved_Transform__c row = [SELECT Id, Definition_JSON__c FROM Saved_Transform__c LIMIT 1];
+			if (OpportunityMirrorService.opportunityType() != null) {
+				System.Assert.isFalse(new OpportunityMirrorMap(MAP_NAME).targetFields().isEmpty(), 'Read by name');
+				System.Assert.isFalse(new OpportunityMirrorMap(row.Id).targetFields().isEmpty(), 'Read by ID');
+			}
 			row.Definition_JSON__c = row.Definition_JSON__c.replace('"Gift__c"', '"Account"');
 			update row;
 			System.Assert.isTrue(

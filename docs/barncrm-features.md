@@ -672,7 +672,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
 | Opportunity mirror | Major | Keeps gifts and Opportunities in step in one chosen direction (Gifts to Opportunities, or Opportunities to Gifts), so NPSP rollups and Opportunity-based apps keep working. | Shipped | X-01, ADR-0058 |
-| Opportunity mirror extra fields | Minor | In Gifts to Opportunities, the Opportunity Mirror Map setting names a map from Gift to Opportunity; each line copies one gift field or a fixed value, with its changes, onto the gift's Opportunity. A map never replaces the fields the mirror writes itself; Where Used lists the setting under the map. | Built, not merged | MAP-07, release 1.33 |
+| Opportunity mirror extra fields | Minor | In Gifts to Opportunities, the Opportunity Mirror Map setting chooses a map from Gift to Opportunity; each line copies one gift field or a fixed value, with its changes, onto the gift's Opportunity. A map never replaces the fields the mirror writes itself; Where Used lists the setting under the map. | Built, not merged | MAP-07, release 1.33 |
 | Campaign sync | Major | Gives every appeal a matching Campaign and keeps it updated, one way, so Campaign Members and email tools work. | Shipped | X-02, ADR-0056 |
 | Inbound gift API | Major | A versioned web address and a "Record Inbound Gift" Flow action let a giving page or processor record gifts directly. | Shipped | X-03, ADR-0051 |
 | Accounting export | Major | Downloads gifts in a date range as a CSV with one row per fund, accounting codes and refunds as negative rows, ready for QuickBooks or Xero. | Shipped | X-04, ADR-0051 |

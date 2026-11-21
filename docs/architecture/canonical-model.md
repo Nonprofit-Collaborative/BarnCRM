@@ -1466,7 +1466,7 @@ shows the last full Health Check result instead of running every check on each l
 | Key | Type | Default | Definition |
 |---|---|---|---|
 | `Health_Check_Last_Run__c` | datetime | empty | When Health Check last ran in full for someone with Manage BarnCRM Settings. Written by Health Check, without an audit row. |
-| `Health_Check_Last_Result__c` | text (255) | empty | How many findings that run had, as three counts separated by commas: to fix (Error), to be aware of (Warning), for information (Info). Written by Health Check with `Health_Check_Last_Run__c`; read only to show the last result. |
+| `Health_Check_Last_Result__c` | text (255) | empty | How many findings that run had, as three counts separated by commas: to fix (Error), to be aware of (Warning), for information (Info). Written by Health Check with `Health_Check_Last_Run__c`; read only to show the last result. Core's `HealthCheckResult` is the one writer and reader of the format; a value it cannot read shows as not run. |
 
 ### Brand keys
 
@@ -3350,7 +3350,9 @@ these rules is the framework-free module `mapDocument` (plan 9.9); its Jest test
 at most 200 samples (file rows, a chosen record, or the items of a pasted JSON list) on the
 server, as the person, and saves nothing. The Mapper then flags, value by value: required and
 blank, too long for the field, not a number, not a date, not a yes or no, a picklist value not in
-the list, and a lookup that finds no record (or several).
+the list, and a lookup that finds no record (or several). Lookup columns that find their parent by
+the same object and field share one query; a preview that looks parents up by more than 50
+different object and field pairs is refused with a message.
 
 ### Salesforce implementation
 
@@ -8417,7 +8419,7 @@ stop Mirror installing on an org without Opportunity (ADR-0013).
 |---|---|---|---|
 | `Opportunity_Mirror_Direction__c` | text | Off | `GiftsToOpportunities`, `OpportunitiesToGifts` or `Off`, shown as Gifts to Opportunities, Opportunities to Gifts and Off. Empty reads as Off (R-OM1). |
 | `Opportunity_Mirror_Start__c` | datetime | empty | Opportunities to Gifts only: an Opportunity becomes a gift only when its Close Date is on or after this date, read as a date in the org's default time zone. Empty means no Opportunity becomes a gift (R-OM7). |
-| `Opportunity_Mirror_Map__c` | text | empty | Gifts to Opportunities only: the name of a saved map (R-ST5) from Gift to Opportunity whose columns copy extra fields (R-OM12). Empty means none. |
+| `Opportunity_Mirror_Map__c` | text | empty | Gifts to Opportunities only: the record ID of a saved map (R-ST5) from Gift to Opportunity whose columns copy extra fields (R-OM12), chosen with a record picker; a value that is not a Saved Transform ID is read as a map name. Empty means none. |
 | `Opportunity_Mirror_Record_Types__c` | text | empty | Opportunities to Gifts only: the record types, by API name and separated by commas, whose won Opportunities become gifts. Empty means every record type (R-OM7). |
 | `Opportunity_Mirror_Last_Run__c` | datetime | empty | Written by the runs, not by an administrator: when the last completed run started (R-OM8). |
 | `Opportunity_Mirror_Last_Summary__c` | text | empty | Written by the runs: one sentence saying what the last completed run did (R-OM8). |
@@ -8547,7 +8549,7 @@ or not, which puts right what R-OM3 copies. In Opportunities to Gifts the differ
 only, because a gift is never edited from its Opportunity.
 
 **R-OM12 Extra fields through a map (MAP-07).** In Gifts to Opportunities, an administrator may
-name a saved map (R-ST5) in `Opportunity_Mirror_Map__c`: a map from the record Gift to the record
+choose a saved map (R-ST5) in `Opportunity_Mirror_Map__c`: a map from the record Gift to the record
 Opportunity, built in the Mapper. Each of its columns copies one more field: a field of the gift
 (no parent field, no path) or a fixed value, changed by the column's steps (R-IT15) and its When
 Blank, Use value, into an Opportunity field. It adds, never replaces: a column for a field R-OM3
@@ -8556,9 +8558,11 @@ field the saver cannot read and an Opportunity field the saver cannot create and
 out, so the copy never shows the saver a value they cannot see and never fails for want of
 access. A value the field cannot take leaves that field out for that gift. A change to a gift
 field the map reads starts a copy (R-OM4), and the comparison of R-OM4 includes the extra
-fields. The map is read once per transaction in system mode, as a setting is; a name that finds
-no map, or a map from or to another kind of record, copies no extra field. The map is copied by
-name, so editing the map changes what the next copy writes.
+fields. The map is read once per transaction in system mode, as a setting is: by its record ID
+with Kind Map, or, when the value is not a Saved Transform ID, by name with Kind Map. A value that
+finds no map, a step list, or a map from or to another kind of record copies no extra field. The
+map is linked, not copied, so editing it changes what the next copy writes and renaming it keeps
+the link. Where Used (C-59) lists the setting under the map it links.
 
 ### Salesforce implementation
 
@@ -11218,13 +11222,14 @@ its target object (blank for a JSON target or a people map). Its name is unique 
 created, changed, renamed and deleted by people with Manage BarnCRM Settings, read in user mode
 by every tool a person runs with it (Super Importer, Super Transformer's Apply a Map), in the
 run's access mode by a Connector recipe, and in system mode by the Opportunity mirror, which
-reads the map its setting names as it reads the setting (R-OM12); it is never run by Super
+reads the map its setting chooses as it reads the setting (R-OM12); it is never run by Super
 Transformer's Saved Step Lists card, which
 lists, loads, renames and deletes Step List rows only (a row with no Kind reads as Step List). A
 map is changed in place, because a tool may link it by its record ID; a tool that copies a map
 (Super Importer's Use a Saved Map) keeps its own copy. Where Used lists a map that names a field
 or object, and the Mapper lists the tools that link a map (the `WhereUsedExtension` seam asked
-with a map target) before a change is saved.
+with a map target) before a change is saved and before the map is renamed or deleted (Saved Maps
+asks to confirm, naming them).
 **R-ST4 Org-wide, one set of permissions.** Every list is visible to, and may be renamed or
 deleted by, everyone who holds Bulk Update Records and Find and Export Records (the permission
 set `BarnCRM_Bulk_Update` grants Read, Create, Edit, Delete, View All and Modify All, the last
@@ -20028,6 +20033,7 @@ mirrors the primary member).
 | 1.78 | 2026-11-20 | BarnCRM Connector webhooks in and sending data back (CN-04, D-216, release 1.32). Connector Recipe gains `Webhook_Token_Hash__c` and `Webhook_Hourly_Cap__c`; Connector Run gains `Event_Key__c` and `Reference__c` (all defined in CN-02). R-CR1 adds the `webhook` trigger, the `sendWebhook` step and `urlFrom`; new R-CR10 (the receiver) and R-CR11 (fetch back and callback addresses). New permission set `BarnCRM_Connector_Webhook_Guest`. No object added. |
 | 1.79 | 2026-11-20 | BarnCRM Connector steps and versions (CN-05, CN-08, D-215, D-216, release 1.32). R-CR1 adds the `forEach`, `wait` and `transform` steps, the `loop` path root and the `fill` list an import leaves; new R-CR12 (For Each, Wait and Change Data), R-CR13 (Previous Definition, Roll Back, Discard Draft Changes, Export and Import Recipe), R-CR14 (template import, nothing shipped or kept) and R-CR15 (no secret in a file). Connector Recipe ships `Previous_JSON__c`, defined in v1.75. No object added. |
 | 1.80 | 2026-11-20 | BarnCRM Connector watching apps for new items and runs in the erasure path (CN-13, CN-18, release 1.33). R-CR1 adds the `appPoll` trigger; new R-CR16 (App Poll: poll runs, Watermark, item runs) and R-CR17 (erasing a person deletes the runs that name them). Connector Run allows search (`enableSearch`); `ConnectorErasureExtension` joins Core's erasure extensions. No object or field added. |
+| 1.81 | 2026-11-20 | The Mapper and saved maps (MAP-01 to MAP-07, releases 1.31 to 1.33). `Saved_Transform__c` gains `Kind__c` (Step List, the default, or Map); new R-MAP1 to R-MAP4 (map document, paths, checks, preview) and R-ST5 (maps). `Giving_Settings__c` gains `Opportunity_Mirror_Map__c`, a Saved Transform record ID chosen with a record picker (a map name is read too); new R-OM12 (extra fields through a map). No object added. |
 
 ---
 ## 32. Entity ownership by package

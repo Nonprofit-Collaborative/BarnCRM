@@ -328,16 +328,17 @@ Fundraising deployed by `scripts/org/deploy-packages.sh` and Mirror not deployed
 
 ## T-MIR-20: Opportunity Mirror Extra Fields Through a Map
 
-**Purpose:** confirm the Opportunity mirror copies extra fields through the map named in **Opportunity Mirror Map**, never replaces its own fields, and that Where Used names the setting (MAP-07). Setup detail: [Opportunity Mirror](../admin-guide/opportunity-mirror.md) and [The Mapper and Saved Maps](../admin-guide/mapper.md), section 7.
+**Purpose:** confirm the Opportunity mirror copies extra fields through the map chosen in **Opportunity Mirror Map**, never replaces its own fields, and that Where Used names the setting (MAP-07). Setup detail: [Opportunity Mirror](../admin-guide/opportunity-mirror.md) and [The Mapper and Saved Maps](../admin-guide/mapper.md), section 7.
 **Prerequisites:** an org with Opportunities and Fundraising; admin with **Salesforce Records Sync**; **Opportunity mirror direction** set to **Gifts to Opportunities**.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **Data Manager**, **Maps**, make a map `Gift extras` **From** a record of kind **Gift** **To** a record of kind **Opportunity**: **Description** gets **Payment Reference** with **All capitals**, **Next Step** **Always Use** `Mirrored`, **Amount** **Always Use** `1`. Save it. | The map saves. |
-| 2 | In **BarnCRM Settings**, **Fundraising**, **Gift Mirrors and Exports**, type `Gift extras` in **Opportunity Mirror Map** and save. | The save succeeds. |
+| 1 | In **Data Manager**, **Saved Maps**, make a map `Gift extras` **From** a record of kind **Gift** **To** a record of kind **Opportunity**: **Description** gets **Payment Reference** with **All capitals**, **Next Step** **Always Use** `Mirrored`, **Amount** **Always Use** `1`. Save it. | The map saves. |
+| 2 | In **BarnCRM Settings**, **Fundraising**, **Gift Mirrors and Exports**, search for `Gift extras` in **Opportunity Mirror Map**, choose it and save. | The save succeeds. |
 | 3 | Enter a gift of 100 with **Payment Reference** `chk 42`. Open its Opportunity. | **Description** `CHK 42`, **Next Step** `Mirrored`, **Amount** 100 (the map never replaces the mirror's own fields). |
 | 4 | Change the gift's **Payment Reference** to `chk 43` and save. | The Opportunity's **Description** becomes `CHK 43`. |
 | 5 | Open **Gift extras** in the Mapper and change a line. Before saving, read the Where Used list. | **Opportunity Mirror Map** is listed as a setting that uses the map. |
-| 6 | Clear **Opportunity Mirror Map** and save. Enter another gift. | Its Opportunity has no **Next Step**: nothing extra is copied. |
+| 6 | In **Saved Maps**, rename **Gift extras** to `Gift extras 2`. Read the confirmation, confirm, then change the gift's **Payment Reference** to `chk 44`. | The confirmation names **Opportunity Mirror Map**. The setting still shows the map, and the Opportunity's **Description** becomes `CHK 44`. |
+| 7 | Clear **Opportunity Mirror Map** and save. Enter another gift. | Its Opportunity has no **Next Step**: nothing extra is copied. |
 
-**Cleanup:** delete the gifts, their Opportunities and the **Gift extras** map; leave **Opportunity Mirror Map** empty.
+**Cleanup:** delete the gifts, their Opportunities and the **Gift extras 2** map; leave **Opportunity Mirror Map** empty.

@@ -1712,6 +1712,10 @@ export default class ImportWizard extends LightningElement {
       this.openNewField(source);
       return;
     }
+    // A table drawn because two columns load one field stays the table once that is fixed.
+    if (this.loadsAFieldTwice) {
+      this.columnsAsTable = true;
+    }
     this.columns = this.columns.map((column) => {
       return column.source === source
         ? { ...column, target, lookupField: LOOKUP_BY_ID, guessed: false }
@@ -2036,18 +2040,27 @@ export default class ImportWizard extends LightningElement {
   /**
    * The Mapper draws the step for a mapping of one object whose fields are its own: not people
    * (Contact1, Organization entities, C-49c), not several objects (R-IT20), not a related
-   * record's fields (R-IT17), and not more columns than a map holds. Anything else is the table.
+   * record's fields (R-IT17), not more columns than a map holds, and not two columns loading one
+   * field (the Mapper fills a field from one column). Anything else is the table.
    */
   get canDrawMapper() {
-    return this.loadsSingleObject && !this.loadsRelated && this.headers.length <= MAX_COLUMNS;
+    return (
+      this.loadsSingleObject &&
+      !this.loadsRelated &&
+      this.headers.length <= MAX_COLUMNS &&
+      !this.loadsAFieldTwice
+    );
+  }
+
+  get loadsAFieldTwice() {
+    const loaded = this.columns
+      .map((column) => column.target)
+      .filter((target) => target && !this.savedMapIgnored.includes(target));
+    return new Set(loaded).size < loaded.length;
   }
 
   get drawsMapper() {
     return this.canDrawMapper && !this.columnsAsTable;
-  }
-
-  get drawsTable() {
-    return !this.drawsMapper;
   }
 
   get viewToggleLabel() {
@@ -2069,13 +2082,8 @@ export default class ImportWizard extends LightningElement {
 
   /** Kept while the file and the fields are the same, so the Mapper is not set up again. */
   get mapperSetup() {
-    const key = [
-      this.headers,
-      this.records,
-      this.objectFields,
-      this.canCreateFields,
-      this.templateId
-    ];
+    const canCreateFields = this.newFieldObjects.length > 0;
+    const key = [this.headers, this.records, this.objectFields, canCreateFields, this.templateId];
     const kept = this.mapperSetupCache;
     if (kept && kept.key.every((part, index) => part === key[index])) {
       return kept.setup;
@@ -2095,7 +2103,7 @@ export default class ImportWizard extends LightningElement {
       rows: this.records.slice(0, MAX_SAMPLES),
       targets: this.loadFields.map((field) => ({ value: field.value, label: field.label })),
       lookupChoices,
-      canCreateFields: this.newFieldObjects.length > 0
+      canCreateFields
     };
     this.mapperSetupCache = { key, setup };
     return setup;

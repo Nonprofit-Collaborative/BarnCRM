@@ -571,6 +571,26 @@ describe("Super Transformer's Apply a Map (MAP-06)", () => {
     expect(result.skipped).toBe(6);
   });
 
+  it("counts a fixed value's steps and When Blank, Use, which Set To cannot keep", () => {
+    const result = toChanges(
+      map(
+        [
+          { value: ' a ', target: 'Record.Title', transforms: [{ op: 'trim' }] },
+          { value: 'b', target: 'Record.Department' }
+        ],
+        [{ target: 'Record.Department', value: 'None' }]
+      ),
+      'Contact',
+      FIELDS,
+      5
+    );
+    expect(result.changes).toEqual([
+      { field: 'Title', action: 'set', value: ' a ' },
+      { field: 'Department', action: 'set', value: 'b' }
+    ]);
+    expect(result.skipped).toBe(2);
+  });
+
   it('refuses a map from or to another kind of record', () => {
     expect(toChanges({ ...map([]), to: { kind: 'json' } }, 'Contact', FIELDS, 5).wrongKind).toBe(
       true

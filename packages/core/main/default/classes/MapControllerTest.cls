@@ -202,8 +202,12 @@ private class MapControllerTest {
 	@IsTest
 	static void thePreviewRunsStepsFixedValuesDefaultsAndLookups() {
 		System.runAs(TestUsers.admin()) {
-			Account found = new Account(Name = 'Riverside Food Bank');
-			insert as user new List<Account>{ found, new Account(Name = 'Twin'), new Account(Name = 'Twin') };
+			Account found = TestDataFactory.organization(new Account(Name = 'Riverside Food Bank'));
+			insert as user new List<Account>{
+				found,
+				TestDataFactory.organization(new Account(Name = 'Twin')),
+				TestDataFactory.organization(new Account(Name = 'Twin'))
+			};
 			Map<String, Object> email = column('profile.email', 'Record.Email');
 			email.put(
 				'transforms',
@@ -260,7 +264,7 @@ private class MapControllerTest {
 	@IsTest
 	static void aLookupByRecordIdAndOneByAFieldThatCannotBeFilteredAreHandled() {
 		System.runAs(TestUsers.admin()) {
-			Account parent = new Account(Name = 'Parent');
+			Account parent = TestDataFactory.organization(new Account(Name = 'Parent'));
 			insert as user parent;
 			Map<String, Object> byId = column('org', 'Record.AccountId');
 			byId.put('lookup', new Map<String, Object>{ 'object' => 'Account', 'field' => 'Id' });
@@ -289,6 +293,54 @@ private class MapControllerTest {
 			} catch (AuraHandledException refused) {
 				Assert.areEqual(
 					BarnHelp.text('Core', 'Core_Map_ErrorLookup', new List<Object>{ 'Description', 'Account' }),
+					refused.getMessage()
+				);
+			}
+		}
+	}
+
+	@IsTest
+	static void lookupsByTheSameFieldShareOneQueryAndTooManyFieldsAreRefused() {
+		System.runAs(TestUsers.admin()) {
+			insert as user TestDataFactory.organization(new Account(Name = 'Riverside Food Bank'));
+			Map<String, Object> byName = new Map<String, Object>{ 'object' => 'Account', 'field' => 'Name' };
+			Map<String, Object> account = column('org', 'Record.AccountId');
+			account.put('lookup', byName);
+			Map<String, Object> reportsTo = column('other', 'Record.ReportsToId');
+			reportsTo.put('lookup', byName);
+			String samples = JSON.serialize(
+				new List<Object>{ new Map<String, Object>{ 'org' => 'Riverside Food Bank', 'other' => 'Nobody' } }
+			);
+			// Warm the help catalog and describe so only the lookups' queries are counted.
+			MapController.previewMap(toContact(new List<Object>{ account }, new List<Object>()), samples);
+			Integer before = Limits.getQueries();
+			MapController.previewMap(toContact(new List<Object>{ account }, new List<Object>()), samples);
+			Integer one = Limits.getQueries() - before;
+			before = Limits.getQueries();
+			MapController.Preview preview = MapController.previewMap(
+				toContact(new List<Object>{ account, reportsTo }, new List<Object>()),
+				samples
+			);
+			Assert.areEqual(one, Limits.getQueries() - before, 'Two columns found by Account Name share a query.');
+			Assert.areEqual('found', byTarget(preview.samples[0]).get('Record.AccountId').lookup);
+			Assert.areEqual('none', byTarget(preview.samples[0]).get('Record.ReportsToId').lookup);
+
+			List<Object> columns = new List<Object>();
+			for (Integer i = 0; i <= MapController.MAX_LOOKUP_FIELDS; i++) {
+				Map<String, Object> each = column('c' + i, 'Record.F' + i);
+				each.put('lookup', new Map<String, Object>{ 'object' => 'Account', 'field' => 'F' + i });
+				columns.add(each);
+			}
+			try {
+				MapController.previewMap(toContact(columns, new List<Object>()), samples);
+				Assert.fail('Too many lookup fields are refused.');
+			} catch (AuraHandledException refused) {
+				Assert.areEqual(
+					BarnHelp.text(
+						'Core',
+						'Core_Map_ErrorTooManyLookups',
+						new List<Object>{ MapController.MAX_LOOKUP_FIELDS }
+					),
 					refused.getMessage()
 				);
 			}

@@ -568,7 +568,7 @@ ana.rowe@example.org,Rivergate Library,Volunteer,true,2026-03-01
 | 4 | In **Use a Saved Map** choose **Contact list** and select **Use Map**. | **Email** is mapped again with **All lower case**; a line says how many columns were filled from **Contact list**. The other columns keep their choices. |
 | 5 | Upload a copy of the file with the **Email** column renamed `E-mail address`, and use the map again. | The line also says how many lines of the map did not fit this file and were left out. |
 | 6 | Continue to **Preview**. | The preview uses the columns as shown; matching, row rules and the rest of the import are as before. |
-| 7 | Open **Data Manager**, **Maps**, open **Contact list**, change it and save. Re-open the template's import. | The template is unchanged: it kept its own copy. |
+| 7 | Open **Data Manager**, **Saved Maps**, open **Contact list**, change it and save. Re-open the template's import. | The template is unchanged: it kept its own copy. |
 
 **Cleanup:** Delete the **Contact list** map.
 

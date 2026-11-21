@@ -94,23 +94,12 @@ public with sharing class SavedTransformService {
 
 	private static List<ListEntry> listKind(String kind) {
 		List<ListEntry> entries = new List<ListEntry>();
-		List<Saved_Transform__c> rows = kind == KIND_MAP
-			? [
-					SELECT Id, Name, Object_Name__c
-					FROM Saved_Transform__c
-					WHERE Kind__c = :KIND_MAP
-					WITH USER_MODE
-					ORDER BY Name
-					LIMIT :MAX_LISTS
-			  ]
-			: [
-					SELECT Id, Name, Object_Name__c
-					FROM Saved_Transform__c
-					WHERE Kind__c != :KIND_MAP
-					WITH USER_MODE
-					ORDER BY Name
-					LIMIT :MAX_LISTS
-			  ];
+		List<Saved_Transform__c> rows = ofKind(
+			kind,
+			'Id, Name, Object_Name__c',
+			' ORDER BY Name LIMIT :most',
+			new Map<String, Object>{ 'most' => MAX_LISTS }
+		);
 		for (Saved_Transform__c saved : rows) {
 			ListEntry entry = new ListEntry();
 			entry.recordId = saved.Id;
@@ -359,21 +348,20 @@ public with sharing class SavedTransformService {
 	}
 
 	private static Map<String, Object> readDocument(String definitionJson, String kind) {
-		Boolean isMap = kind == KIND_MAP;
 		if (String.isBlank(definitionJson) || definitionJson.length() > MAX_DOCUMENT) {
 			throw refused(
-				isMap
-					? BarnHelp.text('Core', 'Core_Map_ErrorTooBig')
-					: BarnHelp.text('Core', 'Core_SavedTransform_ErrorTooBig')
+				kind,
+				BarnHelp.text('Core', 'Core_Map_ErrorTooBig'),
+				BarnHelp.text('Core', 'Core_SavedTransform_ErrorTooBig')
 			);
 		}
 		try {
 			return (Map<String, Object>) JSON.deserializeUntyped(definitionJson);
 		} catch (Exception unreadable) {
 			throw refused(
-				isMap
-					? BarnHelp.text('Core', 'Core_Map_ErrorUnreadable')
-					: BarnHelp.text('Core', 'Core_SavedTransform_ErrorUnreadable')
+				kind,
+				BarnHelp.text('Core', 'Core_Map_ErrorUnreadable'),
+				BarnHelp.text('Core', 'Core_SavedTransform_ErrorUnreadable')
 			);
 		}
 	}
@@ -468,12 +456,9 @@ public with sharing class SavedTransformService {
 		String cleaned = name == null ? '' : name.normalizeSpace();
 		if (cleaned.length() == 0 || cleaned.length() > MAX_NAME) {
 			throw refused(
-				kind == KIND_MAP
-					? BarnHelp.text('Core', 'Core_Map_ErrorName', new List<Object>{ MAX_NAME })
-					: String.format(
-							BarnHelp.text('Core', 'Core_SavedTransform_ErrorName'),
-							new List<Object>{ MAX_NAME }
-					  )
+				kind,
+				BarnHelp.text('Core', 'Core_Map_ErrorName', new List<Object>{ MAX_NAME }),
+				BarnHelp.text('Core', 'Core_SavedTransform_ErrorName', new List<Object>{ MAX_NAME })
 			);
 		}
 		return cleaned;
@@ -481,28 +466,39 @@ public with sharing class SavedTransformService {
 
 	/** A list may not share a name (capitals ignored) with another of its kind. */
 	private static void requireFreeName(String name, Id except, String kind) {
-		List<Saved_Transform__c> same = kind == KIND_MAP
-			? [
-					SELECT Id
-					FROM Saved_Transform__c
-					WHERE Name = :name AND Id != :except AND Kind__c = :KIND_MAP
-					WITH USER_MODE
-					LIMIT 1
-			  ]
-			: [
-					SELECT Id
-					FROM Saved_Transform__c
-					WHERE Name = :name AND Id != :except AND Kind__c != :KIND_MAP
-					WITH USER_MODE
-					LIMIT 1
-			  ];
+		List<Saved_Transform__c> same = ofKind(
+			kind,
+			'Id',
+			' AND Name = :name AND Id != :except LIMIT 1',
+			new Map<String, Object>{ 'name' => name, 'except' => except }
+		);
 		if (!same.isEmpty()) {
 			throw refused(
-				kind == KIND_MAP
-					? BarnHelp.text('Core', 'Core_Map_ErrorExists', new List<Object>{ name })
-					: String.format(BarnHelp.text('Core', 'Core_SavedTransform_ErrorExists'), new List<Object>{ name })
+				kind,
+				BarnHelp.text('Core', 'Core_Map_ErrorExists', new List<Object>{ name }),
+				BarnHelp.text('Core', 'Core_SavedTransform_ErrorExists', new List<Object>{ name })
 			);
 		}
+	}
+
+	/** Rows of one kind, in user mode: Map, or Step List (any other Kind, a blank one too). */
+	private static List<Saved_Transform__c> ofKind(String kind, String fields, String rest, Map<String, Object> binds) {
+		binds.put('mapKind', KIND_MAP);
+		return Database.queryWithBinds(
+			'SELECT ' +
+				fields +
+				' FROM Saved_Transform__c WHERE Kind__c ' +
+				(kind == KIND_MAP ? '=' : '!=') +
+				' :mapKind' +
+				rest,
+			binds,
+			AccessLevel.USER_MODE
+		);
+	}
+
+	/** A refusal in a map's words or a step list's, by kind. */
+	private static BulkUpdateFields.BulkUpdateException refused(String kind, String mapText, String listText) {
+		return refused(kind == KIND_MAP ? mapText : listText);
 	}
 
 	/** The row of this kind, or a refusal: a step list is never found as a map, nor a map as a list. */
@@ -518,9 +514,9 @@ public with sharing class SavedTransformService {
 			  ];
 		if (found.isEmpty() || (found[0].Kind__c == KIND_MAP) != (kind == KIND_MAP)) {
 			throw refused(
-				kind == KIND_MAP
-					? BarnHelp.text('Core', 'Core_Map_ErrorNotFound')
-					: BarnHelp.text('Core', 'Core_SavedTransform_ErrorNotFound')
+				kind,
+				BarnHelp.text('Core', 'Core_Map_ErrorNotFound'),
+				BarnHelp.text('Core', 'Core_SavedTransform_ErrorNotFound')
 			);
 		}
 		return found[0];

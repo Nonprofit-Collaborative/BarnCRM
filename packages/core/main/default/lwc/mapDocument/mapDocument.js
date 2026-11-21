@@ -723,8 +723,13 @@ export function columnSentence(targetLabel, sourceLabel, column, words) {
  * left out; steps, lookups and empty-cell clearing are kept. Row rules stay with the template.
  */
 export function fromImportMapping(mappingJson, objectName, ignored) {
-  const skip = new Set((ignored || []).map(lower));
   const { document } = parseMap(mappingJson);
+  return importMap(document.columns, document.defaults, objectName, ignored);
+}
+
+/** A map from file columns to `objectName`'s record, without the `ignored` targets' columns. */
+function importMap(columns, defaults, objectName, ignored) {
+  const skip = new Set((ignored || []).map(lower));
   const to = { kind: 'record' };
   if (nonBlank(objectName)) {
     to.object = objectName;
@@ -733,8 +738,8 @@ export function fromImportMapping(mappingJson, objectName, ignored) {
     version: VERSION,
     from: { kind: 'columns' },
     to,
-    columns: document.columns.filter((column) => !skip.has(lower(column.target))),
-    defaults: document.defaults
+    columns: columns.filter((column) => !skip.has(lower(column.target))),
+    defaults
   };
 }
 
@@ -789,11 +794,8 @@ export function applyToColumns(fileColumns, document, allowedTargets, lookupChoi
  * steps, lookups and empty-cell clearing are kept.
  */
 export function fromImportColumns(fileColumns, objectName, ignored) {
-  const skip = new Set((ignored || []).map(lower));
   const columns = (fileColumns || [])
-    .filter(
-      (each) => nonBlank(each.source) && nonBlank(each.target) && !skip.has(lower(each.target))
-    )
+    .filter((each) => nonBlank(each.source) && nonBlank(each.target))
     .map((each) => {
       const column = { source: each.source, target: each.target };
       if (Array.isArray(each.transforms) && each.transforms.length > 0) {
@@ -810,13 +812,7 @@ export function fromImportColumns(fileColumns, objectName, ignored) {
       }
       return column;
     });
-  return {
-    version: VERSION,
-    from: { kind: 'columns' },
-    to: { kind: 'record', object: objectName },
-    columns,
-    defaults: []
-  };
+  return importMap(columns, [], objectName, ignored);
 }
 
 /**
@@ -856,7 +852,8 @@ const FIELD_NAME = /^[A-Za-z0-9_]+$/;
  * Steps; another field, Copy From with the column's steps; When Blank, Use, a last Value When
  * Empty step. A source that is not a field of the record (a parent's field or a path), a lookup,
  * a field not offered, a field copied into itself unchanged and any change past `max` are left
- * out and counted. Returns { changes, skipped, wrongKind }.
+ * out and counted; a fixed value with steps or When Blank, Use is kept without them and counted
+ * too. Returns { changes, skipped, wrongKind }.
  */
 export function toChanges(document, objectName, fields, max) {
   const doc = document || {};
@@ -896,7 +893,12 @@ export function toChanges(document, objectName, fields, max) {
     if (!field || column.lookup || column.lookupField) {
       skipped += 1;
     } else if (typeof column.value === 'string' && !nonBlank(source)) {
+      const before = changes.length;
       add({ field, action: 'set', value: column.value });
+      // Set To takes no steps: a fixed value kept without its steps and When Blank, Use counts.
+      if (steps.length && changes.length > before) {
+        skipped += 1;
+      }
     } else if (!FIELD_NAME.test(source) || (lower(source) === lower(field) && !steps.length)) {
       skipped += 1;
     } else if (lower(source) === lower(field)) {

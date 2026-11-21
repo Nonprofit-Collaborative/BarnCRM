@@ -173,6 +173,9 @@ export default class SuperTransform extends LightningElement {
     get previewHint() {
       return helpText('Core', 'Core_SuperTransform_PreviewHint');
     },
+    get addSteps() {
+      return helpText('Core', 'Core_SuperTransform_AddSteps');
+    },
     record: RECORD,
     changesTo: CHANGES_TO,
     noChange: NO_CHANGE,
@@ -276,6 +279,7 @@ export default class SuperTransform extends LightningElement {
       this.stopPolling();
       this.job = undefined;
       this.objectApiName = start.object;
+      this.checkMapFroms();
       this.targets = targets;
       this.filterJson = start.filter ? JSON.stringify(start.filter) : '';
       this.filterValid = true;
@@ -481,6 +485,7 @@ export default class SuperTransform extends LightningElement {
       const isMulti = isSet && type === 'multipicklist' && hasPicklist;
       const isPicklist = isSet && !isMulti && hasPicklist;
       const isRecord = isSet && type === 'reference' && Boolean(target.referenceTo);
+      const canCopySteps = change.action === 'copy' && Boolean(target) && type !== 'reference';
       return {
         ...change,
         hasField: Boolean(target),
@@ -505,10 +510,12 @@ export default class SuperTransform extends LightningElement {
         isInput: isSet && !isBoolean && !isMulti && !isPicklist && !isRecord,
         isCopy: change.action === 'copy',
         isTransform: change.action === 'transform',
-        // Steps on a copy (MAP-06) or a transform; a lookup takes neither.
+        // Steps on a copy (MAP-06) or a transform; a lookup takes neither. A copy shows its
+        // steps once it has some or Add Changes was pressed.
         showsSteps:
           change.action === 'transform' ||
-          (change.action === 'copy' && Boolean(target) && type !== 'reference'),
+          (canCopySteps && (Boolean(change.stepsOpen) || (change.transforms || []).length > 0)),
+        offersSteps: canCopySteps && !change.stepsOpen && (change.transforms || []).length === 0,
         stepsSource: change.action === 'copy' ? change.source : change.field,
         stepList: change.transforms || [],
         inputType: NUMBER_TYPES.has(type) ? 'number' : INPUT_TYPES[type] || 'text',
@@ -641,6 +648,7 @@ export default class SuperTransform extends LightningElement {
 
   async handleObjectChange(event) {
     this.objectApiName = event.detail.value;
+    this.checkMapFroms();
     this.mapId = undefined;
     this.filterJson = '';
     this.relatedJson = '';
@@ -776,6 +784,13 @@ export default class SuperTransform extends LightningElement {
     }
   }
 
+  handleAddSteps(event) {
+    const key = event.currentTarget.dataset.key;
+    this.changes = this.changes.map((change) => {
+      return change.key === key ? { ...change, stepsOpen: true } : change;
+    });
+  }
+
   handleStepsChange(event) {
     const key = event.currentTarget.dataset.key;
     const transforms = event.detail.transforms;
@@ -816,6 +831,8 @@ export default class SuperTransform extends LightningElement {
 
   maps = [];
   mapId;
+  /** Each checked map's From kind of record, lower case ('' when it is not a record). */
+  mapFroms = {};
 
   /** Saved maps; none for a person who may not read them, and the control stays hidden. */
   async loadMaps() {
@@ -824,13 +841,47 @@ export default class SuperTransform extends LightningElement {
     } catch {
       this.maps = [];
     }
+    await this.checkMapFroms();
   }
 
-  /** The maps that fill the chosen kind of record. */
+  /** The maps that fill the chosen kind of record, as the list names them. */
+  get mapCandidates() {
+    const objectName = String(this.objectApiName || '').toLowerCase();
+    return objectName
+      ? this.maps.filter((entry) => String(entry.objectName || '').toLowerCase() === objectName)
+      : [];
+  }
+
+  /**
+   * Reads which kind of record each candidate map is From, once per map: the list names only
+   * what a map fills, and a map is applied only from this kind of record to itself.
+   */
+  async checkMapFroms() {
+    const unknown = this.mapCandidates.filter((entry) => !(entry.recordId in this.mapFroms));
+    if (unknown.length === 0) {
+      return;
+    }
+    const found = {};
+    await Promise.all(
+      unknown.map(async (entry) => {
+        try {
+          const saved = await loadMap({ recordId: entry.recordId });
+          const from = (parseMap(saved.definitionJson).document || {}).from || {};
+          found[entry.recordId] =
+            from.kind === 'record' ? String(from.object || '').toLowerCase() : '';
+        } catch {
+          found[entry.recordId] = '';
+        }
+      })
+    );
+    this.mapFroms = { ...this.mapFroms, ...found };
+  }
+
+  /** The maps from and to the chosen kind of record. */
   get mapOptions() {
     const objectName = String(this.objectApiName || '').toLowerCase();
-    return this.maps
-      .filter((entry) => String(entry.objectName || '').toLowerCase() === objectName)
+    return this.mapCandidates
+      .filter((entry) => this.mapFroms[entry.recordId] === objectName)
       .map((entry) => ({ label: entry.name, value: entry.recordId }));
   }
 
@@ -852,6 +903,18 @@ export default class SuperTransform extends LightningElement {
    */
   async handleApplyMap() {
     this.noticeMessage = undefined;
+    if (this.hasChange) {
+      const confirmed = await BarnConfirmModal.open({
+        size: 'small',
+        label: this.labels.mapApply,
+        message: helpText('Core', 'Core_SuperTransform_MapReplaceConfirm'),
+        confirmLabel: this.labels.mapApply,
+        cancelLabel: CANCEL
+      });
+      if (!confirmed) {
+        return;
+      }
+    }
     await this.work(async () => {
       const saved = await loadMap({ recordId: this.mapId });
       const { document } = parseMap(saved.definitionJson);
@@ -1086,6 +1149,7 @@ export default class SuperTransform extends LightningElement {
       this.stopPolling();
       this.job = undefined;
       this.objectApiName = definition.object;
+      this.checkMapFroms();
       this.targets = targets;
       this.filterJson = definition.filter ? JSON.stringify(definition.filter) : '';
       this.relatedJson = '';

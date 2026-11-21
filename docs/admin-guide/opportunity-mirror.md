@@ -29,8 +29,8 @@ remembers its Opportunity in its **Opportunity ID**, whichever side came first.
 
 **Extra fields.** To copy more, make a map in the Mapper **From** a record of kind **Gift** **To**
 a record of kind **Opportunity** (for example Payment Reference to Description, or a fixed Lead
-Source), and type its name in **BarnCRM Settings**, **Gift Mirrors and Exports**, **Opportunity
-Mirror Map**. Each line of the map copies one gift field or a fixed value, with its changes,
+Source), and choose it in **BarnCRM Settings**, **Gift Mirrors and Exports**, **Opportunity
+Mirror Map** (search by its name; it stays chosen when renamed). Each line of the map copies one gift field or a fixed value, with its changes,
 and a change to a gift field the map reads copies the gift again. A map never replaces the
 fields above; lookups, gift fields the person saving cannot read and Opportunity fields they
 cannot edit are left out, and a value the Opportunity field cannot take is left out for that
@@ -140,8 +140,8 @@ cause, then click **Run Now**.
 yours. Edit the gift instead. Fields that are not copied, such as Description, Next Step or your
 own fields, are never touched, unless the Opportunity Mirror Map copies them.
 
-**An extra field is not copied.** Check that **Opportunity Mirror Map** holds the map's name
-exactly (after renaming a map, type its new name there), that the map is **From** Gift **To**
+**An extra field is not copied.** Check that **Opportunity Mirror Map** shows the map (a saved
+step list chosen there copies nothing), that the map is **From** Gift **To**
 Opportunity, that its line names a gift field (not a parent's field) and an Opportunity field
 other than the ones the mirror writes itself, and that the person saving can read the gift field
 and edit the Opportunity field. A value the field cannot take, such as text in a number field, is

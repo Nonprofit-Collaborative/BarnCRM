@@ -182,7 +182,10 @@ other modules (Fundraising, Volunteers and the rest) ship in those modules and l
 this package.
 
 The package gives the **Sample Data** tab (its **Sample Data** permission set) to everyone
-with the **BarnCRM Admin** role, and to no other role: staff and read-only users never see it.
+with the **BarnCRM Admin** role, and to no other role. BarnCRM gives permission sets but never
+takes one away, so a staff or read-only user who already holds **Sample Data** keeps the tab
+until you remove it: in Setup, open the user, then **Permission Set Assignments**, and remove
+**Sample Data**.
 
 1. Open the **Sample Data** tab. **BarnCRM Settings**, **General**, **Sample Data** opens it
    too; type "sample" in the settings search box if you do not see it.

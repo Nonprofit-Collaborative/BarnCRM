@@ -1,6 +1,6 @@
 /**
  * Extra fields the Opportunity mirror copies through a saved map (MAP-07, canonical model
- * R-OM12): the map named in `Opportunity_Mirror_Map__c`, from Gift to Opportunity, read once per
+ * R-OM12): the map chosen in `Opportunity_Mirror_Map__c`, from Gift to Opportunity, read once per
  * transaction in system mode, as the setting naming it is. It adds, never replaces: a column for
  * a field R-OM3 writes, a lookup, a gift field the saver cannot read and an Opportunity field the
  * saver cannot create and edit are left out. Used by `OpportunityMirrorContext`.
@@ -46,19 +46,48 @@ public with sharing class OpportunityMirrorMap {
 		loaded = null;
 	}
 
+	/**
+	 * Whether the setting's value is this map: its record ID, or, for a value stored as a name,
+	 * its name.
+	 */
+	public static Boolean links(String value, Id mapId, String mapName) {
+		Id chosen = idOf(value);
+		return String.isNotBlank(value) && (chosen != null ? chosen == mapId : value.equalsIgnoreCase(mapName));
+	}
+
+	/** The value as a Saved Transform record ID, or null when it is a name. */
+	private static Id idOf(String value) {
+		try {
+			Id candidate = value instanceof Id ? Id.valueOf(value) : null;
+			return candidate != null && candidate.getSObjectType() == Saved_Transform__c.SObjectType ? candidate : null;
+		} catch (Exception notAnId) {
+			return null;
+		}
+	}
+
+	/** `value` is the map's record ID; a name is read too, so a value stored as a name works. */
 	@TestVisible
-	private OpportunityMirrorMap(String name) {
+	private OpportunityMirrorMap(String value) {
 		Schema.SObjectType opportunity = OpportunityMirrorContext.opportunityType();
-		if (String.isBlank(name) || opportunity == null) {
+		if (String.isBlank(value) || opportunity == null) {
 			return;
 		}
-		List<Saved_Transform__c> rows = [
-			SELECT Definition_JSON__c
-			FROM Saved_Transform__c
-			WHERE Name = :name AND Kind__c = :KIND_MAP
-			WITH SYSTEM_MODE
-			LIMIT 1
-		];
+		Id mapId = idOf(value);
+		List<Saved_Transform__c> rows = mapId != null
+			? [
+					SELECT Definition_JSON__c
+					FROM Saved_Transform__c
+					WHERE Id = :mapId AND Kind__c = :KIND_MAP
+					WITH SYSTEM_MODE
+					LIMIT 1
+			  ]
+			: [
+					SELECT Definition_JSON__c
+					FROM Saved_Transform__c
+					WHERE Name = :value AND Kind__c = :KIND_MAP
+					WITH SYSTEM_MODE
+					LIMIT 1
+			  ];
 		Map<String, Object> document = rows.isEmpty() ? null : asMap(parsed(rows[0].Definition_JSON__c));
 		if (
 			document == null ||

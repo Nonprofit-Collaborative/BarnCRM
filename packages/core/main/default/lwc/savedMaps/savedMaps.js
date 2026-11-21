@@ -16,10 +16,11 @@ function errorText(error) {
 }
 
 /**
- * The Maps panel of Data Manager (MAP-03; admin guide mapper.md, section 4): every saved map
- * with Open, Rename and Delete, and New Map. Open and New Map show the Mapper (c/barnMapper)
+ * The Saved Maps panel of Data Manager (MAP-03; admin guide mapper.md, section 4): every saved
+ * map with Open, Rename and Delete, and New Map. Open and New Map show the Mapper (c/barnMapper)
  * with the map's name and Save Map. Before a change to a map is saved, the tools that link it
- * (Where Used, from the installed modules) are listed, and a save that reaches any asks first.
+ * (Where Used, from the installed modules) are listed, and a save, rename or delete that reaches
+ * any asks first, naming them.
  * Save Map waits while a best guess is unchecked or the map has a problem.
  */
 export default class SavedMaps extends LightningElement {
@@ -139,10 +140,50 @@ export default class SavedMaps extends LightningElement {
     this.renamingId = undefined;
   }
 
+  /**
+   * The tools that link a map, as one line for a confirmation, or '' when none does. Undefined
+   * when they cannot be read: the error is shown and nothing goes ahead.
+   */
+  async usersLine(recordId) {
+    try {
+      const users = (await mapUsers({ recordId })) || [];
+      return users
+        .map((user) =>
+          format(helpText('Core', 'Core_SavedMaps_UserLine'), user.kindLabel, user.name)
+        )
+        .join('; ');
+    } catch (error) {
+      this.errorMessage = errorText(error);
+      return undefined;
+    }
+  }
+
   async handleRenameSave() {
+    const recordId = this.renamingId;
+    const found = this.maps.find((entry) => entry.recordId === recordId);
+    const used = await this.usersLine(recordId);
+    if (used === undefined) {
+      return;
+    }
+    if (used) {
+      const confirmed = await BarnConfirmModal.open({
+        size: 'small',
+        label: helpText('Core', 'Core_SavedMaps_Rename'),
+        message: format(
+          helpText('Core', 'Core_SavedMaps_RenameUsedConfirm'),
+          found ? found.name : '',
+          used
+        ),
+        confirmLabel: helpText('Core', 'Core_SavedMaps_Rename'),
+        cancelLabel: CANCEL
+      });
+      if (!confirmed) {
+        return;
+      }
+    }
     this.busy = true;
     try {
-      await renameMap({ recordId: this.renamingId, name: this.renameValue });
+      await renameMap({ recordId, name: this.renameValue });
       this.renamingId = undefined;
       this.errorMessage = undefined;
       await this.refresh();
@@ -156,10 +197,17 @@ export default class SavedMaps extends LightningElement {
   async handleDelete(event) {
     const recordId = event.currentTarget.dataset.recordId;
     const found = this.maps.find((entry) => entry.recordId === recordId);
+    const used = await this.usersLine(recordId);
+    if (used === undefined) {
+      return;
+    }
+    const name = found ? found.name : '';
     const confirmed = await BarnConfirmModal.open({
       size: 'small',
       label: helpText('Core', 'Core_SavedMaps_Delete'),
-      message: format(helpText('Core', 'Core_SavedMaps_DeleteConfirm'), found ? found.name : ''),
+      message: used
+        ? format(helpText('Core', 'Core_SavedMaps_DeleteUsedConfirm'), name, used)
+        : format(helpText('Core', 'Core_SavedMaps_DeleteConfirm'), name),
       confirmLabel: helpText('Core', 'Core_SavedMaps_Delete'),
       cancelLabel: CANCEL,
       confirmVariant: 'destructive'

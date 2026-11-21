@@ -449,5 +449,20 @@ describe('c-barn-mapper', () => {
       find(element, 'create-field').click();
       expect(created).toEqual(['Surname']);
     });
+
+    it("takes lookups from the template and the template's fields when the describe is refused", async () => {
+      getTargetFields.mockRejectedValue({ body: { message: 'You cannot edit Contacts.' } });
+      const element = createImporting([{ source: 'Org', target: 'Record.AccountId' }]);
+      await settle();
+
+      expect(find(element, 'load-error')).toBeNull();
+      targetRow(element, 'Record.AccountId').querySelector('[data-id="details"]').click();
+      await settle();
+      expect(
+        targetRow(element, 'Record.AccountId')
+          .querySelector('[data-id="lookup-field"]')
+          .options.map((o) => o.value)
+      ).toEqual(['Id', 'Name']);
+    });
   });
 });

@@ -62,7 +62,7 @@ There is nothing to turn on. The Mapper needs **Manage BarnCRM Settings**, which
 **BarnCRM Admin** role has: it is how maps are made, changed, renamed and deleted. Maps are
 org-wide: every administrator sees and may change every map.
 
-The Mapper is reached from **Data Manager**: the **Maps** tile in **Bring Data In**. It opens
+The Mapper is reached from **Data Manager**: the **Saved Maps** tile in **Bring Data In**. It opens
 on that page, with **Back to Data Manager** above it.
 
 A map that fills a record offers the kinds of record Super Transformer may change, and only the
@@ -73,7 +73,7 @@ previewed or used, so a map is never a way past a field you cannot reach.
 
 Maria gets a JSON export of event sign-ups and wants it to fill Contacts.
 
-1. Open **Data Manager** and select **Maps**. Press **New Map**.
+1. Open **Data Manager** and select **Saved Maps**. Press **New Map**.
 2. Type the name `Event sign-ups to Contacts`.
 3. Under **From**, choose **JSON Data**, paste one sign-up (or a list of them) into **Sample
    JSON** and press **Use This Sample**. The **From** pane lists **profile, email**, **profile,
@@ -94,20 +94,22 @@ Maria gets a JSON export of event sign-ups and wants it to fill Contacts.
 
 ## 4. Managing Maps
 
-The **Maps** panel lists every map with what it fills (a kind of record, a JSON body, or people
-and organizations for a map saved from a people template).
+The **Saved Maps** panel lists every map with what it fills (a kind of record, a JSON body, or
+people and organizations for a map saved from a people template).
 
 - **Open** shows the map in the Mapper. **Save Map** changes it in place. Before a change is
   saved, the Mapper lists every tool that uses the map (for example "Used by 3 recipes"), from
   **Where Used**, so you know what the change reaches.
-- **Rename** gives a map a new name; names are unique among maps, ignoring capitals.
-- **Delete** removes a map after a confirmation. A tool that copied the map keeps its copy.
+- **Rename** gives a map a new name; names are unique among maps, ignoring capitals. When a
+  tool uses the map, a confirmation names each one first; they keep using it under the new name.
+- **Delete** removes a map after a confirmation, which names each tool that uses the map. A tool
+  that copied the map keeps its copy.
 - **Where Used** (Data Dictionary, Field Utilization or the Record Inspector) lists a map that
   names a field or a kind of record, under **Map**, so a field is never retired while a map
   still fills it.
 
 Maps are kept as rows of **Saved Transform** with the kind **Map**; Super Transformer's
-**Saved Step Lists** never shows them, and the Maps panel never shows a step list.
+**Saved Step Lists** never shows them, and the Saved Maps panel never shows a step list.
 
 ## 5. Super Importer: Use a Saved Map and Save as Map
 
@@ -163,14 +165,14 @@ changes: changing the map later does not change a saved step list.
 
 With the Fundraising module and **Gifts to Opportunities** chosen, the Opportunity mirror can
 copy more fields than its own (see [Opportunity Mirror](opportunity-mirror.md)). Make a map
-**From** a record of kind **Gift** **To** a record of kind **Opportunity**, save it, and type its
-name in **BarnCRM Settings**, **Gift Mirrors and Exports**, **Opportunity Mirror Map**. Each line
+**From** a record of kind **Gift** **To** a record of kind **Opportunity**, save it, and choose
+it in **BarnCRM Settings**, **Gift Mirrors and Exports**, **Opportunity Mirror Map**. Each line
 copies one gift field or a fixed value, with its changes and **When Blank, Use**. The mirror
 never lets a map replace what it writes itself (Amount, Close Date, Stage, Account, Campaign,
 Name, Record Type), and leaves out lookups, gift fields the person saving cannot read and
 Opportunity fields they cannot edit. Where Used lists the setting under the map, so the Mapper
-warns before the map is changed. The setting names the map: after renaming the map, type the
-new name in the setting too.
+warns before the map is changed, renamed or deleted. The setting holds the map itself, so
+renaming the map keeps it chosen.
 
 ## 8. Common Mistakes
 

@@ -300,7 +300,7 @@ Test contacts for the delete scripts: create three contacts with first names `De
 ## T-BULK-18: Apply a Map and Copy With Steps
 
 **Purpose:** confirm **Apply a Map** fills the changes from a saved map from a kind of record to itself, and that **Copy From Another Field** takes steps (MAP-06).
-**Prerequisites:** admin; two contacts with last name `Maptest` and an empty **Description**. In **Data Manager**, **Maps**, a map `Contact tidy` **From** a record of kind **Contact** **To** a record of kind **Contact**: **Description** gets **Last Name** with **All capitals**, **Title** **Always Use** `Volunteer`, **Department** **When Blank, Use** `None`. Setup detail: [Super Transformer](../admin-guide/super-transform.md), section 1, and [The Mapper and Saved Maps](../admin-guide/mapper.md), section 6.
+**Prerequisites:** admin; two contacts with last name `Maptest` and an empty **Description**. In **Data Manager**, **Saved Maps**, a map `Contact tidy` **From** a record of kind **Contact** **To** a record of kind **Contact**: **Description** gets **Last Name** with **All capitals**, **Title** **Always Use** `Volunteer`, **Department** **When Blank, Use** `None`. Setup detail: [Super Transformer](../admin-guide/super-transform.md), section 1, and [The Mapper and Saved Maps](../admin-guide/mapper.md), section 6.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -308,6 +308,8 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | 2 | Choose **Contact tidy** and press **Apply Map**. | Three rows: **Description** **Copy From Another Field** **Last Name** with the step **All capitals**; **Title** **Set To** `Volunteer`; **Department** **Change With Steps** with a **Value when empty** step `None`. A notice says the changes came from the map. |
 | 3 | Press **Preview**. | **Description** goes to `MAPTEST`, **Title** to `Volunteer` and an empty **Department** to `None`. |
 | 4 | Choose **Account** in **1. Kind of Record**. | **Contact tidy** is not offered. |
-| 5 | Choose **Contact** again, set up the condition, choose **Description**, **Copy From Another Field**, **First Name**, add **All lower case** under it and press **Preview**. | The description is each contact's first name in lower case. |
+| 5 | Choose **Contact** again, set up the condition, choose **Description**, **Copy From Another Field**, **First Name**. | No step list shows, only **Add Changes** under the row. |
+| 6 | Press **Add Changes**, add **All lower case** and press **Preview**. | The description is each contact's first name in lower case. |
+| 7 | Choose **Contact tidy** and press **Apply Map**. | A confirmation says the map replaces the changes already chosen. **Cancel** keeps the **Description** row as it was. |
 
 **Cleanup:** delete the Maptest contacts and the **Contact tidy** map.

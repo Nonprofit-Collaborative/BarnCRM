@@ -20,7 +20,11 @@
     </values>
     <values>
         <field>Data_Type__c</field>
-        <value xsi:type="xsd:string">Text</value>
+        <value xsi:type="xsd:string">Record</value>
+    </values>
+    <values>
+        <field>Record_Object__c</field>
+        <value xsi:type="xsd:string">Saved_Transform__c</value>
     </values>
     <values>
         <field>Sort_Order__c</field>
@@ -28,7 +32,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">Gifts to Opportunities only: the name of a map from Gift to Opportunity, made in the Mapper, whose columns copy extra fields to each gift's Opportunity. Empty copies no extra field.</value>
+        <value xsi:type="xsd:string">Gifts to Opportunities only: a map from Gift to Opportunity, made in the Mapper, whose columns copy extra fields to each gift's Opportunity. Search for the map by name; it stays chosen when renamed. Empty copies no extra field.</value>
     </values>
     <values>
         <field>Help_Path__c</field>

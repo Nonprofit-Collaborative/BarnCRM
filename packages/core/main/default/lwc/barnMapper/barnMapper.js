@@ -359,7 +359,8 @@ export default class BarnMapper extends LightningElement {
       this.loadError = undefined;
     } catch (error) {
       this.targetFields = [];
-      this.loadError = errorText(error);
+      // Super Importer offers the template's fields, so the describe is only a refinement there.
+      this.loadError = this.importing ? undefined : errorText(error);
     }
     this.maybeAutoMatch();
     this.schedulePreview();
@@ -727,7 +728,11 @@ export default class BarnMapper extends LightningElement {
     const field = target.field || {};
     const defaultValue = this.defaultFor(target.value);
     const dragging = this.dragState && this.dragState.active ? this.dragState.overZone : null;
-    const isLookup = Boolean(field.referenceTo) && lower(field.dataType) === 'reference';
+    // In Super Importer the template says which fields are lookups: a parent the person can set
+    // on a new record but not change is left out of the describe yet is still a lookup.
+    const isLookup = this.importing
+      ? Boolean((this.importing.lookupChoices || {})[target.value])
+      : Boolean(field.referenceTo) && lower(field.dataType) === 'reference';
     const lookup = (column && column.lookup) || {};
     const isOpen = this.openTarget === target.value;
     const row = {

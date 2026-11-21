@@ -2608,6 +2608,29 @@ describe('the import wizard loading one object', () => {
     expect(element.shadowRoot.querySelector('[data-id="columns-mapper"]')).not.toBeNull();
   });
 
+  it('draws the table while two columns load one field (MAP-05)', async () => {
+    const element = await toColumnsStep(true);
+    click(element, 'columns-view');
+    await flush();
+    const picker = () =>
+      element.shadowRoot
+        .querySelectorAll('[data-id="column-row"]')[2]
+        .querySelector('c-import-field-picker');
+    picker().dispatchEvent(
+      new CustomEvent('change', { detail: { value: 'Record.Session_Key__c' } })
+    );
+    await flush();
+    // The Mapper fills a field from one column, so it is not offered.
+    expect(element.shadowRoot.querySelector('[data-id="columns-view"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="columns-mapper"]')).toBeNull();
+
+    picker().dispatchEvent(new CustomEvent('change', { detail: { value: 'Ignore' } }));
+    await flush();
+    // Fixed, the Mapper is offered again and the table stays until the person switches.
+    expect(element.shadowRoot.querySelector('[data-id="columns-view"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="columns-mapper"]')).toBeNull();
+  });
+
   it('offers the related record fields and sends the related records under a key', async () => {
     getTemplates.mockResolvedValue([
       {

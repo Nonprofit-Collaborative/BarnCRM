@@ -320,6 +320,16 @@
                                     ></c-import-column-transforms>
                                 </div>
                             </template>
+                            <template lwc:if={change.offersSteps}>
+                                <lightning-button
+                                    class="slds-show slds-var-m-top_x-small"
+                                    variant="base"
+                                    data-id="add-steps"
+                                    data-key={change.key}
+                                    label={labels.addSteps}
+                                    onclick={handleAddSteps}
+                                ></lightning-button>
+                            </template>
                         </div>
                     </template>
                     <div class="slds-grid slds-wrap slds-grid_vertical-align-center slds-gutters_x-small">

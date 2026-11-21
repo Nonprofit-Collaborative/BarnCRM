@@ -245,6 +245,48 @@ describe('c-saved-maps', () => {
     findAll(element, 'delete')[0].click();
     await flush();
     expect(deleteMap).toHaveBeenCalledWith({ recordId: MAP_ID });
+    expect(BarnConfirmModal.open.mock.calls[1][0].message).toBe('c.Core_SavedMaps_DeleteConfirm');
+  });
+
+  it('names the tools that use a map before it is renamed or deleted', async () => {
+    mapUsers.mockResolvedValue([{ kindLabel: 'Connector', name: 'Mailing list sync' }]);
+    renameMap.mockResolvedValue({ recordId: MAP_ID, name: 'Event sign-ups' });
+    const element = createComponent();
+    await flush();
+
+    BarnConfirmModal.open.mockResolvedValueOnce(false);
+    findAll(element, 'rename')[0].click();
+    await flush();
+    find(element, 'rename-save').click();
+    await flush();
+    expect(mapUsers).toHaveBeenCalledWith({ recordId: MAP_ID });
+    expect(BarnConfirmModal.open.mock.calls[0][0].message).toBe(
+      'c.Core_SavedMaps_RenameUsedConfirm'
+    );
+    expect(renameMap).not.toHaveBeenCalled();
+    find(element, 'rename-save').click();
+    await flush();
+    expect(renameMap).toHaveBeenCalled();
+
+    findAll(element, 'delete')[0].click();
+    await flush();
+    expect(BarnConfirmModal.open.mock.calls[2][0].message).toBe(
+      'c.Core_SavedMaps_DeleteUsedConfirm'
+    );
+    expect(deleteMap).toHaveBeenCalledWith({ recordId: MAP_ID });
+  });
+
+  it('renames without asking when no tool uses the map', async () => {
+    renameMap.mockResolvedValue({ recordId: MAP_ID, name: 'Event sign-ups' });
+    const element = createComponent();
+    await flush();
+
+    findAll(element, 'rename')[0].click();
+    await flush();
+    find(element, 'rename-save').click();
+    await flush();
+    expect(BarnConfirmModal.open).not.toHaveBeenCalled();
+    expect(renameMap).toHaveBeenCalled();
   });
 
   it('shows the server message when a map cannot be opened', async () => {

@@ -13,6 +13,9 @@ public with sharing class MapController {
 	public static final Integer MAX_SAMPLES = 200;
 	/** The most parent records one lookup reads in a preview. */
 	private static final Integer MAX_LOOKUP_ROWS = 2000;
+	/** The most object and field pairs one preview looks parents up by, one query each. */
+	@TestVisible
+	private static final Integer MAX_LOOKUP_FIELDS = 50;
 	/** A refusal is shown as written and not logged; anything else is logged. */
 	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
 		null,
@@ -154,15 +157,42 @@ public with sharing class MapController {
 			for (Integer i = 0; i < samples.size(); i++) {
 				preview.samples.add(new PreviewSample());
 			}
-			for (Object each : listOf(document.get('columns'))) {
+			// Lookup columns that find by the same object and field share one query.
+			List<Object> columns = listOf(document.get('columns'));
+			List<List<String>> valuesOf = new List<List<String>>();
+			List<String> lookupKeys = new List<String>();
+			Map<String, List<String>> lookupValues = new Map<String, List<String>>();
+			Map<String, Map<String, Object>> lookups = new Map<String, Map<String, Object>>();
+			for (Object each : columns) {
 				Map<String, Object> column = (Map<String, Object>) each;
-				String target = (String) column.get('target');
-				List<String> values = columnValues(column, samples, defaults.remove(target));
-				Map<String, String> found = column.get('lookup') instanceof Map<String, Object>
-					? lookUp((Map<String, Object>) column.get('lookup'), values)
-					: null;
+				List<String> values = columnValues(column, samples, defaults.remove((String) column.get('target')));
+				valuesOf.add(values);
+				String key;
+				if (column.get('lookup') instanceof Map<String, Object>) {
+					Map<String, Object> lookup = (Map<String, Object>) column.get('lookup');
+					key = (lookup.get('object') + '.' + lookup.get('field')).toLowerCase();
+					if (!lookups.containsKey(key)) {
+						lookups.put(key, lookup);
+						lookupValues.put(key, new List<String>());
+					}
+					lookupValues.get(key).addAll(values);
+				}
+				lookupKeys.add(key);
+			}
+			if (lookups.size() > MAX_LOOKUP_FIELDS) {
+				throw new BulkUpdateFields.BulkUpdateException(
+					BarnHelp.text('Core', 'Core_Map_ErrorTooManyLookups', new List<Object>{ MAX_LOOKUP_FIELDS })
+				);
+			}
+			Map<String, Map<String, String>> foundBy = new Map<String, Map<String, String>>();
+			for (String key : lookups.keySet()) {
+				foundBy.put(key, lookUp(lookups.get(key), lookupValues.get(key)));
+			}
+			for (Integer c = 0; c < columns.size(); c++) {
+				String target = (String) ((Map<String, Object>) columns[c]).get('target');
+				Map<String, String> found = lookupKeys[c] == null ? null : foundBy.get(lookupKeys[c]);
 				for (Integer i = 0; i < samples.size(); i++) {
-					preview.samples[i].values.add(valueOf(target, values[i], found));
+					preview.samples[i].values.add(valueOf(target, valuesOf[c][i], found));
 				}
 			}
 			// A default for a target no column fills is the value of every sample.

@@ -237,6 +237,56 @@ describe('c-super-transform', () => {
     ]);
   });
 
+  it('offers only maps from and to this kind of record, and asks before replacing changes', async () => {
+    listMaps.mockResolvedValue([
+      { recordId: 'a0M1', name: 'Tidy contacts', objectName: 'Contact' },
+      { recordId: 'a0M3', name: 'Organizations to contacts', objectName: 'Contact' }
+    ]);
+    loadMap.mockImplementation(({ recordId }) =>
+      Promise.resolve({
+        name: recordId === 'a0M1' ? 'Tidy contacts' : 'Organizations to contacts',
+        definitionJson: JSON.stringify({
+          version: 4,
+          from: { kind: 'record', object: recordId === 'a0M1' ? 'Contact' : 'Account' },
+          to: { kind: 'record', object: 'Contact' },
+          columns: [{ value: 'Web', target: 'Record.Contact_Kind__c' }]
+        })
+      })
+    );
+    BarnConfirmModal.open = jest.fn().mockResolvedValue(false);
+    const element = mount();
+    await flush();
+    await chooseContact(element);
+    await flush();
+
+    expect(q(element, 'map-pick').options).toEqual([{ label: 'Tidy contacts', value: 'a0M1' }]);
+    await setTitle(element, 'Coordinator');
+    q(element, 'map-pick').dispatchEvent(new CustomEvent('change', { detail: { value: 'a0M1' } }));
+    await flush();
+    q(element, 'map-apply').click();
+    await flush();
+    await flush();
+    expect(BarnConfirmModal.open).toHaveBeenCalledTimes(1);
+    expect(qa(element, 'field')[0].value).toBe('Title');
+  });
+
+  it('opens the steps of a copy only on Add Changes', async () => {
+    const element = mount();
+    await flush();
+    await chooseContact(element);
+    q(element, 'field').dispatchEvent(new CustomEvent('change', { detail: { value: 'Title' } }));
+    await flush();
+    q(element, 'action').dispatchEvent(new CustomEvent('change', { detail: { value: 'copy' } }));
+    await flush();
+    await flush();
+
+    expect(qa(element, 'steps')).toHaveLength(0);
+    q(element, 'add-steps').click();
+    await flush();
+    expect(qa(element, 'steps')).toHaveLength(1);
+    expect(q(element, 'add-steps')).toBeNull();
+  });
+
   it('says so, with no error, to a person without the permissions', async () => {
     getPage.mockResolvedValue({ allowed: false, jobs: [] });
     const element = mount();
