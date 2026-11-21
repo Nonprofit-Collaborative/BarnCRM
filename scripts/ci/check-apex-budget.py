@@ -106,7 +106,10 @@ CAPS = {
     # Set 2026-11-20 for landing batch Q (releases 1.31 to 1.33): the Mapper and saved maps
     # (MAP-01 to MAP-07), the Connector seams (CN-01 to CN-18) and D-217 merged together:
     # 1,977,602 measured, plus about 0.1% (2% would pass the 2.0M target).
-    "core": 1_979_600,
+    # Raised 2026-11-20 for the batch Q review fixes: HealthCheckResult (the one owner of the
+    # stored Health Check format), grouped Mapper lookups and 51 messages read from the Core
+    # help catalog instead of labels. 1,980,869 measured, plus about 0.1%.
+    "core": 1_982_850,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured
