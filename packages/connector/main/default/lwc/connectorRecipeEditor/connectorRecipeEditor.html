@@ -1,0 +1,337 @@
+<template>
+    <article class="slds-card slds-is-relative" aria-labelledby="editor-heading">
+        <template lwc:if={working}>
+            <lightning-spinner alternative-text={labels.working} size="small" data-id="working"></lightning-spinner>
+        </template>
+        <div class="slds-card__body slds-card__body_inner">
+            <div class="slds-grid slds-grid_vertical-align-center slds-wrap slds-var-m-bottom_small">
+                <h3 id="editor-heading" class="slds-text-heading_medium slds-var-m-right_small">{title}</h3>
+                <c-barn-status-badge status={statusTone} label={statusLabel} data-id="status"></c-barn-status-badge>
+                <div class="slds-col_bump-left">
+                    <lightning-button label={labels.close} onclick={handleClose} data-id="close"></lightning-button>
+                </div>
+            </div>
+            <template lwc:if={message}>
+                <c-barn-notice class="slds-var-m-bottom_small" variant="success" message={message} data-id="message"></c-barn-notice>
+            </template>
+            <template lwc:if={error}>
+                <c-barn-notice class="slds-var-m-bottom_small" variant="error" message={error} data-id="error"></c-barn-notice>
+            </template>
+
+            <section class="slds-var-m-bottom_medium" aria-labelledby="details-heading">
+                <h4 id="details-heading" class="slds-text-title_bold slds-var-m-bottom_x-small">{labels.details}</h4>
+                <lightning-input label={labels.name} value={name} required max-length="80" read-only={readOnly} onchange={handleName} data-id="name"></lightning-input>
+                <lightning-textarea label={labels.description} value={description} max-length="1000" read-only={readOnly} onchange={handleDescription} data-id="description"></lightning-textarea>
+                <lightning-record-picker label={labels.owner} object-api-name="User" value={ownerId} field-level-help={labels.ownerHelp} disabled={readOnly} onchange={handleOwner} data-id="owner"></lightning-record-picker>
+            </section>
+
+            <section class="slds-var-m-bottom_medium" aria-labelledby="when-heading">
+                <h4 id="when-heading" class="slds-text-title_bold slds-var-m-bottom_x-small">{labels.when}</h4>
+                <lightning-radio-group label={labels.triggerKind} options={triggerOptions} value={trigger.kind} type="button" disabled={readOnly} onchange={handleTriggerKind} data-id="trigger-kind"></lightning-radio-group>
+                <template lwc:if={isManual}>
+                    <p class="slds-text-body_small slds-var-m-vertical_x-small">{labels.whenManual}</p>
+                </template>
+                <template lwc:if={isSchedule}>
+                    <p class="slds-text-body_small slds-var-m-vertical_x-small">{labels.whenSchedule}</p>
+                    <lightning-combobox label={labels.every} options={everyOptions} value={trigger.every} read-only={readOnly} data-field="every" onchange={handleTriggerField} data-id="every"></lightning-combobox>
+                    <template lwc:if={timed}>
+                        <lightning-input type="time" label={labels.at} value={atValue} read-only={readOnly} data-field="at" onchange={handleTriggerField} data-id="at"></lightning-input>
+                    </template>
+                    <template lwc:if={weekly}>
+                        <lightning-combobox label={labels.day} options={dayOptions} value={trigger.day} read-only={readOnly} data-field="day" onchange={handleTriggerField} data-id="day"></lightning-combobox>
+                    </template>
+                </template>
+                <template lwc:if={isRecordChange}>
+                    <p class="slds-text-body_small slds-var-m-vertical_x-small">{labels.whenRecord}</p>
+                    <lightning-combobox label={labels.savedQuery} options={queryOptions} value={trigger.savedQuery} read-only={readOnly} onchange={handleTriggerQuery} data-id="trigger-query"></lightning-combobox>
+                    <lightning-radio-group label={labels.on} options={stampOptions} value={trigger.on} disabled={readOnly} data-field="on" onchange={handleTriggerField} data-id="on"></lightning-radio-group>
+                    <lightning-radio-group label={labels.mode} options={modeOptions} value={trigger.mode} disabled={readOnly} data-field="mode" onchange={handleTriggerField} data-id="mode"></lightning-radio-group>
+                    <lightning-input type="number" label={labels.limit} value={trigger.limit} min="1" max="200" step="1" field-level-help={labels.limitHelp} read-only={readOnly} data-field="limit" onchange={handleTriggerField} data-id="limit"></lightning-input>
+                </template>
+                <template lwc:if={isWebhook}>
+                    <p class="slds-text-body_small slds-var-m-vertical_x-small">{labels.whenWebhook}</p>
+                    <c-connector-webhook-setup recipe-id={recipeId} trigger={trigger} can-manage={canManage} ontriggerchange={handleTriggerChange} data-id="webhook"></c-connector-webhook-setup>
+                </template>
+                <template lwc:if={isAppPoll}>
+                    <p class="slds-text-body_small slds-var-m-vertical_x-small">{labels.whenAppPoll}</p>
+                    <c-connector-app-poll-setup trigger={trigger} connections={connectionOptions} read-only={readOnly} ontriggerchange={handleTriggerChange} data-id="app-poll"></c-connector-app-poll-setup>
+                </template>
+                <template lwc:if={nextRunText}>
+                    <p class="slds-text-body_small slds-var-m-vertical_x-small" data-id="next-run">{nextRunText}</p>
+                </template>
+                <lightning-textarea label={labels.sample} value={sampleText} field-level-help={labels.sampleHelp} read-only={readOnly} onchange={handleSample} data-id="sample"></lightning-textarea>
+            </section>
+
+            <section class="slds-var-m-bottom_medium" aria-labelledby="then-heading">
+                <h4 id="then-heading" class="slds-text-title_bold slds-var-m-bottom_x-small">{labels.then}</h4>
+                <template lwc:if={noSteps}>
+                    <p class="slds-text-body_small slds-var-m-bottom_small" data-id="no-steps">{labels.noSteps}</p>
+                </template>
+                <template for:each={rows} for:item="row">
+                    <div key={row.key} class={row.indentClass} data-id={row.step.id}>
+                        <template lwc:if={row.branchLabel}>
+                            <p class="slds-text-body_small">{row.branchLabel}</p>
+                        </template>
+                        <div class="slds-grid slds-grid_vertical-align-center slds-wrap">
+                            <h5 class="slds-text-heading_small slds-col">{row.heading}</h5>
+                            <template lwc:if={canManage}>
+                                <lightning-button-icon icon-name="utility:arrowup" alternative-text={row.moveUpLabel} data-address={row.address} data-delta="-1" onclick={handleMove}></lightning-button-icon>
+                                <lightning-button-icon class="slds-var-m-left_xx-small" icon-name="utility:arrowdown" alternative-text={row.moveDownLabel} data-address={row.address} data-delta="1" onclick={handleMove}></lightning-button-icon>
+                                <lightning-button-icon class="slds-var-m-left_xx-small" icon-name="utility:delete" alternative-text={row.removeLabel} data-address={row.address} onclick={handleRemove}></lightning-button-icon>
+                            </template>
+                        </div>
+                        <lightning-input label={labels.stepName} value={row.step.id} max-length="20" read-only={readOnly} data-address={row.address} data-field="id" onchange={handleField}></lightning-input>
+                        <template lwc:if={row.fillText}>
+                            <c-barn-notice class="slds-var-m-vertical_x-small" variant="warning" message={row.fillText} data-id={row.fillId}></c-barn-notice>
+                        </template>
+
+                        <template lwc:if={row.isForEach}>
+                            <lightning-input label={labels.items} value={row.step.items} field-level-help={labels.itemsHelp} read-only={readOnly} data-address={row.address} data-field="items" onchange={handleField}></lightning-input>
+                            <template lwc:if={canManage}>
+                                <lightning-button-menu class="slds-var-m-top_x-small" label={labels.addInside} alternative-text={labels.addInside} data-address={row.address} data-branch="do" onselect={handleAddInside}>
+                                    <template for:each={loopAddOptions} for:item="option">
+                                        <lightning-menu-item key={option.value} label={option.label} value={option.value}></lightning-menu-item>
+                                    </template>
+                                </lightning-button-menu>
+                            </template>
+                        </template>
+
+                        <template lwc:if={row.isWait}>
+                            <div class="slds-grid slds-gutters_x-small slds-wrap">
+                                <lightning-input class="slds-col" type="number" label={labels.waitAmount} value={row.step.amount} min="1" step="1" required field-level-help={labels.waitHelp} read-only={readOnly} data-address={row.address} data-field="amount" onchange={handleField}></lightning-input>
+                                <lightning-combobox class="slds-col" label={labels.waitUnit} options={unitOptions} value={row.step.unit} read-only={readOnly} data-address={row.address} data-field="unit" onchange={handleField}></lightning-combobox>
+                            </div>
+                        </template>
+
+                        <template lwc:if={row.isTransform}>
+                            <lightning-combobox label={labels.map} options={row.maps} value={row.step.map} field-level-help={labels.transformHelp} read-only={readOnly} data-address={row.address} data-field="map" onchange={handleField}></lightning-combobox>
+                            <lightning-input label={labels.input} value={row.step.input} read-only={readOnly} data-address={row.address} data-field="input" onchange={handleField}></lightning-input>
+                        </template>
+
+                        <template lwc:if={row.isFind}>
+                            <lightning-combobox label={labels.savedQuery} options={queryOptions} value={row.step.savedQuery} read-only={readOnly} data-address={row.address} onchange={handleQuery}></lightning-combobox>
+                            <template for:each={row.findConditions} for:item="condition">
+                                <lightning-input key={condition.id} label={condition.label} value={condition.path} field-level-help={labels.conditionValue} read-only={readOnly} data-address={row.address} data-condition={condition.id} onchange={handleConditionPath}></lightning-input>
+                            </template>
+                            <lightning-input type="checkbox" label={labels.stopIfNone} checked={row.step.stopIfNone} disabled={readOnly} data-address={row.address} data-field="stopIfNone" onchange={handleField}></lightning-input>
+                        </template>
+
+                        <template lwc:if={row.isRecord}>
+                            <lightning-combobox label={labels.map} options={row.maps} value={row.step.map} read-only={readOnly} data-address={row.address} data-field="map" onchange={handleField}></lightning-combobox>
+                            <template lwc:if={row.isUpdate}>
+                                <lightning-input label={labels.recordId} value={row.step.recordId} read-only={readOnly} data-address={row.address} data-field="recordId" onchange={handleField}></lightning-input>
+                            </template>
+                            <lightning-input label={labels.input} value={row.step.input} read-only={readOnly} data-address={row.address} data-field="input" onchange={handleField}></lightning-input>
+                        </template>
+
+                        <template lwc:if={row.isCall}>
+                            <lightning-combobox label={labels.connection} options={connectionOptions} value={row.step.connection} read-only={readOnly} data-address={row.address} data-field="connection" onchange={handleField}></lightning-combobox>
+                            <template lwc:if={row.isCallApp}>
+                                <lightning-combobox label={labels.method} options={methodOptions} value={row.step.method} read-only={readOnly} data-address={row.address} data-field="method" onchange={handleField}></lightning-combobox>
+                            </template>
+                            <lightning-input label={labels.urlFrom} value={row.step.urlFrom} field-level-help={labels.urlFromHelp} read-only={readOnly} data-address={row.address} data-field="urlFrom" onchange={handleField}></lightning-input>
+                            <lightning-input label={labels.path} value={row.step.path} field-level-help={row.pathHelp} read-only={readOnly} data-address={row.address} data-field="path" onchange={handleField}></lightning-input>
+                            <template for:each={row.pathValues} for:item="slot">
+                                <lightning-input key={slot.key} label={slot.name} value={slot.shown} field-level-help={labels.valueHelp} read-only={readOnly} data-address={row.address} data-list="pathValues" data-index={slot.index} data-field="shown" onchange={handleEntry}></lightning-input>
+                            </template>
+                            <fieldset class="slds-var-m-top_x-small">
+                                <legend class="slds-text-body_small">{labels.queryParams}</legend>
+                                <template for:each={row.query} for:item="pair">
+                                    <div key={pair.key} class="slds-grid slds-gutters_x-small slds-wrap">
+                                        <lightning-input class="slds-col" label={labels.entryName} value={pair.name} read-only={readOnly} data-address={row.address} data-list="query" data-index={pair.index} data-field="name" onchange={handleEntry}></lightning-input>
+                                        <lightning-input class="slds-col" label={labels.entryValue} value={pair.shown} field-level-help={labels.valueHelp} read-only={readOnly} data-address={row.address} data-list="query" data-index={pair.index} data-field="shown" onchange={handleEntry}></lightning-input>
+                                        <template lwc:if={canManage}>
+                                            <lightning-button-icon class="slds-align-bottom" icon-name="utility:close" alternative-text={pair.removeLabel} data-address={row.address} data-list="query" data-index={pair.index} onclick={handleRemoveEntry}></lightning-button-icon>
+                                        </template>
+                                    </div>
+                                </template>
+                                <template lwc:if={canManage}>
+                                    <lightning-button variant="base" label={labels.addEntry} data-address={row.address} data-list="query" onclick={handleAddEntry}></lightning-button>
+                                </template>
+                            </fieldset>
+                            <fieldset class="slds-var-m-top_x-small">
+                                <legend class="slds-text-body_small">{labels.headers}</legend>
+                                <template for:each={row.headers} for:item="header">
+                                    <div key={header.key} class="slds-grid slds-gutters_x-small slds-wrap">
+                                        <lightning-input class="slds-col" label={labels.entryName} value={header.name} read-only={readOnly} data-address={row.address} data-list="headers" data-index={header.index} data-field="name" onchange={handleEntry}></lightning-input>
+                                        <lightning-input class="slds-col" label={labels.entryValue} value={header.shown} field-level-help={labels.valueHelp} read-only={readOnly} data-address={row.address} data-list="headers" data-index={header.index} data-field="shown" onchange={handleEntry}></lightning-input>
+                                        <template lwc:if={canManage}>
+                                            <lightning-button-icon class="slds-align-bottom" icon-name="utility:close" alternative-text={header.removeLabel} data-address={row.address} data-list="headers" data-index={header.index} onclick={handleRemoveEntry}></lightning-button-icon>
+                                        </template>
+                                    </div>
+                                </template>
+                                <template lwc:if={canManage}>
+                                    <lightning-button variant="base" label={labels.addEntry} data-address={row.address} data-list="headers" onclick={handleAddEntry}></lightning-button>
+                                </template>
+                            </fieldset>
+                            <lightning-combobox label={labels.bodyMap} options={row.maps} value={row.step.bodyMap} read-only={readOnly} data-address={row.address} data-field="bodyMap" onchange={handleField}></lightning-combobox>
+                            <lightning-input label={labels.bodyInput} value={row.step.bodyInput} read-only={readOnly} data-address={row.address} data-field="bodyInput" onchange={handleField}></lightning-input>
+                            <lightning-input label={labels.success} value={row.successText} field-level-help={labels.successHelp} read-only={readOnly} data-address={row.address} data-field="success" onchange={handleField}></lightning-input>
+                            <template lwc:if={row.isCallApp}>
+                                <lightning-input type="checkbox" label={labels.notFoundOk} checked={row.step.notFoundOk} disabled={readOnly} data-address={row.address} data-field="notFoundOk" onchange={handleField}></lightning-input>
+                            </template>
+                        </template>
+
+                        <template lwc:if={row.isImport}>
+                            <lightning-combobox label={labels.template} options={templateOptions} value={row.step.template} field-level-help={labels.templateHelp} read-only={readOnly} data-address={row.address} data-field="template" onchange={handleField}></lightning-combobox>
+                            <lightning-input label={labels.rows} value={row.step.rows} field-level-help={labels.rowsHelp} read-only={readOnly} data-address={row.address} data-field="rows" onchange={handleField}></lightning-input>
+                            <fieldset class="slds-var-m-top_x-small">
+                                <legend class="slds-text-body_small">{labels.limits}</legend>
+                                <p class="slds-text-body_small">{labels.limitsHelp}</p>
+                                <div class="slds-grid slds-gutters_x-small slds-wrap">
+                                    <template for:each={row.limits} for:item="limit">
+                                        <lightning-input key={limit.key} class="slds-col" type="number" label={limit.label} value={limit.value} min={limit.min} max="4000" step="1" required field-level-help={limit.help} read-only={readOnly} data-address={row.address} data-limit={limit.key} onchange={handleLimit}></lightning-input>
+                                    </template>
+                                </div>
+                            </fieldset>
+                        </template>
+
+                        <template lwc:if={row.isIf}>
+                            <lightning-radio-group label={labels.match} options={matchOptions} value={row.step.match} type="button" disabled={readOnly} data-address={row.address} data-field="match" onchange={handleField}></lightning-radio-group>
+                            <fieldset class="slds-var-m-top_x-small">
+                                <legend class="slds-text-body_small">{labels.conditions}</legend>
+                                <template for:each={row.conditions} for:item="condition">
+                                    <div key={condition.key} class="slds-grid slds-gutters_x-small slds-wrap">
+                                        <lightning-input class="slds-col" label={labels.conditionPath} value={condition.path} read-only={readOnly} data-address={row.address} data-list="conditions" data-index={condition.index} data-field="path" onchange={handleEntry}></lightning-input>
+                                        <lightning-combobox class="slds-col" label={labels.operator} options={operatorOptions} value={condition.operator} read-only={readOnly} data-address={row.address} data-list="conditions" data-index={condition.index} data-field="operator" onchange={handleEntry}></lightning-combobox>
+                                        <template lwc:if={condition.valueShown}>
+                                            <lightning-input class="slds-col" label={labels.value} value={condition.value} read-only={readOnly} data-address={row.address} data-list="conditions" data-index={condition.index} data-field="value" onchange={handleEntry}></lightning-input>
+                                        </template>
+                                        <template lwc:if={canManage}>
+                                            <lightning-button-icon class="slds-align-bottom" icon-name="utility:close" alternative-text={condition.removeLabel} data-address={row.address} data-list="conditions" data-index={condition.index} onclick={handleRemoveEntry}></lightning-button-icon>
+                                        </template>
+                                    </div>
+                                </template>
+                                <template lwc:if={canManage}>
+                                    <lightning-button variant="base" label={labels.addEntry} data-address={row.address} data-list="conditions" onclick={handleAddEntry}></lightning-button>
+                                </template>
+                            </fieldset>
+                            <template lwc:if={canManage}>
+                                <div class="slds-var-m-top_x-small">
+                                    <lightning-button-menu class="slds-var-m-right_small" label={labels.addThen} alternative-text={labels.addThen} data-address={row.address} data-branch="then" onselect={handleAddInside}>
+                                        <template for:each={addOptions} for:item="option">
+                                            <lightning-menu-item key={option.value} label={option.label} value={option.value}></lightning-menu-item>
+                                        </template>
+                                    </lightning-button-menu>
+                                    <lightning-button-menu label={labels.addOtherwise} alternative-text={labels.addOtherwise} data-address={row.address} data-branch="otherwise" onselect={handleAddInside}>
+                                        <template for:each={addOptions} for:item="option">
+                                            <lightning-menu-item key={option.value} label={option.label} value={option.value}></lightning-menu-item>
+                                        </template>
+                                    </lightning-button-menu>
+                                </div>
+                            </template>
+                        </template>
+
+                        <template lwc:if={row.isStop}>
+                            <lightning-combobox label={labels.outcome} options={outcomeOptions} value={row.step.outcome} read-only={readOnly} data-address={row.address} data-field="outcome" onchange={handleField}></lightning-combobox>
+                            <lightning-input label={labels.stopMessage} value={row.step.message} max-length="255" read-only={readOnly} data-address={row.address} data-field="message" onchange={handleField}></lightning-input>
+                        </template>
+
+                        <p class="slds-text-body_small slds-var-m-top_x-small">{labels.pathsHint} {row.hints}</p>
+                    </div>
+                </template>
+                <template lwc:if={canManage}>
+                    <lightning-button-menu label={labels.addStep} alternative-text={labels.addStep} onselect={handleAdd} data-id="add-step">
+                        <template for:each={addOptions} for:item="option">
+                            <lightning-menu-item key={option.value} label={option.label} value={option.value}></lightning-menu-item>
+                        </template>
+                    </lightning-button-menu>
+                </template>
+            </section>
+
+            <template lwc:if={hasProblems}>
+                <c-barn-notice class="slds-var-m-bottom_medium" variant="warning" title={labels.problemsHeading} message={problemSummary} data-id="problems"></c-barn-notice>
+            </template>
+
+            <section class="slds-var-m-bottom_medium" aria-labelledby="settings-heading">
+                <h4 id="settings-heading" class="slds-text-title_bold slds-var-m-bottom_x-small">{labels.settings}</h4>
+                <template lwc:if={saved}>
+                    <lightning-radio-group label={labels.runAs} options={runAsOptions} value={runAs} disabled={readOnly} onchange={handleRunAs} data-id="run-as"></lightning-radio-group>
+                    <p class="slds-text-body_small slds-var-m-bottom_x-small">{labels.runAsHelp}</p>
+                    <template lwc:if={runAsChosen}>
+                        <p class="slds-text-body_small" data-id="run-as-chosen">{runAsChosen}</p>
+                    </template>
+                    <h4 class="slds-text-title_bold slds-var-m-top_small slds-var-m-bottom_x-small">{labels.runSettings}</h4>
+                    <template lwc:if={failuresText}>
+                        <p class="slds-text-body_small" data-id="failures">{failuresText}</p>
+                    </template>
+                    <div class="slds-grid slds-gutters_x-small slds-wrap">
+                        <lightning-input class="slds-col" type="number" label={labels.retryAttempts} value={retryAttempts} min="0" max="4" step="1" required field-level-help={labels.retryAttemptsHelp} read-only={readOnly} data-field="retryAttempts" onchange={handleSetting} data-id="retry-attempts"></lightning-input>
+                        <lightning-input class="slds-col" type="number" label={labels.pauseAfter} value={pauseAfterFailures} min="1" max="100" step="1" required field-level-help={labels.pauseAfterHelp} read-only={readOnly} data-field="pauseAfterFailures" onchange={handleSetting} data-id="pause-after"></lightning-input>
+                        <lightning-input class="slds-col" type="number" label={labels.keepDays} value={keepRunsDays} min="7" max="365" step="1" required field-level-help={labels.keepDaysHelp} read-only={readOnly} data-field="keepRunsDays" onchange={handleSetting} data-id="keep-days"></lightning-input>
+                    </div>
+                    <lightning-input type="checkbox" label={labels.ignoreOwn} checked={ignoreOwnChanges} field-level-help={labels.ignoreOwnHelp} disabled={readOnly} data-field="ignoreOwnChanges" onchange={handleSetting} data-id="ignore-own"></lightning-input>
+                    <template lwc:if={canManage}>
+                        <div class="slds-var-m-top_x-small">
+                            <lightning-button class="slds-var-m-right_small" label={labels.saveSettings} disabled={working} onclick={handleSaveSettings} data-id="save-settings"></lightning-button>
+                            <template lwc:if={canPause}>
+                                <lightning-button class="slds-var-m-right_small" label={labels.pause} disabled={working} onclick={handlePause} data-id="pause"></lightning-button>
+                            </template>
+                            <template lwc:if={canResume}>
+                                <lightning-button class="slds-var-m-right_small" variant="brand" label={labels.resume} disabled={working} onclick={handleResume} data-id="resume"></lightning-button>
+                            </template>
+                            <lightning-button label={labels.retryAll} disabled={working} onclick={handleRetryAll} data-id="retry-all"></lightning-button>
+                        </div>
+                    </template>
+                </template>
+                <template lwc:else>
+                    <p class="slds-text-body_small" data-id="save-first">{labels.saveFirst}</p>
+                </template>
+            </section>
+
+            <template lwc:if={canManage}>
+                <div class="slds-var-m-bottom_medium">
+                    <lightning-button class="slds-var-m-right_small" label={labels.save} disabled={working} onclick={handleSave} data-id="save"></lightning-button>
+                    <lightning-button class="slds-var-m-right_small" variant="brand" label={labels.publish} disabled={hasProblems} onclick={handlePublish} data-id="publish"></lightning-button>
+                    <template lwc:if={canRollBack}>
+                        <lightning-button class="slds-var-m-right_small" label={labels.rollBack} disabled={working} onclick={handleRollBack} data-id="roll-back"></lightning-button>
+                    </template>
+                    <template lwc:if={canDiscard}>
+                        <lightning-button class="slds-var-m-right_small" label={labels.discard} disabled={working} onclick={handleDiscard} data-id="discard"></lightning-button>
+                    </template>
+                    <template lwc:if={saved}>
+                        <lightning-button class="slds-var-m-right_small" label={labels.exportRecipe} disabled={working} onclick={handleExport} data-id="export"></lightning-button>
+                    </template>
+                    <template lwc:if={saved}>
+                        <lightning-button variant="destructive-text" label={labels.deleteLabel} disabled={working} onclick={handleDelete} data-id="delete"></lightning-button>
+                    </template>
+                </div>
+
+                <section class="slds-var-m-bottom_medium" aria-labelledby="test-heading">
+                    <h4 id="test-heading" class="slds-text-title_bold slds-var-m-bottom_x-small">{labels.testHeading}</h4>
+                    <p class="slds-text-body_small slds-var-m-bottom_x-small">{labels.testIntro}</p>
+                    <lightning-input label={labels.testRecord} value={testRecordId} max-length="18" onchange={handleTestRecord} data-id="test-record"></lightning-input>
+                    <lightning-input type="checkbox" label={labels.sendForReal} checked={sendForReal} onchange={handleSendForReal} data-id="send-for-real"></lightning-input>
+                    <lightning-button class="slds-var-m-top_x-small slds-var-m-right_small" label={labels.test} disabled={hasProblems} onclick={handleTest} data-id="test"></lightning-button>
+                    <template lwc:if={testRun}>
+                        <lightning-button class="slds-var-m-top_x-small" label={labels.checkResult} onclick={handleCheckResult} data-id="check-result"></lightning-button>
+                        <div class="slds-var-m-top_small" data-id="test-result">
+                            <c-barn-status-badge status={testTone} label={testStatus}></c-barn-status-badge>
+                            <ul class="slds-has-dividers_bottom-space">
+                                <template for:each={testRows} for:item="entry">
+                                    <li key={entry.key} class="slds-item">
+                                        <p class="slds-text-body_small">{entry.step}: {entry.outcome}</p>
+                                        <template lwc:if={entry.message}>
+                                            <p class="slds-text-body_small">{entry.message}</p>
+                                        </template>
+                                        <template lwc:if={entry.preview}>
+                                            <pre class="slds-text-body_small">{entry.preview}</pre>
+                                        </template>
+                                    </li>
+                                </template>
+                            </ul>
+                        </div>
+                    </template>
+                </section>
+
+                <template lwc:if={active}>
+                    <section aria-labelledby="run-heading">
+                        <h4 id="run-heading" class="slds-text-title_bold slds-var-m-bottom_x-small">{labels.runHeading}</h4>
+                        <lightning-textarea label={labels.runData} value={runInput} onchange={handleRunInput} data-id="run-data"></lightning-textarea>
+                        <lightning-button class="slds-var-m-top_x-small" variant="brand" label={labels.runNow} disabled={working} onclick={handleRunNow} data-id="run-now"></lightning-button>
+                    </section>
+                </template>
+            </template>
+        </div>
+    </article>
+</template>

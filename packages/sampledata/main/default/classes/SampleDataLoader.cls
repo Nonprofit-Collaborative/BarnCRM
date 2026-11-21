@@ -139,7 +139,7 @@ public with sharing class SampleDataLoader {
 		try {
 			SampleDataSelector selector = new SampleDataSelector();
 			body = String.format(
-				Label.Core_JobNotice_SampleDataBody,
+				BarnHelp.text('Core', 'Core_JobNotice_SampleDataBody'),
 				new List<Object>{
 					selector.countSampleHouseholds().format(),
 					selector.countSampleContacts().format(),

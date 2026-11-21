@@ -161,68 +161,12 @@
         <value>What Is in This Pack</value>
     </labels>
     <labels>
-        <fullName>Core_AiExport_ReadmeFileSchema</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export README: schema.json line</shortDescription>
-        <value>schema.json: every kind of record and field, with types, picklist values, help text, lookups, fill rates, privacy handling, relationships and data quality notes. Give it to the AI tool first.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_ReadmeFileDictionary</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export README: data-dictionary.csv line</shortDescription>
-        <value>data-dictionary.csv: the same fields as a spreadsheet, as BarnCRM's Data Dictionary downloads it.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_ReadmeFileData</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export README: data folder line</shortDescription>
-        <value>data/: one CSV file of records for each kind of record. The first row holds field API names, explained in schema.json. Id and lookup columns hold record Ids, so files can be joined.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_ReadmeObjectLine</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>README object line: {0} label, {1} API name, {2} field count</shortDescription>
-        <value>{0} ({1}): {2} fields.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_ReadmeObjectRecords</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>README object line: {0} label, {1} API name, {2} fields, {3} records, {4} file</shortDescription>
-        <value>{0} ({1}): {2} fields, {3} records in {4}.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_ReadmeObjectStopped</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export README: records stopped at the limit</shortDescription>
-        <value>Not every record is included: this kind of record stopped at the Find export row limit.</value>
-    </labels>
-    <labels>
         <fullName>Core_AiExport_ReadmeRelationships</fullName>
         <categories>AiReadinessExport</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>AI-Readiness Export README: relationships heading</shortDescription>
         <value>How Records Connect</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_ReadmeRelationshipLine</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>README relationship: {0} is Object.Field, {1} is the related objects</shortDescription>
-        <value>{0} holds the Id of a related record ({1}).</value>
     </labels>
     <labels>
         <fullName>Core_AiExport_ReadmePrivacy</fullName>
@@ -233,46 +177,6 @@
         <value>Privacy</value>
     </labels>
     <labels>
-        <fullName>Core_AiExport_ReadmePrivacyNone</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export README: no sensitive fields</shortDescription>
-        <value>No field was flagged as sensitive.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_ReadmePrivacyLeftOut</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export README: left out, {0} is a list of fields</shortDescription>
-        <value>Left out of the record files: {0}.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_ReadmePrivacyMasked</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export README: masked, {0} is a list of fields</shortDescription>
-        <value>Masked (each value replaced with a code that cannot be turned back into it): {0}.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_ReadmePrivacyKept</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export README: kept, {0} is a list of fields</shortDescription>
-        <value>Flagged as sensitive but kept as they are: {0}.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_ReadmePrivacyAdvice</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export README: privacy advice</shortDescription>
-        <value>Read your AI tool's terms before uploading records about people. Many tools keep what you upload, or train on it, unless you turn that off. Share only what the question needs.</value>
-    </labels>
-    <labels>
         <fullName>Core_AiExport_ReadmeQuality</fullName>
         <categories>AiReadinessExport</categories>
         <language>en_US</language>
@@ -281,59 +185,11 @@
         <value>Data Quality Notes</value>
     </labels>
     <labels>
-        <fullName>Core_AiExport_ReadmeQualityLowFill</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>README low fill: {0} is the percent, {1} is a list of fields</shortDescription>
-        <value>Filled on fewer than {0}% of records: {1}.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_ReadmeQualityNone</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export README: no data quality notes</shortDescription>
-        <value>No data quality notes were included.</value>
-    </labels>
-    <labels>
         <fullName>Core_AiExport_ReadmeUse</fullName>
         <categories>AiReadinessExport</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>AI-Readiness Export README: how to use heading</shortDescription>
         <value>How to Use It With an AI Tool</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_ReadmeUseStep1</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export README: step 1</shortDescription>
-        <value>Upload schema.json first, and ask the tool to read it before answering.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_ReadmeUseStep2</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export README: step 2</shortDescription>
-        <value>Upload only the record files the question needs.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_ReadmeUseStep3</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export README: step 3</shortDescription>
-        <value>Ask the tool to use the field API names in schema.json and to say which file each answer comes from.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_ReadmeUseStep4</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export README: step 4</shortDescription>
-        <value>Check figures against BarnCRM before you act on them.</value>
     </labels>
 </CustomLabels>

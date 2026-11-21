@@ -79,6 +79,7 @@ public with sharing class OpportunityMirrorContext {
 		if (hasCampaign) {
 			read.add(CAMPAIGN_FIELD);
 		}
+		read.addAll(OpportunityMirrorMap.current().targetFields());
 		current = OpportunityMirrorSelector.opportunitiesById(describe.getName(), read, linkedIds);
 		if (hasCampaign && !appealIds.isEmpty()) {
 			campaignByAppeal.putAll(CampaignSyncSelector.campaignIdsByAppealId(appealIds));
@@ -134,6 +135,7 @@ public with sharing class OpportunityMirrorContext {
 				: MirrorSync.idOf(campaignByAppeal.get(gift.Appeal__c), campaignType);
 			opportunity.put(CAMPAIGN_FIELD, campaignId);
 		}
+		OpportunityMirrorMap.current().apply(gift, opportunity);
 		return opportunity;
 	}
 
@@ -159,6 +161,13 @@ public with sharing class OpportunityMirrorContext {
 		List<String> fields = new List<String>(COMPARED);
 		if (hasCampaign) {
 			fields.add(CAMPAIGN_FIELD);
+		}
+		Map<String, Object> written = desired.getPopulatedFieldsAsMap();
+		for (String field : OpportunityMirrorMap.current().targetFields()) {
+			// An extra field left out for this gift (R-OM12) is not compared.
+			if (written.containsKey(field)) {
+				fields.add(field);
+			}
 		}
 		for (String field : fields) {
 			if (!MirrorSync.same(desired.get(field), existing.get(field))) {

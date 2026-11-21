@@ -58,3 +58,7 @@ module's component (ADR-0020), so it no longer places the panel; the last result
 on the Org Optimizer page's Health Check section. The component keeps its Home page target and
 its Show the Last Result First setting, so an administrator can add it to Home in the Lightning
 App Builder while the module is installed. The two `BarnCRM_Settings__c` keys stay.
+
+D-217 (2026-11-20, ADR-0233 amendment): Core's Home places its own Health Check tile
+(`hubHealthCheck`) for administrators while the module is installed. It reads the two keys
+above and links to the module's Health Check section; it never runs Health Check.

@@ -113,22 +113,6 @@
         <value>A private saved query owned by {0}</value>
     </labels>
     <labels>
-        <fullName>Core_WhereUsed_BreaksSettingValue</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>What breaks for a setting whose chosen value is the field.</shortDescription>
-        <value>The setting falls back to its default; choose another value before you delete the field.</value>
-    </labels>
-    <labels>
-        <fullName>Core_WhereUsed_BreaksModuleRecord</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>What breaks for a module record that names the field.</shortDescription>
-        <value>This record stops working as set up (screening reads the field as blank, a computed indicator stops updating) until the part that names the field is changed.</value>
-    </labels>
-    <labels>
         <fullName>Core_WhereUsed_Action</fullName>
         <categories>Core</categories>
         <language>en_US</language>

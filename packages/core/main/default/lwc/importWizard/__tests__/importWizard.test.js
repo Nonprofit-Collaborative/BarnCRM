@@ -865,6 +865,41 @@ describe('the import wizard', () => {
     expect(sent.columns[2]).toEqual({ source: 'Notes', target: 'Contact1.Phone' });
   });
 
+  it('takes the columns a saved map fills, keeping the mapping step as it is', async () => {
+    const element = await open();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element);
+    const savedMap = element.shadowRoot.querySelector('c-import-saved-map');
+    expect(savedMap).not.toBeNull();
+    expect(savedMap.allowedTargets).toContain('Contact1.Phone');
+    const columns = savedMap.columns.map((column) => {
+      if (column.source !== 'Notes') {
+        return column;
+      }
+      return {
+        ...column,
+        target: 'Contact1.Phone',
+        transforms: [{ op: 'trim' }],
+        lookupField: undefined
+      };
+    });
+    savedMap.dispatchEvent(new CustomEvent('apply', { detail: { columns } }));
+    await flush();
+    expect(element.shadowRoot.querySelectorAll('[data-id="column-row"]')).toHaveLength(3);
+    click(element, 'next');
+    await flush();
+    click(element, 'dry-run');
+    await flush();
+
+    const sent = JSON.parse(createBatch.mock.calls[0][0].mappingDocument);
+    expect(sent.columns[2]).toEqual({
+      source: 'Notes',
+      target: 'Contact1.Phone',
+      transforms: [{ op: 'trim' }]
+    });
+  });
+
   it('commits only after the dry run has completed', async () => {
     const element = await open();
     click(element, 'next');
@@ -1981,11 +2016,16 @@ describe('the import wizard loading one object', () => {
     jest.clearAllMocks();
   });
 
-  async function toColumnsStep() {
+  /** The column step; these tests use the table, so Show as Table is pressed unless `mapper`. */
+  async function toColumnsStep(mapper = false) {
     const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element, SESSIONS, 'sessions.csv');
+    if (!mapper) {
+      click(element, 'columns-view');
+      await flush();
+    }
     return element;
   }
 
@@ -2134,6 +2174,8 @@ describe('the import wizard loading one object', () => {
     click(element, 'create-object-template');
     await flush();
     click(element, 'next');
+    await flush();
+    click(element, 'columns-view');
     await flush();
 
     // The file is read once and its columns shown; the sheet for another object holds Next.
@@ -2529,6 +2571,66 @@ describe('the import wizard loading one object', () => {
     }
   });
 
+  it('draws the column step with the Mapper, and keeps its choices in the table (MAP-05)', async () => {
+    const element = await toColumnsStep(true);
+    const mapper = element.shadowRoot.querySelector('[data-id="columns-mapper"]');
+    expect(element.shadowRoot.querySelector('[data-id="columns-table"]')).toBeNull();
+    expect(mapper.importSetup.objectName).toBe('Program_Session__c');
+    expect(mapper.importSetup.headers).toEqual(['Session Key', 'Program', 'Notes']);
+    expect(mapper.importSetup.targets.map((t) => t.value)).toContain('Record.Program__c');
+    expect(mapper.importSetup.lookupChoices['Record.Program__c'].map((o) => o.value)).toEqual([
+      'Id',
+      'Name'
+    ]);
+    // A column on Do not load is left out of the map; the lookup's field is kept.
+    expect(JSON.parse(mapper.value).columns).toEqual([
+      { source: 'Session Key', target: 'Record.Session_Key__c' },
+      { source: 'Program', target: 'Record.Program__c', lookupField: 'Name' }
+    ]);
+
+    // The Mapper moves Notes onto Session Key, ticks its empty cells, and leaves Program out.
+    mapper.dispatchEvent(
+      new CustomEvent('change', {
+        detail: {
+          columns: [{ source: 'Notes', target: 'Record.Session_Key__c', blankClears: true }]
+        }
+      })
+    );
+    await flush();
+    click(element, 'columns-view');
+    await flush();
+    const rows = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
+    const targets = Array.from(rows).map((row) => row.querySelector('c-import-field-picker').value);
+    expect(targets).toEqual(['Ignore', 'Ignore', 'Record.Session_Key__c']);
+    expect(rows[2].querySelector('[data-id="blank-clears"]').checked).toBe(true);
+    click(element, 'columns-view');
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="columns-mapper"]')).not.toBeNull();
+  });
+
+  it('draws the table while two columns load one field (MAP-05)', async () => {
+    const element = await toColumnsStep(true);
+    click(element, 'columns-view');
+    await flush();
+    const picker = () =>
+      element.shadowRoot
+        .querySelectorAll('[data-id="column-row"]')[2]
+        .querySelector('c-import-field-picker');
+    picker().dispatchEvent(
+      new CustomEvent('change', { detail: { value: 'Record.Session_Key__c' } })
+    );
+    await flush();
+    // The Mapper fills a field from one column, so it is not offered.
+    expect(element.shadowRoot.querySelector('[data-id="columns-view"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="columns-mapper"]')).toBeNull();
+
+    picker().dispatchEvent(new CustomEvent('change', { detail: { value: 'Ignore' } }));
+    await flush();
+    // Fixed, the Mapper is offered again and the table stays until the person switches.
+    expect(element.shadowRoot.querySelector('[data-id="columns-view"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="columns-mapper"]')).toBeNull();
+  });
+
   it('offers the related record fields and sends the related records under a key', async () => {
     getTemplates.mockResolvedValue([
       {
@@ -2544,7 +2646,10 @@ describe('the import wizard loading one object', () => {
     getRelatedFields.mockResolvedValue([
       { value: 'Related.Status__c', label: 'Attendance: Status', isLookup: false, lookupFields: [] }
     ]);
-    const element = await toColumnsStep();
+    // A related record's fields are not the object's own: the table draws the step (MAP-05).
+    const element = await toColumnsStep(true);
+    expect(element.shadowRoot.querySelector('[data-id="columns-view"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="columns-mapper"]')).toBeNull();
     expect(getRelatedFields).toHaveBeenCalledWith({
       templateId: 'a05',
       related: 'Attendance__c.Session__c'

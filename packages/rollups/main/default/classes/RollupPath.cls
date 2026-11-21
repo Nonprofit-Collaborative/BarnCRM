@@ -88,7 +88,7 @@ public with sharing class RollupPath {
 	 */
 	public static Parsed parse(String path) {
 		if (String.isBlank(path)) {
-			throw new RollupPathException(System.Label.Core_Rollups_ErrorInvalidFilter);
+			throw new RollupPathException(BarnHelp.text('Core', 'Core_Rollups_ErrorInvalidFilter'));
 		}
 		Parsed parsed = new Parsed();
 		for (String rawBranch : path.split('\\' + ALTERNATIVE_SEPARATOR)) {
@@ -103,7 +103,7 @@ public with sharing class RollupPath {
 					continue;
 				}
 				if (!isToken(segment) && !REFERENCE_SEGMENT.matcher(segment).matches()) {
-					throw new RollupPathException(System.Label.Core_Rollups_ErrorInvalidFilter);
+					throw new RollupPathException(BarnHelp.text('Core', 'Core_Rollups_ErrorInvalidFilter'));
 				}
 				branch.segments.add(segment);
 			}
@@ -112,7 +112,7 @@ public with sharing class RollupPath {
 			}
 		}
 		if (parsed.branches.isEmpty()) {
-			throw new RollupPathException(System.Label.Core_Rollups_ErrorInvalidFilter);
+			throw new RollupPathException(BarnHelp.text('Core', 'Core_Rollups_ErrorInvalidFilter'));
 		}
 		return parsed;
 	}

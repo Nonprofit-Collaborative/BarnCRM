@@ -49,7 +49,7 @@ public with sharing class HealthCheckFixes {
 		try {
 			List<String> scope = HealthCheckService.fixScope(fixKey);
 			if (scope.isEmpty() || !sameScope(scope, expectedScope)) {
-				throw UserErrors.message(System.Label.Core_HealthCheck_FixStale);
+				throw UserErrors.message(BarnHelp.text('Core', 'Core_HealthCheck_FixStale'));
 			}
 			String outcome = runFix(fixKey, scope);
 			SettingsService.logChange(

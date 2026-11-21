@@ -132,7 +132,7 @@
     "Giving_Periods_Intro": "Close the books through a date when a month is finished. No gift dated on or before it can be added, or have its date, amount, donor, payment method, reference or funds changed, or be deleted. Refunds and write-offs are dated today, so they still work.",
     "Giving_Periods_ReopenNote": "Moving the date back reopens a closed period. It needs the Override Posting Lock permission, granted in Setup, and it is written to the Error Log.",
     "Giving_PledgeReminders_Intro": "Reminders for scheduled payments of pledges and recurring gifts that are coming due or overdue. Each step fires a set number of days before or after a payment's due date, by email or letter. Only the latest step due for a payment is sent, and every reminder is logged below.",
-    "Giving_PledgeReminders_NoLog": "Reminders appear here after a step sends an email or queues a letter. Add a step above, then send reminders or wait for the nightly run.",
+    "Giving_PledgeReminders_NoLogMessage": "Reminders appear here after a step sends an email or queues a letter. Add a step above, then send reminders or wait for the nightly run.",
     "Giving_PledgeReminders_NoSteps": "A step is one reminder, sent a set number of days before or after a payment is due. Add the first step, for example an email 7 days before the due date and another 14 days after.",
     "Giving_PledgeReminders_TemplateFieldHelp": "The email template this step sends. Use merge fields from the scheduled payment, such as the due date and the amount, so each donor sees their own.",
     "Giving_PostingCard_ClosedPeriod": "Dated in a closed period, so its date, amount, donor, payment method, reference and funds stay locked. The books are closed through",

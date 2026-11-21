@@ -181,6 +181,12 @@ or demo org; uninstall it when you no longer need sample records. The sample set
 other modules (Fundraising, Volunteers and the rest) ship in those modules and load through
 this package.
 
+The package gives the **Sample Data** tab (its **Sample Data** permission set) to everyone
+with the **BarnCRM Admin** role, and to no other role. BarnCRM gives permission sets but never
+takes one away, so a staff or read-only user who already holds **Sample Data** keeps the tab
+until you remove it: in Setup, open the user, then **Permission Set Assignments**, and remove
+**Sample Data**.
+
 1. Open the **Sample Data** tab. **BarnCRM Settings**, **General**, **Sample Data** opens it
    too; type "sample" in the settings search box if you do not see it.
 2. Read the warning, then select **Load Sample Data**.
@@ -329,7 +335,8 @@ household records, names, greetings, member counts, and Members panel.
   select **Remove Sample Data** again.
 - **Not having the permission.** If the **Load Sample Data** button does not appear, you
   are missing **Manage BarnCRM Settings**. Ask an administrator to grant it from the
-  **Access** page, not from Setup.
+  **Access** page, not from Setup. If the **Sample Data** tab itself is missing, you do not
+  have the **BarnCRM Admin** role, which is the only role the tab comes with.
 
 ## Reference
 

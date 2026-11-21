@@ -265,7 +265,7 @@ public with sharing class BulkDeleteUndoBatch implements Database.Batchable<SObj
 				System.Label.Core_JobNotice_BulkDeleteUndo,
 				failed,
 				String.format(
-					System.Label.Core_JobNotice_BulkDeleteUndoBody,
+					BarnHelp.text('Core', 'Core_JobNotice_BulkDeleteUndoBody'),
 					new List<Object>{ restored.format(), purged.format(), alreadyBack.format(), refused.format() }
 				),
 				jobId

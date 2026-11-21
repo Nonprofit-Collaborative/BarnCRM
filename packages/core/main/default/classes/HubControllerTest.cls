@@ -3,7 +3,7 @@
  * Manage BarnCRM Settings permission, sees the same page and cannot change anything.
  * Finishing a step belongs to the Setup Assistant's own controller.
  */
-@IsTest(testFor='ApexClass:HubController')
+@IsTest(testFor='ApexClass:HubController, ApexClass:HealthCheckResult')
 private class HubControllerTest {
 	@TestSetup
 	static void grantPermission() {
@@ -362,6 +362,64 @@ private class HubControllerTest {
 			Assert.isNull(model.seasonalAddressLastRun, 'Nor does the seasonal tile');
 			Assert.isFalse(model.seasonalAddressScheduled, 'It does not claim a schedule');
 			Assert.isFalse(model.seasonalAddressStale, 'or a missed run');
+		}
+	}
+
+	/**
+	 * The Health Check tile (D-217, OO-01): the stored last run and the Org Optimizer tab from
+	 * its catalog row, only while that module is installed.
+	 */
+	@IsTest
+	static void showsTheLastHealthCheckOnlyWhileOrgOptimizerIsInstalled() {
+		System.runAs(TestUsers.admin()) {
+			SetupAssistantTestExtension.useNone();
+			Datetime ranAt = Datetime.now().addHours(-2);
+			OrgSettingsSystemWriter.save(
+				new Map<Schema.SObjectField, Object>{
+					BarnCRM_Settings__c.Health_Check_Last_Run__c => ranAt,
+					BarnCRM_Settings__c.Health_Check_Last_Result__c => '1,2,3'
+				}
+			);
+			String moduleName = ModuleDetectionService.MODULE_ORG_OPTIMIZER;
+
+			Test.startTest();
+			ModuleDetectionService.installedOverride.put(moduleName, false);
+			HubController.HomeModel absent = HubController.getHomeModel();
+			ModuleDetectionService.installedOverride.put(moduleName, true);
+			HubController.HomeModel installed = HubController.getHomeModel();
+			Test.stopTest();
+
+			Assert.isNull(absent.healthCheckTab, 'No module, no tile');
+			Assert.isNull(absent.healthCheckRanAt, 'and no result read');
+			Assert.areEqual(
+				NamespaceUtil.qualify(ModuleDetectionService.firstAdminTab(moduleName)),
+				installed.healthCheckTab,
+				'The tab comes from the catalog row'
+			);
+			Assert.areEqual(ranAt, installed.healthCheckRanAt, 'When it last ran');
+			Assert.areEqual(1, installed.healthCheckErrors, 'And its counts');
+			Assert.areEqual(2, installed.healthCheckWarnings);
+			Assert.areEqual(3, installed.healthCheckInfos);
+		}
+	}
+
+	/** A stored result nobody can read reads as never run; the next run writes it again. */
+	@IsTest
+	static void readsAnUnreadableHealthCheckResultAsNeverRun() {
+		System.runAs(TestUsers.admin()) {
+			Assert.areEqual('4,0,1', HealthCheckResult.text(4, 0, 1));
+			for (String stored : new List<String>{ '1,2', 'a,b,c', null }) {
+				OrgSettingsSystemWriter.save(
+					new Map<Schema.SObjectField, Object>{
+						BarnCRM_Settings__c.Health_Check_Last_Run__c => Datetime.now(),
+						BarnCRM_Settings__c.Health_Check_Last_Result__c => stored
+					}
+				);
+				HealthCheckResult.Counts counts = HealthCheckResult.read();
+				// An assertion refuses a null message even when it passes, so the stored value is quoted.
+				Assert.isNull(counts.ranAt, 'Stored: ' + stored);
+				Assert.isNull(counts.errors, 'Stored: ' + stored);
+			}
 		}
 	}
 }

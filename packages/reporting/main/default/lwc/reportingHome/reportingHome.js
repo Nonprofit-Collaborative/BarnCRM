@@ -196,12 +196,9 @@ export default class ReportingHome extends LightningElement {
       modified: helpText('Reporting', 'Reporting_Home_Modified'),
       open: helpText('Reporting', 'Reporting_Home_Open'),
       noDashboards: helpText('Reporting', 'Reporting_Home_NoDashboards'),
-      noDashboardsHelp: helpText(
-        'Reporting',
-        this.hasTemplates
-          ? 'Reporting_Home_NoDashboardsHelp'
-          : 'Reporting_Home_NoDashboardsHelpNoTemplates'
-      ),
+      noDashboardsHelp: this.hasTemplates
+        ? helpText('Reporting', 'Reporting_Home_NoDashboardsHelp')
+        : helpText('Reporting', 'Reporting_Home_NoDashboardsHelpNoTemplates'),
       noReports: helpText('Reporting', 'Reporting_Home_NoReports'),
       noReportsHelp: helpText('Reporting', 'Reporting_Home_NoReportsHelp'),
       noObjects: helpText('Reporting', 'Reporting_Home_NoObjects')

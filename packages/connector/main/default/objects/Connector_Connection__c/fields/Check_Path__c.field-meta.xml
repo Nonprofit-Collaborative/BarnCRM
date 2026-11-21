@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Check_Path__c</fullName>
+  <description>What follows the connection's base URL for Check Connection, such as /ping, from the template the connection was made from (canonical model R-CN9). Blank checks the base URL.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>The path Check Connection asks the app for. Blank asks for the base URL.</inlineHelpText>
+  <label>Check Path</label>
+  <length>255</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

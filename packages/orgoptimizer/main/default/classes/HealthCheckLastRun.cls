@@ -71,35 +71,25 @@ public with sharing class HealthCheckLastRun {
 		OrgSettingsSystemWriter.save(
 			new Map<Schema.SObjectField, Object>{
 				BarnCRM_Settings__c.Health_Check_Last_Run__c => Datetime.now(),
-				BarnCRM_Settings__c.Health_Check_Last_Result__c => errors +
-				',' +
-				warnings +
-				',' +
-				infos
+				BarnCRM_Settings__c.Health_Check_Last_Result__c => HealthCheckResult.text(errors, warnings, infos)
 			}
 		);
 	}
 
-	/** The last recorded result; every field is null when Health Check has never run. */
+	/**
+	 * The last recorded result (Core's HealthCheckResult reads it); every field is null when
+	 * Health Check has never run or the stored value cannot be read, which the next run fixes.
+	 */
 	public static Summary read() {
-		BarnCRM_Settings__c settings = SettingsService.getSettings();
+		HealthCheckResult.Counts counts = HealthCheckResult.read();
 		Summary summary = new Summary();
-		summary.ranAt = settings.Health_Check_Last_Run__c;
-		List<String> counts = String.isBlank(settings.Health_Check_Last_Result__c)
-			? new List<String>()
-			: settings.Health_Check_Last_Result__c.split(',');
-		if (summary.ranAt == null || counts.size() != 3) {
-			summary.ranAt = null;
+		if (counts.ranAt == null) {
 			return summary;
 		}
-		try {
-			summary.errors = Integer.valueOf(counts[0].trim());
-			summary.warnings = Integer.valueOf(counts[1].trim());
-			summary.infos = Integer.valueOf(counts[2].trim());
-		} catch (TypeException unreadable) {
-			// A value nobody can read is shown as "has not run yet", and the next run fixes it.
-			return new Summary();
-		}
+		summary.ranAt = counts.ranAt;
+		summary.errors = counts.errors;
+		summary.warnings = counts.warnings;
+		summary.infos = counts.infos;
 		summary.result = String.format(
 			BarnHelp.text('Core', 'Core_HealthCheck_LastResult'),
 			new List<Object>{ summary.errors, summary.warnings, summary.infos }

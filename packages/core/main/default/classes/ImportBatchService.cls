@@ -326,7 +326,7 @@ public with sharing class ImportBatchService {
 		if (undo != null) {
 			return undo;
 		}
-		return hasRows(batch.Id) ? null : Label.Core_Import_ErrorRowsRemoved;
+		return hasRows(batch.Id) ? null : BarnHelp.text('Core', 'Core_Import_ErrorRowsRemoved');
 	}
 
 	/** Removes the rows an unfinished retry staged, bounded by its row cap; how many. */
@@ -639,7 +639,7 @@ public with sharing class ImportBatchService {
 		}
 		// A batch whose rows the nightly cleanup removed would run over nothing (R-IR5).
 		if (!hasRows(batch.Id)) {
-			throw new ImportException(Label.Core_Import_ErrorRowsRemoved);
+			throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorRowsRemoved'));
 		}
 		if (
 			!oneObject &&
@@ -1050,7 +1050,7 @@ public with sharing class ImportBatchService {
 			dryRun == true ? Label.Core_JobNotice_ImportPreview : Label.Core_DataJobs_KindImport,
 			failed == true,
 			String.format(
-				Label.Core_JobNotice_ImportBody,
+				BarnHelp.text('Core', 'Core_JobNotice_ImportBody'),
 				new List<Object>{
 					batch.Rows_Created__c.format(),
 					batch.Rows_Updated__c.format(),

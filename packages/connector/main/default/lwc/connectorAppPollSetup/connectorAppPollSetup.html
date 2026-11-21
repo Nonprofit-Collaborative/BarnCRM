@@ -1,0 +1,29 @@
+<template>
+    <div class="slds-var-m-vertical_x-small">
+        <lightning-combobox label={labels.connection} options={connections} value={starter.connection} read-only={readOnly} data-field="connection" onchange={handleField} data-id="connection"></lightning-combobox>
+        <lightning-input label={labels.path} value={starter.path} field-level-help={labels.pathHelp} read-only={readOnly} data-field="path" onchange={handleField} data-id="path"></lightning-input>
+        <template for:each={pathValues} for:item="slot">
+            <lightning-input key={slot.key} label={slot.name} value={slot.shown} field-level-help={labels.valueHelp} read-only={readOnly} data-list="pathValues" data-index={slot.index} data-field="shown" onchange={handleEntry}></lightning-input>
+        </template>
+        <fieldset class="slds-var-m-top_x-small" data-id="query">
+            <legend class="slds-text-body_small">{labels.queryParams}</legend>
+            <template for:each={query} for:item="pair">
+                <div key={pair.key} class="slds-grid slds-gutters_x-small slds-wrap">
+                    <lightning-input class="slds-col" label={labels.entryName} value={pair.name} read-only={readOnly} data-list="query" data-index={pair.index} data-field="name" onchange={handleEntry}></lightning-input>
+                    <lightning-input class="slds-col" label={labels.entryValue} value={pair.shown} field-level-help={labels.valueHelp} read-only={readOnly} data-list="query" data-index={pair.index} data-field="shown" onchange={handleEntry}></lightning-input>
+                    <template lwc:if={canEdit}>
+                        <lightning-button-icon class="slds-align-bottom" icon-name="utility:close" alternative-text={pair.removeLabel} data-index={pair.index} onclick={handleRemoveQuery}></lightning-button-icon>
+                    </template>
+                </div>
+            </template>
+            <template lwc:if={canEdit}>
+                <lightning-button variant="base" label={labels.addEntry} onclick={handleAddQuery} data-id="add-query"></lightning-button>
+            </template>
+        </fieldset>
+        <lightning-input label={labels.items} value={starter.items} field-level-help={labels.itemsHelp} read-only={readOnly} data-field="items" onchange={handleField} data-id="items"></lightning-input>
+        <lightning-input label={labels.itemId} value={starter.id} field-level-help={labels.itemIdHelp} read-only={readOnly} data-field="id" onchange={handleField} data-id="item-id"></lightning-input>
+        <lightning-input label={labels.stamp} value={starter.stamp} field-level-help={labels.stampHelp} read-only={readOnly} data-field="stamp" onchange={handleField} data-id="stamp"></lightning-input>
+        <lightning-radio-group label={labels.mode} options={modeOptions} value={starter.mode} disabled={readOnly} data-field="mode" onchange={handleField} data-id="mode"></lightning-radio-group>
+        <lightning-input type="number" label={labels.limit} value={starter.limit} min="1" max="200" step="1" field-level-help={labels.limitHelp} read-only={readOnly} data-field="limit" onchange={handleField} data-id="limit"></lightning-input>
+    </div>
+</template>

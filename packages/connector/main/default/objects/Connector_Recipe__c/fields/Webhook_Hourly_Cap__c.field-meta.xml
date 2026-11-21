@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Webhook_Hourly_Cap__c</fullName>
+  <defaultValue>500</defaultValue>
+  <description>Posts the webhook receiver stores for this recipe in any hour before it refuses more with 429 (canonical model R-CR10), 1 to 5,000; blank or out of range reads as 500.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>Posts kept in any hour. More are refused until the hour passes, and the sending app usually tries again later.</inlineHelpText>
+  <label>Webhook Hourly Cap</label>
+  <precision>4</precision>
+  <required>false</required>
+  <scale>0</scale>
+  <trackTrending>false</trackTrending>
+  <type>Number</type>
+  <unique>false</unique>
+</CustomField>

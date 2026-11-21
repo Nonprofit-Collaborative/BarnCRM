@@ -118,7 +118,7 @@ private class RollupsHealthCheckExtensionTest {
 			Assert.fail('A fix whose scope no longer matches the org is refused.');
 		} catch (AuraHandledException expected) {
 			Assert.areEqual(
-				System.Label.Core_HealthCheck_FixStale,
+				BarnHelp.text('Core', 'Core_HealthCheck_FixStale'),
 				expected.getMessage(),
 				'Refused with the sentence that says the org changed since the scan.'
 			);
@@ -405,7 +405,7 @@ private class RollupsHealthCheckExtensionTest {
 					Assert.fail('A fix that would create more than was confirmed is refused.');
 				} catch (AuraHandledException expected) {
 					Assert.areEqual(
-						System.Label.Core_HealthCheck_FixStale,
+						BarnHelp.text('Core', 'Core_HealthCheck_FixStale'),
 						expected.getMessage(),
 						'With the sentence that tells her to read the finding again.'
 					);

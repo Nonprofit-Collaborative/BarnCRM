@@ -1,0 +1,44 @@
+<template>
+    <template lwc:if={helpReady}>
+    <template lwc:if={shown}>
+        <lightning-card title={labels.heading} icon-name="standard:approval" data-id="health-check-card">
+            <div class="slds-var-p-horizontal_medium">
+                <template lwc:if={errorMessage}>
+                    <c-barn-notice variant="error" message={errorMessage} data-id="load-error"></c-barn-notice>
+                </template>
+                <template lwc:else>
+                    <c-barn-status-badge
+                        status={badgeStatus}
+                        label={badge.badgeLabel}
+                        data-id="health-check-badge"
+                    ></c-barn-status-badge>
+                    <template lwc:if={hasRun}>
+                        <p class="slds-var-m-top_xx-small">
+                            <span class="slds-text-title_bold">{labels.lastRun}</span>&nbsp;
+                            <lightning-formatted-date-time
+                                value={lastRun.ranAt}
+                                year="numeric"
+                                month="short"
+                                day="numeric"
+                                hour="numeric"
+                                minute="2-digit"
+                                data-id="health-check-ran-at"
+                            ></lightning-formatted-date-time>
+                        </p>
+                        <p class="slds-var-m-bottom_x-small" data-id="health-check-result">{resultText}</p>
+                    </template>
+                    <template lwc:else>
+                        <p class="slds-var-m-vertical_x-small" data-id="health-check-never">{neverText}</p>
+                    </template>
+                    <lightning-button
+                        variant="base"
+                        label={labels.link}
+                        data-id="open-health-check"
+                        onclick={handleOpen}
+                    ></lightning-button>
+                </template>
+            </div>
+        </lightning-card>
+    </template>
+    </template>
+</template>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Run_As__c</fullName>
+  <description>The identity and access mode the recipe's runs use (R-CR4, D-215): BarnCRM Automation (the Automated Process user in user mode with the permission sets picked in Recipe Access), System (the Automated Process user in system mode, by explicit choice) or Integration User.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>Who the recipe runs as. Never a staff member, so nobody leaving stops it.</inlineHelpText>
+  <label>Run As</label>
+  <required>true</required>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Automation</fullName>
+        <default>true</default>
+        <label>BarnCRM Automation</label>
+      </value>
+      <value>
+        <fullName>System</fullName>
+        <default>false</default>
+        <label>System</label>
+      </value>
+      <value>
+        <fullName>IntegrationUser</fullName>
+        <default>false</default>
+        <label>Integration User</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

@@ -148,7 +148,25 @@ pipes) or an Excel workbook (.xlsx). A small one is best for the first run: five
    usual columns, the picker lists your org's own fields on people and organizations that
    you may edit (for example "Person: Member Since"), and each one's Salesforce record ID
    (section 8). **Change Values** beside a column tidies its values as they load, for
-   example names in capitals or dates written day first (section 10).
+   example names in capitals or dates written day first (section 10). Under the table,
+   **Saved Maps** has **Use a Saved Map** (choose a map and press **Use Map**: each column
+   whose heading the map names takes the map's field, changes and lookup, and the other
+   columns keep their choice) and **Save as Map** (type a name and press **Save as Map** to
+   keep these columns as a map other tools can use). A message says how many columns a map set
+   and how many of its columns this file or template could not use. The template keeps its own
+   copy, so a map changed later never changes it. Maps are made and changed in the Mapper
+   ([The Mapper and Saved Maps](mapper.md)).
+   For a template that loads one kind of record (section 9) into its own fields, this step is
+   drawn by the **Mapper** instead of the table: **From** lists the file's columns with their
+   first values, **To** lists the template's fields as sentences, and **Preview** shows the record
+   the first rows would make. Everything the table does is there: pick or drag a column onto a
+   field (a column fills one field, so placing it again moves it), accept a best guess, open
+   **Changes** on a field for its steps, **Find the Parent By** on a lookup, **Empty cells clear
+   the field (updates)**, and **Create Field** beside a column not yet loaded. A column on no field is **Do
+   not load**. **Show as Table** above it switches to the table and **Show in the Mapper** back;
+   both show the same choices. The table stays the only view for people templates, several kinds
+   of record in one upload, a template whose rows also create a related record, and a file with
+   more than 200 columns.
 4. Choose how rows are matched. **Email exact** is the safe default for people. Read the
    sentence under each rule before you change it: **Name plus postal code** will treat two
    different people who share a name at one address as the same person. If the file has
@@ -387,9 +405,14 @@ The BarnCRM home page then lists every recurring source with the date it was las
 imported, oldest first, and **Never** for one you have not loaded yet. When a date is older
 than you expect, that file has not been loaded this month.
 
-Marking a template recurring changes nothing about how its files are imported. BarnCRM
-never fetches or loads a file on its own: every file is still uploaded, previewed and
-imported by a person, because an import nobody watched is an import nobody checked.
+Marking a template recurring changes nothing about how its files are imported. Super
+Importer never fetches or loads a file on its own: every file is still uploaded, previewed and
+imported by a person, because an import nobody watched is an import nobody checked. When the
+optional BarnCRM Connector module is installed, a recipe can load rows through a template on a
+schedule, committing only when its dry run is inside limits you set and otherwise leaving the
+data job here for you to check (see
+[Scheduled Imports](connector.md#scheduled-imports-load-rows-with-an-import-template)). Its data
+jobs are named "Recipe <name>, run <run>" in the history.
 
 ### Start a New Template From This One
 

@@ -72,7 +72,7 @@ private class GivingWhereUsedExtensionTest {
 				Schema.Giving_Settings__c.Donor_Level_Source_Field__c.getDescribe().getLabel(),
 				onContact[0].getName()
 			);
-			Assert.areEqual(System.Label.Core_WhereUsed_BreaksSettingValue, onContact[0].getBreaks());
+			Assert.areEqual(BarnHelp.text('Core', 'Core_WhereUsed_BreaksSettingValue'), onContact[0].getBreaks());
 			Assert.isTrue(notChosen.isEmpty(), 'A total the levels do not run on finds nothing.');
 		}
 	}

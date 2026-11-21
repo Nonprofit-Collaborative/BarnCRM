@@ -1011,6 +1011,12 @@ package ids is all that is left:
 - **`ancestorVersion`** is not set until the first version is promoted. From then on each
   package carries `"ancestorVersion": "HIGHEST"`, which a managed upgrade needs (the install and
   upgrade test checks it).
+- **No component moves both ways between two installed packages in one version.** A subscriber
+  upgrade cannot remove a component from one package while the other still holds it, so a
+  two-way move deadlocks. Settle these before the first version: the four classes Core hands to
+  Org Optimizer (`AutomationInventoryService`, `PersonLinkOrphanSelector`,
+  `PicklistUsageService`, `UserAccessSelector`) and `healthCheckBadge`, which Org Optimizer hands
+  to Core. Once versions exist, a move goes one way per version.
 
 **Less common metadata in 2GP managed packages (D-200, N11).** Checked 2026-11-12. The
 Salesforce Metadata Coverage Report and the 2GP "Metadata Components and Attributes" page

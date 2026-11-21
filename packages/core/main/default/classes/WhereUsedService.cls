@@ -22,6 +22,7 @@ public with sharing class WhereUsedService {
 
 	public static final String KIND_SAVED_QUERY = 'savedQuery';
 	public static final String KIND_SAVED_TRANSFORM = 'savedTransform';
+	public static final String KIND_MAP = 'map';
 	@NamespaceAccessible
 	public static final String KIND_IMPORT_MAPPING = 'importMapping';
 	public static final String KIND_MERGE_RULE = 'mergeRule';
@@ -49,6 +50,12 @@ public with sharing class WhereUsedService {
 		public String fieldName { get; private set; }
 		@NamespaceAccessible
 		public String fieldLabel { get; private set; }
+		/**
+		 * Set only when the question is which tools link a saved map (R-ST5): then no object or
+		 * field is asked about, and every match method answers false.
+		 */
+		@NamespaceAccessible
+		public Id mapId { get; private set; }
 		private Schema.DescribeFieldResult field;
 		private String compoundName;
 		private Map<String, Map<String, Schema.SObjectField>> fieldMaps = new Map<String, Map<String, Schema.SObjectField>>();
@@ -66,6 +73,17 @@ public with sharing class WhereUsedService {
 			}
 		}
 
+		private Target(Id mapId, String mapName) {
+			this.mapId = mapId;
+			this.objectLabel = mapName;
+		}
+
+		/** True when the question is which tools link this saved map. */
+		@NamespaceAccessible
+		public Boolean isMap(Id recordId) {
+			return mapId != null && mapId == recordId;
+		}
+
 		/** True for a custom field of this org, which an administrator can delete in Setup. */
 		public Boolean isDeletable() {
 			return field != null && field.isCustom() && field.getName() == field.getLocalName();
@@ -74,7 +92,7 @@ public with sharing class WhereUsedService {
 		/** True when the question is about the whole object, not one field. */
 		@NamespaceAccessible
 		public Boolean isObject() {
-			return fieldName == null;
+			return fieldName == null && mapId == null;
 		}
 
 		/** True when the name is the target object (with or without this package's prefix). */
@@ -455,6 +473,29 @@ public with sharing class WhereUsedService {
 		return result;
 	}
 
+	/**
+	 * The tools that link a saved map (R-ST5), as the installed modules list them: Core links none
+	 * (Super Importer copies a map), so only extensions answer. Asked before a map is changed.
+	 */
+	@NamespaceAccessible
+	public static List<Reference> mapUsers(Id mapId, String mapName) {
+		Target target = new Target(mapId, mapName);
+		List<Reference> found = new List<Reference>();
+		Map<String, WhereUsedExtension> extensions = WhereUsedExtensions.findAll();
+		for (String className : extensions.keySet()) {
+			try {
+				List<Reference> added = extensions.get(className).references(target);
+				if (added != null) {
+					found.addAll(added);
+				}
+			} catch (Exception failed) {
+				ErrorLogger.log(failed, 'WhereUsedService.mapUsers: ' + className);
+			}
+		}
+		found.sort();
+		return found;
+	}
+
 	/** One reference per record and kind: a mapping Core and Giving both read is listed once. */
 	private static List<Reference> merged(List<Reference> found) {
 		Map<String, Reference> byKey = new Map<String, Reference>();
@@ -589,6 +630,13 @@ public with sharing class WhereUsedService {
 		List<Reference> found = new List<Reference>();
 		for (Saved_Transform__c saved : WhereUsedSelector.savedTransforms()) {
 			Map<String, Object> document = parsed(saved.Definition_JSON__c);
+			if (saved.Kind__c == SavedTransformService.KIND_MAP) {
+				Reference named = mapReference(target, saved, document);
+				if (!named.parts.isEmpty()) {
+					found.add(named);
+				}
+				continue;
+			}
 			String base = saved.Object_Name__c;
 			Reference reference = new Reference(
 				KIND_SAVED_TRANSFORM,
@@ -614,6 +662,69 @@ public with sharing class WhereUsedService {
 			}
 		}
 		return found;
+	}
+
+	/** A saved map (R-MAP1, R-ST5) naming the target in its object, a column, a default or its match. */
+	private static Reference mapReference(Target target, Saved_Transform__c saved, Map<String, Object> document) {
+		String base = saved.Object_Name__c;
+		Map<String, Object> fromPart = document.get('from') instanceof Map<String, Object>
+			? (Map<String, Object>) document.get('from')
+			: new Map<String, Object>();
+		String sourceObject = fromPart.get('kind') == 'record' ? stringOf(fromPart.get('object')) : null;
+		Reference reference = new Reference(
+			KIND_MAP,
+			BarnHelp.text('Core', 'Core_WhereUsed_KindMap'),
+			saved.Name,
+			saved.Id
+		);
+		if (target.isObject() && (target.isObject(base) || target.isObject(sourceObject))) {
+			reference.addPart(System.Label.Core_WhereUsed_PartObject);
+		}
+		for (Object entry : listOf(document.get('columns'))) {
+			Map<String, Object> column = entry instanceof Map<String, Object>
+				? (Map<String, Object>) entry
+				: new Map<String, Object>();
+			Map<String, Object> lookup = column.get('lookup') instanceof Map<String, Object>
+				? (Map<String, Object>) column.get('lookup')
+				: new Map<String, Object>();
+			String lookupObject = stringOf(lookup.get('object'));
+			if (
+				target.matchesField(base, recordField(column.get('target'))) ||
+				target.matchesPath(sourceObject, stringOf(column.get('source'))) ||
+				(target.isObject() && target.isObject(lookupObject)) ||
+				target.matchesField(lookupObject, stringOf(lookup.get('field')))
+			) {
+				String named = stringOf(column.get('source'));
+				reference.addPart(
+					String.format(
+						System.Label.Core_WhereUsed_PartColumn,
+						new List<Object>{ named == null ? stringOf(column.get('target')) : named }
+					)
+				);
+			}
+		}
+		for (Object entry : listOf(document.get('defaults'))) {
+			if (
+				entry instanceof Map<String, Object> &&
+				target.matchesField(base, recordField(((Map<String, Object>) entry).get('target')))
+			) {
+				reference.addPart(System.Label.Core_WhereUsed_PartDefault);
+			}
+		}
+		Object match = document.get('match');
+		if (
+			match instanceof Map<String, Object> &&
+			target.matchesField(base, stringOf(((Map<String, Object>) match).get('field')))
+		) {
+			reference.addPart(System.Label.Core_WhereUsed_PartMatchingField);
+		}
+		return reference.withBreaks(BarnHelp.text('Core', 'Core_WhereUsed_BreaksMap')).withEdit('Data_Manager', null);
+	}
+
+	/** The field of a `Record.<field>` map target, or null. */
+	private static String recordField(Object target) {
+		String text = stringOf(target);
+		return text != null && text.startsWith(ImportMapping.ENTITY_RECORD + '.') ? text.substringAfter('.') : null;
 	}
 
 	/** A change entry (R-ST1) or a step inside it: any `field` or `source` key, at any depth. */

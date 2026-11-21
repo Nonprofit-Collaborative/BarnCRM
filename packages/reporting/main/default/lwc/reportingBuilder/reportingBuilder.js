@@ -455,12 +455,10 @@ export default class ReportingBuilder extends LightningElement {
       delete: helpText('Reporting', 'Reporting_Delete'),
       result: helpText('Reporting', 'Reporting_Builder_Result'),
       runFirst: helpText('Reporting', 'Reporting_Builder_RunFirst'),
-      readOnly: helpText(
-        'Reporting',
+      readOnly:
         this.context && this.context.canSave
-          ? 'Reporting_Builder_ReadOnly'
-          : 'Reporting_Builder_ReadOnlyNoSave'
-      ),
+          ? helpText('Reporting', 'Reporting_Builder_ReadOnly')
+          : helpText('Reporting', 'Reporting_Builder_ReadOnlyNoSave'),
       done: helpText('Reporting', 'Reporting_Done')
     };
   }

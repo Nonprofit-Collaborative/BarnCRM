@@ -181,6 +181,28 @@
             <section class="step" data-id="step-changes" aria-labelledby="step-changes-heading">
                 <h2 id="step-changes-heading" class="slds-text-heading_small step__heading">{labels.stepChanges}</h2>
                 <template lwc:if={hasObject}>
+                    <template lwc:if={hasMaps}>
+                        <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end slds-var-m-bottom_small" data-id="apply-map">
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                                <lightning-combobox
+                                    data-id="map-pick"
+                                    label={labels.mapChoose}
+                                    options={mapOptions}
+                                    value={mapId}
+                                    field-level-help={labels.mapHelp}
+                                    onchange={handleMapPick}
+                                ></lightning-combobox>
+                            </div>
+                            <div class="slds-col slds-no-flex">
+                                <lightning-button
+                                    data-id="map-apply"
+                                    label={labels.mapApply}
+                                    disabled={applyMapDisabled}
+                                    onclick={handleApplyMap}
+                                ></lightning-button>
+                            </div>
+                        </div>
+                    </template>
                     <template for:each={changeRows} for:item="change">
                         <div key={change.key} class="change slds-var-m-bottom_small" data-id="change">
                             <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
@@ -286,17 +308,27 @@
                                     ></lightning-button-icon>
                                 </div>
                             </div>
-                            <template lwc:if={change.isTransform}>
+                            <template lwc:if={change.showsSteps}>
                                 <div class="slds-var-m-top_x-small" data-id="steps">
                                     <c-import-column-transforms
                                         embedded
-                                        source={change.field}
+                                        source={change.stepsSource}
                                         column-options={change.sourceOptions}
                                         transforms={change.stepList}
                                         data-key={change.key}
                                         onchange={handleStepsChange}
                                     ></c-import-column-transforms>
                                 </div>
+                            </template>
+                            <template lwc:if={change.offersSteps}>
+                                <lightning-button
+                                    class="slds-show slds-var-m-top_x-small"
+                                    variant="base"
+                                    data-id="add-steps"
+                                    data-key={change.key}
+                                    label={labels.addSteps}
+                                    onclick={handleAddSteps}
+                                ></lightning-button>
                             </template>
                         </div>
                     </template>

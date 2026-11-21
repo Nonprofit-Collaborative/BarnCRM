@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>Framework-free rules for BarnCRM Connector recipe documents: steps, value paths and problems.</description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

@@ -136,7 +136,10 @@ public with sharing class OpportunityMirrorSelector {
 	 * linked, so a Cancelled gift's Opportunity is moved to the lost stage too.
 	 */
 	public static String giftsToCopyQuery(Boolean inRange, Boolean sinceLastRun) {
-		String query = 'SELECT ' + GIFT_FIELDS + ' FROM Gift__c WHERE ';
+		// With the gift fields an extra-fields map reads (R-OM12), API names from describe.
+		List<String> fields = new List<String>{ GIFT_FIELDS };
+		fields.addAll(OpportunityMirrorMap.current().sourceFieldsBesides(GIFT_FIELDS));
+		String query = 'SELECT ' + String.join(fields, ', ') + ' FROM Gift__c WHERE ';
 		if (inRange == true) {
 			query +=
 				'Gift_Date__c >= :fromDate AND Gift_Date__c <= :toDate' +

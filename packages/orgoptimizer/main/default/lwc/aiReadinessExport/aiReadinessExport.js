@@ -50,30 +50,12 @@ import DOWNLOAD from '@salesforce/label/c.Core_AiExport_Download';
 import README_TITLE from '@salesforce/label/c.Core_OrgOptimizer_AiExport';
 import README_INTRO from '@salesforce/label/c.Core_AiExport_ReadmeIntro';
 import README_FILES from '@salesforce/label/c.Core_AiExport_ReadmeFiles';
-import README_FILE_SCHEMA from '@salesforce/label/c.Core_AiExport_ReadmeFileSchema';
-import README_FILE_DICTIONARY from '@salesforce/label/c.Core_AiExport_ReadmeFileDictionary';
-import README_FILE_DATA from '@salesforce/label/c.Core_AiExport_ReadmeFileData';
 import README_OBJECTS from '@salesforce/label/c.Core_AccessCompare_KindsHeading';
-import README_OBJECT_LINE from '@salesforce/label/c.Core_AiExport_ReadmeObjectLine';
-import README_OBJECT_RECORDS from '@salesforce/label/c.Core_AiExport_ReadmeObjectRecords';
-import README_OBJECT_STOPPED from '@salesforce/label/c.Core_AiExport_ReadmeObjectStopped';
 import README_RELATIONSHIPS from '@salesforce/label/c.Core_AiExport_ReadmeRelationships';
-import README_RELATIONSHIP_LINE from '@salesforce/label/c.Core_AiExport_ReadmeRelationshipLine';
 import README_PRIVACY from '@salesforce/label/c.Core_AiExport_ReadmePrivacy';
-import README_PRIVACY_NONE from '@salesforce/label/c.Core_AiExport_ReadmePrivacyNone';
-import README_PRIVACY_LEFT_OUT from '@salesforce/label/c.Core_AiExport_ReadmePrivacyLeftOut';
-import README_PRIVACY_MASKED from '@salesforce/label/c.Core_AiExport_ReadmePrivacyMasked';
-import README_PRIVACY_KEPT from '@salesforce/label/c.Core_AiExport_ReadmePrivacyKept';
-import README_PRIVACY_ADVICE from '@salesforce/label/c.Core_AiExport_ReadmePrivacyAdvice';
 import README_QUALITY from '@salesforce/label/c.Core_AiExport_ReadmeQuality';
-import README_QUALITY_LOW_FILL from '@salesforce/label/c.Core_AiExport_ReadmeQualityLowFill';
 import README_QUALITY_CHECK from '@salesforce/label/c.Core_Format_PairSentence';
-import README_QUALITY_NONE from '@salesforce/label/c.Core_AiExport_ReadmeQualityNone';
 import README_USE from '@salesforce/label/c.Core_AiExport_ReadmeUse';
-import README_USE_STEP_1 from '@salesforce/label/c.Core_AiExport_ReadmeUseStep1';
-import README_USE_STEP_2 from '@salesforce/label/c.Core_AiExport_ReadmeUseStep2';
-import README_USE_STEP_3 from '@salesforce/label/c.Core_AiExport_ReadmeUseStep3';
-import README_USE_STEP_4 from '@salesforce/label/c.Core_AiExport_ReadmeUseStep4';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const FILE_BASE = 'AI_Readiness_Export';
@@ -92,35 +74,38 @@ const REASON_LABELS = {
   [REASONS.FREE_TEXT]: REASON_FREE_TEXT
 };
 
-const README_TEXT = {
-  title: README_TITLE,
-  intro: README_INTRO,
-  filesHeading: README_FILES,
-  fileSchema: README_FILE_SCHEMA,
-  fileDictionary: README_FILE_DICTIONARY,
-  fileData: README_FILE_DATA,
-  objectsHeading: README_OBJECTS,
-  objectLine: README_OBJECT_LINE,
-  objectWithRecords: README_OBJECT_RECORDS,
-  objectStopped: README_OBJECT_STOPPED,
-  relationshipsHeading: README_RELATIONSHIPS,
-  relationshipLine: README_RELATIONSHIP_LINE,
-  privacyHeading: README_PRIVACY,
-  privacyNone: README_PRIVACY_NONE,
-  privacyLeftOut: README_PRIVACY_LEFT_OUT,
-  privacyMasked: README_PRIVACY_MASKED,
-  privacyKept: README_PRIVACY_KEPT,
-  privacyAdvice: README_PRIVACY_ADVICE,
-  qualityHeading: README_QUALITY,
-  qualityLowFill: README_QUALITY_LOW_FILL,
-  qualityCheck: README_QUALITY_CHECK,
-  qualityNone: README_QUALITY_NONE,
-  useHeading: README_USE,
-  useStep1: README_USE_STEP_1,
-  useStep2: README_USE_STEP_2,
-  useStep3: README_USE_STEP_3,
-  useStep4: README_USE_STEP_4
-};
+/** The README's texts: headings are labels, the sentences come from the Core help catalog. */
+function readmeText() {
+  return {
+    title: README_TITLE,
+    intro: README_INTRO,
+    filesHeading: README_FILES,
+    fileSchema: helpText('Core', 'Core_AiExport_ReadmeFileSchema'),
+    fileDictionary: helpText('Core', 'Core_AiExport_ReadmeFileDictionary'),
+    fileData: helpText('Core', 'Core_AiExport_ReadmeFileData'),
+    objectsHeading: README_OBJECTS,
+    objectLine: helpText('Core', 'Core_AiExport_ReadmeObjectLine'),
+    objectWithRecords: helpText('Core', 'Core_AiExport_ReadmeObjectRecords'),
+    objectStopped: helpText('Core', 'Core_AiExport_ReadmeObjectStopped'),
+    relationshipsHeading: README_RELATIONSHIPS,
+    relationshipLine: helpText('Core', 'Core_AiExport_ReadmeRelationshipLine'),
+    privacyHeading: README_PRIVACY,
+    privacyNone: helpText('Core', 'Core_AiExport_ReadmePrivacyNone'),
+    privacyLeftOut: helpText('Core', 'Core_AiExport_ReadmePrivacyLeftOut'),
+    privacyMasked: helpText('Core', 'Core_AiExport_ReadmePrivacyMasked'),
+    privacyKept: helpText('Core', 'Core_AiExport_ReadmePrivacyKept'),
+    privacyAdvice: helpText('Core', 'Core_AiExport_ReadmePrivacyAdvice'),
+    qualityHeading: README_QUALITY,
+    qualityLowFill: helpText('Core', 'Core_AiExport_ReadmeQualityLowFill'),
+    qualityCheck: README_QUALITY_CHECK,
+    qualityNone: helpText('Core', 'Core_AiExport_ReadmeQualityNone'),
+    useHeading: README_USE,
+    useStep1: helpText('Core', 'Core_AiExport_ReadmeUseStep1'),
+    useStep2: helpText('Core', 'Core_AiExport_ReadmeUseStep2'),
+    useStep3: helpText('Core', 'Core_AiExport_ReadmeUseStep3'),
+    useStep4: helpText('Core', 'Core_AiExport_ReadmeUseStep4')
+  };
+}
 
 /**
  * The AI-Readiness Export section of Org Optimizer (AIR-01, plan Section 6.1 item 7, D-154,
@@ -335,7 +320,7 @@ export default class AiReadinessExport extends LightningElement {
         })
       );
       const bytes = await writeZip([
-        ['README.md', buildReadme(schema, README_TEXT)],
+        ['README.md', buildReadme(schema, readmeText())],
         ['schema.json', `${JSON.stringify(schema, null, 2)}\n`],
         ['data-dictionary.csv', dictionaryCsv(dictionaryRows, this.includeFillRates)],
         ...files

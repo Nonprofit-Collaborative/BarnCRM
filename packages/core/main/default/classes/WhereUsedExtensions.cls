@@ -9,14 +9,16 @@ public with sharing class WhereUsedExtensions {
 	/**
 	 * The class names dependent packages register, in the order they are asked: the Rollup
 	 * Builder module's rollup definitions, Giving's gift import columns, Programs' eligibility
-	 * rules, then Logic Models' computed indicators. Funders stores no field names, so it has none.
+	 * rules, Logic Models' computed indicators, then the Connector's recipes (Find steps and the
+	 * saved maps they link). Funders stores no field names, so it has none.
 	 */
 	@NamespaceAccessible
 	public static final List<String> EXTENSION_CLASSES = new List<String>{
 		'RollupsWhereUsedExtension',
 		'GivingWhereUsedExtension',
 		'ProgramsWhereUsedExtension',
-		'LogicModelsWhereUsedExtension'
+		'LogicModelsWhereUsedExtension',
+		'ConnectorWhereUsedExtension'
 	};
 
 	/** Injected by Core's tests by class name, since no other package is there to resolve. */

@@ -8,6 +8,40 @@ addressverification/AddressVerificationNightlyJobProvider.cls | public AddressVe
 addressverification/AddressVerificationNightlyJobProvider.cls | public class AddressVerificationNightlyJobProvider
 addressverification/AddressVerificationPostInstall.cls | public AddressVerificationPostInstall()
 addressverification/AddressVerificationPostInstall.cls | public class AddressVerificationPostInstall
+connector/ConnectorApplyMapAction.cls | global Id recordId
+connector/ConnectorApplyMapAction.cls | global Id sourceRecordId
+connector/ConnectorApplyMapAction.cls | global Id targetRecordId
+connector/ConnectorApplyMapAction.cls | global String action
+connector/ConnectorApplyMapAction.cls | global String dataJson
+connector/ConnectorApplyMapAction.cls | global String mapName
+connector/ConnectorApplyMapAction.cls | global String message
+connector/ConnectorApplyMapAction.cls | global class ConnectorApplyMapAction
+connector/ConnectorApplyMapAction.cls | global class Request
+connector/ConnectorApplyMapAction.cls | global class Result
+connector/ConnectorApplyMapAction.cls | global static List<Result> apply(List<Request>)
+connector/ConnectorErasureExtension.cls | public ConnectorErasureExtension()
+connector/ConnectorErasureExtension.cls | public class ConnectorErasureExtension
+connector/ConnectorHealthCheckExtension.cls | public ConnectorHealthCheckExtension()
+connector/ConnectorHealthCheckExtension.cls | public class ConnectorHealthCheckExtension
+connector/ConnectorNightlyJobProvider.cls | public ConnectorNightlyJobProvider()
+connector/ConnectorNightlyJobProvider.cls | public class ConnectorNightlyJobProvider
+connector/ConnectorPostInstall.cls | public ConnectorPostInstall()
+connector/ConnectorPostInstall.cls | public class ConnectorPostInstall
+connector/ConnectorRunRecipeAction.cls | global Boolean queued
+connector/ConnectorRunRecipeAction.cls | global Id recordId
+connector/ConnectorRunRecipeAction.cls | global Id runId
+connector/ConnectorRunRecipeAction.cls | global List<Id> recordIds
+connector/ConnectorRunRecipeAction.cls | global String dataJson
+connector/ConnectorRunRecipeAction.cls | global String message
+connector/ConnectorRunRecipeAction.cls | global String recipeName
+connector/ConnectorRunRecipeAction.cls | global class ConnectorRunRecipeAction
+connector/ConnectorRunRecipeAction.cls | global class Request
+connector/ConnectorRunRecipeAction.cls | global class Result
+connector/ConnectorRunRecipeAction.cls | global static List<Result> run(List<Request>)
+connector/ConnectorWebhookRest.cls | global class ConnectorWebhookRest
+connector/ConnectorWebhookRest.cls | global static void receive()
+connector/ConnectorWhereUsedExtension.cls | public ConnectorWhereUsedExtension()
+connector/ConnectorWhereUsedExtension.cls | public class ConnectorWhereUsedExtension
 contactpoints/ContactPointAccountHandler.cls | public ContactPointAccountHandler()
 contactpoints/ContactPointAccountHandler.cls | public class ContactPointAccountHandler
 contactpoints/ContactPointAddressHandler.cls | public ContactPointAddressHandler()
@@ -80,22 +114,6 @@ core/AutomationControl.cls | public static void clearCache()
 core/AutomationControl.cls | public static void ensureSwitch(String,String,String,String)
 core/AutomationControl.cls | public static void resumeAll()
 core/AutomationControl.cls | public static void setEnabled(String,Boolean)
-core/AutomationInventoryService.cls | public Boolean flowsFailed
-core/AutomationInventoryService.cls | public Boolean triggersFailed
-core/AutomationInventoryService.cls | public Boolean truncated
-core/AutomationInventoryService.cls | public Integer apiVersion
-core/AutomationInventoryService.cls | public List<Item> items
-core/AutomationInventoryService.cls | public String apiName
-core/AutomationInventoryService.cls | public String automationType
-core/AutomationInventoryService.cls | public String detail
-core/AutomationInventoryService.cls | public String name
-core/AutomationInventoryService.cls | public String status
-core/AutomationInventoryService.cls | public class AutomationInventoryService
-core/AutomationInventoryService.cls | public class Item
-core/AutomationInventoryService.cls | public class Result
-core/AutomationInventoryService.cls | public static Result forObject(Schema.DescribeSObjectResult)
-core/AutomationInventoryService.cls | public static String failType
-core/AutomationInventoryService.cls | public static final String TYPE_FLOW
 core/AutomationRegistrySelector.cls | public class AutomationRegistrySelector
 core/AutomationRegistrySelector.cls | public static List<Automation_Registry__mdt> registryOverride
 core/AutomationRegistrySelector.cls | public static List<Automation_Registry__mdt> selectForFramework()
@@ -147,6 +165,10 @@ core/BrandShareJob.cls | public class BrandShareJob
 core/BrandShareJob.cls | public class VisibilityCheck
 core/BulkDeleteController.cls | public class BulkDeleteController
 core/BulkDeleteController.cls | public static Boolean hasPermission()
+core/BulkUpdateFields.cls | public class BulkUpdateException
+core/BulkUpdateFields.cls | public class BulkUpdateFields
+core/BulkUpdateFields.cls | public static Object fromText(Schema.DescribeFieldResult,String)
+core/BulkUpdateFields.cls | public static String toText(Schema.DescribeFieldResult,Object)
 core/CheckAutomationAction.cls | global Boolean run
 core/CheckAutomationAction.cls | global String automationName
 core/CheckAutomationAction.cls | global String reason
@@ -420,6 +442,14 @@ core/HealthCheckFixes.cls | public static HealthCheckService.Report applyForModu
 core/HealthCheckFixes.cls | public static String apply(String,List<String>)
 core/HealthCheckFixes.cls | public static void failAfterFixForTest(Boolean)
 core/HealthCheckFixes.cls | public static void requireManageSettings()
+core/HealthCheckResult.cls | public Datetime ranAt
+core/HealthCheckResult.cls | public Integer errors
+core/HealthCheckResult.cls | public Integer infos
+core/HealthCheckResult.cls | public Integer warnings
+core/HealthCheckResult.cls | public class Counts
+core/HealthCheckResult.cls | public class HealthCheckResult
+core/HealthCheckResult.cls | public static Counts read()
+core/HealthCheckResult.cls | public static String text(Integer,Integer,Integer)
 core/HealthCheckRun.cls | public interface HealthCheckRun
 core/HealthCheckService.cls | public Boolean getCanManageSettings()
 core/HealthCheckService.cls | public Boolean getModeNeedsAttention()
@@ -1044,8 +1074,11 @@ core/ImportValues.cls | public static List<List<String>> slices(Set<String>,Inte
 core/ImportValues.cls | public static String digest(String,String)
 core/ImportValues.cls | public static final Integer KEYS_PER_QUERY
 core/IntegrationAppService.cls | public class IntegrationAppService
+core/IntegrationAppService.cls | public class KitRef
 core/IntegrationAppService.cls | public static Boolean migrationInstalled()
 core/IntegrationAppService.cls | public static Boolean migrationInstalledOverride
+core/IntegrationAppService.cls | public static KitRef kitRef(Migration_Kit__mdt)
+core/IntegrationAppService.cls | public static List<Migration_Kit__mdt> kits()
 core/IntegrationAppService.cls | public static Set<String> detectedKeys()
 core/IntegrationAppService.cls | public static void useCatalogForTest(List<Integration_App__mdt>,Set<String>)
 core/JobNotifier.cls | public Id recipientId
@@ -1276,11 +1309,6 @@ core/PersonErasureExtensions.cls | public class PersonErasureExtensions
 core/PersonErasureExtensions.cls | public static List<PersonErasureExtension> installed()
 core/PersonErasureExtensions.cls | public static final List<String> EXTENSION_CLASSES
 core/PersonErasureStartExtension.cls | public interface PersonErasureStartExtension
-core/PersonLinkOrphanSelector.cls | public class PersonLinkOrphanSelector
-core/PersonLinkOrphanSelector.cls | public static Integer countAffiliations(Integer)
-core/PersonLinkOrphanSelector.cls | public static Integer countRelationships(Integer)
-core/PersonLinkOrphanSelector.cls | public static List<Affiliation__c> affiliations(Integer)
-core/PersonLinkOrphanSelector.cls | public static List<Relationship__c> relationships(Integer)
 core/PersonMatcher.cls | public Boolean byNameAndPostalCode
 core/PersonMatcher.cls | public Map<String,String> duplicateRuleValues
 core/PersonMatcher.cls | public String email
@@ -1302,39 +1330,6 @@ core/PersonReference.cls | public static Boolean isSamePerson(Id,Id,Id,Id)
 core/PersonReference.cls | public static Id idOf(Id,Id)
 core/PersonReference.cls | public static String keyOf(Id,Id)
 core/PersonReference.cls | public static String nameOf(Contact,Account,String)
-core/PicklistUsageService.cls | public Boolean done
-core/PicklistUsageService.cls | public Boolean truncated
-core/PicklistUsageService.cls | public Datetime lastUsed
-core/PicklistUsageService.cls | public Id lastId
-core/PicklistUsageService.cls | public Integer read
-core/PicklistUsageService.cls | public Integer records
-core/PicklistUsageService.cls | public List<Usage> values
-core/PicklistUsageService.cls | public Map<String,Map<String,Datetime>> lastUsed
-core/PicklistUsageService.cls | public Set<String> cut
-core/PicklistUsageService.cls | public String status
-core/PicklistUsageService.cls | public String value
-core/PicklistUsageService.cls | public String valueLabel
-core/PicklistUsageService.cls | public class FieldResult
-core/PicklistUsageService.cls | public class PicklistUsageService
-core/PicklistUsageService.cls | public class ScanResult
-core/PicklistUsageService.cls | public class Usage
-core/PicklistUsageService.cls | public static Boolean datesFit(Integer)
-core/PicklistUsageService.cls | public static FieldResult combine(Map<String,String>,Map<String,Usage>)
-core/PicklistUsageService.cls | public static FieldResult usage(Schema.DescribeSObjectResult,Schema.DescribeFieldResult,Boolean)
-core/PicklistUsageService.cls | public static Integer dateRowBudget
-core/PicklistUsageService.cls | public static Integer maxScanRows
-core/PicklistUsageService.cls | public static Integer scanRows(Integer)
-core/PicklistUsageService.cls | public static Integer total(Schema.DescribeSObjectResult)
-core/PicklistUsageService.cls | public static List<Schema.DescribeFieldResult> picklistFields(Schema.DescribeSObjectResult)
-core/PicklistUsageService.cls | public static Map<String,Schema.DescribeFieldResult> picklistFieldsByName(Schema.DescribeSObjectResult)
-core/PicklistUsageService.cls | public static ScanResult lastUsed(Schema.DescribeSObjectResult,List<Schema.DescribeFieldResult>,Id)
-core/PicklistUsageService.cls | public static String dateField(Schema.DescribeSObjectResult)
-core/PicklistUsageService.cls | public static final Integer CHUNK_SIZE
-core/PicklistUsageService.cls | public static final Integer MAX_VALUES
-core/PicklistUsageService.cls | public static final String ACTIVE
-core/PicklistUsageService.cls | public static final String INACTIVE
-core/PicklistUsageService.cls | public static final String NEVER_USED
-core/PicklistUsageService.cls | public static final String NO_VALUE
 core/PortalActionExtension.cls | public interface PortalActionExtension
 core/PortalActionExtensions.cls | public class PortalActionExtensions
 core/PortalActionExtensions.cls | public static PortalActionExtension forAction(String)
@@ -1635,12 +1630,6 @@ core/TriggerHandler.cls | public virtual void afterUpdate()
 core/TriggerHandler.cls | public virtual void beforeDelete()
 core/TriggerHandler.cls | public virtual void beforeInsert()
 core/TriggerHandler.cls | public virtual void beforeUpdate()
-core/UserAccessSelector.cls | public class UserAccessSelector
-core/UserAccessSelector.cls | public static Integer countActiveAssignees(Set<String>)
-core/UserAccessSelector.cls | public static Integer countActiveDirectAssignees(Set<String>)
-core/UserAccessSelector.cls | public static Integer countActiveStandardUsersExcluding(Set<Id>)
-core/UserAccessSelector.cls | public static Set<Id> getAssignedUserIds(Set<String>)
-core/UserAccessSelector.cls | public static Set<Id> getPermissionSetAssigneeIds(Set<String>)
 core/UserErrors.cls | public AuraHandledException wrap(Exception)
 core/UserErrors.cls | public AuraHandledException wrap(Exception,String)
 core/UserErrors.cls | public AuraHandledException wrap(Exception,String,Id)
@@ -1661,11 +1650,13 @@ core/WhereUsedExtension.cls | public interface WhereUsedExtension
 core/WhereUsedExtensions.cls | public class WhereUsedExtensions
 core/WhereUsedExtensions.cls | public static Map<String,WhereUsedExtension> findAll()
 core/WhereUsedExtensions.cls | public static final List<String> EXTENSION_CLASSES
+core/WhereUsedService.cls | public Boolean isMap(Id)
 core/WhereUsedService.cls | public Boolean isObject()
 core/WhereUsedService.cls | public Boolean isObject(String)
 core/WhereUsedService.cls | public Boolean matchesField(String,String)
 core/WhereUsedService.cls | public Boolean matchesFilter(String,Object)
 core/WhereUsedService.cls | public Boolean matchesPath(String,String)
+core/WhereUsedService.cls | public Id mapId
 core/WhereUsedService.cls | public List<String> getParts()
 core/WhereUsedService.cls | public Reference addPart(String)
 core/WhereUsedService.cls | public Reference withBreaks(String)
@@ -1686,6 +1677,7 @@ core/WhereUsedService.cls | public class WhereUsedException
 core/WhereUsedService.cls | public class WhereUsedService
 core/WhereUsedService.cls | public static List<Object> listOf(Object)
 core/WhereUsedService.cls | public static List<Reference> importColumnReferences(Target,Map<String,String>)
+core/WhereUsedService.cls | public static List<Reference> mapUsers(Id,String)
 core/WhereUsedService.cls | public static Map<String,Object> parsed(String)
 core/WhereUsedService.cls | public static Reference settingReference(String,String,String)
 core/WhereUsedService.cls | public static String tabUrl(String,Map<String,String>)

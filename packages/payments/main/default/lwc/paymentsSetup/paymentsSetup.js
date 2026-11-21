@@ -217,12 +217,9 @@ export default class PaymentsSetup extends LightningElement {
       size: 'small',
       label: fill(helpText('Payments', 'Payments_Setup_DisconnectTitle'), [processor]),
       message: fill(
-        helpText(
-          'Payments',
-          processor === 'PayPal'
-            ? 'Payments_Setup_DisconnectConfirmPayPal'
-            : 'Payments_Setup_DisconnectConfirm'
-        ),
+        processor === 'PayPal'
+          ? helpText('Payments', 'Payments_Setup_DisconnectConfirmPayPal')
+          : helpText('Payments', 'Payments_Setup_DisconnectConfirm'),
         [processor]
       ),
       confirmLabel: this.labels.clear,

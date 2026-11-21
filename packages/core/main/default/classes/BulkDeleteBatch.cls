@@ -188,7 +188,7 @@ public with sharing class BulkDeleteBatch implements Database.Batchable<SObject>
 				System.Label.Core_JobNotice_BulkDelete,
 				failed,
 				String.format(
-					System.Label.Core_JobNotice_BulkDeleteBody,
+					BarnHelp.text('Core', 'Core_JobNotice_BulkDeleteBody'),
 					new List<Object>{ deletedRecords.format(), noLongerMatching.format(), failedRecords.format() }
 				),
 				jobId

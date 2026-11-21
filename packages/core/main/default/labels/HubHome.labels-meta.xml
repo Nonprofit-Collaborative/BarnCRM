@@ -72,4 +72,12 @@
         <shortDescription>Overdue badge: a late nightly job tile; Grants Grant Calendar overdue mark</shortDescription>
         <value>Overdue</value>
     </labels>
+    <labels>
+        <fullName>Core_HubHome_HealthCheckLink</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Hub home: Health Check tile link to the Org Optimizer section</shortDescription>
+        <value>Open Health Check</value>
+    </labels>
 </CustomLabels>

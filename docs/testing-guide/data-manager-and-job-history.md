@@ -13,7 +13,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | In the BarnCRM app, open the **Data Manager** tab. | The page name **Data Manager** shows once, in the page header with the tab icon, and no other icon or title repeats it. The line **Start a data task, or see and undo what changed.** is under it, then **About This Tool** (open on your first visit) with two short lines on which tool to use and a **Learn More** link. |
-| 2 | Look at the tiles. | Four groups in this order: **Bring Data In** (**Super Importer**), **Find and Change** (**Find**, **Super Transformer**), **Check and Tidy** (**Org Optimizer**, **Duplicate Matching**), **Careful** (**Delete Many Records**, alone and last). Each tile has an icon, its name and one line of 12 words or fewer; there are no **Open** buttons. **Super Importer** reads "Add or update records from a spreadsheet.", **Find** reads "Find records, then save or export them." and **Super Transformer** reads "Change fields on many records at once, no file needed." The **Super Importer**, **Find**, **Super Transformer**, **Org Optimizer** and **Duplicate Matching** tiles show the same icon as their tabs. |
+| 2 | Look at the tiles. | Four groups in this order: **Bring Data In** (**Super Importer**, **Import Files**, **Saved Maps**), **Find and Change** (**Find**, **Super Transformer**), **Check and Tidy** (**Org Optimizer**, **Duplicate Matching**), **Careful** (**Delete Many Records**, alone and last). Each tile has an icon, its name and one line of 12 words or fewer; there are no **Open** buttons. **Super Importer** reads "Add or update records from a spreadsheet.", **Find** reads "Find records, then save or export them." and **Super Transformer** reads "Change fields on many records at once, no file needed." The **Super Importer**, **Find**, **Super Transformer**, **Org Optimizer** and **Duplicate Matching** tiles show the same icon as their tabs. |
 | 3 | Look around the tiles. | There is no warning box anywhere on the page. |
 | 4 | Look under **Import Templates**. | The line "A template remembers how a file's columns match fields." with a **Learn More** link, then a table with the columns **Template**, **Loads**, **Arrives Regularly As**, **Last Loaded**, listing the shipped import templates. **Loads** reads **People and organizations** for the people templates, **Gifts** for a gift template, and a plural object name (for example **Accounts**) for a one-object template; never an API name such as `Account`. With no template at all it shows an illustration, **No Import Templates Yet**, and a **Create a Template** button that opens **Import**. |
 | 5 | Look at the job list card. | It is headed **Data Jobs**, with a **Refresh** button, a **Show** list and a **Show everyone's jobs** checkbox. With no jobs run yet it shows an illustration, the heading **No Data Jobs Yet** and the line "Each import, Super Transformer run and bulk delete is listed here, with its undo." |
@@ -244,3 +244,42 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 10 | Click **Continue**. | Reading carries on from where it stopped (the count does not start from 0) and Last Used fills in. |
 
 **Cleanup:** Reactivate any value you deactivated in step 5.
+
+## T-DM-15: The Mapper Matches, Explains and Checks a Map
+
+**Purpose:** Confirm the Mapper fills fields from a JSON sample, marks guesses, reads each field as a sentence and checks the map on samples before anything runs. Setup detail: [The Mapper and Saved Maps](../admin-guide/mapper.md).
+**Prerequisites:** admin; an Account named `Riverside Food Bank`.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Data Manager** and select **Saved Maps**. | **Saved Maps** opens on this page with **New Map** and, with no maps yet, **No maps yet**. |
+| 2 | Select **New Map**. Under **From** choose **JSON Data**, paste `[{"profile":{"email":" Pat@Example.ORG ","family_last_name":"Lee","born":"soon"},"order":{"company":"Riverside Food Bank"}},{"profile":{"email":"x@y.org","family_last_name":"Ng","born":"2020-01-02"},"order":{"company":"Nobody"}}]` into **Sample JSON** and select **Use This Sample**. | The **From** pane lists **profile, email**, **profile, family_last_name**, **profile, born** and **order, company**, each with its value. |
+| 3 | Under **To**, keep **A Record** and choose **Contact** in **Object to Fill**. | **To** lists **Required** (Last Name), **Suggested** and **All Fields**. **Email** gets **profile, email**. **Last Name** gets **profile, family_last_name** with the badge **Best Guess, Check It** and an **Accept** button; a line above the panes says a guess still needs a check. |
+| 4 | Select **Accept** on **Last Name**. | The badge and the line are gone. |
+| 5 | On **Email**, select **Changes**, add **Remove extra spaces** and **All lower case**. | The sentence reads "Email gets profile, email, then remove extra spaces, then all lower case." **Preview** shows `pat@example.org`. |
+| 6 | On **Birthdate**, select **Pick** and choose **profile, born**. Use the keyboard only: tab to the list, type `born`, press Enter. | **Birthdate** gets **profile, born**. In **Preview**, sample 1 shows **not a date** beside **soon**. |
+| 7 | On **Account Name** (the Account lookup), drag **order, company** onto it, then select **Changes**, set **Find the Parent By** to **Account Name** and **When No Parent Is Found** to **Leave it empty**. | The lookup sentence reads "Finds the Account whose Account Name equals order, company; when none is found: leave it empty." |
+| 8 | Under **Matching**, set **Match Existing Records By** to **A field** and leave **Field to Match By** empty. | A red notice says part of the map is not complete. Choose **Email**: the notice is gone, a sentence starting "When Email matches, the record is updated" shows with a line on what a field that is not unique risks. |
+| 9 | Use **Next Sample** in **Preview**. | Sample 2 of 2: **Account Name** shows **no parent found**. |
+| 10 | Select **Check Before Running**. | "2 fields need attention across 2 samples." with one line for **Birthdate** (not a date in 1 samples) and one for **Account Name** (no parent found). Nothing is saved anywhere. |
+
+**Cleanup:** Select **Cancel** (or keep the map for T-DM-16).
+
+## T-DM-16: Saved Maps Save, Rename, Delete and Show in Where Used
+
+**Purpose:** Confirm a map saves only when it is complete, changes in place, and is found by Where Used.
+**Prerequisites:** admin; the map of T-DM-15 open in the Mapper.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Clear **Map Name**. | **Save Map** is unavailable. Type `Event sign-ups`. |
+| 2 | Select **Match Fields** after removing the **Last Name** line, so the guess comes back. | **Save Map** is unavailable and a line says to accept or change each guess first. Accept it. |
+| 3 | Select **Save Map**. | "Saved Event sign-ups." The list shows **Event sign-ups**, filling **Contact**. |
+| 4 | Select **New Map**, name it `event sign-ups` (lower case) with any one field filled, and select **Save Map**. | Refused: a map with that name already exists. Select **Cancel**. |
+| 5 | On **Event sign-ups** select **Rename**, type `Event sign-ups 2026` and **Save Name**. | Renamed without a question (no tool links this map in Core). The list shows the new name. |
+| 6 | Select **Open**, change any field and **Save Map**. | Saved without a question (no tool links this map in Core). The map keeps its place in the list. |
+| 7 | Open **Org Optimizer**, **Field Use**, **Contact**, and choose **Where Used** on **Email**. | **Event sign-ups 2026** is listed as a **Saved Map** with **Column "profile.email"** and **Matching field**; on **Birthdate**, with **Column "profile.born"**. |
+| 8 | Back on **Saved Maps**, select **Delete** on the map, then **Cancel**; then **Delete** and confirm. | Cancel keeps it; confirming removes it from the list. |
+| 9 | As a staff user (no Manage BarnCRM Settings), open **Data Manager**. | There is no **Saved Maps** tile. |
+
+**Cleanup:** None.

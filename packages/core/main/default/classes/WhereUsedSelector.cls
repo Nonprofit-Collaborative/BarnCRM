@@ -25,10 +25,10 @@ public without sharing class WhereUsedSelector {
 		];
 	}
 
-	/** Every saved Super Transform step list. */
+	/** Every saved Super Transform step list and saved map (by Kind). */
 	public static List<Saved_Transform__c> savedTransforms() {
 		return [
-			SELECT Id, Name, Object_Name__c, Definition_JSON__c
+			SELECT Id, Name, Object_Name__c, Definition_JSON__c, Kind__c
 			FROM Saved_Transform__c
 			WITH SYSTEM_MODE
 			ORDER BY Name

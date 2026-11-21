@@ -28,10 +28,10 @@ with its own.
   `OrgOptimizerObjectChecks`), the page controllers (`DataHygieneController`,
   `FieldUtilizationController`, `DataDictionaryController`, `OrgOptimizerSetupController`,
   `OrgOptimizerStorageController`, `SetupChangeController`, `ReportSubscriptions`,
-  `AccessExplorerController`, `FieldAccessController`) and their services, and
-  `OrgOptimizerPostInstall`.
-- LWC: `orgOptimizer` (the page), `healthCheckPanel`, `healthCheckBadge` and the section
-  components.
+  `AccessExplorerController`, `FieldAccessController`) and their services (among them
+  `PicklistUsageService` and `AutomationInventoryService`), the Health Check reads
+  `UserAccessSelector` and `PersonLinkOrphanSelector`, and `OrgOptimizerPostInstall`.
+- LWC: `orgOptimizer` (the page), `healthCheckPanel` and the section components.
 - Custom metadata: the Org Optimizer section's Setting Definitions (thresholds, retention, the
   Health and Error Log links).
 - Permission sets: `Org_Optimizer_Admin` (BarnCRM Admin holders: every section) and
@@ -48,5 +48,7 @@ checks compile against Core alone; `BarnInstallCheck.runHealthCheck`, which repo
 `available` false without this package; the nightly Setup Changes copy (`SetupChangeCopyJob`,
 which runs only while this package is installed) and the record cleanup of saved counts;
 `OrgLimitReader` (the admin digest reads limits too); Field History (a record card and a
-Settings switch, not an Org Optimizer section); the Error Log tile; and the Help catalog
-entries and labels that Core and other modules also use.
+Settings switch, not an Org Optimizer section); the Error Log tile; the Home page's Health
+Check tile (`hubHealthCheck`, shown while this package is installed) and the badge it shares
+with this package's page (`healthCheckBadge`); and the Help catalog entries and labels that
+Core and other modules also use.

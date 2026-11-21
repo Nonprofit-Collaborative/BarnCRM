@@ -1,6 +1,6 @@
 # Admin Guide
 
-Applies to: BarnCRM main at f0eae0b38 (releases 1.26 to 1.30). Pre-release: no package version exists yet; this tracks the newest code on main. The page list is in the [Index](#index).
+Applies to: BarnCRM main at 3b7d72840 (releases 1.26 to 1.30, with release 1.33's Org Optimizer follow-ups). Pre-release: no package version exists yet; this tracks the newest code on main. The page list is in the [Index](#index).
 
 > **Not for production orgs:** BarnCRM is in pilot. We do not recommend installing pilot or testing versions in a production Salesforce org. Use a sandbox, a free Developer Edition org or a scratch org.
 
@@ -147,6 +147,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | Data Manager (one place to start a data task, and every job's Undo) | [data-manager.md](data-manager.md) | Core |
 | C-14, C-19, C-32, C-33 Importing, import undo, matching rules and Load one object | [importing.md](importing.md) | Core |
 | C-49d Creating a new field from an import | [import-new-fields.md](import-new-fields.md) | Core |
+| MAP-01 to MAP-07 The Mapper and Saved Maps (one mapping screen, also drawing Super Importer's Check Columns step; maps reused by Super Importer, Super Transformer, the Opportunity mirror and the Connector) | [mapper.md](mapper.md) | Core |
 | C-49b Super Importer rows: browse, correct and retry import rows | [import-rows.md](import-rows.md) | Core |
 | C-34, C-36 Find and export | [find.md](find.md) | Core |
 | C-41, C-41b Grid and saved grids | [grid.md](grid.md) | Core |
@@ -299,6 +300,12 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | Feature | Page | Package |
 |---|---|---|
 | O-02 Advanced Reporting (beta): install, access, where reports and dashboards are kept and how sharing works, large data volumes, the dashboard templates, how it relates to Salesforce reports, Grid and Analytics, troubleshooting | [advanced-reporting.md](advanced-reporting.md) | BarnCRM Advanced Reporting |
+
+### BarnCRM Connector
+
+| Feature | Page | Package |
+|---|---|---|
+| CN-01 Connections (beta): install, the four sign-in kinds, the Secret URL notice, the one Setup step and Check Again, Check Connection, Replace Key, Disconnect and Delete, access, Health Check, removing it | [connector.md](connector.md) | BarnCRM Connector |
 
 ### Project Management
 

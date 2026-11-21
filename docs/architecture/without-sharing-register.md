@@ -171,3 +171,9 @@ they share them, and writes the one anonymous Session Rating an agenda rating se
 | Class | Kind | What it reaches past sharing for | Authority |
 |---|---|---|---|
 | MirrorSettingsWriter | Platform | Each mirror's run record on the protected org settings | ADR-0021, ADR-0038 |
+
+## BarnCRM Connector
+
+| Class | Kind | What it reaches past sharing for | Authority |
+|---|---|---|---|
+| ConnectorRunStore | Org job | The module's own queue of Connector Run records and the private recipes they run: a Flow action queues a run for someone who cannot see the recipe, and the runner reads and updates every queued run. The webhook receiver, on the Site guest user, finds a published recipe only by its token's hash and stores one Received run through it (CN-04, F13). It also runs the steps of a recipe an admin set to System (recorded, listed by Health Check), so those steps alone skip sharing. An App Poll's poll run moves its recipe's Watermark and queues the item runs (CN-13), and erasing a person finds and deletes the runs that name them, whoever erases (CN-18) | ADR-0021, ADR-0235 |

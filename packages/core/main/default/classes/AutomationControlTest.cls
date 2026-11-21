@@ -104,7 +104,7 @@ private class AutomationControlTest {
 						Assert.fail('David should not be able to ' + action + '.');
 					} catch (AutomationControl.AutomationControlException expected) {
 						Assert.areEqual(
-							Label.Core_Automation_NoPermission,
+							BarnHelp.text('Core', 'Core_Automation_NoPermission'),
 							expected.getMessage(),
 							'The message names the permission David needs.'
 						);
@@ -156,7 +156,7 @@ private class AutomationControlTest {
 						Assert.fail('A pause of ' + hours + ' hours should be refused.');
 					} catch (AutomationControl.AutomationControlException expected) {
 						Assert.areEqual(
-							Label.Core_Automation_PauseHoursInvalid,
+							BarnHelp.text('Core', 'Core_Automation_PauseHoursInvalid'),
 							expected.getMessage(),
 							'Maria is told which lengths she can choose.'
 						);
@@ -229,7 +229,7 @@ private class AutomationControlTest {
 					Assert.fail('An unknown automation should be refused.');
 				} catch (AutomationControl.AutomationControlException expected) {
 					Assert.areEqual(
-						Label.Core_Automation_NotFound,
+						BarnHelp.text('Core', 'Core_Automation_NotFound'),
 						expected.getMessage(),
 						'Maria is told to refresh the page.'
 					);
@@ -239,7 +239,7 @@ private class AutomationControlTest {
 					Assert.fail('An empty automation name should be refused.');
 				} catch (AutomationControl.AutomationControlException expected) {
 					Assert.areEqual(
-						Label.Core_Automation_NameRequired,
+						BarnHelp.text('Core', 'Core_Automation_NameRequired'),
 						expected.getMessage(),
 						'Maria is told to pick an automation.'
 					);
@@ -265,7 +265,7 @@ private class AutomationControlTest {
 					Assert.fail('David has no settings permission.');
 				} catch (AutomationControl.AutomationControlException expected) {
 					Assert.areEqual(
-						Label.Core_Automation_NoPermission,
+						BarnHelp.text('Core', 'Core_Automation_NoPermission'),
 						expected.getMessage(),
 						'Refused, with the permission named.'
 					);
@@ -277,7 +277,7 @@ private class AutomationControlTest {
 					Assert.fail('A switch needs a name.');
 				} catch (AutomationControl.AutomationControlException expected) {
 					Assert.areEqual(
-						Label.Core_Automation_NameRequired,
+						BarnHelp.text('Core', 'Core_Automation_NameRequired'),
 						expected.getMessage(),
 						'Refused, asking for a name.'
 					);

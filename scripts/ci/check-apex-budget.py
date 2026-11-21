@@ -99,7 +99,17 @@ CAPS = {
     # optional packages; the seams, @NamespaceAccessible marks and getters they need stay.
     # 2,201,145 measured before, 1,970,388 after, plus about 0.1%: Core is under the 2.0M
     # target.
-    "core": 1_972_400,
+    # Lowered 2026-11-20 for D-217 (OO-01 to OO-04): PicklistUsageService,
+    # AutomationInventoryService, UserAccessSelector and PersonLinkOrphanSelector moved into
+    # Org Optimizer, the Migration package reads Core's one kit query, and Home gained the
+    # Health Check tile. 1,971,740 measured before, 1,955,421 after, plus about 0.1%.
+    # Set 2026-11-20 for landing batch Q (releases 1.31 to 1.33): the Mapper and saved maps
+    # (MAP-01 to MAP-07), the Connector seams (CN-01 to CN-18) and D-217 merged together:
+    # 1,977,602 measured, plus about 0.1% (2% would pass the 2.0M target).
+    # Raised 2026-11-20 for the batch Q review fixes: HealthCheckResult (the one owner of the
+    # stored Health Check format), grouped Mapper lookups and 51 messages read from the Core
+    # help catalog instead of labels. 1,980,869 measured, plus about 0.1%.
+    "core": 1_982_850,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured
@@ -391,6 +401,31 @@ CAPS = {
     # server with the multi-currency refusal, checked lookup names: 30,239 measured 2026-11-19,
     # raised by 2,200 (what the fixes added).
     "reporting": 30_900,
+    # BarnCRM Connector (CN-01, D-210, D-216, ADR-0235): Connections on
+    # External and Named Credentials (page-entered keys, the F2 refusal, redacted logs, the
+    # Connections access set), its Health Check extension and post-install, 31,084 measured
+    # 2026-11-20, plus about 2%.
+    # Raised 2026-11-20 for CN-02 Recipes and Runs (document rules, the runner and step runner,
+    # map runtime, Recipe Access, run store, Where Used and Health Check additions) and CN-06
+    # Flow actions (Run a Recipe 3,317, Apply a Saved Map 5,000): 122,190 measured, plus about 2%.
+    # Raised 2026-11-20 for CN-03 the recipe clock (the lane heartbeat, Schedule and Record Change
+    # triggers, retries with backoff and auto-pause, the integration user and its subscriber
+    # write, Health Check findings, the nightly cleanup): 140,100 measured, plus about 2%.
+    # Raised 2026-11-20 for CN-09 Load Rows with an Import Template (ConnectorImportStep: rows
+    # from records, lists or CSV handed to Super Importer, the wait, the limit check; C-38):
+    # 170,634 measured on the CN-03 head, 183,913 with CN-09, plus about 2%.
+    # Raised 2026-11-20 for CN-04 webhooks in and sending data back (the receiver, the Webhook
+    # card's controller, Send to Webhook, Address From the Data, the guest Health Check fix):
+    # 205,718 measured with CN-09 and CN-04 merged (landing batch Q), plus about 2%.
+    # Raised 2026-11-20 for CN-13 the App Poll trigger (ConnectorAppPoll: the poll run, item
+    # stamps, the watermark) and CN-18 runs in the erasure path (ConnectorErasureExtension and
+    # the run search in ConnectorRunStore): 210,563 measured, plus about 2%.
+    # Set 2026-11-20 for landing batch Q with CN-04, CN-05, CN-08, CN-09, CN-13 and CN-18
+    # merged together: 254,714 measured, plus about 2%. Raised 2026-11-20 for the batch Q
+    # Connector review fixes (the Running claim model, step and heap guards, the template
+    # check path and account, Where Used triggers, the import refusals): 267,980 measured,
+    # plus about 2%.
+    "connector": 273_400,
     # Mirror: the NPSP gifts migration kit's extension (MIG-05), 187,295 measured, then the
     # Nonprofit Cloud gifts kit's (MIG-04), 195,957 measured, then the Nonprofit Cloud
     # relationships kit's (MIG-02), about 200,500 combined, plus about 1%.
@@ -422,7 +457,9 @@ CAPS = {
     # runner, checks, controller and last run, and every Org Optimizer section's controllers
     # and services, moved out of Core, with the post-install: 215,159 measured 2026-11-20,
     # plus about 2%.
-    "orgoptimizer": 219_500,
+    # Raised 2026-11-20 for D-217 (OO-03): the four Org Optimizer services and selectors only
+    # it called moved out of Core: 231,414 measured, plus about 2%.
+    "orgoptimizer": 236_000,
     # Sample Data (D-215): the loader, its stages, selector and controller, the package host
     # and the post-install, moved out of Core: 29,516 measured 2026-11-20, plus about 2%.
     "sampledata": 30_200,

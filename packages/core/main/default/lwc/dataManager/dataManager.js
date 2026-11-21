@@ -56,7 +56,7 @@ const TABS = {
   delete: 'Find'
 };
 /** The tiles whose tool opens on this page, in place of the hub, with a way back. */
-const PANELS = ['backup', 'files'];
+const PANELS = ['backup', 'files', 'maps'];
 /** The tiles that open Find for a bulk tool, and the tool Find's note names. */
 const BULK_TOOLS = { delete: 'delete' };
 
@@ -165,6 +165,10 @@ export default class DataManager extends NavigationMixin(LightningElement) {
     return this.panel === 'files';
   }
 
+  get showMaps() {
+    return this.panel === 'maps';
+  }
+
   handleBack() {
     this.panel = undefined;
   }
@@ -243,6 +247,15 @@ export default class DataManager extends NavigationMixin(LightningElement) {
           helpText('Core', 'Core_DataManager_FilesTitle'),
           helpText('Core', 'Core_DataManager_FilesText'),
           'standard:file'
+        )
+      );
+      // Maps (MAP-03): the Mapper and every saved map, for admins, who make and change maps.
+      bringIn.push(
+        tile(
+          'maps',
+          helpText('Core', 'Core_DataManager_MapsTitle'),
+          helpText('Core', 'Core_DataManager_MapsText'),
+          'standard:data_mapping'
         )
       );
     }

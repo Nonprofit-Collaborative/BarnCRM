@@ -1,6 +1,6 @@
 # User Guide
 
-Applies to: BarnCRM main at f0eae0b38 (releases 1.26 to 1.30). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM main at 3b7d72840 (releases 1.26 to 1.30, with release 1.33's Org Optimizer follow-ups). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 ## Who This Is For
 
@@ -19,6 +19,7 @@ Every BarnCRM module is in Beta right now: a **Beta** badge beside a module's na
 - [Getting around BarnCRM](getting-around.md): the apps, tabs, Home, What's new, in-app tips and notifications.
 - [Read only access](read-only-access.md): what a person with the Read Only role can and cannot do.
 - Moving from another app: when your organization moves records from another app in the same org (for example DLRS rollups, NPSP relationships, affiliations, addresses, funds, levels, recurring donations and engagement plans, gifts and soft credits, Nonprofit Cloud gifts, commitments, soft credits, relationships and affiliations, or Volunteers for Salesforce jobs, shifts and hours), your admin runs the [Migration Assistant](../admin-guide/migration-assistant.md). Nothing changes in your daily work until they finish; ask them when the old app's screens stop being updated.
+- Records from a file or another system: your admin decides which value fills which field with the [Mapper](../admin-guide/mapper.md) and saves it as a map. If a value lands in the wrong field after an import, tell your admin which record and which field; the map is theirs to change.
 
 ### People and Households
 
@@ -86,6 +87,10 @@ Every BarnCRM module is in Beta right now: a **Beta** badge beside a module's na
 ### Advanced Reporting
 
 - [Advanced Reporting](advanced-reporting.md): dashboard templates and their filters, building a report across related records, totals and charts, saving, sharing and exporting, building a dashboard.
+
+### BarnCRM Connector
+
+- [BarnCRM Connector](connector.md): what the module does, why there is nothing for staff to do yet, and keeping keys with your admin.
 
 ### Project Management
 

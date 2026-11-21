@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Is_Test__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description>A Test run of the draft from the editor (R-CR5): record steps saved nothing.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>A test run from the editor; it saved no records.</inlineHelpText>
+  <label>Is Test</label>
+  <trackTrending>false</trackTrending>
+  <type>Checkbox</type>
+</CustomField>

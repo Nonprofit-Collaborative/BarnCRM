@@ -32,7 +32,6 @@ import STOP_SCHEDULE from '@salesforce/label/c.Rollups_Rollups_StopSchedule';
 import RESTORE_DEFAULTS from '@salesforce/label/c.Rollups_Rollups_RestoreDefaults';
 import NEVER_CALCULATED from '@salesforce/label/c.Rollups_Rollups_NeverCalculated';
 import FRESHNESS_TITLE from '@salesforce/label/c.Core_Rollups_FreshnessTitle';
-import FRESHNESS_STALE from '@salesforce/label/c.Core_Rollups_FreshnessStale';
 import NEW_ROLLUP from '@salesforce/label/c.Rollups_RollupBuilder_New';
 import EDIT from '@salesforce/label/c.Core_CmdtManager_EditAction';
 import COPY from '@salesforce/label/c.Core_RecordInspector_Copy';
@@ -112,11 +111,11 @@ function readText(file) {
  * shows the vendored engine's own configuration, which is the whole point of ADR-0015.
  */
 export default class RollupDefinitions extends NavigationMixin(LightningElement) {
-  helpReady = isHelpLoaded('Rollups');
+  helpReady = isHelpLoaded(['Rollups', 'Core']);
 
   connectedCallback() {
     if (!this.helpReady) {
-      loadHelp('Rollups').then(() => {
+      loadHelp(['Rollups', 'Core']).then(() => {
         this.helpReady = true;
       });
     }
@@ -197,7 +196,9 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     },
     neverCalculated: NEVER_CALCULATED,
     freshnessTitle: FRESHNESS_TITLE,
-    freshnessStale: FRESHNESS_STALE,
+    get freshnessStale() {
+      return helpText('Core', 'Core_Rollups_FreshnessStale');
+    },
     get readOnly() {
       return helpText('Rollups', 'Core_Rollups_ReadOnly');
     },

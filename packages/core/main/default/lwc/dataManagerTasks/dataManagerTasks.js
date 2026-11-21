@@ -35,6 +35,12 @@ export const TASKS = Object.freeze([
     text: 'Load documents and attachments into Files',
     words: 'files attachments documents zip pdf scans letters photos upload migrate'
   },
+  // Maps (MAP-03)
+  {
+    tool: 'maps',
+    text: 'Map fields once and reuse the map',
+    words: 'mapping mapper field map columns json payload transform reuse saved'
+  },
   {
     tool: 'import',
     text: 'Delete the records a file lists',

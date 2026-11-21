@@ -1,0 +1,53 @@
+<template>
+    <section class="slds-box slds-box_x-small slds-is-relative slds-var-m-vertical_small" aria-labelledby="webhook-heading">
+        <template lwc:if={working}>
+            <lightning-spinner alternative-text={labels.working} size="small" data-id="working"></lightning-spinner>
+        </template>
+        <h5 id="webhook-heading" class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.heading}</h5>
+        <template lwc:if={message}>
+            <c-barn-notice class="slds-var-m-bottom_small" variant="success" message={message} data-id="message"></c-barn-notice>
+        </template>
+        <template lwc:if={error}>
+            <c-barn-notice class="slds-var-m-bottom_small" variant="error" message={error} data-id="error"></c-barn-notice>
+        </template>
+        <template lwc:if={saved}>
+            <p class="slds-text-body_small slds-var-m-bottom_x-small">{labels.intro}</p>
+            <template lwc:if={noSite}>
+                <c-barn-notice class="slds-var-m-bottom_small" variant="warning" message={labels.noSite} data-id="no-site"></c-barn-notice>
+            </template>
+            <template for:each={addresses} for:item="entry">
+                <div key={entry.key} class="slds-var-m-bottom_x-small" data-id="address">
+                    <lightning-input label={labels.address} value={entry.address} read-only></lightning-input>
+                    <lightning-input label={labels.addressWithToken} value={entry.withToken} read-only></lightning-input>
+                </div>
+            </template>
+            <lightning-input label={labels.header} value={headerName} read-only data-id="header"></lightning-input>
+            <template lwc:if={token}>
+                <c-barn-notice class="slds-var-m-vertical_x-small" variant="warning" message={labels.tokenShown}></c-barn-notice>
+                <lightning-input label={labels.token} value={token} read-only data-id="token"></lightning-input>
+            </template>
+            <template lwc:if={tokenText}>
+                <p class="slds-text-body_small slds-var-m-vertical_x-small" data-id="token-state">{tokenText}</p>
+            </template>
+            <template lwc:if={canManage}>
+                <lightning-button class="slds-var-m-vertical_x-small" label={labels.newToken} disabled={working} onclick={handleNewToken} data-id="new-token"></lightning-button>
+            </template>
+            <div class="slds-grid slds-gutters_x-small slds-wrap slds-grid_vertical-align-end">
+                <lightning-input class="slds-col" type="number" label={labels.hourlyCap} value={hourlyCap} min="1" max="5000" step="1" required field-level-help={labels.hourlyCapHelp} read-only={readOnly} onchange={handleCap} data-id="hourly-cap"></lightning-input>
+                <template lwc:if={canManage}>
+                    <div class="slds-col slds-grow-none">
+                        <lightning-button label={labels.saveCap} disabled={working} onclick={handleSaveCap} data-id="save-cap"></lightning-button>
+                    </div>
+                </template>
+            </div>
+        </template>
+        <template lwc:else>
+            <p class="slds-text-body_small slds-var-m-bottom_x-small" data-id="save-first">{labels.saveFirst}</p>
+        </template>
+        <lightning-input label={labels.eventId} value={trigger.eventId} field-level-help={labels.eventIdHelp} read-only={readOnly} onchange={handleEventId} data-id="event-id"></lightning-input>
+        <lightning-radio-group label={labels.replyStatus} options={statusOptions} value={replyStatus} type="button" disabled={readOnly} data-field="status" onchange={handleReply} data-id="reply-status"></lightning-radio-group>
+        <lightning-textarea label={labels.replyBody} value={replyBody} max-length="4000" field-level-help={labels.replyBodyHelp} read-only={readOnly} data-field="body" onchange={handleReply} data-id="reply-body"></lightning-textarea>
+        <lightning-input label={labels.challenge} value={reply.challenge} max-length="100" field-level-help={labels.challengeHelp} read-only={readOnly} data-field="challenge" onchange={handleReply} data-id="challenge"></lightning-input>
+        <p class="slds-text-body_small slds-var-m-top_x-small" data-id="fetch-back">{labels.fetchBack}</p>
+    </section>
+</template>

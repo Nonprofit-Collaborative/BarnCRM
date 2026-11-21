@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_Import_SeveralLinkLine</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: a same-row link; {0} child, {1} parent, {2} field</shortDescription>
-        <value>Each {0} record is linked to the {1} record on its row through {2}.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_KindSeveralTitle</fullName>
         <categories>Import</categories>
         <language>en_US</language>

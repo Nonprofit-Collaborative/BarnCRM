@@ -19,7 +19,6 @@ import PAUSE_BUTTON from '@salesforce/label/c.Core_AutomationControl_PauseButton
 import RESUME_BUTTON from '@salesforce/label/c.Core_AutomationControl_ResumeButton';
 import PAUSE_LENGTH from '@salesforce/label/c.Core_AutomationControl_PauseLength';
 import PAUSED_BANNER from '@salesforce/label/c.Core_AutomationControl_PausedBanner';
-import READ_ONLY from '@salesforce/label/c.Core_AutomationControl_ReadOnly';
 import RUNS_ON from '@salesforce/label/c.Core_AutomationControl_RunsOn';
 import ONE_HOUR from '@salesforce/label/c.Core_AutomationControl_OneHour';
 import TWO_HOURS from '@salesforce/label/c.Core_AutomationControl_TwoHours';
@@ -94,7 +93,9 @@ export default class AutomationControl extends LightningElement {
     resumeButton: RESUME_BUTTON,
     pauseLength: PAUSE_LENGTH,
     pausedBanner: PAUSED_BANNER,
-    readOnly: READ_ONLY,
+    get readOnly() {
+      return helpText('Core', 'Core_AutomationControl_ReadOnly');
+    },
     get noControlRows() {
       return helpText('Core', 'Core_AutomationControl_NoControlRows');
     },

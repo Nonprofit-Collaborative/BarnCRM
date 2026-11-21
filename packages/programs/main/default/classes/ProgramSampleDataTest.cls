@@ -174,7 +174,8 @@ private class ProgramSampleDataTest {
 			);
 			Assert.areEqual(1, [SELECT COUNT() FROM Goal__c WHERE Next_Review_Date__c < TODAY], 'One review is due.');
 			Goal__c achieved = [SELECT Closed_Date__c FROM Goal__c WHERE Status__c = 'Achieved'];
-			Assert.areEqual(Date.today().addDays(-95), achieved.Closed_Date__c, 'Kept as loaded.');
+			// The loader dates rows from the org's today, which differs from the runner's near midnight.
+			Assert.areEqual(OrgDate.today().addDays(-95), achieved.Closed_Date__c, 'Kept as loaded.');
 			Assert.areEqual(7, [SELECT COUNT() FROM Goal_Step__c WHERE Status__c = 'Done']);
 			Assert.areEqual(12, [SELECT COUNT() FROM Goal_Step__c], 'Two steps each.');
 			SampleDataModule module = SampleDataFile.find(FILE);

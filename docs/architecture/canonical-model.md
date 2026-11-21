@@ -1054,8 +1054,9 @@ N-11): one row per item, with a Kind naming the tool. Kinds:
 (one run of **Deactivate Org Flows and Validation Rules**, with each item's state before and
 after; C-60, plan D-184, ADR-0174 "Deactivate org automation with a snapshot and restore"),
 together called an automation snapshot and described by the rules below; **Merge** (one merge,
-Section 29A, R-DP10); **Migration** (one Migration Kit run, Section 29ZS); and **Household
-Adoption** (one adopted Account, Section 29ZQ). Every reader names its kind. Neutral: it names
+Section 29A, R-DP10); **Migration** (one Migration Kit run, Section 29ZS); **Household
+Adoption** (one adopted Account, Section 29ZQ); and **Connection** (one BarnCRM Connector key
+replacement, who and when, never the key; Section 29CN1, R-CN6). Every reader names its kind. Neutral: it names
 no nonprofit concept and is in Core.
 
 ### Attributes
@@ -1118,8 +1119,8 @@ lists, undoes or deletes another's rows.
 
 | Attribute | API name | Type | Notes |
 |---|---|---|---|
-| Kind | `Kind__c` | Picklist, restricted, no default | Merge, Scan, Deactivation, Migration, Household Adoption. Every writer sets it. |
-| Status | `Status__c` | Picklist, restricted, no default | Merged, Undone, Partly Undone, Undo Failed (Merge); Running, Done, Partial, Failed, Restoring, Restored (Scan, Deactivation); In Progress, Complete (Migration); Adopted, Undone, Not Restored (Household Adoption). Every writer sets it. |
+| Kind | `Kind__c` | Picklist, restricted, no default | Merge, Scan, Deactivation, Migration, Household Adoption, Connection. Every writer sets it. |
+| Status | `Status__c` | Picklist, restricted, no default | Merged, Undone, Partly Undone, Undo Failed (Merge); Running, Done, Partial, Failed, Restoring, Restored (Scan, Deactivation); In Progress, Complete (Migration); Adopted, Undone, Not Restored (Household Adoption); Key Replaced (Connection, R-CN6). Every writer sets it. |
 | Run Id | `Run_Id__c` | Text(36), external id | A merge's or an adoption's run; undo works on a run. |
 | Survivor Id | `Survivor_Id__c` | Text(18) | Merge: the record the merge kept. |
 | Merged Id | `Merged_Id__c` | Text(18) | Merge: the record merged away, undeleted by undo. |
@@ -1465,7 +1466,7 @@ shows the last full Health Check result instead of running every check on each l
 | Key | Type | Default | Definition |
 |---|---|---|---|
 | `Health_Check_Last_Run__c` | datetime | empty | When Health Check last ran in full for someone with Manage BarnCRM Settings. Written by Health Check, without an audit row. |
-| `Health_Check_Last_Result__c` | text (255) | empty | How many findings that run had, as three counts separated by commas: to fix (Error), to be aware of (Warning), for information (Info). Written by Health Check with `Health_Check_Last_Run__c`; read only to show the last result. |
+| `Health_Check_Last_Result__c` | text (255) | empty | How many findings that run had, as three counts separated by commas: to fix (Error), to be aware of (Warning), for information (Info). Written by Health Check with `Health_Check_Last_Run__c`; read only to show the last result. Core's `HealthCheckResult` is the one writer and reader of the format; a value it cannot read shows as not run. |
 
 ### Brand keys
 
@@ -3316,6 +3317,43 @@ shipped-default rows, not new attributes. One template reads one export shape, b
 import saves the file's own columns back to the template it used (admin guide, "Migrating
 from Nonprofit Cloud", section 5).
 
+**R-MAP1 Map document.** The R-IT1 document, version 4, may carry `from`, `to` and `match` and,
+per column, `value`, `required` and `lookup`, as defined in the integration hub design Section
+2.2 (ADR-0234 `0234-reusable-mapper.md`). A version 1 to 3 document is a version 4 document with
+`from.kind` columns and `to.kind` record. Super Importer reads `columns`, `defaults`, `transforms`
+and `lookup` (as `lookupField` when `lookup.object` is the field's own reference target), and
+ignores `from`, `to` and `match`, which a template keeps in its own fields (R-IT2, R-IT9, R-IT12).
+
+| Key | Values |
+|---|---|
+| `from` | `{ "kind": "columns" }` (the default), `{ "kind": "record", "object" }` or `{ "kind": "json", "label", "sample" }`; `sample` at most 20,000 characters as JSON |
+| `to` | `{ "kind": "record", "object" }` (the default) or `{ "kind": "json" }` |
+| `columns[]` | `source` (a column name, a field API name with at most one lookup hop, or an R-MAP2 path) or `value` (literal text, at most 255), `target` (`Entity.Attribute`, or an R-MAP2 path for a JSON target), `transforms` (R-IT15), `required` (boolean), `lookup` (`{ "object", "field", "notFound": "reject" or "leaveEmpty" }`) |
+| `defaults[]` | `{ "target", "value" }` as R-IT1 |
+| `match` | `by`: `id`, `field`, `externalId` or `duplicateRules`; `field`; `several`: `reject` or `newest`; `none`: `create`, `skip` or `reject` (R-IT2, R-IT8, R-IT9, R-IT16 semantics) |
+
+A target appears in at most one column. A map holds at most 200 columns and 50 defaults.
+**R-MAP2 Paths.** A source or JSON target path is at most 10 parts of letters, digits,
+underscores and hyphens joined by dots, each part optionally followed by `[n]` (n from 0 to 999).
+A path that finds nothing gives a blank value. Nothing in a path is evaluated.
+**R-MAP3 Checked on save, forgiving on read, checked as the person on use** (as R-IT1, R-IT15 and
+R-ST3). A save is refused when the document is not JSON, is over 100,000 characters, is not
+version 1 to 4, names an unknown `from.kind`, `to.kind`, `match` value or `notFound` value, has
+more than 200 columns or 50 defaults, has a column with neither a source nor a value, a path that
+breaks R-MAP2, a target used twice, or steps `DataTransform.problems` names a problem with. A
+record target's object must be one a bulk update may write (R-BU1). On read a broken column is
+skipped and the screen says how many. Field names are checked against describe as the person
+when a map is loaded, previewed and used, never trusted from the document. The browser half of
+these rules is the framework-free module `mapDocument` (plan 9.9); its Jest tests and
+`MapControllerTest` share the fixture `MapDocumentFixture.json`.
+**R-MAP4 Preview and Check Before Running.** A preview applies each column's steps and lookups to
+at most 200 samples (file rows, a chosen record, or the items of a pasted JSON list) on the
+server, as the person, and saves nothing. The Mapper then flags, value by value: required and
+blank, too long for the field, not a number, not a date, not a yes or no, a picklist value not in
+the list, and a lookup that finds no record (or several). Lookup columns that find their parent by
+the same object and field share one query; a preview that looks parents up by more than 50
+different object and field pairs is refused with a message.
+
 ### Salesforce implementation
 
 - **Object:** `Import_Template__c`.
@@ -3761,6 +3799,17 @@ At, File Amount and the control totals, adds its log after the commit's, counts 
 the batch when it finishes and re-stamps the undo deadline; the records it creates carry the
 batch's tag and the values it changes are journaled under the batch, so the one undo covers
 them (R-IB8, R-IB9).
+
+**R-IB18 A data job a recipe starts** (C-38, CN-09). A BarnCRM Connector recipe's Load Rows step
+(R-CR9) creates an import exactly as the wizard does, through the same entry points (create,
+stage, dry run, commit), so every rule of this section holds: R-IB1 dry run first, R-IB13 one
+pass at a time, the same matching, transforms, rejections, journal and Undo. The differences
+are only who and what: the recipe's identity is the running user, so it needs Manage BarnCRM
+Settings and is Committed By; File Reference is empty and File Name reads "Recipe <name>, run
+<run>"; there are no control totals or file values, and the rows are staged in one page of at
+most 4,000. A dry run whose counts are outside the step's limits is left Dry run complete for
+a person to check and commit, or to leave, in Super Importer. No Core field or method is added
+for it.
 
 ### Salesforce implementation
 
@@ -8370,6 +8419,7 @@ stop Mirror installing on an org without Opportunity (ADR-0013).
 |---|---|---|---|
 | `Opportunity_Mirror_Direction__c` | text | Off | `GiftsToOpportunities`, `OpportunitiesToGifts` or `Off`, shown as Gifts to Opportunities, Opportunities to Gifts and Off. Empty reads as Off (R-OM1). |
 | `Opportunity_Mirror_Start__c` | datetime | empty | Opportunities to Gifts only: an Opportunity becomes a gift only when its Close Date is on or after this date, read as a date in the org's default time zone. Empty means no Opportunity becomes a gift (R-OM7). |
+| `Opportunity_Mirror_Map__c` | text | empty | Gifts to Opportunities only: the record ID of a saved map (R-ST5) from Gift to Opportunity whose columns copy extra fields (R-OM12), chosen with a record picker; a value that is not a Saved Transform ID is read as a map name. Empty means none. |
 | `Opportunity_Mirror_Record_Types__c` | text | empty | Opportunities to Gifts only: the record types, by API name and separated by commas, whose won Opportunities become gifts. Empty means every record type (R-OM7). |
 | `Opportunity_Mirror_Last_Run__c` | datetime | empty | Written by the runs, not by an administrator: when the last completed run started (R-OM8). |
 | `Opportunity_Mirror_Last_Summary__c` | text | empty | Written by the runs: one sentence saying what the last completed run did (R-OM8). |
@@ -8405,7 +8455,7 @@ otherwise its first active won stage by order; the lost stage is found the same 
 `Closed Lost`. On creation only, the Opportunity is named from the donor and the gift date, and
 takes the record type `Donation` when the org has one the saver may use; a Donation record type
 whose sales process lacks the chosen stage makes the insert fail, which is logged as R-OM6
-describes. Nothing else is written.
+describes. Nothing else is written, except the extra fields of R-OM12.
 A copied field changed by hand on the Opportunity is overwritten the next time its gift changes
 in one of these attributes.
 
@@ -8498,6 +8548,22 @@ Opportunities it offers **Copy these gifts again**, a run over every gift in the
 or not, which puts right what R-OM3 copies. In Opportunities to Gifts the differences are shown
 only, because a gift is never edited from its Opportunity.
 
+**R-OM12 Extra fields through a map (MAP-07).** In Gifts to Opportunities, an administrator may
+choose a saved map (R-ST5) in `Opportunity_Mirror_Map__c`: a map from the record Gift to the record
+Opportunity, built in the Mapper. Each of its columns copies one more field: a field of the gift
+(no parent field, no path) or a fixed value, changed by the column's steps (R-IT15) and its When
+Blank, Use value, into an Opportunity field. It adds, never replaces: a column for a field R-OM3
+writes (Amount, Close Date, Stage, Account, Campaign, Name, Record Type), a lookup column, a gift
+field the saver cannot read and an Opportunity field the saver cannot create and edit are left
+out, so the copy never shows the saver a value they cannot see and never fails for want of
+access. A value the field cannot take leaves that field out for that gift. A change to a gift
+field the map reads starts a copy (R-OM4), and the comparison of R-OM4 includes the extra
+fields. The map is read once per transaction in system mode, as a setting is: by its record ID
+with Kind Map, or, when the value is not a Saved Transform ID, by name with Kind Map. A value that
+finds no map, a step list, or a map from or to another kind of record copies no extra field. The
+map is linked, not copied, so editing it changes what the next copy writes and renaming it keeps
+the link. Where Used (C-59) lists the setting under the map it links.
+
 ### Salesforce implementation
 
 - **Attribute on `Gift__c`, shipped by Fundraising** (`packages/giving`):
@@ -8513,6 +8579,7 @@ only, because a gift is never edited from its Opportunity.
 | Opportunity Mirror Direction | `Opportunity_Mirror_Direction__c` | Text(40) |
 | Opportunity Mirror Start | `Opportunity_Mirror_Start__c` | Date/Time |
 | Opportunity Mirror Record Types | `Opportunity_Mirror_Record_Types__c` | Text(255) |
+| Opportunity Mirror Map | `Opportunity_Mirror_Map__c` | Text(80) |
 | Opportunity Mirror Last Run | `Opportunity_Mirror_Last_Run__c` | Date/Time |
 | Opportunity Mirror Last Summary | `Opportunity_Mirror_Last_Summary__c` | Text(255) |
 
@@ -9152,6 +9219,9 @@ permission and, because every bulk update starts from a Find query, `Find_And_Ex
 
 **R-BU7 Change with steps.** A change whose action is `transform` carries `transforms`, a list
 of steps in the transform document of R-IT15 (ADR-0081), and changes each record's own value.
+A `copy` change may carry `transforms` too (MAP-06, Super Transformer's Apply a Map): the steps
+then start from the source field's value as text instead of the target's, the source may be of
+any type the person may read, and everything below applies as it does to `transform`.
 For each record the job reads the target's value as text and applies the steps with
 `DataTransform.apply`; an `append` step names fields of the same record by API name, each a
 field of the query's object the person may read, read with the record and passed to the engine
@@ -11109,7 +11179,9 @@ A named, reusable Super Transformer step list (plan feature C-50f1): the object,
 (a Find filter document) and up to five field changes, kept as one documented JSON document so
 that a person can load it on the Super Transformer page later, rename it or delete it. It is
 org-wide: everyone who may use Super Transformer sees and manages every list. It holds no
-records and grants access to none. Neutral: it names no nonprofit concept and is in Core.
+records and grants access to none. Neutral: it names no nonprofit concept and is in Core. A row
+of Kind Map is a saved map instead (the Mapper, R-ST5), so maps need no object of their own
+(ADR-0227).
 
 ### Attributes
 
@@ -11118,6 +11190,7 @@ records and grants access to none. Neutral: it names no nonprofit concept and is
 | Name | text | yes | The list's name, 1 to 80 characters, unique among lists ignoring capitals. |
 | Object Name | text | yes | The API name of the object the list changes, copied from the definition when it is saved. |
 | Definition | long text | yes | The list as a version 1 JSON document (R-ST1). |
+| Kind | picklist(Step List, Map) | yes (defaults Step List) | Step List is a Super Transformer step list (R-ST1); Map is a saved map document (R-MAP1). |
 
 ### Rules
 
@@ -11144,6 +11217,19 @@ the list, because dropping a condition, with or without `logic`, would match mor
 runs on a load, and a preview, the confirmation and the
 run check everything as the person (R-BU1 to R-BU7). A list is therefore no way past a field
 or record the person cannot reach.
+**R-ST5 Maps.** A row of Kind Map holds a map document (R-MAP1) in Definition, and Object Name is
+its target object (blank for a JSON target or a people map). Its name is unique among maps. It is
+created, changed, renamed and deleted by people with Manage BarnCRM Settings, read in user mode
+by every tool a person runs with it (Super Importer, Super Transformer's Apply a Map), in the
+run's access mode by a Connector recipe, and in system mode by the Opportunity mirror, which
+reads the map its setting chooses as it reads the setting (R-OM12); it is never run by Super
+Transformer's Saved Step Lists card, which
+lists, loads, renames and deletes Step List rows only (a row with no Kind reads as Step List). A
+map is changed in place, because a tool may link it by its record ID; a tool that copies a map
+(Super Importer's Use a Saved Map) keeps its own copy. Where Used lists a map that names a field
+or object, and the Mapper lists the tools that link a map (the `WhereUsedExtension` seam asked
+with a map target) before a change is saved and before the map is renamed or deleted (Saved Maps
+asks to confirm, naming them).
 **R-ST4 Org-wide, one set of permissions.** Every list is visible to, and may be renamed or
 deleted by, everyone who holds Bulk Update Records and Find and Export Records (the permission
 set `BarnCRM_Bulk_Update` grants Read, Create, Edit, Delete, View All and Modify All, the last
@@ -11159,13 +11245,19 @@ mode. Rename changes only the name; a list is saved new, never overwritten.
 | Attribute | API name | Type | Notes |
 |---|---|---|---|
 | Object Name | `Object_Name__c` | Text(255) | |
-| Definition | `Definition_JSON__c` | Long Text Area(131072) | Written only by Super Transformer. |
+| Definition | `Definition_JSON__c` | Long Text Area(131072) | Written by Super Transformer (a step list) or the Mapper (a map). |
+| Kind | `Kind__c` | Picklist (restricted): `StepList` (default), `Map` | Every existing row reads as Step List. |
 
-- **Service:** `SavedTransformService` (list, load, save, rename, delete, document checks) and
-  five `@AuraEnabled` methods on `BulkUpdateController` (`getSavedLists`, `loadSavedList`,
-  `saveSavedList`, `renameSavedList`, `deleteSavedList`), each requiring Bulk Update Records and
-  Find and Export Records. The page is the `superTransform` component, whose Saved Step Lists
-  card is the only place a list is made or used.
+- **Service:** `SavedTransformService` (list, load, save, rename, delete, document checks for
+  both kinds) and five `@AuraEnabled` methods on `BulkUpdateController` (`getSavedLists`,
+  `loadSavedList`, `saveSavedList`, `renameSavedList`, `deleteSavedList`), each requiring Bulk
+  Update Records and Find and Export Records. The page is the `superTransform` component, whose
+  Saved Step Lists card is the only place a list is made or used.
+- **Maps:** `MapController` (`listMaps`, `loadMap`, `saveMap`, `renameMap`, `deleteMap`,
+  `mapUsers`, `getTargetFields`, `previewMap`); every change needs Manage BarnCRM Settings, and
+  listing and loading need read access to Saved Transform. The screen is the `barnMapper`
+  component, opened from the Maps tile of Data Manager (`savedMaps`); Super Importer's Check
+  Columns step offers Use a Saved Map and Save as Map (`importSavedMap`).
 
 ---
 
@@ -18978,6 +19070,522 @@ without a namespace.
 - **Static resource:** `BarnReporting_Templates` (four dashboard definitions, each with the
   objects it requires).
 
+## 29CN1. Connection
+
+### Definition
+
+A saved, checked sign-in to another app for the BarnCRM Connector module (CN-01, D-215, D-216;
+ADR-0235 `0235-integration-module.md`; design `integration-hub-design.md` Section 3.5; security
+review `connector-secrets-security-review.md`, F1 to F13). Each connection is one External
+Credential and one Named Credential of the same developer name, created by BarnCRM at run time
+through `ConnectApi.NamedCredentials`. The secret lives only in the External Credential's
+principal, never in a BarnCRM record. What a credential has no field for (a template's check
+path) is kept in a Connector Connection row named by the connection (R-CN9). Only Generic REST
+is built in; app templates are imported files (D-216) that prefill this same shape.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | computed | `BarnConn_<connector>_<6 random>`, generated by the server only (R-CN1); the developer name of both credentials. `rest` is the built-in connector. |
+| Label | text | yes | The admin's name for it, 1 to 80 characters. |
+| Auth Kind | choice | yes | API Key in a Header, Bearer Token, Basic (user and password) or Secret URL. Read back from the principal's name (R-CN2). |
+| Base URL | text | yes | `https` only (R-CN4). For Secret URL, the URL is the secret and is never returned (R-CN5). |
+| Header Name | text | for API Key in a Header | The header that carries the key, letters, digits and hyphens, at most 64 characters, never `Authorization`. |
+| User Name | text | for Basic | Not secret; stored unencrypted on the principal. |
+| Key | secret | yes, except Secret URL | Entered on the page, written encrypted to the principal, never read back (R-CN3). |
+| Callouts Enabled | boolean | computed | The Named Credential's Enabled for Callouts, read through `ConnectApi`; set by the admin in Setup. |
+| Key Stored | boolean | computed | Whether the principal holds a credential (Disconnect removes it). |
+| Access Granted | boolean | computed | Whether the principal is in the "BarnCRM Connections" permission set (R-CN7). |
+| Check Path | text | no | What follows the Base URL for Check Connection, such as `/ping`, from the template the connection was made from (R-CN9). Blank checks the Base URL. |
+
+### Rules
+
+**R-CN1 BarnCRM's own credentials only.** The server generates every name. Replace Key, Check,
+Disconnect and Delete accept only a name starting `BarnConn_` that is an External Credential of
+the org, without a namespace, linked to a Named Credential of the same name; anything else is
+refused before any `ConnectApi` call. Principal and parameter names come from the built-in auth
+kinds, never the client.
+**R-CN2 Built-in auth kinds.** Each kind fixes its principal name, its parameters and its header
+template: API Key in a Header (`ApiKeyHeader`, parameter `Key`, header `<name>:
+{!$Credential.<Name>.Key}`), Bearer Token (`BearerToken`, parameter `Token`, header
+`Authorization: Bearer ...`), Basic (`BasicAuth`, parameters `UserName` and `Password`, header
+`Authorization: Basic` of the two) and Secret URL (`SecretUrl`, no parameter, no header). Allow
+Formulas in HTTP Header is on only where a header template needs it; Allow Formulas in HTTP Body
+is always off; Generate Authorization Header is off.
+**R-CN3 Who writes a key, and how.** Creating, Replace Key, Disconnect and Delete need the custom
+permission `Manage_BarnCRM_Connector` and Manage Named Credentials or Customize Application, and
+run synchronously as that person; a key is never queued, stored in a field, logged or returned.
+Every key parameter is written with `encrypted = true`; only User Name is `false`.
+**R-CN4 Hosts do not move.** The Base URL is `https`, with no user information. A stored
+connection's scheme and host never change: a different host is a new connection. A Secret URL
+connection's replacement URL keeps the same host and port. A template may lock the host to a
+pattern (Mailchimp: `^[a-z]{2}[0-9]{1,3}$` for its data center).
+**R-CN5 Secret URLs are configuration.** A Secret URL is stored as the Named Credential's URL,
+which administrators who can view Setup can read; the page says so. It is never returned to the
+browser: the list shows its host and last four characters.
+**R-CN6 A replaced key is visible.** Replace Key writes one Admin Journal row of Kind Connection,
+Status Key Replaced, with the connection's label and name in Message; Created By and Created
+Date say who and when. Health Check lists keys replaced in the last 7 days.
+**R-CN7 The Connections permission set.** BarnCRM creates one unpackaged permission set,
+`BarnCRM_Connections` ("BarnCRM Connections"), adds each connection's principal to it, and
+assigns it only to the person creating or checking a connection, who must hold
+`BarnCRM_Connector_Admin`, and to the recipe identity, the Automated Process user, when an admin
+saves Recipe Access (R-CR4; the integration user from CN-03). User Ids never come from the
+browser. Health Check warns when it holds anything but External Credential principal access.
+**R-CN8 Delete and Disconnect.** Disconnect removes the principal's key and keeps the
+connection, and is refused for a Secret URL, which has no key apart from its address; Delete
+removes both credentials, the Named Credential first, and its Connector Connection row, and is
+refused while a recipe's definition or draft names the connection.
+**R-CN9 Check path and account.** A connection made from a template keeps the template's check
+path (one slash first, no query, slot, space, at sign, backslash or hash) in a Connector
+Connection row, written by a person who may write keys (R-CN3) in a call of its own after the
+create, since the create writes permission sets. Check Connection GETs the check path, or the
+Base URL when there is none, and when a 2xx answer names the account (`account_name`,
+`accountName`, `login`, `username`, `email`, `account`, `name` or `company`, at the top or under
+`account`, `user` or `data`), shows it, 80 characters at most (F11). The row holds no key.
+**R-CN10 Integration user.** Choosing the integration user (R-CR4) needs the same permissions
+as writing a key (R-CN3), and refuses a user who is a System Administrator or holds Modify All
+Data or View All Data.
+
+### Salesforce implementation
+
+- **Credentials:** External and Named Credentials (developer name `BarnConn_`, no namespace)
+  created, read, updated and deleted only through `ConnectApi.NamedCredentials` (Apex cannot
+  query `ExternalCredential`); the named
+  principal's Id from `ConnectApi` is the setup entity of its principal access;
+  `SetupEntityAccess` (principal access in `BarnCRM_Connections`), `PermissionSetAssignment`.
+- **Object:** `Connector_Connection__c` (Connector Connection), private, no tab, report or
+  search; Name (Text(80)) is the connection's developer name; `Check_Path__c` (Text(255)).
+  Written and read by the module only, in system mode; granted by no permission set.
+- **Custom permission:** `Manage_BarnCRM_Connector`, granted only by `BarnCRM_Connector_Admin`.
+- **Admin Journal:** Kind `Connection`, Status `Key Replaced` (Section 10A).
+
+---
+
+## 29CN2. Connector Recipe
+
+### Definition
+
+A saved integration of the BarnCRM Connector module: a trigger and its steps, with the state its
+clock needs (CN-02, D-215, D-216; design `integration-hub-design.md` Sections 3.2 to 3.10,
+Appendix A.3). Holds no record data beyond what its definition names.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | The recipe's name, 1 to 80 characters, unique ignoring capitals. |
+| Description | long text | no | What it does, in the admin's words. |
+| Status | picklist(Draft, Active, Paused, Paused by Failures) | yes (defaults Draft) | Whether it runs. |
+| Trigger Kind | picklist(Schedule, Record Change, Webhook, App Poll, Manual) | yes | Copied from the definition for list views and the clock's query. |
+| Definition | long text | no | The published recipe document (R-CR1); blank until the first Publish. |
+| Draft | long text | no | The definition being edited; Publish copies it to Definition. |
+| Previous Definition | long text | no | The definition before the last Publish, for Roll Back. |
+| Version | integer | yes (defaults 0) | Increments on each Publish. |
+| Webhook Token Hash | text(64) | no | SHA-256 of the webhook token, hexadecimal; unique. |
+| Watermark | text(60) | no | The last stamp and Id a poll reached. |
+| Next Run At | datetime | no | When a schedule or poll is next due. |
+| Last Run At | datetime | no | When it last ran. |
+| Consecutive Failures | integer | yes (defaults 0) | Failed runs in a row; reset by a success. |
+| Pause After Failures | integer | yes (defaults 10) | Failures in a row that pause it (1 to 100). |
+| Retry Attempts | integer | yes (defaults 3) | Retries of a transient failure (0 to 4). |
+| Webhook Hourly Cap | integer | yes (defaults 500) | Posts stored per hour (1 to 5,000). |
+| Keep Runs Days | integer | yes (defaults 30) | Days runs are kept (7 to 365). |
+| Ignore Own Changes | boolean | yes (defaults true) | Record Change trigger skips records last changed by a recipe identity. |
+| Run As | picklist(BarnCRM Automation, System, Integration User) | yes (defaults BarnCRM Automation) | The identity and access mode its runs use (design Section 3.10). |
+| Run As Chosen By | reference(User) | computed | Who last set Run As; shown with System recipes in Health Check. |
+| Run As Chosen At | datetime | computed | When Run As was last set. |
+| Record Owner | text(18) | no | The user or queue Id given as owner of records the recipe creates; blank means the identity. |
+
+### Rules
+
+**R-CR1 The recipe document.** `{ "version": 1, "trigger": { "kind", ... }, "steps": [ { "id",
+"kind", ... } ] }` with the trigger kinds and step kinds of the design Sections 3.2 and 3.4; at
+most 25 steps in all, nesting at most 2, at most 100,000 characters. Steps name connections by
+developer name, maps by record Id, and values by paths (R-MAP2) rooted at `trigger` (the run's
+Input), `steps.<id>` (an earlier step's result) or, inside a For Each, `loop` (`loop.item`, the
+item, and `loop.index`, its place from 0). A webhook trigger may carry `reply` (status 200
+or 202, a fixed body of at most 4,000 characters with no `{!`, an optional challenge field name;
+design Section 3.3a), which the receiver reads with the recipe it already finds by token hash.
+Step ids are 1 to 20 letters, digits or underscores, unique in the recipe. No string anywhere in
+the document may contain `{!` (security review F1).
+
+The kinds release 1.31 (CN-02), 1.32 (CN-03: `schedule` and `record`; CN-04: `webhook` and
+`sendWebhook`) and 1.33 (CN-13: `appPoll`) build, the others arriving with their slices:
+
+| Kind | Keys | Result for later steps |
+|---|---|---|
+| trigger `manual` | `sample` (optional JSON object for the editor's data pills and Test) | Input: Run Now's pasted JSON; the Flow action's `{ "recordId", "recordIds", "data" }` |
+| trigger `schedule` | `every` (`15m`, `hour`, `day` or `week`), `at` (`HH:MM`, 24 hour, the org's time zone; `day` and `week`), `day` (`MON` to `SUN`; `week`), `sample` | Input: `{ "scheduledAt" }` (R-CR6) |
+| trigger `record` | `query` (an R-SQ1 document copied from a saved query: the object, at most 20 fields and an optional filter), `savedQuery`, `on` (`created` or `changed`), `mode` (`each` or `batch`), `limit` (1 to 200, default 200), `sample` | Input: `each` `{ "recordId", "record": {field: value} }`; `batch` `{ "recordIds", "records" }` (R-CR6) |
+| trigger `webhook` | `eventId` (optional path whose value names the post, for duplicates), `reply` (`status` 200 or 202, default 202; `body`, fixed JSON text of at most 4,000 characters, `{reference}` filled with the run's Reference; `challenge`, optional name of one top-level field or query parameter echoed back), `sample` | Input: the posted JSON object; a posted list is `{ "items": [...] }`; a form post is its fields as text (R-CR10) |
+| trigger `appPoll` | `connection`, `path` (with `{name}` slots), `pathValues`, `query` and `headers` (each value fixed, or the path `trigger.watermark`), `items` (where the list sits in the answer; blank is the answer itself), `id` and `stamp` (where each item keeps its id and the time or growing number it last changed), `mode` (`each` or `batch`), `limit` (1 to 200, default 200), `sample` | Input: `each` `{ "itemId", "item" }`; `batch` `{ "itemIds", "items" }` (R-CR16) |
+| `find` | `query` (an R-SQ1 document, copied from a saved query), `values` (`[{ "condition": <id>, "path" }]`, a path's value replaces that condition's value), `stopIfNone` | `{ "count", "records": [ {field: value} ] }`, at most 200 records |
+| `create`, `update`, `upsert` | `map` (a saved map's Id, `to.kind` record), `input` (the path the map reads from; blank is `trigger`); `update` also `recordId` (a path) | `{ "id", "action" }`, action created, updated or skipped |
+| `callApp` | `connection`, `method` (GET, POST, PUT, PATCH, DELETE), `path` (with `{name}` slots), `pathValues` and `query` (`[{ "name", "value" or "path" }]`), `headers` (`[{ "name", "value" or "path" }]`), `bodyMap` and `bodyInput` (a saved map with `to.kind` json), `success` (status codes; blank is 200 to 299), `notFoundOk`, `urlFrom` (optional path to an address in the data, used in place of `path` under R-CR11: fetch back) | `{ "status", "body" }`, the body parsed when it is JSON |
+| `sendWebhook` | `connection`, `path` (optional; blank posts to the connection's own address), `urlFrom` (optional path to a callback address in the data, R-CR11), `headers`, `bodyMap` and `bodyInput`, `success`; always POST with a JSON body | `{ "status", "body" }` |
+| `if` | `conditions` (`[{ "path", "operator", "value" }]`, R-R2 operator names: equals, not equals, contains, does not contain, starts with, greater than, less than, is null, is not null), `match` (`all` or `any`), `then`, `otherwise` | `{ "branch" }` |
+| `stop` | `outcome` (Succeeded, Skipped or Failed), `message` | none |
+| `importRows` (CN-09) | `template` (an active Import Template's Id, not a delete by file), `rows` (a path to a list of objects keyed by column name, a list of lists whose first list holds the column names, or CSV text with a header row), `limits` (`rows` 1 to 4,000, default 1,000; `rejected` default 0; `created` and `updated` default 1,000; each 0 to 4,000) | `{ "batchId", "batch", "rows", "created", "updated", "matched", "rejected" }` (R-CR9) |
+| `forEach` (CN-05) | `items` (a path to a list), `do` (the steps run for each item: no For Each, Wait or Load Rows among them, nesting counted as for If) | `{ "count" }` (R-CR12) |
+| `wait` (CN-05) | `amount` (a whole number), `unit` (`minutes`, `hours` or `days`); 5 minutes to 30 days in all | `{ "until" }` (R-CR12) |
+| `transform` (CN-05) | `map` (a saved map's Id, `to.kind` json), `input` (the path the map reads from; blank is `trigger`) | the object the map builds, so later steps read `steps.<id>.<key>` |
+
+Any step may carry `fill`, a list of the step's keys an import left blank because this org has
+no match (R-CR13); while it holds any, the step is a problem, so a recipe with blanks can be
+neither saved nor published, and filling a key in the editor takes it off the list.
+
+A `callApp` path starts with one `/`, and neither the path nor any value put into it, a query
+value or a header holds `@`, `\`, `{!`, a carriage return or a line feed; each value put into the
+path or the query is URL-encoded; a header is never `Authorization`, `Host`, `Cookie`,
+`Content-Length` or `Transfer-Encoding` (F1, F4). The request goes to `callout:<connection>` plus
+that path, never to a typed address. The same rules hold for `sendWebhook`.
+**R-CR2 Checked on Publish,** as the publisher and against the identity's access, and against
+the catalog; a recipe whose connection is disconnected or whose map is gone cannot be published.
+For BarnCRM Automation the identity's access is that of the permission sets assigned to the
+Automated Process user: each map's target object must be creatable (create, upsert) or editable
+(update, upsert) and each target field editable through one of them; for Integration User,
+those of the sets the chosen integration user holds, and Publish is refused while none is
+chosen or it is inactive; System checks none. A `record` trigger's query compiles as the
+publisher and its object must have the stamp field `on` names.
+**R-CR3 Only Connector admins** (custom permission Manage BarnCRM Connector) create, publish,
+pause and delete recipes and set Run As; Connector viewers read recipes and runs.
+**R-CR4 Run As.** A run never executes as a staff member: BarnCRM Automation (Automated Process
+user, user mode with the picked permission sets), System (Automated Process user, system mode;
+set only through a confirmation that says so) or Integration User (the chosen integration
+user, user mode with its own permission sets; CN-03). Changing Run As writes Run As Chosen By
+and Chosen At. Run Now, Test and the Flow action insert a Queued run and publish its lane's
+start event: `Connector_Start__e` for BarnCRM Automation and System, whose trigger keeps
+Salesforce's default running user, the Automated Process user; `Connector_Start_User__e` for
+Integration User, whose trigger runs as the integration user through a
+`PlatformEventSubscriberConfig` BarnCRM writes. Each trigger starts its lane's one runner chain
+and heartbeat, so every run keeps its identity. A runner or heartbeat job that finds itself
+running as anyone else does nothing and writes one Error Log warning.
+**Integration User** (on Super Connector, Recipe Access) is one active standard user a Connector
+admin picks, stored in Connector Settings (29CN4). Saving it assigns BarnCRM Connections to that
+user (and removes it from the previous one unless that user is a Connector admin) and queues a
+job, as the admin, that writes the `PlatformEventSubscriberConfig`
+`BarnCRM_Connector_Start_User` (consumer `ConnectorStartUserTrigger`, that user) through the
+org connection (ADR-0148, Tooling API). The admin then suspends and resumes the subscription
+in Setup so the change takes effect at once.
+**Recipe Access** (on Super Connector, linked from BarnCRM Settings) picks the permission sets
+the Automated Process user holds, BarnCRM Admin and each installed module's admin set to start,
+and saving it assigns them, and BarnCRM Connections, to that user from Apex; no BarnCRM record
+keeps the choice, which is read back from the assignments.
+**R-CR5 Test.** A Test run executes the Draft on a pasted sample or a record Id, as the recipe's
+identity: Find and GET calls run; record steps report the fields they would write and save
+nothing; other methods report the request (method, path, query, body, header names) unless
+Send for Real was ticked. It is a run with Is Test set.
+**R-CR6 The recipe clock** (CN-03; no Scheduled Apex, no person). Each lane (the Automated
+Process user; the integration user) has one heartbeat, a Queueable that its start event's
+trigger starts and that queues itself again 5 minutes later while its lane has an Active
+Schedule or Record Change recipe, a Waiting run or a Queued run. Each beat, in its lane:
+Waiting runs whose Next Attempt At has passed become Queued; each Active recipe whose Next Run
+At has passed is run: a `schedule` recipe queues one run (Started By Schedule) and moves Next
+Run At to its next time in the org's time zone; a `record` recipe polls its query for records
+whose stamp (`CreatedDate` for `created`, `SystemModstamp` for `changed`) is after its
+Watermark (stamp then Id), at most `limit`, ordered by stamp then Id, skipping records last
+changed by a recipe identity when Ignore Own Changes is on, queues one run per record (`each`)
+or one run for all (`batch`) (Started By Record Change), stores the last stamp and Id as the
+Watermark and sets Next Run At 15 minutes on. Publish and Resume set the first Next Run At
+(now for `record`, whose Watermark starts at the publish time) and start the heartbeat. When
+Queued runs wait, the beat publishes its lane's start event, which starts the runner (a run
+left Queued because the org was busy is picked up this way). A Transaction Finalizer queues a
+beat that failed again; the nightly step and any start event start a missing one. A beat
+stops early, leaving the rest due, near 150 queries, 120 writes or 40 seconds of CPU.
+**R-CR7 Retries and pause.** A run that fails on a callout exception or an HTTP 408, 429, 500,
+502, 503 or 504 waits (Status Waiting, Next Attempt At) and is retried from the failed step at
+15 minutes, 1 hour, 4 hours and 12 hours, up to Retry Attempts (0 to 4), or later when the
+app's `Retry-After` (seconds) says so, capped at 24 hours. Test runs never wait. A finished
+non-test run resets Consecutive Failures (Succeeded or Skipped) or adds one (Failed); at Pause
+After Failures the recipe becomes Paused by Failures and one Error Log entry says so. A Paused
+or Paused by Failures recipe neither polls nor runs; its Queued runs wait for Resume, which
+clears Consecutive Failures. Pause All Recipes (Connector Settings) and BarnCRM Automation
+Control's timed pause or Pause All stop every recipe the same way; Test runs still run.
+**R-CR8 Health Check** (CN-03, beside CN-01's and CN-02's): a lane that needs its heartbeat and
+has none (warning, with Open Super Connector); Integration User recipes while no integration
+user is chosen, or it is inactive (error, "Integration User inactive"), or it lacks BarnCRM
+Connections (warning); runs Queued for more than 30 minutes (warning); recipes Paused by
+Failures (warning); Active recipes whose Record Owner is inactive (warning); Pause All Recipes
+on (info).
+**R-CR9 Load Rows with an Import Template** (CN-09, C-38, release 1.32). The step hands its rows
+to Super Importer (R-IB18) and commits only inside its limits. Its first pass reads the rows
+(values become text, as in a file; a nested value is kept as its JSON), refuses more than Most
+Rows before anything is staged, creates the data job, stages the rows, starts the dry run and
+waits: the run is Waiting with Next Attempt At 5 minutes on, its State holds the job and the
+phase, and waking it counts no attempt (R-CR7 counts only a retry, which has a failed step).
+While the pass runs the run waits again, failing after 24 hours. A finished dry run whose
+rejected, created or updated count is over its limit fails the step, naming the job, the count
+and the limit; nothing is committed and the job stays Dry run complete in Super Importer. Inside
+every limit the step starts the commit and waits; a Complete commit ends the step with the
+counts (Records Written adds created and updated, and the Step Log names the job). A failed
+step keeps no progress, so Retry stages the rows again as a new job. A Test run reads the rows
+and reports the template, row count and limits, staging nothing. The identity must hold
+Manage BarnCRM Settings (Super Importer's permission), whatever Run As says, since Super
+Importer writes in user mode; Publish checks that the template is active and visible to the
+publisher, not a delete by file, and that the identity can create data jobs.
+**R-CR10 Webhooks in** (CN-04; design Section 3.3, review F13). A `webhook` recipe receives posts
+at `<Site address>/services/apexrest/barncrm/connector/v1/hook`, with its token in the
+`X-BarnCRM-Token` header or, for apps that cannot send headers, `?token=`. The token is 64
+hexadecimal characters from 256 random bits, shown once by New Webhook Token (Connector admins)
+and stored only as its SHA-256 hash in Webhook Token Hash; a new token replaces the old one. The
+Site guest only stores: a post with no token, an unknown one, or one for a recipe never
+published is answered 404 with an empty body and stores nothing; a body over 131,072
+characters 413; a body that is neither JSON nor form fields 415 or 400; a post past the
+recipe's Webhook Hourly Cap (1 to 5,000, default 500) in the last hour 429, the first refusal
+each hour writing one Error Log warning naming the recipe. Otherwise one Run is inserted,
+Received, Started By Webhook, its Input the posted data and its Reference 20 random characters,
+and the lane's start event is published; the runner takes Received runs as it takes Queued
+ones, as the recipe's identity. A Paused recipe still stores posts and runs them on Resume. When
+`eventId` names a value, Event Key is the recipe Id and that value, so a resend is dropped and
+answered as the first was. The reply is the trigger's `reply`: its status and fixed body (never
+a record or a step's result), or the challenge value as plain text; a refused post is never
+given a body. The token never appears in a run, a log or an error.
+**R-CR11 Fetch back and callback addresses** (CN-04; design Section 3.3a, review F4). A
+`callApp` or `sendWebhook` step's `urlFrom` reads an address from the data (an app's resource
+URL, or a `response_url` a post carries). It is used only when it is `https`, has no user
+information or fragment, and has the step's connection's exact host and port (ignoring capitals)
+and starts with the connection's own path; then only its remaining path and query are appended
+to `callout:<connection>`, under R-CR1's path rules. Anything else fails the step; the posted
+address is never the endpoint. `sendWebhook` always POSTs a JSON body built from its map and
+retries as Call an App does (R-CR7).
+**R-CR12 For Each, Wait and Change Data** (CN-05, release 1.32). For Each reads its `items` list
+once per pass, refuses more than 1,000 items (the step fails, naming the count), and runs `do`
+for each item with `loop.item` and `loop.index`; its progress (the next item) is kept in the
+run's State, so a run continued after a checkpoint or retried after a failure carries on at the
+item and step it reached, never repeating a finished item. The run checkpoints (continues in a
+new transaction) every 200 items and whenever the transaction nears its limits. Steps inside
+log only failures; the For Each logs one entry with the item count. The results of the steps
+inside are kept for the current item only. A Test run runs the first item only and keeps its
+results. Wait makes the run Waiting with Next Attempt At at the end of the wait (the recipe
+clock wakes it, 5 minutes at the finest, R-CR6) and counts no attempt; a Test run does not wait.
+Change Data applies a saved map with `to.kind` json to its input and gives the object it builds
+to later steps; it writes nothing. Publish checks that its map exists and builds JSON.
+**R-CR13 Versions, Export and Import Recipe** (CN-08, release 1.32). Publish copies Definition to
+Previous Definition before Definition takes the Draft. Roll Back (offered while Previous
+Definition is filled) checks Previous Definition as Publish checks a draft, then swaps it with
+Definition and adds one to Version, so a second Roll Back returns to where it was; the Draft is
+left as it is. Discard Draft Changes copies Definition to Draft. Export Recipe gives a file
+`{ "barnRecipe": 1, "name", "description", "recipe", "names" }`: the published definition (the
+draft before the first Publish) without the trigger's sample data, and `names`, the name of
+each saved map, import template and connection label it names, so another org can match them.
+No Run As, record owner, run, token or key is exported. Import Recipe reads such a file (or
+pasted text), at most 400,000 characters: it is refused when it holds `{!` anywhere (F1), a key
+named like a secret (R-CR15) or a problem other than a blank; each map, import template and
+connection is matched by name in this org (connections by label), Find and Record Change saved
+query links are dropped (the query stays in the step), and each one with no match is blanked
+and listed in the step's `fill`. The checks Publish makes (R-CR2) run on the result and are
+shown as what to fix before Publish. Nothing is saved: the recipe opens in the editor as a new
+draft, and Save checks it as any save does.
+**R-CR14 Templates** (CN-08, D-216, release 1.32). A template is a JSON file an admin imports,
+from a file or pasted, on Super Connector's Templates section; no template is shipped, stored or
+kept. Its keys: `key`, `label`, `version` (1), `description`, `auth` (`kind`, one of the built-in
+kinds ApiKeyHeader, BearerToken, BasicAuth, SecretUrl; `headerName` for ApiKeyHeader; `params`,
+labels and help for the boxes the admin fills), `baseUrl` (`https`, with `{name}` placeholders
+in the host only), `urlParams` (`name`, `label`, `pattern`, a regular expression each value must
+match, and optional `fromParam` and `after`, a non-secret part of the key read in the browser),
+`check` (`method` GET, `path`), `actions` (`key`, `label`, `method`, `path`, `query`), `pollers`,
+`webhook` (kept for later slices, checked only for `{!` and secrets), `requires` (object API
+names the recipes need) and `recipes` (`name`, `description`, `draft`, a recipe document whose
+Call an App steps may name an `action`). Import checks the schema in the browser and again in
+Apex and refuses any other key, `{!` anywhere, any auth header template or formula option (a key
+`header`, `headerValue`, `headerTemplate`, `formula`, `allowMergeFieldsInBody` or
+`allowMergeFieldsInHeader`), a secret (R-CR15), an `http` or malformed base URL, a placeholder
+without a pattern, and a recipe document with a problem other than a blank. When an object in
+`requires` is missing, import says which and offers nothing. Otherwise it offers a New
+Connection form filled with the label, auth kind, header name and base URL, the host locked to
+the template's pattern (only the placeholders are typed), and each recipe to open as a new draft:
+an `action` is copied into the step (method, path and query; each path slot left blank) and the
+step's connection is blank and listed in `fill`. The admin pastes the key as for any
+connection.
+**R-CR15 No secret in a file.** An exported recipe holds none, and an imported recipe or
+template is refused when any key, at any depth, is named `password`, `secret`, `clientSecret`,
+`token`, `accessToken`, `refreshToken`, `apiKey`, `apiSecret`, `authorization`, `credential`,
+`privateKey` or `secretUrl` (ignoring capitals, hyphens and underscores), when any text is a
+Bearer or Basic credential (the word, then 12 or more token characters holding a digit), or
+when a header whose name holds `key`, `token`, `secret`, `auth`, `password`, `signature` or
+`session` has a typed value. Export blanks such a header's value and lists it in the step's
+`fill`.
+**R-CR16 Watching apps for new items** (CN-13, release 1.33; design Section 3.2, review F1, F4,
+F7). An Active `appPoll` recipe is due every 15 minutes (R-CR6). A beat cannot call out, so it
+queues one poll run instead: Started By App Poll, no Input, Event Key the recipe Id, `:poll:`
+and a time, and none while that recipe's poll run is still Queued, Running or Waiting. The
+runner, as the recipe's identity, sends the trigger's request as a GET `callApp` step under
+R-CR1's rules (only `callout:<connection>` and a checked path, values URL-encoded, no `{!`, no
+reserved header), with `trigger.watermark` the recipe's Watermark; a query value that reads it is
+left out while the Watermark is blank. A poll run never follows a record write in its
+transaction. From the answer's list at `items` it keeps the items with an `id` and a `stamp`
+after the Watermark (both numbers: compared as numbers; otherwise as text), oldest first, at most
+`limit`, plus any more sharing the last one's stamp, up to 1,000. While the Watermark is blank
+it queues no run and sets the Watermark to the newest stamp (the first look after Publish).
+Otherwise it queues one run per item (`each`) or one for them all, split under 120,000
+characters (`batch`), Started By App Poll, and moves the Watermark to the last stamp kept (at
+most 60 characters, else the poll fails). The spent poll run is deleted in the same save, so
+Run History lists item runs only. A poll that fails (the app's status, no list at `items`, a
+stamp too long) stays as a Failed run on the step `trigger`, with the trimmed response, waits
+and retries, counts toward Pause After Failures and writes one Error Log entry as any run
+(R-CR7, R-RUN4); the Watermark does not move. Publish sets Next Run At to now and, when the
+recipe was never published or had another trigger kind, a blank Watermark; Resume keeps it.
+A Test run uses the sample, never the app.
+**R-CR17 Runs in a person's erasure** (CN-18, release 1.33; R-ER8; design Section 5). Erasing a
+person (Section 29H) deletes, in the erasure's own transaction and whoever erases, every Run
+whose Input, State or Step Log holds the person's record Id (its 15 character form, capitals
+kept, which the 18 starts with) or one of the values of the person record's email fields, read
+before Core empties them, as a whole address ignoring capitals. Long text cannot be filtered in
+a query, so the candidates are the runs the org's search finds for those terms, at most 2,000,
+and every run changed in the last hour, which search may not hold yet; each is read and checked
+before it is deleted. The runs are listed as Deleted, by Id. When search finds 2,000 runs, the
+erasure is refused, so none is left behind. Recipes are kept; the preview deletes nothing.
+
+### Salesforce implementation
+
+| Attribute | API name | Type |
+|---|---|---|
+| Description | `Description__c` | Long Text Area(32768) |
+| Status | `Status__c` | Picklist (restricted): `Draft` (default), `Active`, `Paused`, `PausedByFailures` |
+| Trigger Kind | `Trigger_Kind__c` | Picklist (restricted): `Schedule`, `RecordChange`, `Webhook`, `AppPoll`, `Manual` (default) |
+| Definition, Draft, Previous Definition | `Definition_JSON__c`, `Draft_JSON__c`, `Previous_JSON__c` | Long Text Area(131072) |
+| Version | `Version__c` | Number(6,0) |
+| Webhook Token Hash | `Webhook_Token_Hash__c` | Text(64), unique, external ID |
+| Watermark | `Watermark__c` | Text(60) |
+| Next Run At, Last Run At | `Next_Run_At__c`, `Last_Run_At__c` | Date/Time |
+| Consecutive Failures, Pause After Failures, Retry Attempts, Webhook Hourly Cap, Keep Runs Days | `Consecutive_Failures__c`, `Pause_After_Failures__c`, `Retry_Attempts__c`, `Webhook_Hourly_Cap__c`, `Keep_Runs_Days__c` | Number |
+| Ignore Own Changes | `Ignore_Own_Changes__c` | Checkbox |
+| Run As | `Run_As__c` | Picklist (restricted): `Automation` (default), `System`, `IntegrationUser` |
+| Run As Chosen By, Run As Chosen At | `Run_As_Chosen_By__c` (Lookup(User)), `Run_As_Chosen_At__c` | Lookup, Date/Time |
+| Record Owner | `Record_Owner_Id__c` | Text(18) |
+
+- **Fields by slice:** CN-02 ships `Description__c`, `Status__c`, `Trigger_Kind__c`,
+  `Definition_JSON__c`, `Draft_JSON__c`, `Version__c`, `Last_Run_At__c`, `Run_As__c`,
+  `Run_As_Chosen_By__c`, `Run_As_Chosen_At__c` and `Record_Owner_Id__c`. The clock, retry and
+  retention fields (`Watermark__c`, `Next_Run_At__c`, `Consecutive_Failures__c`,
+  `Pause_After_Failures__c`, `Retry_Attempts__c`, `Keep_Runs_Days__c`, `Ignore_Own_Changes__c`)
+  ship with CN-03 (Consecutive Failures, Pause After Failures, Retry Attempts and Keep Runs
+  Days as Number(3,0) with defaults 0, 10, 3 and 30; Ignore Own Changes defaulting true), the
+  webhook fields (`Webhook_Token_Hash__c`, `Webhook_Hourly_Cap__c`) with CN-04 and
+  `Previous_JSON__c` with CN-08, each defined above before it ships. A blank or out of range
+  number reads as its default.
+- **Object:** `Connector_Recipe__c`, private sharing; Name is the recipe's name (Text(80)).
+  `BarnCRM_Connector_Admin` full access with View All and Modify All, `BarnCRM_Connector_Viewer`
+  read with View All.
+- **Platform events:** `Connector_Start__e` and `Connector_Start_User__e` (no fields, publish
+  after commit, R-CR4): a queued run, a retry, Publish, Resume, Restart, the heartbeat and the
+  nightly step publish them; `ConnectorStartTrigger` keeps Salesforce's default running user
+  (Automated Process) and `ConnectorStartUserTrigger` runs as the integration user through the
+  `PlatformEventSubscriberConfig` `BarnCRM_Connector_Start_User`. Each starts its lane's runner
+  chain and heartbeat (`ConnectorClock`) when none is going.
+- **Nightly step** (ADR-0166, key `Connector`, 2:40 AM, switch ships on): deletes finished runs
+  older than their recipe's Keep Runs Days (R-RUN2), at most 9,000 a night, and publishes the
+  start events when a lane needs its heartbeat.
+- **Flow actions** (CN-06): Run a BarnCRM Connector Recipe (an Active Manual recipe by name, with
+  record Ids and optional JSON; queues one run per call) and Apply a Saved Map (a saved map by
+  name, from a record Id or JSON, creating or updating the map's target record as the flow's
+  running user, in user mode).
+- **Where Used** (C-59): recipes whose definition or draft names a saved map, or a field or
+  object in a Find step or a map they link.
+
+## 29CN3. Connector Run
+
+### Definition
+
+One time a recipe ran or was asked to run: its input, its progress and its result (CN-02; design
+Appendix A.4).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Recipe | reference(Connector Recipe) | yes | The recipe (master). |
+| Status | picklist(Received, Queued, Running, Waiting, Succeeded, Skipped, Failed) | yes | Where the run stands. Running: claimed for the next runner job (R-RUN4). |
+| Started By | picklist(Schedule, Record Change, Webhook, App Poll, Manual, Flow, Test) | yes | What started it. |
+| Ran As | picklist(BarnCRM Automation, System, Integration User) | yes | The recipe's Run As when the run executed, for audit. |
+| Recipe Version | integer | yes | The version it ran. |
+| Input | long text | no | The trigger data (record Ids, webhook body or polled item). |
+| State | long text | no | Completed step Ids and the data later steps need. |
+| Step Log | long text | no | Each step's outcome, duration, Ids written, HTTP status, trimmed failed response. |
+| Event Key | text(255) | no | Recipe plus event id; unique, so a resend is dropped. |
+| Reference | text(20) | no | Opaque run reference returned in a webhook reply (design Section 3.3a); unique. |
+| Attempt | integer | yes (defaults 0) | Retries made. |
+| Next Attempt At | datetime | no | When a Waiting run resumes. |
+| Started At, Finished At | datetime | no | When it ran. |
+| Failed Step, Error Message | text | no | Where and why it failed, in plain words. |
+| Records Written | integer | no | Records created or updated. |
+| Is Test | boolean | yes (defaults false) | A Test run from the editor. |
+
+### Rules
+
+**R-RUN1 Written in system mode by the module only** (the guest's insert of Received runs, the
+runner's bookkeeping); nobody edits a run. **R-RUN2 Retention:** the nightly step deletes runs
+older than the recipe's Keep Runs Days (CN-03). **R-RUN3 No secret or header is ever stored.**
+**R-RUN4 Checkpoints and Retry.** A run's State holds the ids of completed steps and their
+results; a run continues in a new transaction (Queued again) before a callout that would follow
+a record write, and before 90 callouts, 100 seconds of callout time, 45 seconds of CPU, 180
+queries or 140 writes in one. Retry on a Failed run queues it again from the failed step; the
+completed steps are never repeated. A Step Log entry keeps a failed step's response, trimmed to
+2,000 characters, and never a header. A failed run writes one Error Log entry naming the recipe,
+the step and the plain message, never a request, a header or a response. A runner job works
+only on runs already Running: the job that starts the chain, and each job as it ends, marks up
+to one batch of Queued runs Running for the next job, since a job may not write before its
+callouts. A job that dies leaves its started runs Failed through its finalizer, which then
+claims and chains the next batch. A run that continues on a newer published version says so in
+its Step Log. A step whose results would not fit the run's State fails plainly.
+
+### Salesforce implementation
+
+API names: `Recipe__c` (master-detail), `Status__c`, `Started_By__c`, `Ran_As__c`, `Recipe_Version__c`,
+`Input_JSON__c`, `State_JSON__c`, `Step_Log_JSON__c` (Long Text Area(131072)), `Event_Key__c`
+(Text(255), unique, external ID), `Reference__c` (Text(20), unique), `Attempt__c`, `Next_Attempt_At__c`, `Started_At__c`,
+`Finished_At__c`, `Failed_Step__c` (Text(40)), `Error_Message__c` (Long Text Area(1000): a
+Text field stops at 255), `Records_Written__c`, `Is_Test__c`. Picklist values: Status `Received`, `Queued`, `Running`,
+`Waiting`, `Succeeded`, `Skipped`, `Failed`; Started By `Schedule`, `RecordChange`,
+`Webhook`, `AppPoll`, `Manual`, `Flow`, `Test`; Ran As as Run As.
+
+- **Fields by slice:** CN-02 ships every field above except `Next_Attempt_At__c` (CN-03, retries,
+  Date/Time) and `Event_Key__c` and `Reference__c` (CN-04, webhooks).
+- **Object:** `Connector_Run__c`, controlled by parent; autonumber Name `RUN-{000000}`. Read by
+  `BarnCRM_Connector_Admin` and `BarnCRM_Connector_Viewer` (View All); written only by the
+  module's `ConnectorRunStore` in system mode. Search is allowed (`enableSearch`), so a
+  person's erasure finds the runs that name them (R-CR17); only users who may read runs see them
+  in search.
+- **Poll runs** (CN-13): `Event_Key__c` also marks an App Poll's poll run, `<recipe Id>:poll:<time>`
+  (R-CR16).
+- **Erasure** (CN-18): `ConnectorErasureExtension` implements `PersonErasureExtension` and
+  `PersonErasureStartExtension` (R-ER8), registered in Core's `PersonErasureExtensions` before
+  Contact Point Sync; it deletes runs through `ConnectorRunStore` (R-CR17).
+- **Retry All Failed** (CN-03) queues every Failed non-test run of one recipe again from its
+  failed step, at most 200 at once.
+
+## 29CN4. Connector Settings
+
+### Definition
+
+BarnCRM Connector's own org-wide settings (CN-03; ADR-0017 gives each package its own settings
+object). Edited on Super Connector's Recipe Access card; Pause All Recipes also in the BarnCRM
+Settings console.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Recipes Paused | boolean | yes (defaults false) | Pause All Recipes: no recipe polls, runs or retries until it is off (R-CR7). |
+| Integration User | text(18) | no | The Id of the user Integration User recipes run as (R-CR4); blank means none chosen, and those recipes wait. |
+
+### Rules
+
+**R-CS1 Saved only by a Connector admin,** on Super Connector, org-wide. The Integration User is
+an active user of type Standard, never the Automated Process user, and is checked again on
+every save; the browser's value is never assigned anything before those checks (security review
+F12). Turning Pause All Recipes off publishes both start events.
+
+### Salesforce implementation
+
+- **Custom setting:** `Connector_Settings__c`, hierarchy, protected. Fields `Recipes_Paused__c`
+  (Checkbox, default false) and `Integration_User_Id__c` (Text(18)).
+- **Setting Definition row:** `Connector_Recipes_Paused` (Checkbox, Module `Connector`). The
+  Integration User has none: choosing one also assigns a permission set and writes the
+  subscriber configuration, which only Super Connector does.
+
 ---
 
 ## 30. Deferred to later iterations
@@ -19439,6 +20047,15 @@ mirrors the primary member).
 | 1.71 | 2026-11-19 | Advanced Reporting (O-02, D-202, D-207, release 1.29; ADR-0231 `0231-advanced-reporting.md`). No object or field added. Section 29AR records the saved report and dashboard JSON formats and their storage as Salesforce Files (`.barnreport`, `.barndash`) shared through ContentDocumentLink, with rules R-AR1 to R-AR5. |
 | 1.72 | 2026-11-20 | Migration package (S11, D-213, release 1.30; ADR-0232 `0232-migration-package.md`). No object added or removed. The optional BarnCRM Migration package (`packages/migration`) ships Admin Journal's Kit (`Kit__c`) and Import Batch's Migration Run (`Migration_Journal__c`) and Migration Step (`Migration_Step__c`), the Migration Assistant (29ZS) and the NPSP and Nonprofit Cloud household adoption (29ZQ), kit `NPSP_People` with its three templates, and a Migration Assistant tab. Core keeps `Migration_Kit__mdt`, the extension seam (`MigrationKitExtension` now receives the rows the Assistant read) and `NpspHouseholdSource`. The settings rows `NPSP_Household_Adoption` and `NPC_Household_Conversion` are removed; Setting Definition `Migration_Assistant_Page` (Integrations) and `BarnCRM_Module.Migration` are added. |
 | 1.73 | 2026-11-20 | Org Optimizer and Sample Data modules (D-215, release 1.30; ADR-0233 `0233-org-optimizer-and-sample-data-modules.md`). No object or field added or removed. The optional BarnCRM Org Optimizer package (`packages/orgoptimizer`) ships the Org Optimizer page (app page `Data_Hygiene`) with every section's classes and components, and Health Check's runner, checks, controller, last run and panel; `Setup_Change__c`, `Field_Utilization_Snapshot__c`, the Org Optimizer and Health Check keys of `BarnCRM_Settings__c`, the Health Check vocabulary and seams (new `HealthCheckRun`, `HealthCheckFixes`) stay in Core. The optional BarnCRM Sample Data package (`packages/sampledata`) ships the loader, the Core sample set and a Sample Data tab; the framework every module's set runs on stays in Core, with a new seam `SampleDataHost`. Setting Definitions `Error_Log_Optimizer_Link`, `Health_Check_Optimizer_Link`, `Field_Utilization_Retention_Days`, `Old_Api_Version`, `Setup_Change_Retention_Days`, `Stale_Record_Years`, `Unused_Login_Days` and `Unused_Report_Days` ship in the Org Optimizer package and `Sample_Data` in the Sample Data package; `Health_Check` (the Settings panel) is removed; `BarnCRM_Module.OrgOptimizer` and `BarnCRM_Module.SampleData` are added. R-SU8 follows the package, not a feature switch. |
+| 1.74 | 2026-11-20 | BarnCRM Connector connections (CN-01, D-215, D-216, release 1.31; ADR-0235 `0235-integration-module.md`). No object added (the suite stays at 197; Connector Recipe and Connector Run follow in CN-02). Section 29CN1 records a connection as an External Credential and Named Credential pair named `BarnConn_<connector>_<6 random>`, with rules R-CN1 to R-CN8. The Admin Journal's `Kind__c` gains Connection and `Status__c` gains Key Replaced (R-CN6). |
+| 1.75 | 2026-11-20 | BarnCRM Connector recipes and runs (CN-02, CN-06, D-215, release 1.31; design Appendix A.3 and A.4). Two objects added, 197 to 199 in the suite: Section 29CN2 Connector Recipe (`Connector_Recipe__c`, R-CR1 to R-CR5) and Section 29CN3 Connector Run (`Connector_Run__c`, R-RUN1 to R-RUN4), and the platform event `Connector_Start__e`. R-CN7 gives BarnCRM Connections to the Automated Process user through Recipe Access; R-CN8 refuses Delete of a connection a recipe names. |
+| 1.76 | 2026-11-20 | BarnCRM Connector recipe clock (CN-03, D-215, release 1.32). Connector Recipe gains `Watermark__c`, `Next_Run_At__c`, `Consecutive_Failures__c`, `Pause_After_Failures__c`, `Retry_Attempts__c`, `Keep_Runs_Days__c` and `Ignore_Own_Changes__c`; Connector Run gains `Next_Attempt_At__c`. New custom setting Section 29CN4 Connector Settings (`Connector_Settings__c`, R-CS1) and platform event `Connector_Start_User__e`. R-CR1 adds the `schedule` and `record` triggers, R-CR4 the Integration User lane, and new R-CR6 (clock), R-CR7 (retries and pause) and R-CR8 (Health Check). No object added (custom settings are not counted). |
+| 1.77 | 2026-11-20 | BarnCRM Connector Load Rows with an Import Template (CN-09, C-38, D-215, release 1.32). R-CR1 adds the `importRows` step; new R-CR9 (a scheduled dry run that commits only inside the step's limits) and R-IB18 (a data job a recipe starts, through Super Importer's own entry points). R-CR7: waking a run that waits on a data job counts no attempt. No object or field added. |
+| 1.78 | 2026-11-20 | BarnCRM Connector webhooks in and sending data back (CN-04, D-216, release 1.32). Connector Recipe gains `Webhook_Token_Hash__c` and `Webhook_Hourly_Cap__c`; Connector Run gains `Event_Key__c` and `Reference__c` (all defined in CN-02). R-CR1 adds the `webhook` trigger, the `sendWebhook` step and `urlFrom`; new R-CR10 (the receiver) and R-CR11 (fetch back and callback addresses). New permission set `BarnCRM_Connector_Webhook_Guest`. No object added. |
+| 1.79 | 2026-11-20 | BarnCRM Connector steps and versions (CN-05, CN-08, D-215, D-216, release 1.32). R-CR1 adds the `forEach`, `wait` and `transform` steps, the `loop` path root and the `fill` list an import leaves; new R-CR12 (For Each, Wait and Change Data), R-CR13 (Previous Definition, Roll Back, Discard Draft Changes, Export and Import Recipe), R-CR14 (template import, nothing shipped or kept) and R-CR15 (no secret in a file). Connector Recipe ships `Previous_JSON__c`, defined in v1.75. No object added. |
+| 1.80 | 2026-11-20 | BarnCRM Connector watching apps for new items and runs in the erasure path (CN-13, CN-18, release 1.33). R-CR1 adds the `appPoll` trigger; new R-CR16 (App Poll: poll runs, Watermark, item runs) and R-CR17 (erasing a person deletes the runs that name them). Connector Run allows search (`enableSearch`); `ConnectorErasureExtension` joins Core's erasure extensions. No object or field added. |
+| 1.81 | 2026-11-20 | The Mapper and saved maps (MAP-01 to MAP-07, releases 1.31 to 1.33). `Saved_Transform__c` gains `Kind__c` (Step List, the default, or Map); new R-MAP1 to R-MAP4 (map document, paths, checks, preview) and R-ST5 (maps). `Giving_Settings__c` gains `Opportunity_Mirror_Map__c`, a Saved Transform record ID chosen with a record picker (a map name is read too); new R-OM12 (extra fields through a map). No object added. |
+| 1.82 | 2026-11-20 | BarnCRM Connector pre-batch review fixes (release 1.33). One object added, 199 to 200 in the suite: Connector Connection (`Connector_Connection__c`, `Check_Path__c`), which keeps a template's check path beside a connection (29CN1, new R-CN9: Check Connection asks for it and shows the account an answer names). New R-CN10: choosing the integration user needs the key-writing permissions and refuses an all-seeing user. R-CN8: Disconnect refuses a Secret URL. Connector Run's Status loses Rejected; Running marks runs claimed for the next runner job (R-RUN4). |
 
 ---
 ## 32. Entity ownership by package
@@ -19669,6 +20286,10 @@ included; standard objects the packages extend are named by the entity that gove
 | Certification | Memberships | 1.17 (G-22e) | 29MEM5 |
 | Member Certification | Memberships | 1.17 (G-22e) | 29MEM6 |
 | Continuing Credit | Memberships | 1.17 (G-22e) | 29MEM7 |
+| Connection (External and Named Credentials, and `Connector_Connection__c` for its check path) | BarnCRM Connector | 1.31 (CN-01) | 29CN1 |
+| Connector Recipe | BarnCRM Connector | 1.31 (CN-02) | 29CN2 |
+| Connector Run | BarnCRM Connector | 1.31 (CN-02) | 29CN3 |
+| Connector Settings | BarnCRM Connector | 1.32 (CN-03) | 29CN4 |
 | Address Verification Settings | Address Verification | 1.15 (C-46) | 29AV1 |
 
 **Components that are not entities (C-29, ADR-0059).** Core is the Standard Edition on its own,

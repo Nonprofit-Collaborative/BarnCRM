@@ -36,12 +36,24 @@ public with sharing class GivingWhereUsedExtension implements WhereUsedExtension
 	@TestVisible
 	private static List<WhereUsedService.Reference> settingReferences(WhereUsedService.Target target) {
 		List<WhereUsedService.Reference> found = new List<WhereUsedService.Reference>();
+		// The gift mirror's extra-fields map, linked by record ID (R-OM12).
+		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
+		String chosen = settings == null ? null : settings.Opportunity_Mirror_Map__c;
+		if (target.mapId != null && OpportunityMirrorMap.links(chosen, target.mapId, target.objectLabel)) {
+			found.add(
+				WhereUsedService.settingReference(
+					Schema.Giving_Settings__c.Opportunity_Mirror_Map__c.getDescribe().getLabel(),
+					BarnHelp.text('Core', 'Core_WhereUsed_BreaksSettingValue'),
+					'Giving'
+				)
+			);
+		}
 		String source = DonorLevelService.sourceField();
 		if (!target.isObject() && (target.matchesField('Contact', source) || target.matchesField('Account', source))) {
 			found.add(
 				WhereUsedService.settingReference(
 					Schema.Giving_Settings__c.Donor_Level_Source_Field__c.getDescribe().getLabel(),
-					System.Label.Core_WhereUsed_BreaksSettingValue,
+					BarnHelp.text('Core', 'Core_WhereUsed_BreaksSettingValue'),
 					'Giving'
 				)
 			);

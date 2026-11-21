@@ -177,14 +177,6 @@
         <value>Schedule Them Again as Me</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_FixStale</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Fix refused: what it would change is not what the finding said.</shortDescription>
-        <value>Something changed since Health Check last ran, so this fix would not do exactly what you confirmed. Nothing was changed. Health Check has run again: read the finding and press its button again if it is still there.</value>
-    </labels>
-    <labels>
         <fullName>Core_HealthCheck_IndustriesDetected</fullName>
         <categories>Core</categories>
         <language>en_US</language>

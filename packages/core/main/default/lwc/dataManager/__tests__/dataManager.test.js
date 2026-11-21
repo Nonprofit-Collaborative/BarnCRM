@@ -144,6 +144,7 @@ describe('c-data-manager', () => {
     expect(tiles(element).map((tile) => tile.name)).toEqual([
       'import',
       'files',
+      'maps',
       'find',
       'grid',
       'backup',
@@ -177,6 +178,14 @@ describe('c-data-manager', () => {
     await flush();
     expect(one(element, 'panel')).toBeNull();
     expect(one(element, 'tools')).not.toBeNull();
+  });
+
+  it('opens Maps on this page', async () => {
+    const element = await render();
+    select(element, 'maps');
+    await flush();
+    expect(mockNavigate).not.toHaveBeenCalled();
+    expect(one(element, 'panel').querySelector('c-saved-maps')).not.toBeNull();
   });
 
   it('opens Duplicate Matching from its tile', async () => {

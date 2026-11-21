@@ -12,8 +12,10 @@
  *
  * This decides what may be offered and checked. Every write is still in user mode.
  */
+@NamespaceAccessible
 public with sharing class BulkUpdateFields {
 	/** Raised for anything the person can fix; the message is for them. */
+	@NamespaceAccessible
 	public class BulkUpdateException extends Exception {
 	}
 
@@ -76,6 +78,13 @@ public with sharing class BulkUpdateFields {
 		public String referenceTo;
 		@AuraEnabled
 		public List<QueryFieldCatalog.PicklistOption> picklistValues;
+		/** For the Mapper's checks (R-MAP4): the longest text, whether a new record needs it, an external ID. */
+		@AuraEnabled
+		public Integer length;
+		@AuraEnabled
+		public Boolean required;
+		@AuraEnabled
+		public Boolean externalId;
 	}
 
 	/** The object, or a refusal naming it when no bulk update may write its records. */
@@ -121,6 +130,9 @@ public with sharing class BulkUpdateFields {
 			target.label = field.getLabel();
 			target.dataType = String.valueOf(field.getType()).toLowerCase();
 			target.nillable = field.isNillable();
+			target.length = field.getLength();
+			target.required = !field.isNillable() && field.isCreateable() && !field.isDefaultedOnCreate();
+			target.externalId = field.isExternalId();
 			List<Schema.SObjectType> parents = field.getReferenceTo();
 			target.referenceTo = parents.size() == 1
 				? parents[0].getDescribe(SObjectDescribeOptions.DEFERRED).getName()
@@ -299,6 +311,7 @@ public with sharing class BulkUpdateFields {
 	 * reads), and a number without exponent. Decided by the field's type, never by
 	 * `instanceof`, because in Apex a Date is also an instance of Datetime. Null stays null.
 	 */
+	@NamespaceAccessible
 	public static String toText(Schema.DescribeFieldResult field, Object value) {
 		if (value == null) {
 			return null;
@@ -330,6 +343,7 @@ public with sharing class BulkUpdateFields {
 	 * naming the field and the value, so the record is journaled as Failed rather than saved
 	 * wrong. That includes a checkbox result that is none of those words.
 	 */
+	@NamespaceAccessible
 	public static Object fromText(Schema.DescribeFieldResult field, String text) {
 		Schema.DisplayType kind = field.getType();
 		if (kind == Schema.DisplayType.BOOLEAN) {

@@ -225,7 +225,10 @@ private class RollupTriggerHandlerTest {
 				'So the entry can be grouped by what it is about'
 			);
 			System.Assert.areEqual(
-				String.format(System.Label.Core_ErrorLog_UnexpectedFailureIn, new List<Object>{ 'RollupPlanner.plan' }),
+				String.format(
+					BarnHelp.text('Core', 'Core_ErrorLog_UnexpectedFailureIn'),
+					new List<Object>{ 'RollupPlanner.plan' }
+				),
 				logged[0].Message__c,
 				'What Maria reads is plain language'
 			);

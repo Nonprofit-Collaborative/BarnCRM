@@ -42,7 +42,7 @@ private class ProgramsWhereUsedExtensionTest {
 				new List<String>{ Schema.SObjectType.Program__c.fields.Eligibility_Rules__c.getLabel() },
 				source[0].getParts()
 			);
-			Assert.areEqual(System.Label.Core_WhereUsed_BreaksModuleRecord, source[0].getBreaks());
+			Assert.areEqual(BarnHelp.text('Core', 'Core_WhereUsed_BreaksModuleRecord'), source[0].getBreaks());
 			Assert.areEqual('/lightning/r/' + screened.Id + '/view', source[0].editUrl);
 			Assert.isTrue(other.isEmpty(), 'A field no rule reads is not listed.');
 			Assert.isTrue(wholeObject.isEmpty(), 'The module\'s own object is not reported.');

@@ -1,0 +1,539 @@
+<template>
+    <template lwc:if={helpReady}>
+        <div class="barn-mapper" data-id="mapper">
+            <template lwc:if={notImporting}>
+            <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_small" data-id="setup">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                    <lightning-combobox
+                        label={text.fromKind}
+                        value={fromKind}
+                        options={fromKindOptions}
+                        onchange={handleFromKind}
+                        data-id="from-kind"
+                    ></lightning-combobox>
+                </div>
+                <template lwc:if={isFromRecord}>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                        <lightning-combobox
+                            label={text.fromObject}
+                            value={fromObject}
+                            options={readableObjects}
+                            onchange={handleFromObject}
+                            data-id="from-object"
+                        ></lightning-combobox>
+                    </div>
+                </template>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                    <lightning-combobox
+                        label={text.toKind}
+                        value={toKind}
+                        options={toKindOptions}
+                        onchange={handleToKind}
+                        data-id="to-kind"
+                    ></lightning-combobox>
+                </div>
+                <template lwc:if={isToRecord}>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                        <lightning-combobox
+                            label={text.toObject}
+                            value={toObject}
+                            options={writableObjects}
+                            onchange={handleToObject}
+                            data-id="to-object"
+                        ></lightning-combobox>
+                    </div>
+                </template>
+            </div>
+
+            <div class="slds-var-m-bottom_small" data-id="sample">
+                <template lwc:if={isFromColumns}>
+                    <lightning-input
+                        type="file"
+                        label={text.chooseFile}
+                        accept=".csv,.txt,.tsv"
+                        onchange={handleFile}
+                        data-id="file"
+                    ></lightning-input>
+                </template>
+                <template lwc:if={isFromRecord}>
+                    <template lwc:if={fromObject}>
+                        <lightning-record-picker
+                            label={text.chooseRecord}
+                            object-api-name={fromObject}
+                            onchange={handleRecord}
+                            data-id="record"
+                        ></lightning-record-picker>
+                    </template>
+                </template>
+                <template lwc:if={isFromJson}>
+                    <lightning-textarea
+                        label={text.sampleJson}
+                        value={jsonText}
+                        onchange={handleJsonText}
+                        data-id="json"
+                    ></lightning-textarea>
+                    <lightning-button
+                        class="slds-var-m-top_x-small"
+                        label={text.useSample}
+                        onclick={handleUseJson}
+                        data-id="use-json"
+                    ></lightning-button>
+                </template>
+                <template lwc:if={sampleError}>
+                    <c-barn-notice
+                        class="slds-show slds-var-m-top_x-small"
+                        variant="error"
+                        message={sampleError}
+                        data-id="sample-error"
+                    ></c-barn-notice>
+                </template>
+            </div>
+            </template>
+
+            <template lwc:if={loadError}>
+                <c-barn-notice
+                    class="slds-show slds-var-m-bottom_small"
+                    variant="error"
+                    message={loadError}
+                    data-id="load-error"
+                ></c-barn-notice>
+            </template>
+            <template lwc:if={skippedText}>
+                <c-barn-notice
+                    class="slds-show slds-var-m-bottom_small"
+                    variant="warning"
+                    message={skippedText}
+                    data-id="skipped"
+                ></c-barn-notice>
+            </template>
+            <template lwc:if={hasProblems}>
+                <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="error" data-id="problems">
+                    <ul class="slds-list_dotted">
+                        <template for:each={problemTexts} for:item="problem">
+                            <li key={problem.key}>{problem.text}</li>
+                        </template>
+                    </ul>
+                </c-barn-notice>
+            </template>
+            <template lwc:if={hasGuesses}>
+                <div
+                    class="slds-var-m-bottom_small slds-grid slds-grid_vertical-align-center slds-wrap"
+                    role="status"
+                    data-id="guess-pending"
+                >
+                    <p class="slds-var-m-right_small">{guessText}</p>
+                    <lightning-button
+                        label={text.acceptAll}
+                        onclick={handleAcceptAll}
+                        data-id="accept-all"
+                    ></lightning-button>
+                </div>
+            </template>
+
+            <div class="slds-grid slds-wrap slds-gutters_small" data-id="panes">
+                <section
+                    class="slds-col slds-size_1-of-1 slds-large-size_1-of-4 slds-var-m-bottom_small"
+                    aria-labelledby="from-heading"
+                >
+                    <h3 id="from-heading" class="slds-text-heading_small slds-var-m-bottom_x-small">
+                        {text.fromHeading}
+                    </h3>
+                    <template lwc:if={hasSources}>
+                        <ul
+                            class="barn-mapper-sources"
+                            data-drop-zone="sources"
+                            data-drop-label={text.fromHeading}
+                            data-id="sources"
+                        >
+                            <template for:each={sourceRows} for:item="source">
+                                <li
+                                    key={source.name}
+                                    class={source.itemClass}
+                                    data-drag-id={source.name}
+                                    data-drag-label={source.label}
+                                    tabindex="0"
+                                    aria-describedby="drag-help"
+                                    onpointerdown={handlePointerDown}
+                                    onkeydown={handleDragKey}
+                                    data-id="source"
+                                >
+                                    <p class="slds-text-title_bold">{source.label}</p>
+                                    <p class="slds-text-body_small slds-text-color_weak">{source.exampleText}</p>
+                                    <template lwc:if={source.canCreate}>
+                                        <lightning-button
+                                            variant="base"
+                                            label={text.createField}
+                                            aria-label={source.createLabel}
+                                            data-source={source.name}
+                                            onpointerdown={handleCreateKey}
+                                            onkeydown={handleCreateKey}
+                                            onclick={handleCreateField}
+                                            data-id="create-field"
+                                        ></lightning-button>
+                                    </template>
+                                </li>
+                            </template>
+                        </ul>
+                    </template>
+                    <template lwc:else>
+                        <p class="slds-text-body_small slds-text-color_weak" data-id="no-sources">{text.noSources}</p>
+                    </template>
+                    <span id="drag-help" class="slds-assistive-text">{dragHelp}</span>
+                </section>
+
+                <section
+                    class="slds-col slds-size_1-of-1 slds-large-size_2-of-4 slds-var-m-bottom_small"
+                    aria-labelledby="to-heading"
+                >
+                    <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-var-m-bottom_x-small">
+                        <h3 id="to-heading" class="slds-text-heading_small">{text.toHeading}</h3>
+                        <lightning-button
+                            label={text.matchFields}
+                            onclick={handleMatch}
+                            data-id="match-fields"
+                        ></lightning-button>
+                    </div>
+                    <template lwc:if={isToJson}>
+                        <div class="slds-grid slds-grid_vertical-align-end slds-var-m-bottom_x-small">
+                            <lightning-input
+                                class="slds-col"
+                                label={text.addKey}
+                                value={newKey}
+                                onchange={handleNewKey}
+                                data-id="new-key"
+                            ></lightning-input>
+                            <lightning-button
+                                class="slds-var-m-left_x-small"
+                                label={text.addKeyButton}
+                                onclick={handleAddKey}
+                                data-id="add-key"
+                            ></lightning-button>
+                        </div>
+                        <template lwc:if={keyError}>
+                            <p class="slds-text-color_error slds-text-body_small" data-id="key-error">{keyError}</p>
+                        </template>
+                    </template>
+                    <lightning-input
+                        type="search"
+                        label={text.findField}
+                        value={fieldQuery}
+                        onchange={handleFieldQuery}
+                        data-id="field-search"
+                    ></lightning-input>
+                    <template lwc:if={hasTargets}>
+                        <template for:each={targetGroups} for:item="group">
+                            <div key={group.key} class="slds-var-m-top_small" data-id="group" data-group={group.key}>
+                                <h4 class="slds-text-title_bold slds-var-m-bottom_xx-small">{group.label}</h4>
+                                <ul>
+                                    <template for:each={group.rows} for:item="row">
+                                        <li
+                                            key={row.key}
+                                            class={row.rowClass}
+                                            data-drop-zone={row.target}
+                                            data-drop-label={row.label}
+                                            data-id="target"
+                                            data-target={row.target}
+                                        >
+                                            <div class="slds-grid slds-wrap slds-grid_vertical-align-center">
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_7-of-12">
+                                                    <p class="slds-text-title_bold">
+                                                        {row.label}
+                                                        <template lwc:if={row.required}>
+                                                            <abbr class="slds-required" title={text.required}>*</abbr>
+                                                        </template>
+                                                    </p>
+                                                    <p class="slds-text-body_small" data-id="sentence">{row.sentence}</p>
+                                                    <template lwc:if={row.guessed}>
+                                                        <span title={text.guessBadgeHelp} data-id="guess">
+                                                            <c-barn-status-badge
+                                                                status="attention"
+                                                                label={text.guessBadge}
+                                                            ></c-barn-status-badge>
+                                                            <span class="slds-assistive-text">{text.guessBadgeHelp}</span>
+                                                        </span>
+                                                    </template>
+                                                    <template lwc:if={row.gone}>
+                                                        <p class="slds-text-color_error slds-text-body_small" data-id="gone">
+                                                            {text.fieldGone}
+                                                        </p>
+                                                    </template>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_5-of-12 slds-text-align_right">
+                                                    <template lwc:if={row.guessed}>
+                                                        <lightning-button
+                                                            variant="base"
+                                                            label={text.accept}
+                                                            title={row.acceptLabel}
+                                                            data-target={row.target}
+                                                            onclick={handleAccept}
+                                                            data-id="accept"
+                                                        ></lightning-button>
+                                                    </template>
+                                                    <lightning-button
+                                                        class="slds-var-m-left_x-small"
+                                                        variant="base"
+                                                        label={text.pick}
+                                                        title={row.pickLabel}
+                                                        data-target={row.target}
+                                                        onclick={handlePick}
+                                                        data-id="pick"
+                                                    ></lightning-button>
+                                                    <lightning-button
+                                                        class="slds-var-m-left_x-small"
+                                                        variant="base"
+                                                        label={text.details}
+                                                        title={row.detailsLabel}
+                                                        data-target={row.target}
+                                                        onclick={handleDetails}
+                                                        data-id="details"
+                                                    ></lightning-button>
+                                                    <template lwc:if={row.mapped}>
+                                                        <lightning-button
+                                                            class="slds-var-m-left_x-small"
+                                                            variant="base"
+                                                            label={text.remove}
+                                                            title={row.removeLabel}
+                                                            data-target={row.target}
+                                                            onclick={handleRemove}
+                                                            data-id="remove"
+                                                        ></lightning-button>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                            <template lwc:if={row.isPicking}>
+                                                <c-import-field-picker
+                                                    class="slds-show slds-var-m-top_x-small"
+                                                    label={row.pickLabel}
+                                                    options={sourceOptions}
+                                                    value={row.source}
+                                                    pinned-value={none}
+                                                    used-values={usedSources}
+                                                    data-target={row.target}
+                                                    onchange={handlePicked}
+                                                    data-id="picker"
+                                                ></c-import-field-picker>
+                                            </template>
+                                            <template lwc:if={row.isOpen}>
+                                                <div class="barn-mapper-details slds-var-p-around_small slds-var-m-top_x-small" data-id="details-panel">
+                                                    <template lwc:if={row.mapped}>
+                                                        <c-import-column-transforms
+                                                            embedded
+                                                            transforms={row.transforms}
+                                                            column-options={stepSourceOptions}
+                                                            data-target={row.target}
+                                                            onchange={handleSteps}
+                                                            data-id="steps"
+                                                        ></c-import-column-transforms>
+                                                    </template>
+                                                    <template lwc:if={notImporting}>
+                                                    <lightning-input
+                                                        label={text.alwaysUse}
+                                                        value={row.fixedValue}
+                                                        max-length="255"
+                                                        data-target={row.target}
+                                                        onchange={handleFixed}
+                                                        data-id="fixed"
+                                                    ></lightning-input>
+                                                    <lightning-input
+                                                        label={text.whenBlank}
+                                                        value={row.defaultValue}
+                                                        data-target={row.target}
+                                                        onchange={handleDefault}
+                                                        data-id="default"
+                                                    ></lightning-input>
+                                                    </template>
+                                                    <template lwc:elseif={row.mapped}>
+                                                        <lightning-input
+                                                            type="checkbox"
+                                                            class="slds-show slds-var-m-top_x-small"
+                                                            label={text.blankClears}
+                                                            checked={row.blankClears}
+                                                            data-target={row.target}
+                                                            onchange={handleBlankClears}
+                                                            data-id="blank-clears"
+                                                        ></lightning-input>
+                                                    </template>
+                                                    <template lwc:if={isToJson}>
+                                                        <lightning-input
+                                                            type="checkbox"
+                                                            class="slds-show slds-var-m-top_x-small"
+                                                            label={text.requiredBox}
+                                                            checked={row.columnRequired}
+                                                            disabled={row.notMapped}
+                                                            data-target={row.target}
+                                                            onchange={handleRequired}
+                                                            data-id="required"
+                                                        ></lightning-input>
+                                                    </template>
+                                                    <template lwc:if={row.isLookup}>
+                                                        <template lwc:if={row.mapped}>
+                                                            <template lwc:if={row.lookupSentence}>
+                                                                <p class="slds-var-m-top_small" data-id="lookup-sentence">{row.lookupSentence}</p>
+                                                            </template>
+                                                            <lightning-combobox
+                                                                label={text.lookupField}
+                                                                value={row.lookupField}
+                                                                options={row.lookupFieldOptions}
+                                                                data-target={row.target}
+                                                                onchange={handleLookupField}
+                                                                data-id="lookup-field"
+                                                            ></lightning-combobox>
+                                                            <template lwc:if={notImporting}>
+                                                                <lightning-combobox
+                                                                    label={text.lookupNotFound}
+                                                                    value={row.notFound}
+                                                                    options={notFoundOptions}
+                                                                    data-target={row.target}
+                                                                    onchange={handleNotFound}
+                                                                    data-id="lookup-not-found"
+                                                                ></lightning-combobox>
+                                                            </template>
+                                                        </template>
+                                                    </template>
+                                                </div>
+                                            </template>
+                                        </li>
+                                    </template>
+                                </ul>
+                            </div>
+                        </template>
+                    </template>
+                    <template lwc:else>
+                        <p class="slds-text-body_small slds-text-color_weak slds-var-m-top_small" data-id="no-targets">
+                            {text.noTargets}
+                        </p>
+                    </template>
+
+                    <template lwc:if={showMatch}>
+                        <div class="barn-mapper-details slds-var-p-around_small slds-var-m-top_medium" data-id="match-card">
+                            <h4 class="slds-text-heading_small slds-var-m-bottom_x-small">{text.matchHeading}</h4>
+                            <lightning-combobox
+                                label={text.matchBy}
+                                value={matchBy}
+                                options={matchByOptions}
+                                onchange={handleMatchBy}
+                                data-id="match-by"
+                            ></lightning-combobox>
+                            <template lwc:if={matchNeedsField}>
+                                <lightning-combobox
+                                    label={text.matchField}
+                                    value={matchField}
+                                    options={matchFieldOptions}
+                                    onchange={handleMatchField}
+                                    data-id="match-field"
+                                ></lightning-combobox>
+                            </template>
+                            <template lwc:if={hasMatch}>
+                                <lightning-combobox
+                                    label={text.matchSeveral}
+                                    value={matchSeveral}
+                                    options={severalOptions}
+                                    onchange={handleMatchSeveral}
+                                    data-id="match-several"
+                                ></lightning-combobox>
+                                <lightning-combobox
+                                    label={text.matchNone}
+                                    value={matchNone}
+                                    options={noneOptions}
+                                    onchange={handleMatchNone}
+                                    data-id="match-none"
+                                ></lightning-combobox>
+                                <p class="slds-var-m-top_small" data-id="match-sentence">{matchSentence}</p>
+                                <p class="slds-text-body_small slds-text-color_weak" data-id="match-risk">{matchRisk}</p>
+                            </template>
+                        </div>
+                    </template>
+                </section>
+
+                <section
+                    class="slds-col slds-size_1-of-1 slds-large-size_1-of-4 slds-var-m-bottom_small"
+                    aria-labelledby="preview-heading"
+                >
+                    <h3 id="preview-heading" class="slds-text-heading_small slds-var-m-bottom_x-small">
+                        {text.previewHeading}
+                    </h3>
+                    <template lwc:if={hasSamples}>
+                        <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_x-small">
+                            <lightning-button-icon
+                                icon-name="utility:chevronleft"
+                                alternative-text={text.previous}
+                                disabled={isFirstSample}
+                                onclick={handlePrevious}
+                                data-id="previous"
+                            ></lightning-button-icon>
+                            <span class="slds-var-m-horizontal_small" aria-live="polite" data-id="counter">{sampleCounter}</span>
+                            <lightning-button-icon
+                                icon-name="utility:chevronright"
+                                alternative-text={text.next}
+                                disabled={isLastSample}
+                                onclick={handleNext}
+                                data-id="next"
+                            ></lightning-button-icon>
+                        </div>
+                        <template lwc:if={previewError}>
+                            <c-barn-notice variant="error" message={previewError} data-id="preview-error"></c-barn-notice>
+                        </template>
+                        <template lwc:if={hasPreviewRows}>
+                            <table
+                                class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked"
+                                aria-label={text.previewHeading}
+                                data-id="preview"
+                            >
+                                <thead>
+                                    <tr class="slds-line-height_reset">
+                                        <th scope="col">{text.fieldColumn}</th>
+                                        <th scope="col">{text.valueColumn}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={previewRows} for:item="row">
+                                        <tr key={row.key} data-id="preview-row">
+                                            <td data-label={text.fieldColumn} class="slds-cell-wrap">{row.label}</td>
+                                            <td data-label={text.valueColumn} class="slds-cell-wrap">
+                                                <span>{row.shown}</span>
+                                                <template for:each={row.badges} for:item="badge">
+                                                    <c-barn-status-badge
+                                                        key={badge.key}
+                                                        class="slds-show"
+                                                        status="error"
+                                                        label={badge.label}
+                                                        data-id="flag"
+                                                    ></c-barn-status-badge>
+                                                </template>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </template>
+                        <lightning-button
+                            class="slds-show slds-var-m-top_small"
+                            variant="brand"
+                            label={text.check}
+                            disabled={checkDisabled}
+                            onclick={handleCheck}
+                            data-id="check"
+                        ></lightning-button>
+                        <template lwc:if={checking}>
+                            <lightning-spinner alternative-text={text.check} size="small"></lightning-spinner>
+                        </template>
+                        <template lwc:if={checkDone}>
+                            <div class="slds-var-m-top_small" role="status" data-id="check-results">
+                                <p>{checkSummary}</p>
+                                <ul class="slds-list_dotted">
+                                    <template for:each={checkResults} for:item="line">
+                                        <li key={line.key}>{line.text}</li>
+                                    </template>
+                                </ul>
+                            </div>
+                        </template>
+                    </template>
+                    <template lwc:else>
+                        <p class="slds-text-body_small slds-text-color_weak" data-id="no-samples">{text.noSamples}</p>
+                    </template>
+                </section>
+            </div>
+            <div class="slds-assistive-text" aria-live="polite" data-id="announcement">{announcement}</div>
+        </div>
+    </template>
+</template>

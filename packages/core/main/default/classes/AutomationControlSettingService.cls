@@ -313,7 +313,9 @@ public with sharing class AutomationControlSettingService {
 
 	private static void requirePermission() {
 		if (!AutomationControl.canManage()) {
-			throw new AutomationControl.AutomationControlException(Label.Core_Automation_NoPermission);
+			throw new AutomationControl.AutomationControlException(
+				BarnHelp.text('Core', 'Core_Automation_NoPermission')
+			);
 		}
 	}
 

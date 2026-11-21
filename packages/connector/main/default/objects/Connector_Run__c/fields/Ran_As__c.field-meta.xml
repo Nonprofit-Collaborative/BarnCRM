@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Ran_As__c</fullName>
+  <description>The recipe's Run As when the run executed, for audit (R-CR4).</description>
+  <externalId>false</externalId>
+  <inlineHelpText>Who the run ran as.</inlineHelpText>
+  <label>Ran As</label>
+  <required>true</required>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Automation</fullName>
+        <default>true</default>
+        <label>BarnCRM Automation</label>
+      </value>
+      <value>
+        <fullName>System</fullName>
+        <default>false</default>
+        <label>System</label>
+      </value>
+      <value>
+        <fullName>IntegrationUser</fullName>
+        <default>false</default>
+        <label>Integration User</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

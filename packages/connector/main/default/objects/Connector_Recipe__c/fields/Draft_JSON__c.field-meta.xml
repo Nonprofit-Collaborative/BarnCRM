@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Draft_JSON__c</fullName>
+  <description>The recipe document being edited (R-CR1); Publish copies it to Definition.</description>
+  <inlineHelpText>The recipe as last saved in the editor, not yet published.</inlineHelpText>
+  <label>Draft</label>
+  <length>131072</length>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>5</visibleLines>
+</CustomField>

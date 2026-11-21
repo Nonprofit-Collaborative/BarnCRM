@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The Super Connector tab: BarnCRM Connector's connections, their Setup step, Check Connection,
+    Replace Key, Disconnect and Delete.
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Super Connector</masterLabel>
+  <targets>
+    <target>lightning__Tab</target>
+  </targets>
+</LightningComponentBundle>

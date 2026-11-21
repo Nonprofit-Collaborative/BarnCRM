@@ -28,7 +28,7 @@ package is installed.
 - Static resources: `SampleData` (Core's generated set, `scripts/data/generate-sample-data.py`)
   and `CoreSampleData` (Core's extra records, in the generic module format).
 - Custom metadata: Setting Definition `Sample_Data` (Settings, General: opens the tab).
-- Permission set: `Sample_Data` (BarnCRM Admin, Staff and Read Only holders; loading and
+- Permission set: `Sample_Data` (BarnCRM Admin holders only; loading and
   removing also need Manage BarnCRM Settings).
 - Tab: `Sample_Data`.
 - Catalog row: `BarnCRM_Module.SampleData` (Core), both editions.

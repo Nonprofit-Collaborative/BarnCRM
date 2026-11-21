@@ -15,7 +15,10 @@ import loadSavedList from '@salesforce/apex/BulkUpdateController.loadSavedList';
 import saveSavedList from '@salesforce/apex/BulkUpdateController.saveSavedList';
 import renameSavedList from '@salesforce/apex/BulkUpdateController.renameSavedList';
 import deleteSavedList from '@salesforce/apex/BulkUpdateController.deleteSavedList';
+import listMaps from '@salesforce/apex/MapController.listMaps';
+import loadMap from '@salesforce/apex/MapController.loadMap';
 import { PHONE_PRESET_STEPS } from 'c/transformFormat';
+import { parseMap, toChanges } from 'c/mapDocument';
 
 import RECORD from '@salesforce/label/c.Core_BulkUpdate_Record';
 import REMOVE from '@salesforce/label/c.Core_BulkUpdate_Remove';
@@ -170,6 +173,9 @@ export default class SuperTransform extends LightningElement {
     get previewHint() {
       return helpText('Core', 'Core_SuperTransform_PreviewHint');
     },
+    get addSteps() {
+      return helpText('Core', 'Core_SuperTransform_AddSteps');
+    },
     record: RECORD,
     changesTo: CHANGES_TO,
     noChange: NO_CHANGE,
@@ -196,7 +202,16 @@ export default class SuperTransform extends LightningElement {
     savedName: SAVED_NAME,
     savedSave: SAVED_SAVE,
     savedRename: SAVED_RENAME,
-    savedDelete: SAVED_DELETE
+    savedDelete: SAVED_DELETE,
+    get mapChoose() {
+      return helpText('Core', 'Core_SuperTransform_MapChoose');
+    },
+    get mapApply() {
+      return helpText('Core', 'Core_SuperTransform_MapApply');
+    },
+    get mapHelp() {
+      return helpText('Core', 'Core_SuperTransform_MapHelp');
+    }
   };
 
   loaded = false;
@@ -264,6 +279,7 @@ export default class SuperTransform extends LightningElement {
       this.stopPolling();
       this.job = undefined;
       this.objectApiName = start.object;
+      this.checkMapFroms();
       this.targets = targets;
       this.filterJson = start.filter ? JSON.stringify(start.filter) : '';
       this.filterValid = true;
@@ -287,6 +303,7 @@ export default class SuperTransform extends LightningElement {
       });
     }
     this.load();
+    this.loadMaps();
   }
 
   disconnectedCallback() {
@@ -468,6 +485,7 @@ export default class SuperTransform extends LightningElement {
       const isMulti = isSet && type === 'multipicklist' && hasPicklist;
       const isPicklist = isSet && !isMulti && hasPicklist;
       const isRecord = isSet && type === 'reference' && Boolean(target.referenceTo);
+      const canCopySteps = change.action === 'copy' && Boolean(target) && type !== 'reference';
       return {
         ...change,
         hasField: Boolean(target),
@@ -492,6 +510,13 @@ export default class SuperTransform extends LightningElement {
         isInput: isSet && !isBoolean && !isMulti && !isPicklist && !isRecord,
         isCopy: change.action === 'copy',
         isTransform: change.action === 'transform',
+        // Steps on a copy (MAP-06) or a transform; a lookup takes neither. A copy shows its
+        // steps once it has some or Add Changes was pressed.
+        showsSteps:
+          change.action === 'transform' ||
+          (canCopySteps && (Boolean(change.stepsOpen) || (change.transforms || []).length > 0)),
+        offersSteps: canCopySteps && !change.stepsOpen && (change.transforms || []).length === 0,
+        stepsSource: change.action === 'copy' ? change.source : change.field,
         stepList: change.transforms || [],
         inputType: NUMBER_TYPES.has(type) ? 'number' : INPUT_TYPES[type] || 'text',
         referenceTo: target ? target.referenceTo : undefined,
@@ -623,6 +648,8 @@ export default class SuperTransform extends LightningElement {
 
   async handleObjectChange(event) {
     this.objectApiName = event.detail.value;
+    this.checkMapFroms();
+    this.mapId = undefined;
     this.filterJson = '';
     this.relatedJson = '';
     this.radiusJson = '';
@@ -757,6 +784,13 @@ export default class SuperTransform extends LightningElement {
     }
   }
 
+  handleAddSteps(event) {
+    const key = event.currentTarget.dataset.key;
+    this.changes = this.changes.map((change) => {
+      return change.key === key ? { ...change, stepsOpen: true } : change;
+    });
+  }
+
   handleStepsChange(event) {
     const key = event.currentTarget.dataset.key;
     const transforms = event.detail.transforms;
@@ -777,6 +811,9 @@ export default class SuperTransform extends LightningElement {
           }
           if (change.action === 'copy') {
             entry.source = change.source;
+            if (change.transforms && change.transforms.length > 0) {
+              entry.transforms = change.transforms;
+            }
           }
           if (change.action === 'transform') {
             entry.transforms = change.transforms || [];
@@ -788,6 +825,136 @@ export default class SuperTransform extends LightningElement {
 
   invalidate() {
     this.preview = undefined;
+  }
+
+  /* ---------- Apply a Map (MAP-06; admin guide super-transform.md section 5) ---------- */
+
+  maps = [];
+  mapId;
+  /** Each checked map's From kind of record, lower case ('' when it is not a record). */
+  mapFroms = {};
+
+  /** Saved maps; none for a person who may not read them, and the control stays hidden. */
+  async loadMaps() {
+    try {
+      this.maps = (await listMaps()) || [];
+    } catch {
+      this.maps = [];
+    }
+    await this.checkMapFroms();
+  }
+
+  /** The maps that fill the chosen kind of record, as the list names them. */
+  get mapCandidates() {
+    const objectName = String(this.objectApiName || '').toLowerCase();
+    return objectName
+      ? this.maps.filter((entry) => String(entry.objectName || '').toLowerCase() === objectName)
+      : [];
+  }
+
+  /**
+   * Reads which kind of record each candidate map is From, once per map: the list names only
+   * what a map fills, and a map is applied only from this kind of record to itself.
+   */
+  async checkMapFroms() {
+    const unknown = this.mapCandidates.filter((entry) => !(entry.recordId in this.mapFroms));
+    if (unknown.length === 0) {
+      return;
+    }
+    const found = {};
+    await Promise.all(
+      unknown.map(async (entry) => {
+        try {
+          const saved = await loadMap({ recordId: entry.recordId });
+          const from = (parseMap(saved.definitionJson).document || {}).from || {};
+          found[entry.recordId] =
+            from.kind === 'record' ? String(from.object || '').toLowerCase() : '';
+        } catch {
+          found[entry.recordId] = '';
+        }
+      })
+    );
+    this.mapFroms = { ...this.mapFroms, ...found };
+  }
+
+  /** The maps from and to the chosen kind of record. */
+  get mapOptions() {
+    const objectName = String(this.objectApiName || '').toLowerCase();
+    return this.mapCandidates
+      .filter((entry) => this.mapFroms[entry.recordId] === objectName)
+      .map((entry) => ({ label: entry.name, value: entry.recordId }));
+  }
+
+  get hasMaps() {
+    return this.mapOptions.length > 0;
+  }
+
+  get applyMapDisabled() {
+    return this.busy || !this.mapId;
+  }
+
+  handleMapPick(event) {
+    this.mapId = event.detail.value;
+  }
+
+  /**
+   * Puts a map's columns in place of the changes (c/mapDocument toChanges): a map from this
+   * kind of record to itself, at most five changes, each checked as the person on Preview.
+   */
+  async handleApplyMap() {
+    this.noticeMessage = undefined;
+    if (this.hasChange) {
+      const confirmed = await BarnConfirmModal.open({
+        size: 'small',
+        label: this.labels.mapApply,
+        message: helpText('Core', 'Core_SuperTransform_MapReplaceConfirm'),
+        confirmLabel: this.labels.mapApply,
+        cancelLabel: CANCEL
+      });
+      if (!confirmed) {
+        return;
+      }
+    }
+    await this.work(async () => {
+      const saved = await loadMap({ recordId: this.mapId });
+      const { document } = parseMap(saved.definitionJson);
+      const fields = this.targets.map((target) => target.apiName);
+      const result = toChanges(document, this.objectApiName, fields, this.maxChanges);
+      if (result.wrongKind || result.changes.length === 0) {
+        throw new Error(format(helpText('Core', 'Core_SuperTransform_MapNone'), saved.name));
+      }
+      this.changes = await Promise.all(
+        result.changes.map(async (change) => {
+          const entry = { ...this.newChange(), ...change, value: change.value || '' };
+          if (entry.action === 'copy' || entry.action === 'transform') {
+            const sources = await getCopySources({
+              objectName: this.objectApiName,
+              fieldName: change.field
+            });
+            // A copy with steps may start from a field of another type: it is listed too.
+            const listed = (sources || []).some((option) => option.value === entry.source);
+            entry.sources =
+              entry.source && !listed
+                ? (sources || []).concat([{ label: entry.source, value: entry.source }])
+                : sources;
+          }
+          return entry;
+        })
+      );
+      this.invalidate();
+      this.noticeMessage = result.skipped
+        ? format(
+            helpText('Core', 'Core_SuperTransform_MapAppliedSome'),
+            saved.name,
+            result.changes.length,
+            result.skipped
+          )
+        : format(
+            helpText('Core', 'Core_SuperTransform_MapApplied'),
+            saved.name,
+            result.changes.length
+          );
+    });
   }
 
   /* ---------- 4. preview ---------- */
@@ -982,6 +1149,7 @@ export default class SuperTransform extends LightningElement {
       this.stopPolling();
       this.job = undefined;
       this.objectApiName = definition.object;
+      this.checkMapFroms();
       this.targets = targets;
       this.filterJson = definition.filter ? JSON.stringify(definition.filter) : '';
       this.relatedJson = '';

@@ -123,11 +123,9 @@ jest.mock('@salesforce/customPermission/Manage_BarnCRM_Settings', () => ({ defau
   virtual: true
 });
 
-jest.mock(
-  '@salesforce/label/c.Core_Rollups_FreshnessStale',
-  () => ({ default: 'Rollups have not been calculated in more than 36 hours.' }),
-  { virtual: true }
-);
+setHelpTextForTest({
+  Core_Rollups_FreshnessStale: 'Rollups have not been calculated in more than 36 hours.'
+});
 
 jest.mock(
   '@salesforce/label/c.Rollups_Rollups_CountsSeparatedBy',

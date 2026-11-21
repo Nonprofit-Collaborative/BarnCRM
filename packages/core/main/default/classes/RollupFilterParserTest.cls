@@ -310,7 +310,11 @@ private class RollupFilterParserTest {
 				RollupFilterParser.toWhereClause(document);
 				System.Assert.fail('Must be refused: ' + document);
 			} catch (RollupFilterParser.RollupFilterException expected) {
-				System.Assert.areEqual(System.Label.Core_Rollups_ErrorInvalidFilter, expected.getMessage(), document);
+				System.Assert.areEqual(
+					BarnHelp.text('Core', 'Core_Rollups_ErrorInvalidFilter'),
+					expected.getMessage(),
+					document
+				);
 			}
 		}
 	}

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>The Templates tab of Super Connector: imports a template or an exported recipe from a file or pasted text.</description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

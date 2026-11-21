@@ -633,7 +633,7 @@ public with sharing class TriggerDispatcher {
 	private static void skip(String className, String objectApiName) {
 		ErrorLogger.logMessage(
 			String.format(
-				Label.Core_Automation_HandlerUnavailable,
+				BarnHelp.text('Core', 'Core_Automation_HandlerUnavailable'),
 				new List<String>{ className == null ? '' : className }
 			),
 			'Trigger dispatch: ' + objectApiName,

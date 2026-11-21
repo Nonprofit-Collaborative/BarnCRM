@@ -5,6 +5,7 @@
 
 # A job chaining its next step from inside its own execute or finish: it already runs inside
 # the limits AsyncStarter checks, and a refusal there has no person to tell.
+packages/connector/main/default/classes/ConnectorRunner.cls 1
 packages/core/main/default/classes/BrandShareJob.cls 3
 packages/core/main/default/classes/CorePostInstallRetryQueueable.cls 1
 packages/core/main/default/classes/DuplicateRulesStarter.cls 1
