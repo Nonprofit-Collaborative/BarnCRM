@@ -33,14 +33,6 @@
         <value>A program that can no longer be found</value>
     </labels>
     <labels>
-        <fullName>LogicModels_Builder_Change</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Button that changes whose model this is</shortDescription>
-        <value>Change</value>
-    </labels>
-    <labels>
         <fullName>LogicModels_Builder_AddTo</fullName>
         <categories>LogicModels</categories>
         <language>en_US</language>

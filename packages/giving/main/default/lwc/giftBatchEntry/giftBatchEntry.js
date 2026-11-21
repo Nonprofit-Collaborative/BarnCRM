@@ -24,7 +24,7 @@ import columnDonor from '@salesforce/label/c.Giving_GiftBatch_ColumnDonor';
 import columnAmount from '@salesforce/label/c.Giving_AskPipeline_FieldAmount';
 import columnReference from '@salesforce/label/c.Giving_GiftBatch_ColumnReference';
 import columnDate from '@salesforce/label/c.Core_ImportNewField_TypeDate';
-import columnMethod from '@salesforce/label/c.Giving_GiftBatch_ColumnMethod';
+import columnMethod from '@salesforce/label/c.Giving_QuickGiftEntry_TypeLabel';
 import columnFund from '@salesforce/label/c.Giving_GiftBatch_ColumnFund';
 import columnAppeal from '@salesforce/label/c.Giving_QuickGiftEntry_AppealLabel';
 import columnGift from '@salesforce/label/c.Giving_Section_Gift';

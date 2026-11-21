@@ -9,7 +9,7 @@ import GROUP_ALTERNATIVE from '@salesforce/label/c.Core_Integrations_GroupAltern
 import INSTALLED from '@salesforce/label/c.Core_Integrations_Installed';
 import NOT_INSTALLED from '@salesforce/label/c.Core_Integrations_NotInstalled';
 import STATUS_IN_PROGRESS from '@salesforce/label/c.Core_Integrations_StatusInProgress';
-import STATUS_AVAILABLE from '@salesforce/label/c.Core_Integrations_StatusAvailable';
+import STATUS_AVAILABLE from '@salesforce/label/c.Core_Filter_AvailableValues';
 import REQUEST_HEADING from '@salesforce/label/c.Core_Integrations_RequestLink';
 import REQUEST_LINK from '@salesforce/label/c.Core_Integrations_RequestLink';
 import REQUEST_URL from '@salesforce/label/c.Core_Integrations_RequestUrl';

@@ -41,14 +41,6 @@
         <value>Fair Market Value</value>
     </labels>
     <labels>
-        <fullName>Giving_QuickGiftEntry_DateLabel</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Quick gift entry: gift date</shortDescription>
-        <value>Gift Date</value>
-    </labels>
-    <labels>
         <fullName>Giving_QuickGiftEntry_TypeLabel</fullName>
         <categories>Giving</categories>
         <language>en_US</language>

@@ -209,30 +209,6 @@
         <value>Read</value>
     </labels>
     <labels>
-        <fullName>Core_AccessExplorer_ColCreate</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: column</shortDescription>
-        <value>Create</value>
-    </labels>
-    <labels>
-        <fullName>Core_AccessExplorer_ColEdit</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: column</shortDescription>
-        <value>Edit</value>
-    </labels>
-    <labels>
-        <fullName>Core_AccessExplorer_ColDelete</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: column</shortDescription>
-        <value>Delete</value>
-    </labels>
-    <labels>
         <fullName>Core_AccessExplorer_ColViewAll</fullName>
         <categories>AccessExplorer</categories>
         <language>en_US</language>

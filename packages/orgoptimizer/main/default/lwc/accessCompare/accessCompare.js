@@ -36,9 +36,9 @@ import KIND_OF_RECORD from '@salesforce/label/c.Core_AccessExplorer_KindOfRecord
 import FIELD from '@salesforce/label/c.Core_AccessExplorer_Field';
 import COL_API_NAME from '@salesforce/label/c.Core_AccessExplorer_ColApiName';
 import COL_READ from '@salesforce/label/c.Core_AccessExplorer_ColRead';
-import COL_CREATE from '@salesforce/label/c.Core_AccessExplorer_ColCreate';
-import COL_EDIT from '@salesforce/label/c.Core_AccessExplorer_ColEdit';
-import COL_DELETE from '@salesforce/label/c.Core_AccessExplorer_ColDelete';
+import COL_CREATE from '@salesforce/label/c.Core_Import_LoadObjectCreateButton';
+import COL_EDIT from '@salesforce/label/c.Core_CmdtManager_EditAction';
+import COL_DELETE from '@salesforce/label/c.Core_Find_Delete';
 import COL_VIEW_ALL from '@salesforce/label/c.Core_AccessExplorer_ColViewAll';
 import COL_MODIFY_ALL from '@salesforce/label/c.Core_AccessExplorer_ColModifyAll';
 import DOWNLOAD from '@salesforce/label/c.Core_AccessExplorer_Download';

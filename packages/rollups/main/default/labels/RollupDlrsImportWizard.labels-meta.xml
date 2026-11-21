@@ -17,22 +17,6 @@
         <value>Choose</value>
     </labels>
     <labels>
-        <fullName>Rollups_RollupBuilder_DlrsImportStepCompare</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import from DLRS step name</shortDescription>
-        <value>Compare</value>
-    </labels>
-    <labels>
-        <fullName>Rollups_RollupBuilder_DlrsImportStepTurnOn</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import from DLRS step name</shortDescription>
-        <value>Turn On</value>
-    </labels>
-    <labels>
         <fullName>Rollups_RollupBuilder_DlrsImportCanCopy</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -63,14 +47,6 @@
         <protected>false</protected>
         <shortDescription>Import from DLRS button that copies the chosen rollups</shortDescription>
         <value>Copy Switched Off</value>
-    </labels>
-    <labels>
-        <fullName>Rollups_RollupBuilder_DlrsImportCompare</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import from DLRS button that compares one copy</shortDescription>
-        <value>Compare</value>
     </labels>
     <labels>
         <fullName>Rollups_RollupBuilder_DlrsImportActive</fullName>

@@ -49,14 +49,6 @@
         <value>In Progress</value>
     </labels>
     <labels>
-        <fullName>Core_Integrations_StatusAvailable</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Integrations: status of an integration that is built</shortDescription>
-        <value>Available</value>
-    </labels>
-    <labels>
         <fullName>Core_Integrations_Maintainer</fullName>
         <categories>Core</categories>
         <language>en_US</language>

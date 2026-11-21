@@ -9,8 +9,6 @@ import TITLE from '@salesforce/label/c.Rollups_RollupBuilder_DlrsImportTitle';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import STEP_CHOOSE from '@salesforce/label/c.Rollups_RollupBuilder_DlrsImportStepChoose';
 import STEP_REVIEW from '@salesforce/label/c.Core_DuplicateMatching_Review';
-import STEP_COMPARE from '@salesforce/label/c.Rollups_RollupBuilder_DlrsImportStepCompare';
-import STEP_TURN_ON from '@salesforce/label/c.Rollups_RollupBuilder_DlrsImportStepTurnOn';
 import CAN_COPY from '@salesforce/label/c.Rollups_RollupBuilder_DlrsImportCanCopy';
 import STAYS from '@salesforce/label/c.Rollups_RollupBuilder_DlrsImportStays';
 import FILLS from '@salesforce/label/c.Rollups_RollupBuilder_DlrsImportFills';
@@ -19,7 +17,7 @@ import NEXT from '@salesforce/label/c.Core_Import_NextButton';
 import BACK from '@salesforce/label/c.Core_Kit_Back';
 import CLOSE from '@salesforce/label/c.Core_BulkUpdate_Close';
 import FINISH from '@salesforce/label/c.Core_SetupAssistant_FinishButton';
-import COMPARE from '@salesforce/label/c.Rollups_RollupBuilder_DlrsImportCompare';
+import COMPARE from '@salesforce/label/c.Core_AccessCompare_Compare';
 import TURN_ON from '@salesforce/label/c.Core_ModuleManager_TurnOnButton';
 import ACTIVE from '@salesforce/label/c.Rollups_RollupBuilder_DlrsImportActive';
 import RECORD from '@salesforce/label/c.Core_BulkUpdate_Record';
@@ -120,8 +118,8 @@ export default class RollupDlrsImport extends LightningElement {
   steps = [
     { value: CHOOSE_STEP, label: STEP_CHOOSE },
     { value: REVIEW_STEP, label: STEP_REVIEW },
-    { value: COMPARE_STEP, label: STEP_COMPARE },
-    { value: TURN_ON_STEP, label: STEP_TURN_ON }
+    { value: COMPARE_STEP, label: COMPARE },
+    { value: TURN_ON_STEP, label: TURN_ON }
   ];
 
   step = CHOOSE_STEP;

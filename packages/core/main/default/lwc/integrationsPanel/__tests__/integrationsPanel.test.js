@@ -177,7 +177,7 @@ describe('c-integrations-panel', () => {
     const done = row(element, 'done').querySelector('[data-id="status"]');
     expect(plan.label).toBe('c.Core_Integrations_StatusInProgress');
     expect(plan.status).toBe('in-progress');
-    expect(done.label).toBe('c.Core_Integrations_StatusAvailable');
+    expect(done.label).toBe('c.Core_Filter_AvailableValues');
     expect(done.status).toBe('success');
   });
 
