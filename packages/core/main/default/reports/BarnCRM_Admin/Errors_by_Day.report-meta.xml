@@ -46,7 +46,7 @@
     <field>Error_Log__c$Timestamp__c</field>
     <sortOrder>Asc</sortOrder>
   </groupingsDown>
-  <name>Errors by Day</name>
+  <name>Errors Logged by Day</name>
   <reportType>Error_Logs__c</reportType>
   <scope>organization</scope>
   <showDetails>false</showDetails>
