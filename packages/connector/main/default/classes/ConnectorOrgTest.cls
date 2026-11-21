@@ -6,6 +6,7 @@
  */
 @IsTest(testFor='ApexClass:ConnectorOrg')
 private class ConnectorOrgTest {
+	// runs-as: deploying user (ConnectorOrg reads ConnectApi results and writes principal access in system mode; no user access is checked)
 	private static final String MISSING = 'BarnConn_Rest_NoSuchCredential';
 
 	@IsTest

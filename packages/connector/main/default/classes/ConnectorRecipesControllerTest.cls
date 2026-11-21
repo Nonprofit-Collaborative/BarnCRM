@@ -14,6 +14,19 @@ private class ConnectorRecipesControllerTest {
 	static void createTestUsers() {
 		TestUsers.adminWith(ConnectorConnections.ADMIN_SET);
 		TestUsers.adminWith(VIEWER_SET);
+		TestUsers.standardUserWith('Sam', new List<String>{ VIEWER_SET });
+		TestUsers.standardUser('Autopilot');
+	}
+
+	/** A user the setup made, by last name (its email is the last name at barncrm.example.invalid). */
+	private static User made(String lastName) {
+		return [
+			SELECT Id, Username, ProfileId
+			FROM User
+			WHERE LastName = :lastName AND Email LIKE '%barncrm.example.invalid'
+			ORDER BY CreatedDate DESC
+			LIMIT 1
+		];
 	}
 
 	private static User admin() {
@@ -305,7 +318,7 @@ private class ConnectorRecipesControllerTest {
 
 	@IsTest
 	static void samSeesRecipesButCannotChangeThem() {
-		System.runAs(TestUsers.standardUserWith('Sam', new List<String>{ VIEWER_SET })) {
+		System.runAs(made('Sam')) {
 			Test.startTest();
 			ConnectorRecipes.RecipesPage page = ConnectorRecipesController.getRecipes();
 			List<ConnectorRecipes.Run> runs = ConnectorRecipes.runs(null, null);
@@ -418,7 +431,7 @@ private class ConnectorRecipesControllerTest {
 			'getIntegrationUser',
 			'chooseIntegrationUser'
 		};
-		System.runAs(TestUsers.standardUserWith('Sam', new List<String>{ VIEWER_SET })) {
+		System.runAs(made('Sam')) {
 			Test.startTest();
 			Map<String, String> refused = new Map<String, String>();
 			for (String action : changes) {
@@ -578,7 +591,7 @@ private class ConnectorRecipesControllerTest {
 
 	@IsTest
 	static void beforeAFirstSaveBarnCrmAdminAndTheModuleAdminSetsAreTicked() {
-		User identity = TestUsers.standardUser('Autopilot');
+		User identity = made('Autopilot');
 		System.runAs(admin()) {
 			ConnectorIdentity.automatedProcessOverride = identity.Id;
 
@@ -610,7 +623,7 @@ private class ConnectorRecipesControllerTest {
 
 	@IsTest
 	static void savingAssignsOnlyTheNewPicksAndDroppingARecipeAccessSetRemovesIt() {
-		User identity = TestUsers.standardUser('Autopilot');
+		User identity = made('Autopilot');
 		System.runAs(admin()) {
 			ConnectorIdentity.automatedProcessOverride = identity.Id;
 			String coreAdmin = choiceNamed(ConnectorIdentity.access(), 'BarnCRM_Admin').id;

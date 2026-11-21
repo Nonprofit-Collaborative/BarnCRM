@@ -568,6 +568,7 @@ private class ConnectorWebhooksTest {
 
 	@IsTest
 	static void tokensAreHashedAsLowerCaseHexAndReferencesAreOpaqueAndNew() {
+		// runs-as: deploying user (pure logic: hashing, references and the cap, no DML or SOQL)
 		String token = 'ab'.repeat(32);
 
 		String hashed = ConnectorWebhooks.hashOf(token);
