@@ -13,7 +13,7 @@ private class ConnectorConnectionsControllerTest {
 	private class FakeOrg extends ConnectorOrg {
 		Map<String, ConnectorOrg.Pair> pairs = new Map<String, ConnectorOrg.Pair>();
 		Map<String, String> kinds = new Map<String, String>();
-		Map<String, Id> principals = new Map<String, Id>();
+		Integer principalCount = 0;
 		Map<Id, Set<Id>> granted = new Map<Id, Set<Id>>();
 		List<ConnectApi.CredentialInput> credentials = new List<ConnectApi.CredentialInput>();
 		List<ConnectApi.NamedCredentialInput> named = new List<ConnectApi.NamedCredentialInput>();
@@ -36,7 +36,7 @@ private class ConnectorConnectionsControllerTest {
 			pair.calloutsEnabled = calloutsOn;
 			pair.keyStored = keyStored;
 			pairs.put(name, pair);
-			principals.put(name, Id.valueOf('001' + String.valueOf(principals.size() + 1).leftPad(12, '0')));
+			pair.principalId = Id.valueOf('001' + String.valueOf(++principalCount).leftPad(12, '0'));
 			return pair;
 		}
 
@@ -50,10 +50,6 @@ private class ConnectorConnectionsControllerTest {
 
 		public override ConnectorOrg.Pair read(String name, String label) {
 			return pairs.get(name);
-		}
-
-		public override Map<String, Id> principalIds() {
-			return principals.clone();
 		}
 
 		public override Set<Id> grantedEntities(Id permissionSetId) {
@@ -402,27 +398,18 @@ private class ConnectorConnectionsControllerTest {
 			Assert.areEqual(SECRET_URL + 'new', fake.pairs.get('BarnConn_rest_bbbbbb').url, 'The new address is kept');
 			Assert.isFalse(fake.named[0].calloutOptions.allowMergeFieldsInBody, 'Formulas stay off in the body');
 			Assert.isFalse(JSON.serialize(replaced).contains('/services/'), 'The new address is not returned (F5)');
-		}
-	}
 
-	@IsTest
-	static void aTemplateHostLockHoldsTheDataCenterToItsPattern() {
-		System.runAs(dana()) {
-			Map<String, String> parts = new Map<String, String>{ 'dc' => '^[a-z]{2}[0-9]{1,3}$' };
-			String template = '{dc}.api.mailchimp.com';
-
-			Assert.isTrue(ConnectorConnections.hostFitsTemplate('us21.api.mailchimp.com', template, parts), 'Fits');
-			Assert.isTrue(ConnectorConnections.hostFitsTemplate('US21.API.mailchimp.com', template, parts), 'Any case');
-			Assert.isFalse(
-				ConnectorConnections.hostFitsTemplate('us21.api.mailchimp.com.attacker.net', template, parts),
-				'No suffix host'
+			String disconnectRefusal;
+			try {
+				ConnectorConnectionsController.disconnect('BarnConn_rest_bbbbbb');
+			} catch (AuraHandledException e) {
+				disconnectRefusal = refusal(e);
+			}
+			Assert.areEqual(
+				BarnHelp.text('Connector', 'Connector_Error_DisconnectSecretUrl'),
+				disconnectRefusal,
+				'A Secret URL has no key to remove, so Disconnect says so'
 			);
-			Assert.isFalse(ConnectorConnections.hostFitsTemplate('attacker.net', template, parts), 'No other host');
-			Assert.isFalse(
-				ConnectorConnections.hostFitsTemplate('x.y.api.mailchimp.com', template, parts),
-				'The data center keeps its pattern'
-			);
-			Assert.isFalse(ConnectorConnections.hostFitsTemplate('us21.api.mailchimp.com', template, null), 'Locked');
 		}
 	}
 

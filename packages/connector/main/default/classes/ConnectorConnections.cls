@@ -221,31 +221,6 @@ public with sharing class ConnectorConnections {
 		return address.getPort() == -1 ? address.getDefaultPort() : address.getPort();
 	}
 
-	/**
-	 * Whether a host fits a template's locked host (R-CN4), such as `{dc}.api.mailchimp.com`
-	 * with `dc` held to `^[a-z]{2}[0-9]{1,3}$`. Every part outside a placeholder must match
-	 * exactly; a placeholder without a pattern never matches.
-	 */
-	public static Boolean hostFitsTemplate(String host, String template, Map<String, String> partPatterns) {
-		if (String.isBlank(host) || String.isBlank(template)) {
-			return false;
-		}
-		String regex = '';
-		Matcher placeholder = Pattern.compile('\\{([a-zA-Z]+)\\}').matcher(template);
-		Integer last = 0;
-		while (placeholder.find()) {
-			String part = partPatterns == null ? null : partPatterns.get(placeholder.group(1));
-			if (String.isBlank(part)) {
-				return false;
-			}
-			regex += Pattern.quote(template.substring(last, placeholder.start()));
-			regex += '(?:' + part.removeStart('^').removeEnd('$') + ')';
-			last = placeholder.end();
-		}
-		regex += Pattern.quote(template.substring(last));
-		return Pattern.matches(regex, host.toLowerCase());
-	}
-
 	/** The host of an address, or blank. */
 	public static String hostOf(String address) {
 		try {
@@ -340,16 +315,28 @@ public with sharing class ConnectorConnections {
 	public static ConnectionsPage page() {
 		ConnectionsPage result = new ConnectionsPage();
 		result.canWrite = canWrite();
-		Map<String, Id> principals = org.principalIds();
 		Set<Id> granted = grantedPrincipals();
 		Map<String, String> labels = org.labelsByName();
 		for (String name : labels.keySet()) {
 			ConnectorOrg.Pair pair = org.read(name, labels.get(name));
 			if (pair != null && pair.linked && KINDS.contains(pair.principal)) {
-				result.connections.add(shown(pair, granted.contains(principals.get(name))));
+				result.connections.add(shown(pair, pair.principalId != null && granted.contains(pair.principalId)));
 			}
 		}
 		return result;
+	}
+
+	/** The principal Ids of every `BarnConn_` connection, one read each. */
+	public static Set<Id> principalIds() {
+		Set<Id> found = new Set<Id>();
+		Map<String, String> labels = org.labelsByName();
+		for (String name : labels.keySet()) {
+			ConnectorOrg.Pair pair = org.read(name, labels.get(name));
+			if (pair != null && pair.principalId != null) {
+				found.add(pair.principalId);
+			}
+		}
+		return found;
 	}
 
 	/** Names and status only: the URL becomes a host, a Secret URL its host and last four. */
@@ -456,7 +443,8 @@ public with sharing class ConnectorConnections {
 				AccessLevel.SYSTEM_MODE
 			);
 		}
-		Id principal = org.principalIds().get(name);
+		ConnectorOrg.Pair pair = org.read(name, null);
+		Id principal = pair == null ? null : pair.principalId;
 		if (principal == null) {
 			return false;
 		}

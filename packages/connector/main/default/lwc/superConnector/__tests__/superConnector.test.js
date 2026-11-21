@@ -58,6 +58,9 @@ jest.mock(
   () => ({ default: jest.fn(() => Promise.resolve([])) }),
   { virtual: true }
 );
+jest.mock('@salesforce/customPermission/Manage_BarnCRM_Connector', () => ({ default: true }), {
+  virtual: true
+});
 
 const READY = {
   name: 'BarnConn_rest_abc123',
@@ -118,14 +121,13 @@ describe('c-super-connector', () => {
     expect(find(element, 'tabs').activeTabValue).toBe('recipes');
   });
 
-  it('keeps Recipes and Run History for a Viewer who cannot load connections, without Retry', async () => {
-    getConnections.mockRejectedValue({ body: { message: 'Needs BarnCRM Connector Admin.' } });
+  it('keeps Retry for an admin whose connections fail to load', async () => {
+    getConnections.mockRejectedValue({ body: { message: 'Unavailable.' } });
     const element = createElement('c-super-connector', { is: SuperConnector });
     document.body.appendChild(element);
     await flush();
-    expect(find(element, 'recipes')).not.toBeNull();
-    expect(find(element, 'runs').canManage).toBe(false);
-    expect(find(element, 'error').message).toBe('Needs BarnCRM Connector Admin.');
+    expect(find(element, 'runs').canManage).toBe(true);
+    expect(find(element, 'error').message).toBe('Unavailable.');
   });
 
   it('lists connections with status and the Setup step, never a key', async () => {

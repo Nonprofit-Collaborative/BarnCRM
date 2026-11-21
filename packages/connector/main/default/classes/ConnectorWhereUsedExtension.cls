@@ -3,8 +3,8 @@
  * recipes that name the target:
  * - a saved map, when a Create, Update, Create or Update or Call an App step links it (R-ST5), so
  *   the Mapper warns before the map is changed;
- * - an object or field, when a Find step's query names it as its object, a field it returns or a
- *   condition.
+ * - an object or field, when a Find step's query or a Record Change trigger's query names it as
+ *   its object, a field it returns or a condition.
  * Both the published definition and the unpublished draft count. Core finds this class by name
  * (`WhereUsedExtensions`) and asks only someone who may manage settings, so it reads in system
  * mode.
@@ -56,6 +56,14 @@ public with sharing class ConnectorWhereUsedExtension implements WhereUsedExtens
 		WhereUsedService.Target target,
 		Map<String, Object> document
 	) {
+		Map<String, Object> starter = ConnectorRecipeDocument.mapOf(document.get('trigger'));
+		if (
+			target.mapId == null &&
+			ConnectorRecipeDocument.textOf(starter.get('kind')) == 'record' &&
+			queryNames(target, ConnectorRecipeDocument.mapOf(starter.get('query')))
+		) {
+			reference.addPart(BarnHelp.text('Connector', 'Connector_WhereUsed_Trigger'));
+		}
 		for (Map<String, Object> step : ConnectorRecipeDocument.allSteps(document)) {
 			String label = BarnHelp.text(
 				'Connector',
@@ -71,23 +79,26 @@ public with sharing class ConnectorWhereUsedExtension implements WhereUsedExtens
 				}
 				continue;
 			}
-			if (ConnectorRecipeDocument.textOf(step.get('kind')) != 'find') {
-				continue;
-			}
-			Map<String, Object> query = ConnectorRecipeDocument.mapOf(step.get('query'));
-			String objectName = ConnectorRecipeDocument.textOf(query.get('object'));
-			if (target.isObject() && target.isObject(objectName)) {
-				reference.addPart(label);
-				continue;
-			}
-			Boolean named = target.matchesFilter(objectName, query.get('filter'));
-			for (Object field : ConnectorRecipeDocument.listOf(query.get('fields'))) {
-				named = named || target.matchesPath(objectName, ConnectorRecipeDocument.textOf(field));
-			}
-			if (named) {
+			if (
+				ConnectorRecipeDocument.textOf(step.get('kind')) == 'find' &&
+				queryNames(target, ConnectorRecipeDocument.mapOf(step.get('query')))
+			) {
 				reference.addPart(label);
 			}
 		}
+	}
+
+	/** Whether a query names the target as its object, a field it returns or a condition. */
+	private static Boolean queryNames(WhereUsedService.Target target, Map<String, Object> query) {
+		String objectName = ConnectorRecipeDocument.textOf(query.get('object'));
+		if (target.isObject() && target.isObject(objectName)) {
+			return true;
+		}
+		Boolean named = target.matchesFilter(objectName, query.get('filter'));
+		for (Object field : ConnectorRecipeDocument.listOf(query.get('fields'))) {
+			named = named || target.matchesPath(objectName, ConnectorRecipeDocument.textOf(field));
+		}
+		return named;
 	}
 
 	private static Map<String, Object> parsed(String source) {

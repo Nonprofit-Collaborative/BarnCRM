@@ -194,7 +194,7 @@ public with sharing class ConnectorHealthCheckExtension implements HealthCheckEx
 			return false;
 		}
 		Set<Id> entities = ConnectorConnections.store().grantedEntities(target.Id);
-		entities.removeAll(ConnectorConnections.store().principalIds().values());
+		entities.removeAll(ConnectorConnections.principalIds());
 		Id setId = target.Id;
 		return !entities.isEmpty() ||
 			holdsSystemPermission(setId) ||

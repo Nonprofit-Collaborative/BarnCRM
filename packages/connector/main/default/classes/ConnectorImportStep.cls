@@ -315,47 +315,61 @@ public inherited sharing class ConnectorImportStep {
 		return rows;
 	}
 
-	/** CSV text (RFC 4180: quoted fields, doubled quotes, commas and line breaks inside quotes) as lines of cells. */
+	/**
+	 * CSV text (RFC 4180: quoted fields, doubled quotes, commas and line breaks inside quotes) as
+	 * lines of cells. Each run of plain characters is taken with one `substring`, so a long cell
+	 * costs one copy, not one per character.
+	 */
 	@TestVisible
 	private static List<Object> csv(String text) {
+		final Integer quote = 34;
+		final Integer comma = 44;
+		final Integer lineFeed = 10;
+		final Integer carriageReturn = 13;
 		List<Object> lines = new List<Object>();
 		List<Object> cells = new List<Object>();
 		String cell = '';
 		Boolean quoted = false;
+		Integer start = 0;
 		Integer i = 0;
 		Integer size = text.length();
 		while (i < size) {
-			String c = text.substring(i, i + 1);
+			Integer c = text.charAt(i);
 			if (quoted) {
-				if (c == '"' && i + 1 < size && text.substring(i + 1, i + 2) == '"') {
-					cell += '"';
-					i++;
-				} else if (c == '"') {
-					quoted = false;
-				} else {
-					cell += c;
+				if (c == quote) {
+					cell += text.substring(start, i);
+					if (i + 1 < size && text.charAt(i + 1) == quote) {
+						cell += '"';
+						i++;
+					} else {
+						quoted = false;
+					}
+					start = i + 1;
 				}
-			} else if (c == '"') {
+			} else if (c == quote) {
+				cell += text.substring(start, i);
 				quoted = true;
-			} else if (c == ',') {
-				cells.add(cell);
+				start = i + 1;
+			} else if (c == comma) {
+				cells.add(cell + text.substring(start, i));
 				cell = '';
-			} else if (c == '\n' || c == '\r') {
-				if (c == '\r' && i + 1 < size && text.substring(i + 1, i + 2) == '\n') {
+				start = i + 1;
+			} else if (c == lineFeed || c == carriageReturn) {
+				cells.add(cell + text.substring(start, i));
+				if (c == carriageReturn && i + 1 < size && text.charAt(i + 1) == lineFeed) {
 					i++;
 				}
-				cells.add(cell);
 				lines.add(cells);
 				cells = new List<Object>();
 				cell = '';
-			} else {
-				cell += c;
+				start = i + 1;
 			}
 			i++;
 		}
 		if (quoted) {
 			throw failure(BarnHelp.text('Connector', 'Connector_Import_ErrorRowsUnreadable', new List<Object>()));
 		}
+		cell += text.substring(start, size);
 		if (cell != '' || !cells.isEmpty()) {
 			cells.add(cell);
 			lines.add(cells);

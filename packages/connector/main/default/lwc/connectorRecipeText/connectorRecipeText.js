@@ -279,11 +279,11 @@ const TEXTS = {
   get Connector_Editor_Method() {
     return helpText('Connector', 'Connector_Editor_Method');
   },
-  get Connector_Editor_MoveDown() {
-    return helpText('Connector', 'Connector_Editor_MoveDown');
+  get Connector_Editor_MoveDownStep() {
+    return helpText('Connector', 'Connector_Editor_MoveDownStep');
   },
-  get Connector_Editor_MoveUp() {
-    return helpText('Connector', 'Connector_Editor_MoveUp');
+  get Connector_Editor_MoveUpStep() {
+    return helpText('Connector', 'Connector_Editor_MoveUpStep');
   },
   get Connector_Editor_Name() {
     return helpText('Connector', 'Connector_Editor_Name');
@@ -333,8 +333,11 @@ const TEXTS = {
   get Connector_Editor_RecordId() {
     return helpText('Connector', 'Connector_Editor_RecordId');
   },
-  get Connector_Editor_Remove() {
-    return helpText('Connector', 'Connector_Editor_Remove');
+  get Connector_Editor_RemoveEntry() {
+    return helpText('Connector', 'Connector_Editor_RemoveEntry');
+  },
+  get Connector_Editor_RemoveStep() {
+    return helpText('Connector', 'Connector_Editor_RemoveStep');
   },
   get Connector_Editor_RunAs() {
     return helpText('Connector', 'Connector_Editor_RunAs');

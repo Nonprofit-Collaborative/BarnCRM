@@ -4,6 +4,7 @@ import getConnections from '@salesforce/apex/ConnectorConnectionsController.getC
 import checkConnection from '@salesforce/apex/ConnectorConnectionsController.checkConnection';
 import disconnect from '@salesforce/apex/ConnectorConnectionsController.disconnect';
 import deleteConnection from '@salesforce/apex/ConnectorConnectionsController.deleteConnection';
+import manageConnector from '@salesforce/customPermission/Manage_BarnCRM_Connector';
 import BarnConfirmModal from 'c/barnConfirmModal';
 import { isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { iconFor } from 'c/barnIcons';
@@ -55,6 +56,9 @@ export default class SuperConnector extends LightningElement {
     },
     get noWrite() {
       return text('Connector_Page_NoWrite');
+    },
+    get viewerNotice() {
+      return text('Connector_Page_ViewerNotice');
     },
     get replaceKey() {
       return text('Connector_Page_ReplaceKey');
@@ -114,7 +118,21 @@ export default class SuperConnector extends LightningElement {
         this.helpReady = true;
       });
     }
-    this.load();
+    if (this.canManage) {
+      this.load();
+    }
+  }
+
+  /**
+   * Whether the person is a Connector admin (Manage BarnCRM Connector): Run History offers Retry
+   * and the Connections tab loads. A Viewer sees a plain notice there instead.
+   */
+  get canManage() {
+    return manageConnector === true;
+  }
+
+  get viewerOnly() {
+    return !this.canManage;
   }
 
   async load() {
@@ -131,7 +149,7 @@ export default class SuperConnector extends LightningElement {
   }
 
   get loading() {
-    return !this.error && (!this.loaded || this.working);
+    return !this.error && ((this.canManage && !this.loaded) || this.working);
   }
 
   get canWrite() {

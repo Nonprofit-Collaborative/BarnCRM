@@ -38,9 +38,6 @@ export default class ConnectorAppPollSetup extends LightningElement {
     get addEntry() {
       return helpText('Connector', 'Connector_Editor_AddEntry');
     },
-    get remove() {
-      return helpText('Connector', 'Connector_Editor_Remove');
-    },
     get items() {
       return helpText('Connector', 'Connector_Poll_Items');
     },
@@ -103,7 +100,8 @@ export default class ConnectorAppPollSetup extends LightningElement {
       key: `query-${index}`,
       index,
       name: entry.name || '',
-      shown: entry.path || entry.value || ''
+      shown: entry.path || entry.value || '',
+      removeLabel: helpText('Connector', 'Connector_Poll_RemoveParam', entry.name || index + 1)
     }));
   }
 

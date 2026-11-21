@@ -481,11 +481,22 @@ private class ConnectorClockTest {
 				ConnectorRecipes.SCHEDULE,
 				ConnectorRecipes.RUN_AS_AUTOMATION
 			);
-			ConnectorRecipeTestData.recipe(
+			Connector_Recipe__c integrated = ConnectorRecipeTestData.recipe(
 				'As The Integrator',
 				ConnectorRecipeTestData.document(STOP_STEPS),
 				true,
 				ConnectorRecipes.RUN_AS_USER
+			);
+			String neverRuns;
+			try {
+				ConnectorRecipes.runNow(integrated.Id, null);
+			} catch (ConnectorConnections.ConnectorException refused) {
+				neverRuns = refused.getMessage();
+			}
+			Assert.areEqual(
+				BarnHelp.text('Connector', 'Connector_RunAs_ErrorNoUser'),
+				neverRuns,
+				'Run Now waits for an integration user instead of queuing a run that never starts.'
 			);
 			Connector_Recipe__c failing = ConnectorRecipeTestData.recipe(
 				'Gave Up',

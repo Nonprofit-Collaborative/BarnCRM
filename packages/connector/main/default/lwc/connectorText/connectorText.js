@@ -25,6 +25,9 @@ const TEXTS = {
   get Connector_Page_NoWrite() {
     return helpText('Connector', 'Connector_Page_NoWrite');
   },
+  get Connector_Page_ViewerNotice() {
+    return helpText('Connector', 'Connector_Page_ViewerNotice');
+  },
   get Connector_Page_ReplaceKey() {
     return helpText('Connector', 'Connector_Page_ReplaceKey');
   },

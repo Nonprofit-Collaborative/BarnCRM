@@ -100,14 +100,11 @@ public with sharing class ConnectorConnectionsController {
 		} catch (ConnectorConnections.ConnectorException refused) {
 			throw UserErrors.message(refused.getMessage());
 		} catch (Exception failure) {
-			String detail = String.valueOf(failure.getMessage());
-			if (String.isNotBlank(secret)) {
-				detail = detail.replace(secret, '****');
-				for (String part : secret.split('[^A-Za-z0-9]')) {
-					detail = part.length() >= 6 ? detail.replace(part, '****') : detail;
-				}
-			}
-			ConnectorConnections.logRedacted(CONTEXT + '.createConnection', failure.getTypeName(), detail);
+			ConnectorConnections.logRedacted(
+				CONTEXT + '.createConnection',
+				failure.getTypeName(),
+				redacted(failure.getMessage(), secret)
+			);
 			undo(name, externalMade, namedMade);
 			throw UserErrors.message(BarnHelp.text('Connector', 'Connector_Error_SaveFailed'));
 		}
@@ -184,14 +181,11 @@ public with sharing class ConnectorConnectionsController {
 		} catch (ConnectorConnections.ConnectorException refused) {
 			throw UserErrors.message(refused.getMessage());
 		} catch (Exception failure) {
-			String detail = String.valueOf(failure.getMessage());
-			if (String.isNotBlank(secret)) {
-				detail = detail.replace(secret, '****');
-				for (String part : secret.split('[^A-Za-z0-9]')) {
-					detail = part.length() >= 6 ? detail.replace(part, '****') : detail;
-				}
-			}
-			ConnectorConnections.logRedacted(CONTEXT + '.replaceKey', failure.getTypeName(), detail);
+			ConnectorConnections.logRedacted(
+				CONTEXT + '.replaceKey',
+				failure.getTypeName(),
+				redacted(failure.getMessage(), secret)
+			);
 			throw UserErrors.message(BarnHelp.text('Connector', 'Connector_Error_SaveFailed'));
 		}
 		Result result = new Result();
@@ -248,13 +242,21 @@ public with sharing class ConnectorConnectionsController {
 		return result;
 	}
 
-	/** Removes the key and keeps the connection (R-CN8). */
+	/**
+	 * Removes the key and keeps the connection (R-CN8). A Secret URL has no key apart from its
+	 * address, so it is refused: replace or delete it instead.
+	 */
 	@AuraEnabled
 	public static Result disconnect(String name) {
 		try {
 			ConnectorConnections.requireWriter();
 			ConnectorOrg.Pair pair = ConnectorConnections.owned(name);
-			if (pair.principal != ConnectorConnections.SECRET_URL && pair.keyStored) {
+			if (pair.principal == ConnectorConnections.SECRET_URL) {
+				throw new ConnectorConnections.ConnectorException(
+					BarnHelp.text('Connector', 'Connector_Error_DisconnectSecretUrl')
+				);
+			}
+			if (pair.keyStored) {
 				ConnectorConnections.store().deleteKey(pair.name, pair.principal);
 			}
 			Result result = new Result();
@@ -302,6 +304,21 @@ public with sharing class ConnectorConnectionsController {
 				ErrorLogger.SEVERITY_WARNING
 			);
 		}
+	}
+
+	/**
+	 * The failure text with the secret, and each run of 6 or more letters and digits in it,
+	 * replaced by `****` (F7). The secret passes through and is not kept (F8).
+	 */
+	private static String redacted(String message, String secret) {
+		String detail = String.valueOf(message);
+		if (String.isNotBlank(secret)) {
+			detail = detail.replace(secret, '****');
+			for (String part : secret.split('[^A-Za-z0-9]')) {
+				detail = part.length() >= 6 ? detail.replace(part, '****') : detail;
+			}
+		}
+		return detail;
 	}
 
 	/** A refusal written for a person as it is; anything else as Core's unexpected error, logged. */

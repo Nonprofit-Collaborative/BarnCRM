@@ -133,10 +133,6 @@ public class ConnectorRecipeTestData {
 			return pair;
 		}
 
-		public override Map<String, Id> principalIds() {
-			return new Map<String, Id>();
-		}
-
 		public override Set<Id> grantedEntities(Id permissionSetId) {
 			return new Set<Id>();
 		}
