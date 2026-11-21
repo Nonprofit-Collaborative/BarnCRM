@@ -208,8 +208,10 @@ public with sharing class SavedTransformService {
 		Saved_Transform__c saved = find(recordId, kind);
 		String cleaned = cleanName(name, kind);
 		requireFreeName(cleaned, saved.Id, kind);
+		// Only the name is written: the row read back carries Kind__c, which a Bulk Update user
+		// may read but not edit, and a user-mode update refuses any read-only field it is handed.
+		update as user new Saved_Transform__c(Id = saved.Id, Name = cleaned);
 		saved.Name = cleaned;
-		update as user saved;
 		return toView(saved);
 	}
 
