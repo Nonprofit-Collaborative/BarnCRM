@@ -379,7 +379,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On **Org Optimizer**, open **Report Subscriptions**. | The intro, a notice that the org connection is needed and the connection panel. Every report in a BarnCRM folder (for example **Errors by Day**, **LYBUNT Donors**) is listed with its folder and description, each a link that opens the report in a new tab. No **Subscribe** button. |
+| 1 | On **Org Optimizer**, open **Report Subscriptions**. | The intro, a notice that the org connection is needed and the connection panel. Every report in a BarnCRM folder (for example **Errors Logged by Day**, **LYBUNT Donors**) is listed with its folder and description, each a link that opens the report in a new tab. No **Subscribe** button. |
 | 2 | Set up the connection from the panel, leave and reopen the section. | Each report has **Subscribe**. |
 | 3 | On **New Versus Retained Donors** choose **Subscribe**, then **Weekly**, **Monday**, **7:00 AM**, and **Save**. | **Saving your subscription.**, then a green **Subscribed. Salesforce will email you New Versus Retained Donors on the schedule you chose.** |
 | 4 | Open the report and choose **Subscribe**. | Salesforce shows your subscription: weekly on Monday at 7:00 AM, sent to you. |

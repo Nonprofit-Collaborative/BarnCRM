@@ -77,7 +77,7 @@ folder:
 A chart shows to anyone who may run reports and read the records. It refreshes about once a day,
 or at once with its refresh button. Every report reads BarnCRM's own objects only.
 
-The BarnCRM home page also carries an admin-only chart, **Errors by Day**, from the **BarnCRM
+The BarnCRM home page also carries an admin-only chart, **Errors Logged by Day**, from the **BarnCRM
 Admin** report folder: the Error Log entries of severity Error or Critical in the last 30 days.
 
 ## Changing the Page

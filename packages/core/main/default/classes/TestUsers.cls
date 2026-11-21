@@ -56,7 +56,7 @@ public class TestUsers {
 		'Memberships_Admin',
 		'Projects_Admin',
 		'Address_Verification_Admin',
-		'BarnCRM_Connector_Admin',
+		'Connector_Admin',
 		'Reporting_Admin'
 	};
 

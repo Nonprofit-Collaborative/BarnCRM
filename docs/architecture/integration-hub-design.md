@@ -236,7 +236,7 @@ Connections alone.
 
 **Its own console app (D-216).** The module ships the BarnCRM Connector console app
 (`BarnCRM_Connector`) in its own package, following ADR-0223: its logo, the Super Connector tab,
-Reports, and Error Log last (D-135); app visibility in `BarnCRM_Connector_Admin` (the module has
+Reports, and Error Log last (D-135); app visibility in `Connector_Admin` (the module has
 no Staff set; Connector work is admin work, R-CR3). The Super Connector tab also joins the
 BarnCRM apps through the module's catalog row (ADR-0137, ADR-0192), so a capped test org, which
 leaves the app out through `LEFT_OUT` in `scripts/org/capped-org-apps.py` (`MODULE_APPS`), still
@@ -321,7 +321,7 @@ Endpoint: `POST <site URL>/services/apexrest/barncrm/connector/v1/hook?token=<64
 - **No signature checks:** an HMAC check would need Apex to read a signing secret, which ADR-0229
   rules out. Token, fetch back, caps and idempotency replace it. Apps that refuse to deliver
   without a secret-based handshake (Zoom's URL validation) use the polling trigger instead.
-- **Guest access:** a `BarnCRM_Connector_Webhook_Guest` permission set with the REST class and
+- **Guest access:** a `Connector_Webhook_Guest` permission set with the REST class and
   create on the start event only (no Connections controller, no principal access: the receiver
   makes no callout), assigned to Site guest users by the existing Health Check fix. A Site is needed (most orgs with
   Payments or Forms have one); the Settings tab says how to create one.
@@ -462,7 +462,7 @@ D-215 with the requirements below.
   Customize Application (a `PermissionSetAssignment` query, as `BarnCRMPermissions` does), and
   refuses in plain words otherwise. The ConnectApi call runs synchronously in that request, as
   that user: a secret is never queued, scheduled, published or handed to a recipe identity or any
-  system-context path. The controller is granted only by `BarnCRM_Connector_Admin` (never the
+  system-context path. The controller is granted only by `Connector_Admin` (never the
   guest set or a user-level set) and its page is in the internal app only, with no Visualforce
   page or REST resource exposing the write.
 - **F4 Hosts cannot move.** Base URLs must be `https://`. A connection's scheme and host are
@@ -512,7 +512,7 @@ D-215 with the requirements below.
 - **F12 The "BarnCRM Connections" permission set.** BarnCRM creates one org-owned permission set,
   "BarnCRM Connections" (unpackaged, because a packaged permission set cannot be changed in a
   subscriber org), and adds each connection's principal to it. It is assigned only to users who
-  already hold `BarnCRM_Connector_Admin` and to the recipe identities (Section 3.10); user Ids
+  already hold `Connector_Admin` and to the recipe identities (Section 3.10); user Ids
   never come from the client; Health Check warns when the set holds anything other than External
   Credential principal access.
 - **F13 Webhooks:** Section 3.3.
@@ -806,7 +806,7 @@ Large one-off loads belong in Super Importer, which a recipe can call (`importRo
 - **Who a run executes as.** Never a staff member (D-215): the Automated Process user or the
   designated integration user, so whoever publishes a recipe acts with that identity's access.
   Publishing, and choosing Run As, need the custom permission `Manage_BarnCRM_Connector`, granted
-  only by `BarnCRM_Connector_Admin`, which the guide says to give only to system administrators.
+  only by `Connector_Admin`, which the guide says to give only to system administrators.
   At Publish, a BarnCRM Automation or Integration User recipe's map targets and Find fields are
   also checked against the identity's describe, so the editor sees access problems before the
   first run.
@@ -859,7 +859,7 @@ Large one-off loads belong in Super Importer, which a recipe can call (`importRo
 | Connector | Generic REST definition | Apex constants and a framework-free JS module; app templates are imported files, never shipped (D-216) | 0 |
 | Connector | `BarnCRM_Connector` console app | Custom application (ADR-0223; left out on capped orgs) | 0 |
 | Connector | `Connector_Webhook_Rest`, the runner, clock and controllers | Apex | 0 |
-| Connector | `BarnCRM_Connector_Admin`, `BarnCRM_Connector_Viewer`, `BarnCRM_Connector_Webhook_Guest` | Permission sets | 0 |
+| Connector | `Connector_Admin`, `Connector_Viewer`, `Connector_Webhook_Guest` | Permission sets | 0 |
 | Core | `Saved_Transform__c.Kind__c` | Field (picklist Step List, Map) | 0 |
 | Core | `barnMapper` and `mapDocument` | LWC | 0 |
 
@@ -1095,8 +1095,8 @@ mode). Changing Run As writes Run As Chosen By and Chosen At.
 | Run As Chosen By, Run As Chosen At | `Run_As_Chosen_By__c` (Lookup(User)), `Run_As_Chosen_At__c` | Lookup, Date/Time |
 | Record Owner | `Record_Owner_Id__c` | Text(18) |
 
-Object `Connector_Recipe__c`, private sharing, `BarnCRM_Connector_Admin` full access with View
-All and Modify All, `BarnCRM_Connector_Viewer` read with View All.
+Object `Connector_Recipe__c`, private sharing, `Connector_Admin` full access with View
+All and Modify All, `Connector_Viewer` read with View All.
 
 ### A.4 Connector Run (new section, BarnCRM Connector)
 

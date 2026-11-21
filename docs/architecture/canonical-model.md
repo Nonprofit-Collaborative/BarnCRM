@@ -19130,7 +19130,7 @@ Date say who and when. Health Check lists keys replaced in the last 7 days.
 **R-CN7 The Connections permission set.** BarnCRM creates one unpackaged permission set,
 `BarnCRM_Connections` ("BarnCRM Connections"), adds each connection's principal to it, and
 assigns it only to the person creating or checking a connection, who must hold
-`BarnCRM_Connector_Admin`, and to the recipe identity, the Automated Process user, when an admin
+`Connector_Admin`, and to the recipe identity, the Automated Process user, when an admin
 saves Recipe Access (R-CR4; the integration user from CN-03). User Ids never come from the
 browser. Health Check warns when it holds anything but External Credential principal access.
 **R-CN8 Delete and Disconnect.** Disconnect removes the principal's key and keeps the
@@ -19158,7 +19158,7 @@ Data or View All Data.
 - **Object:** `Connector_Connection__c` (Connector Connection), private, no tab, report or
   search; Name (Text(80)) is the connection's developer name; `Check_Path__c` (Text(255)).
   Written and read by the module only, in system mode; granted by no permission set.
-- **Custom permission:** `Manage_BarnCRM_Connector`, granted only by `BarnCRM_Connector_Admin`.
+- **Custom permission:** `Manage_BarnCRM_Connector`, granted only by `Connector_Admin`.
 - **Admin Journal:** Kind `Connection`, Status `Key Replaced` (Section 10A).
 
 ---
@@ -19468,7 +19468,7 @@ erasure is refused, so none is left behind. Recipes are kept; the preview delete
   `Previous_JSON__c` with CN-08, each defined above before it ships. A blank or out of range
   number reads as its default.
 - **Object:** `Connector_Recipe__c`, private sharing; Name is the recipe's name (Text(80)).
-  `BarnCRM_Connector_Admin` full access with View All and Modify All, `BarnCRM_Connector_Viewer`
+  `Connector_Admin` full access with View All and Modify All, `Connector_Viewer`
   read with View All.
 - **Platform events:** `Connector_Start__e` and `Connector_Start_User__e` (no fields, publish
   after commit, R-CR4): a queued run, a retry, Publish, Resume, Restart, the heartbeat and the
@@ -19545,7 +19545,7 @@ Text field stops at 255), `Records_Written__c`, `Is_Test__c`. Picklist values: S
 - **Fields by slice:** CN-02 ships every field above except `Next_Attempt_At__c` (CN-03, retries,
   Date/Time) and `Event_Key__c` and `Reference__c` (CN-04, webhooks).
 - **Object:** `Connector_Run__c`, controlled by parent; autonumber Name `RUN-{000000}`. Read by
-  `BarnCRM_Connector_Admin` and `BarnCRM_Connector_Viewer` (View All); written only by the
+  `Connector_Admin` and `Connector_Viewer` (View All); written only by the
   module's `ConnectorRunStore` in system mode. Search is allowed (`enableSearch`), so a
   person's erasure finds the runs that name them (R-CR17); only users who may read runs see them
   in search.
@@ -20052,7 +20052,7 @@ mirrors the primary member).
 | 1.75 | 2026-11-20 | BarnCRM Connector recipes and runs (CN-02, CN-06, D-215, release 1.31; design Appendix A.3 and A.4). Two objects added, 197 to 199 in the suite: Section 29CN2 Connector Recipe (`Connector_Recipe__c`, R-CR1 to R-CR5) and Section 29CN3 Connector Run (`Connector_Run__c`, R-RUN1 to R-RUN4), and the platform event `Connector_Start__e`. R-CN7 gives BarnCRM Connections to the Automated Process user through Recipe Access; R-CN8 refuses Delete of a connection a recipe names. |
 | 1.76 | 2026-11-20 | BarnCRM Connector recipe clock (CN-03, D-215, release 1.32). Connector Recipe gains `Watermark__c`, `Next_Run_At__c`, `Consecutive_Failures__c`, `Pause_After_Failures__c`, `Retry_Attempts__c`, `Keep_Runs_Days__c` and `Ignore_Own_Changes__c`; Connector Run gains `Next_Attempt_At__c`. New custom setting Section 29CN4 Connector Settings (`Connector_Settings__c`, R-CS1) and platform event `Connector_Start_User__e`. R-CR1 adds the `schedule` and `record` triggers, R-CR4 the Integration User lane, and new R-CR6 (clock), R-CR7 (retries and pause) and R-CR8 (Health Check). No object added (custom settings are not counted). |
 | 1.77 | 2026-11-20 | BarnCRM Connector Load Rows with an Import Template (CN-09, C-38, D-215, release 1.32). R-CR1 adds the `importRows` step; new R-CR9 (a scheduled dry run that commits only inside the step's limits) and R-IB18 (a data job a recipe starts, through Super Importer's own entry points). R-CR7: waking a run that waits on a data job counts no attempt. No object or field added. |
-| 1.78 | 2026-11-20 | BarnCRM Connector webhooks in and sending data back (CN-04, D-216, release 1.32). Connector Recipe gains `Webhook_Token_Hash__c` and `Webhook_Hourly_Cap__c`; Connector Run gains `Event_Key__c` and `Reference__c` (all defined in CN-02). R-CR1 adds the `webhook` trigger, the `sendWebhook` step and `urlFrom`; new R-CR10 (the receiver) and R-CR11 (fetch back and callback addresses). New permission set `BarnCRM_Connector_Webhook_Guest`. No object added. |
+| 1.78 | 2026-11-20 | BarnCRM Connector webhooks in and sending data back (CN-04, D-216, release 1.32). Connector Recipe gains `Webhook_Token_Hash__c` and `Webhook_Hourly_Cap__c`; Connector Run gains `Event_Key__c` and `Reference__c` (all defined in CN-02). R-CR1 adds the `webhook` trigger, the `sendWebhook` step and `urlFrom`; new R-CR10 (the receiver) and R-CR11 (fetch back and callback addresses). New permission set `Connector_Webhook_Guest`. No object added. |
 | 1.79 | 2026-11-20 | BarnCRM Connector steps and versions (CN-05, CN-08, D-215, D-216, release 1.32). R-CR1 adds the `forEach`, `wait` and `transform` steps, the `loop` path root and the `fill` list an import leaves; new R-CR12 (For Each, Wait and Change Data), R-CR13 (Previous Definition, Roll Back, Discard Draft Changes, Export and Import Recipe), R-CR14 (template import, nothing shipped or kept) and R-CR15 (no secret in a file). Connector Recipe ships `Previous_JSON__c`, defined in v1.75. No object added. |
 | 1.80 | 2026-11-20 | BarnCRM Connector watching apps for new items and runs in the erasure path (CN-13, CN-18, release 1.33). R-CR1 adds the `appPoll` trigger; new R-CR16 (App Poll: poll runs, Watermark, item runs) and R-CR17 (erasing a person deletes the runs that name them). Connector Run allows search (`enableSearch`); `ConnectorErasureExtension` joins Core's erasure extensions. No object or field added. |
 | 1.81 | 2026-11-20 | The Mapper and saved maps (MAP-01 to MAP-07, releases 1.31 to 1.33). `Saved_Transform__c` gains `Kind__c` (Step List, the default, or Map); new R-MAP1 to R-MAP4 (map document, paths, checks, preview) and R-ST5 (maps). `Giving_Settings__c` gains `Opportunity_Mirror_Map__c`, a Saved Transform record ID chosen with a record picker (a map name is read too); new R-OM12 (extra fields through a map). No object added. |

@@ -1,7 +1,7 @@
 /**
  * The BarnCRM Connector webhook receiver (CN-04; canonical model R-CR10; design Sections 3.3 and
  * 3.3a; security review F13), on the org's Salesforce Site for its guest user
- * (`BarnCRM_Connector_Webhook_Guest`):
+ * (`Connector_Webhook_Guest`):
  *
  *   POST <site URL>/services/apexrest/barncrm/connector/v1/hook
  *   with the header X-BarnCRM-Token: <token>, or ?token=<token> for apps that cannot send one
