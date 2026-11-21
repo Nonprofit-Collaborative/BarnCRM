@@ -1,4 +1,4 @@
-import { LightningElement, wire } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
 import { refreshApex } from '@salesforce/apex';
 // Bare, and correctly so: a custom permission defined in the same package resolves without a
 // namespace prefix, so this is not the B5 problem that TriggerHandler.getName had.
@@ -74,7 +74,21 @@ const DEFAULT_HOURS = '2';
 const STATUS_LINE_MS = 6000;
 
 export default class AutomationControl extends LightningElement {
+  /**
+   * On the Automation page (set on its Lightning page), opens with the shared page header and
+   * moves the intro into it (Q-02). Off in the Settings console, which has its own header.
+   */
+  @api pageHeader = false;
+
   helpReady = isHelpLoaded('Core');
+
+  get showCardIntro() {
+    return !this.pageHeader;
+  }
+
+  get pauseCardClass() {
+    return this.pageHeader ? 'slds-show slds-var-m-top_small' : undefined;
+  }
 
   connectedCallback() {
     if (!this.helpReady) {
@@ -85,6 +99,10 @@ export default class AutomationControl extends LightningElement {
   }
 
   labels = {
+    // Read by screen readers only (the app page prints its name), so from the help catalog.
+    get pageTitle() {
+      return helpText('Core', 'Core_AutomationControl_PageTitle');
+    },
     title: TITLE,
     get listTitle() {
       return helpText('Core', 'Core_AutomationControl_ListTitle');

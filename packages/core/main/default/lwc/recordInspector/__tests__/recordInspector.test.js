@@ -127,6 +127,8 @@ describe('c-record-inspector', () => {
     const element = mount();
     expect(inspect).not.toHaveBeenCalled();
     expect(q(element, '[data-id="intro"]')).not.toBeNull();
+    // On a record page the header carries the title only; the purpose line is the page's.
+    expect(q(element, '[data-id="shell"]').purpose).toBeUndefined();
     expect(q(element, '[data-id="field-history"]')).toBeNull();
 
     await open(element);
@@ -298,6 +300,10 @@ describe('c-record-inspector on the Record Inspector page', () => {
     await flush();
 
     expect(inspect).not.toHaveBeenCalled();
+    const shell = q(element, '[data-id="shell"]');
+    expect(shell.title).toBe('c.Core_RecordInspector_Title');
+    expect(shell.titleHidden).toBe(false);
+    expect(shell.purpose).toBeTruthy();
     expect(q(element, '[data-id="record-input"]')).not.toBeNull();
     expect(q(element, '[data-id="intro"]')).not.toBeNull();
     expect(q(element, '[data-id="inspect-button"]')).toBeNull();
