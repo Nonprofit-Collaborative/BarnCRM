@@ -1,6 +1,6 @@
 # BarnCRM Overview
 
-Applies to: BarnCRM main at 678dfe553 (releases 1.26 to 1.33). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM main at bf3dfb580 (releases 1.26 to 1.33 and batch R). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 ## What BarnCRM Is
 
