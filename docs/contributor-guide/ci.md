@@ -168,6 +168,11 @@ Salesforce org is needed for this job. Steps:
    from 4,394,706 to 3,523,686 characters (Core from 2,421,585 to 1,942,950). Format with
    Prettier and the repository's configuration, so a hand-indented file does not creep the
    count back up.
+   `scripts/ci/check-aura-lds.py` (ADR-0093) fails on an `@AuraEnabled` method that is one
+   user-mode query over one object, or one single-record DML statement, with no aggregate,
+   describe, service call or system-mode work: the LWC reads or writes that with a GraphQL
+   wire or `uiRecordApi`. Existing matches are listed in `scripts/ci/aura-lds-allowlist.txt`
+   as `Class.method`; remove a line when its method is converted (a stale line fails too).
    `scripts/ci/check-help-text.py` checks those catalogs (`BarnHelp_<Package>.json`): every
    key a `helpText`, `BarnHelp.text` or `help-key` names is in its package's catalog and
    written as a literal, every catalog key is used and is not also a label, translations are
