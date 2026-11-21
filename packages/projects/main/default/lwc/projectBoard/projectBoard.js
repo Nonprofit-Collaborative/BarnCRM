@@ -63,6 +63,7 @@ export default class ProjectBoard extends NavigationMixin(LightningElement) {
       taskName: helpText('Projects', 'Projects_Board_TaskName'),
       dueDate: helpText('Projects', 'Projects_Board_DueDate'),
       milestone: helpText('Projects', 'Projects_Board_Milestone'),
+      overdue: helpText('Projects', 'Projects_Board_Overdue'),
       status: helpText('Projects', 'Projects_Board_Status'),
       date: helpText('Projects', 'Projects_Board_Date'),
       hours: helpText('Projects', 'Projects_Board_Hours'),

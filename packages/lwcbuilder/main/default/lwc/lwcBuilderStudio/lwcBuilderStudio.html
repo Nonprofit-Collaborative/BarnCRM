@@ -1,6 +1,6 @@
 <template>
   <template lwc:if={helpReady}>
-    <lightning-card title={labels.title} icon-name="custom:custom34" data-id="card">
+    <c-barn-page-shell title={labels.title} purpose={labels.intro} icon-name="custom:custom34" data-id="card">
       <div slot="actions" class="slds-grid slds-wrap slds-grid_vertical-align-end">
         <lightning-combobox
           class="slds-var-m-right_x-small"
@@ -27,8 +27,7 @@
         </lightning-button-group>
       </div>
 
-      <div class="slds-var-p-horizontal_medium">
-        <p class="slds-text-color_weak slds-var-m-bottom_small">{labels.intro}</p>
+      <div>
         <template lwc:if={errorMessage}>
           <c-barn-notice
             variant="error"
@@ -326,6 +325,6 @@
           </div>
         </template>
       </div>
-    </lightning-card>
+    </c-barn-page-shell>
   </template>
 </template>
