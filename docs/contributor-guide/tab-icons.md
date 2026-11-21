@@ -161,7 +161,6 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | core | householdMembersPanel | custom:custom15 | Households |
 | core | householdOfPerson | custom:custom15 | Households |
 | core | hubErrors | custom:custom53 | Error_Log__c |
-| core | recordInspector | custom:custom38 | Record_Inspector |
 | core | relationshipPanel | custom:custom37 | Relationship__c |
 | funders | fundersBoard | custom:custom100 | Funders_Board |
 | funders | grantAnswerLibrary | custom:custom87 | Grant_Answer__c |
