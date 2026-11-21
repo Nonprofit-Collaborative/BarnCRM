@@ -58,7 +58,7 @@ public with sharing class ConnectorWebhooks {
 		@AuraEnabled
 		public Integer hourlyCap;
 		@AuraEnabled
-		public String header = HEADER;
+		public String header = ConnectorWebhooks.HEADER;
 		@AuraEnabled
 		public List<String> addresses = new List<String>();
 	}

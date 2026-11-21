@@ -35,7 +35,7 @@ public inherited sharing class ConnectorTriggers {
 			String every = text(starter.get('every'));
 			Boolean timed = every == 'day' || every == 'week';
 			if (
-				!EVERY.contains(every) ||
+				!ConnectorTriggers.EVERY.contains(every) ||
 				(timed && !AT.matcher(text(starter.get('at'))).matches()) ||
 				(every == 'week' && !DAYS.contains(text(starter.get('day'))))
 			) {

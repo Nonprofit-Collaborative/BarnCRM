@@ -328,8 +328,9 @@ public with sharing class ConnectorRecipes {
 	public static Recipe saveDraft(Id recipeId, String name, String description, String draftJson, String ownerId) {
 		ConnectorConnections.requireManager();
 		String checkedName = ConnectorConnections.checkedLabel(name);
-		Map<String, Object> draft = ConnectorRecipeDocument.parse(draftJson);
-		refuseProblems(ConnectorRecipeDocument.problems(draft));
+		// Not named "draft": Apex names are case-insensitive, so it would hide the DRAFT status.
+		Map<String, Object> document = ConnectorRecipeDocument.parse(draftJson);
+		refuseProblems(ConnectorRecipeDocument.problems(document));
 		if (String.isNotBlank(description) && description.contains('{!')) {
 			throw new ConnectorConnections.ConnectorException(
 				BarnHelp.text('Connector', 'Connector_Recipe_ErrorMergeField')
@@ -361,7 +362,7 @@ public with sharing class ConnectorRecipes {
 		row.Draft_JSON__c = draftJson;
 		// The clock reads Trigger Kind, so a published recipe keeps its definition's until Publish.
 		if (stored == null || String.isBlank(stored.Definition_JSON__c)) {
-			row.Trigger_Kind__c = kindOf(draft);
+			row.Trigger_Kind__c = kindOf(document);
 		}
 		row.Record_Owner_Id__c = owner == null ? null : String.valueOf(Id.valueOf(owner));
 		if (recipeId == null) {

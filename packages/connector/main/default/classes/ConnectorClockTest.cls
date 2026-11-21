@@ -19,8 +19,8 @@ private class ConnectorClockTest {
 		// runs-as: deploying user (creates the test users and deactivates one; no BarnCRM logic runs)
 		TestUsers.adminWith(ConnectorConnections.ADMIN_SET);
 		TestUsers.standardUser(INTEGRATOR);
-		TestUsers.fromSetup(INTEGRATOR);
-		User departed = TestUsers.standardUser(DEPARTED);
+		TestUsers.fromSetup(ConnectorClockTest.INTEGRATOR);
+		User departed = TestUsers.standardUser(ConnectorClockTest.DEPARTED);
 		departed.IsActive = false;
 		update as system departed;
 	}
@@ -279,16 +279,19 @@ private class ConnectorClockTest {
 			Connector_Recipe__c after = reread(recipe.Id);
 			Assert.areEqual(ConnectorRunStore.PAUSED_BY_FAILURES, after.Status__c);
 			Assert.areEqual(2, after.Consecutive_Failures__c);
-			Assert.areEqual(
-				3,
-				[
-					SELECT COUNT()
-					FROM Error_Log__c
-					WHERE Message__c LIKE '%Always Fails%' AND Context__c = 'ConnectorRunner' AND Severity__c = 'Error'
-					WITH SYSTEM_MODE
-				],
-				'Each failed run is logged, and the pause once more.'
-			);
+			// Message is long text, which SOQL cannot filter on, so the match is made here.
+			Integer failures = 0;
+			for (Error_Log__c log : [
+				SELECT Message__c
+				FROM Error_Log__c
+				WHERE Context__c = 'ConnectorRunner' AND Severity__c = 'Error'
+				WITH SYSTEM_MODE
+			]) {
+				if (log.Message__c != null && log.Message__c.contains('Always Fails')) {
+					failures++;
+				}
+			}
+			Assert.areEqual(3, failures, 'Each failed run is logged, and the pause once more.');
 		}
 	}
 
@@ -414,7 +417,7 @@ private class ConnectorClockTest {
 
 	@IsTest
 	static void danaChoosesTheIntegrationUserAndTheSubscriberIsWritten() {
-		User integrator = TestUsers.fromSetup(INTEGRATOR);
+		User integrator = TestUsers.fromSetup(ConnectorClockTest.INTEGRATOR);
 		System.runAs(admin()) {
 			ConnectorRecipeTestData.App app = new ConnectorRecipeTestData.App(200, '{"records":[]}');
 			Test.setMock(HttpCalloutMock.class, app);
@@ -459,7 +462,7 @@ private class ConnectorClockTest {
 
 	@IsTest
 	static void aRefusedSubscriberWriteIsLoggedAndAccessStaysAsItWas() {
-		User integrator = TestUsers.fromSetup(INTEGRATOR);
+		User integrator = TestUsers.fromSetup(ConnectorClockTest.INTEGRATOR);
 		System.runAs(admin()) {
 			Test.setMock(HttpCalloutMock.class, new ConnectorRecipeTestData.App(403, '[{"message":"no"}]'));
 
