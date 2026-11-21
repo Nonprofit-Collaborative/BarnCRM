@@ -291,7 +291,7 @@ private class ProgramSampleDataTest {
 	}
 
 	/**
-	 * Case notes are private to their authors. An admin on a standard profile (no View All Data)
+	 * A case note is private to its author. An admin on a standard profile (no View All Data)
 	 * who loaded the sample data still finds a note someone else wrote when removing it, so the
 	 * note's enrollment and program stay and removal does not fail on it.
 	 */
