@@ -3,6 +3,22 @@ import LwcBuilderStudio from 'c/lwcBuilderStudio';
 import getStudio from '@salesforce/apex/LwcBuilderController.getStudio';
 import saveComponent from '@salesforce/apex/LwcBuilderController.saveComponent';
 import { setHelpTextForTest } from 'c/barnHelpText';
+import { createDragController } from 'c/barnDrag';
+
+jest.mock('c/barnDrag', () => ({
+  createDragController: jest.fn(() => ({
+    pointerDown: jest.fn(),
+    keyDown: jest.fn(),
+    cancel: jest.fn(),
+    destroy: jest.fn()
+  }))
+}));
+
+/** The options the studio gave the drag controller, so a test can drop as the controller would. */
+function dragOptions() {
+  const calls = createDragController.mock.calls;
+  return calls[calls.length - 1][0];
+}
 
 const HELP = require('../../../staticresources/BarnHelp_LwcBuilder.json').texts;
 
@@ -120,16 +136,63 @@ describe('c-lwc-builder-studio', () => {
     expect(find(element, 'column').getAttribute('aria-pressed')).toBe('true');
   });
 
-  it('drags a block from the list onto a column', async () => {
+  it('uses pointer and key drag from c/barnDrag, never HTML5 drag and drop', async () => {
     const element = await mount();
     find(element, 'add-section').click();
     await flush();
-    const source = palette(element, 'image').parentElement;
-    source.dispatchEvent(new CustomEvent('dragstart'));
-    const column = find(element, 'column');
-    column.dispatchEvent(new CustomEvent('drop'));
+    palette(element, 'image').click();
     await flush();
-    expect(findAll(element, 'block')).toHaveLength(1);
+
+    const item = palette(element, 'image').parentElement;
+    expect(item.hasAttribute('draggable')).toBe(false);
+    expect(item.dataset.dragId).toBe('palette:image');
+    expect(find(element, 'palette-zone').dataset.dropZone).toBe('palette');
+    const column = find(element, 'column');
+    expect(column.dataset.dropZone).toBeTruthy();
+    expect(find(element, 'block').hasAttribute('draggable')).toBe(false);
+    expect(find(element, 'block').dataset.dragId).toBeTruthy();
+    // Nothing can be dropped back on the block list.
+    expect(dragOptions().canDrop('b1', column.dataset.dropZone, 'palette')).toBe(false);
+  });
+
+  it('drops a block from the list onto a column, before the block it lands on', async () => {
+    const element = await mount();
+    find(element, 'add-section').click();
+    await flush();
+    palette(element, 'text').click();
+    await flush();
+    const columnId = find(element, 'column').dataset.dropZone;
+    const first = find(element, 'block').dataset.dragId;
+
+    await dragOptions().onDrop({
+      itemId: 'palette:image',
+      fromZone: 'palette',
+      toZone: columnId,
+      toIndex: 0
+    });
+    await flush();
+
+    const blocks = findAll(element, 'block');
+    expect(blocks).toHaveLength(2);
+    expect(blocks[1].dataset.dragId).toBe(first);
+  });
+
+  it('moves a block within its column and refuses a drop with no column', async () => {
+    const element = await mount();
+    find(element, 'add-section').click();
+    await flush();
+    palette(element, 'text').click();
+    await flush();
+    palette(element, 'image').click();
+    await flush();
+    const columnId = find(element, 'column').dataset.dropZone;
+    const [a, b] = [...findAll(element, 'block')].map((block) => block.dataset.dragId);
+
+    expect(await dragOptions().onDrop({ itemId: b, toZone: null, toIndex: -1 })).toBe(false);
+    await dragOptions().onDrop({ itemId: b, fromZone: columnId, toZone: columnId, toIndex: 0 });
+    await flush();
+
+    expect([...findAll(element, 'block')].map((block) => block.dataset.dragId)).toEqual([b, a]);
   });
 
   it('lists what is missing instead of saving', async () => {

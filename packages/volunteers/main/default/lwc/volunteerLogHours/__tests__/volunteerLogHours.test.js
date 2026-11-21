@@ -158,6 +158,26 @@ describe('c-volunteer-log-hours', () => {
     expect(personIdFromState(undefined)).toBeUndefined();
   });
 
+  it('shows the page header on the tab and the bare form in the action window', async () => {
+    getContext.mockResolvedValue(FROM_SHIFT);
+    const action = build();
+    await flush();
+    // eslint-disable-next-line @lwc/lwc/no-unexpected-wire-adapter-usages
+    CurrentPageReference.emit({ type: 'standard__recordPage', state: {} });
+    await flush();
+    expect(find(action, '[data-id="shell"]')).toBeNull();
+    expect(find(action, '[data-id="title"]')).not.toBeNull();
+
+    const tab = createElement('c-volunteer-log-hours', { is: VolunteerLogHours });
+    document.body.appendChild(tab);
+    // eslint-disable-next-line @lwc/lwc/no-unexpected-wire-adapter-usages
+    CurrentPageReference.emit({ type: 'standard__navItemPage', state: {} });
+    await flush();
+    expect(find(tab, '[data-id="shell"]').title).toBeTruthy();
+    expect(find(tab, '[data-id="shell"]').purpose).toBeTruthy();
+    expect(find(tab, '[data-id="title"]')).toBeNull();
+  });
+
   it('on the Log Hours tab starts on the person and returns to them after the save', async () => {
     const PERSON_ID = '003000000000007';
     getContext.mockImplementation(({ recordId }) =>

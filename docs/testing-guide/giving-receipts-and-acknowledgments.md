@@ -20,7 +20,7 @@ For every script on this page:
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, then the **Organization** section. | Your legal name and tax ID are filled in. If the legal name is blank, fill it in and select **Save** (receipts need it). |
 | 2 | Open the **Receipts** section. Set **Receipt number prefix** to `TEST`, leave **Receipt next counter** at 1, set **Statement year** to last year. Select **Save**. | The toast reads "Your settings are saved." |
-| 3 | On the **Receipt Letters and Year End Statements** row, select **Open Receipt Letters**. | The Receipt Letters page opens on the **Receipt Templates** tab. |
+| 3 | On the **Receipt Letters and Year End Statements** row, select **Open Receipt Letters**. | The Receipt Letters page opens with the page header **Receipt Letters** and its purpose line, then the **Receipt Templates** tab. |
 | 4 | Open the **Letter** list. | Two letters are listed: the per gift receipt and the consolidated statement. Neither ends in ", not in use". |
 | 5 | Read the notes under the editor. | The tax note starts "The tax wording is not in this letter and cannot be edited." and a token list follows "Tokens you can use." |
 

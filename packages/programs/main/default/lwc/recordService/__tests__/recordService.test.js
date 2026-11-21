@@ -171,6 +171,22 @@ describe('c-record-service', () => {
     expect(q(failed, 'load-error').message).toBe('c.Programs_Fail_RecordService');
   });
 
+  it('shows the page header on the tab, not in the action window', async () => {
+    getForm.mockResolvedValue(formOf());
+    const action = await render();
+    expect(q(action, 'shell')).toBeNull();
+    expect(action.shadowRoot.querySelector('lightning-quick-action-panel').header).toBeTruthy();
+
+    const tab = createElement('c-record-service', { is: RecordService });
+    document.body.appendChild(tab);
+    // eslint-disable-next-line @lwc/lwc/no-unexpected-wire-adapter-usages
+    CurrentPageReference.emit({ type: 'standard__navItemPage', state: {} });
+    await flush();
+    expect(q(tab, 'shell').title).toBeTruthy();
+    expect(q(tab, 'shell').purpose).toBeTruthy();
+    expect(tab.shadowRoot.querySelector('lightning-quick-action-panel').header).toBeUndefined();
+  });
+
   it('on the Record Service tab starts on the person and returns to them after the save', async () => {
     getForm.mockImplementation(({ recordId }) =>
       Promise.resolve(formOf({ personId: recordId, enrollmentId: null }))

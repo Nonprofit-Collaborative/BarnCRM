@@ -1,7 +1,7 @@
 <template>
     <template lwc:if={helpReady}>
-    <!-- The page header (Q-02): the Import app page prints its name, so the shell leads with the purpose. -->
-    <c-barn-page-shell title={labels.cardTitle} purpose={labels.purpose} title-hidden data-id="shell">
+    <!-- The page header (Q-02): an App Page prints no header, so the shell shows the name. -->
+    <c-barn-page-shell title={labels.cardTitle} purpose={labels.purpose} data-id="shell">
         <div>
             <template lwc:if={loading}>
                 <lightning-spinner

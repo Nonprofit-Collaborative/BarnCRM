@@ -91,6 +91,7 @@
     "Programs_RecordService_NoAccess": "You can see services but not record them. Ask your BarnCRM admin if you need to.",
     "Programs_RecordService_NoServices": "There is no active service to record. Add one in a program's Services list first.",
     "Programs_RecordService_Saved": "Service recorded.",
+    "Programs_RecordService_PageIntro": "Record one service delivery by hand: pick the person, the service, the date and whether they attended. The same rules apply as on a new Service Delivery record.",
     "Programs_Roster_Changed": "{0} is now {1}.",
     "Programs_Roster_Empty": "No one to list. Click Enroll Someone to add a person, or turn on Show Ended to see past enrollments.",
     "Programs_Roster_MoreThanShown": "Showing the first {0}. The Enrollments tab lists them all.",

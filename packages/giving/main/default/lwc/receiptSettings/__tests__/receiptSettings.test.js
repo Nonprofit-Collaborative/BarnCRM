@@ -126,6 +126,14 @@ describe('c-receipt-settings', () => {
     jest.clearAllMocks();
   });
 
+  it('opens with the page header titled Receipt Letters from the help catalog', async () => {
+    const element = await loaded(true);
+
+    const shell = byId(element, 'shell');
+    expect(shell.title).toBeTruthy();
+    expect(shell.purpose).toBeTruthy();
+  });
+
   it('loads the first letter into a rich text editor, not a plain text box', async () => {
     const element = await loaded(true);
 
