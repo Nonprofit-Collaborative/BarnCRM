@@ -361,6 +361,14 @@ Salesforce org is needed for this job. Steps:
    `AsyncStarter.BusyException`, whose message asks the person to try again in a few minutes.
    The allowlist keeps jobs that chain themselves, starts from a trigger or save, post-install
    steps and batches over values; its counts must match, so lower one as a call moves over.
+   `scripts/ci/check-shadowed-constants.py` fails the build if a local, parameter or loop
+   variable has the name of a `static final` constant of its class, ignoring case, and the
+   constant's spelling is read where the variable is visible. Apex names ignore case, so a
+   parameter `context` hides `CONTEXT` and `CONTEXT + '.run'` logs the job context object
+   instead of the class name; a call that happens to fit compiles and does the wrong thing
+   silently. A local's own initializer still reads the constant. Rename the variable; a
+   deliberate one goes in `scripts/ci/shadowed-constants-allowlist.txt` as
+   `ClassName.name # reason`.
 17. `python3 -m unittest discover -s scripts/migration/tests`, the migration kit's unit tests
    (C-31, [Migration kit](migration-kit.md)). They need no org, and one of them builds the
    mapping from the real package source, so a new object or field that breaks it fails here.

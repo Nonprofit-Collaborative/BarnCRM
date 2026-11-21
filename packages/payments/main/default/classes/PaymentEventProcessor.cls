@@ -55,7 +55,7 @@ public with sharing class PaymentEventProcessor implements Schedulable {
 	 * their listeners never share limits with event processing; enqueues itself while more wait.
 	 */
 	public with sharing class Abandon implements Queueable {
-		public void execute(QueueableContext context) {
+		public void execute(QueueableContext job) {
 			Integer cancelled = 0;
 			try {
 				cancelled = PaymentService.cancelAbandoned(ABANDON_PER_RUN);
@@ -75,7 +75,7 @@ public with sharing class PaymentEventProcessor implements Schedulable {
 	 * callout failed in transport stays Received too, and is read again by the next run.
 	 */
 	public with sharing class Run implements Queueable, Database.AllowsCallouts {
-		public void execute(QueueableContext context) {
+		public void execute(QueueableContext job) {
 			List<Payment_Event__c> batch = waiting(PER_RUN + 1);
 			List<PaymentService.Outcome> outcomes = new List<PaymentService.Outcome>();
 			// Logged after the last callout: the Error Log's direct-insert fallback is DML, and DML
