@@ -265,7 +265,11 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
   /** The Quick Gift Entry tab opened for a known donor: c__donorId in the page state. */
   @wire(CurrentPageReference)
   readPageState(pageRef) {
-    this.onTab = !!pageRef && pageRef.type === 'standard__navItemPage';
+    // Its own tab only: in the Fundraising utility bar it sees whichever tab the user has open.
+    this.onTab =
+      !!pageRef &&
+      pageRef.type === 'standard__navItemPage' &&
+      String((pageRef.attributes || {}).apiName || '').endsWith('Quick_Gift_Entry');
     const donorId = pageRef && pageRef.state ? pageRef.state.c__donorId : undefined;
     if (!donorId || donorId === this.stateDonorId) {
       return;

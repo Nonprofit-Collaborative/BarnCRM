@@ -707,11 +707,28 @@ describe('c-quick-gift-entry', () => {
     expect(element.shadowRoot.querySelector('lightning-card').title).toBeTruthy();
 
     // eslint-disable-next-line @lwc/lwc/no-unexpected-wire-adapter-usages
-    CurrentPageReference.emit({ type: 'standard__navItemPage', state: {} });
+    CurrentPageReference.emit({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'Quick_Gift_Entry' },
+      state: {}
+    });
     await settle();
     expect(pick(element, 'shell').title).toBeTruthy();
     expect(pick(element, 'shell').purpose).toBeTruthy();
     expect(element.shadowRoot.querySelector('lightning-card').title).toBeUndefined();
+  });
+
+  it('keeps the bare form in the utility bar while another tab is open', async () => {
+    const element = build();
+    await settle();
+    // eslint-disable-next-line @lwc/lwc/no-unexpected-wire-adapter-usages
+    CurrentPageReference.emit({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'Fundraising_Home' },
+      state: {}
+    });
+    await settle();
+    expect(pick(element, 'shell')).toBeNull();
   });
 
   it('keeps the bare form in the action window and on a record page', async () => {
