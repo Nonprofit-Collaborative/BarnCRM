@@ -537,6 +537,32 @@ public with sharing class ConnectorConnections {
 		);
 	}
 
+	/**
+	 * The same row from a job, for a write a record may not follow in its transaction (a Secret
+	 * URL's Named Credential update, a setup write; barn-platform, 2026-11-21).
+	 */
+	public static void journalKeyReplacedLater(ConnectorOrg.Pair pair) {
+		AsyncStarter.queue(new JournalJob(pair.name, pair.label), 'ConnectorConnections.journalKeyReplacedLater');
+	}
+
+	/** Writes one key-replaced Admin Journal row: names only, never the key. */
+	public with sharing class JournalJob implements Queueable {
+		private String name;
+		private String label;
+
+		public JournalJob(String name, String label) {
+			this.name = name;
+			this.label = label;
+		}
+
+		public void execute(QueueableContext context) {
+			ConnectorOrg.Pair pair = new ConnectorOrg.Pair();
+			pair.name = name;
+			pair.label = label;
+			journalKeyReplaced(pair);
+		}
+	}
+
 	/** Labels of connections whose key was replaced in the last days given, newest first. */
 	public static List<String> keysReplacedSince(Integer days) {
 		DateTime since = DateTime.now().addDays(-days);

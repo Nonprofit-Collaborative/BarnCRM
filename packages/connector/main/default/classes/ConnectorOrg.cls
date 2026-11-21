@@ -66,9 +66,28 @@ public virtual with sharing class ConnectorOrg {
 				pair.keyStored = String.valueOf(principal.authenticationStatus) == 'Configured';
 				pair.principalId = String.isNotBlank(principal.id) ? Id.valueOf(principal.id) : null;
 			}
+			if (!pair.keyStored && pair.principal != null && pair.principal != ConnectorConnections.SECRET_URL) {
+				// A Custom principal's status stays Unknown with a key stored (barn-platform,
+				// 2026-11-21), so the key's parameter names are asked for: never their values.
+				pair.keyStored = hasKey(name, pair.principal);
+			}
 			return pair;
 		} catch (Exception unreadable) {
 			return null;
+		}
+	}
+
+	/** Whether the principal holds any key parameter; false when Salesforce will not say. */
+	private static Boolean hasKey(String name, String principal) {
+		try {
+			ConnectApi.Credential stored = ConnectApi.NamedCredentials.getCredential(
+				name,
+				principal,
+				ConnectApi.CredentialPrincipalType.NamedPrincipal
+			);
+			return stored.credentials != null && !stored.credentials.isEmpty();
+		} catch (Exception unreadable) {
+			return false;
 		}
 	}
 

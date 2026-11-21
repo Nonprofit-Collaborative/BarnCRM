@@ -52,8 +52,10 @@ public with sharing class ConnectorConnectionsController {
 	}
 
 	/**
-	 * Creates the External Credential, the Named Credential and, except for a Secret URL, the
-	 * principal's key, then the principal access (F12). The server makes the name (F2).
+	 * Creates the External Credential, the Named Credential and the principal access (F12). The
+	 * server makes the name (F2). `secretUrl` is a Secret URL connection's address, its only key;
+	 * any other kind's key follows in `saveFirstKey`, a call of its own, because Salesforce
+	 * refuses a key for a principal made in the same transaction (barn-platform, 2026-11-21).
 	 */
 	@AuraEnabled
 	public static Result createConnection(
@@ -61,8 +63,7 @@ public with sharing class ConnectorConnectionsController {
 		String authKind,
 		String baseUrl,
 		String headerName,
-		String userName,
-		String secret
+		String secretUrl
 	) {
 		String name;
 		Boolean externalMade = false;
@@ -74,17 +75,7 @@ public with sharing class ConnectorConnectionsController {
 			String header = kind == ConnectorConnections.API_KEY
 				? ConnectorConnections.checkedHeaderName(headerName)
 				: null;
-			String url = ConnectorConnections.checkedUrl(kind == ConnectorConnections.SECRET_URL ? secret : baseUrl);
-			if (kind != ConnectorConnections.SECRET_URL && String.isBlank(secret)) {
-				throw new ConnectorConnections.ConnectorException(
-					BarnHelp.text('Connector', 'Connector_Error_KeyRequired')
-				);
-			}
-			if (kind == ConnectorConnections.BASIC && String.isBlank(userName)) {
-				throw new ConnectorConnections.ConnectorException(
-					BarnHelp.text('Connector', 'Connector_Error_UserRequired')
-				);
-			}
+			String url = ConnectorConnections.checkedUrl(kind == ConnectorConnections.SECRET_URL ? secretUrl : baseUrl);
 			ConnectorOrg org = ConnectorConnections.store();
 			name = ConnectorConnections.newName();
 			org.createExternal(ConnectorConnections.externalInput(name, checkedLabel, kind));
@@ -97,31 +88,13 @@ public with sharing class ConnectorConnectionsController {
 				ConnectApi.NamedCredentials.createNamedCredential(named);
 			}
 			namedMade = true;
-			if (kind != ConnectorConnections.SECRET_URL) {
-				ConnectApi.CredentialInput credential = ConnectorConnections.credentialInput(name, kind);
-				if (kind == ConnectorConnections.BASIC) {
-					credential.credentials.put(
-						ConnectorConnections.USER_PARAMETER,
-						ConnectorConnections.plainValue(userName.trim())
-					);
-				}
-				ConnectApi.CredentialValueInput key = new ConnectApi.CredentialValueInput();
-				key.value = secret;
-				key.encrypted = true;
-				credential.credentials.put(ConnectorConnections.SECRET_PARAMETER.get(kind), key);
-				if (org.fake) {
-					org.record(credential, false);
-				} else {
-					ConnectApi.NamedCredentials.createCredential(credential);
-				}
-			}
 		} catch (ConnectorConnections.ConnectorException refused) {
 			throw UserErrors.message(refused.getMessage());
 		} catch (Exception failure) {
 			ConnectorConnections.logRedacted(
 				CONTEXT + '.createConnection',
 				failure.getTypeName(),
-				redacted(failure.getMessage(), secret)
+				redacted(failure.getMessage(), secretUrl)
 			);
 			undo(name, externalMade, namedMade);
 			throw UserErrors.message(BarnHelp.text('Connector', 'Connector_Error_SaveFailed'));
@@ -135,6 +108,86 @@ public with sharing class ConnectorConnectionsController {
 			throw shown(failure, 'createConnection');
 		}
 		return result;
+	}
+
+	/**
+	 * Writes the first key of a connection just created (any kind but Secret URL). When it is
+	 * refused the connection is taken away, so no connection without a key is left (F7, F8).
+	 */
+	@AuraEnabled
+	public static Result saveFirstKey(String name, String userName, String secret) {
+		ConnectorOrg.Pair pair;
+		try {
+			ConnectorConnections.requireWriter();
+			pair = ConnectorConnections.owned(name);
+			if (pair.principal == ConnectorConnections.SECRET_URL || pair.keyStored) {
+				throw new ConnectorConnections.ConnectorException(
+					BarnHelp.text('Connector', 'Connector_Error_NotOurs')
+				);
+			}
+		} catch (ConnectorConnections.ConnectorException refused) {
+			throw UserErrors.message(refused.getMessage());
+		} catch (Exception failure) {
+			throw shown(failure, 'saveFirstKey');
+		}
+		try {
+			ConnectApi.CredentialInput credential = keyInput(pair, userName, secret);
+			ConnectorOrg org = ConnectorConnections.store();
+			if (org.fake) {
+				org.record(credential, false);
+			} else {
+				ConnectApi.NamedCredentials.createCredential(credential);
+			}
+		} catch (ConnectorConnections.ConnectorException refused) {
+			undo(pair.name, true, true);
+			throw UserErrors.message(refused.getMessage());
+		} catch (Exception failure) {
+			ConnectorConnections.logRedacted(
+				CONTEXT + '.saveFirstKey',
+				failure.getTypeName(),
+				redacted(failure.getMessage(), secret)
+			);
+			undo(pair.name, true, true);
+			throw UserErrors.message(BarnHelp.text('Connector', 'Connector_Error_SaveFailed'));
+		}
+		Result result = new Result();
+		result.name = pair.name;
+		result.outcome = 'keySaved';
+		try {
+			result.page = ConnectorConnections.page();
+		} catch (Exception failure) {
+			throw shown(failure, 'saveFirstKey');
+		}
+		return result;
+	}
+
+	/**
+	 * The principal's key input for a connection that is not a Secret URL: the key encrypted and
+	 * Basic's user name plain (F6). Refuses a blank key or a blank Basic user name.
+	 */
+	private static ConnectApi.CredentialInput keyInput(ConnectorOrg.Pair pair, String userName, String secret) {
+		if (String.isBlank(secret)) {
+			throw new ConnectorConnections.ConnectorException(
+				BarnHelp.text('Connector', 'Connector_Error_KeyRequired')
+			);
+		}
+		ConnectApi.CredentialInput credential = ConnectorConnections.credentialInput(pair.name, pair.principal);
+		if (pair.principal == ConnectorConnections.BASIC) {
+			if (String.isBlank(userName)) {
+				throw new ConnectorConnections.ConnectorException(
+					BarnHelp.text('Connector', 'Connector_Error_UserRequired')
+				);
+			}
+			credential.credentials.put(
+				ConnectorConnections.USER_PARAMETER,
+				ConnectorConnections.plainValue(userName.trim())
+			);
+		}
+		ConnectApi.CredentialValueInput key = new ConnectApi.CredentialValueInput();
+		key.value = secret;
+		key.encrypted = true;
+		credential.credentials.put(ConnectorConnections.SECRET_PARAMETER.get(pair.principal), key);
+		return credential;
 	}
 
 	/**
@@ -168,27 +221,7 @@ public with sharing class ConnectorConnectionsController {
 					ConnectApi.NamedCredentials.updateNamedCredential(pair.name, named);
 				}
 			} else {
-				if (String.isBlank(secret)) {
-					throw new ConnectorConnections.ConnectorException(
-						BarnHelp.text('Connector', 'Connector_Error_KeyRequired')
-					);
-				}
-				ConnectApi.CredentialInput credential = ConnectorConnections.credentialInput(pair.name, pair.principal);
-				if (pair.principal == ConnectorConnections.BASIC) {
-					if (String.isBlank(userName)) {
-						throw new ConnectorConnections.ConnectorException(
-							BarnHelp.text('Connector', 'Connector_Error_UserRequired')
-						);
-					}
-					credential.credentials.put(
-						ConnectorConnections.USER_PARAMETER,
-						ConnectorConnections.plainValue(userName.trim())
-					);
-				}
-				ConnectApi.CredentialValueInput key = new ConnectApi.CredentialValueInput();
-				key.value = secret;
-				key.encrypted = true;
-				credential.credentials.put(ConnectorConnections.SECRET_PARAMETER.get(pair.principal), key);
+				ConnectApi.CredentialInput credential = keyInput(pair, userName, secret);
 				if (org.fake) {
 					org.record(credential, pair.keyStored);
 				} else if (pair.keyStored) {
@@ -209,7 +242,12 @@ public with sharing class ConnectorConnectionsController {
 		}
 		Result result = new Result();
 		try {
-			ConnectorConnections.journalKeyReplaced(pair);
+			if (pair.principal == ConnectorConnections.SECRET_URL) {
+				// A Named Credential write is a setup write: the journal row follows in a job.
+				ConnectorConnections.journalKeyReplacedLater(pair);
+			} else {
+				ConnectorConnections.journalKeyReplaced(pair);
+			}
 			result.outcome = 'replaced';
 			result.page = ConnectorConnections.page();
 		} catch (Exception failure) {

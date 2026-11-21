@@ -1,13 +1,14 @@
 import { LightningElement, api } from 'lwc';
 import createConnection from '@salesforce/apex/ConnectorConnectionsController.createConnection';
 import replaceKey from '@salesforce/apex/ConnectorConnectionsController.replaceKey';
+import saveFirstKey from '@salesforce/apex/ConnectorConnectionsController.saveFirstKey';
 import saveCheckPath from '@salesforce/apex/ConnectorConnectionsController.saveCheckPath';
 import { KINDS, API_KEY, BASIC, SECRET_URL, formProblems } from 'c/connectorRules';
 import { say as text } from 'c/connectorText';
 import { lockedUrl, partOfKey } from 'c/connectorFileRules';
 
 /**
- * New Connection and Replace Key on Super Connector (CN-01). This form alone calls the two Apex
+ * New Connection and Replace Key on Super Connector (CN-01). This form alone calls the Apex
  * methods that take a key, so the key never leaves it: it is read from the password box at the
  * moment of sending, never kept in a field, a store, the URL or an event, and the box is emptied
  * after every call, success or failure (security review F10). `saved` carries the outcome and
@@ -191,14 +192,7 @@ export default class ConnectorKeyForm extends LightningElement {
     this.working = true;
     try {
       const result = this.creating
-        ? await createConnection({
-            label: this.label,
-            authKind: this.authKind,
-            baseUrl,
-            headerName: this.headerName,
-            userName: this.userName,
-            secret: box.value
-          })
+        ? await this.createWithKey(baseUrl, box)
         : await replaceKey({
             name: this.connection.name,
             userName: this.userName,
@@ -225,6 +219,31 @@ export default class ConnectorKeyForm extends LightningElement {
       box.value = '';
       this.working = false;
     }
+  }
+
+  /**
+   * Creates the connection, then saves its key in a call of its own: Salesforce refuses a key in
+   * the transaction that made its principal. A Secret URL's address is its key and goes with the
+   * create. A refused key takes the new connection away again on the server.
+   */
+  async createWithKey(baseUrl, box) {
+    const secretUrl = this.authKind === SECRET_URL;
+    const created = await createConnection({
+      label: this.label,
+      authKind: this.authKind,
+      baseUrl,
+      headerName: this.headerName,
+      secretUrl: secretUrl ? box.value : null
+    });
+    if (secretUrl || !created || !created.name) {
+      return created;
+    }
+    const keyed = await saveFirstKey({
+      name: created.name,
+      userName: this.userName,
+      secret: box.value
+    });
+    return { ...created, page: keyed && keyed.page ? keyed.page : created.page };
   }
 
   handleCancel() {

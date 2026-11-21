@@ -53,23 +53,33 @@ global with sharing class ConnectorApplyMapAction {
 	global static List<Result> apply(List<Request> requests) {
 		List<Result> results = new List<Result>();
 		Map<String, ConnectorMapRuntime.SavedMap> maps = new Map<String, ConnectorMapRuntime.SavedMap>();
+		// The most queries and statements one request's save has used so far, with what the
+		// record's own triggers spend (about 6 queries a Contact on barn-platform, 2026-11-21), so
+		// the next request starts only when the same again, and 5 more, still fits.
+		Integer queriesEach = 0;
+		Integer statementsEach = 0;
 		for (Request request : requests == null ? new List<Request>() : requests) {
 			Result result = new Result();
 			results.add(result);
 			// In order, each save seeing the ones before it (a later request's match finds an
 			// earlier one's record); one statement each, so a bulk flow runs to the limits.
 			if (
-				Limits.getDmlStatements() >= Limits.getLimitDmlStatements() - 5 ||
-				Limits.getQueries() >= Limits.getLimitQueries() - 5
+				Limits.getDmlStatements() + statementsEach + 5 > Limits.getLimitDmlStatements() ||
+				Limits.getQueries() + queriesEach + 5 > Limits.getLimitQueries()
 			) {
 				result.message = BarnHelp.text('Connector', 'Connector_Flow_TooMany');
 				continue;
 			}
+			Integer queriesBefore;
+			Integer statementsBefore;
 			try {
 				String name = request.mapName == null ? '' : request.mapName.trim();
 				if (!maps.containsKey(name.toLowerCase())) {
 					maps.put(name.toLowerCase(), byName(name));
 				}
+				// Measured from here: a map is read once, not once a request.
+				queriesBefore = Limits.getQueries();
+				statementsBefore = Limits.getDmlStatements();
 				ConnectorMapRuntime.SavedMap saved = maps.get(name.toLowerCase());
 				if (String.isBlank(ConnectorMapRuntime.objectOf(saved.document))) {
 					throw new ConnectorMapRuntime.MapException(
@@ -97,6 +107,10 @@ global with sharing class ConnectorApplyMapAction {
 				result.action = done.action;
 			} catch (Exception refused) {
 				result.message = words(refused);
+			}
+			if (queriesBefore != null) {
+				queriesEach = Math.max(queriesEach, Limits.getQueries() - queriesBefore);
+				statementsEach = Math.max(statementsEach, Limits.getDmlStatements() - statementsBefore);
 			}
 		}
 		return results;

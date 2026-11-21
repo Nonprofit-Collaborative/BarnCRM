@@ -81,6 +81,39 @@ private class SetupChangeCopyJobTest {
 	}
 
 	@IsTest
+	static void aConnectorAddressIsKeptWithItsHostOnly() {
+		// runs-as: deploying user (a pure text function, no record or permission involved)
+		// Salesforce's own sentence for a Secret URL connection (barn-platform, 2026-11-21).
+		String made =
+			'Created a new parameter: Url (Parameter Type: URL, Parameter Value: ' +
+			'https://hooks.example.com/services/T0/B0/s3cr3tPath,x)9) for BarnConn_rest_abc123';
+		Assert.areEqual(
+			'Created a new parameter: Url (Parameter Type: URL, Parameter Value: ' +
+			'https://hooks.example.com/****) for BarnConn_rest_abc123',
+			SetupChangeCopyJob.masked(made),
+			'The path is cut, the host and the closing bracket stay.'
+		);
+		Assert.areEqual(
+			'Url https://api.example.com for BarnConn_rest_abc123',
+			SetupChangeCopyJob.masked('Url https://api.example.com for BarnConn_rest_abc123'),
+			'An address with no path is kept.'
+		);
+		Assert.areEqual(
+			'Changed Url to https://a.example.com/**** from https://a.example.com/**** on BarnConn_rest_abc123',
+			SetupChangeCopyJob.masked(
+				'Changed Url to https://a.example.com/new from https://a.example.com/old?k=1 on BarnConn_rest_abc123'
+			),
+			'Every address in the sentence is cut.'
+		);
+		Assert.areEqual(
+			'Url https://hooks.example.com/keep for Barn_Stripe',
+			SetupChangeCopyJob.masked('Url https://hooks.example.com/keep for Barn_Stripe'),
+			'A sentence about anything else is kept as it is.'
+		);
+		Assert.isNull(SetupChangeCopyJob.masked(null), 'No sentence, nothing to cut.');
+	}
+
+	@IsTest
 	static void aChunkThatCannotBeKeptIsLoggedNotThrown() {
 		Datetime at = Datetime.now().addDays(-1);
 		// The same trail ID twice in one chunk: the platform refuses both, and the run goes on.

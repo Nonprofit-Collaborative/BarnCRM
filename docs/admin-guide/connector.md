@@ -61,8 +61,11 @@ Sign-in kinds:
 
 **Secret URL connections are visible in Setup.** Salesforce cannot encrypt an address, so a
 Secret URL is stored as the Named Credential's URL, which every administrator who can view
-Setup can read. BarnCRM shows only its host and last four characters. Where the app offers a
-token instead (Slack offers a bot token), prefer **Bearer Token**.
+Setup can read. BarnCRM shows only its host and last four characters. Salesforce's Setup Audit
+Trail also writes the address in full when a connection is made or its address replaced; the
+copy BarnCRM keeps in [Setup Changes](setup-changes.md) cuts every address about a BarnCRM
+connection to its host. Where the app offers a token instead (Slack offers a bot token), prefer
+**Bearer Token**.
 
 **Enter keys only when no debug logging is on for you.** A Salesforce debug log at its finest
 level can record what a page sends. If a trace flag was on for you while you entered a key,
