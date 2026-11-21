@@ -461,6 +461,9 @@ export default class ImportWizard extends LightningElement {
     guessAccept,
     guessAcceptAll,
     cardTitle: tabLabel,
+    get purpose() {
+      return helpText('Core', 'Core_Import_Purpose');
+    },
     stepTemplate,
     stepFileType,
     stepUpload,

@@ -71,7 +71,7 @@ function settle() {
 }
 
 function message(element) {
-  return element.shadowRoot.querySelector('[data-id="welcome-message"]').textContent;
+  return element.shadowRoot.querySelector('[data-id="shell"]').purpose;
 }
 
 function button(element) {
@@ -91,9 +91,14 @@ describe('c-hub-welcome', () => {
     getHomeModel.emit(model());
     await settle();
 
-    const card = element.shadowRoot.querySelector('lightning-card');
-    expect(card.title).toContain('Core_HubHome_WelcomeHeading');
-    expect(card.iconName).toBe('custom:custom1');
+    // The page header style every Core page shares, with the welcome as its title.
+    const shell = element.shadowRoot.querySelector('[data-id="shell"]');
+    expect(shell.title).toContain('Core_HubHome_WelcomeHeading');
+    expect(shell.titleHidden).toBe(false);
+    expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="patch"]').getAttribute('slot')).toBe(
+      'figure'
+    );
     expect(message(element)).toContain('Core_HubHome_WelcomeMessage');
     expect(message(element)).not.toContain('Everyday');
   });

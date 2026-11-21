@@ -12,4 +12,9 @@
     <target>lightning__RecordPage</target>
     <target>lightning__HomePage</target>
   </targets>
+  <targetConfigs>
+    <targetConfig targets="lightning__AppPage">
+      <property name="pageHeader" type="Boolean" label="Page Header" description="Opens with the page header that names the page and says what it is for. On for the Automation page, where this component is the top of the page." default="false" />
+    </targetConfig>
+  </targetConfigs>
 </LightningComponentBundle>
