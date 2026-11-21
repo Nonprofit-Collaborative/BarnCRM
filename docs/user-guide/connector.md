@@ -16,8 +16,9 @@ Automation (the Automated Process user) or the integration user as who changed i
 recipes and **Run History**: each run's status, what started it, how many records it wrote and,
 when it failed, the step that failed and why in plain words. A **Waiting** run failed for a
 reason that may pass, such as the other app being down, and shows when it is tried again. Viewers
-cannot change, test, run or retry a recipe. If a run failed, tell your admin; they can fix the
-recipe and select **Retry**. A run started by **Webhook** also shows its **Reference**: the same
+cannot change, test, run or retry a recipe, and the **Connections** tab only says that Connector
+admins manage connections. A **Running** run is being worked on now. If a run failed, tell your
+admin; they can fix the recipe and select **Retry**. A run started by **Webhook** also shows its **Reference**: the same
 reference the other app was given, so a post in that app can be matched to its run. A run started
 by **App Poll** is one look at the app: it is gone once its new items have their own runs, and
 stays only when the look failed.

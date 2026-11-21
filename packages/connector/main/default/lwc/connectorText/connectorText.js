@@ -91,6 +91,9 @@ const TEXTS = {
   get Connector_Outcome_Connected() {
     return helpText('Connector', 'Connector_Outcome_Connected');
   },
+  get Connector_Outcome_ConnectedAs() {
+    return helpText('Connector', 'Connector_Outcome_ConnectedAs');
+  },
   get Connector_Outcome_KeyRefused() {
     return helpText('Connector', 'Connector_Outcome_KeyRefused');
   },

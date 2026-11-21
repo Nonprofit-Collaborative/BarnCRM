@@ -2,6 +2,7 @@ import { createElement } from 'lwc';
 import ConnectorKeyForm from 'c/connectorKeyForm';
 import createConnection from '@salesforce/apex/ConnectorConnectionsController.createConnection';
 import replaceKey from '@salesforce/apex/ConnectorConnectionsController.replaceKey';
+import saveCheckPath from '@salesforce/apex/ConnectorConnectionsController.saveCheckPath';
 import { expectAccessible } from 'barn/a11y';
 
 jest.mock(
@@ -11,6 +12,11 @@ jest.mock(
 );
 jest.mock(
   '@salesforce/apex/ConnectorConnectionsController.replaceKey',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/apex/ConnectorConnectionsController.saveCheckPath',
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
@@ -85,6 +91,32 @@ describe('c-connector-key-form', () => {
     expect(saved).toHaveBeenCalledTimes(1);
     expect(JSON.stringify(saved.mock.calls[0][0].detail)).not.toContain(SECRET);
     expect(JSON.stringify(Object.values(element))).not.toContain(SECRET);
+  });
+
+  it('keeps a template check path with the new connection in its own call (R-CN9)', async () => {
+    createConnection.mockResolvedValue({ outcome: 'created', name: 'BarnConn_rest_abc123' });
+    saveCheckPath.mockResolvedValue(undefined);
+    const element = render({
+      prefill: {
+        label: 'Mailing List',
+        authKind: 'BearerToken',
+        baseUrl: 'https://api.example.org/v2',
+        urlParams: [],
+        checkPath: '/ping'
+      }
+    });
+    await flush();
+    find(element, 'secret').value = SECRET;
+    const saved = jest.fn();
+    element.addEventListener('saved', saved);
+    find(element, 'save').click();
+    await flush();
+    expect(saveCheckPath).toHaveBeenCalledWith({
+      name: 'BarnConn_rest_abc123',
+      checkPath: '/ping'
+    });
+    expect(JSON.stringify(saveCheckPath.mock.calls)).not.toContain(SECRET);
+    expect(saved).toHaveBeenCalledTimes(1);
   });
 
   it('empties the box after a failure and passes on only the message', async () => {

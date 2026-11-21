@@ -295,7 +295,7 @@ export default class SuperConnector extends LightningElement {
       this.page = result.page;
     }
     const outcome = outcomeOf(result);
-    this.message = text(outcome.key, outcome.status);
+    this.message = text(outcome.key, outcome.status, outcome.account);
     this.messageVariant = outcome.variant;
   }
 

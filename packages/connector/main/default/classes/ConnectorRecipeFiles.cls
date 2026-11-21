@@ -112,6 +112,9 @@ public with sharing class ConnectorRecipeFiles {
 		public String baseUrl;
 		@AuraEnabled
 		public List<UrlParam> urlParams = new List<UrlParam>();
+		/** The template's check path, which Check Connection asks for (e1); blank is the base URL. */
+		@AuraEnabled
+		public String checkPath;
 	}
 
 	public class UrlParam {
@@ -347,6 +350,7 @@ public with sharing class ConnectorRecipeFiles {
 
 	private static Imported template(Map<String, Object> file) {
 		refuseUnknown(file, TEMPLATE_KEYS);
+		refuseNotYet(file, new List<String>{ 'pollers', 'webhook' });
 		String label = ConnectorRecipeDocument.textOf(file.get('label'));
 		if (
 			file.get('version') != 1 ||
@@ -445,7 +449,46 @@ public with sharing class ConnectorRecipeFiles {
 		) {
 			throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorAction', detail('check')));
 		}
+		result.checkPath = check.isEmpty() ? null : ConnectorRecipeDocument.textOf(check.get('path'));
 		return result;
+	}
+
+	/**
+	 * Refuses a template part BarnCRM does not import yet (pollers, a webhook, action inputs or
+	 * body), so the author is told instead of the part being dropped.
+	 */
+	private static void refuseNotYet(Map<String, Object> source, List<String> parts) {
+		for (String part : parts) {
+			Object given = source.get(part);
+			Boolean empty =
+				given == null ||
+				(given instanceof List<Object> && ((List<Object>) given).isEmpty()) ||
+				(given instanceof Map<String, Object> && ((Map<String, Object>) given).isEmpty());
+			if (!empty) {
+				throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorNotYet', detail(part)));
+			}
+		}
+	}
+
+	/**
+	 * A template's entry values (query, path values, headers): `{{watermark}}` in an App Poll
+	 * trigger becomes the value path `trigger.watermark`; any other `{{...}}` is refused, since
+	 * nothing would fill it.
+	 */
+	private static void templateValues(List<Object> entries, Boolean pollTrigger) {
+		for (Object raw : entries) {
+			Map<String, Object> entry = ConnectorRecipeDocument.mapOf(raw);
+			String value = ConnectorRecipeDocument.textOf(entry.get('value'));
+			if (!value.contains('{{')) {
+				continue;
+			}
+			if (pollTrigger && value.trim() == '{{watermark}}') {
+				entry.remove('value');
+				entry.put('path', ConnectorAppPoll.WATERMARK_PATH);
+			} else {
+				throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorNotYet', detail(value)));
+			}
+		}
 	}
 
 	/** An `https` base URL whose placeholders sit in the host and each have a pattern (F4). */
@@ -472,6 +515,7 @@ public with sharing class ConnectorRecipeFiles {
 		for (Object raw : ConnectorRecipeDocument.listOf(file.get('actions'))) {
 			Map<String, Object> action = ConnectorRecipeDocument.mapOf(raw);
 			refuseUnknown(action, ACTION_KEYS);
+			refuseNotYet(action, new List<String>{ 'inputs', 'body' });
 			String key = ConnectorRecipeDocument.textOf(action.get('key'));
 			if (
 				String.isBlank(key) ||
@@ -509,6 +553,14 @@ public with sharing class ConnectorRecipeFiles {
 		Draft result = new Draft();
 		result.name = name;
 		result.description = description;
+		if (actions != null) {
+			for (String entries : new List<String>{ 'query', 'pathValues' }) {
+				templateValues(
+					ConnectorRecipeDocument.listOf(starter.get(entries)),
+					starter.get('kind') == ConnectorAppPoll.KIND
+				);
+			}
+		}
 		if (starter.get('kind') == ConnectorAppPoll.KIND && triggerBlanked(starter, names, matches)) {
 			result.blanks.add('trigger');
 			String problem = ConnectorTriggers.problem(starter);
@@ -520,6 +572,9 @@ public with sharing class ConnectorRecipeFiles {
 			step.remove('savedQuery');
 			if (actions != null) {
 				copyAction(step, actions);
+				for (String entries : new List<String>{ 'query', 'pathValues', 'headers' }) {
+					templateValues(ConnectorRecipeDocument.listOf(step.get(entries)), false);
+				}
 			}
 			for (String key : new List<String>{ 'map', 'bodyMap', 'template' }) {
 				String given = ConnectorRecipeDocument.textOf(step.get(key));
@@ -626,7 +681,10 @@ public with sharing class ConnectorRecipeFiles {
 		return found;
 	}
 
-	/** A template action named by a Call an App step: its method, path and query, each slot blank. */
+	/**
+	 * A template action named by a Call an App step: its method, path and query, each slot blank.
+	 * Its query values are checked by `templateValues` after the copy.
+	 */
 	private static void copyAction(Map<String, Object> step, Map<String, Map<String, Object>> actions) {
 		if (step.get('kind') != 'callApp' || !step.containsKey('action')) {
 			return;

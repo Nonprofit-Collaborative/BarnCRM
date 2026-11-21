@@ -1,6 +1,7 @@
 import { LightningElement, api } from 'lwc';
 import createConnection from '@salesforce/apex/ConnectorConnectionsController.createConnection';
 import replaceKey from '@salesforce/apex/ConnectorConnectionsController.replaceKey';
+import saveCheckPath from '@salesforce/apex/ConnectorConnectionsController.saveCheckPath';
 import { KINDS, API_KEY, BASIC, SECRET_URL, formProblems } from 'c/connectorRules';
 import { say as text } from 'c/connectorText';
 import { lockedUrl, partOfKey } from 'c/connectorFileRules';
@@ -19,9 +20,10 @@ export default class ConnectorKeyForm extends LightningElement {
   @api connection;
 
   /**
-   * A template's connection (CN-08, R-CR14): label, auth kind, header name and base URL, never a
-   * key. Its host is locked: only the URL parts the template names are typed, each checked
-   * against the template's pattern (F4).
+   * A template's connection (CN-08, R-CR14): label, auth kind, header name, base URL and check
+   * path, never a key. Its host is locked: only the URL parts the template names are typed, each
+   * checked against the template's pattern (F4). The check path is kept with the new connection
+   * in a call of its own after the create (R-CN9).
    */
   @api
   get prefill() {
@@ -202,6 +204,11 @@ export default class ConnectorKeyForm extends LightningElement {
             userName: this.userName,
             secret: box.value
           });
+      box.value = '';
+      const checkPath = this.creating && this._prefill && this._prefill.checkPath;
+      if (checkPath && result && result.name) {
+        await saveCheckPath({ name: result.name, checkPath });
+      }
       this.dispatchEvent(new CustomEvent('saved', { detail: { result } }));
     } catch (failure) {
       this.problems = [];

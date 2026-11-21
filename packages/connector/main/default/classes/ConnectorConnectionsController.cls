@@ -19,9 +19,27 @@ public with sharing class ConnectorConnectionsController {
 		public String outcome;
 		@AuraEnabled
 		public Integer status;
+		/** The account a check call's answer names, when the app gives one (F11). */
+		@AuraEnabled
+		public String account;
+		/** The new connection's name, after a create. */
+		@AuraEnabled
+		public String name;
 		@AuraEnabled
 		public ConnectorConnections.ConnectionsPage page;
 	}
+
+	/** Where an answer may name the signed-in account, in order. */
+	private static final List<String> ACCOUNT_KEYS = new List<String>{
+		'account_name',
+		'accountName',
+		'login',
+		'username',
+		'email',
+		'account',
+		'name',
+		'company'
+	};
 
 	@AuraEnabled
 	public static ConnectorConnections.ConnectionsPage getConnections() {
@@ -109,6 +127,7 @@ public with sharing class ConnectorConnectionsController {
 			throw UserErrors.message(BarnHelp.text('Connector', 'Connector_Error_SaveFailed'));
 		}
 		Result result = new Result();
+		result.name = name;
 		try {
 			result.outcome = ConnectorConnections.grantAccess(name) ? 'created' : 'createdAccessMissing';
 			result.page = ConnectorConnections.page();
@@ -200,9 +219,24 @@ public with sharing class ConnectorConnectionsController {
 	}
 
 	/**
-	 * One GET of the base URL through the connection, as the person checking. Before it: callouts
-	 * must be on (the Setup step) and the person must hold the Connections set; giving it is a
-	 * setup write, after which a callout may not follow, so the page asks to check again.
+	 * Keeps a template's check path with a connection just created (R-CN9, e1). A call of its
+	 * own: the create writes permission sets, and a record write may not share that transaction.
+	 */
+	@AuraEnabled
+	public static void saveCheckPath(String name, String checkPath) {
+		try {
+			ConnectorConnections.saveCheckPath(name, checkPath);
+		} catch (Exception failure) {
+			throw shown(failure, 'saveCheckPath');
+		}
+	}
+
+	/**
+	 * One GET through the connection, as the person checking: of the template's check path when
+	 * the connection has one (R-CN9), else of the base URL. A 2xx answer that names the account
+	 * shows it (F11). Before it: callouts must be on (the Setup step) and the person must hold
+	 * the Connections set; giving it is a setup write, after which a callout may not follow, so
+	 * the page asks to check again.
 	 */
 	@AuraEnabled
 	public static Result checkConnection(String name) {
@@ -215,11 +249,14 @@ public with sharing class ConnectorConnectionsController {
 			} else if (!ConnectorConnections.holdsAccessSet()) {
 				result.outcome = ConnectorConnections.grantAccess(pair.name) ? 'accessAdded' : 'accessMissing';
 			} else {
+				String path = ConnectorConnections.checkPathOf(pair.name);
 				HttpRequest request = new HttpRequest();
-				request.setEndpoint('callout:' + pair.name);
+				request.setEndpoint('callout:' + pair.name + (String.isBlank(path) ? '' : path));
 				request.setMethod('GET');
 				request.setTimeout(30000);
-				result.status = new Http().send(request).getStatusCode();
+				HttpResponse response = new Http().send(request);
+				result.status = response.getStatusCode();
+				result.account = result.status >= 200 && result.status < 300 ? accountOf(response.getBody()) : null;
 				result.outcome = 'answered';
 			}
 		} catch (ConnectorConnections.ConnectorException refused) {
@@ -278,6 +315,7 @@ public with sharing class ConnectorConnectionsController {
 				throw new ConnectorConnections.ConnectorException(BarnHelp.text('Connector', 'Connector_Error_InUse'));
 			}
 			ConnectorConnections.store().remove(pair.name, true);
+			ConnectorConnections.forget(pair.name);
 			Result result = new Result();
 			result.outcome = 'deleted';
 			result.page = ConnectorConnections.page();
@@ -304,6 +342,43 @@ public with sharing class ConnectorConnectionsController {
 				ErrorLogger.SEVERITY_WARNING
 			);
 		}
+	}
+
+	/**
+	 * The account a check answer names (F11): the first text, 80 characters at most, under a
+	 * key such as `account_name`, `login` or `email`, at the top of a JSON object or inside its
+	 * `account`, `user` or `data` object. Null when the answer names none.
+	 */
+	@TestVisible
+	private static String accountOf(String body) {
+		if (String.isBlank(body) || body.length() > 100000) {
+			return null;
+		}
+		Object parsed;
+		try {
+			parsed = JSON.deserializeUntyped(body);
+		} catch (Exception notJson) {
+			return null;
+		}
+		if (!(parsed instanceof Map<String, Object>)) {
+			return null;
+		}
+		Map<String, Object> top = (Map<String, Object>) parsed;
+		List<Map<String, Object>> places = new List<Map<String, Object>>{ top };
+		for (String nested : new List<String>{ 'account', 'user', 'data' }) {
+			if (top.get(nested) instanceof Map<String, Object>) {
+				places.add((Map<String, Object>) top.get(nested));
+			}
+		}
+		for (Map<String, Object> place : places) {
+			for (String key : ACCOUNT_KEYS) {
+				Object value = place.get(key);
+				if (value instanceof String && String.isNotBlank((String) value)) {
+					return ((String) value).trim().left(80);
+				}
+			}
+		}
+		return null;
 	}
 
 	/**

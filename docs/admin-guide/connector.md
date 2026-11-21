@@ -88,15 +88,18 @@ select **Check Again**.
 
 ## Using a Connection
 
-- **Check Connection** sends one GET request to the base URL and shows the app's answer:
+- **Check Connection** sends one GET request to the base URL, or to the template's check path
+  (such as `/ping`) for a connection made from a template, and shows the app's answer:
   **Connected** (the app accepted the key), **Key Refused** (the app answered 401 or 403: replace
-  the key), or the status the app returned. A Secret URL usually answers a GET with 400 or 405,
-  which still shows the address is reachable.
+  the key), or the status the app returned. When the app's answer names the account the key
+  belongs to, it is shown (**Connected as ...**): check it is your organization's account. A
+  Secret URL usually answers a GET with 400 or 405, which still shows the address is reachable.
 - **Replace Key** writes a new key over the old one. Each replacement is recorded in the Admin
   Journal (who and when, never the key), and Health Check lists keys replaced in the last 7 days,
   so a key swapped to another account is noticed. For a Secret URL, the new address must keep the
   same host.
-- **Disconnect** removes the key and keeps the connection, to be given a new key later.
+- **Disconnect** removes the key and keeps the connection, to be given a new key later. A
+  Secret URL has no key apart from its address, so it is replaced or deleted instead.
 - **Delete** removes the connection and its key from Salesforce. A connection a recipe uses (in
   its published version or its draft) cannot be deleted: take it out of every recipe first.
 
@@ -306,7 +309,9 @@ Records** you choose on the recipe, or by the Automated Process user when blank.
 then a path that must start with one `/` and cannot hold `//`, `@`, `\`, `?`, `#` or spaces, so a
 recipe can never reach another host. Each `{slot}` and query value is URL-encoded, so a value
 cannot add a path segment or a parameter. Authorization and the other sign-in headers come from
-the connection, never from a step. Any value that holds a Salesforce merge field (an opening
+the connection, never from a step: a header whose name looks like a sign-in header (with key,
+token, secret, auth, password, signature or session in it) cannot hold a typed value, only a
+value from the trigger or an earlier step, and Save says so. Any value that holds a Salesforce merge field (an opening
 brace followed by an exclamation mark), whether typed in the recipe, sent by an app or read from a
 record, fails the step and nothing is sent: a recipe can never make Salesforce insert a key.
 The same rules hold for Send to Webhook. An **Address From the Data** is used only when it is
@@ -394,7 +399,10 @@ Setup shows but cannot edit, so BarnCRM writes it for you:
 
 1. Create or pick a user for recipes only, such as "BarnCRM Integration", with a Salesforce
    license that lets it edit what your recipes write. Give it the permission sets your
-   Integration User recipes need. Keep it active.
+   Integration User recipes need, and nothing more: a System Administrator, or a user holding
+   Modify All Data or View All Data, is refused. Keep it active. Choosing the user, like saving
+   a key, needs Customize Application or Manage Named Credentials as well as BarnCRM Connector
+   Admin.
 2. On **Super Connector**, open **Recipes**, then **Recipe Clock**. Under **Integration User**,
    choose the user and select **Save User**. BarnCRM saves the choice org-wide, writes the
    subscriber setting **BarnCRM_Connector_Start_User** through the org connection
@@ -443,7 +451,9 @@ Changes**, **Export Recipe** and **Delete**; Test and Run Now have their own sec
    Access. Then the draft becomes the published version, the version number goes up and the
    recipe is **Active**.
 4. **Run Now** queues a run of the published version with the JSON you paste (blank is `{}`).
-   Runs start within moments and appear on **Run History**.
+   Runs start within moments and appear on **Run History**. Run Now and Test on an Integration
+   User recipe are refused while no integration user is chosen and active, since the run could
+   never start.
 
 Test runs only the first item of a For Each and does not wait at a Wait step.
 
@@ -475,7 +485,10 @@ Salesforce's limits (90 callouts, 100 seconds of callouts, 45 seconds of process
 or 140 saves in one transaction) and continues where it stopped; a step that already ran is never
 run again. A run's data, kept between steps, is limited to about 130,000 characters, which also
 bounds the rows one Load Rows step can take from an earlier step; larger loads belong in Super
-Importer.
+Importer. A Find Records, Call an App, Send to Webhook or Change Data step whose results alone
+would pass about 125,000 characters fails with a plain message instead: find fewer records, or
+ask the app for less. A run waiting for a retry that continues after you publish a new version
+runs the new version, and its steps say so.
 
 ## Templates and Moving Recipes
 
@@ -552,16 +565,23 @@ of the key at saving, and one recipe:
 A Call an App step that names an `action` gets the action's method, path and query on import,
 with each path slot left to fill. `auth.kind` is one of `ApiKeyHeader` (with `headerName`),
 `BearerToken`, `BasicAuth` or `SecretUrl`. A key `requires` lists the objects the recipes need.
+`check.path` is kept with the connection you create, for Check Connection. In an App Poll
+trigger, the query value `{{watermark}}` becomes `trigger.watermark`, the stamp of the newest
+item already seen; any other `{{...}}` value is refused. Template `pollers`, `webhook`, and an
+action's `inputs` and `body` are not imported yet: a template holding them is refused with the
+part named, so set that part up on the recipe after import instead.
 
 ## Run History
 
 **Run History** lists the latest 50 runs, newest first, with the recipe, status (Received,
-Queued, Waiting, Succeeded, Skipped, Failed), what started it (Manual, Flow, Test, Schedule,
+Queued, Running, Waiting, Succeeded, Skipped, Failed), what started it (Manual, Flow, Test, Schedule,
 Record Change, Webhook, App Poll), Run As, version, records written, the failed step and, for a Waiting run,
 when it is tried next. A webhook run also shows the reference its app was given. Open a run to see each step: its outcome, how long it took, the
 records it wrote, the app's status code and, for a failed Call an App, the first 2,000 characters
-of the app's answer. A Test run also shows what each step would have written or sent. No request
-header and no key is ever kept.
+of the app's answer. A Test run also shows what each step would have written or sent, and a
+retried run how many times it was tried again. No request header and no key is ever kept.
+**Running** means the run is picked up for the next job; if that job stops unexpectedly, its
+runs are marked Failed with the reason and can be retried.
 
 **Retry** (BarnCRM Connector Admin only) queues a failed run again from its failed step: steps
 that already succeeded are not repeated. Each failed run also writes one Error Log entry naming
@@ -599,15 +619,16 @@ map's Match, or creates one.
 
 ## Where Used
 
-**Where Used** (see [Where Used](where-used.md)) lists recipes whose Find steps name the field or
-object you ask about, and the Mapper warns before you change a map a recipe links.
+**Where Used** (see [Where Used](where-used.md)) lists recipes whose Find steps or Record Change
+trigger name the field or object you ask about, and the Mapper warns before you change a map a
+recipe links.
 
 ## Access
 
 | Permission set | Gives |
 |---|---|
 | BarnCRM Connector Admin | The BarnCRM Connector app, the Super Connector tab, Manage BarnCRM Connector and every recipe and run. Give it only to system administrators: whoever holds it decides where your data goes. |
-| BarnCRM Connector Viewer | The BarnCRM Connector app and the Super Connector tab, to see recipes and Run History without changing them. |
+| BarnCRM Connector Viewer | The BarnCRM Connector app and the Super Connector tab, to see recipes and Run History without changing them. The Connections tab tells a Viewer that Connector admins manage connections. |
 | BarnCRM Connector Webhook Guest | For a Site's guest user only: the webhook receiver and nothing else (no object, record, connection or key). Health Check's **Give Webhook Access** assigns it. |
 | BarnCRM Connections | Created by BarnCRM in your org, not part of the package. It holds each connection's principal access and is given only to Connector admins when they create or check a connection, to the Automated Process user when you save Recipe Access, and to the integration user when you choose it. Do not add other permissions to it: Health Check warns when it holds anything else. |
 

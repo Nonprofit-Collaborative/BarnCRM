@@ -278,7 +278,80 @@ private class ConnectorRecipeFilesTest {
 			Assert.areEqual('/lists/{listId}', step.get('path'));
 			Assert.isFalse(step.containsKey('action'), 'The recipe no longer needs the template.');
 			Assert.areEqual(new List<Object>{ 'pathValues', 'connection' }, step.get('fill'));
+			Assert.areEqual('/ping', result.connection.checkPath, 'The check path goes to New Connection.');
 			Assert.areEqual(0, [SELECT COUNT() FROM Connector_Recipe__c WITH SYSTEM_MODE], 'Nothing is stored.');
+		}
+	}
+
+	@IsTest
+	static void aTemplateMapsTheWatermarkAndRefusesWhatItCannotImportYet() {
+		System.runAs(admin()) {
+			ConnectorRecipeTestData.noConnections();
+			Map<String, Object> polling = template();
+			((List<Object>) polling.get('recipes'))
+				.add(
+					new Map<String, Object>{
+						'name' => 'Pull Unsubscribes',
+						'draft' => new Map<String, Object>{
+							'version' => 1,
+							'trigger' => new Map<String, Object>{
+								'kind' => 'appPoll',
+								'connection' => 'Mailchimp',
+								'path' => '/lists/abc/members',
+								'items' => 'members',
+								'id' => 'id',
+								'stamp' => 'last_changed',
+								'mode' => 'each',
+								'query' => new List<Object>{
+									new Map<String, Object>{
+										'name' => 'since_last_changed',
+										'value' => '{{watermark}}'
+									}
+								}
+							},
+							'steps' => new List<Object>{
+								new Map<String, Object>{ 'id' => 'end', 'kind' => 'stop', 'outcome' => 'Succeeded' }
+							}
+						}
+					}
+				);
+			Map<String, Object> pollers = template();
+			pollers.put('pollers', new List<Object>{ new Map<String, Object>{ 'key' => 'unsubscribes' } });
+			Map<String, Object> body = template();
+			((Map<String, Object>) ((List<Object>) body.get('actions'))[0])
+				.put('body', new Map<String, Object>{ 'members' => '{{list}}' });
+			Map<String, Object> filled = template();
+			((Map<String, Object>) ((List<Object>) filled.get('actions'))[0])
+				.put('query', new Map<String, Object>{ 'members' => '{{list}}' });
+
+			Test.startTest();
+			ConnectorRecipeFiles.Imported result = ConnectorRecipesController.importFile(JSON.serialize(polling));
+			String poller = refusal(JSON.serialize(pollers));
+			String bodied = refusal(JSON.serialize(body));
+			String value = refusal(JSON.serialize(filled));
+			Test.stopTest();
+
+			Map<String, Object> starter = (Map<String, Object>) ((Map<String, Object>) JSON.deserializeUntyped(
+					result.recipes[1].draftJson
+				))
+				.get('trigger');
+			Assert.areEqual(
+				new Map<String, Object>{ 'name' => 'since_last_changed', 'path' => 'trigger.watermark' },
+				((List<Object>) starter.get('query'))[0],
+				'{{watermark}} becomes the value path of the newest stamp already seen.'
+			);
+			Assert.areEqual(
+				BarnHelp.text('Connector', 'Connector_Import_ErrorNotYet', new List<Object>{ 'pollers' }),
+				poller
+			);
+			Assert.areEqual(
+				BarnHelp.text('Connector', 'Connector_Import_ErrorNotYet', new List<Object>{ 'body' }),
+				bodied
+			);
+			Assert.areEqual(
+				BarnHelp.text('Connector', 'Connector_Import_ErrorNotYet', new List<Object>{ '{{list}}' }),
+				value
+			);
 		}
 	}
 

@@ -326,6 +326,59 @@ public with sharing class ConnectorConnections {
 		return result;
 	}
 
+	/**
+	 * The path Check Connection asks for (R-CN9): the check path of the template the connection
+	 * was made from, or null for the base URL. Read in system mode: the row holds no key.
+	 */
+	public static String checkPathOf(String name) {
+		for (Connector_Connection__c row : [
+			SELECT Check_Path__c
+			FROM Connector_Connection__c
+			WHERE Name = :name
+			WITH SYSTEM_MODE
+			LIMIT 1
+		]) {
+			return row.Check_Path__c;
+		}
+		return null;
+	}
+
+	/**
+	 * Keeps a template's check path with the connection (R-CN9). Its own call after the create,
+	 * since that one writes permission sets and a record write may not share it.
+	 */
+	public static void saveCheckPath(String name, String path) {
+		requireWriter();
+		ConnectorOrg.Pair pair = owned(name);
+		String checked = String.isBlank(path) ? null : path.trim();
+		if (
+			checked != null &&
+			(checked.length() > 255 ||
+			checked.contains('{') ||
+			ConnectorRecipeDocument.pathProblem(checked))
+		) {
+			throw new ConnectorException(BarnHelp.text('Connector', 'Connector_Error_CheckPath'));
+		}
+		List<Connector_Connection__c> rows = [
+			SELECT Id
+			FROM Connector_Connection__c
+			WHERE Name = :pair.name
+			WITH SYSTEM_MODE
+			LIMIT 1
+		];
+		Connector_Connection__c row = rows.isEmpty() ? new Connector_Connection__c(Name = pair.name) : rows[0];
+		row.Check_Path__c = checked;
+		Database.upsert(row, AccessLevel.SYSTEM_MODE);
+	}
+
+	/** Removes what was kept beside a deleted connection (R-CN9). */
+	public static void forget(String name) {
+		Database.delete(
+			[SELECT Id FROM Connector_Connection__c WHERE Name = :name WITH SYSTEM_MODE LIMIT 10],
+			AccessLevel.SYSTEM_MODE
+		);
+	}
+
 	/** The principal Ids of every `BarnConn_` connection, one read each. */
 	public static Set<Id> principalIds() {
 		Set<Id> found = new Set<Id>();

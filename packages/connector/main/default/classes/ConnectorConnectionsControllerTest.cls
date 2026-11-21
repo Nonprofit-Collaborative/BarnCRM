@@ -113,6 +113,7 @@ private class ConnectorConnectionsControllerTest {
 	private class Answer implements HttpCalloutMock {
 		Integer status;
 		String endpoint;
+		String body;
 		Answer(Integer status) {
 			this.status = status;
 		}
@@ -120,6 +121,9 @@ private class ConnectorConnectionsControllerTest {
 			endpoint = request.getEndpoint();
 			HttpResponse response = new HttpResponse();
 			response.setStatusCode(status);
+			if (body != null) {
+				response.setBody(body);
+			}
 			return response;
 		}
 	}
@@ -507,6 +511,45 @@ private class ConnectorConnectionsControllerTest {
 			Assert.areEqual('answered', result.outcome, 'The app answered');
 			Assert.areEqual(200, result.status, 'With its status');
 			Assert.areEqual('callout:BarnConn_rest_ffffff', answer.endpoint, 'Through the Named Credential only');
+			Assert.isNull(result.account, 'An answer naming no account shows none');
+		}
+	}
+
+	@IsTest
+	static void aTemplateCheckPathIsAskedForAndTheAccountShown() {
+		System.runAs(dana()) {
+			FakeOrg fake = useFake();
+			ConnectorOrg.Pair pair = fake.add(
+				'BarnConn_rest_kkkkkk',
+				ConnectorConnections.BEARER,
+				'https://api.example.com',
+				true,
+				true
+			);
+			Answer answer = new Answer(200);
+			answer.body = '{"account":{"account_name":"Barn Rescue","id":"x1"},"health":"ok"}';
+			Test.setMock(HttpCalloutMock.class, answer);
+			String refused;
+			try {
+				ConnectorConnectionsController.saveCheckPath(pair.name, '/ping?x=1');
+			} catch (AuraHandledException e) {
+				refused = refusal(e);
+			}
+			ConnectorConnectionsController.saveCheckPath(pair.name, '/ping');
+			ConnectorConnectionsController.checkConnection(pair.name);
+
+			Test.startTest();
+			ConnectorConnectionsController.Result result = ConnectorConnectionsController.checkConnection(pair.name);
+			Test.stopTest();
+
+			Assert.areEqual(BarnHelp.text('Connector', 'Connector_Error_CheckPath'), refused, 'A query is refused');
+			Assert.areEqual('callout:BarnConn_rest_kkkkkk/ping', answer.endpoint, 'The template check path');
+			Assert.areEqual('Barn Rescue', result.account, 'The account the app names (F11)');
+			Assert.isNull(ConnectorConnectionsController.accountOf('[1,2]'), 'A list names no account');
+			Assert.isNull(ConnectorConnectionsController.accountOf('not json'), 'Nor does plain text');
+
+			ConnectorConnectionsController.deleteConnection(pair.name);
+			Assert.isNull(ConnectorConnections.checkPathOf(pair.name), 'Delete forgets the check path');
 		}
 	}
 

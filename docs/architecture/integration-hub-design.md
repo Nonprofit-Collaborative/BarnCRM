@@ -540,7 +540,9 @@ imports (CN-08, release 1.32):
    built-in templates) and no Allow Formulas in HTTP Body option (F1).
 2. Import fills in a new Generic REST connection: label, auth kind, header name, base URL and
    check path, with the base URL's host locked to the template's pattern (F4). The admin pastes
-   the key as for any connection; nothing secret is ever in a template.
+   the key as for any connection; nothing secret is ever in a template. The check path is kept
+   with the connection (canonical model R-CN9), so Check Connection asks the app for it and
+   shows the account the answer names (F11).
 3. Import creates the template's recipes as Draft recipes with each blank highlighted (Section
    3.8). Actions the recipes use are copied into their Call an App steps, so a recipe never
    depends on the template file afterwards.
@@ -553,27 +555,33 @@ first. A template in the schema (the Mailchimp example):
 ```json
 {
   "key": "mailchimp", "label": "Mailchimp", "version": 1,
-  "auth": { "kind": "apiKeyBasic", "params": [{ "name": "ApiKey", "label": "API key", "help": "Account, Extras, API keys" }] },
+  "auth": { "kind": "BasicAuth", "params": [{ "name": "Password", "label": "API key", "help": "Account, Extras, API keys" }] },
   "baseUrl": "https://{dc}.api.mailchimp.com/3.0",
-  "urlParams": [{ "name": "dc", "label": "Data center", "fromParam": "ApiKey", "after": "-" }],
+  "urlParams": [{ "name": "dc", "label": "Data center", "pattern": "^[a-z]{2}[0-9]{1,3}$", "fromParam": "Password", "after": "-" }],
   "check": { "method": "GET", "path": "/ping" },
   "actions": [
-    { "key": "upsertMembers", "label": "Add or update subscribers", "method": "POST", "path": "/lists/{listId}",
-      "inputs": [{ "name": "listId", "label": "Audience", "pick": { "path": "/lists", "items": "lists", "value": "id", "label": "name" } }],
-      "body": { "members": "{{list}}", "update_existing": true } }
+    { "key": "upsertMembers", "label": "Add or update subscribers", "method": "POST", "path": "/lists/{listId}" }
   ],
-  "pollers": [
-    { "key": "unsubscribes", "label": "New unsubscribes", "path": "/lists/{listId}/members",
-      "query": { "status": "unsubscribed", "since_last_changed": "{{watermark}}" }, "items": "members", "id": "id", "stamp": "last_changed" }
-  ],
-  "webhook": { "eventId": "id", "fetchBack": null },
-  "recipes": [{ "name": "Add new people to an audience", "draft": { "version": 1, "trigger": {}, "steps": [] } }]
+  "recipes": [
+    { "name": "Add new people to an audience",
+      "draft": { "version": 1, "trigger": { "kind": "manual" }, "steps": [{ "id": "send", "kind": "callApp", "action": "upsertMembers" }] } },
+    { "name": "Pull unsubscribes back",
+      "draft": { "version": 1,
+        "trigger": { "kind": "appPoll", "connection": "Mailchimp", "path": "/lists/{listId}/members",
+          "query": [{ "name": "status", "value": "unsubscribed" }, { "name": "since_last_changed", "value": "{{watermark}}" }],
+          "items": "members", "id": "id", "stamp": "last_changed", "mode": "each" },
+        "steps": [] } }
+  ]
 }
 ```
 
 `urlParams.fromParam` is the one exception where a non-secret part of a key (Mailchimp's data
 center suffix) is read: the page derives it in the browser before the key is sent, so Apex still
-never reads the key. Pickers (`pick`) call the app to list choices (audiences, events, sheets).
+never reads the key. In an App Poll trigger, a query value `{{watermark}}` becomes the value path
+`trigger.watermark` (the stamp of the newest item already seen); any other `{{...}}` value is
+refused. Template `pollers`, a `webhook` part, and action `inputs` (with pickers that call the
+app to list choices) and `body` are planned: until they are built, import refuses a template
+that has them and says which part, rather than dropping it.
 
 **Template backlog** (built later, Section 7.2; value for effort for small organizations; more
 will be added as asked):
@@ -597,8 +605,8 @@ import and creates nothing when the module is missing.
 
 ### 3.7 Runs, Retries, Errors and Pause
 
-- **Run statuses:** Received (webhook stored), Queued, Running, Waiting (a Wait step or a retry),
-  Succeeded, Skipped, Failed, Rejected (webhook refused at processing).
+- **Run statuses:** Received (webhook stored), Queued, Running (claimed for the next runner
+  job), Waiting (a Wait step or a retry), Succeeded, Skipped, Failed.
 - **Run detail:** each step's outcome, duration, record Ids written, HTTP status and a trimmed
   response (first 2,000 characters, kept only for failed steps), and the map version used. Headers
   are never kept.
@@ -1097,7 +1105,7 @@ All and Modify All, `BarnCRM_Connector_Viewer` read with View All.
 | Attribute | Type | Required | Definition |
 |---|---|---|---|
 | Recipe | reference(Connector Recipe) | yes | The recipe (master). |
-| Status | picklist(Received, Queued, Running, Waiting, Succeeded, Skipped, Failed, Rejected) | yes | Where the run stands. |
+| Status | picklist(Received, Queued, Running, Waiting, Succeeded, Skipped, Failed) | yes | Where the run stands. |
 | Started By | picklist(Schedule, Record Change, Webhook, App Poll, Manual, Flow, Test) | yes | What started it. |
 | Ran As | picklist(BarnCRM Automation, System, Integration User) | yes | The recipe's Run As when the run executed, for audit. |
 | Recipe Version | integer | yes | The version it ran. |
