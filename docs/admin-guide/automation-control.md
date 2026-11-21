@@ -65,9 +65,9 @@ the records in first and the automatic housekeeping to happen afterwards, so not
    record anyone saves. If you forget this step, nothing breaks: automation turns itself
    back on at the two hour mark, and the change is recorded like any other (see "How long
    a pause lasts" below).
-7. Now switch off a single automation instead. Find **Household upkeep when a person
-   changes** in the list and click its switch to **Off**. Only that one stops running. For a
-   few seconds a line next to the switch says "Households when a person changes is
+7. Now switch off a single automation instead. Find **Contact: keep households in
+   step** in the list and click its switch to **Off**. Only that one stops running. For a
+   few seconds a line next to the switch says "Contact: keep households in step is
    off. Turn it back on here." (a screen reader announces it).
    Everything else carries on.
 8. Switch it back **On**. Every change you make here is recorded with your name, the time,
@@ -122,7 +122,7 @@ somehow reaches the server it is refused with the same explanation.
 
 Core ships one, which keeps something correct rather than refusing anything:
 
-- **Address match key** keeps each address's Match Key in step with its street and postal
+- **Address: fill the match key** keeps each address's Match Key in step with its street and postal
   code, so duplicate matching finds addresses through an index. A key a pause left stale
   would hide a duplicate, so it always runs. See [Duplicates](duplicates.md).
 

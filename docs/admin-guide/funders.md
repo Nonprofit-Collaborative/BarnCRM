@@ -476,7 +476,7 @@ After that, change a payment's date or amount, add one, or cancel one in the gra
 list. **Mark Received** on the card sets a payment Received; its **Received Date** fills in with
 today unless you typed one, and the card offers **Undo** while it is open: the payment goes back
 to Expected with its earlier Received Date, and the Received ledger entry it wrote is removed,
-unless the payment was changed since. That is the automation **Grant payment received** on the
+unless the payment was changed since. That is the automation **Grant: payment received** on the
 **Automation** page; switch it off while you import past payments.
 
 ## Restricted Funds
@@ -500,7 +500,7 @@ On a restricted grant, marking a payment **Received** adds its **Received** entr
 entry follows the payment: a changed amount or date changes it, and setting the payment back to
 Expected or Cancelled, or deleting it, removes it. Entries you type yourself are never changed.
 Ticking **Restricted** after payments came in adds no entries for them: add those yourself. The
-automation is **Grant payment received** on the **Automation** page; switch it off while you
+automation is **Grant: payment received** on the **Automation** page; switch it off while you
 import past payments and entries.
 
 ### The Fund a Grant Is Booked To

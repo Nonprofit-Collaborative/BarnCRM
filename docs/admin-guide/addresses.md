@@ -70,7 +70,7 @@ two; a new install shows the first.
 
 BarnCRM's own clean-ups (the nightly tidy-up of empty households, and erasing a person) delete
 the addresses whichever you choose. The work is done by two automations on the
-**Automation** page, **Addresses of a deleted person** and **Addresses of a deleted account**;
+**Automation** page, **Contact: remove addresses on delete** and **Account: remove addresses on delete**;
 switching one off keeps the addresses as **Keep their addresses** does.
 
 Then turn on the seasonal address swap, which is off until you turn it on.

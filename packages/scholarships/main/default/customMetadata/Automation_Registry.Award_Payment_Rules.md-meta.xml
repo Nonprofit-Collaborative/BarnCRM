@@ -24,7 +24,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">Lets a disbursement become Paid only for someone with Manage Scholarships and only when no open condition of its award holds it back, and fills an empty Paid Date with today. This automation enforces a rule rather than doing work for you, so it cannot be switched off here and pausing automation does not suspend it.</value>
+        <value xsi:type="xsd:string">Lets a disbursement become Paid only for someone with Manage Scholarships and only when no open condition of its award holds it back, and fills an empty Paid Date with today.</value>
     </values>
     <values>
         <field>Module__c</field>

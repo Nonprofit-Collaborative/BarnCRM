@@ -74,7 +74,7 @@ can: matching by id is exact, matching by email is a fallback.
 | Card expiry warning days (`Recurring_Card_Expiry_Days__c`) | 60 | How many days before a card's expiry month ends the gift joins the list. 0 to 365. |
 
 The matching and updating can be switched off on the **Automation** page (registry row
-**Recurring gift event: match and apply**).
+**Recurring Gift Event: match and apply**).
 
 ## Who Can Use It
 

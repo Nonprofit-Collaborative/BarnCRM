@@ -31,7 +31,7 @@ to install and no Setup step.
 On the **Automation** page in BarnCRM Settings you will see two rows for relationships
 rather than one:
 
-- **Check relationships before saving.** The rules: a relationship is between two
+- **Relationship: check before saving.** The rules: a relationship is between two
   different people, both sides name someone, the same relationship is not entered twice, and
   the status agrees with the dates. Leave this on. Switching it off lets an import create
   duplicate relationships and relationships between someone and themselves, with nothing to
@@ -166,7 +166,7 @@ back with it, paired as before, and no extra copy is made.
 relationship in step** switched off, BarnCRM writes only the side you entered and
 leaves any pairing it made earlier exactly as it is. Your relationships are still checked:
 duplicates and self relationships are still refused, because the checks are the separate
-**Check relationships before saving** row on the Automation page. Switch the upkeep
+**Relationship: check before saving** row on the Automation page. Switch the upkeep
 back on and the next save on a relationship brings its other side back into step. You can
 also stop the mirroring for one relationship only, without changing the setting for everyone:
 clear **Keep both sides in step** on that one record.
