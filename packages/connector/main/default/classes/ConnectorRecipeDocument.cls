@@ -320,7 +320,8 @@ public with sharing class ConnectorRecipeDocument {
 			path.contains('{!') ||
 			path.contains('?') ||
 			path.contains('#') ||
-			Pattern.matches('.*\\s.*', path);
+			// Any whitespace, CR and LF included (a `.*\s.*` match misses them: `.` stops at a line end).
+			path.containsWhitespace();
 	}
 
 	/** As `pathProblem`, but Send to Webhook may leave the path blank to post to the connection's own address. */
@@ -386,8 +387,16 @@ public with sharing class ConnectorRecipeDocument {
 		}
 	}
 
+	/** A whole record Id: `instanceof Id` passes an 18 character value whose last 3 do not match. */
 	public static Boolean isId(String value) {
-		return String.isNotBlank(value) && value instanceof Id;
+		if (String.isBlank(value) || !(value instanceof Id)) {
+			return false;
+		}
+		try {
+			return Id.valueOf(value) != null;
+		} catch (StringException malformed) {
+			return false;
+		}
 	}
 
 	public static Map<String, Object> mapOf(Object raw) {

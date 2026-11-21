@@ -147,7 +147,7 @@ private class ConnectorRecipesControllerTest {
 			}
 			String integrationUser;
 			try {
-				ConnectorRecipesController.setRunAs(saved.id, 'IntegrationUser', true);
+				ConnectorRecipesController.setRunAs(saved.id, ConnectorRecipes.RUN_AS_USER, true);
 			} catch (AuraHandledException refused) {
 				integrationUser = message(refused);
 			}
@@ -167,9 +167,9 @@ private class ConnectorRecipesControllerTest {
 			);
 			Assert.areEqual(BarnHelp.text('Connector', 'Connector_RunAs_ErrorConfirm'), unconfirmed);
 			Assert.areEqual(
-				BarnHelp.text('Connector', 'Connector_RunAs_ErrorChoice'),
+				BarnHelp.text('Connector', 'Connector_RunAs_ErrorNoUser'),
 				integrationUser,
-				'The Integration User comes with CN-03.'
+				'The Integration User needs an active integration user chosen on Recipe Clock first.'
 			);
 			Assert.areEqual(ConnectorRecipes.RUN_AS_SYSTEM, chosen.runAs);
 			Assert.areEqual(UserInfo.getName(), chosen.runAsChosenBy, 'Who chose System is recorded.');

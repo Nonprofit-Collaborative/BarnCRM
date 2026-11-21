@@ -59,9 +59,16 @@ private class ConnectorAppPollTest {
 		return recipe;
 	}
 
-	/** Queues the recipe's poll run as the clock does, and runs the runner's job body once. */
-	private static void pollOnce(Connector_Recipe__c recipe) {
+	/**
+	 * Queues the recipe's poll run as the clock does. Called before `Test.startTest`: a callout
+	 * cannot follow a record write in the same transaction, as in the clock's own beat.
+	 */
+	private static void queuePoll(Connector_Recipe__c recipe) {
 		insert as system ConnectorAppPoll.pollRun(recipe);
+	}
+
+	/** Runs the runner's job body once over the queued runs. */
+	private static void runOnce() {
 		ConnectorRunner.process(
 			ConnectorRunStore.queued(50, ConnectorRunStore.ALL_RUN_AS, false),
 			new ConnectorRunner.Guard()
@@ -187,8 +194,9 @@ private class ConnectorAppPollTest {
 			);
 			Test.setMock(HttpCalloutMock.class, app);
 
+			queuePoll(recipe);
 			Test.startTest();
-			pollOnce(recipe);
+			runOnce();
 			Test.stopTest();
 
 			Assert.isTrue(runsOf(recipe.Id).isEmpty(), 'Items already in the app are not run; the poll run is spent.');
@@ -228,8 +236,9 @@ private class ConnectorAppPollTest {
 			);
 			Test.setMock(HttpCalloutMock.class, app);
 
+			queuePoll(recipe);
 			Test.startTest();
-			pollOnce(recipe);
+			runOnce();
 			Test.stopTest();
 
 			List<Connector_Run__c> runs = runsOf(recipe.Id);
@@ -266,8 +275,9 @@ private class ConnectorAppPollTest {
 				new ConnectorRecipeTestData.App(200, '[{"id":1,"seq":9},{"id":2,"seq":10},{"id":3,"seq":11}]')
 			);
 
+			queuePoll(recipe);
 			Test.startTest();
-			pollOnce(recipe);
+			runOnce();
 			Test.stopTest();
 
 			List<Connector_Run__c> runs = runsOf(recipe.Id);
@@ -287,8 +297,9 @@ private class ConnectorAppPollTest {
 			Connector_Recipe__c recipe = pollRecipe(starter(new Map<String, Object>()), '2026-11-20T09:00:00Z');
 			Test.setMock(HttpCalloutMock.class, new ConnectorRecipeTestData.App(503, 'down ' + SECRET));
 
+			queuePoll(recipe);
 			Test.startTest();
-			pollOnce(recipe);
+			runOnce();
 			Test.stopTest();
 
 			List<Connector_Run__c> runs = runsOf(recipe.Id);
@@ -306,8 +317,9 @@ private class ConnectorAppPollTest {
 			Connector_Recipe__c recipe = pollRecipe(starter(new Map<String, Object>()), '2026-11-20T09:00:00Z');
 			Test.setMock(HttpCalloutMock.class, new ConnectorRecipeTestData.App(401, SECRET.repeat(200)));
 
+			queuePoll(recipe);
 			Test.startTest();
-			pollOnce(recipe);
+			runOnce();
 			Test.stopTest();
 
 			Connector_Run__c run = runsOf(recipe.Id)[0];
@@ -339,9 +351,10 @@ private class ConnectorAppPollTest {
 			);
 			Test.setMock(HttpCalloutMock.class, new ConnectorRecipeTestData.App(200, '{"data":[]}'));
 
+			queuePoll(recipe);
+			queuePoll(other);
 			Test.startTest();
-			insert as system ConnectorAppPoll.pollRun(recipe);
-			pollOnce(other);
+			runOnce();
 			Test.stopTest();
 
 			Connector_Run__c guarded = runsOf(recipe.Id)[0];

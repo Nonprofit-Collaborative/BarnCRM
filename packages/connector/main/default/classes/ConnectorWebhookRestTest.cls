@@ -69,12 +69,17 @@ private class ConnectorWebhookRestTest {
 
 			Test.startTest();
 			RestResponse response = receive(request);
+			List<Connector_Run__c> stored = runs();
 			Test.stopTest();
 
 			Assert.areEqual(202, response.statusCode);
-			List<Connector_Run__c> stored = runs();
 			Assert.areEqual(1, stored.size());
 			Assert.areEqual(ConnectorRunStore.RECEIVED, stored[0].Status__c);
+			Assert.areEqual(
+				ConnectorRunStore.RUNNING,
+				runs()[0].Status__c,
+				'The start event takes the Received run for the runner (R-CR10, R-RUN4).'
+			);
 			Assert.areEqual(ConnectorWebhooks.WEBHOOK, stored[0].Started_By__c);
 			Assert.areEqual(ConnectorRecipes.RUN_AS_AUTOMATION, stored[0].Ran_As__c);
 			Assert.areEqual(25, ((Map<String, Object>) JSON.deserializeUntyped(stored[0].Input_JSON__c)).get('amount'));
@@ -171,6 +176,8 @@ private class ConnectorWebhookRestTest {
 				'first=Ada&amount=25&note=a%20b&token=' + token,
 				'application/x-www-form-urlencoded'
 			);
+			// The token comes in `?token=` (R-CR10); a copy among the form fields is dropped.
+			request.params.put('token', token);
 
 			Assert.areEqual(202, receive(request).statusCode);
 			Map<String, Object> input = (Map<String, Object>) JSON.deserializeUntyped(runs()[0].Input_JSON__c);

@@ -51,7 +51,14 @@ private class ConnectorClockTest {
 
 	private static Connector_Recipe__c reread(Id recipeId) {
 		return [
-			SELECT Id, Status__c, Next_Run_At__c, Watermark__c, Consecutive_Failures__c
+			SELECT
+				Id,
+				Status__c,
+				Run_As__c,
+				Next_Run_At__c,
+				Watermark__c,
+				Ignore_Own_Changes__c,
+				Consecutive_Failures__c
 			FROM Connector_Recipe__c
 			WHERE Id = :recipeId
 			WITH SYSTEM_MODE
@@ -170,6 +177,8 @@ private class ConnectorClockTest {
 				ConnectorRecipes.RUN_AS_AUTOMATION
 			);
 			recipe.Watermark__c = ConnectorTriggers.watermark(Datetime.now().addMinutes(-10), null);
+			// The field's default, as the clock reads it; a recipe built in memory holds false.
+			recipe.Ignore_Own_Changes__c = true;
 			update as system recipe;
 			insert as system new List<Contact>{
 				TestDataFactory.person(new Contact(LastName = 'Lovelace')),

@@ -130,8 +130,10 @@ private class ConnectorErasureExtensionTest {
 		System.runAs(eraser()) {
 			Contact person = ana();
 			Connector_Recipe__c recipe = recipe();
+			// A lower cap stands in for 2,000: that many results outlast search's time limit here.
+			ConnectorRunStore.searchCap = 5;
 			List<Connector_Run__c> runs = new List<Connector_Run__c>();
-			for (Integer i = 0; i < ConnectorRunStore.MOST_SEARCHED; i++) {
+			for (Integer i = 0; i < ConnectorRunStore.searchCap; i++) {
 				runs.add(run(recipe.Id, '{"n":' + i + '}', null, null));
 			}
 			insert as system runs;
@@ -157,7 +159,7 @@ private class ConnectorErasureExtensionTest {
 				),
 				refused
 			);
-			Assert.areEqual(ConnectorRunStore.MOST_SEARCHED, remaining().size(), 'Nothing is deleted.');
+			Assert.areEqual(ConnectorRunStore.searchCap, remaining().size(), 'Nothing is deleted.');
 			Assert.isTrue(extension.fieldsToKeep(Contact.SObjectType).isEmpty());
 		}
 	}

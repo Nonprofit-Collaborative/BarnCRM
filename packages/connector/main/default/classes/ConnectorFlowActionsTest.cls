@@ -84,7 +84,7 @@ private class ConnectorFlowActionsTest {
 			List<ConnectorApplyMapAction.Result> results = ConnectorApplyMapAction.apply(requests);
 			Test.stopTest();
 
-			Assert.areEqual('created', results[0].action, results[0].message);
+			Assert.areEqual('created', results[0].action, 'Message: ' + results[0].message);
 			Assert.areEqual('updated', results[1].action, 'The map matches by email.');
 			Assert.areEqual(results[0].recordId, results[1].recordId);
 			Assert.areEqual(1, [SELECT COUNT() FROM Contact WHERE Email = :MAIL WITH SYSTEM_MODE]);
@@ -116,7 +116,7 @@ private class ConnectorFlowActionsTest {
 			);
 			Test.stopTest();
 
-			Assert.areEqual('updated', results[0].action, results[0].message);
+			Assert.areEqual('updated', results[0].action, 'Message: ' + results[0].message);
 			Assert.areEqual(target.Id, results[0].recordId);
 			Assert.areEqual('Source', [SELECT LastName FROM Contact WHERE Id = :target.Id WITH SYSTEM_MODE].LastName);
 		}
