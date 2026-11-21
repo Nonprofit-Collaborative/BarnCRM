@@ -823,11 +823,15 @@ Detection never creates, activates or shows a record type.
   resolver, `AccountKinds`, answers "is this an organization" and "which record type does a
   new organization get" for Core and every module; nothing else names a record type for
   organizations.
-- **Formula field:** `Is_Organization__c` (Checkbox), true when the account's record type
-  developer name equals `$Setup.BarnCRM_Settings__c.Organization_Record_Type__c`, or when the
-  setting is `Master` and the account has no record type (a blank `RecordTypeId`, or the
-  master record type, which has no developer name). The Organizations list view and
-  every record page rule for organizations filter on it. Read access in the three role sets.
+- **Field:** `Is_Organization__c` (Checkbox, default false, kept by BarnCRM), true when the
+  account's record type developer name equals the Organization Record Type setting
+  (`Organization_Record_Type__c`, Section 12), or when the setting is `Master` and the account
+  has no record type (a blank `RecordTypeId`, or the master record type, which has no developer
+  name). The Account trigger handler sets it on insert and whenever the record type changes;
+  when the setting's saved value changes, `OrganizationFlagBatch` resets it on every Account
+  (ADR-NEXT settings as custom metadata, which replaced the formula over `$Setup`). The
+  Organizations list view and every record page rule for organizations filter on it. Read
+  access in the three role sets.
 - **Fields:** standard `Name`; `Primary_Contact__c` (shared with Household, above);
   `Sample_Data__c` (Checkbox, shared field definition with Household, above);
   `Sample_Data_Key__c` (Text(20), shared with Household, holding the key the generated
@@ -1035,11 +1039,14 @@ names recompute and the waiting rollups.
   `Is_Package_Default__c` (Checkbox). The record name holds the automation's label as the
   admin reads it.
 - **Shipped defaults:** `Automation_Registry__mdt` (Section 13).
-- **Org-level pause:** `BarnCRM_Settings__c.Automation_Paused_Until__c`.
+- **Org-level pause:** `BarnCRM_Automation_Control__c.Paused_Until__c` (DateTime, organization
+  level only), read beside `Pause_All__c` at no query cost on every save (ADR-NEXT settings as
+  custom metadata). `BarnCRM_Settings__c.Automation_Paused_Until__c` is read only until the org
+  carries its settings over, and is removed in phase 2.
 - **Automation Control:** `BarnCRM_Automation_Control__c`, a public hierarchy custom setting
   (public so that an organization's own formulas, validation rules and flows read it through
   `$Setup`), with `Pause_All__c` (Checkbox, default false) and `Bypass__c` (Checkbox, default
-  false) (R-A7).
+  false) (R-A7), and `Paused_Until__c` (DateTime, organization level only, the pause end above).
 - **Service:** `AutomationControl`, `TriggerDispatcher`, `CheckAutomationAction`.
 
 ---
@@ -1200,9 +1207,15 @@ deployment Id.
 ### Definition
 
 The org's simple, org-wide toggles and values: feature flags, mode selections, and
-naming pattern choices. Stored as a protected hierarchy custom setting so that the
-settings console can write them synchronously and so that they are cacheable (Decision
-D-06).
+naming pattern choices. Each key's default ships on its `Setting_Definition__mdt` row
+(`Default_Value__c`) and a value the org changed is a `Setting_Value__mdt` record of the same
+name, so settings are deployable metadata (D-219, ADR-NEXT settings as custom metadata).
+The keys below keep their `BarnCRM_Settings__c` field names: the console and every reader name a
+key by them, and `SettingsService.getSettings()` returns a `BarnCRM_Settings__c` built in
+memory from the store. The custom setting itself is read only until the org carries its saved
+values over, and is removed in phase 2. Run-state keys (last runs, summaries, watermarks, setup
+markers) are rows of `Nightly_Job__c` with `Kind__c` State (Section 29 Nightly Jobs), not
+settings; the automation pause end is `BarnCRM_Automation_Control__c.Paused_Until__c`.
 
 Core is neutral (plan Section 4.1, C-29, ADR-0059): a key lives here only if Core reads it or
 it means the same thing to any organization. The console and the object are labelled **BarnCRM
@@ -1497,7 +1510,10 @@ definition.
 
 ### Salesforce implementation
 
-- **Custom setting:** `BarnCRM_Settings__c`, hierarchy, protected.
+- **Store:** `Setting_Value__mdt` over `Setting_Definition__mdt.Default_Value__c` (Section 13),
+  read by `SettingStore` and written by an Apex metadata deployment whose callback,
+  `SettingValueDeployCallback`, audits each key. `BarnCRM_Settings__c` (hierarchy, protected)
+  is the legacy store, read until `Settings_Carried_Over` is true, marked for removal.
 - **Picklist keys are stored as text.** Custom settings do not support picklist fields on
   the platform, so `Coexistence_Mode__c` and `Household_Membership_Mode__c` are Text
   fields holding one of the values listed above, validated by `SettingsService` rather
@@ -1543,14 +1559,11 @@ With no notes shipped, Dismiss stores nothing.
 
 ### Salesforce implementation
 
-- **Custom setting:** `Whats_New_Seen__c`, hierarchy, protected, with user-level records only
-  (`SetupOwnerId` is the person). Not a key on `BarnCRM_Settings__c`, because a user-level
-  record of that setting would hide the organization's values from that person (ADR-0087,
-  `0087-whats-new-from-packaged-release-notes.md`).
-
-| Attribute | API name | Type | Notes |
-|---|---|---|---|
-| Last Seen Version | `Last_Seen_Version__c` | Text(20) | Written in system mode by `WhatsNewSeenWriter` (ADR-0021), for the running user only. |
+- **Store:** one `Nightly_Job__c` row per person, `Kind__c` Seen, Name `WhatsNew:<UserId>`,
+  the version in `Value__c` (ADR-NEXT settings as custom metadata). Written in system mode by
+  `WhatsNewSeenWriter` (ADR-0021), for the running user only. The legacy custom setting
+  `Whats_New_Seen__c` (user-level records, `Last_Seen_Version__c`) is read while a person has no
+  row, and is removed in phase 2.
 
 - **Service:** `WhatsNewController`, with the LWC `whatsNew` on the BarnCRM home page.
 
@@ -1589,6 +1602,32 @@ settings to the console by shipping rows rather than by editing the console.
 | `Sort_Order__c` | number | The order of this row inside its section. |
 | `Min_Value__c` | number(18, 2) | Number rows only: the lowest value the console accepts. The console marks a lower value before Save, and `SettingsService` refuses it on the server whoever saves it, naming the setting and the range (owner decision 2026-10-13, ADMIN-27). Every shipped Number row sets it. |
 | `Max_Value__c` | number(18, 2) | Number rows only: the highest value accepted, enforced the same way. Every shipped Number row sets it. |
+| `Default_Value__c` | text (255) | The value the setting has until the org changes it, as a JSON literal (`true`, `90`, `"Both"`); blank means no default (ADR-NEXT settings as custom metadata). A row whose setting ships a value states it here; `check-setting-defaults.py` checks Core's against the field defaults. |
+
+`Data_Type__c` also takes Hidden: a value BarnCRM writes from another page (the features turned
+on, the modules turned off) or for itself (`Settings_Carried_Over`), held in the store like any
+other key and never listed by the console.
+
+### Setting Value
+
+`Setting_Value__mdt` (Core, Public): one record per setting the org changed from its default
+(D-219, ADR-NEXT settings as custom metadata). No package ships a record; an upgrade never
+touches one. Retrieved and deployed like any metadata (`CustomMetadata:Setting_Value.*`).
+
+| Field | Type | Definition |
+|---|---|---|
+| DeveloperName | text | The DeveloperName of the Setting Definition the value belongs to. |
+| `Value__c` | text (255) | The org's value as a JSON literal; blank means the default. |
+
+**R-SV1 Effective value.** The Setting Value when one exists and is not blank and parses as JSON,
+else the definition's `Default_Value__c`; a record with no definition (a module not installed) is
+ignored. Before `Settings_Carried_Over` is true, a value the org saved in the legacy custom
+setting is used ahead of the default.
+**R-SV2 Saving.** One save sends one deployment of every changed key. The page shows Saving
+until the deployment ends, then Saved or the reason it was not. Each key's Setting Change is
+written when the deployment succeeds, with its Deployment Id (R-S6).
+**R-SV3 Carry-over.** Carry Over Saved Settings deploys, in one deployment, every legacy value
+that differs from its default plus the marker, and copies run state to state rows.
 
 ### Automation Registry
 
@@ -13789,7 +13828,15 @@ pages' Schedule and Stop buttons, which require Manage BarnCRM Settings.
 | Last Finished | `Last_Finished__c` | DateTime |
 | Last Outcome | `Last_Outcome__c` | Picklist (Running, Done, Done With Errors, Failed, Skipped, Gave Up Waiting), restricted |
 | Last Message | `Last_Message__c` | Text(255) |
+| Kind | `Kind__c` | Picklist (Job, State, Seen), restricted; blank reads as Job |
+| Value | `Value__c` | Long Text (32768), a JSON literal; State and Seen rows only |
 
+- **State rows** (ADR-NEXT settings as custom metadata): `Kind__c` State, Name the key (the
+  former `BarnCRM_Settings__c` field name, such as `Error_Digest_Last_Run__c`), `Value__c` the
+  value. They hold what ran in this org (last runs, summaries, watermarks, setup markers), so
+  they are not deployable and not settings. Read once per transaction by `SettingsState` and
+  written in system mode. The job registry (`NightlyJobs.rows`) reads Job rows only. Seen rows
+  are Section 12A.
 - **Classes:** `NightlyStep` (one step), `NightlyStepProvider` (a module's steps),
   `NightlyJobs` (the registry, switches, results, scheduling and adoption), `NightlyRun` (the
   run: schedulable and queueable). Each former scheduler class keeps its `start`, `stop`,
@@ -20058,6 +20105,7 @@ mirrors the primary member).
 | 1.81 | 2026-11-20 | The Mapper and saved maps (MAP-01 to MAP-07, releases 1.31 to 1.33). `Saved_Transform__c` gains `Kind__c` (Step List, the default, or Map); new R-MAP1 to R-MAP4 (map document, paths, checks, preview) and R-ST5 (maps). `Giving_Settings__c` gains `Opportunity_Mirror_Map__c`, a Saved Transform record ID chosen with a record picker (a map name is read too); new R-OM12 (extra fields through a map). No object added. |
 | 1.82 | 2026-11-20 | BarnCRM Connector pre-batch review fixes (release 1.33). One object added, 199 to 200 in the suite: Connector Connection (`Connector_Connection__c`, `Check_Path__c`), which keeps a template's check path beside a connection (29CN1, new R-CN9: Check Connection asks for it and shows the account an answer names). New R-CN10: choosing the integration user needs the key-writing permissions and refuses an all-seeing user. R-CN8: Disconnect refuses a Secret URL. Connector Run's Status loses Rejected; Running marks runs claimed for the next runner job (R-RUN4). |
 | 1.83 | 2026-11-20 | R-CR6 the recipe clock: a claimed Running run counts as Queued for the clock, so the heartbeat keeps running while a lane has a Waiting run, a Queued run or a claimed Running run (batch Q gate fix). |
+| 1.84 | 2026-11-21 | Settings as custom metadata, phase 1 Core (SET-01, D-219, ADR-NEXT settings as custom metadata). New custom metadata type `Setting_Value__mdt` with `Value__c` (Section 13, R-SV1 to R-SV3; not counted as an object). `Setting_Definition__mdt` gains `Default_Value__c` and the Hidden data type. `Nightly_Job__c` gains `Kind__c` and `Value__c` (state and What's New rows). `BarnCRM_Automation_Control__c` gains `Paused_Until__c`. `Account.Is_Organization__c` becomes a kept checkbox (Section 8). `BarnCRM_Settings__c` and `Whats_New_Seen__c` are read only until carry-over and are removed in phase 2; no object count change in phase 1. |
 
 ---
 ## 32. Entity ownership by package

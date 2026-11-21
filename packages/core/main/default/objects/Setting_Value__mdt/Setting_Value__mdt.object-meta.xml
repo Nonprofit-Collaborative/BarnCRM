@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    One setting this org has changed from its default. The record has the same name as the
+    setting's Setting Definition, and holds the value as JSON. Written by the BarnCRM Settings
+    console; deployable between orgs like any other metadata. BarnCRM never ships a record.
+  </description>
+  <label>Setting Value</label>
+  <pluralLabel>Setting Values</pluralLabel>
+  <visibility>Public</visibility>
+</CustomObject>

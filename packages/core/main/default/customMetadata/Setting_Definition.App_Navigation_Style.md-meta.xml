@@ -40,4 +40,8 @@
     <field>Sort_Order__c</field>
     <value xsi:type="xsd:double">8</value>
   </values>
+  <values>
+    <field>Default_Value__c</field>
+    <value xsi:type="xsd:string">"Both"</value>
+  </values>
 </CustomMetadata>

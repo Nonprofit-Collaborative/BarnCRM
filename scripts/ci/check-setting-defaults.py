@@ -122,39 +122,71 @@ def ships_on(fields_dir):
     return on
 
 
-def registered_defaults(source):
-    """The (object, field) pairs registered in SettingsService.SHIPPED_DEFAULTS."""
-    match = re.search(
-        r"SHIPPED_DEFAULTS\s*=\s*new\s+Map<Schema\.SObjectField,\s*Boolean>\s*\{(.*?)\}",
-        source,
-        re.DOTALL,
+DEFINITIONS = "packages/*/main/default/customMetadata/Setting_Definition.*.md-meta.xml"
+# Core keys whose blank default is deliberate: blank means nobody has chosen yet.
+BLANK_BY_DESIGN = {"Coexistence_Mode__c", "Household_Membership_Mode__c"}
+
+
+def definition_value(text, field):
+    found = re.search(
+        r"<field>" + field + r"</field>\s*<value[^>]*?(?:/>|>(.*?)</value>)", text, re.DOTALL
     )
-    if match is None:
-        return None
+    return found.group(1).strip() if found and found.group(1) else ""
+
+
+def registered_defaults():
+    """Core's shipped defaults, from Default_Value__c on its Setting Definition rows (ADR-NEXT
+    settings as custom metadata): checkbox keys as booleans, every key's raw JSON alongside."""
     pairs = {}
-    for object_name, field_name, value in re.findall(
-        r"(\w+__c)\.(\w+__c)\s*=>\s*(true|false)", match.group(1)
-    ):
-        pairs[(object_name, field_name)] = value == "true"
-    return pairs
+    raw = {}
+    for path in sorted(glob.glob(DEFINITIONS)):
+        text = open(path, encoding="utf-8").read()
+        if definition_value(text, "Settings_Object__c") != CORE_SETTINGS:
+            continue
+        key = definition_value(text, "Setting_Key__c")
+        if not key:
+            continue
+        default = definition_value(text, "Default_Value__c")
+        raw[(CORE_SETTINGS, key)] = default
+        if default in ("true", "false"):
+            pairs[(CORE_SETTINGS, key)] = default == "true"
+    return pairs, raw
+
+
+def core_field_defaults():
+    """Each Core settings field that declares a default, as the JSON its definition must ship."""
+    expected = {}
+    pattern = f"packages/core/main/default/objects/{CORE_SETTINGS}/fields/*.field-meta.xml"
+    for path in sorted(glob.glob(pattern)):
+        root = ET.parse(path).getroot()
+        name = text_of(root, "fullName")
+        declared = text_of(root, "defaultValue")
+        if not declared or name in BLANK_BY_DESIGN:
+            continue
+        kind = text_of(root, "type")
+        if kind == "Checkbox":
+            expected[name] = declared.lower()
+        elif kind == "Number":
+            expected[name] = declared
+        elif declared.startswith('"') and declared.endswith('"'):
+            expected[name] = '"' + declared[1:-1] + '"'
+    return expected
 
 
 def main():
-    if not os.path.exists(SETTINGS_SERVICE):
-        print(f"{SETTINGS_SERVICE} is missing, so the shipped defaults cannot be read.")
-        return 1
-    with open(SETTINGS_SERVICE, encoding="utf-8") as handle:
-        registered = registered_defaults(handle.read())
-    if registered is None:
-        print(
-            "SettingsService no longer declares a SHIPPED_DEFAULTS map of "
-            "Schema.SObjectField to Boolean. That map is what puts a shipped default on an "
-            "org that has never saved its settings; without it every checkbox that ships on "
-            "reads off on a fresh install."
-        )
-        return 1
+    registered, raw_defaults = registered_defaults()
 
     problems = []
+    for key, expected in sorted(core_field_defaults().items()):
+        shipped = raw_defaults.get((CORE_SETTINGS, key))
+        if shipped is None:
+            continue
+        if shipped != expected:
+            problems.append(
+                f"{CORE_SETTINGS}.{key}: its Setting Definition ships Default_Value__c "
+                f"{shipped or '(blank)'}, but the field declares {expected}. Every reader of the "
+                f"setting uses the definition's default, so the two have to agree."
+            )
     checked = 0
     from_metadata = 0
     declared = set()
@@ -183,7 +215,7 @@ def main():
                 f"{object_name}.{field_name} declares defaultValue true, but Apex never sees "
                 f"that default: getOrgDefaults() returns false for it until the org saves its "
                 f"settings, so whatever this setting guards does nothing on a fresh install "
-                f"and says nothing about it. Register it in SettingsService.SHIPPED_DEFAULTS."
+                f"and says nothing about it. Ship Default_Value__c true on its Setting Definition."
             )
 
     problems.extend(raw_settings_saves(settings_objects))
@@ -212,9 +244,9 @@ def main():
             )
 
     for key in sorted(registered):
-        if key not in declared:
+        if registered[key] and key not in declared:
             problems.append(
-                f"{key[0]}.{key[1]} is registered in SettingsService.SHIPPED_DEFAULTS but its "
+                f"{key[0]}.{key[1]} ships Default_Value__c true on its Setting Definition but its "
                 f"field metadata does not declare defaultValue true. The console, the admin "
                 f"guide and the code all read that metadata as the shipped default, so they "
                 f"have to agree."

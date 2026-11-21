@@ -158,6 +158,10 @@ def check_setting_rows(problems):
             )
         if value_of(text, "Data_Type__c") == "Component":
             continue
+        if value_of(text, "Data_Type__c") == "Hidden" and not value_of(text, "Setting_Key__c"):
+            # A value only BarnCRM writes, held by name in Setting Value (ADR-NEXT settings as
+            # custom metadata), such as the carry-over marker: no settings field behind it.
+            continue
         if value_of(text, "Data_Type__c") == "SetupValue":
             # A value Setup holds, shown read only (ADR-0135). The console shows only the keys
             # SetupValueSelector lists and silently leaves any other row out, so check it here.
