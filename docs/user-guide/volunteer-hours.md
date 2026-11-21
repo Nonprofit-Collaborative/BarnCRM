@@ -62,7 +62,8 @@ Needs **Manage Volunteers**.
 
 1. Click the **Approve Hours** tab.
 2. Leave **Show** on **Submitted** to see the entries waiting. To narrow the list, choose a
-   **Job**, or set **From** and **To** (dates worked).
+   **Job**, or set **From** and **To** (dates worked). When nothing matches, the page says so and
+   suggests changing **Show** or the dates; there is no page control until there are entries.
 3. Check odd entries first: the **Notes** column shows what the person wrote (point at a long
    note to read it all), and clicking a person's name opens the entry itself.
 4. Tick the entries to approve, or tick the box in the heading row to select the whole page.

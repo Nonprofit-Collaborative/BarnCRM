@@ -83,6 +83,32 @@ export default class VolunteersHome extends NavigationMixin(LightningElement) {
     };
   }
 
+  get title() {
+    return this.helpReady ? helpText('Volunteers', 'Volunteers_Home_Title') : '';
+  }
+
+  get purpose() {
+    return this.helpReady ? helpText('Volunteers', 'Volunteers_Home_Purpose') : '';
+  }
+
+  get iconName() {
+    return iconFor('Volunteers_Home');
+  }
+
+  /** With nothing to count yet, the report charts below are empty: say why and what to do. */
+  get showChartsNote() {
+    return Boolean(
+      this.helpReady &&
+        this.hasTiles &&
+        !this.loading &&
+        this.tiles.every((tile) => tile.value === 0)
+    );
+  }
+
+  get chartsNote() {
+    return helpText('Volunteers', 'Volunteers_Home_ChartsEmpty');
+  }
+
   get hasTiles() {
     return !this.firstRun && this.tiles.length > 0;
   }

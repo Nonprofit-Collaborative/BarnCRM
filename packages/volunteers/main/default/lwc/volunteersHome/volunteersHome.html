@@ -1,6 +1,6 @@
 <template>
-  <lightning-card>
-    <div class="slds-var-p-horizontal_medium">
+  <c-barn-page-shell title={title} purpose={purpose} icon-name={iconName} title-hidden data-id="shell">
+    <div class="slds-is-relative">
       <template lwc:if={loading}>
         <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
       </template>
@@ -52,6 +52,14 @@
           </template>
         </div>
       </template>
+      <template lwc:if={showChartsNote}>
+        <c-barn-notice
+          variant="info"
+          message={chartsNote}
+          class="slds-show slds-var-m-top_small"
+          data-id="charts-note"
+        ></c-barn-notice>
+      </template>
     </div>
-  </lightning-card>
+  </c-barn-page-shell>
 </template>
