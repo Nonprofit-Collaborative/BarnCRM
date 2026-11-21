@@ -54,7 +54,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Approve Hours screen title</shortDescription>
-        <value>Approve Volunteer Hours</value>
+        <value>Approve Hours</value>
     </labels>
     <labels>
         <fullName>Volunteers_Approve_StatusSubmitted</fullName>

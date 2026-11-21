@@ -235,7 +235,7 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 1 | As the admin, open the **BarnCRM Programs** app. | **Programs Dashboard** is the first tab. |
 | 2 | Open **Programs Dashboard**. | Period **This Month**; seven tiles (Active Programs, Open Enrollments, New Enrollments, People Served, Served Without Enrollment, Services Delivered, Attendance Rate), a **Tools** row with a tile for each Programs tab (each opens its list), and a **By Program** table listing every Active program by name, the rate shown as a bar and a percent. |
 | 3 | Compare the program's row with its **Program Roster** panel and today's log. | Open Enrollments matches the roster's Applied plus Enrolled; Services Delivered counts the Present delivery only; Attendance Rate is 50%; People Served is 1. |
-| 4 | Pick **Last Year**. | The figures reload for last year; a program with no activity then shows 0 and "None yet" for the rate in its row, and the **Attendance Rate** tile shows 0%. |
+| 4 | Pick **Last Year**. | The figures reload for last year; a program with no activity then shows 0 and "None yet" for the rate in its row, and the **Attendance Rate** tile shows a dash with its label reading "Attendance Rate: None yet". |
 | 5 | Click a program's name. | The program opens. |
 | 6 | Open the test person who attended, in the BarnCRM Programs app. | The **Programs** card starts with "Last service:" today's date and "(1 attended in all)". |
 | 7 | Open the test person who was absent. | No Last service line (an absence is not a service). |
