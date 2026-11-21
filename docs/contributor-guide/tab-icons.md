@@ -118,7 +118,7 @@ Rules:
 | giving | Campaign_Sync | Custom35: Microphone |
 | giving | Gift_Transaction_Mirror | Custom31: Car |
 | giving | Opportunity_Mirror | Custom30: Radardish |
-| programs | Case_Note__c | Custom12: Circle |
+| programs | Case_Note__c | Custom55: Books |
 | programs | Cohort__c | Custom50: Bigtop |
 | programs | Enrollment__c | Custom60: Umbrella |
 | programs | Goal__c | Custom96: StreetSign |
@@ -126,7 +126,7 @@ Rules:
 | programs | Programs_Dashboard | Custom9: Lightning |
 | programs | Programs_Settings | Custom73: HighwaySign |
 | programs | Referral__c | Custom85: RealEstateSign |
-| programs | Service_Count__c | Custom6: Triangle |
+| programs | Service_Count__c | Custom79: MeasuringTape |
 | programs | Service_Delivery__c | Custom16: Bank |
 | programs | Session__c | Custom20: Airplane |
 | rollups | Rollup_Builder | Custom63: Chip |
