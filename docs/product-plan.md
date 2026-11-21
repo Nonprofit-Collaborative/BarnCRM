@@ -792,8 +792,8 @@ This subsection is the schedule for every open, approved item. Where Sections 6.
 | N | 1.27, 1.28 | Owner decisions of 2026-11-14 (D-208): Grants rename everywhere, Memberships and Scholarships apps, org-wide Core dates, admin-only Form delete, Error Log grouping key, address match-key warning, Health Check Run Remaining Checks, quick link help in BarnHelp JSON, Mirror without nonprofit modules, hourly case status pull (1.27); fewer custom objects without losing function (1.28). Landed 2026-11-19 with batch O: squash `8c772d5d4`, PR #1327; release gate at `32c252100` passed on `barn-sales` and `barn-platform` (6,167 of 6,167 tests each, 93% coverage, 0 classes under the floor), then incremental gates 6,166 of 6,166 on `barn-sales` for three CI fixes; Core deployed to `mwdbdevsb` at `8c772d5d4` (validation 0AfWF00000HZDlN0AX, 2,759 of 2,759 tests, removed BarnCRM objects destroyed; quick deploy 0AfWF00000HZGo50AH; D-192) |
 | O | 1.29 | Apex character trim pass plus the Advanced Reporting module (D-202, D-208), after all current and pending work. Landed 2026-11-19 with batch N |
 | P | 1.30 | S11 Migration package, D-213 naming, Org Optimizer module, Sample Data package (D-213, D-215, D-216). Landed 2026-11-20: squash `f0eae0b38`, PR #1341 (#1334, #1335, #1338 closed as landed); incremental gate at `f24a9f7aa` 6126 of 6126 on `barn-sales`, 6125 of 6125 on `barn-platform` |
-| Q | 1.31, 1.32 | The Mapper and BarnCRM Connector: Connections, Recipes and Runs, console app, Flow actions, recipe clock, inbound and outbound webhooks, scheduled imports (C-38), importable templates (D-214 to D-216) |
-| R | 1.33 | The Mapper everywhere (Super Importer, Super Transformer, gift mirrors), app polling, erasure path (D-214) |
+| Q | 1.31, 1.32, 1.33 | The Mapper and BarnCRM Connector: Connections, Recipes and Runs, console app, Flow actions, recipe clock, inbound and outbound webhooks, scheduled imports (C-38), importable templates (D-214 to D-216); the Mapper everywhere, app polling, erasure path, Org Optimizer moves (D-217). Landed 2026-11-20: squash `678dfe553`, PR #1350 (#1336, #1337, #1339, #1340, #1343 to #1349 closed as landed); incremental gate at `c261db977` 6235 of 6235 on `barn-platform`. `barn-sales` refuses a full deploy (suite 201 of Enterprise Edition's 200 custom objects); owner decision pending |
+| R | 1.33 | Built and landed with Batch Q (D-217: all building before testing) |
 
 Portals into Batch C (Brandon, 2026-11-04, "Yes", D-178): C-46 Address Verification is no longer a Portal Builder or Corporate Hub prerequisite, so Portal Builder (PB-01) and the volunteer, speaker and donor portal templates (PB-03, PB-07, PB-08) are in release 1.3. PB-01 still starts only after the item 30 terms check confirms option B; if it does not, the Portal Builder items are re-slotted.
 
@@ -1339,38 +1339,45 @@ Design: `docs/architecture/integration-hub-design.md`, the reusable mapper ADR a
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| MAP-01/02 | The Mapper: one mapping screen (source with samples, target sentences, live preview, auto-match, plain-language steps, drag and drop, Check Before Running) on the map document (import mapping document v4) | Major | Built (#1336) | D-214 |
-| CN-01 | BarnCRM Connector module with its own console app (Super Connector), Connections (page-entered keys under F1 to F13), Connector Admin | Major | Built (#1337) | D-214, D-216 |
-| CN-02 | Recipes and Runs: When and Then steps, Run As (BarnCRM Automation default, System, Integration User), Run History, Retry, test run | Major | Built (#1339; Integration User lane in CN-03) | D-214, D-215 |
-| MAP-03 | Saved Maps (Saved_Transform__c Kind Map) with Where Used | Minor | Built (#1336, access tightened in #1340) | D-214 |
-| MAP-04 | Super Importer Save as Map and Use a Saved Map | Minor | Built (#1336) | D-214 |
-| CN-06 | Flow actions: run a recipe, apply a saved map | Minor | Built (#1339) | D-214 |
+| MAP-01/02 | The Mapper: one mapping screen (source with samples, target sentences, live preview, auto-match, plain-language steps, drag and drop, Check Before Running) on the map document (import mapping document v4) | Major | Landed (#1350) | D-214 |
+| CN-01 | BarnCRM Connector module with its own console app (Super Connector), Connections (page-entered keys under F1 to F13), Connector Admin | Major | Landed (#1350) | D-214, D-216 |
+| CN-02 | Recipes and Runs: When and Then steps, Run As (BarnCRM Automation default, System, Integration User), Run History, Retry, test run | Major | Landed (#1350) | D-214, D-215 |
+| MAP-03 | Saved Maps (Saved_Transform__c Kind Map) with Where Used | Minor | Landed (#1350) | D-214 |
+| MAP-04 | Super Importer Save as Map and Use a Saved Map | Minor | Landed (#1350) | D-214 |
+| CN-06 | Flow actions: run a recipe, apply a saved map | Minor | Landed (#1350) | D-214 |
 
 #### Release 1.32 (Batch Q): recipes that run on their own and send data back
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| CN-03 | Recipe clock (every 15 minutes) with record-change checks, retries with backoff and automatic pause | Major | Planned | D-214 |
-| CN-04 | Data sent in by other apps (inbound webhooks, F13) and sending data back: a reply to the calling app and a Send to Webhook step | Major | Planned | D-214, D-216 |
-| CN-09 | Scheduled imports with dry run and admin-set limits (C-38, taken off hold) | Major | Planned | D-215 |
-| CN-05 | For each, wait and change data steps | Minor | Planned | D-214 |
-| CN-08 | Recipe versions, and importable recipe and connector templates (JSON files imported on demand; nothing preloaded) | Minor | Planned | D-214, D-216 |
+| CN-03 | Recipe clock (every 15 minutes) with record-change checks, retries with backoff and automatic pause | Major | Landed (#1350) | D-214 |
+| CN-04 | Data sent in by other apps (inbound webhooks, F13) and sending data back: a reply to the calling app and a Send to Webhook step | Major | Landed (#1350) | D-214, D-216 |
+| CN-09 | Scheduled imports with dry run and admin-set limits (C-38, taken off hold) | Major | Landed (#1350) | D-215 |
+| CN-05 | For each, wait and change data steps | Minor | Landed (#1350) | D-214 |
+| CN-08 | Recipe versions, and importable recipe and connector templates (JSON files imported on demand; nothing preloaded) | Minor | Landed (#1350) | D-214, D-216 |
 
-#### Release 1.33 (Batch R): the Mapper everywhere
+#### Release 1.33 (Batch Q, built with it per D-217): the Mapper everywhere
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| MAP-05 | Super Importer's mapping step drawn by the Mapper once it matches everything the current step does | Major | Planned | D-214 |
-| MAP-06 | Super Transformer Apply a Map | Minor | Planned | D-214 |
-| MAP-07 | Extra copied fields for gift mirrors through maps | Minor | Planned | D-214 |
-| CN-13 | Watching apps for new items (polling) | Minor | Planned | D-214 |
-| CN-18 | Connector runs in the GDPR erasure path | Minor | Planned | D-214 |
+| MAP-05 | Super Importer's mapping step drawn by the Mapper once it matches everything the current step does | Major | Landed (#1350) | D-214 |
+| MAP-06 | Super Transformer Apply a Map | Minor | Landed (#1350) | D-214 |
+| MAP-07 | Extra copied fields for gift mirrors through maps | Minor | Landed (#1350) | D-214 |
+| CN-13 | Watching apps for new items (polling) | Minor | Landed (#1350) | D-214 |
+| CN-18 | Connector runs in the GDPR erasure path | Minor | Landed (#1350) | D-214 |
+| OO-01 | Core Home tile with the last Health Check result, shown only while the Org Optimizer module is installed | Minor | Landed (#1350) | D-217 |
+| OO-02 | Sample Data tab for the Admin role only | Minor | Landed (#1350) | D-217 |
+| OO-03 | Move PicklistUsageService, AutomationInventoryService, UserAccessSelector and PersonLinkOrphanSelector (used only by Org Optimizer) into the Org Optimizer module | Minor | Landed (#1350) | D-217 |
+| OO-04 | One KitRef type and kit query shared by Core and the Migration package | Minor | Landed (#1350) | D-217 |
+| CN-19 | Connector Patch logo (Brandon may supply it) | Minor | Planned (waiting on the owner's logo) | D-217 |
+| Q-01 | Back under Enterprise Edition's 200 custom objects (suite 201 after Connector Connection and Connector Settings; ADR-0235 planned no settings object) | Minor | Owner decision pending | ADR-0227 |
 
 #### Later: Connector templates and future connections (D-216)
 
 - Importable connector and recipe templates, built later and imported on demand, never preloaded: Slack and Teams, Mailchimp, Google Sheets, giving-tool webhooks, Eventbrite, Zoom, Constant Contact, QuickBooks Online, GoFundMe Pro, and more over time.
 - Event-driven triggers (record changes acted on as they happen, not every 15 minutes).
 - SFTP and direct database connections (Apex cannot open them; needs its own design).
+- Extra copied fields for the Nonprofit Cloud Gift Transaction mirror through a map (MAP-07 covers the Opportunity mirror only; batch Q review e1).
 
 #### Held
 
@@ -2482,6 +2489,7 @@ Findings and decisions about the modules (Giving, Mirror, Volunteers, Programs, 
 | D-214 | Owner request of 2026-11-20 (Brandon): "I'd also like to create and integration/middleware module. I'd like it to be similar to Workato in capabilities and super easy for a non technical user to setup and use. Also, I'd like a UI feature to map objects and fields that can be reused for functions like data import, transformations, automations, and integrations. I'd like it to be as easy or easier/more intuitive to use as Salesforce's Flow/Data 360 transform screen. Please design, build, and start integrating these now." Design first (an ADR for the reusable mapper and for the integration module, on `feature/integration-design`); the build mechanisms go to Brandon for sign-off under the right-sizing gate before code. Likely starts C-38 (scheduled imports and external sources, held under D-39); to be confirmed with the design | Keep C-38 on hold; rely on Zapier recipes (MIG-06) | Owner request |
 | D-215 | Owner answers of 2026-11-20 (Brandon) on the D-214 design and Core size. C-38 taken off hold: "Yes", built inside BarnCRM Connector (scheduled imports with dry run and limits, Google Sheets; no SFTP or database sources). Pasting a connection's secret on BarnCRM's page through `ConnectApi`: "Please review this more in depth for security vulnerabilities with this approach but I'm good with approving this if the results of that review say it's secure" (approved subject to a passing security review). Names approved: module "BarnCRM Connector", tab "Super Connector", Core feature "the Mapper" with saved "Maps". Run identity: "I'd rather recipes being able to be ran as system, integration user, or non-user specific to avoid disruptions due to changed permissions or deactivated users" (replaces the proposal that unattended runs act as the admin who turned recipes on; design amended). Two new objects (`Connector_Recipe__c`, `Connector_Run__c`) approved. Core size: "Moving Org Optimizer to a module with Health Check in that module" (a new module holding Org Optimizer and Health Check, reversing their place in Core under D-101) and B "Approved" (the sample data loader as a small optional package). Stewardship setup tab naming left to the integrator's recommendation. Design sign-off (D-214) pending the restated design. Follow-up 2026-11-20: the security review (docs/architecture/connector-secrets-security-review.md on `feature/integration-design`) found page entry "secure with required mitigations" (F1 to F13, binding in the integration ADR; OAuth Auth Providers only through a guided Setup step), so page-entered secrets are approved on those terms; Run As redesigned as BarnCRM Automation (Automated Process user with chosen permission sets, recommended default; permission set assignment to Automated Process verified on `barn-sales`), System (explicit, recorded, listed by Health Check) or Integration User (free Integration license, PlatformEventSubscriberConfig) | Recipes run as the admin who turned them on; Org Optimizer and Health Check stay Core features; sample data stays in Core | Owner decisions |
 | D-216 | Owner approval of 2026-11-20 (Brandon): "The Mapper and Connector designs are approved with the excepts of: make a module specific console app for Connector, it needs to be able to send info back (such as through a webhook connection), and the premade system integrations should be templates that can easily be imported (but not already loaded into Salesforce in order to prevent unnecessary tech debt and solution bloat) and those templates can wait to be built until later. I'd also need some additional templates, such as GoFundMe Pro, and many others in the future. I'd also like SFTP and direct database connections in the future but it doesn't need to be in the first version. Event driven triggers (instead of every 15 minutes) should also be in a future release. S11 exception approved." Result: D-214 design approved; BarnCRM Connector ships its own console app; recipes can send data back (reply to the calling app, Send to Webhook step); app connectors are importable JSON templates, imported on demand and never preloaded, built later (GoFundMe Pro added); SFTP, direct database connections and event-driven triggers are later items; the S11 household writer seam exception to ADR-0155 is accepted. Releases 1.30 to 1.33 and the Later list record the slots | Ship app connectors in the package; poll only | Owner decisions |
+| D-217 | Owner answers of 2026-11-20 (Brandon) on the batch P review: "1. Deploy and delete unnecessary/old BarnCRM components once everything is done building, testing, etc. No Org Optimizer module in MWD. 2. Yes 3. Tile is fine, only shown if the module is installed. 4. Okay 5. Yes, automatic for admins 6. Yes, I can create this if needed 7. Both approved. Please complete this and all other building across batches before testing, enhancements, fixes, and deployments." | `mwdbdevsb` gets Core only, with the former Core copies of moved components (Migration fields included) deleted, after all building and testing; sync duplicate git refs deleted; a Core Home tile shows the last Health Check result only while the Org Optimizer module is installed; Sample Data tab for Admin only; Connector Admin stays automatic for BarnCRM Admins; a Connector Patch logo (Brandon may supply it); four Org-Optimizer-only Core classes move to the module and one KitRef type; every planned build across batches finishes before any testing, fix or deploy cycle | Org Optimizer module on `mwdbdevsb`; Health Check off Home entirely | Owner decisions |
 
 ---
 
