@@ -10,7 +10,7 @@ Limits checked, on the XML text with leading and trailing whitespace trimmed but
 breaks and indentation inside it counted (filterBuilder's wrapped description, 256 characters
 that way, was refused; duplicateReview's, 251, deployed):
 - description 255: custom permission, permission set, permission set group, FlexiPage, LWC
-  bundle (js-meta), custom tab, custom application
+  bundle (js-meta), custom tab, custom application, static resource
 - field label 40, field inline help 510, field and object description 1000
 - custom label value 1000
 - validation rule errorMessage 255
@@ -39,6 +39,7 @@ DESCRIPTION_255 = [
     "packages/*/main/default/lwc/*/*.js-meta.xml",
     "packages/*/main/default/tabs/*.tab-meta.xml",
     "packages/*/main/default/applications/*.app-meta.xml",
+    "packages/*/main/default/staticresources/*.resource-meta.xml",
 ]
 FIELDS = "packages/*/main/default/objects/*/fields/*.field-meta.xml"
 OBJECTS = "packages/*/main/default/objects/*/*.object-meta.xml"
