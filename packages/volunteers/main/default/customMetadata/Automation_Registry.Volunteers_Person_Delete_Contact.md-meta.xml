@@ -24,9 +24,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value
-      xsi:type="xsd:string"
-    >Deleting a person deletes their volunteer requirements and volunteer skills, whoever deletes them, so a background check never outlives its person. Merging a duplicate keeps them: the merge moves them to the person kept. Restoring a person from the Recycle Bin does not bring them back.</value>
+        <value xsi:type="xsd:string">Deleting a person deletes their volunteer requirements and volunteer skills, whoever deletes them, so a background check never outlives its person. Merging a duplicate keeps them: the merge moves them to the person kept. Restoring a person from the Recycle Bin does not bring them back.</value>
     </values>
     <values>
         <field>Module__c</field>

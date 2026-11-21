@@ -24,9 +24,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value
-      xsi:type="xsd:string"
-    >Refuses to delete approved volunteer hours, for everyone: they count in totals, and deleting them would change the totals with nothing on record. A coordinator reopens the hours (moves them back to Submitted) first.</value>
+        <value xsi:type="xsd:string">Refuses to delete approved volunteer hours, for everyone: they count in totals, and deleting them would change the totals with nothing on record. A coordinator reopens the hours (moves them back to Submitted) first.</value>
     </values>
     <values>
         <field>Module__c</field>
