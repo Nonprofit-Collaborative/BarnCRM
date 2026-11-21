@@ -226,7 +226,10 @@ public with sharing class ErrorLogger {
 	private static String friendlyMessage(String context) {
 		return String.isBlank(context)
 			? BarnHelp.text('Core', 'Core_ErrorLog_UnexpectedFailure')
-			: String.format(Label.Core_ErrorLog_UnexpectedFailureIn, new List<Object>{ context.trim() });
+			: String.format(
+					BarnHelp.text('Core', 'Core_ErrorLog_UnexpectedFailureIn'),
+					new List<Object>{ context.trim() }
+			  );
 	}
 
 	private static String technicalDetail(Exception thrown) {

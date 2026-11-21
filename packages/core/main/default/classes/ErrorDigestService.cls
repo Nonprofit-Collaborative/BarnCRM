@@ -79,7 +79,7 @@ public with sharing class ErrorDigestService {
 
 		if (!ignoreFrequency && coveredUntil != null && !isDue(coveredUntil, periodDays, runAt)) {
 			outcome.summary = String.format(
-				System.Label.Core_ErrorDigest_SummaryNotDue,
+				BarnHelp.text('Core', 'Core_ErrorDigest_SummaryNotDue'),
 				new List<Object>{ coveredUntil.addDays(periodDays).format() }
 			);
 			return finish(outcome, runAt, coveredUntil);
@@ -111,7 +111,7 @@ public with sharing class ErrorDigestService {
 		if (recipients.isEmpty()) {
 			// Not written to the Error Log: the next run would find that entry, fail to send it,
 			// and log again. Health Check already names an org where nobody administers.
-			outcome.summary = System.Label.Core_ErrorDigest_SummaryNoRecipients;
+			outcome.summary = BarnHelp.text('Core', 'Core_ErrorDigest_SummaryNoRecipients');
 			return finish(outcome, runAt, coveredUntil);
 		}
 
@@ -232,22 +232,27 @@ public with sharing class ErrorDigestService {
 		String base = URL.getOrgDomainUrl().toExternalForm();
 		if (window.total == 0) {
 			List<String> only = new List<String>{
-				String.format(System.Label.Core_AdminDigest_NoNewErrors, new List<Object>{ windowStart.format() }),
+				String.format(
+					BarnHelp.text('Core', 'Core_AdminDigest_NoNewErrors'),
+					new List<Object>{ windowStart.format() }
+				),
 				''
 			};
 			only.addAll(AdminDigestSummary.lines(summary, base));
-			only.add(System.Label.Core_ErrorDigest_Footer);
+			only.add(BarnHelp.text('Core', 'Core_ErrorDigest_Footer'));
 			return String.join(only, '\n');
 		}
 		List<String> lines = new List<String>{
 			String.format(
-				System.Label.Core_ErrorDigest_Intro,
+				BarnHelp.text('Core', 'Core_ErrorDigest_Intro'),
 				new List<Object>{ counted(window.total, window.capped), windowStart.format() }
 			),
 			''
 		};
 		if (window.capped) {
-			lines.add(String.format(System.Label.Core_ErrorDigest_Capped, new List<Object>{ String.valueOf(cap) }));
+			lines.add(
+				String.format(BarnHelp.text('Core', 'Core_ErrorDigest_Capped'), new List<Object>{ String.valueOf(cap) })
+			);
 			lines.add('');
 		}
 		lines.add(System.Label.Core_ErrorDigest_BySource);
@@ -286,7 +291,7 @@ public with sharing class ErrorDigestService {
 		lines.add(String.format(System.Label.Core_ErrorDigest_StillNew, new List<Object>{ stillNew(cap) }));
 		lines.add('');
 		lines.addAll(AdminDigestSummary.lines(summary, base));
-		lines.add(System.Label.Core_ErrorDigest_Footer);
+		lines.add(BarnHelp.text('Core', 'Core_ErrorDigest_Footer'));
 		return String.join(lines, '\n');
 	}
 

@@ -75,7 +75,7 @@ public with sharing class RollupDateWindow {
 			return '';
 		}
 		if (String.isBlank(dateFieldName)) {
-			throw new RollupDateWindowException(System.Label.Core_Rollups_ErrorInvalidFilter);
+			throw new RollupDateWindowException(BarnHelp.text('Core', 'Core_Rollups_ErrorInvalidFilter'));
 		}
 		Window window = windowFor(offset);
 		return dateFieldName +

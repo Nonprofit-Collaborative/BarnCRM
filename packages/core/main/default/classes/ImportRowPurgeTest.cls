@@ -236,7 +236,7 @@ private class ImportRowPurgeTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(Label.Core_Import_ErrorRowsRemoved, refused, 'Refused, saying why.');
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Import_ErrorRowsRemoved'), refused, 'Refused, saying why.');
 		}
 	}
 

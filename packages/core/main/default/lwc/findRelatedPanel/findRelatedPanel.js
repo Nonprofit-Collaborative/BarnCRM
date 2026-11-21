@@ -10,7 +10,6 @@ import HAS_NO from '@salesforce/label/c.Core_Find_HasNo';
 import WHICH from '@salesforce/label/c.Core_Find_Which';
 import RELATED_KIND from '@salesforce/label/c.Core_Find_RelatedKind';
 import CHOOSE_RELATED from '@salesforce/label/c.Core_Find_ChooseRelated';
-import RELATED_CONDITIONS from '@salesforce/label/c.Core_Find_RelatedConditions';
 import RELATED_COLUMNS from '@salesforce/label/c.Core_Find_RelatedColumns';
 import ADD_COLUMN from '@salesforce/label/c.Core_Find_AddRelatedColumn';
 import RELATED_FIELDS from '@salesforce/label/c.Core_Find_RelatedFields';
@@ -49,7 +48,9 @@ export default class FindRelatedPanel extends LightningElement {
     which: WHICH,
     relatedKind: RELATED_KIND,
     chooseRelated: CHOOSE_RELATED,
-    relatedConditions: RELATED_CONDITIONS,
+    get relatedConditions() {
+      return helpText('Core', 'Core_Find_RelatedConditions');
+    },
     relatedColumns: RELATED_COLUMNS,
     addColumn: ADD_COLUMN,
     relatedFields: RELATED_FIELDS,

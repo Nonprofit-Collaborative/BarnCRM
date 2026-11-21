@@ -3,7 +3,6 @@ import { NavigationMixin } from 'lightning/navigation';
 import getHomeModel from '@salesforce/apex/HubController.getHomeModel';
 import getSettingsLink from '@salesforce/apex/SettingsController.getSettingsLink';
 import HEADING from '@salesforce/label/c.Core_Rollups_FreshnessTitle';
-import STALE from '@salesforce/label/c.Core_Rollups_FreshnessStale';
 import LINK from '@salesforce/label/c.Core_Rollups_FreshnessLink';
 import NOT_RUN from '@salesforce/label/c.Core_OrgOptimizer_BadgeNotRun';
 import OVERDUE from '@salesforce/label/c.Core_HubHome_BadgeOverdue';
@@ -32,7 +31,9 @@ export default class HubRollups extends NavigationMixin(LightningElement) {
     get never() {
       return helpText('Core', 'Core_Rollups_FreshnessNever');
     },
-    stale: STALE,
+    get stale() {
+      return helpText('Core', 'Core_Rollups_FreshnessStale');
+    },
     link: LINK,
     notRun: NOT_RUN,
     overdue: OVERDUE

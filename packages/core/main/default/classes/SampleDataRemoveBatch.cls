@@ -27,7 +27,7 @@ public with sharing class SampleDataRemoveBatch extends SampleDataStageBatch {
 			UserInfo.getUserId(),
 			Label.Core_JobNotice_SampleDataRemove,
 			true,
-			Label.Core_JobNotice_SampleDataRemoveStoppedBody
+			BarnHelp.text('Core', 'Core_JobNotice_SampleDataRemoveStoppedBody')
 		);
 	}
 }

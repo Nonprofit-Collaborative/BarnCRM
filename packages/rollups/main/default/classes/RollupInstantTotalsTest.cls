@@ -225,7 +225,7 @@ private class RollupInstantTotalsTest {
 					System.Assert.fail('Staff cannot change an automation switch.');
 				} catch (AuraHandledException refused) {
 					System.Assert.areEqual(
-						Label.Core_Automation_NoPermission,
+						BarnHelp.text('Core', 'Core_Automation_NoPermission'),
 						refused.getMessage(),
 						'Refused, with the permission named.'
 					);

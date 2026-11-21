@@ -622,7 +622,7 @@ private class RollupBuilderControllerTest {
 
 			RollupBuilderController.Draft unreadableFilter = childCount();
 			unreadableFilter.filterJson = '{not json';
-			drafts.put(Label.Core_Rollups_ErrorInvalidFilter, unreadableFilter);
+			drafts.put(BarnHelp.text('Core', 'Core_Rollups_ErrorInvalidFilter'), unreadableFilter);
 
 			for (String expected : drafts.keySet()) {
 				System.Assert.areEqual(

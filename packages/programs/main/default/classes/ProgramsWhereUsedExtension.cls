@@ -41,7 +41,7 @@ public with sharing class ProgramsWhereUsedExtension implements WhereUsedExtensi
 							program.Id
 						)
 						.addPart(Schema.SObjectType.Program__c.fields.Eligibility_Rules__c.getLabel())
-						.withBreaks(System.Label.Core_WhereUsed_BreaksModuleRecord)
+						.withBreaks(BarnHelp.text('Core', 'Core_WhereUsed_BreaksModuleRecord'))
 						.withRecordEdit(program.Id)
 				);
 			}

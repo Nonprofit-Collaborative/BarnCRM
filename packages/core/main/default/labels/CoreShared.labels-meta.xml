@@ -9,46 +9,6 @@
         <value>This automation enforces a rule, so it always runs. It cannot be switched off here and a pause does not suspend it.</value>
     </labels>
     <labels>
-        <fullName>Core_Automation_HandlerUnavailable</fullName>
-        <categories>Core, Automation</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error Log: an automation handler could not start; {0} is its name</shortDescription>
-        <value>BarnCRM could not start one of its automations ({0}), so it was skipped. Everything else ran as usual. Send this entry to whoever supports your Salesforce.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Automation_NameRequired</fullName>
-        <categories>Core, Automation</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Automation name required</shortDescription>
-        <value>Pick an automation before switching it on or off.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Automation_NoPermission</fullName>
-        <categories>Core, Automation</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Automation change not permitted</shortDescription>
-        <value>You do not have permission to change automation. Ask your BarnCRM admin for the Manage BarnCRM Settings permission.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Automation_NotFound</fullName>
-        <categories>Core, Automation</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Automation not found</shortDescription>
-        <value>That automation is not in this org's list. Refresh the Automation page and try again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Automation_PauseHoursInvalid</fullName>
-        <categories>Core, Automation</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Pause length not allowed</shortDescription>
-        <value>Choose how long to pause automation: 1, 2, 4, 8, or 24 hours.</value>
-    </labels>
-    <labels>
         <fullName>Core_Automation_UnexpectedError</fullName>
         <categories>Core, Automation</categories>
         <language>en_US</language>
@@ -87,14 +47,6 @@
         <protected>false</protected>
         <shortDescription>Shown where a coexistence mode is expected and none has been confirmed.</shortDescription>
         <value>not confirmed yet</value>
-    </labels>
-    <labels>
-        <fullName>Core_ErrorLog_UnexpectedFailureIn</fullName>
-        <categories>Core, Error Log</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error log default message naming where it happened ({0})</shortDescription>
-        <value>BarnCRM hit an unexpected problem in {0}. The technical detail on this entry says what failed and where. The admin guide page for that feature says what to check.</value>
     </labels>
     <labels>
         <fullName>Core_ErrorLogTile_Acknowledge</fullName>

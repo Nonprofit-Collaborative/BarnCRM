@@ -195,7 +195,7 @@ private class AutomationControlControllerTest {
 						Assert.fail('David should not be able to ' + action + '.');
 					} catch (AuraHandledException expected) {
 						Assert.areEqual(
-							Label.Core_Automation_NoPermission,
+							BarnHelp.text('Core', 'Core_Automation_NoPermission'),
 							expected.getMessage(),
 							'The message names the permission David needs.'
 						);
@@ -221,7 +221,7 @@ private class AutomationControlControllerTest {
 					Assert.fail('Three hours is not one of the offered lengths.');
 				} catch (AuraHandledException expected) {
 					Assert.areEqual(
-						Label.Core_Automation_PauseHoursInvalid,
+						BarnHelp.text('Core', 'Core_Automation_PauseHoursInvalid'),
 						expected.getMessage(),
 						'Maria is told which lengths she can choose.'
 					);
@@ -231,7 +231,7 @@ private class AutomationControlControllerTest {
 					Assert.fail('An automation with no name should be refused.');
 				} catch (AuraHandledException expected) {
 					Assert.areEqual(
-						Label.Core_Automation_NameRequired,
+						BarnHelp.text('Core', 'Core_Automation_NameRequired'),
 						expected.getMessage(),
 						'Maria is told to pick an automation.'
 					);

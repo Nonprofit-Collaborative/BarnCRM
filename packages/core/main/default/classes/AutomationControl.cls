@@ -72,14 +72,14 @@ public with sharing class AutomationControl {
 	@NamespaceAccessible
 	public static void setEnabled(String automationName, Boolean enabled) {
 		if (String.isBlank(automationName)) {
-			throw new AutomationControlException(Label.Core_Automation_NameRequired);
+			throw new AutomationControlException(BarnHelp.text('Core', 'Core_Automation_NameRequired'));
 		}
 		requirePermission();
 		List<Automation_Setting__c> matches = AutomationSettingSelector.selectByNames(
 			new Set<String>{ automationName }
 		);
 		if (matches.isEmpty()) {
-			throw new AutomationControlException(Label.Core_Automation_NotFound);
+			throw new AutomationControlException(BarnHelp.text('Core', 'Core_Automation_NotFound'));
 		}
 		Boolean target = enabled == true;
 		Automation_Setting__c setting = matches[0];
@@ -114,7 +114,7 @@ public with sharing class AutomationControl {
 	@NamespaceAccessible
 	public static void ensureSwitch(String automationName, String switchLabel, String objectName, String description) {
 		if (String.isBlank(automationName)) {
-			throw new AutomationControlException(Label.Core_Automation_NameRequired);
+			throw new AutomationControlException(BarnHelp.text('Core', 'Core_Automation_NameRequired'));
 		}
 		requirePermission();
 		if (!AutomationSettingSelector.selectByNames(new Set<String>{ automationName }).isEmpty()) {
@@ -217,7 +217,7 @@ public with sharing class AutomationControl {
 
 	private static void requirePermission() {
 		if (!canManage()) {
-			throw new AutomationControlException(Label.Core_Automation_NoPermission);
+			throw new AutomationControlException(BarnHelp.text('Core', 'Core_Automation_NoPermission'));
 		}
 	}
 
@@ -230,7 +230,7 @@ public with sharing class AutomationControl {
 	@NamespaceAccessible
 	public static Datetime pauseAll(Integer hours) {
 		if (hours == null || !ALLOWED_PAUSE_HOURS.contains(hours)) {
-			throw new AutomationControlException(Label.Core_Automation_PauseHoursInvalid);
+			throw new AutomationControlException(BarnHelp.text('Core', 'Core_Automation_PauseHoursInvalid'));
 		}
 		Datetime until = writePausedUntil(System.now().addHours(hours));
 		try {

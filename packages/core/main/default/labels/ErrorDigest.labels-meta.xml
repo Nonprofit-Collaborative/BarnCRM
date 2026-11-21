@@ -1,28 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_ErrorDigest_SummaryNotDue</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error digest run summary: not due yet; {0} is a time.</shortDescription>
-        <value>Not due yet: the next digest can go out after {0}. No email sent.</value>
-    </labels>
-    <labels>
         <fullName>Core_ErrorDigest_SummaryNothingNew</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error digest run summary: nothing new; {0} is a time.</shortDescription>
         <value>Nothing new since {0}: no email sent.</value>
-    </labels>
-    <labels>
-        <fullName>Core_ErrorDigest_SummaryNoRecipients</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error digest run summary: nobody to send to.</shortDescription>
-        <value>Nobody to send the digest to: no active user holds the Manage BarnCRM Settings permission and no addresses are listed. No email sent.</value>
     </labels>
     <labels>
         <fullName>Core_ErrorDigest_SummaryNotSent</fullName>
@@ -55,14 +39,6 @@
         <protected>false</protected>
         <shortDescription>Error digest email sender display name.</shortDescription>
         <value>BarnCRM</value>
-    </labels>
-    <labels>
-        <fullName>Core_ErrorDigest_Intro</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error digest email first line; {0} count, {1} time.</shortDescription>
-        <value>{0} new Error Log entries since {1} are waiting for someone to look at them.</value>
     </labels>
     <labels>
         <fullName>Core_ErrorDigest_BySource</fullName>
@@ -111,14 +87,6 @@
         <protected>false</protected>
         <shortDescription>Error digest email: all entries still New; {0} is a count.</shortDescription>
         <value>Entries still marked New, in all: {0}.</value>
-    </labels>
-    <labels>
-        <fullName>Core_ErrorDigest_Footer</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error digest email footer: why you get it and where to stop it.</shortDescription>
-        <value>You receive this because you look after BarnCRM in this Salesforce org. Change who receives it, or stop it, in BarnCRM Settings under Error Log.</value>
     </labels>
     <labels>
         <fullName>Core_ErrorDigest_NoSource</fullName>
@@ -201,14 +169,6 @@
         <value>everyone with the Manage BarnCRM Settings permission:</value>
     </labels>
     <labels>
-        <fullName>Core_ErrorDigest_Capped</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error digest: more new entries than it counts; {0} is the number counted.</shortDescription>
-        <value>There are more new entries than one digest counts. The numbers below cover the newest {0}.</value>
-    </labels>
-    <labels>
         <fullName>Core_ErrorDigest_NoRoom</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -223,14 +183,6 @@
         <protected>false</protected>
         <shortDescription>Weekly digest subject when there are no new Error Log entries.</shortDescription>
         <value>BarnCRM: Weekly Admin Summary</value>
-    </labels>
-    <labels>
-        <fullName>Core_AdminDigest_NoNewErrors</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Weekly digest intro with no new Error Log entries; {0} is a time.</shortDescription>
-        <value>No new Error Log entries since {0}. Here is what else needs a look.</value>
     </labels>
     <labels>
         <fullName>Core_AdminDigest_Heading</fullName>
@@ -279,13 +231,5 @@
         <protected>false</protected>
         <shortDescription>Weekly digest: duplicate suggestions waiting; {0} is a count.</shortDescription>
         <value>Duplicate suggestions waiting for review: {0}</value>
-    </labels>
-    <labels>
-        <fullName>Core_AdminDigest_SetupChanges</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Weekly digest: Setup changes kept since the last digest; {0} is a count.</shortDescription>
-        <value>Setup changes since the last digest: {0} (see Org Optimizer, Setup Changes)</value>
     </labels>
 </CustomLabels>

@@ -64,7 +64,7 @@ private class LogicModelsWhereUsedExtensionTest {
 				new List<String>{ Schema.SObjectType.Indicator__c.fields.Source_Definition__c.getLabel() },
 				byDate[0].getParts()
 			);
-			Assert.areEqual(System.Label.Core_WhereUsed_BreaksModuleRecord, byDate[0].getBreaks());
+			Assert.areEqual(BarnHelp.text('Core', 'Core_WhereUsed_BreaksModuleRecord'), byDate[0].getBreaks());
 			Assert.areEqual('/lightning/r/' + model.Id + '/view', byDate[0].editUrl);
 			Assert.areEqual(1, bySum.size(), 'The field the source sums.');
 			Assert.isTrue(other.isEmpty(), 'A field the source does not read is not listed.');

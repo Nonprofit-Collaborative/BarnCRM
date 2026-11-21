@@ -1,6 +1,7 @@
 import { createElement } from 'lwc';
 import AutomationControl from 'c/automationControl';
 import getPage from '@salesforce/apex/AutomationControlController.getPage';
+import { setHelpTextForTest } from 'c/barnHelpText';
 
 jest.mock(
   '@salesforce/apex/AutomationControlController.getPage',
@@ -32,14 +33,10 @@ jest.mock('@salesforce/customPermission/Manage_BarnCRM_Settings', () => ({ defau
   virtual: true
 });
 
-jest.mock(
-  '@salesforce/label/c.Core_AutomationControl_ReadOnly',
-  () => ({
-    default:
-      'You can read this page but not change it. Ask your administrator for the Manage BarnCRM Settings permission.'
-  }),
-  { virtual: true }
-);
+setHelpTextForTest({
+  Core_AutomationControl_ReadOnly:
+    'You can read this page but not change it. Ask your BarnCRM admin for the Manage BarnCRM Settings permission.'
+});
 
 const PAGE = {
   paused: false,

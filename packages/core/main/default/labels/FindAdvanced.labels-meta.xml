@@ -217,14 +217,6 @@
         <value>Choose a kind of related record</value>
     </labels>
     <labels>
-        <fullName>Core_Find_RelatedConditions</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Label above the related records' own conditions.</shortDescription>
-        <value>Conditions on the related records (none means any related record)</value>
-    </labels>
-    <labels>
         <fullName>Core_Find_RelatedColumns</fullName>
         <categories>Find</categories>
         <language>en_US</language>

@@ -161,7 +161,7 @@ public with sharing class FindExportBatch implements Database.Batchable<SObject>
 			System.Label.Core_Find_ExportFiles,
 			failed,
 			String.format(
-				System.Label.Core_JobNotice_FindExportBody,
+				BarnHelp.text('Core', 'Core_JobNotice_FindExportBody'),
 				new List<Object>{ rowsWritten.format(), parts.format() }
 			),
 			firstDocumentId

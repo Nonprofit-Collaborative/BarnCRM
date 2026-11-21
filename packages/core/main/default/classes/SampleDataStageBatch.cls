@@ -138,7 +138,7 @@ public virtual with sharing class SampleDataStageBatch implements Database.Batch
 			UserInfo.getUserId(),
 			Label.Core_JobNotice_SampleData,
 			true,
-			Label.Core_JobNotice_SampleDataStoppedBody
+			BarnHelp.text('Core', 'Core_JobNotice_SampleDataStoppedBody')
 		);
 	}
 

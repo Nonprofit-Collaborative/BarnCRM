@@ -653,7 +653,7 @@ public with sharing class RollupBuilderController {
 		}
 		String aggregate = String.isBlank(draft.aggregate) ? '' : draft.aggregate.toUpperCase();
 		if (!valuesOf(Rollup_Definition__c.Aggregate__c).contains(aggregate)) {
-			return Label.Core_Rollups_ErrorInvalidOperator;
+			return BarnHelp.text('Core', 'Core_Rollups_ErrorInvalidOperator');
 		}
 		String problem = RollupPlanner.targetTypeProblem(aggregate, target.getDescribe().getType());
 		if (problem == null) {
@@ -809,7 +809,7 @@ public with sharing class RollupBuilderController {
 		try {
 			RollupFilterParser.toWhereClause(document, entity);
 		} catch (Exception unreadable) {
-			return Label.Core_Rollups_ErrorInvalidFilter;
+			return BarnHelp.text('Core', 'Core_Rollups_ErrorInvalidFilter');
 		}
 		Map<String, Schema.SObjectField> fields = fieldMap(entity);
 		for (String field : RollupFilterParser.fieldsOf(document)) {

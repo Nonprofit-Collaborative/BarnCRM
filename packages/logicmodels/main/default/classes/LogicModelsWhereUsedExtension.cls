@@ -41,7 +41,7 @@ public with sharing class LogicModelsWhereUsedExtension implements WhereUsedExte
 							indicator.Id
 						)
 						.addPart(Schema.SObjectType.Indicator__c.fields.Source_Definition__c.getLabel())
-						.withBreaks(System.Label.Core_WhereUsed_BreaksModuleRecord)
+						.withBreaks(BarnHelp.text('Core', 'Core_WhereUsed_BreaksModuleRecord'))
 						.withRecordEdit(indicator.Element__r?.Logic_Model__c)
 				);
 			}

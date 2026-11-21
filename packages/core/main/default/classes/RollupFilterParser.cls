@@ -189,23 +189,23 @@ public with sharing class RollupFilterParser {
 		try {
 			parsed = (Map<String, Object>) JSON.deserializeUntyped(filterDocument);
 		} catch (Exception parseFailure) {
-			throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
+			throw new RollupFilterException(BarnHelp.text('Core', 'Core_Rollups_ErrorInvalidFilter'));
 		}
 		if (parsed == null) {
-			throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
+			throw new RollupFilterException(BarnHelp.text('Core', 'Core_Rollups_ErrorInvalidFilter'));
 		}
 		try {
 			return compile(parsed, binder, entity);
 		} catch (TypeException wrongShape) {
 			// A part of the right name but the wrong shape, such as "conditions": ["Name"].
-			throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
+			throw new RollupFilterException(BarnHelp.text('Core', 'Core_Rollups_ErrorInvalidFilter'));
 		}
 	}
 
 	private static String compile(Map<String, Object> parsed, FilterValueBinder binder, Schema.SObjectType entity) {
 		Integer version = parsed.get('version') == null ? SUPPORTED_VERSION : Integer.valueOf(parsed.get('version'));
 		if (version != SUPPORTED_VERSION) {
-			throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
+			throw new RollupFilterException(BarnHelp.text('Core', 'Core_Rollups_ErrorInvalidFilter'));
 		}
 		List<Object> rawConditions = (List<Object>) parsed.get('conditions');
 		if (rawConditions == null || rawConditions.isEmpty()) {
@@ -271,7 +271,7 @@ public with sharing class RollupFilterParser {
 		String fieldName = (String) condition.get('field');
 		String operator = ((String) condition.get('operator'))?.toLowerCase()?.trim();
 		if (String.isBlank(fieldName) || FIELD_NAME.matcher(fieldName).matches() == false) {
-			throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
+			throw new RollupFilterException(BarnHelp.text('Core', 'Core_Rollups_ErrorInvalidFilter'));
 		}
 		if (binder != null) {
 			fieldName = binder.useField(fieldName, operator);
@@ -284,7 +284,7 @@ public with sharing class RollupFilterParser {
 			return fieldName + ' = LAST_N_DAYS:' + dayCount(condition.get('value'));
 		}
 		if (COMPARISON_BY_OPERATOR.containsKey(operator) == false) {
-			throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidOperator);
+			throw new RollupFilterException(BarnHelp.text('Core', 'Core_Rollups_ErrorInvalidOperator'));
 		}
 		String comparison = COMPARISON_BY_OPERATOR.get(operator);
 		if (NO_VALUE_OPERATORS.contains(operator)) {
@@ -383,7 +383,7 @@ public with sharing class RollupFilterParser {
 	public static Integer dayCount(Object rawValue) {
 		Decimal days = SettingsService.toNumber(rawValue);
 		if (days == null || days.stripTrailingZeros().scale() > 0 || days < 1 || days > MAX_DAYS) {
-			throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
+			throw new RollupFilterException(BarnHelp.text('Core', 'Core_Rollups_ErrorInvalidFilter'));
 		}
 		return days.intValue();
 	}
@@ -424,14 +424,14 @@ public with sharing class RollupFilterParser {
 		for (String token : tokens) {
 			String upper = token.toUpperCase();
 			if (LOGIC_TOKEN.matcher(upper).matches() == false) {
-				throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
+				throw new RollupFilterException(BarnHelp.text('Core', 'Core_Rollups_ErrorInvalidFilter'));
 			}
 			if (clauseByConditionId.containsKey(token)) {
 				rendered.add('(' + clauseByConditionId.get(token) + ')');
 			} else if (upper == 'AND' || upper == 'OR' || upper == 'NOT' || upper == '(' || upper == ')') {
 				rendered.add(upper);
 			} else {
-				throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
+				throw new RollupFilterException(BarnHelp.text('Core', 'Core_Rollups_ErrorInvalidFilter'));
 			}
 		}
 		return String.join(rendered, ' ');

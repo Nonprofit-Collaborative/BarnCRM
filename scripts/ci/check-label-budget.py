@@ -61,7 +61,9 @@ import sys
 # N-09: raised by 1 for Mirror_Access_AddOnProviderRequests, the Access page sentence of the
 # Provider Requests set Mirror ships now that Salesforce Records Sync is Fundraising's
 # (an Access Add-On row names its sentence as a label, which AccessService reads by name).
-BUDGET = 2427
+# Batch Q review (s2): 51 Core messages and AI Readiness Export README sentences moved to the
+# Core help catalog; lowered to the merged total, 2,376, under TARGET.
+BUDGET = 2376
 TARGET = 2400
 LABEL_FILES = "packages/*/main/default/labels/*.labels-meta.xml"
 

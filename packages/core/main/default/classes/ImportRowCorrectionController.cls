@@ -203,7 +203,7 @@ public with sharing class ImportRowCorrectionController {
 			LIMIT 1
 		];
 		if (rows.isEmpty()) {
-			throw new ImportException(Label.Core_Import_ErrorRowsRemoved);
+			throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorRowsRemoved'));
 		}
 		return rows[0];
 	}

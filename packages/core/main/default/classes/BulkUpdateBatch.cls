@@ -207,7 +207,7 @@ public with sharing class BulkUpdateBatch implements Database.Batchable<SObject>
 				System.Label.Core_JobNotice_BulkUpdate,
 				failed,
 				String.format(
-					System.Label.Core_JobNotice_BulkUpdateBody,
+					BarnHelp.text('Core', 'Core_JobNotice_BulkUpdateBody'),
 					new List<Object>{
 						updated.format(),
 						unchanged.format(),

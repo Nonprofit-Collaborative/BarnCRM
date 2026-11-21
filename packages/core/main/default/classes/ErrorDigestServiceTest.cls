@@ -187,7 +187,9 @@ private class ErrorDigestServiceTest {
 
 			Assert.isFalse(early.sent, 'Two days into the week, the scheduled run waits.');
 			Assert.isTrue(
-				early.summary.startsWith(Label.Core_ErrorDigest_SummaryNotDue.substringBefore('{0}')),
+				early.summary.startsWith(
+					BarnHelp.text('Core', 'Core_ErrorDigest_SummaryNotDue').substringBefore('{0}')
+				),
 				'And says when it will be due.'
 			);
 			Assert.isTrue(due.sent, 'Seven days on, it sends.');
@@ -271,7 +273,7 @@ private class ErrorDigestServiceTest {
 			String body = MAIL.received[0].getPlainTextBody();
 			Assert.isTrue(body.contains('Household naming: 3'), 'The counts cover what it read.');
 			Assert.isTrue(
-				body.contains(Label.Core_ErrorDigest_Capped.substringBefore('{0}')),
+				body.contains(BarnHelp.text('Core', 'Core_ErrorDigest_Capped').substringBefore('{0}')),
 				'And the email says the numbers are the newest few.'
 			);
 			Assert.isNotNull(settings().Error_Digest_Covered_Until__c, 'The window moved on.');
@@ -367,7 +369,7 @@ private class ErrorDigestServiceTest {
 				body.contains(String.format(Label.Core_AdminDigest_FailedJobs, new List<Object>{ '1' })),
 				'The failed job is counted.'
 			);
-			Assert.isTrue(body.contains(Label.Core_ErrorDigest_Footer), 'The footer closes it.');
+			Assert.isTrue(body.contains(BarnHelp.text('Core', 'Core_ErrorDigest_Footer')), 'The footer closes it.');
 		}
 	}
 
@@ -518,7 +520,9 @@ private class ErrorDigestServiceTest {
 			Assert.isTrue(summary.hasContent(), 'Setup changes alone are worth an email.');
 			String joined = String.join(AdminDigestSummary.lines(summary, 'https://x'), '\n');
 			Assert.isTrue(
-				joined.contains(String.format(Label.Core_AdminDigest_SetupChanges, new List<Object>{ '2' })),
+				joined.contains(
+					String.format(BarnHelp.text('Core', 'Core_AdminDigest_SetupChanges'), new List<Object>{ '2' })
+				),
 				'The count is in the summary.'
 			);
 		}

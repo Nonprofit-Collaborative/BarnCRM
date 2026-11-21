@@ -219,7 +219,7 @@ public with sharing class ImportUndoService {
 					: Label.Core_JobNotice_ImportUndo,
 				failed == true,
 				String.format(
-					Label.Core_JobNotice_ImportUndoBody,
+					BarnHelp.text('Core', 'Core_JobNotice_ImportUndoBody'),
 					new List<Object>{
 						Math.max(counted - left.total, 0).format(),
 						left.total.format(),

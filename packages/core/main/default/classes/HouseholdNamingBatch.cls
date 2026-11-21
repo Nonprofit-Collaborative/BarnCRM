@@ -40,7 +40,7 @@ public with sharing class HouseholdNamingBatch implements Database.Batchable<SOb
 			System.Label.Core_JobNotice_HouseholdNaming,
 			false,
 			String.format(
-				System.Label.Core_JobNotice_HouseholdNamingBody,
+				BarnHelp.text('Core', 'Core_JobNotice_HouseholdNamingBody'),
 				new List<Object>{
 					householdsRead.format(),
 					householdsChanged.format(),

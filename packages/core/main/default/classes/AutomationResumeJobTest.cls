@@ -235,13 +235,21 @@ private class AutomationResumeJobTest {
 					AutomationControl.pauseAll(2);
 					Assert.fail('David may not pause.');
 				} catch (AutomationControl.AutomationControlException expected) {
-					Assert.areEqual(Label.Core_Automation_NoPermission, expected.getMessage(), 'Why.');
+					Assert.areEqual(
+						BarnHelp.text('Core', 'Core_Automation_NoPermission'),
+						expected.getMessage(),
+						'Why.'
+					);
 				}
 				try {
 					AutomationControl.resumeAll();
 					Assert.fail('David may not resume.');
 				} catch (AutomationControl.AutomationControlException expected) {
-					Assert.areEqual(Label.Core_Automation_NoPermission, expected.getMessage(), 'Why.');
+					Assert.areEqual(
+						BarnHelp.text('Core', 'Core_Automation_NoPermission'),
+						expected.getMessage(),
+						'Why.'
+					);
 				}
 				Test.stopTest();
 			}

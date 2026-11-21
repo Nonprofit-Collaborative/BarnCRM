@@ -121,7 +121,7 @@ public with sharing class AdminDigestSummary {
 		if (summary.setupChanges > 0) {
 			lines.add(
 				String.format(
-					System.Label.Core_AdminDigest_SetupChanges,
+					BarnHelp.text('Core', 'Core_AdminDigest_SetupChanges'),
 					new List<Object>{
 						summary.setupChangesCapped ? summary.setupChanges + '+' : String.valueOf(summary.setupChanges)
 					}

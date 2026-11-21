@@ -613,7 +613,7 @@ public with sharing class ImportController {
 		for (Integer parent : step.links.keySet()) {
 			view.links.add(
 				String.format(
-					Label.Core_Import_SeveralLinkLine,
+					BarnHelp.text('Core', 'Core_Import_SeveralLinkLine'),
 					new List<String>{
 						view.objectLabel,
 						steps[parent].label(),

@@ -404,7 +404,7 @@ public with sharing class RollupPlanner {
 		String aggregate = String.isBlank(definition.Aggregate__c) ? '' : definition.Aggregate__c.toUpperCase();
 		String kind = KIND_BY_AGGREGATE.get(aggregate);
 		if (kind == null) {
-			throw new RollupPlanException(System.Label.Core_Rollups_ErrorInvalidOperator);
+			throw new RollupPlanException(BarnHelp.text('Core', 'Core_Rollups_ErrorInvalidOperator'));
 		}
 		if (SettingsService.typeByName(definition.Source_Object__c) == null) {
 			throw new RollupPlanException(BarnHelp.text('Rollups', 'Core_Rollups_ErrorUnknownObject'));
@@ -463,7 +463,7 @@ public with sharing class RollupPlanner {
 		for (Integer i = 0; i < branch.segments.size(); i++) {
 			if (RollupPath.isToken(branch.segments[i])) {
 				if (i != branch.segments.size() - 1) {
-					throw new RollupPlanException(System.Label.Core_Rollups_ErrorInvalidFilter);
+					throw new RollupPlanException(BarnHelp.text('Core', 'Core_Rollups_ErrorInvalidFilter'));
 				}
 				token = RollupPath.TOKEN_HOUSEHOLD.equalsIgnoreCase(branch.segments[i])
 					? RollupPath.TOKEN_HOUSEHOLD
@@ -517,7 +517,7 @@ public with sharing class RollupPlanner {
 	/** An attribute name, or a dotted path to one, and nothing else. */
 	private static String checkedPath(String value) {
 		if (String.isBlank(value) || !FIELD_PATH.matcher(value.trim()).matches()) {
-			throw new RollupPlanException(System.Label.Core_Rollups_ErrorInvalidOperator);
+			throw new RollupPlanException(BarnHelp.text('Core', 'Core_Rollups_ErrorInvalidOperator'));
 		}
 		return value.trim();
 	}
