@@ -1,6 +1,7 @@
 import { createElement } from 'lwc';
 import HubHealthCheck from 'c/hubHealthCheck';
 import getHomeModel from '@salesforce/apex/HubController.getHomeModel';
+import getSettingsLink from '@salesforce/apex/SettingsController.getSettingsLink';
 import { expectAccessible } from 'barn/a11y';
 
 jest.mock(
@@ -70,7 +71,9 @@ describe('c-hub-health-check', () => {
     getHomeModel.emit({
       healthCheckTab: TAB,
       healthCheckRanAt: '2026-11-20T09:00:00.000Z',
-      healthCheckLastResult: '2,1,4'
+      healthCheckErrors: 2,
+      healthCheckWarnings: 1,
+      healthCheckInfos: 4
     });
     await settle();
 
@@ -84,7 +87,7 @@ describe('c-hub-health-check', () => {
 
   it('says Not Run Yet before the first full run', async () => {
     const element = build();
-    getHomeModel.emit({ healthCheckTab: TAB, healthCheckRanAt: null, healthCheckLastResult: null });
+    getHomeModel.emit({ healthCheckTab: TAB, healthCheckRanAt: null });
     await settle();
 
     expect(byId(element, 'health-check-badge').label).toBe('c.Core_OrgOptimizer_BadgeNotRun');
@@ -101,13 +104,25 @@ describe('c-hub-health-check', () => {
     expect(byId(element, 'health-check-card')).toBeNull();
   });
 
-  it('says the tile could not load rather than claiming anything about the run', async () => {
+  it('shows no tile when the home model cannot load, which the other tiles report', async () => {
     const element = build();
     getHomeModel.error();
     await settle();
 
+    expect(byId(element, 'health-check-card')).toBeNull();
+  });
+
+  it('says the tile could not open, with no button to a tab it cannot reach', async () => {
+    getSettingsLink.mockRejectedValueOnce(new Error('no'));
+    const element = build();
+    getHomeModel.emit({ healthCheckTab: TAB, healthCheckRanAt: null });
+    await settle();
+
+    byId(element, 'open-health-check').click();
+    await settle();
     expect(byId(element, 'load-error')).not.toBeNull();
     expect(byId(element, 'health-check-badge')).toBeNull();
+    expect(byId(element, 'open-health-check')).toBeNull();
   });
 
   it('opens the Health Check section of the Org Optimizer tab the model named', async () => {

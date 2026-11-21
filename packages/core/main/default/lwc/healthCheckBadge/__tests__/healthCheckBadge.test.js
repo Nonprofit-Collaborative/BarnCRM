@@ -1,4 +1,4 @@
-import { healthCheckBadge, lastRunFrom } from 'c/healthCheckBadge';
+import { healthCheckBadge } from 'c/healthCheckBadge';
 
 describe('c/healthCheckBadge', () => {
   it('says Not Run Yet before the first full run', () => {
@@ -23,15 +23,5 @@ describe('c/healthCheckBadge', () => {
       badgeLabel: 'c.Core_OrgOptimizer_BadgeAllClear',
       badgeVariant: 'success'
     });
-  });
-
-  it('reads the stored last run, and treats a missing or unreadable one as never run', () => {
-    const ranAt = '2026-11-20T09:00:00.000Z';
-    expect(lastRunFrom(ranAt, '1, 2,3')).toEqual({ ranAt, errors: 1, warnings: 2, infos: 3 });
-    expect(lastRunFrom(null, '1,2,3')).toEqual({ ranAt: null });
-    expect(lastRunFrom(ranAt, null)).toEqual({ ranAt: null });
-    expect(lastRunFrom(ranAt, '1,2')).toEqual({ ranAt: null });
-    expect(lastRunFrom(ranAt, '1,,3')).toEqual({ ranAt: null });
-    expect(lastRunFrom(ranAt, 'a,b,c')).toEqual({ ranAt: null });
   });
 });

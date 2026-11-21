@@ -442,6 +442,14 @@ core/HealthCheckFixes.cls | public static HealthCheckService.Report applyForModu
 core/HealthCheckFixes.cls | public static String apply(String,List<String>)
 core/HealthCheckFixes.cls | public static void failAfterFixForTest(Boolean)
 core/HealthCheckFixes.cls | public static void requireManageSettings()
+core/HealthCheckResult.cls | public Datetime ranAt
+core/HealthCheckResult.cls | public Integer errors
+core/HealthCheckResult.cls | public Integer infos
+core/HealthCheckResult.cls | public Integer warnings
+core/HealthCheckResult.cls | public class Counts
+core/HealthCheckResult.cls | public class HealthCheckResult
+core/HealthCheckResult.cls | public static Counts read()
+core/HealthCheckResult.cls | public static String text(Integer,Integer,Integer)
 core/HealthCheckRun.cls | public interface HealthCheckRun
 core/HealthCheckService.cls | public Boolean getCanManageSettings()
 core/HealthCheckService.cls | public Boolean getModeNeedsAttention()

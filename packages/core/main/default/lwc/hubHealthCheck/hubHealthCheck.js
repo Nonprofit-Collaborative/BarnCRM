@@ -5,7 +5,7 @@ import getSettingsLink from '@salesforce/apex/SettingsController.getSettingsLink
 import HEADING from '@salesforce/label/c.Core_HealthCheck_Title';
 import LAST_RUN from '@salesforce/label/c.Core_HealthCheck_LastRunLabel';
 import LINK from '@salesforce/label/c.Core_HubHome_HealthCheckLink';
-import { healthCheckBadge, lastRunFrom } from 'c/healthCheckBadge';
+import { healthCheckBadge } from 'c/healthCheckBadge';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 // The Org Optimizer page's section name for Health Check, read from its page state.
@@ -34,15 +34,21 @@ export default class HubHealthCheck extends NavigationMixin(LightningElement) {
   lastRun = { ranAt: null };
   errorMessage;
 
+  /** Only while the module is installed: a home model that fails to load names no tab. */
   get shown() {
-    return Boolean(this.tab) || Boolean(this.errorMessage);
+    return Boolean(this.tab);
   }
 
   @wire(getHomeModel)
   wiredModel({ data, error }) {
     if (data) {
       this.tab = data.healthCheckTab;
-      this.lastRun = lastRunFrom(data.healthCheckRanAt, data.healthCheckLastResult);
+      this.lastRun = {
+        ranAt: data.healthCheckRanAt || null,
+        errors: data.healthCheckErrors,
+        warnings: data.healthCheckWarnings,
+        infos: data.healthCheckInfos
+      };
       this.errorMessage = undefined;
     } else if (error) {
       this.errorMessage = helpText('Core', 'Core_HubHome_LoadErrorMessage');

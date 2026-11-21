@@ -30,13 +30,13 @@
                     <template lwc:else>
                         <p class="slds-var-m-vertical_x-small" data-id="health-check-never">{neverText}</p>
                     </template>
+                    <lightning-button
+                        variant="base"
+                        label={labels.link}
+                        data-id="open-health-check"
+                        onclick={handleOpen}
+                    ></lightning-button>
                 </template>
-                <lightning-button
-                    variant="base"
-                    label={labels.link}
-                    data-id="open-health-check"
-                    onclick={handleOpen}
-                ></lightning-button>
             </div>
         </lightning-card>
     </template>

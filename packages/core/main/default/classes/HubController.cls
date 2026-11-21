@@ -55,11 +55,15 @@ public with sharing class HubController {
 		 */
 		@AuraEnabled
 		public String healthCheckTab;
+		/** When it last ran in full, or null when it never ran; then its counts by severity. */
 		@AuraEnabled
 		public Datetime healthCheckRanAt;
-		/** The last run's counts as "errors,warnings,infos"; the tile reads them. */
 		@AuraEnabled
-		public String healthCheckLastResult;
+		public Integer healthCheckErrors;
+		@AuraEnabled
+		public Integer healthCheckWarnings;
+		@AuraEnabled
+		public Integer healthCheckInfos;
 		@AuraEnabled
 		public Datetime seasonalAddressLastRun;
 		@AuraEnabled
@@ -343,10 +347,12 @@ public with sharing class HubController {
 			if (tab == null) {
 				return;
 			}
-			BarnCRM_Settings__c settings = SettingsService.getSettings();
+			HealthCheckResult.Counts last = HealthCheckResult.read();
 			model.healthCheckTab = NamespaceUtil.qualify(tab);
-			model.healthCheckRanAt = settings.Health_Check_Last_Run__c;
-			model.healthCheckLastResult = settings.Health_Check_Last_Result__c;
+			model.healthCheckRanAt = last.ranAt;
+			model.healthCheckErrors = last.errors;
+			model.healthCheckWarnings = last.warnings;
+			model.healthCheckInfos = last.infos;
 		} catch (Exception e) {
 			ErrorLogger.log(e, ERROR_CONTEXT);
 		}
