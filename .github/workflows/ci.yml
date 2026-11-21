@@ -105,6 +105,9 @@ jobs:
       - name: Check permission sets grant only what exists
         run: python3 scripts/ci/check-permission-sets.py
 
+      - name: Check permission sets match their generator
+        run: python3 scripts/ci/check-generated-permission-sets.py
+
       - name: Check every Learn more link points at a page that exists
         run: python3 scripts/ci/check-help-links.py
 
