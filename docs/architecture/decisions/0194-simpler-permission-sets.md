@@ -389,3 +389,14 @@ group, `RetiredRoleMigration` and the retired-role branches in `AccessService`,
 `MirrorAccessSync`; the Coordinator lines in the module access syncs; and the Volunteers
 Health Check coordinator finding and its fix. `Volunteers_Coordinator` stays, given per person
 on the Access page (D1). No destructive manifest is needed, since no org upgrades in place.
+
+## Note, 2026-11-21: module admin sets do not grant report authoring (D-219, OD-11)
+
+`Giving_Admin` and `Volunteers_Admin` no longer grant Create and Customize Reports, Create and
+Customize Dashboards, Edit My Reports or Edit My Dashboards (the last because it goes with
+Create and Customize Dashboards). They keep Run Reports, View Public Reports and View Public
+Dashboards, like every other module set. Report and dashboard authoring is an org-wide user
+right that reaches every object the person can read, so it belongs to the profile the org
+chooses, not to a BarnCRM module set. The rights were deltas of the Admin sets only
+(`scripts/permission-sets/deltas/Giving.json` and `Volunteers.json`), so the Staff and Read
+Only sets are unchanged.

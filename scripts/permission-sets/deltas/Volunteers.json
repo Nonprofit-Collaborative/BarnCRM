@@ -34,12 +34,6 @@
         "Volunteer_Approve_Hours": {"visibility": "Visible"},
         "Volunteer_Letter_Template__c": {"visibility": "Visible"},
         "Volunteer_Requirement__c": {"visibility": "Visible"}
-      },
-      "userPermissions": {
-        "CreateCustomizeDashboards": {"enabled": "true"},
-        "CreateCustomizeReports": {"enabled": "true"},
-        "EditMyDashboards": {"enabled": "true"},
-        "EditMyReports": {"enabled": "true"}
       }
     },
     "set": {
