@@ -594,7 +594,9 @@ private class ConnectorWebhooksTest {
 
 	@IsTest
 	static void aRecipeThatIsGoneHasNoWebhookCardTokenOrCap() {
-		Id gone = Id.valueOf(Connector_Recipe__c.SObjectType.getDescribe().getKeyPrefix() + '000000000001');
+		Id gone = Id.valueOf(
+			Connector_Recipe__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() + '000000000001'
+		);
 		System.runAs(admin()) {
 			ConnectorWebhooks.testSites = new List<ConnectorWebhooks.SiteInfo>();
 			Integer refused = 0;

@@ -326,7 +326,9 @@ private class ConnectorRecipesControllerTest {
 
 	/** A well-formed Id no recipe or run holds. */
 	private static Id gone() {
-		return Id.valueOf(Connector_Recipe__c.SObjectType.getDescribe().getKeyPrefix() + '000000000001');
+		return Id.valueOf(
+			Connector_Recipe__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() + '000000000001'
+		);
 	}
 
 	/** What the controller says when the running user calls the named action, or null when it answers. */

@@ -68,6 +68,92 @@ private class ConnectorOrgTest {
 		Assert.areEqual('Not a test', namedMessage);
 	}
 
+	private static ConnectApi.ExternalCredential external(String developerName, String namespace) {
+		ConnectApi.ExternalCredential row = new ConnectApi.ExternalCredential();
+		row.developerName = developerName;
+		row.masterLabel = 'Label ' + developerName;
+		row.createdByNamespace = namespace;
+		row.principals = new List<ConnectApi.ExternalCredentialPrincipal>();
+		return row;
+	}
+
+	private static ConnectApi.NamedCredential named(String linkedTo, Boolean enabled) {
+		ConnectApi.NamedCredential row = new ConnectApi.NamedCredential();
+		row.calloutUrl = 'https://api.example.org';
+		row.calloutStatus = enabled ? ConnectApi.CalloutStatus.Enabled : ConnectApi.CalloutStatus.Disabled;
+		row.externalCredentials = new List<ConnectApi.ExternalCredential>{ external(linkedTo, null) };
+		return row;
+	}
+
+	private static ConnectApi.ExternalCredentialPrincipal principal(
+		String principalName,
+		ConnectApi.CredentialAuthenticationStatus status
+	) {
+		ConnectApi.ExternalCredentialPrincipal row = new ConnectApi.ExternalCredentialPrincipal();
+		row.principalName = principalName;
+		row.authenticationStatus = status;
+		row.id = UserInfo.getUserId();
+		return row;
+	}
+
+	@IsTest
+	static void onlyTheOrgsOwnPrefixedCredentialsAreListedAtMostFifty() {
+		List<ConnectApi.ExternalCredential> rows = new List<ConnectApi.ExternalCredential>{
+			external('BarnConn_Rest_Mine', null),
+			external('BarnConn_Rest_Packaged', 'other'),
+			external('Someone_Else', null),
+			external(null, null)
+		};
+		for (Integer i = 0; i < 60; i++) {
+			rows.add(external('BarnConn_Rest_Many' + i, null));
+		}
+
+		Test.startTest();
+		Map<String, String> found = ConnectorOrg.labelsFrom(rows);
+		Test.stopTest();
+
+		Assert.areEqual(50, found.size(), 'At most 50.');
+		Assert.areEqual('Label BarnConn_Rest_Mine', found.get('BarnConn_Rest_Mine'));
+		Assert.isFalse(found.containsKey('BarnConn_Rest_Packaged'), 'A package\'s credential is not offered.');
+		Assert.isFalse(found.containsKey('Someone_Else'), 'Only the prefix.');
+	}
+
+	@IsTest
+	static void aConfiguredPairReadsItsAddressLinkAndKeyStatus() {
+		ConnectApi.ExternalCredential held = external(MISSING, null);
+		held.principals.add(
+			principal(ConnectorConnections.SECRET_URL, ConnectApi.CredentialAuthenticationStatus.Configured)
+		);
+
+		Test.startTest();
+		ConnectorOrg.Pair pair = ConnectorOrg.pairFrom(MISSING, 'Mine', named(MISSING, true), held);
+		Test.stopTest();
+
+		Assert.areEqual(MISSING, pair.name);
+		Assert.areEqual('Mine', pair.label);
+		Assert.areEqual('https://api.example.org', pair.url, 'Kept server side.');
+		Assert.isTrue(pair.calloutsEnabled);
+		Assert.isTrue(pair.linked, 'The Named Credential points at its own External Credential.');
+		Assert.isTrue(pair.keyStored);
+		Assert.areEqual(ConnectorConnections.SECRET_URL, pair.principal);
+		Assert.areEqual(UserInfo.getUserId(), pair.principalId);
+	}
+
+	@IsTest
+	static void aCustomPrincipalWhoseKeyCannotBeAskedForReadsAsNoKey() {
+		ConnectApi.ExternalCredential held = external(MISSING, null);
+		held.principals.add(principal('Key', ConnectApi.CredentialAuthenticationStatus.Unknown));
+
+		Test.startTest();
+		ConnectorOrg.Pair pair = ConnectorOrg.pairFrom(MISSING, 'Mine', named('Another', false), held);
+		Test.stopTest();
+
+		Assert.isFalse(pair.calloutsEnabled);
+		Assert.isFalse(pair.linked, 'Linked to another External Credential.');
+		Assert.isFalse(pair.keyStored, 'Salesforce will not say, so no key is claimed.');
+		Assert.areEqual('Key', pair.principal);
+	}
+
 	@IsTest
 	static void principalAccessIsGrantedToAPermissionSetAndReadBack() {
 		ConnectorOrg org = new ConnectorOrg();
