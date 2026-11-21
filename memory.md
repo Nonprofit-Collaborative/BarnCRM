@@ -279,6 +279,7 @@ Donor portal and online giving; email marketing beyond export; grantmaking as a 
 ## Pending owner decisions and notes (2026-10-30)
 
 - Open (2026-11-20, plan row Q-01): the suite is 201 custom objects after the Connector added Connector Connection and Connector Settings, over Enterprise Edition's 200; `barn-sales` refused the full deploy ("reached maximum number of custom objects"). ADR-0235 planned no settings object. Owner decision pending; `barn-platform` is used for the full gate meanwhile. CN-19 (Connector logo) waits on the owner.
+- Open (2026-11-21, plan row Q-02): module UX findings from the screenshot review, planned with the module rollouts; owner to say whether to fix them now.
 
 - Sample households with custom names get greetings at load only (#728); R-H8 is unchanged. Pending Brandon: should normal upkeep fill blank greetings on custom-named households (never touching the name or entered greetings)? Recommended yes.
 - The Home install count includes ModuleSetups (#728).
