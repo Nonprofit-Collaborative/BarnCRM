@@ -421,7 +421,7 @@ public with sharing class TerritoryRunBatch implements Database.Batchable<SObjec
 		}
 	}
 
-	public void finish(Database.BatchableContext context) {
+	public void finish(Database.BatchableContext job) {
 		if (kindIndex + 1 < kinds.size() && String.isBlank(totals.stoppedBecause)) {
 			try {
 				Database.executeBatch(
