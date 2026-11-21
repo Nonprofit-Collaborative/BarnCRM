@@ -13,6 +13,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | From the App Launcher, open **BarnCRM Volunteers**. | It opens on **Volunteers Home** with three figures: **Hours This Month** (badge **Approved**), **Volunteer Hours** (badge **Submitted**, 4) and **Shifts Needing Volunteers**, and the **Approved Hours This Year by Job** chart. Clicking **Volunteer Hours** opens **Approve Hours**; clicking **Shifts Needing Volunteers** opens that list view. The tabs **Volunteers Home**, **Volunteer Jobs**, **Volunteer Shifts**, **Volunteer Sign-Ups**, **Volunteer Hours**, **Approve Hours**, **Volunteer Letter Templates**, **Skills**, **Volunteer Requirements**, **Dashboards** and **Reports** show. There is no **Volunteer Settings** tab. |
+| 1b | On an org where nothing is counted yet (all three figures 0), open **Volunteers Home**. | A note under the figures says the charts fill in once hours are approved, and what to do. The page header is the shared one, with the **Volunteers Home** icon and a one-line purpose. |
 | 1a | On an org with Volunteers and no volunteer job yet (before sample data), open **Volunteers Home** as admin. | **Set Up Your First Volunteer Job** shows instead of the figures, with **New Volunteer Job** and **Import a File**. **New Volunteer Job** opens the new job form; **Import a File** opens the **Import** tab. Save a job and reload: the panel is gone and the figures show. |
 | 2 | Open **Volunteer Jobs**, list view **All Jobs**. | **Food pantry sort**, **Front desk** and **Community garden** are listed. |
 | 3 | Open **Volunteer Shifts**, list view **Shifts Needing Volunteers**. | Upcoming Open shifts of **Front desk** and **Community garden** are listed, each named from its job and start (for example "Front desk: 28 Oct 2026, 9:00 AM"). |
@@ -93,12 +94,12 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Approve Hours**. | The page **Approve Volunteer Hours** shows, **Show** set to **Submitted**, with columns **Person**, **Job**, **Shift**, **Date worked**, **Hours** and **Notes**. **Approve** and **Reject** are disabled. Each person's name is a link; clicking one opens that hours entry. |
+| 1 | Open **Approve Hours**. | The page titled **Approve Hours** shows, **Show** set to **Submitted**, with columns **Person**, **Job**, **Shift**, **Date worked**, **Hours** and **Notes**. **Approve** and **Reject** are disabled. Each person's name is a link; clicking one opens that hours entry. |
 | 2 | Set **From** to today and **To** to yesterday. | The field says "From must be on or before To." and the list does not change. |
 | 3 | Clear both dates. In **Job**, choose "Test sorting". | Only the two "Test sorting" entries are listed. |
 | 4 | Tick the 3-hour entry and click **Approve**. | "Entries approved: 1." shows under the buttons and as a toast. The entry leaves the list. |
 | 5 | Tick the 2-hour entry and click **Reject**. Leave **Reason for rejecting** empty and click **Reject Selected**. | Nothing is rejected; the field says "Say why these hours are rejected, so the person who entered them knows what to fix." |
-| 6 | Type "Wrong date" and click **Reject Selected**. | "Entries rejected: 1." The list shows an all-clear picture with "No hours match these filters." |
+| 6 | Type "Wrong date" and click **Reject Selected**. | "Entries rejected: 1." The list shows an all-clear picture with "No hours match these filters." and a line on changing **Show** or the dates, and no **Previous** or **Next** buttons. |
 | 7 | Set **Show** to **Rejected**. | The 2-hour entry is listed with **Rejection Reason** "Wrong date". Only **Reopen** shows. |
 | 8 | Tick it and click **Reopen**. | "Entries reopened: 1." It is back under **Submitted**. |
 | 9 | Open the job "Test sorting". | **Total Hours** is 3 (only the Approved entry counts). |

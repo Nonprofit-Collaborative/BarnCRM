@@ -168,7 +168,8 @@ export default class ProgramDashboard extends NavigationMixin(LightningElement) 
       peopleServed: PEOPLE_SERVED,
       peopleCounted: PEOPLE_COUNTED,
       delivered: DELIVERED,
-      attendanceRate: ATTENDANCE_RATE
+      attendanceRate: ATTENDANCE_RATE,
+      noRate: NO_RATE
     });
   }
 

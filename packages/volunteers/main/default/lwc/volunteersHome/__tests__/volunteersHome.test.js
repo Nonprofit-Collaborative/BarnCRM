@@ -106,6 +106,29 @@ describe('c-volunteers-home', () => {
     expect(element.shadowRoot.querySelectorAll('c-barn-stat-tile')).toHaveLength(2);
   });
 
+  it('uses the shared page shell and explains the empty charts only when nothing is counted', async () => {
+    setHelpTextForTest({
+      Volunteers_Home_Title: 'Volunteers Home',
+      Volunteers_Home_Purpose: 'See hours.',
+      Volunteers_Home_ChartsEmpty: 'Charts fill in later.'
+    });
+    getHome.mockResolvedValue(TILES);
+    let element = build();
+    await flush();
+    const shell = element.shadowRoot.querySelector('c-barn-page-shell');
+    expect(shell.title).toBe('Volunteers Home');
+    expect(shell.titleHidden).toBe(true);
+    expect(element.shadowRoot.querySelector('[data-id="charts-note"]')).toBeNull();
+
+    document.body.removeChild(element);
+    getHome.mockResolvedValue(TILES.map((tile) => ({ ...tile, value: 0 })));
+    element = build();
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="charts-note"]').message).toBe(
+      'Charts fill in later.'
+    );
+  });
+
   afterEach(() => {
     while (document.body.firstChild) {
       document.body.removeChild(document.body.firstChild);
