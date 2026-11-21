@@ -5,6 +5,11 @@ Every top-level non-test Apex class declared `without sharing` must have a row i
 (the first column of a table row, as `| ClassName |`), and every class in the register must
 still be declared `without sharing`. A security reviewer reads the register to see each path
 that ignores sharing and why (architect review RT-14).
+
+An inner class declared `without sharing` inside a top-level class that is itself `without
+sharing` takes its outer class's row. One inside a `with sharing` or `inherited sharing` class
+is the only path in that class that ignores sharing, so it needs a row of its own, as
+`| Outer.Inner |` (2026-11-21 security review: eight such classes had no entry at all).
 """
 
 import glob
@@ -21,7 +26,16 @@ TOP_LEVEL = re.compile(
     r"without sharing\s+class\s+(\w+)",
     re.M | re.I,
 )
-ROW = re.compile(r"^\|\s*([A-Za-z]\w*)\s*\|\s*(?:Integrity|Upkeep|Org job|Org figure|Platform|Portal)\s*\|", re.M)
+FIRST_CLASS = re.compile(r"\bclass\s+(\w+)", re.I)
+INNER = re.compile(
+    r"^[ \t]+(?:@\w+(?:\([^)]*\))?\s+)*(?:public|global|private|protected)?\s*(?:abstract\s+|virtual\s+)*"
+    r"without sharing\s+class\s+(\w+)",
+    re.M | re.I,
+)
+ROW = re.compile(
+    r"^\|\s*([A-Za-z]\w*(?:\.[A-Za-z]\w*)?)\s*\|\s*(?:Integrity|Upkeep|Org job|Org figure|Platform|Portal)\s*\|",
+    re.M,
+)
 
 
 def main():
@@ -31,14 +45,19 @@ def main():
             source = handle.read()
         if is_test_class(source):
             continue
-        match = TOP_LEVEL.search(strip(source))
+        code = strip(source)
+        match = TOP_LEVEL.search(code)
         if match:
             in_code.add(match.group(1))
+            continue
+        outer = FIRST_CLASS.search(code)
+        if outer:
+            in_code.update(f"{outer.group(1)}.{inner}" for inner in INNER.findall(code))
     with open(REGISTER, encoding="utf-8") as handle:
         in_register = set(ROW.findall(handle.read()))
     problems = [f"{name} is declared without sharing but has no row in {REGISTER}: add one with"
                 " its kind, what it reaches and the ADR that allows it" for name in sorted(in_code - in_register)]
-    problems += [f"{name} is in {REGISTER} but is no longer a top-level without sharing class:"
+    problems += [f"{name} is in {REGISTER} but is no longer declared without sharing:"
                  " remove its row" for name in sorted(in_register - in_code)]
     for problem in problems:
         print(problem, file=sys.stderr)
