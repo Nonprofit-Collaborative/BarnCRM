@@ -156,8 +156,10 @@ public with sharing class ConnectorIntegrationUser {
 
 	/**
 	 * Whether a user reaches every record: Modify All Data or View All Data from the profile or
-	 * any permission set, or the System Administrator profile. Integration User recipes run with
-	 * this user's access, so such a user would give them all of it (F12).
+	 * any permission set. The profile's own permission set is one of the user's assignments, so
+	 * this also covers the System Administrator profile, by what it grants rather than by its
+	 * name (which an org can clone or a translation can change). Integration User recipes run
+	 * with this user's access, so such a user would give them all of it (F12).
 	 */
 	@TestVisible
 	private static Boolean seesEverything(Id userId) {
@@ -168,12 +170,6 @@ public with sharing class ConnectorIntegrationUser {
 					AssigneeId = :userId
 					AND (PermissionSet.PermissionsModifyAllData = TRUE
 					OR PermissionSet.PermissionsViewAllData = TRUE)
-				WITH SYSTEM_MODE
-			] > 0 ||
-			[
-				SELECT COUNT()
-				FROM User
-				WHERE Id = :userId AND Profile.Name = 'System Administrator'
 				WITH SYSTEM_MODE
 			] > 0;
 	}
