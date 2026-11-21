@@ -171,7 +171,10 @@ private class ConnectorClockTest {
 			);
 			recipe.Watermark__c = ConnectorTriggers.watermark(Datetime.now().addMinutes(-10), null);
 			update as system recipe;
-			insert as system new List<Contact>{ new Contact(LastName = 'Lovelace'), new Contact(LastName = 'Hopper') };
+			insert as system new List<Contact>{
+				TestDataFactory.person(new Contact(LastName = 'Lovelace')),
+				TestDataFactory.person(new Contact(LastName = 'Hopper'))
+			};
 			Map<String, Object> each = (Map<String, Object>) JSON.deserializeUntyped(recordTrigger('each'));
 			Map<String, Object> batch = (Map<String, Object>) JSON.deserializeUntyped(recordTrigger('batch'));
 			Connector_Recipe__c copy = recipe.clone(true);

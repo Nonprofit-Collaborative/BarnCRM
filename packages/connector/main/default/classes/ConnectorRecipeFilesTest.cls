@@ -90,10 +90,6 @@ private class ConnectorRecipeFilesTest {
 		return null;
 	}
 
-	private static String expected(String key, Object detail) {
-		return BarnHelp.text('Connector', key, new List<Object>{ detail });
-	}
-
 	@IsTest
 	static void publishKeepsThePreviousVersionForRollBackAndDiscard() {
 		System.runAs(admin()) {
@@ -306,17 +302,62 @@ private class ConnectorRecipeFilesTest {
 			String signIn = refusal(JSON.serialize(bearer));
 			Test.stopTest();
 
-			Assert.areEqual(expected('Connector_Import_ErrorMergeField', ''), mergeField);
-			Assert.areEqual(expected('Connector_Import_ErrorMergeField', ''), escaped);
-			Assert.areEqual(expected('Connector_Import_ErrorUrl', 'http://{dc}.api.mailchimp.com/3.0'), http);
-			Assert.areEqual(expected('Connector_Import_ErrorUrl', 'https://api.mailchimp.com/{dc}'), path);
-			Assert.areEqual(expected('Connector_Import_ErrorKey', 'extra'), extra);
-			Assert.areEqual(expected('Connector_Import_ErrorMissing', 'No_Such_Object__c'), needs);
-			Assert.areEqual(expected('Connector_Import_ErrorAuth', 'MagicSignIn'), kind);
-			Assert.areEqual(expected('Connector_Import_ErrorFormula', 'headerTemplate'), header);
-			Assert.areEqual(expected('Connector_Import_ErrorFormula', 'allowMergeFieldsInBody'), formula);
-			Assert.areEqual(expected('Connector_Import_ErrorSecret', 'apiKey'), secret);
-			Assert.areEqual(expected('Connector_Import_ErrorSecret', 'Bearer'), signIn);
+			Assert.areEqual(
+				BarnHelp.text('Connector', 'Connector_Import_ErrorMergeField', new List<Object>{ '' }),
+				mergeField
+			);
+			Assert.areEqual(
+				BarnHelp.text('Connector', 'Connector_Import_ErrorMergeField', new List<Object>{ '' }),
+				escaped
+			);
+			Assert.areEqual(
+				BarnHelp.text(
+					'Connector',
+					'Connector_Import_ErrorUrl',
+					new List<Object>{ 'http://{dc}.api.mailchimp.com/3.0' }
+				),
+				http
+			);
+			Assert.areEqual(
+				BarnHelp.text(
+					'Connector',
+					'Connector_Import_ErrorUrl',
+					new List<Object>{ 'https://api.mailchimp.com/{dc}' }
+				),
+				path
+			);
+			Assert.areEqual(
+				BarnHelp.text('Connector', 'Connector_Import_ErrorKey', new List<Object>{ 'extra' }),
+				extra
+			);
+			Assert.areEqual(
+				BarnHelp.text('Connector', 'Connector_Import_ErrorMissing', new List<Object>{ 'No_Such_Object__c' }),
+				needs
+			);
+			Assert.areEqual(
+				BarnHelp.text('Connector', 'Connector_Import_ErrorAuth', new List<Object>{ 'MagicSignIn' }),
+				kind
+			);
+			Assert.areEqual(
+				BarnHelp.text('Connector', 'Connector_Import_ErrorFormula', new List<Object>{ 'headerTemplate' }),
+				header
+			);
+			Assert.areEqual(
+				BarnHelp.text(
+					'Connector',
+					'Connector_Import_ErrorFormula',
+					new List<Object>{ 'allowMergeFieldsInBody' }
+				),
+				formula
+			);
+			Assert.areEqual(
+				BarnHelp.text('Connector', 'Connector_Import_ErrorSecret', new List<Object>{ 'apiKey' }),
+				secret
+			);
+			Assert.areEqual(
+				BarnHelp.text('Connector', 'Connector_Import_ErrorSecret', new List<Object>{ 'Bearer' }),
+				signIn
+			);
 			Assert.isFalse(signIn.contains('abcdef1234567890'), 'A refusal never repeats the secret (F7).');
 		}
 	}

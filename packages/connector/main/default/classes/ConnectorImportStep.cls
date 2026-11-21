@@ -74,7 +74,7 @@ public inherited sharing class ConnectorImportStep {
 		ConnectorStepRunner.Budget budget
 	) {
 		if (!BarnCRMPermissions.canManageSettings()) {
-			throw failure('Connector_Import_ErrorPermission', new List<Object>());
+			throw failure(BarnHelp.text('Connector', 'Connector_Import_ErrorPermission', new List<Object>()));
 		}
 		try {
 			if (progress.get('batchId') == null) {
@@ -96,13 +96,15 @@ public inherited sharing class ConnectorImportStep {
 		List<Map<String, Object>> rows = rowsOf(source);
 		Integer most = limitOf(step, 'rows');
 		if (rows.size() > most) {
-			throw failure('Connector_Import_ErrorTooManyRows', new List<Object>{ rows.size(), most });
+			throw failure(
+				BarnHelp.text('Connector', 'Connector_Import_ErrorTooManyRows', new List<Object>{ rows.size(), most })
+			);
 		}
 		Import_Template__c template = ImportTemplateSelector.selectById(
 			Id.valueOf(ConnectorRecipeDocument.textOf(step.get('template')))
 		);
 		if (template == null || template.Active__c != true) {
-			throw failure('Connector_Import_ErrorTemplateGone', new List<Object>());
+			throw failure(BarnHelp.text('Connector', 'Connector_Import_ErrorTemplateGone', new List<Object>()));
 		}
 		if (run.Is_Test__c == true) {
 			Map<String, Object> chosen = new Map<String, Object>();
@@ -152,18 +154,26 @@ public inherited sharing class ConnectorImportStep {
 			Id.valueOf(ConnectorRecipeDocument.textOf(progress.get('batchId')))
 		);
 		if (batch == null) {
-			throw failure('Connector_Import_ErrorBatchGone', new List<Object>());
+			throw failure(BarnHelp.text('Connector', 'Connector_Import_ErrorBatchGone', new List<Object>()));
 		}
 		Long since = Long.valueOf(ConnectorRecipeDocument.textOf(progress.get('since')));
 		if (ImportBatchService.isRunning(batch)) {
 			if (now() - since > MOST_HOURS * 3600000L) {
-				throw failure('Connector_Import_ErrorTooLong', new List<Object>{ batch.Name });
+				throw failure(
+					BarnHelp.text('Connector', 'Connector_Import_ErrorTooLong', new List<Object>{ batch.Name })
+				);
 			}
 			throw waiting(progress);
 		}
 		if (ConnectorRecipeDocument.textOf(progress.get('phase')) == DRY_RUN) {
 			if (batch.Status__c != ImportBatchService.STATUS_DRY_RUN_COMPLETE) {
-				throw failure('Connector_Import_ErrorDryRun', new List<Object>{ batch.Name, batch.Status__c });
+				throw failure(
+					BarnHelp.text(
+						'Connector',
+						'Connector_Import_ErrorDryRun',
+						new List<Object>{ batch.Name, batch.Status__c }
+					)
+				);
 			}
 			String over = overLimit(step, batch);
 			if (over != null) {
@@ -174,7 +184,13 @@ public inherited sharing class ConnectorImportStep {
 			throw waiting(new Map<String, Object>{ 'batchId' => batch.Id, 'phase' => COMMITTING, 'since' => now() });
 		}
 		if (batch.Status__c != ImportBatchService.STATUS_COMPLETE) {
-			throw failure('Connector_Import_ErrorCommit', new List<Object>{ batch.Name, batch.Status__c });
+			throw failure(
+				BarnHelp.text(
+					'Connector',
+					'Connector_Import_ErrorCommit',
+					new List<Object>{ batch.Name, batch.Status__c }
+				)
+			);
 		}
 		Map<String, Object> counts = counts(batch);
 		counts.put('batchId', batch.Id);
@@ -200,16 +216,16 @@ public inherited sharing class ConnectorImportStep {
 	@TestVisible
 	private static String overLimit(Map<String, Object> step, Import_Batch__c batch) {
 		Map<String, Object> counts = counts(batch);
-		Map<String, String> words = new Map<String, String>{
-			'rejected' => 'Connector_Import_OverRejected',
-			'created' => 'Connector_Import_OverCreated',
-			'updated' => 'Connector_Import_OverUpdated'
-		};
 		for (String key : new List<String>{ 'rejected', 'created', 'updated' }) {
 			Integer found = (Integer) counts.get(key);
 			Integer most = limitOf(step, key);
 			if (found > most) {
-				String what = BarnHelp.text('Connector', words.get(key), new List<Object>{ found });
+				List<Object> values = new List<Object>{ found };
+				String what = key == 'rejected'
+					? BarnHelp.text('Connector', 'Connector_Import_OverRejected', values)
+					: key == 'created'
+							? BarnHelp.text('Connector', 'Connector_Import_OverCreated', values)
+							: BarnHelp.text('Connector', 'Connector_Import_OverUpdated', values);
 				return BarnHelp.text(
 					'Connector',
 					'Connector_Import_ErrorOverLimit',
@@ -256,7 +272,7 @@ public inherited sharing class ConnectorImportStep {
 			return fromLists(csv((String) source));
 		}
 		if (!(source instanceof List<Object>)) {
-			throw failure('Connector_Import_ErrorRowsUnreadable', new List<Object>());
+			throw failure(BarnHelp.text('Connector', 'Connector_Import_ErrorRowsUnreadable', new List<Object>()));
 		}
 		List<Object> items = (List<Object>) source;
 		if (items.isEmpty() || items[0] instanceof List<Object>) {
@@ -265,7 +281,7 @@ public inherited sharing class ConnectorImportStep {
 		List<Map<String, Object>> rows = new List<Map<String, Object>>();
 		for (Object item : items) {
 			if (!(item instanceof Map<String, Object>)) {
-				throw failure('Connector_Import_ErrorRowsUnreadable', new List<Object>());
+				throw failure(BarnHelp.text('Connector', 'Connector_Import_ErrorRowsUnreadable', new List<Object>()));
 			}
 			Map<String, Object> row = new Map<String, Object>();
 			Map<String, Object> given = (Map<String, Object>) item;
@@ -338,7 +354,7 @@ public inherited sharing class ConnectorImportStep {
 			i++;
 		}
 		if (quoted) {
-			throw failure('Connector_Import_ErrorRowsUnreadable', new List<Object>());
+			throw failure(BarnHelp.text('Connector', 'Connector_Import_ErrorRowsUnreadable', new List<Object>()));
 		}
 		if (cell != '' || !cells.isEmpty()) {
 			cells.add(cell);
@@ -349,7 +365,7 @@ public inherited sharing class ConnectorImportStep {
 
 	private static List<Object> listOf(Object raw) {
 		if (!(raw instanceof List<Object>)) {
-			throw failure('Connector_Import_ErrorRowsUnreadable', new List<Object>());
+			throw failure(BarnHelp.text('Connector', 'Connector_Import_ErrorRowsUnreadable', new List<Object>()));
 		}
 		return (List<Object>) raw;
 	}
@@ -382,7 +398,7 @@ public inherited sharing class ConnectorImportStep {
 		return wait;
 	}
 
-	private static ConnectorStepRunner.StepFailureException failure(String key, List<Object> values) {
-		return new ConnectorStepRunner.StepFailureException(BarnHelp.text('Connector', key, values));
+	private static ConnectorStepRunner.StepFailureException failure(String text) {
+		return new ConnectorStepRunner.StepFailureException(text);
 	}
 }

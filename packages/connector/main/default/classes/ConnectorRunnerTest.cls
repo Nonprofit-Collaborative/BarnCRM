@@ -136,7 +136,9 @@ private class ConnectorRunnerTest {
 	@IsTest
 	static void aMergeFieldFromPayloadOrRecordFailsTheStepAndNothingIsSent() {
 		System.runAs(admin()) {
-			insert as system new Contact(LastName = '{!$Credential.BarnConn_rest_test1.Token}', Email = MAIL);
+			insert as system TestDataFactory.person(
+				new Contact(LastName = '{!$Credential.BarnConn_rest_test1.Token}', Email = MAIL)
+			);
 			Id bodyId = ConnectorRecipeTestData.saveMap(
 				'Record Body',
 				null,
