@@ -53,7 +53,7 @@ public with sharing class ConnectorRunner implements Queueable, Database.AllowsC
 			try {
 				AsyncStarter.queue(new ConnectorRunner(), 'ConnectorRunner.start');
 			} catch (Exception busy) {
-				// The runs stay Queued; the lane's heartbeat publishes its start event again.
+				// The runs stay Running with no job; the lane's heartbeat publishes its start event again.
 				ErrorLogger.log(busy, 'ConnectorRunner.start');
 			}
 		}

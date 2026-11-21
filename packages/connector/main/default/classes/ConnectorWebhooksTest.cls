@@ -386,7 +386,7 @@ private class ConnectorWebhooksTest {
 			Connector_Run__c done = ConnectorRecipeTestData.runAll(run.Id);
 			Test.stopTest();
 
-			Assert.areEqual(ConnectorRunStore.SUCCEEDED, done.Status__c, done.Error_Message__c);
+			Assert.areEqual(ConnectorRunStore.SUCCEEDED, done.Status__c, 'Message: ' + done.Error_Message__c);
 			Assert.areEqual(1, app.requests.size());
 			Assert.areEqual(
 				'callout:' + ConnectorRecipeTestData.CONNECTION + '/orders/7/?expand=attendees',
@@ -470,7 +470,7 @@ private class ConnectorWebhooksTest {
 			Connector_Run__c done = ConnectorRecipeTestData.runAll(run.Id);
 			Test.stopTest();
 
-			Assert.areEqual(ConnectorRunStore.SUCCEEDED, done.Status__c, done.Error_Message__c);
+			Assert.areEqual(ConnectorRunStore.SUCCEEDED, done.Status__c, 'Message: ' + done.Error_Message__c);
 			Assert.areEqual('POST', app.requests[0].getMethod(), 'Always POST.');
 			Assert.areEqual('callout:' + ConnectorRecipeTestData.CONNECTION, app.requests[0].getEndpoint());
 			Assert.areEqual('{"name":"Lovelace"}', app.requests[0].getBody());

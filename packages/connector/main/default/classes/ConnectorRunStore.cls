@@ -81,6 +81,7 @@ public without sharing class ConnectorRunStore {
 				State_JSON__c,
 				Step_Log_JSON__c,
 				Attempt__c,
+				Failed_Step__c,
 				Started_At__c,
 				Records_Written__c,
 				Is_Test__c
@@ -222,10 +223,11 @@ public without sharing class ConnectorRunStore {
 
 	/**
 	 * Whether a lane needs its heartbeat (R-CR6): an Active Schedule or Record Change recipe, or a
-	 * Waiting or Queued run it may run.
+	 * Waiting or Queued run it may run. A Running run counts as Queued: it is claimed for a runner
+	 * job, and if that job could not be queued the beat's start event is what starts one.
 	 */
 	public static Boolean clockNeeded(Set<String> runAs) {
-		Set<String> open = new Set<String>{ QUEUED, RECEIVED, WAITING };
+		Set<String> open = new Set<String>{ QUEUED, RECEIVED, RUNNING, WAITING };
 		return [
 				SELECT COUNT()
 				FROM Connector_Recipe__c
@@ -582,6 +584,12 @@ public without sharing class ConnectorRunStore {
 
 	/** Most runs an erasure's search may find; more refuses the erasure, so none is missed. */
 	public static final Integer MOST_SEARCHED = 2000;
+	/**
+	 * The search cap in force: MOST_SEARCHED. Tests lower it, since a search returning 2,000 runs
+	 * outlasts the search service's time limit when tests run in parallel ("Search unavailable").
+	 */
+	@TestVisible
+	private static Integer searchCap = MOST_SEARCHED;
 	/** Runs changed this recently are read as well: the search index may not hold them yet. */
 	public static final Integer RECENT_MINUTES = 60;
 	/** Runs read together while an erasure checks them. */
@@ -605,13 +613,10 @@ public without sharing class ConnectorRunStore {
 			terms.add('"' + searchEscaped(email) + '"');
 		}
 		List<List<SObject>> hits = Search.query(
-			'FIND {' +
-				String.join(terms, ' OR ') +
-				'} IN ALL FIELDS RETURNING Connector_Run__c(Id) LIMIT ' +
-				MOST_SEARCHED,
+			'FIND {' + String.join(terms, ' OR ') + '} IN ALL FIELDS RETURNING Connector_Run__c(Id) LIMIT ' + searchCap,
 			AccessLevel.SYSTEM_MODE
 		);
-		if (hits[0].size() >= MOST_SEARCHED) {
+		if (hits[0].size() >= searchCap) {
 			return null;
 		}
 		Set<Id> candidates = new Set<Id>();

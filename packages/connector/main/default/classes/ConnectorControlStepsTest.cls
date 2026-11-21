@@ -62,7 +62,7 @@ private class ConnectorControlStepsTest {
 			Connector_Run__c done = ConnectorRecipeTestData.runAll(run.Id);
 			Test.stopTest();
 
-			Assert.areEqual(ConnectorRunStore.SUCCEEDED, done.Status__c, done.Error_Message__c);
+			Assert.areEqual(ConnectorRunStore.SUCCEEDED, done.Status__c, 'Message: ' + done.Error_Message__c);
 			Assert.areEqual(3, done.Records_Written__c.intValue());
 			Assert.areEqual(3, [SELECT COUNT() FROM Contact WHERE Email LIKE 'person%@example.org' WITH SYSTEM_MODE]);
 			Assert.areEqual(3, output(done, 'each').get('count'));
@@ -88,7 +88,7 @@ private class ConnectorControlStepsTest {
 			Test.stopTest();
 
 			Assert.areEqual(ConnectorRunStore.QUEUED, paused.Status__c, 'Continues in a new transaction.');
-			Assert.areEqual(ConnectorRunStore.SUCCEEDED, done.Status__c, done.Error_Message__c);
+			Assert.areEqual(ConnectorRunStore.SUCCEEDED, done.Status__c, 'Message: ' + done.Error_Message__c);
 			Assert.areEqual(250, output(done, 'each').get('count'));
 		}
 	}
@@ -121,7 +121,7 @@ private class ConnectorControlStepsTest {
 				BarnHelp.text('Connector', 'Connector_Run_ErrorTooManyItems', new List<Object>{ 1001, 1000 }),
 				refused.Error_Message__c
 			);
-			Assert.areEqual(ConnectorRunStore.SUCCEEDED, tried.Status__c, tried.Error_Message__c);
+			Assert.areEqual(ConnectorRunStore.SUCCEEDED, tried.Status__c, 'Message: ' + tried.Error_Message__c);
 			Assert.areEqual(1, output(tried, 'each').get('count'), 'A test runs the first item only.');
 			Assert.isNotNull(output(tried, 'save').get('wouldWrite'), 'And keeps what it would write.');
 			Assert.areEqual(0, [SELECT COUNT() FROM Contact WHERE Email LIKE 'person%@example.org' WITH SYSTEM_MODE]);
@@ -161,7 +161,7 @@ private class ConnectorControlStepsTest {
 			Assert.isTrue(stored.Next_Attempt_At__c > Datetime.now().addMinutes(55), 'About an hour on.');
 			Assert.isTrue(stored.Next_Attempt_At__c <= Datetime.now().addMinutes(61));
 			Assert.isTrue(stored.Attempt__c == null || stored.Attempt__c == 0, 'A wait uses no retry.');
-			Assert.areEqual(ConnectorRunStore.SUCCEEDED, done.Status__c, done.Error_Message__c);
+			Assert.areEqual(ConnectorRunStore.SUCCEEDED, done.Status__c, 'Message: ' + done.Error_Message__c);
 		}
 	}
 
@@ -188,7 +188,7 @@ private class ConnectorControlStepsTest {
 			Connector_Run__c done = ConnectorRecipeTestData.runAll(run.Id);
 			Test.stopTest();
 
-			Assert.areEqual(ConnectorRunStore.SUCCEEDED, done.Status__c, done.Error_Message__c);
+			Assert.areEqual(ConnectorRunStore.SUCCEEDED, done.Status__c, 'Message: ' + done.Error_Message__c);
 			Assert.areEqual('Lovelace', output(done, 'reshape').get('name'));
 			Assert.areEqual(0, done.Records_Written__c.intValue(), 'Change Data writes nothing.');
 		}

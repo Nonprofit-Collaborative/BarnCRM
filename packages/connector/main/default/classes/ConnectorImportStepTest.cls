@@ -139,7 +139,7 @@ private class ConnectorImportStepTest {
 			Connector_Run__c done = ConnectorRecipeTestData.runAll(run.Id);
 			Test.stopTest();
 
-			Assert.areEqual(ConnectorRunStore.SUCCEEDED, done.Status__c, done.Error_Message__c);
+			Assert.areEqual(ConnectorRunStore.SUCCEEDED, done.Status__c, 'Message: ' + done.Error_Message__c);
 			Assert.areEqual(2, done.Records_Written__c.intValue());
 			Map<String, Object> result = (Map<String, Object>) stateOf(done).get('load');
 			Assert.areEqual(batch.Name, result.get('batch'));
@@ -224,7 +224,7 @@ private class ConnectorImportStepTest {
 			Connector_Run__c tested = ConnectorRecipeTestData.runAll(run.Id);
 			Test.stopTest();
 
-			Assert.areEqual(ConnectorRunStore.SUCCEEDED, tested.Status__c, tested.Error_Message__c);
+			Assert.areEqual(ConnectorRunStore.SUCCEEDED, tested.Status__c, 'Message: ' + tested.Error_Message__c);
 			Map<String, Object> would = (Map<String, Object>) ((Map<String, Object>) stateOf(tested).get('load'))
 				.get('wouldWrite');
 			Assert.areEqual(template.Name, would.get('template'));

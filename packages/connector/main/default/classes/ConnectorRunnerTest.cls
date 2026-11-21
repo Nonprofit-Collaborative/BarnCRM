@@ -273,7 +273,7 @@ private class ConnectorRunnerTest {
 			Connector_Run__c result = ConnectorRecipeTestData.runAll(run.Id);
 			Test.stopTest();
 
-			Assert.areEqual(ConnectorRunStore.SUCCEEDED, result.Status__c, result.Error_Message__c);
+			Assert.areEqual(ConnectorRunStore.SUCCEEDED, result.Status__c, 'Message: ' + result.Error_Message__c);
 			Assert.areEqual(0, [SELECT COUNT() FROM Contact WHERE Email = 'grace@example.org' WITH SYSTEM_MODE]);
 			Assert.isTrue(app.requests.isEmpty(), 'A test sends only GET unless asked.');
 			Map<String, Object> outputs = (Map<String, Object>) ((Map<String, Object>) JSON.deserializeUntyped(

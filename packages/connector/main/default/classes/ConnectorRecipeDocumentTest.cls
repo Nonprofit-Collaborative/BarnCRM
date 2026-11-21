@@ -5,7 +5,7 @@
  */
 @IsTest(testFor='ApexClass:ConnectorRecipeDocument')
 private class ConnectorRecipeDocumentTest {
-	private static final String MAP_ID = 'a0B000000000001AAA';
+	private static final String MAP_ID = 'a0B000000000001EAA';
 
 	@TestSetup
 	static void createTestUser() {
@@ -165,8 +165,8 @@ private class ConnectorRecipeDocumentTest {
 				new List<String>{
 					BarnHelp.text('Connector', 'Connector_Recipe_ErrorStepKind', new List<Object>{ 'w' })
 				},
-				problems(ConnectorRecipeTestData.document('[{"id":"w","kind":"wait"}]')),
-				'Steps of later slices are refused.'
+				problems(ConnectorRecipeTestData.document('[{"id":"w","kind":"repeat"}]')),
+				'A kind of step BarnCRM Connector does not have is refused.'
 			);
 			Assert.areEqual(
 				new Set<String>{ Id.valueOf(MAP_ID) },
