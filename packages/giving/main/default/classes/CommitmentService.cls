@@ -84,6 +84,46 @@ public with sharing class CommitmentService {
 	}
 
 	/**
+	 * Refuses, at save, a pledge whose last payment would be zero or less (D-219, OD-14): the
+	 * last installment absorbs the expected total minus the even amounts before it, so an
+	 * amount times the installments that passes the total would otherwise plan a zero or
+	 * negative payment. An update is checked only when the amount, total, count or type
+	 * changed, so an older pledge still saves its other edits. Nothing is queried.
+	 */
+	public static void refuseNonPositiveLastPayments(List<Commitment__c> commitments, Map<Id, Commitment__c> oldMap) {
+		for (Commitment__c commitment : commitments) {
+			if (
+				!TYPE_PLEDGE.equals(commitment.Type__c) ||
+				commitment.Expected_Total__c == null ||
+				commitment.Amount__c == null ||
+				commitment.Amount__c <= 0
+			) {
+				continue;
+			}
+			Commitment__c previous = oldMap == null ? null : oldMap.get(commitment.Id);
+			if (
+				previous != null &&
+				previous.Type__c == commitment.Type__c &&
+				previous.Amount__c == commitment.Amount__c &&
+				previous.Expected_Total__c == commitment.Expected_Total__c &&
+				previous.Installments_Planned__c == commitment.Installments_Planned__c
+			) {
+				continue;
+			}
+			Integer count = plannedCount(commitment);
+			if (count <= 0) {
+				continue;
+			}
+			Decimal last = (commitment.Expected_Total__c - commitment.Amount__c * (count - 1)).setScale(2);
+			if (last <= 0) {
+				commitment.addError(
+					BarnHelp.text('Giving', 'Giving_Commitment_LastPaymentNotPositive', new List<Object>{ last.format() })
+				);
+			}
+		}
+	}
+
+	/**
 	 * The schedule a commitment implies, as unsaved installments in sequence order.
 	 * Nothing is queried and nothing is saved, so the same method serves the preview on
 	 * screen and the generation behind it.

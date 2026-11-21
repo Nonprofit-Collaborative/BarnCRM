@@ -441,6 +441,7 @@
     "Giving_Commitment_DeleteBlocked": "This commitment cannot be deleted because a gift has been received against one of its payments. Cancel it instead.",
     "Giving_Commitment_DonorDeleteBlocked": "This record is the donor of an active or paused pledge or recurring gift, so it cannot be deleted. Cancel the commitment or change its donor first. Merging a duplicate still works.",
     "Giving_Commitment_InvalidSchedule": "Enter an amount, a frequency, and a start date before previewing the schedule.",
+    "Giving_Commitment_LastPaymentNotPositive": "With this amount and number of payments, the last payment would be {0}, which is not more than zero. Lower the amount or the number of payments, or raise the expected total, so the payments add up to the total.",
     "Giving_Commitment_NoPermission": "You can see this commitment but not change it. Ask your BarnCRM admin for the Fundraising Staff role, together with the Fundraising Staff Access permission set.",
     "Giving_Commitment_NotFound": "That commitment could not be found. Refresh the page and try again.",
     "Giving_Commitment_StatusChanged": "The commitment was updated.",

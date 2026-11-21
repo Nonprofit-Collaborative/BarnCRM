@@ -3,7 +3,8 @@
  * Automation Registry row `Commitment_Schedule`.
  *
  * Before save it derives the household from the donor, exactly as a gift's is (R-CM1), and
- * fills in a pledge's blank expected total from its amount and installments (R-CM5).
+ * fills in a pledge's blank expected total from its amount and installments (R-CM5), then
+ * refuses a pledge whose last payment would be zero or less (D-219).
  * After insert it generates the schedule, after update it rebuilds the unpaid part of the
  * schedule when the schedule itself changed (R-CM6), and before delete it refuses to
  * remove a commitment that has been paid.
@@ -17,11 +18,16 @@ public with sharing class CommitmentTriggerHandler extends TriggerHandler {
 
 	public override void beforeInsert() {
 		CommitmentService.fillExpectedTotals((List<Commitment__c>) newRecords());
+		CommitmentService.refuseNonPositiveLastPayments((List<Commitment__c>) newRecords(), null);
 		deriveHouseholds((List<Commitment__c>) newRecords(), null);
 	}
 
 	public override void beforeUpdate() {
 		CommitmentService.fillExpectedTotals((List<Commitment__c>) newRecords());
+		CommitmentService.refuseNonPositiveLastPayments(
+			(List<Commitment__c>) newRecords(),
+			(Map<Id, Commitment__c>) oldRecordsById()
+		);
 		deriveHouseholds((List<Commitment__c>) newRecords(), (Map<Id, Commitment__c>) oldRecordsById());
 	}
 

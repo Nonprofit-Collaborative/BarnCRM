@@ -39,6 +39,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 6 | Clear **Donor Account**, set **Expected Total** `600`, save. | Refused: "A recurring commitment has no expected total. Choose Pledge if the donor promised a fixed amount." |
 | 7 | Clear **Expected Total**, set **Day of Month** `40`, save. | Refused: "Day of month is a day between 1 and 31, or empty to use the day of the start date." |
 | 8 | Clear **Day of Month**, save. | Saved, unchanged. |
+| 9 | **Edit** again. Set **Type** to **Pledge**, **Payments Planned** `5`, **Expected Total** `200`, save. | Refused: "With this amount and number of payments, the last payment would be 0..." (four payments of 50 already reach the 200 total). |
+| 10 | Set **Expected Total** `150`, save. | Refused the same way, naming a last payment of -50. Cancel the edit, so the gift stays recurring. |
 
 **Cleanup:** keep the recurring gift for T-COM-06.
 
