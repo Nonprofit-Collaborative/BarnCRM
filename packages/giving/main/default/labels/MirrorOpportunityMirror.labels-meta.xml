@@ -97,22 +97,6 @@
     <value>Reconciliation</value>
   </labels>
   <labels>
-    <fullName>Mirror_OpportunityMirror_FromDate</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Field label: range start</shortDescription>
-    <value>From</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_OpportunityMirror_ToDate</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Field label: range end</shortDescription>
-    <value>To</value>
-  </labels>
-  <labels>
     <fullName>Mirror_OpportunityMirror_CopyAgain</fullName>
     <categories>Mirror, Opportunity Mirror</categories>
     <language>en_US</language>

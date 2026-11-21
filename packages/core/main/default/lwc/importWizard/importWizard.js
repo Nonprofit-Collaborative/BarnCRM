@@ -72,7 +72,6 @@ import stepTemplate from '@salesforce/label/c.Core_Import_StepTemplate';
 import stepUpload from '@salesforce/label/c.Core_Import_StepUpload';
 import stepColumns from '@salesforce/label/c.Core_Import_StepColumns';
 import stepMatching from '@salesforce/label/c.Core_Import_StepMatching';
-import stepPreview from '@salesforce/label/c.Core_Import_StepPreview';
 import stepResults from '@salesforce/label/c.Core_Find_Results';
 import nextButton from '@salesforce/label/c.Core_Import_NextButton';
 import dryRunButton from '@salesforce/label/c.Core_BulkUpdate_Preview';
@@ -469,7 +468,7 @@ export default class ImportWizard extends LightningElement {
     stepUpload,
     stepColumns,
     stepMatching,
-    stepPreview,
+    stepPreview: dryRunButton,
     stepResults,
     nextButton,
     dryRunButton,

@@ -41,14 +41,6 @@
         <value>Remove this change</value>
     </labels>
     <labels>
-        <fullName>Core_Import_ChangesDone</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: closes a column&apos;s changes</shortDescription>
-        <value>Done</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_ChangesOpTrim</fullName>
         <categories>Import</categories>
         <language>en_US</language>

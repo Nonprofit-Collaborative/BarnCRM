@@ -21,13 +21,12 @@ import UNDO_UNTIL from '@salesforce/label/c.Core_BulkUpdate_UndoUntil';
 import FAILURES from '@salesforce/label/c.Core_BulkUpdate_Failures';
 import CLOSE from '@salesforce/label/c.Core_BulkUpdate_Close';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
-import PATH_PREVIEW from '@salesforce/label/c.Core_Import_StepPreview';
-import PATH_CONFIRM from '@salesforce/label/c.Core_BulkUpdate_PathConfirm';
-import PATH_RUN from '@salesforce/label/c.Core_BulkUpdate_PathRun';
+import PATH_CONFIRM from '@salesforce/label/c.Core_HealthCheck_ConfirmButton';
+import PATH_RUN from '@salesforce/label/c.Core_Find_Run';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const STEPS = [
-  { value: 'preview', label: PATH_PREVIEW },
+  { value: 'preview', label: PREVIEW },
   { value: 'confirm', label: PATH_CONFIRM },
   { value: 'run', label: PATH_RUN }
 ];

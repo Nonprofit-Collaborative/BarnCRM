@@ -193,14 +193,6 @@
         <value>Download</value>
     </labels>
     <labels>
-        <fullName>Core_Import_StepPreview</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: step five heading</shortDescription>
-        <value>Preview</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_NextButton</fullName>
         <categories>Import</categories>
         <language>en_US</language>

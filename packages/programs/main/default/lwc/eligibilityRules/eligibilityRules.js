@@ -5,7 +5,7 @@ import screen from '@salesforce/apex/EligibilityController.screen';
 
 import TITLE from '@salesforce/label/c.Programs_Elig_Title';
 import RULE from '@salesforce/label/c.Programs_Elig_Rule';
-import FIELD from '@salesforce/label/c.Programs_Elig_Field';
+import FIELD from '@salesforce/label/c.Core_AccessExplorer_Field';
 import OPERATOR from '@salesforce/label/c.Programs_Elig_Operator';
 import VALUE from '@salesforce/label/c.Core_Filter_Value';
 import VALUE_LIST from '@salesforce/label/c.Programs_Elig_ValueList';

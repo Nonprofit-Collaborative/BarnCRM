@@ -57,14 +57,6 @@
         <value>When all of these are true</value>
     </labels>
     <labels>
-        <fullName>Programs_Elig_Field</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility rules panel: field</shortDescription>
-        <value>Field</value>
-    </labels>
-    <labels>
         <fullName>Programs_Elig_Operator</fullName>
         <categories>Programs</categories>
         <language>en_US</language>

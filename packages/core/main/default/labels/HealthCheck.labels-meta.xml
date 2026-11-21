@@ -521,14 +521,6 @@
         <value>Last run</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_RunNowButton</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Button that runs every check where the panel showed the last result.</shortDescription>
-        <value>Run Now</value>
-    </labels>
-    <labels>
         <fullName>Core_HealthCheck_RelationshipsNoPersonTitle</fullName>
         <categories>Core</categories>
         <language>en_US</language>

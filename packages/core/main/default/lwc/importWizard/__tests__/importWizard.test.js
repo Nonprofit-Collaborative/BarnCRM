@@ -381,7 +381,7 @@ describe('the import wizard', () => {
       'c.Core_Import_StepUpload',
       'c.Core_Import_StepColumns',
       'c.Core_Import_StepMatching',
-      'c.Core_Import_StepPreview',
+      'c.Core_BulkUpdate_Preview',
       'c.Core_Find_Results'
     ]);
     expect(flow.currentStep).toBe('1');

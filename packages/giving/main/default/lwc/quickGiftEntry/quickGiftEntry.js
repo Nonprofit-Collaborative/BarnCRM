@@ -23,7 +23,7 @@ import newPerson from '@salesforce/label/c.Giving_QuickGiftEntry_NewPerson';
 import organizationLabel from '@salesforce/label/c.Core_Settings_NavGroup_Organization';
 import donorPlaceholder from '@salesforce/label/c.Core_HouseholdPanel_AddExistingPlaceholder';
 import amountLabel from '@salesforce/label/c.Giving_AskPipeline_FieldAmount';
-import dateLabel from '@salesforce/label/c.Giving_QuickGiftEntry_DateLabel';
+import dateLabel from '@salesforce/label/c.Giving_AskPipeline_FieldGiftDate';
 import typeLabel from '@salesforce/label/c.Giving_QuickGiftEntry_TypeLabel';
 import typePlaceholder from '@salesforce/label/c.Giving_QuickGiftEntry_TypePlaceholder';
 import appealLabel from '@salesforce/label/c.Giving_QuickGiftEntry_AppealLabel';

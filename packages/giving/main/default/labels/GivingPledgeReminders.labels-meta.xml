@@ -153,14 +153,6 @@
     <value>Edit Step</value>
   </labels>
   <labels>
-    <fullName>Giving_PledgeReminders_TemplateField</fullName>
-    <categories>Giving, Pledge Reminders</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Pledge reminders page: template picker label</shortDescription>
-    <value>Email Template</value>
-  </labels>
-  <labels>
     <fullName>Giving_PledgeReminders_TemplatePlaceholder</fullName>
     <categories>Giving, Pledge Reminders</categories>
     <language>en_US</language>
@@ -207,14 +199,6 @@
     <protected>false</protected>
     <shortDescription>Pledge reminders page: column step</shortDescription>
     <value>Step</value>
-  </labels>
-  <labels>
-    <fullName>Giving_PledgeReminders_ColumnPledge</fullName>
-    <categories>Giving, Pledge Reminders</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Pledge reminders page: column pledge</shortDescription>
-    <value>Commitment</value>
   </labels>
   <labels>
     <fullName>Giving_PledgeReminders_ColumnInstallment</fullName>

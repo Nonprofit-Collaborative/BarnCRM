@@ -31,7 +31,6 @@ import STEP_OBJECT from '@salesforce/label/c.Core_SuperTransform_StepObject';
 import STEP_RECORDS from '@salesforce/label/c.Core_SuperTransform_StepRecords';
 import STEP_CHANGES from '@salesforce/label/c.Core_SuperTransform_StepChanges';
 import STEP_PREVIEW from '@salesforce/label/c.Core_SuperTransform_StepPreview';
-import RUN_SHORT from '@salesforce/label/c.Core_BulkUpdate_PathRun';
 import STEP_RUN from '@salesforce/label/c.Core_SuperTransform_StepRun';
 import SEARCH_OBJECTS from '@salesforce/label/c.Core_SuperTransform_SearchObjects';
 import OBJECT from '@salesforce/label/c.Core_FieldUtilization_ChooseLabel';
@@ -149,7 +148,7 @@ export default class SuperTransform extends LightningElement {
     stepChanges: STEP_CHANGES,
     stepPreview: STEP_PREVIEW,
     stepRun: STEP_RUN,
-    runShort: RUN_SHORT,
+    runShort: CONFIRM_BUTTON,
     searchObjects: SEARCH_OBJECTS,
     object: OBJECT,
     chooseObject: CHOOSE_OBJECT,
