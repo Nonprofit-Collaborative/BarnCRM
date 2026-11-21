@@ -290,6 +290,50 @@ private class ProgramSampleDataTest {
 		}
 	}
 
+	/**
+	 * A case note is private to its author. An admin on a standard profile (no View All Data)
+	 * who loaded the sample data still finds a note someone else wrote when removing it, so the
+	 * note's enrollment and program stay and removal does not fail on it.
+	 */
+	@IsTest
+	static void aRemoverWithoutViewAllDataStillSeesSomeoneElsesCaseNote() {
+		System.runAs(admin()) {
+			samplePeople(12);
+		}
+		User remover = TestUsers.standardUserWith('Remover', new List<String>{ TestUsers.CORE_ADMIN, ADMIN });
+		System.runAs(remover) {
+			loadEverything();
+		}
+		Enrollment__c noted;
+		System.runAs(admin()) {
+			noted = [SELECT Id FROM Enrollment__c WHERE Program__r.Name = 'Food pantry' LIMIT 1];
+			insert new Case_Note__c(Enrollment__c = noted.Id, Subject__c = 'Kept', Note__c = 'x');
+		}
+
+		Test.startTest();
+		System.runAs(remover) {
+			Assert.areEqual(
+				1,
+				[SELECT COUNT() FROM Case_Note__c WITH USER_MODE],
+				'Programs Admin views all case notes, so the remover sees the other author\'s note.'
+			);
+			removeEverything();
+		}
+		Test.stopTest();
+
+		Assert.areEqual(
+			new List<Id>{ noted.Id },
+			new List<Id>(new Map<Id, Enrollment__c>([SELECT Id FROM Enrollment__c]).keySet()),
+			'Only the enrollment with the other author\'s case note stays.'
+		);
+		Assert.areEqual(1, [SELECT COUNT() FROM Case_Note__c], 'The note itself is never removed.');
+		Assert.areEqual(
+			'Food pantry',
+			[SELECT Name FROM Program__c WHERE Sample_Data__c = TRUE].Name,
+			'Its program stays.'
+		);
+	}
+
 	@IsTest
 	static void withNoSamplePeopleTheProgramsStillLoad() {
 		System.runAs(admin()) {
