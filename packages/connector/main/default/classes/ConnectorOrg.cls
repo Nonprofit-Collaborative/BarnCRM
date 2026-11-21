@@ -32,10 +32,14 @@ public virtual with sharing class ConnectorOrg {
 
 	/** The org's own `BarnConn_` External Credential names and labels, at most 50. */
 	public virtual Map<String, String> labelsByName() {
+		return labelsFrom(ConnectApi.NamedCredentials.getExternalCredentials().externalCredentials);
+	}
+
+	/** The `BarnConn_` names and labels among the rows `ConnectApi` gives, the org's own only. */
+	@TestVisible
+	private static Map<String, String> labelsFrom(List<ConnectApi.ExternalCredential> rows) {
 		Map<String, String> found = new Map<String, String>();
-		for (
-			ConnectApi.ExternalCredential row : ConnectApi.NamedCredentials.getExternalCredentials().externalCredentials
-		) {
+		for (ConnectApi.ExternalCredential row : rows) {
 			if (
 				found.size() < 50 &&
 				row.developerName != null &&
@@ -51,30 +55,40 @@ public virtual with sharing class ConnectorOrg {
 	/** The pair's status from `ConnectApi`, or null when either credential cannot be read. */
 	public virtual Pair read(String name, String label) {
 		try {
-			Pair pair = new Pair();
-			pair.name = name;
-			pair.label = label;
 			ConnectApi.NamedCredential named = ConnectApi.NamedCredentials.getNamedCredential(name);
-			pair.url = named.calloutUrl;
-			pair.calloutsEnabled = String.valueOf(named.calloutStatus) == 'Enabled';
-			for (ConnectApi.ExternalCredential link : named.externalCredentials) {
-				pair.linked = pair.linked || link.developerName == name;
-			}
-			ConnectApi.ExternalCredential external = ConnectApi.NamedCredentials.getExternalCredential(name);
-			for (ConnectApi.ExternalCredentialPrincipal principal : external.principals) {
-				pair.principal = principal.principalName;
-				pair.keyStored = String.valueOf(principal.authenticationStatus) == 'Configured';
-				pair.principalId = String.isNotBlank(principal.id) ? Id.valueOf(principal.id) : null;
-			}
-			if (!pair.keyStored && pair.principal != null && pair.principal != ConnectorConnections.SECRET_URL) {
-				// A Custom principal's status stays Unknown with a key stored (barn-platform,
-				// 2026-11-21), so the key's parameter names are asked for: never their values.
-				pair.keyStored = hasKey(name, pair.principal);
-			}
-			return pair;
+			return pairFrom(name, label, named, ConnectApi.NamedCredentials.getExternalCredential(name));
 		} catch (Exception unreadable) {
 			return null;
 		}
+	}
+
+	/** The pair's status from the two credentials `ConnectApi` gives. */
+	@TestVisible
+	private static Pair pairFrom(
+		String name,
+		String label,
+		ConnectApi.NamedCredential named,
+		ConnectApi.ExternalCredential external
+	) {
+		Pair pair = new Pair();
+		pair.name = name;
+		pair.label = label;
+		pair.url = named.calloutUrl;
+		pair.calloutsEnabled = String.valueOf(named.calloutStatus) == 'Enabled';
+		for (ConnectApi.ExternalCredential link : named.externalCredentials) {
+			pair.linked = pair.linked || link.developerName == name;
+		}
+		for (ConnectApi.ExternalCredentialPrincipal principal : external.principals) {
+			pair.principal = principal.principalName;
+			pair.keyStored = String.valueOf(principal.authenticationStatus) == 'Configured';
+			pair.principalId = String.isNotBlank(principal.id) ? Id.valueOf(principal.id) : null;
+		}
+		if (!pair.keyStored && pair.principal != null && pair.principal != ConnectorConnections.SECRET_URL) {
+			// A Custom principal's status stays Unknown with a key stored (barn-platform,
+			// 2026-11-21), so the key's parameter names are asked for: never their values.
+			pair.keyStored = hasKey(name, pair.principal);
+		}
+		return pair;
 	}
 
 	/** Whether the principal holds any key parameter; false when Salesforce will not say. */

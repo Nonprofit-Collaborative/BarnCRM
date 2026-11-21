@@ -111,6 +111,7 @@ public with sharing class HealthCheckController {
 	}
 
 	/** The error a failed load shows: logged, and replaced by the load failure text. */
+	@TestVisible
 	private static AuraHandledException loadFailed(Exception caught) {
 		return UserErrors.wrap(
 			caught,

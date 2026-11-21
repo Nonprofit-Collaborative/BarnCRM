@@ -60,4 +60,25 @@ private class SampleDataPostInstallTest {
 			Assert.isTrue(host.coreRemoveStages() instanceof SampleDataRemoveStages, 'Core\'s removal stages');
 		}
 	}
+
+	@IsTest
+	static void theHostLoadsTheSampleSetAndTellsTheLoaderWhenItIsIn() {
+		System.runAs(TestUsers.adminWithInstalledModules()) {
+			insert new BarnCRM_Settings__c(SetupOwnerId = UserInfo.getOrganizationId(), Job_Notifications__c = true);
+			SettingsService.clearCaches();
+			SampleDataHost host = new SampleDataPackageHost();
+
+			Test.startTest();
+			host.load();
+			Test.stopTest();
+
+			Assert.isTrue(SampleDataLoader.status().householdCount > 0, 'The host started the load, households are in');
+
+			host.notifyLoadFinished();
+
+			List<JobNotifier.Notice> sent = JobNotifier.sentNotices();
+			Assert.areEqual(1, sent.size(), 'One notice when the load is in');
+			Assert.areEqual(UserInfo.getUserId(), sent[0].recipientId, 'To the person who loaded it');
+		}
+	}
 }

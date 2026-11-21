@@ -351,6 +351,23 @@ private class ConnectorClockTest {
 	}
 
 	@IsTest
+	static void aPublishedStartEventReachesTheTriggerAndStartsNothingForTheWrongIdentity() {
+		System.runAs(admin()) {
+			Test.startTest();
+			Database.SaveResult published = EventBus.publish(new Connector_Start_User__e());
+			Test.getEventBus().deliver();
+			Test.stopTest();
+
+			Assert.isTrue(published.isSuccess(), 'The event is published.');
+			Assert.areEqual(
+				1,
+				logged('ConnectorClock.onStart'),
+				'The trigger ran, and the identity it ran as is no integration user: it says so once.'
+			);
+		}
+	}
+
+	@IsTest
 	static void theHeartbeatPicksUpAQueuedRunNoRunnerStarted() {
 		System.runAs(admin()) {
 			Connector_Recipe__c recipe = ConnectorRecipeTestData.recipe(
@@ -546,6 +563,48 @@ private class ConnectorClockTest {
 			Assert.isNotNull(findingOf(none, 'connector_paused_by_failures'));
 			Assert.isNull(findingOf(none, 'connector_recipes_paused'));
 			Assert.isNotNull(findingOf(inactive, 'connector_recipes_paused'));
+		}
+	}
+
+	@IsTest
+	static void healthCheckNamesAnIntegrationUserWithoutConnectionsAndRecipesWhoseOwnerLeft() {
+		User integrator = TestUsers.fromSetup(ConnectorClockTest.INTEGRATOR);
+		System.runAs(admin()) {
+			chooseUser(integrator.Id);
+			clockRecipe(
+				'Hourly As Integrator',
+				'{"kind":"schedule","every":"hour"}',
+				ConnectorRecipes.SCHEDULE,
+				ConnectorRecipes.RUN_AS_USER
+			);
+			Connector_Recipe__c owned = clockRecipe(
+				'Owned By Departed',
+				'{"kind":"schedule","every":"hour"}',
+				ConnectorRecipes.SCHEDULE,
+				ConnectorRecipes.RUN_AS_AUTOMATION
+			);
+			owned.Record_Owner_Id__c = String.valueOf(departed());
+			update as system owned;
+
+			Test.startTest();
+			List<HealthCheckService.Finding> found = ConnectorClockChecks.findings();
+			Test.stopTest();
+
+			Map<String, Object> access = findingOf(found, 'connector_integration_user_access');
+			Assert.isNotNull(access, 'An active user without BarnCRM Connections cannot use the connections.');
+			Assert.areEqual(HealthCheckService.SEVERITY_WARNING, access.get('severity'));
+			Assert.isTrue(String.valueOf(access.get('detail')).contains(integrator.LastName), 'The user is named.');
+			Assert.isNull(findingOf(found, 'connector_integration_user_inactive'), 'The user is chosen and active.');
+			Map<String, Object> stopped = findingOf(
+				found,
+				'connector_clock_stopped_' + ConnectorClock.LANE_USER.toLowerCase()
+			);
+			Assert.isNotNull(stopped, 'The Integration User lane has work, a ready user and no heartbeat.');
+			Assert.areEqual(BarnHelp.text('Connector', 'Connector_Health_ClockStopped_Title'), stopped.get('title'));
+			Map<String, Object> ownerless = findingOf(found, 'connector_owner_inactive');
+			Assert.isNotNull(ownerless, 'A recipe whose Record Owner is inactive is named.');
+			Assert.isTrue(String.valueOf(ownerless.get('detail')).contains('Owned By Departed'));
+			Assert.isFalse(String.valueOf(ownerless.get('detail')).contains('Hourly As Integrator'));
 		}
 	}
 
