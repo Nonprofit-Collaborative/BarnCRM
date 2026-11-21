@@ -62,11 +62,6 @@ public with sharing class PortalTokens {
 			'&algorithm=SHA1&digits=6&period=30';
 	}
 
-	/** Whether the code is the secret's code now, or one step either side. */
-	public static Boolean authenticatorCodeMatches(String secret, String code, Datetime now) {
-		return matchedStep(secret, code, now) != null;
-	}
-
 	/**
 	 * The 30-second step the code belongs to, now or one step either side, or null when it is
 	 * none of them. A caller keeps the step so the same code is never accepted twice (R-PA3).
