@@ -1,5 +1,13 @@
 <template>
-  <lightning-quick-action-panel header={labels.title}>
+  <template lwc:if={showShell}>
+    <c-barn-page-shell
+      class="slds-show slds-var-m-bottom_small"
+      title={labels.title}
+      purpose={pageIntro}
+      data-id="shell"
+    ></c-barn-page-shell>
+  </template>
+  <lightning-quick-action-panel header={panelHeader}>
     <template lwc:if={helpReady}>
       <div class="slds-is-relative">
         <template lwc:if={working}>

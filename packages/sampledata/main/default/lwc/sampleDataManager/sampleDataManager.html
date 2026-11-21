@@ -1,6 +1,14 @@
 <template>
     <template lwc:if={helpReady}>
-    <lightning-card title={labels.cardTitle} icon-name="standard:dataset">
+    <template lwc:if={showShell}>
+        <c-barn-page-shell
+            class="slds-show slds-var-m-bottom_small"
+            title={labels.cardTitle}
+            purpose={pageIntro}
+            data-id="shell"
+        ></c-barn-page-shell>
+    </template>
+    <lightning-card title={cardHeading} icon-name={cardIcon}>
         <span slot="actions">
             <c-barn-status-badge status={statusTone} label={statusLabel} data-id="status"></c-barn-status-badge>
         </span>

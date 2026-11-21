@@ -1,10 +1,10 @@
 <template>
     <template lwc:if={helpReady}>
     <!-- On the Automation page (page-header on), the page header every Core page shares (Q-02);
-         the app page prints its own name, so the h1 is for screen readers. In the Settings
+         an App Page prints no header, so the shell shows the name. In the Settings
          console, which has its own header, the first card carries the intro instead. -->
     <template lwc:if={pageHeader}>
-        <c-barn-page-shell title={labels.pageTitle} purpose={labels.intro} title-hidden data-id="shell"></c-barn-page-shell>
+        <c-barn-page-shell title={labels.pageTitle} purpose={labels.intro} data-id="shell"></c-barn-page-shell>
     </template>
     <lightning-card title={labels.title} icon-name="custom:custom32" class={pauseCardClass} data-id="pause-card">
         <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium">

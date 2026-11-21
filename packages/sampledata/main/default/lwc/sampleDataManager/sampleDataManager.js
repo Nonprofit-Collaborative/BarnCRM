@@ -1,4 +1,5 @@
-import { LightningElement, wire } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
+import { CurrentPageReference } from 'lightning/navigation';
 import Toast from 'lightning/toast';
 import BarnConfirmModal from 'c/barnConfirmModal';
 import getStatus from '@salesforce/apex/SampleDataController.getStatus';
@@ -36,7 +37,36 @@ const POLL_INTERVAL_MS = 3000;
  * See docs/admin-guide/sample-data.md.
  */
 export default class SampleDataManager extends LightningElement {
+  /**
+   * Opens with the shared page header (Q-02). Set on an App Page; the Sample Data tab cannot
+   * carry a property, so it also turns on when the page reference is a tab. Off on Home and
+   * record pages, where the card sits among other components.
+   */
+  @api pageHeader = false;
+  onTab = false;
+
   helpReady = isHelpLoaded('Core');
+
+  @wire(CurrentPageReference)
+  readPageType(pageRef) {
+    this.onTab = !!pageRef && pageRef.type === 'standard__navItemPage';
+  }
+
+  get showShell() {
+    return this.pageHeader || this.onTab;
+  }
+
+  get pageIntro() {
+    return helpText('Core', 'Core_SampleData_PageIntro');
+  }
+
+  get cardHeading() {
+    return this.showShell ? undefined : this.labels.cardTitle;
+  }
+
+  get cardIcon() {
+    return this.showShell ? undefined : 'standard:dataset';
+  }
 
   labels = {
     cardTitle,

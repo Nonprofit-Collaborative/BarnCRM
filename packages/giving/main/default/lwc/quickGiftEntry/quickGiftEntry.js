@@ -265,6 +265,11 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
   /** The Quick Gift Entry tab opened for a known donor: c__donorId in the page state. */
   @wire(CurrentPageReference)
   readPageState(pageRef) {
+    // Its own tab only: in the Fundraising utility bar it sees whichever tab the user has open.
+    this.onTab =
+      !!pageRef &&
+      pageRef.type === 'standard__navItemPage' &&
+      String((pageRef.attributes || {}).apiName || '').endsWith('Quick_Gift_Entry');
     const donorId = pageRef && pageRef.state ? pageRef.state.c__donorId : undefined;
     if (!donorId || donorId === this.stateDonorId) {
       return;
@@ -293,12 +298,24 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
     clearTimeout(this.paymentTimer);
   }
 
+  /** True when the page reference is a tab: the page header shows there, not in an action or on a record page. */
+  onTab = false;
+
+  /** The page header shows on the tab only; the action window and a record page carry their own title. */
+  get showShell() {
+    return this.onTab && !this.inAction && !this.pageRecordId;
+  }
+
+  get pageIntro() {
+    return helpText('Giving', 'Giving_QuickGiftEntry_PageIntro');
+  }
+
   get cardTitle() {
-    return this.inAction ? undefined : heading;
+    return this.inAction || this.showShell ? undefined : heading;
   }
 
   get cardIcon() {
-    return this.inAction ? undefined : iconFor('Quick_Gift_Entry');
+    return this.inAction || this.showShell ? undefined : iconFor('Quick_Gift_Entry');
   }
 
   get donorKindOptions() {

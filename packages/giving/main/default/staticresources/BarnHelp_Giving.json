@@ -657,6 +657,9 @@
     "Mirror_SetupNote_Mirror_Steps": "Click the permission set your fundraising staff have (or open Profiles for their profile).|Click Object Settings, then Opportunities, then Edit.|Tick Read, Create and Edit, then click Save.",
     "Mirror_SetupNote_Mirror_What": "To give each gift its Opportunity at once, let fundraising staff create and edit Opportunities through their profile or a permission set. Give yourself Salesforce Records Sync on the Access page.",
     "Mirror_SetupNote_Mirror_Why": "Opportunities are written with the access of the person saving the gift; without it the nightly run catches them up instead.",
-    "Mirror_Sync_OtherMessages": "Refused for other reasons, too many different ones to list one by one. Save one of these records by hand to see why it was refused."
+    "Mirror_Sync_OtherMessages": "Refused for other reasons, too many different ones to list one by one. Save one of these records by hand to see why it was refused.",
+    "Giving_QuickGiftEntry_PageIntro": "Enter a gift that has just arrived on one screen, built for a phone. Defaults come from BarnCRM Settings, and a gift saved here is checked by the same rules as any other.",
+    "Giving_Receipt_PageTitle": "Receipt Letters",
+    "Giving_Receipt_PageIntro": "Edit the letters donors receive for a gift and for a year, preview them with a sample, and generate year end statements."
   }
 }

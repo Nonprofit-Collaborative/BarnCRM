@@ -1,5 +1,11 @@
 <template>
     <template lwc:if={helpReady}>
+  <c-barn-page-shell
+    class="slds-show slds-var-m-bottom_small"
+    title={labels.pageTitle}
+    purpose={labels.pageIntro}
+    data-id="shell"
+  ></c-barn-page-shell>
   <div class="slds-var-p-around_medium">
     <c-settings-setup-notes notes={setupNotes}></c-settings-setup-notes>
     <template lwc:if={loadError}>

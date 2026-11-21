@@ -26,6 +26,7 @@
     "Volunteers_LogHours_LoadFailed": "The Log Hours form did not open. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
     "Volunteers_LogHours_NoAccess": "Your BarnCRM role cannot enter volunteer hours. Ask your BarnCRM admin if you need to.",
     "Volunteers_LogHours_Saved": "Hours logged.",
+    "Volunteers_LogHours_PageIntro": "Log the hours a volunteer worked: pick the person, the job or shift, the date and the hours. The same hours rules and approval status apply as on a new Volunteer Hours record.",
     "Volunteers_Recognition_AnniversaryOne": "Thank {0} for a year of volunteering",
     "Volunteers_Recognition_Anniversary": "Thank {0} for {1} years of volunteering",
     "Volunteers_Recognition_Description": "Created by BarnCRM because Send thank-you tasks is on (Volunteers settings). A call, a note or a mention in your newsletter all count.",

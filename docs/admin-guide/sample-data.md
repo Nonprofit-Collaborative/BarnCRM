@@ -188,7 +188,9 @@ until you remove it: in Setup, open the user, then **Permission Set Assignments*
 **Sample Data**.
 
 1. Open the **Sample Data** tab. **BarnCRM Settings**, **General**, **Sample Data** opens it
-   too; type "sample" in the settings search box if you do not see it.
+   too; type "sample" in the settings search box if you do not see it. The tab opens with the
+   page header **Sample Data**. Placed on an App Page, the component shows it when you turn on
+   its **Page Header** property; on Home and record pages it stays a plain card.
 2. Read the warning, then select **Load Sample Data**.
 3. Confirm in the dialog. Loading runs in the background; the card shows progress and
    updates automatically until it finishes. With Fundraising installed there are several

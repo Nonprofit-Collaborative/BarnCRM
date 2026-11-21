@@ -116,23 +116,26 @@
             <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12">
               <h2 class="slds-text-title_bold slds-var-m-bottom_x-small">{labels.blocks}</h2>
               <p class="slds-text-color_weak slds-text-body_small slds-var-m-bottom_x-small">{labels.blocksHelp}</p>
-              <template for:each={palette} for:item="item">
-                <div
-                  key={item.type}
-                  class="slds-var-m-bottom_xx-small"
-                  draggable="true"
-                  data-type={item.type}
-                  ondragstart={handlePaletteDrag}
-                >
-                  <lightning-button
-                    stretch
-                    label={item.label}
-                    data-type={item.type}
-                    onclick={handlePaletteAdd}
-                    data-id="palette"
-                  ></lightning-button>
-                </div>
-              </template>
+              <div data-drop-zone="palette" data-drop-label={labels.blocks} data-id="palette-zone">
+                <template for:each={palette} for:item="item">
+                  <div
+                    key={item.type}
+                    class="slds-var-m-bottom_xx-small lb-palette-item"
+                    data-drag-id={item.dragId}
+                    data-drag-label={item.label}
+                    onpointerdown={handleDragPointerDown}
+                    onkeydown={handleDragKeyDown}
+                  >
+                    <lightning-button
+                      stretch
+                      label={item.label}
+                      data-type={item.type}
+                      onclick={handlePaletteAdd}
+                      data-id="palette"
+                    ></lightning-button>
+                  </div>
+                </template>
+              </div>
             </div>
 
             <!-- The canvas -->
@@ -190,8 +193,8 @@
                                 aria-pressed={column.isSelected}
                                 onclick={handleSelectColumn}
                                 onkeydown={handleColumnKey}
-                                ondragover={handleDragOver}
-                                ondrop={handleDrop}
+                                data-drop-zone={column.id}
+                                data-drop-label={column.zoneLabel}
                                 data-id="column"
                               >
                                 <template lwc:if={column.isEmpty}>
@@ -201,15 +204,16 @@
                                   <div
                                     key={block.id}
                                     class={block.css}
-                                    draggable="true"
                                     role="button"
                                     tabindex="0"
+                                    aria-describedby="lb-drag-help"
                                     data-block={block.id}
                                     data-column={block.columnId}
+                                    data-drag-id={block.id}
+                                    data-drag-label={block.label}
                                     onclick={handleSelectBlock}
-                                    ondragstart={handleBlockDrag}
-                                    ondragover={handleDragOver}
-                                    ondrop={handleDrop}
+                                    onpointerdown={handleDragPointerDown}
+                                    onkeydown={handleDragKeyDown}
                                     data-id="block"
                                   >
                                     <span class="slds-text-title_bold">{block.label}</span>
@@ -324,6 +328,8 @@
             </div>
           </div>
         </template>
+        <span id="lb-drag-help" class="slds-assistive-text">{dragHelp}</span>
+        <div aria-live="polite" class="slds-assistive-text" data-id="drag-announcer">{liveText}</div>
       </div>
     </c-barn-page-shell>
   </template>
