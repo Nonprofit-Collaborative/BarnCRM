@@ -840,11 +840,8 @@ private class SampleDataLoaderTest {
 				sent[0].title,
 				'Saying the sample data load finished'
 			);
-			Assert.areEqual(
-				ModuleDetectionService.firstAdminTab(ModuleDetectionService.MODULE_SAMPLE_DATA),
-				sent[0].tab,
-				'Opening the Sample Data tab'
-			);
+			// Which tab is Core's to say; JobNotificationPathsTest checks it is the Sample Data tab.
+			Assert.isNotNull(sent[0].tab, 'Opening a tab, not a record or a settings section');
 		}
 	}
 
