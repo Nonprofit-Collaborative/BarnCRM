@@ -95,6 +95,9 @@ export default class VolunteerHoursApproval extends NavigationMixin(LightningEle
     cancel: CANCEL,
     previous: PREVIOUS,
     next: NEXT,
+    get emptyNext() {
+      return helpText('Volunteers', 'Volunteers_Approve_EmptyNext');
+    },
     get empty() {
       return helpText('Volunteers', 'Volunteers_Approve_Empty');
     },
@@ -239,6 +242,11 @@ export default class VolunteerHoursApproval extends NavigationMixin(LightningEle
 
   get isEmpty() {
     return this.loaded && !this.hasRows;
+  }
+
+  /** No pager on an empty first page: there is nothing to page through. */
+  get showPager() {
+    return !(this.isEmpty && this.pageIndex === 0);
   }
 
   /** The Notes column's heading: the field's own label, from the server. */

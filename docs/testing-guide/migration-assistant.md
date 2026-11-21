@@ -113,7 +113,7 @@ active and its BarnCRM copy not yet made. T-MIG-06 needs an org with NPSP.
 ## T-MIG-08: NPSP Gifts and Soft Credits Copies Won Opportunities Once
 
 **Purpose:** confirm the NPSP Gifts and Soft Credits kit (Fundraising) makes one gift per won Opportunity with its donor, method, funds, tribute and soft credits, and never duplicates.
-**Prerequisites:** the NPSP org of T-MIG-07 with Fundraising deployed and T-GIFT-22 done (fund **Building Fund** exists); admin user with **Salesforce Records Sync**; **Opportunity mirror direction** Off; **Send gift acknowledgments** off. In NPSP: a Campaign **Spring Appeal**; a won Opportunity of 300 for Ana on that Campaign, paid by one Check payment with number 1201, allocated 200 to Building Fund and 100 to General Fund, tribute type Memorial for "Grace", with Ben as a contact role **Solicitor** and Ana's colleague Cara as **Soft Credit** with a partial soft credit of 50; a won Opportunity of 500 for **Test Org** with Ana as its primary contact; an open (not won) Opportunity.
+**Prerequisites:** the NPSP org of T-MIG-07 with Fundraising deployed and T-GIFT-22 done (fund **Building Fund** exists); admin user with **Salesforce Records Sync**; **Opportunity mirror direction** Off; **Send Thank-Yous** off. In NPSP: a Campaign **Spring Appeal**; a won Opportunity of 300 for Ana on that Campaign, paid by one Check payment with number 1201, allocated 200 to Building Fund and 100 to General Fund, tribute type Memorial for "Grace", with Ben as a contact role **Solicitor** and Ana's colleague Cara as **Soft Credit** with a partial soft credit of 50; a won Opportunity of 500 for **Test Org** with Ana as its primary contact; an open (not won) Opportunity.
 
 | Step | Action | Expected result |
 |---|---|---|

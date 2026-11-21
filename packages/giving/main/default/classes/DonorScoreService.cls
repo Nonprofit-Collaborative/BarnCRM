@@ -27,8 +27,6 @@ public with sharing class DonorScoreService {
 		'RFM_Segment__c'
 	};
 
-	private static Map<String, Map<String, String>> cachedFieldNames = new Map<String, Map<String, String>>();
-
 	/** Today, replaceable in a test. */
 	@TestVisible
 	private static Date todayOverride;
@@ -56,7 +54,7 @@ public with sharing class DonorScoreService {
 		if (record == null) {
 			return false;
 		}
-		Map<String, String> names = fieldNames(record.getSObjectType());
+		Map<String, String> names = DonorLevelService.fieldNames(record.getSObjectType());
 		if (!names.containsKey('Last_Gift_Date__c') || !names.containsKey('RFM_Segment__c')) {
 			// The object does not carry giving totals or scores, so there is nothing to score.
 			return false;
@@ -127,20 +125,5 @@ public with sharing class DonorScoreService {
 	private static String text(String key) {
 		Object value = SettingsService.getValue(SETTINGS_OBJECT, key);
 		return value == null ? null : String.valueOf(value);
-	}
-
-	/** The real API name of each field this class touches, namespace or not. */
-	private static Map<String, String> fieldNames(Schema.SObjectType type) {
-		String key = String.valueOf(type);
-		if (cachedFieldNames.containsKey(key)) {
-			return cachedFieldNames.get(key);
-		}
-		Map<String, String> byLocalName = new Map<String, String>();
-		for (Schema.SObjectField token : type.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap().values()) {
-			Schema.DescribeFieldResult field = token.getDescribe();
-			byLocalName.put(field.getLocalName(), field.getName());
-		}
-		cachedFieldNames.put(key, byLocalName);
-		return byLocalName;
 	}
 }

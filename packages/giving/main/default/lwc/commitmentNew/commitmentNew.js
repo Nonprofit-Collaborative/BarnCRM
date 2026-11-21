@@ -13,7 +13,7 @@ import TITLE from '@salesforce/label/c.Giving_CommitmentNew_Title';
 import RECURRING_GIFT from '@salesforce/label/c.Giving_CommitmentNew_RecurringGift';
 import AMOUNT_EACH_TIME from '@salesforce/label/c.Giving_CommitmentNew_AmountEachTime';
 import LAST_PAYMENT_DATE from '@salesforce/label/c.Giving_CommitmentNew_LastPaymentDate';
-import PLEDGE from '@salesforce/label/c.Giving_PledgeReminders_ColumnPledge';
+import PLEDGE from '@salesforce/label/c.Giving_Section_Commitment';
 import KIND from '@salesforce/label/c.Core_DataDictionary_ColType';
 import DONOR from '@salesforce/label/c.Giving_GiftBatch_ColumnDonor';
 import PERSON_LABEL from '@salesforce/label/c.Core_Section_Person';

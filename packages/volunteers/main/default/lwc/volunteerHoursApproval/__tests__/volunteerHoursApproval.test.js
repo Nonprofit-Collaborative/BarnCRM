@@ -344,6 +344,9 @@ describe('c-volunteer-hours-approval', () => {
     await flush();
     // Nothing waiting for approval is a good empty.
     expect(byId(element, 'empty-state').illustration).toBe('all-clear');
+    // An empty first page has nothing to page through.
+    expect(byId(element, 'previous')).toBeNull();
+    expect(byId(element, 'next')).toBeNull();
 
     getHours.mockRejectedValueOnce({ body: { message: 'Not allowed.' } });
     byId(element, 'job-filter').dispatchEvent(

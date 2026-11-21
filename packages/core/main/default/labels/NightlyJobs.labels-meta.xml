@@ -41,22 +41,6 @@
         <value>Nightly Jobs</value>
     </labels>
     <labels>
-        <fullName>Core_NightlyJobs_TurnOn</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Button that switches one nightly job on.</shortDescription>
-        <value>Turn On</value>
-    </labels>
-    <labels>
-        <fullName>Core_NightlyJobs_TurnOff</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Button that switches one nightly job off.</shortDescription>
-        <value>Turn Off</value>
-    </labels>
-    <labels>
         <fullName>Core_NightlyJobs_RunNow</fullName>
         <categories>Core</categories>
         <language>en_US</language>

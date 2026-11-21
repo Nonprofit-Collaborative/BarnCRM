@@ -41,14 +41,6 @@
         <value>Test</value>
     </labels>
     <labels>
-        <fullName>Core_Import_RowRulesText</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: the text a skip rule compares</shortDescription>
-        <value>Text</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_RowRulesTestBlank</fullName>
         <categories>Import</categories>
         <language>en_US</language>

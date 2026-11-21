@@ -24,7 +24,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">Shares each new enrollment with the Programs Participant Records group, so the Participant Privacy preset on the Programs settings page decides who sees it. Without it a new enrollment would be seen only by its owner, so it cannot be switched off here and pausing automation does not suspend it.</value>
+        <value xsi:type="xsd:string">Shares each new enrollment with the Programs Participant Records group, so the Participant Privacy preset on the Programs settings page decides who sees it. Without it a new enrollment would be seen only by its owner.</value>
     </values>
     <values>
         <field>Module__c</field>

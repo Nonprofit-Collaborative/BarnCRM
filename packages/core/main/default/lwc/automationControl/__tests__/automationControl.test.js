@@ -138,7 +138,27 @@ describe('c-automation-control', () => {
     expect(element.shadowRoot.querySelector('[data-id="pause-card"]').title).toBe(
       'Pause and Catch Up'
     );
+    // In the Settings console: no page header of its own, the intro opens the first card.
+    expect(element.shadowRoot.querySelector('[data-id="shell"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="card-intro"]')).not.toBeNull();
     expect(element.shadowRoot.querySelector('[data-id="list-card"]').title).toBe('Automations');
+  });
+
+  it('opens the Automation page with the shared page header, the intro as its purpose', async () => {
+    const element = createElement('c-automation-control', { is: AutomationControl });
+    element.pageHeader = true;
+    document.body.appendChild(element);
+    getPage.emit(RUNNING_PAGE);
+    await flush();
+
+    const shell = element.shadowRoot.querySelector('[data-id="shell"]');
+    expect(shell.title).toContain('Core_AutomationControl_PageTitle');
+    expect(shell.titleHidden).toBeFalsy();
+    expect(shell.purpose).toBeTruthy();
+    expect(element.shadowRoot.querySelector('[data-id="card-intro"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="pause-card"]').title).toBe(
+      'Pause and Catch Up'
+    );
   });
 
   it('shows an automation that always runs as off, disabled, and says why', async () => {

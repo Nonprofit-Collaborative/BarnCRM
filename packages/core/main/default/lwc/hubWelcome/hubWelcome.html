@@ -1,71 +1,70 @@
 <template>
-    <lightning-card title={labels.welcomeHeading} icon-name={iconName}>
-        <div class="slds-var-p-horizontal_medium slds-media">
-            <template lwc:if={helpReady}>
-                <div class="slds-media__figure slds-show_medium">
-                    <img src={patchUrl} alt={labels.patchAlt} width="96" height="100" data-id="patch" />
+    <!-- The page header (Q-02), the same on every Core page: Patch, the welcome as the title,
+         the welcome message as the purpose, and New Person and New Household as its actions. -->
+    <c-barn-page-shell title={labels.welcomeHeading} purpose={purpose} data-id="shell">
+        <template lwc:if={helpReady}>
+            <img
+                slot="figure"
+                class="slds-show_medium"
+                src={patchUrl}
+                alt={labels.patchAlt}
+                width="96"
+                height="100"
+                data-id="patch"
+            />
+        </template>
+
+        <div slot="actions" class="slds-grid slds-wrap slds-gutters_xx-small">
+            <template lwc:if={showNewPersonButton}>
+                <div class="slds-col slds-grow-none slds-var-m-bottom_x-small">
+                    <lightning-button
+                        variant="brand"
+                        label={labels.newPerson}
+                        data-id="new-person"
+                        onclick={handleNewPerson}
+                    ></lightning-button>
                 </div>
             </template>
-            <div class="slds-media__body">
-                <template lwc:if={helpReady}>
-                    <p class="slds-text-body_regular slds-var-m-bottom_small" data-id="welcome-message">
-                        {welcomeMessage}
-                    </p>
-                </template>
-
-                <div class="slds-grid slds-wrap slds-gutters_xx-small">
-                    <template lwc:if={showNewPersonButton}>
-                        <div class="slds-col slds-grow-none slds-var-m-bottom_x-small">
-                            <lightning-button
-                                variant="brand"
-                                label={labels.newPerson}
-                                data-id="new-person"
-                                onclick={handleNewPerson}
-                            ></lightning-button>
-                        </div>
-                    </template>
-                    <template lwc:if={showNewHouseholdButton}>
-                        <div class="slds-col slds-grow-none slds-var-m-bottom_x-small">
-                            <lightning-button
-                                variant={newHouseholdVariant}
-                                label={labels.newHousehold}
-                                data-id="new-household"
-                                disabled={creating}
-                                onclick={handleNewHousehold}
-                            ></lightning-button>
-                        </div>
-                    </template>
+            <template lwc:if={showNewHouseholdButton}>
+                <div class="slds-col slds-grow-none slds-var-m-bottom_x-small">
+                    <lightning-button
+                        variant={newHouseholdVariant}
+                        label={labels.newHousehold}
+                        data-id="new-household"
+                        disabled={creating}
+                        onclick={handleNewHousehold}
+                    ></lightning-button>
                 </div>
-
-                <template lwc:if={createError}>
-                    <c-barn-notice
-                        variant="error"
-                        message={createError}
-                        data-id="create-error"
-                        class="slds-var-m-top_small"
-                    ></c-barn-notice>
-                </template>
-
-                <template lwc:if={automationPaused}>
-                    <c-barn-notice
-                        variant="warning"
-                        message={labels.pausedBanner}
-                        action-label={resumeLabel}
-                        onaction={handleResume}
-                        data-id="paused-banner"
-                        class="slds-var-m-top_small"
-                    ></c-barn-notice>
-                </template>
-
-                <template lwc:if={errorMessage}>
-                    <c-barn-notice
-                        variant="error"
-                        message={errorMessage}
-                        data-id="load-error"
-                        class="slds-var-m-top_small"
-                    ></c-barn-notice>
-                </template>
-            </div>
+            </template>
         </div>
-    </lightning-card>
+
+        <template lwc:if={createError}>
+            <c-barn-notice
+                variant="error"
+                message={createError}
+                data-id="create-error"
+                class="slds-show slds-var-m-bottom_small"
+            ></c-barn-notice>
+        </template>
+
+        <template lwc:if={automationPaused}>
+            <c-barn-notice
+                variant="warning"
+                message={labels.pausedBanner}
+                action-label={resumeLabel}
+                onaction={handleResume}
+                data-id="paused-banner"
+                class="slds-show slds-var-m-bottom_small"
+            ></c-barn-notice>
+        </template>
+
+        <template lwc:if={errorMessage}>
+            <c-barn-notice
+                variant="error"
+                message={errorMessage}
+                data-id="load-error"
+                class="slds-show slds-var-m-bottom_small"
+            ></c-barn-notice>
+        </template>
+    </c-barn-page-shell>
 </template>

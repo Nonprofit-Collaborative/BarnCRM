@@ -395,7 +395,7 @@ public without sharing class RollupNightlyBatch implements Database.Batchable<SO
 
 	/** Marks the records deleted since the last run, then the next pass, then the end. */
 	public void finish(Database.BatchableContext context) {
-		this.plan.stopped += stoppedChunks(context);
+		this.plan.stopped += RollupFullRecalcBatch.stoppedChunks(context);
 		try {
 			Pass pass = currentPass();
 			List<SObject> deleted = Database.queryWithBinds(
@@ -447,19 +447,5 @@ public without sharing class RollupNightlyBatch implements Database.Batchable<SO
 			execute(null, chunk);
 		}
 		finish(null);
-	}
-
-	private static Integer stoppedChunks(Database.BatchableContext context) {
-		if (context == null) {
-			return 0;
-		}
-		Id jobId = context.getJobId();
-		List<AsyncApexJob> jobs = [
-			SELECT NumberOfErrors
-			FROM AsyncApexJob
-			WHERE Id = :jobId
-			WITH SYSTEM_MODE
-		];
-		return jobs.isEmpty() || jobs[0].NumberOfErrors == null ? 0 : jobs[0].NumberOfErrors;
 	}
 }

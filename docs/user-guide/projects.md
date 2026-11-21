@@ -27,8 +27,8 @@ click **Start a Project** to go to **New Project From Template**.
 - The progress line shows tasks done and the percent complete; with time tracking, the hours
   and the budget.
 - Each phase shows its dates on the timeline, its progress and its tasks. Change a task's status
-  from its menu; **Done** records today as its completed date. **Add Task** adds one to the
-  phase.
+  from its menu; **Done** records today as its completed date. An open task past its due date
+  shows the date in red with an **Overdue** badge. **Add Task** adds one to the phase.
 - **Log Time** records your hours for a day, on a task or the project, billable or not.
 - **Draft Status Update** writes a status update from the project (done since the last update,
   due in the next 14 days, risks). Open it from Status Updates, edit the words, then share it.

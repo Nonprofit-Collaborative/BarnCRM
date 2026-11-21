@@ -22,13 +22,13 @@ the same thing in every organization, so there is nothing to configure.
 On the **Automation** page in BarnCRM Settings you will see two rows for affiliations,
 both switched on as they ship:
 
-- **Check affiliations before they are saved.** The rules: an affiliation names one person
+- **Affiliation: check before saving.** The rules: an affiliation names one person
   and one organization, a person is not affiliated with themselves, it does not cover dates
   another affiliation for the same person, organization, and role already covers, and the
   status agrees with the dates. Leave this on. Switching it off lets an import create
   overlapping affiliations and affiliations with no organization, with nothing to tell you
   afterwards which records those were.
-- **Keep one primary affiliation per person.** The upkeep: making sure at most one current
+- **Affiliation: one primary per person.** The upkeep: making sure at most one current
   affiliation per person carries the Primary badge, and keeping the **Primary Affiliation**
   field on the person equal to it.
 
@@ -124,8 +124,7 @@ on their record.
 **Marking a second organization primary and expecting to clear the first.** You do not have
 to. Marking any affiliation primary clears the primary flag on that person's other
 affiliations in the same save. If two lines somehow both show the badge, open one and save it
-again and the other clears. If it keeps happening, check whether **Keep one primary
-affiliation per person** is switched off on the Automation page: with that row off nothing
+again and the other clears. If it keeps happening, check whether **Affiliation: one primary per person** is switched off on the Automation page: with that row off nothing
 settles the badge, though every rule on an affiliation still runs.
 
 **Wondering why Primary Affiliation went empty.** A former affiliation is never the primary

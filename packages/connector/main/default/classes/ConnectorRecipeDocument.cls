@@ -339,19 +339,6 @@ public with sharing class ConnectorRecipeDocument {
 		return String.isNotBlank(path) && PILL_PATH.matcher(path).matches();
 	}
 
-	/** Every saved map Id and connection name a document names, at any depth. */
-	public static Set<String> mapIds(Map<String, Object> document) {
-		Set<String> found = new Set<String>();
-		for (Map<String, Object> step : allSteps(document)) {
-			for (String key : new List<String>{ 'map', 'bodyMap' }) {
-				if (isId(textOf(step.get(key)))) {
-					found.add(Id.valueOf(textOf(step.get(key))));
-				}
-			}
-		}
-		return found;
-	}
-
 	public static Set<String> connections(Map<String, Object> document) {
 		Set<String> found = new Set<String>();
 		// The App Poll trigger's connection (CN-13).

@@ -24,7 +24,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">Keeps each promo code unique within its event, regardless of case, and trims spaces from it. This automation enforces a rule rather than doing work for you, so it cannot be switched off here and pausing automation does not suspend it.</value>
+        <value xsi:type="xsd:string">Keeps each promo code unique within its event, regardless of case, and trims spaces from it.</value>
     </values>
     <values>
         <field>Module__c</field>

@@ -1,8 +1,12 @@
 <template>
     <template lwc:if={helpReady}>
-    <lightning-card title={labels.title} icon-name={icons.accountingExport}>
-        <div class="slds-var-p-horizontal_medium">
-            <p class="slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
+    <c-barn-page-shell
+        title={labels.title}
+        purpose={labels.intro}
+        icon-name={icons.accountingExport}
+        data-id="shell"
+    >
+        <div>
             <p class="slds-text-color_weak slds-var-m-bottom_medium" data-id="visibility">
                 {labels.visibility}
             </p>
@@ -86,6 +90,6 @@
                 <c-barn-notice class="slds-var-m-bottom_medium" variant="info" message={labels.markNeedsAllFunds} data-id="needs-all-funds"></c-barn-notice>
             </template>
         </div>
-    </lightning-card>
+    </c-barn-page-shell>
     </template>
 </template>

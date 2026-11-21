@@ -1,6 +1,11 @@
 <template>
   <template lwc:if={helpReady}>
-    <lightning-card title={labels.title} icon-name={icons.pipeline}>
+    <c-barn-page-shell
+      title={labels.title}
+      purpose={labels.intro}
+      icon-name={icons.pipeline}
+      data-id="shell"
+    >
       <div slot="actions" class="slds-grid slds-grid_vertical-align-center slds-wrap">
         <lightning-radio-group
           data-id="view"
@@ -33,9 +38,7 @@
         </template>
       </div>
 
-      <div class="slds-var-p-horizontal_medium">
-        <p class="slds-text-body_regular slds-var-m-bottom_small">{labels.intro}</p>
-
+      <div>
         <div class="slds-assistive-text" aria-live="polite" data-id="live">{liveMessage}</div>
         <span id="ask-drag-help" class="slds-assistive-text">{labels.dragInstructions}</span>
 
@@ -91,7 +94,7 @@
                 value={board.wonAmount}
                 format-style="currency"
                 badge-label={wonDetail}
-                badge-variant="success"
+                badge-variant={wonBadgeVariant}
                 bordered
                 align="start"
               ></c-barn-stat-tile>
@@ -255,7 +258,7 @@
           </div>
         </template>
       </div>
-    </lightning-card>
+    </c-barn-page-shell>
 
     <template lwc:if={isClosing}>
       <section

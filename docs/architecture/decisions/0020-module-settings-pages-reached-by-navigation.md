@@ -93,3 +93,7 @@ names it with `<lwcComponent>` instead of `<flexiPage>`. The tab keeps its API n
 Consequence: one fewer metadata file per page, and no page layout an admin can edit separately
 from the component. An org that already has a converted tab as an app-page tab may need the
 tab redeployed and the old FlexiPage removed through the destructive manifest.
+
+## Amendment A2, 2026-11-21: an App Page shows the shell title too
+
+A Lightning App Page on the default app home template prints no page header, so point 3 of Amendment A1 (an app page printed its name above the component) does not hold. Automation Control, Import, Super Transformer and Volunteers Home no longer pass `title-hidden` to `c-barn-page-shell`; every tab-level page shows its name in the shell. `title-hidden` stays for a component embedded in a page that already has a header.

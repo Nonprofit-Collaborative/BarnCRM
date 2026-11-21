@@ -20,7 +20,7 @@
   </values>
   <values>
     <field>Navigation_Label__c</field>
-    <value xsi:type="xsd:string">Org Optimizer</value>
+    <value xsi:type="xsd:string">Duplicate Matching</value>
   </values>
   <values>
     <field>Help_Path__c</field>

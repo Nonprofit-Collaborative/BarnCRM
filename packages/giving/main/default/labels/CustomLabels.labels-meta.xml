@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Quick gift entry: donor kind chooser</shortDescription>
-        <value>Who gave this gift</value>
+        <value>Who Gave This Gift</value>
     </labels>
     <labels>
         <fullName>Giving_QuickGiftEntry_NewPerson</fullName>
@@ -30,7 +30,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Quick gift entry: what an in-kind gift was</shortDescription>
-        <value>What was given</value>
+        <value>What Was Given</value>
     </labels>
     <labels>
         <fullName>Giving_QuickGiftEntry_FairMarketValueLabel</fullName>
@@ -38,15 +38,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Quick gift entry: fair market value</shortDescription>
-        <value>Fair market value</value>
-    </labels>
-    <labels>
-        <fullName>Giving_QuickGiftEntry_DateLabel</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Quick gift entry: gift date</shortDescription>
-        <value>Gift date</value>
+        <value>Fair Market Value</value>
     </labels>
     <labels>
         <fullName>Giving_QuickGiftEntry_TypeLabel</fullName>
@@ -54,7 +46,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Quick gift entry: payment method</shortDescription>
-        <value>Payment method</value>
+        <value>Payment Method</value>
     </labels>
     <labels>
         <fullName>Giving_QuickGiftEntry_TypePlaceholder</fullName>
@@ -78,7 +70,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Quick gift entry: check or reference number</shortDescription>
-        <value>Check or reference number</value>
+        <value>Check or Reference Number</value>
     </labels>
     <labels>
         <fullName>Giving_QuickGiftEntry_SaveAndNewButton</fullName>

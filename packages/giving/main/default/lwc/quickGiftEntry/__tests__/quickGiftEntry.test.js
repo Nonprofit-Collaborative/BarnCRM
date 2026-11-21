@@ -700,6 +700,48 @@ describe('c-quick-gift-entry', () => {
     expect(element.shadowRoot.querySelector('lightning-card').title).toBeUndefined();
   });
 
+  it('shows the page header on the tab only, with the card title moved into it', async () => {
+    const element = build();
+    await settle();
+    expect(pick(element, 'shell')).toBeNull();
+    expect(element.shadowRoot.querySelector('lightning-card').title).toBeTruthy();
+
+    // eslint-disable-next-line @lwc/lwc/no-unexpected-wire-adapter-usages
+    CurrentPageReference.emit({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'Quick_Gift_Entry' },
+      state: {}
+    });
+    await settle();
+    expect(pick(element, 'shell').title).toBeTruthy();
+    expect(pick(element, 'shell').purpose).toBeTruthy();
+    expect(element.shadowRoot.querySelector('lightning-card').title).toBeUndefined();
+  });
+
+  it('keeps the bare form in the utility bar while another tab is open', async () => {
+    const element = build();
+    await settle();
+    // eslint-disable-next-line @lwc/lwc/no-unexpected-wire-adapter-usages
+    CurrentPageReference.emit({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'Fundraising_Home' },
+      state: {}
+    });
+    await settle();
+    expect(pick(element, 'shell')).toBeNull();
+  });
+
+  it('keeps the bare form in the action window and on a record page', async () => {
+    const action = build({ inAction: true });
+    const record = build({ recordId: CONTACT_ID, objectApiName: 'Contact' });
+    await settle();
+    // eslint-disable-next-line @lwc/lwc/no-unexpected-wire-adapter-usages
+    CurrentPageReference.emit({ type: 'standard__navItemPage', state: {} });
+    await settle();
+    expect(pick(action, 'shell')).toBeNull();
+    expect(pick(record, 'shell')).toBeNull();
+  });
+
   describe('pays a scheduled payment', () => {
     const MARCH = 'a01000000000001AAA';
     const APRIL = 'a01000000000002AAA';

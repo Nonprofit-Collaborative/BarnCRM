@@ -12,7 +12,7 @@ public with sharing class ConnectorConnections {
 	/** The built-in Generic REST connector's key in a connection name. */
 	public static final String REST = 'rest';
 	public static final String MANAGE_PERMISSION = 'Manage_BarnCRM_Connector';
-	public static final String ADMIN_SET = 'BarnCRM_Connector_Admin';
+	public static final String ADMIN_SET = 'Connector_Admin';
 	/** The unpackaged permission set holding each connection's principal access (F12). */
 	public static final String ACCESS_SET = 'BarnCRM_Connections';
 	public static final String ACCESS_SET_LABEL = 'BarnCRM Connections';

@@ -6,7 +6,7 @@
     Approve, Reject with a reason, and Reopen.
   </description>
   <isExposed>true</isExposed>
-  <masterLabel>Approve Volunteer Hours</masterLabel>
+  <masterLabel>Approve Hours</masterLabel>
   <targets>
     <target>lightning__AppPage</target>
     <target>lightning__Tab</target>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-    <label>Delivery: share by the privacy preset</label>
+    <label>Service Delivery: share by preset</label>
     <protected>true</protected>
     <values>
         <field>Object_Name__c</field>
@@ -24,7 +24,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">Shares each new service delivery with the Programs Participant Records group, so the Participant Privacy preset on the Programs settings page decides who sees it. Without it a new delivery would be seen only by its owner, so it cannot be switched off here and pausing automation does not suspend it.</value>
+        <value xsi:type="xsd:string">Shares each new service delivery with the Programs Participant Records group, so the Participant Privacy preset on the Programs settings page decides who sees it. Without it a new delivery would be seen only by its owner.</value>
     </values>
     <values>
         <field>Module__c</field>

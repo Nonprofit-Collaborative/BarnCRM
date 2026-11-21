@@ -268,7 +268,7 @@ contacts, then all funds), and calculate all of a record's totals together:
 
 Each rollup has a **calculation**, and the calculation decides what kind of field can show
 the result. BarnCRM refuses to save a rollup whose field cannot hold its result, and says
-which kind of field to choose instead. That check is the **Check rollups before saving**
+which kind of field to choose instead. That check is the **Rollup Definition: check before saving**
 automation on the **Automation** page; if it is switched off, such a rollup still saves, but
 BarnCRM skips it on every run and the Error Log says why. It is part of the module, so it
 also pauses while BarnCRM Rollup Builder is turned off on **Modules**. A rollup saved then is
@@ -1140,9 +1140,7 @@ which shows how many records are still waiting and which could not be saved.
 
 **Switching off a rollup automation and forgetting it (with Fundraising).** Instantly and Both
 work because Fundraising runs an automation each time a gift, a commitment, a gift allocation or
-a soft credit is saved. They are listed on the **Automation** page as **Update rollups when
-a gift changes**, **Update rollups when a commitment changes**, **Update rollups for gift
-allocations** and **Update rollups for soft credits**. Switching one off,
+a soft credit is saved. They are listed on the **Automation** page as **Rollups: update when a gift changes**, **Rollups: update on commitment changes**, **Rollups: update for gift allocations** and **Rollups: update for soft credits**. Switching one off,
 or pausing all automation for a data load, leaves the totals it feeds where they were. A
 rollup in **Both (recommended)** mode is put right by the nightly run; one in **Instantly**
 mode stays behind until you click **Recalculate** on its row. Switch the automation back on
@@ -1155,7 +1153,7 @@ and nothing is processed while it is off. **Recalculate**, **Recalculate All** a
 tonight** say the module is off; a rollup you save in the Builder then is saved and calculated
 once it is on. The values on your records stay. **Turn On** puts every total right: it starts
 the totals that waited and a recalculation of every active rollup, which runs in the
-background. **Check rollups before saving** pauses with the module, so a rollup saved while
+background. **Rollup Definition: check before saving** pauses with the module, so a rollup saved while
 it is off is not checked; the recalculation skips one whose field cannot hold its result and
 the Error Log says why. See [Module Manager](module-manager.md).
 

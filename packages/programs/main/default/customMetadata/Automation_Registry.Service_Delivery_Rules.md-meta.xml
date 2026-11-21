@@ -24,7 +24,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">Sets the Quantity of an absence (Excused or Unexcused) to 0, and links a service delivery saved without an enrollment to the person's enrollment in the service's program. Totals and roster figures depend on both, so it cannot be switched off here and pausing automation does not suspend it.</value>
+        <value xsi:type="xsd:string">Sets the Quantity of an absence (Excused or Unexcused) to 0, and links a service delivery saved without an enrollment to the person's enrollment in the service's program. Totals and roster figures depend on both.</value>
     </values>
     <values>
         <field>Module__c</field>

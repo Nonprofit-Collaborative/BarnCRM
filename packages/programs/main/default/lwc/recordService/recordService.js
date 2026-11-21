@@ -67,9 +67,24 @@ export default class RecordService extends NavigationMixin(LightningElement) {
   statePersonId;
   /** Only the latest load applies, whichever of the record and the page state comes last. */
   loadCount = 0;
+  /** True when the page reference is a tab. The quick-action window keeps its own header. */
+  onTab = false;
+
+  get showShell() {
+    return this.onTab && !this.recordId;
+  }
+
+  get panelHeader() {
+    return this.showShell ? undefined : this.labels.title;
+  }
+
+  get pageIntro() {
+    return helpText('Programs', 'Programs_RecordService_PageIntro');
+  }
 
   @wire(CurrentPageReference)
   readPageState(pageRef) {
+    this.onTab = !!pageRef && pageRef.type === 'standard__navItemPage';
     const state = (pageRef && pageRef.state) || {};
     const key = Object.keys(state).find((name) => name.endsWith('__personId'));
     const personId = key ? state[key] : undefined;

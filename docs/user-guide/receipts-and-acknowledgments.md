@@ -52,14 +52,14 @@ Enter all the year's gifts first. A donor who already has a statement for the ye
 The thank-you page shows what is waiting, sorted into queues by your organization's rules.
 
 1. Open the **Thank-Yous** tab. The rules are in **Rules (Admin)** at the bottom, closed unless you manage BarnCRM settings.
-2. Read **Waiting to Go**: **Emails ready to send**, **Letters ready to merge**, **Opted out of email, sent by letter**, **Waiting, matched by no rule** and **Could not be sent, nobody to email**. A donor who has ticked **Email Opt Out** (for an organization, its primary contact) is never emailed a thank-you; their gift goes in the letter file instead.
+2. Read **Waiting to Go**: **Emails Ready to Send**, **Letters Ready to Merge**, **Opted Out of Email, Sent by Letter**, **Waiting, Matched by No Rule** and **Could Not Be Sent, Nobody to Email**. A donor who has ticked **Email Opt Out** (for an organization, its primary contact) is never emailed a thank-you; their gift goes in the letter file instead.
 3. Click **Send Emails Now** to send the email queue.
 4. Click **Download Letters to Merge** to get the letter queue as a spreadsheet. Under **Recent Runs**, click **Download File**, merge it with your letter, and print.
 5. When the letters are posted, click **Mark as Sent** on that run.
 
 You should see: each run under **Recent Runs** with **Status**, **Sent** and **Errors**. A thanked gift's **Acknowledgment Status** is **Acknowledged**, with an **Acknowledgment Date**. Letters stay in the queue until you click **Mark as Sent**.
 
-Only your admin can add or change rules, or turn on **Send emails nightly**. The **Gifts to Acknowledge** list view on **Gifts** shows every gift still waiting.
+Only your admin can add or change rules, or turn on **Send Emails Nightly**. The **Gifts to Acknowledge** list view on **Gifts** shows every gift still waiting.
 
 ## To Thank a Donor Again, or Not at All
 
@@ -115,9 +115,9 @@ Marking gifts posted, and unposting, need the **Post Gifts** permission, which o
 - "This gift has a receipt number, so its amount, date, donor and in-kind description cannot change." Void and reissue, or record a refund.
 - "Sending thank yous needs the Send Acknowledgments permission." Ask your admin for the Fundraising Staff role.
 - **Send Emails Now** is greyed out. The email queue is empty, or you lack **Send Acknowledgments**.
-- "Acknowledging gifts is switched off, so nothing is joining the queue." Your admin turns it on.
-- Gifts sit under **Waiting, matched by no rule**. No rule covers them; tell your admin.
-- Gifts under **Opted out of email, sent by letter** are not emailed. Click **Download Letters to Merge** to thank those donors by post.
+- "Thank-yous are switched off, so nothing is joining the queue." Your admin turns on **Send Thank-Yous**.
+- Gifts sit under **Waiting, Matched by No Rule**. No rule covers them; tell your admin.
+- Gifts under **Opted Out of Email, Sent by Letter** are not emailed. Click **Download Letters to Merge** to thank those donors by post.
 - **Template not found** beside a rule. Its email template is gone; your admin picks another. The **Failed Acknowledgments** list view on Acknowledgments shows what did not send.
 - "You need the Post Gifts permission to mark gifts posted to accounting or to unpost them."
 

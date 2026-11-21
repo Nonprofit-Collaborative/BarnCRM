@@ -36,7 +36,8 @@ a field).
 | 1 | Open Component Builder, press **New Component**, name it *Donor Snapshot*, Object `Contact`. | The key shows `Donor_Snapshot`. |
 | 2 | Press **Add Section**, title it *At a Glance*; press **Add Row**, layout **6 + 6**. | One section with two equal columns. |
 | 3 | Drag **Record Fields** into the left column; choose Email and Phone. | The block shows in the left column with its title. |
-| 4 | Drag **Text** into the right column, then drag the Text block onto the left column. | The Text block moves to the left column. |
+| 4 | Drag **Text** into the right column, then drag the Text block onto the left column. | The Text block moves to the left column. Do the same with a finger on a phone or tablet (press and hold, then drag); it works the same, and the page does not scroll while you drag. |
+| 4b | Focus a block, press **Space**, press the arrow keys, then press **Space** again. | The block is announced as picked up, moves with the arrows and drops where you left it; **Escape** instead of the second Space puts it back. |
 | 5 | Select the Text block, press **Next Column**, then **Up**. | It moves to the right column, then stays first (it is the only block). |
 | 6 | Press **Preview** and paste the contact's Id in Preview record. | The contact's email and phone show; the text shows on the right. |
 | 7 | Press **Save**. | A message that the component is saved, version 1. Save again: version 2. |

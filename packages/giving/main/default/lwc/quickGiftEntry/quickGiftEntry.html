@@ -1,5 +1,13 @@
 <template>
     <template lwc:if={helpReady}>
+    <template lwc:if={showShell}>
+        <c-barn-page-shell
+            class="slds-show slds-var-m-bottom_small"
+            title={labels.heading}
+            purpose={pageIntro}
+            data-id="shell"
+        ></c-barn-page-shell>
+    </template>
     <lightning-card icon-name={cardIcon} title={cardTitle}>
         <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium">
             <template lwc:if={formError}>

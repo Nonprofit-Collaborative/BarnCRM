@@ -24,7 +24,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">Keeps a grant's Program a real program: it stores the program's record ID in full and refuses text that is not a program. This automation enforces a rule rather than doing work for you, so it cannot be switched off here and pausing automation does not suspend it.</value>
+        <value xsi:type="xsd:string">Keeps a grant's Program a real program: it stores the program's record ID in full and refuses text that is not a program.</value>
     </values>
     <values>
         <field>Module__c</field>

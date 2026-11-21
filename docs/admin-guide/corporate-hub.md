@@ -88,7 +88,7 @@ BarnCRM Settings, **Corporate Hub**:
 The reminder step is **Corporate Hub reminders** on the Nightly Jobs page, at 6:45 AM, with its
 own switch. It runs once a night, but a breach is different: its bell goes the moment the breach
 is logged (D-196), and the 6:45 AM run then sends no second bell for the same deadline date. The
-**Data Breach: Bell When Logged** row on the Automations page turns the immediate bell off, and
+**Data Breach: ring the bell when logged** row on the Automations page turns the immediate bell off, and
 **Send Corporate Hub reminders** turns off both; with either off, the first bell comes with the
 6:45 AM run. A breach logged in a bulk load tells its owner at once for the first 50 only; the
 6:45 AM run sends the rest.
@@ -204,7 +204,7 @@ Objection or Other), the person (a Contact, when you have one) or the requester'
 the date received (today by default) and the **Due Date** (left blank, it becomes the date
 received plus 30 days when you save, and follows the date received if you correct it and never
 edited the due date; change it when you extend the deadline and it stays as you set it). The
-**Data Subject Request: Due Date** row on the Automations page turns this
+**Data Subject Request: set the due date** row on the Automations page turns this
 off. Tick **Identity Verified** once checked. Status is
 Received, In Progress, Completed, Refused or Withdrawn; a closed request needs its **Completed
 Date**. The owner gets one bell reminder before the due date.

@@ -441,4 +441,90 @@ private class ConnectorRunnerTest {
 			);
 		}
 	}
+
+	@IsTest
+	static void aLookupFindsOneRecordAndAnswersAValueItCannotMatchInPlainWords() {
+		Account company = new Account(Name = 'Lookup Test Company');
+		insert as system company;
+		System.runAs(admin()) {
+			Map<String, Object> byName = lookupMap('Name', 'reject');
+			Map<String, Object> byId = lookupMap('Id', 'reject');
+			Map<String, Object> byIdOrEmpty = lookupMap('Id', 'leaveEmpty');
+
+			Test.startTest();
+			ConnectorMapRuntime.Built found = ConnectorMapRuntime.buildRecord(
+				byName,
+				new Map<String, Object>{ 'last' => 'Lovelace', 'company' => 'Lookup Test Company' },
+				AccessLevel.USER_MODE,
+				true
+			);
+			ConnectorMapRuntime.Built foundById = ConnectorMapRuntime.buildRecord(
+				byId,
+				new Map<String, Object>{ 'last' => 'Lovelace', 'company' => String.valueOf(company.Id) },
+				AccessLevel.USER_MODE,
+				true
+			);
+			ConnectorMapRuntime.Built leftEmpty = ConnectorMapRuntime.buildRecord(
+				byIdOrEmpty,
+				new Map<String, Object>{ 'last' => 'Lovelace', 'company' => 'not an id' },
+				AccessLevel.USER_MODE,
+				true
+			);
+			String refused;
+			try {
+				ConnectorMapRuntime.buildRecord(
+					byId,
+					new Map<String, Object>{ 'last' => 'Lovelace', 'company' => 'not an id' },
+					AccessLevel.USER_MODE,
+					true
+				);
+			} catch (ConnectorMapRuntime.MapException expected) {
+				refused = expected.getMessage();
+			}
+			String noObject;
+			try {
+				ConnectorMapRuntime.buildRecord(
+					new Map<String, Object>{
+						'version' => 1,
+						'to' => new Map<String, Object>{ 'kind' => 'record', 'object' => 'No_Such_Object__c' },
+						'columns' => new List<Object>()
+					},
+					new Map<String, Object>(),
+					AccessLevel.USER_MODE,
+					true
+				);
+			} catch (ConnectorMapRuntime.MapException expected) {
+				noObject = expected.getMessage();
+			}
+			Test.stopTest();
+
+			Assert.areEqual(company.Id, found.record.get('AccountId'), 'One account has that name.');
+			Assert.areEqual(company.Id, foundById.record.get('AccountId'), 'Found by its Id.');
+			Assert.isNull(leftEmpty.record.get('AccountId'), 'Not an Id matches nothing; Leave Empty allows it.');
+			String label = Contact.AccountId.getDescribe().getLabel();
+			Assert.areEqual(
+				BarnHelp.text('Connector', 'Connector_Run_ErrorLookupNone', new List<Object>{ label, 'not an id' }),
+				refused,
+				'Not an Id gets the map\'s own answer, not the platform\'s invalid ID error.'
+			);
+			Assert.areEqual(
+				BarnHelp.text('Connector', 'Connector_Run_ErrorMapObject'),
+				noObject,
+				'An object the org lacks gets the map\'s own answer, not a describe error.'
+			);
+		}
+	}
+
+	/** A Contact map whose Account comes from a lookup on the given Account field. */
+	private static Map<String, Object> lookupMap(String field, String notFound) {
+		return (Map<String, Object>) JSON.deserializeUntyped(
+			'{"version":1,"from":{"kind":"json"},"to":{"kind":"record","object":"Contact"},' +
+				'"columns":[{"source":"last","target":"LastName"},{"source":"company","target":"AccountId",' +
+				'"lookup":{"object":"Account","field":"' +
+				field +
+				'","notFound":"' +
+				notFound +
+				'"}}]}'
+		);
+	}
 }

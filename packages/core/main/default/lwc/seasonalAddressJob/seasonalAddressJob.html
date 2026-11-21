@@ -28,6 +28,7 @@
                 <strong>{labels.lastRunTitle}:</strong>
                 <template lwc:if={hasLastRun}>
                     <lightning-formatted-date-time
+                        class="slds-var-m-left_xx-small"
                         data-id="last-run"
                         value={lastRun}
                         year="numeric"
@@ -38,7 +39,7 @@
                     ></lightning-formatted-date-time>
                 </template>
                 <template lwc:else>
-                    <span data-id="never-run">{labels.neverRun}</span>
+                    <span class="slds-var-m-left_xx-small" data-id="never-run">{labels.neverRun}</span>
                 </template>
             </p>
 

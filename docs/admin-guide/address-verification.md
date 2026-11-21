@@ -106,7 +106,7 @@ writes as the person who saved the address, or as whoever scheduled the nightly 
 
 ## Switching It Off
 
-- **Automation**: the **Address Verification** switch on the [Automation](automation-control.md)
+- **Automation**: the **Address Verification: check on save** switch on the [Automation](automation-control.md)
   page stops the on-save check and leaves Verification Status alone; Pause All covers it too.
 - **Nightly**: the **Address Verification** switch on the Nightly Jobs panel stops the nightly
   check.

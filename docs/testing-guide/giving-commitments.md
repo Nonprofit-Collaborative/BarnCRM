@@ -50,7 +50,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Quick Gift Entry**. Pick **Luis Garcia**, **Amount** `100`, leave **Gift Date** today. | **Pays a scheduled payment** appears under **Gift Date** with payment 1 chosen and marked "(suggested)". Under the list: "Chosen because it is due near the gift date and expects this amount. Choose None if the gift is not for it." |
+| 1 | Open **Quick Gift Entry**. Pick **Luis Garcia**, **Amount** `100`, leave **Gift Date** today. | **Pays a Scheduled Payment** appears under **Gift Date** with payment 1 chosen and marked "(suggested)". Under the list: "Chosen because it is due near the gift date and expects this amount. Choose None if the gift is not for it." |
 | 2 | Change **Amount** to `90`. | The list refreshes; **None: a new gift on its own** is chosen (90 is outside the allowed difference). |
 | 3 | Set **Amount** back to `100`. | Payment 1 is suggested and chosen again. |
 | 4 | **Payment Method** `Check`, click **Save**. | "Gift G-... saved". |
@@ -104,7 +104,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 4 | Click **Keep It**. Then click **Cancel Commitment** again and confirm with **Cancel Commitment**. | **Keep It** changes nothing. After confirming: **Status** Cancelled. Every unpaid payment shows a grey **Skipped** badge. No action buttons remain. |
 | 5 | Open the **Commitments** tab, list view **Active Recurring Gifts**. | The cancelled gift is not listed. |
 | 6 | Open the T-COM-01 pledge, click **Mark Complete**. | **Status** Completed. The pledge leaves **Active Pledges**. |
-| 7 | Open **Quick Gift Entry**, pick Luis Garcia, **Amount** `100`. | No **Pays a scheduled payment** list: a completed pledge has no open payments. |
+| 7 | Open **Quick Gift Entry**, pick Luis Garcia, **Amount** `100`. | No **Pays a Scheduled Payment** list: a completed pledge has no open payments. |
 
 **Cleanup:** none.
 

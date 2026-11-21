@@ -63,7 +63,9 @@ import sys
 # (an Access Add-On row names its sentence as a label, which AccessService reads by name).
 # Batch Q review (s2): 51 Core messages and AI Readiness Export README sentences moved to the
 # Core help catalog; lowered to the merged total, 2,376, under TARGET.
-BUDGET = 2376
+# Batch R optimization review: 29 labels that held the same text for the same word (Compare,
+# Turn On, Turn Off, From, To, Edit and others) merged into one each; lowered to 2,347.
+BUDGET = 2347
 TARGET = 2400
 LABEL_FILES = "packages/*/main/default/labels/*.labels-meta.xml"
 

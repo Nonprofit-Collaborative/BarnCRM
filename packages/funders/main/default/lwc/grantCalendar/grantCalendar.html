@@ -80,6 +80,14 @@
         ></c-barn-notice>
       </template>
 
+      <template lwc:if={showEmptyMonth}>
+        <c-barn-notice
+          message={emptyMonthMessage}
+          data-id="empty-month"
+          class="slds-var-m-bottom_small"
+        ></c-barn-notice>
+      </template>
+
       <table class="barn-calendar slds-size_full" data-id="calendar">
         <caption class="slds-assistive-text">
           {monthTitle}

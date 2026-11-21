@@ -7,7 +7,7 @@ import TITLE from '@salesforce/label/c.LogicModels_Builder_Title';
 import FOR_LABEL from '@salesforce/label/c.LogicModels_Builder_For';
 import WHOLE_ORGANIZATION from '@salesforce/label/c.LogicModels_Builder_WholeOrganization';
 import PROGRAM_MISSING from '@salesforce/label/c.LogicModels_Builder_ProgramMissing';
-import CHANGE from '@salesforce/label/c.LogicModels_Builder_Change';
+import CHANGE from '@salesforce/label/c.Core_Import_ChangesKind';
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import ADD_TO from '@salesforce/label/c.LogicModels_Builder_AddTo';

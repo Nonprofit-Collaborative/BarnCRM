@@ -124,10 +124,9 @@ describe('dashboardRows (framework free)', () => {
     expect(shown[0]).toMatchObject({ value: 2, formatStyle: 'decimal' });
     expect(shown[4].value).toBe(25);
     expect(shown[6]).toMatchObject({ value: 0.75, formatStyle: 'percent' });
-    expect(tiles({ canSee: true, totals: {} }, labels)[6]).toMatchObject({
-      value: 0,
-      formatStyle: 'percent'
-    });
+    expect(
+      tiles({ canSee: true, totals: {} }, { ...labels, attendanceRate: 'Rate' })[6]
+    ).toMatchObject({ value: '-', label: 'Rate: None' });
     expect(tiles({ canSee: false }, labels)).toEqual([]);
     expect(rateFraction({ delivered: 1, deliveries: 4 })).toBe(0.25);
     expect(rateFraction({})).toBeNull();

@@ -41,7 +41,7 @@ jest.mock(
 jest.mock('@salesforce/label/c.Core_AccessExplorer_ColRead', () => ({ default: 'Read' }), {
   virtual: true
 });
-jest.mock('@salesforce/label/c.Core_AccessExplorer_ColEdit', () => ({ default: 'Edit' }), {
+jest.mock('@salesforce/label/c.Core_CmdtManager_EditAction', () => ({ default: 'Edit' }), {
   virtual: true
 });
 

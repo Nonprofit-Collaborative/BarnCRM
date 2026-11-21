@@ -105,7 +105,7 @@ administrator's rights and would persist the secret in queued job state.
   Customize Application). Refuse with a plain message otherwise.
 - The ConnectApi call runs synchronously in that request, as that user. Never queue, schedule
   or hand a secret to the runner, a Queueable, a platform event or any system-context path.
-- The controller class is granted only by `BarnCRM_Connector_Admin`; it is never in the webhook
+- The controller class is granted only by `Connector_Admin`; it is never in the webhook
   guest permission set or any user-level set. The page is in the internal app only (not on an
   Experience site).
 - Clickjacking and CSRF: Lightning Experience requests carry the Aura token and are framed only
@@ -286,7 +286,7 @@ Connector admin. One write-up also reports there is no Apex path to link a permi
 principal (`SetupEntityAccess`), which the design already lists as an org test with a fallback.
 
 **Mitigation (required for the assignment part).** Assign only to users who already hold
-`BarnCRM_Connector_Admin` or are the runner; never take user ids from the client; Health Check
+`Connector_Admin` or are the runner; never take user ids from the client; Health Check
 warns when the set contains anything other than External Credential principal access.
 
 ### F13 (Low): Inbound webhook endpoint (Section 3.3)

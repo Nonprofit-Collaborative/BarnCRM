@@ -238,7 +238,7 @@ Admin) and a second user with the Team Member role, called the staff user below.
 | 6 | Run **Corporate Hub reminders** now. | One bell notification: the DPIA review. None for the first breach (already told in step 1) or the low-risk breach. |
 | 7 | Run it again. | No new notification. |
 | 8 | Fill in Authority Notified At on the first breach. | It leaves the Corporate Hub page. |
-| 9 | On the Automations page turn off **Data Breach: Bell When Logged**, then create a breach "Phishing email" with Risk **Risk**. | No bell on saving. Run **Corporate Hub reminders**: one bell for "Phishing email". Turn the row back on. |
+| 9 | On the Automations page turn off **Data Breach: ring the bell when logged**, then create a breach "Phishing email" with Risk **Risk**. | No bell on saving. Run **Corporate Hub reminders**: one bell for "Phishing email". Turn the row back on. |
 
 **Cleanup:** Delete the three breaches; set the activity back to Draft and untick DPIA Required.
 

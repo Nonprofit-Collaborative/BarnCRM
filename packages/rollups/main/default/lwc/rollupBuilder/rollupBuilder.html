@@ -1,6 +1,6 @@
 <template>
-    <lightning-card title={labels.title} icon-name={icons.rollups}>
-        <div class="slds-var-p-horizontal_medium">
+    <c-barn-page-shell title={labels.title} icon-name={icons.rollups} data-id="shell">
+        <div>
             <template lwc:if={hasOtherTools}>
                 <c-barn-notice
                     class="slds-var-m-bottom_small"
@@ -57,11 +57,11 @@
             <c-rollup-needs-attention></c-rollup-needs-attention>
             <c-rollup-templates can-manage={canManage} onopen={handleTemplateOpen} onadded={handleTemplatesAdded}></c-rollup-templates>
             <c-rollup-definitions builder onnew={handleNew} onedit={handleEdit} oncopy={handleCopy}></c-rollup-definitions>
-            <lightning-accordion class="slds-var-m-horizontal_medium" data-id="advanced" allow-multiple-sections-open>
+            <lightning-accordion data-id="advanced" allow-multiple-sections-open>
                 <lightning-accordion-section name="advanced" label={labels.advanced}>
                     <c-rollup-instant-totals can-manage={canManage}></c-rollup-instant-totals>
                 </lightning-accordion-section>
             </lightning-accordion>
         </div>
-    </lightning-card>
+    </c-barn-page-shell>
 </template>

@@ -1,16 +1,21 @@
 <template>
-  <lightning-card>
-    <template lwc:if={canEnterGift}>
-      <lightning-button
-        slot="actions"
-        variant="brand"
-        icon-name="utility:add"
-        label={labels.enterGift}
-        onclick={handleEnterGift}
-        data-id="enter-gift"
-      ></lightning-button>
-    </template>
-    <div class="slds-var-p-horizontal_medium">
+  <template lwc:if={helpReady}>
+    <c-barn-page-shell
+      title={labels.title}
+      purpose={purpose}
+      icon-name={icon}
+      data-id="shell"
+    >
+      <template lwc:if={showHeaderEnterGift}>
+        <lightning-button
+          slot="actions"
+          variant="brand"
+          icon-name="utility:add"
+          label={labels.enterGift}
+          onclick={handleEnterGift}
+          data-id="enter-gift"
+        ></lightning-button>
+      </template>
       <template lwc:if={loading}>
         <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
       </template>
@@ -73,6 +78,9 @@
           data-id="setup"
         ></c-barn-tool-grid>
       </template>
-    </div>
-  </lightning-card>
+      <p class="slds-text-body_small slds-text-color_weak slds-var-m-top_small" data-id="charts-note">
+        {chartsNote}
+      </p>
+    </c-barn-page-shell>
+  </template>
 </template>

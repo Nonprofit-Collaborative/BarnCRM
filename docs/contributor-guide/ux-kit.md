@@ -52,7 +52,7 @@ Help and guidance prose (an intro, a description, an explanation, an empty-state
 
 | Component | Use it for | Main properties |
 |---|---|---|
-| `c-barn-page-shell` | The page of an admin tool: one header, About This Tool help, body, footer | `icon-name`, `title`, `purpose`, `title-hidden`, `help-label`, `help-storage-key`, `status-message`; slots `actions`, `help`, `footer` and the default body |
+| `c-barn-page-shell` | The page of an admin tool: one header, About This Tool help, body, footer | `icon-name`, `title`, `purpose`, `title-hidden`, `help-label`, `help-storage-key`, `status-message`; slots `actions`, `help`, `footer`, `figure` (an image beside the title in place of the icon, as Patch on the Home welcome) and the default body. Every Core page opens with it (Q-02) |
 | `c-barn-tool-grid` | A hub of tools in groups (Data Manager, the Org Optimizer overview, Home) | `groups` (each with `name`, `label`, `tiles`), `heading-level`; fires `select` with `detail.name` |
 | `c-barn-tool-tile` | One tool on a hub; the whole tile is one link or button | `name`, `label`, `description`, `icon-name`, `href`, `new-tab`, `badge-label`, `badge-variant`, `disabled`, `disabled-reason`; fires `select` |
 | `c-barn-empty-state` | Any "nothing here yet" | `illustration` (`no-data`, `setup`, `all-clear`), `heading`, `message`, `size` (`small`, `large`, `compact`), `heading-level`; default slot for the action |
@@ -60,7 +60,8 @@ Help and guidance prose (an intro, a description, an explanation, an empty-state
 
 Notes:
 
-- A page with one component is a Lightning component tab (ADR-0020 amendment A1), which prints no header, so the shell shows its title. Pass `title-hidden` only on a Lightning App Page, where the platform already prints the page name above the component; the `h1` stays for screen readers.
+- A page with one component is a Lightning component tab (ADR-0020 amendment A1), which prints no header, so the shell shows its title. A Lightning App Page on the default app home template prints no header either, so the shell shows its title there too. Pass `title-hidden` only when the component sits inside a page that already carries a header of its own (ADR-0020 amendment A2); the `h1` stays for screen readers.
+- A component that also runs as a quick action or on a record page shows the shell on its tab only (Quick Gift Entry, Log Hours, Record Service, Sample Data, Automation Control): the action pop-up already carries the title and keeps the bare form, and a record page keeps its card. A component tells the tab from the action by having no record id, or by the page reference type `standard__navItemPage` with no record id.
 - The About This Tool region opens on a person's first visit and stays closed after that. With `help-storage-key` the person's own choice is remembered in their browser only; it is a convenience, not a setting.
 - A disabled tile stays focusable so a screen reader reads why it is disabled.
 - Every link that opens a new tab goes through `c-barn-help` or copies its pattern: `rel="noopener noreferrer"`, the new-window icon, and "(opens in a new tab)" for screen readers. A link tile does this with `new-tab` (a grid tile with `newTab: true`), as Data Manager's Salesforce's Own Tools do.

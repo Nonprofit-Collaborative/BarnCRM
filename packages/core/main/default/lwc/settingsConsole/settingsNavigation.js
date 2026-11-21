@@ -31,7 +31,8 @@ const GROUPS = [
       ['Addresses', 'utility:location'],
       ['Contact Points', 'utility:contact_request'],
       ['Forms', 'utility:form'],
-      ['Portals', 'utility:identity']
+      ['Portals', 'utility:identity'],
+      ['Memberships', 'utility:favorite']
     ]
   },
   {
@@ -43,7 +44,8 @@ const GROUPS = [
       ['Field History', 'utility:clock'],
       ['Rollups', 'utility:summary'],
       ['Org Optimizer', 'utility:magicwand'],
-      ['Advanced Reporting', 'utility:chart']
+      ['Advanced Reporting', 'utility:chart'],
+      ['Component Builder', 'utility:builder']
     ]
   },
   {
@@ -51,6 +53,7 @@ const GROUPS = [
     label: FUNDRAISING,
     sections: [
       ['Fundraising', 'utility:moneybag'],
+      ['Payments', 'utility:currency'],
       ['Receipts', 'utility:email'],
       ['Grants', 'utility:ribbon'],
       ['Scholarships and Outbound Grants', 'utility:education']

@@ -498,7 +498,7 @@ optional **Cohort**, the **Days of the Week**, **Repeat Every (Weeks)**, a **Sta
 - **Access.** Programs Admin creates, edits and deletes schedules; Programs Staff create and
   edit them; Programs Read Only reads them. A service or cohort with schedules cannot be deleted
   until its schedules are.
-- **Automation.** The **Session schedule: create its sessions** row on the Automation page can
+- **Automation.** The **Session Schedule: create its sessions** row on the Automation page can
   be switched off; sessions then appear with the nightly run or **Create Sessions Now**.
 
 ### Taking Attendance on a Session
@@ -531,7 +531,7 @@ default, **Last Month**, **This Year**, **Last Year** or **Last 12 Months**). Ti
 | People Served | Different people (contacts plus accounts) with a Present delivery in the period, counted as people rather than by scanning every delivery. |
 | Served Without Enrollment | People counted without names (service counts, above) in the period. Kept apart from People Served. |
 | Services Delivered | Service deliveries marked Present in the period. |
-| Attendance Rate | Present deliveries as a share of all deliveries in the period, absences included. |
+| Attendance Rate | Present deliveries as a share of all deliveries in the period, absences included. A dash, labeled "None yet", when there were no deliveries. |
 
 Below the tiles, **Tools** has a tile for each Programs tab the person can open (Programs,
 Cohorts, Sessions, Enrollments, Service Deliveries, Case Notes, Referrals, Service Counts and

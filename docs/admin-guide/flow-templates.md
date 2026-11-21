@@ -46,47 +46,47 @@ copy pauses and bypasses exactly as BarnCRM's own automation does. Keep that ste
 
 | On the Automation page | Template | Why there is no template |
 |---|---|---|
-| Keep the address an account started with | BarnCRM template: Keep the address an account started with | |
-| Check affiliations before they are saved | BarnCRM template: Check affiliations before they are saved | |
-| Keep one primary affiliation per person | BarnCRM template: Keep one primary affiliation per person, and BarnCRM template: Keep one primary affiliation per person (delete) | |
-| Check relationships before saving | BarnCRM template: Check relationships before saving | |
-| Keep both sides of relationships in step | BarnCRM template: Keep both sides of relationships in step, and BarnCRM template: Keep both sides of relationships in step (delete) | |
-| Households when a person changes | None | Creating households, counting members, naming and greeting households, and tidying away empty ones depend on how your organization holds household membership (BarnCRM Settings, People and Households). It is one piece of work spread across three objects, and a copy that got any part of it wrong would leave households miscounted or misnamed. Use the household settings instead. |
-| Households on household changes | None | The same household automation, from the household side. |
-| Households on membership changes | None | The same household automation, from the membership side. |
-| Keep households together on a move | None | Which household a person's new address goes to depends on how your organization holds household membership, and on the **Addresses** setting. A flow cannot read either the way BarnCRM does. Change the Addresses setting instead. |
-| Addresses of a deleted person | None | A flow cannot restore records from the Recycle Bin, and knows a merge from a delete only after the addresses have lost their owner. Change the **Addresses of deleted records** setting instead. |
-| Keep one default brand | None | Clearing Default on every other brand, and refreshing brand visibility, need writes and sharing upkeep a flow cannot do safely in bulk. Mark the default brand by hand instead. |
-| Keep one default legal entity | None | The same rule for legal entities. Mark the default entity by hand instead. |
-| Keep brand assignments unique | None | The unique key, one primary per record and the brand visibility refresh run together; a copy that missed one would let duplicates in or leave shares stale. |
-| Fill in a new program's brand | None | It runs only while **Use brands** is on and only fills a blank Brand, from the parent record or the creating user's primary brand. Switch it off and set the brand by hand, or with your own flow, instead. |
-| Fill in a new volunteer job's brand | None | The same rule for volunteer jobs. |
-| Addresses of a deleted account | None | The same, for households, organizations and person accounts, and the people deleted with a household. |
-| Copy preferred email on a person | None | Which of a person's three addresses is the preferred one, and the standard email it fills, are fixed by BarnCRM. It has its own switch, separate from the household automations, so switching those off does not stop it. Switch this one off to leave the standard email as typed. |
-| Copy preferred phone on a person | None | Which of a person's numbers (home, mobile, work or other) is the preferred one, and the standard phone it fills, are fixed by BarnCRM. It has its own switch, separate from the household automations. Switch this one off to leave the standard phone as typed. |
-| Copy preferred email, person accounts | None | The same copy for people held as accounts in orgs that use them. A flow in Core cannot name the fields of a person held as an account, because an org without them would refuse to install BarnCRM. |
-| Copy primary address to standard fields | None | The copy reaches every member of a household, in either way of holding household membership, people held as accounts in orgs that use them, and seasonal addresses. A flow in Core cannot name the fields of a person held as an account, because an org without them would refuse to install BarnCRM. |
-| Contact Point Sync: People | None | The copy reaches Contact Point objects your org may not have, and keeps a record of which ones BarnCRM made so it never changes the others. A flow would have to name those objects, and an org without them would refuse it. Switch it off and press Copy Existing People on the Contact Point Sync page instead. See [Contact Point Sync](contact-point-sync.md). |
-| Contact Point Sync: Addresses | None | The same copy, from the address side, for every person or household member an address belongs to. |
-| Contact Point Sync: Person Accounts | None | The same copy, for people stored as person accounts, which a flow would have to reach through the contact the platform keeps behind each account. |
-| Contact Point Sync: Household Moves | None | The same copy, when a person joins, leaves or moves household: which addresses apply depends on how your organization holds household membership, which a flow cannot read the way BarnCRM does. |
-| Update rollups when a person changes | None yet | Totals are worked out by the rollup engine. A flow that runs the engine for records you choose arrives with the next rollup update: see "Rollups on your own objects" below. |
-| Update rollups when membership changes | None yet | The same as above. |
-| Check rollups before saving | None | It checks a rollup definition against the field it fills, which only BarnCRM's rollup engine knows how to read. A flow copy could let a rollup save that the engine then skips on every run. Leave it on, or switch it off and read the Error Log. It also pauses while BarnCRM Rollup Builder is turned off on **Modules**; a rollup saved then that the engine cannot calculate is skipped and logged, never written wrong. |
-| Volunteer hours: status and household | None | It decides whether new hours wait for a coordinator, refuses a status change made any way other than approving, rejecting or reopening, and fills in the household the way your organization holds household membership. A flow cannot read membership the way BarnCRM does, and a copy that let a status through would count hours nobody approved. Switch it off only to load past hours with an import. |
-| Volunteer shift: name from job and start | None | It only names a shift saved without a name. Switch it off to leave unnamed shifts named by their record ID, or type the names yourself. |
-| Shift schedule: keep its shifts | None | It removes a schedule's future shifts that have no sign-ups or hours, even for a coordinator who may not delete shifts, and starts the run that creates shifts in your organization's time zone; a flow can do neither safely. Switch it off and a schedule's shifts appear only with the nightly run, and edits and endings leave existing shifts alone. |
-| Session schedule: create its sessions | None | It only starts the run that creates a session schedule's sessions at once; the same run, with its lock against creating a day twice, is the nightly step and Create Sessions Now. A flow copy would need that lock. Switch it off and a schedule's sessions appear with the nightly run or Create Sessions Now. |
-| Volunteer sign-up: bookings and hours | None | The hours it writes for an attended sign-up go through the same approval as hours typed by hand, which a flow cannot reach. Switch it off to type attendance hours yourself. |
-| Update rollups when hours change | None | Volunteer totals are worked out by the rollup engine, as every other total is. Switched off, they wait for the nightly run, or for **Recalculate All** on the Rollups page. |
-| Update rollups when a sign-up changes | None | The same, for Slots Filled on a shift. |
+| Account: keep its starting address | BarnCRM template: Keep the address an account started with | |
+| Affiliation: check before saving | BarnCRM template: Check affiliations before they are saved | |
+| Affiliation: one primary per person | BarnCRM template: Keep one primary affiliation per person, and BarnCRM template: Keep one primary affiliation per person (delete) | |
+| Relationship: check before saving | BarnCRM template: Check relationships before saving | |
+| Relationship: keep both sides in step | BarnCRM template: Keep both sides of relationships in step, and BarnCRM template: Keep both sides of relationships in step (delete) | |
+| Contact: keep households in step | None | Creating households, counting members, naming and greeting households, and tidying away empty ones depend on how your organization holds household membership (BarnCRM Settings, People and Households). It is one piece of work spread across three objects, and a copy that got any part of it wrong would leave households miscounted or misnamed. Use the household settings instead. |
+| Account: keep households in step | None | The same household automation, from the household side. |
+| Household Member: update households | None | The same household automation, from the membership side. |
+| Contact: keep households on a move | None | Which household a person's new address goes to depends on how your organization holds household membership, and on the **Addresses** setting. A flow cannot read either the way BarnCRM does. Change the Addresses setting instead. |
+| Contact: remove addresses on delete | None | A flow cannot restore records from the Recycle Bin, and knows a merge from a delete only after the addresses have lost their owner. Change the **Addresses of deleted records** setting instead. |
+| Brand: one default | None | Clearing Default on every other brand, and refreshing brand visibility, need writes and sharing upkeep a flow cannot do safely in bulk. Mark the default brand by hand instead. |
+| Legal Entity: one default | None | The same rule for legal entities. Mark the default entity by hand instead. |
+| Brand Assignment: keep unique | None | The unique key, one primary per record and the brand visibility refresh run together; a copy that missed one would let duplicates in or leave shares stale. |
+| Program: fill in the brand | None | It runs only while **Use brands** is on and only fills a blank Brand, from the parent record or the creating user's primary brand. Switch it off and set the brand by hand, or with your own flow, instead. |
+| Volunteer Job: fill in the brand | None | The same rule for volunteer jobs. |
+| Account: remove addresses on delete | None | The same, for households, organizations and person accounts, and the people deleted with a household. |
+| Contact: copy preferred email | None | Which of a person's three addresses is the preferred one, and the standard email it fills, are fixed by BarnCRM. It has its own switch, separate from the household automations, so switching those off does not stop it. Switch this one off to leave the standard email as typed. |
+| Contact: copy preferred phone | None | Which of a person's numbers (home, mobile, work or other) is the preferred one, and the standard phone it fills, are fixed by BarnCRM. It has its own switch, separate from the household automations. Switch this one off to leave the standard phone as typed. |
+| Person Account: copy preferred email | None | The same copy for people held as accounts in orgs that use them. A flow in Core cannot name the fields of a person held as an account, because an org without them would refuse to install BarnCRM. |
+| Address: copy primary to standard fields | None | The copy reaches every member of a household, in either way of holding household membership, people held as accounts in orgs that use them, and seasonal addresses. A flow in Core cannot name the fields of a person held as an account, because an org without them would refuse to install BarnCRM. |
+| Contact Point Sync: people | None | The copy reaches Contact Point objects your org may not have, and keeps a record of which ones BarnCRM made so it never changes the others. A flow would have to name those objects, and an org without them would refuse it. Switch it off and press Copy Existing People on the Contact Point Sync page instead. See [Contact Point Sync](contact-point-sync.md). |
+| Contact Point Sync: addresses | None | The same copy, from the address side, for every person or household member an address belongs to. |
+| Contact Point Sync: person accounts | None | The same copy, for people stored as person accounts, which a flow would have to reach through the contact the platform keeps behind each account. |
+| Contact Point Sync: household moves | None | The same copy, when a person joins, leaves or moves household: which addresses apply depends on how your organization holds household membership, which a flow cannot read the way BarnCRM does. |
+| Rollups: update when a person changes | None yet | Totals are worked out by the rollup engine. A flow that runs the engine for records you choose arrives with the next rollup update: see "Rollups on your own objects" below. |
+| Rollups: update when membership changes | None yet | The same as above. |
+| Rollup Definition: check before saving | None | It checks a rollup definition against the field it fills, which only BarnCRM's rollup engine knows how to read. A flow copy could let a rollup save that the engine then skips on every run. Leave it on, or switch it off and read the Error Log. It also pauses while BarnCRM Rollup Builder is turned off on **Modules**; a rollup saved then that the engine cannot calculate is skipped and logged, never written wrong. |
+| Volunteer Hours: status and household | None | It decides whether new hours wait for a coordinator, refuses a status change made any way other than approving, rejecting or reopening, and fills in the household the way your organization holds household membership. A flow cannot read membership the way BarnCRM does, and a copy that let a status through would count hours nobody approved. Switch it off only to load past hours with an import. |
+| Volunteer Shift: name from job and start | None | It only names a shift saved without a name. Switch it off to leave unnamed shifts named by their record ID, or type the names yourself. |
+| Shift Schedule: keep its shifts | None | It removes a schedule's future shifts that have no sign-ups or hours, even for a coordinator who may not delete shifts, and starts the run that creates shifts in your organization's time zone; a flow can do neither safely. Switch it off and a schedule's shifts appear only with the nightly run, and edits and endings leave existing shifts alone. |
+| Session Schedule: create its sessions | None | It only starts the run that creates a session schedule's sessions at once; the same run, with its lock against creating a day twice, is the nightly step and Create Sessions Now. A flow copy would need that lock. Switch it off and a schedule's sessions appear with the nightly run or Create Sessions Now. |
+| Volunteer Sign-Up: bookings and hours | None | The hours it writes for an attended sign-up go through the same approval as hours typed by hand, which a flow cannot reach. Switch it off to type attendance hours yourself. |
+| Rollups: update when hours change | None | Volunteer totals are worked out by the rollup engine, as every other total is. Switched off, they wait for the nightly run, or for **Recalculate All** on the Rollups page. |
+| Rollups: update when a sign-up changes | None | The same, for Slots Filled on a shift. |
 | Enrollment: fill in the stage dates | None | It only fills an empty Start Date or End Date with today when an enrollment's stage moves, which a record-triggered flow with two assignments can copy if you want a different date. Switch it off while you load past enrollments whose dates you type yourself. |
 | Program: waitlist on Capacity raised | None | It counts places over every enrollment, private ones included, and moves people up oldest first through the same rule as the enrollment save. A flow cannot see private enrollments, so a copy could move up too many people. It does nothing while **Waitlist when full** is off. Switch it off and raising Capacity moves nobody up until someone leaves Enrolled. |
 | Goal: fill in the closed date | None | It only fills an empty Closed Date with today when a goal is Achieved or Not Achieved, and empties it when the goal reopens, which a record-triggered flow with two assignments can copy. Switch it off while you load past goals whose dates you type yourself. |
 | Goal Step: fill in the completed date | None | The same for a step marked Done. Switch it off while you load past steps whose dates you type yourself. |
 | Grant: fill in the stage dates | None | It only fills an empty Submitted Date or Decision Date with today when a grant's stage moves, which a record-triggered flow with two assignments can copy if you want a different date. Switch it off while you load past grants whose dates you type yourself. |
 | Requirement: fill in the submitted date | None | It only fills an empty Submitted Date with today when a grant requirement becomes Submitted or Accepted, which a record-triggered flow with one assignment can copy if you want a different date. Switch it off while you load past requirements whose dates you type yourself. |
-| Grant payment received | None | It fills an empty Received Date with today when a grant payment becomes Received, and keeps a restricted grant's Received ledger entry in step with each received payment; a record-triggered flow could copy the date but would have to match entries to payments itself. Switch it off while you load past payments and entries yourself. |
+| Grant: payment received | None | It fills an empty Received Date with today when a grant payment becomes Received, and keeps a restricted grant's Received ledger entry in step with each received payment; a record-triggered flow could copy the date but would have to match entries to payments itself. Switch it off while you load past payments and entries yourself. |
 | Grant: add checklist tasks | None | It adds a task for each active Grant Checklist step of the stage a grant reaches, skips steps the grant already has, and dates each task from the grant's deadline. A flow could add the tasks but would have to check for duplicates itself. Switch it off while you load past grants, or to add tasks only with Add Checklist Tasks on the grant. |
 | Grant: add the renewal requirement | None | It adds one Renewal requirement, due the set number of days before the award ends, to an awarded grant marked Renewable, and leaves a grant that already has a renewal alone. Switch it off while you load past grants, or to track renewals yourself. |
 | Event: fill venue from the venue record | None | It only fills an empty Venue Name or Venue Address from the venue picked on an event, which a record-triggered flow with a lookup and two assignments can copy if you want different text. Switch it off to type venue details yourself. |
@@ -109,8 +109,7 @@ one person who entered it.
 3. Open the start of your flow (the box at the top) and look at **Entry Conditions**. Add a
    condition: **Type** **Does Not Equal** **Colleague**. Save.
 4. Choose **Activate**.
-5. Open **BarnCRM Settings**, then **Automation**, and switch **Keep both sides of
-   relationships in step** to **Off**. Leave **Check relationships before saving** on: the
+5. Open **BarnCRM Settings**, then **Automation**, and switch **Relationship: keep both sides in step** to **Off**. Leave **Relationship: check before saving** on: the
    checks are a separate automation and yours does not replace them.
 6. Copy **BarnCRM template: Keep both sides of relationships in step (delete)** the same
    way, name it "Our relationship sides (delete)", and activate it.
@@ -191,12 +190,12 @@ For whoever maintains your flows. The API name is what a deployment or a change 
 
 | Template | API name | Runs on | When |
 |---|---|---|---|
-| Keep the address an account started with | `Template_Account_Address_Capture` | Account | After a household or organization is created |
-| Check affiliations before they are saved | `Template_Affiliation_Validation` | Affiliation | Before an affiliation is created or changed |
-| Keep one primary affiliation per person | `Template_Affiliation_Primary` | Affiliation | After an affiliation is created or changed |
+| Account: keep its starting address | `Template_Account_Address_Capture` | Account | After a household or organization is created |
+| Affiliation: check before saving | `Template_Affiliation_Validation` | Affiliation | Before an affiliation is created or changed |
+| Affiliation: one primary per person | `Template_Affiliation_Primary` | Affiliation | After an affiliation is created or changed |
 | Keep one primary affiliation per person (delete) | `Template_Affiliation_Primary_Delete` | Affiliation | Before an affiliation is deleted |
-| Check relationships before saving | `Template_Relationship_Validation` | Relationship | Before a relationship is created or changed |
-| Keep both sides of relationships in step | `Template_Relationship_Reciprocal` | Relationship | After a relationship is created or changed |
+| Relationship: check before saving | `Template_Relationship_Validation` | Relationship | Before a relationship is created or changed |
+| Relationship: keep both sides in step | `Template_Relationship_Reciprocal` | Relationship | After a relationship is created or changed |
 | Keep both sides of relationships in step (delete) | `Template_Relationship_Reciprocal_Delete` | Relationship | Before a relationship is deleted |
 | Recalculate rollups (coming with the rollup update) | `Template_Recalculate_Rollups` | Your object | After a record is saved, and before it is deleted |
 

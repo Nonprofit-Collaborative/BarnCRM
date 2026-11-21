@@ -137,22 +137,6 @@
         <value>Fields to add</value>
     </labels>
     <labels>
-        <fullName>Core_BulkUpdate_PathConfirm</fullName>
-        <categories>BulkUpdate</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Bulk update and delete path: preview shown, count typed.</shortDescription>
-        <value>Confirm</value>
-    </labels>
-    <labels>
-        <fullName>Core_BulkUpdate_PathRun</fullName>
-        <categories>BulkUpdate</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Bulk update and delete path: the job running or done.</shortDescription>
-        <value>Run</value>
-    </labels>
-    <labels>
         <fullName>Core_BulkUpdate_OpenFind</fullName>
         <categories>BulkUpdate</categories>
         <language>en_US</language>

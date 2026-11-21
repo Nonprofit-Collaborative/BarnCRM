@@ -31,7 +31,6 @@ import PRODUCE_LETTERS from '@salesforce/label/c.Giving_Acknowledgments_ProduceL
 import MARK_SENT from '@salesforce/label/c.Giving_Acknowledgments_MarkSent';
 import NIGHTLY from '@salesforce/label/c.Giving_Acknowledgments_Nightly';
 import NEXT_RUN from '@salesforce/label/c.Giving_Acknowledgments_NextRun';
-import LAST_RUN from '@salesforce/label/c.Core_HealthCheck_LastRunLabel';
 import RULES_HEADING from '@salesforce/label/c.Giving_Acknowledgments_RulesHeading';
 import NEW_RULE from '@salesforce/label/c.Giving_Acknowledgments_NewRule';
 import EDIT_RULE from '@salesforce/label/c.Core_CmdtManager_EditAction';
@@ -234,7 +233,9 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
     get notScheduled() {
       return helpText('Giving', 'Giving_Acknowledgments_NotScheduled');
     },
-    lastRun: LAST_RUN,
+    get lastRun() {
+      return helpText('Giving', 'Giving_Acknowledgments_LastRun');
+    },
     get neverRun() {
       return helpText('Giving', 'Giving_Acknowledgments_NeverRun');
     },
@@ -377,7 +378,9 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
       return this.labels.neverRun;
     }
     const when = new Date(this.page.lastRun).toLocaleString();
-    return this.page.lastRunSummary ? `${when}: ${this.page.lastRunSummary}` : when;
+    // The summary is itself a sentence with a colon in it ("Emailed thank yous: 12 sent"), so the
+    // date ends with a full stop rather than a second colon.
+    return this.page.lastRunSummary ? `${when}. ${this.page.lastRunSummary}` : when;
   }
 
   /**

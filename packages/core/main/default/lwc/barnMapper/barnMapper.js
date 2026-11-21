@@ -350,11 +350,13 @@ export default class BarnMapper extends LightningElement {
   async loadSchema() {
     try {
       const toObject = this.toObject;
-      this.targetFields =
-        this.isToRecord && toObject ? (await getTargetFields({ objectName: toObject })) || [] : [];
       const fromObject = this.fromObject;
-      const info =
-        this.isFromRecord && fromObject ? await getObjectInfo({ objectApiName: fromObject }) : null;
+      // Both describes at once: one round trip instead of two.
+      const [targets, info] = await Promise.all([
+        this.isToRecord && toObject ? getTargetFields({ objectName: toObject }) : [],
+        this.isFromRecord && fromObject ? getObjectInfo({ objectApiName: fromObject }) : null
+      ]);
+      this.targetFields = targets || [];
       this.sourceFields = info ? info.fields || [] : [];
       this.loadError = undefined;
     } catch (error) {
