@@ -416,8 +416,9 @@ private class HubControllerTest {
 					}
 				);
 				HealthCheckResult.Counts counts = HealthCheckResult.read();
-				Assert.isNull(counts.ranAt, String.valueOf(stored));
-				Assert.isNull(counts.errors, String.valueOf(stored));
+				// An assertion refuses a null message even when it passes, so the stored value is quoted.
+				Assert.isNull(counts.ranAt, 'Stored: ' + stored);
+				Assert.isNull(counts.errors, 'Stored: ' + stored);
 			}
 		}
 	}

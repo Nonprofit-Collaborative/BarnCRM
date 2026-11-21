@@ -71,7 +71,7 @@ private class AddressHistoryTest {
 				[
 					SELECT COUNT()
 					FROM Address__c
-					WHERE Street__c = :HOME_STREET AND Status__c = 'Former' AND End_Date__c = TODAY
+					WHERE Street__c = :HOME_STREET AND Status__c = 'Former' AND End_Date__c = :OrgDate.today()
 				],
 				'Every old address is ended.'
 			);
@@ -553,7 +553,7 @@ private class AddressHistoryTest {
 						Street__c = :HOME_STREET
 						AND Is_Default__c = FALSE
 						AND Status__c = 'Former'
-						AND End_Date__c = TODAY
+						AND End_Date__c = :OrgDate.today()
 						AND Start_Date__c = NULL
 				],
 				'Every old address is out of use and ended, with no start date given.'
@@ -567,7 +567,7 @@ private class AddressHistoryTest {
 						Street__c = :NEW_STREET
 						AND Is_Default__c = TRUE
 						AND Status__c = 'Current'
-						AND Start_Date__c = TODAY
+						AND Start_Date__c = :OrgDate.today()
 						AND End_Date__c = NULL
 				],
 				'Every new address is the primary, Current and started today.'

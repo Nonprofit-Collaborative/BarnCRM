@@ -59,7 +59,8 @@ private class OpportunityMirrorMapTest {
 	}
 
 	private static SObject opportunityOf(Id giftId) {
-		Gift__c saved = [SELECT Opportunity_Id__c FROM Gift__c WHERE Id = :giftId];
+		// System mode, as the other mirror tests read it: only the sync identity's set opens the link field.
+		Gift__c saved = [SELECT Opportunity_Id__c FROM Gift__c WHERE Id = :giftId WITH SYSTEM_MODE];
 		Id opportunityId = saved.Opportunity_Id__c;
 		return Database.queryWithBinds(
 			'SELECT Amount, Description, NextStep FROM ' +
