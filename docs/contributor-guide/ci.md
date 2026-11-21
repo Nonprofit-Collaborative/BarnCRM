@@ -158,7 +158,8 @@ Salesforce org is needed for this job. Steps:
    package has no cap. An org allows 6,000,000 characters for its own code and every unmanaged
    BarnCRM package together, and scratch orgs allow 10,000,000, so only this sees growth.
    Raise a cap only in the pull request that needs it, and say why. The trim pass targets
-   3,600,000 for the full suite and 2,000,000 for Core (the check reports the gap);
+   5,000,000 for the full suite (Core and every module in one org, D-219) and 2,000,000 for
+   Core (the check reports the distance); a full suite over 5,600,000 fails the check;
    `--report` prints each package's size and the largest classes.
    **Apex is indented with tabs** (`"useTabs": true` in the `*.{cls,trigger}` override of
    `.prettierrc`, with `tabWidth` still 4 so lines wrap where they did). The org counts every

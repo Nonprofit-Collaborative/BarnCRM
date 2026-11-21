@@ -14,8 +14,9 @@ character of a non-test class or trigger except comments. oi-test agreed within 
 
 CAPS is a ceiling per package a little above its measured size, so every addition is a
 choice: raise a cap only in the pull request that needs it, and say why. TARGET is where the
-trim pass should take the full suite and Core (decision 1, 2026-11-04), leaving an org at
-least 2,400,000 characters of its own; above a target the check passes and says by how much.
+trim pass should take the full suite (Core and every module in one org, 5,000,000, D-219) and
+Core (2,000,000); the check passes either way and says the distance. FULL_SUITE_CEILING
+(5,600,000) fails the check, leaving a development org at least 400,000 characters of its own.
 
     python3 scripts/ci/check-apex-budget.py            the check
     python3 scripts/ci/check-apex-budget.py --report   sizes per package, largest classes
@@ -464,7 +465,10 @@ CAPS = {
     # and the post-install, moved out of Core: 29,516 measured 2026-11-20, plus about 2%.
     "sampledata": 30_200,
 }
-TARGET = {"full suite": 3_600_000, "core": 2_000_000}
+# Full suite means Core and every module in one development org (decision D-219). The target is
+# informational; the ceiling fails the check.
+TARGET = {"full suite": 5_000_000, "core": 2_000_000}
+FULL_SUITE_CEILING = 5_600_000
 
 
 def repo_root():
@@ -525,6 +529,13 @@ def main(argv):
         report(sizes)
         return 0
     problems = []
+    full_total = sum(s["size"] for s in sizes.values())
+    if full_total > FULL_SUITE_CEILING:
+        problems.append(
+            f"full suite: {full_total:,} characters of non-test Apex, over the ceiling of"
+            f" {FULL_SUITE_CEILING:,} by {full_total - FULL_SUITE_CEILING:,}. Core and every"
+            " module must fit one development org (D-219). Trim before adding."
+        )
     for package, data in sizes.items():
         cap = CAPS.get(package)
         if cap is None:
@@ -549,6 +560,8 @@ def main(argv):
     for name, value in (("full suite", total), ("core", sizes.get("core", {}).get("size", 0))):
         if value > TARGET[name]:
             notes.append(f"{name} {value - TARGET[name]:,} over its target of {TARGET[name]:,}")
+        else:
+            notes.append(f"{name} {TARGET[name] - value:,} under its target of {TARGET[name]:,}")
     note = f"; {', '.join(notes)}" if notes else ""
     print(f"check-apex-budget.py: OK, full suite {total:,} characters ({percent(total)} of"
           f" {ORG_LIMIT:,}), every package under its cap{note}")
