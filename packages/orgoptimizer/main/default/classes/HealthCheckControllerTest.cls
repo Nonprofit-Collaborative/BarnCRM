@@ -319,6 +319,26 @@ private class HealthCheckControllerTest {
 		}
 	}
 
+	/**
+	 * Every load path (the report, Run Remaining Checks, the last run, the report after a fix)
+	 * turns an unexpected failure into one plain message and an Error Log row. The calls inside
+	 * those paths guard themselves, so the shared helper is checked directly.
+	 */
+	@IsTest
+	static void aFailedLoadShowsThePlainMessageAndIsLogged() {
+		System.runAs(TestUsers.admin()) {
+			Test.startTest();
+			AuraHandledException shown = HealthCheckController.loadFailed(new DmlException('Raw detail'));
+			Test.stopTest();
+
+			Assert.isFalse(shown.getMessage().contains('Raw detail'), 'The raw detail stays out of the message.');
+			Assert.isTrue(
+				shown.getMessage().contains(BarnHelp.text('Core', 'Core_HealthCheck_LoadFailed')),
+				'The person sees the load failure text.'
+			);
+		}
+	}
+
 	private static OrgShapeDetector.OrgShape npspShape() {
 		OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
 		shape.put('hasNpsp', true);
