@@ -2763,6 +2763,12 @@ export default class ImportWizard extends LightningElement {
       this.batch = await getBatch({ batchId: this.batch.id });
       if (this.batch && this.batch.isFinished) {
         this.stopPolling();
+        // A dry run shows each value a column's changes changed, before and after (R-IT15).
+        // Asked for alongside the first page (one round trip); applied after it as before.
+        const changed = this.batch.isDryRun ? getChangedValues({ batchId: this.batch.id }) : null;
+        if (changed) {
+          changed.catch(() => {});
+        }
         // The table shows the first page; the exceptions file reads them all.
         const firstPage = await getRowPage({
           batchId: this.batch.id,
@@ -2772,10 +2778,7 @@ export default class ImportWizard extends LightningElement {
           pageSize: TABLE_PAGE_ROWS
         });
         this.rejectedRows = (firstPage && firstPage.rows) || [];
-        // A dry run shows each value a column's changes changed, before and after (R-IT15).
-        this.changedValues = this.batch.isDryRun
-          ? (await getChangedValues({ batchId: this.batch.id })) || []
-          : [];
+        this.changedValues = changed ? (await changed) || [] : [];
       }
     } catch (error) {
       this.stopPolling();

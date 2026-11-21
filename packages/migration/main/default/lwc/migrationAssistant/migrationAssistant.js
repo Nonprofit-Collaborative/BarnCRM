@@ -223,14 +223,17 @@ export default class MigrationAssistant extends NavigationMixin(LightningElement
       return;
     }
     await this.work(async () => {
-      const batch = await getBatch({ batchId: step.batchId });
-      const page = await getRowPage({
-        batchId: step.batchId,
-        status: 'Rejected',
-        cursor: null,
-        startIndex: 0,
-        pageSize: RESULT_ROWS
-      });
+      // The batch and its first rejected rows at once: one round trip instead of two.
+      const [batch, page] = await Promise.all([
+        getBatch({ batchId: step.batchId }),
+        getRowPage({
+          batchId: step.batchId,
+          status: 'Rejected',
+          cursor: null,
+          startIndex: 0,
+          pageSize: RESULT_ROWS
+        })
+      ]);
       this.changedValues =
         batch && batch.isDryRun ? (await getChangedValues({ batchId: step.batchId })) || [] : [];
       this.rejectedRows = (page && page.rows) || [];

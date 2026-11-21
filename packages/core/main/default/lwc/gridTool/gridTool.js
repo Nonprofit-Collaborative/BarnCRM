@@ -282,8 +282,12 @@ export default class GridTool extends NavigationMixin(LightningElement) {
     if (!objectName || this.fieldsByObject[objectName]) {
       return;
     }
-    const info = await getObjectInfo({ objectApiName: objectName }).catch(() => null);
-    const targets = this.canEdit ? (await getTargets({ objectName }).catch(() => [])) || [] : [];
+    // Both reads at once: one round trip instead of two each time an object is opened.
+    const [info, editable] = await Promise.all([
+      getObjectInfo({ objectApiName: objectName }).catch(() => null),
+      this.canEdit ? getTargets({ objectName }).catch(() => []) : []
+    ]);
+    const targets = editable || [];
     this.fieldsByObject = { ...this.fieldsByObject, [objectName]: (info && info.fields) || [] };
     this.editableByObject = {
       ...this.editableByObject,
