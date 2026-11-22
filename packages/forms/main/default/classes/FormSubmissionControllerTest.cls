@@ -62,7 +62,8 @@ private class FormSubmissionControllerTest {
 
 	@IsTest
 	static void aPersonWithoutFormsAccessGetsAPlainMessage() {
-		Id someSubmission = Form_Submission__c.SObjectType.getDescribe().getKeyPrefix() + '000000000001';
+		Id someSubmission =
+			Form_Submission__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() + '000000000001';
 		System.runAs(TestUsers.standardUser('Zzformless')) {
 			try {
 				FormSubmissionController.processAgain(someSubmission);
