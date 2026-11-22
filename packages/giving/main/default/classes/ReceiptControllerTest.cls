@@ -170,12 +170,13 @@ private class ReceiptControllerTest {
 			System.runAs(ReceiptTestDataFactory.issuer()) {
 				ReceiptTestDataFactory.setUpReceipting();
 				Assert.isTrue(ReceiptController.getCanManageTemplates(), 'This person may manage the letters');
-				List<ReceiptController.TemplateView> letters = ReceiptController.getTemplates();
+				// The console lists the letters through GraphQL (ADR-0093 A2).
+				List<Receipt_Template__c> letters = ReceiptSelector.allTemplates();
 				Assert.areEqual(2, letters.size(), 'A letter of each kind');
 				Id perGift;
-				for (ReceiptController.TemplateView letter : letters) {
-					if (letter.type == ReceiptNumberSequence.TYPE_PER_GIFT) {
-						perGift = letter.id;
+				for (Receipt_Template__c letter : letters) {
+					if (letter.Type__c == ReceiptNumberSequence.TYPE_PER_GIFT) {
+						perGift = letter.Id;
 					}
 				}
 
@@ -258,34 +259,17 @@ private class ReceiptControllerTest {
 	}
 
 	@IsTest
-	static void theRunHistoryShowsTheLatestTenAndAStatementRunCanBeStarted() {
+	static void aStatementRunCanBeStarted() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			System.runAs(ReceiptTestDataFactory.issuer()) {
 				ReceiptTestDataFactory.setUpReceipting();
-				List<Receipt_Run__c> runs = new List<Receipt_Run__c>();
-				for (Integer i = 0; i < 12; i++) {
-					runs.add(
-						new Receipt_Run__c(
-							Type__c = ReceiptNumberSequence.TYPE_STATEMENT,
-							Statement_Year__c = 2020 + (Math.mod(i, 5)),
-							Status__c = 'Completed',
-							Donors_Processed__c = 10,
-							Receipts_Issued__c = 9,
-							Errors__c = 1
-						)
-					);
-				}
-				insert runs;
 
+				// The run history is read through GraphQL (ADR-0093 A2).
 				Test.startTest();
-				List<ReceiptController.RunView> history = ReceiptController.getRuns();
 				ReceiptController.RunView started = ReceiptController.startStatementRun(2025);
 				ReceiptController.RunView defaulted = ReceiptController.startStatementRun(null);
 				Test.stopTest();
 
-				Assert.areEqual(10, history.size(), 'Only the latest ten are listed');
-				Assert.areEqual(10, history[0].donorsProcessed, 'Counts are carried');
-				Assert.areEqual(1, history[0].errors, 'Including errors');
 				Assert.areEqual(2025, started.statementYear, 'The run is for the year asked');
 				Assert.areEqual('Running', started.status, 'And is running');
 				Assert.areEqual(

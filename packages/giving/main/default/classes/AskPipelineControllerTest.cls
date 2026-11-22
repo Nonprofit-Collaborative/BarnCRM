@@ -92,13 +92,15 @@ private class AskPipelineControllerTest {
 			Ask__c open = ask(lee.Id, 'Identified', 100);
 			insert open;
 
+			// The board moves an ask through Lightning Data Service as the user (ADR-0093 A2);
+			// this is the same write, so the ask rules check the stage (R-SO2).
 			Test.startTest();
-			AskPipelineController.moveStage(open.Id, 'Cultivating');
+			update as user new Ask__c(Id = open.Id, Stage__c = 'Cultivating');
 			String refusal;
 			try {
-				AskPipelineController.moveStage(open.Id, 'Negotiating');
-			} catch (AuraHandledException e) {
-				refusal = e.getMessage();
+				update as user new Ask__c(Id = open.Id, Stage__c = 'Negotiating');
+			} catch (DmlException e) {
+				refusal = e.getDmlMessage(0);
 			}
 			Test.stopTest();
 
@@ -279,18 +281,12 @@ private class AskPipelineControllerTest {
 			AskPipelineController.Board board = AskPipelineController.getBoard(false);
 			AskPipelineController.CloseInput input = won(open.Id, AskPipelineController.RESULT_LATER);
 			AskPipelineController.CloseResult result = AskPipelineController.closeAsk(input);
-			String refusal;
-			try {
-				AskPipelineController.moveStage(open.Id, 'Identified');
-			} catch (AuraHandledException e) {
-				refusal = e.getMessage();
-			}
 			Test.stopTest();
 
+			// canEdit false also hides every move on the board (drag and Move to).
 			Assert.areEqual(1, board.cards.size(), 'A reader sees the ask.');
 			Assert.isFalse(board.canEdit, 'But may not change it.');
 			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Ask_ErrorNoPermission'), result.error, 'Closing refused.');
-			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Ask_ErrorNoPermission'), refusal, 'Moving refused.');
 		}
 	}
 

@@ -131,25 +131,9 @@ public with sharing class ReceiptController {
 		}
 	}
 
-	/**
-	 * The letters, for the console.
-	 *
-	 * `cacheable=true` is wanted here and kept: the list is small, it is read on every visit to the
-	 * page and again after every save through `refreshApex`, and it changes only when somebody on
-	 * this screen changes it. What it cost was a defect: this method used to materialize the
-	 * shipped letters when the list came back empty, and **Apex cannot perform DML in a cacheable
-	 * method**, so on an org that had never issued a receipt the page threw instead of showing the
-	 * two shipped letters. Creating them is now the post-install script's job (ADR-0029), with
-	 * `restoreDefaultTemplates` as the recovery path, so this method only reads (ADR-0034).
-	 */
-	@AuraEnabled(cacheable=true)
-	public static List<TemplateView> getTemplates() {
-		try {
-			return viewsOfTemplates(ReceiptSelector.allTemplates());
-		} catch (Exception failure) {
-			throw ERRORS.wrap(failure, 'ReceiptController.getTemplates', null);
-		}
-	}
+	// The console reads the letters and the recent runs through GraphQL as the user (ADR-0093 A2).
+	// Creating the shipped letters is the post-install script's job (ADR-0029), with
+	// `restoreDefaultTemplates` as the recovery path (ADR-0034).
 
 	/** Whether the running user may edit a letter, so the page can say so before they try. */
 	@AuraEnabled(cacheable=true)
@@ -199,30 +183,6 @@ public with sharing class ReceiptController {
 			ReceiptTemplateService.activate(templateId);
 		} catch (Exception failure) {
 			throw ERRORS.wrap(failure, 'ReceiptController.activateTemplate', templateId);
-		}
-	}
-
-	@AuraEnabled(cacheable=true)
-	public static List<RunView> getRuns() {
-		try {
-			List<RunView> views = new List<RunView>();
-			for (Receipt_Run__c run : ReceiptSelector.recentRuns(10)) {
-				RunView view = new RunView();
-				view.id = run.Id;
-				view.name = run.Name;
-				view.type = run.Type__c;
-				view.statementYear = intOf(run.Statement_Year__c);
-				view.status = run.Status__c;
-				view.started = run.Started__c;
-				view.finished = run.Finished__c;
-				view.donorsProcessed = intOf(run.Donors_Processed__c);
-				view.receiptsIssued = intOf(run.Receipts_Issued__c);
-				view.errors = intOf(run.Errors__c);
-				views.add(view);
-			}
-			return views;
-		} catch (Exception failure) {
-			throw ERRORS.wrap(failure, 'ReceiptController.getRuns', null);
 		}
 	}
 

@@ -7,7 +7,6 @@
 
 AccessExplorerController.searchPeople  # keep: SOSL name search and the Access Explorer permission
 AccessExplorerController.searchPermissionSets  # keep: PermissionSet is not in the UI API
-AskPipelineController.moveStage  # convert: updateRecord
 CommitmentController.getSchedule  # keep: two objects and record edit access
 CommitmentEntryController.save  # keep: server validation and the draft built from the entry
 EligibilityController.saveRules  # keep: rules validated against the program's fields
@@ -36,7 +35,6 @@ ProjectRequestsController.getRequest  # keep: Change Requests setting read with 
 ProjectRequestsController.getRequests  # keep: requests setting read with the list
 ProjectTimesheetController.addExpense  # keep: expenses setting
 ProjectsController.logTime  # keep: time tracking setting
-QuickGiftEntryController.getMatchableGifts  # convert: GraphQL
 ScholarshipsController.getAward  # keep: payments from a second object and the manage permission
 ScholarshipsController.getBoard  # keep: review board across objects, blind review
 ScholarshipsController.getReview  # keep: rubric, the reviewer's own review, blind review

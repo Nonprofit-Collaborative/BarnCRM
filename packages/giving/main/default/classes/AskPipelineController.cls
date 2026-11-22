@@ -1,6 +1,7 @@
 /**
  * The Ask Pipeline board (G-26, canonical model Section 25R): the stages, the open asks as cards,
- * the totals, moving an ask to another stage, and closing one.
+ * the totals, and closing one. The board moves an ask to another stage through Lightning Data
+ * Service (ADR-0093 A2).
  *
  * Thin by design (plan Section 9.9): it returns plain shapes the board renders, and arranging the
  * cards into columns happens in the browser module `askPipelineModel`. Everything runs as the
@@ -192,22 +193,6 @@ public with sharing class AskPipelineController {
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getBoard');
 			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_Ask_ErrorLoad'));
-		}
-	}
-
-	/** Moves one ask to another stage. The ask rules check the stage (R-SO2). */
-	@AuraEnabled
-	public static void moveStage(Id askId, String stage) {
-		if (!Schema.SObjectType.Ask__c.isUpdateable()) {
-			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_Ask_ErrorNoPermission'));
-		}
-		try {
-			update as user new Ask__c(Id = askId, Stage__c = stage);
-		} catch (DmlException e) {
-			throw UserErrors.message(e.getDmlMessage(0));
-		} catch (Exception e) {
-			ErrorLogger.log(e, CONTEXT + '.moveStage', askId);
-			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_Ask_ErrorUnexpected'));
 		}
 	}
 

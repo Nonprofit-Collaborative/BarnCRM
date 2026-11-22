@@ -209,27 +209,6 @@ public with sharing class ReceiptSelector {
 		];
 	}
 
-	/** The most recent runs, for the console. */
-	public static List<Receipt_Run__c> recentRuns(Integer howMany) {
-		return [
-			SELECT
-				Id,
-				Name,
-				Type__c,
-				Statement_Year__c,
-				Status__c,
-				Started__c,
-				Finished__c,
-				Donors_Processed__c,
-				Receipts_Issued__c,
-				Errors__c
-			FROM Receipt_Run__c
-			WITH USER_MODE
-			ORDER BY CreatedDate DESC
-			LIMIT :howMany
-		];
-	}
-
 	/** Every template, for the settings console. */
 	public static List<Receipt_Template__c> allTemplates() {
 		return [
