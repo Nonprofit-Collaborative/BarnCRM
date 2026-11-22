@@ -109,10 +109,12 @@ Removal takes the sample people's service deliveries and enrollments in the samp
 cohorts, then the sample programs and their services. A sample program one of your own people is enrolled
 in, or has a service delivery in, stays with those records, and so does a sample program with
 a sample enrollment that has a case note (whoever wrote it, even a note you cannot see). One
-Warning in the [Error Log](error-log.md) names each kept record by kind: "Sample data removal
-kept some Programs sample records, because records of your own point at them: Programs (Food
-pantry). Move or delete your records, then remove sample data again." The same Warning covers
-any module whose sample set ships as a data file (Programs, Logic Models, Grants and Events).
+Warning in the [Error Log](error-log.md) names each kept record by kind, with the reason
+Salesforce gave for refusing its delete: "Sample data removal kept some Programs sample
+records, each with the reason Salesforce gave for refusing the delete: Programs (Food pantry:
+...). Fix what the reason names (most often a record of your own that points at the sample
+record), then remove sample data again." The same Warning covers any module whose sample set
+ships as a data file (Programs, Logic Models, Grants and Events).
 
 ### With Logic Models Installed
 
@@ -212,7 +214,10 @@ the package is installed, and otherwise says how to get it. Loading sample data 
 other step.
 
 You need the **Manage BarnCRM Settings** permission to load or remove sample data.
-Without it, the card is read only and tells you who to ask.
+Without it, the card is read only and tells you who to ask. With it, **Remove Sample Data**
+removes the whole sample set, whoever loaded it and whoever owns each record, even when you are
+not a System Administrator: it deletes only records marked as sample data (and the module
+records that hang off them), never your own.
 
 Sample data loads whichever way your org tracks household membership. In the simple way,
 each sample person carries their household on their own record, and each sample household's
