@@ -227,16 +227,39 @@ private class BrandServiceTest {
 				[SELECT AccountId FROM Contact WHERE Id = :person.Id].AccountId,
 				'A contact with no account adds nothing to the page scope'
 			);
-			insert new Brand_Assignment__c(Brand__c = chapter.Id, Contact__c = person.Id);
+			Contact other = TestDataFactory.person(new Contact(LastName = 'Zztest Alone Too'));
+			insert other;
+			List<Brand_Assignment__c> rows = new List<Brand_Assignment__c>{
+				new Brand_Assignment__c(Brand__c = chapter.Id, Contact__c = person.Id),
+				new Brand_Assignment__c(Brand__c = chapter.Id, Contact__c = other.Id)
+			};
+			insert rows;
+
+			List<Brand_Assignment__c> inScope = [
+				SELECT Id
+				FROM Brand_Assignment__c
+				WHERE Account__c != NULL OR Contact__c != NULL
+				WITH SYSTEM_MODE
+				ORDER BY Id
+			];
 
 			Test.startTest();
+			// Two pages: all but the last row, then the last.
+			BrandShareJob.pageSize = inScope.size() - 1;
+			BrandShareJob job = new BrandShareJob(true, true, null);
 			Integer before = Limits.getQueueableJobs();
-			// A null cursor is the real first page of a full run.
-			new BrandShareJob(true, true, null, null).execute(null);
-			Integer queued = Limits.getQueueableJobs() - before;
+			job.execute(null);
+			Integer afterFirst = Limits.getQueueableJobs() - before;
+			// The platform lets the cursor go between pages: it is opened again after the last Id.
+			BrandShareJob.cursorGoneForTest = true;
+			job.execute(null);
+			Integer afterSecond = Limits.getQueueableJobs() - before;
 			Test.stopTest();
 
-			Assert.areEqual(1, queued, 'The page had a row, so the next page is queued');
+			Assert.areEqual(1, afterFirst, 'A row remained after the first page, so the next page is queued');
+			Assert.areEqual(1, afterSecond, 'The second page was the last, so nothing more is queued');
+			Assert.isFalse(BrandShareJob.cursorGoneForTest, 'The lost cursor was met');
+			Assert.areEqual(inScope[inScope.size() - 1].Id, job.lastId, 'The second page read the last assignment');
 		}
 	}
 
