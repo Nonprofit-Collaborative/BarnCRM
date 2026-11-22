@@ -1443,6 +1443,11 @@ core/SampleDataModules.cls | public static void startRemoval()
 core/SampleDataRemoveBatch.cls | public SampleDataRemoveBatch(SampleDataStages)
 core/SampleDataRemoveBatch.cls | public class SampleDataRemoveBatch
 core/SampleDataRemoveBatch.cls | public static Id startRemoval(SampleDataStages)
+core/SampleDataRemover.cls | public class SampleDataRemover
+core/SampleDataRemover.cls | public static Integer count(String,String)
+core/SampleDataRemover.cls | public static List<Database.DeleteResult> remove(List<Id>,Boolean)
+core/SampleDataRemover.cls | public static List<Id> ids(String,String,Set<Id>,Integer)
+core/SampleDataRemover.cls | public static Map<Id,String> names(String,Set<Id>)
 core/SampleDataStageBatch.cls | public Boolean stopped
 core/SampleDataStageBatch.cls | public SampleDataStageBatch(SampleDataStages)
 core/SampleDataStageBatch.cls | public static Boolean everyStageInTest

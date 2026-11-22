@@ -24,20 +24,36 @@
  * household flagged Sample_Data__c takes its own membership rows with it.
  *
  * Nothing is kept between stages: each one reads what is left.
+ *
+ * Every kind is found and deleted through Core's `SampleDataRemover`, in system mode past
+ * sharing, so any admin with Manage BarnCRM Settings removes the whole set, whoever loaded it
+ * (SR-01, D-219). The conditions below are the sample tracking itself.
  */
 public with sharing class SampleDataRemoveStages implements SampleDataStages {
+	private static final String FLAGGED = 'Sample_Data__c = TRUE';
+
+	/** Each kind as its object and condition, in removal order (one per address owner lookup). */
+	private static final List<List<String>> KINDS = new List<List<String>>{
+		new List<String>{ 'Relationship__c', FLAGGED },
+		new List<String>{ 'Affiliation__c', FLAGGED },
+		new List<String>{ 'Address__c', 'Account__c IN (SELECT Id FROM Account WHERE Sample_Data__c = TRUE)' },
+		new List<String>{ 'Address__c', 'Contact__c IN (SELECT Id FROM Contact WHERE Sample_Data__c = TRUE)' },
+		new List<String>{ 'Address__c', 'Person_Account__c IN (SELECT Id FROM Account WHERE Sample_Data__c = TRUE)' },
+		new List<String>{ 'Contact', FLAGGED },
+		new List<String>{ 'Account', FLAGGED }
+	};
+
 	public String name() {
 		return 'SampleDataRemoveStages';
 	}
 
 	/** One stage per chunk of each kind of record, so the whole set is covered. */
 	public Integer stageCount() {
-		SampleDataSelector selector = new SampleDataSelector();
-		return chunksFor(selector.getSampleRelationshipIds().size()) +
-			chunksFor(selector.getSampleAffiliationIds().size()) +
-			chunksFor(selector.getSampleAddressIds().size()) +
-			chunksFor(selector.getSampleContactIds().size()) +
-			chunksFor(selector.getSampleAccountIds().size());
+		Integer stages = 0;
+		for (List<String> kind : KINDS) {
+			stages += chunksFor(SampleDataRemover.count(kind[0], kind[1]));
+		}
+		return stages;
 	}
 
 	public void runStage(Integer stage) {
@@ -54,29 +70,18 @@ public with sharing class SampleDataRemoveStages implements SampleDataStages {
 	 * Static and public so the tests drive a stage without a batch.
 	 */
 	public static Boolean removeNextChunk() {
-		SampleDataSelector selector = new SampleDataSelector();
-		return deleteChunk(selector.getSampleRelationshipIds()) ||
-			deleteChunk(selector.getSampleAffiliationIds()) ||
-			deleteChunk(selector.getSampleAddressIds()) ||
-			deleteChunk(selector.getSampleContactIds()) ||
-			deleteChunk(selector.getSampleAccountIds());
+		for (List<String> kind : KINDS) {
+			List<Id> chunk = SampleDataRemover.ids(kind[0], kind[1], null, SampleDataLoader.REMOVE_CHUNK_SIZE);
+			if (!chunk.isEmpty()) {
+				SampleDataRemover.remove(chunk, true);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static Integer chunksFor(Integer recordCount) {
 		Integer size = SampleDataLoader.REMOVE_CHUNK_SIZE;
 		return (recordCount + size - 1) / size;
-	}
-
-	/** Deletes up to one chunk of these ids; false when there were none. */
-	private static Boolean deleteChunk(List<Id> ids) {
-		if (ids.isEmpty()) {
-			return false;
-		}
-		List<Id> chunk = new List<Id>();
-		for (Integer i = 0; i < ids.size() && i < SampleDataLoader.REMOVE_CHUNK_SIZE; i++) {
-			chunk.add(ids[i]);
-		}
-		Database.delete(chunk, AccessLevel.USER_MODE);
-		return true;
 	}
 }

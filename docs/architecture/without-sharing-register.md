@@ -41,6 +41,7 @@ into six kinds:
 | RelationshipUpkeepSelector | Integrity | The reciprocal and duplicate relationships owned by someone else | ADR-0021 category 2, ADR-0109 |
 | RelationshipUpkeepWriter | Upkeep | The other side of a relationship, usually owned by another user | ADR-0021 category 2, ADR-0109 |
 | SavedQuerySharingWriter | Platform | Shares on saved queries with an Apex sharing reason | ADR-0076, ADR-0021 |
+| SampleDataRemover | Org job | Every record tracked as sample data (a search must test `Sample_Data__c`), found and deleted for removal whoever loaded or owns it, so any admin with Manage BarnCRM Settings removes the whole set; every method refuses anyone without that permission, and Restrict lookups, rules and triggers still refuse a delete | ADR-0021, ADR-0233 (amendment 2026-11-21, SR-01) |
 | SeasonalAddressSelector | Org job | Every household due a seasonal address swap, so none is silently left out | ADR-0021, ADR-0027 |
 | SeasonalAddressWriter | Org job | The package's own address records for the nightly swap (the copy into standard address fields stays in user mode) | ADR-0021, ADR-0027 |
 | SetupChangeCopyJob | Org job | The package's own copy of Setup changes, written and pruned in full | ADR-0021 |
@@ -92,6 +93,7 @@ into six kinds:
 | VolunteerPersonDeleteHandler.Purge | Upkeep | The requirement rows and volunteer skills of a person the user has just deleted, which a Team Member holds no permission on; only Volunteers objects, by the ids the selector found | ADR-0021 |
 | VolunteersErasureExtension.LetterRemover | Upkeep | The generated volunteer letters of a person being erased, which belong to whoever generated them; only files identified exactly as generated letters, after the Volunteers access check | ADR-0021, ADR-0193 erasure start seam |
 | VolunteerNudgeSelector | Org job | Every unfilled shift and the email address of each volunteer who has helped on its job, for the morning nudges | ADR-0021 |
+| VolunteerSampleDataSelector | Org job | The sample jobs, shifts, schedules, sign-ups, skills and requirements to remove, and the real sign-ups, hours and skills that keep a sample record, whoever owns them; loading reads stay in user mode and deletes go through Core's `SampleDataRemover` | ADR-0021, ADR-0233 (amendment 2026-11-21, SR-01) |
 | VolunteerPublicPage | Platform | A Site guest user or the API's integration user reads the Open shifts still to come of jobs staff marked Show on Public Page (job name, description and location, shift times and place, places left as a count), and, only behind a signed claim the host checked, one person's own upcoming bookings, approved hours and last ten entries; never who else is booked, the coordinator or notes | ADR-0190 public event pages, ADR-0198 volunteer self-service |
 | VolunteerReminderSelector | Org job | Every booking and email address for the morning reminders | ADR-0021 |
 | VolunteersEngagementSignal | Org figure | Each person's Approved volunteer hours for the nightly engagement score, private hours included; returns totals only | ADR-0021, ADR-0212 engagement score |

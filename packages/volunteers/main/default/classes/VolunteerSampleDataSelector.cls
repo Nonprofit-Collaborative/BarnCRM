@@ -9,9 +9,15 @@
  * sample person too, so a row somebody recorded for a real person is never taken. A sample shift
  * that also holds a real person's sign-up or hours is not taken either, nor its job, nor a sample
  * skill a real person or job holds; the "what real records keep" reads find them so the removal
- * can leave them out and name them. Everything reads in the user's own access, as Giving's does.
+ * can leave them out and name them.
+ *
+ * Loading reads in the user's own access (user mode enforces sharing whatever the class says).
+ * The removal reads and the "what real records keep" reads are in system mode past sharing, so
+ * any admin with Manage BarnCRM Settings removes the whole set, whoever loaded it, and a real
+ * record the remover cannot see still keeps its shift, job or skill (SR-01, D-219). The deletes
+ * go through Core's `SampleDataRemover`, which checks that permission.
  */
-public with sharing class VolunteerSampleDataSelector {
+public without sharing class VolunteerSampleDataSelector {
 	/** Up to `cap` sample people, in the order of the key Core's generator gave them. */
 	public List<Contact> samplePeople(Integer cap) {
 		return [
@@ -87,7 +93,7 @@ public with sharing class VolunteerSampleDataSelector {
 				SELECT Id
 				FROM Volunteer_Signup__c
 				WHERE Volunteer_Shift__r.Volunteer_Job__r.Sample_Data__c = TRUE AND Contact__r.Sample_Data__c = TRUE
-				WITH USER_MODE
+				WITH SYSTEM_MODE
 				LIMIT :cap
 			]
 		);
@@ -114,7 +120,7 @@ public with sharing class VolunteerSampleDataSelector {
 						FROM Volunteer_Hours__c
 						WHERE Volunteer_Shift__c != NULL AND (Contact__c = NULL OR Contact__r.Sample_Data__c = FALSE)
 					)
-				WITH USER_MODE
+				WITH SYSTEM_MODE
 				LIMIT :cap
 			]
 		);
@@ -126,7 +132,7 @@ public with sharing class VolunteerSampleDataSelector {
 				SELECT Id
 				FROM Shift_Schedule__c
 				WHERE Job__r.Sample_Data__c = TRUE
-				WITH USER_MODE
+				WITH SYSTEM_MODE
 				LIMIT :cap
 			]
 		);
@@ -139,7 +145,7 @@ public with sharing class VolunteerSampleDataSelector {
 				SELECT Id
 				FROM Volunteer_Job__c
 				WHERE Sample_Data__c = TRUE AND Id NOT IN :kept
-				WITH USER_MODE
+				WITH SYSTEM_MODE
 				LIMIT :cap
 			]
 		);
@@ -155,7 +161,7 @@ public with sharing class VolunteerSampleDataSelector {
 				SELECT Id
 				FROM Volunteer_Skill__c
 				WHERE Contact__r.Sample_Data__c = TRUE
-				WITH USER_MODE
+				WITH SYSTEM_MODE
 				LIMIT :cap
 			]
 		);
@@ -167,7 +173,7 @@ public with sharing class VolunteerSampleDataSelector {
 				SELECT Id
 				FROM Volunteer_Requirement__c
 				WHERE Contact__r.Sample_Data__c = TRUE
-				WITH USER_MODE
+				WITH SYSTEM_MODE
 				LIMIT :cap
 			]
 		);
@@ -184,7 +190,7 @@ public with sharing class VolunteerSampleDataSelector {
 				SELECT Id
 				FROM Skill__c
 				WHERE Sample_Data__c = TRUE AND Id NOT IN :kept
-				WITH USER_MODE
+				WITH SYSTEM_MODE
 				LIMIT :cap
 			]
 		);
@@ -207,7 +213,7 @@ public with sharing class VolunteerSampleDataSelector {
 				Volunteer_Shift__r.Volunteer_Job__r.Sample_Data__c = TRUE
 				AND (Contact__c = NULL
 				OR Contact__r.Sample_Data__c = FALSE)
-			WITH USER_MODE
+			WITH SYSTEM_MODE
 			ORDER BY Volunteer_Shift__r.Start_Time__c, Id
 			LIMIT :cap
 		];
@@ -236,7 +242,7 @@ public with sharing class VolunteerSampleDataSelector {
 				OR Volunteer_Shift__r.Volunteer_Job__r.Sample_Data__c = TRUE)
 				AND (Contact__c = NULL
 				OR Contact__r.Sample_Data__c = FALSE)
-			WITH USER_MODE
+			WITH SYSTEM_MODE
 			ORDER BY Date_Worked__c, Id
 			LIMIT :cap
 		];
@@ -248,7 +254,7 @@ public with sharing class VolunteerSampleDataSelector {
 			SELECT Skill__c, Skill__r.Name, Contact__r.Name, Account__r.Name
 			FROM Volunteer_Skill__c
 			WHERE Skill__r.Sample_Data__c = TRUE AND (Contact__c = NULL OR Contact__r.Sample_Data__c = FALSE)
-			WITH USER_MODE
+			WITH SYSTEM_MODE
 			ORDER BY Skill__r.Name, Id
 			LIMIT :cap
 		];
@@ -260,7 +266,7 @@ public with sharing class VolunteerSampleDataSelector {
 			SELECT Skill__c, Skill__r.Name, Job__r.Name
 			FROM Job_Skill__c
 			WHERE Skill__r.Sample_Data__c = TRUE AND Job__r.Sample_Data__c = FALSE
-			WITH USER_MODE
+			WITH SYSTEM_MODE
 			ORDER BY Skill__r.Name, Id
 			LIMIT :cap
 		];
@@ -278,34 +284,34 @@ public with sharing class VolunteerSampleDataSelector {
 				SELECT COUNT()
 				FROM Volunteer_Signup__c
 				WHERE Volunteer_Shift__r.Volunteer_Job__r.Sample_Data__c = TRUE AND Contact__r.Sample_Data__c = TRUE
-				WITH USER_MODE
+				WITH SYSTEM_MODE
 			],
 			[
 				SELECT COUNT()
 				FROM Volunteer_Shift__c
 				WHERE Volunteer_Job__r.Sample_Data__c = TRUE
-				WITH USER_MODE
+				WITH SYSTEM_MODE
 			],
 			[
 				SELECT COUNT()
 				FROM Shift_Schedule__c
 				WHERE Job__r.Sample_Data__c = TRUE
-				WITH USER_MODE
+				WITH SYSTEM_MODE
 			],
-			[SELECT COUNT() FROM Volunteer_Job__c WHERE Sample_Data__c = TRUE WITH USER_MODE],
+			[SELECT COUNT() FROM Volunteer_Job__c WHERE Sample_Data__c = TRUE WITH SYSTEM_MODE],
 			[
 				SELECT COUNT()
 				FROM Volunteer_Skill__c
 				WHERE Contact__r.Sample_Data__c = TRUE
-				WITH USER_MODE
+				WITH SYSTEM_MODE
 			],
 			[
 				SELECT COUNT()
 				FROM Volunteer_Requirement__c
 				WHERE Contact__r.Sample_Data__c = TRUE
-				WITH USER_MODE
+				WITH SYSTEM_MODE
 			],
-			[SELECT COUNT() FROM Skill__c WHERE Sample_Data__c = TRUE WITH USER_MODE]
+			[SELECT COUNT() FROM Skill__c WHERE Sample_Data__c = TRUE WITH SYSTEM_MODE]
 		};
 	}
 
