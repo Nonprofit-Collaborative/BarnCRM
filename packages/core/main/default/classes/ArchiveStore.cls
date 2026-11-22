@@ -56,8 +56,8 @@ public virtual with sharing class ArchiveStore {
 		}
 		// NOPMD: ApexCRUDViolation, which does not see the isCreateable check above.
 		// Access mode: system. insertImmediate takes no AccessLevel; create access is checked above.
-		for (Database.SaveResult saved : Database.insertImmediate(rows)) {
-			// NOPMD
+		List<Database.SaveResult> saves = Database.insertImmediate(rows); // NOPMD
+		for (Database.SaveResult saved : saves) {
 			result.add(saved.isSuccess());
 		}
 		return result;
@@ -76,8 +76,8 @@ public virtual with sharing class ArchiveStore {
 		// A big object grants only Read and Create, so there is no delete permission to check.
 		// Callers are admin paths (rule runs, restore) or erasure. NOPMD: ApexCRUDViolation.
 		// Access mode: system. deleteImmediate takes no AccessLevel.
-		for (Database.DeleteResult result : Database.deleteImmediate(rows)) {
-			// NOPMD
+		List<Database.DeleteResult> results = Database.deleteImmediate(rows); // NOPMD
+		for (Database.DeleteResult result : results) {
 			deleted += result.isSuccess() ? 1 : 0;
 		}
 		return deleted;
