@@ -47,6 +47,10 @@ class AuraLds(unittest.TestCase):
         self.assertEqual(cal.lds_candidates(src), {})
         self.assertEqual(cal.lds_candidates(apex("// update as user t;\n return null;")), {})
 
+    def test_ignores_dml_words_in_string_literals(self):
+        body = "try { return F.t(o); } catch (Exception e) { throw w(e, 'Bulk update fields'); }"
+        self.assertEqual(cal.lds_candidates(apex(body)), {})
+
     def test_follows_same_class_helper(self):
         helper = "\n private static String h() { update as user t; TaskService.run(); return null; }\n"
         src = apex("update as user t; return h();", helper)

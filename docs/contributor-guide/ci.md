@@ -175,7 +175,9 @@ Salesforce org is needed for this job. Steps:
    user-mode query over one object, or one single-record DML statement, with no aggregate,
    describe, service call or system-mode work: the LWC reads or writes that with a GraphQL
    wire or `uiRecordApi`. Existing matches are listed in `scripts/ci/aura-lds-allowlist.txt`
-   as `Class.method`; remove a line when its method is converted (a stale line fails too).
+   as `Class.method`, each marked keep (with the reason) or convert (with the target) per
+   ADR-0093 Amendment A2; remove a line when its method is converted (a stale line fails
+   too). DML words inside string literals do not count as a write.
    **Deploys and package builds strip the indentation that is left (AP-05, ADR-0241).** The
    repository stays formatted and readable; the copy that goes to an org loses the leading
    spaces and tabs on every line of every `.cls` and `.trigger` file. On 2026-11-21 that took

@@ -24,7 +24,7 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from apex_source import is_test_class, without_comments  # noqa: E402
+from apex_source import is_test_class, strip, without_comments  # noqa: E402
 
 SOURCES = "packages/*/main/**/*.cls"
 ALLOWLIST = os.path.join(HERE, "aura-lds-allowlist.txt")
@@ -89,7 +89,9 @@ def lds_candidates(raw):
             if SERVICE_SUFFIX.search(s) and "FeatureSwitch" not in s
         }
         queries = len(QUERY.findall(inlined))
-        writes = len(DML.findall(inlined))
+        # DML is counted with string literals blanked, so a message such as 'Bulk update
+        # fields' is not a write; queries keep them, since a dynamic query is a string.
+        writes = len(DML.findall(strip(inlined)))
         if HEAVY.search(inlined) or AGGREGATE.search(inlined) or services:
             continue
         if queries == 1 and writes == 0 and USER_MODE.search(inlined):
