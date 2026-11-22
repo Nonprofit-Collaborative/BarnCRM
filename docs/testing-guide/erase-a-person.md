@@ -109,6 +109,21 @@ The admin user holds **BarnCRM Erase People** from the create script. It is in n
 
 **Cleanup:** None.
 
+## T-ERASE-09: BarnCRM Field History Goes With the Person
+
+**Purpose:** Confirm erasing a person deletes the BarnCRM field history of their records and no one else's.
+**Prerequisites:** admin with **Erase People**; **Field History** turned on in BarnCRM Settings with **Address** tracked; two people, Luis Garcia and Harper Garcia, each with an address whose city was edited once.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open Luis Garcia's address and confirm the **Field History** card shows the city change. Do the same for Harper's. | Both show one change. |
+| 2 | On Luis Garcia, choose **Erase Person** and **Preview**. | A **Deleted** line named **Field History** shows a count of 1 or more. Close the preview. |
+| 3 | Erase Luis Garcia with the typed name. | The result lists **Field History** as deleted. |
+| 4 | Search the **Field History** records for Luis's address Id. | No rows. |
+| 5 | Open Harper's address. | The **Field History** card still shows the city change. |
+
+**Cleanup:** None.
+
 ## T-ERASE-08: Nothing Offers an Undo
 
 **Purpose:** Confirm an erasure has no undo anywhere and its record keeps no erased value.

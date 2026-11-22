@@ -65,6 +65,64 @@ private class PersonErasureTest {
 	}
 
 	@IsTest
+	static void fieldHistoryOfThePersonAndTheirDeletedAddressGoesAndAnotherPersonsStays() {
+		System.runAs(eraser()) {
+			isolate();
+			Contact jordan = coupleInContactMode(true);
+			Contact other = RelationshipTestDataFactory.contacts(1, 'Unrelated')[0];
+			Address__c home = new Address__c(Contact__c = jordan.Id, Type__c = 'Home', City__c = 'Springfield');
+			insert home;
+			insert new List<Field_History__c>{
+				new Field_History__c(Record_Id__c = jordan.Id, Object_Name__c = 'Contact', Changes__c = '[]'),
+				new Field_History__c(Record_Id__c = home.Id, Object_Name__c = 'Address__c', Changes__c = '[]'),
+				new Field_History__c(Record_Id__c = other.Id, Object_Name__c = 'Contact', Changes__c = '[]')
+			};
+
+			PersonErasure.Result result = PersonErasure.erase(jordan.Id, jordan.Name, null);
+
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Field_History__c WHERE Record_Id__c IN :new List<String>{ jordan.Id, home.Id }],
+				'The person and their deleted address lose their field history'
+			);
+			Assert.areEqual(
+				1,
+				[SELECT COUNT() FROM Field_History__c WHERE Record_Id__c = :other.Id],
+				'Another person keeps theirs'
+			);
+			Integer listed = 0;
+			for (PersonErasure.Change change : result.changes) {
+				if (change.action == PersonErasure.DELETED && change.objectLabel == Field_History__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel()) {
+					listed = change.count;
+				}
+			}
+			Assert.areEqual(2, listed, 'The admin sees the two rows removed');
+		}
+	}
+
+	@IsTest
+	static void thePreviewCountsFieldHistoryAndKeepsIt() {
+		System.runAs(eraser()) {
+			isolate();
+			Contact jordan = coupleInContactMode(true);
+			insert new Field_History__c(Record_Id__c = jordan.Id, Object_Name__c = 'Contact', Changes__c = '[]');
+
+			PersonErasure.Result preview = PersonErasure.preview(jordan.Id);
+
+			Assert.areEqual(
+				1,
+				[SELECT COUNT() FROM Field_History__c WHERE Record_Id__c = :jordan.Id],
+				'The preview rolls the deletion back'
+			);
+			Boolean listed = false;
+			for (PersonErasure.Change change : preview.changes) {
+				listed |= change.action == PersonErasure.DELETED && change.count == 1 && change.objectLabel == Field_History__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel();
+			}
+			Assert.isTrue(listed, 'The preview lists the field history it would delete');
+		}
+	}
+
+	@IsTest
 	static void erasesTheContactItsAddressesAndConnectionsAndAudits() {
 		System.runAs(eraser()) {
 			isolate();

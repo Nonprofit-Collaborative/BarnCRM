@@ -384,6 +384,7 @@ public with sharing class PersonErasure {
 					}
 				}
 			}
+			removeFieldHistory(personId, individual, result);
 			noteActivitiesAndFiles(personId, result, activitiesAt);
 		} catch (ErasureException refusal) {
 			throw refusal;
@@ -668,6 +669,40 @@ public with sharing class PersonErasure {
 			}
 		}
 		return changed;
+	}
+
+	/**
+	 * Deletes the Field History Keeper rows (ADR-0195) of every record this run changed: the
+	 * person, the Individual, and each record listed so far as Deleted, Updated or Ended, module
+	 * records included (a Kept record stays, with its history). The rows hold old values, so they
+	 * go with the person (R-ER4). They are Core's own rows, written in system mode, so they are
+	 * removed in system mode too.
+	 */
+	private static void removeFieldHistory(Id personId, SObject individual, Result result) {
+		Set<String> recordIds = new Set<String>{ String.valueOf(personId) };
+		if (individual != null) {
+			recordIds.add(String.valueOf(individual.Id));
+		}
+		for (Change change : result.changes) {
+			if (change.action != KEPT) {
+				for (Id recordId : change.recordIds) {
+					recordIds.add(String.valueOf(recordId));
+				}
+			}
+		}
+		List<Field_History__c> rows = [
+			SELECT Id
+			FROM Field_History__c
+			WHERE Record_Id__c IN :recordIds
+			WITH SYSTEM_MODE
+			LIMIT 10000
+		];
+		if (rows.isEmpty()) {
+			return;
+		}
+		delete as system rows;
+		deletedIds.addAll(ids(rows));
+		add(result, DELETED, Field_History__c.SObjectType, ids(rows), null);
 	}
 
 	/** Field history of this record: deleted after commit where the user may, otherwise kept. */
