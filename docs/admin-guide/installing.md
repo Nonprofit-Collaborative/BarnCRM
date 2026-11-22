@@ -148,7 +148,15 @@ module's row in **BarnCRM Settings**, **Modules**
 
 ### Step 3: Set It Up
 
-Open the BarnCRM app and follow the first-run setup window and the
+**Let BarnCRM save its settings (package installs only).** BarnCRM keeps every setting as
+custom metadata, and saves it with a small metadata deployment. When you install BarnCRM from a
+package version that has not passed Salesforce's security review, Salesforce accepts those
+deployments only after you allow them once: in Setup, search for **Apex Settings**, check
+**Deploy Metadata from Non-Certified Package Versions via Apex**, and save. Until you do,
+BarnCRM runs on its defaults and every save on BarnCRM Settings says it was refused. An org
+built by deploying the source, as above, needs no change.
+
+Then open the BarnCRM app and follow the first-run setup window and the
 [Setup Assistant](setup-assistant.md).
 
 ### Upgrading to a Later Release
