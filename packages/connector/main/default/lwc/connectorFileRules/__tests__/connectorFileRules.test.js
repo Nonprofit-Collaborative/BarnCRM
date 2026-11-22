@@ -1,3 +1,4 @@
+/* global __dirname */
 import {
   fileProblem,
   placeholders,

@@ -1,3 +1,5 @@
+// Test wire adapters are emitted to on purpose, which is how a wired component is driven from a test.
+/* eslint-disable @lwc/lwc/no-unexpected-wire-adapter-usages */
 import { createElement } from 'lwc';
 import DataManager from 'c/dataManager';
 import getMappings from '@salesforce/apex/DataManagerController.getMappings';
