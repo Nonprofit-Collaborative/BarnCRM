@@ -2878,7 +2878,7 @@ settings console shows them in its Rollups section as before.
 - **Defaults (ADR-0035):** the readers in `RollupService` and `RollupScheduler` treat blank,
   and anything outside the allowed values, as the shipped value.
 - **Nightly run hour (ADR-0136):** the settings console shows `Nightly_Run_Hour__c` as a
-  picklist of the 24 hours (values 0 to 23, labels 12:00 AM (midnight) to 11:00 PM) from its Setting Definition
+  picklist of the 24 hours (values 0 to 23, labels 12 AM (midnight) to 11 PM, kept under the 255 characters `Setting_Definition__mdt.getAll()` returns of a long text field) from its Setting Definition
   row, since a custom setting cannot hold a picklist. The nightly job, Run tonight and the
   Rollup Builder page's schedule line all use it. A save that changes it moves the scheduled
   nightly run at once: Core's settings service hands every changed key to the engine through

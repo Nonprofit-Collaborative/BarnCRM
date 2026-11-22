@@ -215,7 +215,10 @@ private class RollupLargeParentBatchTest {
 				'One lock row, created the first time'
 			);
 			SettingsState.clearCache();
-			Assert.isNotNull(SettingsState.moment(RollupLargeParentBatch.LOCK_KEY), 'And it holds when the run started');
+			Assert.isNotNull(
+				SettingsState.moment(RollupLargeParentBatch.LOCK_KEY),
+				'And it holds when the run started'
+			);
 		}
 	}
 
