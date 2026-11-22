@@ -337,11 +337,11 @@ describe('the import wizard', () => {
     jest.clearAllMocks();
   });
 
-  it('shows the page name in the shell, since an App Page prints no header', async () => {
+  it('keeps the page name for screen readers only, since the App Page header prints it', async () => {
     const element = await open();
 
     const shell = element.shadowRoot.querySelector('[data-id="shell"]');
-    expect(shell.titleHidden).toBeFalsy();
+    expect(shell.titleHidden).toBe(true);
     expect(shell.title).toBe('c.Core_DataJobs_KindImport');
     expect(shell.purpose).toBeTruthy();
     expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();

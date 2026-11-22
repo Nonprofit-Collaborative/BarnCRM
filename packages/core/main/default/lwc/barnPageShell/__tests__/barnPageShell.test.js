@@ -70,7 +70,11 @@ describe('c-barn-page-shell', () => {
   });
 
   it('story: under an App Page header, the title is kept for screen readers only', () => {
-    const element = render({ title: 'Data Manager', titleHidden: true });
+    const element = render({
+      title: 'Data Manager',
+      titleHidden: true,
+      iconName: 'standard:dashboard'
+    });
     expect(one(element, 'title').className).toBe('slds-assistive-text');
     expect(one(element, 'icon')).toBeNull();
     expect(one(element, 'purpose')).toBeNull();

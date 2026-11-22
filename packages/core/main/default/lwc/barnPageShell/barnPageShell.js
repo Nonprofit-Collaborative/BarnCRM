@@ -14,7 +14,8 @@ const STORAGE_PREFIX = 'barnPageShell.help.';
  * The figure, the help region and the footer show only when their slot has content.
  *
  * On a Lightning App Page the platform already prints the page name above the component, so
- * pass `title-hidden`: the h1 stays for screen readers and the header leads with the purpose.
+ * pass `title-hidden`: the h1 stays for screen readers, the icon is left out (the platform header
+ * has the page's own), and the header leads with the purpose.
  *
  * The help region opens on a person's first visit and is closed after that; with
  * `help-storage-key` set, their own open or closed choice is remembered in this browser. That is
@@ -50,7 +51,7 @@ export default class BarnPageShell extends LightningElement {
   }
 
   get showIcon() {
-    return Boolean(this.iconName);
+    return Boolean(this.iconName) && !this.titleHidden;
   }
 
   get titleClass() {

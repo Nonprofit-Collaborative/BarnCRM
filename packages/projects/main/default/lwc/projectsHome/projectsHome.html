@@ -1,6 +1,6 @@
 <template>
   <template lwc:if={helpReady}>
-    <c-barn-page-shell title={labels.title} purpose={labels.intro} icon-name={icon} data-id="shell">
+    <c-barn-page-shell title={labels.title} purpose={labels.intro} icon-name={icon} title-hidden data-id="shell">
       <div slot="actions">
         <template lwc:if={canCreate}>
           <lightning-button data-id="new-project-action" variant="brand" label={labels.newProject} onclick={handleNewProject}></lightning-button>

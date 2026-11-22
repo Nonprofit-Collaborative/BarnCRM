@@ -153,7 +153,7 @@ describe('c-automation-control', () => {
 
     const shell = element.shadowRoot.querySelector('[data-id="shell"]');
     expect(shell.title).toContain('Core_AutomationControl_PageTitle');
-    expect(shell.titleHidden).toBeFalsy();
+    expect(shell.titleHidden).toBe(true);
     expect(shell.purpose).toBeTruthy();
     expect(element.shadowRoot.querySelector('[data-id="card-intro"]')).toBeNull();
     expect(element.shadowRoot.querySelector('[data-id="pause-card"]').title).toBe(
