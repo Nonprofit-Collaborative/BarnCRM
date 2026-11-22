@@ -113,7 +113,7 @@ public with sharing class VolunteerLetterService {
 		Map<Id, Set<Id>> brandsByPerson = new Map<Id, Set<Id>>();
 		collectHours(people, fromDate, toDate, totals, jobLists, brandsByPerson);
 
-		String organizationName = escape(BarnCRM_Settings__c.getOrgDefaults().Organization_Legal_Name__c);
+		String organizationName = escape(SettingsService.getSettings().Organization_Legal_Name__c);
 		Map<String, String> shared = new Map<String, String>{
 			'OrganizationName' => organizationName,
 			'OrganizationAddress' => escape(OrganizationAddress.oneLine()),

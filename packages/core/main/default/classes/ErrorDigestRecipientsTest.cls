@@ -15,7 +15,8 @@ private class ErrorDigestRecipientsTest {
 	}
 
 	private static BarnCRM_Settings__c settings() {
-		return BarnCRM_Settings__c.getOrgDefaults();
+		SettingsService.clearCaches();
+		return SettingsService.getSettings();
 	}
 
 	@IsTest

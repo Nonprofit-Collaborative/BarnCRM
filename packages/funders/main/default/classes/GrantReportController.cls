@@ -111,7 +111,7 @@ public with sharing class GrantReportController {
 	}
 
 	private static Map<String, Object> grantValues(Grant__c grant) {
-		String organization = BarnCRM_Settings__c.getOrgDefaults().Organization_Legal_Name__c;
+		String organization = SettingsService.getSettings().Organization_Legal_Name__c;
 		return new Map<String, Object>{
 			'OrganizationName' => String.isBlank(organization) ? UserInfo.getOrganizationName() : organization,
 			'Today' => Date.today(),

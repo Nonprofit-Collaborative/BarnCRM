@@ -60,7 +60,7 @@ program to a team, set the Award Program default to Private in Sharing Settings 
 
 ## Settings
 
-BarnCRM Settings, **Scholarships and Outbound Grants**. Every setting is org-wide.
+BarnCRM Settings, **Scholarships and Outbound Grants**. Every setting is org-wide. A save shows **Saving**, then **Saved**, and the value is still there when you reload.
 
 | Setting | Default | What it does |
 |---|---|---|

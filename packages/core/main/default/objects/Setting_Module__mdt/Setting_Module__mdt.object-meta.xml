@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    One record per module whose settings live in the settings store. Shipped in the module's
+    own package: it names the settings group its Setting Definition rows give, the prefix of its
+    run-state keys, and which fields of its legacy custom setting are run state, so Core reads,
+    saves and carries over the module's settings without naming the module.
+  </description>
+  <label>Setting Module</label>
+  <pluralLabel>Setting Modules</pluralLabel>
+  <visibility>Public</visibility>
+</CustomObject>

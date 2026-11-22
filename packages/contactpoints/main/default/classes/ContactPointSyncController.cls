@@ -124,9 +124,8 @@ public with sharing class ContactPointSyncController {
 			WITH SYSTEM_MODE
 			LIMIT :countCap + 1
 		];
-		Contact_Point_Sync_Settings__c saved = Contact_Point_Sync_Settings__c.getOrgDefaults();
-		current.lastBackfill = saved == null ? null : saved.Last_Backfill__c;
-		current.lastSummary = saved == null ? null : saved.Last_Backfill_Summary__c;
+		current.lastBackfill = SettingsState.moment(ContactPointSyncService.KEY_LAST_BACKFILL);
+		current.lastSummary = SettingsState.text(ContactPointSyncService.KEY_LAST_SUMMARY);
 		return current;
 	}
 

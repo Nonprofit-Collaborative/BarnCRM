@@ -123,11 +123,7 @@ private class GrantFinderTest {
 	@IsTest
 	static void theSettingTurnsItOff() {
 		System.runAs(TestUsers.adminWith(GrantTestData.ADMIN)) {
-			OrgSettingsSystemWriter.save(
-				Funders_Settings__c.SObjectType,
-				new Map<Schema.SObjectField, Object>{ Funders_Settings__c.Grant_Finder_Enabled__c => false }
-			);
-			SettingsService.clearCaches();
+			ModuleSettings.setForTest('Funders_Grant_Finder_Enabled', false);
 			Boolean refused = false;
 			Test.startTest();
 			try {

@@ -10,4 +10,5 @@
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">10</value></values>
     <values><field>Description__c</field><value xsi:type="xsd:string">Whether components built in the Component Builder show where they are placed on Lightning pages. Turn off to hide every one at once without editing pages. Default: on.</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">lwc-builder.md</value></values>
+    <values><field>Default_Value__c</field><value xsi:type="xsd:string">true</value></values>
 </CustomMetadata>

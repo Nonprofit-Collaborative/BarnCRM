@@ -83,27 +83,38 @@ public with sharing class AddressVerifier {
 		}
 	}
 
-	/** The org-wide choices, each blank one at its default; never saved, the shipped values. */
-	public static Address_Verification_Settings__c settings() {
-		Address_Verification_Settings__c stored = Address_Verification_Settings__c.getOrgDefaults();
-		if (stored.Id == null) {
-			// getOrgDefaults() returns checkboxes false, not their shipped value (ADR-0035).
-			stored.Verify_On_Save__c = true;
-		}
-		if (String.isBlank(stored.Provider__c)) {
-			stored.Provider__c = SMARTY;
-		}
-		if (stored.Recheck_Months__c == null) {
-			stored.Recheck_Months__c = 12;
-		}
-		if (stored.Nightly_Limit__c == null) {
-			stored.Nightly_Limit__c = 200;
-		}
-		return stored;
+	/** Run state: the provider Check Connection last reached (`AddressVerification.Connected_Provider__c`). */
+	public static final String KEY_CONNECTED = SettingsState.moduleKey(MODULE, 'Connected_Provider__c');
+
+	// The org-wide choices, read through the settings store: an unsaved one is its shipped value.
+
+	/** Whether a saved address is looked up as it is saved. Ships on. */
+	public static Boolean verifyOnSave() {
+		return ModuleSettings.flag('Address_Verification_On_Save');
+	}
+
+	/** Whether verified corrections are written to the address. Ships off. */
+	public static Boolean applyCorrections() {
+		return ModuleSettings.flag('Address_Verification_Corrections');
+	}
+
+	/** Months before a verified address is looked up again; 0 never re-checks. */
+	public static Integer recheckMonths() {
+		return ModuleSettings.integerValue('Address_Verification_Recheck');
+	}
+
+	/** Addresses looked up per night. */
+	public static Integer nightlyLimit() {
+		return ModuleSettings.integerValue('Address_Verification_Nightly_Limit');
 	}
 
 	public static String provider() {
-		return settings().Provider__c == GOOGLE ? GOOGLE : SMARTY;
+		return ModuleSettings.text('Address_Verification_Provider') == GOOGLE ? GOOGLE : SMARTY;
+	}
+
+	/** The provider last connected, or null (run state, written when Check Connection runs). */
+	public static String connectedProvider() {
+		return SettingsState.text(KEY_CONNECTED);
 	}
 
 	/**
@@ -111,7 +122,7 @@ public with sharing class AddressVerifier {
 	 * through its Named Credential (R-AV4). No key is read; Apex never holds one.
 	 */
 	public static Boolean isReady() {
-		return settings().Connected_Provider__c == provider();
+		return connectedProvider() == provider();
 	}
 
 	private static final List<String> ACCESS_SETS = new List<String>{
@@ -258,7 +269,7 @@ public with sharing class AddressVerifier {
 		if (looked.isEmpty()) {
 			return;
 		}
-		Boolean correct = settings().Apply_Corrections__c == true;
+		Boolean correct = applyCorrections();
 		List<Address__c> changes = new List<Address__c>();
 		for (Address__c address : looked) {
 			Outcome outcome = found.get(address.Id);

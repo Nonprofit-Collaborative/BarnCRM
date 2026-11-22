@@ -35,7 +35,7 @@ private class OrgSettingsSystemWriterTest {
 		System.runAs(TestUsers.admin()) {
 			Datetime until = System.now().addHours(2);
 			Test.startTest();
-			AutomationSettingsWriter.savePausedUntil(OrgSettingsSystemWriter.lockStored(), until);
+			OrgSettingsSystemWriter.save(new Map<Schema.SObjectField, Object>{ BarnCRM_Settings__c.Automation_Paused_Until__c => until });
 			Test.stopTest();
 
 			BarnCRM_Settings__c saved = stored();
@@ -49,7 +49,7 @@ private class OrgSettingsSystemWriterTest {
 		System.runAs(TestUsers.admin()) {
 			Datetime finishedAt = System.now();
 			Test.startTest();
-			SeasonalAddressWriter.recordRun(finishedAt, 'Nothing to swap.');
+			OrgSettingsSystemWriter.save(new Map<Schema.SObjectField, Object>{ BarnCRM_Settings__c.Seasonal_Address_Last_Run__c => finishedAt });
 			Test.stopTest();
 
 			BarnCRM_Settings__c saved = stored();
@@ -68,8 +68,8 @@ private class OrgSettingsSystemWriterTest {
 				Coexistence_Mode__c = 'Standalone'
 			);
 			Test.startTest();
-			AutomationSettingsWriter.savePausedUntil(OrgSettingsSystemWriter.lockStored(), System.now().addHours(1));
-			AutomationSettingsWriter.savePausedUntil(OrgSettingsSystemWriter.lockStored(), null);
+			OrgSettingsSystemWriter.save(new Map<Schema.SObjectField, Object>{ BarnCRM_Settings__c.Automation_Paused_Until__c => System.now().addHours(1) });
+			OrgSettingsSystemWriter.save(new Map<Schema.SObjectField, Object>{ BarnCRM_Settings__c.Automation_Paused_Until__c => null });
 			Test.stopTest();
 
 			BarnCRM_Settings__c saved = stored();
@@ -91,7 +91,7 @@ private class OrgSettingsSystemWriterTest {
 			Datetime until = System.now().addHours(2);
 
 			Test.startTest();
-			AutomationSettingsWriter.savePausedUntil(OrgSettingsSystemWriter.lockStored(), until);
+			OrgSettingsSystemWriter.save(new Map<Schema.SObjectField, Object>{ BarnCRM_Settings__c.Automation_Paused_Until__c => until });
 			Test.stopTest();
 
 			Assert.areEqual(

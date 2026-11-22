@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Paused_Until__c</fullName>
+  <description>Organization level only: when the pause set on the Automation page ends. Written by BarnCRM; blank when automation is running.</description>
+  <inlineHelpText>When the automation pause set on the Automation page ends.</inlineHelpText>
+  <label>Paused Until</label>
+  <type>DateTime</type>
+</CustomField>

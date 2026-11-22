@@ -110,7 +110,7 @@ Admin) and a second user with the Team Member role, called the staff user below.
 | 1 | Run **Corporate Hub reminders** now. | Three bell notifications, each opening its record. Each record's Reminded For is its date. |
 | 2 | Run it again. | No new notification. |
 | 3 | Move the obligation's due date by a day and run it again. | One notification for the obligation. |
-| 4 | Turn off **Send Corporate Hub reminders** in Settings, **Corporate Hub**, move a date and run again. | No notification. Turn it back on. |
+| 4 | Turn off **Send Corporate Hub reminders** in Settings, **Corporate Hub**, move a date and run again. | **Saving**, then **Saved**; the setting is still off after a reload. No notification. Turn it back on. |
 
 **Cleanup:** None.
 

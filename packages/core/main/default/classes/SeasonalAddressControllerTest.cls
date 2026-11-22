@@ -68,6 +68,9 @@ private class SeasonalAddressControllerTest {
 			SeasonalAddressScheduler.start();
 
 			Test.startTest();
+			// The run's state rows are read once per transaction for every caller; only the job's
+			// own questions are counted here.
+			SettingsState.get('Seasonal_Address_Last_Run__c');
 			Integer before = Limits.getQueries();
 			SeasonalAddressController.SwapView view = SeasonalAddressController.getSwap();
 			Integer used = Limits.getQueries() - before;

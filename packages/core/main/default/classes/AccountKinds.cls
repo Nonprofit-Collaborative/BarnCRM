@@ -247,9 +247,9 @@ public with sharing class AccountKinds {
 	/**
 	 * Stores the detected record type when nothing usable is stored: blank (a new install), or
 	 * a record type since deactivated, deleted or otherwise no longer a candidate. What install
-	 * and source deploy run (CorePostInstall), so the setting is never blank and the formula
-	 * field `Account.Is_Organization__c`, which reads the stored value, agrees with this class,
-	 * which reads a stale value as the detected one. A stored `Master` is stale too once the
+	 * and source deploy run (CorePostInstall), so the setting is never blank. The flag
+	 * `Account.Is_Organization_Account__c` is set from `isOrganization`, which reads a stale
+	 * value as the detected one (OrganizationFlagBatch). A stored `Master` is stale too once the
 	 * org has a candidate (see noRecordTypeAllowed). A candidate, and `Master` in an org with
 	 * none, the values an administrator can save, are never overwritten.
 	 */

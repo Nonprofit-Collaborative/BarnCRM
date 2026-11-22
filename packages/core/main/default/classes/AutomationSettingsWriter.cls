@@ -1,6 +1,6 @@
 /**
- * The system mode writes behind the Automation page: the org default `BarnCRM_Settings__c`
- * record for the automation pause, the Automation Setting rows materialized from the shipped
+ * The system mode writes behind the Automation page: the org default `BarnCRM_Automation_Control__c`
+ * record for the automation pause (`Paused_Until__c`), the Automation Setting rows materialized from the shipped
  * registry (and an org's own listed flow's row, removed again), and the BarnCRM Automation
  * Control rows (canonical model R-A8: a custom setting takes no permission a BarnCRM Admin
  * could hold; `AutomationControlSettingService` checks the permission and the owner first).
@@ -32,18 +32,46 @@
  */
 public without sharing class AutomationSettingsWriter {
 	/**
-	 * Saves the pause end over `stored`, the record the caller already read and locked with
-	 * `OrgSettingsSystemWriter.lockStored()` to decide what to save (null when the org has none),
-	 * so the row is read under lock once, not twice.
+	 * Locks the organization-level Automation Control row until this transaction ends, so two
+	 * pauses or a pause and the resume job take turns reading and saving the pause end.
 	 */
-	public static void savePausedUntil(BarnCRM_Settings__c stored, Datetime pausedUntil) {
-		// Through the shared writer: a pause is often the first thing saved after install, and
-		// that first save must keep the shipped defaults (OrgSettingsSystemWriter).
-		OrgSettingsSystemWriter.saveOver(
-			BarnCRM_Settings__c.SObjectType,
-			stored,
-			new Map<Schema.SObjectField, Object>{ BarnCRM_Settings__c.Automation_Paused_Until__c => pausedUntil }
-		);
+	public static void lockPause() {
+		Id orgId = UserInfo.getOrganizationId();
+		List<BarnCRM_Automation_Control__c> rows = [
+			SELECT Id
+			FROM BarnCRM_Automation_Control__c
+			WHERE SetupOwnerId = :orgId
+			WITH SYSTEM_MODE
+			LIMIT 1
+			FOR UPDATE
+		];
+		lockedControlId = rows.isEmpty() ? null : rows[0].Id;
+	}
+
+	private static Id lockedControlId;
+
+	/**
+	 * Saves the pause end on the organization-level Automation Control row (ADR-NEXT settings as
+	 * custom metadata, decision 7), creating it with its shipped checkboxes when the org has
+	 * none. A pause the legacy BarnCRM Settings row still holds is cleared, so it cannot come
+	 * back once this one ends.
+	 */
+	public static void savePausedUntil(Datetime pausedUntil) {
+		BarnCRM_Automation_Control__c row = lockedControlId != null
+			? new BarnCRM_Automation_Control__c(Id = lockedControlId)
+			: new BarnCRM_Automation_Control__c(
+					SetupOwnerId = UserInfo.getOrganizationId(),
+					Pause_All__c = false,
+					Bypass__c = false
+				);
+		row.Paused_Until__c = pausedUntil;
+		upsert as system row;
+		lockedControlId = row.Id;
+		if (BarnCRM_Settings__c.getOrgDefaults()?.Automation_Paused_Until__c != null) {
+			OrgSettingsSystemWriter.save(
+				new Map<Schema.SObjectField, Object>{ BarnCRM_Settings__c.Automation_Paused_Until__c => null }
+			);
+		}
 	}
 
 	/** Inserts switch rows materialized from the shipped registry, or a generated trigger's. */

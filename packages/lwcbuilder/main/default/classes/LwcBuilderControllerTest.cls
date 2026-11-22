@@ -136,12 +136,8 @@ private class LwcBuilderControllerTest {
 
 	@IsTest
 	static void theSettingsHideComponentsAndCapLists() {
-		insert as system new LWC_Builder_Settings__c(
-			SetupOwnerId = UserInfo.getOrganizationId(),
-			Components_Enabled__c = false,
-			Rows_Per_List__c = 2
-		);
-		SettingsService.clearCaches();
+		ModuleSettings.setForTest('LwcBuilder_Components_Enabled', false);
+		ModuleSettings.setForTest('LwcBuilder_Rows_Per_List', 2);
 		System.runAs(admin()) {
 			save(new Map<String, Object>());
 
@@ -551,11 +547,7 @@ private class LwcBuilderControllerTest {
 
 	@IsTest
 	static void rowsPerListFallsBackToTenWhenOutOfRange() {
-		insert as system new LWC_Builder_Settings__c(
-			SetupOwnerId = UserInfo.getOrganizationId(),
-			Rows_Per_List__c = 500
-		);
-		SettingsService.clearCaches();
+		ModuleSettings.setForTest('LwcBuilder_Rows_Per_List', 500);
 		System.runAs(admin()) {
 			Assert.areEqual(10, LwcBuilderController.rowsPerList(), 'Over 200 is the default of 10');
 		}

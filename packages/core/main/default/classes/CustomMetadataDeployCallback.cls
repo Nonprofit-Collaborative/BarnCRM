@@ -60,9 +60,11 @@ public with sharing class CustomMetadataDeployCallback implements Metadata.Deplo
 		);
 	}
 
-	/** Salesforce's own words for each component that failed, or a plain fallback. */
-	@TestVisible
-	private static String reasonOf(Metadata.DeployResult result) {
+	/**
+	 * Salesforce's own words for each component that failed, or a plain fallback. Also used by
+	 * SettingValueDeployCallback.
+	 */
+	public static String reasonOf(Metadata.DeployResult result) {
 		List<String> problems = new List<String>();
 		if (result != null && result.details != null && result.details.componentFailures != null) {
 			for (Metadata.DeployMessage failure : result.details.componentFailures) {

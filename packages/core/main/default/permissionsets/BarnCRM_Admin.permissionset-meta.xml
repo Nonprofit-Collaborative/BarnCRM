@@ -764,6 +764,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Account.Is_Organization_Account__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Account.Is_Organization__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -1479,6 +1484,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Nightly_Job__c.Kind__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Nightly_Job__c.Last_Finished__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -1500,6 +1510,11 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Nightly_Job__c.Switch__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Nightly_Job__c.Value__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>

@@ -46,7 +46,7 @@ viewer's object, field and record access allow.
 
 ## Settings
 
-BarnCRM Settings, **Component Builder**:
+BarnCRM Settings, **Component Builder**. Every setting is org-wide; a save shows **Saving**, then **Saved**, and the value is still there when you reload:
 
 | Setting | Default | What it does |
 |---|---|---|

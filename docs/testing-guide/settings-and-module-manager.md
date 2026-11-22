@@ -49,7 +49,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 | 1 | Open **BarnCRM Settings**, **Error Log**. Change **Days to keep Error Log entries** to `90`. | A bar docks to the bottom of the screen: "1 unsaved change", **Discard** and **Save**. Change **Digest frequency** too: the bar says "2 unsaved changes". |
 | 2 | Click **Discard**. | Both values return to what they were and the bar goes away. Nothing is added to **Recent Changes** (shown on **General** only). |
 | 3 | Change the value to `5000` and click **Save**. | The box is marked as out of range and the page says "A number is outside the range its setting takes, so nothing was saved. Correct the marked value and save again." |
-| 4 | Change the value to `90` and click **Save**. | "Your settings are saved." Open **General**: the top row of **Recent Changes** shows **Days to keep Error Log entries**, old value 180, new value 90, your name and the time. |
+| 4 | Change the value to `90` and click **Save**. | "Saving..." for a few seconds, then "Your settings are saved." Open **General**: the top row of **Recent Changes** shows **Days to keep Error Log entries**, old value 180, new value 90, your name and the time. |
 | 5 | Open **Error Log** without changing anything, then open **General**. | No save bar shows while nothing is unsaved, and no new row appears in **Recent Changes**. |
 | 6 | Reload the page and open **Error Log**. | The box shows 90. |
 
@@ -616,3 +616,20 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 | 4 | Open **Corporate Hub Read Only**, **Object Settings**, **Policy Acknowledgment**. | **Edit** is ticked and **Create** is not, as for Corporate Hub Staff. As a read-only user answer your own acknowledgment on the hub: it saves. Marking another person's request Acknowledged (Data Loader or a flow) is refused with "Only the person asked can acknowledge this." |
 
 **Cleanup:** none.
+
+## T-SET-30: Settings Are Custom Metadata You Can Deploy
+
+**Purpose:** confirm a saved setting is a Setting Value record, a deployed one is read, the one-time carry-over moves an org's custom setting values, and Is Organization follows the record type setting.
+**Prerequisites:** admin user; a second org or sandbox to deploy to; for steps 5 to 7, an org whose **BarnCRM Settings** custom setting still holds values (for example one built before this release) and at least one account of the organization record type.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Error Log**, set **Days to keep Error Log entries** to `90` and save. | "Saving...", then "Your settings are saved." In Setup, **Custom Metadata Types**, **Setting Value**, **Manage Records**: a record **Error_Log_Retention_Days** holds `90`. |
+| 2 | Retrieve that record (`sf project retrieve start --metadata CustomMetadata:Setting_Value.Error_Log_Retention_Days`), change its value to `120` and deploy it to the other org. | The other org's **BarnCRM Settings** shows 120 for that setting, with no **Default** badge. |
+| 3 | In Setup, edit the record and empty **Value**. Reload **BarnCRM Settings**. | The setting shows its default (180) with the **Default** badge. |
+| 4 | In a package install without the Apex Settings switch (admin guide, Installing, Step 3), change any setting and save. | The page shows the refusal and the value on screen goes back to what is saved; the reason is in the **Error Log**. Turn the switch on and save again: it saves. |
+| 5 | In the org with custom setting values, open **BarnCRM Settings**. | The **Carry Your Settings Over** banner shows with **Carry Over Settings**. A read-only user sees no banner. |
+| 6 | Click **Carry Over Settings**. | "Saving...", then "Your settings are carried over." The banner goes away and does not come back on reload. Each value that differed from its default is in **Recent Changes** and has a Setting Value record; **What's New** stays dismissed for people who dismissed it. |
+| 7 | Choose a different **Record type for organizations** and save; after a minute open the **Organizations** list. | Accounts of the new record type are listed and those of the old one are not. Change an account's record type to the chosen one: it shows in the list at once. |
+
+**Cleanup:** put the record type and **Days to keep Error Log entries** back as they were and save.

@@ -10,4 +10,5 @@
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">30</value></values>
     <values><field>Description__c</field><value xsi:type="xsd:string">Copies each person's Home, Mobile, Work and Other phone and their standard phone to Salesforce phone Contact Points, one per number, the preferred one marked primary. On by default. Turning it off leaves the copies already made as they are.</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">contact-point-sync.md</value></values>
+    <values><field>Default_Value__c</field><value xsi:type="xsd:string">true</value></values>
 </CustomMetadata>

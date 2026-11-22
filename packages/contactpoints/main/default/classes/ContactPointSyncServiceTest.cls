@@ -353,10 +353,7 @@ private class ContactPointSyncServiceTest {
 			);
 			ContactPointSyncService.missingForTest.clear();
 			ContactPointSyncService.missingForTest.add(ContactPointPlan.ADDRESS);
-			SettingsService.saveValues(
-				ContactPointSyncService.SETTINGS_OBJECT,
-				new Map<String, Object>{ 'Sync_Phones__c' => false }
-			);
+			ModuleSettings.setForTest('Contact_Point_Sync_Phones', false);
 
 			Test.startTest();
 			Set<String> kinds = ContactPointSyncService.activeKinds();

@@ -10,4 +10,5 @@
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">120</value></values>
     <values><field>Description__c</field><value xsi:type="xsd:string">When an address is verified, replace its street, city, state and postal code with the provider's standardized form, such as "123 Main St" for "123 main street". The country is never changed. Off by default: only Verification Status and Latest Verified Date are written.</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">address-verification.md</value></values>
+    <values><field>Default_Value__c</field><value xsi:type="xsd:string">false</value></values>
 </CustomMetadata>

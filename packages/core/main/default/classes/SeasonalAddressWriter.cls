@@ -38,18 +38,16 @@ public without sharing class SeasonalAddressWriter {
 	}
 
 	/**
-	 * Records when the run finished and what it did, on the org-level settings record.
+	 * Records when the run finished and what it did, as run state (SettingsState).
 	 *
 	 * No permission is checked, unlike `SettingsWriter`: nobody asked for this write and no
 	 * value in it came from a person. Both values are produced by the job about itself, and
 	 * they are the whole of C-18's "visible last run" (R-AD8).
 	 */
 	public static void recordRun(Datetime finishedAt, String summary) {
-		OrgSettingsSystemWriter.save(
-			new Map<Schema.SObjectField, Object>{
-				BarnCRM_Settings__c.Seasonal_Address_Last_Run__c => finishedAt,
-				BarnCRM_Settings__c.Seasonal_Address_Last_Run_Summary__c => summary
-			}
-		);
+		SettingsState.put(new Map<String, Object>{ LAST_RUN => finishedAt, LAST_SUMMARY => summary });
 	}
+
+	public static final String LAST_RUN = 'Seasonal_Address_Last_Run__c';
+	public static final String LAST_SUMMARY = 'Seasonal_Address_Last_Run_Summary__c';
 }

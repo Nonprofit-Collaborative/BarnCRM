@@ -10,4 +10,5 @@
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">40</value></values>
     <values><field>Description__c</field><value xsi:type="xsd:string">Copies each person's current addresses, their own and their household's, to Salesforce address Contact Points, the primary one marked default. Former and undeliverable addresses are not copied. On by default. Turning it off leaves the copies already made as they are.</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">contact-point-sync.md</value></values>
+    <values><field>Default_Value__c</field><value xsi:type="xsd:string">true</value></values>
 </CustomMetadata>

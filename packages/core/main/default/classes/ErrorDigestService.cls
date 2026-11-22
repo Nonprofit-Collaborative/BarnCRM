@@ -68,12 +68,12 @@ public with sharing class ErrorDigestService {
 		Datetime runAt = System.now();
 		// Locked until this run ends, so Send now and the scheduled run take turns: the second
 		// reads the window the first moved, and never sends the same entries again.
-		BarnCRM_Settings__c settings = OrgSettingsSystemWriter.lockStored();
-		if (settings == null) {
-			settings = SettingsService.getSettings();
-		}
-		Datetime coveredUntil = settings.Error_Digest_Covered_Until__c;
-		String lastSummary = settings.Error_Digest_Last_Run_Summary__c;
+		SettingsState.lock(
+			new Set<String>{ ErrorDigestWriter.COVERED_UNTIL, ErrorDigestWriter.LAST_SUMMARY, ErrorDigestWriter.LAST_RUN }
+		);
+		BarnCRM_Settings__c settings = SettingsService.getSettings();
+		Datetime coveredUntil = SettingsState.moment(ErrorDigestWriter.COVERED_UNTIL);
+		String lastSummary = SettingsState.text(ErrorDigestWriter.LAST_SUMMARY);
 		Integer periodDays = FREQUENCY_WEEKLY.equals(settings.Error_Digest_Frequency__c) ? 7 : 1;
 		Outcome outcome = new Outcome();
 

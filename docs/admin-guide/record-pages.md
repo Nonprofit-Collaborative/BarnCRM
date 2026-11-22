@@ -22,7 +22,9 @@ until Households is on ([Households](households.md)), and no Contact record type
 does not disturb any you already have. An account is an organization when it has the record
 type chosen in **Record type for organizations** on **General** (or, when **No record type** is
 chosen, no record type); the pages and the **Organizations** list read that through the
-**Is Organization** field, so they follow your choice without being edited.
+**Is Organization** field, so they follow your choice without being edited. BarnCRM keeps that
+field up to date itself: it is set whenever an account is saved, and on every account after
+you change the setting or install a release.
 
 What ships:
 

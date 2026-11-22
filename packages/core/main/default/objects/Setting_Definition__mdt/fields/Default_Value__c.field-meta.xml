@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Default_Value__c</fullName>
+  <description>
+    The value this setting has until the org changes it, as a JSON literal (true, 90, "Both").
+    Blank means the setting has no default. A changed value is a Setting Value record with the
+    same name; the package never ships one, so an upgrade can change a default but never an
+    org's choice.
+  </description>
+  <externalId>false</externalId>
+  <fieldManageability>DeveloperControlled</fieldManageability>
+  <label>Default Value</label>
+  <length>255</length>
+  <required>false</required>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

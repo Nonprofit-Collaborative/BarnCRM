@@ -12,4 +12,8 @@
     >For an organization that works under several names, such as programs, chapters, affiliates or a thrift store. On, new gifts, appeals, volunteer jobs, programs and portals take a brand, and receipts and letters print the brand's name, logo, address and signature. Off, everything prints your organization details as before.</value></values>
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">80</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">brands.md</value></values>
+  <values>
+    <field>Default_Value__c</field>
+    <value xsi:type="xsd:string">false</value>
+  </values>
 </CustomMetadata>

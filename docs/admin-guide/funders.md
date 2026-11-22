@@ -428,7 +428,7 @@ grant in the chain, earlier and later, with its award period and amounts.
 
 ## Settings
 
-Open **BarnCRM Settings**, **Grants** (under Fundraising). Each setting saves for the whole
+Open **BarnCRM Settings**, **Grants** (under Fundraising). A save shows **Saving**, then **Saved**. Each setting saves for the whole
 organization.
 
 | Setting | Default | What it does |

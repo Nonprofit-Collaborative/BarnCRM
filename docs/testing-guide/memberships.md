@@ -35,7 +35,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 ## T-MEM-05: Lapse Handling and Reminders
 
 **Purpose:** confirm Grace, Lapsed and one reminder per term (R-MEM4, R-MEM5).
-**Prerequisites:** two Current memberships: one with End Date 10 days ago, one 40 days ago; a third ending in 20 days whose contact has an email address. Reminders on in BarnCRM Settings, Memberships.
+**Prerequisites:** two Current memberships: one with End Date 10 days ago, one 40 days ago; a third ending in 20 days whose contact has an email address. Reminders on in BarnCRM Settings, Memberships (turn **Send renewal reminders** on and save: **Saving**, then **Saved**; reload and it is still on).
 **Steps:** 1. Run the step. 2. Run it again.
 **Expected:** 1. The first is Grace, the second Lapsed; the third's contact gets one reminder and Reminded For is its end date. 2. No second reminder.
 

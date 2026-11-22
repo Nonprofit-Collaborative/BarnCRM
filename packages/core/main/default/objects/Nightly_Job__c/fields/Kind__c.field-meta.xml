@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Kind__c</fullName>
+  <description>
+    What the row holds: a nightly job step (Job, or blank on a row made before this field), the
+    org's run state under a key (State), or one person's What's New dismissal (Seen).
+  </description>
+  <externalId>false</externalId>
+  <label>Kind</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Job</fullName>
+        <default>false</default>
+        <label>Job</label>
+      </value>
+      <value>
+        <fullName>State</fullName>
+        <default>false</default>
+        <label>State</label>
+      </value>
+      <value>
+        <fullName>Seen</fullName>
+        <default>false</default>
+        <label>Seen</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

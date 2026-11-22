@@ -80,12 +80,7 @@ private class ConnectorClockTest {
 	}
 
 	private static void chooseUser(Id userId) {
-		OrgSettingsSystemWriter.save(
-			Connector_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{
-				Connector_Settings__c.Integration_User_Id__c => String.valueOf(userId)
-			}
-		);
+		SettingsState.put(new Map<String, Object>{ ConnectorIntegrationUser.KEY_USER => String.valueOf(userId) });
 	}
 
 	/** A finding's fields by key; `Finding`'s fields are `@AuraEnabled` only, so read through JSON. */

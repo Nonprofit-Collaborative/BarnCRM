@@ -140,7 +140,12 @@ CAPS = {
     # ArchiveDestination seam, the rule key and schedule, the big object store, the copy and
     # delete chain, the rule service and nightly step, the Archived Records viewer, the restore
     # chain and the archive erasure scan: 1,924,656 measured, plus about 0.1%.
-    "core": 1_926_500,
+    # Raised 2026-11-21 for SET-01 and SET-02 (D-219, settings as custom metadata): SettingStore,
+    # SettingsState, SettingValueDeployCallback, the one-time SettingsCarryOver (removed again
+    # after carry-over), OrganizationFlagBatch and ModuleSettings, less the removed
+    # shipped-defaults table: 1,973,350 measured, plus about 0.1%. Every module's own settings
+    # readers and writers go in SET-03, which is where the suite gets this back.
+    "core": 1_975_400,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured

@@ -6,7 +6,7 @@
   <columns>Primary_Contact__c</columns>
   <filterScope>Mine</filterScope>
   <filters>
-    <field>Is_Organization__c</field>
+    <field>Is_Organization_Account__c</field>
     <operation>equals</operation>
     <value>1</value>
   </filters>

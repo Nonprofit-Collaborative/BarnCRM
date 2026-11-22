@@ -161,10 +161,7 @@ private class HubRemindersTest {
 			Date lapsed = Date.today().addDays(-2);
 			Agreement__c renewing = agreement(lapsed, true);
 			Agreement__c ending = agreement(lapsed, false);
-			insert new Corporate_Hub_Settings__c(
-				SetupOwnerId = UserInfo.getOrganizationId(),
-				Reminders_Enabled__c = false
-			);
+			ModuleSettings.setForTest('CorporateHub_Reminders_Enabled', false);
 
 			new HubReminders().execute(null);
 
@@ -211,11 +208,8 @@ private class HubRemindersTest {
 	@IsTest
 	static void aBlankOrOutOfRangeNumberReadsAsTheShipped30() {
 		System.runAs(TestUsers.adminWith(ADMIN_SET)) {
-			insert new Corporate_Hub_Settings__c(
-				SetupOwnerId = UserInfo.getOrganizationId(),
-				Reminder_Days__c = 0,
-				Acknowledgment_Days__c = 45
-			);
+			ModuleSettings.setForTest('CorporateHub_Reminder_Days', 0);
+			ModuleSettings.setForTest('CorporateHub_Acknowledgment_Days', 45);
 
 			Assert.isTrue(CorporateHubSettings.remindersEnabled(), 'Ships on');
 			Assert.areEqual(30, CorporateHubSettings.reminderDays(), 'Zero is out of range');

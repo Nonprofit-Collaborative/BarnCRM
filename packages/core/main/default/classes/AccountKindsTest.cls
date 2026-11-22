@@ -243,13 +243,13 @@ private class AccountKindsTest {
 
 			Set<Id> ids = new Set<Id>{ organization.Id, household.Id };
 			Map<Id, Account> read = new Map<Id, Account>(
-				[SELECT Id, Is_Organization__c FROM Account WHERE Id IN :ids WITH SYSTEM_MODE]
+				[SELECT Id, Is_Organization_Account__c FROM Account WHERE Id IN :ids WITH SYSTEM_MODE]
 			);
 			Assert.isTrue(
-				read.get(organization.Id).Is_Organization__c,
+				read.get(organization.Id).Is_Organization_Account__c,
 				'An account of the chosen record type is an organization.'
 			);
-			Assert.isFalse(read.get(household.Id).Is_Organization__c, 'A household never is.');
+			Assert.isFalse(read.get(household.Id).Is_Organization_Account__c, 'A household never is.');
 		}
 	}
 
@@ -286,24 +286,24 @@ private class AccountKindsTest {
 
 			Map<Id, Schema.RecordTypeInfo> byId = Schema.SObjectType.Account.getRecordTypeInfosById();
 			for (Account read : [
-				SELECT Id, Name, RecordTypeId, Is_Organization__c
+				SELECT Id, Name, RecordTypeId, Is_Organization_Account__c
 				FROM Account
 				WHERE Id IN :accounts
 				WITH SYSTEM_MODE
 			]) {
 				Assert.areEqual(
 					AccountKinds.isOrganization(read.RecordTypeId),
-					read.Is_Organization__c,
+					read.Is_Organization_Account__c,
 					'The field and the resolver agree for ' + read.Name + '.'
 				);
 				Schema.RecordTypeInfo info = read.RecordTypeId == null ? null : byId.get(read.RecordTypeId);
 				if (read.Id == household.Id) {
-					Assert.isFalse(read.Is_Organization__c, 'A household never is.');
+					Assert.isFalse(read.Is_Organization_Account__c, 'A household never is.');
 				} else if (info == null || info.isMaster()) {
 					// Saved with no record type, or the master's. An account saved without one
 					// takes the running user's default record type when the user has one,
 					// and is then rightly not an organization.
-					Assert.isTrue(read.Is_Organization__c, read.Name + ' is an organization.');
+					Assert.isTrue(read.Is_Organization_Account__c, read.Name + ' is an organization.');
 				}
 			}
 		}
@@ -319,7 +319,7 @@ private class AccountKindsTest {
 			AccountKinds.storeDetectedIfBlank();
 			Test.stopTest();
 
-			String stored = BarnCRM_Settings__c.getOrgDefaults().Organization_Record_Type__c;
+			String stored = SettingsService.getSettings().Organization_Record_Type__c;
 			Assert.areEqual(
 				AccountKinds.detectOrganizationRecordType(),
 				stored,
@@ -341,7 +341,7 @@ private class AccountKindsTest {
 			AccountKinds.storeDetectedIfBlank();
 			Assert.areEqual(
 				AccountKinds.NO_RECORD_TYPE,
-				BarnCRM_Settings__c.getOrgDefaults().Organization_Record_Type__c,
+				SettingsService.getSettings().Organization_Record_Type__c,
 				'Blank is filled with the detected value.'
 			);
 			AccountKinds.reset();
@@ -351,7 +351,7 @@ private class AccountKindsTest {
 
 			Assert.areEqual(
 				AccountKinds.NO_RECORD_TYPE,
-				BarnCRM_Settings__c.getOrgDefaults().Organization_Record_Type__c,
+				SettingsService.getSettings().Organization_Record_Type__c,
 				'A usable stored value is never overwritten.'
 			);
 		}
@@ -389,7 +389,7 @@ private class AccountKindsTest {
 			AccountKinds.storeDetectedIfBlank();
 			Test.stopTest();
 
-			String stored = BarnCRM_Settings__c.getOrgDefaults().Organization_Record_Type__c;
+			String stored = SettingsService.getSettings().Organization_Record_Type__c;
 			if (hasCandidate) {
 				Assert.isTrue(AccountKinds.isCandidate(stored), 'A candidate replaced it.');
 				Assert.areEqual(AccountKinds.detectOrganizationRecordType(), stored, 'The detected one.');

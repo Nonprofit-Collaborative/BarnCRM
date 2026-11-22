@@ -823,11 +823,20 @@ Detection never creates, activates or shows a record type.
   resolver, `AccountKinds`, answers "is this an organization" and "which record type does a
   new organization get" for Core and every module; nothing else names a record type for
   organizations.
-- **Formula field:** `Is_Organization__c` (Checkbox), true when the account's record type
-  developer name equals `$Setup.BarnCRM_Settings__c.Organization_Record_Type__c`, or when the
-  setting is `Master` and the account has no record type (a blank `RecordTypeId`, or the
-  master record type, which has no developer name). The Organizations list view and
-  every record page rule for organizations filter on it. Read access in the three role sets.
+- **Field:** `Is_Organization_Account__c` (Checkbox, label Is Organization, default false, kept
+  by BarnCRM), true when the account's record type developer name equals the Organization
+  Record Type setting (`Organization_Record_Type__c`, Section 12, read through
+  `AccountKinds.isOrganization`), or when the setting is `Master` and the account has no record
+  type (a blank `RecordTypeId`, or the master record type, which has no developer name). The
+  Account trigger handler sets it on every insert and update; `OrganizationFlagBatch` puts
+  right every Account whose flag disagrees when the setting's saved value changes and on each
+  install (ADR-NEXT settings as custom metadata). The Organizations list views, every record
+  page rule for organizations, the address capture flow template and the donor segment
+  template filter on it. Read access in the three role sets.
+- **Field:** `Is_Organization__c` (Checkbox formula over
+  `$Setup.BarnCRM_Settings__c.Organization_Record_Type__c`), unused by BarnCRM and removed in
+  phase 2 of ADR-NEXT settings as custom metadata with `BarnCRM_Settings__c`. Read access in the
+  three role sets until then.
 - **Fields:** standard `Name`; `Primary_Contact__c` (shared with Household, above);
   `Sample_Data__c` (Checkbox, shared field definition with Household, above);
   `Sample_Data_Key__c` (Text(20), shared with Household, holding the key the generated
@@ -1035,11 +1044,14 @@ names recompute and the waiting rollups.
   `Is_Package_Default__c` (Checkbox). The record name holds the automation's label as the
   admin reads it.
 - **Shipped defaults:** `Automation_Registry__mdt` (Section 13).
-- **Org-level pause:** `BarnCRM_Settings__c.Automation_Paused_Until__c`.
+- **Org-level pause:** `BarnCRM_Automation_Control__c.Paused_Until__c` (DateTime, organization
+  level only), read beside `Pause_All__c` at no query cost on every save (ADR-NEXT settings as
+  custom metadata). `BarnCRM_Settings__c.Automation_Paused_Until__c` is read only until the org
+  carries its settings over, and is removed in phase 2.
 - **Automation Control:** `BarnCRM_Automation_Control__c`, a public hierarchy custom setting
   (public so that an organization's own formulas, validation rules and flows read it through
   `$Setup`), with `Pause_All__c` (Checkbox, default false) and `Bypass__c` (Checkbox, default
-  false) (R-A7).
+  false) (R-A7), and `Paused_Until__c` (DateTime, organization level only, the pause end above).
 - **Service:** `AutomationControl`, `TriggerDispatcher`, `CheckAutomationAction`.
 
 ---
@@ -1200,9 +1212,15 @@ deployment Id.
 ### Definition
 
 The org's simple, org-wide toggles and values: feature flags, mode selections, and
-naming pattern choices. Stored as a protected hierarchy custom setting so that the
-settings console can write them synchronously and so that they are cacheable (Decision
-D-06).
+naming pattern choices. Each key's default ships on its `Setting_Definition__mdt` row
+(`Default_Value__c`) and a value the org changed is a `Setting_Value__mdt` record of the same
+name, so settings are deployable metadata (D-219, ADR-NEXT settings as custom metadata).
+The keys below keep their `BarnCRM_Settings__c` field names: the console and every reader name a
+key by them, and `SettingsService.getSettings()` returns a `BarnCRM_Settings__c` built in
+memory from the store. The custom setting itself is read only until the org carries its saved
+values over, and is removed in phase 2. Run-state keys (last runs, summaries, watermarks, setup
+markers) are rows of `Nightly_Job__c` with `Kind__c` State (Section 29 Nightly Jobs), not
+settings; the automation pause end is `BarnCRM_Automation_Control__c.Paused_Until__c`.
 
 Core is neutral (plan Section 4.1, C-29, ADR-0059): a key lives here only if Core reads it or
 it means the same thing to any organization. The console and the object are labelled **BarnCRM
@@ -1499,7 +1517,10 @@ definition.
 
 ### Salesforce implementation
 
-- **Custom setting:** `BarnCRM_Settings__c`, hierarchy, protected.
+- **Store:** `Setting_Value__mdt` over `Setting_Definition__mdt.Default_Value__c` (Section 13),
+  read by `SettingStore` and written by an Apex metadata deployment whose callback,
+  `SettingValueDeployCallback`, audits each key. `BarnCRM_Settings__c` (hierarchy, protected)
+  is the legacy store, read until `Settings_Carried_Over` is true, marked for removal.
 - **Picklist keys are stored as text.** Custom settings do not support picklist fields on
   the platform, so `Coexistence_Mode__c` and `Household_Membership_Mode__c` are Text
   fields holding one of the values listed above, validated by `SettingsService` rather
@@ -1545,14 +1566,11 @@ With no notes shipped, Dismiss stores nothing.
 
 ### Salesforce implementation
 
-- **Custom setting:** `Whats_New_Seen__c`, hierarchy, protected, with user-level records only
-  (`SetupOwnerId` is the person). Not a key on `BarnCRM_Settings__c`, because a user-level
-  record of that setting would hide the organization's values from that person (ADR-0087,
-  `0087-whats-new-from-packaged-release-notes.md`).
-
-| Attribute | API name | Type | Notes |
-|---|---|---|---|
-| Last Seen Version | `Last_Seen_Version__c` | Text(20) | Written in system mode by `WhatsNewSeenWriter` (ADR-0021), for the running user only. |
+- **Store:** one `Nightly_Job__c` row per person, `Kind__c` Seen, Name `WhatsNew:<UserId>`,
+  the version in `Value__c` (ADR-NEXT settings as custom metadata). Written in system mode by
+  `WhatsNewSeenWriter` (ADR-0021), for the running user only. The legacy custom setting
+  `Whats_New_Seen__c` (user-level records, `Last_Seen_Version__c`) is read while a person has no
+  row, and is removed in phase 2.
 
 - **Service:** `WhatsNewController`, with the LWC `whatsNew` on the BarnCRM home page.
 
@@ -1591,6 +1609,61 @@ settings to the console by shipping rows rather than by editing the console.
 | `Sort_Order__c` | number | The order of this row inside its section. |
 | `Min_Value__c` | number(18, 2) | Number rows only: the lowest value the console accepts. The console marks a lower value before Save, and `SettingsService` refuses it on the server whoever saves it, naming the setting and the range (owner decision 2026-10-13, ADMIN-27). Every shipped Number row sets it. |
 | `Max_Value__c` | number(18, 2) | Number rows only: the highest value accepted, enforced the same way. Every shipped Number row sets it. |
+| `Default_Value__c` | text (255) | The value the setting has until the org changes it, as a JSON literal (`true`, `90`, `"Both"`); blank means no default (ADR-NEXT settings as custom metadata). A row whose setting ships a value states it here; `check-setting-defaults.py` checks Core's against the field defaults. |
+
+`Data_Type__c` also takes Hidden: a value BarnCRM writes from another page (the features turned
+on, the modules turned off) or for itself (`Settings_Carried_Over`), held in the store like any
+other key and never listed by the console.
+
+### Setting Value
+
+`Setting_Value__mdt` (Core, Public): one record per setting the org changed from its default
+(D-219, ADR-NEXT settings as custom metadata). No package ships a record; an upgrade never
+touches one. Retrieved and deployed like any metadata (`CustomMetadata:Setting_Value.*`).
+
+| Field | Type | Definition |
+|---|---|---|
+| DeveloperName | text | The DeveloperName of the Setting Definition the value belongs to. |
+| `Value__c` | text (255) | The org's value as a JSON literal; blank means the default. |
+
+**R-SV1 Effective value.** The Setting Value when one exists and is not blank and parses as JSON,
+else the definition's `Default_Value__c`; a record with no definition (a module not installed) is
+ignored. Before `Settings_Carried_Over` is true, a value the org saved in the legacy custom
+setting is used ahead of the default.
+**R-SV2 Saving.** One save sends one deployment of every changed key. The page shows Saving
+until the deployment ends, then Saved or the reason it was not. Each key's Setting Change is
+written when the deployment succeeds, with its Deployment Id (R-S6).
+**R-SV3 Carry-over.** Carry Over Settings (offered to a settings admin while the org has legacy
+values and no marker) deploys, in one deployment, every legacy value that differs from its
+default plus the marker, audited like any save; copies run state to State rows and What's New
+dismissals to Seen rows where none exists; and moves a pause that has not ended to the
+Automation Control org default. A value longer than 255 characters is not carried and is
+reported; it reads its default. A second run, once the marker is deployed, does nothing. The
+same run carries every registered module (Setting Module below): each legacy value with a
+Setting Definition of the module's group joins the one deployment, and each state field gets
+its `Prefix.Field` State row.
+**R-SV4 Module settings.** A module whose settings group has a Setting Module record reads and
+saves every row of that group through the store (`ModuleSettings` by DeveloperName, or
+`SettingsService` by group and key), from its definitions alone, so the group needs no object
+once the legacy custom setting is removed. Until then, and only before carry-over in an org
+that saved Core's legacy settings, a key with no Setting Value reads the legacy field. Keys
+(DeveloperNames, and group plus key) are unique across every package; a registered module's
+Checkbox, Number and Picklist rows ship a `Default_Value__c`, and every row whose legacy field
+declares a default ships the same value (`check-setting-defaults.py`). A console save touching
+Core and modules sends one deployment.
+
+### Setting Module
+
+`Setting_Module__mdt` (Core, Public; not counted as an object): one record per module whose
+settings live in the store, shipped in the module's own package, so Core reads, saves and carries
+over the module's settings without naming it (ADR-0059, ADR-NEXT settings as custom metadata).
+DeveloperName is the module's name, as on its BarnCRM Module record.
+
+| Field | Type | Definition |
+|---|---|---|
+| `Settings_Object__c` | text (80), required | The settings group the module's Setting Definition rows name in `Settings_Object__c`, which is also its legacy hierarchy custom setting's API name without a prefix. Never `BarnCRM_Settings__c`. |
+| `Key_Prefix__c` | text (20), required | The prefix of the module's State row names: `Prefix.Name` (`SettingsState.moduleKey`). Unique across modules. |
+| `State_Fields__c` | long text | The legacy fields that hold run state, comma separated; carry-over copies each to its State row and never carries it as a setting. |
 
 ### Automation Registry
 
@@ -6678,7 +6751,7 @@ other copy exists.
 and `filter` are the R-SQ1 and R-R2 parts, and names carry no namespace prefix: building a
 segment qualifies each custom name for the org. The built document adds `Email` after `Name`
 for people, a limit of 200 rows, and one more condition joined by AND to the template's logic:
-`Deceased__c` equals false for people, `Is_Organization__c` equals true for organizations
+`Deceased__c` equals false for people, `Is_Organization_Account__c` equals true for organizations
 (households are accounts too). A template's name is a custom label and its description is help
 text in the Giving help catalog (`BarnHelp_Giving`, ADR-0164 help-text-json). The five
 templates:
@@ -10053,7 +10126,7 @@ this step does not read. Ships off.
   picklist for blank, so a value an admin adds is not covered), or Volunteer Hours Total is
   above zero, or the user holds
   `Manage_Volunteers` (so a coordinator can set the status of someone new). On Account the six
-  attributes carry a field visibility rule (record type not Household and `Is_Organization__c`
+  attributes carry a field visibility rule (record type not Household and `Is_Organization_Account__c`
   false), and
   the Manage Volunteers clause applies only to that record type, so a household or
   organization shows only its totals, once it has hours.
@@ -13293,8 +13366,10 @@ searches nothing. A blank or out of range renewal lead time reads as 90.
 
 ### Salesforce implementation
 
-- **Object:** `Funders_Settings__c`, hierarchy custom setting, visibility Protected, read through
-  Core's `SettingsService` by `FundersSettings`.
+- **Object:** `Funders_Settings__c`, hierarchy custom setting, visibility Protected. The group
+  is registered in the settings store (`Setting_Module.Funders`, prefix `Funders`, no state
+  fields) and read through `ModuleSettings` by `FundersSettings`; the object is the legacy
+  carry-over source only (SET-03). Every row's `Default_Value__c` equals the default below.
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -13954,7 +14029,18 @@ pages' Schedule and Stop buttons, which require Manage BarnCRM Settings.
 | Last Finished | `Last_Finished__c` | DateTime |
 | Last Outcome | `Last_Outcome__c` | Picklist (Running, Done, Done With Errors, Failed, Skipped, Gave Up Waiting), restricted |
 | Last Message | `Last_Message__c` | Text(255) |
+| Kind | `Kind__c` | Picklist (Job, State, Seen), restricted; blank reads as Job |
+| Value | `Value__c` | Long Text (32768), a JSON literal; State and Seen rows only |
 
+- **State rows** (ADR-NEXT settings as custom metadata): `Kind__c` State, Name the key (the
+  former `BarnCRM_Settings__c` field name, such as `Error_Digest_Last_Run__c`), `Value__c` the
+  value. They hold what ran in this org (last runs, summaries, watermarks, setup markers), so
+  they are not deployable and not settings. Read once per transaction by `SettingsState` and
+  written in system mode. The job registry (`NightlyJobs.rows`) reads Job rows only. Seen rows
+  are Section 12A. A module's rows are named `Prefix.Name`, the prefix from its Setting Module
+  record (Section 13, R-SV4). A run lock is one such row read `FOR UPDATE`
+  (`SettingsState.lockOrCreate`), created by the module at install so two first runs cannot
+  each make one.
 - **Classes:** `NightlyStep` (one step), `NightlyStepProvider` (a module's steps),
   `NightlyJobs` (the registry, switches, results, scheduling and adoption), `NightlyRun` (the
   run: schedulable and queueable). Each former scheduler class keeps its `start`, `stop`,
@@ -14430,6 +14516,10 @@ three switches read as on before the first save.
 ### Salesforce implementation
 
 - **Object:** `Contact_Point_Sync_Settings__c`, hierarchy custom setting, visibility Protected.
+  Registered in the settings store (`Setting_Module.ContactPoints`, prefix `ContactPoints`);
+  the three switches are settings, and `Last_Backfill__c` and `Last_Backfill_Summary__c` are run
+  state (`ContactPoints.Last_Backfill__c`, `ContactPoints.Last_Backfill_Summary__c`) written
+  by the backfill (SET-03). The object is the legacy carry-over source only.
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -16584,6 +16674,9 @@ legal text. Existing records are never changed.
 ### Salesforce implementation
 
 - **Object:** `Corporate_Hub_Settings__c`, hierarchy custom setting, visibility Protected.
+  Registered in the settings store (`Setting_Module.CorporateHub`, prefix `CorporateHub`, no
+  state fields) and read through `ModuleSettings` (SET-03); the object is the legacy
+  carry-over source only.
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -17741,6 +17834,9 @@ Settings.
 ### Salesforce implementation
 
 - **Object:** `LWC_Builder_Settings__c`, hierarchy custom setting, visibility Protected.
+  Registered in the settings store (`Setting_Module.LwcBuilder`, prefix `LwcBuilder`, no state
+  fields) and read through `ModuleSettings` (SET-03); the object is the legacy carry-over
+  source only.
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -17990,6 +18086,9 @@ The module's org-wide settings, edited in the Scholarships and Outbound Grants s
 ### Salesforce implementation
 
 - **Object:** `Scholarships_Settings__c`, label Scholarships Settings, hierarchy custom setting, visibility Protected.
+  Registered in the settings store (`Setting_Module.Scholarships`, prefix `Scholarships`, no
+  state fields) and read through `ModuleSettings` (SET-03); the object is the legacy
+  carry-over source only.
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -18383,6 +18482,9 @@ The Memberships module's org-wide settings, in the Memberships section of BarnCR
 
 - **Object:** `Memberships_Settings__c`, hierarchy custom setting, protected; fields
   `Reminders_Enabled__c`, `Reminder_Days__c`, `Reminder_Template__c`, `Renew_From_Gifts__c`.
+  Registered in the settings store (`Setting_Module.Memberships`, prefix `Memberships`, no
+  state fields) and read through `ModuleSettings` (SET-03); the object is the legacy
+  carry-over source only.
 
 ---
 
@@ -18995,6 +19097,10 @@ the setup page last succeeded; lookups run only while it is the chosen provider.
 ### Salesforce implementation
 
 - **Object:** `Address_Verification_Settings__c`, hierarchy custom setting, visibility Protected.
+  Registered in the settings store (`Setting_Module.AddressVerification`, prefix
+  `AddressVerification`); the five rows are settings and `Connected_Provider__c` is run state
+  (`AddressVerification.Connected_Provider__c`), written at once by Check Connection and
+  Disconnect (SET-03). The object is the legacy carry-over source only.
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -19782,11 +19888,15 @@ F12). Turning Pause All Recipes off publishes both start events.
 
 ### Salesforce implementation
 
-- **Custom setting:** `Connector_Settings__c`, hierarchy, protected. Fields `Recipes_Paused__c`
-  (Checkbox, default false) and `Integration_User_Id__c` (Text(18)).
-- **Setting Definition row:** `Connector_Recipes_Paused` (Checkbox, Module `Connector`). The
-  Integration User has none: choosing one also assigns a permission set and writes the
-  subscriber configuration, which only Super Connector does.
+- **Custom setting:** `Connector_Settings__c`, hierarchy, protected, the legacy carry-over
+  source only. Registered in the settings store (`Setting_Module.Connector`, prefix
+  `Connector`, state fields `Recipes_Paused__c` and `Integration_User_Id__c`, SET-03). Both
+  are run state, written at once: `Connector.Recipes_Paused__c` (Checkbox, default false) is
+  toggled on the Connector page by Connector managers, and `Connector.Integration_User_Id__c`
+  (Text(18)) is set when a user is chosen.
+- **Setting Definition row:** none for either, since a deployed setting cannot be a
+  synchronous switch. Choosing the Integration User also assigns a permission set and writes
+  the subscriber configuration, which only Super Connector does.
 
 ---
 
@@ -20266,6 +20376,9 @@ mirrors the primary member).
 | 1.88 | 2026-11-21 | Storage services for the backup destination (BK-10b, release 1.36; ADR-NEXT decision 8). New R-CN12: AWS Signature Version 4 connections, OAuth connections made in Setup, `{file}` in headers and Google Drive `metadata` in Backup Settings, and a short allowlist for a path's query. No object or field added. (Version number for the integrator to confirm at merge.) |
 | 1.89 | 2026-11-21 | Archive rules and the big object archive (D-221, AR-10, ADR-NEXT archive rules and big object archive). New Section 29D1 Archived Record (`Archived_Record__b`, a big object from the separate allocation; custom objects unchanged), rules R-ARC1 to R-ARC7. Saved Query gains R-SQ18, the `archive` key (destination Files, BigObject or OffPlatform through the `ArchiveDestination` seam, a schedule, an Active switch). R-R2 gains `more than n days ago`. `Import_Batch__c` Operation gains Archive. `BarnCRM_Settings__c` gains `Archived_Record_Count__c`. The nightly run gains the Archive Rules step. |
 | 1.90 | 2026-11-21 | Archived Records viewer, restore and archive erasure (D-221, AR-10 part 4). R-ARC4 gains the restore limits (50 rows, 25 per insert link) and keeps a row archived when its record or a child cannot be created; R-ARC6 names whom the scan matches and the `ArchiveErasureExtension` registration. No object or field added. |
+| 1.91 | 2026-11-21 | Settings as custom metadata, phase 1 Core (SET-01, D-219, ADR-NEXT settings as custom metadata). New custom metadata type `Setting_Value__mdt` with `Value__c` (Section 13, R-SV1 to R-SV3; not counted as an object). `Setting_Definition__mdt` gains `Default_Value__c` and the Hidden data type. `Nightly_Job__c` gains `Kind__c` and `Value__c` (state and What's New rows). `BarnCRM_Automation_Control__c` gains `Paused_Until__c`. New `Account.Is_Organization_Account__c`, a kept checkbox that replaces the `Is_Organization__c` formula everywhere it was read (Section 8; the platform refuses a formula-to-checkbox change, and the formula is removed in phase 2). `BarnCRM_Settings__c` and `Whats_New_Seen__c` are read only until carry-over and are removed in phase 2; no object count change in phase 1. |
+| 1.92 | 2026-11-21 | Settings as custom metadata, phase 2 Core prerequisite (SET-02, D-219). New custom metadata type `Setting_Module__mdt` with `Settings_Object__c`, `Key_Prefix__c` and `State_Fields__c` (Section 13; not counted as an object): a module registers its settings group, its State row prefix and its legacy state fields. New rule R-SV4 (module settings read and saved through the store by name or by group and key); R-SV3 carry-over covers every registered module; module State rows are `Prefix.Name` and a run lock is a State row read `FOR UPDATE` (Section 29 Nightly Jobs). No object count change. |
+| 1.93 | 2026-11-21 | Settings as custom metadata, phase 2 modules (SET-03, D-219): Funders, Scholarships, Memberships, Corporate Hub, Connector, Contact Point Sync, Address Verification and LWC Builder. Each ships a `Setting_Module__mdt` record (`Funders`, `Scholarships`, `Memberships`, `CorporateHub`, `Connector`, `ContactPoints`, `AddressVerification`, `LwcBuilder`) and every Setting Definition row a `Default_Value__c`. Run state moves to State rows: `Connector.Recipes_Paused__c` (synchronous, toggled on the Connector page, so its Setting Definition row `Connector_Recipes_Paused` is removed), `Connector.Integration_User_Id__c`, `ContactPoints.Last_Backfill__c` and `ContactPoints.Last_Backfill_Summary__c`, `AddressVerification.Connected_Provider__c`. The eight legacy custom settings stay until the destructive deploy; no module reads them. No object count change. |
 
 ---
 ## 32. Entity ownership by package
