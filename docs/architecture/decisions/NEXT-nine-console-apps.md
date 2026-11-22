@@ -48,8 +48,9 @@ eight module apps out of every test org. Several module apps held two to five ta
      host app whose package is not deployed (Scholarships without Grants): staff tabs join
      BarnCRM Console.
    - Admin tabs always join BarnCRM Admin Console too, so every admin tool is in one app.
-   Forms splits its tabs to match: Form Submissions is a staff tab (BarnCRM Console); Forms Home
-   and Forms are admin tabs (BarnCRM Admin Console, beside Portal Builder and Super Connector).
+   Forms splits its tabs to match: Forms and Form Submissions are staff tabs (BarnCRM Console,
+   where staff fill in forms and work submissions); Forms Home and Forms are admin tabs (BarnCRM
+   Admin Console, beside Portal Builder and Super Connector).
    Corporate Hub's catalog row gains its three privacy tabs, which only its app listed.
 5. **Members and Partners lives in Core** so either Memberships or Corporate Hub alone fills it:
    a module may not depend on another module, and Core is the one package both depend on. Core's
