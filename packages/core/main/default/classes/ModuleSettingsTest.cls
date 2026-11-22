@@ -260,4 +260,42 @@ private class ModuleSettingsTest {
 			);
 		}
 	}
+
+	/**
+	 * Before carry-over, a module's legacy record is read once per transaction: clearing the
+	 * caches on each save does not read it again.
+	 */
+	@IsTest
+	static void aModulesLegacyRecordIsReadOnceAcrossCacheClears() {
+		System.runAs(TestUsers.admin()) {
+			String standIn = 'BarnCRM_Automation_Control__c';
+			SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+			ModuleSettings.stubbedModules = new List<Setting_Module__mdt>{
+				new Setting_Module__mdt(
+					DeveloperName = 'TestMod',
+					Settings_Object__c = standIn,
+					Key_Prefix__c = 'TestMod'
+				)
+			};
+			insert as system SettingsService.firstSaveRecord();
+			insert as system new BarnCRM_Automation_Control__c(
+				SetupOwnerId = UserInfo.getOrganizationId(),
+				Pause_All__c = true
+			);
+			SettingsService.clearCaches();
+			ModuleSettings.clearLegacyCache();
+
+			Integer before = Limits.getQueries();
+			Assert.areEqual(true, ModuleSettings.legacyValue(standIn, 'Pause_All__c'));
+			Integer firstRead = Limits.getQueries() - before;
+			Assert.isTrue(firstRead >= 1, 'The first read queries the legacy record.');
+
+			before = Limits.getQueries();
+			SettingsService.clearCaches();
+			Assert.areEqual(true, ModuleSettings.legacyValue(standIn, 'Pause_All__c'));
+			SettingsService.clearCaches();
+			Assert.areEqual(true, ModuleSettings.legacyValue(standIn, 'Pause_All__c'));
+			Assert.areEqual(0, Limits.getQueries() - before, 'Not read again after two cache clears.');
+		}
+	}
 }

@@ -61,10 +61,7 @@ private class SeasonalAddressControllerTest {
 	@IsTest
 	static void theViewOfAScheduledSwapCostsTwoQueries() {
 		System.runAs(TestUsers.admin()) {
-			OrgSettingsSystemWriter.save(
-				new Map<Schema.SObjectField, Object>{ BarnCRM_Settings__c.Seasonal_Addresses_Enabled__c => true }
-			);
-			SettingsService.clearCaches();
+			SettingsService.setForTest('Seasonal_Addresses_Enabled__c', true);
 			SeasonalAddressScheduler.start();
 
 			Test.startTest();

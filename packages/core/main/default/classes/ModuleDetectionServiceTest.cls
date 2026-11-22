@@ -206,14 +206,9 @@ private class ModuleDetectionServiceTest {
 		System.runAs(TestUsers.admin()) {
 			chooseSuite('nonprofit');
 			String lowerCase = ModuleDetectionService.chosenSuite();
-			BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
-			settings.Suite__c = ' Community ';
-			update settings;
-			SettingsService.clearCaches();
+			chooseSuite(' Community ');
 			String oldValue = ModuleDetectionService.chosenSuite();
-			settings.Suite__c = 'Premium';
-			update settings;
-			SettingsService.clearCaches();
+			chooseSuite('Premium');
 
 			Test.startTest();
 			String unknown = ModuleDetectionService.chosenSuite();
@@ -714,8 +709,7 @@ private class ModuleDetectionServiceTest {
 	}
 
 	private static void chooseSuite(String suite) {
-		insert new BarnCRM_Settings__c(SetupOwnerId = UserInfo.getOrganizationId(), Suite__c = suite);
-		SettingsService.clearCaches();
+		SettingsService.setForTest('Suite__c', suite);
 	}
 
 	@IsTest

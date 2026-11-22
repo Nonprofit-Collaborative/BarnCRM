@@ -1210,6 +1210,7 @@ core/ModuleSettings.cls | public static Setting_Definition__mdt definitionFor(St
 core/ModuleSettings.cls | public static Setting_Module__mdt moduleByPrefix(String)
 core/ModuleSettings.cls | public static String text(String)
 core/ModuleSettings.cls | public static void clearCache()
+core/ModuleSettings.cls | public static void clearLegacyCache()
 core/ModuleSettings.cls | public static void setForTest(String,Object)
 core/ModuleSetup.cls | public interface ModuleSetup
 core/ModuleSetups.cls | public class ModuleSetups

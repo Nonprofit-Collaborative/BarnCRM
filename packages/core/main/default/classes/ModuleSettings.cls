@@ -327,12 +327,21 @@ public with sharing class ModuleSettings {
 		return SettingsRecordSelector.getOrgDefault(type);
 	}
 
-	/** Forgets what was read, so the next read comes from the platform. */
+	/**
+	 * Forgets what was read, so the next read comes from the platform. The legacy records are
+	 * kept: no registered module writes its legacy custom setting any more, and each one costs a
+	 * query, which `SettingsService.clearCaches` (called on every save) would otherwise repeat.
+	 */
 	@NamespaceAccessible
 	public static void clearCache() {
 		modulesByObject = null;
 		definitionsByName = null;
 		definitionsByObject = null;
+	}
+
+	/** Forgets the legacy records read, for code (a test) that writes or deletes one. */
+	@NamespaceAccessible
+	public static void clearLegacyCache() {
 		legacyByObject.clear();
 	}
 }

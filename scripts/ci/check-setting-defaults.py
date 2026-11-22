@@ -45,6 +45,7 @@ packages, and each registry record names its own group and prefix.
 """
 
 import glob
+import html
 import json
 import os
 import re
@@ -225,6 +226,26 @@ def registry_problems():
     return set(groups), problems
 
 
+# ModuleSettings reads a module's rows through SettingDefinitionSelector.getAllShortFields(),
+# which cuts every long text area to 255 characters, so a longer Picklist_Values__c loses its
+# last choices without a word. Core's rows are read in full.
+SHORT_FIELD_LIMIT = 255
+
+
+def picklist_length_problems(path, group, values):
+    """A module (non-Core) row's Picklist_Values__c, unescaped, fits in SHORT_FIELD_LIMIT."""
+    if group == CORE_SETTINGS or not values:
+        return []
+    length = len(html.unescape(values))
+    if length <= SHORT_FIELD_LIMIT:
+        return []
+    return [
+        f"{path}: Picklist_Values__c is {length} characters; a module's rows are read cut to "
+        f"{SHORT_FIELD_LIMIT} (SettingDefinitionSelector.getAllShortFields), so its last "
+        f"choices would be lost. Shorten the labels."
+    ]
+
+
 def store_definition_problems(registered_groups):
     """Setting Definition keys are unique across every package (the store names a value by the
     DeveloperName, and every package shares one namespace), as are group plus key; a registered
@@ -247,6 +268,7 @@ def store_definition_problems(registered_groups):
             if pair in keys:
                 problems.append(f"{path}: {group}.{key} is also edited by {keys[pair]}.")
             keys[pair] = path
+        problems.extend(picklist_length_problems(path, group, definition_value(text, "Picklist_Values__c")))
         if group.lower() not in registered_groups:
             continue
         default = definition_value(text, "Default_Value__c")

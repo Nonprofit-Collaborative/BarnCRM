@@ -64,8 +64,7 @@ private class SampleDataPostInstallTest {
 	@IsTest
 	static void theHostLoadsTheSampleSetAndTellsTheLoaderWhenItIsIn() {
 		System.runAs(TestUsers.adminWithInstalledModules()) {
-			insert new BarnCRM_Settings__c(SetupOwnerId = UserInfo.getOrganizationId(), Job_Notifications__c = true);
-			SettingsService.clearCaches();
+			SettingsService.setForTest('Job_Notifications__c', true);
 			SampleDataHost host = new SampleDataPackageHost();
 
 			Test.startTest();

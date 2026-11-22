@@ -66,10 +66,10 @@ private class HealthCheckLastRunTest {
 	@IsTest
 	static void anUnreadableResultReadsAsNeverRun() {
 		System.runAs(TestUsers.admin()) {
-			OrgSettingsSystemWriter.save(
-				new Map<Schema.SObjectField, Object>{
-					BarnCRM_Settings__c.Health_Check_Last_Run__c => Datetime.now(),
-					BarnCRM_Settings__c.Health_Check_Last_Result__c => 'one,two,three'
+			SettingsState.put(
+				new Map<String, Object>{
+					'Health_Check_Last_Run__c' => Datetime.now(),
+					'Health_Check_Last_Result__c' => 'one,two,three'
 				}
 			);
 

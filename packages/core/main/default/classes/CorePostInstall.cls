@@ -72,6 +72,7 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 	private static final String NIGHTLY_CONTEXT = 'CorePostInstall.scheduleNightlyRun';
 	private static final String SEASONAL_CONTEXT = 'CorePostInstall.alignSeasonalAddresses';
 	private static final String ORGANIZATION_CONTEXT = 'CorePostInstall.storeOrganizationRecordType';
+	private static final String SETTINGS_CONTEXT = 'CorePostInstall.sendSettings';
 
 	/**
 	 * Core checkboxes that ship on and were added in an upgrade, oldest first: each is turned on
@@ -180,9 +181,16 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 	}
 
 	private void run(Boolean isNewInstall, Id installerId) {
-		fillFeatureList(isNewInstall);
-		applyRecommendedMode();
-		storeOrganizationRecordType();
+		// The steps that save settings send them as one store deployment. None reads what another
+		// saves, and they are sent before any later step reads them.
+		SettingsService.collectSaves();
+		try {
+			fillFeatureList(isNewInstall);
+			applyRecommendedMode();
+			storeOrganizationRecordType();
+		} finally {
+			sendSettings();
+		}
 		AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
 		ImportTemplateService.materializeDefaultsDuringInstall(TEMPLATE_CONTEXT);
 		// Every install and upgrade gives the BarnCRM Tab sets of the features that are on to
@@ -198,6 +206,17 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 			return;
 		}
 		grantInstallerAccess(installerId);
+	}
+
+	/** Sends the settings the steps above saved. Never throws: a refusal is logged. */
+	private void sendSettings() {
+		try {
+			SettingsService.sendCollected();
+		} catch (Exception e) {
+			ErrorLogger.log(e, SETTINGS_CONTEXT);
+		} finally {
+			SettingsService.stopCollecting();
+		}
 	}
 
 	/**

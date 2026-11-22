@@ -30,18 +30,10 @@ public with sharing class AskReminderService {
 	/**
 	 * Whether the pass is switched on. An unset value means on: the shipped default is on, and a
 	 * reminder that never came because an administrator never opened the console is worse than
-	 * one nobody asked for, which costs a task someone can delete.
+	 * one nobody asked for, which costs a task someone can delete (its Default_Value__c).
 	 */
 	public static Boolean isEnabled() {
-		Object value = SettingsService.getValue(SETTINGS_OBJECT, KEY_ENABLED);
-		if (value == null) {
-			return true;
-		}
-		if (value instanceof Boolean) {
-			return (Boolean) value;
-		}
-		String text = String.valueOf(value).trim();
-		return String.isBlank(text) ? true : Boolean.valueOf(text);
+		return SettingsService.flag(SETTINGS_OBJECT, KEY_ENABLED);
 	}
 
 	private static final List<String> UNFINISHED = new List<String>{ 'Holding', 'Queued', 'Preparing', 'Processing' };

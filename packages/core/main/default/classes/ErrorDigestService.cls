@@ -189,7 +189,6 @@ public with sharing class ErrorDigestService {
 
 	private static Outcome finish(Outcome outcome, Datetime runAt, Datetime coveredUntil) {
 		ErrorDigestWriter.recordRun(runAt, outcome.summary, coveredUntil);
-		SettingsService.clearCaches();
 		return outcome;
 	}
 

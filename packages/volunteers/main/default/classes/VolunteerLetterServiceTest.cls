@@ -414,9 +414,8 @@ private class VolunteerLetterServiceTest {
 			Active__c = true
 		);
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
-			BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
-			settings.Brand_Management__c = true;
-			TestDataFactory.saveSettings(settings);
+			SettingsService.setForTest('Brand_Management__c', true);
+			AutomationControl.clearCache();
 			Legal_Entity__c entity = new Legal_Entity__c(Name = 'Thrift LLC');
 			insert entity;
 			Brand__c thrift = new Brand__c(

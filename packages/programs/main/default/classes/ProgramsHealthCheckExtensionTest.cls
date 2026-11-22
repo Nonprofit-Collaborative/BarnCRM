@@ -109,9 +109,8 @@ private class ProgramsHealthCheckExtensionTest {
 	static void noFindingForAViewerWhoMayNotManageSettingsOrWhileTurnedOff() {
 		System.runAs(TestUsers.adminWith(ADMIN)) {
 			enrollmentsInEndedPrograms();
-			BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
-			settings.Modules_Turned_Off__c = 'Programs';
-			TestDataFactory.saveSettings(settings);
+			SettingsService.setForTest('Modules_Turned_Off__c', 'Programs');
+			AutomationControl.clearCache();
 
 			Assert.isTrue(
 				new ProgramsHealthCheckExtension().findings().isEmpty(),

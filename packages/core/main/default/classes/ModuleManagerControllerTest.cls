@@ -158,13 +158,8 @@ private class ModuleManagerControllerTest {
 	static void anExistingSettingsRowThatNeverSetTheFieldShowsTheNonprofitModules() {
 		System.runAs(TestUsers.admin()) {
 			volunteersInstalled();
-			// An org that saved its settings before this field existed: a row with other keys
-			// set and nothing said about hiding.
-			insert new BarnCRM_Settings__c(
-				SetupOwnerId = UserInfo.getOrganizationId(),
-				Suite__c = ModuleDetectionService.SUITE_NONPROFIT
-			);
-			SettingsService.clearCaches();
+			// An org that saved other settings and nothing about hiding.
+			SettingsService.setForTest('Suite__c', ModuleDetectionService.SUITE_NONPROFIT);
 
 			Test.startTest();
 			ModuleManagerController.ManagerState state = ModuleManagerController.getState();

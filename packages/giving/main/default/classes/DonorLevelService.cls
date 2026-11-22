@@ -48,15 +48,7 @@ public with sharing class DonorLevelService {
 
 	/** Whether levels are assigned at all (R-DL7). Off until the organization builds its ladder. */
 	public static Boolean isEnabled() {
-		Object value = SettingsService.getValue(SETTINGS_OBJECT, KEY_ENABLED);
-		if (value == null) {
-			return false;
-		}
-		if (value instanceof Boolean) {
-			return (Boolean) value;
-		}
-		String text = String.valueOf(value).trim();
-		return String.isBlank(text) ? false : Boolean.valueOf(text);
+		return SettingsService.flag(SETTINGS_OBJECT, KEY_ENABLED);
 	}
 
 	/**
@@ -65,8 +57,7 @@ public with sharing class DonorLevelService {
 	 * not exist is worse than assigning them from the lifetime total.
 	 */
 	public static String sourceField() {
-		Object value = SettingsService.getValue(SETTINGS_OBJECT, KEY_SOURCE);
-		String stored = value == null ? null : String.valueOf(value).trim();
+		String stored = SettingsService.text(SETTINGS_OBJECT, KEY_SOURCE);
 		return SOURCE_FIELDS.contains(stored) ? stored : DEFAULT_SOURCE_FIELD;
 	}
 

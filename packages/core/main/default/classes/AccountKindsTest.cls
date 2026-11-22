@@ -20,12 +20,9 @@ private class AccountKindsTest {
 	}
 
 	private static void store(String value) {
-		// A stale value cannot be saved through SettingsService, so the record is written as
-		// the platform would hold it.
-		insert as system new BarnCRM_Settings__c(
-			SetupOwnerId = UserInfo.getOrganizationId(),
-			Organization_Record_Type__c = value
-		);
+		// A stale value cannot be saved through SettingsService, so it is put in the store as the
+		// platform would hold it.
+		SettingsService.setForTest('Organization_Record_Type__c', value);
 	}
 
 	@IsTest

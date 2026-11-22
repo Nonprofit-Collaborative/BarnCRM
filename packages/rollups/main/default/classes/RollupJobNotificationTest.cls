@@ -13,8 +13,7 @@ private class RollupJobNotificationTest {
 	@IsTest
 	static void rollupRecalculationOpensRollups() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			insert new BarnCRM_Settings__c(SetupOwnerId = UserInfo.getOrganizationId(), Job_Notifications__c = true);
-			SettingsService.clearCaches();
+			SettingsService.setForTest('Job_Notifications__c', true);
 			Id organizationType = AccountKindsTestData.organizationRecordTypeId();
 			Account organization = TestDataFactory.organization(
 				new Account(Name = 'Food Bank', RecordTypeId = organizationType)

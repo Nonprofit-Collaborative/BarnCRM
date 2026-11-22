@@ -169,8 +169,7 @@ public with sharing class RollupService {
 	 */
 	@NamespaceAccessible
 	public static Boolean recalculatesInTheSave() {
-		Object stored = SettingsService.getValue(SETTINGS_OBJECT, PROCESSING_SETTING);
-		return stored != null && PROCESSING_IN_SAVE.equals(String.valueOf(stored));
+		return PROCESSING_IN_SAVE.equals(SettingsService.text(SETTINGS_OBJECT, PROCESSING_SETTING));
 	}
 
 	/** The modes a nightly run covers. */
@@ -182,8 +181,7 @@ public with sharing class RollupService {
 	/** The mode a new definition starts in, from the org's default. */
 	@NamespaceAccessible
 	public static String defaultMode() {
-		Object stored = SettingsService.getValue(SETTINGS_OBJECT, MODE_DEFAULT_SETTING);
-		String mode = stored == null ? null : String.valueOf(stored);
+		String mode = SettingsService.text(SETTINGS_OBJECT, MODE_DEFAULT_SETTING);
 		return REAL_TIME_MODES.contains(mode) || MODE_SCHEDULED.equals(mode) ? mode : MODE_BOTH;
 	}
 

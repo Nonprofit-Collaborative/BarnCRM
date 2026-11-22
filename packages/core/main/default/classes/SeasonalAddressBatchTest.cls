@@ -133,12 +133,9 @@ private class SeasonalAddressBatchTest {
 		}
 	}
 
-	/** The Seasonal Addresses switch, written below the console's save. */
+	/** The Seasonal Addresses switch, put below the console's save. */
 	private static void seasonalSwitch(Boolean enabled) {
-		OrgSettingsSystemWriter.save(
-			new Map<Schema.SObjectField, Object>{ BarnCRM_Settings__c.Seasonal_Addresses_Enabled__c => enabled }
-		);
-		SettingsService.clearCaches();
+		SettingsService.setForTest('Seasonal_Addresses_Enabled__c', enabled);
 		NightlyJobs.forget();
 	}
 

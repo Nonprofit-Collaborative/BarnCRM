@@ -14,10 +14,9 @@ private class JobNotifierTest {
 		TestUsers.admin();
 	}
 
-	/** Saves the org's settings with notifications on or off. */
+	/** Puts the org's notifications setting on or off for this test. */
 	private static void notifications(Boolean turnedOn) {
-		insert new BarnCRM_Settings__c(SetupOwnerId = UserInfo.getOrganizationId(), Job_Notifications__c = turnedOn);
-		SettingsService.clearCaches();
+		SettingsService.setForTest('Job_Notifications__c', turnedOn);
 	}
 
 	@IsTest

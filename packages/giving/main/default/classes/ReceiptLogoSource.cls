@@ -34,8 +34,6 @@ public with sharing class ReceiptLogoSource {
 	private static final String KEY_WIDTH = 'Receipt_Logo_Width_Mm__c';
 	private static final String KEY_DELIVERY = 'Receipt_Logo_Delivery__c';
 
-	private static final Integer DEFAULT_WIDTH_MM = 40;
-	private static final Integer MAX_WIDTH_MM = 170;
 	private static final String CONTEXT = 'ReceiptLogoSource';
 
 	/** File extension to media type, for the embedded image route only. */
@@ -73,7 +71,7 @@ public with sharing class ReceiptLogoSource {
 		}
 		String documentId = String.isNotBlank(brandLogoId)
 			? brandLogoId.trim()
-			: trimmed(SettingsService.getValue(SETTINGS_OBJECT, KEY_LOGO_DOCUMENT));
+			: SettingsService.text(SETTINGS_OBJECT, KEY_LOGO_DOCUMENT);
 		if (String.isBlank(documentId)) {
 			return '';
 		}
@@ -162,36 +160,21 @@ public with sharing class ReceiptLogoSource {
 	 * Assistant expects to see it, and the setting exists to turn that off rather than on.
 	 */
 	private static Boolean printLogo() {
-		Object stored = SettingsService.getValue(SETTINGS_OBJECT, KEY_PRINT_LOGO);
-		if (stored == null) {
-			return true;
-		}
-		if (stored instanceof Boolean) {
-			return (Boolean) stored;
-		}
-		return Boolean.valueOf(String.valueOf(stored));
+		return SettingsService.flag(SETTINGS_OBJECT, KEY_PRINT_LOGO);
 	}
 
+	/** The delivery route; anything but the two other routes is a file download. */
 	private static String route() {
-		String stored = trimmed(SettingsService.getValue(SETTINGS_OBJECT, KEY_DELIVERY));
-		return String.isBlank(stored) ? ROUTE_FILE_DOWNLOAD : stored;
+		return SettingsService.text(SETTINGS_OBJECT, KEY_DELIVERY);
 	}
 
 	/**
-	 * The printed width. A width nobody set, or one that would run off the page, falls back to the
-	 * shipped one rather than producing a document an administrator cannot use.
+	 * The printed width. A width nobody set, or one that would run off the page (outside its
+	 * Setting Definition's range), falls back to the shipped one rather than producing a document
+	 * an administrator cannot use.
 	 */
 	private static Integer widthMm() {
-		Object stored = SettingsService.getValue(SETTINGS_OBJECT, KEY_WIDTH);
-		if (!(stored instanceof Decimal)) {
-			return DEFAULT_WIDTH_MM;
-		}
-		Integer width = ((Decimal) stored).intValue();
-		return (width <= 0 || width > MAX_WIDTH_MM) ? DEFAULT_WIDTH_MM : width;
-	}
-
-	private static String trimmed(Object stored) {
-		return stored == null ? null : String.valueOf(stored).trim();
+		return SettingsService.number(SETTINGS_OBJECT, KEY_WIDTH).intValue();
 	}
 
 	private static void warnOnce(String message) {

@@ -69,8 +69,7 @@ private class JobNotificationPathsTest {
 	}
 
 	private static void notifications(Boolean turnedOn) {
-		insert new BarnCRM_Settings__c(SetupOwnerId = UserInfo.getOrganizationId(), Job_Notifications__c = turnedOn);
-		SettingsService.clearCaches();
+		SettingsService.setForTest('Job_Notifications__c', turnedOn);
 	}
 
 	private static Import_Batch__c job(String operation) {

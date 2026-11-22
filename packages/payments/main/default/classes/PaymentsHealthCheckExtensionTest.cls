@@ -115,9 +115,8 @@ private class PaymentsHealthCheckExtensionTest {
 	@IsTest
 	static void quietWhenTurnedOffAndTheOrgsSitesAreRead() {
 		System.runAs(PaymentsTestData.admin()) {
-			BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
-			settings.Modules_Turned_Off__c = 'Payments';
-			TestDataFactory.saveSettings(settings);
+			SettingsService.setForTest('Modules_Turned_Off__c', 'Payments');
+			AutomationControl.clearCache();
 			Assert.isTrue(new PaymentsHealthCheckExtension().findings().isEmpty(), 'Turned off');
 
 			Integer expected = [

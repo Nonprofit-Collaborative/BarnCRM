@@ -53,8 +53,7 @@ private class FindExportBatchTest {
 	}
 
 	private static void notifications() {
-		insert new BarnCRM_Settings__c(SetupOwnerId = UserInfo.getOrganizationId(), Job_Notifications__c = true);
-		SettingsService.clearCaches();
+		SettingsService.setForTest('Job_Notifications__c', true);
 	}
 
 	private static void run(FindExportBatch job) {
