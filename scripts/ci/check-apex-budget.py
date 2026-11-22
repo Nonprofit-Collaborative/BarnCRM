@@ -109,7 +109,10 @@ CAPS = {
     # Raised 2026-11-20 for the batch Q review fixes: HealthCheckResult (the one owner of the
     # stored Health Check format), grouped Mapper lookups and 51 messages read from the Core
     # help catalog instead of labels. 1,980,869 measured, plus about 0.1%.
-    "core": 1_982_850,
+    # Raised 2026-11-21 for AR-10 archive rules (D-221, ADR-NEXT archive rules and big object
+    # archive), part 1: the ArchiveDestination seam, the rule key and its schedule, and the
+    # more than n days ago operator. 1,991,435 measured, plus about 0.1%.
+    "core": 1_993_430,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured

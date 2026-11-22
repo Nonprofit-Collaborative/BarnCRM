@@ -231,6 +231,19 @@ private class RollupFilterParserTest {
 			),
 			'A day count saved as text is still read as a number'
 		);
+		System.Assert.areEqual(
+			'Gift_Date__c < LAST_N_DAYS:1825',
+			RollupFilterParser.toWhereClause(
+				'{"version": 1, "conditions": [{"id": 1, "field": "Gift_Date__c", "operator": "more than n days ago", "value": 1825}]}'
+			),
+			'More than n days ago is every date before the last n days'
+		);
+		System.Assert.isTrue(
+			RollupFilterParser.usesRelativeDate(
+				'{"version": 1, "conditions": [{"id": 1, "field": "Gift_Date__c", "operator": "more than n days ago", "value": 5}]}'
+			),
+			'More than n days ago compares with today'
+		);
 	}
 
 	@IsTest

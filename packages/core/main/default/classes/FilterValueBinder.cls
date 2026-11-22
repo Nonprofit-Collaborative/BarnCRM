@@ -130,6 +130,9 @@ public with sharing class FilterValueBinder {
 		if (operator == 'last n days') {
 			return fieldPath + ' = LAST_N_DAYS:' + RollupFilterParser.dayCount(rawValue);
 		}
+		if (operator == RollupFilterParser.MORE_THAN_N_DAYS_AGO) {
+			return fieldPath + ' < LAST_N_DAYS:' + RollupFilterParser.dayCount(rawValue);
+		}
 		if (operator == 'in' || operator == 'not in') {
 			return fieldPath + (operator == 'in' ? ' IN ' : ' NOT IN ') + bindList(rawValue);
 		}
@@ -167,7 +170,9 @@ public with sharing class FilterValueBinder {
 			operators.addAll(COMPARISONS);
 		} else if (DATE_TYPES.contains(type)) {
 			operators.addAll(COMPARISONS);
-			operators.addAll(new List<String>{ 'this year', 'last year', 'last n days' });
+			operators.addAll(
+				new List<String>{ 'this year', 'last year', 'last n days', RollupFilterParser.MORE_THAN_N_DAYS_AGO }
+			);
 		} else if (type == Schema.DisplayType.BOOLEAN) {
 			return new Set<String>{ 'equals' };
 		} else {

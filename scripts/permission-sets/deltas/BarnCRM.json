@@ -33,6 +33,12 @@
       },
       "fieldPermissions": {
         "Account.BillingAddress": {"editable": "true", "readable": "true"},
+        "Archived_Record__b.Owner_Id__c": {"editable": "true", "readable": "true"},
+        "Archived_Record__b.Person_Ids__c": {"editable": "true", "readable": "true"},
+        "Archived_Record__b.Record_JSON__c": {"editable": "true", "readable": "true"},
+        "Archived_Record__b.Record_Name__c": {"editable": "true", "readable": "true"},
+        "Archived_Record__b.Rule_Id__c": {"editable": "true", "readable": "true"},
+        "Archived_Record__b.Rule_Name__c": {"editable": "true", "readable": "true"},
         "Account.Phone": {"editable": "true", "readable": "true"},
         "Account.Sample_Data_Key__c": {"editable": "true", "readable": "true"},
         "Account.Sample_Data__c": {"editable": "true", "readable": "true"},
@@ -130,6 +136,7 @@
         "Setup_Change__c.Section__c": {"editable": "false", "readable": "true"}
       },
       "objectPermissions": {
+        "Archived_Record__b": {"allowCreate": "true", "allowDelete": "false", "allowEdit": "false", "allowRead": "true", "modifyAllRecords": "false", "viewAllRecords": "false"},
         "Erasure__c": {"allowCreate": "false", "allowDelete": "false", "allowEdit": "false", "allowRead": "true", "modifyAllRecords": "false", "viewAllRecords": "false"},
         "Field_Utilization_Snapshot__c": {"allowCreate": "true", "allowDelete": "true", "allowEdit": "true", "allowRead": "true", "modifyAllRecords": "true", "viewAllRecords": "true"},
         "Import_Journal__c": {"allowCreate": "false", "allowDelete": "false", "allowEdit": "false", "allowRead": "true", "modifyAllRecords": "false", "viewAllRecords": "false"},

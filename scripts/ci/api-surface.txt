@@ -81,6 +81,38 @@ core/AddressMatchKeyHandler.cls | public class AddressMatchKeyHandler
 core/AddressMatchKeyHandler.cls | public class FilledCheck
 core/AddressService.cls | public class AddressService
 core/AddressService.cls | public static final String STATUS_UNDELIVERABLE
+core/ArchiveDestination.cls | public interface ArchiveDestination
+core/ArchiveDestinations.cls | public class ArchiveDestinations
+core/ArchiveDestinations.cls | public static ArchiveDestination forKey(String)
+core/ArchiveDestinations.cls | public static final String OFF_PLATFORM_CLASS
+core/ArchiveRules.cls | public Boolean scheduled()
+core/ArchiveRules.cls | public class ArchiveRuleException
+core/ArchiveRules.cls | public class ArchiveRules
+core/ArchiveRules.cls | public class Rule
+core/ArchiveRules.cls | public static Boolean isDue(Rule,Date)
+core/ArchiveRules.cls | public static Boolean isRule(String)
+core/ArchiveRules.cls | public static Date nextDue(Rule,Date)
+core/ArchiveRules.cls | public static Integer weekdayOf(Date)
+core/ArchiveRules.cls | public static Rule of(String)
+core/ArchiveRules.cls | public static String destinationOf(String)
+core/ArchiveRules.cls | public static String withRule(String,Rule)
+core/ArchiveRules.cls | public static final List<String> DESTINATIONS
+core/ArchiveRules.cls | public static final String BIG_OBJECT
+core/ArchiveRules.cls | public static final String FILES
+core/ArchiveRules.cls | public static final String OFF_PLATFORM
+core/ArchiveRules.cls | public static void check(Rule)
+core/ArchiveRun.cls | public ArchiveRun(Id,String,String,String,Integer)
+core/ArchiveRun.cls | public Boolean scheduled
+core/ArchiveRun.cls | public Id savedQueryId
+core/ArchiveRun.cls | public Integer confirmedCount
+core/ArchiveRun.cls | public String objectName
+core/ArchiveRun.cls | public String queryJson
+core/ArchiveRun.cls | public String ruleName
+core/ArchiveRun.cls | public class ArchiveRun
+core/ArchiveToFiles.cls | public Import_Batch__c start(ArchiveRun)
+core/ArchiveToFiles.cls | public String key()
+core/ArchiveToFiles.cls | public String unavailableReason()
+core/ArchiveToFiles.cls | public class ArchiveToFiles
 core/AsyncStarter.cls | public class AsyncStarter
 core/AsyncStarter.cls | public class BusyException
 core/AsyncStarter.cls | public static Id batch(Database.Batchable<SObject>,Integer,String)

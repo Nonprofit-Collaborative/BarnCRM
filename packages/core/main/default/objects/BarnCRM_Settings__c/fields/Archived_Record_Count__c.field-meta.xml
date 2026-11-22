@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Archived_Record_Count__c</fullName>
+  <description>How many rows the Archived Record big object holds (canonical model Section 29D1, R-AR5). Kept by the archive job from the rows written and removed; not an admin setting.</description>
+  <externalId>false</externalId>
+  <label>Archived Record Count</label>
+  <precision>9</precision>
+  <required>false</required>
+  <scale>0</scale>
+  <trackTrending>false</trackTrending>
+  <type>Number</type>
+  <unique>false</unique>
+</CustomField>

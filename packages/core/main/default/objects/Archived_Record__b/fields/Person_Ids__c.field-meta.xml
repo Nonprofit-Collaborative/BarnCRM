@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Person_Ids__c</fullName>
+  <description>
+    Contact and Account Ids the record or its children name, comma separated, so erasing a person
+    also deletes their archived rows (R-AR6).
+  </description>
+  <label>People</label>
+  <length>32768</length>
+  <type>LongTextArea</type>
+  <visibleLines>3</visibleLines>
+</CustomField>

@@ -51,6 +51,8 @@ public with sharing class RollupFilterParser {
 		'last year' => 'LAST_YEAR'
 	};
 	private static final String LAST_N_DAYS = 'last n days';
+	/** Every date before the last N days (D-221): an archive rule's "older than". */
+	public static final String MORE_THAN_N_DAYS_AGO = 'more than n days ago';
 	private static final Integer MAX_DAYS = 3650;
 	private static final Pattern DATE_VALUE = Pattern.compile('^\\d{4}-\\d{2}-\\d{2}$');
 	private static final Pattern DATETIME_VALUE = Pattern.compile('^\\d{4}-\\d{2}-\\d{2}T[0-9:.]+Z$');
@@ -92,7 +94,11 @@ public with sharing class RollupFilterParser {
 				String operator = ((String) ((Map<String, Object>) rawCondition).get('operator'))
 					?.toLowerCase()
 					?.trim();
-				if (DATE_LITERAL_BY_OPERATOR.containsKey(operator) || operator == LAST_N_DAYS) {
+				if (
+					DATE_LITERAL_BY_OPERATOR.containsKey(operator) ||
+					operator == LAST_N_DAYS ||
+					operator == MORE_THAN_N_DAYS_AGO
+				) {
 					return true;
 				}
 			}
@@ -282,6 +288,9 @@ public with sharing class RollupFilterParser {
 		}
 		if (operator == LAST_N_DAYS) {
 			return fieldName + ' = LAST_N_DAYS:' + dayCount(condition.get('value'));
+		}
+		if (operator == MORE_THAN_N_DAYS_AGO) {
+			return fieldName + ' < LAST_N_DAYS:' + dayCount(condition.get('value'));
 		}
 		if (COMPARISON_BY_OPERATOR.containsKey(operator) == false) {
 			throw new RollupFilterException(BarnHelp.text('Core', 'Core_Rollups_ErrorInvalidOperator'));
