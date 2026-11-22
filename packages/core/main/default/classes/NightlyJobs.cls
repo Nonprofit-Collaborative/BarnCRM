@@ -113,6 +113,7 @@ public with sharing class NightlyJobs {
 			EmptyHouseholdTidyScheduler.step(),
 			BackupSetSchedule.step(),
 			EngagementScoreJob.step(),
+			ArchiveRulesStep.step(),
 			ErrorDigestScheduler.step()
 		};
 	}

@@ -32,6 +32,7 @@ describe('c/filterDocument', () => {
     expect(operatorsFor(field('currency'))).not.toContain(OPERATORS.THIS_YEAR);
     expect(operatorsFor(field('date'))).toContain(OPERATORS.LAST_N_DAYS);
     expect(operatorsFor(field('date'), false)).not.toContain(OPERATORS.LAST_N_DAYS);
+    expect(operatorsFor(field('date'))).toContain(OPERATORS.MORE_THAN_N_DAYS_AGO);
     expect(operatorsFor(field('reference'))).toContain(OPERATORS.IN);
     expect(operatorsFor(field('base64'))).toEqual([]);
   });
@@ -48,6 +49,7 @@ describe('c/filterDocument', () => {
     expect(valueKindFor(field('picklist'), OPERATORS.EQUALS)).toBe(VALUE_KINDS.PICK);
     expect(valueKindFor(field('date'), OPERATORS.THIS_YEAR)).toBe(VALUE_KINDS.NONE);
     expect(valueKindFor(field('date'), OPERATORS.LAST_N_DAYS)).toBe(VALUE_KINDS.DAYS);
+    expect(valueKindFor(field('date'), OPERATORS.MORE_THAN_N_DAYS_AGO)).toBe(VALUE_KINDS.DAYS);
     expect(valueKindFor(field('datetime'), OPERATORS.EQUALS)).toBe(VALUE_KINDS.DATETIME);
     expect(valueKindFor(field('double'), OPERATORS.EQUALS)).toBe(VALUE_KINDS.NUMBER);
     expect(valueKindFor(field('boolean'), OPERATORS.EQUALS)).toBe(VALUE_KINDS.BOOLEAN);

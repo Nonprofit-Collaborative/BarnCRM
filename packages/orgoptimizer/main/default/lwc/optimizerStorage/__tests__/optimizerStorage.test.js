@@ -2,6 +2,25 @@ import { createElement } from 'lwc';
 import OptimizerStorage from 'c/optimizerStorage';
 import getStorage from '@salesforce/apex/OrgOptimizerStorageController.getStorage';
 import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
+import panelStateKey from '@salesforce/apex/DataManagerController.panelStateKey';
+import canViewArchive from '@salesforce/apex/ArchiveController.canViewArchive';
+
+jest.mock(
+  '@salesforce/apex/DataManagerController.panelStateKey',
+  () => {
+    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/apex/ArchiveController.canViewArchive',
+  () => {
+    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
+  { virtual: true }
+);
 
 jest.mock(
   '@salesforce/apex/DataManagerController.findToolStateKey',
@@ -110,6 +129,25 @@ describe('c-optimizer-storage', () => {
       type: 'standard__navItemPage',
       attributes: { apiName: 'Find' },
       state: { ns__tool: 'archive' }
+    });
+  });
+
+  it('offers View Archived Records only with the big object grant, opening Data Manager (D-221)', async () => {
+    getStorage.mockResolvedValue(STORAGE);
+    const element = await render();
+    panelStateKey.emit('ns__panel');
+    canViewArchive.emit(false);
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="view-archived"]')).toBeNull();
+
+    canViewArchive.emit(true);
+    await flush();
+    element.shadowRoot.querySelector('[data-id="view-archived"]').click();
+    await flush();
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'Data_Manager' },
+      state: { ns__panel: 'archived' }
     });
   });
 

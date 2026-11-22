@@ -284,9 +284,11 @@ public with sharing class BulkDeleteService {
 		'ChangeEvent'
 	};
 
-	/** True for a sharing, history, feed or change event child, which no one asks about. */
-	@TestVisible
-	private static Boolean isSystemChild(String apiName) {
+	/**
+	 * True for a sharing, history, feed or change event child, which no one asks about. Archive
+	 * rules leave the same kinds out of an archived record (R-ARC2).
+	 */
+	public static Boolean isSystemChild(String apiName) {
 		for (String suffix : SYSTEM_CHILD_SUFFIXES) {
 			// A custom object's own are Name__Share, Name__History and the like.
 			if (apiName != null && apiName.endsWith(suffix)) {

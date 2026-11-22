@@ -134,8 +134,13 @@ CAPS = {
     # stripped size (AP-05): 1,837,129 measured, plus about 0.1%.
     # Raised 2026-11-21 for BK-10 (D-221): scheduled Backup Sets (BackupSetSchedule, the nightly
     # step, runs kept) and the off-platform destination (the OffPlatformDestination seam,
-    # OffPlatformSendBatch, send and retry, send-before-delete for archives): 1,858,298 measured, plus about 0.1%.
-    "core": 1_860_000,
+    # OffPlatformSendBatch, send and retry, send-before-delete for archives): 1,858,298
+    # measured, plus about 0.1%.
+    # Raised 2026-11-21 for AR-10 (D-221, ADR-NEXT archive rules and big object archive): the
+    # ArchiveDestination seam, the rule key and schedule, the big object store, the copy and
+    # delete chain, the rule service and nightly step, the Archived Records viewer, the restore
+    # chain and the archive erasure scan: 1,924,656 measured, plus about 0.1%.
+    "core": 1_926_500,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured

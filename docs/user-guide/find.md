@@ -49,7 +49,8 @@ page you came from, not to the tab.
    handle (touch: press and hold), or use its Move Up and Move Down buttons. The results follow
    the new order.
 4. Under **Conditions**, press **Add Condition**. Choose a **Field**, an **Operator** (such as
-   **equals**, **contains**, **is blank**, **is one of** or **is in the last N days**) and a
+   **equals**, **contains**, **is blank**, **is one of**, **is in the last N days** or **is more
+   than N days ago**) and a
    **Value**. Add more conditions the same way. With two or more conditions, drag one by its
    handle or use Move Up and Move Down to reorder them; custom condition logic follows, so
    `1 AND (2 OR 3)` still names the same conditions.
@@ -172,4 +173,5 @@ You should see: the builder filled in from your text, ready to run.
 - Admin Guide: [Find and export](../admin-guide/find.md),
   [Super Transformer](../admin-guide/bulk-update.md), [Bulk delete](../admin-guide/bulk-delete.md),
   [Archive by Query](../admin-guide/archive-by-query.md), [Backup Sets](../admin-guide/backup-sets.md),
+  [Archive Rules](../admin-guide/archive-rules.md),
   [Access](../admin-guide/access.md)

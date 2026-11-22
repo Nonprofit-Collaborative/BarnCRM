@@ -1,0 +1,251 @@
+<template>
+    <template lwc:if={helpReady}>
+        <section data-id="archive-rules">
+            <h2 class="slds-text-heading_medium">{labels.title}</h2>
+            <p class="slds-var-m-vertical_x-small">{labels.intro}</p>
+            <template lwc:if={page}>
+                <c-barn-meter
+                    label={labels.usage}
+                    value={usage.percent}
+                    value-text={usage.text}
+                    size="small"
+                    data-id="usage"
+                ></c-barn-meter>
+                <template lwc:if={usage.near}>
+                    <c-barn-notice variant="warning" message={usage.warning} data-id="near-cap"></c-barn-notice>
+                </template>
+            </template>
+            <template lwc:if={errorMessage}>
+                <c-barn-notice variant="error" message={errorMessage} data-id="error"></c-barn-notice>
+            </template>
+            <template lwc:if={noticeMessage}>
+                <c-barn-notice variant="success" message={noticeMessage} data-id="notice"></c-barn-notice>
+            </template>
+            <template lwc:if={loading}>
+                <lightning-spinner size="small" alternative-text={labels.title}></lightning-spinner>
+            </template>
+            <template lwc:else>
+                <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.rulesHeading}</h3>
+                <template lwc:if={hasRules}>
+                    <ul class="slds-has-dividers_bottom-space" data-id="rules">
+                        <template for:each={rules} for:item="rule">
+                            <li key={rule.id} class="slds-item slds-grid slds-grid_vertical-align-center slds-wrap">
+                                <span class="slds-col slds-grow">
+                                    <span class="slds-text-title_bold">{rule.name}</span>
+                                    <span class="slds-text-body_small slds-text-color_weak slds-var-m-left_x-small"
+                                        >{rule.objectName}, {rule.destinationLabel}, {rule.scheduleText}</span
+                                    >
+                                </span>
+                                <lightning-button
+                                    label={labels.previewRun}
+                                    data-id={rule.id}
+                                    data-action="preview"
+                                    disabled={busy}
+                                    onclick={handlePreview}
+                                ></lightning-button>
+                                <template lwc:if={rule.mine}>
+                                    <lightning-button
+                                        class="slds-var-m-left_x-small"
+                                        label={labels.edit}
+                                        data-id={rule.id}
+                                        data-action="edit"
+                                        disabled={busy}
+                                        onclick={handleEdit}
+                                    ></lightning-button>
+                                    <lightning-button
+                                        class="slds-var-m-left_x-small"
+                                        variant="base"
+                                        label={labels.remove}
+                                        data-id={rule.id}
+                                        data-action="remove"
+                                        disabled={busy}
+                                        onclick={handleRemove}
+                                    ></lightning-button>
+                                </template>
+                            </li>
+                        </template>
+                    </ul>
+                </template>
+                <template lwc:else>
+                    <p class="slds-text-color_weak" data-id="none">{labels.none}</p>
+                </template>
+
+                <div class="slds-grid slds-grid_vertical-align-end slds-wrap slds-var-m-top_small" data-id="add">
+                    <template lwc:if={hasCandidates}>
+                        <lightning-combobox
+                            class="slds-var-m-right_x-small"
+                            label={labels.addLabel}
+                            options={candidateOptions}
+                            value={chosen}
+                            onchange={handleChoose}
+                            data-id="choose"
+                        ></lightning-combobox>
+                        <lightning-button
+                            label={labels.add}
+                            disabled={addDisabled}
+                            onclick={handleAdd}
+                            data-id="add-button"
+                        ></lightning-button>
+                    </template>
+                    <template lwc:else>
+                        <p class="slds-text-body_small slds-text-color_weak">{labels.addNone}</p>
+                    </template>
+                </div>
+
+                <template lwc:if={editing}>
+                    <section class="slds-box slds-var-m-top_medium" data-id="editor">
+                        <h3 class="slds-text-heading_small">{editing.name}</h3>
+                        <lightning-combobox
+                            label={labels.destination}
+                            options={destinationOptions}
+                            value={editing.rule.destination}
+                            data-field="destination"
+                            onchange={handleRuleChange}
+                            data-id="destination"
+                        ></lightning-combobox>
+                        <template lwc:if={destinationReason}>
+                            <p class="slds-text-body_small slds-text-color_error" data-id="destination-reason">
+                                {destinationReason}
+                            </p>
+                        </template>
+                        <lightning-combobox
+                            label={labels.frequency}
+                            options={frequencyOptions}
+                            value={editing.rule.frequency}
+                            data-field="frequency"
+                            onchange={handleRuleChange}
+                            data-id="frequency"
+                        ></lightning-combobox>
+                        <template lwc:if={isWeekly}>
+                            <lightning-combobox
+                                label={labels.weekday}
+                                options={weekdayOptions}
+                                value={editing.weekdayText}
+                                data-field="weekday"
+                                onchange={handleRuleChange}
+                                data-id="weekday"
+                            ></lightning-combobox>
+                        </template>
+                        <template lwc:if={isMonthly}>
+                            <lightning-input
+                                type="number"
+                                label={labels.monthDay}
+                                min="1"
+                                max="28"
+                                value={editing.rule.monthDay}
+                                data-field="monthDay"
+                                onchange={handleRuleChange}
+                                data-id="month-day"
+                            ></lightning-input>
+                        </template>
+                        <lightning-input
+                            type="checkbox"
+                            label={labels.active}
+                            checked={editing.rule.active}
+                            data-field="active"
+                            onchange={handleRuleChange}
+                            data-id="active"
+                        ></lightning-input>
+                        <template lwc:if={needsScheduleCount}>
+                            <p class="slds-var-m-top_x-small" data-id="schedule-confirm">{scheduleConfirmText}</p>
+                            <lightning-input
+                                type="number"
+                                label={labels.typedCount}
+                                value={typedCount}
+                                onchange={handleTyped}
+                                data-id="schedule-count"
+                            ></lightning-input>
+                        </template>
+                        <div class="slds-var-m-top_small">
+                            <lightning-button
+                                variant="brand"
+                                label={labels.save}
+                                disabled={busy}
+                                onclick={handleSave}
+                                data-id="save"
+                            ></lightning-button>
+                            <lightning-button
+                                class="slds-var-m-left_x-small"
+                                label={labels.cancel}
+                                onclick={handleCancel}
+                                data-id="cancel"
+                            ></lightning-button>
+                        </div>
+                    </section>
+                </template>
+
+                <template lwc:if={preview}>
+                    <section class="slds-box slds-var-m-top_medium" data-id="preview">
+                        <h3 class="slds-text-heading_small">{preview.ruleName}</h3>
+                        <p data-id="preview-count">{preview.countText}</p>
+                        <template lwc:if={preview.hasSample}>
+                            <ul class="slds-list_dotted slds-var-m-vertical_x-small" data-id="sample">
+                                <template for:each={preview.sample} for:item="record">
+                                    <li key={record.recordId}>{record.name}</li>
+                                </template>
+                            </ul>
+                        </template>
+                        <template lwc:if={preview.hasCascades}>
+                            <p class="slds-text-body_small" data-id="cascades">{preview.cascadeText}</p>
+                        </template>
+                        <p class="slds-text-body_small slds-text-color_weak" data-id="preview-where">{preview.whereText}</p>
+                        <lightning-input
+                            type="number"
+                            label={labels.typedCount}
+                            value={typedCount}
+                            onchange={handleTyped}
+                            data-id="run-count"
+                        ></lightning-input>
+                        <div class="slds-var-m-top_small">
+                            <lightning-button
+                                variant="destructive"
+                                label={labels.runNow}
+                                disabled={runDisabled}
+                                onclick={handleRun}
+                                data-id="run"
+                            ></lightning-button>
+                            <lightning-button
+                                class="slds-var-m-left_x-small"
+                                label={labels.cancel}
+                                onclick={handleCancel}
+                                data-id="cancel-run"
+                            ></lightning-button>
+                        </div>
+                    </section>
+                </template>
+
+                <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.runsHeading}</h3>
+                <template lwc:if={hasRuns}>
+                    <ul class="slds-has-dividers_bottom-space" data-id="runs">
+                        <template for:each={runs} for:item="run">
+                            <li key={run.id} class="slds-item">
+                                <span class="slds-text-title_bold">{run.ruleName}</span>
+                                <span class="slds-var-m-left_x-small">{run.status}</span>
+                                <span class="slds-var-m-left_x-small">{run.detail}</span>
+                                <span class="slds-var-m-left_x-small">
+                                    <lightning-formatted-date-time
+                                        value={run.startedAt}
+                                        year="numeric"
+                                        month="short"
+                                        day="numeric"
+                                        hour="2-digit"
+                                        minute="2-digit"
+                                    ></lightning-formatted-date-time>
+                                </span>
+                                <template lwc:if={run.log}>
+                                    <details class="slds-var-m-top_xx-small">
+                                        <summary>{labels.log}</summary>
+                                        <pre class="slds-text-body_small" data-id="log">{run.log}</pre>
+                                    </details>
+                                </template>
+                            </li>
+                        </template>
+                    </ul>
+                </template>
+                <template lwc:else>
+                    <p class="slds-text-color_weak" data-id="runs-none">{labels.runsNone}</p>
+                </template>
+            </template>
+        </section>
+    </template>
+</template>

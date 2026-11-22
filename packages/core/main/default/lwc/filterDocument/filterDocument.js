@@ -26,7 +26,8 @@ export const OPERATORS = Object.freeze({
   NOT_IN: 'not in',
   THIS_YEAR: 'this year',
   LAST_YEAR: 'last year',
-  LAST_N_DAYS: 'last n days'
+  LAST_N_DAYS: 'last n days',
+  MORE_THAN_N_DAYS_AGO: 'more than n days ago'
 });
 
 const O = OPERATORS;
@@ -52,7 +53,7 @@ const TEXT = [
 const PICKLIST = [O.EQUALS, O.NOT_EQUALS, O.IN, O.NOT_IN, ...NULL_TESTS];
 const MULTI_PICKLIST = [O.EQUALS, O.NOT_EQUALS, ...NULL_TESTS];
 const NUMBER = [...COMPARISONS, ...NULL_TESTS];
-const RELATIVE_DATES = [O.THIS_YEAR, O.LAST_YEAR, O.LAST_N_DAYS];
+const RELATIVE_DATES = [O.THIS_YEAR, O.LAST_YEAR, O.LAST_N_DAYS, O.MORE_THAN_N_DAYS_AGO];
 const DATE = [...NUMBER, ...RELATIVE_DATES];
 const ID = [O.EQUALS, O.NOT_EQUALS, O.IN, O.NOT_IN, ...NULL_TESTS];
 
@@ -116,7 +117,7 @@ export function valueKindFor(field, operator) {
   if ([O.IS_NULL, O.IS_NOT_NULL, O.THIS_YEAR, O.LAST_YEAR].includes(operator)) {
     return VALUE_KINDS.NONE;
   }
-  if (operator === O.LAST_N_DAYS) {
+  if (operator === O.LAST_N_DAYS || operator === O.MORE_THAN_N_DAYS_AGO) {
     return VALUE_KINDS.DAYS;
   }
   const type = field.dataType;

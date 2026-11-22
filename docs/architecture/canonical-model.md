@@ -1461,6 +1461,15 @@ shows the last full Health Check result instead of running every check on each l
 | `Health_Check_Last_Run__c` | datetime | empty | When Health Check last ran in full for someone with Manage BarnCRM Settings. Written by Health Check, without an audit row. |
 | `Health_Check_Last_Result__c` | text (255) | empty | How many findings that run had, as three counts separated by commas: to fix (Error), to be aware of (Warning), for information (Info). Written by Health Check with `Health_Check_Last_Run__c`; read only to show the last result. Core's `HealthCheckResult` is the one writer and reader of the format; a value it cannot read shows as not run. |
 
+### Archive keys
+
+Added by archive rules (D-221, ADR-NEXT archive rules and big object archive, R-SQ18). Not shown
+in the console as a setting: the Archived Records panel shows it.
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Archived_Record_Count__c` | integer | 0 | How many rows `Archived_Record__b` (Section 29D1) holds, kept by the archive and restore links from the rows actually written or removed (the platform cannot count a big object). Warns from 900,000; a run that would pass 1,000,000 stops. Written by the archive job, without an audit row. |
+
 ### Brand keys
 
 Added by C-47 (releases 1.13 and 1.14, D-119, D-120, ADR-0202 brand management and visibility).
@@ -2048,7 +2057,9 @@ version 1 reader refuses rather than misreads, so the version number does not ch
   `last n days` (value: a whole number from 1 to 3650; today and the n days before it).
   They render as the platform's date literals (`THIS_YEAR`, `LAST_YEAR`,
   `LAST_N_DAYS:n`), never as typed text: the number is read as an integer and written
-  back from that integer.
+  back from that integer. A fourth, `more than n days ago` (same value, D-221), is every
+  date before that window: it renders `field < LAST_N_DAYS:n`, so "Close Date more than 1825
+  days ago" is an archive rule's "older than five years".
 - **Parent fields.** `field` may be a path through lookups, written with relationship
   names (`Household__r.Name`), at most two lookups deep. Each segment is checked against
   the running user's describe of the object it is on. The Rollup Builder's source filter
@@ -2063,7 +2074,7 @@ version 1 reader refuses rather than misreads, so the version number does not ch
   phone and URL get equals, not equals, contains, does not contain, starts with, in, not
   in and the two null tests; picklists get equals, not equals, in, not in and the null
   tests; numbers, currency and percent get the six comparisons and the null tests; dates
-  and date/times get those plus the three relative operators; checkboxes get equals only;
+  and date/times get those plus the four relative operators; checkboxes get equals only;
   lookups and Ids get equals, not equals, in, not in and the null tests. Fields the
   platform cannot filter on (long text, compound address and location fields) are not
   offered.
@@ -3441,7 +3452,7 @@ unchanged.
 | Job Id | text | computed | The job running the current dry run or commit, so a pass still running can be told from one the platform aborted (R-IB13). |
 | File Values | long text | no | Values applied to every row of this file that does not carry its own, held as the defaults half of a mapping document (R-IT1, R-IB14). |
 | Match Only | boolean | yes (defaults false) | When true, this file only matches: a row whose person or organization matches no record is rejected rather than creating one (R-IB15). |
-| Operation | picklist(Import, Update, Delete, Access, Backup, Files) | yes (defaults Import) | What kind of data job this is: a file import, a bulk update (R-BU1), a bulk delete (R-BD1), a field access change (R-FA1), a Backup Set run (R-SQ15) or a files import (R-FI1). Empty on a batch created before v0.7, which reads as Import. |
+| Operation | picklist(Import, Update, Delete, Access, Backup, Files, Archive) | yes (defaults Import) | What kind of data job this is: a file import, a bulk update (R-BU1), a bulk delete (R-BD1), a field access change (R-FA1), a Backup Set run (R-SQ15), a files import (R-FI1) or a big object archive run or restore (R-SQ18). Empty on a batch created before v0.7, which reads as Import. |
 | Bulk Update Definition | long text | conditional | For a bulk update, the query document, the changes and the confirmed count it ran with (R-BU1); for a bulk delete, the query document and the confirmed count (R-BD1); empty for an import. |
 | Rows Deleted | integer | computed | How many records a bulk delete deleted (R-BD3); empty for any other data job. |
 | Trial Rows | integer | computed | How many of the file's first rows a trial import committed (R-IB16); empty when the file was committed whole. |
@@ -9078,6 +9089,33 @@ key `offPlatform` is the backup destination. Core names no module class. (AR-10'
 - **Archive.** With `offPlatform`, the delete starts only when every part was sent; otherwise the
   job is Failed, nothing is deleted, and the file stays in Files.
 
+**R-SQ18 Archive rules** (D-221; ADR-NEXT archive rules and big object archive). The document has
+one more optional key, `archive`: `{ "version": 1, "destination": "Files" | "BigObject" |
+"OffPlatform", "frequency": "off" | "daily" | "weekly" | "monthly", "weekday": 1-7 (Monday is 1),
+"monthDay": 1-28, "active": true | false }`. It marks a saved query as an archive rule; Find and
+the compiler ignore it. Only the query's owner adds, changes or removes it, and only a person
+holding Manage BarnCRM Settings, Find and Export Records and Bulk Delete Records may see the
+Archive Rules panel, run a rule or restore.
+
+- **Destinations.** `Files` is R-BD9 unchanged. `BigObject` copies each record to
+  `Archived_Record__b` (Section 29D1) and then deletes it. `OffPlatform` is resolved by class
+  name (`OffPlatformArchiveDestination`, implementing `ArchiveDestination`); while none is
+  installed it is refused with a reason. A missing or unknown value reads as `Files`.
+- **A manual run** is R-BD9's preview and typed count, for any destination, counted within the
+  bulk delete run limit (R-BD2).
+- **A schedule.** `frequency` other than `off` with `active` true is due each night (`daily`), on
+  `weekday` (`weekly`) or on `monthDay` (`monthly`) in the org's time zone. Saving a schedule on
+  asks for the current preview count, typed once. The nightly run's Archive Rules step (R-NJ2,
+  shipped on) starts its own job for each due rule, as the user who scheduled the nightly run;
+  each moves at most the run limit, a rule matching nothing starts no job, and a refused rule is
+  logged to the Error Log. A night missed is not caught up: the rule runs on its next due day.
+- **The job.** Every run of a `BigObject` rule, and every restore, is an `Import_Batch__c` with
+  Operation Archive (Section 16), its definition `{ "version": 1, "action": "archive" |
+  "restore", "savedQueryId", "name", "object", "notChangedAfter", "archivedAt" }`, Row Count, Rows
+  Deleted (originals deleted, or archived rows removed by a restore), Rows Created (records a
+  restore created) and Rows Rejected (left out, each named in the Run Log). A `Files` rule's run
+  is R-BD9's Delete job.
+
 ### Salesforce implementation
 
 - **Object:** `Saved_Query__c`, sharing model Private.
@@ -9106,6 +9144,96 @@ key `offPlatform` is the backup destination. Core names no module class. (AR-10'
   `dataHygieneConsole`).
 - **Backup Sets (R-SQ15):** services `BackupSetService`, `BackupSetController`; UI the Backup Sets
   panel of the Data Manager tab (component `backupSets`).
+- **Archive rules (R-SQ18):** seam `ArchiveDestination` with `ArchiveDestinations`,
+  `ArchiveToFiles` and `ArchiveToBigObject`; services `ArchiveRules` (the `archive` key and its
+  schedule), `ArchiveRuleService`, `ArchiveController`, `ArchiveRulesStep` (the nightly step);
+  UI the Archive Rules panel of the Data Manager tab (component `archiveRules`).
+
+---
+
+## 29D1. Archived Record
+
+A record moved out of its object by an archive rule (R-SQ18) whose destination is `BigObject`:
+its fields as JSON in a big object, outside data storage, until it is restored or erased.
+ADR-NEXT archive rules and big object archive.
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Object | text (60) | yes | The archived record's object API name. First index field (the index's text fields may hold 100 characters in all). |
+| Archived At | date/time | yes | When the run that archived it started its chunk. Second index field, newest first. |
+| Original Id | text (18) | yes | The record's Id before it was archived. Third index field. |
+| Name | text (255) | no | The record's name field, or its Id, for the viewer's list. |
+| Owner Id | text (18) | no | The record's owner, when the object has one. |
+| Record | long text (131072) | no | The record as JSON (R-ARC2). |
+| People | long text (32768) | no | Contact and Account Ids the record or its children name, comma separated, for erasure (R-ARC6). |
+| Rule Id | text (18) | no | The saved query (archive rule) that archived it. |
+| Rule Name | text (80) | no | That rule's name when it ran. |
+
+Who archived a row is its `CreatedById`.
+
+**R-ARC1 Index.** Every read filters on the index fields in order without a gap: an object, then a
+range of Archived At, then Original Id (equals or IN). A read that skips a field aborts the
+transaction on the platform, so the viewer always asks for an object first. Rows are read in index
+order: an object's newest first.
+
+**R-ARC2 The JSON.** `{ "version": 1, "record": <the record>, "children": { <child object>: {
+"field": <lookup to the parent>, "rows": [ <child record> ] } } }`, each record as Apex
+serializes an SObject. `record` holds every field the archiving person could read (R-BD8's
+fields). `children` holds the records of
+each cascade-delete child kind the person may read (the kinds the bulk delete preview lists), one
+level deep. A record whose JSON would pass 131,072 characters is not archived; the run names it.
+
+**R-ARC3 Copy, then settle.** A big object run is a queueable chain whose links alternate and never
+mix DML with an immediate write: Copy deletes the copies the last Settle could not finish, reads up
+to one chunk of matching records in user mode, Id order, and `insertImmediate`s them; Settle reads
+the rows back by full key, reads the originals again, deletes in user mode those whose copy exists
+and that are unchanged since the run started, adds the rows to `Archived_Record_Count__c`, writes
+the job, and queues the next Copy with the copies whose original stayed. The run ends when no
+record matches, at the run's count, or at the cap (R-ARC5).
+
+**R-ARC4 Restore.** The person picks rows of one object. A restore link inserts each record again in
+user mode with the fields the person may create, a lookup only when its target exists, then its
+children with the new parent Id; it logs each old Id with its new Id and what it left out. The next
+link `deleteImmediate`s the rows whose record was created; the one after subtracts them from the
+count and finishes the job. Restored records have new Ids. At most 50 rows per restore, 25 per
+insert link. A record that cannot be created, or whose child cannot be created (the record is
+then deleted again), is reported per row and its row stays archived.
+
+**R-ARC5 Cap.** One million rows are included per org. The panels warn from 900,000; a Copy whose
+chunk would pass 1,000,000 stops the run and says so. Nothing offers more capacity.
+
+**R-ARC6 Erasure.** Erasing a person (Section 29H) queues a scan, which runs only once the Erasure
+record exists: it reads every archived object by index and `deleteImmediate`s each row whose
+Original Id is the person or whose People names them, then subtracts them from the count. The
+person is the Erasure's erased record Id, Contact and Person Account. `ArchiveErasureExtension`
+is registered in `PersonErasureExtensions` and queues the scan only while the archive holds rows.
+
+**R-ARC7 Access.** `BarnCRM_Admin` grants read and create on the object and read on its optional
+fields; the viewer reads in user mode, so no one else sees an archived row. Copies and deletes run
+in system mode after the person's own permissions and record access have been checked.
+
+### Salesforce implementation
+
+- **Object:** `Archived_Record__b` (big object), deployed with its index; it never changes.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Object | `Object_Name__c` | Text (60), index 1 ASC |
+| Archived At | `Archived_At__c` | DateTime, index 2 DESC |
+| Original Id | `Original_Id__c` | Text (18), index 3 ASC |
+| Name | `Record_Name__c` | Text (255) |
+| Owner Id | `Owner_Id__c` | Text (18) |
+| Record | `Record_JSON__c` | Long Text Area (131072) |
+| People | `Person_Ids__c` | Long Text Area (32768) |
+| Rule Id | `Rule_Id__c` | Text (18) |
+| Rule Name | `Rule_Name__c` | Text (80) |
+
+- **Settings key:** `Archived_Record_Count__c` (Section 12, Archive keys).
+- **Services:** `ArchiveStore` (every big object read and write, replaced in tests),
+  `BigObjectArchiveJob` (Copy and Settle), `ArchiveRestoreJob`, `ArchiveErasureExtension` and
+  `ArchiveErasureJob`, `ArchiveController`.
+- **UI:** the Archived Records panel of the Data Manager tab (component `archivedRecords`), also
+  opened from Org Optimizer's Storage and Limits.
 
 ---
 
@@ -20135,6 +20263,8 @@ mirrors the primary member).
 | 1.86 | 2026-11-21 | Off-platform destination seam (BK-10, D-221, release 1.36; ADR-NEXT). Section 29D gains R-SQ17: Core's `OffPlatformDestination` seam, a set's and an archive's `destination`, `OffPlatformSendBatch`, retries and the Files copy. Section 12 gains `Backup_Remove_Sent_Files__c`. (Version number for the integrator to confirm at merge.) |
 | 1.87 | 2026-11-21 | Connector backup destination (BK-10, D-221, release 1.36; ADR-NEXT). Connector Connection gains `Backup_JSON__c` (29CN1, new R-CN11): one connection at most sends Backup Set and archive files by PUT or POST, with a `{file}` path and fixed headers that hold no secret; templates may prefill it. (Version number for the integrator to confirm at merge.) |
 | 1.88 | 2026-11-21 | Storage services for the backup destination (BK-10b, release 1.36; ADR-NEXT decision 8). New R-CN12: AWS Signature Version 4 connections, OAuth connections made in Setup, `{file}` in headers and Google Drive `metadata` in Backup Settings, and a short allowlist for a path's query. No object or field added. (Version number for the integrator to confirm at merge.) |
+| 1.89 | 2026-11-21 | Archive rules and the big object archive (D-221, AR-10, ADR-NEXT archive rules and big object archive). New Section 29D1 Archived Record (`Archived_Record__b`, a big object from the separate allocation; custom objects unchanged), rules R-ARC1 to R-ARC7. Saved Query gains R-SQ18, the `archive` key (destination Files, BigObject or OffPlatform through the `ArchiveDestination` seam, a schedule, an Active switch). R-R2 gains `more than n days ago`. `Import_Batch__c` Operation gains Archive. `BarnCRM_Settings__c` gains `Archived_Record_Count__c`. The nightly run gains the Archive Rules step. |
+| 1.90 | 2026-11-21 | Archived Records viewer, restore and archive erasure (D-221, AR-10 part 4). R-ARC4 gains the restore limits (50 rows, 25 per insert link) and keeps a row archived when its record or a child cannot be created; R-ARC6 names whom the scan matches and the `ArchiveErasureExtension` registration. No object or field added. |
 
 ---
 ## 32. Entity ownership by package

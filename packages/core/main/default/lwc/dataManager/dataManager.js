@@ -1,5 +1,5 @@
 import { LightningElement, wire } from 'lwc';
-import { NavigationMixin } from 'lightning/navigation';
+import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
 import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
 import canFind from '@salesforce/customPermission/Find_And_Export_Records';
 import canBulkUpdate from '@salesforce/customPermission/Bulk_Update_Records';
@@ -9,6 +9,8 @@ import canManageMetadata from '@salesforce/customPermission/Manage_BarnCRM_Metad
 import getMappings from '@salesforce/apex/DataManagerController.getMappings';
 import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
 import orgOptimizerInstalled from '@salesforce/apex/DataManagerController.orgOptimizerInstalled';
+import panelStateKey from '@salesforce/apex/DataManagerController.panelStateKey';
+import canViewArchive from '@salesforce/apex/ArchiveController.canViewArchive';
 import BarnConfirmModal from 'c/barnConfirmModal';
 
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
@@ -56,7 +58,7 @@ const TABS = {
   delete: 'Find'
 };
 /** The tiles whose tool opens on this page, in place of the hub, with a way back. */
-const PANELS = ['backup', 'files', 'maps'];
+const PANELS = ['backup', 'archive', 'archived', 'files', 'maps'];
 /** The tiles that open Find for a bulk tool, and the tool Find's note names. */
 const BULK_TOOLS = { delete: 'delete' };
 
@@ -161,6 +163,14 @@ export default class DataManager extends NavigationMixin(LightningElement) {
     return this.panel === 'backup';
   }
 
+  get showArchive() {
+    return this.panel === 'archive';
+  }
+
+  get showArchived() {
+    return this.panel === 'archived';
+  }
+
   get showFiles() {
     return this.panel === 'files';
   }
@@ -218,6 +228,41 @@ export default class DataManager extends NavigationMixin(LightningElement) {
     if (data) {
       this.toolStateKey = data;
     }
+  }
+
+  /** The page state key that opens a panel (`c__panel`, with the namespace's prefix). */
+  panelKey;
+  /** The page's state, kept until the panel key arrives. */
+  pageState;
+
+  @wire(panelStateKey)
+  wiredPanelKey({ data }) {
+    if (data) {
+      this.panelKey = data;
+      this.openPanelFromState();
+    }
+  }
+
+  @wire(CurrentPageReference)
+  wiredPageReference(reference) {
+    this.pageState = (reference && reference.state) || {};
+    this.openPanelFromState();
+  }
+
+  /** A link such as Org Optimizer's View Archived Records opens its panel in place of the hub. */
+  openPanelFromState() {
+    const wanted = this.panelKey && this.pageState ? this.pageState[this.panelKey] : undefined;
+    if (wanted && PANELS.includes(wanted)) {
+      this.panel = wanted;
+    }
+  }
+
+  /** Archived Records shows to holders of the big object grant (BarnCRM Admin). */
+  archiveViewable = false;
+
+  @wire(canViewArchive)
+  wiredCanViewArchive({ data }) {
+    this.archiveViewable = data === true;
   }
 
   /** The Org Optimizer card shows only once the Org Optimizer module is installed. */
@@ -282,7 +327,29 @@ export default class DataManager extends NavigationMixin(LightningElement) {
             'standard:database'
           )
         );
+        // Archive Rules (D-221): they delete, so they need Bulk Delete Records too.
+        if (canBulkDelete) {
+          findChange.push(
+            tile(
+              'archive',
+              helpText('Core', 'Core_ArchiveRules_Title'),
+              helpText('Core', 'Core_DataManager_ArchiveText'),
+              'standard:archive'
+            )
+          );
+        }
       }
+    }
+    // Archived Records (D-221): the big object's rows, for holders of its grant.
+    if (this.archiveViewable) {
+      findChange.push(
+        tile(
+          'archived',
+          helpText('Core', 'Core_ArchiveViewer_Title'),
+          helpText('Core', 'Core_DataManager_ArchivedText'),
+          'standard:record_lookup'
+        )
+      );
     }
     if (canBulkUpdate) {
       findChange.push(
