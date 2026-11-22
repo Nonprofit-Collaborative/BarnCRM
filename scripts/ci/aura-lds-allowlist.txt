@@ -29,6 +29,8 @@ FundraisingHomeController.getHome
 GrantAnswerController.getLibrary
 GrantAnswerController.markUsed
 GrantPipelineController.moveStage
+LwcBuilderController.getStudio  # also returns the module settings (store, no query), which LDS cannot read
+LwcBuilderController.loadComponent  # also returns the Components Enabled setting (store, no query)
 ProjectBillingController.getInvoiceActions
 ProjectBillingController.getProjectBilling
 ProjectRequestsController.addComment

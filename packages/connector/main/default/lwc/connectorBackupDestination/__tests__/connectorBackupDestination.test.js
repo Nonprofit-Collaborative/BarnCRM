@@ -1,5 +1,6 @@
 import { createElement } from 'lwc';
 import ConnectorBackupDestination from 'c/connectorBackupDestination';
+import { expectAccessible } from 'barn/a11y';
 import getBackupDestination from '@salesforce/apex/ConnectorConnectionsController.getBackupDestination';
 import saveBackupDestination from '@salesforce/apex/ConnectorConnectionsController.saveBackupDestination';
 import stopBackupDestination from '@salesforce/apex/ConnectorConnectionsController.stopBackupDestination';
@@ -73,6 +74,7 @@ describe('c-connector-backup-destination', () => {
     expect(find(element, 'backup-note')).toBeNull();
     expect(find(element, 'backup-edit').label).toBe('c.Connector_Backup_Set');
     expect(find(element, 'backup-stop')).toBeNull();
+    await expectAccessible(element);
   });
 
   it('shows the destination and its note, and saves a change as header lines', async () => {

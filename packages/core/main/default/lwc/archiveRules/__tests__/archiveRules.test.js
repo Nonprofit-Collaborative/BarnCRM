@@ -1,5 +1,6 @@
 import { createElement } from 'lwc';
 import ArchiveRules from 'c/archiveRules';
+import { expectAccessible } from 'barn/a11y';
 import getRules from '@salesforce/apex/ArchiveController.getRules';
 import saveRule from '@salesforce/apex/ArchiveController.saveRule';
 import previewRule from '@salesforce/apex/ArchiveController.previewRule';
@@ -82,6 +83,7 @@ describe('c-archive-rules', () => {
     expect(one(element, 'usage').value).toBe(95);
     expect(one(element, 'runs').textContent).toContain('Old closed lost');
     expect(one(element, 'choose').options).toEqual([{ label: 'Old volunteers', value: 'q2' }]);
+    await expectAccessible(element);
   });
 
   it('adds a rule with a schedule after typing the current count', async () => {
