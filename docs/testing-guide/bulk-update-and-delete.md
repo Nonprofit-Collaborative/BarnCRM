@@ -334,4 +334,23 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | 11 | Untick **Active**, type the count if asked, and **Save**. | The rule shows "(paused)" and the next nightly run starts nothing for it. |
 | 12 | **Remove** the rule. | It moves back to **Add a Rule**; the saved query and the archived rows remain. |
 
-**Cleanup:** delete the Arcbig households, the saved query, and the archived rows (restore them from the archive viewer, or `Database.deleteImmediate` them in anonymous Apex).
+**Cleanup:** none before T-BULK-20, which views, restores and erases these archived rows. Afterwards delete the Arcbig households and the saved query.
+
+## T-BULK-20: Archived Records and Restore
+
+**Purpose:** confirm the Archived Records panel lists and shows archived rows only to holders of the grant, a restore creates records again with new Ids, leaves out lookups to records gone, removes the rows and lowers the count, and a failed row stays archived (AR-10).
+**Prerequisites:** run in barn-platform (Platform-only) right after T-BULK-19, with Big1 to Big4 archived. Before archiving, set Big1's **Reports To** to a contact `Arcboss Staff`, then delete `Arcboss Staff` after the archive run. The second user from T-BULK-19, and a third user with **BarnCRM Admin** but not **BarnCRM Bulk Delete**. Setup detail: [Archive Rules](../admin-guide/archive-rules.md#6-archived-records-looking-records-up).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Data Manager** as the second user. | No **Archived Records** tile. |
+| 2 | As the admin, open **Org Optimizer**, **Storage and Limits**, and press **View Archived Records**. | Data Manager opens on the **Archived Records** panel, which says each archived record holds every field the archiving person could read. |
+| 3 | Choose **Contact** and press **Show**. | Big1 to Big4 are listed newest first, with Original Id, Archived, Rule `Arcbig people` and Archived By. Setting **Archived From** and **Archived To** to yesterday and pressing **Show** lists nothing. |
+| 4 | Press **View** on Big1. | Its fields (First Name Big1, Last Name Arcbig, Reports To Id and the others) are listed. |
+| 5 | As the third user, open the panel and show Contact. | Rows show, but no tick boxes and no **Restore**. |
+| 6 | As the admin, tick Big1 and Big2 and press **Restore 2**. Confirm. | The box says each record gets a new Id and what may be left out. A message says the restore started. |
+| 7 | Open **Archive Rules**, **Recent Runs**. | A run named "Restore Contact" ends Complete; its log reads "Restored 003... as 003..." twice, "Left out of" Big1's old Id "ReportsToId", and "Moved 2 records back out of the archive; 0 stay archived". The meter counts 2 fewer. |
+| 8 | Run `Arcbig people` in Find; then show Contact in **Archived Records** again. | Big1 and Big2 are back with new Ids (Big1 without Reports To). Only Big3 and Big4 remain archived. |
+| 9 | As the admin, remove your create access to Contact's **Title** field in a permission set you hold, restore Big3, and put the access back. | Big3 is restored without its Title; the log lists Title as left out. |
+
+**Cleanup:** delete the Arcbig contacts and households, the saved queries, and restore or `Database.deleteImmediate` any archived rows left.

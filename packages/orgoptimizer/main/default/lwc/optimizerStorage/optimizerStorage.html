@@ -52,6 +52,15 @@
                     onclick={handleArchive}
                 ></lightning-button>
             </template>
+            <template lwc:if={canViewArchived}>
+                <lightning-button
+                    class="slds-show slds-var-m-bottom_medium"
+                    data-id="view-archived"
+                    icon-name="utility:record_lookup"
+                    label={labels.viewArchived}
+                    onclick={handleViewArchived}
+                ></lightning-button>
+            </template>
             <h3 class="slds-text-heading_small">{labels.ownHeading}</h3>
             <p class="slds-text-body_small slds-var-m-bottom_x-small">{labels.ownIntro}</p>
             <lightning-datatable

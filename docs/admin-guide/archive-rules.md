@@ -80,6 +80,52 @@ Maria wants closed lost opportunities older than five years out of the way every
   records each run moved and left out, and its log says why each one was left out. A Files run
   is an Archive by Query delete job, listed in Data Jobs.
 
+## 6. Archived Records: Looking Records Up
+
+Records a Big Object rule moved are listed in **Data Manager**, **Archived Records** (or press
+**View Archived Records** in Org Optimizer's **Storage and Limits**, which opens the same panel).
+
+1. Choose a **Kind of Record**. Only kinds that have archived records are offered.
+2. Optionally set **Archived From** and **Archived To** to the dates the records were archived
+   (not their own dates), then press **Show**.
+3. Records are listed newest first, 50 to a page, with **Next Page** and **Previous Page**. Each
+   row shows the record's name, its original Id, when it was archived, the rule and who ran it.
+4. Press **View** on a row to see its fields and how many related records were saved with it.
+
+The panel always asks for a kind of record first, then dates: that is the only order Salesforce
+can read the archive in. Archived records are not in reports, list views or the weekly export.
+
+**Who can see them.** Only people with the **BarnCRM Admin** permission set, which grants the
+Archived Record object. Each archived record holds **every field the person who archived it
+could read**, and anyone who can open the panel sees all of those fields, whatever their own
+field access is. The panel says so. Give BarnCRM Admin only to people who may see every field.
+
+## 7. Moving Records Back (Restore)
+
+Restore needs the same permissions as running a rule (section 2).
+
+1. In **Archived Records**, show a page of records and tick the ones to move back (up to 50, all
+   of one kind, on one page).
+2. Press **Restore** and confirm. The restore runs in the background; its log is under **Recent
+   Runs** in **Archive Rules**.
+
+What a restore does:
+
+- **New Ids.** Each record is created again, so it gets a **new record Id**. Links, reports or
+  integrations that used the old Id do not find it. The run log lists every old Id with its new
+  Id ("Restored 003... as 003...").
+- **Your access.** Records are created as you, with only the fields you may create. Fields you
+  cannot create are left out.
+- **Lookups.** A lookup is kept only when the record it points at still exists and you can see
+  it (an owner must be an active user). Otherwise it is left out.
+- **Related records** saved with the record are created again under the new record.
+- **What was left out** is listed per record in the run log ("Left out of 003...: ReportsToId").
+- **Failures.** A record that cannot be created, or whose related record cannot be created, is
+  not restored and **stays archived**; the log says why. The others are restored.
+- Once records are created, their archived rows are removed and the **Archived records** count
+  goes down. If a row cannot be removed, the log names the record, which is then both live and
+  archived.
+
 ## Field Reference
 
 | Where | Field | What it holds |
@@ -88,8 +134,10 @@ Maria wants closed lost opportunities older than five years out of the way every
 | Data Job | Operation | Archive, for a big object run. |
 | Data Job | Bulk Update Definition | The rule's saved query, name, object, and when the run started. |
 | Data Job | Row Count | The most records the run may move. |
-| Data Job | Rows Deleted | Records moved into the archive. |
-| Data Job | Rows Rejected | Records left out; the Run Log names them. |
+| Data Job | Rows Deleted | Records moved into the archive; for a restore, rows removed from the archive. |
+| Data Job | Rows Created | For a restore, records created again. |
+| Data Job | Rows Rejected | Records left out (or, for a restore, left archived); the Run Log names them. |
+| Data Job | Run Log | For a restore, each old Id with its new Id and the fields left out. |
 | BarnCRM Settings | Archived Record Count | How many rows the archive holds, kept by BarnCRM. |
 | Archived Record | Object, Archived At, Original Id | The row's key. |
 | Archived Record | Name, Owner Id, Rule Name | What the viewer lists. |
