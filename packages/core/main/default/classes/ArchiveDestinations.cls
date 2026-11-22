@@ -6,6 +6,10 @@
  */
 @NamespaceAccessible
 public with sharing class ArchiveDestinations {
+	/** The Off Platform destination's class name. Kept for the API surface; Core names it directly. */
+	@NamespaceAccessible
+	public static final String OFF_PLATFORM_CLASS = 'OffPlatformArchiveDestination';
+
 	/** Injected by tests in place of the real destination, by key. */
 	@TestVisible
 	private static Map<String, ArchiveDestination> overrides = new Map<String, ArchiveDestination>();
