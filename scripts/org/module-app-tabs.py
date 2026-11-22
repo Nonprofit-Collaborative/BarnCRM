@@ -12,6 +12,8 @@ it names decides where the tabs go (ADR-NEXT, nine console apps):
 - `App_Name__c` names an app another package ships (a host app: Core's BarnCRM Members and
   Partners for Memberships and Corporate Hub, Funders' BarnCRM Grants for Scholarships): the
   module's `Staff_Tabs__c` and `Admin_Tabs__c` join that app, when its package was deployed too.
+  A host app outside Core (BarnCRM Grants) is one the module's own permission sets cannot show,
+  so its `Staff_Tabs__c` join BarnCRM Console as well, and its staff always keep an app.
 - `App_Name__c` names the module's own app (BarnCRM Events, BarnCRM Fundraising): the app
   already lists the tabs, so they join no other app.
 - `App_Name__c` is empty, or names a host app whose package was not deployed: `Staff_Tabs__c`
@@ -127,7 +129,8 @@ def changes(root, folders):
         app = row.get("App_Name__c", "")
         home = app if hosts.get(app, folder) != folder and app not in (STAFF_APP, ADMIN_APP) else None
         own = not home and bool(app) and os.path.exists(app_path(root, folder, app))
-        staff_apps = [home] if home else ([] if own else [STAFF_APP])
+        # The module's sets cannot show a host app outside Core, so its staff tabs join the Console too.
+        staff_apps = ([home] + ([STAFF_APP] if hosts[home] != "core" else [])) if home else ([] if own else [STAFF_APP])
         admin_apps = [ADMIN_APP] + ([home] if home else [])
         tab_dir = os.path.join(root, "packages", folder, "main/default/tabs")
         for key, apps in (("Staff_Tabs__c", staff_apps), ("Admin_Tabs__c", admin_apps)):

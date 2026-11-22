@@ -61,7 +61,9 @@ eight module apps out of every test org. Several module apps held two to five ta
 6. **Scholarships joins Grants without a dependency.** Scholarships does not depend on Funders
    and Funders does not depend on Scholarships, so neither package names the other's tabs. The
    same deploy step adds them, and Grants keeps Grants Home first. The Grants app gains
-   Dashboards for the Scholarships dashboard.
+   Dashboards for the Scholarships dashboard. Scholarships' sets cannot show an app in a package
+   it does not depend on, so a host app outside Core also leaves the staff tabs in BarnCRM
+   Console, and the Scholarships sets show BarnCRM Console: Scholarships-only staff keep an app.
 7. **The universal modules stay out of nonprofit apps.** Memberships, Corporate Hub, Forms, Events
    and Projects never name Fundraising, Grants, Programs or Volunteers as their app; a CI test
    (`test_module_app_tabs.py`) holds the rule.
@@ -92,11 +94,14 @@ eight module apps out of every test org. Several module apps held two to five ta
   and Setting Definition): `BarnCRM_Standard`, `BarnCRM_Admin_Standard`, `Fundraising`,
   `BarnCRM_Connector`, `BarnCRM_Corporate_Hub`, `BarnCRM_Forms`, `BarnCRM_Memberships`,
   `BarnCRM_Portal_Builder`, `BarnCRM_Scholarships`.
-- A person who works only in a module with no app reaches its pages in BarnCRM Console or Admin
-  Console, which their BarnCRM role shows, or from the App Launcher's All Items.
-- Scholarships staff see the Grants app only with a Grants role set; without Grants installed the
-  Scholarships tabs are in BarnCRM Console. With Grants installed but not visible to the user,
-  the Home hub's Open the App link for Scholarships points at an app they cannot open.
+- Nobody who had an app loses one. Each set that showed a removed module app now shows a Core
+  app: the Forms Staff, Read Only and Scholarships sets show BarnCRM Console; Forms Admin shows
+  BarnCRM Console and BarnCRM Admin Console; Portal Builder Admin and both Connector sets show
+  BarnCRM Admin Console. A CI test (`test_core_navigation.py`) holds every set that showed an app
+  to showing at least one shipped app.
+- Scholarships staff see the Grants app only with a Grants role set, and the Scholarships pages
+  in BarnCRM Console always. With Grants installed but not visible to the user, the Home hub's
+  Open the App link for Scholarships points at an app they cannot open.
 - A package install still needs the administrator to add hosted tabs in App Manager; the Setup
   Assistant's Modules step lists them.
 - Module logos with no app stay as content assets for the Home hub's Modules list.

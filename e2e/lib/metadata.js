@@ -88,7 +88,12 @@ function hostedTabs(appFolders) {
       const file = path.join(PACKAGES, folder, 'main', 'default', 'tabs', `${name}.tab-meta.xml`);
       return name && fs.existsSync(file) ? name : null;
     };
-    const staffApps = home ? [home] : own ? [] : ['BarnCRM'];
+    // A host app outside Core cannot be shown by the module's sets, so the Console keeps the tabs.
+    const staffApps = home
+      ? [home, ...(appFolders.get(home) !== 'core' ? ['BarnCRM'] : [])]
+      : own
+        ? []
+        : ['BarnCRM'];
     const adminApps = ['BarnCRM_Admin_Console', ...(home ? [home] : [])];
     for (const [field, apps] of [
       ['Staff_Tabs__c', staffApps],

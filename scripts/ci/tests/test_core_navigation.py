@@ -195,5 +195,43 @@ class CoreAppOrder(unittest.TestCase):
         self.assertNotIn("Record_Inspector", admin)
 
 
+# Every shipped permission set that showed an app before the nine console apps (ADR-NEXT, nine
+# console apps). Each must still show at least one shipped app, so nobody who had an app loses
+# it. BarnCRM_App_Standard and BarnCRM_App_Admin_Standard are gone: their holders get the Console
+# sets from the same roles (TabAccessService).
+SETS_THAT_SHOWED_AN_APP = (
+    "BarnCRM_App_Admin_Console BarnCRM_App_Console Connector_Admin Connector_Viewer "
+    "Corporate_Hub_Admin Corporate_Hub_Read_Only Corporate_Hub_Staff Events_Admin Events_Read_Only "
+    "Events_Staff Forms_Admin Forms_Read_Only Forms_Staff Funders_Admin Funders_Read_Only "
+    "Funders_Staff Giving_Admin Giving_Read_Only Giving_Staff Memberships_Admin "
+    "Memberships_Read_Only Memberships_Staff Portal_Admin Programs_Admin Programs_Read_Only "
+    "Programs_Staff Projects_Admin Projects_Read_Only Projects_Staff Scholarships_Admin "
+    "Scholarships_Read_Only Scholarships_Staff Volunteers_Admin Volunteers_Coordinator "
+    "Volunteers_Read_Only Volunteers_Staff"
+).split()
+
+
+class EveryAppHolderKeepsAnApp(unittest.TestCase):
+    def test_every_set_that_showed_an_app_still_shows_a_shipped_app(self):
+        shipped = {
+            os.path.basename(path)[: -len(".app-meta.xml")]
+            for path in glob.glob(os.path.join(ROOT, "packages/*/main/default/applications/*.app-meta.xml"))
+        }
+        sets = {
+            os.path.basename(path)[: -len(".permissionset-meta.xml")]: path
+            for path in glob.glob(os.path.join(ROOT, "packages/*/main/default/permissionsets/*.permissionset-meta.xml"))
+        }
+        for name in SETS_THAT_SHOWED_AN_APP:
+            with self.subTest(permission_set=name):
+                self.assertIn(name, sets, "a set that showed an app is no longer shipped")
+                root = ET.parse(sets[name]).getroot()
+                visible = [
+                    entry.findtext("m:application", namespaces=NS)
+                    for entry in root.findall("m:applicationVisibilities", NS)
+                    if entry.findtext("m:visible", namespaces=NS) == "true"
+                ]
+                self.assertTrue(set(visible) & shipped, f"{name} shows no shipped app: {visible}")
+
+
 if __name__ == "__main__":
     unittest.main()
