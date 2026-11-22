@@ -1273,6 +1273,10 @@ core/NpspHouseholdSource.cls | public virtual Map<String,Object> binds()
 core/NpspHouseholdSource.cls | public virtual String condition()
 core/NpspHouseholdSource.cls | public virtual String key()
 core/NpspHouseholdSource.cls | public virtual class NpspHouseholdSource
+core/OffPlatformArchiveDestination.cls | public Import_Batch__c start(ArchiveRun)
+core/OffPlatformArchiveDestination.cls | public String key()
+core/OffPlatformArchiveDestination.cls | public String unavailableReason()
+core/OffPlatformArchiveDestination.cls | public class OffPlatformArchiveDestination
 core/OffPlatformDestination.cls | public interface OffPlatformDestination
 core/OrgDate.cls | public class OrgDate
 core/OrgDate.cls | public static Date dateOf(Datetime)
