@@ -25,8 +25,7 @@ recolored or stretched (every master is square, and the welcome pose keeps its a
   BarnCRM_Patch_Portal_Logo          portal        modules/portal-builder-logo   BarnCRM Portal Builder
   BarnCRM_Patch_Memberships_Logo     memberships   modules/memberships-logo      BarnCRM Memberships
   BarnCRM_Patch_Scholarships_Logo    scholarships  modules/scholarships-logo     BarnCRM Scholarships
-  BarnCRM_Patch_Connector_Logo       connector     marks/barncrm-icon            BarnCRM Connector (until a
-                                                                                 Connector master exists)
+  BarnCRM_Connector_Patch_Logo       connector     modules/connector-logo        BarnCRM Connector
 
 Plus Core's static resource `BarnPatchWelcome` (hires/poses/hi-im-patch, 400 px wide), shown by
 c/hubWelcome on BarnCRM Home.
@@ -69,7 +68,7 @@ LOGOS = [
     ("portal", "BarnCRM_Patch_Portal_Logo", "portal", "modules/portal-builder-logo.png"),
     ("memberships", "BarnCRM_Patch_Memberships_Logo", "memberships", "modules/memberships-logo.png"),
     ("scholarships", "BarnCRM_Patch_Scholarships_Logo", "scholarships", "modules/scholarships-logo.png"),
-    ("connector", "BarnCRM_Patch_Connector_Logo", "connector", "marks/barncrm-icon.png"),
+    ("connector", "BarnCRM_Connector_Patch_Logo", "connector", "modules/connector-logo.png"),
 ]
 WELCOME = ("core", "BarnPatchWelcome", "poses/hi-im-patch.png")
 
