@@ -230,10 +230,7 @@ private class EventSurveyControllerTest {
 	static void theFollowUpCarriesTheSurveyLinkOnlyForEventsWithASurvey() {
 		System.runAs(staff()) {
 			FormCatalogTestSupport.install(new Catalog());
-			OrgSettingsSystemWriter.save(
-				Events_Settings__c.SObjectType,
-				new Map<Schema.SObjectField, Object>{ Events_Settings__c.Follow_Ups_Enabled__c => true }
-			);
+			ModuleSettings.setForTest('Events_Follow_Ups_Enabled', true);
 			SettingsService.clearCaches();
 			Event__c surveyed = past(FORM_KEY);
 			Event_Attendee__c sam = attendee(surveyed, 'Lee');

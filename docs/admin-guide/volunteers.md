@@ -229,7 +229,10 @@ and delete those entries (or reject them) before you delete the person.
 ## Settings
 
 As an admin, open the **Volunteers** section of **BarnCRM Settings**. It shows these
-settings, and each saves as you change it.
+settings, and each saves org-wide as you change it, like the rest of BarnCRM Settings:
+**Saving...** for a few seconds, then **Your settings are saved.** (see
+[Saving Your Changes](barncrm-settings.md#saving-your-changes)). A setting you never changed uses
+the default below.
 
 | Setting | Default | What it does | Takes effect |
 |---|---|---|---|

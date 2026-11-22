@@ -9,6 +9,12 @@ private class VolunteerLetterControllerTest {
 	private static final Date FROM_DATE = Date.newInstance(2026, 3, 1);
 	private static final Date TO_DATE = Date.newInstance(2026, 3, 31);
 
+	// A test's setting override does not outlive @TestSetup, so each test method's
+	// transaction sets it as the class loads.
+	static {
+		VolunteersTestData.volunteerSettings(false, true);
+	}
+
 	@TestSetup
 	static void makeData() {
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
@@ -18,7 +24,6 @@ private class VolunteerLetterControllerTest {
 			);
 			TestUsers.standardUserWith(STAFFER, new List<String>{ VolunteersTestData.CORE_STAFF, 'Volunteers_Staff' });
 			VolunteersTestData.contactModeWithoutAutomaticHouseholds();
-			VolunteersTestData.volunteerSettings(false, true);
 			VolunteerLetterTemplates.installDefaultsDuringInstall();
 			Contact person = VolunteersTestData.contact('Rivera', null);
 			update new Contact(Id = person.Id, OwnerId = coordinator.Id);

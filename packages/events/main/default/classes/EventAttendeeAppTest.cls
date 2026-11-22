@@ -81,12 +81,8 @@ private class EventAttendeeAppTest {
 		return record;
 	}
 
-	private static void setting(Schema.SObjectField field, Boolean value) {
-		OrgSettingsSystemWriter.save(
-			Events_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{ field => value }
-		);
-		SettingsService.clearCaches();
+	private static void setting(String name, Boolean value) {
+		ModuleSettings.setForTest(name, value);
 	}
 
 	private static Attendee_Connection__c rowOf(Id personId) {
@@ -167,7 +163,7 @@ private class EventAttendeeAppTest {
 
 			Test.startTest();
 			String off = app.run(EventAttendeeApp.SEND_MESSAGE, c.ana.Id, anas.Id);
-			setting(Events_Settings__c.Attendee_Messages__c, true);
+			setting('Events_Attendee_Messages', true);
 			String notYet = app.run(EventAttendeeApp.SEND_MESSAGE, c.ana.Id, anas.Id);
 			app.run(EventAttendeeApp.ACCEPT, c.ben.Id, rowOf(c.ben.Id).Id);
 			String sent = app.run(EventAttendeeApp.SEND_MESSAGE, c.ana.Id, anas.Id);
@@ -212,7 +208,7 @@ private class EventAttendeeAppTest {
 			String overlap = app.run(EventAttendeeApp.ADD_TO_AGENDA, c.ana.Id, clash.Id);
 			app.run(EventAttendeeApp.ADD_TO_AGENDA, c.ben.Id, small.Id);
 			String full = app.run(EventAttendeeApp.ADD_TO_AGENDA, c.ana.Id, small.Id);
-			setting(Events_Settings__c.Allow_Agenda_Overlaps__c, true);
+			setting('Events_Allow_Agenda_Overlaps', true);
 			String allowed = app.run(EventAttendeeApp.ADD_TO_AGENDA, c.ana.Id, clash.Id);
 			Agenda_Item__c item = [
 				SELECT Id

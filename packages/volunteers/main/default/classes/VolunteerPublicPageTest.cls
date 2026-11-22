@@ -90,10 +90,7 @@ private class VolunteerPublicPageTest {
 
 			Test.startTest();
 			Map<String, Object> closed = new VolunteerPublicPage().page(shift.Id);
-			OrgSettingsSystemWriter.save(
-				Volunteer_Settings__c.SObjectType,
-				new Map<Schema.SObjectField, Object>{ Volunteer_Settings__c.Waitlist_Enabled__c => true }
-			);
+			ModuleSettings.setForTest('Volunteers_Waitlist_Enabled', true);
 			SettingsService.clearCaches();
 			Map<String, Object> waitlist = new VolunteerPublicPage().page(shift.Id);
 			Test.stopTest();

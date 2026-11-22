@@ -16,15 +16,10 @@ private class EventEmailServiceTest {
 	}
 
 	private static void settings(Boolean reminders, Boolean followUps, Boolean noShows) {
-		OrgSettingsSystemWriter.save(
-			Events_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{
-				Events_Settings__c.Reminders_Enabled__c => reminders,
-				Events_Settings__c.Follow_Ups_Enabled__c => followUps,
-				Events_Settings__c.Mark_No_Shows__c => noShows,
-				Events_Settings__c.Reminder_Lead_Days__c => 3
-			}
-		);
+		ModuleSettings.setForTest('Events_Reminders_Enabled', reminders);
+		ModuleSettings.setForTest('Events_Follow_Ups_Enabled', followUps);
+		ModuleSettings.setForTest('Events_Mark_No_Shows', noShows);
+		ModuleSettings.setForTest('Events_Reminder_Lead_Days', 3);
 		SettingsService.clearCaches();
 	}
 

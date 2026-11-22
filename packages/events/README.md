@@ -43,8 +43,9 @@ used. Paid registration (EV-20) reaches the optional BarnCRM Payments module onl
   `EventRegistrationsController`), `EventRegistrationService` with `EventPersonMatcher` (Core's
   shared `PersonMatcher`, the one Forms calls, household-aware) and `EventPricing`, and `EventFormAttachment`, Core's form seam
   (`FormAttachmentExtensions`), used only when Forms is installed.
-- Reminders, follow-ups and No-Show (EV-14): `Events_Settings__c` (29EV25, shared with EV-06's notice templates) with its Setting
-  Definitions (section Events), `EventsSettings`, the nightly step `EventEmailScheduler` given to
+- Reminders, follow-ups and No-Show (EV-14): the Events settings (29EV25, shared with EV-06's notice templates), registered by
+  `Setting_Module.Events` with their Setting Definitions (section Events, shipped defaults; the legacy `Events_Settings__c` is
+  read only until carry-over), `EventsSettings`, the nightly step `EventEmailScheduler` given to
   Core through `EventsNightlyJobProvider` (`NightlyJobs.PROVIDER_CLASSES`), `EventEmailBatch` and
   `EventEmailService`; templates in the `BarnCRM_Events` email folder.
 - Summit Events (EV-10): `SummitEventsAdapter` (dynamic SOQL by object name, no dependency),

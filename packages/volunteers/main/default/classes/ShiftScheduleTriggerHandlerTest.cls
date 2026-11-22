@@ -21,6 +21,12 @@ private class ShiftScheduleTriggerHandlerTest {
 	private static final String STAFF = 'ScheduleStaff';
 	private static final String READ_ONLY = 'ScheduleReader';
 
+	// A test's setting override does not outlive @TestSetup, so each test method's
+	// transaction sets it as the class loads.
+	static {
+		VolunteersTestData.shiftHorizonWeeks(6);
+	}
+
 	@TestSetup
 	static void makeData() {
 		TestUsers.standardUserWith(
@@ -36,7 +42,6 @@ private class ShiftScheduleTriggerHandlerTest {
 			VolunteersTestData.contactModeWithoutAutomaticHouseholds();
 			VolunteersTestData.contact('Rivera', null);
 			Volunteer_Job__c job = VolunteersTestData.job('Food pantry sort');
-			VolunteersTestData.shiftHorizonWeeks(6);
 			ShiftScheduleService.timeZoneOverride = ZONE;
 			ShiftScheduleService.nowOverride = FRIDAY_NOON;
 			Shift_Schedule__c schedule = VolunteersTestData.newSchedule(

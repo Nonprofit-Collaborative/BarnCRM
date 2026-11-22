@@ -130,7 +130,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, **Volunteers**. | The section shows **Require hours approval**, **Create hours from attendance** and **Weeks ahead to create shifts** (8 weeks). |
-| 2 | Turn **Require hours approval** off. | The change saves at once. |
+| 2 | Turn **Require hours approval** off, then reload BarnCRM Settings. | The change shows "Saving..." then "Your settings are saved."; after the reload it is still off. |
 | 3 | Create an hours entry for a sample person on job **Front desk**, 1 hour, yesterday. | It saves with **Status** Approved and **Reviewed By** you. |
 | 4 | Turn **Require hours approval** back on. Create a second entry the same way. | It saves with **Status** Submitted. |
 

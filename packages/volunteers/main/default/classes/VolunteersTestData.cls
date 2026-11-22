@@ -100,22 +100,14 @@ public class VolunteersTestData {
 
 	/** Saves the Volunteers settings as an administrator would, and forgets the cached copy. */
 	public static void volunteerSettings(Boolean hoursRequireApproval, Boolean attendanceCreatesHours) {
-		OrgSettingsSystemWriter.save(
-			Volunteer_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{
-				Volunteer_Settings__c.Hours_Require_Approval__c => hoursRequireApproval,
-				Volunteer_Settings__c.Attendance_Creates_Hours__c => attendanceCreatesHours
-			}
-		);
+		ModuleSettings.setForTest('Volunteers_Hours_Require_Approval', hoursRequireApproval);
+		ModuleSettings.setForTest('Volunteers_Attendance_Creates_Hours', attendanceCreatesHours);
 		SettingsService.clearCaches();
 	}
 
 	/** Saves how many weeks ahead recurring schedules keep their shifts (V-07). */
 	public static void shiftHorizonWeeks(Integer weeks) {
-		OrgSettingsSystemWriter.save(
-			Volunteer_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{ Volunteer_Settings__c.Shift_Horizon_Weeks__c => weeks }
-		);
+		ModuleSettings.setForTest('Volunteers_Shift_Horizon_Weeks', weeks);
 		SettingsService.clearCaches();
 	}
 

@@ -41,13 +41,8 @@ private class EventApplicationsControllerTest {
 	}
 
 	private static void chooseTemplates(String accepted, String declined) {
-		OrgSettingsSystemWriter.save(
-			Events_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{
-				Events_Settings__c.Accept_Notice_Template__c => accepted,
-				Events_Settings__c.Decline_Notice_Template__c => declined
-			}
-		);
+		ModuleSettings.setForTest('Events_Accept_Notice_Template', accepted);
+		ModuleSettings.setForTest('Events_Decline_Notice_Template', declined);
 		SettingsService.clearCaches();
 	}
 

@@ -11,6 +11,12 @@ private class VolunteerLetterBatchTest {
 	private static final Date TO_DATE = Date.newInstance(2026, 3, 31);
 	private static final String HOURS_LETTER = VolunteerLetterTemplates.TYPE_HOURS_LETTER;
 
+	// A test's setting override does not outlive @TestSetup, so each test method's
+	// transaction sets it as the class loads.
+	static {
+		VolunteersTestData.volunteerSettings(false, true);
+	}
+
 	@TestSetup
 	static void makeData() {
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
@@ -22,7 +28,6 @@ private class VolunteerLetterBatchTest {
 			settings.Auto_Create_Households__c = false;
 			settings.Job_Notifications__c = true;
 			TestDataFactory.saveSettings(settings);
-			VolunteersTestData.volunteerSettings(false, true);
 			VolunteersTestData.job('Food pantry');
 			VolunteerLetterTemplates.installDefaultsDuringInstall();
 		}

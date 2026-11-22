@@ -10514,7 +10514,11 @@ page's value are left out, and both tokens merge as empty.
 
 ### Salesforce implementation
 
-- **Custom setting:** `Volunteer_Settings__c`, hierarchy, protected.
+- **Settings store (Section 13 R-SV4):** `Setting_Module.Volunteers` (`Settings_Object__c`
+  `Volunteer_Settings__c`, `Key_Prefix__c` `Volunteers`, no state fields). Each key below is a
+  Setting Value read through `SettingsService` by `VolunteerSettings`, the definition shipping the
+  default as `Default_Value__c`. The legacy hierarchy custom setting `Volunteer_Settings__c`
+  (protected) is read only until carry-over, then removed.
 
 | Key | API name | Type |
 |---|---|---|
@@ -15398,8 +15402,11 @@ reads as its shipped value.
 
 ### Salesforce implementation
 
-- **Object:** `Events_Settings__c`, hierarchy custom setting, visibility Protected, read through
-  Core's `SettingsService` by `EventsSettings`.
+- **Settings store (Section 13 R-SV4):** `Setting_Module.Events` (`Settings_Object__c`
+  `Events_Settings__c`, `Key_Prefix__c` `Events`, no state fields). Each attribute below is a
+  Setting Value read through Core's `SettingsService` by `EventsSettings`, the definition shipping
+  the default as `Default_Value__c`. The legacy hierarchy custom setting `Events_Settings__c`
+  (Protected) is read only until carry-over, then removed.
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -20175,6 +20182,7 @@ mirrors the primary member).
 | 1.85 | 2026-11-21 | Settings as custom metadata, phase 2 Core prerequisite (SET-02, D-219). New custom metadata type `Setting_Module__mdt` with `Settings_Object__c`, `Key_Prefix__c` and `State_Fields__c` (Section 13; not counted as an object): a module registers its settings group, its State row prefix and its legacy state fields. New rule R-SV4 (module settings read and saved through the store by name or by group and key); R-SV3 carry-over covers every registered module; module State rows are `Prefix.Name` and a run lock is a State row read `FOR UPDATE` (Section 29 Nightly Jobs). No object count change. |
 | 1.86 | 2026-11-21 | Settings as custom metadata, phase 2: Rollups, Programs and Portal (SET-03, D-219). Each ships a `Setting_Module__mdt` record (prefixes `Rollups`, `Programs`, `Portal`) and a `Default_Value__c` on every Setting Definition, and reads its settings from the store (R-SV4). Run state moves to State rows: `Rollups.Nightly_Covered_From__c`, `Rollups.Processor_Requested_At__c`, `Programs.Private_Participants__c` (the Participant Privacy preset, saved synchronously), and the large parent run lock `Rollups.Last_Run_Started__c` (Section 14A), which replaces `Rollup_Run_Lock__c` and is created at install. `Rollup_Settings__c`, `Rollup_Run_Lock__c`, `Programs_Settings__c` and `Portal_Settings__c` are no longer written; they stay until the destructive deploy. No object count change. |
 | 1.87 | 2026-11-21 | Settings as custom metadata, phase 2: Projects (SET-03, D-219). `Setting_Module.Projects` (prefix `Projects`), a `Default_Value__c` on every Setting Definition, readers through the store (29PM7); Invoice payment return page reads the org's My Domain address while blank instead of being filled at install. `Project__c` gains Actual Cost (`Actual_Cost_Amount__c`, Currency, stored), kept by `ProjectCostHandler` on the new `ProjectTrigger` and by `ProjectCostSync`, with the formula's results; Remaining Budget reads it. The formula `Actual_Cost__c` is relabeled Actual Cost Formula and left unused. The validation rules `Requests_Turned_On` and `Change_Requests_Turned_On` are inactive: `ProjectRequestHandler` and the new `ProjectChangeRequestHandler` (`ProjectChangeRequestTrigger`) refuse new records instead (R-PM20, R-PM23). New State row `Projects.Cost_Rates_Applied__c`. No object count change. |
+| 1.88 | 2026-11-21 | Settings as custom metadata, phase 2: Events and Volunteers (SET-03, D-219). Each ships a `Setting_Module__mdt` record (prefixes `Events`, `Volunteers`, no state fields) and a `Default_Value__c` on every Setting Definition with a shipped default; their readers already go through `SettingsService`, which now serves the store (R-SV4, Sections 29N and 29EV25). `Events_Settings__c` and `Volunteer_Settings__c` are no longer written; they stay until the destructive deploy. No object count change. |
 
 ---
 ## 32. Entity ownership by package
