@@ -115,25 +115,6 @@ public with sharing class ProjectTimesheetController {
 		}
 	}
 
-	/** The open tasks of a project, for a new timesheet row. */
-	@AuraEnabled
-	public static List<ProjectViews.Named> getTasks(Id projectId) {
-		try {
-			return ProjectViews.named(
-				[
-					SELECT Id, Name
-					FROM Project_Task__c
-					WHERE Project__c = :projectId AND Status__c NOT IN ('Done', 'Cancelled')
-					WITH USER_MODE
-					ORDER BY Sort_Order__c NULLS LAST, Name
-					LIMIT 200
-				]
-			);
-		} catch (Exception e) {
-			throw ERRORS.wrap(e);
-		}
-	}
-
 	/**
 	 * Saves the cells: a new entry for each cell without an id, the hours, billable flag and
 	 * notes of an existing one. A cell cannot be emptied here: Staff cannot delete time, so a

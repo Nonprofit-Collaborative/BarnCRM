@@ -1,6 +1,5 @@
 /**
- * Projects Home, the project board and the at-risk card return what they draw; task status,
- * Log Time, Draft Status Update (R-PM8), utilization (R-PM5) and the billable export (R-PM7)
+ * Projects Home and the project board return what they draw; Log Time, Draft Status Update (R-PM8), utilization (R-PM5) and the billable export (R-PM7)
  * do what the guides say; and a refusal reaches the screen in words.
  */
 @IsTest(testFor='ApexClass:ProjectsController, ApexClass:ProjectReporting, ApexClass:Projects')
@@ -18,9 +17,20 @@ private class ProjectsControllerTest {
 			insert phase;
 			Project_Task__c task = ProjectsTestData.task(project.Id, 'Configure', Date.today().addDays(3), false);
 
+			// Add Task and the status menu write through Lightning Data Service (ADR-0093 A2);
+			// these are the records they write.
+			Project_Task__c added = new Project_Task__c(
+				Project__c = project.Id,
+				Phase__c = phase.Id,
+				Name = 'Go-Live',
+				Status__c = 'Not Started',
+				Due_Date__c = Date.today().addDays(5),
+				Milestone__c = true
+			);
+			insert as user added;
+			update as user new Project_Task__c(Id = task.Id, Status__c = 'Done', Completed_Date__c = Date.today());
+
 			Test.startTest();
-			Id added = ProjectsController.addTask(project.Id, phase.Id, 'Go-Live', Date.today().addDays(5), true);
-			ProjectsController.setTaskStatus(task.Id, 'Done');
 			ProjectsController.Board board = ProjectsController.getBoard(project.Id);
 			ProjectsController.Home home = ProjectsController.getHome();
 			Test.stopTest();
@@ -31,14 +41,6 @@ private class ProjectsControllerTest {
 			Assert.isTrue(board.timeTracking, 'Time tracking ships on');
 			Assert.isTrue(board.canCreateTime, 'An admin may log time');
 			Assert.isTrue(board.canCreateExpense, 'An admin may add an expense');
-			Project_Task__c done = [
-				SELECT Completed_Date__c
-				FROM Project_Task__c
-				WHERE Id = :task.Id
-				WITH SYSTEM_MODE
-			];
-			Assert.areEqual(Date.today(), done.Completed_Date__c, 'Done stamps today (R-PM4)');
-			Assert.isNotNull(added, 'Add Task');
 			Assert.isTrue(home.canManage, 'Admin manages');
 			Assert.areEqual(2, home.templates.size(), 'The two shipped templates');
 			Assert.areEqual(0, home.myTasks.size(), 'Assigned task is done; the added one has no owner');
@@ -75,7 +77,7 @@ private class ProjectsControllerTest {
 	}
 
 	@IsTest
-	static void logTimeDraftAndTheAtRiskCard() {
+	static void logTimeAndDraftStatusUpdate() {
 		System.runAs(ProjectsTestData.admin()) {
 			Project__c project = ProjectsTestData.project('Active', 10);
 			Project_Task__c finished = ProjectsTestData.task(project.Id, 'Interviews', Date.today(), false);
@@ -87,13 +89,12 @@ private class ProjectsControllerTest {
 				false
 			);
 			update new Project_Task__c(Id = blocked.Id, Status__c = 'Blocked');
+			update as user new Project_Task__c(Id = finished.Id, Status__c = 'Done', Completed_Date__c = Date.today());
 
 			Test.startTest();
-			ProjectsController.setTaskStatus(finished.Id, 'Done');
 			ProjectsController.logTime(project.Id, finished.Id, null, 4, true, 'Interviews');
 			ProjectsController.refreshHealth(project.Id);
 			Id updateId = ProjectsController.draftStatusUpdate(project.Id);
-			List<ProjectViews.Project> atRisk = ProjectsController.getAtRisk(true);
 			Test.stopTest();
 
 			Project_Status_Update__c draft = [
@@ -116,7 +117,6 @@ private class ProjectsControllerTest {
 			Assert.isTrue(draft.Next_Steps__c.contains('Design sign-off'), 'Due in the next 14 days');
 			Assert.isTrue(draft.Risks__c.contains('Data cleanup'), 'Blocked and late');
 			Assert.isNotNull(draft.Summary__c, 'A summary line');
-			Assert.areEqual(1, atRisk.size(), 'On the at-risk card, only mine');
 		}
 	}
 

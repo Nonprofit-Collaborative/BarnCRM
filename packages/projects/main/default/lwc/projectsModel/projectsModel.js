@@ -15,6 +15,14 @@ export function isOpen(task) {
 }
 
 /**
+ * A task's Completed Date for a new status (R-PM4): Done stamps today (YYYY-MM-DD), anything
+ * else clears it.
+ */
+export function completedDateFor(status, today) {
+  return status === 'Done' ? today : null;
+}
+
+/**
  * Phases in order, each with its tasks, done and counted tasks (Cancelled left out) and percent;
  * tasks with no phase (or a phase not on this project) come last, in a group with no id.
  */

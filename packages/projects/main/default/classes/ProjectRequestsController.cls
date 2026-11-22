@@ -1,9 +1,10 @@
 /**
  * The Requests tab and the request panel (D-201; ADR-0221 `0221-projects-requests-and-issues.md`
- * decision 3): requests by view, one request with its comments, triage changes, comments, and a
- * task or change request made from a request. Thin by design (plan Section 9.9): plain DTOs,
- * user mode throughout, the rules in `ProjectRequestHandler` and the validation rules; views
- * and display rules in `c/projectsRequestsModel`.
+ * decision 3): requests by view, one request with its comments, and a task or change request
+ * made from a request. Thin by design (plan Section 9.9): plain DTOs, user mode throughout, the
+ * rules in `ProjectRequestHandler` and the validation rules; views and display rules in
+ * `c/projectsRequestsModel`. Triage changes and comments are saved by the panel through
+ * Lightning Data Service (ADR-0093 A2).
  */
 public with sharing class ProjectRequestsController {
 	private static final String CONTEXT = 'ProjectRequestsController';
@@ -19,15 +20,6 @@ public with sharing class ProjectRequestsController {
 		'SELECT Id, Name, Subject__c, Status__c, Priority__c, Type__c, Category__c, ' +
 		'Requester__r.Name, Owner.Name, Owner.Type, OwnerId, Due_Date__c, Overdue__c, ' +
 		'Project__c, Project__r.Name, CreatedDate';
-	/** What triage may change from the panel; anything else in a save is ignored. */
-	private static final Set<String> EDITABLE = new Set<String>{
-		'Status__c',
-		'Priority__c',
-		'OwnerId',
-		'Due_Date__c',
-		'Resolution__c',
-		'Project__c'
-	};
 
 	public class RequestList {
 		@AuraEnabled
@@ -198,41 +190,6 @@ public with sharing class ProjectRequestsController {
 				detail.comments.add(comment);
 			}
 			return detail;
-		} catch (Exception e) {
-			throw failure(e);
-		}
-	}
-
-	/** Saves triage changes (status, priority, owner, due date, resolution, project). */
-	@AuraEnabled
-	public static void saveRequest(Id requestId, Map<String, Object> changes) {
-		try {
-			Project_Request__c request = new Project_Request__c(Id = requestId);
-			for (String field : changes == null ? new Set<String>() : changes.keySet()) {
-				if (!EDITABLE.contains(field)) {
-					continue;
-				}
-				Object value = changes.get(field);
-				if (field == 'Due_Date__c' && value != null) {
-					value = Date.valueOf(String.valueOf(value));
-				}
-				request.put(field, value == '' ? null : value);
-			}
-			update as user request;
-		} catch (Exception e) {
-			throw failure(e);
-		}
-	}
-
-	/** Adds a comment, internal unless shared. */
-	@AuraEnabled
-	public static void addComment(Id requestId, String body, Boolean shared) {
-		try {
-			insert as user new Project_Request_Comment__c(
-				Request__c = requestId,
-				Body__c = body,
-				Shared__c = shared == true
-			);
 		} catch (Exception e) {
 			throw failure(e);
 		}

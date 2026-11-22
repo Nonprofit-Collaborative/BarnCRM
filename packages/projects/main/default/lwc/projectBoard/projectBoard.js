@@ -1,16 +1,30 @@
 import { LightningElement, api } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import { createRecord, updateRecord } from 'lightning/uiRecordApi';
+import TASK from '@salesforce/schema/Project_Task__c';
+import TASK_PROJECT_FIELD from '@salesforce/schema/Project_Task__c.Project__c';
+import TASK_PHASE_FIELD from '@salesforce/schema/Project_Task__c.Phase__c';
+import TASK_STATUS_FIELD from '@salesforce/schema/Project_Task__c.Status__c';
+import TASK_DUE_DATE_FIELD from '@salesforce/schema/Project_Task__c.Due_Date__c';
+import TASK_MILESTONE_FIELD from '@salesforce/schema/Project_Task__c.Milestone__c';
+import TASK_COMPLETED_DATE_FIELD from '@salesforce/schema/Project_Task__c.Completed_Date__c';
 import getBoard from '@salesforce/apex/ProjectsController.getBoard';
-import setTaskStatus from '@salesforce/apex/ProjectsController.setTaskStatus';
-import addTask from '@salesforce/apex/ProjectsController.addTask';
 import logTime from '@salesforce/apex/ProjectsController.logTime';
 import addExpense from '@salesforce/apex/ProjectTimesheetController.addExpense';
 import refreshHealth from '@salesforce/apex/ProjectsController.refreshHealth';
 import draftStatusUpdate from '@salesforce/apex/ProjectsController.draftStatusUpdate';
-import { localIsoDate, messageFrom } from 'c/findCsv';
+import { localIsoDate, messageFrom, recordErrorMessage } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
-import { bar, groupTasks, isOpen, percent, timelineSpan, todayMark } from 'c/projectsModel';
+import {
+  bar,
+  completedDateFor,
+  groupTasks,
+  isOpen,
+  percent,
+  timelineSpan,
+  todayMark
+} from 'c/projectsModel';
 
 const PKG = 'Projects';
 const STATUSES = ['Not Started', 'In Progress', 'Blocked', 'Done', 'Cancelled'];
@@ -207,17 +221,26 @@ export default class ProjectBoard extends NavigationMixin(LightningElement) {
       await this.load();
       return result;
     } catch (error) {
-      this.errorMessage = messageFrom(error);
+      this.errorMessage = recordErrorMessage(error);
       return undefined;
     } finally {
       this.isWorking = false;
     }
   }
 
+  /** Sets a task's status as the user through Lightning Data Service (ADR-0093 A2; R-PM4). */
   handleStatus(event) {
     const taskId = event.target.dataset.task;
     const status = event.detail.value;
-    this.run(() => setTaskStatus({ taskId, status }));
+    this.run(() =>
+      updateRecord({
+        fields: {
+          Id: taskId,
+          [TASK_STATUS_FIELD.fieldApiName]: status,
+          [TASK_COMPLETED_DATE_FIELD.fieldApiName]: completedDateFor(status, localIsoDate())
+        }
+      })
+    );
   }
 
   handleRefresh() {
@@ -253,15 +276,26 @@ export default class ProjectBoard extends NavigationMixin(LightningElement) {
     };
   }
 
+  /** Adds a Not Started task to the phase as the user through Lightning Data Service. */
   async handleSaveTask() {
     const phaseId = this.addingPhase === 'none' ? null : this.addingPhase;
+    const name = (this.newTask.name || '').trim();
+    if (!name) {
+      this.notice = undefined;
+      this.errorMessage = helpText('Projects', 'Projects_Task_NameNeeded');
+      return;
+    }
     const saved = await this.run(() =>
-      addTask({
-        projectId: this.recordId,
-        phaseId,
-        name: this.newTask.name,
-        dueDate: this.newTask.due || null,
-        milestone: this.newTask.milestone === true
+      createRecord({
+        apiName: TASK.objectApiName,
+        fields: {
+          [TASK_PROJECT_FIELD.fieldApiName]: this.recordId,
+          [TASK_PHASE_FIELD.fieldApiName]: phaseId,
+          Name: name,
+          [TASK_STATUS_FIELD.fieldApiName]: 'Not Started',
+          [TASK_DUE_DATE_FIELD.fieldApiName]: this.newTask.due || null,
+          [TASK_MILESTONE_FIELD.fieldApiName]: this.newTask.milestone === true
+        }
       })
     );
     if (saved) {

@@ -1,8 +1,8 @@
 import { createElement } from 'lwc';
+import { createRecord, updateRecord } from 'lightning/uiRecordApi';
 import ProjectBoard from 'c/projectBoard';
 import getBoard from '@salesforce/apex/ProjectsController.getBoard';
-import setTaskStatus from '@salesforce/apex/ProjectsController.setTaskStatus';
-import addTask from '@salesforce/apex/ProjectsController.addTask';
+import { localIsoDate } from 'c/findCsv';
 import logTime from '@salesforce/apex/ProjectsController.logTime';
 import refreshHealth from '@salesforce/apex/ProjectsController.refreshHealth';
 import addExpense from '@salesforce/apex/ProjectTimesheetController.addExpense';
@@ -15,12 +15,6 @@ jest.mock(
 );
 
 jest.mock('@salesforce/apex/ProjectsController.getBoard', () => ({ default: jest.fn() }), {
-  virtual: true
-});
-jest.mock('@salesforce/apex/ProjectsController.setTaskStatus', () => ({ default: jest.fn() }), {
-  virtual: true
-});
-jest.mock('@salesforce/apex/ProjectsController.addTask', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock('@salesforce/apex/ProjectsController.logTime', () => ({ default: jest.fn() }), {
@@ -97,7 +91,6 @@ describe('c-project-board', () => {
 
   it('draws health, progress, the phase and its tasks, and changes a status', async () => {
     getBoard.mockResolvedValue(BOARD);
-    setTaskStatus.mockResolvedValue();
     const element = mount();
     await flush();
     expect(find(element, 'health').textContent).toContain('At Risk');
@@ -110,7 +103,9 @@ describe('c-project-board', () => {
     );
     status.dispatchEvent(new CustomEvent('change', { detail: { value: 'Done' } }));
     await flush();
-    expect(setTaskStatus).toHaveBeenCalledWith({ taskId: 'a03000000000002AAA', status: 'Done' });
+    expect(updateRecord).toHaveBeenCalledWith({
+      fields: { Id: 'a03000000000002AAA', Status__c: 'Done', Completed_Date__c: localIsoDate() }
+    });
     find(element, 'refresh').click();
     await flush();
     expect(refreshHealth).toHaveBeenCalledWith({ projectId: 'a01000000000001AAA' });
@@ -118,7 +113,6 @@ describe('c-project-board', () => {
 
   it('adds a task and logs time, and shows a refusal', async () => {
     getBoard.mockResolvedValue(BOARD);
-    addTask.mockResolvedValue('a03000000000003AAA');
     logTime.mockRejectedValue({ body: { message: 'Enter more than 0 and at most 24 hours.' } });
     const element = mount();
     await flush();
@@ -127,13 +121,25 @@ describe('c-project-board', () => {
     const name = element.shadowRoot.querySelector(
       '[data-id="task-form"] lightning-input[data-field="name"]'
     );
-    name.value = 'Reports';
+    find(element, 'save-task').click();
+    await flush();
+    expect(createRecord).not.toHaveBeenCalled();
+    expect(find(element, 'error-message').message).toBe('c.Projects_Task_NameNeeded');
+    name.value = '  Reports ';
     name.dispatchEvent(new CustomEvent('change'));
     find(element, 'save-task').click();
     await flush();
-    expect(addTask).toHaveBeenCalledWith(
-      expect.objectContaining({ phaseId: 'a02000000000001AAA', name: 'Reports' })
-    );
+    expect(createRecord).toHaveBeenCalledWith({
+      apiName: 'Project_Task__c',
+      fields: {
+        Project__c: 'a01000000000001AAA',
+        Phase__c: 'a02000000000001AAA',
+        Name: 'Reports',
+        Status__c: 'Not Started',
+        Due_Date__c: null,
+        Milestone__c: false
+      }
+    });
     find(element, 'log-time').click();
     await flush();
     find(element, 'save-time').click();
