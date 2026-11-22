@@ -371,9 +371,17 @@ run() {
   # resolves keeps it; an org with none (or a setting pointing at a missing, deleted or
   # inactive fund) gets the generated "Scale test General" fund as its default.
   local setting_fund resolved
+  # The setting is a Setting Value record holding a JSON literal (ADR-NEXT settings as custom
+  # metadata); an org not yet carried over still has it on the legacy Giving Settings.
   setting_fund="$(sf data query --target-org "$ALIAS" --json \
-    --query "SELECT Default_Fund__c FROM Giving_Settings__c" 2>/dev/null </dev/null \
-    | jq -r '[.result.records[]?.Default_Fund__c | select(. != null and . != "")] | first // empty')"
+    --query "SELECT Value__c FROM Setting_Value__mdt WHERE DeveloperName = 'Giving_Default_Fund'" \
+    2>/dev/null </dev/null \
+    | jq -r '[.result.records[]?.Value__c | select(. != null and . != "") | ltrimstr("\"") | rtrimstr("\"")] | first // empty')"
+  if [[ -z "$setting_fund" ]]; then
+    setting_fund="$(sf data query --target-org "$ALIAS" --json \
+      --query "SELECT Default_Fund__c FROM Giving_Settings__c" 2>/dev/null </dev/null \
+      | jq -r '[.result.records[]?.Default_Fund__c | select(. != null and . != "")] | first // empty')"
+  fi
   ORG_HAS_DEFAULT=0
   if [[ -z "$setting_fund" ]]; then
     log "Giving settings name no default fund on $ALIAS."

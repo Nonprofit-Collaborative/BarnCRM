@@ -1591,6 +1591,7 @@ core/SettingsController.cls | public class ConsoleModel
 core/SettingsController.cls | public class SettingsController
 core/SettingsController.cls | public static ConsoleModel consoleModel()
 core/SettingsController.cls | public static ConsoleModel save(Map<String,Object>)
+core/SettingsSavedExtension.cls | public interface SettingsSavedExtension
 core/SettingsService.cls | public class SettingsException
 core/SettingsService.cls | public class SettingsService
 core/SettingsService.cls | public static BarnCRM_Settings__c firstSaveRecord()

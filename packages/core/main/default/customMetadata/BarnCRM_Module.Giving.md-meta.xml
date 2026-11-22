@@ -40,7 +40,7 @@
   </values>
   <values>
     <field>Extensions__c</field>
-    <value xsi:type="xsd:string">NightlyStepProvider: GivingNightlyJobProvider</value>
+    <value xsi:type="xsd:string">NightlyStepProvider: GivingNightlyJobProvider; SettingsSavedExtension: GivingSettingsSaved</value>
   </values>
   <values>
     <field>Quick_Links__c</field>

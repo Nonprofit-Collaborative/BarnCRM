@@ -27,8 +27,8 @@ at any time.
 3. To change which fund catches undesignated gifts, open **BarnCRM Settings**, choose
    **Fundraising**, and change **Default fund**. Click **Save** and wait for **Saved**. That
    setting decides where gifts land.
-4. **Is Default** on each fund shows that setting: it follows the setting the next time the
-   fund is saved, and ticking it on a different fund is refused with a message pointing to
+4. **Is Default** on each fund shows that setting: saving **Default fund** moves the flag to the
+   chosen fund at once, and ticking it on a different fund is refused with a message pointing to
    **Default fund**. While **Default fund** is blank, the fund ticked **Is Default** catches
    undesignated gifts instead, and ticking it on a second fund clears it on the first.
 

@@ -4663,7 +4663,10 @@ is Fund (plan Section 7.1).
 **R-F1 One default fund.** At most one fund has Is Default true. Setting it on a second
 fund clears the first. While the Default Fund setting (R-F4) names a fund, Is Default
 follows that setting on every save of a fund and a tick that disagrees is refused; the
-trigger never saves the setting (a setting is never saved from a trigger).
+trigger never saves the setting (a setting is never saved from a trigger). Saving the setting
+moves the flag at once: Giving's `GivingSettingsSaved`, registered for Core's
+`SettingsSavedExtension` seam, saves the flagged fund and the chosen fund unchanged so the
+trigger sets both.
 
 **R-F2 Deactivation, not deletion.** A fund that has received gifts is deactivated rather
 than deleted, so historical allocations keep their meaning. Deletion is blocked while

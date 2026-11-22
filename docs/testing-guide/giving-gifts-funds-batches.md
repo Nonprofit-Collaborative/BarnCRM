@@ -17,8 +17,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 4 | On the **Funds** tab click **New**. Name `Test Fund`, tick **Active** and **Is Default**, and save. | Refused: "The default fund is chosen in BarnCRM Settings: choose Fundraising and change Default fund there..." |
 | 5 | Untick **Is Default** and save `Test Fund`. | Saved, not the default. |
 | 6 | In **BarnCRM Settings**, **Fundraising**, set **Default fund** to `Test Fund` and save. Enter a gift for any person without choosing a fund. | **Saved**. The gift's one allocation is to `Test Fund`. |
-| 7 | Edit `Test Fund` and save without changing anything. Reopen **General Fund**. | `Test Fund` shows **Is Default** ticked, and **General Fund** no longer does: only one default exists. |
-| 8 | Set **Default fund** back to General Fund and save. Edit **General Fund** and save without changes. Reopen `Test Fund`. | **General Fund** is the default again and `Test Fund` is not. |
+| 7 | Reopen `Test Fund`, then **General Fund**. | `Test Fund` shows **Is Default** ticked, and **General Fund** no longer does: the flags followed the setting when it saved, and only one default exists. |
+| 8 | Set **Default fund** back to General Fund and save. Reopen **General Fund** and `Test Fund`. | **General Fund** is the default again and `Test Fund` is not. |
 | 9 | On **General Fund**, choose **Delete** and confirm. | Refused: "Gifts have been designated to this fund, so it cannot be deleted: deleting it would leave those gifts pointing at nothing. Untick Active instead..." |
 | 10 | Delete the gift from step 6, then delete `Test Fund`. | Deleted. |
 

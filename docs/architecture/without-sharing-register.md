@@ -172,11 +172,6 @@ into six kinds:
 | EventAttendeeApp | Portal | The attendee app's actions, reached only through EventsPortalExtension: the other attendee's row at an event the person attends (opted in only), the person's own connection rows and their pair's other row, messages to or from the person, and the person's own agenda picks; contact details are copied only on accept, and every write names only the verified person and the other side of their own connection | ADR-0021, ADR-0215 events attendee app operations portal templates |
 | CorporateHubPortalExtension | Portal | A board member's own attendee row (packet read, minutes approved while submitted), own vote (only while voting is open) and own open policy or disclosure request; the integration user has no object access, and each action re-reads the row by the person Portal Builder verified | ADR-0021, ADR-0199 corporate hub board governance |
 
-## Mirror
-
-| Class | Kind | What it reaches past sharing for | Authority |
-|---|---|---|---|
-
 ## Payments
 
 | Class | Kind | What it reaches past sharing for | Authority |

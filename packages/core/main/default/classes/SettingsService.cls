@@ -793,7 +793,9 @@ public with sharing class SettingsService {
 			return;
 		}
 		if (!BarnCRMPermissions.canManageSettings()) {
-			throw new SettingsWriter.PermissionException(BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError'));
+			throw new SettingsWriter.PermissionException(
+				BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError')
+			);
 		}
 		if (collected != null) {
 			collected.addAll(changes);
@@ -832,7 +834,7 @@ public with sharing class SettingsService {
 				jsonByKey.put(key.toLowerCase(), change.json);
 			}
 		}
-		if (jsonByKey.containsKey('app_navigation_style__c') || jsonByKey.containsKey('account_tabs__c')) {
+		if (jsonByKey.containsKey('account_tabs__c')) {
 			TabAccessService.requestSync();
 		}
 		if (jsonByKey.containsKey('brand_visibility__c') || jsonByKey.containsKey('brand_management__c')) {
@@ -862,17 +864,25 @@ public with sharing class SettingsService {
 	 * setting that times a scheduled job (the nightly rollup run's hour) moves the job in the
 	 * same save, as Seasonal Addresses does. Core cannot name the module's settings, so it hands
 	 * over every change and the engine picks its own (ADR-0125 decision 4, ADR-0136). A failure
-	 * is logged and the saved setting stands.
+	 * is logged and the saved setting stands. Then every module that registers
+	 * `SettingsSavedExtension` hears of it the same way (Fundraising keeps each fund's Is Default
+	 * in line with Default Fund).
 	 */
 	private static void notifyRollupEngine(String objectName, Set<String> keys) {
 		RollupEngineExtension engine = RollupEngineExtensions.find();
-		if (engine == null) {
-			return;
+		if (engine != null) {
+			try {
+				engine.afterSettingsSaved(objectName, keys);
+			} catch (Exception failed) {
+				ErrorLogger.log(failed, 'SettingsService.notifyRollupEngine');
+			}
 		}
-		try {
-			engine.afterSettingsSaved(objectName, keys);
-		} catch (Exception failed) {
-			ErrorLogger.log(failed, 'SettingsService.notifyRollupEngine');
+		for (Object found : ModuleExtensions.all(SettingsSavedExtension.class)) {
+			try {
+				((SettingsSavedExtension) found).afterSettingsSaved(objectName, keys);
+			} catch (Exception failed) {
+				ErrorLogger.log(failed, 'SettingsService.notifyModules');
+			}
 		}
 	}
 
