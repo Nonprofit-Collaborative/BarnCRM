@@ -118,7 +118,7 @@ kept, with the reason.
 | StewardshipPlanController.deleteStep | giving | write | Keep | Manage BarnCRM Settings permission |
 | StewardshipPlanController.setActive | giving | write | Keep | Manage BarnCRM Settings permission |
 | EligibilityController.saveRules | programs | write | Keep | Rules validated against the program's fields (describe) |
-| CohortController.getPersonName | programs | read | Convert: `getRecord`, optional `Contact.Name` and `Account.Name` (confirm in an org) | |
+| CohortController.getPersonName | programs | read | Converted (AP-03 programs): `getRecords` on the picked people, optional `Contact.Name` and `Account.Name` (confirm in an org) | |
 | EventAgendaController.moveSession | events | write | Converted (AP-03 events): `updateRecord` | |
 | EventAppointmentsController.addSlots | events | write | Keep | Writes several slots |
 | EventProposalReview.removePresenter | events | write | Converted (AP-03 events): `deleteRecord` | |
@@ -158,7 +158,7 @@ kept, with the reason.
 | ScholarshipsController.getAward | scholarships | read | Keep | Payments from a second object and the manage permission |
 | ScholarshipsController.getBoard | scholarships | read | Keep | Review board across objects, blind review |
 | ScholarshipsController.getReview | scholarships | read | Keep | Rubric, the reviewer's own review, blind review |
-| VolunteersHomeController.getFirstRun | volunteers | read | Convert: GraphQL (`Volunteer_Job__c`, first 1) and `getObjectInfo` | |
+| VolunteersHomeController.getFirstRun | volunteers | read | Converted (AP-03 programs): GraphQL (`Volunteer_Job__c`, first 1) and `getObjectInfo` | |
 
 Of the 61 methods, 28 are converted (1 in this part, 27 in the module follow-ups) and 33 stay
 in Apex. `ProjectRequestsController.getRequest` was first listed to convert; the projects

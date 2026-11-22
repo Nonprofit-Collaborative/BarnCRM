@@ -115,15 +115,6 @@ public with sharing class CohortController {
 		}
 	}
 
-	/** The name of a person just picked, for the list of people to add. */
-	@AuraEnabled(cacheable=true)
-	public static String getPersonName(Id personId) {
-		if (personId == null) {
-			return null;
-		}
-		return CohortSelector.selectPersonNames(new Set<Id>{ personId }).get(personId);
-	}
-
 	/** Takes one enrollment out of the cohort; the enrollment is kept. */
 	@AuraEnabled
 	public static Members removeMember(Id cohortId, Id enrollmentId) {

@@ -1,9 +1,10 @@
 import { LightningElement, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
+import { gql, graphql } from 'lightning/graphql';
 import getHome from '@salesforce/apex/VolunteersHomeController.getHome';
-import getFirstRun from '@salesforce/apex/VolunteersHomeController.getFirstRun';
 import VOLUNTEER_JOB from '@salesforce/schema/Volunteer_Job__c';
+import IMPORT_BATCH from '@salesforce/schema/Import_Batch__c';
 import { iconFor } from 'c/barnIcons';
 import { tabPageReference } from 'c/barnTabs';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
@@ -12,6 +13,23 @@ import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 
 /** Core's Import tab, opened by name: the first-run panel's second action. */
 const IMPORT_TAB = 'Import';
+
+/** Whether any volunteer job exists yet, read as the person (ADR-0093). */
+const FIRST_JOB = gql`
+  query firstVolunteerJob {
+    uiapi {
+      query {
+        Volunteer_Job__c(first: 1) {
+          edges {
+            node {
+              Id
+            }
+          }
+        }
+      }
+    }
+  }
+`;
 
 /**
  * Volunteers Home (vis-modules-19): the app's first tab. Three figures that open their lists
@@ -26,12 +44,25 @@ export default class VolunteersHome extends NavigationMixin(LightningElement) {
   loading = true;
   failed = false;
   home = [];
-  firstRunState;
+  /** True once the read finds no volunteer job; undefined until then or when it fails. */
+  noJobYet;
   canCreateJob = false;
+  canCreateImport = false;
 
   @wire(getObjectInfo, { objectApiName: VOLUNTEER_JOB })
   receiveJobInfo({ data }) {
     this.canCreateJob = Boolean(data && data.createable);
+  }
+
+  @wire(getObjectInfo, { objectApiName: IMPORT_BATCH })
+  receiveImportInfo({ data }) {
+    this.canCreateImport = Boolean(data && data.createable);
+  }
+
+  // The first-run panel is a nicety: if the read fails, the figures still show.
+  @wire(graphql, { query: FIRST_JOB })
+  receiveFirstJob({ data }) {
+    this.noJobYet = data ? data.uiapi.query.Volunteer_Job__c.edges.length === 0 : undefined;
   }
 
   /** New Volunteer Job in the header, once the help text is in and not beside the first-run one. */
@@ -51,13 +82,8 @@ export default class VolunteersHome extends NavigationMixin(LightningElement) {
   async load() {
     this.loading = true;
     try {
-      const [home, firstRun] = await Promise.all([
-        getHome(),
-        // The first-run panel is a nicety: if it cannot be read, the figures still show.
-        getFirstRun().catch(() => undefined)
-      ]);
+      const home = await getHome();
       this.home = home || [];
-      this.firstRunState = firstRun;
       this.failed = false;
     } catch {
       this.home = [];
@@ -79,12 +105,13 @@ export default class VolunteersHome extends NavigationMixin(LightningElement) {
     return toTiles(this.home, iconFor);
   }
 
+  /** No volunteer job exists yet and the person may create one (D-200 R4). */
   get firstRun() {
-    return Boolean(this.helpReady && this.firstRunState && this.firstRunState.show);
+    return Boolean(this.helpReady && this.canCreateJob && this.noJobYet === true);
   }
 
   get canImport() {
-    return Boolean(this.firstRunState && this.firstRunState.canImport);
+    return this.firstRun && this.canCreateImport;
   }
 
   get firstRunText() {
