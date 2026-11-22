@@ -228,6 +228,8 @@ private class ArchiveViewerTest {
 	@IsTest
 	static void aRowAlreadyBeingRestoredIsRefused() {
 		archiveVolunteers();
+		// The restores get their own limits, as a person's later clicks would.
+		Test.startTest();
 		System.runAs(archivist()) {
 			List<String> rowIds = new List<String>();
 			for (ArchiveViewerService.Row row : ArchiveViewerService.rows('Contact', null, null, null).rows) {
@@ -255,6 +257,7 @@ private class ArchiveViewerTest {
 				'Once the restore ends, the row is no longer held'
 			);
 		}
+		Test.stopTest();
 	}
 
 	@IsTest
