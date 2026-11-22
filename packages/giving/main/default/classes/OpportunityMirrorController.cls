@@ -173,9 +173,8 @@ public with sharing class OpportunityMirrorController {
 		current.canRun = canRun(current.direction);
 		current.running = OpportunityMirrorSchedulable.isRunning();
 		current.nextRunAt = OpportunityMirrorSchedulable.nextRunAt();
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		current.lastRunAt = settings?.Opportunity_Mirror_Last_Run__c;
-		current.lastSummary = settings?.Opportunity_Mirror_Last_Summary__c;
+		current.lastRunAt = GivingState.moment(GivingState.OPPORTUNITY_MIRROR_LAST_RUN);
+		current.lastSummary = GivingState.text(GivingState.OPPORTUNITY_MIRROR_SUMMARY);
 		return current;
 	}
 

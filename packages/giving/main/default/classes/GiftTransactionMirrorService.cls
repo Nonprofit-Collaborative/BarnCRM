@@ -81,9 +81,8 @@ public with sharing class GiftTransactionMirrorService {
 	 * an empty setting and a direction this version does not offer.
 	 */
 	public static String direction() {
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		String chosen = settings?.Gift_Transaction_Mirror_Direction__c;
-		return chosen != null && chosen.trim() == GIFTS_TO_GIFT_TRANSACTIONS ? GIFTS_TO_GIFT_TRANSACTIONS : OFF;
+		String chosen = ModuleSettings.text('Mirror_Gift_Transaction_Mirror_Direction');
+		return chosen == GIFTS_TO_GIFT_TRANSACTIONS ? GIFTS_TO_GIFT_TRANSACTIONS : OFF;
 	}
 
 	/** Whether the mirror copies in this org: it is available and its direction is chosen. */
@@ -93,8 +92,8 @@ public with sharing class GiftTransactionMirrorService {
 
 	/** The Status value that means paid in this org, as set, or the shipped default (R-GT2). */
 	public static String paidStatus() {
-		String typed = Giving_Settings__c.getOrgDefaults()?.Gift_Transaction_Mirror_Status__c;
-		return String.isBlank(typed) ? DEFAULT_PAID_STATUS : typed.trim();
+		String typed = ModuleSettings.text('Mirror_Gift_Transaction_Mirror_Status');
+		return typed == null ? DEFAULT_PAID_STATUS : typed;
 	}
 
 	/**
@@ -102,7 +101,7 @@ public with sharing class GiftTransactionMirrorService {
 	 * nightly run started by anyone uses the same day, and read once per transaction.
 	 */
 	public static Date startDate() {
-		Datetime start = Giving_Settings__c.getOrgDefaults()?.Gift_Transaction_Mirror_Start__c;
+		Datetime start = ModuleSettings.datetimeValue('Mirror_Gift_Transaction_Mirror_Start');
 		if (start == null) {
 			return null;
 		}

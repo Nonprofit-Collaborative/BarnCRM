@@ -7,13 +7,14 @@
  */
 @IsTest(testFor='ApexClass:CampaignSyncService, ApexClass:CampaignSyncController')
 private class CampaignSyncUnavailableTest {
+	// Every test runs with the sync on: a store value lasts one transaction, so it is put here.
+	static {
+		ModuleSettings.setForTest('Mirror_Campaign_Sync_Enabled', true);
+	}
+
 	@TestSetup
-	static void setup() {
-		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-			settings.Campaign_Sync_Enabled__c = true;
-			upsert settings;
-		}
+	static void createTestUser() {
+		TestUsers.adminWith('Giving_Admin');
 	}
 
 	private static User maria() {

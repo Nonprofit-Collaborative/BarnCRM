@@ -93,7 +93,7 @@ public with sharing class GiftTransactionMirrorBatch extends MirrorRunBatch {
 	}
 
 	protected override Database.QueryLocator locator() {
-		Datetime lastRun = Giving_Settings__c.getOrgDefaults()?.Gift_Transaction_Mirror_Last_Run__c;
+		Datetime lastRun = GivingState.moment(GivingState.GIFT_TRANSACTION_MIRROR_LAST_RUN);
 		return Database.getQueryLocatorWithBinds(
 			GiftTransactionMirrorSelector.giftsToCopyQuery(fromDate != null, lastRun != null),
 			new Map<String, Object>{

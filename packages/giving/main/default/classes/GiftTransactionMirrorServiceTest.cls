@@ -14,16 +14,21 @@ private class GiftTransactionMirrorServiceTest {
 	private static final String LOG_CONTEXT = 'Gift Transaction mirror';
 	private static final Date GIFT_DATE = Date.newInstance(2026, 9, 20);
 
+	// The mirror's settings for every test: a store value lasts one transaction, so it is put here.
+	static {
+		ModuleSettings.setForTest(
+			'Mirror_Gift_Transaction_Mirror_Direction',
+			GiftTransactionMirrorService.GIFTS_TO_GIFT_TRANSACTIONS
+		);
+		ModuleSettings.setForTest('Mirror_Gift_Transaction_Mirror_Status', 'Received');
+		ModuleSettings.setForTest('Mirror_Gift_Transaction_Mirror_Start', Datetime.newInstance(2026, 1, 1, 12, 0, 0));
+	}
+
 	@TestSetup
 	static void setup() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GivingTestDataFactory.ensureDefaultFund();
 			GivingTestDataFactory.insertHouseholdContact('The Garcia Household', 'Luis', 'Garcia');
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-			settings.Gift_Transaction_Mirror_Direction__c = GiftTransactionMirrorService.GIFTS_TO_GIFT_TRANSACTIONS;
-			settings.Gift_Transaction_Mirror_Status__c = 'Received';
-			settings.Gift_Transaction_Mirror_Start__c = Datetime.newInstance(2026, 1, 1, 12, 0, 0);
-			upsert settings;
 		}
 	}
 
@@ -89,9 +94,7 @@ private class GiftTransactionMirrorServiceTest {
 	}
 
 	private static void setPaidStatus(String status) {
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		settings.Gift_Transaction_Mirror_Status__c = status;
-		upsert as system settings;
+		ModuleSettings.setForTest('Mirror_Gift_Transaction_Mirror_Status', status);
 	}
 
 	// --------------------------------------------------------------------------- absent path
@@ -157,11 +160,9 @@ private class GiftTransactionMirrorServiceTest {
 				'A status that is not an active value is named.'
 			);
 
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-			settings.Gift_Transaction_Mirror_Status__c = 'Received';
-			settings.Gift_Transaction_Mirror_Start__c = null;
-			settings.Gift_Transaction_Mirror_Direction__c = 'Backwards';
-			upsert as system settings;
+			ModuleSettings.setForTest('Mirror_Gift_Transaction_Mirror_Status', 'Received');
+			ModuleSettings.setForTest('Mirror_Gift_Transaction_Mirror_Start', null);
+			ModuleSettings.setForTest('Mirror_Gift_Transaction_Mirror_Direction', 'Backwards');
 			Assert.areEqual(
 				BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_NoStartDate'),
 				GiftTransactionMirrorService.notReadyReason()

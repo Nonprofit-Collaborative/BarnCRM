@@ -6,15 +6,19 @@
  */
 @IsTest(testFor='ApexClass:GiftTransactionMirrorController')
 private class GiftTransactionMirrorControllerTest {
+	// The mirror's settings for every test: a store value lasts one transaction, so it is put here.
+	static {
+		ModuleSettings.setForTest(
+			'Mirror_Gift_Transaction_Mirror_Direction',
+			GiftTransactionMirrorService.GIFTS_TO_GIFT_TRANSACTIONS
+		);
+		ModuleSettings.setForTest('Mirror_Gift_Transaction_Mirror_Status', 'Pending');
+		ModuleSettings.setForTest('Mirror_Gift_Transaction_Mirror_Start', Datetime.newInstance(2026, 1, 1, 12, 0, 0));
+	}
+
 	@TestSetup
 	static void setup() {
-		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-			settings.Gift_Transaction_Mirror_Direction__c = GiftTransactionMirrorService.GIFTS_TO_GIFT_TRANSACTIONS;
-			settings.Gift_Transaction_Mirror_Status__c = 'Pending';
-			settings.Gift_Transaction_Mirror_Start__c = Datetime.newInstance(2026, 1, 1, 12, 0, 0);
-			upsert settings;
-		}
+		TestUsers.adminWith('Giving_Admin');
 	}
 
 	/** Maria: an administrator who runs the mirror. */
@@ -140,16 +144,13 @@ private class GiftTransactionMirrorControllerTest {
 				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDatesRequired'),
 				refusalOf(new Action('copyNoDates'))
 			);
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-			settings.Gift_Transaction_Mirror_Start__c = null;
-			upsert as system settings;
+			ModuleSettings.setForTest('Mirror_Gift_Transaction_Mirror_Start', null);
 			Assert.areEqual(
 				BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_NoStartDate'),
 				refusalOf(new Action('schedule')),
 				'Not ready (R-GT2).'
 			);
-			settings.Gift_Transaction_Mirror_Direction__c = GiftTransactionMirrorService.OFF;
-			upsert as system settings;
+			ModuleSettings.setForTest('Mirror_Gift_Transaction_Mirror_Direction', GiftTransactionMirrorService.OFF);
 			Assert.areEqual(
 				BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_SwitchedOff'),
 				refusalOf(new Action('run'))

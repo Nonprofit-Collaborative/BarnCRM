@@ -44,7 +44,7 @@ public with sharing class GiftMirrorHealthChecks {
 		}
 		Datetime since = staleSince(
 			OpportunityMirrorSchedulable.scheduledAt(),
-			Giving_Settings__c.getOrgDefaults()?.Opportunity_Mirror_Last_Run__c
+			GivingState.moment(GivingState.OPPORTUNITY_MIRROR_LAST_RUN)
 		);
 		return since == null
 			? null
@@ -71,7 +71,7 @@ public with sharing class GiftMirrorHealthChecks {
 		}
 		Datetime since = staleSince(
 			GiftTransactionMirrorSchedulable.scheduledAt(),
-			Giving_Settings__c.getOrgDefaults()?.Gift_Transaction_Mirror_Last_Run__c
+			GivingState.moment(GivingState.GIFT_TRANSACTION_MIRROR_LAST_RUN)
 		);
 		return since == null
 			? null

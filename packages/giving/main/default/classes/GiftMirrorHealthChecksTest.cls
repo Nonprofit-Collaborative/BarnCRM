@@ -11,9 +11,7 @@ private class GiftMirrorHealthChecksTest {
 	}
 
 	private static void choose(String direction) {
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		settings.Opportunity_Mirror_Direction__c = direction;
-		upsert settings;
+		ModuleSettings.setForTest('Mirror_Opportunity_Mirror_Direction', direction);
 	}
 
 	private static User maria() {
