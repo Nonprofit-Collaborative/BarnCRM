@@ -33,7 +33,7 @@ administrators only.
 **BarnCRM Console** has **Home**, **Contacts**, **Households**, **Organizations**,
 **Addresses**, **Relationships**, **Affiliations**, **Household Members** and **Data
 Manager**, then the pages of installed modules that have no app of their own, such as **Form
-Submissions**. If your admin chose
+Submissions**, and the Scholarships and Outbound Grants pages. If your admin chose
 the standard **Accounts** tab instead, you see **Accounts** in place of **Households** and
 **Organizations**: open its list view menu for **Households** or **Organizations** (or both
 kinds of tab, if your admin chose Both). **BarnCRM Admin Console**
@@ -93,7 +93,8 @@ a File**) instead. The module's settings are the **Volunteers** section of **Bar
 **BarnCRM Members and Partners** opens on **Memberships Home** (or **Corporate Hub Home** when
 Memberships is not installed) and holds every Memberships and Corporate Hub page. **BarnCRM
 Grants** opens on **Grants Home**; with Scholarships and Outbound Grants installed, **Scholarships
-Home**, **Award Programs**, **Award Applications** and **Awards** follow the grant pages.
+Home**, **Award Programs**, **Award Applications** and **Awards** follow the grant pages (they are in
+**BarnCRM Console** too).
 **Form Submissions** are in **BarnCRM Console**; building forms, portals and Super Connector are
 in **BarnCRM Admin Console**. The **Rollup Builder** is in **BarnCRM Admin Console**; anyone
 else who may view one of these pages opens it by typing its name in the App Launcher.

@@ -15,7 +15,7 @@ takes the apps in a queued job: wait a minute and reload before checking the App
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As admin, open the App Launcher and type `BarnCRM`. | **BarnCRM Console** and **BarnCRM Admin Console** are listed: the first with Patch's face on a sage circle, the admin app with Patch standing in a round badge. With the modules deployed, **BarnCRM Fundraising** shows Patch holding a heart, **BarnCRM Volunteers** Patch in a safety vest, **BarnCRM Programs** Patch with a cap and clipboard, **BarnCRM Grants** Patch with a monocle, **BarnCRM Events** Patch in a party hat, **BarnCRM Projects** Patch in a hard hat and **BarnCRM Members and Partners** Patch wearing a green Member sash. No app named **BarnCRM** or **BarnCRM Admin** alone is listed. No app shows a generic initials tile. |
-| 2 | Open **BarnCRM Console** and its navigation menu (the arrow next to the app name). | Console navigation with a Barn Navy (#1E2A3A) header. **Home**, **Contacts**, **Households**, **Organizations**, **Addresses**, **Relationships**, **Affiliations**, **Household Members**, **Data Manager**, then the pages of installed modules with no app (for example **Form Submissions**). **Find** is not in the navigation. On a wide window, Patch waves beside **Welcome to BarnCRM** on **Home**; its alternative text (a screen reader reads it) is "Patch, the BarnCRM highland cow, waving hello". |
+| 2 | Open **BarnCRM Console** and its navigation menu (the arrow next to the app name). | Console navigation with a Barn Navy (#1E2A3A) header. **Home**, **Contacts**, **Households**, **Organizations**, **Addresses**, **Relationships**, **Affiliations**, **Household Members**, **Data Manager**, then the pages of installed modules with no app (for example **Form Submissions**) and the Scholarships and Outbound Grants pages. **Find** is not in the navigation. On a wide window, Patch waves beside **Welcome to BarnCRM** on **Home**; its alternative text (a screen reader reads it) is "Patch, the BarnCRM highland cow, waving hello". |
 | 3 | Open a household, then one of its addresses. | The household opens in its own tab; the address opens as a subtab under it. |
 | 4 | Open **BarnCRM Admin Console** and its navigation menu. | **BarnCRM Settings**, **Data Manager**, **Duplicate Matching**, **Automation**, the installed modules' admin pages, **Error Log** (last), each opening as a workspace tab. **Super Importer**, **Super Transformer** and **Import Rows** are not in the navigation. It opens on **BarnCRM Settings**. |
 | 5 | As staff, open the App Launcher and type `BarnCRM`. | **BarnCRM Console** is listed. **BarnCRM Admin Console** is not. |
@@ -132,7 +132,8 @@ household and an organization owned by that user.
 Event Management, Project Management, Fundraising, Grants, Programs and Volunteers have an app of
 their own. Memberships and Corporate Hub fill **BarnCRM Members and Partners**, a Core app;
 Scholarships and Outbound Grants joins **BarnCRM Grants**; Forms, Portal Builder and BarnCRM
-Connector have no app. Every org, scratch and Developer Edition included, gets all nine apps
+Connector have no app, and their permission sets show BarnCRM Console or BarnCRM Admin
+Console instead. Every org, scratch and Developer Edition included, gets all nine apps
 (T-APP-13). In each script, the module is installed and on, and its access sync has run
 (**Finish Setup**, or wait an hour).
 
@@ -226,8 +227,8 @@ Connector have no app. Every org, scratch and Developer Edition included, gets a
 
 ## T-APP-15: Scholarships in BarnCRM Grants
 
-**Purpose:** confirm Scholarships and Outbound Grants joins the Grants app after the grant pages, and falls back to BarnCRM Console without Grants.
-**Prerequisites:** admin user; an org with Grants and Scholarships and Outbound Grants; for step 5, an org with Scholarships and Outbound Grants and without Grants.
+**Purpose:** confirm Scholarships and Outbound Grants joins the Grants app after the grant pages and stays in BarnCRM Console, so Scholarships-only staff keep an app.
+**Prerequisites:** admin user; staff user with Scholarships Staff and no Grants permission set; an org with Grants and Scholarships and Outbound Grants.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -235,7 +236,8 @@ Connector have no app. Every org, scratch and Developer Edition included, gets a
 | 2 | Open an award application. | It opens as a workspace tab on the application record page. |
 | 3 | Open **Dashboards**. | The Scholarships and Grants dashboard is listed. |
 | 4 | On BarnCRM Home, find Scholarships and Outbound Grants under **Modules**. | Its **Open the App** link opens **BarnCRM Grants**. |
-| 5 | In the org without Grants, open **BarnCRM Console**. | **Scholarships Home**, **Award Programs**, **Award Applications** and **Awards** are there, after **Data Manager**. |
+| 5 | Open **BarnCRM Console**. | **Scholarships Home**, **Award Programs**, **Award Applications** and **Awards** are there, after **Data Manager**. |
+| 6 | As the staff user, open the App Launcher and type `BarnCRM`. | **BarnCRM Console** is listed and has the Scholarships pages; **BarnCRM Grants** is not listed. |
 
 ## T-APP-16: Module Quick Links Keep Their Words
 
