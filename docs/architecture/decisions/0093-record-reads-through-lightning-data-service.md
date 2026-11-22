@@ -131,8 +131,8 @@ kept, with the reason.
 | EventSponsorsController.removeSponsor | events | write | Converted (AP-03 events): `deleteRecord` | |
 | EventSponsorsController.setDeliverableStatus | events | write | Converted (AP-03 events): `updateRecord` | |
 | EventVolunteersController.getVolunteers | events | read | Keep | Volunteers jobs through the extension point |
-| FormRunnerController.getPublishedForms | forms | read | Convert: GraphQL (`Form__c` Published, by Name) | |
-| FormSubmissionController.getSubmission | forms | read | Convert: GraphQL (`Form_Submission__c` with form and version), shaping in a JS module | |
+| FormRunnerController.getPublishedForms | forms | read | Converted (AP-03 forms): GraphQL (`Form__c` Published, by Name) | |
+| FormSubmissionController.getSubmission | forms | read | Converted (AP-03 forms): GraphQL (`Form_Submission__c` with form and version) and `getObjectInfo`, shaped in `c/formSubmissionModel` | |
 | GrantAnswerController.getLibrary | funders | read | Convert: GraphQL (`Grant_Answer__c` by Name) and `getObjectInfo` | |
 | GrantAnswerController.markUsed | funders | write | Convert: `updateRecord` | |
 | GrantPipelineController.moveStage | funders | write | Convert: `updateRecord` | |

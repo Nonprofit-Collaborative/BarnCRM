@@ -1,7 +1,7 @@
 import { LightningElement, api, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import { gql, graphql } from 'lightning/graphql';
 import FORM_OBJECT from '@salesforce/schema/Form__c';
-import getPublishedForms from '@salesforce/apex/FormRunnerController.getPublishedForms';
 import getForm from '@salesforce/apex/FormRunnerController.getForm';
 import submit from '@salesforce/apex/FormRunnerController.submit';
 import { parseDefinition } from 'c/formDefinition';
@@ -18,6 +18,30 @@ import {
 } from 'c/formRules';
 import { HELP, LABELS, answerText, messageFrom, resultText } from 'c/formText';
 import { isHelpLoaded, loadHelp } from 'c/barnHelpText';
+
+/** The published forms the picker offers, by name, read as the person (ADR-0093). */
+const PUBLISHED_FORMS = gql`
+  query publishedForms {
+    uiapi {
+      query {
+        Form__c(
+          where: { Status__c: { eq: "Published" } }
+          orderBy: { Name: { order: ASC } }
+          first: 500
+        ) {
+          edges {
+            node {
+              Id
+              Name {
+                value
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
 
 /**
  * The Form Runner (C-42a; ADR-0175 `0175-forms-module.md`, decision 12): a published form filled
@@ -87,12 +111,15 @@ export default class FormRunner extends NavigationMixin(LightningElement) {
     return this.onFormPage ? null : this.recordId || null;
   }
 
-  @wire(getPublishedForms)
-  wiredForms({ data, error }) {
+  @wire(graphql, { query: PUBLISHED_FORMS })
+  wiredForms({ data, errors }) {
     if (data) {
-      this.formOptions = data.map((option) => ({ value: option.id, label: option.name }));
-    } else if (error) {
-      this.errorMessage = messageFrom(error);
+      this.formOptions = data.uiapi.query.Form__c.edges.map(({ node }) => ({
+        value: node.Id,
+        label: node.Name.value
+      }));
+    } else if (errors) {
+      this.errorMessage = messageFrom(errors);
     }
   }
 

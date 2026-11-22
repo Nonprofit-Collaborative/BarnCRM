@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The Submission panel's shaping with no framework in it: answers by question as the version
+    asked them, and the records a submission wrote (C-42a).
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>
