@@ -70,3 +70,91 @@ second copy of each query and without moving the reads back to Apex.
    controllers this ADR removed, and the stale Apex cache with them.
 4. **Trade-off.** A dynamic query loses the compiler's check that each field exists. The
    schema imports keep that check: a renamed or deleted field fails the import at deploy.
+
+## Amendment A2, 2026-11-22: the AP-03 inventory (D-219)
+
+AP-03 moves the remaining flat reads and single-record writes off Apex. The inventory below is
+every `@AuraEnabled` method that `scripts/ci/check-aura-lds.py` matches, plus the near misses a
+wider scan found (one query and one write, or one selector call). Each row is converted or
+kept, with the reason.
+
+1. **Convert** when the method is one object read as the user, or one record written as the
+   user, and anything else it does is shaping the LWC can do (trimming, a default value, the
+   object's create or update permission from `getObjectInfo`). The LWC uses the target named,
+   and the Apex method and its tests are deleted.
+2. **Keep** when the method checks a custom permission or a module setting (custom metadata,
+   which the UI API does not read), checks record access (`UserRecordAccess`, which the UI API
+   does not expose), uses SOSL or describe, validates input on the server, writes more than one
+   record, or composes several objects.
+3. **The check.** It now blanks string literals before counting DML, so an error context such
+   as `'Bulk update fields'` is not a write; that removed the two Bulk Update false positives.
+   Every line of `scripts/ci/aura-lds-allowlist.txt` now says keep (with the reason) or
+   convert (with the target); a convert line goes when its module's follow-up lands.
+4. **A converted write loses its Error Log entry** from the controller, as the Consequences
+   above already accept; a trigger failure still logs.
+
+| Class.method | Package | Kind | Decision and target | Keep-reason |
+| --- | --- | --- | --- | --- |
+| ErrorLogController.getBugReport | core | read | Converted (AP-03 part 1): `getRecords` on the listed entries, Technical Detail optional | |
+| BulkUpdateController.getTargets | core | read | Keep | Describe and the Bulk Update permission (was a false positive) |
+| BulkUpdateController.getCopySources | core | read | Keep | Describe and the Bulk Update permission (was a false positive) |
+| HouseholdMergeController.canEdit | core | read | Keep | Record edit access (`UserRecordAccess`) |
+| HouseholdOfPersonController.makePrimary | core | write | Keep | Writes every member row of the household |
+| ImportController.saveFile | core | write | Keep | Import permission, file decoded and stored as a ContentVersion |
+| AccessExplorerController.searchPeople | orgoptimizer | read | Keep | SOSL name search and the Access Explorer permission |
+| AccessExplorerController.searchPermissionSets | orgoptimizer | read | Keep | PermissionSet is not in the UI API |
+| AskPipelineController.moveStage | giving | write | Convert: `updateRecord` | |
+| CommitmentController.getSchedule | giving | read | Keep | Two objects and record edit access |
+| CommitmentEntryController.save | giving | write | Keep | Server validation and the draft built from the entry |
+| FundraisingHomeController.getHome | giving | read | Keep | Composes the home tiles; the one query is a first-run check |
+| QuickGiftEntryController.getMatchableGifts | giving | read | Convert: GraphQL (`Gift__c`, employer filter through both donor lookups) | |
+| ReceiptController.getTemplates | giving | read | Convert: GraphQL (`Receipt_Template__c` by Type, Name) | |
+| ReceiptController.getRuns | giving | read | Convert: GraphQL (`Receipt_Run__c`, latest 10) | |
+| RecurringHealthController.createFollowUp | giving | write | Keep | Reads the commitment and writes a Task (two objects) |
+| StewardshipPlanController.deleteStep | giving | write | Keep | Manage BarnCRM Settings permission |
+| StewardshipPlanController.setActive | giving | write | Keep | Manage BarnCRM Settings permission |
+| EligibilityController.saveRules | programs | write | Keep | Rules validated against the program's fields (describe) |
+| CohortController.getPersonName | programs | read | Convert: `getRecord`, optional `Contact.Name` and `Account.Name` (confirm in an org) | |
+| EventAgendaController.moveSession | events | write | Convert: `updateRecord` | |
+| EventAppointmentsController.addSlots | events | write | Keep | Writes several slots |
+| EventProposalReview.removePresenter | events | write | Convert: `deleteRecord` | |
+| EventProposalReview.saveCriteria | events | write | Keep | Criteria JSON validated on the server |
+| EventSeatingController.deleteTable | events | write | Convert: `deleteRecord` | |
+| EventSeatingController.saveNeeds | events | write | Convert: `updateRecord` (trim in the LWC) | |
+| EventSpeakersController.addSpeaker | events | write | Convert: `createRecord` | |
+| EventSpeakersController.assign | events | write | Convert: `createRecord` | |
+| EventSponsorsController.addDeliverable | events | write | Convert: `createRecord` (trim and default Type in the LWC) | |
+| EventSponsorsController.removeSponsor | events | write | Convert: `deleteRecord` | |
+| EventSponsorsController.setDeliverableStatus | events | write | Convert: `updateRecord` | |
+| EventVolunteersController.getVolunteers | events | read | Keep | Volunteers jobs through the extension point |
+| FormRunnerController.getPublishedForms | forms | read | Convert: GraphQL (`Form__c` Published, by Name) | |
+| FormSubmissionController.getSubmission | forms | read | Convert: GraphQL (`Form_Submission__c` with form and version), shaping in a JS module | |
+| GrantAnswerController.getLibrary | funders | read | Convert: GraphQL (`Grant_Answer__c` by Name) and `getObjectInfo` | |
+| GrantAnswerController.markUsed | funders | write | Convert: `updateRecord` | |
+| GrantPipelineController.moveStage | funders | write | Convert: `updateRecord` | |
+| GrantPipelineController.recordAward | funders | write | Convert: `updateRecord` | |
+| LwcBuilderController.getStudio | lwcbuilder | read | Keep | Returns the module settings (custom metadata) |
+| LwcBuilderController.loadComponent | lwcbuilder | read | Keep | Returns the Components Enabled setting |
+| LwcBuilderController.saveComponent | lwcbuilder | write | Keep | Definition validated and versioned on the server |
+| ProjectBillingController.getInvoiceActions | projects | read | Keep | Billing setting, manage permission, payment availability |
+| ProjectBillingController.getProjectBilling | projects | read | Keep | Billing setting and manage permission |
+| ProjectBillingController.exportInvoices | projects | read | Keep | Stamps every exported invoice |
+| ProjectRequestsController.addComment | projects | write | Convert: `createRecord` | |
+| ProjectRequestsController.getRequest | projects | read | Convert: GraphQL (`Project_Request__c` with comments) | |
+| ProjectRequestsController.getRequests | projects | read | Keep | Requests setting read with the list |
+| ProjectRequestsController.saveRequest | projects | write | Convert: `updateRecord` (editable fields listed in the LWC) | |
+| ProjectStaffingController.saveResource | projects | write | Keep | Upsert by user and the staffing setting |
+| ProjectTimesheetController.addExpense | projects | write | Keep | Expenses setting |
+| ProjectTimesheetController.getTasks | projects | read | Convert: GraphQL (`Project_Task__c` open, by Sort Order) | |
+| ProjectsController.addTask | projects | write | Convert: `createRecord` | |
+| ProjectsController.getAtRisk | projects | read | Convert: GraphQL (`Project__c` at risk or off track) | |
+| ProjectsController.logTime | projects | write | Keep | Time tracking setting |
+| ProjectsController.setTaskStatus | projects | write | Convert: `updateRecord` (Completed Date set in the LWC) | |
+| ReportingLibrary.remove | reporting | write | Keep | Owner check on a ContentDocument |
+| ScholarshipsController.getAward | scholarships | read | Keep | Payments from a second object and the manage permission |
+| ScholarshipsController.getBoard | scholarships | read | Keep | Review board across objects, blind review |
+| ScholarshipsController.getReview | scholarships | read | Keep | Rubric, the reviewer's own review, blind review |
+| VolunteersHomeController.getFirstRun | volunteers | read | Convert: GraphQL (`Volunteer_Job__c`, first 1) and `getObjectInfo` | |
+
+Of the 61 methods, 29 are converted (1 in this part, 28 in the module follow-ups) and 32 stay
+in Apex.

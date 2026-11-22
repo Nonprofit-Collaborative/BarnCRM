@@ -1,8 +1,9 @@
+/* eslint-disable @lwc/lwc/no-unexpected-wire-adapter-usages */
 import { createElement } from 'lwc';
 import ErrorLogTile from 'c/errorLogTile';
 import getTile from '@salesforce/apex/ErrorLogController.getTile';
 import acknowledge from '@salesforce/apex/ErrorLogController.acknowledge';
-import getBugReport from '@salesforce/apex/ErrorLogController.getBugReport';
+import { getRecords } from 'lightning/uiRecordApi';
 import Toast from 'lightning/toast';
 import { EnclosingTabId, getTabInfo, openSubtab } from 'lightning/platformWorkspaceApi';
 import { setHelpTextForTest } from 'c/barnHelpText';
@@ -39,10 +40,6 @@ jest.mock(
   },
   { virtual: true }
 );
-
-jest.mock('@salesforce/apex/ErrorLogController.getBugReport', () => ({ default: jest.fn() }), {
-  virtual: true
-});
 
 jest.mock('@salesforce/apex/ErrorLogController.acknowledge', () => ({ default: jest.fn() }), {
   virtual: true
@@ -134,15 +131,69 @@ describe('c-error-log-tile', () => {
 
   describe('Copy for Bug Report', () => {
     const REPORT = {
-      context: 'GiftService.save',
-      severity: 'Error',
-      occurredAt: '2026-09-07T09:12:00.000Z',
-      occurrences: 3,
-      objectName: 'Gift__c',
-      technicalDetail:
-        'System.DmlException: FIELD_CUSTOM_VALIDATION_EXCEPTION, Pat Lee pat@example.org\n' +
-        'Class.GiftService.save: line 12, column 1'
+      id: ENTRY.recordId,
+      fields: {
+        Context__c: { value: 'GiftService.save' },
+        Severity__c: { value: 'Error' },
+        Timestamp__c: { value: '2026-09-07T09:12:00.000Z' },
+        Occurrences__c: { value: 3 },
+        Object_Name__c: { value: 'Gift__c' },
+        Technical_Detail__c: {
+          value:
+            'System.DmlException: FIELD_CUSTOM_VALIDATION_EXCEPTION, Pat Lee pat@example.org\n' +
+            'Class.GiftService.save: line 12, column 1'
+        }
+      }
     };
+
+    function emitReports(...records) {
+      getRecords.emit({ results: records.map((result) => ({ statusCode: 200, result })) });
+    }
+
+    it('reads the listed entries as the user, Technical Detail optional', async () => {
+      createComponent();
+      getTile.emit(TILE);
+      await flush();
+
+      const config = getRecords.getLastConfig().records[0];
+      expect(config.recordIds).toEqual([ENTRY.recordId, 'a01000000000002AAA']);
+      expect(config.fields.map((field) => field.fieldApiName)).not.toContain('Technical_Detail__c');
+      expect(config.optionalFields.map((field) => field.fieldApiName)).toEqual([
+        'Technical_Detail__c'
+      ]);
+    });
+
+    it('copies a report without the detail for someone who may not read it', async () => {
+      const writeText = jest.fn().mockResolvedValue(undefined);
+      Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+      const element = createComponent();
+      getTile.emit(TILE);
+      const visible = { ...REPORT.fields };
+      delete visible.Technical_Detail__c;
+      emitReports({ ...REPORT, fields: visible });
+      await flush();
+
+      element.shadowRoot.querySelectorAll('.copy-report-button')[0].click();
+      await flush();
+
+      const text = writeText.mock.calls[0][0];
+      expect(text).toContain('GiftService.save');
+      expect(text).toContain('c.Core_ErrorLogTile_BugReport_NoDetail');
+    });
+
+    it('says to refresh when the entry is no longer readable', async () => {
+      const element = createComponent();
+      getTile.emit(TILE);
+      emitReports(REPORT);
+      await flush();
+
+      element.shadowRoot.querySelectorAll('.copy-report-button')[1].click();
+      await flush();
+
+      expect(element.shadowRoot.querySelector('[data-id="error-message"]').message).toBe(
+        'c.Core_ErrorLog_EntryNotFound'
+      );
+    });
 
     afterEach(() => {
       delete navigator.clipboard;
@@ -155,16 +206,15 @@ describe('c-error-log-tile', () => {
         configurable: true
       });
       const toast = jest.spyOn(Toast, 'show').mockImplementation(() => undefined);
-      getBugReport.mockResolvedValue(REPORT);
       const element = createComponent();
       getTile.emit(TILE);
+      emitReports(REPORT);
       await flush();
 
       element.shadowRoot.querySelectorAll('.copy-report-button')[0].click();
       await flush();
       await flush();
 
-      expect(getBugReport).toHaveBeenCalledWith({ errorLogId: ENTRY.recordId });
       const text = writeText.mock.calls[0][0];
       expect(text).toContain('FIELD_CUSTOM_VALIDATION_EXCEPTION');
       expect(text).toContain('Class.GiftService.save: line 12, column 1');
@@ -179,9 +229,9 @@ describe('c-error-log-tile', () => {
         value: { writeText: jest.fn().mockRejectedValue(new Error('denied')) },
         configurable: true
       });
-      getBugReport.mockResolvedValue(REPORT);
       const element = createComponent();
       getTile.emit(TILE);
+      emitReports(REPORT);
       await flush();
 
       element.shadowRoot.querySelectorAll('.copy-report-button')[0].click();
