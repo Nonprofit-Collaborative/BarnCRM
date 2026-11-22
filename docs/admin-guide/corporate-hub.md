@@ -49,8 +49,8 @@ The **Corporate Hub Home**, **Library Documents**, **Compliance Obligations**, *
 Partners** (in a package install the admin adds them in App Manager; the Setup Assistant
 lists the tab names). Corporate Hub's pages are in **BarnCRM Members and Partners**, a Core app shared with
 Memberships and shown to everyone with a Corporate Hub permission set: those six tabs, then
-**Processing Activities**, **Data Subject Requests** and **Data Breaches**, before **Reports**,
-**Dashboards** and **Error Log**. With Memberships installed, its pages come first and the app
+**Processing Activities**, **Data Subject Requests** and **Data Breaches**, before **Reports**
+and **Dashboards** (Error Log is in BarnCRM Admin Console only). With Memberships installed, its pages come first and the app
 opens on Memberships Home; without it, the app opens on Corporate Hub Home (see
 [The Module Apps](barncrm-app.md#the-module-apps)).
 

@@ -18,7 +18,7 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **BarnCRM Grants** app. | It opens on **Grants Home** (first tab), then **Grant Pipeline**, **Grants**, **Reports**, **Error Log** (last). |
+| 1 | Open the **BarnCRM Grants** app. | It opens on **Grants Home** (first tab), then **Grant Pipeline**, **Grants**, **Reports**, **Dashboards** (last), and no **Error Log** tab. |
 | 2 | **Grants**, **New**. Name `2027 Literacy Grant`, leave **Funder** empty, **Save**. | Refused: **Funder** is required. |
 | 3 | Funder `Lakeside Foundation`, Funder Contact `Pat Rivera`, Amount Requested `25,000`, Application Deadline 10 days from today, **Save**. | The grant's page opens on **Overview** (details, and the **Program** card with Programs), with tabs **Money**, **Reporting**, **Writing** and **Related**; on a phone the same tabs. **Money** holds the Award Schedule, Payments and Restricted Fund Entries; **Reporting** the Requirements list, Logic Model Outcomes and Funder Report; **Writing** the Answer Library. **Stage** is **Prospect**; **Submitted Date** and **Decision Date** are empty. |
 | 4 | **Edit**, Stage **Applied**, **Save**. | **Submitted Date** is today. |

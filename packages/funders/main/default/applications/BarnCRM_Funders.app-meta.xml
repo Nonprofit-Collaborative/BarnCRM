@@ -44,12 +44,8 @@
   <tabs>Grant_Checklist_Item__c</tabs>
   <tabs>standard-report</tabs>
   <tabs>standard-Dashboard</tabs>
-  <tabs>Error_Log__c</tabs>
   <uiType>Lightning</uiType>
   <workspaceConfig>
-    <mappings>
-      <tab>Error_Log__c</tab>
-    </mappings>
     <mappings>
       <tab>Grant_Calendar</tab>
     </mappings>
