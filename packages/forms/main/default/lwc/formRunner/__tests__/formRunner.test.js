@@ -1,17 +1,9 @@
 import { createElement } from 'lwc';
 import FormRunner from 'c/formRunner';
-import getPublishedForms from '@salesforce/apex/FormRunnerController.getPublishedForms';
+import { graphql } from 'lightning/graphql';
 import getForm from '@salesforce/apex/FormRunnerController.getForm';
 import submit from '@salesforce/apex/FormRunnerController.submit';
 
-jest.mock(
-  '@salesforce/apex/FormRunnerController.getPublishedForms',
-  () => {
-    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
-    return { default: createApexTestWireAdapter(jest.fn()) };
-  },
-  { virtual: true }
-);
 jest.mock('@salesforce/apex/FormRunnerController.getForm', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -166,7 +158,15 @@ describe('c-form-runner', () => {
   it('offers the published forms when none is set', async () => {
     getForm.mockResolvedValue(FORM);
     const element = await render({});
-    getPublishedForms.emit([{ id: 'a01000000000001', name: 'Volunteer Interest' }]);
+    graphql.emit({
+      uiapi: {
+        query: {
+          Form__c: {
+            edges: [{ node: { Id: 'a01000000000001', Name: { value: 'Volunteer Interest' } } }]
+          }
+        }
+      }
+    });
     await flush();
 
     const picker = find(element, '[data-id="picker"]');
@@ -177,5 +177,16 @@ describe('c-form-runner', () => {
 
     expect(getForm).toHaveBeenCalledWith({ formId: 'a01000000000001', contextRecordId: null });
     expect(find(element, '[data-key="last"]')).not.toBeNull();
+  });
+
+  it('says the published forms could not be read', async () => {
+    const element = await render({});
+    graphql.emitErrors([{ message: 'Field not accessible' }]);
+    await flush();
+
+    expect(find(element, '[data-id="picker"]').options).toEqual([]);
+    expect(find(element, '[data-id="error"]').querySelector('c-barn-notice').message).toBe(
+      'c.Forms_Builder_ActionFailed'
+    );
   });
 });

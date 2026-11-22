@@ -13,8 +13,6 @@ CommitmentEntryController.save  # keep: server validation and the draft built fr
 EligibilityController.saveRules  # keep: rules validated against the program's fields
 EventProposalReview.saveCriteria  # keep: criteria JSON validated on the server
 EventVolunteersController.getVolunteers  # keep: Volunteers jobs through the extension point
-FormRunnerController.getPublishedForms  # convert: GraphQL
-FormSubmissionController.getSubmission  # convert: GraphQL
 FundraisingHomeController.getHome  # keep: composes the home tiles
 GrantAnswerController.getLibrary  # convert: GraphQL
 GrantAnswerController.markUsed  # convert: updateRecord
