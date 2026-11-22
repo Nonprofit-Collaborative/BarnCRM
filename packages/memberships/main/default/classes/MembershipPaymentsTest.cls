@@ -303,6 +303,34 @@ private class MembershipPaymentsTest {
 		}
 	}
 
+	/**
+	 * A payment near midnight, processed by a user in a time zone far from the org's, starts the
+	 * term on the org's date (D-219, OD-15).
+	 */
+	@IsTest
+	static void aPaymentStartsTheTermOnTheOrgDateNotTheProcessingUsersDate() {
+		User processor = TestUsers.adminWith(ADMIN);
+		Datetime paidAt = TestUsers.inAnotherTimeZone(processor);
+		System.runAs(processor) {
+			Membership_Term__c pending = term('Pending', 'payer@example.org');
+			new MembershipPaymentListener()
+				.call(
+					'paymentChanged',
+					new Map<String, Object>{
+						'paymentId' => 'pay-3',
+						'sourceRecordId' => String.valueOf(pending.Id),
+						'status' => 'Paid',
+						'amount' => 50,
+						'paidAt' => paidAt
+					}
+				);
+			Date startedOn = [SELECT Start_Date__c FROM Membership_Term__c WHERE Id = :pending.Id WITH USER_MODE]
+			.Start_Date__c;
+			Assert.areEqual(OrgDate.dateOf(paidAt), startedOn, 'The org date of the payment');
+			Assert.areNotEqual(paidAt.date(), startedOn, 'Not the processing user date');
+		}
+	}
+
 	@IsTest
 	static void thePortalPaysOnlyThePersonsOwnTerm() {
 		System.runAs(TestUsers.adminWith(ADMIN)) {

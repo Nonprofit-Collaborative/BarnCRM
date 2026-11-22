@@ -470,7 +470,7 @@ public with sharing class PaymentService {
 				'customerId' => c.customerId,
 				'event' => c.subscriptionEvent,
 				'eventKey' => o.event.Event_Key__c,
-				'eventDate' => (c.paidAt ?? Datetime.now()).date(),
+				'eventDate' => OrgDate.dateOf(c.paidAt ?? Datetime.now()),
 				'amount' => c.amount,
 				'cardExpires' => c.cardExpires,
 				'detail' => c.detail

@@ -176,3 +176,15 @@ Open the debug log and copy the `checkoutUrl` value into a browser.
 | 4 | In PayPal, deactivate the 25.00 plan, then repeat step 1 once. | The checkout still starts. The new payment has a new **Plan Id**, and the next 25.00 monthly checkout uses that new plan. |
 
 **Cleanup:** cancel the sandbox subscriptions; turn Automatic Recurring Payments off.
+
+## T-PAY-12: Payment Dates Use the Org's Time Zone
+
+**Purpose:** confirm that a gift paid online takes the date in the org's time zone, not the processing user's (D-219).
+**Prerequisites:** admin; Fundraising installed with an appeal whose online donation page works (Stripe connected, T-PAY-02); the org's default time zone in **Setup**, **Company Information** noted.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In your own **Settings**, **Language & Time Zone**, set a time zone at least ten hours ahead of the org's (for an org in America/Los_Angeles, choose Asia/Tokyo). | Saved. |
+| 2 | In the evening of the org's day (after 3 PM in Los Angeles, so it is already the next day in Tokyo), give through the donation page in Stripe test mode, then process payments. | The gift is **Received**. Its **Gift Date** is the org's date, the day **Paid At** falls on in the org's time zone, not your Tokyo date. |
+
+**Cleanup:** set your time zone back.
