@@ -37,7 +37,16 @@ public with sharing class ArchiveRestoreJob implements Queueable {
 
 	public void execute(QueueableContext context) {
 		if (context != null) {
-			System.attachFinalizer(new Finisher(jobId, phase == REMOVE));
+			// A Write rolls back, so nothing it created stays; a Remove that dies leaves restored
+			// records whose rows are still archived, which its log line says.
+			System.attachFinalizer(
+				new BigObjectArchiveJob.Finisher(
+					jobId,
+					phase == REMOVE
+						? BarnHelp.text('Core', 'Core_ArchiveViewer_LogRemoveStopped')
+						: BarnHelp.text('Core', 'Core_ArchiveViewer_LogStopped')
+				)
+			);
 		}
 		if (phase == REMOVE) {
 			remove();
@@ -371,33 +380,6 @@ public with sharing class ArchiveRestoreJob implements Queueable {
 		void fail(String line) {
 			failed++;
 			lines.add(line);
-		}
-	}
-
-	/**
-	 * Marks the job Failed when a link dies unexpectedly. A Write rolls back, so nothing it
-	 * created stays; a Remove that dies leaves restored records whose rows are still archived,
-	 * which the log says. Runs in its own transaction.
-	 */
-	public with sharing class Finisher implements Finalizer {
-		private final Id jobId;
-		private final Boolean removing;
-
-		public Finisher(Id jobId, Boolean removing) {
-			this.jobId = jobId;
-			this.removing = removing;
-		}
-
-		public void execute(FinalizerContext context) {
-			if (context == null || context.getResult() != ParentJobResult.UNHANDLED_EXCEPTION) {
-				return;
-			}
-			String reason = context.getException()?.getMessage();
-			if (removing) {
-				reason =
-					BarnHelp.text('Core', 'Core_ArchiveViewer_LogRemoveStopped') + (reason == null ? '' : ' ' + reason);
-			}
-			BigObjectArchiveJob.fail(jobId, reason);
 		}
 	}
 }

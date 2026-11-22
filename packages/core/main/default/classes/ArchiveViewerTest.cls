@@ -226,6 +226,38 @@ private class ArchiveViewerTest {
 	}
 
 	@IsTest
+	static void aRowAlreadyBeingRestoredIsRefused() {
+		archiveVolunteers();
+		System.runAs(archivist()) {
+			List<String> rowIds = new List<String>();
+			for (ArchiveViewerService.Row row : ArchiveViewerService.rows('Contact', null, null, null).rows) {
+				rowIds.add(row.id);
+			}
+			Import_Batch__c job = ArchiveViewerService.restore('Contact', new List<String>{ rowIds[0] });
+			System.Assert.isTrue(job.Operation_JSON__c.contains(rowIds[0]), 'The job keeps its rows');
+			try {
+				ArchiveViewerService.restore('Contact', rowIds);
+				System.Assert.fail('A row in a restore still going is refused');
+			} catch (ArchiveRules.ArchiveRuleException expected) {
+				System.Assert.areEqual(
+					BarnHelp.text('Core', 'Core_ArchiveViewer_ErrorRestoring'),
+					expected.getMessage(),
+					'In plain words'
+				);
+			}
+			System.Assert.isNotNull(
+				ArchiveViewerService.restore('Contact', new List<String>{ rowIds[1] }),
+				'Another row may start'
+			);
+			drain();
+			System.Assert.isNotNull(
+				ArchiveViewerService.restore('Contact', new List<String>{ rowIds[0] }),
+				'Once the restore ends, the row is no longer held'
+			);
+		}
+	}
+
+	@IsTest
 	static void keepsArchivedARowWhoseRecordOrChildCannotBeCreated() {
 		ArchiveStoreMemory store = ArchiveStoreMemory.install();
 		BigObjectArchiveJob.queuedForTest = new List<Object>();
@@ -322,8 +354,9 @@ private class ArchiveViewerTest {
 
 	@IsTest
 	static void failedLinkMarksTheJobFailed() {
+		Import_Batch__c job;
 		System.runAs(archivist()) {
-			Import_Batch__c job = new Import_Batch__c(
+			job = new Import_Batch__c(
 				Operation__c = BigObjectArchiveJob.OPERATION_ARCHIVE,
 				Status__c = ImportBatchService.STATUS_COMMITTING,
 				Run_Log__c = 'Started',
@@ -331,7 +364,8 @@ private class ArchiveViewerTest {
 				Committed_By__c = UserInfo.getUserId()
 			);
 			insert as system job;
-			new ArchiveRestoreJob.Finisher(job.Id, true).execute(null);
+			new BigObjectArchiveJob.Finisher(job.Id, BarnHelp.text('Core', 'Core_ArchiveViewer_LogRemoveStopped'))
+				.execute(null);
 			System.Assert.areEqual(
 				ImportBatchService.STATUS_COMMITTING,
 				reread(job.Id).Status__c,
@@ -339,7 +373,20 @@ private class ArchiveViewerTest {
 			);
 			Set<Id> found = ArchiveRestoreJob.existingOf(new Set<Id>{ UserInfo.getUserId(), job.Id });
 			System.Assert.isTrue(found.contains(UserInfo.getUserId()), 'An active user exists');
+			// A restore's Write link finishes with the restore's own line.
+			new BigObjectArchiveJob.Finisher(job.Id, BarnHelp.text('Core', 'Core_ArchiveViewer_LogStopped'))
+				.stopped('Because');
 		}
+		Import_Batch__c failed = reread(job.Id);
+		System.Assert.areEqual(ImportBatchService.STATUS_FAILED, failed.Status__c, 'Failed');
+		System.Assert.isTrue(
+			failed.Run_Log__c.endsWith(BarnHelp.text('Core', 'Core_ArchiveViewer_LogStopped') + ' Because'),
+			'A restore names the restore, with the reason: ' + failed.Run_Log__c
+		);
+		System.Assert.isFalse(
+			failed.Run_Log__c.contains(BarnHelp.text('Core', 'Core_ArchiveRules_LogStopped')),
+			'Never "run the rule again"'
+		);
 	}
 
 	private static Archived_Record__b row(String objectName, Datetime at, String originalId, String body) {

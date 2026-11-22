@@ -1,7 +1,8 @@
 /**
  * The `archive` key of a saved query document (canonical model R-SQ18, ADR-0240 archive rules and
  * big object archive): its destination, schedule and Active switch, read, checked, written and
- * asked whether it is due on a day. Pure logic over JSON: no query, no DML.
+ * asked whether it is due on a day. Backup Sets (R-SQ16) use the same schedule logic. Pure logic
+ * over JSON: no query, no DML.
  */
 @NamespaceAccessible
 public with sharing class ArchiveRules {
@@ -68,13 +69,23 @@ public with sharing class ArchiveRules {
 			return null;
 		}
 		Map<String, Object> stored = (Map<String, Object>) raw;
-		Rule rule = new Rule();
+		Rule rule = schedule(stored.get('frequency'), stored.get('weekday'), stored.get('monthDay'));
 		rule.destination = destinationOf(stringOf(stored.get('destination')));
-		String frequency = stringOf(stored.get('frequency'));
-		rule.frequency = FREQUENCIES.contains(frequency) ? frequency : OFF;
-		rule.weekday = intOf(stored.get('weekday'));
-		rule.monthDay = intOf(stored.get('monthDay'));
 		rule.active = stored.get('active') != false;
+		return rule;
+	}
+
+	/**
+	 * A stored schedule as a rule, on: an unknown frequency reads as off. Backup Sets keep their
+	 * schedule this way too (R-SQ16), so both share one frequency list and one `isDue`.
+	 */
+	@NamespaceAccessible
+	public static Rule schedule(Object frequency, Object weekday, Object monthDay) {
+		Rule rule = new Rule();
+		String chosen = stringOf(frequency);
+		rule.frequency = FREQUENCIES.contains(chosen) ? chosen : OFF;
+		rule.weekday = intOf(weekday);
+		rule.monthDay = intOf(monthDay);
 		return rule;
 	}
 

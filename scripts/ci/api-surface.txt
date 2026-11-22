@@ -98,6 +98,7 @@ core/ArchiveRules.cls | public static Boolean isRule(String)
 core/ArchiveRules.cls | public static Date nextDue(Rule,Date)
 core/ArchiveRules.cls | public static Integer weekdayOf(Date)
 core/ArchiveRules.cls | public static Rule of(String)
+core/ArchiveRules.cls | public static Rule schedule(Object,Object,Object)
 core/ArchiveRules.cls | public static String destinationOf(String)
 core/ArchiveRules.cls | public static String withRule(String,Rule)
 core/ArchiveRules.cls | public static final List<String> DESTINATIONS

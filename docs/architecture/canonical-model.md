@@ -9151,7 +9151,9 @@ Manage BarnCRM Settings and Find and Export Records may see the Backup Sets pane
 `0239-automatic-backups-and-off-platform-destination.md`). The `backup` key may hold `schedule`:
 `{ "frequency": "daily" }`, `{ "frequency": "weekly", "weekday" }` (1 Monday to 7 Sunday) or
 `{ "frequency": "monthly", "day" }` (1 to 28). No schedule, or `off`, means Run Now only. Only the
-owner sets it (`BackupSetService.setSchedule`); Find keeps the whole `backup` key on a save.
+owner sets it (`BackupSetService.setSchedule`); Find keeps the whole `backup` key on a save. The
+schedule is read, checked and asked whether it is due by archive rules' own logic
+(`ArchiveRules.schedule`, `check`, `isDue`, R-SQ18), its stored keys unchanged (`day` stays `day`).
 
 - **The step.** Core's nightly step Backup Sets (`BackupSetSchedule`, key `BarnCRM Backup Sets`,
   2:00 AM, own switch shipped on) reads every saved query in system mode without sharing and starts
@@ -9167,7 +9169,7 @@ owner sets it (`BackupSetService.setSchedule`); Find keeps the whole `backup` ke
   A failure to delete is a Warning in the Error Log. A set run only on demand keeps every file.
 
 **R-SQ17 Off-platform destination** (BK-10, D-221; ADR-0239). Core's seam `OffPlatformDestination`
-(`key()`, `notReady()`, `send(fileName, body)`) is found through `ModuleExtensions`; the one with
+(`key()`, `notReady()`, `send(fileName, body)`, `partChars()`) is found through `ModuleExtensions`; the one with
 key `offPlatform` is the backup destination. Core names no module class. (AR-10's
 `ArchiveDestination`, an archive rule's whole-run destination, is a separate seam.)
 
@@ -9175,7 +9177,8 @@ key `offPlatform` is the backup destination. Core names no module class. (AR-10'
   archive's definition holds `archive.destination`. Choosing it is refused while no module
   provides a destination; the panel and the archive then show a note instead of the choice.
 - **Sending.** The run still writes its parts to Files (archive and backup parts at most
-  3,000,000 characters). Its finish records `offPlatform: { state: "sending", sent: [], waiting:
+  3,000,000 characters, or fewer when the installed destination's `partChars()` asks: Connector
+  asks 1,500,000 while it sends metadata, whose multipart body holds the part more than once). Its finish records `offPlatform: { state: "sending", sent: [], waiting:
   [documents] }` and starts `OffPlatformSendBatch` (scope 1, callouts, without sharing): each
   execute reads one part's latest version in system mode and calls `send` with its title plus
   `.csv`. Its finish records `sent` and `waiting` and state `sent` or `waiting`, writes a Run Log
@@ -9202,6 +9205,9 @@ Archive Rules panel, run a rule or restore.
   reason. A missing or unknown value reads as `Files`.
 - **A manual run** is R-BD9's preview and typed count, for any destination, counted within the
   bulk delete run limit (R-BD2).
+- **One run at a time.** While an Archive job of the rule (its `savedQueryId`) is still
+  Committing, a new run of that rule is refused with a plain reason: Run Now, the nightly step
+  (logged) and the Big Object destination itself. The panel turns Run Now off for that rule.
 - **A schedule.** `frequency` other than `off` with `active` true is due each night (`daily`), on
   `weekday` (`weekly`) or on `monthDay` (`monthly`) in the org's time zone. Saving a schedule on
   asks for the current preview count, typed once. The nightly run's Archive Rules step (R-NJ2,
@@ -9210,10 +9216,13 @@ Archive Rules panel, run a rule or restore.
   logged to the Error Log. A night missed is not caught up: the rule runs on its next due day.
 - **The job.** Every run of a `BigObject` rule, and every restore, is an `Import_Batch__c` with
   Operation Archive (Section 16), its definition `{ "version": 1, "action": "archive" |
-  "restore", "savedQueryId", "name", "object", "notChangedAfter", "archivedAt" }`, Row Count, Rows
+  "restore", "savedQueryId", "name", "object", "notChangedAfter", "archivedAt", "rowIds" }`
+  (`rowIds`: a restore's rows), Row Count, Rows
   Deleted (originals deleted, or archived rows removed by a restore), Rows Created (records a
-  restore created) and Rows Rejected (left out, each named in the Run Log). A `Files` rule's run
-  is R-BD9's Delete job.
+  restore created) and Rows Rejected (left out, each named in the Run Log by record name). A
+  `Files` rule's run is R-BD9's Delete job. A link that dies unexpectedly marks its job Failed
+  with a line for its kind: an archive says to run the rule again, a restore to restore the rest
+  again.
 
 ### Salesforce implementation
 
@@ -9282,13 +9291,19 @@ fields). `children` holds the records of
 each cascade-delete child kind the person may read (the kinds the bulk delete preview lists), one
 level deep. A record whose JSON would pass 131,072 characters is not archived; the run names it.
 
-**R-ARC3 Copy, then settle.** A big object run is a queueable chain whose links alternate and never
-mix DML with an immediate write: Copy deletes the copies the last Settle could not finish, reads up
-to one chunk of matching records in user mode, Id order, and `insertImmediate`s them; Settle reads
+**R-ARC3 Copy, then settle.** A big object run is a queueable chain whose links alternate, because
+no immediate big object call may follow ordinary DML in a transaction: Copy deletes the copies
+the last Settle could not finish (retried once; any that stay are counted in the Run Log and the
+list is cleared, so the chain always ends), reads up to one chunk of matching records in user
+mode, Id order, and `insertImmediate`s them; Settle reads
 the rows back by full key, reads the originals again, deletes in user mode those whose copy exists
 and that are unchanged since the run started, adds the rows to `Archived_Record_Count__c`, writes
 the job, and queues the next Copy with the copies whose original stayed. The run ends when no
-record matches, at the run's count, or at the cap (R-ARC5).
+record matches, at the run's count, or at the cap (R-ARC5). Before reading children, Copy counts
+each cascade-delete kind's rows for the chunk and halves the chunk until they fit 2,000 rows; a
+single record with more is left out and named as too large. A link that dies unexpectedly,
+including a Settle whose next link cannot be queued, has its finalizer delete that link's copies
+(a Settle's deletes roll back) and mark the job Failed.
 
 **R-ARC4 Restore.** The person picks rows of one object. A restore link inserts each record again in
 user mode with the fields the person may create, a lookup only when its target exists, then its
@@ -9296,7 +9311,9 @@ children with the new parent Id; it logs each old Id with its new Id and what it
 link `deleteImmediate`s the rows whose record was created; the one after subtracts them from the
 count and finishes the job. Restored records have new Ids. At most 50 rows per restore, 25 per
 insert link. A record that cannot be created, or whose child cannot be created (the record is
-then deleted again), is reported per row and its row stays archived.
+then deleted again), is reported per row and its row stays archived. A restore is refused while
+any of its rows is in another restore still Committing (the job's `rowIds`), and the panel reads
+its page again after starting one.
 
 **R-ARC5 Cap.** One million rows are included per org. The panels warn from 900,000; a Copy whose
 chunk would pass 1,000,000 stops the run and says so. Nothing offers more capacity.
@@ -9306,6 +9323,7 @@ record exists: it reads every archived object by index and `deleteImmediate`s ea
 Original Id is the person or whose People names them, then subtracts them from the count. The
 person is the Erasure's erased record Id, Contact and Person Account. `ArchiveErasureExtension`
 is registered in `PersonErasureExtensions` and queues the scan only while the archive holds rows.
+A scan link that dies unexpectedly is logged by its finalizer as an Error naming no record.
 
 **R-ARC7 Access.** `BarnCRM_Admin` grants read and create on the object and read on its optional
 fields; the viewer reads in user mode, so no one else sees an archived row. Copies and deletes run
@@ -19484,9 +19502,11 @@ most is the backup destination: Core's `OffPlatformDestination` (R-SQ17), implem
 `ConnectorBackupDestination` and registered in the Connector catalog row. Saving it needs the
 key-writing permissions (R-CN3) and Connector Admin, gives the saver the Connections set (R-CN7)
 and clears the setting from every other row. Its Backup Settings hold the method (PUT or POST),
-a path that contains `{file}` once and otherwise follows R-CN9's path rules, and up to five
+a path that contains `{file}` once and otherwise follows R-CN9's path rules (no `..` segment,
+plain or percent-encoded, either), and up to five
 headers, each a name a recipe may set (F1) that does not look like a sign-in header, with a value
-of at most 255 characters and no `{!`, CR or LF: nothing secret is stored there. Each file is
+of at most 255 characters, no `{!`, CR or LF, and not starting with `Bearer` or `Basic` (any
+case): nothing secret is stored there. Each file is
 one request to `callout:<connection>` plus the path, `{file}` replaced by the URL-encoded file
 name, the CSV as the body and `Content-Type: text/csv`, 120 seconds at most; any 2xx answer is
 success, anything else is a failure that names the status. The person who sends (the runner, or
@@ -19506,8 +19526,9 @@ Named Credential of one `BarnConn_` name, linked, with a named principal `OAuth`
 that credential (the first key and Replace Key are refused), and Check Connection adds its
 principal to the Connections set when the set does not yet give it. Backup Settings may put
 `{file}` in a header value, written JSON-escaped with anything outside printable ASCII as
-`\uXXXX`, or in `metadata`, one JSON object of at most 1,000 characters with no `{!`, sent first
-in a `multipart/related` body with the file after it; `{file}` appears at least once across the
+`\uXXXX`, or in `metadata`, one JSON object of at most 1,000 characters with no `{!` and no key
+that looks like a sign-in header, sent first in a `multipart/related` body with the file after it
+(with metadata the destination asks for parts of at most 1,500,000 characters, R-SQ17); `{file}` appears at least once across the
 path, headers and metadata and at most once in the path. A `Content-Type` header replaces
 `text/csv`. The path may end with `?` and `name=value` pairs joined by `&`, each name from
 `uploadType` and `supportsAllDrives`, each value letters, digits, `_` or `-` (1 to 40). A

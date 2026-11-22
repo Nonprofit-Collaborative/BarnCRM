@@ -283,6 +283,7 @@ export default class ArchivedRecords extends LightningElement {
     }
     this.busy = true;
     this.errorMessage = undefined;
+    let started = false;
     try {
       await restoreArchivedRows({ objectName: this.objectName, rowIds: this.selectedIds });
       this.noticeMessage = format(helpText('Core', 'Core_ArchiveViewer_RestoreStarted'), count);
@@ -291,10 +292,16 @@ export default class ArchivedRecords extends LightningElement {
       if (table) {
         table.selectedRows = [];
       }
+      started = true;
     } catch (error) {
       this.errorMessage = messageFrom(error);
     } finally {
       this.busy = false;
+    }
+    if (started) {
+      // The page read again, so rows the restore has taken are not offered twice.
+      const start = this.pageStarts.pop();
+      await this.readPage(start === undefined ? null : start);
     }
   }
 }

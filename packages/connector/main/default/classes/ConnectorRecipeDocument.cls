@@ -308,7 +308,8 @@ public with sharing class ConnectorRecipeDocument {
 
 	/**
 	 * True for a path Call an App may not append to `callout:` (F4): it must start with one `/`
-	 * and hold no `@`, `\`, `{!`, `?`, `#`, white space, carriage return or line feed.
+	 * and hold no `@`, `\`, `{!`, `?`, `#`, `..` segment (plain or percent-encoded), white space,
+	 * carriage return or line feed.
 	 */
 	public static Boolean pathProblem(String path) {
 		return String.isBlank(path) ||
@@ -320,6 +321,7 @@ public with sharing class ConnectorRecipeDocument {
 			path.contains('{!') ||
 			path.contains('?') ||
 			path.contains('#') ||
+			(path.toLowerCase().replace('%2e', '.') + '/').contains('/../') ||
 			// Any whitespace, CR and LF included (a `.*\s.*` match misses them: `.` stops at a line end).
 			path.containsWhitespace();
 	}

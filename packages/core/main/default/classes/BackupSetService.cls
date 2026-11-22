@@ -17,13 +17,6 @@ public with sharing class BackupSetService {
 	private static final Integer RUNS_SHOWN = 20;
 	private static final Integer QUERIES_READ = 500;
 
-	/** The schedule frequencies a set may have (R-SQ16); a set without a schedule is `off`. */
-	public static final String OFF = 'off';
-	public static final String DAILY = 'daily';
-	public static final String WEEKLY = 'weekly';
-	public static final String MONTHLY = 'monthly';
-	private static final Set<String> FREQUENCIES = new Set<String>{ OFF, DAILY, WEEKLY, MONTHLY };
-
 	/** Runs kept per scheduled set while the setting is empty (R-SQ16). */
 	public static final Integer DEFAULT_RUNS_KEPT = 7;
 	public static final Integer MAX_RUNS_KEPT = 365;
@@ -45,7 +38,7 @@ public with sharing class BackupSetService {
 		public Boolean mine;
 		/** `off`, `daily`, `weekly` or `monthly` (R-SQ16). */
 		@AuraEnabled
-		public String frequency = OFF;
+		public String frequency = ArchiveRules.OFF;
 		/** Weekly: 1 (Monday) to 7 (Sunday). */
 		@AuraEnabled
 		public Integer weekday;
@@ -133,10 +126,11 @@ public with sharing class BackupSetService {
 			view.ownerName = query.Owner?.Name;
 			view.mine = query.OwnerId == me;
 			if (isBackupSet(query.Query_JSON__c)) {
-				Map<String, Object> schedule = scheduleOf(query.Query_JSON__c);
-				view.frequency = frequencyOf(schedule);
-				view.weekday = view.frequency == WEEKLY ? numberOf(schedule.get('weekday')) : null;
-				view.day = view.frequency == MONTHLY ? numberOf(schedule.get('day')) : null;
+				// A weekly schedule stores only its weekday, a monthly one only its day (setSchedule).
+				ArchiveRules.Rule schedule = ruleOf(scheduleOf(query.Query_JSON__c));
+				view.frequency = schedule.frequency;
+				view.weekday = schedule.weekday;
+				view.day = schedule.monthDay;
 				view.destination = destinationOf(query.Query_JSON__c);
 				result.sets.add(view);
 			} else if (view.mine) {
@@ -190,50 +184,37 @@ public with sharing class BackupSetService {
 		if (offPlatform && OffPlatformSendBatch.destination() == null) {
 			throw new BackupSetException(BarnHelp.text('Core', 'Core_OffPlatform_NotInstalled'));
 		}
-		setSchedule(queryId, frequency, weekday, day);
-		Saved_Query__c query = readOwnQuery(queryId);
-		Map<String, Object> document = (Map<String, Object>) JSON.deserializeUntyped(query.Query_JSON__c);
-		Map<String, Object> backup = backupOf(document);
-		if (offPlatform) {
-			backup.put('destination', OffPlatformSendBatch.OFF_PLATFORM);
-		} else {
-			backup.remove('destination');
-		}
-		document.put(KEY, backup);
-		Database.update(
-			new Saved_Query__c(Id = query.Id, Query_JSON__c = JSON.serialize(document)),
-			AccessLevel.USER_MODE
-		);
-	}
-
-	/** Sets the schedule only, keeping where the runs go (R-SQ16). */
-	public static void setSchedule(Id queryId, String frequency, Integer weekday, Integer day) {
 		requireAllowed();
 		Saved_Query__c query = readOwnQuery(queryId);
 		if (!isBackupSet(query.Query_JSON__c)) {
 			throw new BackupSetException(BarnHelp.text('Core', 'Core_BackupSets_ErrorNotSet'));
 		}
-		String chosen = String.isBlank(frequency) ? OFF : frequency.trim().toLowerCase();
-		Boolean valid =
-			FREQUENCIES.contains(chosen) &&
-			(chosen != WEEKLY || (weekday != null && weekday >= 1 && weekday <= 7)) &&
-			(chosen != MONTHLY || (day != null && day >= 1 && day <= 28));
-		if (!valid) {
+		String chosen = String.isBlank(frequency) ? ArchiveRules.OFF : frequency.trim().toLowerCase();
+		// One schedule check for archive rules and Backup Sets; a set stores the month day as `day`.
+		ArchiveRules.Rule asked = ArchiveRules.schedule(chosen, weekday, day);
+		try {
+			// An unknown frequency reads as off, so it is checked as no rule at all.
+			ArchiveRules.check(asked.frequency == chosen ? asked : null);
+		} catch (ArchiveRules.ArchiveRuleException invalid) {
 			throw new BackupSetException(BarnHelp.text('Core', 'Core_BackupSets_ErrorSchedule'));
 		}
 		Map<String, Object> document = (Map<String, Object>) JSON.deserializeUntyped(query.Query_JSON__c);
 		Map<String, Object> backup = backupOf(document);
-		if (chosen == OFF) {
+		if (chosen == ArchiveRules.OFF) {
 			backup.remove('schedule');
 		} else {
 			Map<String, Object> schedule = new Map<String, Object>{ 'frequency' => chosen };
-			if (chosen == WEEKLY) {
+			if (chosen == ArchiveRules.WEEKLY) {
 				schedule.put('weekday', weekday);
 			}
-			if (chosen == MONTHLY) {
+			if (chosen == ArchiveRules.MONTHLY) {
 				schedule.put('day', day);
 			}
 			backup.put('schedule', schedule);
+		}
+		backup.remove('destination');
+		if (offPlatform) {
+			backup.put('destination', OffPlatformSendBatch.OFF_PLATFORM);
 		}
 		document.put(KEY, backup);
 		Database.update(
@@ -282,10 +263,7 @@ public with sharing class BackupSetService {
 				)[0]
 				.getSObjectType();
 		}
-		List<String> fields = new List<String>();
-		for (Schema.DescribeFieldResult field : BulkDeleteService.backupFields(objectType)) {
-			fields.add(field.getName());
-		}
+		List<String> fields = BulkDeleteService.backupFieldNames(objectType);
 		Datetime now = Datetime.now();
 		String started = String.format(
 			BarnHelp.text('Core', 'Core_BackupSets_LogStarted'),
@@ -505,26 +483,16 @@ public with sharing class BackupSetService {
 
 	/**
 	 * Whether a set with this schedule runs on `day` (R-SQ16): daily, weekly on its weekday or
-	 * monthly on its day of the month. An unreadable schedule never runs.
+	 * monthly on its day of the month, as an archive rule is. An unreadable schedule never runs.
 	 */
 	public static Boolean isDue(Map<String, Object> schedule, Date day) {
-		String frequency = frequencyOf(schedule);
-		if (frequency == DAILY) {
-			return true;
-		}
-		if (frequency == WEEKLY) {
-			return numberOf(schedule.get('weekday')) == weekdayOf(day);
-		}
-		if (frequency == MONTHLY) {
-			return numberOf(schedule.get('day')) == day.day();
-		}
-		return false;
+		return ArchiveRules.isDue(ruleOf(schedule), day);
 	}
 
-	/** 1 (Monday) to 7 (Sunday): 7 January 1900 was a Sunday. */
-	public static Integer weekdayOf(Date day) {
-		Integer fromSunday = Math.mod(Date.newInstance(1900, 1, 7).daysBetween(day), 7);
-		return fromSunday == 0 ? 7 : fromSunday;
+	/** A set's schedule as an archive rule's: the same frequencies and days, `day` its month day. */
+	private static ArchiveRules.Rule ruleOf(Map<String, Object> schedule) {
+		Map<String, Object> given = schedule ?? new Map<String, Object>();
+		return ArchiveRules.schedule(given.get('frequency'), given.get('weekday'), given.get('day'));
 	}
 
 	/** Runs kept per scheduled set (Backup Runs Kept, R-SQ16), 1 to 365, 7 when empty. */
@@ -548,17 +516,6 @@ public with sharing class BackupSetService {
 			}
 		}
 		return new Map<String, Object>();
-	}
-
-	private static String frequencyOf(Map<String, Object> schedule) {
-		Object value = schedule == null ? null : schedule.get('frequency');
-		return value instanceof String && FREQUENCIES.contains((String) value) ? (String) value : OFF;
-	}
-
-	private static Integer numberOf(Object value) {
-		return value instanceof Decimal
-			? ((Decimal) value).intValue()
-			: (value instanceof Integer ? (Integer) value : null);
 	}
 
 	private static Map<String, Object> backupOf(Map<String, Object> document) {

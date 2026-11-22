@@ -157,11 +157,9 @@ public with sharing class ArchiveViewerService {
 		// a big object's system fields.
 		Set<Id> archivists = new Set<Id>();
 		for (Integer i = 0; i < Math.min(found.size(), PAGE_SIZE); i++) {
-			Id createdBy = (Id) found[i].get('CreatedById');
-			if (createdBy != null) {
-				archivists.add(createdBy);
-			}
+			archivists.add((Id) found[i].get('CreatedById'));
 		}
+		archivists.remove(null);
 		Map<Id, User> users = new Map<Id, User>([SELECT Id, Name FROM User WHERE Id IN :archivists WITH USER_MODE]);
 		for (Integer i = 0; i < Math.min(found.size(), PAGE_SIZE); i++) {
 			Archived_Record__b one = found[i];
@@ -172,8 +170,7 @@ public with sharing class ArchiveViewerService {
 			row.name = String.isBlank(one.Record_Name__c) ? one.Original_Id__c : one.Record_Name__c;
 			row.archivedAt = one.Archived_At__c;
 			row.ruleName = one.Rule_Name__c;
-			Id createdBy = (Id) one.get('CreatedById');
-			row.archivedBy = users.containsKey(createdBy) ? users.get(createdBy).Name : null;
+			row.archivedBy = users.get((Id) one.get('CreatedById'))?.Name;
 			result.rows.add(row);
 		}
 		return result;
@@ -240,6 +237,12 @@ public with sharing class ArchiveViewerService {
 		for (String one : distinct) {
 			keyOf(objectName, one);
 		}
+		// A row already in a restore still going is refused, so it is never created twice.
+		Set<String> restoring = BigObjectArchiveJob.running('restore', 'rowIds');
+		restoring.retainAll(distinct);
+		if (!restoring.isEmpty()) {
+			throw new ArchiveRules.ArchiveRuleException(BarnHelp.text('Core', 'Core_ArchiveViewer_ErrorRestoring'));
+		}
 		String label = labelOf(objectName);
 		Datetime now = Datetime.now();
 		Import_Batch__c job = new Import_Batch__c(
@@ -249,7 +252,8 @@ public with sharing class ArchiveViewerService {
 					'version' => 1,
 					'action' => 'restore',
 					'name' => BarnHelp.text('Core', 'Core_ArchiveViewer_RunName', new List<Object>{ label }),
-					'object' => objectName
+					'object' => objectName,
+					'rowIds' => distinct
 				}
 			),
 			Status__c = ImportBatchService.STATUS_COMMITTING,

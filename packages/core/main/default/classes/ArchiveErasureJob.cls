@@ -36,6 +36,12 @@ public with sharing class ArchiveErasureJob implements Queueable {
 	}
 
 	public void execute(QueueableContext context) {
+		if (context != null) {
+			// A link that dies unexpectedly is logged as an Error naming no record: the person is erased.
+			System.attachFinalizer(
+				new BigObjectArchiveJob.Finisher(null, BarnHelp.text('Core', 'Core_ArchiveErasure_Stopped'))
+			);
+		}
 		if (counting) {
 			// The final link: DML only.
 			if (failure != null) {

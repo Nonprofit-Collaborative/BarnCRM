@@ -63,7 +63,10 @@ private class ConnectorRecipeDocumentTest {
 					'/a#b',
 					'/a b',
 					'contacts',
-					'/a\\r\\nX-Injected: 1'
+					'/a\\r\\nX-Injected: 1',
+					'/files/../admin',
+					'/files/..',
+					'/files/%2E%2e/admin'
 				}
 			) {
 				Assert.isTrue(
@@ -72,6 +75,7 @@ private class ConnectorRecipeDocumentTest {
 				);
 			}
 			Assert.isFalse(ConnectorRecipeDocument.pathProblem('/v1/contacts/{id}'));
+			Assert.isFalse(ConnectorRecipeDocument.pathProblem('/files/a..b/report.v2'), 'Dots inside a name are fine');
 		}
 	}
 

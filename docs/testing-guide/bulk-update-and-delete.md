@@ -360,12 +360,13 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | 4 | Set **Where Records Go** to **Big Object**, **How Often** to **Only when I run it**, and press **Save**. | The rule is listed with "Only when run". |
 | 5 | Press **Preview and Run**. | "4 Contacts match now", up to five sample names, and any related records deleted with them. **Run Now** stays disabled until **Number of records** holds `4`. |
 | 6 | Type `4` and press **Run Now**. While it shows Running, change Big4's Title. | **Recent Runs** shows the run, then "3 moved, 1 left out"; its run log names Big4 as changed since the run started. If the run ends before the edit, all four move; repeat with a fresh Big4. |
-| 7 | Run `Arcbig people` in Find. | Only Big4 is returned. The Recycle Bin holds Big1 to Big3. The meter counts 3 more archived records. |
-| 8 | In the Developer Console, query `SELECT Object_Name__c, Original_Id__c, Record_Name__c FROM Archived_Record__b WHERE Object_Name__c = 'Contact'`. | Three rows, for Big1 to Big3. |
-| 9 | **Edit** the rule, set **How Often** to **Weekly** and **Day** to today, and press **Save**. | A box asks for the current count, 1; another number is refused with "Nothing was saved". With `1` the rule shows "Weekly on" today. |
-| 10 | In **BarnCRM Settings**, **General**, **Nightly Jobs**, find **Archive Rules**, then let the nightly run happen. | The step is listed and on. After the run, **Recent Runs** lists a run that moved Big4. |
-| 11 | Untick **Active**, type the count if asked, and **Save**. | The rule shows "(paused)" and the next nightly run starts nothing for it. |
-| 12 | **Remove** the rule. | It moves back to **Add a Rule**; the saved query and the archived rows remain. |
+| 7 | While the run in step 6 still shows Running, press **Preview and Run** on the rule again and type the count. | **Run Now** stays off, with "This rule is still running. Wait until its run under Recent Runs finishes, then run it again." Once the run ends, **Run Now** turns on again. |
+| 8 | Run `Arcbig people` in Find. | Only Big4 is returned. The Recycle Bin holds Big1 to Big3. The meter counts 3 more archived records. |
+| 9 | In the Developer Console, query `SELECT Object_Name__c, Original_Id__c, Record_Name__c FROM Archived_Record__b WHERE Object_Name__c = 'Contact'`. | Three rows, for Big1 to Big3. |
+| 10 | **Edit** the rule, set **How Often** to **Weekly** and **Day** to today, and press **Save**. | A box asks for the current count, 1; another number is refused with "Nothing was saved". With `1` the rule shows "Weekly on" today. |
+| 11 | In **BarnCRM Settings**, **General**, **Nightly Jobs**, find **Archive Rules**, then let the nightly run happen. | The step is listed and on. After the run, **Recent Runs** lists a run that moved Big4. |
+| 12 | Untick **Active**, type the count if asked, and **Save**. | The rule shows "(paused)" and the next nightly run starts nothing for it. |
+| 13 | **Remove** the rule. | It moves back to **Add a Rule**; the saved query and the archived rows remain. |
 
 **Cleanup:** none before T-BULK-22, which views, restores and erases these archived rows. Afterwards delete the Arcbig households and the saved query.
 
@@ -381,11 +382,12 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | 3 | Choose **Contact** and press **Show**. | Big1 to Big4 are listed newest first, with Original Id, Archived, Rule `Arcbig people` and Archived By. Setting **Archived From** and **Archived To** to yesterday and pressing **Show** lists nothing. |
 | 4 | Press **View** on Big1. | Its fields (First Name Big1, Last Name Arcbig, Reports To Id and the others) are listed. |
 | 5 | As the third user, open the panel and show Contact. | Rows show, but no tick boxes and no **Restore**. |
-| 6 | As the admin, tick Big1 and Big2 and press **Restore 2**. Confirm. | The box says each record gets a new Id and what may be left out. A message says the restore started. |
-| 7 | Open **Archive Rules**, **Recent Runs**. | A run named "Restore Contact" ends Complete; its log reads "Restored 003... as 003..." twice, "Left out of" Big1's old Id "ReportsToId", and "Moved 2 records back out of the archive; 0 stay archived". The meter counts 2 fewer. |
-| 8 | Run `Arcbig people` in Find; then show Contact in **Archived Records** again. | Big1 and Big2 are back with new Ids (Big1 without Reports To). Only Big3 and Big4 remain archived. |
-| 9 | As the admin, remove your create access to Contact's **Title** field in a permission set you hold, restore Big3, and put the access back. | Big3 is restored without its Title; the log lists Title as left out. |
-| 10 | Create contacts `Arcerase Two` and `Arcerase Child` (Reports To `Arcerase Two`). Archive `Arcerase Child` with a saved query and a Big Object rule run once. On `Arcerase Two`, open **Erase a Person** and press **Preview**. | The preview lists **Archived records** as deleted. After the preview, **Archived Records** still lists the Arcerase Child row. |
-| 11 | Erase `Arcerase Two`, wait a minute, and show Contact in **Archived Records**. | The Arcerase Child row is gone, and the meter counts 1 fewer. |
+| 6 | As the admin, tick Big1 and Big2 and press **Restore 2**. Confirm. | The box says each record gets a new Id and what may be left out. A message says the restore started, and the page is read again with no row ticked. |
+| 7 | At once, while that restore is still running, tick Big2 again (if it is still listed) and press **Restore 1**. Confirm. | Refused: "Some of these records are already being restored. Wait until that restore under Recent Runs finishes, then press Show to read the list again." No second restore is listed. If the first restore already ended, Big2 is no longer listed: note it and go on. |
+| 8 | Open **Archive Rules**, **Recent Runs**. | A run named "Restore Contact" ends Complete; its log reads "Restored 003... as 003..." twice, "Left out of" Big1's old Id "ReportsToId", and "Moved 2 records back out of the archive; 0 stay archived". The meter counts 2 fewer. |
+| 9 | Run `Arcbig people` in Find; then show Contact in **Archived Records** again. | Big1 and Big2 are back with new Ids (Big1 without Reports To). Only Big3 and Big4 remain archived. |
+| 10 | As the admin, remove your create access to Contact's **Title** field in a permission set you hold, restore Big3, and put the access back. | Big3 is restored without its Title; the log lists Title as left out. |
+| 11 | Create contacts `Arcerase Two` and `Arcerase Child` (Reports To `Arcerase Two`). Archive `Arcerase Child` with a saved query and a Big Object rule run once. On `Arcerase Two`, open **Erase a Person** and press **Preview**. | The preview lists **Archived records** as deleted. After the preview, **Archived Records** still lists the Arcerase Child row. |
+| 12 | Erase `Arcerase Two`, wait a minute, and show Contact in **Archived Records**. | The Arcerase Child row is gone, and the meter counts 1 fewer. |
 
 **Cleanup:** delete the Arcbig and Arcerase contacts and households, the saved queries, and restore or `Database.deleteImmediate` any archived rows left.

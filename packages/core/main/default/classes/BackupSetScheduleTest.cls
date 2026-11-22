@@ -106,8 +106,8 @@ private class BackupSetScheduleTest {
 	static void aScheduleFallsOnItsDayOnly() {
 		System.runAs(TestUsers.admin()) {
 			Date monday = Date.newInstance(2026, 11, 23);
-			Assert.areEqual(1, BackupSetService.weekdayOf(monday), '23 November 2026 is a Monday');
-			Assert.areEqual(7, BackupSetService.weekdayOf(monday.addDays(6)), 'and the 29th a Sunday');
+			Assert.areEqual(1, ArchiveRules.weekdayOf(monday), '23 November 2026 is a Monday');
+			Assert.areEqual(7, ArchiveRules.weekdayOf(monday.addDays(6)), 'and the 29th a Sunday');
 			Assert.isTrue(BackupSetService.isDue(new Map<String, Object>{ 'frequency' => 'daily' }, monday));
 			Assert.isTrue(
 				BackupSetService.isDue(new Map<String, Object>{ 'frequency' => 'weekly', 'weekday' => 1 }, monday)
@@ -129,9 +129,9 @@ private class BackupSetScheduleTest {
 			Saved_Query__c daily = backupSet('Daily');
 			Saved_Query__c notToday = backupSet('Not Today');
 			backupSet('On Demand');
-			BackupSetService.setSchedule(daily.Id, 'daily', null, null);
-			Integer tomorrow = BackupSetService.weekdayOf(Date.today().addDays(1));
-			BackupSetService.setSchedule(notToday.Id, 'weekly', tomorrow, null);
+			BackupSetService.setSchedule(daily.Id, 'daily', null, null, null);
+			Integer tomorrow = ArchiveRules.weekdayOf(Date.today().addDays(1));
+			BackupSetService.setSchedule(notToday.Id, 'weekly', tomorrow, null, null);
 
 			NightlyStep step = BackupSetSchedule.step();
 			Assert.areEqual(BackupSetSchedule.STEP_KEY, step.key);
@@ -171,7 +171,7 @@ private class BackupSetScheduleTest {
 			settings.Backup_Runs_Kept__c = 1;
 			TestDataFactory.saveSettings(settings);
 			Saved_Query__c query = backupSet('Volunteers');
-			BackupSetService.setSchedule(query.Id, 'daily', null, null);
+			BackupSetService.setSchedule(query.Id, 'daily', null, null, null);
 			List<Id> documents = new List<Id>();
 			List<Import_Batch__c> jobs = new List<Import_Batch__c>();
 			for (Integer index = 0; index < 2; index++) {
@@ -213,7 +213,7 @@ private class BackupSetScheduleTest {
 				older.Run_Log__c.contains(BarnHelp.text('Core', 'Core_BackupSets_LogRemoved', new List<Object>{ 1 }))
 			);
 
-			BackupSetService.setSchedule(query.Id, 'off', null, null);
+			BackupSetService.setSchedule(query.Id, 'off', null, null, null);
 			BackupSetSchedule.keepNewest(query.Id);
 			Assert.areEqual(
 				1,

@@ -118,6 +118,45 @@ private class ArchiveRuleServiceTest {
 	}
 
 	@IsTest
+	static void aRuleStillRunningIsNotStartedAgain() {
+		System.runAs(TestUsers.admin()) {
+			makePeople(2);
+		}
+		ArchiveStoreMemory.install();
+		BigObjectArchiveJob.queuedForTest = new List<Object>();
+		String running = BarnHelp.text('Core', 'Core_ArchiveRules_ErrorRunning');
+		System.runAs(archivist()) {
+			ArchiveRules.Rule settings = new ArchiveRules.Rule();
+			settings.destination = ArchiveRules.BIG_OBJECT;
+			Saved_Query__c query = new Saved_Query__c(
+				Name = 'Old Volunteers',
+				Object_Name__c = 'Contact',
+				Query_JSON__c = ArchiveRules.withRule(VOLUNTEERS, settings)
+			);
+			insert as user query;
+			Test.startTest();
+			ArchiveRuleService.Panel panel = ArchiveController.runRule(query.Id, 2);
+			System.Assert.isTrue(panel.rules[0].running, 'The panel knows the rule is running');
+			try {
+				ArchiveController.runRule(query.Id, 2);
+				System.Assert.fail('A second Run Now waits for the first');
+			} catch (AuraHandledException expected) {
+				System.Assert.isTrue(expected.getMessage().contains(running), expected.getMessage());
+			}
+			System.Assert.isFalse(ArchiveRuleService.runDueRule(query.Id), 'The nightly run does not start it either');
+			try {
+				new ArchiveToBigObject().start(new ArchiveRun(query.Id, query.Name, query.Query_JSON__c, 'Contact', 2));
+				System.Assert.fail('Nor the destination itself');
+			} catch (ArchiveRules.ArchiveRuleException expected) {
+				System.Assert.areEqual(running, expected.getMessage(), 'In plain words');
+			}
+			drain();
+			System.Assert.isFalse(ArchiveController.getRules().rules[0].running, 'Free once the run ends');
+			Test.stopTest();
+		}
+	}
+
+	@IsTest
 	static void refusesPeopleWithoutThePermissions() {
 		System.runAs(TestUsers.standardUserWith('Staff', new List<String>{ 'BarnCRM_Staff' })) {
 			try {
