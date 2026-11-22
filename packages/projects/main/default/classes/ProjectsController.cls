@@ -67,7 +67,7 @@ public with sharing class ProjectsController {
 						Budget_Hours__c,
 						Change_Hours__c,
 						Budget_Amount__c,
-						Actual_Cost__c,
+						Actual_Cost_Amount__c,
 						Remaining_Budget__c,
 						Owner.Name
 					FROM Project__c
@@ -269,7 +269,7 @@ public with sharing class ProjectsController {
 					Budget_Hours__c,
 					Change_Hours__c,
 					Budget_Amount__c,
-					Actual_Cost__c,
+					Actual_Cost_Amount__c,
 					Remaining_Budget__c,
 					OwnerId,
 					Owner.Name

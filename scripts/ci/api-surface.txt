@@ -2032,6 +2032,10 @@ programs/ServicePlanDatesHandler.cls | public ServicePlanDatesHandler()
 programs/ServicePlanDatesHandler.cls | public class ServicePlanDatesHandler
 programs/SessionScheduleTriggerHandler.cls | public SessionScheduleTriggerHandler()
 programs/SessionScheduleTriggerHandler.cls | public class SessionScheduleTriggerHandler
+projects/ProjectChangeRequestHandler.cls | public ProjectChangeRequestHandler()
+projects/ProjectChangeRequestHandler.cls | public class ProjectChangeRequestHandler
+projects/ProjectCostHandler.cls | public ProjectCostHandler()
+projects/ProjectCostHandler.cls | public class ProjectCostHandler
 projects/ProjectEntryHandler.cls | public ProjectEntryHandler()
 projects/ProjectEntryHandler.cls | public class ProjectEntryHandler
 projects/ProjectInvoiceHandler.cls | public ProjectInvoiceHandler()

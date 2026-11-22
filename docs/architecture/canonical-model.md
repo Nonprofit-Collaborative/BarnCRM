@@ -18366,8 +18366,9 @@ A piece of work with a start, a target date and an outcome: a Salesforce impleme
 | Estimated Hours | `Estimated_Hours__c` | Roll-Up Summary (SUM Project_Task__c.Estimated_Hours__c, Status__c not equal to Cancelled) |
 | Actual Hours | `Actual_Hours__c` | Roll-Up Summary (SUM Time_Entry__c.Hours__c, counted: Status__c not equal to Open, Submitted, Rejected; R-PM10) |
 | Billable Hours | `Billable_Hours__c` | Roll-Up Summary (SUM Time_Entry__c.Hours__c, Billable__c equals true, counted) |
-| Actual Cost | `Actual_Cost__c` | Formula (Currency): `IF($Setup.Projects_Settings__c.Rates_Enabled__c, Time_Amount__c, IF(ISBLANK(Hourly_Rate__c), NULL, Actual_Hours__c * Hourly_Rate__c))` |
-| Remaining Budget | `Remaining_Budget__c` | Formula (Currency): `IF(ISBLANK(Budget_Amount__c), NULL, Budget_Amount__c + Change_Amount__c - BLANKVALUE(Actual_Cost__c, 0))` |
+| Actual Cost | `Actual_Cost_Amount__c` | Currency(18, 2), stored: Time Amount with Use rate cards on (blank as 0), else blank without an Hourly Rate, else Actual Hours (blank as 0) times Hourly Rate. Kept by `ProjectCostHandler` (`ProjectTrigger`, registry row `Project_Actual_Cost`, Always Runs) on every project save, which each counted time entry's save causes through the roll-up summaries; `ProjectCostSync` puts every project right at install and from the nightly health step after Use rate cards changes |
+| Actual Cost Formula | `Actual_Cost__c` | Formula (Currency), not used: `IF($Setup.Projects_Settings__c.Rates_Enabled__c, Time_Amount__c, IF(ISBLANK(Hourly_Rate__c), NULL, Actual_Hours__c * Hourly_Rate__c))`; on no layout, report type or permission set; removed with `Projects_Settings__c` |
+| Remaining Budget | `Remaining_Budget__c` | Formula (Currency): `IF(ISBLANK(Budget_Amount__c), NULL, Budget_Amount__c + Change_Amount__c - BLANKVALUE(Actual_Cost_Amount__c, 0))` |
 | Billing Type | `Billing_Type__c` | Picklist (Time and Materials, Fixed Fee, Retainer, Not Billed), restricted, default Time and Materials; blank reads as Time and Materials (PM-10) |
 | Retainer Amount | `Retainer_Amount__c` | Currency(16, 2): Retainer, billed each month |
 | Time Amount | `Time_Amount__c` | Roll-Up Summary (SUM Time_Entry__c.Amount__c, counted; PM-06) |
@@ -18551,9 +18552,17 @@ The module's org-wide settings, edited in the Projects section of BarnCRM Settin
 
 ### Salesforce implementation
 
-- **Object:** `Projects_Settings__c`, label Projects Settings, hierarchy custom setting, visibility Protected.
+- **Settings store (Section 13 R-SV4):** `Setting_Module.Projects` (`Settings_Object__c`
+  `Projects_Settings__c`, `Key_Prefix__c` `Projects`, no state fields). Each key below is a
+  Setting Value read by its definition's DeveloperName (`ProjectsSettings` over
+  `ModuleSettings`), the definition shipping the default as `Default_Value__c`. The legacy
+  hierarchy custom setting `Projects_Settings__c` (Protected) is read only until carry-over,
+  then removed with the formula `Project__c.Actual_Cost__c` and the inactive validation rules
+  `Requests_Turned_On` and `Change_Requests_Turned_On`, which read it through `$Setup`.
+- **State:** `Projects.Cost_Rates_Applied__c`, the Use rate cards value the last
+  `ProjectCostSync` pass applied (29PM1).
 
-| Attribute | API name | Type |
+| Attribute | Key | Type |
 |---|---|---|
 | Track time and budgets | `Time_Tracking_Enabled__c` | Checkbox, default true |
 | Days late before at risk | `At_Risk_Days__c` | Number(3, 0), default 7 (1 to 365) |
@@ -18565,7 +18574,7 @@ The module's org-wide settings, edited in the Projects section of BarnCRM Settin
 | Manage resources | `Resources_Enabled__c` | Checkbox, default false (PM-09) |
 | Create invoices | `Billing_Enabled__c` | Checkbox, default false (PM-10) |
 | Take invoice payments online | `Online_Payments_Enabled__c` | Checkbox, default false (PM-10, R-PM22) |
-| Invoice payment return page | `Invoice_Return_Url__c` | URL(255); filled with the org's My Domain address at install while blank (`ProjectsPostInstall`), so it is never blank; read as that address if cleared |
+| Invoice payment return page | `Invoice_Return_Url__c` | Text (https URL, 255); while blank it reads and shows as the org's My Domain address, which no definition can ship |
 | Invoice due days | `Invoice_Due_Days__c` | Number(3, 0), default 30 (1 to 365) |
 | Show financials and recognize revenue | `Revenue_Enabled__c` | Checkbox, default false (PM-11) |
 | Track change requests | `Change_Requests_Enabled__c` | Checkbox, default false (PM-12) |
@@ -18788,7 +18797,7 @@ A requested change of a project's scope with its hours and amount; approved ones
 
 ### Rules
 
-**R-PM20 Change requests.** Status Draft, Submitted, Approved or Rejected. Only the project's owner or a holder of Manage Projects sets Approved or Rejected (`Decision_By_Manager`). An Approved request's Status, Hours and Amount change only with Manage Projects (`Approved_Locked`). Approved requests are summed into the project's Change Hours and Change Amount (29PM1), so approval and its undoing move the budget with no Apex; Budget Hours and Budget Amount stay the original budget. Hours and Amount may be negative. Field history tracks Status, Hours and Amount.
+**R-PM20 Change requests.** Status Draft, Submitted, Approved or Rejected. Only the project's owner or a holder of Manage Projects sets Approved or Rejected (`Decision_By_Manager`). An Approved request's Status, Hours and Amount change only with Manage Projects (`Approved_Locked`). Approved requests are summed into the project's Change Hours and Change Amount (29PM1), so approval and its undoing move the budget with no Apex; Budget Hours and Budget Amount stay the original budget. Hours and Amount may be negative. Field history tracks Status, Hours and Amount. A new change request is refused while Track change requests is off (`ProjectChangeRequestHandler`, `ProjectChangeRequestTrigger`, registry row `Project_Change_Request_Rules`, Always Runs); one saved while it was on can still be edited.
 
 ### Salesforce implementation
 
@@ -18810,7 +18819,7 @@ A request or issue someone raised with the organization: logged by staff, sent b
 
 ### Rules
 
-**R-PM23 Before save** (registry row `Project_Request_Rules`, Always Runs). A blank Channel is Staff when the saving user can create requests and Portal otherwise. A Portal or Partner Organization request is refused unless Track requests and issues and Take requests from outside are both on, and one owned by the user saving it goes to the shipped Requests queue (`Project_Requests`). A blank Due Date is the creation date plus the priority's due days, counted in weekdays. A blank Requesting Organization takes the requester's Account. Resolved or Closed stamps Resolved Date when blank; any other status clears it. A save by a user who cannot edit requests (the portal's integration user) keeps Subject, Description, Type, Category and Priority as they were. Validation rules: `Requests_Turned_On` (no new request while the feature is off), `Resolution_Needed` (Resolved needs a Resolution).
+**R-PM23 Before save** (registry row `Project_Request_Rules`, Always Runs). A new request is refused while Track requests and issues is off. A blank Channel is Staff when the saving user can create requests and Portal otherwise. A Portal or Partner Organization request is refused unless Track requests and issues and Take requests from outside are both on, and one owned by the user saving it goes to the shipped Requests queue (`Project_Requests`). A blank Due Date is the creation date plus the priority's due days, counted in weekdays. A blank Requesting Organization takes the requester's Account. Resolved or Closed stamps Resolved Date when blank; any other status clears it. A save by a user who cannot edit requests (the portal's integration user) keeps Subject, Description, Type, Category and Priority as they were. Validation rule: `Resolution_Needed` (Resolved needs a Resolution).
 
 **R-PM24 Requester replies.** A non-blank Reply is moved into a new Request Comment marked From Requester and Shared, and cleared; a Waiting on Requester or Resolved request returns to In Progress.
 
@@ -20165,6 +20174,7 @@ mirrors the primary member).
 | 1.84 | 2026-11-21 | Settings as custom metadata, phase 1 Core (SET-01, D-219, ADR-NEXT settings as custom metadata). New custom metadata type `Setting_Value__mdt` with `Value__c` (Section 13, R-SV1 to R-SV3; not counted as an object). `Setting_Definition__mdt` gains `Default_Value__c` and the Hidden data type. `Nightly_Job__c` gains `Kind__c` and `Value__c` (state and What's New rows). `BarnCRM_Automation_Control__c` gains `Paused_Until__c`. New `Account.Is_Organization_Account__c`, a kept checkbox that replaces the `Is_Organization__c` formula everywhere it was read (Section 8; the platform refuses a formula-to-checkbox change, and the formula is removed in phase 2). `BarnCRM_Settings__c` and `Whats_New_Seen__c` are read only until carry-over and are removed in phase 2; no object count change in phase 1. |
 | 1.85 | 2026-11-21 | Settings as custom metadata, phase 2 Core prerequisite (SET-02, D-219). New custom metadata type `Setting_Module__mdt` with `Settings_Object__c`, `Key_Prefix__c` and `State_Fields__c` (Section 13; not counted as an object): a module registers its settings group, its State row prefix and its legacy state fields. New rule R-SV4 (module settings read and saved through the store by name or by group and key); R-SV3 carry-over covers every registered module; module State rows are `Prefix.Name` and a run lock is a State row read `FOR UPDATE` (Section 29 Nightly Jobs). No object count change. |
 | 1.86 | 2026-11-21 | Settings as custom metadata, phase 2: Rollups, Programs and Portal (SET-03, D-219). Each ships a `Setting_Module__mdt` record (prefixes `Rollups`, `Programs`, `Portal`) and a `Default_Value__c` on every Setting Definition, and reads its settings from the store (R-SV4). Run state moves to State rows: `Rollups.Nightly_Covered_From__c`, `Rollups.Processor_Requested_At__c`, `Programs.Private_Participants__c` (the Participant Privacy preset, saved synchronously), and the large parent run lock `Rollups.Last_Run_Started__c` (Section 14A), which replaces `Rollup_Run_Lock__c` and is created at install. `Rollup_Settings__c`, `Rollup_Run_Lock__c`, `Programs_Settings__c` and `Portal_Settings__c` are no longer written; they stay until the destructive deploy. No object count change. |
+| 1.87 | 2026-11-21 | Settings as custom metadata, phase 2: Projects (SET-03, D-219). `Setting_Module.Projects` (prefix `Projects`), a `Default_Value__c` on every Setting Definition, readers through the store (29PM7); Invoice payment return page reads the org's My Domain address while blank instead of being filled at install. `Project__c` gains Actual Cost (`Actual_Cost_Amount__c`, Currency, stored), kept by `ProjectCostHandler` on the new `ProjectTrigger` and by `ProjectCostSync`, with the formula's results; Remaining Budget reads it. The formula `Actual_Cost__c` is relabeled Actual Cost Formula and left unused. The validation rules `Requests_Turned_On` and `Change_Requests_Turned_On` are inactive: `ProjectRequestHandler` and the new `ProjectChangeRequestHandler` (`ProjectChangeRequestTrigger`) refuse new records instead (R-PM20, R-PM23). New State row `Projects.Cost_Rates_Applied__c`. No object count change. |
 
 ---
 ## 32. Entity ownership by package

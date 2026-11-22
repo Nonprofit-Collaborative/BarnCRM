@@ -12,10 +12,7 @@ public class ProjectRevenueTest {
 	}
 
 	public static void revenue(Boolean turnedOn) {
-		OrgSettingsSystemWriter.save(
-			Projects_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{ Projects_Settings__c.Revenue_Enabled__c => turnedOn }
-		);
+		ModuleSettings.setForTest('Projects_Revenue_Enabled', turnedOn);
 		SettingsService.clearCaches();
 	}
 

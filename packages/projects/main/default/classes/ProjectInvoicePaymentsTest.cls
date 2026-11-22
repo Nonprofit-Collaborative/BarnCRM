@@ -32,13 +32,8 @@ private class ProjectInvoicePaymentsTest {
 	}
 
 	private static FakePayments online(Boolean turnedOn) {
-		OrgSettingsSystemWriter.save(
-			Projects_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{
-				Projects_Settings__c.Billing_Enabled__c => true,
-				Projects_Settings__c.Online_Payments_Enabled__c => turnedOn
-			}
-		);
+		ModuleSettings.setForTest('Projects_Billing_Enabled', true);
+		ModuleSettings.setForTest('Projects_Online_Payments_Enabled', turnedOn);
 		SettingsService.clearCaches();
 		FakePayments fake = new FakePayments();
 		ProjectInvoicePayments.apiForTest = fake;

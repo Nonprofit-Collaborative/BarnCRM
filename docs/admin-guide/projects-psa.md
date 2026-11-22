@@ -24,7 +24,8 @@ PayPal account, and the payment marks the invoice Paid.
 
 ## Settings
 
-BarnCRM Settings, **Projects** (org-wide):
+BarnCRM Settings, **Projects** (org-wide; a save shows **Saving...** for a few seconds, then
+**Your settings are saved.**, see [Saving Your Changes](barncrm-settings.md#saving-your-changes)):
 
 | Setting | Default | What it does |
 |---|---|---|
@@ -34,7 +35,7 @@ BarnCRM Settings, **Projects** (org-wide):
 | Manage resources | Off | The Staffing page, resource requests and the allocation view. |
 | Create invoices | Off | Billing Type on projects, New Invoice, the invoice actions and Export Invoices. |
 | Take invoice payments online | Off | Send Payment Link on a sent invoice. Needs Create invoices and the Payments module. |
-| Invoice payment return page | Your My Domain address | The https page a client returns to after paying online, such as your website's thank you page. Filled in with your My Domain address at install. |
+| Invoice payment return page | Your My Domain address | The https page a client returns to after paying online, such as your website's thank you page. While it is blank, your My Domain address is used. |
 | Invoice due days | 30 | Days from the invoice date to its due date (1 to 365). |
 | Show financials and recognize revenue | Off | The financials card on the project page and the monthly recognized revenue rows. |
 | Track change requests | Off | New change requests are refused while it is off. Requests saved while it was on keep counting and can still be edited (see below). |
@@ -79,6 +80,11 @@ with Projects Admin. A bookkeeper who is not a BarnCRM admin needs Projects Admi
 A rate change never reprices time already logged. To reprice an entry, change it (its date or
 person) before it is approved. With rate cards on, **Actual Cost** is the sum of each entry's
 hours times the rate it was logged at.
+
+**Actual Cost** is saved on the project and updated whenever the project or its counted time
+changes. After you turn **Use rate cards** on or off, a project's Actual Cost follows the new
+setting the next time the project or its time changes, and every project's does by the next
+morning (the nightly Projects step).
 
 Two cost figures on a project differ on purpose: **Actual Cost** is time at the **bill rate**
 (the billed value of the time), and **Labor Cost** is time at the **cost rate** (what the time

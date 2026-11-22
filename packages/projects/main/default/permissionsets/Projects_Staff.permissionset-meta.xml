@@ -132,7 +132,7 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
-    <field>Project__c.Actual_Cost__c</field>
+    <field>Project__c.Actual_Cost_Amount__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>

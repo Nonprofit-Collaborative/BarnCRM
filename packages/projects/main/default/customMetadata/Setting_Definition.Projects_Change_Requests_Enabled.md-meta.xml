@@ -10,4 +10,5 @@
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">110</value></values>
     <values><field>Description__c</field><value xsi:type="xsd:string">Change requests with hours and an amount; approved ones add to the project's budget. While off, new requests are refused; saved requests keep counting. Needs Track time and budgets. Default: off.</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">projects-psa.md</value></values>
+    <values><field>Default_Value__c</field><value xsi:type="xsd:string">false</value></values>
 </CustomMetadata>

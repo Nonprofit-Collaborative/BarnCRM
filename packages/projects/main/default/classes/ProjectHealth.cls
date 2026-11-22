@@ -4,7 +4,8 @@
  * line of Health Reasons per reason, and none for any other project.
  *
  * The 6:40 AM step of BarnCRM's nightly run checks every project as whoever scheduled the run,
- * in system mode (ADR-0021), and writes only Health and Health Reasons. Refresh Health on the
+ * in system mode (ADR-0021), and writes only Health and Health Reasons; once Use rate cards has
+ * changed it also starts `ProjectCostSync` for the projects' Actual Cost. Refresh Health on the
  * project page checks one project as the person, in user mode.
  */
 public with sharing class ProjectHealth implements Schedulable {
@@ -57,6 +58,8 @@ public with sharing class ProjectHealth implements Schedulable {
 		} catch (Exception e) {
 			ErrorLogger.log(e, 'ProjectHealth');
 		}
+		// After Use rate cards changes, every project's stored Actual Cost follows that night.
+		ProjectCostSync.startIfRatesChanged();
 	}
 
 	/** Refresh Health: one project, read and written as the person. */
