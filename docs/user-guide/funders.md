@@ -22,8 +22,9 @@ program officer is a contact at that organization.
    **Save**.
 
 You should see: the grant's page, open on its **Overview** tab. The other tabs hold the money
-(**Money**: the Award Schedule, payments and restricted ledger), what you owe the funder
-(**Reporting**: requirements, outcomes and the funder report), your reusable answers
+(**Money**: the Award Schedule, payments soonest due first and the restricted ledger newest
+first), what you owe the funder (**Reporting**: requirements soonest due first, outcomes and the
+funder report), your reusable answers
 (**Writing**) and every related list (**Related**).
 
 ## The Stages
