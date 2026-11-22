@@ -189,7 +189,7 @@ each, the module is installed and on, and its access sync has run
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As admin, open the App Launcher and type `Corporate`. | **BarnCRM Corporate Hub** is listed with Patch's face on a sage circle (the BarnCRM logo, until its own Patch logo is ready). |
-| 2 | Open it and its navigation menu. | Console navigation with the Barn Navy header. Tabs: **Corporate Hub**, **Library Documents**, **Compliance Obligations**, **Agreements**, **Boards and Committees**, **Board Meetings**, **Processing Activities**, **Data Subject Requests**, **Data Breaches**, **Reports**, **Dashboards**, **Error Log** (last). |
+| 2 | Open it and its navigation menu. | Console navigation with the Barn Navy header. Tabs: **Corporate Hub Home**, **Library Documents**, **Compliance Obligations**, **Agreements**, **Boards and Committees**, **Board Meetings**, **Processing Activities**, **Data Subject Requests**, **Data Breaches**, **Reports**, **Dashboards**, **Error Log** (last). |
 | 3 | Open **Board Meetings** and a meeting. | It opens on the Board Meeting record page with its panel. |
 | 4 | Open **BarnCRM**. | The first six tabs are still there after **Data Manager**; the three data protection tabs are not. |
 | 5 | As staff, open the App Launcher and type `Corporate`. | **BarnCRM Corporate Hub** is listed. |
@@ -242,7 +242,7 @@ each, the module is installed and on, and its access sync has run
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As admin, open the App Launcher and type `Scholarships`. | **BarnCRM Scholarships** is listed with Patch in a graduation cap, holding a diploma. |
-| 2 | Open it and its navigation menu. | Console navigation with the Barn Navy header. Tabs: **Scholarships and Grants**, **Award Programs**, **Award Applications**, **Awards**, **Reports**, **Dashboards**, **Error Log** (last). |
+| 2 | Open it and its navigation menu. | Console navigation with the Barn Navy header. Tabs: **Scholarships Home**, **Award Programs**, **Award Applications**, **Awards**, **Reports**, **Dashboards**, **Error Log** (last). |
 | 3 | Open an award application. | It opens as a workspace tab on the application record page, the same page as in **BarnCRM**. |
 | 4 | Open **BarnCRM**. | The four Scholarships tabs are still there, after **Data Manager**. |
 | 5 | On BarnCRM Home, find Scholarships and Outbound Grants under **Modules**. | It has an **Open the App** link to **BarnCRM Scholarships**. |
@@ -257,3 +257,15 @@ each, the module is installed and on, and its access sync has run
 |---|---|---|
 | 1 | Open the **BarnCRM** home page and look at **Quick Links**. | **Enter a Gift** reads "Record a gift in a few keystrokes.", **Log Hours** reads "Hours a volunteer worked, in one short form." and **Enroll** reads "Start someone in a program." No tile shows a key such as `Core_HubHome_QuickLinkEnterGiftLine`. |
 | 2 | Turn Volunteers off in the Module Manager and reload the home page. | **Log Hours** is gone; the other two keep their words. Turn Volunteers back on. |
+
+## T-APP-17: Every Module App Opens on Its Home
+
+**Purpose:** confirm each module app's first tab is its home, named `<Module> Home`, with the same layout (ADR-NEXT, Module Home pattern).
+**Prerequisites:** a production org or sandbox (`mwdbdevsb`) with the modules installed and on; admin user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open each module app from the App Launcher. | The first tab and the page title are: BarnCRM Corporate Hub, **Corporate Hub Home**; BarnCRM Events, **Events Home**; BarnCRM Fundraising, **Fundraising Home**; BarnCRM Grants, **Grants Home**; BarnCRM Programs, **Programs Home**; BarnCRM Projects, **Projects Home**; BarnCRM Scholarships, **Scholarships Home**; BarnCRM Volunteers, **Volunteers Home**. **Error Log** is still the last tab of each. |
+| 2 | On each home, look at the page. | The title and About This Tool at the top, the module's quick actions at the top right, then figures, then the module's lists. |
+| 3 | Open **BarnCRM** (or **BarnCRM Console**). | The module homes it carries read **Corporate Hub Home**, **Programs Home** and **Scholarships Home**. |
+| 4 | Open **BarnCRM Connector**. | It opens on **Super Connector** (a one-tool app, no home). |

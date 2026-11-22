@@ -6,7 +6,7 @@
     "Funders_Award_Saved": "Awarded. Open {0} to build its payment schedule.",
     "Funders_Board_Empty": "Nothing to show for this fiscal year yet.",
     "Funders_Board_Help": "This fiscal year: grants awarded and, with Fundraising, gifts designated to funds. Each person sees totals of what they can read.",
-    "Funders_Board_LoadFailed": "The Board Dashboard did not load. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
+    "Funders_Board_LoadFailed": "Grants Home did not load. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
     "Funders_Budget_Awarded": "Awarded",
     "Funders_Budget_AwardedGap": "The lines' awarded amounts add up to {0}, which is not the grant's Amount Awarded.",
     "Funders_Budget_Empty": "No budget lines yet. Click New Line to split the request into lines.",

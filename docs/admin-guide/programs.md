@@ -519,7 +519,7 @@ person's Programs card, the delivery rules and Participant Privacy all count it 
 
 ## Program Dashboard
 
-The **Programs Dashboard** tab in the BarnCRM Programs app answers how your programs are doing,
+The **Programs Home** tab, the BarnCRM Programs app's home, answers how your programs are doing,
 for everyone with a Programs permission set. Pick a period at the top (**This Month**, the
 default, **Last Month**, **This Year**, **Last Year** or **Last 12 Months**). Tiles show:
 

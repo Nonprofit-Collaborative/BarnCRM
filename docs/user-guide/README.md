@@ -74,7 +74,7 @@ Every BarnCRM module is in Beta right now: a **Beta** badge beside a module's na
 
 ### Corporate Hub
 
-- [Corporate Hub](corporate-hub.md): acknowledging policies, what is due on the Corporate Hub page, Library Documents and their versions, completing a compliance obligation with its evidence, agreements, data subject requests and breaches, and reminders.
+- [Corporate Hub](corporate-hub.md): acknowledging policies, what is due on Corporate Hub Home, Library Documents and their versions, completing a compliance obligation with its evidence, agreements, data subject requests and breaches, and reminders.
 
 ### Payments
 

@@ -98,7 +98,7 @@ you. Click **Print** to print the month without the app's header and navigation.
 
 ## To Show the Board Where the Money Comes From
 
-1. Open the **BarnCRM Grants** app. It opens on the **Board Dashboard**, its home: tiles for
+1. Open the **BarnCRM Grants** app. It opens on **Grants Home**, its home: tiles for
    this fiscal year's revenue and awards, then a tile for each Grants tab.
 2. Read the three parts, all for this fiscal year:
    - **Revenue Mix**: grants awarded by funding source and, if you use Fundraising, gifts to funds,

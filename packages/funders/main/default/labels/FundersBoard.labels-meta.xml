@@ -5,8 +5,8 @@
         <categories>Funders</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Board Dashboard tab title</shortDescription>
-        <value>Board Dashboard</value>
+        <shortDescription>Grants Home page title</shortDescription>
+        <value>Grants Home</value>
     </labels>
     <labels>
         <fullName>Funders_Board_Mix</fullName>

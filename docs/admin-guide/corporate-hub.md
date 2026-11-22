@@ -44,7 +44,7 @@ page, does three things, each safe to run again:
    set to Read Only holders (see Access below).
 3. Loads the shipped templates that your org does not have yet (see Templates).
 
-The **Corporate Hub**, **Library Documents**, **Compliance Obligations**, **Agreements**,
+The **Corporate Hub Home**, **Library Documents**, **Compliance Obligations**, **Agreements**,
 **Boards and Committees** and **Board Meetings** tabs are added at the end of the BarnCRM and
 BarnCRM Console apps (in a package install the admin adds them in App Manager; the Setup Assistant
 lists the tab names). Corporate Hub also has its own app, **BarnCRM Corporate Hub**, shown to
@@ -124,7 +124,7 @@ adjust the recurrence (for example Every Two Years for a biennial state report),
 then publish it (below).
 
 An upgrade adds new templates only; it never changes a record you already have. The **Add
-Missing Templates** button on the Corporate Hub page (admins) loads any template your org has no
+Missing Templates** button on Corporate Hub Home (admins) loads any template your org has no
 record for. Set a template you do not need to Off (obligation) or Retired (policy) rather than
 deleting it, or the next setup loads it again. Other countries: rename the tax return template
 and its instructions, or add your own obligations.
@@ -151,7 +151,7 @@ Acknowledgments** asks either everyone who holds a BarnCRM role or the active me
 public group (direct user members). Each person gets a bell notification and a request due in
 **Days to acknowledge**. Asking again skips anyone already asked for that version.
 
-People acknowledge on the Corporate Hub page, under **Policies to Acknowledge**. The document's
+People acknowledge on Corporate Hub Home, under **Policies to Acknowledge**. The document's
 panel counts acknowledged and outstanding for the current version and lists who is outstanding.
 An admin can **Record** an acknowledgment for someone (a signed paper copy, for example), and can
 create a request by hand for a person with no login by filling in Person instead of User.
@@ -222,7 +222,7 @@ the **Risk** (Not Yet Assessed, Unlikely to Result in Risk, Risk or High Risk), 
 notifying and the actions taken. **Authority Deadline** is 72 hours after discovery. Until you
 record **Authority Notified At**, the owner of an open breach whose risk is not Unlikely to
 Result in Risk gets a bell reminder as soon as the breach is logged (D-196), and the breach
-shows on the Corporate Hub page. Record **People Notified At** when you tell the people affected. A breach cannot be
+shows on Corporate Hub Home. Record **People Notified At** when you tell the people affected. A breach cannot be
 closed while its risk is Not Yet Assessed.
 
 ### On the Corporate Hub Page

@@ -184,6 +184,7 @@
     "Events_Home_EmptyPastHeading": "No Past Events Yet",
     "Events_Home_EmptyUpcoming": "Create an event to start planning it.",
     "Events_Home_EmptyUpcomingHeading": "Nothing Coming Up",
+    "Events_Home_Title": "Events Home",
     "Events_Home_Intro": "Every event the organization runs. Open one to set up its tickets, agenda and speakers.",
     "Events_Home_LoadFailed": "The events could not be loaded. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
     "Events_Home_Truncated": "Showing the first {0} events. Use the list views on the Events tab to see the rest.",

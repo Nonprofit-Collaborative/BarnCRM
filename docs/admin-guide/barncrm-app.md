@@ -83,10 +83,28 @@ Launcher.
 | **BarnCRM Events** | Events Home, Event Calendar, Events, Event Speakers, Venues, Reports, Error Log |
 | **BarnCRM Forms** | Forms, Form Submissions, Reports, Error Log |
 | **BarnCRM Portal Builder** | Portals, Portal Accesses, Reports, Error Log |
-| **BarnCRM Corporate Hub** | Corporate Hub, Library Documents, Compliance Obligations, Agreements, Boards and Committees, Board Meetings, Processing Activities, Data Subject Requests, Data Breaches, Reports, Dashboards, Error Log |
+| **BarnCRM Corporate Hub** | Corporate Hub Home, Library Documents, Compliance Obligations, Agreements, Boards and Committees, Board Meetings, Processing Activities, Data Subject Requests, Data Breaches, Reports, Dashboards, Error Log |
 | **BarnCRM Projects** | Projects Home, Timesheet, Approvals, Requests, Projects, Time Entries, Project Expenses, Project Resources, Staffing, Project Rates, Project Invoices, Request Connections, Reports, Error Log |
 | **BarnCRM Memberships** | Memberships, Member Certifications, Membership Levels, Certifications, Reports, Error Log |
-| **BarnCRM Scholarships** | Scholarships and Grants, Award Programs, Award Applications, Awards, Reports, Dashboards, Error Log |
+| **BarnCRM Scholarships** | Scholarships Home, Award Programs, Award Applications, Awards, Reports, Dashboards, Error Log |
+
+### Module Homes
+
+Every module app opens on its home, the first tab, named for the module: Corporate Hub Home,
+Events Home, Fundraising Home, Grants Home, Programs Home, Projects Home, Scholarships Home and
+Volunteers Home. Each home has the same layout, so people know where to look in any module:
+
+- The page title, its About This Tool help, and the module's quick actions (such as **New
+  Event**) at the top right. A quick action shows only to someone who may create that record.
+- A row of figures, each a link to the list behind it.
+- The lists or charts that module's daily work needs, each with a heading. An empty list says
+  what to do next.
+- Before the module has its first record, a setup panel with the first step in place of the
+  figures and lists.
+
+A home only reads what the module already stores, as the person viewing it, so each person sees
+figures and rows for the records they may read. Nothing on a home is a setting. BarnCRM
+Connector has no home: its app opens on **Super Connector**, its one tool.
 
 Test and developer orgs (scratch and Developer Edition orgs) allow only about 10 custom apps, so
 `scripts/org/deploy-packages.sh` leaves these seven apps out of such an org; every page is still
@@ -106,10 +124,10 @@ need not switch apps. The modules with no app have their pages only here:
 | Forms | Forms, Form Submissions | |
 | Event Management | Events Home, Event Calendar, Events, Event Speakers, Venues | |
 | Portal Builder | | Portals, Portal Accesses |
-| Corporate Hub | Corporate Hub, Library Documents, Compliance Obligations, Agreements, Boards and Committees, Board Meetings | |
+| Corporate Hub | Corporate Hub Home, Library Documents, Compliance Obligations, Agreements, Boards and Committees, Board Meetings | |
 | Project Management | Projects Home, Timesheet, Approvals, Requests, Projects, Time Entries, Project Expenses, Project Resources, Staffing | Project Rates, Project Invoices, Request Connections |
 | Memberships | Memberships, Member Certifications | Membership Levels, Certifications |
-| Scholarships and Outbound Grants | Scholarships and Grants, Award Programs, Award Applications, Awards | |
+| Scholarships and Outbound Grants | Scholarships Home, Award Programs, Award Applications, Awards | |
 
 A module's pages go after **Data Manager** in the everyday apps and before **Error Log** in
 the admin apps, so Error Log stays last. A form, form submission or event opens on its own

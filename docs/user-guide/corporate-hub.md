@@ -7,9 +7,9 @@ page.
 Every Corporate Hub page is in the **BarnCRM Corporate Hub** app (open it from the App
 Launcher), and the everyday ones are also in the **BarnCRM** (or **BarnCRM Console**) app.
 
-## The Corporate Hub Page
+## Corporate Hub Home
 
-Open the **Corporate Hub** tab. Before your organization's first board or committee, it opens
+Open the **Corporate Hub Home** tab, the app's first. Before your organization's first board or committee, it opens
 with **Set Up Your Board** and a **New Board or Committee** button. It shows:
 
 - **Policies to Acknowledge**: the policies you have been asked to read, with their due dates.
@@ -34,7 +34,7 @@ Acknowledgments**.
 
 ## Completing a Compliance Obligation
 
-Open the obligation (from the Corporate Hub page or the **Compliance Obligations** tab), do the
+Open the obligation (from Corporate Hub Home or the **Compliance Obligations** tab), do the
 filing, then on the **Compliance** panel press **Complete This Cycle**. Choose the date it was
 done, the outcome and any notes (a confirmation number, say), then attach the proof with
 **Upload Files**. The due date moves on to the next cycle, and the cycle is kept in the

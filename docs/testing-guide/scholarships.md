@@ -17,8 +17,8 @@ two users with the Team Member role (reviewer A and reviewer B), and a public gr
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the BarnCRM app. | Scholarships and Grants, Award Programs, Award Applications and Awards tabs, at the end of the app (in a package install, add them in App Manager first). |
-| 1a | Before any award program exists, open **Scholarships and Grants** as admin. | **Set Up Your First Award Program** shows. **New Award Program** opens the new program form. After the first program is saved and the page reloaded, the panel is gone. |
+| 1 | Open the BarnCRM app. | Scholarships Home, Award Programs, Award Applications and Awards tabs, at the end of the app (in a package install, add them in App Manager first). |
+| 1a | Before any award program exists, open **Scholarships Home** as admin. | **Set Up Your First Award Program** shows. **New Award Program** opens the new program form. After the first program is saved and the page reloaded, the panel is gone. |
 | 2 | Open Setup, reviewer A's permission set assignments. | Scholarships Staff is assigned (within the hour, or after Finish Setup). |
 | 3 | Open BarnCRM Settings, Scholarships and Outbound Grants. | Send Scholarships reminders on, Days before to remind 14, Email recipients about reports off. |
 
@@ -90,7 +90,7 @@ two users with the Team Member role (reviewer A and reviewer B), and a public gr
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On the Scholarships and Grants tab, **Export Disbursements** for this year. | A CSV downloads with both payments, their payee, amount, status, dates, method and reference. |
+| 1 | On the Scholarships Home tab, **Export Disbursements** for this year. | A CSV downloads with both payments, their payee, amount, status, dates, method and reference. |
 | 2 | Open the paid disbursement. | Exported Date today. |
 
 **Cleanup:** None.
@@ -134,7 +134,7 @@ two users with the Team Member role (reviewer A and reviewer B), and a public gr
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | **BarnCRM Settings**, **Load Sample Data**, wait for it to finish. | The Sample Data card shows a **Scholarships** count of `2`. |
-| 2 | Open **Scholarships and Grants**, **Award Programs**. | Harvest Community Scholarship and Neighborhood Small Grants beside your own program. |
+| 2 | Open **Scholarships Home**, **Award Programs**. | Harvest Community Scholarship and Neighborhood Small Grants beside your own program. |
 | 3 | Open the Harvest Community Scholarship. | Cycles Last Spring (Decided) and This Fall (Open). |
 | 4 | Open **This Fall** applications. | Five applications: Draft, Submitted, Eligible, In Review (one scored, one assigned) and Ineligible with its eligibility note. |
 | 5 | Open **Last Spring** awards. | Three awards (Active, Completed, Accepted) with five disbursements (two Paid) and requirements; the Accepted award has an open Proof of Enrollment condition holding its first disbursement. |

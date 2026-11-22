@@ -259,7 +259,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | F-14 Answer and boilerplate library: Grant Answers | [funders.md](funders.md#answer-library) | BarnCRM Grants |
 | L-06 Link outcomes to grant deliverables: the Logic Model Outcomes card on a requirement | [funders.md](funders.md#outcomes-a-requirement-reports-on) | BarnCRM Grants |
 | F-06 Funder report merge template: Funder Report Templates | [funders.md](funders.md#funder-report-templates) | BarnCRM Grants |
-| F-07 Board dashboard: the Board Dashboard tab | [funders.md](funders.md#the-board-dashboard-tab) | BarnCRM Grants |
+| F-07 Board dashboard: the Grants Home tab | [funders.md](funders.md#the-grants-home-tab) | BarnCRM Grants |
 | C-45 Contact Point Sync: copying email, phone and addresses to Salesforce Contact Points, the settings, Copy Existing People | [contact-point-sync.md](contact-point-sync.md) | BarnCRM Contact Point Sync |
 | C-46 Address Verification: the org's own Smarty or Google key, checks on save and nightly, corrections, the nightly limit, Health Check | [address-verification.md](address-verification.md) | BarnCRM Address Verification |
 

@@ -261,8 +261,8 @@
         <categories>Programs</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Programs dashboard: page title</shortDescription>
-        <value>Programs Dashboard</value>
+        <shortDescription>Programs Home: page title</shortDescription>
+        <value>Programs Home</value>
     </labels>
     <labels>
         <fullName>Programs_Dashboard_ThisMonth</fullName>
