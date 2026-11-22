@@ -9161,14 +9161,18 @@ record matches, at the run's count, or at the cap (R-ARC5).
 user mode with the fields the person may create, a lookup only when its target exists, then its
 children with the new parent Id; it logs each old Id with its new Id and what it left out. The next
 link `deleteImmediate`s the rows whose record was created; the one after subtracts them from the
-count and finishes the job. Restored records have new Ids.
+count and finishes the job. Restored records have new Ids. At most 50 rows per restore, 25 per
+insert link. A record that cannot be created, or whose child cannot be created (the record is
+then deleted again), is reported per row and its row stays archived.
 
 **R-ARC5 Cap.** One million rows are included per org. The panels warn from 900,000; a Copy whose
 chunk would pass 1,000,000 stops the run and says so. Nothing offers more capacity.
 
 **R-ARC6 Erasure.** Erasing a person (Section 29H) queues a scan, which runs only once the Erasure
 record exists: it reads every archived object by index and `deleteImmediate`s each row whose
-Original Id is the person or whose People names them, then subtracts them from the count.
+Original Id is the person or whose People names them, then subtracts them from the count. The
+person is the Erasure's erased record Id, Contact and Person Account. `ArchiveErasureExtension`
+is registered in `PersonErasureExtensions` and queues the scan only while the archive holds rows.
 
 **R-ARC7 Access.** `BarnCRM_Admin` grants read and create on the object and read on its optional
 fields; the viewer reads in user mode, so no one else sees an archived row. Copies and deletes run
@@ -20183,6 +20187,7 @@ mirrors the primary member).
 | 1.82 | 2026-11-20 | BarnCRM Connector pre-batch review fixes (release 1.33). One object added, 199 to 200 in the suite: Connector Connection (`Connector_Connection__c`, `Check_Path__c`), which keeps a template's check path beside a connection (29CN1, new R-CN9: Check Connection asks for it and shows the account an answer names). New R-CN10: choosing the integration user needs the key-writing permissions and refuses an all-seeing user. R-CN8: Disconnect refuses a Secret URL. Connector Run's Status loses Rejected; Running marks runs claimed for the next runner job (R-RUN4). |
 | 1.83 | 2026-11-20 | R-CR6 the recipe clock: a claimed Running run counts as Queued for the clock, so the heartbeat keeps running while a lane has a Waiting run, a Queued run or a claimed Running run (batch Q gate fix). |
 | 1.84 | 2026-11-21 | Archive rules and the big object archive (D-221, AR-10, ADR-NEXT archive rules and big object archive). New Section 29D1 Archived Record (`Archived_Record__b`, a big object from the separate allocation; custom objects unchanged), rules R-ARC1 to R-ARC7. Saved Query gains R-SQ16, the `archive` key (destination Files, BigObject or OffPlatform through the `ArchiveDestination` seam, a schedule, an Active switch). R-R2 gains `more than n days ago`. `Import_Batch__c` Operation gains Archive. `BarnCRM_Settings__c` gains `Archived_Record_Count__c`. The nightly run gains the Archive Rules step. |
+| 1.85 | 2026-11-21 | Archived Records viewer, restore and archive erasure (D-221, AR-10 part 4). R-ARC4 gains the restore limits (50 rows, 25 per insert link) and keeps a row archived when its record or a child cannot be created; R-ARC6 names whom the scan matches and the `ArchiveErasureExtension` registration. No object or field added. |
 
 ---
 ## 32. Entity ownership by package

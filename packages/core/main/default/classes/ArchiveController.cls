@@ -45,6 +45,55 @@ public with sharing class ArchiveController {
 		}
 	}
 
+	/** Whether the person may open Archived Records: the grant on the big object (BarnCRM Admin). */
+	@AuraEnabled(cacheable=true)
+	public static Boolean canViewArchive() {
+		return ArchiveViewerService.allowed();
+	}
+
+	@AuraEnabled
+	public static ArchiveViewerService.Viewer getArchive() {
+		try {
+			return ArchiveViewerService.open();
+		} catch (Exception e) {
+			throw ERRORS.wrap(e, 'ArchiveController.getArchive');
+		}
+	}
+
+	/** One page of an object's archived rows, newest first, after `afterRowId`. */
+	@AuraEnabled
+	public static ArchiveViewerService.RowPage getArchivedRows(
+		String objectName,
+		Date fromDay,
+		Date toDay,
+		String afterRowId
+	) {
+		try {
+			return ArchiveViewerService.rows(objectName, fromDay, toDay, afterRowId);
+		} catch (Exception e) {
+			throw ERRORS.wrap(e, 'ArchiveController.getArchivedRows');
+		}
+	}
+
+	@AuraEnabled
+	public static ArchiveViewerService.Detail getArchivedRow(String objectName, String rowId) {
+		try {
+			return ArchiveViewerService.detail(objectName, rowId);
+		} catch (Exception e) {
+			throw ERRORS.wrap(e, 'ArchiveController.getArchivedRow');
+		}
+	}
+
+	/** Starts restoring the chosen rows; returns the job's Id. */
+	@AuraEnabled
+	public static Id restoreArchivedRows(String objectName, List<String> rowIds) {
+		try {
+			return ArchiveViewerService.restore(objectName, rowIds).Id;
+		} catch (Exception e) {
+			throw ERRORS.wrap(e, 'ArchiveController.restoreArchivedRows');
+		}
+	}
+
 	/** Runs a rule now for at most the typed count. */
 	@AuraEnabled
 	public static ArchiveRuleService.Panel runRule(Id queryId, Integer confirmedCount) {

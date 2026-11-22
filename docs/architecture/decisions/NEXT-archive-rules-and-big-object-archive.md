@@ -119,3 +119,34 @@ transaction; an optional field needs field permission for any user-mode read.
 - Developer Edition's short queueable chain can stop a long run: the job says how far it got,
   and running the rule again continues, since archived records no longer match.
 - Big object rows are not in reports or the weekly export; the viewer is the way in.
+
+## Amendment: viewer, restore and erasure as built (AR-10 part 4, 2026-11-21)
+
+Items 8 to 10 are built as decided, with these details settled:
+
+1. **Opening the viewer.** Archived Records is a Data Manager panel (`archivedRecords`). Data
+   Manager opens a panel named in its page state under `NamespaceUtil.stateKey('panel')`
+   (`c__panel` unpackaged, the namespace's prefix packaged), served by
+   `DataManagerController.panelStateKey` as `findToolStateKey` is. Org Optimizer's Storage and
+   Limits button navigates to Core's `Data_Manager` tab with that state, so Core never depends
+   on the module.
+2. **Who sees it.** Viewing needs only the grant on `Archived_Record__b` (BarnCRM Admin), checked
+   as object read access (`ArchiveController.canViewArchive` gates the tile and the button).
+   Restoring also needs item 6's permissions. The panel and the admin guide say a viewer sees
+   every field the archiving person could read.
+3. **Paging.** Rows are read 50 to a page in index order with a cursor (the last row's time and
+   Original Id), never an offset, which a big object does not support.
+4. **Restore chain.** Up to 50 rows of one object per restore. Links alternate: Write (DML only)
+   first settles the last Remove (reads the removed rows back by key and subtracts those gone
+   from the count), then inserts the next 25 rows' records in user mode; Remove (no DML)
+   `deleteImmediate`s the rows whose record was created. The last Write subtracts and finishes
+   the job, so a two-chunk restore fits Developer Edition's five-link chain. A record whose saved
+   child cannot be created is deleted again, so its row stays archived whole; a Write that
+   throws rolls back to before its inserts. Restores are Archive data jobs with
+   `"action": "restore"`; Rows Created counts records created, Rows Deleted rows removed.
+5. **Erasure scan.** `ArchiveErasureExtension` is queued only when the archive count is above
+   zero. `ArchiveErasureJob` reads the Erasure record for the person and matches rows against its
+   erased record Id, Contact and Person Account; scan links read ten pages of 200 per object in
+   index order and `deleteImmediate` matches; the final link (DML only) subtracts the count and
+   writes any failure to the Error Log, since an Error Log insert may not share a scan link's
+   transaction.
