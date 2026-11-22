@@ -206,8 +206,17 @@ public with sharing class PaymentService {
 		return legacy == null ? null : hashOf(legacy);
 	}
 
+	/**
+	 * Set by a test: stands in for the legacy token of an upgraded org, since the packages no
+	 * longer ship `Payments_Settings__c` (canonical model R-STV5). Blank reads as none.
+	 */
+	@TestVisible
+	private static String legacyTokenForTest;
+
 	private static String legacyToken() {
-		Object legacy = ModuleSettings.legacyValue('Payments_Settings__c', LEGACY_TOKEN);
+		Object legacy = legacyTokenForTest != null
+			? legacyTokenForTest
+			: ModuleSettings.legacyValue('Payments_Settings__c', LEGACY_TOKEN);
 		return legacy == null || String.isBlank(String.valueOf(legacy)) ? null : String.valueOf(legacy).trim();
 	}
 

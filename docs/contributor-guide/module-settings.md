@@ -72,10 +72,10 @@ logic moves to Apex.
   value)`) puts a value in the store as if deployed, for one transaction: a value set in
   `@TestSetup` does not reach the test methods, so set it in a `static { }` block or in each
   method. A save in a test applies at once and runs the callback (no metadata is deployed).
-  Put run state with `SettingsState.put`, whose rows outlast `@TestSetup`. Do not write the
-  legacy custom setting record: it is read only until carry-over. A test that writes or deletes
-  a module's legacy record after reading it calls `ModuleSettings.clearLegacyCache()`, since
-  `clearCache()` keeps the legacy records read.
+  Put run state with `SettingsState.put`, whose rows outlast `@TestSetup`. The packages no
+  longer ship a module's legacy custom setting (R-STV5): a test of the legacy read before
+  carry-over uses a test stand-in in the module itself (for example
+  `PaymentService.legacyTokenForTest`).
 
 ## 4. Run state
 

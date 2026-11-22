@@ -1652,6 +1652,19 @@ Checkbox, Number and Picklist rows ship a `Default_Value__c`, and every row whos
 declares a default ships the same value (`check-setting-defaults.py`). A console save touching
 Core and modules sends one deployment.
 
+**R-STV5 Legacy module objects removed.** The packages no longer ship the seventeen module
+settings custom settings (`Address_Verification_Settings__c`, `Connector_Settings__c`,
+`Contact_Point_Sync_Settings__c`, `Corporate_Hub_Settings__c`, `Events_Settings__c`,
+`Funders_Settings__c`, `Giving_Settings__c`, `LWC_Builder_Settings__c`,
+`Memberships_Settings__c`, `Mirror_Settings__c`, `Payments_Settings__c`, `Portal_Settings__c`,
+`Programs_Settings__c`, `Projects_Settings__c`, `Rollup_Settings__c`,
+`Scholarships_Settings__c`, `Volunteer_Settings__c`), `Rollup_Run_Lock__c`, the unused formula
+Project's Actual Cost Formula field or the inactive validation rules `Requests_Turned_On` and
+`Change_Requests_Turned_On`. Each name stays as its settings group's name (R-STV4). An org that
+had them keeps them until Carry Over Settings has run there, then the release destructive
+manifest removes them; until then R-STV4's legacy read still finds them, by describe. Core's
+`BarnCRM_Settings__c` and `Whats_New_Seen__c` stay until Core's own carry-over is retired.
+
 ### Setting Module
 
 `Setting_Module__mdt` (Core, Public; not counted as an object): one record per module whose
@@ -18599,7 +18612,6 @@ A piece of work with a start, a target date and an outcome: a Salesforce impleme
 | Actual Hours | `Actual_Hours__c` | Roll-Up Summary (SUM Time_Entry__c.Hours__c, counted: Status__c not equal to Open, Submitted, Rejected; R-PM10) |
 | Billable Hours | `Billable_Hours__c` | Roll-Up Summary (SUM Time_Entry__c.Hours__c, Billable__c equals true, counted) |
 | Actual Cost | `Actual_Cost_Amount__c` | Currency(18, 2), stored: Time Amount with Use rate cards on (blank as 0), else blank without an Hourly Rate, else Actual Hours (blank as 0) times Hourly Rate. Kept by `ProjectCostHandler` (`ProjectTrigger`, registry row `Project_Actual_Cost`, Always Runs) on every project save, which each counted time entry's save causes through the roll-up summaries; `ProjectCostSync` puts every project right at install and from the nightly health step after Use rate cards changes |
-| Actual Cost Formula | `Actual_Cost__c` | Formula (Currency), not used: `IF($Setup.Projects_Settings__c.Rates_Enabled__c, Time_Amount__c, IF(ISBLANK(Hourly_Rate__c), NULL, Actual_Hours__c * Hourly_Rate__c))`; on no layout, report type or permission set; removed with `Projects_Settings__c` |
 | Remaining Budget | `Remaining_Budget__c` | Formula (Currency): `IF(ISBLANK(Budget_Amount__c), NULL, Budget_Amount__c + Change_Amount__c - BLANKVALUE(Actual_Cost_Amount__c, 0))` |
 | Billing Type | `Billing_Type__c` | Picklist (Time and Materials, Fixed Fee, Retainer, Not Billed), restricted, default Time and Materials; blank reads as Time and Materials (PM-10) |
 | Retainer Amount | `Retainer_Amount__c` | Currency(16, 2): Retainer, billed each month |
@@ -18789,7 +18801,7 @@ The module's org-wide settings, edited in the Projects section of BarnCRM Settin
   Setting Value read by its definition's DeveloperName (`ProjectsSettings` over
   `ModuleSettings`), the definition shipping the default as `Default_Value__c`. The legacy
   hierarchy custom setting `Projects_Settings__c` (Protected) is read only until carry-over,
-  then removed with the formula `Project__c.Actual_Cost__c` and the inactive validation rules
+  then removed with Project's Actual Cost Formula field and the inactive validation rules
   `Requests_Turned_On` and `Change_Requests_Turned_On`, which read it through `$Setup`.
 - **State:** `Projects.Cost_Rates_Applied__c`, the Use rate cards value the last
   `ProjectCostSync` pass applied (29PM1).
@@ -20463,8 +20475,9 @@ mirrors the primary member).
 | 1.94 | 2026-11-21 | Settings as custom metadata, phase 2 Mirror and Payments (SET-03, D-219). `Setting_Module.Mirror` and `Setting_Module.Payments` register both groups; their rows ship `Default_Value__c`. Payments' connection values, PayPal ids and cap time become State rows `Payments.<Name>` (29PAY3); the receiver token is no longer kept, only its SHA-256 hash (`Payments.Webhook_Token_Hash`), shown once on Generate Token or Regenerate Token. Legacy objects stay until the destructive deploy. No object count change. |
 | 1.95 | 2026-11-21 | Settings as custom metadata, phase 2 Fundraising (SET-03, D-219). `Setting_Module.Giving` registers `Giving_Settings__c` (prefix `Giving`) with 16 state fields; 29 rows gain `Default_Value__c`, and `Giving_Receipt_Statement_Year` ships 0 (last year) with a minimum of 0. Run state and `Books_Closed_Through__c` become State rows `Giving.<Name>` (Section 21A). R-F1 and R-F4: the Default Fund setting is the source, Is Default follows it and the Fund trigger never saves it; no setting is saved at install. No object count change. |
 | 1.96 | 2026-11-21 | Settings as custom metadata, phase 2: Rollups, Programs and Portal (SET-03, D-219). Each ships a `Setting_Module__mdt` record (prefixes `Rollups`, `Programs`, `Portal`) and a `Default_Value__c` on every Setting Definition, and reads its settings from the store (R-STV4). Run state moves to State rows: `Rollups.Nightly_Covered_From__c`, `Rollups.Processor_Requested_At__c`, `Programs.Private_Participants__c` (the Participant Privacy preset, saved synchronously), and the large parent run lock `Rollups.Last_Run_Started__c` (Section 14A), which replaces `Rollup_Run_Lock__c` and is created at install. `Rollup_Settings__c`, `Rollup_Run_Lock__c`, `Programs_Settings__c` and `Portal_Settings__c` are no longer written; they stay until the destructive deploy. No object count change. |
-| 1.97 | 2026-11-21 | Settings as custom metadata, phase 2: Projects (SET-03, D-219). `Setting_Module.Projects` (prefix `Projects`), a `Default_Value__c` on every Setting Definition, readers through the store (29PM7); Invoice payment return page reads the org's My Domain address while blank instead of being filled at install. `Project__c` gains Actual Cost (`Actual_Cost_Amount__c`, Currency, stored), kept by `ProjectCostHandler` on the new `ProjectTrigger` and by `ProjectCostSync`, with the formula's results; Remaining Budget reads it. The formula `Actual_Cost__c` is relabeled Actual Cost Formula and left unused. The validation rules `Requests_Turned_On` and `Change_Requests_Turned_On` are inactive: `ProjectRequestHandler` and the new `ProjectChangeRequestHandler` (`ProjectChangeRequestTrigger`) refuse new records instead (R-PM20, R-PM23). New State row `Projects.Cost_Rates_Applied__c`. No object count change. |
+| 1.97 | 2026-11-21 | Settings as custom metadata, phase 2: Projects (SET-03, D-219). `Setting_Module.Projects` (prefix `Projects`), a `Default_Value__c` on every Setting Definition, readers through the store (29PM7); Invoice payment return page reads the org's My Domain address while blank instead of being filled at install. `Project__c` gains Actual Cost (`Actual_Cost_Amount__c`, Currency, stored), kept by `ProjectCostHandler` on the new `ProjectTrigger` and by `ProjectCostSync`, with the formula's results; Remaining Budget reads it. The old Actual Cost formula is relabeled Actual Cost Formula and left unused. The validation rules `Requests_Turned_On` and `Change_Requests_Turned_On` are inactive: `ProjectRequestHandler` and the new `ProjectChangeRequestHandler` (`ProjectChangeRequestTrigger`) refuse new records instead (R-PM20, R-PM23). New State row `Projects.Cost_Rates_Applied__c`. No object count change. |
 | 1.98 | 2026-11-21 | Settings as custom metadata, phase 2: Events and Volunteers (SET-03, D-219). Each ships a `Setting_Module__mdt` record (prefixes `Events`, `Volunteers`, no state fields) and a `Default_Value__c` on every Setting Definition with a shipped default; their readers already go through `SettingsService`, which now serves the store (R-STV4, Sections 29N and 29EV25). `Events_Settings__c` and `Volunteer_Settings__c` are no longer written; they stay until the destructive deploy. No object count change. |
+| 1.99 | 2026-11-22 | Settings as custom metadata, phase 2 removal (SET-01, D-219, Q-01): R-STV5. The seventeen module settings custom settings and `Rollup_Run_Lock__c` are removed from the packages, with Project's Actual Cost Formula field and the two inactive Projects validation rules. Custom objects 203 to 185, under Enterprise Edition's 200. |
 
 ---
 ## 32. Entity ownership by package

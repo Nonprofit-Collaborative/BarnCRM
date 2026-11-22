@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Installment_Overdue_Last_Run__c</fullName>
-    <description>When the nightly overdue pass last finished, whether or not it marked anything. Empty means the pass has never run in this org, which is a different thing from a pass that ran and found nothing overdue (R-IN2, R-IN5, ADR-0038).</description>
-    <label>Installments Last Checked For Overdue</label>
-    <required>false</required>
-    <trackTrending>false</trackTrending>
-    <type>DateTime</type>
-</CustomField>

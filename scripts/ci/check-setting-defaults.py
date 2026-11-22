@@ -65,30 +65,13 @@ KNOWN_UNREGISTERED = {}
 # packages' SHIPPED_ON_ADDED_IN_UPGRADES lists held when they were reset at the namespaced
 # cut-over (D-199, D-200, 2026-11-12): the managed release is a fresh install everywhere, so
 # every one of these reaches an org through its shipped default. Closed: a new ship-on checkbox
-# goes in its package's SHIPPED_ON_ADDED_IN_UPGRADES list instead.
+# goes in its package's SHIPPED_ON_ADDED_IN_UPGRADES list instead. The module settings objects
+# left the packages (canonical model R-STV5); their defaults ship on the Setting Definitions.
 SHIPPED_BEFORE_UPGRADE_STEP = {
-    ("Address_Verification_Settings__c", "Verify_On_Save__c"),
     ("BarnCRM_Settings__c", "Auto_Create_Households__c"),
     ("BarnCRM_Settings__c", "Error_Digest_Include_Admin_Summary__c"),
     ("BarnCRM_Settings__c", "Job_Notifications__c"),
     ("BarnCRM_Settings__c", "Relationship_Auto_Reciprocal__c"),
-    ("Contact_Point_Sync_Settings__c", "Sync_Addresses__c"),
-    ("Contact_Point_Sync_Settings__c", "Sync_Emails__c"),
-    ("Contact_Point_Sync_Settings__c", "Sync_Phones__c"),
-    ("Corporate_Hub_Settings__c", "Reminders_Enabled__c"),
-    ("Funders_Settings__c", "Grant_Finder_Enabled__c"),
-    ("Funders_Settings__c", "Reminder_Tasks_Enabled__c"),
-    ("Giving_Settings__c", "Ask_Reminders_Enabled__c"),
-    ("Giving_Settings__c", "Auto_Apply_Gifts_To_Installments__c"),
-    ("Giving_Settings__c", "Automatic_Household_Soft_Credits__c"),
-    ("Giving_Settings__c", "Receipt_Print_Logo__c"),
-    ("LWC_Builder_Settings__c", "Components_Enabled__c"),
-    ("LWC_Builder_Settings__c", "Source_Export__c"),
-    ("Memberships_Settings__c", "Renew_From_Gifts__c"),
-    ("Projects_Settings__c", "Time_Tracking_Enabled__c"),
-    ("Scholarships_Settings__c", "Reminders_Enabled__c"),
-    ("Volunteer_Settings__c", "Attendance_Creates_Hours__c"),
-    ("Volunteer_Settings__c", "Hours_Require_Approval__c"),
 }
 UPGRADE_LIST = "SHIPPED_ON_ADDED_IN_UPGRADES"
 UPGRADE_CALL = "ShippedDefaultUpgrades.apply("

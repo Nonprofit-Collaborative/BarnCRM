@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-  <fullName>Webhook_Cap_Hit_At__c</fullName>
-  <description>When the receiver last refused an event because a processor reached the hourly cap; written at most once an hour, and read by Health Check. Written by Payments only.</description>
-  <externalId>false</externalId>
-  <label>Webhook Cap Hit At</label>
-  <required>false</required>
-  <type>DateTime</type>
-</CustomField>
