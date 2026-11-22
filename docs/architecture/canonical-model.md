@@ -9675,7 +9675,9 @@ listed as Deleted; every other soft credit is kept.
 **R-ER4 Platform privacy records.** The linked Individual, where the org has one, is emptied as
 in R-ER1 and marked Forget this Individual. Field history of the person and the Individual is
 deleted after the erasure commits where the user may delete it. Records the erasure deletes are
-emptied from the Recycle Bin.
+emptied from the Recycle Bin. BarnCRM Field History rows (`Field_History__c`, R-FH1) of the person,
+the Individual and every record the erasure deleted, updated or ended are deleted in the same
+transaction, in system mode, and listed as Deleted with a count (ADR-0195 amendment).
 
 **R-ER5 As the user, all or nothing.** What to change is read in system mode; every change is
 made in user mode. A record or a field holding a value that the user cannot edit refuses the

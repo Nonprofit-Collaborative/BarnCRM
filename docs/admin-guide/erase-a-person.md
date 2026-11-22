@@ -34,6 +34,10 @@ The person's record is kept but made anonymous, so every total stays right:
 - **Field history** of the record (old values of tracked fields) is deleted a moment after the
   erasure, if you hold the Salesforce permission **Delete From Field History**. Without it the
   preview says the history is kept.
+- **BarnCRM field history** (the old values the Field History card shows) of the person and of
+  every record the erasure deletes or changes, such as their addresses and relationships, is
+  deleted as part of the erasure, whoever erases. The preview lists it as **Field History**
+  with a count.
 - **Totals stay**: giving totals, counts and dates on the person and the household are kept,
   because they say nothing about who the person was.
 

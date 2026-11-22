@@ -42,3 +42,16 @@ cost nothing when off. Every BarnCRM object with automation already has one trig
 - A change made while automation is paused, or by a flow on an object without a BarnCRM
   trigger, is not kept.
 - Each tracked save adds one insert (system mode) to the transaction.
+
+## Amendment (W8 R1.34): erasure deletes the history rows
+
+Erasing a person (ADR-0110, R-ER4) deletes every `Field_History__c` row whose `Record_Id__c` is
+the person, their Individual, or any record the run deleted, updated or ended (the person's
+addresses, relationships, household memberships, and the records a module's erasure extension
+lists as changed, ADR-0193). A record the erasure keeps unchanged keeps its history. The rows hold
+old values, so keeping them would keep what the erasure cleared. They are Core's own rows,
+written in system mode, so they are read and deleted in system mode inside the erasure's
+transaction (the capture is synchronous, so every row already exists), emptied from the Recycle
+Bin like other deleted records, and listed as a Deleted line with a count in the preview, the
+result and the Erasure record. No module dependency is added: modules appear only through the
+record ids they already report.
