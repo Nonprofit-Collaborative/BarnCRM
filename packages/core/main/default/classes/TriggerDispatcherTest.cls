@@ -491,9 +491,10 @@ private class TriggerDispatcherTest {
 			Test.stopTest();
 
 			Assert.areEqual(
-				3,
+				2,
 				[SELECT COUNT() FROM Error_Log__c WHERE Severity__c = 'Warning'],
-				'Each automation that could not be started is recorded as a warning.'
+				'Each automation that could not be started is recorded as a warning; a row with no ' +
+				'handler class is a before-save flow switch and is passed over without one.'
 			);
 		}
 	}

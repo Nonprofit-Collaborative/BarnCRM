@@ -1840,8 +1840,6 @@ funders/GrantPaymentReceivedHandler.cls | public GrantPaymentReceivedHandler()
 funders/GrantPaymentReceivedHandler.cls | public class GrantPaymentReceivedHandler
 funders/GrantRenewalHandler.cls | public GrantRenewalHandler()
 funders/GrantRenewalHandler.cls | public class GrantRenewalHandler
-funders/GrantRequirementDatesHandler.cls | public GrantRequirementDatesHandler()
-funders/GrantRequirementDatesHandler.cls | public class GrantRequirementDatesHandler
 funders/GrantRequirementRulesHandler.cls | public GrantRequirementRulesHandler()
 funders/GrantRequirementRulesHandler.cls | public class GrantRequirementRulesHandler
 funders/GrantRulesHandler.cls | public GrantRulesHandler()

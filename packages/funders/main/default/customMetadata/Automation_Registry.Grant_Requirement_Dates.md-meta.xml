@@ -7,10 +7,6 @@
         <value xsi:type="xsd:string">Grant_Requirement__c</value>
     </values>
     <values>
-        <field>Handler_Class__c</field>
-        <value xsi:type="xsd:string">GrantRequirementDatesHandler</value>
-    </values>
-    <values>
         <field>Execution_Order__c</field>
         <value xsi:type="xsd:double">10</value>
     </values>

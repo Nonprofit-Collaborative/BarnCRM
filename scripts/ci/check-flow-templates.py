@@ -21,6 +21,18 @@ And every Template_*.flow-meta.xml in Core:
   listed in NON_REGISTRY_TEMPLATES.
 
 Scoped to Core. Giving's rows join when Giving's templates, or its reasons, are written.
+
+Packaged before-save flows (ADR-NEXT, before-save flows), in every package: a flow that is
+not a template is a packaged automation, and
+
+- is named after a registry row with no Handler_Class__c (its switch), and every such row has
+  its flow, so the dispatcher and the flow never both own one rule;
+- ships Active;
+- unless its row always runs, reads the Automation Control setting (Pause All, Bypass and
+  the timed pause), its own switch row, and, for a module's row, the Module Manager list.
+
+A Core row whose packaged flow ships needs no template: the flow itself can be saved as a
+copy.
 """
 
 import glob
@@ -43,7 +55,16 @@ GUIDE = "docs/admin-guide/flow-templates.md"
 
 # Templates that copy no registry row. The rollup template for an administrator's own object
 # arrives with the rollup rework (slice S10) and is named here so this check accepts it.
-NON_REGISTRY_TEMPLATES = {"Recalculate_Rollups"}
+NON_REGISTRY_TEMPLATES = {"Recalculate_Rollups", "Before_Save_Field_Rule"}
+
+ALL_REGISTRY_GLOB = "packages/*/main/default/customMetadata/Automation_Registry.*.md-meta.xml"
+ALL_FLOW_GLOB = "packages/*/main/default/flows/*.flow-meta.xml"
+CONTROL_READS = (
+    "$Setup.BarnCRM_Automation_Control__c.Pause_All__c",
+    "$Setup.BarnCRM_Automation_Control__c.Bypass__c",
+    "$Setup.BarnCRM_Automation_Control__c.Paused_Until__c",
+    "<object>Automation_Setting__c</object>",
+)
 
 
 def q(tag):
@@ -63,6 +84,58 @@ def registry_rows():
                 always = (values.findtext(q("value")) or "").strip().lower() == "true"
         rows.append((name, label, always))
     return rows
+
+
+def flow_rows():
+    """{DeveloperName: (always_runs, module)} for every registry row, in any package, that
+    names no handler class: the switch of a packaged flow."""
+    rows = {}
+    for path in sorted(glob.glob(ALL_REGISTRY_GLOB)):
+        name = os.path.basename(path)[len("Automation_Registry.") : -len(".md-meta.xml")]
+        values = {}
+        for entry in ET.parse(path).getroot().findall(q("values")):
+            values[(entry.findtext(q("field")) or "").strip()] = (
+                entry.findtext(q("value")) or ""
+            ).strip()
+        if not values.get("Handler_Class__c"):
+            rows[name] = (values.get("Always_Runs__c", "").lower() == "true", values.get("Module__c", ""))
+    return rows
+
+
+def packaged_flow_problems():
+    """Problems with packaged (non-template) flows, and the names of those flows."""
+    problems = []
+    rows = flow_rows()
+    flows = {}
+    for path in sorted(glob.glob(ALL_FLOW_GLOB)):
+        root = ET.parse(path).getroot()
+        if (root.findtext(q("isTemplate")) or "").strip() == "true":
+            continue
+        flows[os.path.basename(path)[: -len(".flow-meta.xml")]] = path
+    for flow, path in flows.items():
+        root = ET.parse(path).getroot()
+        if flow not in rows:
+            problems.append(
+                f"{flow}: a packaged flow is named after a registry row with no Handler_Class__c."
+            )
+            continue
+        if (root.findtext(q("status")) or "").strip() != "Active":
+            problems.append(f"{flow}: a packaged flow ships Active; its switch is its registry row.")
+        always, module = rows[flow]
+        if always:
+            continue
+        with open(path, encoding="utf-8") as handle:
+            text = handle.read()
+        needed = list(CONTROL_READS) + [f"<stringValue>{flow}</stringValue>"]
+        if module and module.lower() != "core":
+            needed += ["<object>Setting_Value__mdt</object>", f"<stringValue>{module}</stringValue>"]
+        for token in needed:
+            if token not in text:
+                problems.append(f"{flow}: does not read {token} (copy Grant_Requirement_Dates).")
+    for name in rows:
+        if name not in flows:
+            problems.append(f"{name}: registry row names no Handler_Class__c and ships no flow {name}.")
+    return problems, set(flows)
 
 
 def guide_without_template():
@@ -104,13 +177,16 @@ def main():
         if base not in names and base not in NON_REGISTRY_TEMPLATES:
             problems.append(f"{flow}: names no Core Automation Registry row.")
 
+    flow_problems, packaged_flows = packaged_flow_problems()
+    problems.extend(flow_problems)
+
     reasons = guide_without_template()
     checked = 0
     for name, label, always in rows:
         if always:
             continue
         checked += 1
-        if f"Template_{name}" in templates:
+        if f"Template_{name}" in templates or name in packaged_flows:
             continue
         if label in reasons:
             continue
@@ -126,7 +202,8 @@ def main():
         return 1
     print(
         f"check-flow-templates.py: OK, {checked} switchable Core automations each have a "
-        f"template or a reason, {len(templates)} templates ship inactive"
+        f"template or a reason, {len(templates)} templates ship inactive, "
+        f"{len(packaged_flows)} packaged flows each read their switches"
     )
     return 0
 

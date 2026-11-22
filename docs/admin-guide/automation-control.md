@@ -213,6 +213,10 @@ your organization has:
   flow on that outcome, as every BarnCRM flow template does. To follow the timed pause and a
   switch on this page as well, start it with the **Check BarnCRM Automation** action instead
   and end the flow when **Run** is false.
+- **A before-save flow** (Fast Field Updates) cannot call an action. Copy the template
+  **BarnCRM template: one-field rule before save** instead: it reads the setting, the timed pause
+  (`Paused_Until__c` later than now) and its own switch on this page directly. See "Automations
+  That Are Flows" below.
 - **An Apex trigger:** read `BarnCRM_Automation_Control__c.getInstance()` and return early when
   `Pause_All__c` or `Bypass__c` is true.
 
@@ -227,7 +231,8 @@ The switch works when your flow starts with the **Check BarnCRM Automation** act
 **Automation Name** set to that same name, and ends when **Run** is false. Then switching it
 off here stops the flow, and so do the timed pause and the BarnCRM Automation Control setting.
 A listed flow that does not call the action is on the list for the record only: its switch
-does nothing.
+does nothing. A before-save flow made from **BarnCRM template: one-field rule before save**,
+with its `cSwitchName` set to that same name, follows the switch without the action.
 
 ### Catching Up After a Pause or a Bypassed Load
 
@@ -314,6 +319,27 @@ were are not touched. A run can be restored once, and its result is kept on each
 
 If you save a newer version of a flow in between, Restore still activates the version the
 snapshot names.
+
+## Automations That Are Flows
+
+A few automations that only set one field on the record being saved, from that record's own
+values, ship as active before-save flows (Fast Field Updates) instead of Apex. You can open
+each one in Flow Builder and read exactly what it does. They are listed on this page like
+every other automation, and they follow the same controls:
+
+| On the Automation page | Flow (API name) | Follows |
+|---|---|---|
+| Requirement: fill in the submitted date | `Grant_Requirement_Dates` (Funders) | Its switch, the Funders module switch, the timed pause, Pause All and Bypass |
+| Data Subject Request: set the due date | `Data_Subject_Request_Due` (Corporate Hub) | Its switch, the Corporate Hub module switch, the timed pause, Pause All and Bypass |
+| Stewardship Plan: set the completed date | `Stewardship_Plan_Completed_Date` (Fundraising) | Nothing: it always runs, because without it a status changed by hand is refused |
+
+- **Switch them off here, never by deactivating the flow.** An upgrade can activate the flow
+  again; the switch on this page stays where you put it.
+- **Do not edit them.** An upgrade replaces the flow. To change the rule, Save As your own flow,
+  activate it, list it under **Your Own Flows**, and switch ours off.
+- **Write your own one-field rule** from **BarnCRM template: one-field rule before save**: Save
+  As, change the object, the entry condition, the field and the value, set `cSwitchName` to
+  `Flow:` and your copy's API name, activate it and list it under **Your Own Flows**.
 
 ## Running Your Own Version Instead
 
