@@ -167,6 +167,13 @@ private class ArchiveJobTest {
 				];
 				Database.delete(rest[1], AccessLevel.SYSTEM_MODE);
 			}
+			// One record per Copy runs many links: they share the test's own limits with the
+			// outer ones, as a real chain gives each link its own.
+			Test.startTest();
+			while (!BigObjectArchiveJob.queuedForTest.isEmpty() && Limits.getQueries() < 60) {
+				((Queueable) BigObjectArchiveJob.queuedForTest.remove(0)).execute(null);
+			}
+			Test.stopTest();
 			drain();
 		}
 		return reread(job.Id);

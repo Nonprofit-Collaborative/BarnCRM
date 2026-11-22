@@ -3,6 +3,10 @@
   <label>Stewardship Plan: set the completed date</label>
   <protected>true</protected>
   <values>
+    <field>Handler_Class__c</field>
+    <value xsi:nil="true" />
+  </values>
+  <values>
     <field>Description__c</field>
     <value xsi:type="xsd:string">Fills a plan's Completed Date when its Status is set to Complete or Cancelled by hand, and clears it when the plan is set back to Running, so the date always matches the status.</value>
   </values>
