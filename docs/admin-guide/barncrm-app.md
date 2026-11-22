@@ -250,6 +250,11 @@ side in tabs across the top.
   still there when you come back.
 - **On a phone**, the Salesforce mobile app shows each BarnCRM app as an ordinary app without
   tabs.
+- **The buttons at the top of a BarnCRM record** come from its page layout: Edit, Clone and
+  Delete; Change Owner when the record has its own owner; Sharing when the record is private or
+  read-only to others; Log a Call, New Task and New Event when the record keeps activities; plus
+  any BarnCRM action for that record (such as Refund Gift). Your org's global actions (such as
+  New Contact) are not added there. To add one, edit that object's page layout in Setup.
 
 ## A Five-Minute Walkthrough
 
