@@ -53,7 +53,7 @@ private class BackupSetScheduleTest {
 	static void aScheduleIsSavedShownAndKeptWhenFindSavesTheQueryAgain() {
 		System.runAs(TestUsers.admin()) {
 			Saved_Query__c query = backupSet('Volunteers');
-			BackupSetService.Panel page = BackupSetController.setSchedule(query.Id, 'weekly', 3, null);
+			BackupSetService.Panel page = BackupSetController.setSchedule(query.Id, 'weekly', 3, null, 'files');
 			Assert.areEqual('weekly', page.sets[0].frequency, 'Shown as saved');
 			Assert.areEqual(3, page.sets[0].weekday, 'On Wednesday');
 			Assert.areEqual(BackupSetService.DEFAULT_RUNS_KEPT, page.runsKept, 'The default when the setting is empty');
@@ -62,7 +62,7 @@ private class BackupSetScheduleTest {
 			String saved = [SELECT Query_JSON__c FROM Saved_Query__c WHERE Id = :query.Id].Query_JSON__c;
 			Assert.areEqual(3, BackupSetService.scheduleOf(saved).get('weekday'), 'Find keeps the schedule');
 
-			page = BackupSetController.setSchedule(query.Id, 'off', null, null);
+			page = BackupSetController.setSchedule(query.Id, 'off', null, null, 'files');
 			Assert.areEqual('off', page.sets[0].frequency, 'Taken off');
 			Assert.isTrue(page.sets[0].id == query.Id, 'Still a Backup Set');
 		}
@@ -78,7 +78,13 @@ private class BackupSetScheduleTest {
 				new List<Object>{ 'hourly', null, null }
 			}) {
 				try {
-					BackupSetController.setSchedule(query.Id, (String) wrong[0], (Integer) wrong[1], (Integer) wrong[2]);
+					BackupSetController.setSchedule(
+						query.Id,
+						(String) wrong[0],
+						(Integer) wrong[1],
+						(Integer) wrong[2],
+						null
+					);
 					Assert.fail('Refused: ' + wrong);
 				} catch (AuraHandledException refused) {
 					Assert.areEqual(BarnHelp.text('Core', 'Core_BackupSets_ErrorSchedule'), refused.getMessage());
@@ -86,7 +92,7 @@ private class BackupSetScheduleTest {
 			}
 			BackupSetService.setBackup(query.Id, false);
 			try {
-				BackupSetController.setSchedule(query.Id, 'daily', null, null);
+				BackupSetController.setSchedule(query.Id, 'daily', null, null, null);
 				Assert.fail('Not a set');
 			} catch (AuraHandledException refused) {
 				Assert.areEqual(BarnHelp.text('Core', 'Core_BackupSets_ErrorNotSet'), refused.getMessage());

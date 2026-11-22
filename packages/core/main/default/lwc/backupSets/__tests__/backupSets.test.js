@@ -116,9 +116,42 @@ describe('c-backup-sets', () => {
     await flush();
     one(element, 'save-schedule').click();
     await flush();
-    expect(setSchedule).toHaveBeenCalledWith({ queryId: 'q1', frequency: 'weekly', weekday: 3, day: null });
+    expect(setSchedule).toHaveBeenCalledWith({
+      queryId: 'q1',
+      frequency: 'weekly',
+      weekday: 3,
+      day: null,
+      destination: 'files'
+    });
     expect(one(element, 'schedule-form')).toBeNull();
     expect(one(element, 'notice').message).toBe('c.Core_BackupSets_ScheduleSaved');
+  });
+
+  it('offers the backup destination when one is installed and shows a run being sent', async () => {
+    const page = {
+      ...PAGE,
+      destination: { available: true, note: null },
+      sets: [{ ...PAGE.sets[0], frequency: 'daily', destination: 'offPlatform' }],
+      runs: [{ ...PAGE.runs[0], offPlatform: 'waiting' }]
+    };
+    setSchedule.mockResolvedValue(page);
+    const element = await render(page);
+    expect(one(element, 'off-platform').textContent).toBe('c.Core_BackupSets_RunWaiting');
+    element.shadowRoot.querySelector('[data-action="edit-schedule"]').click();
+    await flush();
+    expect(one(element, 'destination').value).toBe('offPlatform');
+    one(element, 'save-schedule').click();
+    await flush();
+    expect(setSchedule).toHaveBeenCalledWith(expect.objectContaining({ destination: 'offPlatform' }));
+  });
+
+  it('hides the destination choice and says why when no destination is installed', async () => {
+    const page = { ...PAGE, destination: { available: false, note: 'Install BarnCRM Connector.' } };
+    const element = await render(page);
+    element.shadowRoot.querySelector('[data-action="edit-schedule"]').click();
+    await flush();
+    expect(one(element, 'destination')).toBeNull();
+    expect(one(element, 'destination-note').textContent).toBe('Install BarnCRM Connector.');
   });
 
   it('shows a refusal as it came and an empty state with no sets', async () => {

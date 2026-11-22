@@ -115,6 +115,19 @@
                         </div>
                     </template>
                     <template lwc:else>
+                        <template lwc:if={offPlatformAvailable}>
+                            <lightning-input
+                                type="checkbox"
+                                class="slds-var-m-bottom_x-small"
+                                data-id="off-platform"
+                                label={offPlatformLabel}
+                                checked={offPlatform}
+                                onchange={handleOffPlatform}
+                            ></lightning-input>
+                        </template>
+                        <template lwc:if={offPlatformNote}>
+                            <p class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_x-small" data-id="off-platform-note">{offPlatformNote}</p>
+                        </template>
                         <lightning-input
                             type="checkbox"
                             class="slds-var-m-bottom_x-small"

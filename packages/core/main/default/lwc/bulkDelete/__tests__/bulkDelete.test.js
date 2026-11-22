@@ -7,7 +7,12 @@ import previewFile from '@salesforce/apex/BulkDeleteController.previewFile';
 import startFile from '@salesforce/apex/BulkDeleteController.startFile';
 import backupPage from '@salesforce/apex/BulkDeleteController.backupPage';
 import startArchive from '@salesforce/apex/BulkDeleteController.startArchive';
+import getArchiveDestination from '@salesforce/apex/BulkDeleteController.getArchiveDestination';
 import { setHelpTextForTest } from 'c/barnHelpText';
+
+jest.mock('@salesforce/apex/BulkDeleteController.getArchiveDestination', () => ({ default: jest.fn() }), {
+  virtual: true
+});
 
 setHelpTextForTest({
   Core_BulkDelete_BackupDone: 'Downloaded {0} records.',
@@ -316,6 +321,7 @@ describe('c-bulk-delete', () => {
   it('archives: no download, and emptying the Recycle Bin needs the count typed again (C-67)', async () => {
     previewDelete.mockResolvedValue({ ...PREVIEW, cascades: [] });
     startArchive.mockResolvedValue(RUNNING);
+    getArchiveDestination.mockResolvedValue({ available: false, note: 'Install BarnCRM Connector.' });
     capturePolls();
     const element = createElement('c-bulk-delete', { is: BulkDelete });
     element.queryJson = QUERY;
@@ -326,6 +332,8 @@ describe('c-bulk-delete', () => {
     one(element, 'preview').click();
     await flush();
 
+    expect(one(element, 'off-platform')).toBeNull();
+    expect(one(element, 'off-platform-note').textContent).toBe('Install BarnCRM Connector.');
     expect(one(element, 'backup')).toBeNull();
     expect(one(element, 'undo-until')).not.toBeNull();
     expect(one(element, 'empty-confirm')).toBeNull();
@@ -347,9 +355,31 @@ describe('c-bulk-delete', () => {
     expect(startArchive).toHaveBeenCalledWith({
       queryJson: QUERY,
       confirmedCount: 200,
-      emptyConfirmedCount: 200
+      emptyConfirmedCount: 200,
+      destination: 'files'
     });
     expect(startDelete).not.toHaveBeenCalled();
+  });
+
+  it('archives off platform when a backup destination is installed and chosen (R-SQ17)', async () => {
+    previewDelete.mockResolvedValue({ ...PREVIEW, cascades: [] });
+    startArchive.mockResolvedValue(RUNNING);
+    getArchiveDestination.mockResolvedValue({ available: true, note: null });
+    capturePolls();
+    const element = createElement('c-bulk-delete', { is: BulkDelete });
+    element.queryJson = QUERY;
+    element.archive = true;
+    document.body.appendChild(element);
+    await flush();
+    one(element, 'preview').click();
+    await flush();
+    const box = one(element, 'off-platform');
+    box.checked = true;
+    box.dispatchEvent(new CustomEvent('change', { detail: { checked: true } }));
+    await change(one(element, 'confirm'), '200');
+    one(element, 'start').click();
+    await flush();
+    expect(startArchive).toHaveBeenCalledWith(expect.objectContaining({ destination: 'offPlatform' }));
   });
 
   it('shows a refusal and offers no delete', async () => {

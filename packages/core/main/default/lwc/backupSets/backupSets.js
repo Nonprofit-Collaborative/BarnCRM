@@ -54,8 +54,25 @@ export default class BackupSets extends NavigationMixin(LightningElement) {
       dayOfMonth: helpText('Core', 'Core_BackupSets_DayOfMonth'),
       saveSchedule: helpText('Core', 'Core_BackupSets_SaveSchedule'),
       cancel: helpText('Core', 'Core_BackupSets_Cancel'),
-      nightlyOff: helpText('Core', 'Core_BackupSets_NightlyOff')
+      nightlyOff: helpText('Core', 'Core_BackupSets_NightlyOff'),
+      destination: helpText('Core', 'Core_BackupSets_Destination')
     };
+  }
+
+  get destinationAvailable() {
+    return Boolean(this.page && this.page.destination && this.page.destination.available);
+  }
+
+  /** Why the backup destination cannot be chosen or used now, if it cannot. */
+  get destinationNote() {
+    return (this.page && this.page.destination && this.page.destination.note) || '';
+  }
+
+  get destinationOptions() {
+    return [
+      { label: helpText('Core', 'Core_BackupSets_DestinationFiles'), value: 'files' },
+      { label: helpText('Core', 'Core_BackupSets_DestinationOffPlatform'), value: 'offPlatform' }
+    ];
   }
 
   get frequencyOptions() {
@@ -165,6 +182,7 @@ export default class BackupSets extends NavigationMixin(LightningElement) {
     return ((this.page && this.page.runs) || []).map((run) => ({
       ...run,
       fileUrl: run.fileId ? `/lightning/r/ContentDocument/${run.fileId}/view` : null,
+      offPlatformText: offPlatformText(run.offPlatform),
       detail: run.rows === null || run.rows === undefined ? '' : String(run.rows)
     }));
   }
@@ -231,8 +249,13 @@ export default class BackupSets extends NavigationMixin(LightningElement) {
     this.draft = {
       frequency: set.frequency || 'off',
       weekday: String(set.weekday || 1),
-      day: String(set.day || 1)
+      day: String(set.day || 1),
+      destination: set.destination || 'files'
     };
+  }
+
+  handleDestination(event) {
+    this.draft = { ...this.draft, destination: event.detail.value };
   }
 
   handleFrequency(event) {
@@ -253,14 +276,15 @@ export default class BackupSets extends NavigationMixin(LightningElement) {
 
   async handleSaveSchedule() {
     const queryId = this.editingId;
-    const { frequency, weekday, day } = this.draft;
+    const { frequency, weekday, day, destination } = this.draft;
     await this.act(
       () =>
         setSchedule({
           queryId,
           frequency,
           weekday: frequency === 'weekly' ? Number(weekday) : null,
-          day: frequency === 'monthly' ? Number(day) : null
+          day: frequency === 'monthly' ? Number(day) : null,
+          destination: this.destinationAvailable ? destination : 'files'
         }),
       helpText('Core', 'Core_BackupSets_ScheduleSaved')
     );
@@ -272,6 +296,20 @@ export default class BackupSets extends NavigationMixin(LightningElement) {
   async handleOpenImport() {
     this[NavigationMixin.Navigate](await tabPageReference('Import'));
   }
+}
+
+/** What a run's off-platform state reads as (R-SQ17); empty for Files only. */
+function offPlatformText(state) {
+  if (state === 'sending') {
+    return helpText('Core', 'Core_BackupSets_RunSending');
+  }
+  if (state === 'sent') {
+    return helpText('Core', 'Core_BackupSets_RunSent');
+  }
+  if (state === 'waiting') {
+    return helpText('Core', 'Core_BackupSets_RunWaiting');
+  }
+  return '';
 }
 
 /** A weekday's name, 1 Monday to 7 Sunday, in the person's language. */

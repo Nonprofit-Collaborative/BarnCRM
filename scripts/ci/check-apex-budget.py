@@ -111,7 +111,10 @@ CAPS = {
     # help catalog instead of labels. 1,980,869 measured, plus about 0.1%.
     # Raised 2026-11-21 for BK-10 scheduled Backup Sets (BackupSetSchedule, the nightly step and
     # runs kept; ADR-NEXT automatic backups): 1,992,998 measured, plus about 0.1%.
-    "core": 1_995_000,
+    # Raised 2026-11-21 for BK-10 off-platform destination (the ArchiveDestination seam,
+    # OffPlatformSendBatch, send and retry on Backup Sets, send-before-delete for archives):
+    # 2,005,880 measured, plus about 0.1%. Past the 2.0M target: for the integrator.
+    "core": 2_008_000,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured

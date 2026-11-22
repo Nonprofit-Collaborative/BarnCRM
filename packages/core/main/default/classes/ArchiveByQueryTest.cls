@@ -202,7 +202,7 @@ private class ArchiveByQueryTest {
 			Test.startTest();
 			System.runAs(deleter()) {
 				try {
-					BulkDeleteController.startArchive(VOLUNTEERS, 3, 2);
+					BulkDeleteController.startArchive(VOLUNTEERS, 3, 2, null);
 					System.Assert.fail('A different second count must be refused');
 				} catch (AuraHandledException refused) {
 					System.Assert.areEqual(
@@ -213,7 +213,7 @@ private class ArchiveByQueryTest {
 			}
 			System.runAs(TestUsers.withPermissionSets(new List<String>{ TestUsers.CORE_ADMIN })) {
 				try {
-					BulkDeleteController.startArchive(VOLUNTEERS, 3, null);
+					BulkDeleteController.startArchive(VOLUNTEERS, 3, null, null);
 					System.Assert.fail('Archive needs Bulk Delete Records');
 				} catch (AuraHandledException refused) {
 					System.Assert.isNotNull(refused.getMessage());

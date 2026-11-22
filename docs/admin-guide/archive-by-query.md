@@ -61,6 +61,14 @@ file and take them out of Salesforce.
    large archive is saved in more than one part, each with the header row. Keep the files
    somewhere safe; download them if your org's file storage is also tight.
 
+**Sending the archive to your own storage.** With BarnCRM Connector installed and a connection
+marked **Use for Backups** ([Backup Sets](backup-sets.md#sending-backups-off-platform) and
+[BarnCRM Connector](connector.md#backup-destination)), the panel offers **Send the file to your
+backup destination before deleting**. Tick it before step 7. BarnCRM saves the file in Files,
+sends each part to your storage, and starts the delete only when every part was accepted. If any
+part is not accepted, the job ends **Failed**, nothing is deleted, the file stays in Files and the
+reason is in the job's log and the Error Log. Without the Connector, a short note says so instead.
+
 ## 4. Bringing Records Back
 
 - **Within the undo window, if you did not empty the Recycle Bin:** open **Data Manager**,

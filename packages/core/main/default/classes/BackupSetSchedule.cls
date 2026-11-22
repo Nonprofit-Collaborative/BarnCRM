@@ -15,6 +15,8 @@ public without sharing class BackupSetSchedule implements Schedulable {
 	private static final String CONTEXT = 'BackupSetSchedule';
 	private static final Integer QUERIES_READ = 500;
 	private static final Integer JOBS_READ = 1000;
+	/** Earlier runs whose waiting parts one night sends again. */
+	private static final Integer RESENDS = 10;
 
 	/**
 	 * Two in the morning, after Record Cleanup; shipped on, as nothing runs without a schedule.
@@ -33,6 +35,7 @@ public without sharing class BackupSetSchedule implements Schedulable {
 	}
 
 	public void execute(SchedulableContext context) {
+		resendWaiting();
 		startDue(Date.today());
 	}
 
@@ -122,23 +125,66 @@ public without sharing class BackupSetSchedule implements Schedulable {
 			if (trimmed.isEmpty()) {
 				return;
 			}
-			List<String> failures = new List<String>();
-			List<ContentDocument> doomed = new List<ContentDocument>();
-			for (Id documentId : documents) {
-				doomed.add(new ContentDocument(Id = documentId));
-			}
-			for (Database.DeleteResult result : Database.delete(doomed, false, AccessLevel.SYSTEM_MODE)) {
-				if (!result.isSuccess()) {
-					failures.add(result.getId() + ': ' + result.getErrors()[0].getMessage());
-				}
-			}
-			if (!failures.isEmpty()) {
-				ErrorLogger.logMessage(String.join(failures, '\n').left(30000), CONTEXT, ErrorLogger.SEVERITY_WARNING);
-			}
+			removeFiles(documents);
 			Database.update(trimmed, false, AccessLevel.SYSTEM_MODE);
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT, savedQueryId);
 		}
+	}
+
+	/** Deletes these run files, whoever owns them; a file that cannot go is a Warning. */
+	public static void removeFiles(Set<Id> documents) {
+		List<ContentDocument> doomed = new List<ContentDocument>();
+		for (Id documentId : documents) {
+			doomed.add(new ContentDocument(Id = documentId));
+		}
+		List<String> failures = new List<String>();
+		for (Database.DeleteResult result : Database.delete(doomed, false, AccessLevel.SYSTEM_MODE)) {
+			if (!result.isSuccess()) {
+				failures.add(result.getId() + ': ' + result.getErrors()[0].getMessage());
+			}
+		}
+		if (!failures.isEmpty()) {
+			ErrorLogger.logMessage(String.join(failures, '\n').left(30000), CONTEXT, ErrorLogger.SEVERITY_WARNING);
+		}
+	}
+
+	/**
+	 * Starts sending the parts still waiting from earlier runs whose files are kept (R-SQ17), at
+	 * most `RESENDS` runs a night, newest first; returns how many started.
+	 */
+	public static Integer resendWaiting() {
+		Integer started = 0;
+		for (Import_Batch__c job : [
+			SELECT Id, Operation_JSON__c
+			FROM Import_Batch__c
+			WHERE
+				Operation__c = :BackupSetService.OPERATION_BACKUP
+				AND Status__c = :ImportBatchService.STATUS_COMPLETE
+				AND File_Id__c != NULL
+			WITH SYSTEM_MODE
+			ORDER BY Started_At__c DESC
+			LIMIT :JOBS_READ
+		]) {
+			Object state = definitionOf(job).get('offPlatform');
+			if (started >= RESENDS || !(state instanceof Map<String, Object>)) {
+				continue;
+			}
+			Map<String, Object> offPlatform = (Map<String, Object>) state;
+			if (offPlatform.get('state') != 'waiting' || !(offPlatform.get('waiting') instanceof List<Object>)) {
+				continue;
+			}
+			List<Id> waiting = new List<Id>();
+			for (Object documentId : (List<Object>) offPlatform.get('waiting')) {
+				waiting.add(Id.valueOf(String.valueOf(documentId)));
+			}
+			if (waiting.isEmpty()) {
+				continue;
+			}
+			BackupSetService.startSending(job.Id, waiting);
+			started++;
+		}
+		return started;
 	}
 
 	private static Boolean isScheduled(Id savedQueryId) {

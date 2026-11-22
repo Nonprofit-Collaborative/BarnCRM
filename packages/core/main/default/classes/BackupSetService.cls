@@ -52,6 +52,9 @@ public with sharing class BackupSetService {
 		/** Monthly: the day of the month, 1 to 28. */
 		@AuraEnabled
 		public Integer day;
+		/** `files`, or `offPlatform` to send each run's files to the backup destination too (R-SQ17). */
+		@AuraEnabled
+		public String destination = OffPlatformSendBatch.FILES;
 	}
 
 	/** One run as the panel and Data Jobs list it. */
@@ -76,6 +79,9 @@ public with sharing class BackupSetService {
 		public String fileName;
 		@AuraEnabled
 		public String log;
+		/** Off platform: `sending`, `sent` or `waiting` (parts to try again); null for Files only. */
+		@AuraEnabled
+		public String offPlatform;
 	}
 
 	/** The panel: the Backup Sets, the person's own queries that are not one, and the runs. */
@@ -94,6 +100,9 @@ public with sharing class BackupSetService {
 		/** True when the nightly run is scheduled and its Backup Sets step is on. */
 		@AuraEnabled
 		public Boolean nightlyOn;
+		/** Whether an off-platform destination is installed, and a note when it is not ready. */
+		@AuraEnabled
+		public OffPlatformSendBatch.Status destination;
 	}
 
 	/** Whether the running user may use Backup Sets. */
@@ -109,6 +118,7 @@ public with sharing class BackupSetService {
 		result.runsKept = runsKept();
 		result.nightlyOn =
 			NightlyJobs.isScheduled() && NightlyJobs.isSwitchedOn(BackupSetSchedule.STEP_KEY, true);
+		result.destination = OffPlatformSendBatch.status();
 		Id me = UserInfo.getUserId();
 		for (Saved_Query__c query : [
 			SELECT Id, Name, Object_Name__c, OwnerId, Owner.Name, Query_JSON__c
@@ -128,6 +138,7 @@ public with sharing class BackupSetService {
 				view.frequency = frequencyOf(schedule);
 				view.weekday = view.frequency == WEEKLY ? numberOf(schedule.get('weekday')) : null;
 				view.day = view.frequency == MONTHLY ? numberOf(schedule.get('day')) : null;
+				view.destination = destinationOf(query.Query_JSON__c);
 				result.sets.add(view);
 			} else if (view.mine) {
 				result.candidates.add(view);
@@ -172,8 +183,31 @@ public with sharing class BackupSetService {
 
 	/**
 	 * Sets the schedule of one of the person's own Backup Sets (R-SQ16): `off`, `daily`, `weekly`
-	 * on `weekday` (1 Monday to 7 Sunday) or `monthly` on `day` (1 to 28).
+	 * on `weekday` (1 Monday to 7 Sunday) or `monthly` on `day` (1 to 28), and where its runs go
+	 * (R-SQ17): `files`, or `offPlatform` while a destination is installed.
 	 */
+	public static void setSchedule(Id queryId, String frequency, Integer weekday, Integer day, String destination) {
+		Boolean offPlatform = destination == OffPlatformSendBatch.OFF_PLATFORM;
+		if (offPlatform && OffPlatformSendBatch.destination() == null) {
+			throw new BackupSetException(BarnHelp.text('Core', 'Core_OffPlatform_NotInstalled'));
+		}
+		setSchedule(queryId, frequency, weekday, day);
+		Saved_Query__c query = readOwnQuery(queryId);
+		Map<String, Object> document = (Map<String, Object>) JSON.deserializeUntyped(query.Query_JSON__c);
+		Map<String, Object> backup = backupOf(document);
+		if (offPlatform) {
+			backup.put('destination', OffPlatformSendBatch.OFF_PLATFORM);
+		} else {
+			backup.remove('destination');
+		}
+		document.put(KEY, backup);
+		Database.update(
+			new Saved_Query__c(Id = query.Id, Query_JSON__c = JSON.serialize(document)),
+			AccessLevel.USER_MODE
+		);
+	}
+
+	/** Sets the schedule only, keeping where the runs go (R-SQ16). */
 	public static void setSchedule(Id queryId, String frequency, Integer weekday, Integer day) {
 		requireAllowed();
 		Saved_Query__c query = readOwnQuery(queryId);
@@ -268,7 +302,8 @@ public with sharing class BackupSetService {
 					'version' => 1,
 					'savedQueryId' => query.Id,
 					'name' => query.Name,
-					'object' => compiled.objectName
+					'object' => compiled.objectName,
+					'destination' => destinationOf(query.Query_JSON__c)
 				}
 			),
 			Status__c = ImportBatchService.STATUS_COMMITTING,
@@ -325,6 +360,15 @@ public with sharing class BackupSetService {
 			if (!failed && documentIds != null) {
 				definition.put('documents', documentIds);
 			}
+			Boolean send =
+				!failed &&
+				documentIds != null &&
+				!documentIds.isEmpty() &&
+				definition.get('destination') == OffPlatformSendBatch.OFF_PLATFORM;
+			if (send) {
+				definition.put('offPlatform', offPlatformState('sending', new List<Object>(), documentIds));
+				lines.add(BarnHelp.text('Core', 'Core_OffPlatform_LogSending'));
+			}
 			Database.update(
 				new Import_Batch__c(
 					Id = jobId,
@@ -338,12 +382,106 @@ public with sharing class BackupSetService {
 				),
 				AccessLevel.SYSTEM_MODE
 			);
+			if (send) {
+				startSending(jobId, documentIds);
+			}
 			if (!failed) {
 				BackupSetSchedule.keepNewest((Id) definition.get('savedQueryId'));
 			}
 		} catch (Exception e) {
 			ErrorLogger.log(e, 'BackupSetService.afterExport', jobId);
 		}
+	}
+
+	/**
+	 * Starts sending a run's parts (R-SQ17). When the org is too busy to start, the parts wait
+	 * for the next scheduled run, which tries them again.
+	 */
+	public static void startSending(Id jobId, List<Id> documentIds) {
+		try {
+			OffPlatformSendBatch.start(jobId, documentIds, false);
+		} catch (Exception e) {
+			ErrorLogger.log(e, 'BackupSetService.startSending', jobId);
+			afterSent(
+				jobId,
+				new List<Id>(),
+				documentIds,
+				new List<String>{ BarnHelp.text('Core', 'Core_AsyncStarter_Busy') }
+			);
+		}
+	}
+
+	/**
+	 * Called when sending a run's parts ends (R-SQ17): records what was sent and what waits, says
+	 * so on the run, and, when every part is sent and Remove Files Copy After Sending is on,
+	 * deletes the parts from Files. Never throws.
+	 */
+	public static void afterSent(Id jobId, List<Id> sent, List<Id> waiting, List<String> failures) {
+		try {
+			Import_Batch__c job = [
+				SELECT Id, Operation_JSON__c, Run_Log__c
+				FROM Import_Batch__c
+				WHERE Id = :jobId
+				WITH SYSTEM_MODE
+				LIMIT 1
+			];
+			Map<String, Object> definition = definitionOf(jobId);
+			Map<String, Object> before = definition.get('offPlatform') instanceof Map<String, Object>
+				? (Map<String, Object>) definition.get('offPlatform')
+				: new Map<String, Object>();
+			List<Object> allSent = before.get('sent') instanceof List<Object>
+				? (List<Object>) before.get('sent')
+				: new List<Object>();
+			for (Id documentId : sent) {
+				allSent.add(documentId);
+			}
+			Boolean done = waiting.isEmpty();
+			definition.put('offPlatform', offPlatformState(done ? 'sent' : 'waiting', allSent, waiting));
+			String line = done
+				? BarnHelp.text('Core', 'Core_OffPlatform_LogSent', new List<Object>{ allSent.size() })
+				: BarnHelp.text(
+						'Core',
+						'Core_OffPlatform_LogWaiting',
+						new List<Object>{ waiting.size(), failures.isEmpty() ? '' : failures[0] }
+					);
+			Import_Batch__c changed = new Import_Batch__c(
+				Id = jobId,
+				Operation_JSON__c = JSON.serialize(definition)
+			);
+			if (done && removeSentFiles()) {
+				Set<Id> documents = new Set<Id>();
+				for (Object documentId : allSent) {
+					documents.add(Id.valueOf(String.valueOf(documentId)));
+				}
+				BackupSetSchedule.removeFiles(documents);
+				changed.File_Id__c = null;
+				changed.File_Name__c = null;
+				line += '\n' + BarnHelp.text('Core', 'Core_OffPlatform_LogFilesRemoved');
+			}
+			changed.Run_Log__c = (job.Run_Log__c + '\n' + line).right(32768);
+			Database.update(changed, AccessLevel.SYSTEM_MODE);
+		} catch (Exception e) {
+			ErrorLogger.log(e, 'BackupSetService.afterSent', jobId);
+		}
+	}
+
+	/** Remove Files Copy After Sending (R-SQ17), off by default. */
+	public static Boolean removeSentFiles() {
+		return SettingsService.getSettings().Backup_Remove_Sent_Files__c == true;
+	}
+
+	/** Where a set's runs go (R-SQ17): `offPlatform`, or `files` by default. */
+	public static String destinationOf(String queryJson) {
+		try {
+			Object value = backupOf((Map<String, Object>) JSON.deserializeUntyped(queryJson)).get('destination');
+			return value == OffPlatformSendBatch.OFF_PLATFORM ? OffPlatformSendBatch.OFF_PLATFORM : OffPlatformSendBatch.FILES;
+		} catch (Exception notJson) {
+			return OffPlatformSendBatch.FILES;
+		}
+	}
+
+	private static Map<String, Object> offPlatformState(String state, List<Object> sent, List<Id> waiting) {
+		return new Map<String, Object>{ 'state' => state, 'sent' => sent, 'waiting' => waiting };
 	}
 
 	/** Whether a query document carries the `backup` key. */
@@ -446,7 +584,12 @@ public with sharing class BackupSetService {
 		view.fileName = job.File_Name__c;
 		view.log = job.Run_Log__c;
 		try {
-			view.setName = (String) ((Map<String, Object>) JSON.deserializeUntyped(job.Operation_JSON__c)).get('name');
+			Map<String, Object> definition = (Map<String, Object>) JSON.deserializeUntyped(job.Operation_JSON__c);
+			view.setName = (String) definition.get('name');
+			Object offPlatform = definition.get('offPlatform');
+			view.offPlatform = offPlatform instanceof Map<String, Object>
+				? (String) ((Map<String, Object>) offPlatform).get('state')
+				: null;
 		} catch (Exception notJson) {
 			view.setName = null;
 		}

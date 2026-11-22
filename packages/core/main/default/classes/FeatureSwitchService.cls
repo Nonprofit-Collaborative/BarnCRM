@@ -115,7 +115,8 @@ public with sharing class FeatureSwitchService {
 						'Bulk_Update_Run_Limit',
 						'Bulk_Delete_Run_Limit',
 						'Find_Export_Row_Limit',
-						'Backup_Runs_Kept'
+						'Backup_Runs_Kept',
+						'Backup_Remove_Sent_Files'
 					}
 				),
 			new Item(DUPLICATE_REVIEW, KIND_TOOL)

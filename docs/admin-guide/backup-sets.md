@@ -71,6 +71,41 @@ How scheduled runs work:
 - Every run, scheduled or not, is listed under **Recent Runs** for the person who ran it, and in
   **Data Jobs**, with a log line saying which schedule started it.
 
+## Sending Backups Off Platform
+
+A copy inside Salesforce does not help if you lose access to the org. With the optional **BarnCRM
+Connector** module installed, each run can also be sent to storage your organization owns outside
+Salesforce, such as a storage container or a file server that accepts files over HTTPS. BarnCRM
+sends the files; it never stores them anywhere else, and nothing here is a paid service.
+
+Without the Connector, **Edit Schedule** has no **Save To** choice and shows a short note instead.
+
+**Step by step:**
+
+1. Install BarnCRM Connector and set up a connection to your storage, then mark it **Use for
+   Backups** (see [BarnCRM Connector, Backup Destination](connector.md#backup-destination)). The
+   connection holds the key; BarnCRM never shows or stores it anywhere else.
+2. Open **Data Manager**, **Backup Sets**, and press **Edit Schedule** beside one of your sets.
+3. Under **Save To**, choose **Files and backup destination**, then **Save Schedule**.
+4. Press **Run Now** to try it. **Recent Runs** shows "Sending to backup destination", then "Sent
+   to backup destination". Check that the files arrived in your storage.
+5. If you do not want a second copy in Files, turn on **Remove Files Copy After Sending**
+   (BarnCRM Settings, Import). A run's files are then removed from Files once every part reached
+   your storage. It is off by default.
+
+How sending works:
+
+- The run saves its files in Files first, then sends them one at a time. Nothing is lost if the
+  storage cannot be reached: the files stay in Files.
+- A file that could not be sent is written to the **Error Log** and to the run's log, and the run
+  shows "Not all sent: the next scheduled run tries again". The next night's Backup Sets step
+  sends it again.
+- The person who runs the set (for scheduled runs, the user the nightly jobs run as) needs the
+  **BarnCRM Connections** permission set, which holds access to the connection's key. Marking a
+  connection **Use for Backups** gives it to you; give it to the nightly jobs' user too.
+- How long copies are kept in your storage is up to its own rules (such as a lifecycle or
+  retention rule); BarnCRM never deletes anything there.
+
 ## 4. Putting Values Back
 
 Open **Import**, choose **One Kind of Record**, and load the file:
@@ -119,4 +154,6 @@ undone like any other.
 | Data Job | Run Log | When it started, what started it, the parts written, and any warning. |
 | BarnCRM Settings, Import | Export row limit | The most records one run saves. Default 50,000. |
 | BarnCRM Settings, Import | Backup Runs Kept | How many runs of each scheduled set keep their files. Default 7. |
+| BarnCRM Settings, Import | Remove Files Copy After Sending | Delete a run's files from Files once every part reached your backup destination. Off by default. |
+| Saved query | Query document, `backup` key | `destination`: Files and backup destination, when chosen. |
 | BarnCRM Settings, General | Nightly Jobs, Backup Sets | The step that starts scheduled sets at 2:00 AM; on by default. |

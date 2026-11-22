@@ -1335,6 +1335,7 @@ Section 29E, R-BD2). Shown in the console's Import section.
 | `Import_Row_Deletion__c` | picklist(Once_Complete, After_30_Days, After_90_Days, Never) | After_30_Days | Delete Import Rows: when the nightly Record Cleanup deletes the staged rows of a complete import (R-IR5, ADR-0149). Stored as text (ADR-0019); a blank or unknown value reads as After_30_Days. Replaces `Import_Row_Retention_Days__c` (a number of days, D-40), which is removed. |
 | `Bulk_Chunk_Size__c` | integer | 200 | Records each chunk of a bulk update or bulk delete handles (R-BU2, R-BD2). From 10 to 200; empty reads as 200, out of range as the nearest end. Stamped on the job when it starts. |
 | `Backup_Runs_Kept__c` | integer | 7 | Backup Runs Kept: how many runs of each scheduled Backup Set keep their files (R-SQ16, BK-10). From 1 to 365; empty reads as 7, out of range as the nearest end. A set run only on demand keeps every file. |
+| `Backup_Remove_Sent_Files__c` | boolean | false | Remove Files Copy After Sending: once every part of a Backup Set run reached the off-platform backup destination, the run's files are deleted from Files (R-SQ17). Off keeps them. |
 
 ### v0.8 keys
 
@@ -9064,6 +9065,26 @@ owner sets it (`BackupSetService.setSchedule`); Find keeps the whole `backup` ke
   for a run without the list, its first file and the files its runner owns titled as its other
   parts) are deleted in system mode, File Id and File Name are cleared, and a log line says why.
   A failure to delete is a Warning in the Error Log. A set run only on demand keeps every file.
+
+**R-SQ17 Off-platform destination** (BK-10, D-221; ADR-NEXT). Core's seam `ArchiveDestination`
+(`key()`, `notReady()`, `send(fileName, body)`) is found through `ModuleExtensions`; the one with
+key `offPlatform` is the backup destination. Core names no module class.
+
+- **Choice.** The `backup` key may hold `"destination": "offPlatform"` (absent is Files only); an
+  archive's definition holds `archive.destination`. Choosing it is refused while no module
+  provides a destination; the panel and the archive then show a note instead of the choice.
+- **Sending.** The run still writes its parts to Files (archive and backup parts at most
+  3,000,000 characters). Its finish records `offPlatform: { state: "sending", sent: [], waiting:
+  [documents] }` and starts `OffPlatformSendBatch` (scope 1, callouts, without sharing): each
+  execute reads one part's latest version in system mode and calls `send` with its title plus
+  `.csv`. Its finish records `sent` and `waiting` and state `sent` or `waiting`, writes a Run Log
+  line, and logs every failure as an Error in the Error Log against the job.
+- **Retry.** The nightly Backup Sets step first starts sending again the waiting parts of up to
+  10 complete Backup runs whose files are kept, newest first.
+- **Files copy.** When every part was sent and `Backup_Remove_Sent_Files__c` is on, the parts are
+  deleted from Files and File Id and File Name are cleared.
+- **Archive.** With `offPlatform`, the delete starts only when every part was sent; otherwise the
+  job is Failed, nothing is deleted, and the file stays in Files.
 
 ### Salesforce implementation
 
@@ -20080,6 +20101,7 @@ mirrors the primary member).
 | 1.82 | 2026-11-20 | BarnCRM Connector pre-batch review fixes (release 1.33). One object added, 199 to 200 in the suite: Connector Connection (`Connector_Connection__c`, `Check_Path__c`), which keeps a template's check path beside a connection (29CN1, new R-CN9: Check Connection asks for it and shows the account an answer names). New R-CN10: choosing the integration user needs the key-writing permissions and refuses an all-seeing user. R-CN8: Disconnect refuses a Secret URL. Connector Run's Status loses Rejected; Running marks runs claimed for the next runner job (R-RUN4). |
 | 1.83 | 2026-11-20 | R-CR6 the recipe clock: a claimed Running run counts as Queued for the clock, so the heartbeat keeps running while a lane has a Waiting run, a Queued run or a claimed Running run (batch Q gate fix). |
 | 1.84 | 2026-11-21 | Scheduled Backup Sets (BK-10, D-221, release 1.36; ADR-NEXT `NEXT-automatic-backups-and-off-platform-destination.md`). Section 29D gains R-SQ16: the `backup` key's `schedule`, the nightly step Backup Sets, parts kept on the job as `documents`, and runs kept. Section 12 gains `Backup_Runs_Kept__c`. (Version number for the integrator to confirm at merge.) |
+| 1.85 | 2026-11-21 | Off-platform destination seam (BK-10, D-221, release 1.36; ADR-NEXT). Section 29D gains R-SQ17: Core's `ArchiveDestination` seam, a set's and an archive's `destination`, `OffPlatformSendBatch`, retries and the Files copy. Section 12 gains `Backup_Remove_Sent_Files__c`. (Version number for the integrator to confirm at merge.) |
 
 ---
 ## 32. Entity ownership by package
