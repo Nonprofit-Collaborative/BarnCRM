@@ -605,7 +605,7 @@ Design: `docs/architecture/integration-hub-design.md`, the reusable mapper ADR a
 | OO-02 | Sample Data tab for the Admin role only | Minor | Landed (#1350) | D-217 |
 | OO-03 | Move PicklistUsageService, AutomationInventoryService, UserAccessSelector and PersonLinkOrphanSelector (used only by Org Optimizer) into the Org Optimizer module | Minor | Landed (#1350) | D-217 |
 | OO-04 | One KitRef type and kit query shared by Core and the Migration package | Minor | Landed (#1350) | D-217 |
-| CN-19 | Connector Patch logo (Brandon supplied it 2026-11-21) | Minor | Built (#1384, landing batch T) | D-217 |
+| CN-19 | Connector Patch logo (Brandon supplied it 2026-11-21) | Minor | Landed (#1417) | D-217 |
 | Q-01 | Back under Enterprise Edition's 200 custom objects (suite 201 after Connector Connection and Connector Settings; ADR-0235 planned no settings object) | Minor | Decided (D-219): settings to custom metadata, built as SET-01 in release 1.34 | ADR-0227 |
 | Q-02 | Module UX polish from the 2026-11-21 screenshot review on `barn-platform`: Programs Dashboard Attendance Rate shows 0% with no sessions (show a dash); Thank-Yous tab vs "Acknowledge gifts" setting (one term); Ask Pipeline vs Grant Pipeline header and owner toggle wording ("Everyone's Asks / My Asks" vs "Everyone / Mine"); empty report charts on Fundraising and Volunteers homes say only "No chart data." (guidance or hide); green success badge on zero KPI tiles (Grant and Ask Pipeline); KPI and field label casing (Funders Board "Gifts to funds", Acknowledgments KPIs, Quick Gift Entry); Acknowledgments Last run / Next run layout and double colon; Approve Hours tab vs title, pager on an empty result, empty message not actionable; Grant Finder and Grant Calendar empty states; Case Notes icon and Service Counts icon color; Fundraising Home duplicate Enter a Gift; Automation page: 27 always-runs descriptions in Events, Forms, Funders, Giving, Logic Models, Memberships, Programs, Scholarships and Volunteers repeat the "cannot be switched off here" sentence that the page already prints under each such row (drop it from the descriptions), and row names mix styles ("Fill in a new appeal's brand" vs "Agenda Item: send the rating once"); Logic Models import template "Indicator results" not title case; module nav icons in Settings (Payments, Component Builder, Memberships) are the generic gear; plus one page header style (`barnPageShell`) on every tab-level page, Core included | Minor | Landed (batch R, PR #1367, main bf3dfb580, 2026-11-21) | Screenshot review 2026-11-21 |
 
@@ -613,15 +613,15 @@ Design: `docs/architecture/integration-hub-design.md`, the reusable mapper ADR a
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| SET-01 | Every setting in one custom metadata store, saved from the BarnCRM Settings tab by an async metadata deploy; module menus only while the module is installed; job state on keyed Nightly_Job__c rows; Automation Control stays a hierarchy custom setting; What's New per-user rows; Payments webhook token in an External Credential; Is Organization a maintained checkbox; 201 to 181 custom objects (resolves Q-01); before the first package version | Major | Planned | D-219 |
-| OD-16 | One Module Home pattern for every module home tab; Forms, Memberships and Portal Builder get a home | Major | Planned | D-219 |
-| SR-01 | Sample data removal works for any admin: only records tracked as sample data are deleted, in system mode, gated by Manage BarnCRM Settings; the message names the real cause | Minor | Planned | D-219 |
-| OD-10 | Indicator Results nightly at 3:40, Address Verification at 3:50 | Minor | Planned | D-219 |
-| OD-11 | Giving_Admin and Volunteers_Admin keep Run Reports and View Public, drop report and dashboard create, customize and edit | Minor | Planned | D-219 |
-| OD-12 | Payment View All kept, documented in ADR-0201 | Minor | Planned | D-219 |
-| OD-13 | Connector integration user check drops the System Administrator profile-name test | Minor | Planned | D-219 |
-| OD-14 | A pledge whose last installment would be zero or less is refused at save | Minor | Planned | D-219 |
-| OD-15 | Online gift, membership and project dates in the org time zone | Minor | Planned | D-219 |
+| SET-01 | Every setting in one custom metadata store, saved from the BarnCRM Settings tab by an async metadata deploy; module menus only while the module is installed; job state on keyed Nightly_Job__c rows; Automation Control stays a hierarchy custom setting; What's New per-user rows; Payments webhook token in an External Credential; Is Organization a maintained checkbox; 201 to 181 custom objects (resolves Q-01); before the first package version | Major | Landed (#1417) | D-219 |
+| OD-16 | One Module Home pattern for every module home tab; Forms, Memberships and Portal Builder get a home | Major | Landed (#1417) | D-219 |
+| SR-01 | Sample data removal works for any admin: only records tracked as sample data are deleted, in system mode, gated by Manage BarnCRM Settings; the message names the real cause | Minor | Landed (#1417) | D-219 |
+| OD-10 | Indicator Results nightly at 3:40, Address Verification at 3:50 | Minor | Landed (#1417) | D-219 |
+| OD-11 | Giving_Admin and Volunteers_Admin keep Run Reports and View Public, drop report and dashboard create, customize and edit | Minor | Landed (#1417) | D-219 |
+| OD-12 | Payment View All kept, documented in ADR-0201 | Minor | Landed (#1417) | D-219 |
+| OD-13 | Connector integration user check drops the System Administrator profile-name test | Minor | Landed (#1417) | D-219 |
+| OD-14 | A pledge whose last installment would be zero or less is refused at save | Minor | Landed (#1417) | D-219 |
+| OD-15 | Online gift, membership and project dates in the org time zone | Minor | Landed (#1417) | D-219 |
 | OD-17 | Error Log stays out of staff apps, documented | Minor | Planned | D-219 |
 
 ### Release 1.35 (Batch T): one development org for everything, platform features now
@@ -629,8 +629,8 @@ Design: `docs/architecture/integration-hub-design.md`, the reusable mapper ADR a
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
 | AP-03 | Flat reads and single-record writes (about 61 `@AuraEnabled` methods) moved to LDS and GraphQL | Major | Planned | D-219 |
-| AP-01 | Apex budget for one org with Core and every module: target 5,000,000, CI ceiling 5,600,000 | Minor | Planned | D-219 |
-| AP-02 | CI check enforcing ADR-0093 on new and changed `@AuraEnabled` methods | Minor | Planned | D-219 |
+| AP-01 | Apex budget for one org with Core and every module: target 5,000,000, CI ceiling 5,600,000 | Minor | Landed (#1417) | D-219 |
+| AP-02 | CI check enforcing ADR-0093 on new and changed `@AuraEnabled` methods | Minor | Landed (#1417) | D-219 |
 | AP-04 | Large literal catalogs (Connector recipe files, import new-field catalog, module detection lists) moved out of Apex | Minor | Dropped (measured: the literal catalogs are small, so moving them saves little Apex; AP-05 indentation stripping recovered about 400,000 characters instead) | D-219 |
 | PF-01 | Dynamic Related Lists for module record-page panels that only list rows | Minor | Planned | D-219 |
 | PF-02 | Apex Cursors in large-volume jobs | Minor | Planned | D-219 |
@@ -642,11 +642,11 @@ Design: `docs/architecture/integration-hub-design.md`, the reusable mapper ADR a
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| AR-10 | Archive to a big object: archive rules (saved Find query, destination, schedule daily, weekly or monthly), a viewer of archived records and selective restore to the regular object | Major | Planned | D-221 |
-| BK-10 | Automatic backups: Backup Sets and archive runs on a schedule, sent off platform through a Connector destination | Major | Planned | D-221 |
-| GD-01 | GDPR erasure also deletes the person's field history rows | Minor | Built (#1381) | EVAL-01 finding |
-| APP-01 | Nine console apps (Standard-navigation copies removed; Members and Partners app; Scholarships in Grants; Connector, Portal Builder and form building in the Admin Console) | Major | Planned | D-220, D-222 |
-| AP-05 | Apex leading indentation stripped at deploy and package-build time | Minor | Planned | D-222 |
+| AR-10 | Archive to a big object: archive rules (saved Find query, destination, schedule daily, weekly or monthly), a viewer of archived records and selective restore to the regular object | Major | Landed (#1417) | D-221 |
+| BK-10 | Automatic backups: Backup Sets and archive runs on a schedule, sent off platform through a Connector destination | Major | Landed (#1417) | D-221 |
+| GD-01 | GDPR erasure also deletes the person's field history rows | Minor | Landed (#1417) | EVAL-01 finding |
+| APP-01 | Nine console apps (Standard-navigation copies removed; Members and Partners app; Scholarships in Grants; Connector, Portal Builder and form building in the Admin Console) | Major | Landed (#1417) | D-220, D-222 |
+| AP-05 | Apex leading indentation stripped at deploy and package-build time | Minor | Landed (#1417) | D-222 |
 
 ### Later: Connector templates and future connections (D-216)
 
