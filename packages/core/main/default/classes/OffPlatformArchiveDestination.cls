@@ -24,6 +24,11 @@ public with sharing class OffPlatformArchiveDestination implements ArchiveDestin
 		if (reason != null) {
 			throw new ArchiveRules.ArchiveRuleException(reason);
 		}
-		return BulkDeleteService.startArchive(run.queryJson, run.confirmedCount, null, OffPlatformSendBatch.OFF_PLATFORM);
+		return BulkDeleteService.startArchive(
+			run.queryJson,
+			run.confirmedCount,
+			null,
+			OffPlatformSendBatch.OFF_PLATFORM
+		);
 	}
 }
