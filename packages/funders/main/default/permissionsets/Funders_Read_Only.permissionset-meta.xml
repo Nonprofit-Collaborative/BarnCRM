@@ -36,10 +36,6 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
-    <apexClass>GrantAnswerController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
     <apexClass>FundersBoardController</apexClass>
     <enabled>true</enabled>
   </classAccesses>

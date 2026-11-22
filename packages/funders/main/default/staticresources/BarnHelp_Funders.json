@@ -2,7 +2,6 @@
   "languages": ["en"],
   "texts": {
     "Funders_Answers_Empty": "Keep the application answers you reuse on the Grant Answers tab.",
-    "Funders_Answers_LoadFailed": "The Answer Library did not load. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
     "Funders_Award_Saved": "Awarded. Open {0} to build its payment schedule.",
     "Funders_Board_Empty": "Nothing to show for this fiscal year yet.",
     "Funders_Board_FirstRunHeading": "Track Your First Grant",
@@ -108,7 +107,6 @@
     "Funders_Outcomes_NoRequirements": "This grant has no requirements yet. Add one under Requirements, then link it to an outcome here.",
     "Funders_Pipeline_ColumnEmpty": "No grants at this stage.",
     "Funders_Pipeline_ErrorNoPermission": "You do not have permission to change grants. Ask your admin for a Grants role.",
-    "Funders_Pipeline_ErrorStage": "Choose one of the grant stages.",
     "Funders_Pipeline_ErrorUnexpected": "Something went wrong and the change was not saved. Try again, or ask your admin to look at the Error Log.",
     "Funders_Pipeline_ReadOnly": "You can look at the pipeline but not change it.",
     "Funders_Pipeline_Truncated": "Showing the first {0} grants. The totals count every open grant.",
