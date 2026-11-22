@@ -6,6 +6,9 @@
       "fills them in and works their submissions."
     ],
     "add": {
+      "applicationVisibilities": {
+        "BarnCRM_Admin_Console": {"visible": "true"}
+      },
       "classAccesses": {
         "FormBuilderController": {"enabled": "true"}
       },

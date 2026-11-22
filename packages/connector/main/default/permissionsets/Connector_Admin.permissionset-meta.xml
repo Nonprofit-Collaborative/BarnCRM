@@ -7,6 +7,10 @@
     recipes, Run As and Recipe Access (saving a key also needs Customize Application or Manage
     Named Credentials). For system administrators only.
   </description>
+  <applicationVisibilities>
+    <application>BarnCRM_Admin_Console</application>
+    <visible>true</visible>
+  </applicationVisibilities>
   <classAccesses>
     <apexClass>ConnectorConnectionsController</apexClass>
     <enabled>true</enabled>

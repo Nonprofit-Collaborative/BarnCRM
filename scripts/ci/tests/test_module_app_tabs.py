@@ -218,6 +218,17 @@ class ModuleAppTabsTest(unittest.TestCase):
             ["Funders_Board", "Grant__c", "Scholarships", "Award__c", "standard-report", "Error_Log__c"],
             "Grants Home first, Scholarships after Grants' own tabs",
         )
+        self.assertEqual(
+            tabs(parsed(out, "BarnCRM")),
+            ["BarnCRM_Home", "Scholarships", "Award__c"],
+            "Scholarships' sets cannot show Grants, so its staff tabs stay in the Console too",
+        )
+
+    def test_a_core_host_app_keeps_the_tabs_out_of_the_console(self):
+        root, out = repo(), tempfile.mkdtemp()
+        written = mat.write_package(root, out, {"memberships"})
+
+        self.assertIn("BarnCRM_Members_Partners", written)
         self.assertNotIn("BarnCRM", written)
 
     def test_without_the_host_package_the_tabs_fall_back_to_the_console(self):

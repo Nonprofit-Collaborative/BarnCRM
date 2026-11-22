@@ -6,6 +6,10 @@
     Reads BarnCRM Connector recipes and their Run History on Super Connector, without changing,
     running or publishing anything (canonical model R-CR3).
   </description>
+  <applicationVisibilities>
+    <application>BarnCRM_Admin_Console</application>
+    <visible>true</visible>
+  </applicationVisibilities>
   <classAccesses>
     <apexClass>ConnectorRecipesController</apexClass>
     <enabled>true</enabled>
