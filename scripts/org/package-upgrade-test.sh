@@ -326,6 +326,16 @@ step_build() { # phase index
     sfrun package version create --package "${NAMES[$i]}" --code-coverage --installation-key-bypass \
       --wait "$VERSION_WAIT" --target-dev-hub "$DEVHUB_SHOWN"
   else
+    # Built from a staged copy of that ref's project with Apex indentation removed, as
+    # scripts/packaging/create-versions.sh builds the real versions (AP-05); STRIP_APEX_INDENT=0
+    # builds the ref as written. The stage sits beside the worktree and goes with $WORK.
+    if [[ "${STRIP_APEX_INDENT:-1}" != 0 ]]; then
+      if [[ ! -d "$dir-stage" ]]; then
+        python3 "$REPO_ROOT/scripts/packaging/strip-apex-indent.py" --root "$dir" --stage "$dir-stage" >>"$LOG" 2>&1 \
+          || { STEP_MSG="could not stage $dir without Apex indentation"; return 1; }
+      fi
+      dir="$dir-stage"
+    fi
     (cd "$dir" && sfrun package version create --package "${NAMES[$i]}" --code-coverage \
       --installation-key-bypass --wait "$VERSION_WAIT" --target-dev-hub "$DEVHUB_SHOWN") || status=$?
   fi

@@ -87,7 +87,15 @@ if [[ -z "$NAMESPACE" ]]; then
   LOADERS="$(count_query "SELECT COUNT() FROM ApexClass WHERE Name = 'SampleDataLoader' AND NamespacePrefix = null")"
   if [[ "$LOADERS" -eq 0 ]]; then
     echo "The Sample Data package is not in ${ALIAS} yet; deploying packages/sampledata..."
-    sf project deploy start --target-org "$ALIAS" --source-dir "$REPO_ROOT/packages/sampledata" --wait 30
+    # From a staged copy with Apex indentation removed (AP-05); STRIP_APEX_INDENT=0 deploys as written.
+    if [[ "${STRIP_APEX_INDENT:-1}" != 0 ]]; then
+      STAGE="$(mktemp -d "${TMPDIR:-/tmp}/barn-stage.XXXXXX")"
+      python3 "$REPO_ROOT/scripts/packaging/strip-apex-indent.py" --root "$REPO_ROOT" --stage "$STAGE" >/dev/null
+      (cd "$STAGE" && sf project deploy start --target-org "$ALIAS" --source-dir packages/sampledata --wait 30)
+      rm -rf "$STAGE"
+    else
+      sf project deploy start --target-org "$ALIAS" --source-dir "$REPO_ROOT/packages/sampledata" --wait 30
+    fi
     printf '%s\n' 'new SampleDataPostInstall().runSetup(UserInfo.getUserId());' |
       sf apex run --target-org "$ALIAS" >/dev/null
   fi

@@ -12,6 +12,12 @@ CI runs on scratch orgs, whose limit is 10,000,000, so no org test notices growt
 Size is measured the way the org measures it (ApexClass.LengthWithoutComments): every
 character of a non-test class or trigger except comments. oi-test agreed within 2%.
 
+Deploys and package builds strip the leading indentation of every class and trigger
+(scripts/packaging/strip-apex-indent.py, AP-05, ADR-NEXT), so the measure, the caps and the
+targets below are the stripped size, which is what an org counts; the raw size of the
+repository source is printed beside it. Setting STRIP_APEX_INDENT=0 deploys the raw source,
+which an org counts about 8 percent larger.
+
 CAPS is a ceiling per package a little above its measured size, so every addition is a
 choice: raise a cap only in the pull request that needs it, and say why. TARGET is where the
 trim pass should take the full suite (Core and every module in one org, 5,000,000, D-219) and
@@ -25,6 +31,7 @@ scripts/org/install-precheck.py reads package_sizes() to compare an org's room w
 the chosen modules need.
 """
 
+import importlib.util
 import json
 import os
 import subprocess
@@ -33,8 +40,20 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from apex_source import is_test_class, without_comments  # noqa: E402
 
+_spec = importlib.util.spec_from_file_location(
+    "strip_apex_indent",
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "packaging", "strip-apex-indent.py"),
+)
+_strip = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_strip)
+strip_indent = _strip.strip_indent
+
 ORG_LIMIT = 6_000_000
 CAPS = {
+    # Re-based 2026-11-21 (AP-05, D-222) from the raw size to the stripped size, keeping each
+    # package's headroom ratio: every number below is the stripped measure (indentation removed
+    # at deploy) plus the margin its history chose. The notes beneath quote raw measures taken
+    # before that, so read them as raw sizes.
     # Set 2026-11-05 to each package's size with Apex indented by tabs (the org counts every
     # leading space, so tabs cut about 19 percent) plus about 2 percent.
     # Raised 2026-11-06 for the Automation tab's whole-org inventory (C-60, D-184:
@@ -111,10 +130,9 @@ CAPS = {
     # stored Health Check format), grouped Mapper lookups and 51 messages read from the Core
     # help catalog instead of labels. 1,980,869 measured, plus about 0.1%.
     # Raised 2026-11-21 for SR-01 (D-219): SampleDataRemover, the one gated path that removes
-    # sample data past sharing for every module, less the user-mode search it replaces in
-    # SampleDataFile; and OrgDate.dateOf (OD-15) in the sibling pull request. 1,984,236
-    # measured, plus about 0.1%.
-    "core": 1_986_300,
+    # sample data past sharing for every module, and OrgDate.dateOf (OD-15). Re-based to the
+    # stripped size (AP-05): 1,837,129 measured, plus about 0.1%.
+    "core": 1_839_000,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured
@@ -127,7 +145,7 @@ CAPS = {
     # on the batch-k AsyncStarter call sites: 403,678 measured, plus about 0.5%.
     # Lowered for D-200 S1 (release 1.23: RollupAccessSync became Core's catalog data): 398,428
     # measured, plus about 0.5%.
-    "rollups": 400_500,
+    "rollups": 371_000,
     # Giving raised for the v1.0 usability work: Edit Funds (GiftAllocationController),
     # Quick Gift Entry tribute, match and split (people-giving-13, 16, 23), and the New
     # Commitment screen's shared pledge builder (CommitmentEntry, people-giving-11), and
@@ -162,7 +180,7 @@ CAPS = {
     # kits; its post-install, nightly provider and Health Check extension merged into this
     # package's own). 669,576 here and 196,129 there before (capped 670,400 and 199,900);
     # 864,050 measured together, plus about 0.5%.
-    "giving": 868_400,
+    "giving": 802_000,
     # 2026-11-05: Log Hours, Create Shifts Now, Volunteer Letters (modules-14, 15, 20), Home.
     # Batch C landing 2026-11-07: 187,048 measured with the shift nudge (V-10b), plus 1.5%.
     # Batch C wave 2 landing: 189,775 measured (VolunteersEventExtension EV-08), plus about 2%.
@@ -188,7 +206,7 @@ CAPS = {
     # Raised for the release 1.25 sample volunteer profiles (VolunteerSampleDataLoader
     # updateProfiles, so suggestions and nudges have active volunteers to name): 232,331
     # measured, plus about 0.5%.
-    "volunteers": 233_500,
+    "volunteers": 216_100,
     # Raised 2026-11-05 for the Record Service action (modules-14, RecordServiceController).
     # Raised 2026-11-06 for repeating session schedules (modules-24, D-183): the run, nightly
     # batch, save job, trigger handler and selector, and the schedule page's controller methods.
@@ -201,7 +219,7 @@ CAPS = {
     # measured, plus about 1%.
     # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
     # catalog data): 157,934 measured with S2, plus about 2%.
-    "programs": 161_100,
+    "programs": 148_900,
     # Raised for the assumption evidence log (L-05): saveEvidence, evidence on each arrow and
     # the describe-built evidence words; 65,800 measured, plus about 1%. With L-04b's PDF method:
     # 66,645 measured 2026-11-11, plus about 0.5%.
@@ -209,7 +227,7 @@ CAPS = {
     # about 0.5%.
     # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
     # catalog data): 64,360 measured, plus about 2%.
-    "logicmodels": 65_700,
+    "logicmodels": 60_600,
     # Raised from 95,000 for the Funders usability stage: Undo for Mark Received and Mark
     # Submitted, and the award period and Restricted in Record the Award (modules-16, 17).
     # Grant management (F-09 to F-13, release 1.11): 124,151 measured with the Grant Finder,
@@ -221,7 +239,7 @@ CAPS = {
     # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
     # catalog data): 115,433 measured with S2, plus about 2%.
     # Lowered at the batch O trim (O-01, D-207): 113,738 measured 2026-11-19, plus about 2%.
-    "funders": 116_100,
+    "funders": 106_800,
     # Forms engine and builder (C-42a, D-157): submit service, server rules, thin controllers.
     # Batch C landing 2026-11-07: 42,867 measured (C-42a), plus about 2.5%.
     # C-42b public forms (guest intake, allowlist, processor, Health Check, REST): 70,142
@@ -238,7 +256,7 @@ CAPS = {
     # catalog data): 88,989 measured, plus about 2%.
     # Release 1.27 N-04 (D-208: only a Forms administrator deletes a form with submissions, which
     # are kept and named): FormDeleteGuard and FormSubmissionNames, 94,315 measured, plus about 2%.
-    "forms": 96_200,
+    "forms": 88_900,
     # New 2026-11-06 for Contact Point Sync (C-45, ADR-0176 contact point sync module):
     # 43,980 measured with the page and backfill, plus about 2 percent.
     # C-45e (D-186): 45,798 measured with person accounts and household-move sync, plus about 2%.
@@ -253,7 +271,7 @@ CAPS = {
     # reads, the erasure start seam), plus about 2%.
     # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
     # catalog data): 59,404 measured, plus about 2%.
-    "contactpoints": 60_600,
+    "contactpoints": 55_900,
     # Event Management (ADR-0177, events module): events, tickets, agenda and speakers (EV-01,
     # EV-03 to EV-05).
     # Batch C landing 2026-11-07: 29,211 measured (EV-01, EV-03 to EV-05), plus about 2.5%.
@@ -273,7 +291,7 @@ CAPS = {
     # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
     # catalog data): 227,251 measured with S2, plus about 1.5%.
     # Lowered at the batch O trim (O-01, D-207): 224,739 measured 2026-11-19, plus about 2%.
-    "events": 229_300,
+    "events": 210_800,
     # Portal Builder (PB-01, ADR-0185 portal builder): sign-in, sessions, template checks and the
     # person-scoped portal API. 49,205 measured at first build (the API is the security boundary,
     # so every check stays in Apex), plus about 2%.
@@ -288,7 +306,7 @@ CAPS = {
     # about 2%.
     # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
     # catalog data): 57,973 measured, plus about 2%.
-    "portal": 59_200,
+    "portal": 55_200,
     # Corporate Hub (CH-01 to CH-08, ADR-0196 corporate hub module): access sync, post-install,
     # the policy, compliance, reminder and template services and the page controller, 29,744
     # measured, plus about 2%. Board governance (CH-09 to CH-20, PB-02): HubBoard, the board and
@@ -300,7 +318,7 @@ CAPS = {
     # about 2%. Lowered for the cleanup leftovers (D-200 S8b): 58,777 measured, plus about 2%.
     # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
     # catalog data): 55,808 measured, plus about 2%.
-    "corporatehub": 57_000,
+    "corporatehub": 52_100,
     # Payments (PAY-01, ADR-0201 payments module): checkout, receiver, processing and Health
     # Check measured 47,575 on 2026-11-11, plus about 2 percent; raised the same day for the
     # Payments Setup page's controller, measured 52,331.
@@ -324,7 +342,7 @@ CAPS = {
     # Pre-batch review M1: the receiver's address token (made, compared in constant time,
     # regenerated), the hourly cap Warning and its Health Check finding, 75,619 measured
     # 2026-11-19; raised by 800.
-    "payments": 75_700,
+    "payments": 69_400,
     # LWC Builder (LB-01 to LB-06, ADR-0203 lwc builder module): the builder and renderer
     # controller, the App Builder picklist, access sync and post-install, 17,322 measured, plus
     # about 2%. LB-07 (D-196) charts by two groupings and three totals: 19,741 measured, plus
@@ -334,7 +352,7 @@ CAPS = {
     # 20,784 measured, plus about 2%.
     # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
     # catalog data): 17,825 measured, plus about 2%.
-    "lwcbuilder": 18_200,
+    "lwcbuilder": 16_800,
     # Scholarships and Outbound Grants (SG-01 to SG-10, PB-06, ADR-0204 scholarships module):
     # reviews, awards, form intake, portal actions, reminders, the payment rule and the page
     # controller, plus the review and requirement DTOs (R1.21 namespace readiness, D-200 N3),
@@ -344,14 +362,14 @@ CAPS = {
     # catalog data): 49,228 measured, plus about 2%.
     # Lowered for S11 (D-213: a kit gets its default rows from the Migration Assistant):
     # 48,804 measured 2026-11-20, plus about 2%.
-    "scholarships": 49_800,
+    "scholarships": 45_800,
     # Territory Management (C-40, C-40b, ADR-0205 territory management module): the model PR
     # ships no Apex (0 measured). The Apex PR: access sync, post-install, routing, the run
     # batch, the page controller and the nightly step, 31,041 measured, plus about 2%.
     # W10: chunk size by rule count, 31,845 measured, plus about 0.5%.
     # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
     # catalog data): 28,876 measured, plus about 2%.
-    "territory": 29_500,
+    "territory": 26_900,
     # Memberships (G-22a to G-22d, PAY-02, ADR-0206 memberships module): terms, renewals, the
     # nightly run, payment links, the Essentials kit, portal and erasure seams, 39,406 measured
     # on 2026-11-11, plus about 2 percent. PB-09's directory adds no Apex. Raised 2026-11-11 for
@@ -363,7 +381,7 @@ CAPS = {
     # catalog data): 45,390 measured, plus about 2%.
     # Lowered for S11 (D-213: a kit gets its default rows from the Migration Assistant):
     # 44,796 measured 2026-11-20, plus about 2%.
-    "memberships": 45_700,
+    "memberships": 42_200,
     # Project Management (PM-01 to PM-05, ADR-0208 project management module): access sync,
     # post-install, health, templates, reporting and the page controller, 32,637 measured,
     # plus about 2%. PSA model (D-197, ADR-0219 projects PSA): the PSA settings accessors,
@@ -385,7 +403,7 @@ CAPS = {
     # org-to-org request API (ProjectRequestApi): 133,533 measured, plus about 2%.
     # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
     # catalog data): 132,129 measured, plus about 2%.
-    "projects": 134_800,
+    "projects": 122_400,
     # Address Verification (C-46, ADR-0209 address verification module): the Smarty and Google
     # lookups, the handler, the job, setup page controller and Health Check, measured 24,710 on
     # 2026-11-11, plus about 2 percent.
@@ -396,7 +414,7 @@ CAPS = {
     # 2026-11-18, plus about 2%.
     # Pre-batch review M2: no lookup is queued for a saver without principal access, and the
     # missing access is logged once a day, 25,364 measured 2026-11-19; raised by 850.
-    "addressverification": 25_400,
+    "addressverification": 23_600,
     # Advanced Reporting (O-02, D-202, D-207, ADR-0231): one query service
     # (allow-listed by describe, user mode, binds only, aggregates and keyset pages), the library
     # of saved reports and dashboards as Files with their sharing, and post-install, 28,060
@@ -405,7 +423,7 @@ CAPS = {
     # permission on share and delete, the server-side export check, scan fields worked out on the
     # server with the multi-currency refusal, checked lookup names: 30,239 measured 2026-11-19,
     # raised by 2,200 (what the fixes added).
-    "reporting": 30_900,
+    "reporting": 28_600,
     # BarnCRM Connector (CN-01, D-210, D-216, ADR-0235): Connections on
     # External and Named Credentials (page-entered keys, the F2 refusal, redacted logs, the
     # Connections access set), its Health Check extension and post-install, 31,084 measured
@@ -430,7 +448,7 @@ CAPS = {
     # Connector review fixes (the Running claim model, step and heap guards, the template
     # check path and account, Where Used triggers, the import refusals): 267,980 measured,
     # plus about 2%.
-    "connector": 273_400,
+    "connector": 252_600,
     # Mirror: the NPSP gifts migration kit's extension (MIG-05), 187,295 measured, then the
     # Nonprofit Cloud gifts kit's (MIG-04), 195,957 measured, then the Nonprofit Cloud
     # relationships kit's (MIG-02), about 200,500 combined, plus about 1%.
@@ -453,21 +471,21 @@ CAPS = {
     # S11 (D-213): its kits get their default rows from the Migration Assistant, 31,580 measured
     # 2026-11-20; kept, as are Giving's (851,800), Volunteers' (229,585) and Rollups' (394,571),
     # since size plus 2% would raise each.
-    "mirror": 32_100,
+    "mirror": 29_700,
     # Migration (S11, D-213, ADR-0232): the Migration Assistant (kits, runs,
     # the staging job, its controller) and the NPSP and Nonprofit Cloud household adoption and
     # undo, moved out of Core, with the post-install: 56,490 measured 2026-11-20, plus about 2%.
-    "migration": 57_700,
+    "migration": 53_500,
     # Org Optimizer (D-215, ADR-0233): Health Check's
     # runner, checks, controller and last run, and every Org Optimizer section's controllers
     # and services, moved out of Core, with the post-install: 215,159 measured 2026-11-20,
     # plus about 2%.
     # Raised 2026-11-20 for D-217 (OO-03): the four Org Optimizer services and selectors only
     # it called moved out of Core: 231,414 measured, plus about 2%.
-    "orgoptimizer": 236_000,
+    "orgoptimizer": 218_000,
     # Sample Data (D-215): the loader, its stages, selector and controller, the package host
     # and the post-install, moved out of Core: 29,516 measured 2026-11-20, plus about 2%.
-    "sampledata": 30_200,
+    "sampledata": 28_200,
 }
 # Full suite means Core and every module in one development org (decision D-219). The target is
 # informational; the ceiling fails the check.
@@ -497,18 +515,24 @@ def apex_files(root, path):
 
 
 def package_sizes(root=None):
-    """{package: {"size": chars, "classes": {name: chars}}} for non-test Apex, comments removed."""
+    """{package: {"size", "raw", "classes"}} for non-test Apex, comments removed.
+
+    "size" and "classes" are what an org counts: the Apex as deploy and package builds send it,
+    with leading indentation stripped (scripts/packaging/strip-apex-indent.py, AP-05). "raw" is
+    the repository source as formatted, which is what an org counts when STRIP_APEX_INDENT=0.
+    """
     root = root or repo_root()
     sizes = {}
     for package, path in package_dirs(root).items():
-        classes = {}
+        classes, raw = {}, 0
         for rel in apex_files(root, path):
             with open(os.path.join(root, rel), encoding="utf-8") as handle:
                 source = handle.read()
             if rel.endswith(".cls") and is_test_class(source):
                 continue
-            classes[os.path.splitext(os.path.basename(rel))[0]] = len(without_comments(source))
-        sizes[package] = {"size": sum(classes.values()), "classes": classes}
+            raw += len(without_comments(source))
+            classes[os.path.splitext(os.path.basename(rel))[0]] = len(without_comments(strip_indent(source)))
+        sizes[package] = {"size": sum(classes.values()), "raw": raw, "classes": classes}
     return sizes
 
 
@@ -518,11 +542,13 @@ def percent(chars):
 
 def report(sizes):
     total = sum(s["size"] for s in sizes.values())
+    raw_total = sum(s["raw"] for s in sizes.values())
+    print("stripped = what an org counts (indentation removed at deploy); raw = repository source")
     for package, data in sizes.items():
         cap = CAPS.get(package)
-        print(f"{package:12} {data['size']:>10,} chars  {percent(data['size']):>4}  cap {cap:,}" if cap
-              else f"{package:12} {data['size']:>10,} chars  {percent(data['size']):>4}  no cap")
-    print(f"{'full suite':12} {total:>10,} chars  {percent(total):>4}  of {ORG_LIMIT:,}")
+        tail = f"cap {cap:,}" if cap else "no cap"
+        print(f"{package:12} {data['size']:>10,} stripped  {percent(data['size']):>4}  raw {data['raw']:>10,}  {tail}")
+    print(f"{'full suite':12} {total:>10,} stripped  {percent(total):>4}  raw {raw_total:>10,}  of {ORG_LIMIT:,}")
     largest = sorted(((c, n) for d in sizes.values() for n, c in d["classes"].items()), reverse=True)
     print("largest: " + ", ".join(f"{n} {c:,}" for c, n in largest[:10]))
 
@@ -560,6 +586,7 @@ def main(argv):
         print(f"check-apex-budget.py: FAILED, {len(problems)} problem(s) above", file=sys.stderr)
         return 1
     total = sum(s["size"] for s in sizes.values())
+    raw_total = sum(s["raw"] for s in sizes.values())
     notes = []
     for name, value in (("full suite", total), ("core", sizes.get("core", {}).get("size", 0))):
         if value > TARGET[name]:
@@ -567,8 +594,8 @@ def main(argv):
         else:
             notes.append(f"{name} {TARGET[name] - value:,} under its target of {TARGET[name]:,}")
     note = f"; {', '.join(notes)}" if notes else ""
-    print(f"check-apex-budget.py: OK, full suite {total:,} characters ({percent(total)} of"
-          f" {ORG_LIMIT:,}), every package under its cap{note}")
+    print(f"check-apex-budget.py: OK, full suite {total:,} characters stripped ({percent(total)} of"
+          f" {ORG_LIMIT:,}; {raw_total:,} raw), every package under its cap{note}")
     return 0
 
 
