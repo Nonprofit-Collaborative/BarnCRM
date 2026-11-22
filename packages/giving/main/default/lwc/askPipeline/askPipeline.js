@@ -72,7 +72,7 @@ import MOVED from '@salesforce/label/c.Core_Shared_MovedTo';
 import REOPEN_ASK from '@salesforce/label/c.Giving_AskPipeline_ReopenAsk';
 import RECENTLY_CLOSED from '@salesforce/label/c.Giving_AskPipeline_RecentlyClosed';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
-import { messageFrom, recordErrorMessage } from 'c/findCsv';
+import { messageFrom } from 'c/findCsv';
 
 const ACTION_OPEN = 'open';
 const ACTION_CLOSE = 'close';
@@ -516,10 +516,7 @@ export default class AskPipeline extends NavigationMixin(LightningElement) {
       await this.load();
       return true;
     } catch (error) {
-      this.toast(
-        recordErrorMessage(error, helpText('Giving', 'Giving_AskPipeline_ErrorAction')),
-        'error'
-      );
+      this.toast(messageFrom(error, helpText('Giving', 'Giving_AskPipeline_ErrorAction')), 'error');
       return false;
     }
   }

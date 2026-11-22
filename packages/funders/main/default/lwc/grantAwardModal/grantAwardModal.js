@@ -7,7 +7,7 @@ import AMOUNT_AWARDED_FIELD from '@salesforce/schema/Grant__c.Amount_Awarded__c'
 import AWARD_START_FIELD from '@salesforce/schema/Grant__c.Award_Start_Date__c';
 import AWARD_END_FIELD from '@salesforce/schema/Grant__c.Award_End_Date__c';
 import RESTRICTED_FIELD from '@salesforce/schema/Grant__c.Restricted__c';
-import { recordErrorMessage } from 'c/findCsv';
+import { messageFrom } from 'c/findCsv';
 import { helpText } from 'c/barnHelpText';
 
 import AWARD_AMOUNT from '@salesforce/label/c.Funders_Pipeline_AwardAmount';
@@ -132,7 +132,7 @@ export default class GrantAwardModal extends LightningModal {
       );
       this.close({ saved: true });
     } catch (error) {
-      this.errorMessage = recordErrorMessage(error, helpText('Funders', 'Funders_Shared_NotSaved'));
+      this.errorMessage = messageFrom(error, helpText('Funders', 'Funders_Shared_NotSaved'));
     } finally {
       this.isSaving = false;
     }

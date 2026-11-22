@@ -89,6 +89,18 @@ describe('c-volunteers-home', () => {
     });
   });
 
+  it('reads the first-job check again when the card is opened again', async () => {
+    getHome.mockResolvedValue(TILES);
+    const refresh = jest.fn();
+    const element = build();
+    graphql.emit({ uiapi: { query: { Volunteer_Job__c: { edges: [] } } } }, undefined, refresh);
+    await flush();
+    expect(refresh).not.toHaveBeenCalled();
+    document.body.removeChild(element);
+    document.body.appendChild(element);
+    expect(refresh).toHaveBeenCalledTimes(1);
+  });
+
   it('offers a first job and a file import before any job exists', async () => {
     getHome.mockResolvedValue(TILES);
     const element = build();

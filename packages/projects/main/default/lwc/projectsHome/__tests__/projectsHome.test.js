@@ -47,11 +47,6 @@ jest.mock('@salesforce/apex/ProjectsController.getUtilization', () => ({ default
 jest.mock('@salesforce/apex/ProjectsController.exportBillable', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/apex/ProjectsController.getAtRisk',
-  () => ({ default: jest.fn().mockResolvedValue([]) }),
-  { virtual: true }
-);
 
 const flush = () =>
   // eslint-disable-next-line @lwc/lwc/no-async-operation

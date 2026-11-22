@@ -179,6 +179,17 @@ describe('c-form-runner', () => {
     expect(find(element, '[data-key="last"]')).not.toBeNull();
   });
 
+  it('reads the published forms again when the runner is opened again', async () => {
+    const refresh = jest.fn();
+    const element = await render({});
+    graphql.emit({ uiapi: { query: { Form__c: { edges: [] } } } }, undefined, refresh);
+    await flush();
+    expect(refresh).not.toHaveBeenCalled();
+    document.body.removeChild(element);
+    document.body.appendChild(element);
+    expect(refresh).toHaveBeenCalledTimes(1);
+  });
+
   it('says the published forms could not be read', async () => {
     const element = await render({});
     graphql.emitErrors([{ message: 'Field not accessible' }]);
@@ -186,7 +197,7 @@ describe('c-form-runner', () => {
 
     expect(find(element, '[data-id="picker"]').options).toEqual([]);
     expect(find(element, '[data-id="error"]').querySelector('c-barn-notice').message).toBe(
-      'c.Forms_Builder_ActionFailed'
+      'Field not accessible'
     );
   });
 });

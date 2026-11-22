@@ -115,6 +115,8 @@ export default class ErrorLogTile extends NavigationMixin(LightningElement) {
   /** The listed entries' bug report records, by record id. */
   bugReports = {};
   bugReportError;
+  /** True once the read for the current listed entries has returned (data or error). */
+  bugReportsRead = false;
 
   @wire(EnclosingTabId) enclosingTabId;
 
@@ -140,8 +142,10 @@ export default class ErrorLogTile extends NavigationMixin(LightningElement) {
       });
       this.bugReports = byId;
       this.bugReportError = undefined;
+      this.bugReportsRead = true;
     } else if (error) {
       this.bugReportError = error;
+      this.bugReportsRead = true;
     }
   }
 
@@ -151,6 +155,7 @@ export default class ErrorLogTile extends NavigationMixin(LightningElement) {
     const ids = (tile && tile.recent ? tile.recent : []).map((entry) => entry.recordId);
     const current = this.bugReportQuery ? this.bugReportQuery[0].recordIds : [];
     if (ids.join() !== current.join()) {
+      this.bugReportsRead = false;
       this.bugReportQuery = ids.length
         ? [{ recordIds: ids, fields: BUG_REPORT_FIELDS, optionalFields: [TECHNICAL_DETAIL_FIELD] }]
         : undefined;
@@ -187,6 +192,8 @@ export default class ErrorLogTile extends NavigationMixin(LightningElement) {
             : '',
         openTitle: helpText('Core', 'Core_ErrorLogTile_RowAction', this.labels.openEntry, row),
         copyTitle: helpText('Core', 'Core_ErrorLogTile_RowAction', this.labels.copyBugReport, row),
+        // Until the read is in, the entry is not known to be gone, so Copy waits.
+        copyDisabled: !this.bugReportsRead && !this.bugReportError,
         acknowledgeTitle: helpText(
           'Core',
           'Core_ErrorLogTile_RowAction',

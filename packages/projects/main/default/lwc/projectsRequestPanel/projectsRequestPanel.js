@@ -3,7 +3,7 @@ import { createRecord, updateRecord } from 'lightning/uiRecordApi';
 import getRequest from '@salesforce/apex/ProjectRequestsController.getRequest';
 import createTask from '@salesforce/apex/ProjectRequestsController.createTask';
 import createChangeRequest from '@salesforce/apex/ProjectRequestsController.createChangeRequest';
-import { messageFrom, recordErrorMessage } from 'c/findCsv';
+import { messageFrom } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { PRIORITIES, STATUSES, changesBetween, options } from 'c/projectsRequestsModel';
 import PROJECT from '@salesforce/schema/Project__c';
@@ -197,7 +197,7 @@ export default class ProjectsRequestPanel extends LightningElement {
       this.dispatchEvent(new CustomEvent('changed'));
     } catch (error) {
       this.notice = undefined;
-      this.errorMessage = recordErrorMessage(error);
+      this.errorMessage = messageFrom(error);
     } finally {
       this.isWorking = false;
     }
