@@ -160,7 +160,8 @@ Developer; the project's Hourly Rate 100.
 | 5 | Change staff A's Person rate to 999. Open the step 4 entry. | Still 175: a rate change never reprices logged time. |
 | 6 | Change the step 4 entry's Date to 45 days ago. | Bill Rate 150 (the Role rate): a new date prices it again. |
 | 7 | As staff A, open a Project Rate and an entry. | Bill rates visible; no Cost Rate or Cost Amount fields. |
-| 8 | Turn **Use rate cards** off and log 1 hour. | No rates written; Actual Cost is Actual Hours times the Hourly Rate again. No Apply Rates button. |
+| 8 | Turn **Use rate cards** off and save; reload BarnCRM Settings. Log 1 hour. | The save shows "Saving..." then "Your settings are saved."; after the reload Use rate cards is still off. No rates written on the new entry; the project's Actual Cost is Actual Hours times the Hourly Rate again. No Apply Rates button. |
+| 9 | On another project with time but no time logged since step 8, wait a few minutes and check Actual Cost. | It is that project's Actual Hours times its Hourly Rate: the setting's save started a pass over every project. |
 
 **Cleanup:** keep the project for T-PM-10.
 

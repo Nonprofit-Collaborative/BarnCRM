@@ -56,9 +56,7 @@ public class PortalTestData {
 
 	/** Turns Portal Sign-In on, with the shipped limits. */
 	public static void enable() {
-		Portal_Settings__c settings = Portal_Settings__c.getOrgDefaults();
-		settings.Enabled__c = true;
-		upsert settings;
+		ModuleSettings.setForTest('Portal_Enabled', true);
 	}
 
 	/** An active portal with the sample template. */

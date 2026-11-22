@@ -25,10 +25,7 @@ private class VolunteerWaitlistTest {
 	}
 
 	private static void waitlist(Boolean enabled) {
-		OrgSettingsSystemWriter.save(
-			Volunteer_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{ Volunteer_Settings__c.Waitlist_Enabled__c => enabled }
-		);
+		ModuleSettings.setForTest('Volunteers_Waitlist_Enabled', enabled);
 		SettingsService.clearCaches();
 	}
 

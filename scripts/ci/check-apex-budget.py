@@ -420,7 +420,9 @@ CAPS = {
     # org-to-org request API (ProjectRequestApi): 133,533 measured, plus about 2%.
     # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
     # catalog data): 132,129 measured, plus about 2%.
-    "projects": 122_400,
+    # Settings store B (SET-03) and ProjectsSettingsSaved (Actual Cost follows a settings save):
+    # 122,446 stripped, plus about 1%.
+    "projects": 123_700,
     # Address Verification (C-46, ADR-0209 address verification module): the Smarty and Google
     # lookups, the handler, the job, setup page controller and Health Check, measured 24,710 on
     # 2026-11-11, plus about 2 percent.

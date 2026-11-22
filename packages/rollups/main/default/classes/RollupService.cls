@@ -65,6 +65,15 @@ public with sharing class RollupService {
 	/** The module's own settings object (canonical model Section 14B, ADR-0125 decision 6). */
 	@NamespaceAccessible
 	public static final String SETTINGS_OBJECT = 'Rollup_Settings__c';
+	/** The prefix of the module's run-state rows (its `Setting_Module__mdt` record). */
+	@NamespaceAccessible
+	public static final String STATE_PREFIX = 'Rollups';
+
+	/** The run-state key of one of the module's values, such as `Rollups.Last_Run_Started__c`. */
+	@NamespaceAccessible
+	public static String stateKey(String name) {
+		return SettingsState.moduleKey(STATE_PREFIX, name);
+	}
 	/** The setting that says when real-time totals are recalculated (R-R4, ADR-0098). */
 	@NamespaceAccessible
 	public static final String PROCESSING_SETTING = 'Rollup_Processing__c';

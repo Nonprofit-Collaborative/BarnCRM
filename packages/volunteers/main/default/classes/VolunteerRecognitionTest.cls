@@ -24,10 +24,7 @@ private class VolunteerRecognitionTest {
 	}
 
 	private static void recognition(Boolean enabled) {
-		OrgSettingsSystemWriter.save(
-			Volunteer_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{ Volunteer_Settings__c.Recognition_Enabled__c => enabled }
-		);
+		ModuleSettings.setForTest('Volunteers_Recognition_Enabled', enabled);
 		SettingsService.clearCaches();
 	}
 

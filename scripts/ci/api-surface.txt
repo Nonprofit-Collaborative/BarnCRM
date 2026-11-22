@@ -2084,6 +2084,10 @@ programs/ServicePlanDatesHandler.cls | public ServicePlanDatesHandler()
 programs/ServicePlanDatesHandler.cls | public class ServicePlanDatesHandler
 programs/SessionScheduleTriggerHandler.cls | public SessionScheduleTriggerHandler()
 programs/SessionScheduleTriggerHandler.cls | public class SessionScheduleTriggerHandler
+projects/ProjectChangeRequestHandler.cls | public ProjectChangeRequestHandler()
+projects/ProjectChangeRequestHandler.cls | public class ProjectChangeRequestHandler
+projects/ProjectCostHandler.cls | public ProjectCostHandler()
+projects/ProjectCostHandler.cls | public class ProjectCostHandler
 projects/ProjectEntryHandler.cls | public ProjectEntryHandler()
 projects/ProjectEntryHandler.cls | public class ProjectEntryHandler
 projects/ProjectInvoiceHandler.cls | public ProjectInvoiceHandler()
@@ -2160,6 +2164,7 @@ rollups/RollupService.cls | public static Set<String> everyMode()
 rollups/RollupService.cls | public static Set<String> recalculateTargets(Set<Id>,String)
 rollups/RollupService.cls | public static Set<String> scheduledModes()
 rollups/RollupService.cls | public static String defaultMode()
+rollups/RollupService.cls | public static String stateKey(String)
 rollups/RollupService.cls | public static final Integer STALE_AFTER_HOURS
 rollups/RollupService.cls | public static final String FRESHNESS_FIELD
 rollups/RollupService.cls | public static final String MODE_BOTH
@@ -2171,6 +2176,7 @@ rollups/RollupService.cls | public static final String PROCESSING_BACKGROUND
 rollups/RollupService.cls | public static final String PROCESSING_IN_SAVE
 rollups/RollupService.cls | public static final String PROCESSING_SETTING
 rollups/RollupService.cls | public static final String SETTINGS_OBJECT
+rollups/RollupService.cls | public static final String STATE_PREFIX
 rollups/RollupService.cls | public static void catchUpAfterTurnedOn()
 rollups/RollupService.cls | public static void recalculate(Id)
 rollups/RollupService.cls | public static void runAfterDelete(String,List<SObject>)

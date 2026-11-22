@@ -22,6 +22,14 @@ private class VolunteerTotalsTest {
 		);
 	}
 
+	// Each save recalculates its totals before it returns, so a test can read them after
+	// each of several saves (the queued default is the bulk test's path). A test's setting
+	// override does not outlive @TestSetup, so each test method's transaction sets it as the
+	// class loads.
+	static {
+		RollupTestSupport.recalculateInTheSave();
+	}
+
 	@TestSetup
 	static void makeData() {
 		System.runAs(admin()) {
@@ -31,9 +39,6 @@ private class VolunteerTotalsTest {
 			Volunteer_Job__c job = VolunteersTestData.job('Food pantry sort');
 			VolunteersTestData.shift(job.Id);
 			RollupService.ensureDefaults();
-			// Each save recalculates its totals before it returns, so a test can read them after
-			// each of several saves. The queued default is the bulk test's path.
-			RollupTestSupport.recalculateInTheSave();
 		}
 	}
 

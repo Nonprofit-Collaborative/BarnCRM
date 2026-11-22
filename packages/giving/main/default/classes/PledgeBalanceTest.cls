@@ -10,6 +10,11 @@
  */
 @IsTest(testFor='ApexClass:CommitmentService, ApexClass:GiftCommitmentHandler')
 private class PledgeBalanceTest {
+	// Totals are recalculated in the save in every test: a store value lasts one transaction.
+	static {
+		RollupTestSupport.recalculateInTheSave();
+	}
+
 	@TestSetup
 	static void makeData() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {

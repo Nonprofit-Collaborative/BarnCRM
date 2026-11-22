@@ -2,12 +2,12 @@
  * Participant privacy (P-08, canonical model R-EN7 and R-SD6). Enrollments and service
  * deliveries are Private org-wide, and each one is shared, Read/Write, with the public group
  * `Programs_Participants` through the Apex sharing reason `Programs_Participants__c`. The
- * Participant Privacy preset (`Programs_Settings__c.Private_Participants__c`) decides only
+ * Participant Privacy preset (the `Programs.Private_Participants__c` run-state row) decides only
  * whether All Internal Users are in that group, so changing it never touches a record.
  *
  * System mode, `without sharing`, in the manner of ADR-0021: a user cannot write a share with an
  * Apex sharing reason, nor a group member. It writes only those shares, that one group member and
- * the module's own settings record, and is reached from the always-run sharing handler, from the
+ * the preset's run-state row, and is reached from the always-run sharing handler, from the
  * settings page after its caller is checked as a settings manager, and from the install and the
  * hourly access check.
  */
@@ -25,9 +25,15 @@ public without sharing class ProgramsSharing {
 
 	/** True when the preset is Private. Shared, the default, until an admin saves Private. */
 	public static Boolean isPrivate() {
-		Programs_Settings__c settings = Programs_Settings__c.getOrgDefaults();
-		return settings != null && settings.Private_Participants__c == true;
+		return SettingsState.flag(PRESET_KEY);
 	}
+
+	/**
+	 * The preset's run-state row (ADR-NEXT settings as custom metadata): saved synchronously, as
+	 * the sharing it drives is applied at once, and read from the legacy field until carry-over.
+	 */
+	@TestVisible
+	private static final String PRESET_KEY = SettingsState.moduleKey('Programs', 'Private_Participants__c');
 
 	/** The preset's name, as the settings page and the change history show it. */
 	public static String presetName(Boolean privatePreset) {
@@ -44,10 +50,7 @@ public without sharing class ProgramsSharing {
 		if (wanted == stored) {
 			return false;
 		}
-		OrgSettingsSystemWriter.save(
-			Programs_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{ Programs_Settings__c.Private_Participants__c => wanted }
-		);
+		SettingsState.put(new Map<String, Object>{ PRESET_KEY => wanted });
 		SettingsService.logChange(SETTING_NAME, presetName(stored), presetName(wanted));
 		requestApply();
 		return true;

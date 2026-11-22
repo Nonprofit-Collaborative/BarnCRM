@@ -340,7 +340,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Rollups** section. | **Time of the nightly run** shows **2:00 AM**, never blank. Its list offers every hour from **12:00 AM (midnight)** to **11:00 PM**. |
+| 1 | Open **BarnCRM Settings**, **Rollups** section. | **Time of the nightly run** shows **2 AM**, never blank. Its list offers every hour from **12 AM (midnight)** to **11 PM**, and saving **11 PM** shows "Saving..." then "Your settings are saved.". Set it back to **2 AM**. |
 | 2 | Choose **11:00 PM** and save. | The setting saves and shows **11:00 PM**. |
 | 3 | Open the **Rollup Builder** tab. | The text above the buttons reads "Nightly recalculation is scheduled for 11:00 PM." |
 | 4 | In Setup, open **Scheduled Jobs**. | One job named **BarnCRM Nightly Jobs** (the nightly run all steps share, see [Nightly Jobs](../admin-guide/nightly-jobs.md)), next run at midnight; the Nightly Jobs panel lists the rollup step at 11:00 PM. |
@@ -697,6 +697,6 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 2 | Open the **Rollup Builder** tab. | Under the nightly schedule line: "The nightly run recalculates every Every night and Both total over every record on Sunday nights ...". |
 | 3 | Set the night to tomorrow's day of the week; after tomorrow's run, open **Apex Jobs** in Setup. | The night's rollup job is **RollupFullRecalcBatch**. |
 | 4 | Set the night to another day and add a gift during the day. After the next night's run, open **Apex Jobs**. | The night's rollup job is **RollupNightlyBatch**; the gift's donor shows the new total; donors whose gifts did not change keep their earlier **Rollups last calculated** time. |
-| 5 | Choose **Every night** and save; reopen the Rollup Builder. | The line says each nightly run recalculates every total over every record. |
+| 5 | Choose **Every night** and save; reload **BarnCRM Settings**, **Rollups**, then reopen the Rollup Builder. | The save shows "Saving..." then "Your settings are saved."; after the reload the night still shows **Every night** with no **Default** badge. The line says each nightly run recalculates every total over every record. |
 
 **Cleanup:** set the night back to Sunday.

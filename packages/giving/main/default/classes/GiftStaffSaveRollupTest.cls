@@ -10,6 +10,11 @@
  */
 @IsTest(testFor='ApexClass:RollupPlanner, ApexClass:RollupService, ApexClass:RollupQueue')
 private class GiftStaffSaveRollupTest {
+	// Totals are recalculated in the save in every test: a store value lasts one transaction.
+	static {
+		RollupTestSupport.recalculateInTheSave();
+	}
+
 	private static final List<String> STAFF_SETS = new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' };
 
 	/** The bulk case: one more than the platform's trigger chunk of 200 and a batch of 250. */

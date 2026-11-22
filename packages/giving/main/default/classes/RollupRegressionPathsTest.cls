@@ -16,6 +16,11 @@
  */
 @IsTest(testFor='ApexClass:RollupEngine, ApexClass:RollupService')
 private class RollupRegressionPathsTest {
+	// Totals are recalculated in the save in every test: a store value lasts one transaction.
+	static {
+		RollupTestSupport.recalculateInTheSave();
+	}
+
 	@TestSetup
 	static void makeData() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {

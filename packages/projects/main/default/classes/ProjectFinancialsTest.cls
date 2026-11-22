@@ -3,7 +3,9 @@
  * invoiced and the stored months; cost only for Projects Admin; nothing while off. Change
  * requests (PM-12, R-PM20) move the budget the project is measured against, health included.
  */
-@IsTest(testFor='ApexClass:ProjectFinancials, ApexClass:ProjectBillingController, ApexClass:ProjectHealth')
+@IsTest(
+	testFor='ApexClass:ProjectFinancials, ApexClass:ProjectBillingController, ApexClass:ProjectHealth, ApexClass:ProjectChangeRequestHandler, ApexTrigger:ProjectChangeRequestTrigger'
+)
 private class ProjectFinancialsTest {
 	@TestSetup
 	static void setup() {
@@ -107,6 +109,25 @@ private class ProjectFinancialsTest {
 				false
 			);
 			Assert.isFalse(result.isSuccess(), 'Track change requests is off by default');
+			Assert.areEqual(
+				BarnHelp.text('Projects', 'Projects_ChangeRequests_TurnedOff'),
+				result.getErrors()[0].getMessage(),
+				'Refused by the change request rules, saying how to turn them on'
+			);
+		}
+	}
+
+	@IsTest
+	static void aNewChangeRequestIsSavedOnceTrackingIsOnWithoutTimeTracking() {
+		System.runAs(ProjectsTestData.admin()) {
+			Project__c project = ProjectsTestData.project('Active', 10);
+			ModuleSettings.setForTest('Projects_Time_Tracking_Enabled', false);
+			ModuleSettings.setForTest('Projects_Change_Requests_Enabled', true);
+			Database.SaveResult result = Database.insert(
+				new Project_Change_Request__c(Project__c = project.Id, Name = 'Extra', Hours__c = 1),
+				false
+			);
+			Assert.isTrue(result.isSuccess(), 'The setting alone decides, as the rule always did');
 		}
 	}
 }

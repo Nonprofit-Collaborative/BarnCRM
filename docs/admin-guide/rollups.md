@@ -200,10 +200,12 @@ The nightly recalculation is a step of [BarnCRM Nightly Jobs](nightly-jobs.md), 
 nightly run all of BarnCRM's overnight work shares. The step starts at 2:00 AM by default (or
 as soon as the step before it has finished), in the time zone of the person who scheduled the
 run, and is switched on and off here, on the Rollups page. To run it at another hour, open **BarnCRM Settings**, **Rollups** section, and choose
-**Time of the nightly run** (any hour from 12:00 AM (midnight) to 11:00 PM). Saving a new
-hour moves the scheduled run straight away; if the nightly run is not scheduled, the new hour
-is used when you schedule it. Pick a quiet hour after the day's data entry and before the
-morning's reports.
+**Time of the nightly run** (any hour from 12 AM (midnight) to 11 PM). Saving a new
+hour moves the scheduled run straight away, once the save finishes; if the nightly run is not
+scheduled, the new hour is used when you schedule it. Pick a quiet hour after the day's data
+entry and before the morning's reports. Every Rollups setting saves like the rest of BarnCRM
+Settings: **Saving...** for a few seconds, then **Your settings are saved.** (see
+[Saving Your Changes](barncrm-settings.md#saving-your-changes)).
 
 **Every record once a week, what changed the other nights.** Each save already keeps its
 totals right, so most nights the run only checks what a save could have missed. Once a week,

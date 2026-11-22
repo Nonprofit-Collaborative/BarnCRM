@@ -666,7 +666,9 @@ sponsors should install it.
 ## Settings
 
 As an admin, open the **Events** section of **BarnCRM Settings**. Each setting saves org-wide as
-you change it.
+you change it, like the rest of BarnCRM Settings: **Saving...** for a few seconds, then **Your
+settings are saved.** (see [Saving Your Changes](barncrm-settings.md#saving-your-changes)). A
+setting you never changed uses the default below.
 
 | Setting | Default | What it does | Takes effect |
 |---|---|---|---|

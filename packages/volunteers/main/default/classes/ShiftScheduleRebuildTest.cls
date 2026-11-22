@@ -22,6 +22,12 @@ private class ShiftScheduleRebuildTest {
 	private static final String COORDINATOR = 'RebuildCoordinator';
 	private static final String SCHEDULE_ADMIN = 'RebuildAdmin';
 
+	// A test's setting override does not outlive @TestSetup, so each test method's
+	// transaction sets it as the class loads.
+	static {
+		VolunteersTestData.shiftHorizonWeeks(HORIZON_WEEKS);
+	}
+
 	@TestSetup
 	static void makeData() {
 		TestUsers.standardUserWith(
@@ -36,7 +42,6 @@ private class ShiftScheduleRebuildTest {
 			VolunteersTestData.contactModeWithoutAutomaticHouseholds();
 			VolunteersTestData.contact('Rivera', null);
 			Volunteer_Job__c job = VolunteersTestData.job('Food pantry sort');
-			VolunteersTestData.shiftHorizonWeeks(HORIZON_WEEKS);
 			Date firstDay = ShiftScheduleService.today().addDays(1);
 			List<Shift_Schedule__c> created = new List<Shift_Schedule__c>();
 			for (Integer i = 0; i < SCHEDULE_COUNT; i++) {

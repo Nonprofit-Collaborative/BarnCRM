@@ -15,6 +15,11 @@
  */
 @IsTest(critical=true)
 private class GiftRealTimeRollupTest {
+	// Totals are recalculated in the save in every test: a store value lasts one transaction.
+	static {
+		RollupTestSupport.recalculateInTheSave();
+	}
+
 	private static final Set<String> GIVING_SOURCES = new Set<String>{
 		'Gift__c',
 		'Commitment__c',

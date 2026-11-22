@@ -12,6 +12,12 @@ private class VolunteerShiftSignupsControllerTest {
 	private static final String STAFFER = 'SignupsStaffer';
 	private static final String READER = 'SignupsReader';
 
+	// A test's setting override does not outlive @TestSetup, so each test method's
+	// transaction sets it as the class loads.
+	static {
+		VolunteersTestData.volunteerSettings(true, true);
+	}
+
 	@TestSetup
 	static void makeData() {
 		TestUsers.standardUserWith(
@@ -22,7 +28,6 @@ private class VolunteerShiftSignupsControllerTest {
 		TestUsers.standardUserWith(READER, new List<String>{ 'BarnCRM_Read_Only', 'Volunteers_Read_Only' });
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
 			VolunteersTestData.contactModeWithoutAutomaticHouseholds();
-			VolunteersTestData.volunteerSettings(true, true);
 			Volunteer_Job__c job = VolunteersTestData.job('Food pantry sort');
 			VolunteersTestData.shift(job.Id);
 		}

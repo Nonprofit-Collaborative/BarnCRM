@@ -54,21 +54,17 @@ private class ProjectsPostInstallTest {
 			SettingsService.clearCaches();
 			Assert.areEqual(
 				Url.getOrgDomainUrl().toExternalForm(),
-				String.valueOf(SettingsService.getValue(ProjectsSettings.SETTINGS_OBJECT, 'Invoice_Return_Url__c')),
-				'The return page is filled with My Domain, never blank'
+				ProjectsSettings.invoiceReturnUrl(),
+				'The return page is My Domain until the admin saves one, never blank'
 			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Setting_Change__c], 'The install saves no setting');
 		}
 	}
 
 	@IsTest
 	static void aReturnPageTheAdminChoseIsKept() {
 		System.runAs(TestUsers.admin()) {
-			OrgSettingsSystemWriter.save(
-				Projects_Settings__c.SObjectType,
-				new Map<Schema.SObjectField, Object>{
-					Projects_Settings__c.Invoice_Return_Url__c => 'https://example.org/thanks'
-				}
-			);
+			ModuleSettings.setForTest('Projects_Invoice_Return_Url', 'https://example.org/thanks');
 			Test.startTest();
 			new ProjectsPostInstall().runSetup(null);
 			Test.stopTest();

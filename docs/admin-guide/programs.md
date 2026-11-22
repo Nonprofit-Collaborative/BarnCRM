@@ -67,6 +67,10 @@ fills up to the new horizon. A shorter value deletes nothing.
 
 It also has **Waitlist when full** (off by default, saved org-wide). See Capacity and Waitlists.
 
+Both save like the rest of BarnCRM Settings: **Saving...** for a few seconds, then **Your
+settings are saved.** (see [Saving Your Changes](barncrm-settings.md#saving-your-changes)).
+Participant Privacy, on the Programs Settings page, saves at once.
+
 ### Capacity and Waitlists
 
 A program's **Capacity** (optional) is how many people it can have **Enrolled** at once. Empty

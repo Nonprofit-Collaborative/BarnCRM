@@ -53,10 +53,7 @@ private class VolunteerHoursServiceTest {
 			Assert.isTrue(VolunteerSettings.attendanceCreatesHours(), 'Attendance hours ship on.');
 			Assert.areEqual(8, VolunteerSettings.shiftHorizonWeeks(), 'The horizon ships at 8.');
 
-			OrgSettingsSystemWriter.save(
-				Volunteer_Settings__c.SObjectType,
-				new Map<Schema.SObjectField, Object>{ Volunteer_Settings__c.Shift_Horizon_Weeks__c => 40 }
-			);
+			ModuleSettings.setForTest('Volunteers_Shift_Horizon_Weeks', 40);
 			SettingsService.clearCaches();
 			Assert.areEqual(8, VolunteerSettings.shiftHorizonWeeks(), 'Out of range reads as 8.');
 			Assert.isTrue(

@@ -127,7 +127,7 @@
       </layoutItems>
       <layoutItems>
         <behavior>Readonly</behavior>
-        <field>Actual_Cost__c</field>
+        <field>Actual_Cost_Amount__c</field>
       </layoutItems>
       <layoutItems>
         <behavior>Readonly</behavior>

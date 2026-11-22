@@ -547,9 +547,10 @@ private class RollupQueueTest {
 	}
 
 	/**
-	 * D-200 P13: a save that queues entries runs no query to find a processor. The first one
-	 * queues a processor and stamps when; the next, while the stamp is recent, leaves the exact
-	 * check to the subscriber; once the stamp is old (a processor that died), a save queues one.
+	 * D-200 P13: a save that queues entries runs no query to find a processor, only the one
+	 * run-state read every transaction shares. The first one queues a processor and stamps when;
+	 * the next, while the stamp is recent, leaves the exact check to the subscriber; once the
+	 * stamp is old (a processor that died), a save queues one.
 	 */
 	@IsTest
 	static void aSaveRunsNoQueryAndReadsTheStampOfTheLastProcessorAskedFor() {
@@ -559,12 +560,14 @@ private class RollupQueueTest {
 			RollupQueue.readStampInTests = true;
 			RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(5) });
 			Assert.areEqual(1, processorsQueued(), 'Nothing recent, so it queues one');
-			Assert.isNotNull(Rollup_Settings__c.getOrgDefaults().Processor_Requested_At__c, 'And stamps when');
+			SettingsState.clearCache();
+			Assert.isNotNull(SettingsState.moment(RollupQueue.REQUESTED_KEY), 'And stamps when, as run state');
 
 			RollupQueue.newTransactionForTest();
+			SettingsState.clearCache();
 			Integer queriesBefore = Limits.getQueries();
 			RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(5) });
-			Assert.areEqual(0, Limits.getQueries() - queriesBefore, 'No query in the save');
+			Assert.areEqual(1, Limits.getQueries() - queriesBefore, 'Only the run-state read in the save');
 			Assert.areEqual(1, processorsQueued(), 'Recent: it queues no second one');
 			Assert.areEqual(1, RollupQueue.readyEventsPublished, 'The subscriber checks exactly');
 

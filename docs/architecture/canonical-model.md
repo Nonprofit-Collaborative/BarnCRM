@@ -2803,7 +2803,8 @@ R-R13). It owns the entries it was given: it charges each one attempt as it take
 after the fifth), holds them with Next Attempt an hour ahead, renewed with every chunk, deletes
 them when the totals are written and releases them with the reason when a chunk stops, so a run
 that dies leaves them due again rather than lost. One batch runs at a time: a run starts only
-under a lock on the org-level `Rollup_Run_Lock__c` record (created the first time), so two
+under a lock on the State row `Rollups.Last_Run_Started__c` (Section 13 R-STV4; created at
+install, or the first time when missing), so two
 processors routing records at the same moment cannot both find none running and both start one.
 Entries routed while one runs, or when the lock cannot be taken in time, wait two minutes,
 uncharged, and are routed again.
@@ -2828,27 +2829,30 @@ uncharged, and are routed again.
   finalizer); the Rollup Builder's Needs attention list reads and retries entries.
 - **Batch:** `RollupLargeParentBatch`, the large parent route (R-RQ6): a batch over the source
   rows of each planned query, Ids only, chained query by query and entity by entity.
-- **Custom setting:** `Rollup_Run_Lock__c`, hierarchy, protected, one field,
-  `Last_Run_Started__c` (DateTime). Its one org-level record is the row a large parent run locks
-  before it starts (R-RQ6); the code creates it the first time and nothing else reads or writes
-  it. **Throttle (D-200 P2):** under the lock, a run starts only when `Large_Parent_Hours__c`
-  (Section 14B, default 1) has passed since `Last_Run_Started__c`, which the run stamps as it
-  starts; otherwise the entries routed to it wait, uncharged, until then (Next Attempt), and
+- **Run lock:** the State row `Rollups.Last_Run_Started__c` (name `Last_Run_Started__c`, prefix
+  `Rollups`; a `Nightly_Job__c` row of Kind State, Section 29; ADR-NEXT settings as custom metadata, decision 11), holding when the last
+  large parent run started. A run takes it with `SettingsState.lockOrCreate` before it starts
+  (R-RQ6); `RollupsPostInstall` creates it at install, and a lock wait that times out counts as
+  busy. The legacy custom setting `Rollup_Run_Lock__c` is no longer read or written; it is
+  removed with the legacy settings objects. **Throttle (D-200 P2):** under the lock, a run
+  starts only when `Large_Parent_Hours__c` (Section 14B, default 1) has passed since the time
+  that row holds, which the run stamps as it starts; otherwise the entries routed to it wait, uncharged, until then (Next Attempt), and
   the saves queued in between merge into that one run. The Rollup Builder page says how often.
 - **Event:** `Rollup_Queue_Ready__e`, a platform event with no fields, publish behavior Publish
   After Commit, published at most once per transaction by a save inside a Queueable job, or by
   one that queued entries and no processor (R-RQ3).
   `RollupQueueReadyTrigger` subscribes and starts the processor.
 - **Processor request stamp (D-200 P13):** a save that queues entries runs no query to find a
-  processor. It reads `Processor_Requested_At__c` on `Rollup_Settings__c` (from the platform's
-  cache):
+  processor. It reads the State row `Rollups.Processor_Requested_At__c` (name
+  `Processor_Requested_At__c`; the one State read a transaction shares, Section 29):
   within the last ten minutes it publishes the Ready event, whose subscriber checks the job list
   exactly after commit; otherwise it queues a processor and stamps the time (for a chained
   processor queued with a delay, the time it is due). A processor that died is still found
   missing: by the subscriber's exact check while the stamp is recent, and by the next save once
   it is not. The subscriber, background jobs and the nightly run keep the exact check.
 - **Nightly scope (D-200 P1, R-R4b):** `RollupNightlyBatch` plans each night from
-  `Full_Recalc_Day__c` and `Nightly_Covered_From__c` on `Rollup_Settings__c` (Section 14B):
+  the `Rollup_Full_Recalc_Day` setting (key `Full_Recalc_Day__c`) and the State row
+  `Rollups.Nightly_Covered_From__c` (name `Nightly_Covered_From__c`, Section 14B):
   the full run, or one batch pass per source entity that queues the targets of what changed.
   Each night it first releases held Pending entries (Next Attempt cleared) and retries Failed
   ones.
@@ -2867,12 +2871,18 @@ values an org stored on the Core object are not carried over: an org that change
 sets it again. Their Setting Definition rows name this object in `Settings_Object__c`, so the
 settings console shows them in its Rollups section as before.
 
-- **Custom setting:** `Rollup_Settings__c`, hierarchy, protected.
-- **Defaults (ADR-0035):** the field default only fills a record the platform creates; the
-  readers in `RollupService` and `RollupScheduler` treat blank, and anything outside the
-  allowed values, as the shipped value.
+- **Settings store (R-STV4, ADR-NEXT settings as custom metadata, decision 11):** the module
+  ships `Setting_Module.Rollups` (`Settings_Object__c` `Rollup_Settings__c`, `Key_Prefix__c`
+  `Rollups`, `State_Fields__c` `Nightly_Covered_From__c,Processor_Requested_At__c`), so the
+  keys below are Setting Values read by DeveloperName (`ModuleSettings`) or by group and key,
+  each Setting Definition shipping the default below as `Default_Value__c`. The two datetime
+  rows are run state: State rows `Rollups.<Key>`, written by the engine only, created at install
+  by `RollupsPostInstall` with the run lock. The legacy custom setting `Rollup_Settings__c`
+  (hierarchy, protected) is read only until the org carries its settings over, then removed.
+- **Defaults (ADR-0035):** the readers in `RollupService` and `RollupScheduler` treat blank,
+  and anything outside the allowed values, as the shipped value.
 - **Nightly run hour (ADR-0136):** the settings console shows `Nightly_Run_Hour__c` as a
-  picklist of the 24 hours (values 0 to 23, labels 12:00 AM (midnight) to 11:00 PM) from its Setting Definition
+  picklist of the 24 hours (values 0 to 23, labels 12 AM (midnight) to 11 PM, kept under the 255 characters `Setting_Definition__mdt.getAll()` returns of a long text field) from its Setting Definition
   row, since a custom setting cannot hold a picklist. The nightly job, Run tonight and the
   Rollup Builder page's schedule line all use it. A save that changes it moves the scheduled
   nightly run at once: Core's settings service hands every changed key to the engine through
@@ -10684,7 +10694,11 @@ page's value are left out, and both tokens merge as empty.
 
 ### Salesforce implementation
 
-- **Custom setting:** `Volunteer_Settings__c`, hierarchy, protected.
+- **Settings store (Section 13 R-STV4):** `Setting_Module.Volunteers` (`Settings_Object__c`
+  `Volunteer_Settings__c`, `Key_Prefix__c` `Volunteers`, no state fields). Each key below is a
+  Setting Value read through `SettingsService` by `VolunteerSettings`, the definition shipping the
+  default as `Default_Value__c`. The legacy hierarchy custom setting `Volunteer_Settings__c`
+  (protected) is read only until carry-over, then removed.
 
 | Key | API name | Type |
 |---|---|---|
@@ -11725,8 +11739,9 @@ on the Programs settings page decides who is in that group:
   admin may add chosen users, roles or groups to the group in Setup; BarnCRM adds and removes
   only All Internal Users.
 
-The preset is stored in `Programs_Settings__c`, written only by the settings page and audited as
-a settings change. The group follows the preset at once when it is saved, and again at install,
+The preset is stored as the State row `Programs.Private_Participants__c` (Section 13 R-STV4,
+saved synchronously because the sharing it drives follows at once), written only by the settings
+page and audited as a settings change. The group follows the preset at once when it is saved, and again at install,
 at Turn on and in the hourly access check, which repairs a group changed by hand.
 
 **Intake fields hold choices, not typed text (P-07).** The intake and eligibility fields are dates
@@ -11785,18 +11800,23 @@ R-EN2, and is not counted as open on the dashboard or the person card. Cohorts h
   intake picklists' active values and default from describe, with a link to the enrollment's
   fields in Setup (Object Manager by API name). The section name `Programs` is in Core's
   `SettingSections`. It also holds the Participant Privacy preset (R-EN7).
-- **Weeks Ahead to Create Sessions:** `Programs_Settings__c` field `Session_Horizon_Weeks__c` (Number(2, 0),
+- **Settings store (R-STV4):** `Setting_Module.Programs` (`Settings_Object__c`
+  `Programs_Settings__c`, `Key_Prefix__c` `Programs`, `State_Fields__c`
+  `Private_Participants__c`); the two settings below are Setting Values read by DeveloperName,
+  each definition shipping its default. The legacy hierarchy custom setting
+  `Programs_Settings__c` is read only until carry-over, then removed.
+- **Weeks Ahead to Create Sessions:** Setting Definition `Programs_Session_Horizon_Weeks` (key `Session_Horizon_Weeks__c`, Number,
   default 8, 1 to 26), set in the Programs section of BarnCRM Settings
   (`Setting_Definition.Programs_Session_Horizon_Weeks`) and read by `SessionScheduleService.horizonWeeks` (R-SS2).
-- **Waitlist When Full (P-09):** `Programs_Settings__c` field `Waitlist_Enabled__c` (Checkbox,
+- **Waitlist When Full (P-09):** Setting Definition `Programs_Waitlist_Enabled` (key `Waitlist_Enabled__c`, Checkbox,
   default false), set in the Programs section of BarnCRM Settings
   (`Setting_Definition.Programs_Waitlist_Enabled`); R-EN10 by `EnrollmentCapacity`, called from
   the always-running `Enrollment_Rules` handler, and itself the handler of the registry row
   `Program_Capacity` (`ProgramTrigger`, after update), which promotes when Capacity is raised or
   cleared.
 - **Participant privacy (R-EN7, R-SD6):** the public group `Programs_Participants` (no bosses);
-  the hierarchy custom setting `Programs_Settings__c` with `Private_Participants__c` (Checkbox,
-  default unchecked, which is Shared); `ProgramsSharing` writes the shares (handler
+  the State row `Programs.Private_Participants__c` (true or false, blank is false, which is
+  Shared); `ProgramsSharing` writes the shares (handler
   `ProgramsSharingHandler`, registry rows `Enrollment_Sharing` and `Service_Delivery_Sharing`,
   always run), sets the group's All Internal Users member (queued, as a group member is a setup
   object), and shares records that have no share yet (`ProgramsSharingBatch`, run at install
@@ -12378,7 +12398,7 @@ day; Repeat Every 1 to 52; End Time after Start Time when both are set; End Date
 Start Date (validation rule).
 
 **R-SS2 Which days and how far.** A day is a session day by R-SSC1's rule (29T). An active
-schedule keeps sessions created from today to `Programs_Settings__c.Session_Horizon_Weeks__c`
+schedule keeps sessions created from today to the `Programs_Session_Horizon_Weeks` setting
 weeks ahead (Weeks Ahead to Create Sessions, 1 to 26, default 8; blank or out of range reads
 as 8). Each run creates the session days after Created Through (or from today, or Start
 Date, if later) up to the horizon and End Date, and moves Created Through forward. A day is
@@ -15568,8 +15588,11 @@ reads as its shipped value.
 
 ### Salesforce implementation
 
-- **Object:** `Events_Settings__c`, hierarchy custom setting, visibility Protected, read through
-  Core's `SettingsService` by `EventsSettings`.
+- **Settings store (Section 13 R-STV4):** `Setting_Module.Events` (`Settings_Object__c`
+  `Events_Settings__c`, `Key_Prefix__c` `Events`, no state fields). Each attribute below is a
+  Setting Value read through Core's `SettingsService` by `EventsSettings`, the definition shipping
+  the default as `Default_Value__c`. The legacy hierarchy custom setting `Events_Settings__c`
+  (Protected) is read only until carry-over, then removed.
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -16293,9 +16316,13 @@ and answers as usual, so no answer says who is on file.
 
 ### Salesforce implementation
 
-- **Object:** `Portal_Settings__c`, hierarchy custom setting, visibility Protected.
+- **Settings store (Section 13 R-STV4):** `Setting_Module.Portal` (`Settings_Object__c`
+  `Portal_Settings__c`, `Key_Prefix__c` `Portal`, no state fields). Each key below is a Setting
+  Value read by its definition's DeveloperName (`ModuleSettings`), the definition shipping the
+  default as `Default_Value__c`. The legacy hierarchy custom setting `Portal_Settings__c`
+  (Protected) is read only until carry-over, then removed.
 
-| Attribute | API name | Type |
+| Attribute | Key | Type |
 |---|---|---|
 | Portal Sign-In | `Enabled__c` | Checkbox, default false |
 | Code Minutes | `Code_Minutes__c` | Number(2, 0), default 10 |
@@ -18553,8 +18580,9 @@ A piece of work with a start, a target date and an outcome: a Salesforce impleme
 | Estimated Hours | `Estimated_Hours__c` | Roll-Up Summary (SUM Project_Task__c.Estimated_Hours__c, Status__c not equal to Cancelled) |
 | Actual Hours | `Actual_Hours__c` | Roll-Up Summary (SUM Time_Entry__c.Hours__c, counted: Status__c not equal to Open, Submitted, Rejected; R-PM10) |
 | Billable Hours | `Billable_Hours__c` | Roll-Up Summary (SUM Time_Entry__c.Hours__c, Billable__c equals true, counted) |
-| Actual Cost | `Actual_Cost__c` | Formula (Currency): `IF($Setup.Projects_Settings__c.Rates_Enabled__c, Time_Amount__c, IF(ISBLANK(Hourly_Rate__c), NULL, Actual_Hours__c * Hourly_Rate__c))` |
-| Remaining Budget | `Remaining_Budget__c` | Formula (Currency): `IF(ISBLANK(Budget_Amount__c), NULL, Budget_Amount__c + Change_Amount__c - BLANKVALUE(Actual_Cost__c, 0))` |
+| Actual Cost | `Actual_Cost_Amount__c` | Currency(18, 2), stored: Time Amount with Use rate cards on (blank as 0), else blank without an Hourly Rate, else Actual Hours (blank as 0) times Hourly Rate. Kept by `ProjectCostHandler` (`ProjectTrigger`, registry row `Project_Actual_Cost`, Always Runs) on every project save, which each counted time entry's save causes through the roll-up summaries; `ProjectCostSync` puts every project right at install and from the nightly health step after Use rate cards changes |
+| Actual Cost Formula | `Actual_Cost__c` | Formula (Currency), not used: `IF($Setup.Projects_Settings__c.Rates_Enabled__c, Time_Amount__c, IF(ISBLANK(Hourly_Rate__c), NULL, Actual_Hours__c * Hourly_Rate__c))`; on no layout, report type or permission set; removed with `Projects_Settings__c` |
+| Remaining Budget | `Remaining_Budget__c` | Formula (Currency): `IF(ISBLANK(Budget_Amount__c), NULL, Budget_Amount__c + Change_Amount__c - BLANKVALUE(Actual_Cost_Amount__c, 0))` |
 | Billing Type | `Billing_Type__c` | Picklist (Time and Materials, Fixed Fee, Retainer, Not Billed), restricted, default Time and Materials; blank reads as Time and Materials (PM-10) |
 | Retainer Amount | `Retainer_Amount__c` | Currency(16, 2): Retainer, billed each month |
 | Time Amount | `Time_Amount__c` | Roll-Up Summary (SUM Time_Entry__c.Amount__c, counted; PM-06) |
@@ -18738,9 +18766,17 @@ The module's org-wide settings, edited in the Projects section of BarnCRM Settin
 
 ### Salesforce implementation
 
-- **Object:** `Projects_Settings__c`, label Projects Settings, hierarchy custom setting, visibility Protected.
+- **Settings store (Section 13 R-STV4):** `Setting_Module.Projects` (`Settings_Object__c`
+  `Projects_Settings__c`, `Key_Prefix__c` `Projects`, no state fields). Each key below is a
+  Setting Value read by its definition's DeveloperName (`ProjectsSettings` over
+  `ModuleSettings`), the definition shipping the default as `Default_Value__c`. The legacy
+  hierarchy custom setting `Projects_Settings__c` (Protected) is read only until carry-over,
+  then removed with the formula `Project__c.Actual_Cost__c` and the inactive validation rules
+  `Requests_Turned_On` and `Change_Requests_Turned_On`, which read it through `$Setup`.
+- **State:** `Projects.Cost_Rates_Applied__c`, the Use rate cards value the last
+  `ProjectCostSync` pass applied (29PM1).
 
-| Attribute | API name | Type |
+| Attribute | Key | Type |
 |---|---|---|
 | Track time and budgets | `Time_Tracking_Enabled__c` | Checkbox, default true |
 | Days late before at risk | `At_Risk_Days__c` | Number(3, 0), default 7 (1 to 365) |
@@ -18752,7 +18788,7 @@ The module's org-wide settings, edited in the Projects section of BarnCRM Settin
 | Manage resources | `Resources_Enabled__c` | Checkbox, default false (PM-09) |
 | Create invoices | `Billing_Enabled__c` | Checkbox, default false (PM-10) |
 | Take invoice payments online | `Online_Payments_Enabled__c` | Checkbox, default false (PM-10, R-PM22) |
-| Invoice payment return page | `Invoice_Return_Url__c` | URL(255); filled with the org's My Domain address at install while blank (`ProjectsPostInstall`), so it is never blank; read as that address if cleared |
+| Invoice payment return page | `Invoice_Return_Url__c` | Text (https URL, 255); while blank it reads and shows as the org's My Domain address, which no definition can ship |
 | Invoice due days | `Invoice_Due_Days__c` | Number(3, 0), default 30 (1 to 365) |
 | Show financials and recognize revenue | `Revenue_Enabled__c` | Checkbox, default false (PM-11) |
 | Track change requests | `Change_Requests_Enabled__c` | Checkbox, default false (PM-12) |
@@ -18975,7 +19011,7 @@ A requested change of a project's scope with its hours and amount; approved ones
 
 ### Rules
 
-**R-PM20 Change requests.** Status Draft, Submitted, Approved or Rejected. Only the project's owner or a holder of Manage Projects sets Approved or Rejected (`Decision_By_Manager`). An Approved request's Status, Hours and Amount change only with Manage Projects (`Approved_Locked`). Approved requests are summed into the project's Change Hours and Change Amount (29PM1), so approval and its undoing move the budget with no Apex; Budget Hours and Budget Amount stay the original budget. Hours and Amount may be negative. Field history tracks Status, Hours and Amount.
+**R-PM20 Change requests.** Status Draft, Submitted, Approved or Rejected. Only the project's owner or a holder of Manage Projects sets Approved or Rejected (`Decision_By_Manager`). An Approved request's Status, Hours and Amount change only with Manage Projects (`Approved_Locked`). Approved requests are summed into the project's Change Hours and Change Amount (29PM1), so approval and its undoing move the budget with no Apex; Budget Hours and Budget Amount stay the original budget. Hours and Amount may be negative. Field history tracks Status, Hours and Amount. A new change request is refused while Track change requests is off (`ProjectChangeRequestHandler`, `ProjectChangeRequestTrigger`, registry row `Project_Change_Request_Rules`, Always Runs); one saved while it was on can still be edited.
 
 ### Salesforce implementation
 
@@ -18997,7 +19033,7 @@ A request or issue someone raised with the organization: logged by staff, sent b
 
 ### Rules
 
-**R-PM23 Before save** (registry row `Project_Request_Rules`, Always Runs). A blank Channel is Staff when the saving user can create requests and Portal otherwise. A Portal or Partner Organization request is refused unless Track requests and issues and Take requests from outside are both on, and one owned by the user saving it goes to the shipped Requests queue (`Project_Requests`). A blank Due Date is the creation date plus the priority's due days, counted in weekdays. A blank Requesting Organization takes the requester's Account. Resolved or Closed stamps Resolved Date when blank; any other status clears it. A save by a user who cannot edit requests (the portal's integration user) keeps Subject, Description, Type, Category and Priority as they were. Validation rules: `Requests_Turned_On` (no new request while the feature is off), `Resolution_Needed` (Resolved needs a Resolution).
+**R-PM23 Before save** (registry row `Project_Request_Rules`, Always Runs). A new request is refused while Track requests and issues is off. A blank Channel is Staff when the saving user can create requests and Portal otherwise. A Portal or Partner Organization request is refused unless Track requests and issues and Take requests from outside are both on, and one owned by the user saving it goes to the shipped Requests queue (`Project_Requests`). A blank Due Date is the creation date plus the priority's due days, counted in weekdays. A blank Requesting Organization takes the requester's Account. Resolved or Closed stamps Resolved Date when blank; any other status clears it. A save by a user who cannot edit requests (the portal's integration user) keeps Subject, Description, Type, Category and Priority as they were. Validation rule: `Resolution_Needed` (Resolved needs a Resolution).
 
 **R-PM24 Requester replies.** A non-blank Reply is moved into a new Request Comment marked From Requester and Shared, and cleared; a Waiting on Requester or Resolved request returns to In Progress.
 
@@ -20405,6 +20441,9 @@ mirrors the primary member).
 | 1.93 | 2026-11-21 | Settings as custom metadata, phase 2 modules (SET-03, D-219): Funders, Scholarships, Memberships, Corporate Hub, Connector, Contact Point Sync, Address Verification and LWC Builder. Each ships a `Setting_Module__mdt` record (`Funders`, `Scholarships`, `Memberships`, `CorporateHub`, `Connector`, `ContactPoints`, `AddressVerification`, `LwcBuilder`) and every Setting Definition row a `Default_Value__c`. Run state moves to State rows: `Connector.Recipes_Paused__c` (synchronous, toggled on the Connector page, so its Setting Definition row `Connector_Recipes_Paused` is removed), `Connector.Integration_User_Id__c`, `ContactPoints.Last_Backfill__c` and `ContactPoints.Last_Backfill_Summary__c`, `AddressVerification.Connected_Provider__c`. The eight legacy custom settings stay until the destructive deploy; no module reads them. No object count change. |
 | 1.94 | 2026-11-21 | Settings as custom metadata, phase 2 Mirror and Payments (SET-03, D-219). `Setting_Module.Mirror` and `Setting_Module.Payments` register both groups; their rows ship `Default_Value__c`. Payments' connection values, PayPal ids and cap time become State rows `Payments.<Name>` (29PAY3); the receiver token is no longer kept, only its SHA-256 hash (`Payments.Webhook_Token_Hash`), shown once on Generate Token or Regenerate Token. Legacy objects stay until the destructive deploy. No object count change. |
 | 1.95 | 2026-11-21 | Settings as custom metadata, phase 2 Fundraising (SET-03, D-219). `Setting_Module.Giving` registers `Giving_Settings__c` (prefix `Giving`) with 16 state fields; 29 rows gain `Default_Value__c`, and `Giving_Receipt_Statement_Year` ships 0 (last year) with a minimum of 0. Run state and `Books_Closed_Through__c` become State rows `Giving.<Name>` (Section 21A). R-F1 and R-F4: the Default Fund setting is the source, Is Default follows it and the Fund trigger never saves it; no setting is saved at install. No object count change. |
+| 1.96 | 2026-11-21 | Settings as custom metadata, phase 2: Rollups, Programs and Portal (SET-03, D-219). Each ships a `Setting_Module__mdt` record (prefixes `Rollups`, `Programs`, `Portal`) and a `Default_Value__c` on every Setting Definition, and reads its settings from the store (R-STV4). Run state moves to State rows: `Rollups.Nightly_Covered_From__c`, `Rollups.Processor_Requested_At__c`, `Programs.Private_Participants__c` (the Participant Privacy preset, saved synchronously), and the large parent run lock `Rollups.Last_Run_Started__c` (Section 14A), which replaces `Rollup_Run_Lock__c` and is created at install. `Rollup_Settings__c`, `Rollup_Run_Lock__c`, `Programs_Settings__c` and `Portal_Settings__c` are no longer written; they stay until the destructive deploy. No object count change. |
+| 1.97 | 2026-11-21 | Settings as custom metadata, phase 2: Projects (SET-03, D-219). `Setting_Module.Projects` (prefix `Projects`), a `Default_Value__c` on every Setting Definition, readers through the store (29PM7); Invoice payment return page reads the org's My Domain address while blank instead of being filled at install. `Project__c` gains Actual Cost (`Actual_Cost_Amount__c`, Currency, stored), kept by `ProjectCostHandler` on the new `ProjectTrigger` and by `ProjectCostSync`, with the formula's results; Remaining Budget reads it. The formula `Actual_Cost__c` is relabeled Actual Cost Formula and left unused. The validation rules `Requests_Turned_On` and `Change_Requests_Turned_On` are inactive: `ProjectRequestHandler` and the new `ProjectChangeRequestHandler` (`ProjectChangeRequestTrigger`) refuse new records instead (R-PM20, R-PM23). New State row `Projects.Cost_Rates_Applied__c`. No object count change. |
+| 1.98 | 2026-11-21 | Settings as custom metadata, phase 2: Events and Volunteers (SET-03, D-219). Each ships a `Setting_Module__mdt` record (prefixes `Events`, `Volunteers`, no state fields) and a `Default_Value__c` on every Setting Definition with a shipped default; their readers already go through `SettingsService`, which now serves the store (R-STV4, Sections 29N and 29EV25). `Events_Settings__c` and `Volunteer_Settings__c` are no longer written; they stay until the destructive deploy. No object count change. |
 
 ---
 ## 32. Entity ownership by package

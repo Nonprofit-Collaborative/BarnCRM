@@ -15,6 +15,11 @@
  */
 @IsTest(testFor='ApexClass:RollupQueue, ApexClass:TriggerHandler')
 private class RollupPartialSaveTest {
+	// Totals are recalculated in the save in every test: a store value lasts one transaction.
+	static {
+		RollupTestSupport.recalculateInTheSave();
+	}
+
 	private static final Decimal CLOSED_AMOUNT = 100;
 	private static final Decimal OPEN_AMOUNT = 50;
 

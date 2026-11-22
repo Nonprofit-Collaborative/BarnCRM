@@ -17,14 +17,9 @@ private class VolunteerNudgeServiceTest {
 	}
 
 	private static void settings(Boolean enabled, Integer leadDays) {
-		OrgSettingsSystemWriter.save(
-			Volunteer_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{
-				Volunteer_Settings__c.Nudges_Enabled__c => enabled,
-				Volunteer_Settings__c.Nudge_Lead_Days__c => leadDays,
-				Volunteer_Settings__c.Hours_Require_Approval__c => false
-			}
-		);
+		ModuleSettings.setForTest('Volunteers_Nudges_Enabled', enabled);
+		ModuleSettings.setForTest('Volunteers_Nudge_Lead_Days', leadDays);
+		ModuleSettings.setForTest('Volunteers_Hours_Require_Approval', false);
 		SettingsService.clearCaches();
 	}
 
