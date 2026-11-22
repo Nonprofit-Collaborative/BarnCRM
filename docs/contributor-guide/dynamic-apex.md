@@ -296,6 +296,33 @@ alone turned missing field access into a failed Health Check.
   Integer room = (Limits.getLimitQueryRows() - Limits.getQueryRows() - QUERY_ROW_MARGIN) / 2;
   ```
 
+### Walking a large record set in a job (ADR-NEXT)
+
+Pick the reader by what the job does with the rows:
+
+- **A batch class:** `Database.getQueryLocatorWithBinds` with an explicit `AccessLevel` in
+  `start` (`FindExportBatch`, `RollupFullRecalcBatch`). Nothing else is needed.
+- **A queueable chain that walks one fixed set** (each link takes the next slice of what matched
+  when the run started): an Apex cursor, `Database.getCursorWithBinds(soql, binds, accessLevel)`,
+  opened by the first link and carried in the job's state with the next position
+  (`BigObjectArchiveJob`, `BrandShareJob`). The query runs once, not once per link.
+  - Order the query by `Id` and keep the last Id fetched. If a fetch fails (the platform no
+    longer holds the cursor), open it once more with `Id > :lastId` and go on; a second failure
+    ends the run with its reason.
+  - Advance the position by the count asked for, not the rows returned: rows deleted since the
+    cursor opened come back as gaps. Go on while `position < cursor.getNumRecords()`, so an
+    empty fetch is not the end.
+  - Rows a link fetched but did not use are kept in state for the next link, never fetched again.
+  - Fetched rows count toward the query row limit, and a transaction allows only a few fetch
+    calls: one fetch per link. Tests that run several links in one transaction keep the link
+    count small (a `@TestVisible` page size).
+- **A queueable that drains a queue** (pending rows it marks done, such as payment events or
+  form submissions): re-query each link, oldest first. A cursor would miss rows that arrive
+  while the chain runs.
+- **Paging that must see each link's current data** (the row is chosen by a condition that the
+  run itself or a person may change between links, such as `ProjectRevenue`'s "no row for the
+  month yet"): keep the `Id > :lastId` re-query.
+
 ## 8. Trigger paths: headroom and bulk logging
 
 A trigger handler shares its transaction with every other automation, and a large Apex

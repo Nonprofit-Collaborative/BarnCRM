@@ -19,26 +19,38 @@
 @NamespaceAccessible
 public with sharing class BrandShareJob implements Queueable {
 	public static final String GROUP_PREFIX = 'BarnCRM_Brand_';
-	private static final Integer PAGE = 500;
+	/** Brand Assignments per shares page of a full run. */
+	@TestVisible
+	private static Integer pageSize = 500;
+	/** Set by a test: the next fetch finds the cursor gone, as when the platform lets it go. */
+	@TestVisible
+	private static Boolean cursorGoneForTest = false;
 	private static Boolean fullRequested = false;
 	private static Set<Id> pendingAccounts;
 
 	private final Boolean sharesPhase;
 	private final Boolean full;
 	private final Set<Id> accountIds;
-	private final Id cursor;
+	/**
+	 * A full run's Brand Assignments, read once and carried from page to page (ADR-NEXT Apex
+	 * cursors in large-volume jobs). `position` is the next row to fetch, `lastId` the last Id
+	 * fetched, from which the cursor is opened again if the platform has let it go.
+	 */
+	private Database.Cursor assigned;
+	private Integer position = 0;
+	@TestVisible
+	private Id lastId;
 
 	@TestVisible
-	private BrandShareJob(Boolean sharesPhase, Boolean full, Set<Id> accountIds, Id cursor) {
+	private BrandShareJob(Boolean sharesPhase, Boolean full, Set<Id> accountIds) {
 		this.sharesPhase = sharesPhase;
 		this.full = full;
 		this.accountIds = accountIds == null ? new Set<Id>() : accountIds;
-		this.cursor = cursor;
 	}
 
 	/** After a Brand or a setting change: groups, then every assigned Account. Once per transaction. */
 	public static void requestFull() {
-		if (!fullRequested && enqueue(new BrandShareJob(false, true, null, null))) {
+		if (!fullRequested && enqueue(new BrandShareJob(false, true, null))) {
 			fullRequested = true;
 		}
 	}
@@ -69,7 +81,7 @@ public with sharing class BrandShareJob implements Queueable {
 		}
 		if (pendingAccounts == null) {
 			pendingAccounts = touched;
-			enqueue(new BrandShareJob(false, false, pendingAccounts, null));
+			enqueue(new BrandShareJob(false, false, pendingAccounts));
 		} else {
 			// Already queued in this transaction: the job reads the same set when it runs.
 			pendingAccounts.addAll(touched);
@@ -94,41 +106,79 @@ public with sharing class BrandShareJob implements Queueable {
 			if (!sharesPhase) {
 				Map<Id, Id> groups = syncGroups();
 				if (BrandService.visibilityOn() && !groups.isEmpty()) {
-					System.enqueueJob(new BrandShareJob(true, full, accountIds, null));
+					System.enqueueJob(new BrandShareJob(true, full, accountIds));
 				}
 				return;
 			}
 			Set<Id> scope = accountIds;
-			Id last;
 			if (full) {
 				scope = new Set<Id>();
-				// "Id > null" matches no rows, so the first page starts from the lowest possible Id.
-				Id floor = cursor != null
-					? cursor
-					: Id.valueOf(
-							Brand_Assignment__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-								.getKeyPrefix() + '000000000000'
-					  );
-				for (Brand_Assignment__c row : [
-					SELECT Id, Account__c, Contact__r.AccountId
-					FROM Brand_Assignment__c
-					WHERE Id > :floor AND (Account__c != NULL OR Contact__c != NULL)
-					WITH SYSTEM_MODE
-					ORDER BY Id
-					LIMIT :PAGE
-				]) {
-					scope.add(row.Account__c != null ? row.Account__c : row.Contact__r.AccountId);
-					last = row.Id;
+				for (SObject row : nextPage()) {
+					Brand_Assignment__c assignment = (Brand_Assignment__c) row;
+					scope.add(assignment.Account__c != null ? assignment.Account__c : assignment.Contact__r.AccountId);
 				}
 				scope.remove(null);
 			}
 			syncShares(scope, groupsByBrand());
-			if (full && last != null) {
-				System.enqueueJob(new BrandShareJob(true, true, null, last));
+			// Rows deleted since the cursor opened come back as gaps: go on while rows remain.
+			if (full && position < assigned.getNumRecords()) {
+				System.enqueueJob(this);
 			}
 		} catch (Exception failure) {
 			ErrorLogger.log(failure, 'BrandShareJob.execute');
 		}
+	}
+
+	/**
+	 * The next page of a full run's Brand Assignments, opening the cursor on the first page. A
+	 * cursor the platform no longer holds is opened once more after the last Id fetched.
+	 */
+	private List<SObject> nextPage() {
+		if (assigned == null) {
+			open();
+		}
+		try {
+			return fetchPage();
+		} catch (Exception cursorGone) {
+			open();
+			return fetchPage();
+		}
+	}
+
+	private List<SObject> fetchPage() {
+		Integer size = Math.min(pageSize, assigned.getNumRecords() - position);
+		if (size <= 0) {
+			return new List<SObject>();
+		}
+		if (cursorGoneForTest) {
+			cursorGoneForTest = false;
+			throw new CursorGoneException('The cursor is gone');
+		}
+		List<SObject> rows = assigned.fetch(position, size);
+		position += size;
+		if (!rows.isEmpty()) {
+			lastId = rows[rows.size() - 1].Id;
+		}
+		return rows;
+	}
+
+	/** Every assigned Account's row, in Id order, after `lastId` when reopening. */
+	private void open() {
+		Map<String, Object> binds = new Map<String, Object>();
+		if (lastId != null) {
+			binds.put('lastId', lastId);
+		}
+		assigned = Database.getCursorWithBinds(
+			'SELECT Id, Account__c, Contact__r.AccountId FROM Brand_Assignment__c WHERE ' +
+				(lastId == null ? '' : 'Id > :lastId AND ') +
+				'(Account__c != NULL OR Contact__c != NULL) ORDER BY Id',
+			binds,
+			AccessLevel.SYSTEM_MODE
+		);
+		position = 0;
+	}
+
+	private class CursorGoneException extends Exception {
 	}
 
 	/** Phase 1. Returns the groups kept, by brand ID. */
