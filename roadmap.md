@@ -622,21 +622,21 @@ Design: `docs/architecture/integration-hub-design.md`, the reusable mapper ADR a
 | OD-13 | Connector integration user check drops the System Administrator profile-name test | Minor | Landed (#1417) | D-219 |
 | OD-14 | A pledge whose last installment would be zero or less is refused at save | Minor | Landed (#1417) | D-219 |
 | OD-15 | Online gift, membership and project dates in the org time zone | Minor | Landed (#1417) | D-219 |
-| OD-17 | Error Log stays out of staff apps, documented | Minor | Planned | D-219 |
+| OD-17 | Error Log stays out of staff apps, documented | Minor | Landed (#1436) | D-219 |
 
 ### Release 1.35 (Batch T): one development org for everything, platform features now
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| AP-03 | Flat reads and single-record writes (about 61 `@AuraEnabled` methods) moved to LDS and GraphQL | Major | Planned | D-219 |
+| AP-03 | Flat reads and single-record writes (about 61 `@AuraEnabled` methods) moved to LDS and GraphQL | Major | Landed (#1436): 28 converted, 33 kept in Apex with the reason (ADR-0093 A2) | D-219 |
 | AP-01 | Apex budget for one org with Core and every module: target 5,000,000, CI ceiling 5,600,000 | Minor | Landed (#1417) | D-219 |
 | AP-02 | CI check enforcing ADR-0093 on new and changed `@AuraEnabled` methods | Minor | Landed (#1417) | D-219 |
 | AP-04 | Large literal catalogs (Connector recipe files, import new-field catalog, module detection lists) moved out of Apex | Minor | Dropped (measured: the literal catalogs are small, so moving them saves little Apex; AP-05 indentation stripping recovered about 400,000 characters instead) | D-219 |
-| PF-01 | Dynamic Related Lists for module record-page panels that only list rows | Minor | Planned | D-219 |
-| PF-02 | Apex Cursors in large-volume jobs | Minor | Planned | D-219 |
-| PF-03 | One-field rules as before-save Flows with a switch and template | Minor | Planned | D-219 |
-| PF-04 | Lightning Message Service where two panels on one page refresh each other | Minor | Planned | D-219 |
-| EVAL-01 | Evaluation now: Big Objects for Field History, Platform Cache, React Multi-Framework pilot | Minor | Planned | D-219 |
+| PF-01 | Dynamic Related Lists for module record-page panels that only list rows | Minor | Landed (#1436, ADR-0242) | D-219 |
+| PF-02 | Apex Cursors in large-volume jobs | Minor | Landed (#1436, ADR-0243) | D-219 |
+| PF-03 | One-field rules as before-save Flows with a switch and template | Minor | Landed (#1436, ADR-0246) | D-219 |
+| PF-04 | Lightning Message Service where two panels on one page refresh each other | Minor | Landed (#1436, ADR-0244) | D-219 |
+| EVAL-01 | Evaluation now: Big Objects for Field History, Platform Cache, React Multi-Framework pilot | Minor | Landed (#1436, ADR-0245) | D-219 |
 
 ### Release 1.36 (Batch T): archive and backup automation
 
