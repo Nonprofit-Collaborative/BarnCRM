@@ -30,7 +30,6 @@
   <tabs>Project_Invoice__c</tabs>
   <tabs>Request_Connection__c</tabs>
   <tabs>standard-report</tabs>
-  <tabs>Error_Log__c</tabs>
   <uiType>Lightning</uiType>
   <workspaceConfig>
     <mappings>
@@ -71,9 +70,6 @@
     </mappings>
     <mappings>
       <tab>standard-report</tab>
-    </mappings>
-    <mappings>
-      <tab>Error_Log__c</tab>
     </mappings>
   </workspaceConfig>
 </CustomApplication>

@@ -45,3 +45,22 @@ export function linkedText(sponsor) {
   }
   return sponsor.linkedKind ? `${sponsor.linkedKind}: ${sponsor.linkedLabel}` : sponsor.linkedLabel;
 }
+
+/** The longest checklist item name Sponsor_Deliverable__c.Name holds. */
+const DELIVERABLE_NAME_LENGTH = 80;
+
+/**
+ * A new checklist item's fields (Sponsor_Deliverable__c), or null when it has no name: the name
+ * trimmed to what the field holds, and Type Other when none is chosen.
+ */
+export function deliverableFields(sponsorId, name, type) {
+  const trimmed = String(name || '').trim();
+  if (!trimmed) {
+    return null;
+  }
+  return {
+    Event_Sponsor__c: sponsorId,
+    Name: trimmed.substring(0, DELIVERABLE_NAME_LENGTH),
+    Type__c: type && String(type).trim() ? type : 'Other'
+  };
+}

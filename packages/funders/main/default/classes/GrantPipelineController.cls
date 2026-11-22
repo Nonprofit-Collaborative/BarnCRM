@@ -192,74 +192,9 @@ public with sharing class GrantPipelineController {
 		}
 	}
 
-	/**
-	 * Moves one grant to another stage. Moving to Awarded records the amount awarded when one is
-	 * given. The grant rules fill in the stage dates (R-GN3).
-	 */
-	@AuraEnabled
-	public static void moveStage(Id grantId, String stage, Decimal amountAwarded) {
-		if (!Schema.SObjectType.Grant__c.isUpdateable()) {
-			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission'));
-		}
-		if (grantId == null || !GrantService.STAGES.contains(stage)) {
-			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Pipeline_ErrorStage'));
-		}
-		try {
-			Grant__c grant = new Grant__c(Id = grantId, Stage__c = stage);
-			if (stage == GrantService.STAGE_AWARDED && amountAwarded != null) {
-				grant.Amount_Awarded__c = amountAwarded;
-			}
-			update as user grant;
-		} catch (DmlException e) {
-			throw UserErrors.message(e.getDmlMessage(0));
-		} catch (Exception e) {
-			ErrorLogger.log(e, CONTEXT + '.moveStage', grantId);
-			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Shared_NotSaved'));
-		}
-	}
-
-	/**
-	 * Record the Award (modules-16): moves one grant to Awarded with what the award letter says,
-	 * each optional: the amount awarded, the award period and whether the money is restricted. A
-	 * blank value leaves the grant's own value as it is. The grant rules check the dates and fill
-	 * in the decision date (R-GN3).
-	 */
-	@AuraEnabled
-	public static void recordAward(
-		Id grantId,
-		Decimal amountAwarded,
-		Date startDate,
-		Date endDate,
-		Boolean restricted
-	) {
-		if (!Schema.SObjectType.Grant__c.isUpdateable()) {
-			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission'));
-		}
-		if (grantId == null) {
-			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Pipeline_ErrorStage'));
-		}
-		try {
-			Grant__c grant = new Grant__c(Id = grantId, Stage__c = GrantService.STAGE_AWARDED);
-			if (amountAwarded != null) {
-				grant.Amount_Awarded__c = amountAwarded;
-			}
-			if (startDate != null) {
-				grant.Award_Start_Date__c = startDate;
-			}
-			if (endDate != null) {
-				grant.Award_End_Date__c = endDate;
-			}
-			if (restricted != null) {
-				grant.Restricted__c = restricted;
-			}
-			update as user grant;
-		} catch (DmlException e) {
-			throw UserErrors.message(e.getDmlMessage(0));
-		} catch (Exception e) {
-			ErrorLogger.log(e, CONTEXT + '.recordAward', grantId);
-			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Shared_NotSaved'));
-		}
-	}
+	// Moving a grant to another stage and Record the Award (modules-16) save through Lightning
+	// Data Service as the person (ADR-0093 A2); the grant rules check the dates and fill in the
+	// stage dates (R-GN3).
 
 	/** F-02: an open requirement as a deadline row; the Grant Calendar draws the same shape. */
 	public static Card toRequirementRow(Grant_Requirement__c requirement) {

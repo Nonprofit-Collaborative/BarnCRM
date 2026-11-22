@@ -78,7 +78,12 @@ private class EventSeatingControllerTest {
 			}
 			Integer moved = EventSeatingController.assignSeats(event.Id, JSON.serialize(seats));
 			EventSeatingController.Seating seated = EventSeatingController.getSeating(event.Id);
-			EventSeatingController.saveNeeds(seated.guests[0].id, 'Vegetarian ', 'Wheelchair');
+			// The tab saves needs through Lightning Data Service (ADR-0093), trimmed in the browser.
+			update as user new Event_Attendee__c(
+				Id = seated.guests[0].id,
+				Dietary_Needs__c = 'Vegetarian',
+				Access_Needs__c = 'Wheelchair'
+			);
 			EventSeatingController.assignSeats(
 				event.Id,
 				JSON.serialize(
@@ -98,7 +103,7 @@ private class EventSeatingControllerTest {
 			Assert.areEqual(before.guests[0].partyId, before.guests[1].partyId, 'One party');
 			Assert.areEqual(2, moved, 'The party moved together');
 			Assert.areEqual(tableId, seated.guests[0].tableId, 'Seated');
-			Assert.areEqual('Vegetarian', after.guests[0].dietary, 'Dietary saved and trimmed');
+			Assert.areEqual('Vegetarian', after.guests[0].dietary, 'Dietary read back');
 			Assert.areEqual('Wheelchair', after.guests[0].access, 'Access saved');
 			Assert.isNull(after.guests[0].tableId, 'Taken off the table');
 			Assert.isTrue(before.canEdit && before.canAddTable, 'Staff may edit');
@@ -163,7 +168,8 @@ private class EventSeatingControllerTest {
 				)
 			);
 			Test.startTest();
-			EventSeatingController.deleteTable(tableId);
+			// The tab removes a table through Lightning Data Service (ADR-0093).
+			delete as user new Event_Table__c(Id = tableId);
 			Test.stopTest();
 			EventSeatingController.Seating after = EventSeatingController.getSeating(event.Id);
 			Assert.areEqual(0, after.tables.size(), 'Table gone');

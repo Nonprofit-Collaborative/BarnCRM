@@ -118,7 +118,9 @@ click the person's name to open the enrollment and edit it there.
 1. Open the program.
 2. On the **Attendance** tab, in the **Service Delivery Log** panel, pick the **Service** and the
    **Date** (today to start with).
-3. Everyone with an open enrollment is listed. Set each person's **Attendance** (Present,
+3. Everyone with an open enrollment is listed; someone you enroll or move on the **Program
+   Roster** shows up or drops off here without reloading the page, unless you have marks not
+   yet saved (then after you save). Set each person's **Attendance** (Present,
    Excused Absence or Unexcused Absence) and **Quantity**, or click **Mark All Present** to set
    everyone not yet recorded to Present with a quantity of 1.
 4. Click **Save**. While marks are not saved, a hint beside **Save** says "1 unsaved change" (or

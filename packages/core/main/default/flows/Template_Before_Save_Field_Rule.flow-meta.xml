@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <assignments>
+    <description>The one field this rule sets. Change the field and the value for your rule.</description>
+    <name>Set_Field</name>
+    <label>Set field</label>
+    <locationX>50</locationX>
+    <locationY>550</locationY>
+    <assignmentItems>
+      <assignToReference>$Record.MailingCountry</assignToReference>
+      <operator>Assign</operator>
+      <value>
+        <elementReference>cValue</elementReference>
+      </value>
+    </assignmentItems>
+  </assignments>
+  <constants>
+    <description>The name this flow is listed under on the Automation page of BarnCRM Settings: Flow: and your copy's API name. Change it after Save As, then list the flow there.</description>
+    <name>cSwitchName</name>
+    <dataType>String</dataType>
+    <value>
+      <stringValue>Flow:Template_Before_Save_Field_Rule</stringValue>
+    </value>
+  </constants>
+  <constants>
+    <description>The value the rule sets. Change it for your rule.</description>
+    <name>cValue</name>
+    <dataType>String</dataType>
+    <value>
+      <stringValue>United States</stringValue>
+    </value>
+  </constants>
+  <decisions>
+    <description>Ends the flow when the BarnCRM Automation Control setting has Pause All or Bypass on for the person saving, or the timed pause on the Automation page is in effect. Keep this element in your copy.</description>
+    <name>Automation_Control</name>
+    <label>Automation control</label>
+    <locationX>50</locationX>
+    <locationY>150</locationY>
+    <defaultConnector>
+      <targetReference>Get_Switch_Off</targetReference>
+    </defaultConnector>
+    <defaultConnectorLabel>Runs</defaultConnectorLabel>
+    <rules>
+      <name>Paused_Or_Bypassed</name>
+      <conditionLogic>or</conditionLogic>
+      <conditions>
+        <leftValueReference>$Setup.BarnCRM_Automation_Control__c.Pause_All__c</leftValueReference>
+        <operator>EqualTo</operator>
+        <rightValue>
+          <booleanValue>true</booleanValue>
+        </rightValue>
+      </conditions>
+      <conditions>
+        <leftValueReference>$Setup.BarnCRM_Automation_Control__c.Bypass__c</leftValueReference>
+        <operator>EqualTo</operator>
+        <rightValue>
+          <booleanValue>true</booleanValue>
+        </rightValue>
+      </conditions>
+      <conditions>
+        <leftValueReference>fTimedPause</leftValueReference>
+        <operator>EqualTo</operator>
+        <rightValue>
+          <booleanValue>true</booleanValue>
+        </rightValue>
+      </conditions>
+      <label>Paused or bypassed</label>
+    </rules>
+  </decisions>
+  <decisions>
+    <description>Ends the flow when this flow's switch on the Automation page is off. A flow that is not listed there has no switch and runs.</description>
+    <name>Switch</name>
+    <label>Switch</label>
+    <locationX>50</locationX>
+    <locationY>400</locationY>
+    <defaultConnector>
+      <targetReference>Set_Field</targetReference>
+    </defaultConnector>
+    <defaultConnectorLabel>On</defaultConnectorLabel>
+    <rules>
+      <name>Switched_Off</name>
+      <conditionLogic>and</conditionLogic>
+      <conditions>
+        <leftValueReference>Get_Switch_Off</leftValueReference>
+        <operator>IsNull</operator>
+        <rightValue>
+          <booleanValue>false</booleanValue>
+        </rightValue>
+      </conditions>
+      <label>Switched off</label>
+    </rules>
+  </decisions>
+  <description
+  >Template for a one-field rule as a before-save (fast field update) flow that follows the BarnCRM switches. The example fills a blank mailing country on a contact. Save As a new flow, change the object, the entry condition, the field and the value, set cSwitchName to Flow: and your copy's API name, activate it, and list it on the Automation page of BarnCRM Settings so it gets a switch. Keep the Automation Control decision and the switch lookup: they make your rule stop with BarnCRM's own automation for a pause, a bypassed user, or its own switch. A before-save flow cannot call the Check BarnCRM Automation action, so it reads the same things directly. See ADR-0246 (before-save flows) and the admin guide page automation-control.md.</description>
+  <environments>Default</environments>
+  <formulas>
+    <description>True while the timed pause on the Automation page is in effect.</description>
+    <name>fTimedPause</name>
+    <dataType>Boolean</dataType>
+    <expression>AND(NOT(ISBLANK({!$Setup.BarnCRM_Automation_Control__c.Paused_Until__c})), {!$Setup.BarnCRM_Automation_Control__c.Paused_Until__c} &gt; {!$Flow.CurrentDateTime})</expression>
+  </formulas>
+  <interviewLabel>BarnCRM template: one-field rule before save {!$Flow.CurrentDateTime}</interviewLabel>
+  <isTemplate>true</isTemplate>
+  <label>BarnCRM template: one-field rule before save</label>
+  <processMetadataValues>
+    <name>BuilderType</name>
+    <value>
+      <stringValue>LightningFlowBuilder</stringValue>
+    </value>
+  </processMetadataValues>
+  <processMetadataValues>
+    <name>CanvasMode</name>
+    <value>
+      <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+    </value>
+  </processMetadataValues>
+  <processMetadataValues>
+    <name>OriginBuilderType</name>
+    <value>
+      <stringValue>LightningFlowBuilder</stringValue>
+    </value>
+  </processMetadataValues>
+  <processType>AutoLaunchedFlow</processType>
+  <recordLookups>
+    <description>This flow's switch row on the Automation page, when it is off.</description>
+    <name>Get_Switch_Off</name>
+    <label>Get switch off</label>
+    <locationX>50</locationX>
+    <locationY>300</locationY>
+    <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+    <connector>
+      <targetReference>Switch</targetReference>
+    </connector>
+    <filterLogic>and</filterLogic>
+    <filters>
+      <field>Automation_Name__c</field>
+      <operator>EqualTo</operator>
+      <value>
+        <elementReference>cSwitchName</elementReference>
+      </value>
+    </filters>
+    <filters>
+      <field>Enabled__c</field>
+      <operator>EqualTo</operator>
+      <value>
+        <booleanValue>false</booleanValue>
+      </value>
+    </filters>
+    <getFirstRecordOnly>true</getFirstRecordOnly>
+    <object>Automation_Setting__c</object>
+    <queriedFields>Id</queriedFields>
+    <storeOutputAutomatically>true</storeOutputAutomatically>
+  </recordLookups>
+  <start>
+    <locationX>50</locationX>
+    <locationY>0</locationY>
+    <connector>
+      <targetReference>Automation_Control</targetReference>
+    </connector>
+    <filterFormula>ISBLANK({!$Record.MailingCountry})</filterFormula>
+    <object>Contact</object>
+    <recordTriggerType>CreateAndUpdate</recordTriggerType>
+    <triggerType>RecordBeforeSave</triggerType>
+  </start>
+  <status>Draft</status>
+</Flow>

@@ -4,6 +4,8 @@ import ProgramRoster from 'c/programRoster';
 import getRoster from '@salesforce/apex/ProgramRosterController.getRoster';
 import enroll from '@salesforce/apex/ProgramRosterController.enroll';
 import setStage from '@salesforce/apex/ProgramRosterController.setStage';
+import { publish } from 'lightning/messageService';
+import RECORD_CHANGED from '@salesforce/messageChannel/BarnCRM_Record_Changed__c';
 import { format, rosterRows, stageFigures, stageLabel } from '../roster';
 
 setHelpTextForTest({
@@ -147,6 +149,10 @@ describe('c-program-roster', () => {
     });
     expect(one(element, 'result-text').textContent).toBe('Enrollment added.');
     expect(one(element, 'enroll-form')).toBeNull();
+    // The Service Delivery Log on the same program hears that its people changed.
+    expect(publish).toHaveBeenCalledTimes(1);
+    expect(publish.mock.calls[0][1]).toBe(RECORD_CHANGED);
+    expect(publish.mock.calls[0][2]).toEqual({ recordId: PROGRAM_ID, source: 'programRoster' });
   });
 
   it('offers person accounts only in a person account org', async () => {
@@ -188,6 +194,7 @@ describe('c-program-roster', () => {
     await flush();
 
     expect(one(element, 'error-message').message).toBe('Already open in Tutoring.');
+    expect(publish).not.toHaveBeenCalled();
   });
 
   it('lists ended enrollments too when Show Ended is on', async () => {

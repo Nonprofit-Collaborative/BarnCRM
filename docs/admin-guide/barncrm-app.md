@@ -9,11 +9,11 @@ Five serve every organization, nonprofit or for-profit; four are for nonprofits.
 |---|---|---|---|
 | **BarnCRM Console** | Universal | Everyone with a BarnCRM role | Home, Contacts, Households, Organizations, Accounts, Addresses, Relationships, Affiliations, Household Members, Data Manager, then the everyday pages of modules with no app of their own (Forms, Form Submissions, Logic Models, Payments, Component Builder, Advanced Reporting) and of Scholarships and Outbound Grants |
 | **BarnCRM Admin Console** | Universal | The BarnCRM Admin role only | BarnCRM Settings, Data Manager, Duplicate Matching, Automation, every installed module's admin pages (among them Forms Home and Forms, Portal Builder Home, Portals and Portal Accesses, and Super Connector), Error Log |
-| **BarnCRM Members and Partners** | Universal | Memberships and Corporate Hub role holders | Memberships Home, Memberships, Member Certifications, Membership Levels, Certifications, Corporate Hub Home, Library Documents, Compliance Obligations, Agreements, Boards and Committees, Board Meetings, Processing Activities, Data Subject Requests, Data Breaches, Reports, Dashboards, Error Log |
-| **BarnCRM Events** | Universal | Event Management role holders | Events Home, Event Calendar, Events, Event Speakers, Venues, Reports, Error Log |
-| **BarnCRM Projects** | Universal | Project Management role holders | Projects Home, Timesheet, Approvals, Requests, Projects, Time Entries, Project Expenses, Project Resources, Staffing, Project Rates, Project Invoices, Request Connections, Reports, Error Log |
+| **BarnCRM Members and Partners** | Universal | Memberships and Corporate Hub role holders | Memberships Home, Memberships, Member Certifications, Membership Levels, Certifications, Corporate Hub Home, Library Documents, Compliance Obligations, Agreements, Boards and Committees, Board Meetings, Processing Activities, Data Subject Requests, Data Breaches, Reports, Dashboards |
+| **BarnCRM Events** | Universal | Event Management role holders | Events Home, Event Calendar, Events, Event Speakers, Venues, Reports |
+| **BarnCRM Projects** | Universal | Project Management role holders | Projects Home, Timesheet, Approvals, Requests, Projects, Time Entries, Project Expenses, Project Resources, Staffing, Project Rates, Project Invoices, Request Connections, Reports |
 | **BarnCRM Fundraising** | Nonprofit | Fundraising role holders | Fundraising Home, Quick Gift Entry, Contacts, Households, Organizations, Gifts, Commitments, Ask Pipeline, Gift Batches, Receipts, Stewardship Plans, Thank-Yous, Reports, with its utility bar |
-| **BarnCRM Grants** | Nonprofit | Grants role holders | Grants Home, Grant Pipeline, Grant Calendar, Grant Finder, Grants, Grant Requirements, Grant Answers, Funder Report Templates, Grant Checklist Items, then Scholarships Home, Award Programs, Award Applications and Awards (with Scholarships and Outbound Grants), Reports, Dashboards, Error Log |
+| **BarnCRM Grants** | Nonprofit | Grants role holders | Grants Home, Grant Pipeline, Grant Calendar, Grant Finder, Grants, Grant Requirements, Grant Answers, Funder Report Templates, Grant Checklist Items, then Scholarships Home, Award Programs, Award Applications and Awards (with Scholarships and Outbound Grants), Reports, Dashboards |
 | **BarnCRM Programs** | Nonprofit | Programs role holders | Programs Home, Programs, Cohorts, Sessions, Enrollments, Service Deliveries, Case Notes, Referrals, Service Counts, Goals, Reports |
 | **BarnCRM Volunteers** | Nonprofit | Volunteers role holders | Volunteers Home, Volunteer Jobs, Shifts, Sign-Ups, Hours, Approve Hours, Letter Templates, Skills, Requirements, Reports, Dashboards |
 
@@ -28,8 +28,11 @@ your organizations. **BarnCRM Admin Console** holds every BarnCRM tool and setti
 place. **Super Importer**, **Find** and **Super Transformer** are not in any app's navigation:
 open them from the tiles on the **Data Manager** tab, which also has tiles for **Org Optimizer**
 and **Duplicate Matching**. The raw **Import Rows** tab is in no app's navigation either: open
-it from an import's results in Super Importer, or from the App Launcher. **Error Log** is always
-the last tab of an app that has it, after any pages a module adds. In BarnCRM Console, **Data
+it from an import's results in Super Importer, or from the App Launcher. **Error Log** is an
+admin tool, so it is only in **BarnCRM Admin Console**, always its last tab, after any pages a
+module adds. The staff apps (BarnCRM Console, Members and Partners, Events, Projects,
+Fundraising, Grants, Programs and Volunteers) never list it; staff see a plain message when
+something fails, and the admin finds the details in the Error Log. In BarnCRM Console, **Data
 Manager** is the last Core tab and a module's pages follow it.
 
 Each page's icon matches what it does, and the page header and its console tab show the same
@@ -88,8 +91,9 @@ Admin Console.
 
 ### The Module Apps
 
-Each module app is a console app with its own logo, every page of its modules, **Reports**, and
-**Error Log** last where the module ships it. The module's permission sets show the app, so
+Each module app is a console app with its own logo, every page of its modules, and **Reports**
+(and **Dashboards** where the module ships dashboards). Module apps are staff apps, so none has
+an **Error Log** tab: it is in **BarnCRM Admin Console**. The module's permission sets show the app, so
 whoever has the module's Staff, Admin or Read Only set sees it in the App Launcher. **BarnCRM
 Members and Partners** is shown by the Memberships and Corporate Hub sets; nobody sees it until
 one of the two is installed.
@@ -139,7 +143,9 @@ from the module catalog, not from the app's own file:
 | Logic Models, Payments, Component Builder, Advanced Reporting | **BarnCRM Console** | **BarnCRM Admin Console**: their setup pages |
 
 A module's pages go before an app's **Reports**, **Dashboards** and **Error Log** tabs, or at
-the end of BarnCRM Console, so Error Log stays last. A form, form submission or event opens on
+the end of BarnCRM Console, so Error Log stays last in BarnCRM Admin Console, the one app that
+has it. When you add a module's tabs to an app yourself in App Manager, keep **Error Log** out
+of the staff apps and last in BarnCRM Admin Console. A form, form submission or event opens on
 its own record page from any app, since its module makes that page the org default.
 
 - **Deployed from source** with `scripts/org/deploy-packages.sh`: the script adds the pages

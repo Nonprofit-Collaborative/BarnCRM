@@ -59,7 +59,7 @@
 
         <div class="slds-grid slds-gutters slds-wrap slds-grid_vertical-align-end slds-var-m-vertical_small" data-id="add-row">
           <lightning-combobox class="slds-col" label={labels.project} options={projectOptions} value={rowDraft.projectId} onchange={handleProject} data-id="row-project"></lightning-combobox>
-          <lightning-combobox class="slds-col" label={labels.task} options={taskOptions} value={rowDraft.taskId} data-field="taskId" onchange={handleRowDraft}></lightning-combobox>
+          <lightning-combobox class="slds-col" label={labels.task} options={taskOptions} value={rowDraft.taskId} data-field="taskId" onchange={handleRowDraft} data-id="row-task"></lightning-combobox>
           <lightning-input class="slds-col" type="checkbox" label={labels.billable} checked={rowDraft.billable} data-field="billable" onchange={handleRowDraft}></lightning-input>
           <lightning-button class="slds-col" label={labels.addRow} onclick={handleAddRow} data-id="add-row-button"></lightning-button>
         </div>

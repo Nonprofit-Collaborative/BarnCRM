@@ -70,3 +70,97 @@ second copy of each query and without moving the reads back to Apex.
    controllers this ADR removed, and the stale Apex cache with them.
 4. **Trade-off.** A dynamic query loses the compiler's check that each field exists. The
    schema imports keep that check: a renamed or deleted field fails the import at deploy.
+
+## Amendment A2, 2026-11-22: the AP-03 inventory (D-219)
+
+AP-03 moves the remaining flat reads and single-record writes off Apex. The inventory below is
+every `@AuraEnabled` method that `scripts/ci/check-aura-lds.py` matches, plus the near misses a
+wider scan found (one query and one write, or one selector call). Each row is converted or
+kept, with the reason.
+
+1. **Convert** when the method is one object read as the user, or one record written as the
+   user, and anything else it does is shaping the LWC can do (trimming, a default value, the
+   object's create or update permission from `getObjectInfo`). The LWC uses the target named,
+   and the Apex method and its tests are deleted.
+2. **Keep** when the method checks a custom permission or a module setting (custom metadata,
+   which the UI API does not read), checks record access (`UserRecordAccess`, which the UI API
+   does not expose), uses SOSL or describe, validates input on the server, writes more than one
+   record, or composes several objects.
+3. **The check.** It now blanks string literals before counting DML, so an error context such
+   as `'Bulk update fields'` is not a write; that removed the two Bulk Update false positives.
+   Every line of `scripts/ci/aura-lds-allowlist.txt` now says keep (with the reason) or
+   convert (with the target); a convert line goes when its module's follow-up lands.
+4. **A converted write loses its Error Log entry** from the controller, as the Consequences
+   above already accept; a trigger failure still logs.
+5. **Error wording stays.** A failed Lightning Data Service write carries the record's own
+   message (a validation rule, a trigger's `addError`) under `body.output`; Core's
+   `c/findCsv` `messageFrom` reads it first, so the toast says what the Apex method's
+   `getDmlMessage` said before.
+
+| Class.method | Package | Kind | Decision and target | Keep-reason |
+| --- | --- | --- | --- | --- |
+| ErrorLogController.getBugReport | core | read | Converted (AP-03 part 1): `getRecords` on the listed entries, Technical Detail optional | |
+| BulkUpdateController.getTargets | core | read | Keep | Describe and the Bulk Update permission (was a false positive) |
+| BulkUpdateController.getCopySources | core | read | Keep | Describe and the Bulk Update permission (was a false positive) |
+| HouseholdMergeController.canEdit | core | read | Keep | Record edit access (`UserRecordAccess`) |
+| HouseholdOfPersonController.makePrimary | core | write | Keep | Writes every member row of the household |
+| ImportController.saveFile | core | write | Keep | Import permission, file decoded and stored as a ContentVersion |
+| AccessExplorerController.searchPeople | orgoptimizer | read | Keep | SOSL name search and the Access Explorer permission |
+| AccessExplorerController.searchPermissionSets | orgoptimizer | read | Keep | PermissionSet is not in the UI API |
+| AskPipelineController.moveStage | giving | write | Converted (AP-03 part 3): `updateRecord` | |
+| CommitmentController.getSchedule | giving | read | Keep | Two objects and record edit access |
+| CommitmentEntryController.save | giving | write | Keep | Server validation and the draft built from the entry |
+| FundraisingHomeController.getHome | giving | read | Keep | Composes the home tiles; the one query is a first-run check |
+| QuickGiftEntryController.getMatchableGifts | giving | read | Converted (AP-03 part 3): GraphQL (`Gift__c`, employer filter through both donor lookups) | |
+| ReceiptController.getTemplates | giving | read | Converted (AP-03 part 3): GraphQL (`Receipt_Template__c` by Type, Name) | |
+| ReceiptController.getRuns | giving | read | Converted (AP-03 part 3): GraphQL (`Receipt_Run__c`, latest 10) | |
+| RecurringHealthController.createFollowUp | giving | write | Keep | Reads the commitment and writes a Task (two objects) |
+| StewardshipPlanController.deleteStep | giving | write | Keep | Manage BarnCRM Settings permission |
+| StewardshipPlanController.setActive | giving | write | Keep | Manage BarnCRM Settings permission |
+| EligibilityController.saveRules | programs | write | Keep | Rules validated against the program's fields (describe) |
+| CohortController.getPersonName | programs | read | Converted (AP-03 programs): `getRecords` on the picked people, optional `Contact.Name` and `Account.Name` (confirm in an org) | |
+| EventAgendaController.moveSession | events | write | Converted (AP-03 events): `updateRecord` | |
+| EventAppointmentsController.addSlots | events | write | Keep | Writes several slots |
+| EventProposalReview.removePresenter | events | write | Converted (AP-03 events): `deleteRecord` | |
+| EventProposalReview.saveCriteria | events | write | Keep | Criteria JSON validated on the server |
+| EventSeatingController.deleteTable | events | write | Converted (AP-03 events): `deleteRecord` | |
+| EventSeatingController.saveNeeds | events | write | Converted (AP-03 events): `updateRecord`, trimmed in `eventSeatingModel` | |
+| EventSpeakersController.addSpeaker | events | write | Converted (AP-03 events): `createRecord` | |
+| EventSpeakersController.assign | events | write | Converted (AP-03 events): `createRecord` | |
+| EventSponsorsController.addDeliverable | events | write | Converted (AP-03 events): `createRecord`, trimmed and Type defaulted in `eventSponsorsModel` | |
+| EventSponsorsController.removeSponsor | events | write | Converted (AP-03 events): `deleteRecord` | |
+| EventSponsorsController.setDeliverableStatus | events | write | Converted (AP-03 events): `updateRecord` | |
+| EventVolunteersController.getVolunteers | events | read | Keep | Volunteers jobs through the extension point |
+| FormRunnerController.getPublishedForms | forms | read | Converted (AP-03 forms): GraphQL (`Form__c` Published, by Name) | |
+| FormSubmissionController.getSubmission | forms | read | Converted (AP-03 forms): GraphQL (`Form_Submission__c` with form and version) and `getObjectInfo`, shaped in `c/formSubmissionModel` | |
+| GrantAnswerController.getLibrary | funders | read | Converted (AP-03 part 3): GraphQL (`Grant_Answer__c` by Name) and `getObjectInfo`; the emptied class is removed | |
+| GrantAnswerController.markUsed | funders | write | Converted (AP-03 part 3): `updateRecord` | |
+| GrantPipelineController.moveStage | funders | write | Converted (AP-03 part 3): `updateRecord` | |
+| GrantPipelineController.recordAward | funders | write | Converted (AP-03 part 3): `updateRecord` | |
+| LwcBuilderController.getStudio | lwcbuilder | read | Keep | Returns the module settings (custom metadata) |
+| LwcBuilderController.loadComponent | lwcbuilder | read | Keep | Returns the Components Enabled setting |
+| LwcBuilderController.saveComponent | lwcbuilder | write | Keep | Definition validated and versioned on the server |
+| ProjectBillingController.getInvoiceActions | projects | read | Keep | Billing setting, manage permission, payment availability |
+| ProjectBillingController.getProjectBilling | projects | read | Keep | Billing setting and manage permission |
+| ProjectBillingController.exportInvoices | projects | read | Keep | Stamps every exported invoice |
+| ProjectRequestsController.addComment | projects | write | Converted (AP-03 part 3): `createRecord` | |
+| ProjectRequestsController.getRequest | projects | read | Keep (reviewed in AP-03 part 3) | Change Requests setting (custom metadata) read with the request; it enables Create Change Request |
+| ProjectRequestsController.getRequests | projects | read | Keep | Requests setting read with the list |
+| ProjectRequestsController.saveRequest | projects | write | Converted (AP-03 part 3): `updateRecord`, editable fields listed in the LWC | |
+| ProjectStaffingController.saveResource | projects | write | Keep | Upsert by user and the staffing setting |
+| ProjectTimesheetController.addExpense | projects | write | Keep | Expenses setting |
+| ProjectTimesheetController.getTasks | projects | read | Converted (AP-03 part 3): GraphQL (`Project_Task__c` open, by Sort Order) | |
+| ProjectsController.addTask | projects | write | Converted (AP-03 part 3): `createRecord`, blank name refused in the LWC | |
+| ProjectsController.getAtRisk | projects | read | Converted (AP-03 part 3): GraphQL (`Project__c` at risk or off track), Only Mine filtered in the LWC | |
+| ProjectsController.logTime | projects | write | Keep | Time tracking setting |
+| ProjectsController.setTaskStatus | projects | write | Converted (AP-03 part 3): `updateRecord`, Completed Date set in the LWC | |
+| ReportingLibrary.remove | reporting | write | Keep | Owner check on a ContentDocument |
+| ScholarshipsController.getAward | scholarships | read | Keep | Payments from a second object and the manage permission |
+| ScholarshipsController.getBoard | scholarships | read | Keep | Review board across objects, blind review |
+| ScholarshipsController.getReview | scholarships | read | Keep | Rubric, the reviewer's own review, blind review |
+| VolunteersHomeController.getFirstRun | volunteers | read | Converted (AP-03 programs): GraphQL (`Volunteer_Job__c`, first 1) and `getObjectInfo` | |
+
+Of the 61 methods, 28 are converted (1 in this part, 27 in the module follow-ups) and 33 stay
+in Apex. `ProjectRequestsController.getRequest` was first listed to convert; the projects
+follow-up kept it, since the panel's Create Change Request needs the Change Requests setting,
+which the UI API does not read.

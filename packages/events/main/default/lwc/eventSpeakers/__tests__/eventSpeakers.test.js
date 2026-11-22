@@ -1,19 +1,11 @@
 import { createElement } from 'lwc';
 import EventSpeakers from 'c/eventSpeakers';
 import getSpeakers from '@salesforce/apex/EventSpeakersController.getSpeakers';
-import addSpeaker from '@salesforce/apex/EventSpeakersController.addSpeaker';
-import assign from '@salesforce/apex/EventSpeakersController.assign';
 import removeSpeaker from '@salesforce/apex/EventSpeakersController.removeSpeaker';
-import { deleteRecord } from 'lightning/uiRecordApi';
+import { createRecord, deleteRecord } from 'lightning/uiRecordApi';
 import EventRecordModal from 'c/eventRecordModal';
 
 jest.mock('@salesforce/apex/EventSpeakersController.getSpeakers', () => ({ default: jest.fn() }), {
-  virtual: true
-});
-jest.mock('@salesforce/apex/EventSpeakersController.addSpeaker', () => ({ default: jest.fn() }), {
-  virtual: true
-});
-jest.mock('@salesforce/apex/EventSpeakersController.assign', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock(
@@ -21,7 +13,9 @@ jest.mock(
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
-jest.mock('lightning/uiRecordApi', () => ({ deleteRecord: jest.fn() }), { virtual: true });
+jest.mock('lightning/uiRecordApi', () => ({ createRecord: jest.fn(), deleteRecord: jest.fn() }), {
+  virtual: true
+});
 
 const EVENT_ID = 'a01000000000001AAA';
 const ANA = 'a05000000000001AAA';
@@ -104,21 +98,21 @@ describe('c-event-speakers', () => {
 
   it('adds the picked person as a speaker and reloads', async () => {
     const element = await render();
-    addSpeaker.mockResolvedValue('a05000000000009AAA');
+    createRecord.mockResolvedValue({ id: 'a05000000000009AAA' });
     one(element, '[data-id="add-speaker"]').dispatchEvent(
       new CustomEvent('change', { detail: { recordId: '003000000000002AAA' } })
     );
     await flush();
-    expect(addSpeaker).toHaveBeenCalledWith({
-      eventId: EVENT_ID,
-      contactId: '003000000000002AAA'
+    expect(createRecord).toHaveBeenCalledWith({
+      apiName: 'Event_Speaker__c',
+      fields: { Event__c: EVENT_ID, Contact__c: '003000000000002AAA' }
     });
     expect(getSpeakers).toHaveBeenCalledTimes(2);
   });
 
   it('puts a speaker in a session with a role', async () => {
     const element = await render();
-    assign.mockResolvedValue();
+    createRecord.mockResolvedValue({ id: 'a06000000000009AAA' });
     choose(menuOf(element, 1), 'assign');
     await flush();
     const form = one(element, '[data-id="assign-form"]');
@@ -133,10 +127,13 @@ describe('c-event-speakers', () => {
     await flush();
     one(element, '[data-id="assign-save"]').click();
     await flush();
-    expect(assign).toHaveBeenCalledWith({
-      sessionId: KEYNOTE,
-      speakerId: 'a05000000000002AAA',
-      role: 'Moderator'
+    expect(createRecord).toHaveBeenCalledWith({
+      apiName: 'Session_Speaker__c',
+      fields: {
+        Event_Session__c: KEYNOTE,
+        Event_Speaker__c: 'a05000000000002AAA',
+        Role__c: 'Moderator'
+      }
     });
     expect(one(element, '[data-id="assign-form"]')).toBeNull();
   });

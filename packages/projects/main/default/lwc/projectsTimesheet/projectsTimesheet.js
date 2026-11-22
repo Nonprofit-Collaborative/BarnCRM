@@ -1,6 +1,10 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, wire } from 'lwc';
+import { gql, graphql } from 'lightning/graphql';
+import TASK from '@salesforce/schema/Project_Task__c';
+import TASK_PROJECT_FIELD from '@salesforce/schema/Project_Task__c.Project__c';
+import TASK_STATUS_FIELD from '@salesforce/schema/Project_Task__c.Status__c';
+import TASK_SORT_FIELD from '@salesforce/schema/Project_Task__c.Sort_Order__c';
 import getWeek from '@salesforce/apex/ProjectTimesheetController.getWeek';
-import getTasks from '@salesforce/apex/ProjectTimesheetController.getTasks';
 import saveWeek from '@salesforce/apex/ProjectTimesheetController.saveWeek';
 import submitWeek from '@salesforce/apex/ProjectTimesheetController.submitWeek';
 import recallWeek from '@salesforce/apex/ProjectTimesheetController.recallWeek';
@@ -21,6 +25,37 @@ import {
 
 const PKG = 'Projects';
 const CATEGORIES = ['Travel', 'Lodging', 'Meals', 'Mileage', 'Software', 'Supplies', 'Other'];
+const TASK_OBJECT = TASK.objectApiName;
+
+/**
+ * A project's open tasks for a new row, read as the user (ADR-0093 A2), names from schema
+ * imports (A1): not Done or Cancelled, by Sort Order then name.
+ */
+const OPEN_TASKS_QUERY = gql`
+  query openTasks($projectId: ID) {
+    uiapi {
+      query {
+        ${TASK_OBJECT}(
+          where: {
+            ${TASK_PROJECT_FIELD.fieldApiName}: { eq: $projectId }
+            ${TASK_STATUS_FIELD.fieldApiName}: { nin: ["Done", "Cancelled"] }
+          }
+          orderBy: { ${TASK_SORT_FIELD.fieldApiName}: { order: ASC, nulls: LAST }, Name: { order: ASC } }
+          first: 200
+        ) {
+          edges {
+            node {
+              Id
+              Name {
+                value
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
 
 /**
  * Timesheet (PM-07, PM-08): a person's week, Monday to Sunday, as a grid of hours for each
@@ -40,6 +75,8 @@ export default class ProjectsTimesheet extends LightningElement {
   notice;
   rowDraft = { billable: true };
   taskOptions = [];
+  /** The open-tasks query's variables; undefined until a project is chosen, so nothing is read. */
+  taskVariables;
   expense = { billable: false, category: 'Travel' };
   receiptFor;
 
@@ -214,14 +251,23 @@ export default class ProjectsTimesheet extends LightningElement {
     };
   }
 
-  async handleProject(event) {
-    this.rowDraft = { ...this.rowDraft, projectId: event.detail.value, taskId: undefined };
-    try {
-      const tasks = await getTasks({ projectId: event.detail.value });
-      this.taskOptions = tasks.map((task) => ({ label: task.name, value: task.id }));
-    } catch (error) {
-      this.errorMessage = messageFrom(error);
+  @wire(graphql, { query: OPEN_TASKS_QUERY, variables: '$taskVariables' })
+  receiveTasks({ data, errors }) {
+    if (errors && errors.length) {
+      this.taskOptions = [];
+      this.errorMessage = helpText('Projects', 'Projects_Error_Generic');
+    } else if (data) {
+      this.taskOptions = data.uiapi.query[TASK_OBJECT].edges.map(({ node }) => ({
+        label: node.Name.value,
+        value: node.Id
+      }));
     }
+  }
+
+  handleProject(event) {
+    this.taskOptions = [];
+    this.rowDraft = { ...this.rowDraft, projectId: event.detail.value, taskId: undefined };
+    this.taskVariables = event.detail.value ? { projectId: event.detail.value } : undefined;
   }
 
   handleAddRow() {

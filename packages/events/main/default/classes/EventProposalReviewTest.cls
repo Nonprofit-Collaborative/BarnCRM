@@ -180,7 +180,8 @@ private class EventProposalReviewTest {
 			} catch (AuraHandledException e) {
 				sixth = true;
 			}
-			EventProposalReview.removePresenter([SELECT Id FROM Proposal_Presenter__c WITH USER_MODE LIMIT 1].Id);
+			// The Applications tab removes a presenter through Lightning Data Service (ADR-0093).
+			delete as user [SELECT Id FROM Proposal_Presenter__c WITH USER_MODE LIMIT 1];
 			Boolean badCriteria = false;
 			try {
 				EventProposalReview.saveCriteria(talk.Event__c, '[{"label":"A","weight":0}]');

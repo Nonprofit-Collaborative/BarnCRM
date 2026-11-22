@@ -141,6 +141,71 @@ private class ArchiveJobTest {
 		System.Assert.areEqual(2, reread(job.Id).Rows_Rejected__c, 'Both named as not saved');
 	}
 
+	/**
+	 * Runs a three volunteer archive one record per Copy. After the first Copy, either the cursor
+	 * is lost (`cursorGone`) or the second volunteer is deleted.
+	 */
+	private static Import_Batch__c archiveOneByOne(ArchiveStoreMemory store, Boolean cursorGone) {
+		BigObjectArchiveJob.queuedForTest = new List<Object>();
+		BigObjectArchiveJob.chunkSize = 1;
+		Import_Batch__c job;
+		System.runAs(archivist()) {
+			job = ArchiveDestinations.forKey(ArchiveRules.BIG_OBJECT)
+				.start(new ArchiveRun(null, 'Old Volunteers', VOLUNTEERS, 'Contact', 3));
+			((Queueable) BigObjectArchiveJob.queuedForTest.remove(0)).execute(null);
+			System.Assert.areEqual(1, store.rowsByKey.size(), 'The first Copy took one record');
+			if (cursorGone) {
+				BigObjectArchiveJob.cursorGoneForTest = true;
+			} else {
+				// Deleted after the cursor opened: a gap the run steps over.
+				List<Contact> rest = [
+					SELECT Id
+					FROM Contact
+					WHERE Title = 'Volunteer'
+					WITH SYSTEM_MODE
+					ORDER BY Id
+				];
+				Database.delete(rest[1], AccessLevel.SYSTEM_MODE);
+			}
+			// One record per Copy runs many links: they share the test's own limits with the
+			// outer ones, as a real chain gives each link its own.
+			Test.startTest();
+			while (!BigObjectArchiveJob.queuedForTest.isEmpty() && Limits.getQueries() < 60) {
+				((Queueable) BigObjectArchiveJob.queuedForTest.remove(0)).execute(null);
+			}
+			Test.stopTest();
+			drain();
+		}
+		return reread(job.Id);
+	}
+
+	@IsTest
+	static void theCursorStepsOverRecordsDeletedSinceItOpened() {
+		System.runAs(TestUsers.admin()) {
+			makePeople(3);
+		}
+		ArchiveStoreMemory store = ArchiveStoreMemory.install();
+		Import_Batch__c job = archiveOneByOne(store, false);
+		System.Assert.areEqual(ImportBatchService.STATUS_COMPLETE, job.Status__c, 'Complete: ' + job.Run_Log__c);
+		System.Assert.areEqual(2, job.Rows_Deleted__c, 'The two still there archived');
+		System.Assert.areEqual(2, store.rowsByKey.size(), 'Two rows archived');
+		System.Assert.areEqual(1, [SELECT COUNT() FROM Contact WITH SYSTEM_MODE], 'Only the staff person left');
+	}
+
+	@IsTest
+	static void aCursorThePlatformLetGoIsOpenedAgainWhereTheRunWas() {
+		System.runAs(TestUsers.admin()) {
+			makePeople(3);
+		}
+		ArchiveStoreMemory store = ArchiveStoreMemory.install();
+		Import_Batch__c job = archiveOneByOne(store, true);
+		System.Assert.isFalse(BigObjectArchiveJob.cursorGoneForTest, 'The lost cursor was met');
+		System.Assert.areEqual(ImportBatchService.STATUS_COMPLETE, job.Status__c, 'Complete: ' + job.Run_Log__c);
+		System.Assert.areEqual(3, job.Rows_Deleted__c, 'Each record archived once');
+		System.Assert.areEqual(3, store.rowsByKey.size(), 'Three rows, none twice');
+		System.Assert.areEqual(1, [SELECT COUNT() FROM Contact WITH SYSTEM_MODE], 'Only the staff person left');
+	}
+
 	@IsTest
 	static void stopsAtTheCap() {
 		System.runAs(TestUsers.admin()) {
@@ -347,6 +412,7 @@ private class ArchiveJobTest {
 			List<Archived_Record__b> rows = first.rowsFor(page);
 			System.Assert.areEqual(1, rows.size(), 'Halved to the first organization: ' + first.notes);
 			System.Assert.areEqual(String.valueOf(page[0].Id), rows[0].Original_Id__c, 'The first one');
+			System.Assert.areEqual(2, first.leftOver.size(), 'The two not reached wait for the next Copy');
 
 			Account tooMany = page[2].Name == 'Kids Org C'
 				? page[2]

@@ -1,6 +1,8 @@
 import { LightningElement } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import { updateRecord } from 'lightning/uiRecordApi';
 import ASK from '@salesforce/schema/Ask__c';
+import ASK_STAGE from '@salesforce/schema/Ask__c.Stage__c';
 import GIFT from '@salesforce/schema/Gift__c';
 import GIFT_DATE from '@salesforce/schema/Gift__c.Gift_Date__c';
 import GIFT_AMOUNT from '@salesforce/schema/Gift__c.Amount__c';
@@ -11,7 +13,6 @@ import PLEDGE_START from '@salesforce/schema/Commitment__c.Start_Date__c';
 import PLEDGE_TOTAL from '@salesforce/schema/Commitment__c.Expected_Total__c';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getBoard from '@salesforce/apex/AskPipelineController.getBoard';
-import moveStage from '@salesforce/apex/AskPipelineController.moveStage';
 import closeAsk from '@salesforce/apex/AskPipelineController.closeAsk';
 import reopenAsk from '@salesforce/apex/AskPipelineController.reopenAsk';
 import BarnConfirmModal from 'c/barnConfirmModal';
@@ -71,7 +72,7 @@ import MOVED from '@salesforce/label/c.Core_Shared_MovedTo';
 import REOPEN_ASK from '@salesforce/label/c.Giving_AskPipeline_ReopenAsk';
 import RECENTLY_CLOSED from '@salesforce/label/c.Giving_AskPipeline_RecentlyClosed';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
-import { messageFrom } from 'c/findCsv';
+import { messageFrom, recordErrorMessage } from 'c/findCsv';
 
 const ACTION_OPEN = 'open';
 const ACTION_CLOSE = 'close';
@@ -496,11 +497,13 @@ export default class AskPipeline extends NavigationMixin(LightningElement) {
   /**
    * Moves an ask to another stage. A move from the menu is announced here; a drag is announced
    * by the drag controller. Resolves true when the move was saved, false when it was refused.
+   * Saved as the user through Lightning Data Service (ADR-0093 A2); the ask rules check the
+   * stage (R-SO2) and their refusal is shown in its own words.
    */
   async move(askId, stage, announce = true) {
     const card = this.findCard(askId);
     try {
-      await moveStage({ askId, stage });
+      await updateRecord({ fields: { Id: askId, [ASK_STAGE.fieldApiName]: stage } });
       this.toast(format(MOVED, stage), 'success');
       if (announce) {
         this.liveMessage = helpText(
@@ -513,7 +516,10 @@ export default class AskPipeline extends NavigationMixin(LightningElement) {
       await this.load();
       return true;
     } catch (error) {
-      this.toast(messageOf(error), 'error');
+      this.toast(
+        recordErrorMessage(error, helpText('Giving', 'Giving_AskPipeline_ErrorAction')),
+        'error'
+      );
       return false;
     }
   }

@@ -1,20 +1,22 @@
 import { LightningElement, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
+import { updateRecord } from 'lightning/uiRecordApi';
 import PROJECT from '@salesforce/schema/Project__c';
 import PROJECT_TASK from '@salesforce/schema/Project_Task__c';
+import TASK_STATUS_FIELD from '@salesforce/schema/Project_Task__c.Status__c';
+import TASK_COMPLETED_DATE_FIELD from '@salesforce/schema/Project_Task__c.Completed_Date__c';
 import PROJECT_REQUEST from '@salesforce/schema/Project_Request__c';
 import TIME_ENTRY from '@salesforce/schema/Time_Entry__c';
 import getHome from '@salesforce/apex/ProjectsController.getHome';
-import setTaskStatus from '@salesforce/apex/ProjectsController.setTaskStatus';
 import createFromTemplate from '@salesforce/apex/ProjectsController.createFromTemplate';
 import getUtilization from '@salesforce/apex/ProjectsController.getUtilization';
 import exportBillable from '@salesforce/apex/ProjectsController.exportBillable';
 import applyRates from '@salesforce/apex/ProjectsController.applyRates';
-import { fileName, localIsoDate, messageFrom, toCsv } from 'c/findCsv';
+import { fileName, localIsoDate, messageFrom, recordErrorMessage, toCsv } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
-import { BILLABLE_COLUMNS, utilizationRows } from 'c/projectsModel';
+import { BILLABLE_COLUMNS, completedDateFor, utilizationRows } from 'c/projectsModel';
 
 const PKG = 'Projects';
 
@@ -262,11 +264,18 @@ export default class ProjectsHome extends NavigationMixin(LightningElement) {
   async handleDone(event) {
     this.isWorking = true;
     try {
-      await setTaskStatus({ taskId: event.target.dataset.task, status: 'Done' });
+      // Marked Done as the user through Lightning Data Service (ADR-0093 A2; R-PM4).
+      await updateRecord({
+        fields: {
+          Id: event.target.dataset.task,
+          [TASK_STATUS_FIELD.fieldApiName]: 'Done',
+          [TASK_COMPLETED_DATE_FIELD.fieldApiName]: completedDateFor('Done', localIsoDate())
+        }
+      });
       this.notice = helpText('Projects', 'Projects_Home_Marked');
       await this.load();
     } catch (error) {
-      this.errorMessage = messageFrom(error);
+      this.errorMessage = recordErrorMessage(error);
     } finally {
       this.isWorking = false;
     }

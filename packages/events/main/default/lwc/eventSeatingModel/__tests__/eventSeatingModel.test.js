@@ -1,6 +1,7 @@
 import {
   guestsAt,
   moveSeats,
+  needsFields,
   overflowAfter,
   partyOf,
   seatingCsv,
@@ -24,6 +25,19 @@ const GUESTS = [
 ];
 
 describe('eventSeatingModel', () => {
+  it('saves both needs trimmed, blank as none', () => {
+    expect(needsFields('g1', '  Nut allergy ', '   ')).toEqual({
+      Id: 'g1',
+      Dietary_Needs__c: 'Nut allergy',
+      Access_Needs__c: null
+    });
+    expect(needsFields('g1', undefined, 'Step free')).toEqual({
+      Id: 'g1',
+      Dietary_Needs__c: null,
+      Access_Needs__c: 'Step free'
+    });
+  });
+
   it('counts seats taken, free and over', () => {
     const rows = tableCounts(TABLES, [
       ...GUESTS,

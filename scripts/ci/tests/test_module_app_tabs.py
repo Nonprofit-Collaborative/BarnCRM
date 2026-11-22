@@ -16,6 +16,8 @@ spec.loader.exec_module(mat)
 NS = {"m": mat.NS}
 CORE = "packages/core/main/default"
 CORE_ROLE_APPS = (mat.STAFF_APP, mat.ADMIN_APP)
+# The apps that hold admin tools. Every other app is a staff app (OD-17).
+ADMIN_APPS = {mat.ADMIN_APP}
 
 CONSOLE = """<?xml version="1.0" encoding="UTF-8" ?>
 <CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
@@ -361,16 +363,23 @@ class CoreAppsTest(unittest.TestCase):
         for app_name in CORE_ROLE_APPS:
             self.assertIn("Data_Manager", [tab.text for tab in apps[app_name].findall("m:tabs", NS)], app_name)
 
-    def test_error_log_is_the_last_tab_of_every_app_that_has_it(self):
+    def test_error_log_is_in_admin_apps_only_and_always_last(self):
+        """Error Log is an admin tool: it stays out of every staff app (OD-17) and is the last
+        tab of an admin app (D-135). No catalog row may list it as a staff tab either, since
+        module-app-tabs.py would carry it into a staff app at deploy."""
         root = os.path.join(HERE, "..", "..", "..")
         pattern = os.path.join(root, "packages", "*", "main", "default", "applications", "*.app-meta.xml")
         paths = glob.glob(pattern)
         self.assertTrue(paths)
         for path in paths:
-            app = ET.parse(path).getroot()
-            tabs = [tab.text for tab in app.findall("m:tabs", NS)]
-            if mat.ERROR_LOG_TAB in tabs:
-                self.assertEqual(tabs[-1], mat.ERROR_LOG_TAB, f"{os.path.basename(path)}: Error Log is last")
+            name = os.path.basename(path)[: -len(".app-meta.xml")]
+            tabs = [tab.text for tab in ET.parse(path).getroot().findall("m:tabs", NS)]
+            if name in ADMIN_APPS:
+                self.assertEqual(tabs[-1], mat.ERROR_LOG_TAB, f"{name}: Error Log is last")
+            else:
+                self.assertNotIn(mat.ERROR_LOG_TAB, tabs, f"{name} is a staff app: Error Log stays out (OD-17)")
+        for row in mat.catalog(root):
+            self.assertNotIn(mat.ERROR_LOG_TAB, mat.names(row.get("Staff_Tabs__c")), row.get("Package_Folder__c"))
 
     def test_duplicate_matching_is_in_the_admin_console(self):
         tabs = [tab.text for tab in self.core_apps()[mat.ADMIN_APP].findall("m:tabs", NS)]

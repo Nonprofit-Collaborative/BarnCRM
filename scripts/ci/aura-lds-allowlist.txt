@@ -2,50 +2,27 @@
 # Seeded with every match when scripts/ci/check-aura-lds.py was added. Remove an entry when its
 # method is converted to Lightning Data Service or GraphQL; a stale entry fails the check.
 # New code must not be added here without a reason written beside the line.
+# ADR-0093 Amendment A2 (AP-03) decides each line: "keep" lines stay in Apex for the reason
+# given; "convert" lines are waiting for their module's AP-03 follow-up.
 
-AccessExplorerController.searchPeople
-AccessExplorerController.searchPermissionSets
-AskPipelineController.moveStage
-BulkUpdateController.getCopySources
-BulkUpdateController.getTargets
-CommitmentController.getSchedule
-CommitmentEntryController.save
-EligibilityController.saveRules
-EventAgendaController.moveSession
-EventProposalReview.removePresenter
-EventProposalReview.saveCriteria
-EventSeatingController.deleteTable
-EventSeatingController.saveNeeds
-EventSpeakersController.addSpeaker
-EventSpeakersController.assign
-EventSponsorsController.addDeliverable
-EventSponsorsController.removeSponsor
-EventSponsorsController.setDeliverableStatus
-EventVolunteersController.getVolunteers
-FormRunnerController.getPublishedForms
-FormSubmissionController.getSubmission
-FundraisingHomeController.getHome
-GrantAnswerController.getLibrary
-GrantAnswerController.markUsed
-GrantPipelineController.moveStage
-LwcBuilderController.getStudio  # also returns the module settings (store, no query), which LDS cannot read
-LwcBuilderController.loadComponent  # also returns the Components Enabled setting (store, no query)
-ProjectBillingController.getInvoiceActions
-ProjectBillingController.getProjectBilling
-ProjectRequestsController.addComment
-ProjectRequestsController.getRequest
-ProjectRequestsController.getRequests
-ProjectRequestsController.saveRequest
-ProjectTimesheetController.addExpense
-ProjectTimesheetController.getTasks
-ProjectsController.addTask
-ProjectsController.getAtRisk
-ProjectsController.logTime
-ProjectsController.setTaskStatus
-QuickGiftEntryController.getMatchableGifts
-ScholarshipsController.getAward
-ScholarshipsController.getBoard
-ScholarshipsController.getReview
-StewardshipPlanController.deleteStep
-StewardshipPlanController.setActive
-VolunteersHomeController.getFirstRun
+AccessExplorerController.searchPeople  # keep: SOSL name search and the Access Explorer permission
+AccessExplorerController.searchPermissionSets  # keep: PermissionSet is not in the UI API
+CommitmentController.getSchedule  # keep: two objects and record edit access
+CommitmentEntryController.save  # keep: server validation and the draft built from the entry
+EligibilityController.saveRules  # keep: rules validated against the program's fields
+EventProposalReview.saveCriteria  # keep: criteria JSON validated on the server
+EventVolunteersController.getVolunteers  # keep: Volunteers jobs through the extension point
+FundraisingHomeController.getHome  # keep: composes the home tiles
+LwcBuilderController.getStudio  # keep: also returns the module settings (store, no query), which LDS cannot read
+LwcBuilderController.loadComponent  # keep: also returns the Components Enabled setting (store, no query)
+ProjectBillingController.getInvoiceActions  # keep: billing setting, manage permission, payment availability
+ProjectBillingController.getProjectBilling  # keep: billing setting and manage permission
+ProjectRequestsController.getRequest  # keep: Change Requests setting read with the request
+ProjectRequestsController.getRequests  # keep: requests setting read with the list
+ProjectTimesheetController.addExpense  # keep: expenses setting
+ProjectsController.logTime  # keep: time tracking setting
+ScholarshipsController.getAward  # keep: payments from a second object and the manage permission
+ScholarshipsController.getBoard  # keep: review board across objects, blind review
+ScholarshipsController.getReview  # keep: rubric, the reviewer's own review, blind review
+StewardshipPlanController.deleteStep  # keep: Manage BarnCRM Settings permission
+StewardshipPlanController.setActive  # keep: Manage BarnCRM Settings permission

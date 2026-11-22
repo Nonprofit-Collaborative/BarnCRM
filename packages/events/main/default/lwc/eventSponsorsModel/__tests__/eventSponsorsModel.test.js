@@ -1,6 +1,23 @@
-import { committedTotal, linkedText, progressText, sponsorWord } from 'c/eventSponsorsModel';
+import {
+  committedTotal,
+  deliverableFields,
+  linkedText,
+  progressText,
+  sponsorWord
+} from 'c/eventSponsorsModel';
 
 describe('eventSponsorsModel', () => {
+  it('builds a checklist item trimmed, Type Other by default, none without a name', () => {
+    expect(deliverableFields('s1', '  Banner ', '')).toEqual({
+      Event_Sponsor__c: 's1',
+      Name: 'Banner',
+      Type__c: 'Other'
+    });
+    expect(deliverableFields('s1', 'x'.repeat(90), 'Logo').Name).toHaveLength(80);
+    expect(deliverableFields('s1', 'Logo', 'Logo').Type__c).toBe('Logo');
+    expect(deliverableFields('s1', '   ', 'Logo')).toBeNull();
+  });
+
   it('gives each status a badge word and an unknown one a neutral look', () => {
     expect(sponsorWord('Confirmed')).toBe('approved');
     expect(sponsorWord('Declined')).toBe('rejected');

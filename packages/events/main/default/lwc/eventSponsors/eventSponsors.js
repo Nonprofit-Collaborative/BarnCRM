@@ -1,18 +1,22 @@
 import { LightningElement, api } from 'lwc';
-import { deleteRecord } from 'lightning/uiRecordApi';
+import { createRecord, deleteRecord, updateRecord } from 'lightning/uiRecordApi';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getSponsors from '@salesforce/apex/EventSponsorsController.getSponsors';
 import addSponsor from '@salesforce/apex/EventSponsorsController.addSponsor';
-import addDeliverable from '@salesforce/apex/EventSponsorsController.addDeliverable';
-import setDeliverableStatus from '@salesforce/apex/EventSponsorsController.setDeliverableStatus';
-import removeSponsor from '@salesforce/apex/EventSponsorsController.removeSponsor';
 import getLeads from '@salesforce/apex/EventSponsorsController.getLeads';
 import { downloadCsv, format, messageFrom } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import EventRecordModal from 'c/eventRecordModal';
 import LEVEL from '@salesforce/schema/Sponsorship_Level__c';
+import DELIVERABLE from '@salesforce/schema/Sponsor_Deliverable__c';
 import BarnConfirmModal from 'c/barnConfirmModal';
-import { committedTotal, linkedText, progressText, sponsorWord } from 'c/eventSponsorsModel';
+import {
+  committedTotal,
+  deliverableFields,
+  linkedText,
+  progressText,
+  sponsorWord
+} from 'c/eventSponsorsModel';
 
 import TAB from '@salesforce/label/c.Events_EventTab_Sponsors';
 import EDIT from '@salesforce/label/c.Core_CmdtManager_EditAction';
@@ -307,10 +311,15 @@ export default class EventSponsors extends LightningElement {
     this.adding = undefined;
   }
 
+  /** The checklist writes below are saved as the user through Lightning Data Service (ADR-0093). */
   async handleDeliverableSave() {
     const { sponsorId, name, type } = this.adding;
     await this.run(async () => {
-      await addDeliverable({ sponsorId, name, type });
+      const fields = deliverableFields(sponsorId, name, type);
+      if (!fields) {
+        throw new Error(helpText('Events', 'Events_Sponsor_DeliverableNeedsName'));
+      }
+      await createRecord({ apiName: DELIVERABLE.objectApiName, fields });
       this.adding = undefined;
     });
   }
@@ -318,7 +327,7 @@ export default class EventSponsors extends LightningElement {
   async handleDeliverableStatus(event) {
     const deliverableId = event.target.dataset.id;
     const status = event.detail.value;
-    await this.run(() => setDeliverableStatus({ deliverableId, status }));
+    await this.run(() => updateRecord({ fields: { Id: deliverableId, Status__c: status } }));
   }
 
   async handleDeliverableRemove(event) {
@@ -374,7 +383,8 @@ export default class EventSponsors extends LightningElement {
       size: 'small'
     });
     if (confirmed) {
-      await this.run(() => removeSponsor({ sponsorId: sponsor.id }));
+      // Its checklist goes with it.
+      await this.run(() => deleteRecord(sponsor.id));
     }
   }
 

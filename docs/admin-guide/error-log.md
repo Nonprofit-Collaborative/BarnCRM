@@ -32,7 +32,8 @@ You will find it in three places:
   when it happened more than once, how many times, for example "12 times"), an
   **Open This Entry** button and a **Mark Acknowledged** button. The Errors section needs
   the Manage BarnCRM Settings permission (the BarnCRM Admin role).
-- **The Error Log tab** in the BarnCRM app. This is the full list, and you can sort
+- **The Error Log tab**, the last tab of **BarnCRM Admin Console**. It is in no staff app
+  (BarnCRM Console and the module apps). This is the full list, and you can sort
   it, filter it, and build reports on it like any other list in Salesforce. Its list views
   (**All Errors**, **My Error Log** and **New**) show each entry's **Occurrences**.
 

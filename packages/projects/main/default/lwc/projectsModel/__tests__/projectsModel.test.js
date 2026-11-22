@@ -1,5 +1,6 @@
 import {
   bar,
+  completedDateFor,
   groupTasks,
   isOpen,
   percent,
@@ -20,6 +21,11 @@ describe('c-projects-model', () => {
     expect(isOpen({ status: 'Blocked' })).toBe(true);
     expect(isOpen({ status: 'Done' })).toBe(false);
     expect(isOpen({ status: 'Cancelled' })).toBe(false);
+  });
+
+  it('stamps Completed Date for Done and clears it for any other status (R-PM4)', () => {
+    expect(completedDateFor('Done', '2026-11-22')).toBe('2026-11-22');
+    expect(completedDateFor('Blocked', '2026-11-22')).toBeNull();
   });
 
   it('groups tasks under their phases, leaves cancelled ones out of the count, and keeps loose ones last', () => {

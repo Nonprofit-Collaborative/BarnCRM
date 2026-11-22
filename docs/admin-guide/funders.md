@@ -107,12 +107,14 @@ A grant's page groups its panels into tabs, on a phone too:
 | Tab | What is on it |
 |---|---|
 | Overview | The grant's details, and the Program and Fund cards (each only with its module). |
-| Money | The Award Schedule card, the Payments list and the Restricted Fund Entries list. |
-| Reporting | The Requirements list, the Logic Model Outcomes card (with Logic Models) and the Funder Report card. |
+| Money | The Award Schedule card, the Grant Payments list (Due Date, Amount, Status, Received Date; soonest due first) and the Restricted Fund Entries list (Type, Amount, Entry Date, Description; newest first). |
+| Reporting | The Grant Requirements list (Type, Due Date, Status, Assigned To; soonest due first), the Logic Model Outcomes card (with Logic Models) and the Funder Report card. |
 | Writing | The Answer Library card. |
 | Related | Every related list, including any your organization adds. |
 
-To change the page, edit **Grant Record Page** in Lightning App Builder.
+The three lists are Dynamic Related Lists: their columns and sort are set on the page, not taken
+from the Grant layout, and each column shows only to users who may read that field. To change the
+page, or a list's columns, filters or sort, edit **Grant Record Page** in Lightning App Builder.
 
 ### Government Awards
 

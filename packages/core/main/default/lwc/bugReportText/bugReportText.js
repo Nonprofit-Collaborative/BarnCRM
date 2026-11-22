@@ -77,7 +77,7 @@ export function utcMinute(value) {
 
 /**
  * The bug report text for one Error Log entry.
- * @param {object} entry from ErrorLogController.getBugReport: context, severity, occurredAt,
+ * @param {object} entry the Error Log entry's fields: context, severity, occurredAt,
  *   occurrences, objectName, technicalDetail (absent for someone who may not read it)
  * @param {object} words heading, where, object, severity, when, times, codes, stack, none,
  *   noDetail: the help catalog's words

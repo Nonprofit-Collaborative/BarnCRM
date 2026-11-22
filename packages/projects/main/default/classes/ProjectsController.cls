@@ -1,6 +1,7 @@
 /**
- * Projects Home, the project board and the Projects at Risk card (ADR-0208
- * `0208-project-management-module.md`). Thin by design (plan Section 9.9): it returns plain
+ * Projects Home and the project board (ADR-0208 `0208-project-management-module.md`); task
+ * status, Add Task and the Projects at Risk card go through Lightning Data Service and GraphQL
+ * (ADR-0093 A2). Thin by design (plan Section 9.9): it returns plain
  * shapes (`ProjectViews`, never records), in user mode, and leaves grouping, progress and the
  * timeline to `c/projectsModel`. A refusal written for the person, or a save's own message, is shown as it
  * is; anything else is logged and shown as one message.
@@ -118,41 +119,6 @@ public with sharing class ProjectsController {
 			board.canCreateTime = Schema.SObjectType.Time_Entry__c.isCreateable();
 			board.canCreateExpense = Schema.SObjectType.Project_Expense__c.isCreateable();
 			return board;
-		} catch (Exception e) {
-			throw ERRORS.wrap(e);
-		}
-	}
-
-	/** Sets a task's status; Done stamps Completed Date with today, anything else clears it (R-PM4). */
-	@AuraEnabled
-	public static void setTaskStatus(Id taskId, String status) {
-		try {
-			update as user new Project_Task__c(
-				Id = taskId,
-				Status__c = status,
-				Completed_Date__c = status == Projects.DONE ? Date.today() : null
-			);
-		} catch (Exception e) {
-			throw ERRORS.wrap(e);
-		}
-	}
-
-	@AuraEnabled
-	public static Id addTask(Id projectId, Id phaseId, String name, Date dueDate, Boolean milestone) {
-		try {
-			if (String.isBlank(name)) {
-				throw Projects.refuse(BarnHelp.text('Projects', 'Projects_Task_NameNeeded'));
-			}
-			Project_Task__c task = new Project_Task__c(
-				Project__c = projectId,
-				Phase__c = phaseId,
-				Name = name.trim().abbreviate(80),
-				Status__c = 'Not Started',
-				Due_Date__c = dueDate,
-				Milestone__c = milestone == true
-			);
-			insert as user task;
-			return task.Id;
 		} catch (Exception e) {
 			throw ERRORS.wrap(e);
 		}
@@ -277,49 +243,6 @@ public with sharing class ProjectsController {
 			);
 			addFigures(home);
 			return home;
-		} catch (Exception e) {
-			throw ERRORS.wrap(e);
-		}
-	}
-
-	/** The Projects at Risk card: Active projects At Risk or Off Track, worst first. */
-	@AuraEnabled
-	public static List<ProjectViews.Project> getAtRisk(Boolean onlyMine) {
-		try {
-			Id me = UserInfo.getUserId();
-			List<ProjectViews.Project> rows = new List<ProjectViews.Project>();
-			for (Project__c project : [
-				SELECT
-					Id,
-					Name,
-					Status__c,
-					Health__c,
-					Health_Reasons__c,
-					Start_Date__c,
-					Target_Date__c,
-					Is_Template__c,
-					Tasks__c,
-					Tasks_Done__c,
-					Estimated_Hours__c,
-					Actual_Hours__c,
-					Budget_Hours__c,
-					Change_Hours__c,
-					Budget_Amount__c,
-					Actual_Cost_Amount__c,
-					Remaining_Budget__c,
-					OwnerId,
-					Owner.Name
-				FROM Project__c
-				WHERE Status__c = :Projects.ACTIVE AND Is_Template__c = FALSE AND Health__c IN ('At Risk', 'Off Track')
-				WITH USER_MODE
-				ORDER BY Health__c DESC, Target_Date__c NULLS LAST
-				LIMIT 200
-			]) {
-				if (onlyMine != true || project.OwnerId == me) {
-					rows.add(new ProjectViews.Project(project));
-				}
-			}
-			return rows;
 		} catch (Exception e) {
 			throw ERRORS.wrap(e);
 		}

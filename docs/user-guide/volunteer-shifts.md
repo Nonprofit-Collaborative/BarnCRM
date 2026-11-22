@@ -142,6 +142,7 @@ that weekday, hours already given on this job, onboarding up to date).
 3. Click **Sign Up** on their row.
 
 They are added as **Signed up**, the **Sign-Ups** panel updates and the person leaves the list.
+Someone you add in the **Sign-Ups** panel leaves the list too, without reloading the page.
 Someone who does not list the shift's weekday, or whose onboarding is not current, is listed
 lower with that said, but you can still sign them up. If the card says nobody is left, every
 active volunteer is already on the shift. Use **Add Sign-Up** for anyone who is not an active

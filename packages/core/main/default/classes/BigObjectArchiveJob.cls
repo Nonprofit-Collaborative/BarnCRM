@@ -4,9 +4,11 @@
  * object call may follow ordinary DML in a transaction (the platform refuses it, uncatchably).
  *
  * - Copy (no DML): deletes copies the last Settle could not finish (one retry, then the run log
- *   counts any that stay), reads the next chunk of matching records in user mode, Id order, with
- *   every readable field and their cascade-delete children (the chunk halved until the children
- *   fit `childRows`), and writes them with `insertImmediate`.
+ *   counts any that stay), takes the next chunk of matching records from an Apex cursor (opened
+ *   once by the first Copy, in user mode, Id order, at most the confirmed count, and carried from
+ *   link to link; ADR-0243 Apex cursors in large-volume jobs), reads them again with every
+ *   readable field and their cascade-delete children (the chunk halved until the children fit
+ *   `childRows`), and writes them with `insertImmediate`.
  * - Settle (DML only): reads the copies back by full key, reads the originals again, deletes in
  *   user mode those copied and unchanged since the run started, counts them, writes the job, and
  *   queues the next Copy with any copy whose original stayed.
@@ -19,6 +21,12 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 	public static final String OPERATION_ARCHIVE = 'Archive';
 	/** Records per Copy. */
 	public static final Integer CHUNK = 200;
+	/** Records per Copy as run: CHUNK, smaller in a test. */
+	@TestVisible
+	private static Integer chunkSize = CHUNK;
+	/** Set by a test: the next fetch finds the cursor gone, as when the platform lets it go. */
+	@TestVisible
+	private static Boolean cursorGoneForTest = false;
 	/** Characters of JSON one Copy writes at most, kept well inside the async heap. */
 	public static final Integer JSON_BUDGET = 4000000;
 	/** Rows included per org; past it the platform charges, so BarnCRM stops (R-ARC5). */
@@ -51,7 +59,17 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 	private final Datetime notChangedAfter;
 	private String phase = COPY;
 	private Integer remaining;
+	/**
+	 * The run's matching Ids, read once: the rule's filter, which may not be selective, is not run
+	 * again for every chunk (ADR-0243). `position` is the next row to fetch, `lastId` the last Id
+	 * fetched, from which the cursor is opened again if the platform has let it go.
+	 */
+	private Database.Cursor matches;
+	private Integer position = 0;
 	private Id lastId;
+	/** Rows fetched but not yet taken (a chunk cut short by its children or the JSON budget). */
+	@TestVisible
+	private List<SObject> leftOver = new List<SObject>();
 	private Datetime copiedAt;
 	/** The last Copy's saved rows: record name by Original Id. */
 	private Map<String, String> copiedNames = new Map<String, String>();
@@ -109,10 +127,14 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 				done = true;
 				return;
 			}
-			QueryCompiler.Compiled idPage = QueryCompiler.compileIdPage(queryJson, lastId, Math.min(CHUNK, remaining));
-			List<SObject> page = Database.queryWithBinds(idPage.soql, idPage.binds, AccessLevel.USER_MODE);
+			Integer want = Math.min(chunkSize, remaining);
+			List<SObject> page = new List<SObject>(leftOver);
+			if (page.size() < want) {
+				page.addAll(fetch(want - page.size()));
+			}
 			if (page.isEmpty()) {
-				done = true;
+				// Rows deleted since the cursor opened come back as gaps: go on while rows remain.
+				done = position >= matches.getNumRecords();
 				return;
 			}
 			if (archivedCount() + page.size() > CAP) {
@@ -157,9 +179,60 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 		orphans = new List<ArchiveStore.Key>();
 	}
 
-	/** The rows for a page of Ids, stopping early at the JSON budget; moves the cursor. */
+	/**
+	 * Up to `count` more matching Ids from the cursor, opening it on the first call. A cursor the
+	 * platform no longer holds is opened once more after the last Id fetched, so a long run goes
+	 * on where it was; a second failure stops the run with its reason.
+	 */
+	private List<SObject> fetch(Integer count) {
+		if (matches == null) {
+			open();
+		}
+		List<SObject> rows;
+		try {
+			rows = fetchFrom(count);
+		} catch (Exception cursorGone) {
+			open();
+			rows = fetchFrom(count);
+		}
+		if (!rows.isEmpty()) {
+			lastId = rows[rows.size() - 1].Id;
+		}
+		return rows;
+	}
+
+	private List<SObject> fetchFrom(Integer count) {
+		Integer size = Math.min(count, matches.getNumRecords() - position);
+		if (size <= 0) {
+			return new List<SObject>();
+		}
+		if (cursorGoneForTest) {
+			cursorGoneForTest = false;
+			throw new ArchiveRules.ArchiveRuleException('The cursor is gone');
+		}
+		List<SObject> rows = matches.fetch(position, size);
+		position += size;
+		return rows;
+	}
+
+	/** Opens the cursor over the Ids still to read: after `lastId`, at most what is left to archive. */
+	private void open() {
+		QueryCompiler.Compiled ids = QueryCompiler.compileIdPage(
+			queryJson,
+			lastId,
+			Math.max(remaining - leftOver.size(), 0)
+		);
+		matches = Database.getCursorWithBinds(ids.soql, ids.binds, AccessLevel.USER_MODE);
+		position = 0;
+	}
+
+	/**
+	 * The rows for a page of Ids, stopping early at the JSON budget or when the children do not
+	 * fit; the Ids not reached are kept for the next Copy.
+	 */
 	@TestVisible
 	private List<Archived_Record__b> rowsFor(List<SObject> page) {
+		List<SObject> given = page;
 		BulkDeleteService.Plan checked = BulkDeleteService.plan(queryJson);
 		Schema.DescribeSObjectResult described = checked.objectType.getDescribe(SObjectDescribeOptions.DEFERRED);
 		List<ArchiveRecordJson.ChildKind> kinds = ArchiveRecordJson.childKinds(described);
@@ -195,7 +268,6 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 		for (SObject idOnly : page) {
 			SObject record = records.get(idOnly.Id);
 			used++;
-			lastId = idOnly.Id;
 			if (record == null) {
 				continue;
 			}
@@ -236,6 +308,10 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 			}
 		}
 		remaining -= used;
+		leftOver = new List<SObject>();
+		for (Integer i = used; i < given.size(); i++) {
+			leftOver.add(given[i]);
+		}
 		return rows;
 	}
 
