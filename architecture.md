@@ -93,6 +93,8 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 
 ## Gotchas
 
+- A static resource read without its timestamp (`/resource/<Name>`) is served with `cache-control: public,max-age=3888000` (45 days), and Salesforce served the previous file a day after a deploy. `c/barnHelpText` adds an hourly `?v=` to module catalog URLs; anything else fetching a resource by bare name needs the same.
+- A CustomTab that names a `<flexiPage>` shows the platform page header (tab icon and name); a `<lwcComponent>` tab shows none. Page components on a FlexiPage tab pass `title-hidden` to `c-barn-page-shell` (ADR-0020 A3).
 - Source deploys never delete: removed objects, flexipages, tabs, classes and custom metadata must be destroyed in existing orgs. Scratch orgs need destructive changes plus purge-on-delete (Erase of deleted objects); old org-only flexipages (Rollup_Settings, Volunteer_Settings, BarnCRM_Settings) broke the Core UI until destroyed. Delete a keys object only after the new Apex replaces every old reference.
 - Never put a raw U+FFFF (or similar) character in LWC source: escape it. Static resource descriptions are 255 characters at most.
 - In tests, a callout after DML fails: enqueue the next run instead. `delete as user` takes records only (not Ids).
