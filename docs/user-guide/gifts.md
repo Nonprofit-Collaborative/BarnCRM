@@ -6,7 +6,7 @@ Before you start: open the **BarnCRM Fundraising** app. You need the **Fundraisi
 
 ## To Enter a Gift with Quick Gift Entry
 
-Quick Gift Entry is the first tab of the BarnCRM Fundraising app. On a computer it is also in the utility bar at the bottom of the screen, so you can open it over whatever page you are on.
+Quick Gift Entry is the second tab of the BarnCRM Fundraising app, after Fundraising Home. On a computer it is also in the utility bar at the bottom of the screen, so you can open it over whatever page you are on.
 
 1. Open the **Quick Gift Entry** tab, or click **Quick Gift Entry** in the utility bar.
 2. Under **Who Gave This Gift**, choose **Person** or **Organization**.

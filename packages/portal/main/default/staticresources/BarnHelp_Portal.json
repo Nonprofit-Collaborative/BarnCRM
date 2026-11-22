@@ -15,7 +15,7 @@
     "Portal_Home_SignIns": "Signed In, Last 30 Days",
     "Portal_Home_Portals": "Portals",
     "Portal_Home_RecentSignIns": "Latest Sign-Ins",
-    "Portal_Home_NoSignIns": "No sign-ins in the last 30 days",
+    "Portal_Home_NoSignIns": "No Sign-Ins in the Last 30 Days",
     "Portal_Home_NoSignInsNext": "Make a portal active and invite people from its Portal Access list; their sign-ins show here.",
     "Portal_Home_LoadFailed": "Portal Builder Home did not load. Try again. If it happens again, ask your BarnCRM admin to check the Error Log."
   }
