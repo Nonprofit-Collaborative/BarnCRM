@@ -1,16 +1,15 @@
 import { createElement } from 'lwc';
 import EventAgenda from 'c/eventAgenda';
 import getAgenda from '@salesforce/apex/EventAgendaController.getAgenda';
-import moveSession from '@salesforce/apex/EventAgendaController.moveSession';
+import { updateRecord } from 'lightning/uiRecordApi';
 import EventRecordModal from 'c/eventRecordModal';
 
 jest.mock('@salesforce/apex/EventAgendaController.getAgenda', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock('@salesforce/apex/EventAgendaController.moveSession', () => ({ default: jest.fn() }), {
+jest.mock('lightning/uiRecordApi', () => ({ deleteRecord: jest.fn(), updateRecord: jest.fn() }), {
   virtual: true
 });
-jest.mock('lightning/uiRecordApi', () => ({ deleteRecord: jest.fn() }), { virtual: true });
 jest.mock('@salesforce/i18n/locale', () => ({ default: 'en-US' }), { virtual: true });
 jest.mock('@salesforce/i18n/timeZone', () => ({ default: 'UTC' }), { virtual: true });
 jest.mock('@salesforce/label/c.Core_Shared_MoveTo', () => ({ default: 'Move to {0}' }), {
@@ -95,19 +94,34 @@ describe('c-event-agenda', () => {
 
   it('moves a session by its menu, changing only its track', async () => {
     const element = await render();
-    moveSession.mockResolvedValue();
+    updateRecord.mockResolvedValue({});
     const menu = element.shadowRoot.querySelector('lightning-button-menu[data-id="S1"]');
     const values = [...menu.querySelectorAll('lightning-menu-item')].map((item) => item.value);
     expect(values).toEqual(['edit', 'move:none', 'delete']);
     menu.dispatchEvent(new CustomEvent('select', { detail: { value: 'move:none' } }));
     await flush();
-    expect(moveSession).toHaveBeenCalledWith({ sessionId: 'S1', trackId: null });
+    expect(updateRecord).toHaveBeenCalledWith({ fields: { Id: 'S1', Track__c: null } });
+    expect(getAgenda).toHaveBeenCalledTimes(2);
+  });
+
+  it('shows the save error from the record API and reloads', async () => {
+    const element = await render();
+    updateRecord.mockRejectedValue({
+      body: { message: 'generic', output: { errors: [{ message: 'Track is closed' }] } }
+    });
+    const menu = element.shadowRoot.querySelector('lightning-button-menu[data-id="S1"]');
+    const toasts = [];
+    element.addEventListener('lightning__showtoast', (event) => toasts.push(event.detail));
+    menu.dispatchEvent(new CustomEvent('select', { detail: { value: 'move:none' } }));
+    await flush();
+    await flush();
+    expect(toasts[0].message).toBe('Track is closed');
     expect(getAgenda).toHaveBeenCalledTimes(2);
   });
 
   it('moves a session by keyboard on its drag handle', async () => {
     const element = await render();
-    moveSession.mockResolvedValue();
+    updateRecord.mockResolvedValue({});
     const handle = one(element, '[data-drag-id="S1"]');
     const key = (name) =>
       handle.dispatchEvent(new KeyboardEvent('keydown', { key: name, bubbles: true }));
@@ -117,7 +131,7 @@ describe('c-event-agenda', () => {
     await flush();
     key(' ');
     await flush();
-    expect(moveSession).toHaveBeenCalledWith({ sessionId: 'S1', trackId: null });
+    expect(updateRecord).toHaveBeenCalledWith({ fields: { Id: 'S1', Track__c: null } });
   });
 
   it('gives drag handles only to a person who may move sessions', async () => {

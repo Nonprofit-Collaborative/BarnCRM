@@ -92,6 +92,10 @@ kept, with the reason.
    convert (with the target); a convert line goes when its module's follow-up lands.
 4. **A converted write loses its Error Log entry** from the controller, as the Consequences
    above already accept; a trigger failure still logs.
+5. **Error wording stays.** A failed Lightning Data Service write carries the record's own
+   message (a validation rule, a trigger's `addError`) under `body.output`; Core's
+   `c/findCsv` `messageFrom` reads it first, so the toast says what the Apex method's
+   `getDmlMessage` said before.
 
 | Class.method | Package | Kind | Decision and target | Keep-reason |
 | --- | --- | --- | --- | --- |
@@ -115,17 +119,17 @@ kept, with the reason.
 | StewardshipPlanController.setActive | giving | write | Keep | Manage BarnCRM Settings permission |
 | EligibilityController.saveRules | programs | write | Keep | Rules validated against the program's fields (describe) |
 | CohortController.getPersonName | programs | read | Convert: `getRecord`, optional `Contact.Name` and `Account.Name` (confirm in an org) | |
-| EventAgendaController.moveSession | events | write | Convert: `updateRecord` | |
+| EventAgendaController.moveSession | events | write | Converted (AP-03 events): `updateRecord` | |
 | EventAppointmentsController.addSlots | events | write | Keep | Writes several slots |
-| EventProposalReview.removePresenter | events | write | Convert: `deleteRecord` | |
+| EventProposalReview.removePresenter | events | write | Converted (AP-03 events): `deleteRecord` | |
 | EventProposalReview.saveCriteria | events | write | Keep | Criteria JSON validated on the server |
-| EventSeatingController.deleteTable | events | write | Convert: `deleteRecord` | |
-| EventSeatingController.saveNeeds | events | write | Convert: `updateRecord` (trim in the LWC) | |
-| EventSpeakersController.addSpeaker | events | write | Convert: `createRecord` | |
-| EventSpeakersController.assign | events | write | Convert: `createRecord` | |
-| EventSponsorsController.addDeliverable | events | write | Convert: `createRecord` (trim and default Type in the LWC) | |
-| EventSponsorsController.removeSponsor | events | write | Convert: `deleteRecord` | |
-| EventSponsorsController.setDeliverableStatus | events | write | Convert: `updateRecord` | |
+| EventSeatingController.deleteTable | events | write | Converted (AP-03 events): `deleteRecord` | |
+| EventSeatingController.saveNeeds | events | write | Converted (AP-03 events): `updateRecord`, trimmed in `eventSeatingModel` | |
+| EventSpeakersController.addSpeaker | events | write | Converted (AP-03 events): `createRecord` | |
+| EventSpeakersController.assign | events | write | Converted (AP-03 events): `createRecord` | |
+| EventSponsorsController.addDeliverable | events | write | Converted (AP-03 events): `createRecord`, trimmed and Type defaulted in `eventSponsorsModel` | |
+| EventSponsorsController.removeSponsor | events | write | Converted (AP-03 events): `deleteRecord` | |
+| EventSponsorsController.setDeliverableStatus | events | write | Converted (AP-03 events): `updateRecord` | |
 | EventVolunteersController.getVolunteers | events | read | Keep | Volunteers jobs through the extension point |
 | FormRunnerController.getPublishedForms | forms | read | Convert: GraphQL (`Form__c` Published, by Name) | |
 | FormSubmissionController.getSubmission | forms | read | Convert: GraphQL (`Form_Submission__c` with form and version), shaping in a JS module | |

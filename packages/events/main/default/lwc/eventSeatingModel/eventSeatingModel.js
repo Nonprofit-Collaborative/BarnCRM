@@ -159,3 +159,18 @@ export function seatingCsv(tables, guests) {
   unseated(guests).forEach((guest) => lines.push(guestRow(guest, undefined)));
   return lines.map((line) => line.map(csvCell).join(',')).join('\r\n');
 }
+
+/** A note as saved: trimmed, and null when blank. */
+const noteValue = (value) => (value && String(value).trim()) || null;
+
+/**
+ * The attendee fields a needs change saves (Event_Attendee__c): both notes, trimmed, blank as
+ * none.
+ */
+export function needsFields(attendeeId, dietary, access) {
+  return {
+    Id: attendeeId,
+    Dietary_Needs__c: noteValue(dietary),
+    Access_Needs__c: noteValue(access)
+  };
+}

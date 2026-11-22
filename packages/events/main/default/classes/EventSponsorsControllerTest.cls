@@ -128,14 +128,13 @@ private class EventSponsorsControllerTest {
 
 			Test.startTest();
 			Id logo = EventSponsorsController.getSponsors(event.Id).sponsors[0].deliverables[0].id;
-			EventSponsorsController.setDeliverableStatus(logo, 'Done');
-			EventSponsorsController.addDeliverable(sponsorId, 'Banner at the entrance', 'Other');
-			Boolean refused = false;
-			try {
-				EventSponsorsController.addDeliverable(sponsorId, '  ', 'Other');
-			} catch (AuraHandledException e) {
-				refused = true;
-			}
+			// The tab changes and adds checklist items through Lightning Data Service (ADR-0093).
+			update as user new Sponsor_Deliverable__c(Id = logo, Status__c = 'Done');
+			insert as user new Sponsor_Deliverable__c(
+				Event_Sponsor__c = sponsorId,
+				Name = 'Banner at the entrance',
+				Type__c = 'Other'
+			);
 			Sponsor_Deliverable__c banner = [
 				SELECT Type__c
 				FROM Sponsor_Deliverable__c
@@ -148,7 +147,6 @@ private class EventSponsorsControllerTest {
 			];
 			Test.stopTest();
 
-			Assert.isTrue(refused, 'An item needs a name');
 			Assert.areEqual('Other', banner.Type__c, 'Typed as given');
 			Assert.areEqual(5, sponsor.Deliverables_Total__c, 'Four from the level and one added');
 			Assert.areEqual(1, sponsor.Deliverables_Done__c, 'One done');
@@ -185,7 +183,8 @@ private class EventSponsorsControllerTest {
 			);
 
 			Test.startTest();
-			EventSponsorsController.removeSponsor(sponsorId);
+			// The tab removes a sponsor through Lightning Data Service (ADR-0093).
+			delete as user new Event_Sponsor__c(Id = sponsorId);
 			Test.stopTest();
 
 			Assert.areEqual(0, [SELECT COUNT() FROM Event_Sponsor__c], 'Sponsor removed');

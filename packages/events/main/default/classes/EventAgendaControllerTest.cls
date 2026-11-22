@@ -94,32 +94,6 @@ private class EventAgendaControllerTest {
 	}
 
 	@IsTest
-	static void moveChangesOnlyTheTrack() {
-		System.runAs(staff()) {
-			Datetime start = Datetime.now().addDays(30);
-			Event__c event = conference(start);
-			Event_Track__c admins = new Event_Track__c(Event__c = event.Id, Name = 'Admins');
-			insert as user admins;
-			Event_Session__c talk = session(event, 'Flows 101', start.addHours(1));
-			insert as user talk;
-
-			Test.startTest();
-			EventAgendaController.moveSession(talk.Id, admins.Id);
-			Test.stopTest();
-
-			Event_Session__c saved = [
-				SELECT Track__c, Room__c, Start__c
-				FROM Event_Session__c
-				WHERE Id = :talk.Id
-				WITH USER_MODE
-			];
-			Assert.areEqual(admins.Id, saved.Track__c, 'Moved to Admins');
-			Assert.areEqual('Hall A', saved.Room__c, 'Room unchanged');
-			Assert.areEqual(start.addHours(1), saved.Start__c, 'Time unchanged');
-		}
-	}
-
-	@IsTest
 	static void refusesAnotherEventsTrackAndTimesOutsideTheEvent() {
 		System.runAs(staff()) {
 			Datetime start = Datetime.now().addDays(30);
@@ -136,8 +110,9 @@ private class EventAgendaControllerTest {
 			Test.startTest();
 			Boolean refused = false;
 			try {
-				EventAgendaController.moveSession(talk.Id, foreign.Id);
-			} catch (AuraHandledException e) {
+				// The Agenda tab moves a session through Lightning Data Service (ADR-0093).
+				update as user new Event_Session__c(Id = talk.Id, Track__c = foreign.Id);
+			} catch (DmlException e) {
 				refused = true;
 			}
 			List<Database.SaveResult> results = Database.insert(

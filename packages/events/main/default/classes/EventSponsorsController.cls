@@ -4,7 +4,8 @@
  * deliverables checklist (logo, booth, passes). Thin by design (plan Section 9.9): progress and
  * status words live in `eventSponsorsModel`. Reads in user mode; writes
  * `AccessLevel.USER_MODE`. Levels and sponsor details are edited through the platform's record
- * form. A sponsor's Giving gift or commitment, or Funders award, is held as a record identifier
+ * form; adding a checklist item, setting its status and removing a sponsor (its checklist goes with
+ * it) are Lightning Data Service writes in the LWC (ADR-0093). A sponsor's Giving gift or commitment, or Funders award, is held as a record identifier
  * and labelled through Core's `LinkedRecords`, so nothing here names another module.
  */
 public with sharing class EventSponsorsController {
@@ -283,63 +284,6 @@ public with sharing class EventSponsorsController {
 		}
 	}
 
-	/**
-	 * Adds one item to a sponsor's checklist.
-	 *
-	 * @param sponsorId the sponsor
-	 * @param name what is owed, for example "Logo for the program"
-	 * @param type Logo, Booth, Passes or Other
-	 */
-	@AuraEnabled
-	public static void addDeliverable(Id sponsorId, String name, String type) {
-		if (String.isBlank(name)) {
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Sponsor_DeliverableNeedsName'));
-		}
-		save(
-			new Sponsor_Deliverable__c(
-				Event_Sponsor__c = sponsorId,
-				Name = name.trim().left(80),
-				Type__c = String.isBlank(type) ? 'Other' : type
-			),
-			'addDeliverable'
-		);
-	}
-
-	/**
-	 * Sets a checklist item's status (Pending, Requested, Received or Done).
-	 *
-	 * @param deliverableId the item
-	 * @param status the new status
-	 */
-	@AuraEnabled
-	public static void setDeliverableStatus(Id deliverableId, String status) {
-		try {
-			update as user new Sponsor_Deliverable__c(Id = deliverableId, Status__c = status);
-		} catch (DmlException e) {
-			throw UserErrors.message(e.getDmlMessage(0));
-		} catch (Exception e) {
-			ErrorLogger.log(e, CONTEXT + '.setDeliverableStatus', deliverableId);
-			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Shared_NotSaved'));
-		}
-	}
-
-	/**
-	 * Removes a sponsor and, with it, its checklist.
-	 *
-	 * @param sponsorId the sponsor
-	 */
-	@AuraEnabled
-	public static void removeSponsor(Id sponsorId) {
-		try {
-			delete as user new Event_Sponsor__c(Id = sponsorId);
-		} catch (DmlException e) {
-			throw UserErrors.message(e.getDmlMessage(0));
-		} catch (Exception e) {
-			ErrorLogger.log(e, CONTEXT + '.removeSponsor', sponsorId);
-			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Shared_NotSaved'));
-		}
-	}
-
 	/** One column of the leads download: its label and the row key it reads. */
 	public class LeadColumn {
 		@AuraEnabled
@@ -479,17 +423,6 @@ public with sharing class EventSponsorsController {
 			if (entry.isActive()) {
 				result.deliverableTypes.add(new Option(entry.getLabel(), entry.getValue()));
 			}
-		}
-	}
-
-	private static void save(SObject record, String method) {
-		try {
-			insert as user record;
-		} catch (DmlException e) {
-			throw UserErrors.message(e.getDmlMessage(0));
-		} catch (Exception e) {
-			ErrorLogger.log(e, CONTEXT + '.' + method);
-			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Shared_NotSaved'));
 		}
 	}
 }

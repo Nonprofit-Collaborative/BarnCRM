@@ -3,9 +3,8 @@ import EventSeating from 'c/eventSeating';
 import BarnConfirmModal from 'c/barnConfirmModal';
 import getSeating from '@salesforce/apex/EventSeatingController.getSeating';
 import saveTable from '@salesforce/apex/EventSeatingController.saveTable';
-import deleteTable from '@salesforce/apex/EventSeatingController.deleteTable';
 import assignSeats from '@salesforce/apex/EventSeatingController.assignSeats';
-import saveNeeds from '@salesforce/apex/EventSeatingController.saveNeeds';
+import { deleteRecord, updateRecord } from 'lightning/uiRecordApi';
 import { ShowToastEventName } from 'lightning/platformShowToastEvent';
 
 jest.mock('@salesforce/apex/EventSeatingController.getSeating', () => ({ default: jest.fn() }), {
@@ -14,13 +13,10 @@ jest.mock('@salesforce/apex/EventSeatingController.getSeating', () => ({ default
 jest.mock('@salesforce/apex/EventSeatingController.saveTable', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock('@salesforce/apex/EventSeatingController.deleteTable', () => ({ default: jest.fn() }), {
-  virtual: true
-});
 jest.mock('@salesforce/apex/EventSeatingController.assignSeats', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock('@salesforce/apex/EventSeatingController.saveNeeds', () => ({ default: jest.fn() }), {
+jest.mock('lightning/uiRecordApi', () => ({ deleteRecord: jest.fn(), updateRecord: jest.fn() }), {
   virtual: true
 });
 
@@ -50,8 +46,8 @@ async function render(data = DATA) {
   getSeating.mockResolvedValue(data);
   assignSeats.mockResolvedValue(1);
   saveTable.mockResolvedValue('t9');
-  deleteTable.mockResolvedValue();
-  saveNeeds.mockResolvedValue();
+  deleteRecord.mockResolvedValue();
+  updateRecord.mockResolvedValue({});
   const element = createElement('c-event-seating', { is: EventSeating });
   element.recordId = EVENT_ID;
   document.body.appendChild(element);
@@ -132,7 +128,7 @@ describe('c-event-seating', () => {
     expect(BarnConfirmModal.open).toHaveBeenCalledWith(
       expect.objectContaining({ confirmVariant: 'destructive' })
     );
-    expect(deleteTable).toHaveBeenCalledWith({ tableId: 't2' });
+    expect(deleteRecord).toHaveBeenCalledWith('t2');
   });
 
   it('keeps the table when the confirmation is cancelled', async () => {
@@ -140,19 +136,17 @@ describe('c-event-seating', () => {
     const element = await render();
     one(element, '[data-action="delete-table"][data-id="t2"]').click();
     await flush();
-    expect(deleteTable).not.toHaveBeenCalled();
+    expect(deleteRecord).not.toHaveBeenCalled();
   });
 
   it('saves dietary needs when the field is left', async () => {
     const element = await render();
     const input = one(element, '[data-field="dietary"][data-id="g2"]');
-    Object.defineProperty(input, 'value', { value: 'Nut allergy', configurable: true });
+    Object.defineProperty(input, 'value', { value: ' Nut allergy ', configurable: true });
     input.dispatchEvent(new CustomEvent('blur'));
     await flush();
-    expect(saveNeeds).toHaveBeenCalledWith({
-      attendeeId: 'g2',
-      dietary: 'Nut allergy',
-      access: undefined
+    expect(updateRecord).toHaveBeenCalledWith({
+      fields: { Id: 'g2', Dietary_Needs__c: 'Nut allergy', Access_Needs__c: null }
     });
   });
 

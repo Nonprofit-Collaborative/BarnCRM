@@ -11,16 +11,7 @@ AskPipelineController.moveStage  # convert: updateRecord
 CommitmentController.getSchedule  # keep: two objects and record edit access
 CommitmentEntryController.save  # keep: server validation and the draft built from the entry
 EligibilityController.saveRules  # keep: rules validated against the program's fields
-EventAgendaController.moveSession  # convert: updateRecord
-EventProposalReview.removePresenter  # convert: deleteRecord
 EventProposalReview.saveCriteria  # keep: criteria JSON validated on the server
-EventSeatingController.deleteTable  # convert: deleteRecord
-EventSeatingController.saveNeeds  # convert: updateRecord
-EventSpeakersController.addSpeaker  # convert: createRecord
-EventSpeakersController.assign  # convert: createRecord
-EventSponsorsController.addDeliverable  # convert: createRecord
-EventSponsorsController.removeSponsor  # convert: deleteRecord
-EventSponsorsController.setDeliverableStatus  # convert: updateRecord
 EventVolunteersController.getVolunteers  # keep: Volunteers jobs through the extension point
 FormRunnerController.getPublishedForms  # convert: GraphQL
 FormSubmissionController.getSubmission  # convert: GraphQL
