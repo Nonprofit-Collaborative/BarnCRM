@@ -31,8 +31,8 @@ private class ConsoleSaveAcrossModulesTest {
 			);
 			Assert.areEqual(
 				'12-3456789',
-				Giving_Settings__c.getOrgDefaults().Organization_EIN__c,
-				'and the Giving setting on Giving Settings, in the same Save'
+				ModuleSettings.text('Giving_Organization_EIN'),
+				'and the Giving setting in the settings store, in the same Save'
 			);
 			Set<String> audited = new Set<String>();
 			for (Setting_Change__c change : [SELECT Setting_Name__c FROM Setting_Change__c]) {

@@ -47,9 +47,7 @@ private class GivingNightlyJobProviderTest {
 	@IsTest
 	static void theCardOffersRunNowWhereTheOldPageDidAndShowsEachSummary() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-			settings.Installment_Top_Up_Last_Run_Summary__c = '3 payments added';
-			Database.upsert(settings, AccessLevel.SYSTEM_MODE);
+			GivingState.put(new Map<String, Object>{ GivingState.INSTALLMENT_TOP_UP_SUMMARY => '3 payments added' });
 
 			Map<String, NightlyStep> byKey = new Map<String, NightlyStep>();
 			for (NightlyStep step : new GivingNightlyJobProvider().nightlySteps()) {

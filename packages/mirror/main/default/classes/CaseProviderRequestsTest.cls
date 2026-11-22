@@ -58,10 +58,8 @@ private class CaseProviderRequestsTest {
 	}
 
 	private static void turnOn(Boolean enabled) {
-		Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
-		settings.Case_Requests_Enabled__c = enabled;
-		settings.Case_Requests_Type__c = 'Other';
-		upsert settings;
+		ModuleSettings.setForTest('Mirror_Case_Requests', enabled);
+		ModuleSettings.setForTest('Mirror_Case_Requests_Type', 'Other');
 	}
 
 	/** A Case of the chosen Type, and its number. */

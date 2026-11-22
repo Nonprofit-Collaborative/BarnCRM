@@ -53,7 +53,7 @@ public with sharing class DonorLevelController {
 			model.enabled = DonorLevelService.isEnabled();
 			model.canRecalculate = BarnCRMPermissions.canManageSettings();
 			model.sourceFieldLabel = sourceLabel();
-			model.lastRecalculated = Giving_Settings__c.getOrgDefaults().Donor_Levels_Last_Recalculated__c;
+			model.lastRecalculated = GivingState.moment(GivingState.DONOR_LEVELS_RECALCULATED);
 			Map<Id, Integer> counts = DonorLevelSelector.countDonorsByLevel();
 			model.rungs = new List<RungModel>();
 			for (Donor_Level__c level : DonorLevelSelector.selectAllLevels()) {

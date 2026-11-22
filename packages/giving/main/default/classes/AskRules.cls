@@ -46,8 +46,7 @@ public with sharing class AskRules {
 
 	/** The organization's stages: the setting, or the shipped list when it is empty. */
 	public static List<String> stages() {
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		List<String> configured = parse(settings == null ? null : settings.Ask_Stages__c);
+		List<String> configured = parse(ModuleSettings.text('Giving_Ask_Stages'));
 		return configured.isEmpty() ? parse(DEFAULT_STAGES) : configured;
 	}
 

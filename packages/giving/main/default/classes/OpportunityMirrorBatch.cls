@@ -82,7 +82,7 @@ public with sharing class OpportunityMirrorBatch extends MirrorRunBatch {
 		if (makesGifts()) {
 			return wonOpportunities();
 		}
-		Datetime lastRun = Giving_Settings__c.getOrgDefaults()?.Opportunity_Mirror_Last_Run__c;
+		Datetime lastRun = GivingState.moment(GivingState.OPPORTUNITY_MIRROR_LAST_RUN);
 		return Database.getQueryLocatorWithBinds(
 			OpportunityMirrorSelector.giftsToCopyQuery(fromDate != null, lastRun != null),
 			new Map<String, Object>{

@@ -63,13 +63,9 @@ public without sharing class DonorLevelWriter {
 
 	/**
 	 * Stamps when a recalculation finished, the freshness promise the rollups make (Principle 2).
-	 * Only this key is written, on the locked stored record, and a first save keeps the
-	 * checkboxes that ship on (OrgSettingsSystemWriter).
+	 * Run state, not a setting (`GivingState`).
 	 */
 	public static void stampRecalculation(Datetime completedAt) {
-		OrgSettingsSystemWriter.save(
-			Giving_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{ Giving_Settings__c.Donor_Levels_Last_Recalculated__c => completedAt }
-		);
+		GivingState.put(new Map<String, Object>{ GivingState.DONOR_LEVELS_RECALCULATED => completedAt });
 	}
 }

@@ -143,9 +143,8 @@ public with sharing class OpportunityMirrorService {
 
 	/** The chosen direction: Off, GiftsToOpportunities or OpportunitiesToGifts (R-OM1). */
 	public static String direction() {
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		String chosen = settings == null ? null : settings.Opportunity_Mirror_Direction__c;
-		return String.isBlank(chosen) ? OFF : chosen;
+		String chosen = ModuleSettings.text('Mirror_Opportunity_Mirror_Direction');
+		return chosen == null ? OFF : chosen;
 	}
 
 	/** Whether gifts are copied to Opportunities in this org. */

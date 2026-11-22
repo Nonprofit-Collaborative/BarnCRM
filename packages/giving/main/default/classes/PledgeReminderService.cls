@@ -73,7 +73,7 @@ public with sharing class PledgeReminderService {
 
 	/** Whether reminders may go out at all. Off by default. */
 	public static Boolean isEnabled() {
-		return Giving_Settings__c.getOrgDefaults().Pledge_Reminders_Enabled__c == true;
+		return ModuleSettings.flag('Giving_Pledge_Reminders_Enabled');
 	}
 
 	public static void requireEnabled() {
@@ -595,15 +595,11 @@ public with sharing class PledgeReminderService {
 
 	/** Records what the last run did, so the page can say so. */
 	public static void recordLastRun(String summary) {
-		OrgSettingsSystemWriter.save(
-			Giving_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{
-				Giving_Settings__c.Pledge_Reminders_Last_Run__c => System.now(),
-				Giving_Settings__c.Pledge_Reminders_Last_Run_Summary__c => summary == null ||
-					summary.length() <= 255
-					? summary
-					: summary.substring(0, 255)
-			}
+		GivingState.recordRun(
+			GivingState.PLEDGE_REMINDERS_LAST_RUN,
+			GivingState.PLEDGE_REMINDERS_SUMMARY,
+			System.now(),
+			summary
 		);
 	}
 

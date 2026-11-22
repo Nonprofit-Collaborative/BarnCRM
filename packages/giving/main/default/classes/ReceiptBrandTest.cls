@@ -18,10 +18,7 @@ private class ReceiptBrandTest {
 		BarnCRM_Settings__c core = BarnCRM_Settings__c.getOrgDefaults();
 		core.Brand_Management__c = true;
 		upsert core;
-		Giving_Settings__c giving = Giving_Settings__c.getOrgDefaults();
-		giving.SetupOwnerId = UserInfo.getOrganizationId();
-		giving.Receipt_Numbering_Scope__c = scope;
-		upsert giving;
+		ModuleSettings.setForTest('Giving_Receipt_Numbering_Scope', scope);
 		SettingsService.clearCaches();
 		Legal_Entity__c entity = new Legal_Entity__c(Name = 'Barn Thrift LLC', Tax_Id__c = '98-7654321');
 		insert entity;

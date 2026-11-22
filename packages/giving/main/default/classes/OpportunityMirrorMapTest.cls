@@ -13,6 +13,18 @@
 private class OpportunityMirrorMapTest {
 	private static final String MAP_NAME = 'Gift extras';
 
+	// The mirror is on with the map the setup made: a store value lasts one transaction, so it is
+	// put here, for every test.
+	static {
+		List<Saved_Transform__c> maps = [SELECT Id FROM Saved_Transform__c WHERE Name = :MAP_NAME LIMIT 1];
+		useMap(maps.isEmpty() ? null : maps[0].Id);
+	}
+
+	private static void useMap(Id mapId) {
+		ModuleSettings.setForTest('Mirror_Opportunity_Mirror_Direction', OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
+		ModuleSettings.setForTest('Mirror_Opportunity_Mirror_Map', mapId == null ? null : String.valueOf(mapId));
+	}
+
 	@TestSetup
 	static void setup() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
@@ -43,10 +55,6 @@ private class OpportunityMirrorMapTest {
 				)
 			);
 			insert chosen;
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-			settings.Opportunity_Mirror_Direction__c = OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES;
-			settings.Opportunity_Mirror_Map__c = chosen.Id;
-			upsert settings;
 		}
 	}
 

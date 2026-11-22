@@ -29,13 +29,16 @@ private class RollupRegressionHouseholdsTest {
 		GivingRollupTestData.HOUSEHOLD_SOFT_COUNT
 	};
 
+	// Credits are made by hand in these tests, so that which household is credited is decided by
+	// the test and not by the automatic household credit. A store value lasts one transaction.
+	static {
+		RecognitionTestData.setAutomaticHouseholdCredits(false);
+	}
+
 	@TestSetup
 	static void makeData() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GivingTestDataFactory.insertDefaultFund();
-			// Credits are made by hand in these tests, so that which household is credited is
-			// decided by the test and not by the automatic household credit.
-			RecognitionTestData.setAutomaticHouseholdCredits(false);
 		}
 	}
 

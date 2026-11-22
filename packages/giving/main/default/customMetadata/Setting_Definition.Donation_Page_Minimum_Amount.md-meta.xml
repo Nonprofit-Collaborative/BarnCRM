@@ -42,4 +42,8 @@
         <field>Max_Value__c</field>
         <value xsi:type="xsd:double">1000000</value>
     </values>
+    <values>
+        <field>Default_Value__c</field>
+        <value xsi:type="xsd:string">5</value>
+    </values>
 </CustomMetadata>

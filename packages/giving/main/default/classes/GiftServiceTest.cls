@@ -208,11 +208,7 @@ private class GiftServiceTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Fund__c chosen = GivingTestDataFactory.buildFund('Building', false);
 			insert chosen;
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-			settings.SetupOwnerId = UserInfo.getOrganizationId();
-			settings.Default_Fund__c = chosen.Id;
-			upsert settings;
-			SettingsService.clearCaches();
+			ModuleSettings.setForTest('Giving_Default_Fund', String.valueOf(chosen.Id));
 
 			Test.startTest();
 			Gift__c gift = insertGift(60);
@@ -234,11 +230,7 @@ private class GiftServiceTest {
 	@IsTest
 	static void anUnusableSettingsFundFallsBackToTheFlaggedFund() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-			settings.SetupOwnerId = UserInfo.getOrganizationId();
-			settings.Default_Fund__c = 'not an identifier';
-			upsert settings;
-			SettingsService.clearCaches();
+			ModuleSettings.setForTest('Giving_Default_Fund', 'not an identifier');
 			Fund__c flagged = [SELECT Id FROM Fund__c WHERE Is_Default__c = TRUE LIMIT 1];
 
 			Test.startTest();

@@ -11,9 +11,19 @@ private class PaymentWebhookRestTest {
 		TestUsers.adminWith(PaymentsTestData.ADMIN);
 	}
 
+	private static String madeToken;
+
+	/** The test's token, made once (only its hash is kept, so the test holds the token). */
+	private static String token() {
+		if (madeToken == null) {
+			madeToken = PaymentService.newWebhookToken();
+		}
+		return madeToken;
+	}
+
 	private static RestRequest request(String processor, String body, Map<String, String> headers) {
 		RestRequest request = bare(processor, body, headers);
-		request.params.put('token', PaymentService.webhookToken(false));
+		request.params.put('token', token());
 		return request;
 	}
 
@@ -151,7 +161,7 @@ private class PaymentWebhookRestTest {
 	static void aPostWithoutTheSavedTokenIsRefusedAndStoresNothing() {
 		System.runAs(PaymentsTestData.admin()) {
 			PaymentsTestData.connect(PaymentService.STRIPE);
-			String token = PaymentService.webhookToken(false);
+			String token = token();
 			Assert.isTrue(token.length() >= 32, 'A long random token');
 			String body = PaymentsTestData.stripeEvent(
 				'evt_5',
@@ -174,7 +184,7 @@ private class PaymentWebhookRestTest {
 			Assert.areEqual(200, PaymentWebhookRest.store(right), 'The saved token is accepted');
 			Assert.areEqual(1, storedEvents(), 'Stored');
 
-			String replaced = PaymentService.webhookToken(true);
+			String replaced = PaymentService.newWebhookToken();
 			Assert.areNotEqual(token, replaced, 'Regenerated');
 			Assert.areEqual(404, PaymentWebhookRest.store(right), 'The old token stops working');
 		}
@@ -220,7 +230,7 @@ private class PaymentWebhookRestTest {
 				],
 				'One Warning for the hour, not one per refused post'
 			);
-			Assert.isNotNull(PaymentService.settings().Webhook_Cap_Hit_At__c, 'Health Check can see the cap was hit');
+			Assert.isNotNull(PaymentService.capHitAt(), 'Health Check can see the cap was hit');
 			Assert.areEqual(
 				200,
 				stripe(stripeBody),

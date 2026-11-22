@@ -38,8 +38,7 @@ public with sharing class OpportunityGiftService {
 	 * in the org's default time zone, so a nightly run started by anyone uses the same day.
 	 */
 	public static Date startDate() {
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		Datetime start = settings?.Opportunity_Mirror_Start__c;
+		Datetime start = ModuleSettings.datetimeValue('Mirror_Opportunity_Mirror_Start');
 		if (start == null) {
 			return null;
 		}
@@ -95,7 +94,7 @@ public with sharing class OpportunityGiftService {
 	}
 
 	private static List<String> listedRecordTypes() {
-		String listed = Giving_Settings__c.getOrgDefaults()?.Opportunity_Mirror_Record_Types__c;
+		String listed = ModuleSettings.text('Mirror_Opportunity_Mirror_Record_Types');
 		List<String> names = new List<String>();
 		for (String name : String.isBlank(listed) ? new List<String>() : listed.split(',')) {
 			if (String.isNotBlank(name)) {

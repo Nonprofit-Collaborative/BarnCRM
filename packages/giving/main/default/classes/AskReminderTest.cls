@@ -82,11 +82,7 @@ private class AskReminderTest {
 	}
 
 	private static void setRemindersEnabled(Boolean enabled) {
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		settings.SetupOwnerId = UserInfo.getOrganizationId();
-		settings.Ask_Reminders_Enabled__c = enabled;
-		upsert settings;
-		SettingsService.clearCaches();
+		ModuleSettings.setForTest('Ask_Reminders_Enabled', enabled);
 	}
 
 	private static List<Task> remindersFor(Id donorId) {
@@ -130,7 +126,7 @@ private class AskReminderTest {
 			);
 			Assert.areNotEqual(
 				null,
-				Giving_Settings__c.getOrgDefaults().Ask_Reminders_Last_Run__c,
+				GivingState.moment(GivingState.ASK_REMINDERS_LAST_RUN),
 				'The run records that it finished, which the Nightly Jobs page shows.'
 			);
 		}

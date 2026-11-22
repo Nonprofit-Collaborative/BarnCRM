@@ -69,7 +69,7 @@ private class GivingWhereUsedExtensionTest {
 			Assert.areEqual(1, onContact.size());
 			Assert.areEqual(1, onAccount.size());
 			Assert.areEqual(
-				Schema.Giving_Settings__c.Donor_Level_Source_Field__c.getDescribe().getLabel(),
+				ModuleSettings.definition('Donor_Level_Source_Field').MasterLabel,
 				onContact[0].getName()
 			);
 			Assert.areEqual(BarnHelp.text('Core', 'Core_WhereUsed_BreaksSettingValue'), onContact[0].getBreaks());

@@ -71,7 +71,7 @@ private class InstallmentTopUpBatchTest {
 			}
 			Assert.areNotEqual(
 				null,
-				Giving_Settings__c.getOrgDefaults().Installment_Top_Up_Last_Run__c,
+				GivingState.moment(GivingState.INSTALLMENT_TOP_UP_LAST_RUN),
 				'The batch records when it finished, which is what the Hub shows.'
 			);
 		}

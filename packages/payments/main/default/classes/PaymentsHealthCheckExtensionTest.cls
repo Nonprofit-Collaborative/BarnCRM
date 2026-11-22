@@ -54,9 +54,7 @@ private class PaymentsHealthCheckExtensionTest {
 	static void aStripeKeyForTheOtherModeIsReported() {
 		System.runAs(PaymentsTestData.admin()) {
 			PaymentsTestData.connect(PaymentService.STRIPE);
-			Payments_Settings__c live = Payments_Settings__c.getOrgDefaults();
-			live.Mode__c = PaymentService.LIVE;
-			update live;
+			PaymentsTestData.mode(PaymentService.LIVE);
 			PaymentsTestData.Processors mock = PaymentsTestData.processors()
 				.answer('balance', 200, '{"object":"balance","livemode":false}');
 

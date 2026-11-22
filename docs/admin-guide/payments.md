@@ -107,10 +107,14 @@ shown.
    parameter `SecretKey` with that key (see [Entering a Secret in Setup](#entering-a-secret-in-setup)).
 4. Open **Payments Setup** in BarnCRM and select **Check Connection** on the Stripe card. It
    reads **Connected** and says which mode the key is for.
-5. Copy the **Stripe address** Payments Setup shows, for example
+5. On Payments Setup, select **Generate Token** (or, if a token was made before and you no
+   longer have the addresses, **Regenerate Token**). Copy the **Stripe address** it then shows,
+   for example
    `https://yourorg.my.salesforce-sites.com/services/apexrest/barncrm/payments/v1/stripe?token=...`.
    Copy all of it: the random token after the question mark is what lets Stripe's posts in, and
-   a post without it is refused and stores nothing.
+   a post without it is refused and stores nothing. The token is shown only this once: BarnCRM
+   keeps a fingerprint (hash) of it, never the token, so copy the PayPal address now too if you
+   use PayPal.
 6. In Stripe, **Developers > Webhooks > Add endpoint**: paste the address and choose these
    events: `checkout.session.completed`, `checkout.session.async_payment_succeeded`,
    `checkout.session.async_payment_failed`, `checkout.session.expired`, `charge.refunded`,
@@ -126,7 +130,8 @@ shown.
 2. In Setup, on the **BarnCRM PayPal** External Credential, principal `Barn_PayPal_App`, add the
    parameters `ClientId` and `ClientSecret`. One app's credentials serve the mode you are in:
    **BarnCRM PayPal Sandbox** is used in Test mode and **BarnCRM PayPal Live** in Live mode.
-3. In the app, **Add Webhook**: paste the **PayPal address** from **Payments Setup** and choose
+3. In the app, **Add Webhook**: paste the **PayPal address** you copied when the token was shown
+   (or Regenerate Token on **Payments Setup** and paste the new Stripe address in Stripe too) and choose
    **Checkout order approved**, **Payment capture completed**, **Payment capture denied**,
    **Payment capture refunded** and **Payment capture reversed**, and, for automatic recurring
    payments, **Payment sale completed**, **Billing subscription payment failed** and **Billing
@@ -165,10 +170,13 @@ It shows the address to give each processor and, for each processor, a card with
   connected and writes the detail to the Error Log. Checkouts start only for a connected
   processor.
 - For PayPal, the **PayPal Webhook ID** box and **Save Webhook ID**.
-- **Regenerate Token** (under the addresses, after a confirmation): BarnCRM made the token in
-  the addresses the first time you opened this page. Regenerating replaces it, so the addresses
-  already given to Stripe and PayPal stop working until you paste in the new ones. Use it if an
-  address may have been shared.
+- **Generate Token** (under the addresses, until a token exists): makes the random token the
+  addresses end with and shows the full addresses this once, with a reminder to copy them. BarnCRM
+  keeps only a fingerprint (SHA-256 hash) of the token, so on later visits each address ends in
+  `?token=` with nothing after it.
+- **Regenerate Token** (once a token exists, after a confirmation): replaces the token and shows
+  the new addresses once. The addresses already given to Stripe and PayPal stop working until you
+  paste in the new ones. Use it if an address may have been shared, or if you no longer have it.
 - **Disconnect**: after you confirm, marks the processor not connected (and, for PayPal, clears the webhook id).
   It shows only on a connected processor, or on PayPal while a webhook id is saved.
   The secrets stay on the External Credential until you remove them in Setup.

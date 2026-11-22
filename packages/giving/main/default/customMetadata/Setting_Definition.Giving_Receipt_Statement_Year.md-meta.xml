@@ -28,7 +28,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">The tax year the year end statement run covers. Set it in January to the year that just ended.</value>
+    <value xsi:type="xsd:string">The tax year the year end statement run covers. 0, the default, means the year that just ended; enter a year (2000 to 2100) to run another.</value>
   </values>
   <values>
     <field>Help_Path__c</field>
@@ -36,10 +36,14 @@
   </values>
   <values>
     <field>Min_Value__c</field>
-    <value xsi:type="xsd:double">2000</value>
+    <value xsi:type="xsd:double">0</value>
   </values>
   <values>
     <field>Max_Value__c</field>
     <value xsi:type="xsd:double">2100</value>
+  </values>
+  <values>
+    <field>Default_Value__c</field>
+    <value xsi:type="xsd:string">0</value>
   </values>
 </CustomMetadata>

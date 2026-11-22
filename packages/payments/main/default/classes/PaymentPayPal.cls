@@ -100,8 +100,8 @@ public with sharing class PaymentPayPal {
 		HttpResponse answer = remembered
 			? send(SUBSCRIPTIONS, plan.subscription(planId, ref, successUrl, cancelUrl), ref)
 			: null;
-		Payments_Settings__c stored = PaymentService.settings();
-		String product = stored.PayPal_Product_Id__c;
+		String saved = PaymentService.stateText(PaymentService.PAYPAL_PRODUCT_ID);
+		String product = saved;
 		if (answer == null || refused(answer)) {
 			String fresh = remembered ? '-' + ref : '';
 			HttpResponse made = product == null
@@ -139,9 +139,8 @@ public with sharing class PaymentPayPal {
 		payment.Subscription_Id__c = payment.Checkout_Id__c;
 		payment.Plan_Key__c = plan.key;
 		payment.Plan_Id__c = planId;
-		if (product != null && !product.equals(stored.PayPal_Product_Id__c)) {
-			Payments_Settings__c change = new Payments_Settings__c(Id = stored.Id, PayPal_Product_Id__c = product);
-			update as system change;
+		if (product != null && !product.equals(saved)) {
+			PaymentService.putState(new Map<String, Object>{ PaymentService.PAYPAL_PRODUCT_ID => product });
 		}
 	}
 
@@ -394,7 +393,7 @@ public with sharing class PaymentPayPal {
 	private static Boolean verify(Payment_Event__c event) {
 		// Apex names ignore case, so this cannot be called `headers` beside HEADERS.
 		Map<String, Object> sent = PaymentStripe.parse(event.Headers__c);
-		String webhookId = PaymentService.settings().PayPal_Webhook_Id__c;
+		String webhookId = PaymentService.stateText(PaymentService.PAYPAL_WEBHOOK_ID);
 		if (String.isBlank(webhookId) || String.isBlank(event.Payload__c)) {
 			return false;
 		}

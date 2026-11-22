@@ -9,6 +9,12 @@
 private class DonorLevelControllerTest {
 	private static final String PERMISSION_SET = 'DonorLevelsTestAccess';
 
+	// Levels on, placed by Total Giving. A store value lasts one transaction, so it is put here.
+	static {
+		ModuleSettings.setForTest('Donor_Levels_Enabled', true);
+		ModuleSettings.setForTest('Donor_Level_Source_Field', 'Total_Giving__c');
+	}
+
 	@TestSetup
 	static void makeData() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
@@ -17,11 +23,6 @@ private class DonorLevelControllerTest {
 				new Donor_Level__c(Name = 'Sustainer', Minimum_Amount__c = 1000, Maximum_Amount__c = 5000),
 				new Donor_Level__c(Name = 'Retired Circle', Minimum_Amount__c = 50000, Active__c = false)
 			};
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-			settings.SetupOwnerId = UserInfo.getOrganizationId();
-			settings.Donor_Levels_Enabled__c = true;
-			settings.Donor_Level_Source_Field__c = 'Total_Giving__c';
-			upsert settings;
 			// The permission set is a setup object; it cannot share a transaction with the rows
 			// above unless it is written as the same user in a separate context.
 			System.runAs(new User(Id = UserInfo.getUserId())) {
@@ -115,10 +116,7 @@ private class DonorLevelControllerTest {
 	@IsTest
 	static void recalculationIsRefusedWhileLevelsAreOff() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-			settings.Donor_Levels_Enabled__c = false;
-			update settings;
-			SettingsService.clearCaches();
+			ModuleSettings.setForTest('Donor_Levels_Enabled', false);
 
 			String message;
 			try {

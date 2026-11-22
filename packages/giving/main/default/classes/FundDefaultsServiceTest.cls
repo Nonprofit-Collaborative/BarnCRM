@@ -26,10 +26,9 @@ private class FundDefaultsServiceTest {
 			Assert.isFalse(fund.Restricted__c, 'It is unrestricted money.');
 			Assert.isTrue(fund.Is_Default__c, 'It catches undesignated gifts.');
 			Assert.isNull(fund.Accounting_Code__c, 'The accounting code is the organization to set.');
-			Assert.areEqual(
-				String.valueOf(fund.Id),
-				Giving_Settings__c.getOrgDefaults().Default_Fund__c,
-				'Giving settings name it as the Default Fund, so the setting is never blank.'
+			Assert.isNull(
+				ModuleSettings.text('Giving_Default_Fund'),
+				'No setting is saved at install: the flag makes it the default until one is chosen.'
 			);
 			Assert.areEqual(
 				fund.Id,
@@ -54,7 +53,7 @@ private class FundDefaultsServiceTest {
 			Assert.isNull(created, 'Nothing is created beside an existing fund.');
 			Assert.areEqual(1, allFunds().size(), 'Only the org\'s own fund exists.');
 			Assert.isNull(
-				Giving_Settings__c.getOrgDefaults().Default_Fund__c,
+				ModuleSettings.text('Giving_Default_Fund'),
 				'The Default Fund setting is not filled in on the org\'s behalf.'
 			);
 		}
@@ -64,7 +63,7 @@ private class FundDefaultsServiceTest {
 	static void aDefaultFundAlreadySetIsLeftAlone() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			String chosen = '001000000000000AAA';
-			insert new Giving_Settings__c(SetupOwnerId = UserInfo.getOrganizationId(), Default_Fund__c = chosen);
+			ModuleSettings.setForTest('Giving_Default_Fund', chosen);
 
 			Test.startTest();
 			Fund__c created = FundDefaultsService.installDefaultFundDuringInstall(null);
@@ -74,7 +73,7 @@ private class FundDefaultsServiceTest {
 			Assert.isTrue(allFunds().isEmpty(), 'No fund appears.');
 			Assert.areEqual(
 				chosen,
-				Giving_Settings__c.getOrgDefaults().Default_Fund__c,
+				ModuleSettings.text('Giving_Default_Fund'),
 				'The chosen default is unchanged.'
 			);
 		}

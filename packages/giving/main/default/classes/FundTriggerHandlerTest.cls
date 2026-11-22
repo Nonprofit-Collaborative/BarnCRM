@@ -1,6 +1,6 @@
 /**
  * At most one fund is the default, and Maria never has to remember to untick the old one
- * (R-F1).
+ * (R-F1). The Default Fund setting decides the flag, and the trigger never saves it (R-F4).
  */
 @IsTest(testFor='ApexClass:FundTriggerHandler')
 private class FundTriggerHandlerTest {
@@ -104,7 +104,7 @@ private class FundTriggerHandlerTest {
 	}
 
 	@IsTest
-	static void markingADefaultWritesTheSettingsKeyToo() {
+	static void tickingADefaultNeverSavesTheSetting() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Fund__c general = GivingTestDataFactory.buildFund('General', false);
 			insert general;
@@ -114,61 +114,68 @@ private class FundTriggerHandlerTest {
 			update general;
 			Test.stopTest();
 
-			System.assertEquals(
-				String.valueOf(general.Id),
-				Giving_Settings__c.getOrgDefaults().Default_Fund__c,
-				'The flag and the BarnCRM Settings key are two faces of one decision (R-F4).'
+			Assert.isNull(
+				ModuleSettings.text('Giving_Default_Fund'),
+				'A trigger never saves a setting; the Default Fund setting stays blank (R-F4).'
 			);
-			System.assertEquals(
+			Assert.areEqual(
 				general.Id,
 				GiftService.resolveDefaultFundId(),
-				'So ticking the box actually changes where gifts land.'
+				'While the setting is blank, ticking the box changes where gifts land.'
 			);
 		}
 	}
 
 	@IsTest
-	static void movingTheDefaultMovesTheSettingsKey() {
+	static void theSettingDecidesEachFundsFlag() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Fund__c general = GivingTestDataFactory.buildFund('General', true);
 			insert general;
 			Fund__c building = GivingTestDataFactory.buildFund('Building', false);
 			insert building;
+			ModuleSettings.setForTest('Giving_Default_Fund', String.valueOf(building.Id));
 
 			Test.startTest();
-			building.Is_Default__c = true;
-			update building;
+			update new List<Fund__c>{ new Fund__c(Id = general.Id, Name = 'General'), new Fund__c(Id = building.Id) };
 			Test.stopTest();
 
-			System.assertEquals(
-				String.valueOf(building.Id),
-				Giving_Settings__c.getOrgDefaults().Default_Fund__c,
-				'The key follows the flag rather than quietly outvoting it.'
+			Assert.isFalse(
+				[SELECT Is_Default__c FROM Fund__c WHERE Id = :general.Id].Is_Default__c,
+				'A fund the setting does not name loses the flag on its next save.'
 			);
-			System.assertEquals(
-				building.Id,
-				GiftService.resolveDefaultFundId(),
-				'And gifts land in the fund Maria just marked.'
+			Assert.isTrue(
+				[SELECT Is_Default__c FROM Fund__c WHERE Id = :building.Id].Is_Default__c,
+				'The fund the setting names shows the flag.'
 			);
+			Assert.areEqual(building.Id, GiftService.resolveDefaultFundId(), 'Gifts land where the setting says.');
 		}
 	}
 
 	@IsTest
-	static void untickingTheDefaultEmptiesTheSettingsKey() {
+	static void aTickThatDisagreesWithTheSettingIsRefused() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Fund__c general = GivingTestDataFactory.buildFund('General', true);
 			insert general;
+			Fund__c building = GivingTestDataFactory.buildFund('Building', false);
+			insert building;
+			ModuleSettings.setForTest('Giving_Default_Fund', String.valueOf(general.Id));
+			String message = '';
 
 			Test.startTest();
-			general.Is_Default__c = false;
-			update general;
+			try {
+				building.Is_Default__c = true;
+				update building;
+			} catch (DmlException refused) {
+				message = refused.getDmlMessage(0);
+			}
 			Test.stopTest();
 
-			System.assertEquals(
-				null,
-				Giving_Settings__c.getOrgDefaults().Default_Fund__c,
-				'A fund that is no longer the default does not stay named in the settings.'
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Fund_DefaultFromSettings'),
+				message,
+				'The refusal says the default fund is chosen in BarnCRM Settings.'
 			);
+			Assert.areEqual(general.Id, GiftService.resolveDefaultFundId(), 'The setting still decides.');
 		}
 	}
 

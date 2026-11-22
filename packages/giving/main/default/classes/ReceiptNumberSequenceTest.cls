@@ -8,6 +8,10 @@
 private class ReceiptNumberSequenceTest {
 	private static final Integer YEAR = 2026;
 
+	static {
+		ReceiptTestDataFactory.useReceiptSettings();
+	}
+
 	@TestSetup
 	static void setUp() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {

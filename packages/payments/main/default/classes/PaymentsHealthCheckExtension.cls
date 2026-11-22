@@ -115,7 +115,7 @@ public with sharing class PaymentsHealthCheckExtension implements HealthCheckExt
 				)
 			);
 		}
-		Datetime capHit = PaymentService.settings().Webhook_Cap_Hit_At__c;
+		Datetime capHit = PaymentService.capHitAt();
 		if (capHit != null && capHit > Datetime.now().addHours(-24)) {
 			found.add(
 				finding(

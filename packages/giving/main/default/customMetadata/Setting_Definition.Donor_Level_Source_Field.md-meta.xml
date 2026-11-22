@@ -38,4 +38,8 @@
         <field>Help_Path__c</field>
         <value xsi:type="xsd:string">donor-levels.md</value>
     </values>
+    <values>
+        <field>Default_Value__c</field>
+        <value xsi:type="xsd:string">"Total_Giving__c"</value>
+    </values>
 </CustomMetadata>

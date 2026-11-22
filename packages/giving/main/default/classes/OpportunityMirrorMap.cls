@@ -35,8 +35,7 @@ public with sharing class OpportunityMirrorMap {
 	/** The map for this transaction: empty when none is named or it cannot be used. */
 	public static OpportunityMirrorMap current() {
 		if (loaded == null) {
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-			loaded = new OpportunityMirrorMap(settings == null ? null : settings.Opportunity_Mirror_Map__c);
+			loaded = new OpportunityMirrorMap(ModuleSettings.text('Mirror_Opportunity_Mirror_Map'));
 		}
 		return loaded;
 	}

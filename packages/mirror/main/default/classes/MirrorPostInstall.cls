@@ -1,9 +1,8 @@
 /**
  * What BarnCRM Mirror does for itself at install and at every upgrade: add the module to Core's
  * setup marker. Mirror registers no automation switch since the gift mirrors moved to BarnCRM
- * Fundraising (ADR-0228; `GivingPostInstall` creates their switches), and it creates
- * no `Mirror_Settings__c`: Send Cases to a service provider's field default of false already reads
- * as off. The hourly Case check is scheduled by the nightly run's step once that setting is on,
+ * Fundraising (ADR-0228; `GivingPostInstall` creates their switches), and it saves no
+ * setting: Send Cases to a service provider ships off as its Setting Definition default. The hourly Case check is scheduled by the nightly run's step once that setting is on,
  * never at install, so an org that does not send Cases keeps no scheduled job for it.
  *
  * The step is `runSetup`, which is also what Finish Setup runs for a module copied into an org by

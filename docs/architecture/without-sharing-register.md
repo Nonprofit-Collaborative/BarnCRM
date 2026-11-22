@@ -176,7 +176,6 @@ into six kinds:
 
 | Class | Kind | What it reaches past sharing for | Authority |
 |---|---|---|---|
-| MirrorSettingsWriter | Platform | Each mirror's run record on the protected org settings | ADR-0021, ADR-0038 |
 
 ## Payments
 

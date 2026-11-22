@@ -98,8 +98,7 @@ public with sharing class CampaignSyncService {
 
 	/** The Copy appeals to Campaigns setting, off at install (R-CS1). */
 	public static Boolean isSwitchedOn() {
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		return settings != null && settings.Campaign_Sync_Enabled__c == true;
+		return ModuleSettings.flag('Mirror_Campaign_Sync_Enabled');
 	}
 
 	/**

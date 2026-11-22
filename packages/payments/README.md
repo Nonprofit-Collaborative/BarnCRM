@@ -22,8 +22,10 @@ No consumer is a dependency, and no consumer depends on this package (the seam b
 
 ## Contents
 
-- Objects: `Payment__c` (29PAY1), `Payment_Event__c` (29PAY2); settings `Payments_Settings__c`
-  (29PAY3, which holds no secret: connection flags and the PayPal webhook and product ids).
+- Objects: `Payment__c` (29PAY1), `Payment_Event__c` (29PAY2); settings group `Payments_Settings__c`
+  in the settings store (29PAY3, `Setting_Module.Payments`); connection flags, the PayPal webhook
+  and product ids, the cap time and the receiver token's SHA-256 hash are run state
+  (`Payments.<Name>` rows). No secret and no token is kept.
 - `PaymentsApi`: the seam (`System.Callable`).
 - `PaymentService`: starting a checkout, the status moves (R-PAY1, R-PAY2) and telling listeners.
 - `PaymentStripe`, `PaymentPayPal`: each processor's checkout call, event reading and

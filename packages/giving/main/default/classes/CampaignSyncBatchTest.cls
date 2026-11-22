@@ -5,8 +5,15 @@
  */
 @IsTest(testFor='ApexClass:CampaignSyncBatch')
 private class CampaignSyncBatchTest {
+	// Every test runs with the sync on: a store value lasts one transaction, so it is put here.
+	static {
+		ModuleSettings.setForTest('Mirror_Campaign_Sync_Enabled', true);
+	}
+
 	@TestSetup
 	static void setup() {
+		// Off while the appeals are made, so none of them has a Campaign yet.
+		ModuleSettings.setForTest('Mirror_Campaign_Sync_Enabled', false);
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Appeal__c parent = new Appeal__c(Name = 'Capital campaign', Active__c = true);
 			insert parent;
@@ -14,10 +21,6 @@ private class CampaignSyncBatchTest {
 				new Appeal__c(Name = 'Spring appeal', Goal__c = 25000, Active__c = true),
 				new Appeal__c(Name = 'Gala', Parent_Appeal__c = parent.Id, Active__c = true)
 			};
-			// Switched on only now, so none of the appeals above has a Campaign yet.
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-			settings.Campaign_Sync_Enabled__c = true;
-			upsert settings;
 		}
 	}
 

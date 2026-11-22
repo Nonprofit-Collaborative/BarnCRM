@@ -213,9 +213,8 @@ public with sharing class AcknowledgmentController {
 		view.scheduled = AcknowledgmentScheduler.isScheduled();
 		view.nextRunAt = AcknowledgmentScheduler.nextRunAt();
 
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		view.lastRun = settings.Acknowledgments_Last_Run__c;
-		view.lastRunSummary = settings.Acknowledgments_Last_Run_Summary__c;
+		view.lastRun = GivingState.moment(GivingState.ACKNOWLEDGMENTS_LAST_RUN);
+		view.lastRunSummary = GivingState.text(GivingState.ACKNOWLEDGMENTS_SUMMARY);
 
 		view.templates = GivingEmailTemplates.options();
 		view.rules = ruleViews(GivingEmailTemplates.labelsByDeveloperName(view.templates));

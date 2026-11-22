@@ -66,9 +66,7 @@ private class PaymentPayPalTest {
 	static void liveModeUsesTheLiveAddressAndWholeUnitCurrenciesHaveNoDecimals() {
 		System.runAs(PaymentsTestData.admin()) {
 			PaymentsTestData.connect(PaymentService.PAYPAL);
-			Payments_Settings__c settings = Payments_Settings__c.getOrgDefaults();
-			settings.Mode__c = PaymentService.LIVE;
-			update settings;
+			PaymentsTestData.mode(PaymentService.LIVE);
 			PaymentsTestData.Processors mock = PaymentsTestData.processors()
 				.answer('oauth2/token', 200, '{"access_token":"tok"}')
 				.answer(
@@ -122,9 +120,7 @@ private class PaymentPayPalTest {
 	static void withoutAWebhookIdEveryEventIsRejected() {
 		System.runAs(PaymentsTestData.admin()) {
 			PaymentsTestData.connect(PaymentService.PAYPAL);
-			Payments_Settings__c stored = Payments_Settings__c.getOrgDefaults();
-			stored.PayPal_Webhook_Id__c = null;
-			update stored;
+			PaymentService.putState(new Map<String, Object>{ PaymentService.PAYPAL_WEBHOOK_ID => null });
 			verifying();
 
 			Test.startTest();

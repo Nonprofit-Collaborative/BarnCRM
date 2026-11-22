@@ -10,6 +10,10 @@
  */
 @IsTest(testFor='ApexClass:ReceiptController, ApexClass:ReceiptTemplateService')
 private class ReceiptLetterEditorTest {
+	static {
+		ReceiptTestDataFactory.useReceiptSettings();
+	}
+
 	@TestSetup
 	static void setUp() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {

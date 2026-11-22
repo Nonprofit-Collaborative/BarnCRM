@@ -360,11 +360,7 @@ private class InboundGiftServiceTest {
 	@IsTest
 	static void aGiftDatedInAClosedPeriodIsNotSavedAndSaysWhy() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			// Written as InboundGiftAccessTest writes Giving settings: the org default, directly.
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-			settings.SetupOwnerId = UserInfo.getOrganizationId();
-			settings.Books_Closed_Through__c = Date.today().addDays(-1);
-			upsert settings;
+			GivingTestDataFactory.closeBooksThrough(Date.today().addDays(-1));
 			InboundGift late = gift('p:closed', 10);
 			late.giftDate = Date.today().addDays(-5);
 

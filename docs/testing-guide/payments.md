@@ -23,6 +23,7 @@ Open the debug log and copy the `checkoutUrl` value into a browser.
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, **Payments**. | **Processor** Stripe, **Mode** Test, **Default currency** USD, and a **Payments Setup** link. |
+| 1a | Change **Default currency** to CAD and save. Reload the page. | The save shows Saving, then Saved; after the reload **Default currency** is still CAD. Set it back to USD. |
 | 2 | Open **Health Check**. | `Payment Processor Is Not Connected` for Stripe, `Payment Processing Is Not Scheduled` with **Schedule Payment Processing**, and, if the Site guest lacks it, `A Site Guest User Can't Receive Payment News` with **Give Payments Webhook Guest**. |
 | 3 | Select both fixes. | Both findings are gone after the page refreshes. **Setup > Scheduled Jobs** lists four `BarnCRM Payments Processing` jobs. |
 | 4 | Open **Payments Setup**. | "Processing is scheduled" and no **Schedule Processing** button. |
@@ -38,7 +39,8 @@ Open the debug log and copy the `checkoutUrl` value into a browser.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Payments Setup**. | A Stripe address and a PayPal address on your Site, ending `/payments/v1/stripe` and `/payments/v1/paypal`. A Stripe and a PayPal card, each **Not connected**, naming its External Credential, principal and parameters (`SecretKey`; `ClientId, ClientSecret`) with the Setup steps. No box for a secret. |
+| 1 | Open **Payments Setup**. | A Stripe address and a PayPal address on your Site, ending `/payments/v1/stripe?token=` and `/payments/v1/paypal?token=`, a warning that the addresses need a token, and **Generate Token**. A Stripe and a PayPal card, each **Not connected**, naming its External Credential, principal and parameters (`SecretKey`; `ClientId, ClientSecret`) with the Setup steps. No box for a secret. |
+| 1a | Select **Generate Token** (no confirmation is asked). Copy both addresses. | Each address now ends with a 64-character token, with a warning that it is shown only once. The button reads **Regenerate Token**. |
 | 2 | Select **Check Connection** on the Stripe card before entering anything in Setup. | A message that Stripe could not be reached through its Named Credential; still **Not connected**. The **Error Log** has a row for it. |
 | 3 | In **Setup > Named Credentials > External Credentials**, open **BarnCRM Stripe**, edit the principal `Barn_Stripe_Key`, add the parameter `SecretKey` with your Stripe test secret key and save. Select **Check Connection** again. | `Stripe is connected (Test mode).`; the card reads **Connected**. `Payment Processor Is Not Connected` is gone from Health Check. |
 | 4 | Reload Payments Setup and look at the page's network responses. | No secret appears anywhere. |
@@ -84,7 +86,8 @@ Open the debug log and copy the `checkoutUrl` value into a browser.
 | 1 | In Stripe, **Developers > Events**, open the `charge.refunded` event and select **Resend**. | Stripe reports a 200 answer. **Payment Events** gains no new row and the payment is unchanged. |
 | 2 | From a terminal, `curl -X POST <Stripe address> -d '{}'` (the full address, with its `token=`). | The answer is 400. No Payment Event is added. |
 | 2a | `curl -i -X POST <Stripe address without ?token=...> -d '{}'`, then again with a wrong token. | Both answers are 404 with an empty body. No Payment Event is added. |
-| 2b | On **Payments Setup**, select **Regenerate Token** and confirm. Post to the old address. | The addresses show a new token and the old address answers 404. Put the new address in Stripe and PayPal. |
+| 2b | On **Payments Setup**, select **Regenerate Token** and confirm. Post to the old address. | The addresses show a new token, with a warning that it is shown only once, and the old address answers 404. Put the new address in Stripe and PayPal. |
+| 2b1 | Reload **Payments Setup**. | The addresses end in `?token=` with nothing after it, a line says only a fingerprint of the token is kept, and the button reads **Regenerate Token**. The address copied in 2b still answers 400 to `curl -X POST <address> -d '{}'`. |
 | 2c | Optional: with the receiver at its hourly cap (500 events from one processor in an hour), post again. | The answer is 429; the **Error Log** gains one Warning for the hour (not one per post) and **Health Check** shows `Payment Receiver Hit Its Hourly Limit`. |
 | 3 | `curl -X POST <Stripe address> -H 'Content-Type: application/json' -d '{"id":"evt_forged123","type":"checkout.session.completed","data":{"object":{"client_reference_id":"<a Pending payment Id>"}}}'`, then process. | The answer is 200 and a Payment Event `stripe:evt_forged123` is **Received**. After processing it is **Rejected**, "Stripe has no event with this ID", and the payment is still **Pending**. |
 | 4 | Post the same body with `"type":"customer.created"`. | The answer is 200 and nothing is stored: Payments does not use that type. |
