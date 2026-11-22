@@ -106,6 +106,7 @@ private class ArchiveErasureTest {
 			finisher.execute(null);
 			System.Assert.areEqual(0, [SELECT COUNT() FROM Error_Log__c WITH SYSTEM_MODE], 'No context, no log');
 			finisher.stopped('Because');
+			Test.getEventBus().deliver();
 			Error_Log__c logged = [SELECT Severity__c, Message__c FROM Error_Log__c WITH SYSTEM_MODE LIMIT 1];
 			System.Assert.areEqual(ErrorLogger.SEVERITY_ERROR, logged.Severity__c, 'An Error');
 			System.Assert.isTrue(logged.Message__c.contains('Because'), 'With the reason: ' + logged.Message__c);

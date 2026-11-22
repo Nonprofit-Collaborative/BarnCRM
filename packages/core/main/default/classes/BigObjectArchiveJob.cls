@@ -55,6 +55,7 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 	private Datetime copiedAt;
 	/** The last Copy's saved rows: record name by Original Id. */
 	private Map<String, String> copiedNames = new Map<String, String>();
+	@TestVisible
 	private List<String> notes = new List<String>();
 	@TestVisible
 	private List<ArchiveStore.Key> orphans = new List<ArchiveStore.Key>();
@@ -163,28 +164,28 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 		Schema.DescribeSObjectResult described = checked.objectType.getDescribe(SObjectDescribeOptions.DEFERRED);
 		List<ArchiveRecordJson.ChildKind> kinds = ArchiveRecordJson.childKinds(described);
 		Set<Id> ids = new Map<Id, SObject>(page).keySet();
-		Integer childCount = countChildren(kinds, ids);
+		Map<String, String> fieldByObject = new Map<String, String>();
+		Map<Id, Map<String, List<SObject>>> children = childrenOf(kinds, ids, fieldByObject);
 		// Too many children to read at once: the first half of the parents, until one is left.
-		while (childCount > childRows && page.size() > 1) {
+		while (children == null && page.size() > 1) {
 			List<SObject> half = new List<SObject>();
 			for (Integer i = 0; i < page.size() / 2; i++) {
 				half.add(page[i]);
 			}
 			page = half;
 			ids = new Map<Id, SObject>(page).keySet();
-			childCount = countChildren(kinds, ids);
+			children = childrenOf(kinds, ids, fieldByObject);
 		}
-		Boolean tooMany = childCount > childRows;
+		Boolean tooMany = children == null;
+		if (tooMany) {
+			children = new Map<Id, Map<String, List<SObject>>>();
+		}
 		Set<String> fields = new Set<String>(BulkDeleteService.backupFieldNames(checked.objectType));
 		fields.add('SystemModstamp');
 		QueryCompiler.Compiled read = QueryCompiler.compileSelection(queryJson, fields, ids);
 		Map<Id, SObject> records = new Map<Id, SObject>(
 			Database.queryWithBinds(read.soql, read.binds, AccessLevel.USER_MODE)
 		);
-		Map<String, String> fieldByObject = new Map<String, String>();
-		Map<Id, Map<String, List<SObject>>> children = tooMany
-			? new Map<Id, Map<String, List<SObject>>>()
-			: childrenOf(kinds, ids, fieldByObject);
 		Boolean hasOwner = described.fields.getMap().containsKey('OwnerId');
 
 		copiedAt = Datetime.newInstance((Datetime.now().getTime() / 1000) * 1000);
@@ -238,42 +239,37 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 		return rows;
 	}
 
-	/** How many cascade-delete children these records have, counted in user mode. */
-	private static Integer countChildren(List<ArchiveRecordJson.ChildKind> kinds, Set<Id> ids) {
-		Integer total = 0;
-		for (ArchiveRecordJson.ChildKind kind : kinds) {
-			total += Database.countQueryWithBinds(
-				'SELECT COUNT() FROM ' + kind.objectName + ' WHERE ' + kind.fieldName + ' IN :ids',
-				new Map<String, Object>{ 'ids' => ids },
-				AccessLevel.USER_MODE
-			);
-		}
-		return total;
-	}
-
-	/** Each record's cascade-delete children, by record and child object, read in user mode. */
+	/**
+	 * Each record's cascade-delete children, by record and child object, read in user mode; null
+	 * when they come to more than `childRows`. One query per child object, each limited to the
+	 * room left, so the check costs no extra query.
+	 */
 	private static Map<Id, Map<String, List<SObject>>> childrenOf(
 		List<ArchiveRecordJson.ChildKind> kinds,
 		Set<Id> ids,
 		Map<String, String> fieldByObject
 	) {
 		Map<Id, Map<String, List<SObject>>> result = new Map<Id, Map<String, List<SObject>>>();
+		Integer read = 0;
 		for (ArchiveRecordJson.ChildKind kind : kinds) {
 			fieldByObject.put(kind.objectName, kind.fieldName);
 			List<String> childFields = BulkDeleteService.backupFieldNames(NamespaceUtil.objectType(kind.objectName));
-			for (
-				SObject child : Database.queryWithBinds(
-					'SELECT ' +
-						String.join(childFields, ', ') +
-						' FROM ' +
-						kind.objectName +
-						' WHERE ' +
-						kind.fieldName +
-						' IN :ids',
-					new Map<String, Object>{ 'ids' => ids },
-					AccessLevel.USER_MODE
-				)
-			) {
+			List<SObject> found = Database.queryWithBinds(
+				'SELECT ' +
+					String.join(childFields, ', ') +
+					' FROM ' +
+					kind.objectName +
+					' WHERE ' +
+					kind.fieldName +
+					' IN :ids LIMIT :room',
+				new Map<String, Object>{ 'ids' => ids, 'room' => childRows - read + 1 },
+				AccessLevel.USER_MODE
+			);
+			read += found.size();
+			if (read > childRows) {
+				return null;
+			}
+			for (SObject child : found) {
 				Id parentId = (Id) child.get(kind.fieldName);
 				if (!result.containsKey(parentId)) {
 					result.put(parentId, new Map<String, List<SObject>>());

@@ -276,6 +276,8 @@ private class ArchiveJobTest {
 		System.runAs(TestUsers.admin()) {
 			makePeople(1);
 		}
+		// The second run gets its own limits, as a later run would.
+		Test.startTest();
 		System.runAs(archivist()) {
 			// Refused twice: the copy stays, the log counts it, and the chain still ends.
 			job = ArchiveDestinations.forKey(ArchiveRules.BIG_OBJECT)
@@ -285,6 +287,7 @@ private class ArchiveJobTest {
 			store.deletesRefused = 2;
 			drain();
 		}
+		Test.stopTest();
 		finished = reread(job.Id);
 		System.Assert.isTrue(finished.Run_Log__c.contains(left), 'Counted: ' + finished.Run_Log__c);
 		Integer stayed = 0;
@@ -323,24 +326,40 @@ private class ArchiveJobTest {
 			.replace('"Title"', '"Name"')
 			.replace('"equals"', '"contains"')
 			.replace('"Volunteer"', '"Kids Org"');
-		ArchiveStoreMemory store = ArchiveStoreMemory.install();
+		ArchiveStoreMemory.install();
 		BigObjectArchiveJob.queuedForTest = new List<Object>();
 		// Each organization with two children fits alone; the one with six never does.
 		BigObjectArchiveJob.childRows = 5;
-		Import_Batch__c job;
+		// An organization has many kinds of cascade-delete children, each a query per Copy, so
+		// the test reads the rows of single Copies rather than running the whole chain.
+		Test.startTest();
 		System.runAs(archivist()) {
-			job = ArchiveDestinations.forKey(ArchiveRules.BIG_OBJECT)
+			ArchiveDestinations.forKey(ArchiveRules.BIG_OBJECT)
 				.start(new ArchiveRun(null, 'Old Orgs', orgsQuery, 'Account', 3));
-			drain();
+			BigObjectArchiveJob first = (BigObjectArchiveJob) BigObjectArchiveJob.queuedForTest[0];
+			List<Account> page = [
+				SELECT Id, Name
+				FROM Account
+				WHERE Name LIKE 'Kids Org%'
+				WITH SYSTEM_MODE
+				ORDER BY Id
+			];
+			List<Archived_Record__b> rows = first.rowsFor(page);
+			System.Assert.areEqual(1, rows.size(), 'Halved to the first organization: ' + first.notes);
+			System.Assert.areEqual(String.valueOf(page[0].Id), rows[0].Original_Id__c, 'The first one');
+
+			Account tooMany = page[2].Name == 'Kids Org C'
+				? page[2]
+				: [
+						SELECT Id, Name
+						FROM Account
+						WHERE Name = 'Kids Org C'
+						WITH SYSTEM_MODE
+				  ];
+			rows = first.rowsFor(new List<SObject>{ tooMany });
+			System.Assert.isTrue(rows.isEmpty(), 'The organization with too many children is left out');
+			System.Assert.isTrue(String.join(first.notes, ' ').contains('Kids Org C'), 'By name: ' + first.notes);
 		}
-		System.Assert.areEqual(2, store.rowsByKey.size(), 'Two archived: ' + reread(job.Id).Run_Log__c);
-		System.Assert.areEqual(
-			1,
-			[SELECT COUNT() FROM Account WHERE Name = 'Kids Org C' WITH SYSTEM_MODE],
-			'The organization with too many children stays'
-		);
-		job = reread(job.Id);
-		System.Assert.areEqual(1, job.Rows_Rejected__c, 'Named as left out: ' + job.Run_Log__c);
-		System.Assert.isTrue(job.Run_Log__c.contains('Kids Org C'), 'By name: ' + job.Run_Log__c);
+		Test.stopTest();
 	}
 }
