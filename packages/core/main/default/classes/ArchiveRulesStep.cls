@@ -1,5 +1,5 @@
 /**
- * The nightly Archive Rules step (canonical model R-SQ18, ADR-0166 nightly-job-dispatcher, ADR-NEXT
+ * The nightly Archive Rules step (canonical model R-SQ18, ADR-0166 nightly-job-dispatcher, ADR-0240
  * archive rules and big object archive): at 3:00, every archive rule due today starts its run, as
  * the user who scheduled the nightly run. Shipped on; with no scheduled rule it does nothing. The
  * step's switch on the Nightly Jobs card and each rule's Active switch turn the automation off.

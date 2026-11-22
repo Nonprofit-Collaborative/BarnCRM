@@ -1,12 +1,12 @@
 /**
- * The Archived Records panel (canonical model Section 29D1, R-ARC1, R-ARC4, R-ARC7; ADR-NEXT archive
+ * The Archived Records panel (canonical model Section 29D1, R-ARC1, R-ARC4, R-ARC7; ADR-0240 archive
  * rules and big object archive): the archived objects, one object's rows newest first within a
  * date range, a row's fields from its JSON, and starting a restore.
  *
  * Only a person granted the Archived Record object (BarnCRM Admin) may use it; the rows are read
  * in user mode through `ArchiveStore`. A row's JSON holds every field the archiving person could
  * read, and a viewer sees all of it, which the panel and the admin guide say. Restoring also needs
- * the archive rule permissions (ADR-NEXT item 6).
+ * the archive rule permissions (ADR-0240 item 6).
  */
 public with sharing class ArchiveViewerService {
 	/** Rows shown per page, and the most one restore takes. */

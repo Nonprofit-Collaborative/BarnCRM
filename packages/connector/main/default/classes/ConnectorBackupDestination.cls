@@ -1,5 +1,5 @@
 /**
- * The backup destination (BK-10, D-221; canonical model R-CN11 and R-SQ17; ADR-NEXT automatic
+ * The backup destination (BK-10, D-221; canonical model R-CN11 and R-SQ17; ADR-0239 automatic
  * backups). Core's `OffPlatformDestination`, found through the Connector catalog row's
  * `Extensions__c`, so Core names no Connector class. One connection at most holds Backup
  * Settings in its Connector Connection row: a method, a path with `{file}` and fixed headers

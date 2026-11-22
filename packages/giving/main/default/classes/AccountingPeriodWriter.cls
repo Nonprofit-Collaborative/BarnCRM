@@ -1,6 +1,6 @@
 /**
  * The one write that sets Books Closed Through, and nothing else. It is run state, not a setting
- * (ADR-NEXT settings as custom metadata, decision 6): one `GivingState` row, written
+ * (ADR-0238 settings as custom metadata, decision 6): one `GivingState` row, written
  * synchronously in system mode (ADR-0021).
  *
  * The four ADR-0021 conditions:

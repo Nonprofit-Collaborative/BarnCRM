@@ -14,6 +14,6 @@ unpackaged today, so a shared name would collide on deploy.
 No app of its own: the catalog row's `App_Name__c` is `BarnCRM_Members_Partners` (a Core app,
 shown by the Memberships permission sets), so `scripts/org/module-app-tabs.py` adds
 `Staff_Tabs__c` there first and `Admin_Tabs__c` to BarnCRM Admin Console and that app
-(ADR-NEXT (nine console apps)).
+(ADR-0237 (nine console apps)).
 
 Admin guide: `docs/admin-guide/memberships.md`. Canonical model: Sections 29MEM1 to 29MEM4.

@@ -11,7 +11,7 @@
  *
  * The settings need no step: an unsaved setting reads its shipped default from its Setting
  * Definition, and Invoice payment return page reads the org's My Domain address while blank
- * (ADR-NEXT settings as custom metadata). The steps are `runSetup`, which also adds the module
+ * (ADR-0238 settings as custom metadata). The steps are `runSetup`, which also adds the module
  * to Core's setup marker and is what Finish Setup runs for a module copied into an org by hand
  * (`ModuleSetups`).
  */

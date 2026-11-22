@@ -1,5 +1,5 @@
 /**
- * Where an archive rule moves its records (canonical model R-SQ18, ADR-NEXT archive rules and big
+ * Where an archive rule moves its records (canonical model R-SQ18, ADR-0240 archive rules and big
  * object archive). Core ships Files (`ArchiveToFiles`) and BigObject (`ArchiveToBigObject`); the
  * off-platform store is the class `OffPlatformArchiveDestination`, found by name in
  * `ArchiveDestinations`, so it can live in Core or a module without the rule's shape changing.

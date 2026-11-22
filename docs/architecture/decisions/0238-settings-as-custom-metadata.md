@@ -1,4 +1,4 @@
-# ADR-NEXT: Settings as Custom Metadata: Defaults on Setting Definition, Changed Values in Setting Value, Run State on Nightly Job
+# ADR-0238: Settings as Custom Metadata: Defaults on Setting Definition, Changed Values in Setting Value, Run State on Nightly Job
 
 **Status:** Accepted (owner decision D-219, 2026-11-21); phase 1 (Core) built, phase 2 Core
 prerequisite built (decision 11), phase 2 module moves planned

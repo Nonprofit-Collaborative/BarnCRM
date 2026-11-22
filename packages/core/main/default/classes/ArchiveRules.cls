@@ -1,5 +1,5 @@
 /**
- * The `archive` key of a saved query document (canonical model R-SQ18, ADR-NEXT archive rules and
+ * The `archive` key of a saved query document (canonical model R-SQ18, ADR-0240 archive rules and
  * big object archive): its destination, schedule and Active switch, read, checked, written and
  * asked whether it is due on a day. Pure logic over JSON: no query, no DML.
  */

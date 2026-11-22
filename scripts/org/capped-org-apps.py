@@ -32,7 +32,7 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 NS = "http://soap.sforce.com/2006/04/metadata"
 # The module folders whose app a capped org does not get. None: the suite ships nine console apps
-# (ADR-NEXT, nine console apps), all within the budget, so a capped org gets every app. A tenth
+# (ADR-0237, nine console apps), all within the budget, so a capped org gets every app. A tenth
 # app either fits a raised budget, once a scratch org is shown to take it, or puts its folder here.
 LEFT_OUT = ()
 CAPPED_ORG_APP_BUDGET = 9

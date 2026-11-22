@@ -160,7 +160,7 @@ class AppHeaderColor(unittest.TestCase):
 
 class CoreAppOrder(unittest.TestCase):
     def test_core_ships_console_apps_only(self):
-        # ADR-NEXT (nine console apps): BarnCRM Console, BarnCRM Admin Console and BarnCRM
+        # ADR-0237 (nine console apps): BarnCRM Console, BarnCRM Admin Console and BarnCRM
         # Members and Partners, each in console navigation.
         pattern = os.path.join(CORE, "applications", "*.app-meta.xml")
         names = sorted(os.path.basename(p)[: -len(".app-meta.xml")] for p in glob.glob(pattern))
@@ -195,7 +195,7 @@ class CoreAppOrder(unittest.TestCase):
         self.assertNotIn("Record_Inspector", admin)
 
 
-# Every shipped permission set that showed an app before the nine console apps (ADR-NEXT, nine
+# Every shipped permission set that showed an app before the nine console apps (ADR-0237, nine
 # console apps). Each must still show at least one shipped app, so nobody who had an app loses
 # it. BarnCRM_App_Standard and BarnCRM_App_Admin_Standard are gone: their holders get the Console
 # sets from the same roles (TabAccessService).

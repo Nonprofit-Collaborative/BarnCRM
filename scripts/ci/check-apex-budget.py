@@ -13,7 +13,7 @@ Size is measured the way the org measures it (ApexClass.LengthWithoutComments): 
 character of a non-test class or trigger except comments. oi-test agreed within 2%.
 
 Deploys and package builds strip the leading indentation of every class and trigger
-(scripts/packaging/strip-apex-indent.py, AP-05, ADR-NEXT), so the measure, the caps and the
+(scripts/packaging/strip-apex-indent.py, AP-05, ADR-0241), so the measure, the caps and the
 targets below are the stripped size, which is what an org counts; the raw size of the
 repository source is printed beside it. Setting STRIP_APEX_INDENT=0 deploys the raw source,
 which an org counts about 8 percent larger.
@@ -136,7 +136,7 @@ CAPS = {
     # step, runs kept) and the off-platform destination (the OffPlatformDestination seam,
     # OffPlatformSendBatch, send and retry, send-before-delete for archives): 1,858,298
     # measured, plus about 0.1%.
-    # Raised 2026-11-21 for AR-10 (D-221, ADR-NEXT archive rules and big object archive): the
+    # Raised 2026-11-21 for AR-10 (D-221, ADR-0240 archive rules and big object archive): the
     # ArchiveDestination seam, the rule key and schedule, the big object store, the copy and
     # delete chain, the rule service and nightly step, the Archived Records viewer, the restore
     # chain and the archive erasure scan: 1,924,656 measured, plus about 0.1%.
@@ -355,7 +355,7 @@ CAPS = {
     # Pre-batch review M1: the receiver's address token (made, compared in constant time,
     # regenerated), the hourly cap Warning and its Health Check finding, 75,619 measured
     # 2026-11-19; raised by 800.
-    # SET-03 (D-219, ADR-NEXT settings as custom metadata): settings read from the store, the
+    # SET-03 (D-219, ADR-0238 settings as custom metadata): settings read from the store, the
     # org's connection values as run state, and the receiver token kept only as a SHA-256 hash
     # (shown once, an upgraded org's legacy token hashed at install), 70,825 measured
     # stripped (AP-05) 2026-11-21, plus about 1%.

@@ -42,7 +42,7 @@ class CappedOrgApps(unittest.TestCase):
         )
 
     def test_the_suite_ships_nine_console_apps(self):
-        # ADR-NEXT (nine console apps): only console-navigation apps ship, nine of them.
+        # ADR-0237 (nine console apps): only console-navigation apps ship, nine of them.
         paths = app_paths()
         self.assertEqual(len(paths), 9, sorted(os.path.basename(p) for p in paths))
         for path in paths:

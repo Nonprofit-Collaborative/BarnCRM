@@ -1,5 +1,5 @@
 /**
- * A module's step after a settings save lands (ADR-NEXT settings as custom metadata): Core hands
+ * A module's step after a settings save lands (ADR-0238 settings as custom metadata): Core hands
  * every module that registers this seam in its catalog row's `Extensions__c`
  * (`SettingsSavedExtension: <Class>`) the settings group and keys a save changed, so a module
  * keeps records that show a setting in line at once (Fundraising's Is Default flag on funds).

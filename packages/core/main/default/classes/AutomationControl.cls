@@ -160,7 +160,7 @@ public with sharing class AutomationControl {
 	/**
 	 * The stored pause end, expired or not: the organization-level Automation Control value
 	 * (no query), else, until the org carries its settings over, the legacy BarnCRM Settings one
-	 * (ADR-NEXT settings as custom metadata, decision 7).
+	 * (ADR-0238 settings as custom metadata, decision 7).
 	 */
 	private static Datetime storedPauseEnd() {
 		Datetime until = BarnCRM_Automation_Control__c.getOrgDefaults()?.Paused_Until__c;

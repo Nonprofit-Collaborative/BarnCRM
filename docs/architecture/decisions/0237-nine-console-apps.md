@@ -1,4 +1,4 @@
-# ADR-NEXT: The suite ships nine console apps
+# ADR-0237: The suite ships nine console apps
 
 **Status:** Accepted (owner decision)
 **Date:** 2026-11-21
@@ -7,11 +7,8 @@ console-navigation apps ship, exactly nine of them, and the universal modules ne
 nonprofit app. Amends ADR-0137 (four BarnCRM apps, standard and console), ADR-0192 (Batch C
 modules add their tabs to the BarnCRM apps), ADR-0223 (module apps, capped test orgs) and
 ADR-0226 (Memberships and Scholarships apps). Builds on ADR-0013 (Core runs alone), ADR-0102
-(console app) and the Module Home pattern (`NEXT-module-home-pattern.md`, the other ADR-NEXT of
-release 1.34).
-
-Cited elsewhere as "ADR-NEXT (nine console apps)" so the integrator can tell it from the Module
-Home ADR when numbering both.
+(console app) and the Module Home pattern (ADR-0236, `0236-module-home-pattern.md`, release
+1.34).
 
 ## Context
 

@@ -2,7 +2,7 @@
  * The Event Management settings as the module's code reads them (canonical model 29EV25).
  *
  * Read through Core's typed `SettingsService` readers, which serve each setting from the settings
- * store (module `Events`, ADR-NEXT settings as custom metadata): a setting never saved reads its
+ * store (module `Events`, ADR-0238 settings as custom metadata): a setting never saved reads its
  * Setting Definition's shipped default, and a blank or out of range value reads as that default,
  * the range being the definition's, so no caller has to know the defaults. That includes the two
  * speaker notice templates, which ship as BarnCRM_Speaker_Accepted and BarnCRM_Speaker_Declined

@@ -1,5 +1,5 @@
 /**
- * Deletes the archived rows that name an erased person (canonical model R-ARC6, ADR-NEXT archive
+ * Deletes the archived rows that name an erased person (canonical model R-ARC6, ADR-0240 archive
  * rules and big object archive item 10), queued by `ArchiveErasureExtension`.
  *
  * - Scan links (no DML): run only when the person's Erasure record exists, so a preview or an

@@ -2,7 +2,7 @@
 """Stages the project with leading indentation removed from every Apex class and trigger.
 
 Salesforce counts every character of Apex but comments against the org's 6,000,000 character
-limit, and indentation is characters. The repository keeps Apex formatted (tabs, ADR-NEXT
+limit, and indentation is characters. The repository keeps Apex formatted (tabs, ADR-0241
 "Strip Apex indentation at deploy time"); only the copy sent to an org or into a package
 version loses the leading spaces and tabs on each line. Newlines stay, so a line number in a
 stack trace is the line number in the repository source. Code viewed in Setup appears without

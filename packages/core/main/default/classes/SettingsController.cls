@@ -45,7 +45,7 @@ public with sharing class SettingsController {
 		@AuraEnabled
 		public List<SectionModel> sections;
 		/**
-		 * The deployment a save sent (ADR-NEXT settings as custom metadata), which the console
+		 * The deployment a save sent (ADR-0238 settings as custom metadata), which the console
 		 * follows with getSaveOutcome until it ends; null when nothing is pending.
 		 */
 		@AuraEnabled

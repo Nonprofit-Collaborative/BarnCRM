@@ -1,5 +1,5 @@
 /**
- * What erasing a person does to the archive (canonical model R-ARC6, R-ER8; ADR-NEXT archive rules
+ * What erasing a person does to the archive (canonical model R-ARC6, R-ER8; ADR-0240 archive rules
  * and big object archive item 10). Archived rows cannot be deleted in the erasure's own
  * transaction (an immediate big object call cannot follow its DML), so `erase` queues
  * `ArchiveErasureJob` and reports the rows as counted, not listed. The job does nothing unless

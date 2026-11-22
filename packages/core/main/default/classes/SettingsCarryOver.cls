@@ -1,5 +1,5 @@
 /**
- * The one-time carry-over of an org's settings into custom metadata (ADR-NEXT settings as custom
+ * The one-time carry-over of an org's settings into custom metadata (ADR-0238 settings as custom
  * metadata, decision 9; canonical model R-STV1).
  *
  * Until it runs, a Core setting with no Setting Value record reads the legacy BarnCRM Settings

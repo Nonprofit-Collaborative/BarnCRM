@@ -29,7 +29,7 @@ Both editions include the full core suite of tools: people, households, relation
 
 Every module is in Beta right now (D-211): a **Beta** badge shows beside each module's name in the Module Manager, the Setup Assistant and the Home page Modules card. Core is not marked.
 
-Every module app opens on its home, named for the module (Events Home, Grants Home, Programs Home and so on), with one layout: the module's quick actions, a row of figures that open their lists, the lists its daily work needs, and a setup panel before the first record (ADR-NEXT, Module Home pattern).
+Every module app opens on its home, named for the module (Events Home, Grants Home, Programs Home and so on), with one layout: the module's quick actions, a row of figures that open their lists, the lists its daily work needs, and a setup panel before the first record (ADR-0236, Module Home pattern).
 
 You choose the edition once, in the first-run setup window; the Setup Assistant shows that answer. You can change it later: see [Editions](admin-guide/editions.md). A module you never install leaves nothing behind in your org.
 

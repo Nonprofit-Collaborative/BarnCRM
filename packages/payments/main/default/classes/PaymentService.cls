@@ -88,7 +88,7 @@ public with sharing class PaymentService {
 
 	// Settings are read from the settings store by DeveloperName; what the module records about
 	// this org (connections, the PayPal webhook and product ids, the cap time, the token's hash)
-	// is run state (ADR-NEXT settings as custom metadata, decisions 6 and 11).
+	// is run state (ADR-0238 settings as custom metadata, decisions 6 and 11).
 	private static final String STATE_PREFIX = 'Payments';
 	public static final String STRIPE_CONNECTED = 'Stripe_Connected__c';
 	public static final String PAYPAL_CONNECTED = 'PayPal_Connected__c';

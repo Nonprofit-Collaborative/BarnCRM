@@ -1,6 +1,6 @@
 /**
  * Fundraising's run state: last runs and their summaries, the donor level recalculation time and
- * Books Closed Through (ADR-NEXT settings as custom metadata, decisions 6 and 11). Nobody chooses
+ * Books Closed Through (ADR-0238 settings as custom metadata, decisions 6 and 11). Nobody chooses
  * these in BarnCRM Settings, so they are `SettingsState` rows named `Giving.<Name>`, written
  * synchronously in system mode by the run or page that owns each, and never saved as settings.
  * A name is the legacy `Giving_Settings__c` field it replaces, so an org that has not carried

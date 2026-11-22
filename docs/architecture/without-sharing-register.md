@@ -29,8 +29,8 @@ into six kinds:
 | AffiliationUpkeepWriter | Upkeep | The person's primary affiliation fields and their other affiliations, which the saver may not be able to edit | ADR-0021 category 2 |
 | BrandShareWriter | Platform | Brand groups, their members and Account shares granted to them, which a staff member assigning a brand cannot create; one default brand and entity and one primary assignment cleared on rows the saver may not edit | ADR-0021, ADR-0202 brand management and visibility |
 | AutomationSettingsWriter | Platform | The automation pause on the protected BarnCRM Automation Control org default and the Automation Setting rows from the shipped registry | ADR-0021 |
-| BackupSetSchedule | Org job | Every saved query marked as a Backup Set with a schedule, private ones included, so the nightly run starts each one due; and the files of a scheduled set's runs past Backup Runs Kept, whoever ran them. The records a run saves are still read as the running user | ADR-0021, ADR-0213, ADR-NEXT |
-| OffPlatformSendBatch | Org job | A Backup Set run's or an archive's CSV parts in Files, owned by whoever ran it, read one at a time to send to the org's backup destination when the nightly run sends waiting parts again; nothing is written but the job's own row | ADR-0021, ADR-NEXT |
+| BackupSetSchedule | Org job | Every saved query marked as a Backup Set with a schedule, private ones included, so the nightly run starts each one due; and the files of a scheduled set's runs past Backup Runs Kept, whoever ran them. The records a run saves are still read as the running user | ADR-0021, ADR-0213, ADR-0239 |
+| OffPlatformSendBatch | Org job | A Backup Set run's or an archive's CSV parts in Files, owned by whoever ran it, read one at a time to send to the org's backup destination when the nightly run sends waiting parts again; nothing is written but the job's own row | ADR-0021, ADR-0239 |
 | AddressMatchKeyBatch | Org job | Every address without its Match Key, given one so duplicate matching reads addresses through the index; a key it cannot see would hide a duplicate | ADR-0021, D-200 P6 |
 | EmptyHouseholdTidyBatch | Org job | Every empty household, read and deleted as the scheduler, with the dependents check reaching every child record | ADR-0021, ADR-0036 |
 | ErrorDigestWriter | Platform | The digest run state rows, written by the scheduler | ADR-0021, ADR-0027 |
@@ -47,11 +47,11 @@ into six kinds:
 | SeasonalAddressSelector | Org job | Every household due a seasonal address swap, so none is silently left out | ADR-0021, ADR-0027 |
 | SeasonalAddressWriter | Org job | The package's own address records for the nightly swap (the copy into standard address fields stays in user mode) | ADR-0021, ADR-0027 |
 | SetupChangeCopyJob | Org job | The package's own copy of Setup changes, written and pruned in full | ADR-0021 |
-| OrganizationFlagBatch | Org job | Every account whose Is Organization flag disagrees with the organization record type, so the Organizations list view counts every one | ADR-0021, ADR-NEXT settings as custom metadata |
-| SettingStore | Platform | Reads the org's Setting Value records and enqueues the metadata deployment of a save, which the caller has permission-checked | ADR-0021, ADR-NEXT settings as custom metadata |
-| SettingValueDeployCallback | Platform | Writes the Setting Change audit rows and Error Log entry of a finished settings deployment, as the platform's callback user | ADR-0021, ADR-NEXT settings as custom metadata |
-| SettingsCarryOver | Platform | Reads the protected legacy settings records and writes the package's own state and seen rows once, for a holder of Manage BarnCRM Settings | ADR-0021, ADR-NEXT settings as custom metadata |
-| SettingsState | Org job | The package's own run-state rows (last runs, watermarks, setup markers), read and written for every user whose action moves them | ADR-0021, ADR-NEXT settings as custom metadata |
+| OrganizationFlagBatch | Org job | Every account whose Is Organization flag disagrees with the organization record type, so the Organizations list view counts every one | ADR-0021, ADR-0238 settings as custom metadata |
+| SettingStore | Platform | Reads the org's Setting Value records and enqueues the metadata deployment of a save, which the caller has permission-checked | ADR-0021, ADR-0238 settings as custom metadata |
+| SettingValueDeployCallback | Platform | Writes the Setting Change audit rows and Error Log entry of a finished settings deployment, as the platform's callback user | ADR-0021, ADR-0238 settings as custom metadata |
+| SettingsCarryOver | Platform | Reads the protected legacy settings records and writes the package's own state and seen rows once, for a holder of Manage BarnCRM Settings | ADR-0021, ADR-0238 settings as custom metadata |
+| SettingsState | Org job | The package's own run-state rows (last runs, watermarks, setup markers), read and written for every user whose action moves them | ADR-0021, ADR-0238 settings as custom metadata |
 | WhatsNewSeenWriter | Platform | The running user's own Seen row on an object only BarnCRM Admin can read | ADR-0021, ADR-0087 |
 | WhereUsedSelector | Integrity | Every saved query, private ones included, before a field is retired | ADR-0021 |
 

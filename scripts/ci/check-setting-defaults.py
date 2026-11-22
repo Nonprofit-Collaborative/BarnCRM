@@ -35,7 +35,7 @@ the upgrade step; the list is closed) or registered in a `SHIPPED_ON_ADDED_IN_UP
 the package's post-install class, which passes it to `ShippedDefaultUpgrades.apply` to turn it
 on once in such an org.
 
-Modules in the settings store (ADR-NEXT settings as custom metadata, phase 2): a module that
+Modules in the settings store (ADR-0238 settings as custom metadata, phase 2): a module that
 ships a `Setting_Module__mdt` record reads every row of its group from the store, where an
 unsaved setting is its `Default_Value__c` and nothing else. So its Checkbox, Number and
 Picklist rows must ship one, a row whose legacy field declares a default must ship the same,
@@ -144,7 +144,7 @@ def definition_value(text, field):
 
 
 def registered_defaults():
-    """Core's shipped defaults, from Default_Value__c on its Setting Definition rows (ADR-NEXT
+    """Core's shipped defaults, from Default_Value__c on its Setting Definition rows (ADR-0238
     settings as custom metadata): checkbox keys as booleans, every key's raw JSON alongside."""
     pairs = {}
     raw = {}
@@ -199,7 +199,7 @@ def json_literal(text):
 
 
 def registry_problems():
-    """Setting Module records (ADR-NEXT settings as custom metadata, phase 2): each names a
+    """Setting Module records (ADR-0238 settings as custom metadata, phase 2): each names a
     settings group other than Core's and a prefix, and neither repeats. Returns the registered
     groups and the problems."""
     problems = []

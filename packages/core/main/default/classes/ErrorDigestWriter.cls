@@ -16,7 +16,7 @@
 @NamespaceAccessible
 public without sharing class ErrorDigestWriter {
 	public static void recordRun(Datetime ranAt, String summary, Datetime coveredUntil) {
-		// Run state, not settings: kept on state rows (ADR-NEXT settings as custom metadata).
+		// Run state, not settings: kept on state rows (ADR-0238 settings as custom metadata).
 		SettingsState.put(
 			new Map<String, Object>{
 				LAST_RUN => ranAt,

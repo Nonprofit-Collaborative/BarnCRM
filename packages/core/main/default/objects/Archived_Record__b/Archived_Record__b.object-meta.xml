@@ -3,7 +3,7 @@
   <deploymentStatus>Deployed</deploymentStatus>
   <description>
     Records moved out of their object by an archive rule whose destination is Big Object, as JSON,
-    outside data storage (canonical model Section 29D1, ADR-NEXT archive rules and big object
+    outside data storage (canonical model Section 29D1, ADR-0240 archive rules and big object
     archive). Read through the Archived Records panel only; the index never changes.
   </description>
   <label>Archived Record</label>

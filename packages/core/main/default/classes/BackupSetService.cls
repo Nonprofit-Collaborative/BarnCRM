@@ -1,6 +1,6 @@
 /**
  * Backup Sets (C-66, canonical model R-SQ15 and R-SQ16, ADR-0213 `0213-backup-sets.md` as amended
- * by ADR-NEXT `NEXT-automatic-backups-and-off-platform-destination.md`): saved Find queries whose
+ * by ADR-0239 `0239-automatic-backups-and-off-platform-destination.md`): saved Find queries whose
  * document carries the `backup` key, run on demand or on their schedule by the nightly run
  * (`BackupSetSchedule`) as a Backup data job that writes Archive by Query's file (R-BD9) to Files.
  * Nothing is changed or deleted except, for a scheduled set, the files of runs past the number of

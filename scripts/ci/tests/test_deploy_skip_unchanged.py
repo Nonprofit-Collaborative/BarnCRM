@@ -221,7 +221,7 @@ class DeploySkipUnchanged(unittest.TestCase):
 
     def test_a_capped_org_gets_every_app_while_none_is_left_out(self):
         # ADR-0223 (module apps): a Developer Edition or scratch org refuses apps past about 10.
-        # The nine console apps fit (ADR-NEXT, nine console apps), so LEFT_OUT is empty and a
+        # The nine console apps fit (ADR-0237, nine console apps), so LEFT_OUT is empty and a
         # capped org gets each module whole, with no permission set stage of its own.
         requests = self.deploy(FAKE_ORG_TYPE="Developer Edition")
         sent = [d for r in requests for d in r]

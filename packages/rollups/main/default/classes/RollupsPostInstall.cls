@@ -82,7 +82,7 @@ public with sharing class RollupsPostInstall implements InstallHandler, ModuleSe
 	 * (`Rollups.Last_Run_Started__c`, which `RollupLargeParentBatch` locks), the nightly
 	 * watermark and the processor stamp, each holding what the org had (its legacy value until
 	 * carry-over), so a row that exists is never changed. The settings themselves need nothing:
-	 * an unsaved setting reads its shipped default (ADR-NEXT settings as custom metadata). Also
+	 * an unsaved setting reads its shipped default (ADR-0238 settings as custom metadata). Also
 	 * run by `scripts/org/deploy-packages.sh`. Never throws: a failure goes to the Error Log.
 	 */
 	public static void ensureSettingsRow() {

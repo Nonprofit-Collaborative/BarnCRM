@@ -163,7 +163,7 @@ def check_setting_rows(problems):
         if value_of(text, "Data_Type__c") == "Component":
             continue
         if value_of(text, "Data_Type__c") == "Hidden" and not value_of(text, "Setting_Key__c"):
-            # A value only BarnCRM writes, held by name in Setting Value (ADR-NEXT settings as
+            # A value only BarnCRM writes, held by name in Setting Value (ADR-0238 settings as
             # custom metadata), such as the carry-over marker: no settings field behind it.
             continue
         if value_of(text, "Data_Type__c") == "SetupValue":
@@ -192,7 +192,7 @@ def check_setting_rows(problems):
         settings_object = value_of(text, "Settings_Object__c") or CORE_SETTINGS_OBJECT
         if settings_object.lower() in store_groups:
             # A module in the settings store (Setting_Module__mdt) reads and saves the row from
-            # its definition alone; its legacy object may be gone (ADR-NEXT settings as custom
+            # its definition alone; its legacy object may be gone (ADR-0238 settings as custom
             # metadata, phase 2). check-setting-defaults.py checks these rows instead.
             continue
         fields = objects.get(settings_object)

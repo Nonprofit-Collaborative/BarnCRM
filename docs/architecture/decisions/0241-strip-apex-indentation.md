@@ -1,4 +1,4 @@
-# ADR-NEXT: Strip Leading Indentation From Apex at Deploy and Package-Build Time
+# ADR-0241: Strip Leading Indentation From Apex at Deploy and Package-Build Time
 
 **Status:** Accepted
 **Date:** 2026-11-21

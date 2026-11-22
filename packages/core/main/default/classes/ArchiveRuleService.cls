@@ -1,5 +1,5 @@
 /**
- * Archive rules (canonical model R-SQ18, ADR-NEXT archive rules and big object archive): saved Find
+ * Archive rules (canonical model R-SQ18, ADR-0240 archive rules and big object archive): saved Find
  * queries whose document carries the `archive` key, set up, previewed and run from the Archive
  * Rules panel, and run on their schedule by the nightly run's Archive Rules step.
  *

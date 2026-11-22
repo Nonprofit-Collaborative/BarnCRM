@@ -1,6 +1,6 @@
 /**
  * Brings `Account.Is_Organization_Account__c` in line with Record type for organizations on every
- * account whose flag disagrees (canonical model R-O4; ADR-NEXT settings as custom metadata,
+ * account whose flag disagrees (canonical model R-O4; ADR-0238 settings as custom metadata,
  * decision 8). The account trigger sets the flag on each save; this runs when the setting
  * changes and on each install, since a custom metadata value cannot drive a formula field.
  *

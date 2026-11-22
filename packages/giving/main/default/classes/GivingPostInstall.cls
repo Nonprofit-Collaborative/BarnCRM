@@ -46,7 +46,7 @@
  * Rollups page still offers the same button.
  *
  * No setting is saved here: Giving's settings are in the settings store, where an unsaved setting
- * reads as its shipped default (ADR-NEXT settings as custom metadata, decision 11).
+ * reads as its shipped default (ADR-0238 settings as custom metadata, decision 11).
  *
  * The steps are `runSetup`, which also adds the module to Core's setup marker and is what
  * Finish Setup runs for a module copied into an org by hand (FS1, `ModuleSetups`).

@@ -56,4 +56,4 @@ general guidance, not legal advice.
   Committees and Board Meetings; Processing Activities, Data Subject Requests and Data Breaches. No app of its own: the catalog
   row's `App_Name__c` is `BarnCRM_Members_Partners` (a Core app, shown by the Corporate Hub
   permission sets), and its `Staff_Tabs__c` (every tab) join it after Memberships' pages
-  (ADR-NEXT (nine console apps)).
+  (ADR-0237 (nine console apps)).

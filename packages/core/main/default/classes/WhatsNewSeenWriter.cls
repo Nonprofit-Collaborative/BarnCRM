@@ -1,7 +1,7 @@
 /**
  * Stores and reads, for the running user, the release whose What's new notes they dismissed
  * (C-27): one `Nightly_Job__c` row with `Kind__c` Seen, Name `WhatsNew:<UserId>`, the version in
- * `Value__c` (ADR-NEXT settings as custom metadata, decision 7).
+ * `Value__c` (ADR-0238 settings as custom metadata, decision 7).
  *
  * DOCUMENTED EXCEPTION to the user-mode DML rule (plan Section 7.2), under ADR-0021 and
  * ADR-0087 (`0087-whats-new-from-packaged-release-notes.md`). The row lives on an object only

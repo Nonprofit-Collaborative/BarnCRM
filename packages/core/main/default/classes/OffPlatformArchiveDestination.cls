@@ -1,5 +1,5 @@
 /**
- * The Off Platform destination of an archive rule (canonical model R-SQ18 and R-SQ17, ADR-NEXT
+ * The Off Platform destination of an archive rule (canonical model R-SQ18 and R-SQ17, ADR-0240
  * archive rules and big object archive): Archive by Query (R-BD9) with its file sent to the
  * installed backup destination (`OffPlatformDestination`, from a module such as BarnCRM Connector)
  * before anything is deleted. Usable only while a destination is installed and ready for the

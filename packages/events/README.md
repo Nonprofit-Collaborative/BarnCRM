@@ -35,7 +35,7 @@ used. Paid registration (EV-20) reaches the optional BarnCRM Payments module onl
 - The event record page `Event_Record_Page`: Core's header, main and sidebar template with tabs,
   assigned as `Event__c`'s org default.
 - App `BarnCRM_Events` (BarnCRM Events, logo `BarnCRM_Patch_Events_Logo`), visible through the Events
-  permission sets; every org gets it (ADR-0223, module apps; ADR-NEXT (nine console apps)). The app
+  permission sets; every org gets it (ADR-0223, module apps; ADR-0237 (nine console apps)). The app
   lists every tab itself, so the catalog row's tabs join no other app.
 - Registrations (EV-02): `Event_Registration__c` (Private) and `Event_Attendee__c` (29EV8,
   29EV9), the Registrations tab (`eventRegistrations`, `eventRegistrationsModel`,

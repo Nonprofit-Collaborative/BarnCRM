@@ -1,5 +1,5 @@
 /**
- * The Big Object destination of an archive rule (canonical model R-SQ18 and R-ARC3, ADR-NEXT archive
+ * The Big Object destination of an archive rule (canonical model R-SQ18 and R-ARC3, ADR-0240 archive
  * rules and big object archive): an Archive data job and the first Copy of `BigObjectArchiveJob`.
  * Refused for a person without the BarnCRM Admin grant on the big object, and at the cap.
  */

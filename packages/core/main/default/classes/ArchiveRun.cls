@@ -1,5 +1,5 @@
 /**
- * One run of an archive rule, as a destination receives it (canonical model R-SQ18, ADR-NEXT
+ * One run of an archive rule, as a destination receives it (canonical model R-SQ18, ADR-0240
  * archive rules and big object archive): the saved query, its document, and how many records the
  * person confirmed (a manual run) or the run limit allowed (a scheduled run).
  */

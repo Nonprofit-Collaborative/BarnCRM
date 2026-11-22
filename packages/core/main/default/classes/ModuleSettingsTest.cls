@@ -1,5 +1,5 @@
 /**
- * A module's settings in the store (ADR-NEXT settings as custom metadata, phase 2): typed reads
+ * A module's settings in the store (ADR-0238 settings as custom metadata, phase 2): typed reads
  * by name answer the saved value, else the legacy value before carry-over, else the default;
  * saves through SettingsService are validated, audited and deployed once; run state uses
  * prefixed keys and a run lock; carry-over covers every registered module.

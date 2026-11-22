@@ -8,7 +8,7 @@
  * marked records; `RollupBackgroundTest` and the Giving `GiftSaveRollupCostTest` pin the queued
  * path and its cost.
  *
- * The setting is the module's `Rollup_Processing` row in the settings store (ADR-NEXT settings
+ * The setting is the module's `Rollup_Processing` row in the settings store (ADR-0238 settings
  * as custom metadata), put there as if deployed.
  */
 @IsTest

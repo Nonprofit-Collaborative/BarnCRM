@@ -1,5 +1,5 @@
 /**
- * The Archived Record JSON (canonical model R-ARC2, ADR-NEXT archive rules and big object archive):
+ * The Archived Record JSON (canonical model R-ARC2, ADR-0240 archive rules and big object archive):
  * a record and its cascade-delete children written as one row, the people it names, and the
  * records a restore builds from it. Describe and JSON only: no query, no DML.
  */

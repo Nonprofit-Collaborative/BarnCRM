@@ -1,6 +1,6 @@
 /**
  * Where a Backup Set run's or an archive's CSV parts go besides Files (canonical model R-SQ17,
- * ADR-NEXT `NEXT-automatic-backups-and-off-platform-destination.md`). A module implements it and
+ * ADR-0239 `0239-automatic-backups-and-off-platform-destination.md`). A module implements it and
  * registers the class in its catalog row's `Extensions__c` (`OffPlatformDestination: <Class>`),
  * so Core names no module class; `OffPlatformSendBatch` finds it through `ModuleExtensions`.
  *

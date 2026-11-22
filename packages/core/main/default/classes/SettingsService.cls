@@ -1,7 +1,7 @@
 /**
  * Reads and writes the org's settings.
  *
- * Core's settings live in the settings store (`SettingStore`, ADR-NEXT settings as custom
+ * Core's settings live in the settings store (`SettingStore`, ADR-0238 settings as custom
  * metadata): the default on each Setting Definition row, a changed value in a Setting Value
  * record. They keep their `BarnCRM_Settings__c` field names as keys, and `getSettings()` returns
  * a `BarnCRM_Settings__c` built in memory from the store, so readers are unchanged. Until the org
@@ -185,7 +185,7 @@ public with sharing class SettingsService {
 	}
 
 	/**
-	 * Puts a Core setting in the store for a test, as if it were deployed (ADR-NEXT settings as
+	 * Puts a Core setting in the store for a test, as if it were deployed (ADR-0238 settings as
 	 * custom metadata: tests cannot deploy metadata). Keyed by the field name, as readers name it.
 	 */
 	@NamespaceAccessible
@@ -621,7 +621,7 @@ public with sharing class SettingsService {
 
 	/**
 	 * Validates Core values as `applyValues` does, then saves run-state keys as state rows at
-	 * once and every changed setting in one store deployment (ADR-NEXT settings as custom
+	 * once and every changed setting in one store deployment (ADR-0238 settings as custom
 	 * metadata). Compared against what the org saved, so keeping a shown default saves it. The
 	 * save's side effects run when the deployment succeeds (`afterSaved`).
 	 */
@@ -815,7 +815,7 @@ public with sharing class SettingsService {
 	 * apps and account tabs people see follow their settings (ADR-0137, C-73), brand sharing
 	 * follows either brand switch (R-BR7), the seasonal job follows its switch, the rollup
 	 * engine hears of every change (ADR-0125), and organization flags follow the organization
-	 * record type (ADR-NEXT settings as custom metadata, decision 8).
+	 * record type (ADR-0238 settings as custom metadata, decision 8).
 	 */
 	public static void afterSaved(List<SettingStore.Change> changes) {
 		clearCaches();
@@ -1287,7 +1287,7 @@ public with sharing class SettingsService {
 	/**
 	 * The record a system mode writer creates when the org has never saved its legacy Core
 	 * settings: owned by the org, with the checkbox defaults its field metadata declares
-	 * (ADR-0035). Only tests and the legacy writers still save that record (ADR-NEXT settings as
+	 * (ADR-0035). Only tests and the legacy writers still save that record (ADR-0238 settings as
 	 * custom metadata); it is removed with the object in phase 2.
 	 */
 	@NamespaceAccessible

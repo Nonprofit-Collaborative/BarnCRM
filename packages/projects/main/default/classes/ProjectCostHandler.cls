@@ -4,7 +4,7 @@
  * the cost is Time Amount (each counted time entry's amount); off, Actual Hours times the Hourly
  * Rate, blank with no rate. A counted time entry's save changes the project's roll-up summaries,
  * which saves the project through this handler, so the cost follows every entry. Stored, not a
- * formula, because a packaged formula cannot read the settings store (ADR-NEXT settings as
+ * formula, because a packaged formula cannot read the settings store (ADR-0238 settings as
  * custom metadata); `ProjectCostSync` puts every project right after the setting changes.
  */
 @NamespaceAccessible

@@ -145,7 +145,7 @@ function variablesFor(now) {
 }
 
 /**
- * Memberships Home (ADR-NEXT, Module Home pattern): active members, terms expiring in the next 30
+ * Memberships Home (ADR-0236, Module Home pattern): active members, terms expiring in the next 30
  * days, members in their grace period and renewals in the last 30 days as figures; the terms
  * expiring soonest and the newest renewals as lists; and New Membership for someone who may
  * create one. Before the first membership a first-run panel points to the next step: a level

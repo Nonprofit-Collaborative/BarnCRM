@@ -124,7 +124,7 @@ function infosOf(results) {
 }
 
 /**
- * Portal Builder Home (ADR-NEXT, Module Home pattern): active portals, people with access,
+ * Portal Builder Home (ADR-0236, Module Home pattern): active portals, people with access,
  * suspended access and sign-ins in the last 30 days as figures; every portal with its status and
  * access mode, and the latest sign-ins, as lists; and New Portal. Before the first portal a
  * first-run panel offers New Portal instead. Reads only through Lightning Data Service.

@@ -1,5 +1,5 @@
 /**
- * How a module reads and saves its settings in the settings store (ADR-NEXT settings as custom
+ * How a module reads and saves its settings in the settings store (ADR-0238 settings as custom
  * metadata, phase 2).
  *
  * A module declares its settings by shipping, in its own package, one `Setting_Module__mdt`

@@ -830,12 +830,12 @@ Detection never creates, activates or shows a record type.
   type (a blank `RecordTypeId`, or the master record type, which has no developer name). The
   Account trigger handler sets it on every insert and update; `OrganizationFlagBatch` puts
   right every Account whose flag disagrees when the setting's saved value changes and on each
-  install (ADR-NEXT settings as custom metadata). The Organizations list views, every record
+  install (ADR-0238 settings as custom metadata). The Organizations list views, every record
   page rule for organizations, the address capture flow template and the donor segment
   template filter on it. Read access in the three role sets.
 - **Field:** `Is_Organization__c` (Checkbox formula over
   `$Setup.BarnCRM_Settings__c.Organization_Record_Type__c`), unused by BarnCRM and removed in
-  phase 2 of ADR-NEXT settings as custom metadata with `BarnCRM_Settings__c`. Read access in the
+  phase 2 of ADR-0238 settings as custom metadata with `BarnCRM_Settings__c`. Read access in the
   three role sets until then.
 - **Fields:** standard `Name`; `Primary_Contact__c` (shared with Household, above);
   `Sample_Data__c` (Checkbox, shared field definition with Household, above);
@@ -1045,7 +1045,7 @@ names recompute and the waiting rollups.
   admin reads it.
 - **Shipped defaults:** `Automation_Registry__mdt` (Section 13).
 - **Org-level pause:** `BarnCRM_Automation_Control__c.Paused_Until__c` (DateTime, organization
-  level only), read beside `Pause_All__c` at no query cost on every save (ADR-NEXT settings as
+  level only), read beside `Pause_All__c` at no query cost on every save (ADR-0238 settings as
   custom metadata). `BarnCRM_Settings__c.Automation_Paused_Until__c` is read only until the org
   carries its settings over, and is removed in phase 2.
 - **Automation Control:** `BarnCRM_Automation_Control__c`, a public hierarchy custom setting
@@ -1214,7 +1214,7 @@ deployment Id.
 The org's simple, org-wide toggles and values: feature flags, mode selections, and
 naming pattern choices. Each key's default ships on its `Setting_Definition__mdt` row
 (`Default_Value__c`) and a value the org changed is a `Setting_Value__mdt` record of the same
-name, so settings are deployable metadata (D-219, ADR-NEXT settings as custom metadata).
+name, so settings are deployable metadata (D-219, ADR-0238 settings as custom metadata).
 The keys below keep their `BarnCRM_Settings__c` field names: the console and every reader name a
 key by them, and `SettingsService.getSettings()` returns a `BarnCRM_Settings__c` built in
 memory from the store. The custom setting itself is read only until the org carries its saved
@@ -1481,7 +1481,7 @@ shows the last full Health Check result instead of running every check on each l
 
 ### Archive keys
 
-Added by archive rules (D-221, ADR-NEXT archive rules and big object archive, R-SQ18). Not shown
+Added by archive rules (D-221, ADR-0240 archive rules and big object archive, R-SQ18). Not shown
 in the console as a setting: the Archived Records panel shows it.
 
 | Key | Type | Default | Definition |
@@ -1567,7 +1567,7 @@ With no notes shipped, Dismiss stores nothing.
 ### Salesforce implementation
 
 - **Store:** one `Nightly_Job__c` row per person, `Kind__c` Seen, Name `WhatsNew:<UserId>`,
-  the version in `Value__c` (ADR-NEXT settings as custom metadata). Written in system mode by
+  the version in `Value__c` (ADR-0238 settings as custom metadata). Written in system mode by
   `WhatsNewSeenWriter` (ADR-0021), for the running user only. The legacy custom setting
   `Whats_New_Seen__c` (user-level records, `Last_Seen_Version__c`) is read while a person has no
   row, and is removed in phase 2.
@@ -1609,7 +1609,7 @@ settings to the console by shipping rows rather than by editing the console.
 | `Sort_Order__c` | number | The order of this row inside its section. |
 | `Min_Value__c` | number(18, 2) | Number rows only: the lowest value the console accepts. The console marks a lower value before Save, and `SettingsService` refuses it on the server whoever saves it, naming the setting and the range (owner decision 2026-10-13, ADMIN-27). Every shipped Number row sets it. |
 | `Max_Value__c` | number(18, 2) | Number rows only: the highest value accepted, enforced the same way. Every shipped Number row sets it. |
-| `Default_Value__c` | text (255) | The value the setting has until the org changes it, as a JSON literal (`true`, `90`, `"Both"`); blank means no default (ADR-NEXT settings as custom metadata). A row whose setting ships a value states it here; `check-setting-defaults.py` checks Core's against the field defaults. |
+| `Default_Value__c` | text (255) | The value the setting has until the org changes it, as a JSON literal (`true`, `90`, `"Both"`); blank means no default (ADR-0238 settings as custom metadata). A row whose setting ships a value states it here; `check-setting-defaults.py` checks Core's against the field defaults. |
 
 `Data_Type__c` also takes Hidden: a value BarnCRM writes from another page (the features turned
 on, the modules turned off) or for itself (`Settings_Carried_Over`), held in the store like any
@@ -1618,7 +1618,7 @@ other key and never listed by the console.
 ### Setting Value
 
 `Setting_Value__mdt` (Core, Public): one record per setting the org changed from its default
-(D-219, ADR-NEXT settings as custom metadata). No package ships a record; an upgrade never
+(D-219, ADR-0238 settings as custom metadata). No package ships a record; an upgrade never
 touches one. Retrieved and deployed like any metadata (`CustomMetadata:Setting_Value.*`).
 
 | Field | Type | Definition |
@@ -1656,7 +1656,7 @@ Core and modules sends one deployment.
 
 `Setting_Module__mdt` (Core, Public; not counted as an object): one record per module whose
 settings live in the store, shipped in the module's own package, so Core reads, saves and carries
-over the module's settings without naming it (ADR-0059, ADR-NEXT settings as custom metadata).
+over the module's settings without naming it (ADR-0059, ADR-0238 settings as custom metadata).
 DeveloperName is the module's name, as on its BarnCRM Module record.
 
 | Field | Type | Definition |
@@ -1887,11 +1887,11 @@ names the modules a module's package needs installed first (ADR-0125
 | Install Version Id | `Install_Version_Id__c` | text (18) | The published package version Id (`04t`) Salesforce's installer opens, or empty until the module is first published. |
 | Sort Order | `Sort_Order__c` | number | The order modules are listed in, lowest first, after Core. |
 | Probe Object | `Probe_Object__c` | text (80) | Optional. An object of the module's own, unprefixed (for example `Rollup_Definition__c`): when this package's object by that name exists, the module counts as installed. Only for a module whose code still ships in Core or that announces no settings rows (Rollup Builder today); empty means detection by announcement alone. Forms and Logic Models ship one Setting Definition row each (`Forms_Page`, `Logic_Models_Page`, C-72) and have no probe. While the namespace is deferred a subscriber's own object can share a module object's name, so a module that ships Setting Definition rows naming itself has no probe. |
-| App Name | `App_Name__c` | text (80) | Optional. The developer name of the Lightning app the module's tabs live in, unprefixed: its own app (for example `BarnCRM_Fundraising`), or a host app Core or another module ships (`BarnCRM_Members_Partners` for Memberships and Corporate Hub, `BarnCRM_Funders` for Scholarships), which the source deploy adds the module's tabs to (ADR-NEXT, nine console apps). The Modules section links an installed module to it by the app's DurableId (`06m`, found once through `AppDefinition`, matching this name and the package namespace), or by `c__Name` (`namespace__Name` when namespaced) when the app is not found; empty means no link yet. The home page's Modules list and the Module Manager link to it. |
+| App Name | `App_Name__c` | text (80) | Optional. The developer name of the Lightning app the module's tabs live in, unprefixed: its own app (for example `BarnCRM_Fundraising`), or a host app Core or another module ships (`BarnCRM_Members_Partners` for Memberships and Corporate Hub, `BarnCRM_Funders` for Scholarships), which the source deploy adds the module's tabs to (ADR-0237, nine console apps). The Modules section links an installed module to it by the app's DurableId (`06m`, found once through `AppDefinition`, matching this name and the package namespace), or by `c__Name` (`namespace__Name` when namespaced) when the app is not found; empty means no link yet. The home page's Modules list and the Module Manager link to it. |
 | Access By Permission Set | `Access_By_Permission_Set__c` | text (255) | Optional. Each module permission set Core's access sync gives (`ModuleAccessSyncs`, ADR-0131), with the Core permission sets whose holders get it: `Set=Holder,Holder`, entries separated by semicolons (for example `Giving_Admin=BarnCRM_Admin`). A set given to `BarnCRM_Admin` holders is the module's admin set, which its install also gives the installer. Empty means none (D-200 S1). |
 | Access By Role | `Access_By_Role__c` | text (255) | Optional. The same for the BarnCRM roles (permission set groups), for example `Giving_Staff=Program_Staff,Fundraising_Staff;Giving_Read_Only=Read_Only`. One pass gives at most 9,000 assignments across all the module's sets, 5,000 for one set. Empty means none (D-200 S1). |
 | Extensions | `Extensions__c` | long text (4000) | Optional. The module's classes Core builds by name for its extension seams, one per line as `Seam: Class` (for example `NightlyStepProvider: GivingNightlyJobProvider`), the seam being the Core interface the class implements. `ModuleExtensions` asks the modules in Sort Order, then name, and skips a class that is not installed; it reads the catalog with SOQL, since a long text field is cut short by `getAll`. Core names no module class in code (ADR-0017 as extended by D-200 S1). Empty means none. |
-| Staff Tabs | `Staff_Tabs__c` | text (255) | Optional. The module's tabs for everyday work, by tab API name unprefixed, separated by semicolons (for example `Gift__c;Commitment__c`), that belong in the module's app: a host app App Name names, none more when the module ships the app named, or BarnCRM Console when App Name is empty or its host app's package is not deployed (ADR-0137, ADR-NEXT nine console apps). A page tab whose label is not its name with spaces is written `Name:Label` (for example `Donor_Levels:Donor Level Ladder`), so the Setup Assistant names it as App Manager does; an object tab is labelled from its object. A CI test holds both to the shipped tabs. Core cannot name a module tab in its own apps, so `scripts/org/deploy-packages.sh` adds them on a source deploy, and the Setup Assistant's modules step lists them for an installed package. Empty means none. |
+| Staff Tabs | `Staff_Tabs__c` | text (255) | Optional. The module's tabs for everyday work, by tab API name unprefixed, separated by semicolons (for example `Gift__c;Commitment__c`), that belong in the module's app: a host app App Name names, none more when the module ships the app named, or BarnCRM Console when App Name is empty or its host app's package is not deployed (ADR-0137, ADR-0237 nine console apps). A page tab whose label is not its name with spaces is written `Name:Label` (for example `Donor_Levels:Donor Level Ladder`), so the Setup Assistant names it as App Manager does; an object tab is labelled from its object. A CI test holds both to the shipped tabs. Core cannot name a module tab in its own apps, so `scripts/org/deploy-packages.sh` adds them on a source deploy, and the Setup Assistant's modules step lists them for an installed package. Empty means none. |
 | Admin Tabs | `Admin_Tabs__c` | text (255) | Optional. The same for the module's admin tools and settings pages, which belong in the BarnCRM Admin Console app, and also in a host app App Name names (for example `Rollup_Builder`). Empty means none. |
 | Requires | `Requires__c` | text (255) | Optional. The modules this module's package needs installed first, as their DeveloperNames separated by semicolons, in install order (for example `Rollups` for Giving and Volunteers, `Rollups;Giving` for Mirror). While one of them is not installed, the module's row in the Modules section and the Setup Assistant says to install it first. Empty means none. |
 | Beta | `Beta__c` | checkbox (default false) | Marks a module that is in beta (D-211, N-14): the Module Manager, the Setup Assistant's modules step and the Home Modules card show a Beta badge beside its name. Ticked on every shipped module record; Core has no record and is never marked. Clearing it on a record removes that module's badge. |
@@ -2830,7 +2830,7 @@ uncharged, and are routed again.
 - **Batch:** `RollupLargeParentBatch`, the large parent route (R-RQ6): a batch over the source
   rows of each planned query, Ids only, chained query by query and entity by entity.
 - **Run lock:** the State row `Rollups.Last_Run_Started__c` (name `Last_Run_Started__c`, prefix
-  `Rollups`; a `Nightly_Job__c` row of Kind State, Section 29; ADR-NEXT settings as custom metadata, decision 11), holding when the last
+  `Rollups`; a `Nightly_Job__c` row of Kind State, Section 29; ADR-0238 settings as custom metadata, decision 11), holding when the last
   large parent run started. A run takes it with `SettingsState.lockOrCreate` before it starts
   (R-RQ6); `RollupsPostInstall` creates it at install, and a lock wait that times out counts as
   busy. The legacy custom setting `Rollup_Run_Lock__c` is no longer read or written; it is
@@ -2871,7 +2871,7 @@ values an org stored on the Core object are not carried over: an org that change
 sets it again. Their Setting Definition rows name this object in `Settings_Object__c`, so the
 settings console shows them in its Rollups section as before.
 
-- **Settings store (R-STV4, ADR-NEXT settings as custom metadata, decision 11):** the module
+- **Settings store (R-STV4, ADR-0238 settings as custom metadata, decision 11):** the module
   ships `Setting_Module.Rollups` (`Settings_Object__c` `Rollup_Settings__c`, `Key_Prefix__c`
   `Rollups`, `State_Fields__c` `Nightly_Covered_From__c,Processor_Requested_At__c`), so the
   keys below are Setting Values read by DeveloperName (`ModuleSettings`) or by group and key,
@@ -4934,7 +4934,7 @@ these keys, which is what makes a module that is off leave nothing behind.
 ### Salesforce implementation
 
 - **Custom setting:** `Giving_Settings__c`, hierarchy, protected.
-- **Store (SET-03, ADR-NEXT settings as custom metadata):** `Setting_Module.Giving` registers
+- **Store (SET-03, ADR-0238 settings as custom metadata):** `Setting_Module.Giving` registers
   the group (prefix `Giving`). Every key a Setting Definition row names is read and saved
   through the settings store by its row name, and every Checkbox, Number and Picklist row
   ships `Default_Value__c` equal to the field default (`Giving_Receipt_Statement_Year` ships
@@ -9147,8 +9147,8 @@ Manage BarnCRM Settings and Find and Export Records may see the Backup Sets pane
   records that still exist) or Create (records since deleted, as new records), as R-BD9's file is.
 - **Schedule.** R-SQ16.
 
-**R-SQ16 Scheduled Backup Sets** (BK-10, D-221; ADR-NEXT
-`NEXT-automatic-backups-and-off-platform-destination.md`). The `backup` key may hold `schedule`:
+**R-SQ16 Scheduled Backup Sets** (BK-10, D-221; ADR-0239
+`0239-automatic-backups-and-off-platform-destination.md`). The `backup` key may hold `schedule`:
 `{ "frequency": "daily" }`, `{ "frequency": "weekly", "weekday" }` (1 Monday to 7 Sunday) or
 `{ "frequency": "monthly", "day" }` (1 to 28). No schedule, or `off`, means Run Now only. Only the
 owner sets it (`BackupSetService.setSchedule`); Find keeps the whole `backup` key on a save.
@@ -9166,7 +9166,7 @@ owner sets it (`BackupSetService.setSchedule`); Find keeps the whole `backup` ke
   parts) are deleted in system mode, File Id and File Name are cleared, and a log line says why.
   A failure to delete is a Warning in the Error Log. A set run only on demand keeps every file.
 
-**R-SQ17 Off-platform destination** (BK-10, D-221; ADR-NEXT). Core's seam `OffPlatformDestination`
+**R-SQ17 Off-platform destination** (BK-10, D-221; ADR-0239). Core's seam `OffPlatformDestination`
 (`key()`, `notReady()`, `send(fileName, body)`) is found through `ModuleExtensions`; the one with
 key `offPlatform` is the backup destination. Core names no module class. (AR-10's
 `ArchiveDestination`, an archive rule's whole-run destination, is a separate seam.)
@@ -9187,7 +9187,7 @@ key `offPlatform` is the backup destination. Core names no module class. (AR-10'
 - **Archive.** With `offPlatform`, the delete starts only when every part was sent; otherwise the
   job is Failed, nothing is deleted, and the file stays in Files.
 
-**R-SQ18 Archive rules** (D-221; ADR-NEXT archive rules and big object archive). The document has
+**R-SQ18 Archive rules** (D-221; ADR-0240 archive rules and big object archive). The document has
 one more optional key, `archive`: `{ "version": 1, "destination": "Files" | "BigObject" |
 "OffPlatform", "frequency": "off" | "daily" | "weekly" | "monthly", "weekday": 1-7 (Monday is 1),
 "monthDay": 1-28, "active": true | false }`. It marks a saved query as an archive rule; Find and
@@ -9254,7 +9254,7 @@ Archive Rules panel, run a rule or restore.
 
 A record moved out of its object by an archive rule (R-SQ18) whose destination is `BigObject`:
 its fields as JSON in a big object, outside data storage, until it is restored or erased.
-ADR-NEXT archive rules and big object archive.
+ADR-0240 archive rules and big object archive.
 
 | Attribute | Type | Required | Definition |
 |---|---|---|---|
@@ -14067,7 +14067,7 @@ pages' Schedule and Stop buttons, which require Manage BarnCRM Settings.
 | Kind | `Kind__c` | Picklist (Job, State, Seen), restricted; blank reads as Job |
 | Value | `Value__c` | Long Text (32768), a JSON literal; State and Seen rows only |
 
-- **State rows** (ADR-NEXT settings as custom metadata): `Kind__c` State, Name the key (the
+- **State rows** (ADR-0238 settings as custom metadata): `Kind__c` State, Name the key (the
   former `BarnCRM_Settings__c` field name, such as `Error_Digest_Last_Run__c`), `Value__c` the
   value. They hold what ran in this org (last runs, summaries, watermarks, setup markers), so
   they are not deployable and not settings. Read once per transaction by `SettingsState` and
@@ -14227,7 +14227,7 @@ before, for anyone who may delete it.
 ### Salesforce implementation
 
 - **Object:** `Form__c`, name field Text, label Form Name, sharing Public Read Only (Forms Admin
-  edits), tab Forms in BarnCRM Admin Console (ADR-NEXT (nine console apps)).
+  edits), tab Forms in BarnCRM Admin Console (ADR-0237 (nine console apps)).
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -19479,7 +19479,7 @@ Base URL when there is none, and when a 2xx answer names the account (`account_n
 **R-CN10 Integration user.** Choosing the integration user (R-CR4) needs the same permissions
 as writing a key (R-CN3), and refuses a user who is a System Administrator or holds Modify All
 Data or View All Data.
-**R-CN11 Backup destination** (BK-10, D-221; ADR-NEXT automatic backups). One connection at
+**R-CN11 Backup destination** (BK-10, D-221; ADR-0239 automatic backups). One connection at
 most is the backup destination: Core's `OffPlatformDestination` (R-SQ17), implemented by
 `ConnectorBackupDestination` and registered in the Connector catalog row. Saving it needs the
 key-writing permissions (R-CN3) and Connector Admin, gives the saver the Connections set (R-CN7)
@@ -19495,7 +19495,7 @@ destination says so. A template's optional `backup` part (method, path, headers)
 when the connection is created from the template; such a template may leave `baseUrl` blank, so
 the person types the storage's own address as on New Connection (an app template still locks
 its host, R-CR14).
-**R-CN12 Storage services** (BK-10b; ADR-NEXT automatic backups, decision 8). Besides the four
+**R-CN12 Storage services** (BK-10b; ADR-0239 automatic backups, decision 8). Besides the four
 kinds, New Connection makes **AWS Signature Version 4** (`AwsSigV4`): an External Credential with
 Salesforce's `AwsSv4` protocol, `AwsService` and `AwsRegion` read from a base URL host of the
 form `[bucket.]service.region.amazonaws.com` (any other host is refused before anything is
@@ -20429,14 +20429,14 @@ mirrors the primary member).
 | 1.81 | 2026-11-20 | The Mapper and saved maps (MAP-01 to MAP-07, releases 1.31 to 1.33). `Saved_Transform__c` gains `Kind__c` (Step List, the default, or Map); new R-MAP1 to R-MAP4 (map document, paths, checks, preview) and R-ST5 (maps). `Giving_Settings__c` gains `Opportunity_Mirror_Map__c`, a Saved Transform record ID chosen with a record picker (a map name is read too); new R-OM12 (extra fields through a map). No object added. |
 | 1.82 | 2026-11-20 | BarnCRM Connector pre-batch review fixes (release 1.33). One object added, 199 to 200 in the suite: Connector Connection (`Connector_Connection__c`, `Check_Path__c`), which keeps a template's check path beside a connection (29CN1, new R-CN9: Check Connection asks for it and shows the account an answer names). New R-CN10: choosing the integration user needs the key-writing permissions and refuses an all-seeing user. R-CN8: Disconnect refuses a Secret URL. Connector Run's Status loses Rejected; Running marks runs claimed for the next runner job (R-RUN4). |
 | 1.83 | 2026-11-20 | R-CR6 the recipe clock: a claimed Running run counts as Queued for the clock, so the heartbeat keeps running while a lane has a Waiting run, a Queued run or a claimed Running run (batch Q gate fix). |
-| 1.84 | 2026-11-21 | Nine console apps (APP-01, D-220 to D-222, ADR-NEXT nine console apps, release 1.36). `BarnCRM_Settings__c` loses App_Navigation_Style__c (the standard-navigation apps are gone). `BarnCRM_Module__mdt` `App_Name__c` may name a host app another package ships, whose app then takes the module's tabs; Staff Tabs and Admin Tabs definitions follow. Records: Memberships and Corporate Hub name `BarnCRM_Members_Partners`, Scholarships `BarnCRM_Funders`, Giving `BarnCRM_Fundraising`; Forms, Portal and Connector name none; Forms splits into staff (Form Submissions) and admin (Forms Home, Forms) tabs; Corporate Hub lists its privacy tabs. No object added. |
-| 1.85 | 2026-11-21 | Scheduled Backup Sets (BK-10, D-221, release 1.36; ADR-NEXT `NEXT-automatic-backups-and-off-platform-destination.md`). Section 29D gains R-SQ16: the `backup` key's `schedule`, the nightly step Backup Sets, parts kept on the job as `documents`, and runs kept. Section 12 gains `Backup_Runs_Kept__c`. (Version number for the integrator to confirm at merge.) |
-| 1.86 | 2026-11-21 | Off-platform destination seam (BK-10, D-221, release 1.36; ADR-NEXT). Section 29D gains R-SQ17: Core's `OffPlatformDestination` seam, a set's and an archive's `destination`, `OffPlatformSendBatch`, retries and the Files copy. Section 12 gains `Backup_Remove_Sent_Files__c`. (Version number for the integrator to confirm at merge.) |
-| 1.87 | 2026-11-21 | Connector backup destination (BK-10, D-221, release 1.36; ADR-NEXT). Connector Connection gains `Backup_JSON__c` (29CN1, new R-CN11): one connection at most sends Backup Set and archive files by PUT or POST, with a `{file}` path and fixed headers that hold no secret; templates may prefill it. (Version number for the integrator to confirm at merge.) |
-| 1.88 | 2026-11-21 | Storage services for the backup destination (BK-10b, release 1.36; ADR-NEXT decision 8). New R-CN12: AWS Signature Version 4 connections, OAuth connections made in Setup, `{file}` in headers and Google Drive `metadata` in Backup Settings, and a short allowlist for a path's query. No object or field added. (Version number for the integrator to confirm at merge.) |
-| 1.89 | 2026-11-21 | Archive rules and the big object archive (D-221, AR-10, ADR-NEXT archive rules and big object archive). New Section 29D1 Archived Record (`Archived_Record__b`, a big object from the separate allocation; custom objects unchanged), rules R-ARC1 to R-ARC7. Saved Query gains R-SQ18, the `archive` key (destination Files, BigObject or OffPlatform through the `ArchiveDestination` seam, a schedule, an Active switch). R-R2 gains `more than n days ago`. `Import_Batch__c` Operation gains Archive. `BarnCRM_Settings__c` gains `Archived_Record_Count__c`. The nightly run gains the Archive Rules step. |
+| 1.84 | 2026-11-21 | Nine console apps (APP-01, D-220 to D-222, ADR-0237 nine console apps, release 1.36). `BarnCRM_Settings__c` loses App_Navigation_Style__c (the standard-navigation apps are gone). `BarnCRM_Module__mdt` `App_Name__c` may name a host app another package ships, whose app then takes the module's tabs; Staff Tabs and Admin Tabs definitions follow. Records: Memberships and Corporate Hub name `BarnCRM_Members_Partners`, Scholarships `BarnCRM_Funders`, Giving `BarnCRM_Fundraising`; Forms, Portal and Connector name none; Forms splits into staff (Form Submissions) and admin (Forms Home, Forms) tabs; Corporate Hub lists its privacy tabs. No object added. |
+| 1.85 | 2026-11-21 | Scheduled Backup Sets (BK-10, D-221, release 1.36; ADR-0239 `0239-automatic-backups-and-off-platform-destination.md`). Section 29D gains R-SQ16: the `backup` key's `schedule`, the nightly step Backup Sets, parts kept on the job as `documents`, and runs kept. Section 12 gains `Backup_Runs_Kept__c`. |
+| 1.86 | 2026-11-21 | Off-platform destination seam (BK-10, D-221, release 1.36; ADR-0239). Section 29D gains R-SQ17: Core's `OffPlatformDestination` seam, a set's and an archive's `destination`, `OffPlatformSendBatch`, retries and the Files copy. Section 12 gains `Backup_Remove_Sent_Files__c`. |
+| 1.87 | 2026-11-21 | Connector backup destination (BK-10, D-221, release 1.36; ADR-0239). Connector Connection gains `Backup_JSON__c` (29CN1, new R-CN11): one connection at most sends Backup Set and archive files by PUT or POST, with a `{file}` path and fixed headers that hold no secret; templates may prefill it. |
+| 1.88 | 2026-11-21 | Storage services for the backup destination (BK-10b, release 1.36; ADR-0239 decision 8). New R-CN12: AWS Signature Version 4 connections, OAuth connections made in Setup, `{file}` in headers and Google Drive `metadata` in Backup Settings, and a short allowlist for a path's query. No object or field added. |
+| 1.89 | 2026-11-21 | Archive rules and the big object archive (D-221, AR-10, ADR-0240 archive rules and big object archive). New Section 29D1 Archived Record (`Archived_Record__b`, a big object from the separate allocation; custom objects unchanged), rules R-ARC1 to R-ARC7. Saved Query gains R-SQ18, the `archive` key (destination Files, BigObject or OffPlatform through the `ArchiveDestination` seam, a schedule, an Active switch). R-R2 gains `more than n days ago`. `Import_Batch__c` Operation gains Archive. `BarnCRM_Settings__c` gains `Archived_Record_Count__c`. The nightly run gains the Archive Rules step. |
 | 1.90 | 2026-11-21 | Archived Records viewer, restore and archive erasure (D-221, AR-10 part 4). R-ARC4 gains the restore limits (50 rows, 25 per insert link) and keeps a row archived when its record or a child cannot be created; R-ARC6 names whom the scan matches and the `ArchiveErasureExtension` registration. No object or field added. |
-| 1.91 | 2026-11-21 | Settings as custom metadata, phase 1 Core (SET-01, D-219, ADR-NEXT settings as custom metadata). New custom metadata type `Setting_Value__mdt` with `Value__c` (Section 13, R-STV1 to R-STV3; not counted as an object). `Setting_Definition__mdt` gains `Default_Value__c` and the Hidden data type. `Nightly_Job__c` gains `Kind__c` and `Value__c` (state and What's New rows). `BarnCRM_Automation_Control__c` gains `Paused_Until__c`. New `Account.Is_Organization_Account__c`, a kept checkbox that replaces the `Is_Organization__c` formula everywhere it was read (Section 8; the platform refuses a formula-to-checkbox change, and the formula is removed in phase 2). `BarnCRM_Settings__c` and `Whats_New_Seen__c` are read only until carry-over and are removed in phase 2; no object count change in phase 1. |
+| 1.91 | 2026-11-21 | Settings as custom metadata, phase 1 Core (SET-01, D-219, ADR-0238 settings as custom metadata). New custom metadata type `Setting_Value__mdt` with `Value__c` (Section 13, R-STV1 to R-STV3; not counted as an object). `Setting_Definition__mdt` gains `Default_Value__c` and the Hidden data type. `Nightly_Job__c` gains `Kind__c` and `Value__c` (state and What's New rows). `BarnCRM_Automation_Control__c` gains `Paused_Until__c`. New `Account.Is_Organization_Account__c`, a kept checkbox that replaces the `Is_Organization__c` formula everywhere it was read (Section 8; the platform refuses a formula-to-checkbox change, and the formula is removed in phase 2). `BarnCRM_Settings__c` and `Whats_New_Seen__c` are read only until carry-over and are removed in phase 2; no object count change in phase 1. |
 | 1.92 | 2026-11-21 | Settings as custom metadata, phase 2 Core prerequisite (SET-02, D-219). New custom metadata type `Setting_Module__mdt` with `Settings_Object__c`, `Key_Prefix__c` and `State_Fields__c` (Section 13; not counted as an object): a module registers its settings group, its State row prefix and its legacy state fields. New rule R-STV4 (module settings read and saved through the store by name or by group and key); R-STV3 carry-over covers every registered module; module State rows are `Prefix.Name` and a run lock is a State row read `FOR UPDATE` (Section 29 Nightly Jobs). No object count change. |
 | 1.93 | 2026-11-21 | Settings as custom metadata, phase 2 modules (SET-03, D-219): Funders, Scholarships, Memberships, Corporate Hub, Connector, Contact Point Sync, Address Verification and LWC Builder. Each ships a `Setting_Module__mdt` record (`Funders`, `Scholarships`, `Memberships`, `CorporateHub`, `Connector`, `ContactPoints`, `AddressVerification`, `LwcBuilder`) and every Setting Definition row a `Default_Value__c`. Run state moves to State rows: `Connector.Recipes_Paused__c` (synchronous, toggled on the Connector page, so its Setting Definition row `Connector_Recipes_Paused` is removed), `Connector.Integration_User_Id__c`, `ContactPoints.Last_Backfill__c` and `ContactPoints.Last_Backfill_Summary__c`, `AddressVerification.Connected_Provider__c`. The eight legacy custom settings stay until the destructive deploy; no module reads them. No object count change. |
 | 1.94 | 2026-11-21 | Settings as custom metadata, phase 2 Mirror and Payments (SET-03, D-219). `Setting_Module.Mirror` and `Setting_Module.Payments` register both groups; their rows ship `Default_Value__c`. Payments' connection values, PayPal ids and cap time become State rows `Payments.<Name>` (29PAY3); the receiver token is no longer kept, only its SHA-256 hash (`Payments.Webhook_Token_Hash`), shown once on Generate Token or Regenerate Token. Legacy objects stay until the destructive deploy. No object count change. |
@@ -20699,11 +20699,11 @@ so nothing below that is nonprofit-specific ships in Core.
 | Programs app, permission sets (Admin, Staff, Read Only), Program Roster panel | Programs | Metadata and its catalog row's access maps (ADR-0151). Console app `BarnCRM_Programs` with the Programs and Enrollments tabs; the Program record page carries the roster panel (`programRoster`) |
 | Logic Models tab, permission sets (Admin, Staff, Read Only), Logic Model Builder panel | Logic Models | Metadata and its catalog row's access maps (ADR-0154 `0154-logic-models-module.md`). No app of its own since release 1.24 (D-200 R6): the Logic Models tab joins the BarnCRM apps, and the Logic Model record page, which carries the builder panel (`logicModelBuilder`), is the object's org default |
 | Funders app, permission sets (Admin, Staff, Read Only), Grant Pipeline tab, program picker | Funders | Metadata and its catalog row's access maps (ADR-0161 `0161-funders-module.md`). Console app `BarnCRM_Funders` with the Grant Pipeline, Grants and Grant Requirements tabs and Error Log last; the Grant record page carries the program picker (`grantLinkedRecord`, kind Program) |
-| Permission sets (Admin, Staff, Read Only), Events Home tab, Repeat Event | Event Management | Metadata and its catalog row's access maps (ADR-0177 `0177-events-module.md`). App `BarnCRM_Events` (ADR-0223 module apps, ADR-NEXT (nine console apps)), which lists every tab; the Event record page, the object's org default, carries the event's tabs |
+| Permission sets (Admin, Staff, Read Only), Events Home tab, Repeat Event | Event Management | Metadata and its catalog row's access maps (ADR-0177 `0177-events-module.md`). App `BarnCRM_Events` (ADR-0223 module apps, ADR-0237 (nine console apps)), which lists every tab; the Event record page, the object's org default, carries the event's tabs |
 | Grant Calendar tab, Fund card, Award Schedule card | Funders | Metadata (ADR-0162 `0162-funders-restricted-funds-schedules-calendar.md`). The Grant Calendar tab (`grantCalendar`) in the Funders app after Grant Pipeline; the Grant record page carries the Fund card (`grantLinkedRecord`, kind Fund) and the Award Schedule card (`grantSchedule`) |
-| Permission sets (Admin, Staff, Read Only), Form Builder, Form Runner and Submission panels | Forms | Metadata and its catalog row's access maps (ADR-0175 `0175-forms-module.md`). No app (ADR-NEXT (nine console apps)): the Forms and Form Submissions tabs join BarnCRM Console and the Forms Home and Forms tabs join BarnCRM Admin Console at deploy; the Form record page (org default) carries the builder and the runner, the Form Submission page the submission panel |
+| Permission sets (Admin, Staff, Read Only), Form Builder, Form Runner and Submission panels | Forms | Metadata and its catalog row's access maps (ADR-0175 `0175-forms-module.md`). No app (ADR-0237 (nine console apps)): the Forms and Form Submissions tabs join BarnCRM Console and the Forms Home and Forms tabs join BarnCRM Admin Console at deploy; the Form record page (org default) carries the builder and the runner, the Form Submission page the submission panel |
 | Form attachment seam (a module attaches a form to its own record and receives submissions) | Core | `FormAttachmentExtension`, `FormAttachmentExtensions`, `FormSubmissionReceipt` (ADR-0175 `0175-forms-module.md` decision 9) |
-| Permission sets (Admin, Staff, Read Only), custom permission Manage Corporate Hub, Corporate Hub tab, acknowledgment and cycle panels, reminder notification type | Corporate Hub | Metadata and its catalog row's access maps (ADR-0196 `0196-corporate-hub-module.md`). No app of its own (ADR-NEXT (nine console apps)): every tab joins the Core app `BarnCRM_Members_Partners` at deploy |
+| Permission sets (Admin, Staff, Read Only), custom permission Manage Corporate Hub, Corporate Hub tab, acknowledgment and cycle panels, reminder notification type | Corporate Hub | Metadata and its catalog row's access maps (ADR-0196 `0196-corporate-hub-module.md`). No app of its own (ADR-0237 (nine console apps)): every tab joins the Core app `BarnCRM_Members_Partners` at deploy |
 | Permission sets (Admin, Staff, Read Only, Webhook Guest), Payments Setup tab, webhook receiver, processing job | Payments | Metadata and its catalog row's access maps (ADR-0201 `0201-payments-module.md`). No app: the Payments tab joins BarnCRM Console and the Payments Setup tab BarnCRM Admin Console at deploy |
 | Payment seam (a module starts a checkout and is told of each status change) | Payments | `PaymentsApi`, a `System.Callable` found by name; listeners are the consumers' own `System.Callable` classes (ADR-0201 `0201-payments-module.md` decision 8) |
 | Permission sets (Admin, Staff, Read Only), Territory Management tab, nightly assignment step | Territory Management | Metadata, its catalog row's access maps and `TerritoryNightlyJobProvider` (ADR-0205 `0205-territory-management-module.md`). No app (ADR-0192): the Territory Management tab joins BarnCRM Admin Console |

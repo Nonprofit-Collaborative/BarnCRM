@@ -25,7 +25,7 @@ takes the apps in a queued job: wait a minute and reload before checking the App
 
 ## T-APP-02: Only Console Apps Ship
 
-**Purpose:** confirm the suite has nine apps, each in console navigation, and no navigation style setting (ADR-NEXT, nine console apps).
+**Purpose:** confirm the suite has nine apps, each in console navigation, and no navigation style setting (ADR-0237, nine console apps).
 **Prerequisites:** an org deployed with every module by `scripts/org/deploy-packages.sh`; admin user.
 
 | Step | Action | Expected result |
@@ -252,7 +252,7 @@ Console instead. Every org, scratch and Developer Edition included, gets all nin
 
 ## T-APP-17: Every Module App Opens on Its Home
 
-**Purpose:** confirm each module app's first tab is its home, named `<Module> Home`, with the same layout (ADR-NEXT, Module Home pattern).
+**Purpose:** confirm each module app's first tab is its home, named `<Module> Home`, with the same layout (ADR-0236, Module Home pattern).
 **Prerequisites:** a production org or sandbox (`mwdbdevsb`) with the modules installed and on; admin user.
 
 | Step | Action | Expected result |

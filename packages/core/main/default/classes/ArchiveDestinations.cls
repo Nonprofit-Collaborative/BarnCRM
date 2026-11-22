@@ -1,5 +1,5 @@
 /**
- * Finds the destination an archive rule names (canonical model R-SQ18, ADR-NEXT archive rules and
+ * Finds the destination an archive rule names (canonical model R-SQ18, ADR-0240 archive rules and
  * big object archive). All three are Core's: Files (`ArchiveToFiles`), BigObject
  * (`ArchiveToBigObject`) and OffPlatform (`OffPlatformArchiveDestination`, which sends the file
  * through the backup destination a module installs and is refused with a reason while none is).

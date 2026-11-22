@@ -28,7 +28,7 @@ recolored or stretched (every master is square, and the welcome pose keeps its a
   BarnCRM_Patch_Scholarships_Logo    scholarships  modules/scholarships-logo     (module asset)
   BarnCRM_Connector_Patch_Logo       connector     modules/connector-logo        (module asset)
 
-The suite ships nine console apps (ADR-NEXT, nine console apps). BarnCRM Members and Partners is a
+The suite ships nine console apps (ADR-0237, nine console apps). BarnCRM Members and Partners is a
 Core app that Memberships and Corporate Hub fill, so Core ships its logo, made from the Memberships
 master. The module assets with no app stay for a Module Manager tile.
 

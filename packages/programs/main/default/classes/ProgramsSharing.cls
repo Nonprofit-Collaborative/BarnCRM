@@ -29,7 +29,7 @@ public without sharing class ProgramsSharing {
 	}
 
 	/**
-	 * The preset's run-state row (ADR-NEXT settings as custom metadata): saved synchronously, as
+	 * The preset's run-state row (ADR-0238 settings as custom metadata): saved synchronously, as
 	 * the sharing it drives is applied at once, and read from the legacy field until carry-over.
 	 */
 	@TestVisible

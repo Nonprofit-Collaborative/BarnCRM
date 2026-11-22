@@ -27,7 +27,7 @@ public with sharing class HealthCheckResult {
 	private static final String LAST_RUN = 'Health_Check_Last_Run__c';
 	private static final String LAST_RESULT = 'Health_Check_Last_Result__c';
 
-	/** Records a run's counts as run state (ADR-NEXT settings as custom metadata). */
+	/** Records a run's counts as run state (ADR-0238 settings as custom metadata). */
 	@NamespaceAccessible
 	public static void write(Integer errors, Integer warnings, Integer infos) {
 		SettingsState.put(

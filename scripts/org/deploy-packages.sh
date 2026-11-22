@@ -138,7 +138,7 @@ RETRY_BACKOFF_SECONDS="${RETRY_BACKOFF_SECONDS:-5}"
 SOURCE_POST_INSTALL="${SOURCE_POST_INSTALL:-1}"
 STALLS_RECOVERED=0
 # 1 (the default) deploys every Apex class and trigger from a staged copy of the project with the
-# leading indentation removed (scripts/packaging/strip-apex-indent.py, AP-05, ADR-NEXT): an org
+# leading indentation removed (scripts/packaging/strip-apex-indent.py, AP-05, ADR-0241): an org
 # counts every character of Apex toward its 6,000,000 limit, indentation included. Newlines stay,
 # so line numbers are unchanged. 0 deploys the repository source as written (debugging, or to
 # have source tracking see the repository files).
@@ -1024,7 +1024,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # capped-org-apps.py lists deploy without their applications and permissionsets folders, and
   # their permission sets follow in a stage of their own with the left-out apps' visibilities
   # removed (a set naming a missing app fails). Every other org gets every app. The list is empty
-  # while the suite's nine console apps fit the budget (ADR-NEXT, nine console apps), so today
+  # while the suite's nine console apps fit the budget (ADR-0237, nine console apps), so today
   # every org gets every app.
   CAPPED_APP_MODULES=" "
   [[ "$MODULE_APPS" == "auto" ]] && MODULE_APPS="$(org_app_limit)"
@@ -1102,7 +1102,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # Console (every module's admin tabs). The app copies are written to a temporary
   # metadata-format package; the repository's app files are never changed. --all writes every
   # host app deployed here, so each holds exactly its own tabs plus the modules deployed here,
-  # and a module left out has its tabs taken out (ADR-0192, ADR-NEXT nine console apps).
+  # and a module left out has its tabs taken out (ADR-0192, ADR-0237 nine console apps).
   deployed_modules=(rollups giving mirror programs logicmodels funders forms contactpoints events portal corporatehub payments lwcbuilder scholarships territory memberships projects addressverification reporting connector migration orgoptimizer sampledata)
   volunteers_has_metadata && deployed_modules+=(volunteers)
   APP_TABS_DIR="$(mktemp -d)"

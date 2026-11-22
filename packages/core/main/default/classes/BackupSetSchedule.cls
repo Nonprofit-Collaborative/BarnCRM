@@ -1,6 +1,6 @@
 /**
- * Scheduled Backup Sets (canonical model R-SQ16, ADR-NEXT
- * `NEXT-automatic-backups-and-off-platform-destination.md`): the Backup Sets step of the nightly
+ * Scheduled Backup Sets (canonical model R-SQ16, ADR-0239
+ * `0239-automatic-backups-and-off-platform-destination.md`): the Backup Sets step of the nightly
  * run (ADR-0166), with its own switch, starts every set whose schedule falls today, and a
  * complete run of a scheduled set removes the files of that set's runs past Backup Runs Kept.
  *

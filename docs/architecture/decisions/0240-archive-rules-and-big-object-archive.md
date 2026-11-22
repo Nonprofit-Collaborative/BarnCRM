@@ -1,4 +1,4 @@
-# ADR-NEXT: Archive rules move records to Files, a big object or an off-platform store, on a schedule
+# ADR-0240: Archive rules move records to Files, a big object or an off-platform store, on a schedule
 
 **Status:** Proposed (build agent W8 R1.36, 2026-11-21; for the integrator and Brandon)
 **Date:** 2026-11-21

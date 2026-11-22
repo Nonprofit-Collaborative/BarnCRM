@@ -3,7 +3,7 @@
  *
  * A checkbox that ships on reaches an org that has never saved its settings through the shipped
  * defaults (`Default_Value__c` on its Setting Definition for Core, which needs no upgrade step;
- * the field's declared default for a module until phase 2 of ADR-NEXT settings as custom
+ * the field's declared default for a module until phase 2 of ADR-0238 settings as custom
  * metadata). An org that saved its settings before the field existed has a stored record, and the
  * platform adds the new field to it as false. So the feature arrived switched off there, which is
  * how Send Weekly Admin Summary (C-54) and Ask Reminders (G-29) started off on barn-npc.

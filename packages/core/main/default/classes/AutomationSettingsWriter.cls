@@ -51,7 +51,7 @@ public without sharing class AutomationSettingsWriter {
 	private static Id lockedControlId;
 
 	/**
-	 * Saves the pause end on the organization-level Automation Control row (ADR-NEXT settings as
+	 * Saves the pause end on the organization-level Automation Control row (ADR-0238 settings as
 	 * custom metadata, decision 7), creating it with its shipped checkboxes when the org has
 	 * none. A pause the legacy BarnCRM Settings row still holds is cleared, so it cannot come
 	 * back once this one ends.

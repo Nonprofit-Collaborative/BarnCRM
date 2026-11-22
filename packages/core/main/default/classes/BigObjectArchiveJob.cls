@@ -1,5 +1,5 @@
 /**
- * A big object archive run (canonical model R-ARC3, ADR-NEXT archive rules and big object archive):
+ * A big object archive run (canonical model R-ARC3, ADR-0240 archive rules and big object archive):
  * a queueable chain whose links alternate between Copy and Settle, so no transaction mixes
  * ordinary DML with an immediate big object write (the platform refuses that, uncatchably).
  *

@@ -1,5 +1,5 @@
 /**
- * Restoring archived rows (canonical model R-ARC4, ADR-NEXT archive rules and big object archive): a
+ * Restoring archived rows (canonical model R-ARC4, ADR-0240 archive rules and big object archive): a
  * queueable chain whose links alternate, so no transaction mixes ordinary DML with an immediate
  * big object call (the platform refuses that, uncatchably).
  *

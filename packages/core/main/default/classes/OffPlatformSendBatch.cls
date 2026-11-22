@@ -1,6 +1,6 @@
 /**
  * Sends a Backup Set run's or an archive's CSV parts to the off-platform destination (canonical
- * model R-SQ17, ADR-NEXT `NEXT-automatic-backups-and-off-platform-destination.md`): one part per
+ * model R-SQ17, ADR-0239 `0239-automatic-backups-and-off-platform-destination.md`): one part per
  * execute (scope 1), so a transaction holds at most one part of about 3 MB under the 12 MB
  * asynchronous heap and the callout size limit. The destination is the installed module's
  * `OffPlatformDestination` with key `offPlatform`; Core names no module class.

@@ -1,5 +1,5 @@
 /**
- * The org's run state: last runs, summaries, watermarks and setup markers (ADR-NEXT settings as
+ * The org's run state: last runs, summaries, watermarks and setup markers (ADR-0238 settings as
  * custom metadata, decision 6). Not settings: nobody chooses them and they describe only this
  * org, so they are rows of `Nightly_Job__c` with `Kind__c` State, Name the key, and the value in
  * `Value__c` as a JSON literal, written synchronously in system mode by BarnCRM code (ADR-0021).

@@ -1,5 +1,5 @@
 /**
- * `Account.Is_Organization_Account__c` is kept by BarnCRM (canonical model R-O4; ADR-NEXT settings as
+ * `Account.Is_Organization_Account__c` is kept by BarnCRM (canonical model R-O4; ADR-0238 settings as
  * custom metadata, decision 8): set on each save from the organization record type, and put
  * right on every account that disagrees by OrganizationFlagBatch.
  */

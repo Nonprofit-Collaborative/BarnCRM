@@ -113,7 +113,7 @@ function infosOf(results) {
 }
 
 /**
- * Forms Home (ADR-NEXT, Module Home pattern): published forms, submissions in the last 30 days
+ * Forms Home (ADR-0236, Module Home pattern): published forms, submissions in the last 30 days
  * and submissions that need a look as figures, the forms changed most recently and the newest
  * submissions as lists, and New Form for someone who may create forms. Before the first form, a
  * first-run panel offers New Form instead. Reads only through Lightning Data Service.

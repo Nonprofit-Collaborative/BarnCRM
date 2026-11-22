@@ -29,7 +29,7 @@
  * The Account Tabs setting (C-73) picks the Organizations tab set (with Households), the
  * standard Accounts tab set, or both, each going to every BarnCRM role while chosen.
  *
- * The two Core role apps follow the same way (ADR-0137, ADR-NEXT nine console apps): each has a
+ * The two Core role apps follow the same way (ADR-0137, ADR-0237 nine console apps): each has a
  * BarnCRM App set that shows that app and nothing else, and its audience is every BarnCRM role
  * (BarnCRM Admin Console: BarnCRM Admin only). The sets are always on.
  */

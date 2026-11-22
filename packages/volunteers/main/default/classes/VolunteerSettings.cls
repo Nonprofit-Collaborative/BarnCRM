@@ -2,7 +2,7 @@
  * The Volunteers settings as the module's code reads them (canonical model Section 29N).
  *
  * Read through Core's typed `SettingsService` readers, which serve each setting from the settings
- * store (module `Volunteers`, ADR-NEXT settings as custom metadata): a setting never saved reads
+ * store (module `Volunteers`, ADR-0238 settings as custom metadata): a setting never saved reads
  * its Setting Definition's shipped default, so a checkbox that ships on reads as on. A blank or
  * out of range value reads as that default, the range being the definition's, so no caller has
  * to know the defaults.

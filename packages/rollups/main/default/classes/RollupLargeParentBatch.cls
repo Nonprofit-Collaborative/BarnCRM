@@ -229,7 +229,7 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
 
 	/**
 	 * Takes the run lock until this transaction ends: the run-state row
-	 * `Rollups.Last_Run_Started__c` (ADR-NEXT settings as custom metadata, decision 11), which
+	 * `Rollups.Last_Run_Started__c` (ADR-0238 settings as custom metadata, decision 11), which
 	 * the module creates at install and this creates when an org lacks it. Two processors
 	 * routing records here at the same moment both found no run going and both started one (the
 	 * scale rerun had two or three at once); with the lock the second waits for the first to

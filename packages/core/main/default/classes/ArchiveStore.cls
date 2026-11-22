@@ -1,6 +1,6 @@
 /**
  * Every read and write of the Archived Record big object (canonical model Section 29D1, R-ARC1,
- * ADR-NEXT archive rules and big object archive). One place, so tests replace it: a big object
+ * ADR-0240 archive rules and big object archive). One place, so tests replace it: a big object
  * cannot be written or read in an Apex test.
  *
  * Every read filters on the index fields in order, never skipping one: a filter with a gap aborts

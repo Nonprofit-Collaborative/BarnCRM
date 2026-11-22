@@ -234,7 +234,7 @@ Tab **Super Connector** with four sections (`barnTabs`): Recipes, Connections, R
 Templates (the import). Each section arrives with the slice that builds it; CN-01 ships
 Connections alone.
 
-**In BarnCRM Admin Console (ADR-NEXT, nine console apps).** The module ships no app: the Super
+**In BarnCRM Admin Console (ADR-0237, nine console apps).** The module ships no app: the Super
 Connector tab joins BarnCRM Admin Console, before Error Log, through the module's catalog row
 (`Admin_Tabs__c`, ADR-0137). Tab visibility is in `Connector_Admin` and `Connector_Viewer` (the
 module has no Staff set; Connector work is admin work, R-CR3).
@@ -854,7 +854,7 @@ Large one-off loads belong in Super Importer, which a recipe can call (`importRo
 | Connector | `Connector_Start__e`, `Connector_Start_User__e` | Platform events (their own allocation, not custom objects, ADR-0227) | 0 |
 | Connector | Connections | External and Named Credentials created at run time, not objects | 0 |
 | Connector | Generic REST definition | Apex constants and a framework-free JS module; app templates are imported files, never shipped (D-216) | 0 |
-| Connector | Super Connector tab in BarnCRM Admin Console | Catalog `Admin_Tabs__c` (ADR-NEXT, nine console apps) | 0 |
+| Connector | Super Connector tab in BarnCRM Admin Console | Catalog `Admin_Tabs__c` (ADR-0237, nine console apps) | 0 |
 | Connector | `Connector_Webhook_Rest`, the runner, clock and controllers | Apex | 0 |
 | Connector | `Connector_Admin`, `Connector_Viewer`, `Connector_Webhook_Guest` | Permission sets | 0 |
 | Core | `Saved_Transform__c.Kind__c` | Field (picklist Step List, Map) | 0 |
@@ -969,7 +969,7 @@ Decided 2026-11-20 (plan D-215):
 
 Approved with exceptions 2026-11-20 (plan D-216, quoted in the header), applied here:
 
-6. **Where it lives:** Section 3.1 (the Super Connector tab in BarnCRM Admin Console, ADR-NEXT,
+6. **Where it lives:** Section 3.1 (the Super Connector tab in BarnCRM Admin Console, ADR-0237,
    nine console apps), Section 6.2, CN-01.
 7. **Sending information back:** Section 3.3a (a synchronous fixed reply to the posting app; a
    Send to Webhook step and callback replies after processing, under F1 and F4), Section 3.4,

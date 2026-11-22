@@ -131,7 +131,7 @@ mkdir -p "$(dirname "$OUT")"
 LAST="$(mktemp -t barn-version-XXXXXX)"
 # The versions are built from a staged copy of the project with the leading indentation of every
 # Apex class and trigger removed, so an installed package counts about 8 percent fewer Apex
-# characters in the subscriber's org (AP-05, ADR-NEXT). STRIP_APEX_INDENT=0 builds the source as
+# characters in the subscriber's org (AP-05, ADR-0241). STRIP_APEX_INDENT=0 builds the source as
 # written. The repository is never modified.
 BUILD_ROOT="$REPO_ROOT"
 STAGE=""

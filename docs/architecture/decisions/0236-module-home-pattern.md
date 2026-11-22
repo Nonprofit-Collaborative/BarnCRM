@@ -1,4 +1,4 @@
-# ADR-NEXT: Every module app opens on one Module Home pattern
+# ADR-0236: Every module app opens on one Module Home pattern
 
 **Status:** Accepted (owner decision)
 **Date:** 2026-11-21

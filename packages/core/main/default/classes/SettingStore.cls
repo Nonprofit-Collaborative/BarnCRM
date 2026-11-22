@@ -1,5 +1,5 @@
 /**
- * The settings store (ADR-NEXT settings as custom metadata, D-219).
+ * The settings store (ADR-0238 settings as custom metadata, D-219).
  *
  * A setting's default ships on its `Setting_Definition__mdt` row (`Default_Value__c`) and a value
  * the org changed is a `Setting_Value__mdt` record of the same name; both hold a JSON literal.
@@ -144,7 +144,7 @@ public without sharing class SettingStore {
 	/**
 	 * Saves the changes in one deployment and returns its Id (null in a test). Refused, with
 	 * nothing saved, when a value is longer than the store holds or Salesforce does not accept
-	 * the deployment (on a packaged install, until the Setup switch is on: ADR-NEXT decision 5).
+	 * the deployment (on a packaged install, until the Setup switch is on: ADR-0238 decision 5).
 	 */
 	public static Id save(List<Change> changes, Boolean audit) {
 		if (changes == null || changes.isEmpty()) {

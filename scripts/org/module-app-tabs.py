@@ -7,7 +7,7 @@ An app may not name a tab its own package does not ship: a deploy of that packag
 fail on the missing tab, and each package runs without the modules that do not depend on it
 (ADR-0013). So module tabs reach an app in another package from outside that app's metadata
 (ADR-0137). Each module's `BarnCRM_Module__mdt` record names its tabs and its app, and the app
-it names decides where the tabs go (ADR-NEXT, nine console apps):
+it names decides where the tabs go (ADR-0237, nine console apps):
 
 - `App_Name__c` names an app another package ships (a host app: Core's BarnCRM Members and
   Partners for Memberships and Corporate Hub, Funders' BarnCRM Grants for Scholarships): the

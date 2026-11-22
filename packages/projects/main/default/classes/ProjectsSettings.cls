@@ -1,6 +1,6 @@
 /**
  * The Project Management settings as the module's code reads them (canonical model 29PM7), from
- * the settings store by Setting Definition name (`ModuleSettings`, ADR-NEXT settings as custom
+ * the settings store by Setting Definition name (`ModuleSettings`, ADR-0238 settings as custom
  * metadata): an org that never saved one reads its shipped default, and a blank or out of range
  * number reads as that default, the range being its Setting Definition's.
  */

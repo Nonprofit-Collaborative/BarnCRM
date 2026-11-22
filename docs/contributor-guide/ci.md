@@ -176,7 +176,7 @@ Salesforce org is needed for this job. Steps:
    describe, service call or system-mode work: the LWC reads or writes that with a GraphQL
    wire or `uiRecordApi`. Existing matches are listed in `scripts/ci/aura-lds-allowlist.txt`
    as `Class.method`; remove a line when its method is converted (a stale line fails too).
-   **Deploys and package builds strip the indentation that is left (AP-05, ADR-NEXT).** The
+   **Deploys and package builds strip the indentation that is left (AP-05, ADR-0241).** The
    repository stays formatted and readable; the copy that goes to an org loses the leading
    spaces and tabs on every line of every `.cls` and `.trigger` file. On 2026-11-21 that took
    the full suite from 5,307,460 raw characters (88 percent of 6,000,000) to 4,902,193 (82
@@ -1022,7 +1022,7 @@ plan mode itself is T-INST-04 and `scripts/ci/tests/test_package_upgrade_test.py
 ### Creating package versions
 
 `create-versions.sh` (and the builds in `package-upgrade-test.sh`) run `sf package version
-create` from a staged copy of the project with Apex indentation removed (AP-05, ADR-NEXT; see
+create` from a staged copy of the project with Apex indentation removed (AP-05, ADR-0241; see
 the Apex budget note above), so a subscriber's org counts the stripped size. The repository is
 not changed. `STRIP_APEX_INDENT=0` builds the source as written.
 
