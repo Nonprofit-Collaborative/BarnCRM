@@ -182,7 +182,7 @@ active and its BarnCRM copy not yet made. T-MIG-06 needs an org with NPSP.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the app launcher, **BarnCRM Admin**, **Migration Assistant**. | The tab shows **Migration Assistant** with its purpose, **Migration Kits** listing **DLRS Rollups** with its description and **Start**, and a closing line about uninstalling BarnCRM Migration. No **Households** section in an org without NPSP or Nonprofit Cloud. |
+| 1 | Open the app launcher, **BarnCRM Admin Console**, **Migration Assistant**. | The tab shows **Migration Assistant** with its purpose, **Migration Kits** listing **DLRS Rollups** with its description and **Start**, and a closing line about uninstalling BarnCRM Migration. No **Households** section in an org without NPSP or Nonprofit Cloud. |
 | 2 | In an org with no product that has a kit, open the tab. | **Migration Kits** says no product with a Migration Kit is in this org, and points to Import on the Data Manager tab. |
 | 3 | Open **BarnCRM Settings**, **Integrations**, then **Modules**. | Integrations has a **Migration Assistant** entry; **Modules** lists **BarnCRM Migration** (Beta) as installed. |
 | 4 | Without BarnCRM Migration, open **BarnCRM Settings**, **Integrations**. | DLRS shows **Installed in this org** with no **Start Migration**. No **Migration Assistant** tab or entry. |

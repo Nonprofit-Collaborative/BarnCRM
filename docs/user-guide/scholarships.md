@@ -6,7 +6,7 @@ Guide's [Scholarships and Outbound Grants](../admin-guide/scholarships.md) page.
 
 ## Scholarships Home
 
-Open the **BarnCRM Scholarships** app (or **BarnCRM** or **BarnCRM Console**) and its
+Open the **BarnCRM Grants** app (or **BarnCRM Console** when Grants is not installed) and its
 **Scholarships Home** tab. Before your organization's first award program, it
 opens with **Set Up Your First Award Program** and a **New Award Program** button. It shows:
 

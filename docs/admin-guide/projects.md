@@ -32,13 +32,12 @@ program launch, internal work or client work.
 3. Within the hour (or at once with **Finish Setup**) BarnCRM Admin holders get Projects Admin,
    the Team Member and Fundraising Staff roles get Projects Staff, and Read Only gets Projects
    Read Only.
-4. The Projects Home, Projects and Time Entries tabs appear in BarnCRM and BarnCRM Console, before
-   Error Log.
+4. The Project Rates, Project Invoices and Request Connections tabs appear in BarnCRM Admin
+   Console, before Error Log.
 5. The **BarnCRM Projects** app appears in the App Launcher for everyone with a Projects
    permission set: Projects Home, Timesheet, Approvals, Requests, Projects, Time Entries,
    Project Expenses, Project Resources, Staffing, Project Rates, Project Invoices, Request
-   Connections, Reports and Error Log. A scratch or Developer Edition org gets no BarnCRM
-   Projects app, only the tabs in the BarnCRM apps (see
+   Connections, Reports and Error Log. Every org gets it (see
    [The Module Apps](barncrm-app.md#the-module-apps)).
 
 ## Access

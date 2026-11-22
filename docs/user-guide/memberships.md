@@ -7,7 +7,7 @@ the levels (see [Memberships](../admin-guide/memberships.md) in the Admin Guide)
 
 ## Memberships Home
 
-Open the **BarnCRM Memberships** app (or **BarnCRM**) and its **Memberships Home** tab. The
+Open the **BarnCRM Members and Partners** app and its **Memberships Home** tab. The
 figures at the top count active members, memberships ending in the next 30 days, members in
 their grace period and renewals from the last 30 days; click one to open the memberships list.
 **Expiring Soon** lists the memberships ending soonest, so you can reach those members before
@@ -16,7 +16,7 @@ If you may add members, **New Membership** is at the top right.
 
 ## To Add a Member
 
-1. Open the **BarnCRM Memberships** app (or **BarnCRM** or **BarnCRM Console**) and the
+1. Open the **BarnCRM Members and Partners** app and the
    **Memberships** tab, then click **New**.
 2. Choose the **Level**, and the **Contact** (a person's own membership), the **Household or
    Organization**, or both (an organization member and the person you deal with).

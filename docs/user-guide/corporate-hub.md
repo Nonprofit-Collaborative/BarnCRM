@@ -4,8 +4,8 @@ Corporate Hub keeps your organization's policies, filings and contracts in one p
 turns it on; the setup is in the Admin Guide's [Corporate Hub](../admin-guide/corporate-hub.md)
 page.
 
-Every Corporate Hub page is in the **BarnCRM Corporate Hub** app (open it from the App
-Launcher), and the everyday ones are also in the **BarnCRM** (or **BarnCRM Console**) app.
+Every Corporate Hub page is in the **BarnCRM Members and Partners** app (open it from the App
+Launcher).
 
 ## Corporate Hub Home
 
@@ -76,7 +76,7 @@ and press **Send Poll**; then press **Choose This Time** on the time that suits 
 
 ## Data Protection
 
-Open these in the **BarnCRM Corporate Hub** app, or from the App Launcher:
+Open these in the **BarnCRM Members and Partners** app, or from the App Launcher:
 
 - **Data Subject Requests**: when someone asks to see, correct, delete or move their data, or
   objects to how it is used, create a request with its type and the person. The due date is 30

@@ -18,7 +18,7 @@ publishes a version.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **BarnCRM** app, **Forms** tab (after **Data Manager**; there is no BarnCRM Forms app), **New**. Name `Volunteer Interest`, save. | The record page opens on the **Builder** tab (the **Form Builder** panel) with one step, a person under **Records to Write**, and **Fix Before Publishing** listing that the person needs a question written to Last Name. **Publish** is disabled. |
+| 1 | Open the **BarnCRM Admin Console** app, **Forms** tab (before **Error Log**), **New**. Name `Volunteer Interest`, save. | The record page opens on the **Builder** tab (the **Form Builder** panel) with one step, a person under **Records to Write**, and **Fix Before Publishing** listing that the person needs a question written to Last Name. **Publish** is disabled. |
 | 2 | Set **Step Title** to `You`. Select **Add Question**: **Question** `Last Name`, **Required**, **Write To** `person (Person)`, **Field** `Last Name (LastName)`. Add `First Name` written to `FirstName` and `Email` (type Email) written to `Email`. | The three questions are under `You`. **Fix Before Publishing** is gone; **Publish** is enabled. |
 | 3 | Select **Add Question** on `You`: `Age`, type Number, not written to a record. Select **Add Step**: title `Guardian`, a question `Guardian Name`, required, written to the person's `Description`. | Two steps in the left column. |
 | 4 | Select the `Guardian` step. Under **Show When** choose **All Are True**, then the test `Age`, **is less than**, value `18`. | The condition shows one row. |
@@ -173,7 +173,7 @@ second published form `Zzdelete Empty` with none.
 ## T-FORM-10: Forms Home
 
 **Purpose:** confirm Forms Home shows the module's figures and lists, its first-run panel and New Form only for creators (Module Home pattern).
-**Prerequisites:** admin and read-only testers; a production org or sandbox for the app (in a scratch org use the **Forms Home** tab in **BarnCRM**). Start with no forms for step 1.
+**Prerequisites:** admin and read-only testers; a production org or sandbox for the app (in a scratch org use the **Forms Home** tab in **BarnCRM Console**). Start with no forms for step 1.
 
 | Step | Action | Expected result |
 |---|---|---|

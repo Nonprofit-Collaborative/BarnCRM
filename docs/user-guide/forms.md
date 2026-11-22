@@ -6,7 +6,7 @@ BarnCRM admin builds the forms (see [Forms](../admin-guide/forms.md) in the Admi
 
 ## Forms Home
 
-Open the **BarnCRM Forms** app (or **BarnCRM**) and its **Forms Home** tab. The figures at the
+Open **BarnCRM Admin Console** (or the App Launcher) and its **Forms Home** tab. The figures at the
 top count the published forms, the submissions from the last 30 days and the submissions that
 need review; click one to open its list. Below them are the forms changed most recently and the
 newest submissions; click a name to open it. If you may create forms, **New Form** is at the top
@@ -14,8 +14,7 @@ right.
 
 ## To Fill In a Form
 
-1. Open the **BarnCRM Forms** app (or **BarnCRM**, or **BarnCRM Console**), the **Forms** tab,
-   and the form.
+1. Open **BarnCRM Admin Console** (or the App Launcher), the **Forms** tab, and the form.
 2. Select the **Fill In** tab.
 3. Answer the questions on the first step and select **Next**. A question you must answer, or an
    answer BarnCRM cannot take (an email without an `@`, a date that is not a date), says what to

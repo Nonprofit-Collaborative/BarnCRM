@@ -28,8 +28,7 @@ through Core's `FormAttachmentExtension` seam and holds the form's record identi
   each submission (R-FM4, R-FS8).
 - Permission sets `Forms_Admin`, `Forms_Staff`, `Forms_Read_Only`, given by role through
   `FormsAccessSync`; install steps in `FormsPostInstall`.
-- App `BarnCRM_Forms` (BarnCRM Forms, logo `BarnCRM_Patch_Forms_Logo`), visible through the Forms
-  permission sets; left out of scratch and Developer Edition orgs (ADR-0223, module apps). The
-  Forms and Form Submissions tabs also join BarnCRM and BarnCRM Console through the catalog row's
-  `Staff_Tabs__c` and `scripts/org/module-app-tabs.py`; the Form and Form Submission record pages
+- No app (ADR-NEXT (nine console apps)): Form Submissions joins BarnCRM Console through the catalog row's
+  `Staff_Tabs__c`, and Forms Home and Forms join BarnCRM Admin Console through
+  `Admin_Tabs__c`, both by `scripts/org/module-app-tabs.py`; the Form and Form Submission record pages
   are each object's org default.

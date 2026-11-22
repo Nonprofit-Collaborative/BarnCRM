@@ -60,7 +60,7 @@ There is nothing to do in Salesforce Setup.
 Maria's org has had NPSP for six years and holds 3,214 household accounts. She has just
 installed BarnCRM.
 
-1. Maria installs BarnCRM Migration, opens the **BarnCRM Admin** app and clicks the
+1. Maria installs BarnCRM Migration, opens the **BarnCRM Admin Console** app and clicks the
    **Migration Assistant** tab.
 2. Under **Households**, the **Adopt NPSP Households** section says **3,214 NPSP households can be adopted** and lists the first ten: each household's name,
    its NPSP formal and informal greetings, its primary contact and how many contacts it has.

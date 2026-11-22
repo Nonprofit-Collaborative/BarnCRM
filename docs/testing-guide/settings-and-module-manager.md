@@ -14,7 +14,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | From the App Launcher, open the **BarnCRM Admin** app and click the **BarnCRM Settings** tab. | The page name **BarnCRM Settings** shows once, in the page header, with the line "Choose how BarnCRM works for your whole organization." under it. A **Search settings** box and the section list are on the left; the first section shows on the right. No read-only notice is shown. |
+| 1 | From the App Launcher, open the **BarnCRM Admin Console** app and click the **BarnCRM Settings** tab. | The page name **BarnCRM Settings** shows once, in the page header, with the line "Choose how BarnCRM works for your whole organization." under it. A **Search settings** box and the section list are on the left; the first section shows on the right. No read-only notice is shown. |
 | 2 | Read the section list. | Sections sit under group headings, each with an icon: **Organization** (**General**, **Organization**), **People** (**People and Households**, **Addresses**), **Data** (**Import**, **Duplicate Matching**, **Rollups** with Rollup Builder installed, **Org Optimizer**, **Advanced Reporting** with Advanced Reporting installed), **Fundraising** (**Fundraising** and **Receipts** with Fundraising installed), **Programs** (**Volunteers** with Volunteers installed) and **System** (**Modules**, **Access**, **Automation**, **Integrations**, **Health**, **Error Log**). **Error Log** is the last item. A Core-only org has no Fundraising or Programs group. |
 | 3 | Click **General**. | **Edition**, **Features**, **Sample Data**, **Custom Metadata** and the setting rows show. No description is printed under a row: each row has an info icon, and clicking it shows the plain description. Unless a Custom Metadata save has already worked here, a **Needs a Change in Setup** note at the top shows one line, an **Open in Setup** button and **Show Steps** (T-SET-20). No note asks you to match a fiscal year: **Fiscal year start month** is a read-only row (T-SET-15). In **Features**, no description says "tab" or "Data Hygiene". |
 | 4 | Click **Learn More** beside the info icon of any setting. | **Learn More** stands apart from any text, with a new-window icon. A new browser tab opens the matching admin-guide page on GitHub. The console tab is unchanged. |
@@ -193,12 +193,12 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 
 ## T-SET-07D: The Automation Tab
 
-**Purpose:** confirm Automation has its own tab in the admin apps (D-184) and the Settings section still works.
+**Purpose:** confirm Automation has its own tab in BarnCRM Admin Console (D-184) and the Settings section still works.
 **Prerequisites:** admin user; a staff user.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **BarnCRM Admin** app. | The tabs read **BarnCRM Settings**, **Data Manager**, **Data Hygiene**, **Duplicate Matching**, **Automation**, then any module admin tabs, and **Error Log** last. **Automation** has a factory icon. |
+| 1 | Open the **BarnCRM Admin Console** app. | The tabs read **BarnCRM Settings**, **Data Manager**, **Data Hygiene**, **Duplicate Matching**, **Automation**, then any module admin tabs, and **Error Log** last. **Automation** has a factory icon. |
 | 2 | Click **Automation**. | The **Automation** card (factory icon) shows the pause controls, the switches, **Pause or Bypass for Some People** and **Your Own Flows**, as on **BarnCRM Settings**, **Automation**. |
 | 3 | Open **BarnCRM Admin Console** and click **Automation**. | It opens as a workspace tab with the same card. |
 | 4 | Open **BarnCRM Settings**, **Automation**. | The same card shows there; a switch changed on one page shows changed on the other after a reload. |
@@ -316,7 +316,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As admin, open the **BarnCRM** app, **Home** tab. | **What's New in BarnCRM** at the top ("Here is what changed since you last dismissed this card.", a **Version** heading showing **0.11**, the bold headline "A simpler way to work with your data, plus faster saves" and nine lines under it covering Data Manager, Import, Org Optimizer, Duplicate Matching, Settings, Setup Checklist and Home, record panels, faster saves and polish; no 0.6 note), then **Welcome to BarnCRM**, **Setup Checklist** or **Setup Complete**, **Errors to Review**, the rollups and seasonal address tiles, **Modules** and **Quick Links**. |
+| 1 | As admin, open the **BarnCRM Console** app, **Home** tab. | **What's New in BarnCRM** at the top ("Here is what changed since you last dismissed this card.", a **Version** heading showing **0.11**, the bold headline "A simpler way to work with your data, plus faster saves" and nine lines under it covering Data Manager, Import, Org Optimizer, Duplicate Matching, Settings, Setup Checklist and Home, record panels, faster saves and polish; no 0.6 note), then **Welcome to BarnCRM**, **Setup Checklist** or **Setup Complete**, **Errors to Review**, the rollups and seasonal address tiles, **Modules** and **Quick Links**. |
 | 2 | In **Quick Links**, click the **Households** tile, go back, then the **BarnCRM Settings** tile. | Three icon tiles, each with a one-line description; each opens its tab. **Organizations** is also listed. |
 | 3 | In **Modules**, click **Open the Module Manager**. | **BarnCRM Settings** opens on **Modules**. |
 | 4 | Look at the status tiles. | Each card has an icon. There is no Health Check card: Health Check is on the **Org Optimizer** tab, **Health Check**. **Errors to Review** shows **All Clear** at zero. In an org where rollups never ran, the rollups tile shows **Not Run Yet** with no warning; once they ran and are more than 36 hours old it shows an **Overdue** badge. |

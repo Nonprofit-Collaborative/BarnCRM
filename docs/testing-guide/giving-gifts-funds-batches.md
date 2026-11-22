@@ -334,7 +334,7 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In the **BarnCRM** app, open **Harper Garcia**. | The sidebar starts with **Giving at a Glance**: **Total Giving**, **Last Gift Date**, **Donor Level** (when she has one) and **Enter a Gift**. |
+| 1 | In the **BarnCRM Console** app, open **Harper Garcia**. | The sidebar starts with **Giving at a Glance**: **Total Giving**, **Last Gift Date**, **Donor Level** (when she has one) and **Enter a Gift**. |
 | 2 | Click **Enter a Gift**. | Quick Gift Entry opens with Harper Garcia as the donor. |
 | 3 | Save a gift of 25, go back to Harper and refresh. | **Total Giving** has gone up by 25 and **Last Gift Date** is today. |
 | 4 | Open **The Garcia Family** and an organization that gave. | Each shows the card with its own figures. |

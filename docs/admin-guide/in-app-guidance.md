@@ -33,8 +33,8 @@ There is nothing to turn on. The tips are active as soon as BarnCRM is installed
   in the same app, counting your organization's own prompts, so someone who opens Settings and
   Import on their first day sees the Import tip on a later visit. BarnCRM does not skip that
   wait.
-- **Where they do not appear:** in another app that has the same tabs (BarnCRM, BarnCRM Admin
-  and BarnCRM Admin Console among them), and in the Salesforce
+- **Where they do not appear:** in another app that has the same tabs (BarnCRM Admin Console among
+  them), and in the Salesforce
   mobile app, which does not show in-app guidance.
 
 ## A Five-Minute Walkthrough

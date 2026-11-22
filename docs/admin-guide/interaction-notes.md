@@ -21,7 +21,7 @@ learn, and nothing to keep in step: if your team already logs calls, notes appea
 Interaction notes work as soon as Core is installed. There is nothing to switch on.
 
 **Where the button is.** **Log an Interaction** sits in the action bar at the top of the
-packaged person page and the packaged household and organization page, in the **BarnCRM**
+packaged person page and the packaged household and organization page, in the **BarnCRM Console**
 app and, with Fundraising installed, the **BarnCRM Fundraising** app, on the desktop and on the phone. If
 you do not see it, you are probably looking at the record outside those apps, or somebody
 has assigned a different record page in the Lightning App Builder.
@@ -44,7 +44,7 @@ log it from the household or organization page to cover everyone there.
 
 Maria does this from the sample data.
 
-1. Open the **BarnCRM** app, click the **Contacts** tab, and open any sample person.
+1. Open the **BarnCRM Console** app, click the **Contacts** tab, and open any sample person.
 2. Click **Log an Interaction** in the action bar. A window opens with **Date** set to today
    and **Type** set to **Meeting**. The note is saved as completed, so it is history, not a
    to-do.

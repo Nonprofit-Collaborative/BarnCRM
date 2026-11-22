@@ -59,7 +59,7 @@ split** action sits in the action bar of the packaged Account record page, on ho
 only, and the BarnCRM app opens households on that page, on the desktop and on the
 phone. So the button is there on a fresh install, with nothing to wire up in the Lightning
 App Builder. If you do not see it, the two usual reasons are that you are looking at the
-record outside the **BarnCRM** app (another app can carry its own record page
+record outside the **BarnCRM Console** app (another app can carry its own record page
 assignment), or that somebody has since overridden the assignment in the Lightning App
 Builder.
 
@@ -69,7 +69,7 @@ Maria does this from the sample data, after an import left her with the Garcia f
 
 ### Merging Two Households
 
-1. Open the **BarnCRM** app and click the **Households** tab.
+1. Open the **BarnCRM Console** app and click the **Households** tab.
 2. Open **The Garcia Family**. Note that Harper, Luis and Diego Garcia are its members.
    The sample data ships one Garcia household, so to follow the merge make a second one
    first: a household named Garcia with a member or two in it, standing in for the

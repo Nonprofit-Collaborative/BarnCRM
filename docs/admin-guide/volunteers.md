@@ -695,7 +695,7 @@ opened on its own it starts empty and clears itself after each save.
 
 ### Volunteering at a Glance
 
-In the **BarnCRM** apps a person opens on Core's page, which shows no volunteering. Volunteers
+In the **BarnCRM Console** app a person opens on Core's page, which shows no volunteering. Volunteers
 adds a **Volunteering at a Glance** card to that page's glance area (the record glance seam,
 ADR-0167): **Volunteer Hours This Year** and **Last Volunteer Date** (the rollups already on
 the person), with **Log Hours** (the tab above, on that person) for someone who may create

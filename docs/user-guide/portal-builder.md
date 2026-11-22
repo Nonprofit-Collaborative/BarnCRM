@@ -7,15 +7,14 @@ Guide). This page is for staff who look after the people using them.
 
 ## Portal Builder Home
 
-With Portal Builder Admin, the **BarnCRM Portal Builder** app opens on **Portal Builder Home**:
+With Portal Builder Admin, open **Portal Builder Home** in **BarnCRM Admin Console**:
 how many portals are active, how many people have access, how many are suspended and how many
 signed in during the last 30 days (click a figure to open its list), then every portal with its
 status and the latest sign-ins.
 
 ## Who Can Sign In
 
-1. Open the **BarnCRM Portal Builder** app (or **BarnCRM Admin**, or **BarnCRM Admin Console**)
-   and the **Portals** tab, then the portal.
+1. Open **BarnCRM Admin Console** and the **Portals** tab, then the portal.
 2. A portal set to **Invited** lets in only the people with a **Portal Access** record for it.
    To invite someone, open the **Portal Accesses** tab, select **New**, and pick the portal and
    the person. Their email address in BarnCRM is the one they sign in with.

@@ -24,10 +24,10 @@ module, your admin gives **Fundraising Read Only** separately, if you should see
 | Error Log | Read entries (open it from the navigation menu if it is not shown) | Change entries |
 | Find, Data Manager, Org Optimizer | Nothing, unless your admin also gives the **BarnCRM Find and Export** add-on | Run Super Transformer or bulk delete |
 
-Tabs you see in the **BarnCRM** app: **Home**, **Households** and **Organizations**, plus
+Tabs you see in the **BarnCRM Console** app: **Home**, **Households** and **Organizations**, plus
 **Contacts** if your Salesforce profile shows it. **BarnCRM Console** adds **Addresses**,
 **Relationships**, **Affiliations** and **Household Members**. **BarnCRM Settings** and
-**Error Log** are in the admin apps, which you do not see; open them by typing their name in
+**Error Log** are in BarnCRM Admin Console, which you do not see; open them by typing their name in
 the App Launcher.
 
 If your admin gives you **BarnCRM Find and Export**, you can build, run, save and export Find
@@ -60,8 +60,8 @@ that says you cannot record a refund or start a plan.
 
 ## To Check What You Can See
 
-1. Open the App Launcher and choose **BarnCRM** (or **BarnCRM Fundraising**, or **BarnCRM
-   Volunteers**).
+1. Open the App Launcher and choose **BarnCRM Console** (or **BarnCRM Fundraising**, or
+   **BarnCRM Volunteers**).
 2. Open a tab, then a record.
 
 You should see: the record with its cards. Salesforce's **Edit** and **Delete** buttons are

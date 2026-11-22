@@ -45,14 +45,13 @@ page, does three things, each safe to run again:
 3. Loads the shipped templates that your org does not have yet (see Templates).
 
 The **Corporate Hub Home**, **Library Documents**, **Compliance Obligations**, **Agreements**,
-**Boards and Committees** and **Board Meetings** tabs are added at the end of the BarnCRM and
-BarnCRM Console apps (in a package install the admin adds them in App Manager; the Setup Assistant
-lists the tab names). Corporate Hub also has its own app, **BarnCRM Corporate Hub**, shown to
-everyone with a Corporate Hub permission set: those six tabs, then **Processing Activities**,
-**Data Subject Requests**, **Data Breaches**, **Reports**, **Dashboards** and **Error Log**.
-The three data protection tabs are not added to the BarnCRM apps' menus (most organizations
-open them rarely): open them in BarnCRM Corporate Hub or the App Launcher. A scratch or
-Developer Edition org gets no BarnCRM Corporate Hub app, only the tabs in the BarnCRM apps (see
+**Boards and Committees** and **Board Meetings** tabs are added to **BarnCRM Members and
+Partners** (in a package install the admin adds them in App Manager; the Setup Assistant
+lists the tab names). Corporate Hub's pages are in **BarnCRM Members and Partners**, a Core app shared with
+Memberships and shown to everyone with a Corporate Hub permission set: those six tabs, then
+**Processing Activities**, **Data Subject Requests** and **Data Breaches**, before **Reports**,
+**Dashboards** and **Error Log**. With Memberships installed, its pages come first and the app
+opens on Memberships Home; without it, the app opens on Corporate Hub Home (see
 [The Module Apps](barncrm-app.md#the-module-apps)).
 
 ## Access

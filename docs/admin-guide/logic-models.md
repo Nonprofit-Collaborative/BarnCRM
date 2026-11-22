@@ -343,7 +343,7 @@ record ID, so neither module needs the other. See
 
 Do this as Maria, who holds the Admin role.
 
-1. In the **BarnCRM** app, open **Logic Models** and click **New**, name it "Reading
+1. In the **BarnCRM Console** app, open **Logic Models** and click **New**, name it "Reading
    Program Model" and save. **For** shows **The whole organization**.
 2. In the builder, add "Two tutors" under **Inputs**, "Weekly reading sessions" under
    **Activities**, "Sessions held" under **Outputs**, "Students read more at home" under **Short

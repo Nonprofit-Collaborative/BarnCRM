@@ -107,7 +107,7 @@ a Nonprofit Cloud household: naming, greetings, addresses and memberships work a
 Maria has installed BarnCRM into an org that has been running Nonprofit Cloud for two years.
 Her colleagues have grouped 1,240 families there.
 
-1. Maria installs BarnCRM Migration, opens the **BarnCRM Admin** app and clicks the
+1. Maria installs BarnCRM Migration, opens the **BarnCRM Admin Console** app and clicks the
    **Migration Assistant** tab. Household membership is already set to membership records.
 2. Two families should stay in Nonprofit Cloud for now. She opens each account and sets
    **Household Model** to **Nonprofit Cloud**.

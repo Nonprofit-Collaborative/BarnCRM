@@ -181,7 +181,7 @@ an entry for longer, export the Error Log list or build a report on it before it
 
 Maria has heard from a colleague that "something did not save this morning."
 
-1. Open the **BarnCRM** app. On the home page, look at the **Errors to Review** tile. It
+1. Open the **BarnCRM Console** app. On the home page, look at the **Errors to Review** tile. It
    shows how many new errors there are, for example "3".
 2. Open the **Org Optimizer** tab and choose **Errors**. The **Error Log** card shows
    "3 new" and the five most recent entries. Each shows the message and where it came

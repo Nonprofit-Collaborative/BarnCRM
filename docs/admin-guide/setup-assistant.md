@@ -35,7 +35,7 @@ There is nothing to turn on. The Setup Assistant is the BarnCRM home page until 
 finish it.
 
 1. Click the app launcher (the grid of dots at the top left of Salesforce).
-2. Type `BarnCRM` and choose **BarnCRM**.
+2. Type `BarnCRM` and choose **BarnCRM Console**.
 3. The home page opens on the assistant, at the first step you have not finished.
 
 The **Setup Checklist** card lists every step at once, with how many are done ("3 of 9 steps
@@ -307,8 +307,8 @@ opening its install link and following the Salesforce install screens yourself: 
 assistant never installs anything for you.
 
 Under each installed module, the step also lists its pages that belong in the BarnCRM apps:
-"Add to BarnCRM and BarnCRM Console" for everyday pages, and "Add to BarnCRM Admin and BarnCRM
-Admin Console" for admin pages, with how to add them in App Manager. A package cannot add its
+"Add to the module's app if they are not there, or to BarnCRM Console for a module with no app"
+for everyday pages, and "Add to BarnCRM Admin Console" for admin pages, with how to add them in App Manager. A package cannot add its
 pages to another package's app, so this is the one step you do by hand after a package install;
 a source deploy adds them itself. See
 [A Module's Pages in the BarnCRM Apps](barncrm-app.md#a-modules-pages-in-the-barncrm-apps).

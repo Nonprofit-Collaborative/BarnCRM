@@ -58,7 +58,7 @@ had none).
    saves a list of them for you too, but Salesforce may not let the kit read every one, so a
    screenshot of each section is your backup.
 5. **Stop the scheduled jobs.** A package cannot be removed while one of its jobs is scheduled.
-   With Rollup Builder, on the **Rollup Builder** tab of **BarnCRM Admin**, click **Stop the nightly
+   With Rollup Builder, on the **Rollup Builder** tab of **BarnCRM Admin Console**, click **Stop the nightly
    recalculation**. In BarnCRM Settings: on **Error Log**, click **Stop**; on **Addresses**, under **Seasonal Address Swap**, stop the nightly
    swap. With Fundraising, on **Commitments**, click **Stop the nightly jobs**, and on
    **Opportunity Mirror**, click **Stop Nightly Run**. With Mirror, turn off **Send Cases to a

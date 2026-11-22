@@ -36,8 +36,7 @@ Install it from **Module Manager** (see [Module Manager](module-manager.md)). Wh
 finishes, BarnCRM gives you, the person who installed it, the **Payments Admin** permission set,
 and gives everyone who already has a BarnCRM role their Payments permission set (see below).
 
-Payments has no app of its own: its **Payments** tab joins the **BarnCRM** and **BarnCRM
-Console** apps, and the **Payments Setup** and **Payment Events** tabs are for admins. A source
+Payments has no app of its own: its **Payments** tab joins the **BarnCRM Console** app, and the **Payments Setup** and **Payment Events** tabs are for admins. A source
 install puts them there itself; after a package install, add them once in App Manager (see
 [The BarnCRM Apps](barncrm-app.md#a-modules-pages-in-the-barncrm-apps)).
 

@@ -102,9 +102,8 @@ licenses (where your organization has them) may be simpler than a portal.
    working within a day. The plugin's small stylesheet puts one field per line and fits a
    phone, in your theme's own fonts and colors. For any other website, the
    `portal-client/README.md` explains the small server piece you need.
-8. **Add a portal.** In the **BarnCRM Portal Builder** app (or **BarnCRM Admin** or **BarnCRM
-   Admin Console**, where Portal Builder's **Portal Builder Home**, **Portals** and **Portal
-   Accesses** tabs sit before **Error Log**; a scratch or Developer Edition org has only these),
+8. **Add a portal.** In **BarnCRM Admin Console**, where Portal Builder's **Portal Builder Home**, **Portals**
+   and **Portal Accesses** tabs sit before **Error Log**,
    **New Portal** on Portal Builder Home (or Portals, New): a name
    people see, a
    **Key** matching the shortcode, **Access Mode**, **Second Factor**, **Session Hours**,
@@ -119,7 +118,7 @@ licenses (where your organization has them) may be simpler than a portal.
 
 ## Portal Builder Home
 
-**Portal Builder Home** is the first tab of the BarnCRM Portal Builder app and follows the Module
+**Portal Builder Home** is in BarnCRM Admin Console, before Portals, and follows the Module
 Home layout (see [Module Homes](barncrm-app.md#module-homes)). Like the rest of Portal Builder it
 is for holders of Portal Builder Admin. It shows:
 

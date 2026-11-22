@@ -69,7 +69,7 @@ Platform user nothing usable.
 feature is on, to holders of **BarnCRM Admin**, **BarnCRM Duplicate Review** and **BarnCRM
 Metadata Admin** (see [Access](access.md)).
 
-1. Open the **BarnCRM Admin** app and choose the **Duplicate Matching** tab (someone without
+1. Open the **BarnCRM Admin Console** app and choose the **Duplicate Matching** tab (someone without
    that app, such as a Duplicate Review holder, finds the tab in the App Launcher). (In **BarnCRM
    Settings**, the **Duplicate Matching** section's **Duplicate Matching** row has an **Open
    this page** button that brings you here too.)

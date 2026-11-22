@@ -16,7 +16,7 @@ the records you choose, in your own org.
 
 ## 2. How to Turn It On
 
-There is nothing to turn on. You need two permissions, both in **BarnCRM Admin**:
+There is nothing to turn on. You need two permissions, both in **BarnCRM Admin Console**:
 
 - **Manage BarnCRM Settings**, because the files hold every field of many records and restoring
   them is an import;
