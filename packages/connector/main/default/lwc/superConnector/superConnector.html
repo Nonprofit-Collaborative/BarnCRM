@@ -50,7 +50,9 @@
                                         <div class="slds-var-m-top_small">
                                             <lightning-button class="slds-var-m-right_small" label={row.checkLabel} data-name={row.name} disabled={busy} onclick={handleCheck} data-id={row.checkId}></lightning-button>
                                             <template lwc:if={canWrite}>
-                                                <lightning-button class="slds-var-m-right_small" label={labels.replaceKey} data-name={row.name} disabled={busy} onclick={handleReplace} data-id={row.replaceId}></lightning-button>
+                                                <template lwc:if={row.canReplace}>
+                                                    <lightning-button class="slds-var-m-right_small" label={labels.replaceKey} data-name={row.name} disabled={busy} onclick={handleReplace} data-id={row.replaceId}></lightning-button>
+                                                </template>
                                                 <template lwc:if={row.canDisconnect}>
                                                     <lightning-button class="slds-var-m-right_small" label={labels.disconnect} data-name={row.name} disabled={busy} onclick={handleDisconnect} data-id={row.disconnectId}></lightning-button>
                                                 </template>
@@ -61,6 +63,7 @@
                                 </template>
                             </ul>
                         </section>
+                        <c-connector-backup-destination connections={page.connections} can-write={canWrite} from-template={backupTemplate} data-id="backup-destination"></c-connector-backup-destination>
                     </template>
                 </lightning-tab>
                 <lightning-tab label={labels.templatesTab} value="templates" onactive={handleTabActive} data-id="tab-templates">

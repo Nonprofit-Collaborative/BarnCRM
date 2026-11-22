@@ -1,0 +1,35 @@
+<template>
+    <section class="slds-var-m-top_large" aria-labelledby="backup-destination-heading">
+        <h2 id="backup-destination-heading" class="slds-text-heading_medium slds-var-m-bottom_x-small">{labels.heading}</h2>
+        <p class="slds-text-body_small slds-var-m-bottom_small">{labels.intro}</p>
+        <template lwc:if={errorMessage}>
+            <c-barn-notice class="slds-var-m-bottom_small" variant="error" message={errorMessage} data-id="backup-error"></c-barn-notice>
+        </template>
+        <p class="slds-var-m-bottom_x-small" data-id="backup-summary">{summary}</p>
+        <template lwc:if={note}>
+            <c-barn-notice class="slds-var-m-bottom_small" variant="warning" message={note} data-id="backup-note"></c-barn-notice>
+        </template>
+        <template lwc:if={editing}>
+            <div class="slds-var-m-bottom_small" data-id="backup-form">
+                <template lwc:if={templateNote}>
+                    <c-barn-notice class="slds-var-m-bottom_small" variant="info" message={templateNote} data-id="backup-template-note"></c-barn-notice>
+                </template>
+                <lightning-combobox label={labels.connection} options={connectionOptions} value={draft.name} data-field="name" onchange={handleChange} data-id="backup-connection"></lightning-combobox>
+                <lightning-combobox label={labels.method} options={methodOptions} value={draft.method} data-field="method" onchange={handleChange} data-id="backup-method"></lightning-combobox>
+                <lightning-input label={labels.path} value={draft.path} field-level-help={labels.pathHelp} max-length="1000" data-field="path" onchange={handleChange} data-id="backup-path"></lightning-input>
+                <lightning-textarea label={labels.headers} value={draft.headers} field-level-help={labels.headersHelp} data-field="headers" onchange={handleChange} data-id="backup-headers"></lightning-textarea>
+                <lightning-textarea label={labels.metadata} value={draft.metadata} field-level-help={labels.metadataHelp} max-length="1000" data-field="metadata" onchange={handleChange} data-id="backup-metadata"></lightning-textarea>
+                <div class="slds-var-m-top_small">
+                    <lightning-button class="slds-var-m-right_small" variant="brand" label={labels.save} disabled={busy} onclick={handleSave} data-id="backup-save"></lightning-button>
+                    <lightning-button label={labels.cancel} disabled={busy} onclick={handleCancel} data-id="backup-cancel"></lightning-button>
+                </div>
+            </div>
+        </template>
+        <template lwc:if={showChange}>
+            <lightning-button class="slds-var-m-right_small" label={changeLabel} disabled={busy} onclick={handleEdit} data-id="backup-edit"></lightning-button>
+            <template lwc:if={isSet}>
+                <lightning-button variant="destructive-text" label={labels.stop} disabled={busy} onclick={handleStop} data-id="backup-stop"></lightning-button>
+            </template>
+        </template>
+    </section>
+</template>

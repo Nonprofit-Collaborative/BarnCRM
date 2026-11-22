@@ -1,0 +1,16 @@
+{
+  "key": "azure-blob-backup",
+  "label": "Azure Blob Storage Backup Container",
+  "version": 1,
+  "description": "Sends Backup Set and archive CSV files to an Azure Blob Storage container with Microsoft Entra ID (OAuth), never a shared key or SAS token. Make the connection in Setup first (an External Credential with OAuth 2.0 client credentials or a browser flow for scope https://storage.azure.com/.default, and a Named Credential named BarnConn_azureblob with the URL https://ACCOUNT.blob.core.windows.net and principal OAuth), as the admin guide's Backup Destination section describes. Give the app the Storage Blob Data Contributor role on the container only. Replace barncrm-backups in the path with the container's name.",
+  "auth": { "kind": "OAuth" },
+  "baseUrl": "",
+  "backup": {
+    "method": "PUT",
+    "path": "/barncrm-backups/{file}",
+    "headers": [
+      { "name": "x-ms-blob-type", "value": "BlockBlob" },
+      { "name": "x-ms-version", "value": "2023-11-03" }
+    ]
+  }
+}

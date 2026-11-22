@@ -129,16 +129,38 @@ public with sharing class BulkDeleteController {
 
 	/**
 	 * Starts an archive (R-BD9): the records saved to Files, then deleted. `emptyConfirmedCount`
-	 * is the count typed again to empty the Recycle Bin too, or null.
+	 * is the count typed again to empty the Recycle Bin too, or null. `destination` is
+	 * `offPlatform` to send the file to the backup destination before deleting (R-SQ17).
 	 */
 	@AuraEnabled
-	public static JobView startArchive(String queryJson, Integer confirmedCount, Integer emptyConfirmedCount) {
+	public static JobView startArchive(
+		String queryJson,
+		Integer confirmedCount,
+		Integer emptyConfirmedCount,
+		String destination
+	) {
 		try {
 			requirePermission();
-			Import_Batch__c started = BulkDeleteService.startArchive(queryJson, confirmedCount, emptyConfirmedCount);
+			Import_Batch__c started = BulkDeleteService.startArchive(
+				queryJson,
+				confirmedCount,
+				emptyConfirmedCount,
+				destination
+			);
 			return toView(requireJob(started.Id), true);
 		} catch (Exception caught) {
 			throw ERRORS.wrap(caught, 'Start an archive');
+		}
+	}
+
+	/** Whether an archive may also be sent off platform, and a note when it may not (R-SQ17). */
+	@AuraEnabled
+	public static OffPlatformSendBatch.Status getArchiveDestination() {
+		try {
+			requirePermission();
+			return OffPlatformSendBatch.status();
+		} catch (Exception caught) {
+			throw ERRORS.wrap(caught, 'Read the archive destination');
 		}
 	}
 

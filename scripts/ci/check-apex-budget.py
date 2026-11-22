@@ -132,7 +132,10 @@ CAPS = {
     # Raised 2026-11-21 for SR-01 (D-219): SampleDataRemover, the one gated path that removes
     # sample data past sharing for every module, and OrgDate.dateOf (OD-15). Re-based to the
     # stripped size (AP-05): 1,837,129 measured, plus about 0.1%.
-    "core": 1_839_000,
+    # Raised 2026-11-21 for BK-10 (D-221): scheduled Backup Sets (BackupSetSchedule, the nightly
+    # step, runs kept) and the off-platform destination (the OffPlatformDestination seam,
+    # OffPlatformSendBatch, send and retry, send-before-delete for archives): 1,858,298 measured, plus about 0.1%.
+    "core": 1_860_000,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured
@@ -447,8 +450,11 @@ CAPS = {
     # merged together: 254,714 measured, plus about 2%. Raised 2026-11-20 for the batch Q
     # Connector review fixes (the Running claim model, step and heap guards, the template
     # check path and account, Where Used triggers, the import refusals): 267,980 measured,
-    # plus about 2%.
-    "connector": 252_600,
+    # plus about 2%. Raised 2026-11-21 for BK-10 and BK-10b (D-221): the backup destination
+    # (ConnectorBackupDestination, its controller methods, the template backup part) and storage
+    # services (AWS Signature Version 4 and Setup OAuth connections, {file} in headers, Google
+    # Drive multipart metadata): 265,061 measured stripped (AP-05), plus about 1%.
+    "connector": 267_700,
     # Mirror: the NPSP gifts migration kit's extension (MIG-05), 187,295 measured, then the
     # Nonprofit Cloud gifts kit's (MIG-04), 195,957 measured, then the Nonprofit Cloud
     # relationships kit's (MIG-02), about 200,500 combined, plus about 1%.

@@ -76,9 +76,13 @@ public with sharing class ConnectorConnectionsController {
 				? ConnectorConnections.checkedHeaderName(headerName)
 				: null;
 			String url = ConnectorConnections.checkedUrl(kind == ConnectorConnections.SECRET_URL ? secretUrl : baseUrl);
+			if (kind == ConnectorConnections.AWS) {
+				// Before anything is made: the address must name an AWS service and region.
+				ConnectorConnections.awsScope(url);
+			}
 			ConnectorOrg org = ConnectorConnections.store();
 			name = ConnectorConnections.newName();
-			org.createExternal(ConnectorConnections.externalInput(name, checkedLabel, kind));
+			org.createExternal(ConnectorConnections.externalInput(name, checkedLabel, kind, url));
 			externalMade = true;
 			ConnectApi.NamedCredentialInput named = ConnectorConnections.namedInput(name, checkedLabel, kind, header);
 			named.calloutUrl = url;
@@ -120,6 +124,7 @@ public with sharing class ConnectorConnectionsController {
 		try {
 			ConnectorConnections.requireWriter();
 			pair = ConnectorConnections.owned(name);
+			ConnectorConnections.refuseSetupMade(pair);
 			if (pair.principal == ConnectorConnections.SECRET_URL || pair.keyStored) {
 				throw new ConnectorConnections.ConnectorException(
 					BarnHelp.text('Connector', 'Connector_Error_NotOurs')
@@ -172,14 +177,15 @@ public with sharing class ConnectorConnectionsController {
 			);
 		}
 		ConnectApi.CredentialInput credential = ConnectorConnections.credentialInput(pair.name, pair.principal);
-		if (pair.principal == ConnectorConnections.BASIC) {
+		Boolean aws = pair.principal == ConnectorConnections.AWS;
+		if (pair.principal == ConnectorConnections.BASIC || aws) {
 			if (String.isBlank(userName)) {
 				throw new ConnectorConnections.ConnectorException(
 					BarnHelp.text('Connector', 'Connector_Error_UserRequired')
 				);
 			}
 			credential.credentials.put(
-				ConnectorConnections.USER_PARAMETER,
+				aws ? ConnectorConnections.AWS_KEY_ID_PARAMETER : ConnectorConnections.USER_PARAMETER,
 				ConnectorConnections.plainValue(userName.trim())
 			);
 		}
@@ -200,6 +206,7 @@ public with sharing class ConnectorConnectionsController {
 		try {
 			ConnectorConnections.requireWriter();
 			pair = ConnectorConnections.owned(name);
+			ConnectorConnections.refuseSetupMade(pair);
 			ConnectorOrg org = ConnectorConnections.store();
 			if (pair.principal == ConnectorConnections.SECRET_URL) {
 				String url = ConnectorConnections.checkedUrl(secret);
@@ -284,7 +291,8 @@ public with sharing class ConnectorConnectionsController {
 			ConnectorOrg.Pair pair = ConnectorConnections.owned(name);
 			if (!pair.calloutsEnabled) {
 				result.outcome = 'calloutsOff';
-			} else if (!ConnectorConnections.holdsAccessSet()) {
+			} else if (!ConnectorConnections.holdsAccessSet() || !ConnectorConnections.principalGranted(pair)) {
+				// A connection made in Setup (OAuth) is added to the Connections set here.
 				result.outcome = ConnectorConnections.grantAccess(pair.name) ? 'accessAdded' : 'accessMissing';
 			} else {
 				String path = ConnectorConnections.checkPathOf(pair.name);
@@ -315,6 +323,47 @@ public with sharing class ConnectorConnectionsController {
 		}
 		result.page = ConnectorConnections.page();
 		return result;
+	}
+
+	/** The Backup Destination part of the section (R-CN11). */
+	@AuraEnabled
+	public static ConnectorBackupDestination.Setup getBackupDestination() {
+		try {
+			return ConnectorBackupDestination.setup();
+		} catch (Exception failure) {
+			throw shown(failure, 'getBackupDestination');
+		}
+	}
+
+	/**
+	 * Makes the connection the backup destination (R-CN11); `headers` is `Name: value` lines and
+	 * `metadata` Google Drive's multipart JSON, or blank.
+	 */
+	@AuraEnabled
+	public static ConnectorBackupDestination.Setup saveBackupDestination(
+		String name,
+		String method,
+		String path,
+		String headers,
+		String metadata
+	) {
+		try {
+			ConnectorBackupDestination.save(name, method, path, headers, metadata);
+			return ConnectorBackupDestination.setup();
+		} catch (Exception failure) {
+			throw shown(failure, 'saveBackupDestination');
+		}
+	}
+
+	/** No connection is the backup destination any more (R-CN11). */
+	@AuraEnabled
+	public static ConnectorBackupDestination.Setup stopBackupDestination() {
+		try {
+			ConnectorBackupDestination.stop();
+			return ConnectorBackupDestination.setup();
+		} catch (Exception failure) {
+			throw shown(failure, 'stopBackupDestination');
+		}
 	}
 
 	/**

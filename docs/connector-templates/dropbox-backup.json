@@ -1,0 +1,19 @@
+{
+  "key": "dropbox-backup",
+  "label": "Dropbox Backup Folder",
+  "version": 1,
+  "description": "Sends Backup Set and archive CSV files to a Dropbox folder. Make the connection in Setup first (an Auth Provider for Dropbox, then an External Credential and a Named Credential named BarnConn_dropbox with the URL https://content.dropboxapi.com and principal OAuth), as the admin guide's Backup Destination section describes. Dropbox takes the file's path in the Dropbox-API-Arg header, where {file} is filled in for each file.",
+  "auth": { "kind": "OAuth" },
+  "baseUrl": "https://content.dropboxapi.com",
+  "backup": {
+    "method": "POST",
+    "path": "/2/files/upload",
+    "headers": [
+      {
+        "name": "Dropbox-API-Arg",
+        "value": "{\"path\":\"/BarnCRM-Backups/{file}\",\"mode\":\"overwrite\",\"mute\":true}"
+      },
+      { "name": "Content-Type", "value": "application/octet-stream" }
+    ]
+  }
+}

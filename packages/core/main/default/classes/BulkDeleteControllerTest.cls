@@ -218,7 +218,7 @@ private class BulkDeleteControllerTest {
 			String refusal = BarnHelp.text('Core', 'Core_BulkDelete_ErrorNoPermission');
 			List<String> messages = new List<String>();
 			try {
-				BulkDeleteController.startArchive(VOLUNTEERS, 2, null);
+				BulkDeleteController.startArchive(VOLUNTEERS, 2, null, null);
 			} catch (AuraHandledException expected) {
 				messages.add(expected.getMessage());
 			}
@@ -263,7 +263,7 @@ private class BulkDeleteControllerTest {
 			System.runAs(deleter()) {
 				Integer refused = 0;
 				try {
-					BulkDeleteController.startArchive(VOLUNTEERS, 2, 3);
+					BulkDeleteController.startArchive(VOLUNTEERS, 2, 3, null);
 				} catch (AuraHandledException expected) {
 					System.Assert.areEqual(
 						BarnHelp.text('Core', 'Core_Archive_ErrorEmptyConfirm'),
@@ -273,7 +273,7 @@ private class BulkDeleteControllerTest {
 					refused++;
 				}
 				try {
-					BulkDeleteController.startArchive(VOLUNTEERS, 1, null);
+					BulkDeleteController.startArchive(VOLUNTEERS, 1, null, null);
 				} catch (AuraHandledException expected) {
 					refused++;
 				}

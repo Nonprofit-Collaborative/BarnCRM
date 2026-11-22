@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Backup_Remove_Sent_Files__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description>Whether a Backup Set run's files are deleted from Files once every part was sent to the off-platform backup destination (canonical model R-SQ17). Shipped false: the Files copy is kept.</description>
+  <inlineHelpText>Delete a run's files from Files once every part reached your backup destination, so storage is not doubled.</inlineHelpText>
+  <label>Remove Files Copy After Sending</label>
+  <type>Checkbox</type>
+</CustomField>

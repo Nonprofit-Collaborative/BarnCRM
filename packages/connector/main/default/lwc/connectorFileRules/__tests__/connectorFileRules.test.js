@@ -4,10 +4,37 @@ import {
   lockedUrl,
   partOfKey,
   exportName,
+  headerLines,
   MAX_FILE
 } from 'c/connectorFileRules';
 
 const text = (value) => JSON.stringify(value);
+
+describe('backup destination templates (R-CN11)', () => {
+  const fs = require('fs');
+  const path = require('path');
+  const folder = path.join(__dirname, '../../../../../../../docs/connector-templates');
+
+  it('passes each example template in docs/connector-templates', () => {
+    const files = fs.readdirSync(folder).filter((name) => name.endsWith('.json'));
+    expect(files.length).toBeGreaterThan(0);
+    files.forEach((name) => {
+      expect(fileProblem(fs.readFileSync(path.join(folder, name), 'utf8'))).toBeNull();
+    });
+  });
+
+  it('refuses a backup part with a sign-in header', () => {
+    const file = { key: 'x', backup: { headers: [{ name: 'X-Api-Key', value: 'abc' }] } };
+    expect(fileProblem(text(file))).toEqual({ key: 'Connector_Import_ErrorSecret', detail: 'X-Api-Key' });
+  });
+
+  it('turns headers into Name: value lines', () => {
+    expect(headerLines([{ name: 'Overwrite', value: 'T' }, { name: 'X-Folder', value: 'crm' }, null])).toBe(
+      'Overwrite: T\nX-Folder: crm'
+    );
+    expect(headerLines(undefined)).toBe('');
+  });
+});
 
 describe('c/connectorFileRules (CN-08, R-CR13 to R-CR15)', () => {
   it('accepts a plain template or recipe file', () => {

@@ -1334,6 +1334,8 @@ Section 29E, R-BD2). Shown in the console's Import section.
 | `Bulk_Delete_Run_Limit__c` | integer | 10000 | The most records one bulk delete may delete (R-BD2). From 1 to 48,000; empty reads as 10,000, out of range as the nearest end. |
 | `Import_Row_Deletion__c` | picklist(Once_Complete, After_30_Days, After_90_Days, Never) | After_30_Days | Delete Import Rows: when the nightly Record Cleanup deletes the staged rows of a complete import (R-IR5, ADR-0149). Stored as text (ADR-0019); a blank or unknown value reads as After_30_Days. Replaces `Import_Row_Retention_Days__c` (a number of days, D-40), which is removed. |
 | `Bulk_Chunk_Size__c` | integer | 200 | Records each chunk of a bulk update or bulk delete handles (R-BU2, R-BD2). From 10 to 200; empty reads as 200, out of range as the nearest end. Stamped on the job when it starts. |
+| `Backup_Runs_Kept__c` | integer | 7 | Backup Runs Kept: how many runs of each scheduled Backup Set keep their files (R-SQ16, BK-10). From 1 to 365; empty reads as 7, out of range as the nearest end. A set run only on demand keeps every file. |
+| `Backup_Remove_Sent_Files__c` | boolean | false | Remove Files Copy After Sending: once every part of a Backup Set run reached the off-platform backup destination, the run's files are deleted from Files (R-SQ17). Off keeps them. |
 
 ### v0.8 keys
 
@@ -9028,12 +9030,53 @@ Manage BarnCRM Settings and Find and Export Records may see the Backup Sets pane
   query could not run, with Completed At, Row Count (rows written), File Id (the first part's
   document), File Name (its title) and a Run Log line naming the parts. A run that wrote exactly
   the limit says in its log that the set may hold more. The Q-04 notification opens the first
-  part. Nothing is deleted, by the run or later: the files are the person's.
+  part. No record is deleted; files are deleted only for a scheduled set's runs past the number
+  kept (R-SQ16).
 - **The run list.** The person's own Backup jobs, newest first (`DataJobs.read`); Data Jobs lists
   them too. A Backup job has no undo and is not listed as an import.
 - **Restore.** No code: the file is loaded with Load one object as Update by record ID (values of
   records that still exist) or Create (records since deleted, as new records), as R-BD9's file is.
-- **Schedule.** None until C-38 (D-39).
+- **Schedule.** R-SQ16.
+
+**R-SQ16 Scheduled Backup Sets** (BK-10, D-221; ADR-NEXT
+`NEXT-automatic-backups-and-off-platform-destination.md`). The `backup` key may hold `schedule`:
+`{ "frequency": "daily" }`, `{ "frequency": "weekly", "weekday" }` (1 Monday to 7 Sunday) or
+`{ "frequency": "monthly", "day" }` (1 to 28). No schedule, or `off`, means Run Now only. Only the
+owner sets it (`BackupSetService.setSchedule`); Find keeps the whole `backup` key on a save.
+
+- **The step.** Core's nightly step Backup Sets (`BackupSetSchedule`, key `BarnCRM Backup Sets`,
+  2:00 AM, own switch shipped on) reads every saved query in system mode without sharing and starts
+  each set due today, as the nightly run's user, who must hold Manage BarnCRM Settings and Find and
+  Export Records; otherwise nothing starts and a Warning is logged. A set that cannot start is
+  logged and the others still start. The run's log says which schedule started it.
+- **Parts kept on the job.** A Backup run's finish (and an archive's) records every part's
+  document in the definition as `documents`, in order.
+- **Runs kept.** When a run of a set with a schedule completes, that set's complete runs past the
+  newest `Backup_Runs_Kept__c` (Section 12) lose their files: the documents in `documents` (or,
+  for a run without the list, its first file and the files its runner owns titled as its other
+  parts) are deleted in system mode, File Id and File Name are cleared, and a log line says why.
+  A failure to delete is a Warning in the Error Log. A set run only on demand keeps every file.
+
+**R-SQ17 Off-platform destination** (BK-10, D-221; ADR-NEXT). Core's seam `OffPlatformDestination`
+(`key()`, `notReady()`, `send(fileName, body)`) is found through `ModuleExtensions`; the one with
+key `offPlatform` is the backup destination. Core names no module class. (AR-10's
+`ArchiveDestination`, an archive rule's whole-run destination, is a separate seam.)
+
+- **Choice.** The `backup` key may hold `"destination": "offPlatform"` (absent is Files only); an
+  archive's definition holds `archive.destination`. Choosing it is refused while no module
+  provides a destination; the panel and the archive then show a note instead of the choice.
+- **Sending.** The run still writes its parts to Files (archive and backup parts at most
+  3,000,000 characters). Its finish records `offPlatform: { state: "sending", sent: [], waiting:
+  [documents] }` and starts `OffPlatformSendBatch` (scope 1, callouts, without sharing): each
+  execute reads one part's latest version in system mode and calls `send` with its title plus
+  `.csv`. Its finish records `sent` and `waiting` and state `sent` or `waiting`, writes a Run Log
+  line, and logs every failure as an Error in the Error Log against the job.
+- **Retry.** The nightly Backup Sets step first starts sending again the waiting parts of up to
+  10 complete Backup runs whose files are kept, newest first.
+- **Files copy.** When every part was sent and `Backup_Remove_Sent_Files__c` is on, the parts are
+  deleted from Files and File Id and File Name are cleared.
+- **Archive.** With `offPlatform`, the delete starts only when every part was sent; otherwise the
+  job is Failed, nothing is deleted, and the file stays in Files.
 
 ### Salesforce implementation
 
@@ -19091,6 +19134,7 @@ is built in; app templates are imported files (D-216) that prefill this same sha
 | Key Stored | boolean | computed | Whether the principal holds a credential (Disconnect removes it). |
 | Access Granted | boolean | computed | Whether the principal is in the "BarnCRM Connections" permission set (R-CN7). |
 | Check Path | text | no | What follows the Base URL for Check Connection, such as `/ping`, from the template the connection was made from (R-CN9). Blank checks the Base URL. |
+| Backup Settings | JSON | no | How Backup Sets and archives send their files through this connection (R-CN11): `{ "method": "PUT" or "POST", "path": "/backups/{file}", "headers": [ { "name", "value" } ], "metadata": "<JSON object text, optional>" }`. Blank when it is not the backup destination; at most one connection has it. |
 
 ### Rules
 
@@ -19140,6 +19184,40 @@ Base URL when there is none, and when a 2xx answer names the account (`account_n
 **R-CN10 Integration user.** Choosing the integration user (R-CR4) needs the same permissions
 as writing a key (R-CN3), and refuses a user who is a System Administrator or holds Modify All
 Data or View All Data.
+**R-CN11 Backup destination** (BK-10, D-221; ADR-NEXT automatic backups). One connection at
+most is the backup destination: Core's `OffPlatformDestination` (R-SQ17), implemented by
+`ConnectorBackupDestination` and registered in the Connector catalog row. Saving it needs the
+key-writing permissions (R-CN3) and Connector Admin, gives the saver the Connections set (R-CN7)
+and clears the setting from every other row. Its Backup Settings hold the method (PUT or POST),
+a path that contains `{file}` once and otherwise follows R-CN9's path rules, and up to five
+headers, each a name a recipe may set (F1) that does not look like a sign-in header, with a value
+of at most 255 characters and no `{!`, CR or LF: nothing secret is stored there. Each file is
+one request to `callout:<connection>` plus the path, `{file}` replaced by the URL-encoded file
+name, the CSV as the body and `Content-Type: text/csv`, 120 seconds at most; any 2xx answer is
+success, anything else is a failure that names the status. The person who sends (the runner, or
+the nightly run's user for a scheduled set) needs the Connections set; until they hold it the
+destination says so. A template's optional `backup` part (method, path, headers) prefills it
+when the connection is created from the template; such a template may leave `baseUrl` blank, so
+the person types the storage's own address as on New Connection (an app template still locks
+its host, R-CR14).
+**R-CN12 Storage services** (BK-10b; ADR-NEXT automatic backups, decision 8). Besides the four
+kinds, New Connection makes **AWS Signature Version 4** (`AwsSigV4`): an External Credential with
+Salesforce's `AwsSv4` protocol, `AwsService` and `AwsRegion` read from a base URL host of the
+form `[bucket.]service.region.amazonaws.com` (any other host is refused before anything is
+made), a named principal `AwsSigV4` holding `awsAccessKeyId` plain and `awsSecretAccessKey`
+encrypted, and a Named Credential that generates the Authorization header with no formula
+header. BarnCRM also lists and uses an **OAuth** connection an admin made in Setup: External and
+Named Credential of one `BarnConn_` name, linked, with a named principal `OAuth`; it never writes
+that credential (the first key and Replace Key are refused), and Check Connection adds its
+principal to the Connections set when the set does not yet give it. Backup Settings may put
+`{file}` in a header value, written JSON-escaped with anything outside printable ASCII as
+`\uXXXX`, or in `metadata`, one JSON object of at most 1,000 characters with no `{!`, sent first
+in a `multipart/related` body with the file after it; `{file}` appears at least once across the
+path, headers and metadata and at most once in the path. A `Content-Type` header replaces
+`text/csv`. The path may end with `?` and `name=value` pairs joined by `&`, each name from
+`uploadType` and `supportsAllDrives`, each value letters, digits, `_` or `-` (1 to 40). A
+template whose auth kind is `OAuth` must carry a `backup` part and creates no connection: it
+fills the Backup Destination form, which then offers only OAuth connections.
 
 ### Salesforce implementation
 
@@ -19149,7 +19227,8 @@ Data or View All Data.
   principal's Id from `ConnectApi` is the setup entity of its principal access;
   `SetupEntityAccess` (principal access in `BarnCRM_Connections`), `PermissionSetAssignment`.
 - **Object:** `Connector_Connection__c` (Connector Connection), private, no tab, report or
-  search; Name (Text(80)) is the connection's developer name; `Check_Path__c` (Text(255)).
+  search; Name (Text(80)) is the connection's developer name; `Check_Path__c` (Text(255));
+  `Backup_JSON__c` (Long Text Area(4000)).
   Written and read by the module only, in system mode; granted by no permission set.
 - **Custom permission:** `Manage_BarnCRM_Connector`, granted only by `Connector_Admin`.
 - **Admin Journal:** Kind `Connection`, Status `Key Replaced` (Section 10A).
@@ -20052,6 +20131,10 @@ mirrors the primary member).
 | 1.82 | 2026-11-20 | BarnCRM Connector pre-batch review fixes (release 1.33). One object added, 199 to 200 in the suite: Connector Connection (`Connector_Connection__c`, `Check_Path__c`), which keeps a template's check path beside a connection (29CN1, new R-CN9: Check Connection asks for it and shows the account an answer names). New R-CN10: choosing the integration user needs the key-writing permissions and refuses an all-seeing user. R-CN8: Disconnect refuses a Secret URL. Connector Run's Status loses Rejected; Running marks runs claimed for the next runner job (R-RUN4). |
 | 1.83 | 2026-11-20 | R-CR6 the recipe clock: a claimed Running run counts as Queued for the clock, so the heartbeat keeps running while a lane has a Waiting run, a Queued run or a claimed Running run (batch Q gate fix). |
 | 1.84 | 2026-11-21 | Nine console apps (APP-01, D-220 to D-222, ADR-NEXT nine console apps, release 1.36). `BarnCRM_Settings__c` loses App_Navigation_Style__c (the standard-navigation apps are gone). `BarnCRM_Module__mdt` `App_Name__c` may name a host app another package ships, whose app then takes the module's tabs; Staff Tabs and Admin Tabs definitions follow. Records: Memberships and Corporate Hub name `BarnCRM_Members_Partners`, Scholarships `BarnCRM_Funders`, Giving `BarnCRM_Fundraising`; Forms, Portal and Connector name none; Forms splits into staff (Form Submissions) and admin (Forms Home, Forms) tabs; Corporate Hub lists its privacy tabs. No object added. |
+| 1.85 | 2026-11-21 | Scheduled Backup Sets (BK-10, D-221, release 1.36; ADR-NEXT `NEXT-automatic-backups-and-off-platform-destination.md`). Section 29D gains R-SQ16: the `backup` key's `schedule`, the nightly step Backup Sets, parts kept on the job as `documents`, and runs kept. Section 12 gains `Backup_Runs_Kept__c`. (Version number for the integrator to confirm at merge.) |
+| 1.86 | 2026-11-21 | Off-platform destination seam (BK-10, D-221, release 1.36; ADR-NEXT). Section 29D gains R-SQ17: Core's `OffPlatformDestination` seam, a set's and an archive's `destination`, `OffPlatformSendBatch`, retries and the Files copy. Section 12 gains `Backup_Remove_Sent_Files__c`. (Version number for the integrator to confirm at merge.) |
+| 1.87 | 2026-11-21 | Connector backup destination (BK-10, D-221, release 1.36; ADR-NEXT). Connector Connection gains `Backup_JSON__c` (29CN1, new R-CN11): one connection at most sends Backup Set and archive files by PUT or POST, with a `{file}` path and fixed headers that hold no secret; templates may prefill it. (Version number for the integrator to confirm at merge.) |
+| 1.88 | 2026-11-21 | Storage services for the backup destination (BK-10b, release 1.36; ADR-NEXT decision 8). New R-CN12: AWS Signature Version 4 connections, OAuth connections made in Setup, `{file}` in headers and Google Drive `metadata` in Backup Settings, and a short allowlist for a path's query. No object or field added. (Version number for the integrator to confirm at merge.) |
 
 ---
 ## 32. Entity ownership by package

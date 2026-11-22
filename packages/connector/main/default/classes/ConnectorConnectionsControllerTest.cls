@@ -66,7 +66,10 @@ private class ConnectorConnectionsControllerTest {
 			granted.get(permissionSetId).add(principalId);
 		}
 
+		ConnectApi.ExternalCredentialInput lastExternal;
+
 		public override void createExternal(ConnectApi.ExternalCredentialInput input) {
+			lastExternal = input;
 			kinds.put(input.developerName, input.principals[0].principalName);
 		}
 
@@ -198,6 +201,95 @@ private class ConnectorConnectionsControllerTest {
 			Assert.areEqual(1, apiKey.page.connections.size(), 'The first result lists the first connection');
 			Assert.areEqual(0, Limits.getQueueableJobs(), 'No credential write is queued (F3)');
 			Assert.areEqual(0, Limits.getFutureCalls(), 'No credential write is deferred (F3)');
+		}
+	}
+
+	@IsTest
+	static void anAwsConnectionIsSignedBySalesforceWithItsSecretEncrypted() {
+		System.runAs(dana()) {
+			FakeOrg fake = useFake();
+			String refused;
+			try {
+				ConnectorConnectionsController.createConnection(
+					'Backups',
+					ConnectorConnections.AWS,
+					'https://files.example.org',
+					null,
+					null
+				);
+			} catch (AuraHandledException e) {
+				refused = refusal(e);
+			}
+			Assert.areEqual(BarnHelp.text('Connector', 'Connector_Error_AwsUrl'), refused, 'Only an AWS address');
+			Assert.isNull(fake.lastExternal, 'Refused before anything is made');
+
+			ConnectorConnectionsController.Result made = ConnectorConnectionsController.createConnection(
+				'Backups',
+				ConnectorConnections.AWS,
+				'https://barn-backups.s3.us-east-2.amazonaws.com',
+				null,
+				null
+			);
+			ConnectorConnectionsController.saveFirstKey(made.name, 'AKIAEXAMPLEKEYID', KEY);
+
+			ConnectApi.ExternalCredentialInput external = fake.lastExternal;
+			Assert.areEqual(ConnectApi.CredentialAuthenticationProtocol.AwsSv4, external.authenticationProtocol);
+			Assert.areEqual('AwsService', external.parameters[0].parameterName);
+			Assert.areEqual('s3', external.parameters[0].parameterValue, 'The service from the host');
+			Assert.areEqual('AwsRegion', external.parameters[1].parameterName);
+			Assert.areEqual('us-east-2', external.parameters[1].parameterValue, 'The region from the host');
+			Assert.areEqual('AuthParameter', String.valueOf(external.parameters[0].parameterType));
+			ConnectApi.NamedCredentialInput named = fake.named[0];
+			Assert.isTrue(named.calloutOptions.generateAuthorizationHeader, 'Salesforce writes the signed header');
+			Assert.isFalse(named.calloutOptions.allowMergeFieldsInHeader, 'No formula');
+			Assert.isTrue(named.customHeaders.isEmpty(), 'No header holds a formula');
+			ConnectApi.CredentialInput credential = fake.credentials[0];
+			Assert.areEqual(ConnectApi.CredentialAuthenticationProtocol.AwsSv4, credential.authenticationProtocol);
+			Assert.isFalse(credential.credentials.get('awsAccessKeyId').encrypted, 'The key ID is not a secret');
+			Assert.isTrue(credential.credentials.get('awsSecretAccessKey').encrypted, 'The secret is encrypted (F6)');
+			Assert.areEqual(
+				new List<String>{ 's3', 'us-east-1' },
+				ConnectorConnections.awsScope('https://s3.us-east-1.amazonaws.com'),
+				'A path-style address works too'
+			);
+		}
+	}
+
+	@IsTest
+	static void anOAuthConnectionMadeInSetupIsUsedButNeverGivenAKey() {
+		System.runAs(dana()) {
+			FakeOrg fake = useFake();
+			ConnectorOrg.Pair pair = fake.add(
+				'BarnConn_dropbox',
+				ConnectorConnections.OAUTH,
+				'https://content.dropboxapi.com',
+				true,
+				true
+			);
+			Assert.areEqual(
+				ConnectorConnections.OAUTH,
+				ConnectorConnectionsController.getConnections().connections[0].authKind
+			);
+			String setupMade = BarnHelp.text('Connector', 'Connector_Error_SetupMade');
+			for (Integer attempt = 0; attempt < 2; attempt++) {
+				try {
+					if (attempt == 0) {
+						ConnectorConnectionsController.replaceKey(pair.name, null, KEY);
+					} else {
+						ConnectorConnectionsController.saveFirstKey(pair.name, null, KEY);
+					}
+					Assert.fail('A key is never written');
+				} catch (AuraHandledException e) {
+					Assert.areEqual(setupMade, refusal(e), 'Sign in again from Setup');
+				}
+			}
+			Assert.isTrue(fake.credentials.isEmpty(), 'Nothing written');
+			Assert.areEqual(
+				'accessAdded',
+				ConnectorConnectionsController.checkConnection(pair.name).outcome,
+				'Its principal is added to the Connections set'
+			);
+			Assert.isTrue(ConnectorConnections.principalGranted(pair), 'Granted');
 		}
 	}
 

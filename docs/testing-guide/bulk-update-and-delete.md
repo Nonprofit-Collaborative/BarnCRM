@@ -313,3 +313,37 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | 7 | Choose **Contact tidy** and press **Apply Map**. | A confirmation says the map replaces the changes already chosen. **Cancel** keeps the **Description** row as it was. |
 
 **Cleanup:** delete the Maptest contacts and the **Contact tidy** map.
+
+## T-BULK-19: Scheduled Backup Sets
+
+**Purpose:** confirm a Backup Set's schedule is saved and kept, the nightly Backup Sets step starts only the sets due, and a scheduled set keeps only its newest runs' files.
+**Prerequisites:** T-BULK-17's admin, contacts and saved query `Baktest people` added to Backup Sets; the nightly jobs scheduled (BarnCRM Settings, General, Nightly Jobs). A second saved query `Baktest other` added to Backup Sets. In BarnCRM Settings, Import, **Backup Runs Kept** set to 2.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open Backup Sets. | Each set shows "Not scheduled". **Edit Schedule** shows beside your own sets only. |
+| 2 | Press **Edit Schedule** beside `Baktest people`, choose **Weekly**, then today's day of the week, and **Save Schedule**. | "Schedule saved."; the set shows "Weekly on" today's day. A note says scheduled sets run at 2:00 AM and keep the files of their newest 2 runs. |
+| 3 | Give `Baktest other` **Weekly** on tomorrow's day of the week. In Find, open `Baktest people`, change a column and **Save**. Reopen Backup Sets. | `Baktest people` still shows its weekly schedule. |
+| 4 | In BarnCRM Settings, General, Nightly Jobs, press **Run Now** on **Backup Sets** if offered, or wait for the next night's run. | One new run of `Baktest people` only; its log says "Started by its weekly schedule." `Baktest other` did not run. |
+| 5 | Press **Run Now** on `Baktest people` twice, waiting for each to complete. | After the second, **Recent Runs** shows the oldest of the three runs with no file, and its log (Data Jobs) ends "Files removed: a scheduled set keeps the files of its newest 2 runs." Its file is gone from Files; the two newest files remain. |
+| 6 | Turn the nightly jobs' **Backup Sets** step off. Reopen Backup Sets. | A warning says the nightly jobs are not scheduled or their Backup Sets step is off. Turn the step back on. |
+| 7 | **Edit Schedule** on `Baktest people`, choose **Not scheduled**, **Save Schedule**, then **Run Now** twice. | Every run keeps its file: a set run only on demand keeps every file. |
+
+**Cleanup:** delete the runs' files and `Baktest other`; set **Backup Runs Kept** back to 7; then T-BULK-17's cleanup.
+
+## T-BULK-20: Off-Platform Backups and Archives
+
+**Purpose:** confirm the backup destination is offered only with a destination installed, a run's files are sent and kept or removed as set, a refused file waits and is sent again, and an archive deletes only after its file was accepted.
+**Prerequisites:** T-BULK-17's admin and `Baktest people` Backup Set. For steps 2 to 7: BarnCRM Connector with a connection set as the **Backup Destination** to a test HTTPS endpoint you can watch (T-CN-35 in the Connector testing guide sets one up), and BarnCRM Connections given to the admin and the nightly jobs' user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Without BarnCRM Connector installed, open Backup Sets and press **Edit Schedule**. Open Find, archive any query (Data Manager, **Archive by Query**) up to **Preview**. | No **Save To** choice; a note says to install BarnCRM Connector and set up a backup destination. The archive panel shows the same note and no send option. |
+| 2 | With the Connector set up, **Edit Schedule** on `Baktest people`, choose **Daily** and **Files and backup destination**, **Save Schedule**, then **Run Now**. | **Recent Runs** shows "Sending to backup destination", then "Sent to backup destination". The endpoint received one CSV file per part, named as in Files. The files are still in Files. |
+| 3 | In BarnCRM Settings, Import, turn on **Remove Files Copy After Sending**. **Run Now** again. | Once sent, the run's file link is gone and its log says the files were removed from Files. |
+| 4 | Make the endpoint refuse uploads (or point the connection's path at a place it refuses). **Run Now**. | The run shows "Not all sent: the next scheduled run tries again"; the Error Log has an Error naming the file and the endpoint's answer; the file stays in Files even with step 3's setting on. |
+| 5 | Let the endpoint accept uploads again. In BarnCRM Settings, General, Nightly Jobs, **Run Now** on **Backup Sets**. | The waiting run becomes "Sent to backup destination". |
+| 6 | Archive three test contacts with **Send the file to your backup destination before deleting** ticked while the endpoint refuses uploads. | The job ends **Failed**; its log says the file was not sent so nothing was deleted; the three contacts remain; the file is in Files. |
+| 7 | Repeat step 6 with the endpoint accepting uploads. | The log says the files were sent, then the delete runs and the three contacts are deleted. |
+
+**Cleanup:** turn **Remove Files Copy After Sending** off; set `Baktest people` back to **Not scheduled** and **Files**; delete the endpoint's test files and the runs' files; then T-BULK-17's cleanup.

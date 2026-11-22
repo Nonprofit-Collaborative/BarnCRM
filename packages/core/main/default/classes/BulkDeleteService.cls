@@ -43,6 +43,8 @@ public with sharing class BulkDeleteService {
 		public Datetime notChangedAfter;
 		/** An archive (R-BD9) whose deleted records are emptied from the Recycle Bin. */
 		public Boolean emptyRecycleBin = false;
+		/** An archive (R-SQ17): `offPlatform` sends the file before the delete; else Files only. */
+		public String destination;
 
 		/**
 		 * What a job keeps (R-BD1, R-BD7, R-BD9): the query document, or the object a file
@@ -64,7 +66,8 @@ public with sharing class BulkDeleteService {
 					'archive',
 					new Map<String, Object>{
 						'notChangedAfter' => notChangedAfter,
-						'emptyRecycleBin' => emptyRecycleBin
+						'emptyRecycleBin' => emptyRecycleBin,
+						'destination' => destination
 					}
 				);
 			}
@@ -204,6 +207,7 @@ public with sharing class BulkDeleteService {
 				Datetime.class
 			);
 			result.emptyRecycleBin = archive.get('emptyRecycleBin') == true;
+			result.destination = (String) archive.get('destination');
 		}
 		return result;
 	}
@@ -383,7 +387,25 @@ public with sharing class BulkDeleteService {
 	 * for the Recycle Bin to be emptied too; null leaves it.
 	 */
 	public static Import_Batch__c startArchive(String queryJson, Integer confirmedCount, Integer emptyConfirmedCount) {
+		return startArchive(queryJson, confirmedCount, emptyConfirmedCount, null);
+	}
+
+	/**
+	 * The same, with where the file goes (R-SQ17): `offPlatform` sends it to the backup
+	 * destination and deletes only once every part was sent; anything else is Files only.
+	 */
+	public static Import_Batch__c startArchive(
+		String queryJson,
+		Integer confirmedCount,
+		Integer emptyConfirmedCount,
+		String destination
+	) {
+		Boolean offPlatform = destination == OffPlatformSendBatch.OFF_PLATFORM;
+		if (offPlatform && OffPlatformSendBatch.destination() == null) {
+			throw new BulkDeleteException(BarnHelp.text('Core', 'Core_OffPlatform_NotInstalled'));
+		}
 		Plan checked = plan(queryJson);
+		checked.destination = offPlatform ? OffPlatformSendBatch.OFF_PLATFORM : null;
 		if (emptyConfirmedCount != null && emptyConfirmedCount != confirmedCount) {
 			throw new BulkDeleteException(BarnHelp.text('Core', 'Core_Archive_ErrorEmptyConfirm'));
 		}
@@ -413,6 +435,20 @@ public with sharing class BulkDeleteService {
 	 * marks the job Failed with nothing deleted. Never throws.
 	 */
 	public static void afterArchiveExport(Id jobId, Boolean exportFailed, Integer rows, String file) {
+		afterArchiveExport(jobId, exportFailed, rows, file, null);
+	}
+
+	/**
+	 * The same, with the file's parts: an archive whose destination is `offPlatform` sends them
+	 * first, and its delete starts from `afterArchiveSent` (R-SQ17).
+	 */
+	public static void afterArchiveExport(
+		Id jobId,
+		Boolean exportFailed,
+		Integer rows,
+		String file,
+		List<Id> documentIds
+	) {
 		List<Import_Batch__c> found = [
 			SELECT Id, Operation_JSON__c, Run_Log__c, Chunk_Size__c
 			FROM Import_Batch__c
@@ -439,6 +475,17 @@ public with sharing class BulkDeleteService {
 						new List<Object>{ rows.format(), file }
 					);
 				job.Row_Count__c = count;
+				if (checked.destination == OffPlatformSendBatch.OFF_PLATFORM && documentIds != null) {
+					Map<String, Object> definition = (Map<String, Object>) JSON.deserializeUntyped(
+						job.Operation_JSON__c
+					);
+					definition.put('documents', documentIds);
+					job.Operation_JSON__c = JSON.serialize(definition);
+					job.Run_Log__c += '\n' + BarnHelp.text('Core', 'Core_OffPlatform_LogSending');
+					Database.update(job, AccessLevel.SYSTEM_MODE);
+					OffPlatformSendBatch.start(job.Id, documentIds, true);
+					return;
+				}
 				Database.update(job, AccessLevel.SYSTEM_MODE);
 				DataJobs.launch(new BulkDeleteBatch(job.Id), job);
 				return;
@@ -455,6 +502,51 @@ public with sharing class BulkDeleteService {
 				Status__c = ImportBatchService.STATUS_FAILED,
 				Completed_At__c = Datetime.now(),
 				Run_Log__c = (job.Run_Log__c + '\n' + failure).right(32768)
+			),
+			AccessLevel.SYSTEM_MODE
+		);
+	}
+
+	/**
+	 * Called when sending an off-platform archive's parts ends (R-SQ17): with every part sent,
+	 * the delete starts; otherwise the job is Failed, nothing is deleted and the file stays in
+	 * Files. Never throws.
+	 */
+	public static void afterArchiveSent(Id jobId, List<Id> sent, List<Id> waiting, List<String> failures) {
+		Import_Batch__c job;
+		try {
+			job = [
+				SELECT Id, Operation_JSON__c, Run_Log__c, Chunk_Size__c
+				FROM Import_Batch__c
+				WHERE Id = :jobId
+				WITH SYSTEM_MODE
+				LIMIT 1
+			];
+			if (waiting.isEmpty()) {
+				job.Run_Log__c += '\n' + BarnHelp.text('Core', 'Core_OffPlatform_LogSent', new List<Object>{ sent.size() });
+				Database.update(job, AccessLevel.SYSTEM_MODE);
+				DataJobs.launch(new BulkDeleteBatch(job.Id), job);
+				return;
+			}
+		} catch (Exception e) {
+			ErrorLogger.log(e, 'BulkDeleteService.afterArchiveSent', jobId);
+			if (job == null) {
+				return;
+			}
+		}
+		Database.update(
+			new Import_Batch__c(
+				Id = jobId,
+				Status__c = ImportBatchService.STATUS_FAILED,
+				Completed_At__c = Datetime.now(),
+				Run_Log__c = (job.Run_Log__c +
+					'\n' +
+					BarnHelp.text(
+						'Core',
+						'Core_OffPlatform_LogArchiveNotSent',
+						new List<Object>{ failures.isEmpty() ? '' : failures[0] }
+					))
+					.right(32768)
 			),
 			AccessLevel.SYSTEM_MODE
 		);
