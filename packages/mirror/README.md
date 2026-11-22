@@ -33,15 +33,16 @@ required"). Offered in both editions.
   requests hourly`, at 15 minutes past each hour): a `LIMIT 1` guard first, so an hour with no
   open request or Case makes no callout and no Error Log entry. The nightly step
   (`MirrorNightlyJobProvider`, 01:40) keeps it scheduled, shows whether it is, and its switch
-  stops it. Off until `Mirror_Settings__c.Case_Requests_Enabled__c`. Permission set:
+  stops it. Off until the `Mirror_Case_Requests` setting is on. Permission set:
   `Provider_Requests` (read on the tab), an Access Add-On row. See
   `docs/admin-guide/mirror-case-requests.md` and canonical model Section 29C2.
 - **Nonprofit Cloud households and relationships (X-09, MIG-02b).** `NpcHouseholdSource` (the
   conversion's source and the drift finding in `MirrorHealthCheckExtension`) and
   `NpcRelationsKit`, with the `NPC_Households` and `NPC_Relations` migration kits and their two
   import templates. See `docs/admin-guide/nonprofit-cloud-households.md`.
-- **Settings.** `Mirror_Settings__c` holds the Case request settings only. The gift mirror
-  settings are fields of Fundraising's `Giving_Settings__c`.
+- **Settings.** The Case request settings are the `Mirror_Settings__c` group in the settings
+  store (`Setting_Module.Mirror`, prefix `Mirror`; read with `ModuleSettings`). The gift mirror
+  settings are in Fundraising's `Giving_Settings__c` group.
 - `MirrorPostInstall` marks the module's setup as run.
 
 ## How to test it alone

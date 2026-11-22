@@ -8915,7 +8915,7 @@ Case is never named at compile time or given a field: the link is the Case Id he
 | Last Synced | `Synced__c` | Date/Time |
 | Last Error | `Error__c` | Text(255) |
 
-- **Settings:** on `Mirror_Settings__c`, `Case_Requests_Enabled__c` (Checkbox, default false, Setting Definition `Mirror_Case_Requests`) and `Case_Requests_Type__c` (Text(80), default Service Provider, `Mirror_Case_Requests_Type`).
+- **Settings:** the settings group `Mirror_Settings__c` in the store (`Setting_Module.Mirror`, state prefix `Mirror`, no state fields; R-SV4), `Case_Requests_Enabled__c` (Checkbox, default false, Setting Definition `Mirror_Case_Requests`) and `Case_Requests_Type__c` (Text(80), default Service Provider, `Mirror_Case_Requests_Type`). The legacy `Mirror_Settings__c` custom setting is read only until carry-over.
 - **Access:** read through Mirror's `Provider_Requests` permission set (an Access Add-On row; N-09 moved it out of Salesforce Records Sync, which is Fundraising's); the Provider Requests tab in Mirror's Admin_Tabs.
 
 ---
@@ -17317,21 +17317,30 @@ The Payments module's org-wide choices, edited in the Payments section of BarnCR
 | PayPal Connected | checkbox | no (defaults off) | The same for PayPal's sign-in through `Barn_PayPal_Live` or `Barn_PayPal_Sandbox`. |
 | PayPal Webhook Id | text | for PayPal | The id PayPal gives the webhook, used to verify events. Not a secret; entered on the Payments Setup page. |
 | PayPal Product Id | text | no | The PayPal catalog product every PayPal subscription plan belongs to, made at the first PayPal subscription checkout and written by Payments only (R-PAY7). Not a secret, and not shown on the setup page. |
-| Webhook Token | text | no | The random token (64 hexadecimal characters) a processor's post must carry as `token=` in its address, or the receiver stores nothing. Made by BarnCRM the first time Payments Setup is opened, replaced by Regenerate Token. Not a provider secret (R-PK1). |
+| Webhook Token Hash | text | no | The SHA-256 hash (hexadecimal) of the random token (64 hexadecimal characters) a processor's post must carry as `token=` in its address, or the receiver stores nothing. The token itself is never kept: Generate Token or Regenerate Token on Payments Setup makes it and shows it once, in the addresses. Not a provider secret (R-PK1). |
 | Webhook Cap Hit At | datetime | no | When the receiver last refused an event at the hourly cap; written at most once an hour, with one Warning in the Error Log, and read by Health Check. Written by Payments only. |
+
+The first four are settings, in the settings store (R-SV4). The rest are run state (`SettingsState`
+rows `Payments.<Name>`, written synchronously in system mode by Payments only), never settings.
 
 ### Rules
 
 **R-PK1 No secret is stored here.** The processors' secrets (Stripe secret key, PayPal client id
 and secret) are External Credential principal parameters (`Barn_Stripe`, `Barn_PayPal`), entered
 by an administrator in Setup and merged into callouts by Salesforce; Apex never reads them. Stripe
-needs no signing secret (R-PEV2). The four fields above it are written by Payments' Apex only and
-no Setting Definition shows them. A processor is ready when it is connected (and, for PayPal, its
+needs no signing secret (R-PEV2). The run state above is written by Payments' Apex only and no
+Setting Definition shows it. A processor is ready when it is connected (and, for PayPal, its
 webhook id is entered).
 
 ### Salesforce implementation
 
-- **Object:** `Payments_Settings__c`, hierarchy custom setting, visibility Protected.
+- **Store:** the settings group `Payments_Settings__c` (`Setting_Module.Payments`, state prefix
+  `Payments`; state fields `Stripe_Connected__c`, `PayPal_Connected__c`, `PayPal_Webhook_Id__c`,
+  `PayPal_Product_Id__c`, `Webhook_Cap_Hit_At__c`, plus the state row
+  `Payments.Webhook_Token_Hash`). Until carry-over the legacy object below is read; the install
+  keeps the hash of a legacy `Webhook_Token__c` so its addresses keep working. The legacy object
+  is removed in the destructive deploy.
+- **Legacy object:** `Payments_Settings__c`, hierarchy custom setting, visibility Protected.
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -20144,6 +20153,7 @@ mirrors the primary member).
 | 1.83 | 2026-11-20 | R-CR6 the recipe clock: a claimed Running run counts as Queued for the clock, so the heartbeat keeps running while a lane has a Waiting run, a Queued run or a claimed Running run (batch Q gate fix). |
 | 1.84 | 2026-11-21 | Settings as custom metadata, phase 1 Core (SET-01, D-219, ADR-NEXT settings as custom metadata). New custom metadata type `Setting_Value__mdt` with `Value__c` (Section 13, R-SV1 to R-SV3; not counted as an object). `Setting_Definition__mdt` gains `Default_Value__c` and the Hidden data type. `Nightly_Job__c` gains `Kind__c` and `Value__c` (state and What's New rows). `BarnCRM_Automation_Control__c` gains `Paused_Until__c`. New `Account.Is_Organization_Account__c`, a kept checkbox that replaces the `Is_Organization__c` formula everywhere it was read (Section 8; the platform refuses a formula-to-checkbox change, and the formula is removed in phase 2). `BarnCRM_Settings__c` and `Whats_New_Seen__c` are read only until carry-over and are removed in phase 2; no object count change in phase 1. |
 | 1.85 | 2026-11-21 | Settings as custom metadata, phase 2 Core prerequisite (SET-02, D-219). New custom metadata type `Setting_Module__mdt` with `Settings_Object__c`, `Key_Prefix__c` and `State_Fields__c` (Section 13; not counted as an object): a module registers its settings group, its State row prefix and its legacy state fields. New rule R-SV4 (module settings read and saved through the store by name or by group and key); R-SV3 carry-over covers every registered module; module State rows are `Prefix.Name` and a run lock is a State row read `FOR UPDATE` (Section 29 Nightly Jobs). No object count change. |
+| 1.86 | 2026-11-21 | Settings as custom metadata, phase 2 Mirror and Payments (SET-03, D-219). `Setting_Module.Mirror` and `Setting_Module.Payments` register both groups; their rows ship `Default_Value__c`. Payments' connection values, PayPal ids and cap time become State rows `Payments.<Name>` (29PAY3); the receiver token is no longer kept, only its SHA-256 hash (`Payments.Webhook_Token_Hash`), shown once on Generate Token or Regenerate Token. Legacy objects stay until the destructive deploy. No object count change. |
 
 ---
 ## 32. Entity ownership by package

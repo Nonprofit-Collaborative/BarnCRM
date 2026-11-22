@@ -8,6 +8,9 @@
  * 1. Queue the job that gives the installer Payments Admin (a permission set assignment is a
  *    setup object write).
  * 2. Give the Payments sets to BarnCRM's roles (`ModuleAccessSyncs`), queued for the same reason.
+ * 3. In an upgraded org whose legacy settings hold a receiver token, keep that token's hash as run
+ *    state, so the addresses already given to a processor keep working once settings are carried
+ *    over (`PaymentService.keepLegacyTokenHash`). Saves no setting.
  *
  * Nothing is scheduled and no key is shipped: processing is scheduled from Health Check, the
  * secrets are entered on the processor's External Credential in Setup and Check Connection on
@@ -35,5 +38,10 @@ public with sharing class PaymentsPostInstall implements InstallHandler, ModuleS
 	public void runSetup(Id installerId) {
 		ModuleSetups.markRan(MODULE_KEY);
 		ModuleAccessSyncs.setUp(MODULE_KEY, installerId);
+		try {
+			PaymentService.keepLegacyTokenHash();
+		} catch (Exception failed) {
+			ErrorLogger.log(failed, 'PaymentsPostInstall.keepLegacyTokenHash');
+		}
 	}
 }

@@ -33,6 +33,15 @@
                 </template>
                 <template lwc:else>
                     <p class="slds-var-m-bottom_small">{labels.addresses}</p>
+                    <template lwc:if={tokenShown}>
+                        <c-barn-notice class="slds-var-m-bottom_small" variant="warning" message={labels.tokenShown} data-id="token-shown"></c-barn-notice>
+                    </template>
+                    <template lwc:elseif={hasToken}>
+                        <p class="slds-var-m-bottom_small slds-text-body_small" data-id="token-kept">{labels.tokenKept}</p>
+                    </template>
+                    <template lwc:else>
+                        <c-barn-notice class="slds-var-m-bottom_small" variant="warning" message={labels.noToken} data-id="no-token"></c-barn-notice>
+                    </template>
                     <ul class="slds-var-m-bottom_medium" data-id="receivers">
                         <template for:each={receivers} for:item="receiver">
                             <li key={receiver.site} class="slds-var-m-bottom_small">
@@ -44,7 +53,7 @@
                     </ul>
                     <lightning-button
                         class="slds-var-m-bottom_medium"
-                        label={labels.regenerate}
+                        label={tokenButtonLabel}
                         disabled={locked}
                         data-id="regenerate"
                         onclick={handleRegenerate}

@@ -111,8 +111,7 @@ public with sharing class CaseProviderRequests implements Queueable, Database.Al
 
 	/** Send Cases to a service provider, off at install, and an org with Case. */
 	public static Boolean isOn() {
-		Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
-		return settings != null && settings.Case_Requests_Enabled__c == true && caseType() != null;
+		return ModuleSettings.flag('Mirror_Case_Requests') && caseType() != null;
 	}
 
 	/**
@@ -472,8 +471,8 @@ public with sharing class CaseProviderRequests implements Queueable, Database.Al
 
 	/** The Case Type the hourly check sends, default Service Provider. */
 	private static String chosenType() {
-		Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
-		return String.isBlank(settings?.Case_Requests_Type__c) ? 'Service Provider' : settings.Case_Requests_Type__c;
+		String chosen = ModuleSettings.text('Mirror_Case_Requests_Type');
+		return chosen == null ? 'Service Provider' : chosen;
 	}
 
 	@TestVisible

@@ -11,4 +11,5 @@
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">10</value></values>
     <values><field>Description__c</field><value xsi:type="xsd:string">The processor a payment goes through when the module taking it does not choose one. Enter its keys on Payments Setup. Default Stripe.</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">payments.md</value></values>
+    <values><field>Default_Value__c</field><value xsi:type="xsd:string">"Stripe"</value></values>
 </CustomMetadata>

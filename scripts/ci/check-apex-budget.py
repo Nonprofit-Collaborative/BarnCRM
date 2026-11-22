@@ -328,7 +328,11 @@ CAPS = {
     # Pre-batch review M1: the receiver's address token (made, compared in constant time,
     # regenerated), the hourly cap Warning and its Health Check finding, 75,619 measured
     # 2026-11-19; raised by 800.
-    "payments": 75_700,
+    # SET-03 (D-219, ADR-NEXT settings as custom metadata): settings read from the store, the
+    # org's connection values as run state, and the receiver token kept only as a SHA-256 hash
+    # (shown once, an upgraded org's legacy token hashed at install), 77,170 measured
+    # 2026-11-21, plus about 1%.
+    "payments": 78_000,
     # LWC Builder (LB-01 to LB-06, ADR-0203 lwc builder module): the builder and renderer
     # controller, the App Builder picklist, access sync and post-install, 17,322 measured, plus
     # about 2%. LB-07 (D-196) charts by two groupings and three totals: 19,741 measured, plus

@@ -69,6 +69,18 @@ export default class PaymentsSetup extends LightningElement {
     },
     get regenerate() {
       return helpText('Payments', 'Payments_Setup_RegenerateToken');
+    },
+    get generate() {
+      return helpText('Payments', 'Payments_Setup_GenerateToken');
+    },
+    get noToken() {
+      return helpText('Payments', 'Payments_Setup_NoToken');
+    },
+    get tokenShown() {
+      return helpText('Payments', 'Payments_Setup_TokenShown');
+    },
+    get tokenKept() {
+      return helpText('Payments', 'Payments_Setup_TokenKept');
     }
   };
 
@@ -180,6 +192,19 @@ export default class PaymentsSetup extends LightningElement {
     return this.setup.scheduled === true;
   }
 
+  /** The token just made, shown this once in the addresses (only its hash is kept). */
+  get tokenShown() {
+    return Boolean(this.setup.token);
+  }
+
+  get hasToken() {
+    return this.setup.hasToken === true;
+  }
+
+  get tokenButtonLabel() {
+    return this.hasToken ? this.labels.regenerate : this.labels.generate;
+  }
+
   handleType(event) {
     this.typed = { ...this.typed, [event.target.dataset.name]: event.target.value };
     this.notice = undefined;
@@ -194,8 +219,11 @@ export default class PaymentsSetup extends LightningElement {
     return this.run(() => scheduleProcessing());
   }
 
-  /** Replacing the token breaks the addresses already given, so it asks first. */
+  /** Replacing a token breaks the addresses already given, so it asks first; a first one does not. */
   async handleRegenerate() {
+    if (!this.hasToken) {
+      return this.run(() => regenerateToken());
+    }
     const confirmed = await BarnConfirmModal.open({
       size: 'small',
       label: helpText('Payments', 'Payments_Setup_RegenerateTitle'),

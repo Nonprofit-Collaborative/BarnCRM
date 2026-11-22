@@ -194,8 +194,33 @@ describe('c-payments-setup', () => {
     expect(find(element, 'schedule')).toBeNull();
   });
 
-  it('regenerates the token only after the admin confirms', async () => {
+  it('generates a first token without asking and shows it once', async () => {
     const element = await render(SETUP);
+    expect(find(element, 'no-token')).not.toBeNull();
+    expect(find(element, 'regenerate').label).toBe('c.Payments_Setup_GenerateToken');
+    regenerateToken.mockResolvedValue({
+      ...SETUP,
+      hasToken: true,
+      token: 'a1',
+      receivers: [{ ...SETUP.receivers[0], stripeUrl: 'https://new/stripe?token=a1' }]
+    });
+    find(element, 'regenerate').click();
+    await flush();
+    expect(BarnConfirmModal.open).not.toHaveBeenCalled();
+    expect(find(element, 'token-shown')).not.toBeNull();
+    expect(inputs(element, 'receivers')[0].value).toContain('token=a1');
+    expect(find(element, 'regenerate').label).toBe('c.Payments_Setup_RegenerateToken');
+  });
+
+  it('says the token is kept only as a fingerprint once it has been shown', async () => {
+    const element = await render({ ...SETUP, hasToken: true });
+    expect(find(element, 'token-kept')).not.toBeNull();
+    expect(find(element, 'token-shown')).toBeNull();
+    expect(find(element, 'no-token')).toBeNull();
+  });
+
+  it('regenerates the token only after the admin confirms', async () => {
+    const element = await render({ ...SETUP, hasToken: true });
     BarnConfirmModal.open.mockResolvedValue(false);
     find(element, 'regenerate').click();
     await flush();

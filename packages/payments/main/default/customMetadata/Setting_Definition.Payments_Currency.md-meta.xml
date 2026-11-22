@@ -10,4 +10,5 @@
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">30</value></values>
     <values><field>Description__c</field><value xsi:type="xsd:string">The three-letter currency a payment is taken in when the module taking it does not name one, such as USD, CAD or EUR. Your processor account must accept it. Default USD.</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">payments.md</value></values>
+    <values><field>Default_Value__c</field><value xsi:type="xsd:string">"USD"</value></values>
 </CustomMetadata>
