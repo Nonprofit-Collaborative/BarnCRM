@@ -21,17 +21,26 @@ import { createHelpStore } from 'c/barnHelpCatalog';
 // segment is dropped: it is Core's, and a module's catalog changes when the module does. The
 // path before /resource/ is kept too, so a page on a Salesforce Site with a path prefix (a
 // public form, C-42b) reads the catalog from its own Site.
+//
+// A static resource read without its timestamp is served with a 45-day public cache, and
+// Salesforce still served a catalog's previous file a day after a deploy, so an upgrade's new
+// keys read as missing (blank buttons and tile labels). The hour in the query string makes a
+// new address each hour: an upgrade's text shows within the hour, and within the hour a page
+// still reads each catalog from the cache.
+const HOUR_MS = 3600000;
+
 function urlFor(name) {
+  const version = '?v=' + Math.floor(Date.now() / HOUR_MS);
   const url = String(CORE_HELP_URL || '');
   const at = url.lastIndexOf('BarnHelp_Core');
   if (at < 0) {
-    return '/resource/' + name;
+    return '/resource/' + name + version;
   }
   const lastSlash = url.lastIndexOf('/', at);
   const prefix = url.substring(lastSlash + 1, at);
   const resourceAt = url.indexOf('/resource/');
   const site = resourceAt > 0 ? url.substring(0, resourceAt) : '';
-  return site + '/resource/' + prefix + name;
+  return site + '/resource/' + prefix + name + version;
 }
 
 function fetchJson(url) {
