@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Auto_Apply_Gifts_To_Installments__c</fullName>
-    <defaultValue>true</defaultValue>
-    <description>Whether a gift that names a commitment but no installment is linked to that commitment's earliest unpaid installment automatically.</description>
-    <label>Auto-Apply Gifts to Installments</label>
-    <trackTrending>false</trackTrending>
-    <type>Checkbox</type>
-</CustomField>

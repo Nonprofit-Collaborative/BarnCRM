@@ -84,16 +84,14 @@ private class PaymentsPostInstallTest {
 		System.runAs(TestUsers.admin()) {
 			String legacyToken = 'aa11bb22cc33dd44ee55ff66aa77bb88';
 			insert as system SettingsService.firstSaveRecord();
-			Payments_Settings__c legacy = new Payments_Settings__c(
-				SetupOwnerId = UserInfo.getOrganizationId(),
-				Webhook_Token__c = legacyToken
-			);
-			insert as system legacy;
+			// The packages no longer ship Payments_Settings__c; an upgraded org still has it.
+			PaymentService.legacyTokenForTest = legacyToken;
 			ModuleSettings.clearCache();
 			Assert.isTrue(PaymentService.tokenMatches(legacyToken), 'Read from the legacy settings before the install');
 
 			new PaymentsPostInstall().runSetup(null);
-			delete as system legacy;
+			// The integrator's destructive deploy removes the legacy object.
+			PaymentService.legacyTokenForTest = '';
 			ModuleSettings.clearCache();
 			ModuleSettings.clearLegacyCache();
 			SettingsState.clearCache();
