@@ -97,7 +97,7 @@ a value; the operators offered depend on the field:
 - **Is this year** and **is last year** are calendar years. **Is in the last N days** counts
   today and the N days before it. **Is more than N days ago** is every date before that, so
   "Close Date is more than 1825 days ago" finds records older than about five years; it suits
-  archive rules. N is at most 3650.
+  [archive rules](archive-rules.md). N is at most 3650.
 - **Condition logic.** With two or more conditions, tick **Use custom condition logic** to
   combine them with AND, OR, NOT and brackets, for example `1 AND (2 OR 3)`. Every condition
   must appear in the logic.

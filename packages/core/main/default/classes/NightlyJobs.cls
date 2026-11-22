@@ -112,6 +112,7 @@ public with sharing class NightlyJobs {
 			SetupChangeCopyJob.step(),
 			EmptyHouseholdTidyScheduler.step(),
 			EngagementScoreJob.step(),
+			ArchiveRulesStep.step(),
 			ErrorDigestScheduler.step()
 		};
 	}

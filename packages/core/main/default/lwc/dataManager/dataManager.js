@@ -56,7 +56,7 @@ const TABS = {
   delete: 'Find'
 };
 /** The tiles whose tool opens on this page, in place of the hub, with a way back. */
-const PANELS = ['backup', 'files', 'maps'];
+const PANELS = ['backup', 'archive', 'files', 'maps'];
 /** The tiles that open Find for a bulk tool, and the tool Find's note names. */
 const BULK_TOOLS = { delete: 'delete' };
 
@@ -159,6 +159,10 @@ export default class DataManager extends NavigationMixin(LightningElement) {
 
   get showBackup() {
     return this.panel === 'backup';
+  }
+
+  get showArchive() {
+    return this.panel === 'archive';
   }
 
   get showFiles() {
@@ -282,6 +286,17 @@ export default class DataManager extends NavigationMixin(LightningElement) {
             'standard:database'
           )
         );
+        // Archive Rules (D-221): they delete, so they need Bulk Delete Records too.
+        if (canBulkDelete) {
+          findChange.push(
+            tile(
+              'archive',
+              helpText('Core', 'Core_ArchiveRules_Title'),
+              helpText('Core', 'Core_DataManager_ArchiveText'),
+              'standard:archive'
+            )
+          );
+        }
       }
     }
     if (canBulkUpdate) {

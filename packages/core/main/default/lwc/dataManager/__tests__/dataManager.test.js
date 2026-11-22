@@ -148,6 +148,7 @@ describe('c-data-manager', () => {
       'find',
       'grid',
       'backup',
+      'archive',
       'optimizer',
       'duplicates',
       'delete'

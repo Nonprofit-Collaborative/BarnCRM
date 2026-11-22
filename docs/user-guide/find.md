@@ -173,4 +173,5 @@ You should see: the builder filled in from your text, ready to run.
 - Admin Guide: [Find and export](../admin-guide/find.md),
   [Super Transformer](../admin-guide/bulk-update.md), [Bulk delete](../admin-guide/bulk-delete.md),
   [Archive by Query](../admin-guide/archive-by-query.md), [Backup Sets](../admin-guide/backup-sets.md),
+  [Archive Rules](../admin-guide/archive-rules.md),
   [Access](../admin-guide/access.md)

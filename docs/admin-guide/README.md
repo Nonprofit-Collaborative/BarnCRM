@@ -156,6 +156,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-37 Bulk delete | [bulk-delete.md](bulk-delete.md) | Core |
 | C-67 Archive by Query (save old records to a file in Files, then delete them; optionally empty the Recycle Bin) | [archive-by-query.md](archive-by-query.md) | Core |
 | C-66 Backup Sets (saved Find queries saved to files in Files on demand; restore through Load one object) | [backup-sets.md](backup-sets.md) | Core |
+| AR-10 Archive Rules (saved Find queries that move records to Files or the Archived Record big object, now or on a schedule) | [archive-rules.md](archive-rules.md) | Core |
 | C-70 Import Files (a zip with a manifest loaded into Files linked to records, with dry run and undo) | [files-import.md](files-import.md) | Core |
 | Org Optimizer (Data Quality, Field Use, Data Dictionary, Health Check, Errors, Storage and Limits, Unused Setup, Setup Changes, Access Explorer) | [org-optimizer.md](org-optimizer.md) | BarnCRM Org Optimizer |
 | C-28 Data Quality (the Data Quality section of Org Optimizer) | [data-hygiene.md](data-hygiene.md) | BarnCRM Org Optimizer |

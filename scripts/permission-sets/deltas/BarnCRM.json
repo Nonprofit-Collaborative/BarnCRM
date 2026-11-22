@@ -4,6 +4,7 @@
     "description": ["Part of the BarnCRM Admin role. Give the role, not this set. Settings, custom metadata,", "automation control, Error Log; View All and Modify All on Account and Contact (ADR-0142)."],
     "add": {
       "classAccesses": {
+        "ArchiveController": {"enabled": "true"},
         "AutoMergeController": {"enabled": "true"},
         "BackupSetController": {"enabled": "true"},
         "BulkUpdateController": {"enabled": "true"},

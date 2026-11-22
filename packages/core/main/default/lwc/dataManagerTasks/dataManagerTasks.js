@@ -73,6 +73,12 @@ export const TASKS = Object.freeze([
     text: 'Back up records to a file',
     words: 'backup copy keep snapshot save restore before cleanup'
   },
+  // Archive Rules (D-221)
+  {
+    tool: 'archive',
+    text: 'Archive old records on a schedule',
+    words: 'archive big object old storage space move schedule weekly closed lost'
+  },
   // Super Transformer
   {
     tool: 'update',

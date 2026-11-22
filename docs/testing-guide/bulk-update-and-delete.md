@@ -313,3 +313,25 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | 7 | Choose **Contact tidy** and press **Apply Map**. | A confirmation says the map replaces the changes already chosen. **Cancel** keeps the **Description** row as it was. |
 
 **Cleanup:** delete the Maptest contacts and the **Contact tidy** map.
+
+## T-BULK-19: Archive Rules to the Big Object
+
+**Purpose:** confirm an archive rule copies records into the Archived Record big object before deleting them, keeps records changed during the run, counts archived rows, and runs on its schedule (AR-10).
+**Prerequisites:** run in barn-platform (Platform-only). Admin with the **BarnCRM Admin** permission set; four contacts with Last Name `Arcbig` (First Name Big1 to Big4); a saved Find query `Arcbig people` (Contact, Last Name equals `Arcbig`). A second user with only **BarnCRM Find and Export**. Setup detail: [Archive Rules](../admin-guide/archive-rules.md).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Data Manager** as the admin, then as the second user. | The admin sees an **Archive Rules** tile under **Find and Change**; the second user does not. |
+| 2 | As the admin, select **Archive Rules**. | The panel shows "No rules yet", the **Archived records** meter against the 1,000,000 included, and **Add a Rule** offering `Arcbig people`. |
+| 3 | Choose `Arcbig people` and press **Add**. Set **Where Records Go** to **Off Platform** and press **Save**. | A message says no off-platform store is set up, and the rule is not saved. |
+| 4 | Set **Where Records Go** to **Big Object**, **How Often** to **Only when I run it**, and press **Save**. | The rule is listed with "Only when run". |
+| 5 | Press **Preview and Run**. | "4 Contacts match now", up to five sample names, and any related records deleted with them. **Run Now** stays disabled until **Number of records** holds `4`. |
+| 6 | Type `4` and press **Run Now**. While it shows Running, change Big4's Title. | **Recent Runs** shows the run, then "3 moved, 1 left out"; its run log names Big4 as changed since the run started. If the run ends before the edit, all four move; repeat with a fresh Big4. |
+| 7 | Run `Arcbig people` in Find. | Only Big4 is returned. The Recycle Bin holds Big1 to Big3. The meter counts 3 more archived records. |
+| 8 | In the Developer Console, query `SELECT Object_Name__c, Original_Id__c, Record_Name__c FROM Archived_Record__b WHERE Object_Name__c = 'Contact'`. | Three rows, for Big1 to Big3. |
+| 9 | **Edit** the rule, set **How Often** to **Weekly** and **Day** to today, and press **Save**. | A box asks for the current count, 1; another number is refused with "Nothing was saved". With `1` the rule shows "Weekly on" today. |
+| 10 | In **BarnCRM Settings**, **General**, **Nightly Jobs**, find **Archive Rules**, then let the nightly run happen. | The step is listed and on. After the run, **Recent Runs** lists a run that moved Big4. |
+| 11 | Untick **Active**, type the count if asked, and **Save**. | The rule shows "(paused)" and the next nightly run starts nothing for it. |
+| 12 | **Remove** the rule. | It moves back to **Add a Rule**; the saved query and the archived rows remain. |
+
+**Cleanup:** delete the Arcbig households, the saved query, and the archived rows (restore them from the archive viewer, or `Database.deleteImmediate` them in anonymous Apex).
