@@ -6,6 +6,8 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ## 2026-11-22
 
+- PR #1444 squash-merged as ab3fc9573: the 67 custom-object layouts without a `platformActionList` now list their own record actions (Edit, Clone, Delete; Change Owner unless ControlledByParent; Sharing when Private or Read; Log a Call, New Task, New Event with activities), so a record no longer shows the org's global actions (the Event page offered New Contact and New Opportunity). Gate `barn-platform` 165 of 165; the Event page there shows Edit, Change Owner, Clone and Delete.
+
 - UX screenshot check on `barn-platform` after main 0e2389817 was deployed (incremental gate 165 of 165): Projects Home tiles and New Project button show their labels; Projects Home, Volunteers Home, Fundraising Home, Automation, Import and Super Transformer each print their name once; no missing help text warnings.
 - PR #1442 squash-merged as 0e2389817: tabs that name a FlexiPage get the platform page header, so the shells of Automation, Import, Super Transformer and the Fundraising, Projects and Volunteers homes pass `title-hidden` again, and `barnPageShell` leaves out its icon when the title is hidden (ADR-0020 Amendment A3 corrects A2). Gate `barn-platform` 165 of 165.
 - PR #1441 squash-merged as 3858e7a32: `c/barnHelpText` reads each module catalog with an hourly `?v=` query string, since an untimestamped static resource is cached publicly for 45 days and served stale after a deploy (blank Projects Home labels on `barn-platform`). Gate `barn-platform` 165 of 165.
