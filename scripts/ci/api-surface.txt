@@ -85,6 +85,8 @@ core/ArchiveDestination.cls | public interface ArchiveDestination
 core/ArchiveDestinations.cls | public class ArchiveDestinations
 core/ArchiveDestinations.cls | public static ArchiveDestination forKey(String)
 core/ArchiveDestinations.cls | public static final String OFF_PLATFORM_CLASS
+core/ArchiveErasureExtension.cls | public ArchiveErasureExtension()
+core/ArchiveErasureExtension.cls | public class ArchiveErasureExtension
 core/ArchiveRules.cls | public Boolean scheduled()
 core/ArchiveRules.cls | public class ArchiveRuleException
 core/ArchiveRules.cls | public class ArchiveRules

@@ -126,6 +126,14 @@ What a restore does:
   goes down. If a row cannot be removed, the log names the record, which is then both live and
   archived.
 
+## 8. Erasing a Person
+
+When you [erase a person](erase-a-person.md), archived records that are that person, or that
+name them in a lookup (for example a gift whose donor was the person), are deleted from the
+archive in the background once the erasure is saved. The erasure summary lists **Archived
+records** as deleted, counted rather than listed. A preview deletes nothing. The archived record
+count goes down when the background work ends.
+
 ## Field Reference
 
 | Where | Field | What it holds |

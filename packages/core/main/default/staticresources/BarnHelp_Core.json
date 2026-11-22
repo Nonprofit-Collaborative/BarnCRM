@@ -202,6 +202,8 @@
     "Core_ArchiveViewer_ColumnOriginalId": "Original Id",
     "Core_ArchiveViewer_ColumnRule": "Rule",
     "Core_ArchiveViewer_DetailHeading": "Archived Record: {0}",
+    "Core_ArchiveViewer_ErasureLabel": "Archived records",
+    "Core_ArchiveViewer_ErasureNote": "Archived records that name this person are deleted from the archive in the background once the erasure is saved.",
     "Core_ArchiveViewer_ErrorGone": "That archived record is no longer in the archive. Press Show to read the list again.",
     "Core_ArchiveViewer_ErrorNoAccess": "Archived records need the BarnCRM Admin permission set, which grants the Archived Record object.",
     "Core_ArchiveViewer_ErrorNoObject": "Choose the kind of record to show.",

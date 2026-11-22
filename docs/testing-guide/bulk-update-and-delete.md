@@ -336,9 +336,9 @@ Test contacts for the delete scripts: create three contacts with first names `De
 
 **Cleanup:** none before T-BULK-20, which views, restores and erases these archived rows. Afterwards delete the Arcbig households and the saved query.
 
-## T-BULK-20: Archived Records and Restore
+## T-BULK-20: Archived Records, Restore and Erasure
 
-**Purpose:** confirm the Archived Records panel lists and shows archived rows only to holders of the grant, a restore creates records again with new Ids, leaves out lookups to records gone, removes the rows and lowers the count, and a failed row stays archived (AR-10).
+**Purpose:** confirm the Archived Records panel lists and shows archived rows only to holders of the grant, a restore creates records again with new Ids, leaves out lookups to records gone, removes the rows and lowers the count, a failed row stays archived, and erasing a person deletes the archived rows that name them (AR-10).
 **Prerequisites:** run in barn-platform (Platform-only) right after T-BULK-19, with Big1 to Big4 archived. Before archiving, set Big1's **Reports To** to a contact `Arcboss Staff`, then delete `Arcboss Staff` after the archive run. The second user from T-BULK-19, and a third user with **BarnCRM Admin** but not **BarnCRM Bulk Delete**. Setup detail: [Archive Rules](../admin-guide/archive-rules.md#6-archived-records-looking-records-up).
 
 | Step | Action | Expected result |
@@ -352,5 +352,7 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | 7 | Open **Archive Rules**, **Recent Runs**. | A run named "Restore Contact" ends Complete; its log reads "Restored 003... as 003..." twice, "Left out of" Big1's old Id "ReportsToId", and "Moved 2 records back out of the archive; 0 stay archived". The meter counts 2 fewer. |
 | 8 | Run `Arcbig people` in Find; then show Contact in **Archived Records** again. | Big1 and Big2 are back with new Ids (Big1 without Reports To). Only Big3 and Big4 remain archived. |
 | 9 | As the admin, remove your create access to Contact's **Title** field in a permission set you hold, restore Big3, and put the access back. | Big3 is restored without its Title; the log lists Title as left out. |
+| 10 | Create contacts `Arcerase Two` and `Arcerase Child` (Reports To `Arcerase Two`). Archive `Arcerase Child` with a saved query and a Big Object rule run once. On `Arcerase Two`, open **Erase a Person** and press **Preview**. | The preview lists **Archived records** as deleted. After the preview, **Archived Records** still lists the Arcerase Child row. |
+| 11 | Erase `Arcerase Two`, wait a minute, and show Contact in **Archived Records**. | The Arcerase Child row is gone, and the meter counts 1 fewer. |
 
-**Cleanup:** delete the Arcbig contacts and households, the saved queries, and restore or `Database.deleteImmediate` any archived rows left.
+**Cleanup:** delete the Arcbig and Arcerase contacts and households, the saved queries, and restore or `Database.deleteImmediate` any archived rows left.

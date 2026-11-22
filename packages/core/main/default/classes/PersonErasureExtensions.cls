@@ -12,7 +12,8 @@ public with sharing class PersonErasureExtensions {
 	/**
 	 * The class names dependent packages register, in the order they are asked. Contact Point
 	 * Sync is last: its one address copy is made after every other module has changed its own
-	 * records (ADR-0193 erasure start seam).
+	 * records (ADR-0193 erasure start seam). Core's own archive (`ArchiveErasureExtension`,
+	 * R-ARC6) is resolved the same way.
 	 */
 	@NamespaceAccessible
 	public static final List<String> EXTENSION_CLASSES = new List<String>{
@@ -21,6 +22,7 @@ public with sharing class PersonErasureExtensions {
 		'ProgramsErasureExtension',
 		'MembershipsErasureExtension',
 		'ConnectorErasureExtension',
+		'ArchiveErasureExtension',
 		'ContactPointErasureExtension'
 	};
 

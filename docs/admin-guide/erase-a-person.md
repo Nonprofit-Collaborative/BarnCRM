@@ -55,6 +55,11 @@ their email addresses is deleted, whoever erases; recipes are kept. When too man
 sure of finding every one, the erasure is refused. See
 [BarnCRM Connector](connector.md#erasing-a-person).
 
+When records were moved to the archive big object by an [archive rule](archive-rules.md),
+archived records that are the person, or that name them in a lookup, are deleted from the
+archive in the background once the erasure is saved; a preview deletes nothing. See
+[Archive Rules](archive-rules.md#8-erasing-a-person).
+
 Every erasure writes an **Erasure** record: who erased, when, the request reference you typed,
 and each record that changed with the fields that were emptied. It never holds an erased value.
 
