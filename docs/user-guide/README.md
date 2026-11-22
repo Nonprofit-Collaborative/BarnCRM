@@ -70,7 +70,7 @@ Every BarnCRM module is in Beta right now: a **Beta** badge beside a module's na
 
 ### Portal Builder
 
-- [Portals](portal-builder.md): who can sign in to a portal, ending someone's portal sessions, what a person sees when they sign in, and what the volunteer, speaker and donor portals show and let them do.
+- [Portals](portal-builder.md): Portal Builder Home, who can sign in to a portal, ending someone's portal sessions, what a person sees when they sign in, and what the volunteer, speaker and donor portals show and let them do.
 
 ### Corporate Hub
 

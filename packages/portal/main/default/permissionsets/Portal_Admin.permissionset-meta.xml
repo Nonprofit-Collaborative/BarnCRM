@@ -120,4 +120,8 @@
     <tab>Portal_Access__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>
+  <tabSettings>
+    <tab>Portal_Builder_Home</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
 </PermissionSet>

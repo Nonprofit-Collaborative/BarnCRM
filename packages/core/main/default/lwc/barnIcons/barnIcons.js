@@ -94,6 +94,7 @@ const ICONS = Object.freeze({
   // Portal Builder
   Portal_Access__c: 'custom:custom77',
   Portal__c: 'custom:custom47',
+  Portal_Builder_Home: 'custom:custom68',
   // Corporate Hub
   Agreement__c: 'custom:custom93',
   Board__c: 'custom:custom47',

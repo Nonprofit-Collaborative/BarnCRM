@@ -28,7 +28,7 @@
   </values>
   <values>
     <field>Admin_Tabs__c</field>
-    <value xsi:type="xsd:string">Portal__c;Portal_Access__c</value>
+    <value xsi:type="xsd:string">Portal_Builder_Home;Portal__c;Portal_Access__c</value>
   </values>
   <values>
     <field>Probe_Object__c</field>

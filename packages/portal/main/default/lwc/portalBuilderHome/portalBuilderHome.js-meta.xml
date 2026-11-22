@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Portal Builder Home: active portals, people with access, suspended access and recent sign-ins
+    as figures, every portal with its status, the latest sign-ins, and New Portal (Module Home
+    pattern).
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Portal Builder Home</masterLabel>
+  <targets>
+    <target>lightning__AppPage</target>
+    <target>lightning__Tab</target>
+  </targets>
+</LightningComponentBundle>

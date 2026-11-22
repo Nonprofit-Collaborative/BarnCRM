@@ -103,8 +103,9 @@ licenses (where your organization has them) may be simpler than a portal.
    phone, in your theme's own fonts and colors. For any other website, the
    `portal-client/README.md` explains the small server piece you need.
 8. **Add a portal.** In the **BarnCRM Portal Builder** app (or **BarnCRM Admin** or **BarnCRM
-   Admin Console**, where Portal Builder's **Portals** and **Portal Accesses** tabs sit before
-   **Error Log**; a scratch or Developer Edition org has only these), Portals, New: a name
+   Admin Console**, where Portal Builder's **Portal Builder Home**, **Portals** and **Portal
+   Accesses** tabs sit before **Error Log**; a scratch or Developer Edition org has only these),
+   **New Portal** on Portal Builder Home (or Portals, New): a name
    people see, a
    **Key** matching the shortcode, **Access Mode**, **Second Factor**, **Session Hours**,
    **Sender Address**, and the **Template** (below). Set **Status** to Active. With brands on
@@ -115,6 +116,22 @@ licenses (where your organization has them) may be simpler than a portal.
    Accesses, New, or the Portal Accesses list on the portal). For Any Matching Person, anyone
    whose email matches exactly one person in BarnCRM can sign in.
 10. **Turn Portal sign-in on** in BarnCRM Settings, Portals.
+
+## Portal Builder Home
+
+**Portal Builder Home** is the first tab of the BarnCRM Portal Builder app and follows the Module
+Home layout (see [Module Homes](barncrm-app.md#module-homes)). Like the rest of Portal Builder it
+is for holders of Portal Builder Admin. It shows:
+
+- **Active Portals**, **People With Access** (active Portal Access records across every portal),
+  **Suspended Access** and **Signed In, Last 30 Days** as figures; each opens its list.
+- **Portals**: every portal with its status and access mode.
+- **Latest Sign-Ins**: the ten most recent sign-ins in the last 30 days, with the person and
+  portal.
+- **New Portal** at the top right.
+
+Before the first portal it shows **Set Up Your First Portal** in place of the figures and lists.
+It reads no sign-in code, token or authenticator secret, stores nothing and has no settings.
 
 ## Templates
 

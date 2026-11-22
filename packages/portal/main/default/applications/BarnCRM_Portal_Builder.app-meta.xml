@@ -17,12 +17,16 @@
   <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
   <label>BarnCRM Portal Builder</label>
   <navType>Console</navType>
+  <tabs>Portal_Builder_Home</tabs>
   <tabs>Portal__c</tabs>
   <tabs>Portal_Access__c</tabs>
   <tabs>standard-report</tabs>
   <tabs>Error_Log__c</tabs>
   <uiType>Lightning</uiType>
   <workspaceConfig>
+    <mappings>
+      <tab>Portal_Builder_Home</tab>
+    </mappings>
     <mappings>
       <tab>Portal__c</tab>
     </mappings>

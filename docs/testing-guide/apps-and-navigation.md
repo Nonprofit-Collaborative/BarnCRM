@@ -177,8 +177,8 @@ each, the module is installed and on, and its access sync has run
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As admin, open the App Launcher and type `Portal`. | **BarnCRM Portal Builder** is listed with Patch in a tool belt. |
-| 2 | Open it and its navigation menu. | Console navigation with the Barn Navy header. Tabs: **Portals**, **Portal Accesses**, **Reports**, **Error Log** (last). |
-| 3 | Open **BarnCRM Admin**. | **Portals** and **Portal Accesses** are still there, before **Error Log**. |
+| 2 | Open it and its navigation menu. | Console navigation with the Barn Navy header. Tabs: **Portal Builder Home**, **Portals**, **Portal Accesses**, **Reports**, **Error Log** (last). |
+| 3 | Open **BarnCRM Admin**. | **Portal Builder Home**, **Portals** and **Portal Accesses** are still there, before **Error Log**. |
 | 4 | As staff, open the App Launcher and type `Portal`. | **BarnCRM Portal Builder** is not listed (only Portal Builder Admin shows it). |
 
 ## T-APP-11: BarnCRM Corporate Hub
@@ -265,7 +265,7 @@ each, the module is installed and on, and its access sync has run
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open each module app from the App Launcher. | The first tab and the page title are: BarnCRM Corporate Hub, **Corporate Hub Home**; BarnCRM Events, **Events Home**; BarnCRM Forms, **Forms Home**; BarnCRM Fundraising, **Fundraising Home**; BarnCRM Grants, **Grants Home**; BarnCRM Memberships, **Memberships Home**; BarnCRM Programs, **Programs Home**; BarnCRM Projects, **Projects Home**; BarnCRM Scholarships, **Scholarships Home**; BarnCRM Volunteers, **Volunteers Home**. **Error Log** is still the last tab of each. |
+| 1 | Open each module app from the App Launcher. | The first tab and the page title are: BarnCRM Corporate Hub, **Corporate Hub Home**; BarnCRM Events, **Events Home**; BarnCRM Forms, **Forms Home**; BarnCRM Fundraising, **Fundraising Home**; BarnCRM Grants, **Grants Home**; BarnCRM Memberships, **Memberships Home**; BarnCRM Portal Builder, **Portal Builder Home**; BarnCRM Programs, **Programs Home**; BarnCRM Projects, **Projects Home**; BarnCRM Scholarships, **Scholarships Home**; BarnCRM Volunteers, **Volunteers Home**. **Error Log** is still the last tab of each. |
 | 2 | On each home, look at the page. | The title and About This Tool at the top, the module's quick actions at the top right, then figures, then the module's lists. |
-| 3 | Open **BarnCRM** (or **BarnCRM Console**). | The module homes it carries read **Corporate Hub Home**, **Forms Home**, **Memberships Home**, **Programs Home** and **Scholarships Home**. |
+| 3 | Open **BarnCRM** (or **BarnCRM Console**). | The module homes it carries read **Corporate Hub Home**, **Forms Home**, **Memberships Home**, **Programs Home** and **Scholarships Home**; **BarnCRM Admin** carries **Portal Builder Home**. |
 | 4 | Open **BarnCRM Connector**. | It opens on **Super Connector** (a one-tool app, no home). |

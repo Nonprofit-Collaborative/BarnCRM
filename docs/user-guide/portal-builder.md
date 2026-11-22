@@ -5,6 +5,13 @@ volunteer, a member, a client) signs in and sees or updates their own informatio
 BarnCRM admin sets portals up (see [Portal Builder](../admin-guide/portal-builder.md) in the Admin
 Guide). This page is for staff who look after the people using them.
 
+## Portal Builder Home
+
+With Portal Builder Admin, the **BarnCRM Portal Builder** app opens on **Portal Builder Home**:
+how many portals are active, how many people have access, how many are suspended and how many
+signed in during the last 30 days (click a figure to open its list), then every portal with its
+status and the latest sign-ins.
+
 ## Who Can Sign In
 
 1. Open the **BarnCRM Portal Builder** app (or **BarnCRM Admin**, or **BarnCRM Admin Console**)

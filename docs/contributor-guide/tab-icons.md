@@ -84,6 +84,7 @@ Rules:
 | logicmodels | Logic_Model__c | Custom62: Chalkboard |
 | portal | Portal_Access__c | Custom77: Locked |
 | portal | Portal__c | Custom47: Knight |
+| portal | Portal_Builder_Home | Custom68: Globe |
 | corporatehub | Agreement__c | Custom93: ShoppingCart |
 | corporatehub | Board__c | Custom47: Knight |
 | corporatehub | Board_Meeting__c | Custom84: Presenter |
