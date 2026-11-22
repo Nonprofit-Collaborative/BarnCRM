@@ -1,16 +1,12 @@
 /**
  * Finds the destination an archive rule names (canonical model R-SQ18, ADR-NEXT archive rules and
- * big object archive). Files and BigObject are Core's; OffPlatform is the class
- * `OffPlatformArchiveDestination`, looked up by name in the package namespace and then without
- * one, as `PersonErasureExtensions` does, so it may live in Core or a module.
+ * big object archive). All three are Core's: Files (`ArchiveToFiles`), BigObject
+ * (`ArchiveToBigObject`) and OffPlatform (`OffPlatformArchiveDestination`, which sends the file
+ * through the backup destination a module installs and is refused with a reason while none is).
  */
 @NamespaceAccessible
 public with sharing class ArchiveDestinations {
-	/** The off-platform destination's class name, which its builder implements. */
-	@NamespaceAccessible
-	public static final String OFF_PLATFORM_CLASS = 'OffPlatformArchiveDestination';
-
-	/** Injected by tests in place of the class lookup, by key. */
+	/** Injected by tests in place of the real destination, by key. */
 	@TestVisible
 	private static Map<String, ArchiveDestination> overrides = new Map<String, ArchiveDestination>();
 
@@ -33,8 +29,7 @@ public with sharing class ArchiveDestinations {
 			return overrides.get(wanted);
 		}
 		if (wanted == ArchiveRules.OFF_PLATFORM) {
-			ArchiveDestination found = offPlatform();
-			return found == null ? new Missing() : found;
+			return new OffPlatformArchiveDestination();
 		}
 		if (wanted == ArchiveRules.BIG_OBJECT) {
 			return new ArchiveToBigObject();
@@ -65,39 +60,5 @@ public with sharing class ArchiveDestinations {
 			return BarnHelp.text('Core', 'Core_ArchiveRules_DestinationOffPlatform');
 		}
 		return BarnHelp.text('Core', 'Core_ArchiveRules_DestinationFiles');
-	}
-
-	private static ArchiveDestination offPlatform() {
-		String prefix = NamespaceUtil.prefix();
-		Type found = Type.forName(String.isBlank(prefix) ? null : prefix.removeEnd('__'), OFF_PLATFORM_CLASS);
-		if (found == null) {
-			found = Type.forName(OFF_PLATFORM_CLASS);
-		}
-		if (found == null) {
-			return null;
-		}
-		try {
-			Object candidate = found.newInstance();
-			return candidate instanceof ArchiveDestination ? (ArchiveDestination) candidate : null;
-		} catch (Exception cannotBuild) {
-			ErrorLogger.log(cannotBuild, 'ArchiveDestinations.offPlatform');
-			return null;
-		}
-	}
-
-	/** The off-platform destination while none is installed: offered, refused with a reason. */
-	@TestVisible
-	private class Missing implements ArchiveDestination {
-		public String key() {
-			return ArchiveRules.OFF_PLATFORM;
-		}
-
-		public String unavailableReason() {
-			return BarnHelp.text('Core', 'Core_ArchiveRules_OffPlatformMissing');
-		}
-
-		public Import_Batch__c start(ArchiveRun run) {
-			throw new ArchiveRules.ArchiveRuleException(unavailableReason());
-		}
 	}
 }

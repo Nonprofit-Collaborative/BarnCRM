@@ -145,7 +145,7 @@ private class ArchiveRulesTest {
 		System.Assert.isNull(ArchiveDestinations.forKey(ArchiveRules.FILES).unavailableReason(), 'Files is usable');
 		ArchiveDestination offPlatform = ArchiveDestinations.forKey(ArchiveRules.OFF_PLATFORM);
 		System.Assert.areEqual(ArchiveRules.OFF_PLATFORM, offPlatform.key(), 'Off Platform is offered');
-		if (Type.forName(ArchiveDestinations.OFF_PLATFORM_CLASS) == null) {
+		if (OffPlatformSendBatch.destination() == null) {
 			System.Assert.isNotNull(offPlatform.unavailableReason(), 'Refused with a reason while none is installed');
 			try {
 				offPlatform.start(new ArchiveRun(null, 'Rule', QUERY, 'Contact', 1));

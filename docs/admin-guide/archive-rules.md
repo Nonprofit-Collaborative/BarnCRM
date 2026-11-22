@@ -13,8 +13,11 @@ Each rule sends its records to one **destination**:
 - **Big Object:** each record, with every field you can read and the related records Salesforce
   would delete with it, is copied into BarnCRM's **Archived Record** big object, then deleted.
   Big object rows do not use your data storage.
-- **Off Platform:** a store outside Salesforce. It shows as not set up until your org has one;
-  a rule cannot use it until then.
+- **Off Platform:** your own storage outside Salesforce. The records are saved to a file in your
+  Files as with **Files (CSV)**, the file is sent to your backup destination, and records are
+  deleted only once every part of the file was accepted. It needs BarnCRM Connector with a
+  connection set as the **Backup Destination** ([BarnCRM Connector, Backup Destination](connector.md#backup-destination)); until then it
+  shows as not set up and a rule cannot use it.
 
 A record is only deleted after its copy is saved and read back. A record changed after the run
 started is left alone and named in the run's log.

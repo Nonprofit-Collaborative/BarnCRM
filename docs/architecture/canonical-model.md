@@ -9098,9 +9098,10 @@ holding Manage BarnCRM Settings, Find and Export Records and Bulk Delete Records
 Archive Rules panel, run a rule or restore.
 
 - **Destinations.** `Files` is R-BD9 unchanged. `BigObject` copies each record to
-  `Archived_Record__b` (Section 29D1) and then deletes it. `OffPlatform` is resolved by class
-  name (`OffPlatformArchiveDestination`, implementing `ArchiveDestination`); while none is
-  installed it is refused with a reason. A missing or unknown value reads as `Files`.
+  `Archived_Record__b` (Section 29D1) and then deletes it. `OffPlatform` is Core's
+  `OffPlatformArchiveDestination`: R-BD9 with the file sent through the installed backup
+  destination (R-SQ17) before the delete; while none is installed or ready it is refused with a
+  reason. A missing or unknown value reads as `Files`.
 - **A manual run** is R-BD9's preview and typed count, for any destination, counted within the
   bulk delete run limit (R-BD2).
 - **A schedule.** `frequency` other than `off` with `active` true is due each night (`daily`), on
@@ -9145,7 +9146,7 @@ Archive Rules panel, run a rule or restore.
 - **Backup Sets (R-SQ15):** services `BackupSetService`, `BackupSetController`; UI the Backup Sets
   panel of the Data Manager tab (component `backupSets`).
 - **Archive rules (R-SQ18):** seam `ArchiveDestination` with `ArchiveDestinations`,
-  `ArchiveToFiles` and `ArchiveToBigObject`; services `ArchiveRules` (the `archive` key and its
+  `ArchiveToFiles`, `ArchiveToBigObject` and `OffPlatformArchiveDestination`; services `ArchiveRules` (the `archive` key and its
   schedule), `ArchiveRuleService`, `ArchiveController`, `ArchiveRulesStep` (the nightly step);
   UI the Archive Rules panel of the Data Manager tab (component `archiveRules`).
 

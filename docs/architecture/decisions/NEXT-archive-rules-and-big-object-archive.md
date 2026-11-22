@@ -48,10 +48,10 @@ transaction; an optional field needs field permission for any user-mode read.
 3. **Destinations are one seam.** `ArchiveDestination` (Core, `@NamespaceAccessible`) has a key,
    a reason it cannot be used here (null when it can), and `start(ArchiveRun)`, which returns the
    data job. `ArchiveDestinations.forKey` resolves Files (`ArchiveToFiles`, R-BD9 unchanged) and
-   BigObject (`ArchiveToBigObject`) in Core, and OffPlatform by class name
-   `OffPlatformArchiveDestination` through `Type.forName`, so BK-10 implements it in Core or a
-   module without changing the rule's shape. Until one is installed, OffPlatform is offered but
-   refused with a plain reason.
+   BigObject (`ArchiveToBigObject`) in Core, and OffPlatform (`OffPlatformArchiveDestination`,
+   also Core), which runs R-BD9 with the file sent through BK-10's `OffPlatformDestination` seam
+   before the delete. Until a module installs a ready backup destination, OffPlatform is offered
+   but refused with a plain reason.
 4. **A big object run never mixes DML and immediate writes in one transaction.** It is a
    queueable chain whose links alternate:
    - **Copy** (no DML): delete any archived copies the last link could not finish (below), read
