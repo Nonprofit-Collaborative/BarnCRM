@@ -3,7 +3,7 @@
  * model R-SQ17, ADR-NEXT `NEXT-automatic-backups-and-off-platform-destination.md`): one part per
  * execute (scope 1), so a transaction holds at most one part of about 3 MB under the 12 MB
  * asynchronous heap and the callout size limit. The destination is the installed module's
- * `ArchiveDestination` with key `offPlatform`; Core names no module class.
+ * `OffPlatformDestination` with key `offPlatform`; Core names no module class.
  *
  * Its finish hands what was sent and what was not to `BackupSetService.afterSent` or
  * `BulkDeleteService.afterArchiveSent`; nothing is deleted here.
@@ -39,9 +39,9 @@ public without sharing class OffPlatformSendBatch implements Database.Batchable<
 	}
 
 	/** The installed off-platform destination, or null when no module provides one. */
-	public static ArchiveDestination destination() {
-		for (Object found : ModuleExtensions.all(ArchiveDestination.class)) {
-			ArchiveDestination candidate = (ArchiveDestination) found;
+	public static OffPlatformDestination destination() {
+		for (Object found : ModuleExtensions.all(OffPlatformDestination.class)) {
+			OffPlatformDestination candidate = (OffPlatformDestination) found;
 			if (candidate.key() == OFF_PLATFORM) {
 				return candidate;
 			}
@@ -53,7 +53,7 @@ public without sharing class OffPlatformSendBatch implements Database.Batchable<
 	public static Status status() {
 		Status result = new Status();
 		try {
-			ArchiveDestination found = destination();
+			OffPlatformDestination found = destination();
 			result.available = found != null;
 			result.note = found == null ? BarnHelp.text('Core', 'Core_OffPlatform_NotInstalled') : found.notReady();
 		} catch (Exception e) {
@@ -82,7 +82,7 @@ public without sharing class OffPlatformSendBatch implements Database.Batchable<
 			ContentVersion part = (ContentVersion) row;
 			String failure;
 			try {
-				ArchiveDestination found = destination();
+				OffPlatformDestination found = destination();
 				failure = found == null ? BarnHelp.text('Core', 'Core_OffPlatform_NotInstalled') : found.notReady();
 				if (failure == null) {
 					Blob body = [

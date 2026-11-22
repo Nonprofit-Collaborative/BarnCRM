@@ -14,7 +14,7 @@ private class OffPlatformSendBatchTest {
 	}
 
 	/** Stands in for a module's destination: answers with `failure`, keeps what it was sent. */
-	private class FakeDestination implements ArchiveDestination {
+	private class FakeDestination implements OffPlatformDestination {
 		String failure;
 		List<String> names = new List<String>();
 		public String key() {
@@ -32,12 +32,12 @@ private class OffPlatformSendBatchTest {
 	private static FakeDestination install(String failure) {
 		FakeDestination fake = new FakeDestination();
 		fake.failure = failure;
-		ModuleExtensions.stubForTest(ArchiveDestination.class, 'Connector', fake, true);
+		ModuleExtensions.stubForTest(OffPlatformDestination.class, 'Connector', fake, true);
 		return fake;
 	}
 
 	private static void noneInstalled() {
-		ModuleExtensions.stubForTest(ArchiveDestination.class, 'Connector', null, true);
+		ModuleExtensions.stubForTest(OffPlatformDestination.class, 'Connector', null, true);
 	}
 
 	/** A complete Backup run with one part in Files, sent off platform. */

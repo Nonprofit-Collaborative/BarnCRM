@@ -9066,9 +9066,10 @@ owner sets it (`BackupSetService.setSchedule`); Find keeps the whole `backup` ke
   parts) are deleted in system mode, File Id and File Name are cleared, and a log line says why.
   A failure to delete is a Warning in the Error Log. A set run only on demand keeps every file.
 
-**R-SQ17 Off-platform destination** (BK-10, D-221; ADR-NEXT). Core's seam `ArchiveDestination`
+**R-SQ17 Off-platform destination** (BK-10, D-221; ADR-NEXT). Core's seam `OffPlatformDestination`
 (`key()`, `notReady()`, `send(fileName, body)`) is found through `ModuleExtensions`; the one with
-key `offPlatform` is the backup destination. Core names no module class.
+key `offPlatform` is the backup destination. Core names no module class. (AR-10's
+`ArchiveDestination`, an archive rule's whole-run destination, is a separate seam.)
 
 - **Choice.** The `backup` key may hold `"destination": "offPlatform"` (absent is Files only); an
   archive's definition holds `archive.destination`. Choosing it is refused while no module
@@ -20101,7 +20102,7 @@ mirrors the primary member).
 | 1.82 | 2026-11-20 | BarnCRM Connector pre-batch review fixes (release 1.33). One object added, 199 to 200 in the suite: Connector Connection (`Connector_Connection__c`, `Check_Path__c`), which keeps a template's check path beside a connection (29CN1, new R-CN9: Check Connection asks for it and shows the account an answer names). New R-CN10: choosing the integration user needs the key-writing permissions and refuses an all-seeing user. R-CN8: Disconnect refuses a Secret URL. Connector Run's Status loses Rejected; Running marks runs claimed for the next runner job (R-RUN4). |
 | 1.83 | 2026-11-20 | R-CR6 the recipe clock: a claimed Running run counts as Queued for the clock, so the heartbeat keeps running while a lane has a Waiting run, a Queued run or a claimed Running run (batch Q gate fix). |
 | 1.84 | 2026-11-21 | Scheduled Backup Sets (BK-10, D-221, release 1.36; ADR-NEXT `NEXT-automatic-backups-and-off-platform-destination.md`). Section 29D gains R-SQ16: the `backup` key's `schedule`, the nightly step Backup Sets, parts kept on the job as `documents`, and runs kept. Section 12 gains `Backup_Runs_Kept__c`. (Version number for the integrator to confirm at merge.) |
-| 1.85 | 2026-11-21 | Off-platform destination seam (BK-10, D-221, release 1.36; ADR-NEXT). Section 29D gains R-SQ17: Core's `ArchiveDestination` seam, a set's and an archive's `destination`, `OffPlatformSendBatch`, retries and the Files copy. Section 12 gains `Backup_Remove_Sent_Files__c`. (Version number for the integrator to confirm at merge.) |
+| 1.85 | 2026-11-21 | Off-platform destination seam (BK-10, D-221, release 1.36; ADR-NEXT). Section 29D gains R-SQ17: Core's `OffPlatformDestination` seam, a set's and an archive's `destination`, `OffPlatformSendBatch`, retries and the Files copy. Section 12 gains `Backup_Remove_Sent_Files__c`. (Version number for the integrator to confirm at merge.) |
 
 ---
 ## 32. Entity ownership by package

@@ -43,12 +43,15 @@ still not depend on the Connector module (ADR-0013, ADR-0017).
    not only the first, are found again.
 4. **Destinations behind a Core seam (amends ADR-0213 decision 1 and D-13 as amended there).** A
    copy may leave the org, to storage the organization owns and names: Core defines the interface
-   `ArchiveDestination`, found through the module catalog's `Extensions__c` like every other seam,
-   so Core names no module class. A Backup Set gains a destination (`files`, the default, or
-   `offPlatform`), and Archive by Query gains the same choice. The option is shown only when an
-   installed module provides a destination; otherwise a short note says the BarnCRM Connector
-   adds it. Archive rules on a schedule (AR-10, Big Object and Off Platform destinations) are
-   built on the same seam; the integrator reconciles the interface if both branches define it.
+   `OffPlatformDestination` (send one file), found through the module catalog's `Extensions__c`
+   like every other seam, so Core names no module class. A Backup Set gains a destination
+   (`files`, the default, or `offPlatform`), and Archive by Query gains the same choice. The
+   option is shown only when an installed module provides a destination; otherwise a short note
+   says the BarnCRM Connector adds it. AR-10's `ArchiveDestination` (an archive rule's Files,
+   BigObject or OffPlatform choice, which starts a whole run and is found by the class name
+   `OffPlatformArchiveDestination`) is a separate, coarser seam; its OffPlatform choice is a
+   Core class that writes the parts to Files and sends them through `OffPlatformDestination`,
+   added once both branches are on main.
 5. **Files first, then sent, one part per transaction.** A run still writes its parts to Files;
    a Core batch (`OffPlatformSendBatch`, scope 1, callouts allowed) then reads one part per
    execute and hands it to the destination, so a part of at most about 3 MB is the most any
@@ -71,9 +74,11 @@ still not depend on the Connector module (ADR-0013, ADR-0017).
    External Credential; the user who sends (the runner, or the nightly run's user) needs the
    connection's principal access (BarnCRM Connections), which Use for Backups gives the admin who
    saves it. CN-08 templates gain an optional `backup` part (method, path, headers) so templates
-   for common storage services (an HTTPS endpoint that accepts PUT with a key, such as an Azure
-   Blob container with a SAS URL or a WebDAV folder) prefill it; none is preloaded or shipped as
-   metadata, and the example files live in the repository as documentation.
+   for common storage services (an HTTPS endpoint that accepts PUT with a header key, or a WebDAV
+   folder such as Nextcloud, ownCloud or a NAS) prefill it; none is preloaded or shipped as
+   metadata, and the example files live in the repository as documentation. A path holds no
+   query string (F1 path rules), so storage that needs a secret in the URL's query (a SAS token)
+   is not supported.
 
 ## Alternatives considered
 
