@@ -528,9 +528,7 @@ public without sharing class RollupQueue implements Queueable {
 		if (requestedAtForTest == null && Test.isRunningTest() && readStampInTests != true) {
 			return false;
 		}
-		Datetime requestedAt = requestedAtForTest != null
-			? requestedAtForTest
-			: SettingsState.moment(REQUESTED_KEY);
+		Datetime requestedAt = requestedAtForTest != null ? requestedAtForTest : SettingsState.moment(REQUESTED_KEY);
 		return requestedAt != null && requestedAt > Datetime.now().addMinutes(-REQUEST_FRESH_MINUTES);
 	}
 

@@ -17,11 +17,15 @@ private class RollupApiTest {
 	private static final String CHILD_COUNT_KEY = 'Core_Api_Child_Count';
 
 	/** Totals read right after each call: recalculated in the transaction when there is room. */
+	// A test's setting override does not outlive @TestSetup, so each test method's
+	// transaction sets it as the class loads.
+	static {
+		RollupTestSupport.recalculateInTheSave();
+	}
+
 	@TestSetup
-	static void recalculateInTheSave() {
-		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			RollupTestSupport.recalculateInTheSave();
-		}
+	static void makeAdmin() {
+		TestUsers.adminWith('Rollup_Builder_Admin');
 	}
 
 	private static Rollup_Definition__c childCount(String bypassPermission) {
