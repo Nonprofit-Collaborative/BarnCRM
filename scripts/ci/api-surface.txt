@@ -1234,6 +1234,7 @@ core/NpspHouseholdSource.cls | public virtual String condition()
 core/NpspHouseholdSource.cls | public virtual String key()
 core/NpspHouseholdSource.cls | public virtual class NpspHouseholdSource
 core/OrgDate.cls | public class OrgDate
+core/OrgDate.cls | public static Date dateOf(Datetime)
 core/OrgDate.cls | public static Date today()
 core/OrgDate.cls | public static TimeZone zone()
 core/OrgLimitReader.cls | public Integer getPercent()
