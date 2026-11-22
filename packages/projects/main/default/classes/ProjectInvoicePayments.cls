@@ -198,8 +198,9 @@ public with sharing class ProjectInvoicePayments {
 			(invoice.Amount_Paid__c == null ? 0 : invoice.Amount_Paid__c);
 	}
 
+	/** The org's date, not the processing user's (D-219, OD-15). */
 	private static Date paidOn(Object paidAt) {
-		return paidAt instanceof Datetime ? ((Datetime) paidAt).date() : Date.today();
+		return paidAt instanceof Datetime ? OrgDate.dateOf((Datetime) paidAt) : OrgDate.today();
 	}
 
 	private static Decimal number(Object value) {

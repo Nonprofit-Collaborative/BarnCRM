@@ -98,6 +98,7 @@ If your organization has turned on pledge reminders, donors with a payment comin
 - "Enter the pledge total, above zero." or "Enter how often the donor pays, how many payments, and the date of the first one." Fill in **Pledge Total**, **How Often**, **First Payment Date**, and **Number of Payments** or **Last Payment Date**.
 - "The last payment date is before the first payment date. Change one of them." Check both dates.
 - "Choose one donor for this commitment, either a person or an account, not both." (when editing) Clear **Donor** or **Donor Account**.
+- "With this amount and number of payments, the last payment would be ..., which is not more than zero." (when editing a pledge) The amount times the payments before the last already reaches the **Expected Total**. Lower **Amount** or **Payments Planned**, or raise **Expected Total**.
 - "A pledge needs an expected total or a number of installments, so the schedule can be worked out." (when editing) Fill in **Expected Total** or **Payments Planned**.
 - "A recurring commitment has no expected total. Choose Pledge if the donor promised a fixed amount." (when editing) Clear **Expected Total**, or change **Type** to **Pledge**.
 - "Day of month is a day between 1 and 31, or empty to use the day of the start date." A 31 falls on the last day of a shorter month.

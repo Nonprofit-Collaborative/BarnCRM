@@ -38,8 +38,9 @@ public with sharing class MembershipPaymentListener implements Callable {
 
 	private static void paid(Map<String, Object> payment, String paymentId) {
 		Object source = payment.get('sourceRecordId');
+		// The org's date, not the processing user's (D-219, OD-15).
 		Date paidOn = payment.get('paidAt') instanceof Datetime
-			? ((Datetime) payment.get('paidAt')).date()
+			? OrgDate.dateOf((Datetime) payment.get('paidAt'))
 			: MembershipService.today();
 		Decimal amount = (Decimal) payment.get('amount');
 		List<Membership_Term__c> found = [

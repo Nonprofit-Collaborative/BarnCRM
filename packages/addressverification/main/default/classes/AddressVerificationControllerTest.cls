@@ -152,6 +152,7 @@ private class AddressVerificationControllerTest {
 			Assert.isFalse(stepBefore.active, 'The step waits for a connection');
 			Assert.isTrue(stepAfter.active, 'Then runs');
 			Assert.isTrue(stepAfter.switchDefault, 'Its switch ships on');
+			Assert.areEqual(230, stepAfter.minute, 'At 3:50, after the other 3:30 and 3:40 steps');
 			Assert.areEqual(
 				BarnHelp.text('AddressVerification', 'AddressVerification_Setup_NotStarted'),
 				notStarted,

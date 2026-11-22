@@ -88,3 +88,11 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 **Prerequisites:** an Active member certification with Expires On set to yesterday (as an admin).
 **Steps:** 1. Wait for the next nightly run. 2. Open the member certification.
 **Expected:** 2. Status Expired. Renew is offered again once the credits are in.
+
+## T-MEM-13: The Org's Date for Every User
+
+**Purpose:** confirm renewal and expiry use the organization's date, not the running user's (D-219, OD-15).
+**Prerequisites:** a Team Member whose time zone (Settings, Personal Information) is at least 11 hours from the org's (**Setup**, **Company Information**), for example Pacific/Kiritimati when the org is in America; run it when that user's date differs from the org's (the org's late evening for a zone ahead). Two Current memberships: one ending on the org's today, one ending the org's yesterday; one Lapsed membership.
+**Steps:** 1. Run the Memberships step as that user (**Nightly Jobs**, **Memberships**, **Run Now**). 2. As that user, renew the Lapsed membership. 3. As that user, add a membership with only the level and a contact.
+**Expected:** 1. The one ending the org's today stays Current; the one ending the org's yesterday moves to Grace. 2. The new term starts on the org's today. 3. Start Date is the org's today and End Date is a year later less a day.
+**Cleanup:** Put the user's time zone back.

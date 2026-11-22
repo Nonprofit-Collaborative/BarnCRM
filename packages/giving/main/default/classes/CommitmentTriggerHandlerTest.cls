@@ -255,4 +255,54 @@ private class CommitmentTriggerHandlerTest {
 			);
 		}
 	}
+
+	/**
+	 * Three payments of 100 toward a total of 200 would leave a last payment of 0, and toward 150
+	 * one of -50: both are refused at save with the reason. A total of 200.01 leaves 0.01, the
+	 * smallest valid last payment, and saves. Raising a saved pledge's amount to 150 is refused
+	 * the same way (D-219, OD-14).
+	 */
+	@IsTest
+	static void refusesAPledgeWhoseLastPaymentWouldBeZeroOrLess() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			Contact person = donor();
+			Commitment__c zero = pledgeFor(person.Id);
+			zero.Expected_Total__c = 200;
+			Commitment__c negative = pledgeFor(person.Id);
+			negative.Expected_Total__c = 150;
+			Commitment__c boundary = pledgeFor(person.Id);
+			boundary.Expected_Total__c = 200.01;
+
+			Test.startTest();
+			List<Database.SaveResult> results = Database.insert(
+				new List<Commitment__c>{ zero, negative, boundary },
+				false,
+				AccessLevel.USER_MODE
+			);
+			Commitment__c saved = pledgeFor(person.Id);
+			insert saved;
+			saved.Amount__c = 150;
+			Database.SaveResult raised = Database.update(saved, false, AccessLevel.USER_MODE);
+			Test.stopTest();
+
+			Decimal zeroLast = 0.00;
+			Decimal negativeLast = -50.00;
+			Assert.isFalse(results[0].isSuccess(), 'A zero last payment is refused.');
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Commitment_LastPaymentNotPositive', new List<Object>{ zeroLast.format() }),
+				results[0].getErrors()[0].getMessage(),
+				'The error names the last payment and how to fix it.'
+			);
+			Assert.isFalse(results[1].isSuccess(), 'A negative last payment is refused.');
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Commitment_LastPaymentNotPositive', new List<Object>{ negativeLast.format() }),
+				results[1].getErrors()[0].getMessage(),
+				'The negative amount is named.'
+			);
+			Assert.isTrue(results[2].isSuccess(), 'A last payment of 0.01 saves.');
+			List<Installment__c> plan = CommitmentService.buildSchedule(boundary);
+			Assert.areEqual(0.01, plan[2].Expected_Amount__c, 'The last payment absorbs the remainder.');
+			Assert.isFalse(raised.isSuccess(), 'Raising the amount past the total is refused on update too.');
+		}
+	}
 }

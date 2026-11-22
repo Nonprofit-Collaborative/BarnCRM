@@ -19,7 +19,7 @@ public with sharing class AddressVerificationNightlyJobProvider implements Night
 					STEP_KEY,
 					BarnHelp.text('AddressVerification', 'AddressVerification_NightlyStep'),
 					3,
-					30,
+					50,
 					new AddressVerificationJob()
 				)
 				.withSwitch(true)

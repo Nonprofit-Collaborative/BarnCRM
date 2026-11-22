@@ -792,10 +792,11 @@ that org builds its own lapsing report on an account-based report type.
 the package, so everyone who opens it sees the hours and sign-ups that user can see, not their own
 view. Hours are private, so share the folder only with people who are allowed to see all volunteer
 hours, such as Coordinators. The folders ship public read only, and all four
-Volunteers permission sets can run and view the reports and dashboards. Only **Volunteers Admin**
-can also create reports and dashboards of their own, and change the shipped ones by saving a copy
-into a folder they can write to. No Volunteers set edits or deletes everything in public folders:
-to let someone change the shipped folders themselves, share those folders with them as Manager in
+Volunteers permission sets can run and view the reports and dashboards. No Volunteers set
+creates or customizes reports and dashboards: those rights come from the person's profile, as for
+any other Salesforce report, so your organization decides who builds them. No Volunteers set edits
+or deletes everything in public folders: to let someone change the shipped folders themselves,
+share those folders with them as Manager in
 Salesforce.
 
 **How to change the running user.** The running user is the admin who installed or deployed the

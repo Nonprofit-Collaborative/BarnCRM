@@ -619,4 +619,32 @@ public class TestUsers {
 	private static String keyHash(String key) {
 		return EncodingUtil.convertToHex(Crypto.generateDigest('MD5', Blob.valueOf(key))).left(10);
 	}
+
+	/**
+	 * Moves a test user to a time zone at least eleven hours from the org's (Pacific/Pago_Pago
+	 * for an org at or east of GMT, Pacific/Kiritimati otherwise) and returns a moment two days
+	 * ago, near midnight in one of the two zones, that falls on a different calendar date for
+	 * that user than for the org. For tests that a date comes from `OrgDate`, not the running
+	 * user's time zone (D-219, OD-15).
+	 *
+	 * @param person a test user, updated here
+	 * @return the moment, whose `OrgDate.dateOf` differs from its date in the user's zone
+	 */
+	@NamespaceAccessible
+	public static Datetime inAnotherTimeZone(User person) {
+		String orgZone = OrgDate.zone().getID();
+		String userZone = OrgDate.zone().getOffset(Datetime.now()) >= 0 ? 'Pacific/Pago_Pago' : 'Pacific/Kiritimati';
+		person.TimeZoneSidKey = userZone;
+		System.runAs(new User(Id = UserInfo.getUserId())) {
+			update person;
+		}
+		Date day = Date.today().addDays(-2);
+		for (Integer hour = 0; hour < 24; hour++) {
+			Datetime moment = Datetime.newInstanceGmt(day, Time.newInstance(hour, 30, 0, 0));
+			if (moment.format('yyyy-MM-dd', orgZone) != moment.format('yyyy-MM-dd', userZone)) {
+				return moment;
+			}
+		}
+		return null;
+	}
 }

@@ -83,6 +83,12 @@ Date** of today for a Current membership, the **End Date** from the level's Term
 day), and **Member Since** from the term it renews. A membership names a contact, a household or
 organization, or both (an organization member with its named contact).
 
+Every Memberships "today" is the date in your organization's default time zone (**Setup**,
+**Company Information**), whoever is working: the start date filled on save, a rejoin after a
+lapse, when a term ends and moves to Grace or Lapsed, reminders, and when a certification is
+granted, renewed or expires. A staff member whose own time zone has already moved to the next day
+gets the same dates as everyone else.
+
 **Origin** says whether a term is **New**, a **Renewal** (renewed while Current or in Grace, so
 the new term starts the day after the old one ends) or a **Rejoin** (renewed after it lapsed, so
 it starts on the renewal day). **Source** says how it was made: Staff, Gift, Recurring Gift,

@@ -470,6 +470,11 @@ private class ConnectorClockTest {
 				tooMuch,
 				'An administrator would give Integration User recipes every record.'
 			);
+			Assert.isTrue(
+				ConnectorIntegrationUser.seesEverything(UserInfo.getUserId()),
+				'The System Administrator profile counts through its own permission set, not its name.'
+			);
+			Assert.isFalse(ConnectorIntegrationUser.seesEverything(integrator.Id), 'A recipe user does not.');
 			Assert.areEqual(String.valueOf(integrator.Id), chosen.id);
 			Assert.areEqual(integrator.Id, ConnectorIntegrationUser.chosenId(), 'Saved org-wide.');
 			Assert.isTrue(ConnectorIntegrationUser.ready());

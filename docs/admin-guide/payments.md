@@ -189,6 +189,12 @@ BarnCRM never shows a secret: it cannot read one.
 Refunds are made in Stripe or PayPal, never in BarnCRM; BarnCRM records them when the processor
 reports them.
 
+The date a payment gives a gift, a membership term, an invoice or a recurring gift event is the
+day **Paid At** falls on in your organization's default time zone (**Setup**, **Company
+Information**), whoever processes it. A gift paid at 11:30 PM in your time zone is dated that
+day, even when the payment is processed by a user whose own time zone has already moved to the
+next day.
+
 **Payment Events** lists every message the processors sent, with what was done with it
 (Applied, Ignored, Rejected, Failed) and why. Each processor message is used once, however many
 times it is sent. A Stripe message is fetched back from Stripe before it is used: if Stripe has

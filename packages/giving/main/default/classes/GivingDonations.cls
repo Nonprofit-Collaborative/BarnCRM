@@ -9,7 +9,8 @@
  *   to Received, Refunded or Cancelled; with no gift yet it does nothing, except for a donor
  *   portal payment on a commitment (PAY-03), whose Paid report writes the Received gift.
  * Both are safe to run twice. User mode throughout: the processing staff user, or the Payments
- * processing administrator.
+ * processing administrator. Gift dates are the org's date (`OrgDate`), never the processing
+ * user's (D-219, OD-15).
  *
  * Giving does not depend on Payments: the seam is `PaymentsApi`, built by name (ADR-0017).
  */
@@ -79,7 +80,7 @@ public with sharing class GivingDonations implements Callable {
 		Gift__c gift = new Gift__c(
 			Appeal__c = receipt.contextRecordId,
 			Amount__c = (Decimal) payment.get('amount'),
-			Gift_Date__c = Date.today(),
+			Gift_Date__c = OrgDate.today(),
 			Type__c = String.valueOf(payment.get('processor')) == 'Stripe' ? 'Card' : 'Other',
 			Payment_Reference__c = reference,
 			Status__c = giftStatus(String.valueOf(payment.get('status'))) ?? 'Pending'
@@ -238,7 +239,7 @@ public with sharing class GivingDonations implements Callable {
 				Installment__c = charged?.Commitment__c == source ? charged.Id : null,
 				Appeal__c = commitment.Appeal__c,
 				Amount__c = (Decimal) payment.get('amount'),
-				Gift_Date__c = Date.today(),
+				Gift_Date__c = OrgDate.today(),
 				Type__c = String.valueOf(payment.get('processor')) == 'Stripe' ? 'Card' : 'Other',
 				Payment_Reference__c = reference,
 				Status__c = 'Received'
@@ -363,7 +364,7 @@ public with sharing class GivingDonations implements Callable {
 
 	private static void settleDate(Gift__c gift, Map<String, Object> payment) {
 		if (gift.Status__c == 'Received' && payment.get('paidAt') instanceof Datetime) {
-			gift.Gift_Date__c = ((Datetime) payment.get('paidAt')).date();
+			gift.Gift_Date__c = OrgDate.dateOf((Datetime) payment.get('paidAt'));
 		}
 	}
 

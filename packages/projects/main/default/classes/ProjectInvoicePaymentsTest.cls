@@ -152,6 +152,31 @@ private class ProjectInvoicePaymentsTest {
 		}
 	}
 
+	/**
+	 * A payment near midnight, processed by a user in a time zone far from the org's, is dated
+	 * with the org's date (D-219, OD-15).
+	 */
+	@IsTest
+	static void thePaidDateIsTheOrgDateNotTheProcessingUsersDate() {
+		User processor = ProjectsTestData.admin();
+		Datetime paidAt = TestUsers.inAnotherTimeZone(processor);
+		System.runAs(processor) {
+			online(true);
+			Project_Invoice__c invoice = sentInvoice();
+			ProjectInvoicePayments.sendLink(invoice.Id);
+			Map<String, Object> paid = report(invoice.Id, 'Paid', 300, 0);
+			paid.put('paidAt', paidAt);
+
+			Test.startTest();
+			new ProjectInvoicePaymentListener().call('paymentChanged', paid);
+			Test.stopTest();
+
+			Date paidOn = reload(invoice.Id).Paid_Date__c;
+			Assert.areEqual(OrgDate.dateOf(paidAt), paidOn, 'The org date of the payment');
+			Assert.areNotEqual(paidAt.date(), paidOn, 'Not the processing user date');
+		}
+	}
+
 	@IsTest
 	static void anOlderPaymentOrAVoidInvoiceIsNeverChanged() {
 		System.runAs(ProjectsTestData.admin()) {

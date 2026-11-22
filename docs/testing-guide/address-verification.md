@@ -72,7 +72,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 1 | Set **Most addresses checked a night** to 3. | Saved. |
 | 2 | On **Address Verification Setup** select **Verify Waiting Addresses**. | "Started." |
 | 3 | After a minute, run a Find query on Addresses where Verification Status is Unverified. | 3 fewer than before. |
-| 4 | Open **Nightly Jobs** in Settings. | An **Address Verification** step at 3:30 AM, switched on. |
+| 4 | Open **Nightly Jobs** in Settings. | An **Address Verification** step at 3:50 AM, switched on. |
 
 **Cleanup:** Set the limit back to 200.
 
