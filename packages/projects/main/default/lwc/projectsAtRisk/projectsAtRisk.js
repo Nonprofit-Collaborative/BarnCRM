@@ -88,8 +88,13 @@ export default class ProjectsAtRisk extends LightningElement {
   allRows = [];
   onlyMine = false;
   errorMessage;
+  refreshProjects;
 
   connectedCallback() {
+    // A card opened again shows the cached read at once; read it again for new projects.
+    if (this.refreshProjects) {
+      this.refreshProjects();
+    }
     if (!this.helpReady) {
       loadHelp([PKG]).then(() => {
         this.helpReady = true;
@@ -98,7 +103,9 @@ export default class ProjectsAtRisk extends LightningElement {
   }
 
   @wire(graphql, { query: AT_RISK_QUERY })
-  receiveProjects({ data, errors }) {
+  receiveProjects(result) {
+    const { data, errors } = result;
+    this.refreshProjects = result.refresh;
     if (errors && errors.length) {
       this.allRows = [];
       this.errorMessage = helpText('Projects', 'Projects_Error_Generic');

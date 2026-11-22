@@ -163,6 +163,18 @@ describe('c-grant-answer-library', () => {
     expect(updateRecord).not.toHaveBeenCalled();
   });
 
+  it('reads the answers again when the card is opened again', async () => {
+    const refresh = jest.fn();
+    const element = createElement('c-grant-answer-library', { is: GrantAnswerLibrary });
+    document.body.appendChild(element);
+    graphql.emit(payload(ANSWERS), undefined, refresh);
+    await flush();
+    expect(refresh).not.toHaveBeenCalled();
+    document.body.removeChild(element);
+    document.body.appendChild(element);
+    expect(refresh).toHaveBeenCalledTimes(1);
+  });
+
   it('says when there are no answers yet, and shows a load error', async () => {
     let element = await render([], { createable: false, fields: {} });
     expect(one(element, '[data-id="empty"]')).not.toBeNull();

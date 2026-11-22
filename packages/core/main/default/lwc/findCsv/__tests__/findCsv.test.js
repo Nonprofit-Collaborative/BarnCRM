@@ -6,7 +6,6 @@ import {
   fileName,
   format,
   messageFrom,
-  recordErrorMessage,
   saveBlob,
   toCsv,
   valueAt,
@@ -126,26 +125,6 @@ describe('c/findCsv', () => {
     expect(bodyMessage(new Error('Thrown'), 'Fallback')).toBe('Fallback');
     expect(bodyMessage({ body: { message: '' } }, 'Fallback')).toBe('Fallback');
     expect(bodyMessage(null)).toBe('c.Core_UnexpectedError');
-  });
-
-  it('shows the record or field error a Lightning Data Service save returned', () => {
-    const general = 'An error occurred while trying to update the record.';
-    expect(
-      recordErrorMessage({
-        body: { message: general, output: { errors: [{ message: 'Resolution is needed' }] } }
-      })
-    ).toBe('Resolution is needed');
-    expect(
-      recordErrorMessage({
-        body: {
-          message: general,
-          output: { errors: [], fieldErrors: { Name: [{ message: 'Name is too long' }] } }
-        }
-      })
-    ).toBe('Name is too long');
-    expect(recordErrorMessage({ body: { message: general, output: {} } })).toBe(general);
-    expect(recordErrorMessage(new Error('Thrown'), 'Fallback')).toBe('Thrown');
-    expect(recordErrorMessage(null)).toBe('c.Core_UnexpectedError');
   });
 
   describe('saving files', () => {

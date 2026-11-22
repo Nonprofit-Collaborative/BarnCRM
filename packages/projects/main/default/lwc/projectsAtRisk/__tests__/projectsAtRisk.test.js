@@ -70,6 +70,17 @@ describe('c-projects-at-risk', () => {
     expect(rows(element)[0].textContent).toContain('Rollout');
   });
 
+  it('reads the list again when the card is opened again', async () => {
+    const refresh = jest.fn();
+    const element = mount();
+    graphql.emit({ uiapi: { query: { Project__c: { edges: [] } } } }, undefined, refresh);
+    await flush();
+    expect(refresh).not.toHaveBeenCalled();
+    document.body.removeChild(element);
+    document.body.appendChild(element);
+    expect(refresh).toHaveBeenCalledTimes(1);
+  });
+
   it('says when nothing is at risk and shows a failure', async () => {
     const element = mount();
     emitProjects();

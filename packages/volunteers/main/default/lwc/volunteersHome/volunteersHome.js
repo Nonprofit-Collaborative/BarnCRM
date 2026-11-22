@@ -14,12 +14,15 @@ import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 /** Core's Import tab, opened by name: the first-run panel's second action. */
 const IMPORT_TAB = 'Import';
 
+// The name comes from a schema import (ADR-0093 A1), so the query works with any namespace.
+const JOB_OBJECT = VOLUNTEER_JOB.objectApiName;
+
 /** Whether any volunteer job exists yet, read as the person (ADR-0093). */
 const FIRST_JOB = gql`
   query firstVolunteerJob {
     uiapi {
       query {
-        Volunteer_Job__c(first: 1) {
+        ${JOB_OBJECT}(first: 1) {
           edges {
             node {
               Id
@@ -48,6 +51,7 @@ export default class VolunteersHome extends NavigationMixin(LightningElement) {
   noJobYet;
   canCreateJob = false;
   canCreateImport = false;
+  refreshFirstJob;
 
   @wire(getObjectInfo, { objectApiName: VOLUNTEER_JOB })
   receiveJobInfo({ data }) {
@@ -61,8 +65,10 @@ export default class VolunteersHome extends NavigationMixin(LightningElement) {
 
   // The first-run panel is a nicety: if the read fails, the figures still show.
   @wire(graphql, { query: FIRST_JOB })
-  receiveFirstJob({ data }) {
-    this.noJobYet = data ? data.uiapi.query.Volunteer_Job__c.edges.length === 0 : undefined;
+  receiveFirstJob(result) {
+    const { data } = result;
+    this.refreshFirstJob = result.refresh;
+    this.noJobYet = data ? data.uiapi.query[JOB_OBJECT].edges.length === 0 : undefined;
   }
 
   /** New Volunteer Job in the header, once the help text is in and not beside the first-run one. */
@@ -71,6 +77,10 @@ export default class VolunteersHome extends NavigationMixin(LightningElement) {
   }
 
   connectedCallback() {
+    // A card opened again shows the cached read at once; read it again for new jobs.
+    if (this.refreshFirstJob) {
+      this.refreshFirstJob();
+    }
     if (!this.helpReady) {
       loadHelp('Volunteers').then(() => {
         this.helpReady = true;

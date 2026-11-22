@@ -9,7 +9,7 @@ import ANSWER_FIELD from '@salesforce/schema/Grant_Answer__c.Answer__c';
 import LAST_USED_FIELD from '@salesforce/schema/Grant_Answer__c.Last_Used_Date__c';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { filterAnswers, preview, topicList } from 'c/grantAnswerModel';
-import { format, localIsoDate, recordErrorMessage } from 'c/findCsv';
+import { format, localIsoDate, messageFrom } from 'c/findCsv';
 import { showDate } from 'c/grantReportModel';
 
 import TITLE from '@salesforce/label/c.Funders_Answers_Title';
@@ -115,7 +115,13 @@ export default class GrantAnswerLibrary extends NavigationMixin(LightningElement
   canCreate = false;
   canStamp = false;
 
+  refreshLibrary;
+
   connectedCallback() {
+    // A card opened again shows the cached read at once; read it again for new answers.
+    if (this.refreshLibrary) {
+      this.refreshLibrary();
+    }
     if (!this.helpReady) {
       loadHelp('Funders').then(() => {
         this.helpReady = true;
@@ -124,7 +130,9 @@ export default class GrantAnswerLibrary extends NavigationMixin(LightningElement
   }
 
   @wire(graphql, { query: LIBRARY_QUERY })
-  receiveLibrary({ data, errors }) {
+  receiveLibrary(result) {
+    const { data, errors } = result;
+    this.refreshLibrary = result.refresh;
     if (errors && errors.length) {
       this.library = undefined;
       this.errorMessage = helpText('Funders', 'Funders_Answers_ErrorLoad');
@@ -249,10 +257,7 @@ export default class GrantAnswerLibrary extends NavigationMixin(LightningElement
       const withDate = (each) => (each.id === id ? { ...each, lastUsed: stamped } : each);
       this.library = { ...this.library, answers: this.answers.map(withDate) };
     } catch (error) {
-      this.toast(
-        recordErrorMessage(error, helpText('Funders', 'Funders_Answers_ErrorStamp')),
-        'error'
-      );
+      this.toast(messageFrom(error, helpText('Funders', 'Funders_Answers_ErrorStamp')), 'error');
     }
   }
 

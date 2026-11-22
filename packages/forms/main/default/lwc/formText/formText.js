@@ -414,3 +414,9 @@ export function actionText(action) {
 export function messageFrom(error) {
   return error && error.body && error.body.message ? error.body.message : LABELS.actionFailed;
 }
+
+/** The first message a GraphQL read returned in its `errors` array, or the general one. */
+export function graphqlMessage(errors) {
+  const first = (errors || []).find((error) => error && error.message);
+  return messageFrom(first ? { body: { message: first.message } } : null);
+}

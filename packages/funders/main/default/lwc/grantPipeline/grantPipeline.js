@@ -20,7 +20,7 @@ import {
 } from 'c/grantPipelineModel';
 import { createDragController } from 'c/barnDrag';
 import { dragInstructions, dragMessages } from 'c/barnDragText';
-import { format, messageFrom, recordErrorMessage } from 'c/findCsv';
+import { format, messageFrom } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
 import { recordHref } from 'c/barnFormat';
 import GrantAwardModal from 'c/grantAwardModal';
@@ -449,10 +449,7 @@ export default class GrantPipeline extends NavigationMixin(LightningElement) {
       await this.load();
       return true;
     } catch (error) {
-      this.toast(
-        recordErrorMessage(error, helpText('Funders', 'Funders_Shared_NotSaved')),
-        'error'
-      );
+      this.toast(messageFrom(error, helpText('Funders', 'Funders_Shared_NotSaved')), 'error');
       return false;
     }
   }

@@ -156,9 +156,7 @@ describe('c-form-submission', () => {
     document.body.appendChild(element);
     graphql.emitErrors([{ message: 'No access' }]);
     await flush();
-    expect(find(element, 'error').querySelector('c-barn-notice').message).toBe(
-      'c.Forms_Builder_ActionFailed'
-    );
+    expect(find(element, 'error').querySelector('c-barn-notice').message).toBe('No access');
 
     const empty = await render(null);
     expect(find(empty, 'status')).toBeNull();

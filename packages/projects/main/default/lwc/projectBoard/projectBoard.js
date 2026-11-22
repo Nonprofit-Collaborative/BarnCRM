@@ -13,7 +13,7 @@ import logTime from '@salesforce/apex/ProjectsController.logTime';
 import addExpense from '@salesforce/apex/ProjectTimesheetController.addExpense';
 import refreshHealth from '@salesforce/apex/ProjectsController.refreshHealth';
 import draftStatusUpdate from '@salesforce/apex/ProjectsController.draftStatusUpdate';
-import { localIsoDate, messageFrom, recordErrorMessage } from 'c/findCsv';
+import { localIsoDate, messageFrom } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import {
@@ -221,7 +221,7 @@ export default class ProjectBoard extends NavigationMixin(LightningElement) {
       await this.load();
       return result;
     } catch (error) {
-      this.errorMessage = recordErrorMessage(error);
+      this.errorMessage = messageFrom(error);
       return undefined;
     } finally {
       this.isWorking = false;

@@ -2,6 +2,7 @@ import {
   LABELS,
   actionText,
   answerText,
+  graphqlMessage,
   messageFrom,
   nestedKept,
   onMatchOptions,
@@ -58,5 +59,11 @@ describe('c/formText', () => {
   it('gives a failed call its own message, or the general one', () => {
     expect(messageFrom({ body: { message: 'Locked.' } })).toBe('Locked.');
     expect(messageFrom(new Error('x'))).toBe('c.Forms_Builder_ActionFailed');
+  });
+
+  it('shows the first message a GraphQL read returned, or the general one', () => {
+    expect(graphqlMessage([{}, { message: 'No access' }, { message: 'Other' }])).toBe('No access');
+    expect(graphqlMessage([])).toBe('c.Forms_Builder_ActionFailed');
+    expect(graphqlMessage(undefined)).toBe('c.Forms_Builder_ActionFailed');
   });
 });

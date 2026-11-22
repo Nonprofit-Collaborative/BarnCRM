@@ -13,7 +13,7 @@ import createFromTemplate from '@salesforce/apex/ProjectsController.createFromTe
 import getUtilization from '@salesforce/apex/ProjectsController.getUtilization';
 import exportBillable from '@salesforce/apex/ProjectsController.exportBillable';
 import applyRates from '@salesforce/apex/ProjectsController.applyRates';
-import { fileName, localIsoDate, messageFrom, recordErrorMessage, toCsv } from 'c/findCsv';
+import { fileName, localIsoDate, messageFrom, toCsv } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { BILLABLE_COLUMNS, completedDateFor, utilizationRows } from 'c/projectsModel';
@@ -275,7 +275,7 @@ export default class ProjectsHome extends NavigationMixin(LightningElement) {
       this.notice = helpText('Projects', 'Projects_Home_Marked');
       await this.load();
     } catch (error) {
-      this.errorMessage = recordErrorMessage(error);
+      this.errorMessage = messageFrom(error);
     } finally {
       this.isWorking = false;
     }

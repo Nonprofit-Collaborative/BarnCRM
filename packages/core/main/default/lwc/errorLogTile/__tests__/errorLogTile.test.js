@@ -181,6 +181,20 @@ describe('c-error-log-tile', () => {
       expect(text).toContain('c.Core_ErrorLogTile_BugReport_NoDetail');
     });
 
+    it('keeps Copy disabled until the entries are read, never saying the entry is gone', async () => {
+      const element = createComponent();
+      getTile.emit(TILE);
+      await flush();
+
+      const buttons = element.shadowRoot.querySelectorAll('.copy-report-button');
+      expect(buttons[0].disabled).toBe(true);
+      expect(buttons[1].disabled).toBe(true);
+
+      emitReports(REPORT);
+      await flush();
+      expect(element.shadowRoot.querySelectorAll('.copy-report-button')[0].disabled).toBe(false);
+    });
+
     it('says to refresh when the entry is no longer readable', async () => {
       const element = createComponent();
       getTile.emit(TILE);

@@ -2,6 +2,7 @@ import { LightningElement, api, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import { gql, graphql } from 'lightning/graphql';
 import FORM_OBJECT from '@salesforce/schema/Form__c';
+import STATUS_FIELD from '@salesforce/schema/Form__c.Status__c';
 import getForm from '@salesforce/apex/FormRunnerController.getForm';
 import submit from '@salesforce/apex/FormRunnerController.submit';
 import { parseDefinition } from 'c/formDefinition';
@@ -16,16 +17,19 @@ import {
   readFiles,
   visibleSteps
 } from 'c/formRules';
-import { HELP, LABELS, answerText, messageFrom, resultText } from 'c/formText';
+import { HELP, LABELS, answerText, graphqlMessage, messageFrom, resultText } from 'c/formText';
 import { isHelpLoaded, loadHelp } from 'c/barnHelpText';
+
+// Every name comes from a schema import (ADR-0093 A1), so the query works with any namespace.
+const FORM = FORM_OBJECT.objectApiName;
 
 /** The published forms the picker offers, by name, read as the person (ADR-0093). */
 const PUBLISHED_FORMS = gql`
   query publishedForms {
     uiapi {
       query {
-        Form__c(
-          where: { Status__c: { eq: "Published" } }
+        ${FORM}(
+          where: { ${STATUS_FIELD.fieldApiName}: { eq: "Published" } }
           orderBy: { Name: { order: ASC } }
           first: 500
         ) {
@@ -85,8 +89,13 @@ export default class FormRunner extends NavigationMixin(LightningElement) {
   loading = false;
   errorMessage;
   result;
+  refreshForms;
 
   connectedCallback() {
+    // A card opened again shows the cached list at once; read it again for new forms.
+    if (this.refreshForms) {
+      this.refreshForms();
+    }
     if (!this.helpReady) {
       loadHelp(HELP).then(() => {
         this.helpReady = true;
@@ -112,14 +121,16 @@ export default class FormRunner extends NavigationMixin(LightningElement) {
   }
 
   @wire(graphql, { query: PUBLISHED_FORMS })
-  wiredForms({ data, errors }) {
+  wiredForms(result) {
+    const { data, errors } = result;
+    this.refreshForms = result.refresh;
     if (data) {
-      this.formOptions = data.uiapi.query.Form__c.edges.map(({ node }) => ({
+      this.formOptions = data.uiapi.query[FORM].edges.map(({ node }) => ({
         value: node.Id,
         label: node.Name.value
       }));
     } else if (errors) {
-      this.errorMessage = messageFrom(errors);
+      this.errorMessage = graphqlMessage(errors);
     }
   }
 
