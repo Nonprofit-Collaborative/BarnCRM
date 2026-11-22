@@ -631,7 +631,7 @@ recipe links.
 | Permission set | Gives |
 |---|---|
 | BarnCRM Connector Admin | The Super Connector tab (in BarnCRM Admin Console), Manage BarnCRM Connector and every recipe and run. Give it only to system administrators: whoever holds it decides where your data goes. |
-| BarnCRM Connector Viewer | The Super Connector tab (from the App Launcher), to see recipes and Run History without changing them. The Connections tab tells a Viewer that Connector admins manage connections. |
+| BarnCRM Connector Viewer | The Super Connector tab (in BarnCRM Admin Console), to see recipes and Run History without changing them. The Connections tab tells a Viewer that Connector admins manage connections. |
 | BarnCRM Connector Webhook Guest | For a Site's guest user only: the webhook receiver and nothing else (no object, record, connection or key). Health Check's **Give Webhook Access** assigns it. |
 | BarnCRM Connections | Created by BarnCRM in your org, not part of the package. It holds each connection's principal access and is given only to Connector admins when they create or check a connection, to the Automated Process user when you save Recipe Access, and to the integration user when you choose it. Do not add other permissions to it: Health Check warns when it holds anything else. |
 

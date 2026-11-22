@@ -28,6 +28,6 @@ referenced.
   `ScholarshipsAccessSync`; custom permission `Scholarships_Manage`.
 - No app of its own: the catalog row's `App_Name__c` is `BarnCRM_Funders`, so
   `scripts/org/module-app-tabs.py` adds `Staff_Tabs__c` to BarnCRM Grants after the grant pages,
-  or to BarnCRM Console when Grants is not deployed (ADR-NEXT (nine console apps)).
+  and to BarnCRM Console, which the Scholarships sets show (ADR-NEXT (nine console apps)).
 - Settings in the Scholarships and Outbound Grants section of BarnCRM Settings; help text in
   `BarnHelp_Scholarships`.

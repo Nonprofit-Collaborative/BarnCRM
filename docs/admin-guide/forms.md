@@ -31,11 +31,11 @@ Install it from **Module Manager** (see [Module Manager](module-manager.md)). Wh
 finishes, BarnCRM gives you, the person who installed it, the **Forms Admin** permission set,
 and gives everyone who already has a BarnCRM role their Forms permission set (see below).
 
-Forms has no app of its own. Its **Form Submissions** tab is in the **BarnCRM Console** app, after
-**Data Manager**, and its **Forms Home** and **Forms** tabs are in **BarnCRM Admin Console**,
-before **Error Log**. A source install puts them there itself; after a package install, add them once in
-App Manager (see [The BarnCRM Apps](barncrm-app.md#a-modules-pages-in-the-barncrm-apps)). Anyone with a
-Forms permission set can also open these pages from the App Launcher. A form or submission opens on its own
+Forms has no app of its own. Its **Forms** and **Form Submissions** tabs are in the **BarnCRM
+Console** app, after **Data Manager**, and its **Forms Home** and **Forms** tabs are in **BarnCRM
+Admin Console**, before **Error Log**. A source install puts them there itself; after a package install, add them once in
+App Manager (see [The BarnCRM Apps](barncrm-app.md#a-modules-pages-in-the-barncrm-apps)). The Forms
+permission sets show BarnCRM Console, and Forms Admin also BarnCRM Admin Console. A form or submission opens on its own
 record page from any app.
 
 ### Forms Home

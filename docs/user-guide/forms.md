@@ -14,7 +14,7 @@ right.
 
 ## To Fill In a Form
 
-1. Open **BarnCRM Admin Console** (or the App Launcher), the **Forms** tab, and the form.
+1. Open the **BarnCRM Console** app, the **Forms** tab, and the form.
 2. Select the **Fill In** tab.
 3. Answer the questions on the first step and select **Next**. A question you must answer, or an
    answer BarnCRM cannot take (an email without an `@`, a date that is not a date), says what to
