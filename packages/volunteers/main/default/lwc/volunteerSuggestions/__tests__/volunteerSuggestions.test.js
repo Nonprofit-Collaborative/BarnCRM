@@ -3,6 +3,8 @@ import { createElement } from 'lwc';
 import VolunteerSuggestions from 'c/volunteerSuggestions';
 import getSuggestions from '@salesforce/apex/VolunteerSuggestionController.getSuggestions';
 import addSignup from '@salesforce/apex/VolunteerShiftSignupsController.addSignup';
+import { publish, subscribe, unsubscribe } from 'lightning/messageService';
+import RECORD_CHANGED from '@salesforce/messageChannel/BarnCRM_Record_Changed__c';
 
 setHelpTextForTest({
   Volunteers_Suggestions_Booked: '{0} is signed up.',
@@ -133,8 +135,6 @@ describe('c-volunteer-suggestions', () => {
       .mockResolvedValueOnce(suggestions([candidate('p1', 'Ana Strong')]))
       .mockResolvedValueOnce(suggestions([]));
     addSignup.mockResolvedValue({});
-    const heard = jest.fn();
-    window.addEventListener('barnshiftsignupschanged', heard);
     const element = build();
     await flush();
 
@@ -142,11 +142,38 @@ describe('c-volunteer-suggestions', () => {
     await flush();
 
     expect(addSignup).toHaveBeenCalledWith({ shiftId: SHIFT_ID, personId: 'p1', status: null });
-    expect(heard).toHaveBeenCalledTimes(1);
-    expect(heard.mock.calls[0][0].detail).toEqual({ shiftId: SHIFT_ID });
+    expect(publish).toHaveBeenCalledTimes(1);
+    expect(publish.mock.calls[0][1]).toBe(RECORD_CHANGED);
+    expect(publish.mock.calls[0][2]).toEqual({
+      recordId: SHIFT_ID,
+      source: 'volunteerSuggestions'
+    });
     expect(byId(element, 'result-text').textContent).toBe('Ana Strong is signed up.');
     expect(element.shadowRoot.querySelectorAll('[data-id="suggestion"]').length).toBe(0);
-    window.removeEventListener('barnshiftsignupschanged', heard);
+  });
+
+  it('reloads when the Sign-ups panel changes this shift, and stops listening when removed', async () => {
+    getSuggestions.mockResolvedValue(suggestions([candidate('p1', 'Ana Strong')]));
+    subscribe.mockReturnValue({ id: 'subscription' });
+    const element = build();
+    await flush();
+    expect(getSuggestions).toHaveBeenCalledTimes(1);
+    expect(subscribe).toHaveBeenCalledWith(undefined, RECORD_CHANGED, expect.any(Function));
+    const handler = subscribe.mock.calls[0][2];
+
+    handler({ recordId: 'other', source: 'shiftSignups' });
+    handler({ recordId: SHIFT_ID, source: 'volunteerSuggestions' });
+    await flush();
+    expect(getSuggestions).toHaveBeenCalledTimes(1);
+
+    getSuggestions.mockResolvedValue(suggestions([]));
+    handler({ recordId: SHIFT_ID, source: 'shiftSignups' });
+    await flush();
+    expect(getSuggestions).toHaveBeenCalledTimes(2);
+    expect(element.shadowRoot.querySelectorAll('[data-id="suggestion"]').length).toBe(0);
+
+    document.body.removeChild(element);
+    expect(unsubscribe).toHaveBeenCalledWith({ id: 'subscription' });
   });
 
   it('reports a sign-up the server refused in its own words', async () => {

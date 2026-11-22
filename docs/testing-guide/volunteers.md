@@ -240,7 +240,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 1 | Open the shift. | **Suggested Volunteers** is under the Sign-Ups panel. |
 | 2 | Read the list. | Ana is first ("Has 1 of the 1 skills this job needs", "Available on Saturdays"), then Cleo ("No available days recorded"), then Ben ("Does not list Saturdays as an available day"). The Prospective contact is not listed. |
 | 3 | Click **Sign Up** on Ana's row. | "Ana is signed up for this shift." Ana leaves the list and appears in the Sign-Ups panel as Signed up, without a page refresh. |
-| 4 | Add a Cancelled sign-up for Cleo in the Sign-Ups panel. | Cleo leaves the list (a cancelled sign-up still counts as signed up). |
+| 4 | Add a Cancelled sign-up for Cleo in the Sign-Ups panel. | Cleo leaves the list without a page refresh (a cancelled sign-up still counts as signed up). |
 | 5 | Set the shift's status to **Cancelled** and reload. | The card is gone. |
 | 6 | Open a shift as a Read Only user. | No Suggested Volunteers card. |
 

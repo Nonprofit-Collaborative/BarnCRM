@@ -508,3 +508,17 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 4 | Pick **Last Year** in the period picker. | **No Programs in This Period**, in the compact size, with a line saying to pick another period or add a program. |
 
 **Cleanup:** delete the program from step 3.
+
+## T-PRG-30: The Roster and the Service Delivery Log Stay in Step
+
+**Purpose:** confirm an enrollment change on the Program Roster reaches the Service Delivery Log on the same page without a reload, and never throws away unsaved attendance (PF-04).
+**Prerequisites:** a staff user; an Active program with an Active service and at least one person Enrolled; two test contacts, "Lee Step" and "Kai Step", not enrolled in it.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the program. On the **Attendance** tab pick the service and today; then go back to the roster. | The log lists the people Enrolled. |
+| 2 | In **Program Roster**, enroll Lee Step as **Enrolled**. Open the **Attendance** tab without reloading the page. | Lee Step is listed in the log, at **Not Recorded**, with the same service and date still picked. |
+| 3 | In the log click **Mark All Present** but do not save. In **Program Roster**, enroll Kai Step. Open the **Attendance** tab. | The marks are still there and the unsaved hint shows; Kai Step is not listed yet. |
+| 4 | Click **Save**. | Saved; Kai Step is now listed at **Not Recorded**. |
+
+**Cleanup:** delete both test enrollments and the deliveries from step 4.

@@ -23,6 +23,8 @@ import addSignup from '@salesforce/apex/VolunteerShiftSignupsController.addSignu
 import setStatus from '@salesforce/apex/VolunteerShiftSignupsController.setStatus';
 import closeShift from '@salesforce/apex/VolunteerShiftSignupsController.closeShift';
 import BarnConfirmModal from 'c/barnConfirmModal';
+import { publish, subscribe, unsubscribe } from 'lightning/messageService';
+import RECORD_CHANGED from '@salesforce/messageChannel/BarnCRM_Record_Changed__c';
 
 setHelpTextForTest({
   Volunteers_Signups_NoHoursWarning: '{0} has no hours.',
@@ -163,6 +165,10 @@ describe('c-shift-signups', () => {
     // Announced once, in the status region, not by a toast as well.
     expect(byId(element, 'result-text').textContent).toContain('Volunteers_Signups_Added');
     expect(byId(element, 'result-warning')).toBeNull();
+    // Suggested Volunteers on the same page hears that this shift changed.
+    expect(publish).toHaveBeenCalledTimes(1);
+    expect(publish.mock.calls[0][1]).toBe(RECORD_CHANGED);
+    expect(publish.mock.calls[0][2]).toEqual({ recordId: SHIFT_ID, source: 'shiftSignups' });
   });
 
   it('shows a spinner while the panel loads', async () => {
@@ -367,30 +373,28 @@ describe('c-shift-signups', () => {
 
   it('reloads when Suggested Volunteers signs someone up for this shift, and stops listening when removed', async () => {
     getPanel.mockResolvedValue(panelOf([]));
+    subscribe.mockReturnValue({ id: 'subscription' });
     const element = build();
     await flush();
     expect(getPanel).toHaveBeenCalledTimes(1);
+    expect(subscribe).toHaveBeenCalledWith(undefined, RECORD_CHANGED, expect.any(Function));
+    const handler = subscribe.mock.calls[0][2];
 
-    window.dispatchEvent(
-      new CustomEvent('barnshiftsignupschanged', { detail: { shiftId: 'other' } })
-    );
+    handler({ recordId: 'other', source: 'volunteerSuggestions' });
+    handler({ recordId: SHIFT_ID, source: 'shiftSignups' });
     await flush();
     expect(getPanel).toHaveBeenCalledTimes(1);
 
     getPanel.mockResolvedValue(panelOf([ANA]));
-    window.dispatchEvent(
-      new CustomEvent('barnshiftsignupschanged', { detail: { shiftId: SHIFT_ID } })
-    );
+    handler({ recordId: SHIFT_ID, source: 'volunteerSuggestions' });
     await flush();
     expect(getPanel).toHaveBeenCalledTimes(2);
     expect(element.shadowRoot.querySelectorAll('[data-id="signup"]').length).toBe(1);
+    // A reload is not a change of its own: nothing is published back.
+    expect(publish).not.toHaveBeenCalled();
 
     document.body.removeChild(element);
-    window.dispatchEvent(
-      new CustomEvent('barnshiftsignupschanged', { detail: { shiftId: SHIFT_ID } })
-    );
-    await flush();
-    expect(getPanel).toHaveBeenCalledTimes(2);
+    expect(unsubscribe).toHaveBeenCalledWith({ id: 'subscription' });
   });
 
   it('is read only for a person who may not change sign-ups', async () => {

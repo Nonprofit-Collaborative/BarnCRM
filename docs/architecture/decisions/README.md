@@ -250,6 +250,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0239](0239-automatic-backups-and-off-platform-destination.md) | Backup Sets run on a schedule and send their files off platform through the Connector | Proposed |
 | [0240](0240-archive-rules-and-big-object-archive.md) | Archive rules move records to Files, a big object or an off-platform store, on a schedule | Proposed |
 | [0241](0241-strip-apex-indentation.md) | Strip leading indentation from Apex at deploy and package-build time | Accepted |
+| [NEXT](NEXT-lightning-message-service-for-panel-refresh.md) | Panels on one page refresh each other through one Lightning Message Channel | Accepted |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

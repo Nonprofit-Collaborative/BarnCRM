@@ -31,6 +31,10 @@ module.exports = {
     // worker where another component importing it ran first (2026-11-14).
     '^lightning/platformResourceLoader$':
       '<rootDir>/node_modules/@salesforce/sfdx-lwc-jest/src/lightning-stubs/platformResourceLoader/platformResourceLoader.js',
+    // Same reason: c/barnRecordChanged and the panels that use it must share the stub whose
+    // publish and subscribe a test checks (PF-04).
+    '^lightning/messageService$':
+      '<rootDir>/node_modules/@salesforce/sfdx-lwc-jest/src/lightning-stubs/messageService/messageService.js',
     // The accessibility assertion each component test makes (QA review Q5).
     '^barn/a11y$': '<rootDir>/packages/core/test/jest-helpers/a11y.js'
   },
