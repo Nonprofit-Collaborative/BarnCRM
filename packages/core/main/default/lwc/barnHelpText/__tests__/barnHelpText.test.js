@@ -13,7 +13,7 @@ const CATALOGS = {
 describe('c/barnHelpText', () => {
   beforeEach(() => {
     global.fetch = jest.fn((url) => {
-      const name = url.substring(url.lastIndexOf('/') + 1);
+      const name = url.substring(url.lastIndexOf('/') + 1).split('?')[0];
       return Promise.resolve({
         ok: Boolean(CATALOGS[name]),
         json: () => Promise.resolve(CATALOGS[name])
@@ -29,6 +29,8 @@ describe('c/barnHelpText', () => {
     expect(global.fetch).toHaveBeenCalledTimes(2);
     const urls = global.fetch.mock.calls.map((call) => call[0]);
     expect(urls.every((url) => url.startsWith('/resource/'))).toBe(true);
+    // A new address each hour, so an upgrade's catalog is not read from a stale cache.
+    expect(urls.every((url) => /\?v=\d+$/.test(url))).toBe(true);
     expect(isHelpLoaded(['Core', 'Giving'])).toBe(true);
     expect(helpText('Core', 'Core_Example_Intro')).toBe('Start here.');
     expect(helpText('Core', 'Core_Example_Count', 12)).toBe('12 rows.');
