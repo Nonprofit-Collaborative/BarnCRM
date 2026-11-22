@@ -297,7 +297,7 @@ private class RollupsPostInstallTest {
 
 			Assert.areEqual(
 				RollupsPostInstall.STATE_NAMES.size(),
-				[SELECT COUNT() FROM Nightly_Job__c WHERE Kind__c = :SettingsState.KIND_STATE AND Name LIKE 'Rollups.%'],
+				[SELECT COUNT() FROM Nightly_Job__c WHERE Kind__c = 'State' AND Name LIKE 'Rollups.%'],
 				'One row per run-state value, run twice.'
 			);
 			Assert.areEqual(0, [SELECT COUNT() FROM Setting_Change__c], 'Nothing audited.');
@@ -338,7 +338,7 @@ private class RollupsPostInstallTest {
 			String key = RollupService.stateKey('Last_Run_Started__c');
 			Assert.areEqual(
 				1,
-				[SELECT COUNT() FROM Nightly_Job__c WHERE Kind__c = :SettingsState.KIND_STATE AND Name = :key],
+				[SELECT COUNT() FROM Nightly_Job__c WHERE Kind__c = 'State' AND Name = :key],
 				'A new install leaves the run lock row in place, so two first runs share it.'
 			);
 		}
