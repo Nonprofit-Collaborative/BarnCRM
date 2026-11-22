@@ -171,7 +171,7 @@ describe('c-volunteers-home', () => {
     await flush();
     const shell = element.shadowRoot.querySelector('c-barn-page-shell');
     expect(shell.title).toBe('Volunteers Home');
-    expect(shell.titleHidden).toBeFalsy();
+    expect(shell.titleHidden).toBe(true);
     expect(element.shadowRoot.querySelector('[data-id="charts-note"]')).toBeNull();
 
     document.body.removeChild(element);

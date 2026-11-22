@@ -97,3 +97,7 @@ tab redeployed and the old FlexiPage removed through the destructive manifest.
 ## Amendment A2, 2026-11-21: an App Page shows the shell title too
 
 A Lightning App Page on the default app home template prints no page header, so point 3 of Amendment A1 (an app page printed its name above the component) does not hold. Automation Control, Import, Super Transformer and Volunteers Home no longer pass `title-hidden` to `c-barn-page-shell`; every tab-level page shows its name in the shell. `title-hidden` stays for a component embedded in a page that already has a header.
+
+## Amendment A3, 2026-11-22: an App Page tab does print its name
+
+Screenshots on `barn-platform` on 2026-11-22 show the platform header (tab icon and page name) above every tab whose CustomTab names a `<flexiPage>`, on both the default app home template and the header template: Automation, Import, Super Transformer, Fundraising Home, Projects Home and Volunteers Home each printed their name twice. A component tab (`<lwcComponent>`) prints no header. So point 3 of Amendment A1 holds and Amendment A2 does not: the shell in those six components passes `title-hidden` (the h1 stays for screen readers), and with the title hidden the shell leaves out its own icon, since the platform header shows the tab's. Component tabs keep the shell title. Projects Staffing keeps its two panel titles, which name sections, not the page.
