@@ -59,4 +59,17 @@ private class FormSubmissionControllerTest {
 			}
 		}
 	}
+
+	@IsTest
+	static void aPersonWithoutFormsAccessGetsAPlainMessage() {
+		Id someSubmission = Form_Submission__c.SObjectType.getDescribe().getKeyPrefix() + '000000000001';
+		System.runAs(TestUsers.standardUser('Zzformless')) {
+			try {
+				FormSubmissionController.processAgain(someSubmission);
+				Assert.fail('Refused without access to submissions');
+			} catch (AuraHandledException expected) {
+				Assert.isTrue(String.isNotBlank(expected.getMessage()), 'In plain words');
+			}
+		}
+	}
 }
