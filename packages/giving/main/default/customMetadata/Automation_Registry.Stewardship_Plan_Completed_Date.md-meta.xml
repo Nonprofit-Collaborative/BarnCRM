@@ -19,10 +19,6 @@
     <value xsi:type="xsd:double">10</value>
   </values>
   <values>
-    <field>Handler_Class__c</field>
-    <value xsi:type="xsd:string">StewardshipPlanTriggerHandler</value>
-  </values>
-  <values>
     <field>Object_Name__c</field>
     <value xsi:type="xsd:string">Stewardship_Plan__c</value>
   </values>

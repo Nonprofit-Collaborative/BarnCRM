@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <assignments>
+    <description>A plan set back to Running has no completed date.</description>
+    <name>Clear_Completed_Date</name>
+    <label>Clear completed date</label>
+    <locationX>50</locationX>
+    <locationY>300</locationY>
+    <assignmentItems>
+      <assignToReference>$Record.Completed_Date__c</assignToReference>
+      <operator>Assign</operator>
+    </assignmentItems>
+  </assignments>
+  <assignments>
+    <description>A plan set to Complete or Cancelled with no completed date gets today.</description>
+    <name>Fill_Completed_Date</name>
+    <label>Fill completed date</label>
+    <locationX>250</locationX>
+    <locationY>300</locationY>
+    <assignmentItems>
+      <assignToReference>$Record.Completed_Date__c</assignToReference>
+      <operator>Assign</operator>
+      <value>
+        <elementReference>$Flow.CurrentDate</elementReference>
+      </value>
+    </assignmentItems>
+  </assignments>
+  <decisions>
+    <description>Running clears the date; Complete or Cancelled fills it.</description>
+    <name>Running</name>
+    <label>Running</label>
+    <locationX>50</locationX>
+    <locationY>150</locationY>
+    <defaultConnector>
+      <targetReference>Fill_Completed_Date</targetReference>
+    </defaultConnector>
+    <defaultConnectorLabel>Closed</defaultConnectorLabel>
+    <rules>
+      <name>Is_Running</name>
+      <conditionLogic>and</conditionLogic>
+      <conditions>
+        <leftValueReference>$Record.Status__c</leftValueReference>
+        <operator>EqualTo</operator>
+        <rightValue>
+          <stringValue>Running</stringValue>
+        </rightValue>
+      </conditions>
+      <connector>
+        <targetReference>Clear_Completed_Date</targetReference>
+      </connector>
+      <label>Is running</label>
+    </rules>
+  </decisions>
+  <description
+  >BarnCRM automation "Stewardship Plan: set the completed date" (registry row Stewardship_Plan_Completed_Date). Keeps a plan's Completed Date in step with its Status, so the Completed_Date_Matches_Status validation rule accepts a status changed by hand: a plan set to Complete or Cancelled with no date gets today, a typed date is kept, and a plan set back to Running loses its date. It always runs (ADR-0024): without it a status changed by hand is refused by the validation rule, so it reads no switch, pause or bypass, and its row on the Automation page cannot be switched off. See ADR-NEXT (before-save flows).</description>
+  <environments>Default</environments>
+  <interviewLabel>Stewardship Plan: set the completed date {!$Flow.CurrentDateTime}</interviewLabel>
+  <label>Stewardship Plan: set the completed date</label>
+  <processMetadataValues>
+    <name>BuilderType</name>
+    <value>
+      <stringValue>LightningFlowBuilder</stringValue>
+    </value>
+  </processMetadataValues>
+  <processMetadataValues>
+    <name>CanvasMode</name>
+    <value>
+      <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+    </value>
+  </processMetadataValues>
+  <processMetadataValues>
+    <name>OriginBuilderType</name>
+    <value>
+      <stringValue>LightningFlowBuilder</stringValue>
+    </value>
+  </processMetadataValues>
+  <processType>AutoLaunchedFlow</processType>
+  <start>
+    <locationX>50</locationX>
+    <locationY>0</locationY>
+    <connector>
+      <targetReference>Running</targetReference>
+    </connector>
+    <filterFormula>OR(AND(ISPICKVAL({!$Record.Status__c}, "Running"), NOT(ISBLANK({!$Record.Completed_Date__c}))), AND(NOT(ISBLANK(TEXT({!$Record.Status__c}))), NOT(ISPICKVAL({!$Record.Status__c}, "Running")), ISBLANK({!$Record.Completed_Date__c})))</filterFormula>
+    <object>Stewardship_Plan__c</object>
+    <recordTriggerType>CreateAndUpdate</recordTriggerType>
+    <triggerType>RecordBeforeSave</triggerType>
+  </start>
+  <status>Active</status>
+</Flow>

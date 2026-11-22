@@ -1791,8 +1791,6 @@ corporatehub/CorporateHubPostInstall.cls | public CorporateHubPostInstall()
 corporatehub/CorporateHubPostInstall.cls | public class CorporateHubPostInstall
 corporatehub/DataBreachHandler.cls | public DataBreachHandler()
 corporatehub/DataBreachHandler.cls | public class DataBreachHandler
-corporatehub/DataSubjectRequestHandler.cls | public DataSubjectRequestHandler()
-corporatehub/DataSubjectRequestHandler.cls | public class DataSubjectRequestHandler
 events/EventFormAttachment.cls | public EventFormAttachment()
 events/EventFormAttachment.cls | public class EventFormAttachment
 events/EventKeyHandler.cls | public EventKeyHandler()
@@ -1969,9 +1967,6 @@ giving/SoftCreditTriggerHandler.cls | public SoftCreditTriggerHandler()
 giving/SoftCreditTriggerHandler.cls | public class SoftCreditTriggerHandler
 giving/StewardshipCommitmentHandler.cls | public StewardshipCommitmentHandler()
 giving/StewardshipCommitmentHandler.cls | public class StewardshipCommitmentHandler
-giving/StewardshipPlanTriggerHandler.cls | public StewardshipPlanTriggerHandler()
-giving/StewardshipPlanTriggerHandler.cls | public class StewardshipPlanTriggerHandler
-giving/StewardshipPlanTriggerHandler.cls | public static void syncCompletedDates(List<SObject>)
 giving/StewardshipTriggerHandler.cls | public StewardshipTriggerHandler()
 giving/StewardshipTriggerHandler.cls | public class StewardshipTriggerHandler
 giving/TributeTriggerHandler.cls | public TributeTriggerHandler()

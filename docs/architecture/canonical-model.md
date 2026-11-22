@@ -17291,7 +17291,7 @@ Section 29H), which writes an Erasure record; the request links to it.
 **R-DS1 Dates.** A blank Due Date is filled with Received Date plus 30 days on save; when
 Received Date changes and Due Date is still the old Received Date plus 30 (never edited), it
 follows the new date; a Due Date a person set stays. A switchable automation (registry row
-`Data_Subject_Request_Due`, handler `DataSubjectRequestHandler`). Due Date is on or after Received Date (`Due_After_Received`); a Completed or
+`Data_Subject_Request_Due`, the before-save flow of the same name). Due Date is on or after Received Date (`Due_After_Received`); a Completed or
 Refused request has a Completed Date (`Closed_Needs_Date`). The nightly step reminds the owner of
 a Received or In Progress request whose Due Date is within the reminder days (R-CR1).
 

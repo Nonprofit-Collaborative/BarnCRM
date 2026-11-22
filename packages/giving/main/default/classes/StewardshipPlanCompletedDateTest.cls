@@ -1,9 +1,10 @@
 /**
  * That Completed Date follows Status however the status was changed: by the package, or by a person
- * editing the plan.
+ * editing the plan. The before-save flow Stewardship_Plan_Completed_Date does the work (ADR-NEXT,
+ * before-save flows); record-triggered flows run in Apex tests, so these saves exercise it.
  */
-@IsTest(testFor='ApexClass:StewardshipPlanTriggerHandler')
-private class StewardshipPlanTriggerHandlerTest {
+@IsTest(testFor='ApexTrigger:StewardshipPlanTrigger')
+private class StewardshipPlanCompletedDateTest {
 	@TestSetup
 	static void createTestUser() {
 		TestUsers.adminWith('Giving_Admin');
@@ -91,6 +92,27 @@ private class StewardshipPlanTriggerHandlerTest {
 				Date.today(),
 				reload(second.Id).Completed_Date__c,
 				'Cancelling fills the date when there is none.'
+			);
+		}
+	}
+
+	@IsTest
+	static void itAlwaysRunsEvenForABypassedUser() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			Stewardship_Plan__c plan = runningPlan();
+			insert as system new BarnCRM_Automation_Control__c(
+				SetupOwnerId = UserInfo.getUserId(),
+				Bypass__c = true,
+				Pause_All__c = true
+			);
+
+			plan.Status__c = StewardshipService.STATUS_COMPLETE;
+			update plan;
+
+			Assert.areEqual(
+				Date.today(),
+				reload(plan.Id).Completed_Date__c,
+				'An always-run rule reads no switch: without the date the validation rule refuses the save.'
 			);
 		}
 	}
