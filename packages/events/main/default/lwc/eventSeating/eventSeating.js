@@ -1,6 +1,8 @@
 import { LightningElement, api } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { deleteRecord, updateRecord } from 'lightning/uiRecordApi';
+import DIETARY_FIELD from '@salesforce/schema/Event_Attendee__c.Dietary_Needs__c';
+import ACCESS_FIELD from '@salesforce/schema/Event_Attendee__c.Access_Needs__c';
 import getSeating from '@salesforce/apex/EventSeatingController.getSeating';
 import saveTable from '@salesforce/apex/EventSeatingController.saveTable';
 import assignSeats from '@salesforce/apex/EventSeatingController.assignSeats';
@@ -385,7 +387,14 @@ export default class EventSeating extends LightningElement {
     if ((guest[field] || '') === value) {
       return;
     }
-    await this.run(() => updateRecord({ fields: needsFields(id, dietary, access) }));
+    await this.run(() =>
+      updateRecord({
+        fields: needsFields(id, dietary, access, {
+          dietary: DIETARY_FIELD.fieldApiName,
+          access: ACCESS_FIELD.fieldApiName
+        })
+      })
+    );
   }
 
   handleExport() {

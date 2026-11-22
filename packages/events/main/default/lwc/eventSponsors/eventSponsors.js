@@ -8,7 +8,12 @@ import { downloadCsv, format, messageFrom } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import EventRecordModal from 'c/eventRecordModal';
 import LEVEL from '@salesforce/schema/Sponsorship_Level__c';
+import SPONSOR from '@salesforce/schema/Event_Sponsor__c';
 import DELIVERABLE from '@salesforce/schema/Sponsor_Deliverable__c';
+import DELIVERABLE_SPONSOR_FIELD from '@salesforce/schema/Sponsor_Deliverable__c.Event_Sponsor__c';
+import DELIVERABLE_NAME_FIELD from '@salesforce/schema/Sponsor_Deliverable__c.Name';
+import DELIVERABLE_TYPE_FIELD from '@salesforce/schema/Sponsor_Deliverable__c.Type__c';
+import DELIVERABLE_STATUS_FIELD from '@salesforce/schema/Sponsor_Deliverable__c.Status__c';
 import BarnConfirmModal from 'c/barnConfirmModal';
 import {
   committedTotal,
@@ -315,7 +320,11 @@ export default class EventSponsors extends LightningElement {
   async handleDeliverableSave() {
     const { sponsorId, name, type } = this.adding;
     await this.run(async () => {
-      const fields = deliverableFields(sponsorId, name, type);
+      const fields = deliverableFields(sponsorId, name, type, {
+        sponsor: DELIVERABLE_SPONSOR_FIELD.fieldApiName,
+        name: DELIVERABLE_NAME_FIELD.fieldApiName,
+        type: DELIVERABLE_TYPE_FIELD.fieldApiName
+      });
       if (!fields) {
         throw new Error(helpText('Events', 'Events_Sponsor_DeliverableNeedsName'));
       }
@@ -327,7 +336,11 @@ export default class EventSponsors extends LightningElement {
   async handleDeliverableStatus(event) {
     const deliverableId = event.target.dataset.id;
     const status = event.detail.value;
-    await this.run(() => updateRecord({ fields: { Id: deliverableId, Status__c: status } }));
+    await this.run(() =>
+      updateRecord({
+        fields: { Id: deliverableId, [DELIVERABLE_STATUS_FIELD.fieldApiName]: status }
+      })
+    );
   }
 
   async handleDeliverableRemove(event) {
@@ -340,7 +353,7 @@ export default class EventSponsors extends LightningElement {
     const saved = await EventRecordModal.open({
       label: `${EDIT}: ${row.name}`,
       size: 'small',
-      objectApiName: isLevel ? 'Sponsorship_Level__c' : 'Event_Sponsor__c',
+      objectApiName: isLevel ? LEVEL.objectApiName : SPONSOR.objectApiName,
       recordId: row.id,
       fields: isLevel ? LEVEL_FIELDS : SPONSOR_FIELDS
     });

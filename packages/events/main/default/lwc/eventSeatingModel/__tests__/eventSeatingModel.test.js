@@ -24,17 +24,25 @@ const GUESTS = [
   { id: 'g6', name: 'Flo', partyId: null }
 ];
 
+const NEED_NAMES = { dietary: 'Dietary_Needs__c', access: 'Access_Needs__c' };
+
 describe('eventSeatingModel', () => {
   it('saves both needs trimmed, blank as none', () => {
-    expect(needsFields('g1', '  Nut allergy ', '   ')).toEqual({
+    expect(needsFields('g1', '  Nut allergy ', '   ', NEED_NAMES)).toEqual({
       Id: 'g1',
       Dietary_Needs__c: 'Nut allergy',
       Access_Needs__c: null
     });
-    expect(needsFields('g1', undefined, 'Step free')).toEqual({
+    expect(needsFields('g1', undefined, 'Step free', NEED_NAMES)).toEqual({
       Id: 'g1',
       Dietary_Needs__c: null,
       Access_Needs__c: 'Step free'
+    });
+    // The caller's names key the result, whatever the org calls the fields.
+    expect(needsFields('g1', 'Vegan', '', { dietary: 'Diet__c', access: 'Access__c' })).toEqual({
+      Id: 'g1',
+      Diet__c: 'Vegan',
+      Access__c: null
     });
   });
 

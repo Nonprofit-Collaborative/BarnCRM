@@ -12,6 +12,9 @@ import { format, messageFrom } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import EventRecordModal from 'c/eventRecordModal';
 import BarnConfirmModal from 'c/barnConfirmModal';
+import TRACK_OBJECT from '@salesforce/schema/Event_Track__c';
+import SESSION_OBJECT from '@salesforce/schema/Event_Session__c';
+import SESSION_TRACK_FIELD from '@salesforce/schema/Event_Session__c.Track__c';
 
 import AGENDA from '@salesforce/label/c.Events_EventTab_Agenda';
 import NEW_TRACK from '@salesforce/label/c.Events_Agenda_NewTrack';
@@ -28,8 +31,9 @@ import DATE_RANGE from '@salesforce/label/c.Core_Address_DateRange';
 import ACTIONS_FOR from '@salesforce/label/c.Core_HouseholdMembersPanel_ActionsFor';
 
 const HELP_PACKAGES = ['Events', 'Core'];
-const TRACK = 'Event_Track__c';
-const SESSION = 'Event_Session__c';
+// Every object and field the page writes is named by a schema import (ADR-0093 A1).
+const TRACK = TRACK_OBJECT.objectApiName;
+const SESSION = SESSION_OBJECT.objectApiName;
 const TRACK_FIELDS = ['Name', 'Sort_Order__c', 'Description__c'];
 const SESSION_FIELDS = [
   'Name',
@@ -370,7 +374,10 @@ export default class EventAgenda extends LightningElement {
   async moveTo(sessionId, columnId) {
     try {
       await updateRecord({
-        fields: { Id: sessionId, Track__c: columnId === NO_TRACK ? null : columnId }
+        fields: {
+          Id: sessionId,
+          [SESSION_TRACK_FIELD.fieldApiName]: columnId === NO_TRACK ? null : columnId
+        }
       });
       await this.load();
     } catch (error) {
