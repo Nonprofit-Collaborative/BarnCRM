@@ -28,7 +28,25 @@
         ></c-barn-notice>
       </template>
 
-      <template lwc:if={board}>
+      <template lwc:if={firstRun}>
+        <c-barn-empty-state
+          illustration="setup"
+          heading={labels.firstRunHeading}
+          message={labels.firstRunMessage}
+          heading-level="2"
+          class="slds-show slds-var-m-bottom_medium"
+          data-id="first-run"
+        >
+          <lightning-button
+            variant="brand"
+            label={labels.newGrant}
+            onclick={handleNewGrant}
+            data-id="first-run-new"
+          ></lightning-button>
+        </c-barn-empty-state>
+      </template>
+
+      <template lwc:if={showBoard}>
         <div class="slds-grid slds-wrap slds-gutters_x-small" data-id="tiles">
           <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-var-m-bottom_x-small">
             <c-barn-stat-tile
@@ -92,7 +110,7 @@
         data-id="tools"
       ></c-barn-tool-grid>
 
-      <template lwc:if={board}>
+      <template lwc:if={showBoard}>
         <div class="slds-grid slds-wrap slds-gutters">
           <section
             class="slds-col slds-size_1-of-1 slds-large-size_1-of-2 slds-var-m-bottom_medium"

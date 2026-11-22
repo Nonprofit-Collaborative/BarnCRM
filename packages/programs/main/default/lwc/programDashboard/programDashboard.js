@@ -2,6 +2,7 @@ import { LightningElement, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import { getObjectInfos } from 'lightning/uiObjectInfoApi';
 import getDashboard from '@salesforce/apex/ProgramDashboardController.getDashboard';
+import PROGRAM_OBJECT from '@salesforce/schema/Program__c';
 
 import TITLE from '@salesforce/label/c.Programs_Dashboard_Title';
 import PERIOD from '@salesforce/label/c.Core_Shared_Period';
@@ -91,6 +92,18 @@ export default class ProgramDashboard extends NavigationMixin(LightningElement) 
     get noPrograms() {
       return helpText('Programs', 'Programs_Dashboard_NoPrograms');
     },
+    get noProgramsNext() {
+      return helpText('Programs', 'Programs_Dashboard_NoProgramsNext');
+    },
+    get firstRunHeading() {
+      return helpText('Programs', 'Programs_Dashboard_FirstRunHeading');
+    },
+    get firstRunMessage() {
+      return helpText('Programs', 'Programs_Dashboard_FirstRunMessage');
+    },
+    get newProgram() {
+      return helpText('Programs', 'Programs_Dashboard_NewProgram');
+    },
     get moreThanShown() {
       return helpText('Programs', 'Programs_Dashboard_MoreThanShown');
     },
@@ -158,6 +171,22 @@ export default class ProgramDashboard extends NavigationMixin(LightningElement) 
 
   get noAccess() {
     return !!this.dashboard && !this.dashboard.canSee;
+  }
+
+  /** Before the first program, for someone who may create one: the first-run panel instead. */
+  get firstRun() {
+    return this.canSee && this.dashboard.firstRun === true;
+  }
+
+  get showFigures() {
+    return this.canSee && !this.firstRun;
+  }
+
+  handleNewProgram() {
+    this[NavigationMixin.Navigate]({
+      type: 'standard__objectPage',
+      attributes: { objectApiName: PROGRAM_OBJECT.objectApiName, actionName: 'new' }
+    });
   }
 
   get tiles() {

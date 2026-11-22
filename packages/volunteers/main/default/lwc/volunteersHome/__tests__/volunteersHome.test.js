@@ -22,6 +22,10 @@ import getHome from '@salesforce/apex/VolunteersHomeController.getHome';
 import getFirstRun from '@salesforce/apex/VolunteersHomeController.getFirstRun';
 import { setHelpTextForTest, clearHelpTextForTest } from 'c/barnHelpText';
 import { badgeStatusFor, pageReferenceFor, valueFor } from '../volunteersHomeModel';
+// The object info test wire adapter is emitted to on purpose, which is how a wired component is
+// driven from a test.
+// eslint-disable-next-line @lwc/lwc/no-unexpected-wire-adapter-usages
+import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 
 jest.mock('@salesforce/apex/VolunteersHomeController.getHome', () => ({ default: jest.fn() }), {
   virtual: true
@@ -83,6 +87,7 @@ describe('c-volunteers-home', () => {
 
     const panel = element.shadowRoot.querySelector('[data-id="first-run"]');
     expect(panel.heading).toBe('Set Up Your First Volunteer Job');
+    expect(panel.illustration).toBe('setup');
     expect(element.shadowRoot.querySelector('[data-id="tiles"]')).toBeNull();
     element.shadowRoot.querySelector('[data-id="first-run-job"]').click();
     expect(mockNavigate).toHaveBeenCalledWith({
@@ -153,6 +158,33 @@ describe('c-volunteers-home', () => {
       type: 'standard__navItemPage',
       attributes: { apiName: 'Volunteer_Approve_Hours' }
     });
+  });
+
+  it('shows New Volunteer Job in the header only to someone who may create jobs', async () => {
+    getHome.mockResolvedValue(TILES);
+    const element = build();
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="new-job"]')).toBeNull();
+
+    getObjectInfo.emit({ apiName: 'Volunteer_Job__c', createable: true });
+    await flush();
+    const button = element.shadowRoot.querySelector('[data-id="new-job"]');
+    expect(button.label).toBe('New Volunteer Job');
+    button.click();
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: 'standard__objectPage',
+      attributes: { objectApiName: 'Volunteer_Job__c', actionName: 'new' }
+    });
+  });
+
+  it('keeps New Volunteer Job out of the header while the first-run panel offers it', async () => {
+    getHome.mockResolvedValue(TILES);
+    getFirstRun.mockResolvedValue({ show: true, canImport: false });
+    const element = build();
+    await flush();
+    getObjectInfo.emit({ apiName: 'Volunteer_Job__c', createable: true });
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="new-job"]')).toBeNull();
   });
 
   it('says so when the figures do not load', async () => {

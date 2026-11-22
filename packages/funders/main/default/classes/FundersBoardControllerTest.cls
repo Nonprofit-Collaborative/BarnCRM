@@ -98,6 +98,20 @@ private class FundersBoardControllerTest {
 			Assert.areEqual(0, board.giftsThisYear, 'No gifts');
 			Assert.isTrue(board.givingByAccount.isEmpty(), 'No giving by organization');
 			Assert.isTrue(board.restrictedFunds.isEmpty(), 'No funds');
+			Assert.isFalse(board.firstRun, 'Grants exist, so there is no first-run panel');
+		}
+	}
+
+	@IsTest
+	static void theFirstRunShowsBeforeTheFirstGrant() {
+		// System mode: clears the shared setup's grants so the org has none, as on first install.
+		delete as system [SELECT Id FROM Grant__c WITH SYSTEM_MODE];
+		System.runAs(TestUsers.adminWith(GrantTestData.ADMIN)) {
+			Test.startTest();
+			FundersBoardController.Board board = FundersBoardController.getBoard();
+			Test.stopTest();
+
+			Assert.isTrue(board.firstRun, 'No grant yet, and a Grants admin may create one');
 		}
 	}
 }

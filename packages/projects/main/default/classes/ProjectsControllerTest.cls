@@ -47,6 +47,24 @@ private class ProjectsControllerTest {
 	}
 
 	@IsTest
+	static void theFiguresCountActiveProjectsAndThisMonthsHours() {
+		System.runAs(ProjectsTestData.admin()) {
+			Project__c project = ProjectsTestData.project('Active', null);
+			ProjectsTestData.project('On Hold', null);
+			ProjectsTestData.time(project.Id, 6, true);
+			ProjectsTestData.time(project.Id, 1.5, false);
+
+			Test.startTest();
+			Map<String, Decimal> figures = ProjectsController.getHome().figures;
+			Test.stopTest();
+
+			Assert.areEqual(1, figures.get('active'), 'Only the active project');
+			Assert.areEqual(7.5, figures.get('hours'), 'Hours logged this month, with time tracking on');
+			Assert.isFalse(figures.containsKey('requests'), 'Requests are off, so no open requests figure');
+		}
+	}
+
+	@IsTest
 	static void theFirstRunPanelShowsBeforeTheFirstProject() {
 		System.runAs(ProjectsTestData.admin()) {
 			Test.startTest();

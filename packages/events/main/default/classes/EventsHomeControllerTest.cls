@@ -49,6 +49,38 @@ private class EventsHomeControllerTest {
 	}
 
 	@IsTest
+	static void countsTheFiguresAndOffersTheFirstRunBeforeAnyEvent() {
+		System.runAs(staff()) {
+			Assert.isTrue(EventsHomeController.getEvents('upcoming').firstRun, 'No event yet: first run');
+
+			Datetime now = Datetime.now();
+			Event__c open = event('Gala', now.addDays(20), 'Open');
+			insert as user new List<Event__c>{
+				open,
+				event('Planning', now.addDays(2), 'Draft'),
+				event('Held', now.addDays(-10), 'Completed'),
+				event('Called Off', now.addDays(5), 'Cancelled')
+			};
+			Contact ana = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Garcia'));
+			Contact ben = TestDataFactory.person(new Contact(FirstName = 'Ben', LastName = 'Okafor'));
+			insert as user new List<Contact>{ ana, ben };
+			insert as user new List<Event_Registration__c>{
+				new Event_Registration__c(Event__c = open.Id, Contact__c = ana.Id, Status__c = 'Registered', Source__c = 'Staff'),
+				new Event_Registration__c(Event__c = open.Id, Contact__c = ben.Id, Status__c = 'Cancelled', Source__c = 'Staff')
+			};
+
+			Test.startTest();
+			EventsHomeController.Home home = EventsHomeController.getEvents(EventsHomeController.VIEW_PAST);
+			Test.stopTest();
+
+			Assert.isFalse(home.firstRun, 'Events exist');
+			Assert.areEqual(2, home.figures.get('upcoming'), 'Upcoming counts the two not over or cancelled, in either view');
+			Assert.areEqual(1, home.figures.get('open'), 'One is open for registration');
+			Assert.areEqual(1, home.figures.get('registrations'), 'A cancelled registration is not counted');
+		}
+	}
+
+	@IsTest
 	static void repeatMakesDraftCopiesInTheSeries() {
 		System.runAs(staff()) {
 			Datetime start = Datetime.now().addDays(7);

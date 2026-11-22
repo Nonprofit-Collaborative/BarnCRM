@@ -1,5 +1,6 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import getHome from '@salesforce/apex/VolunteersHomeController.getHome';
 import getFirstRun from '@salesforce/apex/VolunteersHomeController.getFirstRun';
 import VOLUNTEER_JOB from '@salesforce/schema/Volunteer_Job__c';
@@ -15,8 +16,9 @@ const IMPORT_TAB = 'Import';
 /**
  * Volunteers Home (vis-modules-19): the app's first tab. Three figures that open their lists
  * (approved hours this month, hours to approve, shifts needing people), with the Volunteers
- * report charts beside them on the same page. Before the first volunteer job, a first-run
- * panel offers New Volunteer Job and Import a File instead of empty figures (D-200 R4).
+ * report charts beside them on the same page, and New Volunteer Job in the header for whoever
+ * may create one. Before the first volunteer job, a first-run panel offers New Volunteer Job and
+ * Import a File instead of empty figures (D-200 R4).
  */
 export default class VolunteersHome extends NavigationMixin(LightningElement) {
   labels = { loading: LOADING };
@@ -25,6 +27,17 @@ export default class VolunteersHome extends NavigationMixin(LightningElement) {
   failed = false;
   home = [];
   firstRunState;
+  canCreateJob = false;
+
+  @wire(getObjectInfo, { objectApiName: VOLUNTEER_JOB })
+  receiveJobInfo({ data }) {
+    this.canCreateJob = Boolean(data && data.createable);
+  }
+
+  /** New Volunteer Job in the header, once the help text is in and not beside the first-run one. */
+  get showNewJob() {
+    return this.helpReady && this.canCreateJob && !this.firstRun;
+  }
 
   connectedCallback() {
     if (!this.helpReady) {

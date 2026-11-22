@@ -82,6 +82,15 @@ export default class FundersBoard extends NavigationMixin(LightningElement) {
     get empty() {
       return helpText('Funders', 'Funders_Board_Empty');
     },
+    get firstRunHeading() {
+      return helpText('Funders', 'Funders_Board_FirstRunHeading');
+    },
+    get firstRunMessage() {
+      return helpText('Funders', 'Funders_Board_FirstRunMessage');
+    },
+    get newGrant() {
+      return helpText('Funders', 'Funders_Board_NewGrant');
+    },
     mix: MIX,
     concentration: CONCENTRATION,
     restricted: RESTRICTED,
@@ -138,6 +147,22 @@ export default class FundersBoard extends NavigationMixin(LightningElement) {
 
   money(amount) {
     return showMoney(amount, this.board.currencyCode);
+  }
+
+  /** Before the first grant, for someone who may create one: the first-run panel instead. */
+  get firstRun() {
+    return Boolean(this.board && this.board.firstRun);
+  }
+
+  get showBoard() {
+    return Boolean(this.board) && !this.firstRun;
+  }
+
+  handleNewGrant() {
+    this[NavigationMixin.Navigate]({
+      type: 'standard__objectPage',
+      attributes: { objectApiName: GRANT.objectApiName, actionName: 'new' }
+    });
   }
 
   get currencyCode() {

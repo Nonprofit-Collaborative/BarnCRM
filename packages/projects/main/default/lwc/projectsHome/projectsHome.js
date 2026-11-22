@@ -1,5 +1,10 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import { getObjectInfo } from 'lightning/uiObjectInfoApi';
+import PROJECT from '@salesforce/schema/Project__c';
+import PROJECT_TASK from '@salesforce/schema/Project_Task__c';
+import PROJECT_REQUEST from '@salesforce/schema/Project_Request__c';
+import TIME_ENTRY from '@salesforce/schema/Time_Entry__c';
 import getHome from '@salesforce/apex/ProjectsController.getHome';
 import setTaskStatus from '@salesforce/apex/ProjectsController.setTaskStatus';
 import createFromTemplate from '@salesforce/apex/ProjectsController.createFromTemplate';
@@ -20,14 +25,22 @@ function weekStart(today = new Date()) {
   return localIsoDate(day);
 }
 
+/** An object's list, from its schema import so the name carries any namespace. */
+function listHref(schema) {
+  return `/lightning/o/${schema.objectApiName}/list`;
+}
+
 /**
- * Projects Home (PM-02 to PM-05): the Projects at Risk card, my open tasks with Done, New
- * Project From Template, and, with time tracking on, utilization by person and (Manage
- * Projects) Export Billable Time as a CSV built here with Core's `c/findCsv`.
+ * Projects Home (PM-02 to PM-05): New Project for whoever may create one, the figures row
+ * (active projects, my open tasks, open requests with Requests on, hours this month with time
+ * tracking on), the Projects at Risk card, my open tasks with Done, New Project From Template,
+ * and, with time tracking on, utilization by person and (Manage Projects) Export Billable Time
+ * as a CSV built here with Core's `c/findCsv`.
  */
 export default class ProjectsHome extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded([PKG]);
   icon = iconFor('Projects_Home');
+  canCreate = false;
   home;
   isLoading = true;
   isWorking = false;
@@ -82,13 +95,64 @@ export default class ProjectsHome extends NavigationMixin(LightningElement) {
       applyRates: helpText('Projects', 'Projects_Rates_Apply'),
       firstRunHeading: helpText('Projects', 'Projects_Home_FirstRunHeading'),
       firstRunMessage: helpText('Projects', 'Projects_Home_FirstRunMessage'),
-      firstRunStart: helpText('Projects', 'Projects_Home_FirstRunStart')
+      firstRunStart: helpText('Projects', 'Projects_Home_FirstRunStart'),
+      newProject: helpText('Projects', 'Projects_Home_NewProject')
     };
+  }
+
+  /** New Project shows only to someone who may create projects. */
+  @wire(getObjectInfo, { objectApiName: PROJECT })
+  receiveProjectInfo({ data }) {
+    this.canCreate = Boolean(data && data.createable);
+  }
+
+  handleNewProject() {
+    this[NavigationMixin.Navigate]({
+      type: 'standard__objectPage',
+      attributes: { objectApiName: PROJECT.objectApiName, actionName: 'new' }
+    });
   }
 
   /** True before the org's first project, for someone who may create one (D-200 R4). */
   get firstRun() {
     return this.home?.firstRun === true;
+  }
+
+  get showTiles() {
+    return Boolean(this.home) && !this.firstRun;
+  }
+
+  /** The figures row (Module Home pattern), each a link to the list behind it. */
+  get tiles() {
+    const figures = this.home?.figures || {};
+    const tiles = [
+      {
+        key: 'active',
+        label: helpText('Projects', 'Projects_Home_FigureActive'),
+        value: figures.active,
+        href: listHref(PROJECT)
+      },
+      {
+        key: 'tasks',
+        label: helpText('Projects', 'Projects_Home_FigureMyTasks'),
+        value: this.tasks.length,
+        href: listHref(PROJECT_TASK)
+      },
+      {
+        key: 'requests',
+        label: helpText('Projects', 'Projects_Home_FigureRequests'),
+        value: figures.requests,
+        href: listHref(PROJECT_REQUEST)
+      },
+      {
+        key: 'hours',
+        label: helpText('Projects', 'Projects_Home_FigureHours'),
+        value: figures.hours,
+        href: listHref(TIME_ENTRY)
+      }
+    ];
+    // A figure the server left out (a module setting off, or no access) gets no tile.
+    return tiles.filter((tile) => typeof tile.value === 'number');
   }
 
   /** The first-run action: the New Project From Template form is on this page, so go to it. */

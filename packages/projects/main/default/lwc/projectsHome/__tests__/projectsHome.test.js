@@ -6,6 +6,27 @@ import createFromTemplate from '@salesforce/apex/ProjectsController.createFromTe
 import getUtilization from '@salesforce/apex/ProjectsController.getUtilization';
 import exportBillable from '@salesforce/apex/ProjectsController.exportBillable';
 import applyRates from '@salesforce/apex/ProjectsController.applyRates';
+// The object info test wire adapter is emitted to on purpose, which is how a wired component is
+// driven from a test.
+// eslint-disable-next-line @lwc/lwc/no-unexpected-wire-adapter-usages
+import { getObjectInfo } from 'lightning/uiObjectInfoApi';
+
+const mockNavigate = jest.fn();
+jest.mock(
+  'lightning/navigation',
+  () => {
+    const Navigate = Symbol('Navigate');
+    const NavigationMixin = (Base) =>
+      class extends Base {
+        [Navigate](...args) {
+          mockNavigate(...args);
+        }
+      };
+    NavigationMixin.Navigate = Navigate;
+    return { NavigationMixin, CurrentPageReference: null, __esModule: true };
+  },
+  { virtual: true }
+);
 
 jest.mock('@salesforce/apex/ProjectsController.applyRates', () => ({ default: jest.fn() }), {
   virtual: true
@@ -164,5 +185,46 @@ describe('c-projects-home', () => {
     await flush();
     expect(find(element, 'utilization')).toBeNull();
     expect(getUtilization).not.toHaveBeenCalled();
+  });
+
+  it('shows New Project only to someone who may create projects, and opens the new form', async () => {
+    getHome.mockResolvedValue(HOME);
+    const element = mount();
+    await flush();
+    expect(find(element, 'new-project-action')).toBeNull();
+
+    getObjectInfo.emit({ apiName: 'Project__c', createable: true });
+    await flush();
+    find(element, 'new-project-action').click();
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: 'standard__objectPage',
+      attributes: { objectApiName: 'Project__c', actionName: 'new' }
+    });
+
+    getObjectInfo.emit({ apiName: 'Project__c', createable: false });
+    await flush();
+    expect(find(element, 'new-project-action')).toBeNull();
+  });
+
+  it('shows the figures the server counted, each a link to its list', async () => {
+    getHome.mockResolvedValue({ ...HOME, figures: { active: 3, hours: 12.5 } });
+    const element = mount();
+    await flush();
+
+    const tiles = [...element.shadowRoot.querySelectorAll('[data-id="tiles"] c-barn-stat-tile')];
+    expect(tiles.map((tile) => tile.label)).toEqual([
+      'c.Projects_Home_FigureActive',
+      'c.Projects_Home_FigureMyTasks',
+      'c.Projects_Home_FigureHours'
+    ]);
+    expect(tiles.map((tile) => tile.value)).toEqual([3, 1, 12.5]);
+    expect(tiles[0].href).toBe('/lightning/o/Project__c/list');
+  });
+
+  it('shows no figures on the first-run panel', async () => {
+    getHome.mockResolvedValue({ ...HOME, firstRun: true, figures: { active: 0 } });
+    const element = mount();
+    await flush();
+    expect(find(element, 'tiles')).toBeNull();
   });
 });

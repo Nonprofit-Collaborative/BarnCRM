@@ -26,6 +26,9 @@ public with sharing class ProgramDashboardController {
 		public List<ProgramFigures> programs = new List<ProgramFigures>();
 		@AuraEnabled
 		public Boolean moreThanShown = false;
+		/** True when the person may create programs and none exists yet (Module Home first run). */
+		@AuraEnabled
+		public Boolean firstRun = false;
 	}
 
 	/** One set of counts. */
@@ -284,6 +287,10 @@ public with sharing class ProgramDashboardController {
 			LIMIT :(MAX_PROGRAMS + 1)
 		];
 		result.moreThanShown = programs.size() > MAX_PROGRAMS;
+		result.firstRun =
+			programs.isEmpty() &&
+			Schema.SObjectType.Program__c.isCreateable() &&
+			[SELECT Id FROM Program__c WITH USER_MODE LIMIT 1].isEmpty();
 		for (Integer i = 0; i < programs.size() && i < MAX_PROGRAMS; i++) {
 			Program__c program = programs[i];
 			ProgramFigures figures = byProgram.containsKey(program.Id)

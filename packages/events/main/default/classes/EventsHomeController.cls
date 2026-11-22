@@ -32,6 +32,12 @@ public with sharing class EventsHomeController {
 		/** The object's plural label, the page's title. */
 		@AuraEnabled
 		public String title;
+		/** True when the person may create events and none exists yet (Module Home first run). */
+		@AuraEnabled
+		public Boolean firstRun = false;
+		/** The figures row: `upcoming`, `open` (open for registration), `registrations` (this month). */
+		@AuraEnabled
+		public Map<String, Integer> figures = new Map<String, Integer>();
 	}
 
 	/** One event in the list. */
@@ -96,11 +102,50 @@ public with sharing class EventsHomeController {
 			for (Integer i = 0; i < rows.size() && i < maxEvents; i++) {
 				home.events.add(toRow(rows[i]));
 			}
+			addFigures(home);
 			return home;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getEvents');
 			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Home_LoadFailed'));
 		}
+	}
+
+	/**
+	 * The figures row, counted as the person: upcoming events by status in one aggregate, and
+	 * this month's registrations not cancelled when the person may read registrations. Before
+	 * the first event, the first-run panel instead (for someone who may create one).
+	 */
+	private static void addFigures(Home home) {
+		Integer upcoming = 0;
+		Integer open = 0;
+		for (AggregateResult row : [
+			SELECT Status__c status, COUNT(Id) total
+			FROM Event__c
+			WHERE End__c >= :Datetime.now() AND Status__c != :STATUS_CANCELLED
+			WITH USER_MODE
+			GROUP BY Status__c
+		]) {
+			Integer total = (Integer) row.get('total');
+			upcoming += total;
+			open += row.get('status') == 'Open' ? total : 0;
+		}
+		home.figures.put('upcoming', upcoming);
+		home.figures.put('open', open);
+		if (Schema.SObjectType.Event_Registration__c.isAccessible()) {
+			home.figures.put(
+				'registrations',
+				[
+					SELECT COUNT()
+					FROM Event_Registration__c
+					WHERE CreatedDate = THIS_MONTH AND Status__c != :STATUS_CANCELLED
+					WITH USER_MODE
+				]
+			);
+		}
+		home.firstRun =
+			home.canCreate &&
+			upcoming == 0 &&
+			[SELECT Id FROM Event__c WITH USER_MODE LIMIT 1].isEmpty();
 	}
 
 	/**

@@ -160,4 +160,24 @@ describe('c-funders-board', () => {
     expect(loadStyle).toHaveBeenCalled();
     expect(window.print).toHaveBeenCalled();
   });
+
+  it('opens on the first-run panel before the first grant, with the tools still there', async () => {
+    const element = await render({ ...BOARD, firstRun: true });
+    const panel = one(element, '[data-id="first-run"]');
+    expect(panel.illustration).toBe('setup');
+    expect(panel.heading).toBe('c.Funders_Board_FirstRunHeading');
+    expect(one(element, '[data-id="tiles"]')).toBeNull();
+    expect(one(element, '[data-id="tools"]')).not.toBeNull();
+
+    one(element, '[data-id="first-run-new"]').click();
+    expect(getNavigateCalledWith()).toEqual({
+      type: 'standard__objectPage',
+      attributes: { objectApiName: 'Grant__c', actionName: 'new' }
+    });
+  });
+
+  it('shows no first-run panel once a grant exists', async () => {
+    const element = await render(BOARD);
+    expect(one(element, '[data-id="first-run"]')).toBeNull();
+  });
 });

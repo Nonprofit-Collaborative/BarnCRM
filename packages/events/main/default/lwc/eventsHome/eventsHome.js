@@ -1,6 +1,7 @@
 import { LightningElement } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import EVENT from '@salesforce/schema/Event__c';
+import REGISTRATION from '@salesforce/schema/Event_Registration__c';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import LOCALE from '@salesforce/i18n/locale';
 import TIME_ZONE from '@salesforce/i18n/timeZone';
@@ -50,6 +51,12 @@ export default class EventsHome extends NavigationMixin(LightningElement) {
     actions: ACTIONS,
     get intro() {
       return helpText('Events', 'Events_Home_Intro');
+    },
+    get firstRunHeading() {
+      return helpText('Events', 'Events_Home_FirstRunHeading');
+    },
+    get firstRunMessage() {
+      return helpText('Events', 'Events_Home_FirstRunMessage');
     }
   };
 
@@ -131,8 +138,39 @@ export default class EventsHome extends NavigationMixin(LightningElement) {
     return this.rows.length > 0;
   }
 
+  /** Before the first event, for someone who may create one: the first-run panel alone. */
+  get firstRun() {
+    return Boolean(this.home && this.home.firstRun);
+  }
+
+  get showTiles() {
+    return Boolean(this.home && !this.firstRun);
+  }
+
+  /** The figures row (Module Home pattern), each a link to the list behind it. */
+  get tiles() {
+    const figures = (this.home && this.home.figures) || {};
+    const tiles = [
+      {
+        key: 'upcoming',
+        label: helpText('Events', 'Events_Home_FigureUpcoming'),
+        href: listHref(EVENT)
+      },
+      { key: 'open', label: helpText('Events', 'Events_Home_FigureOpen'), href: listHref(EVENT) },
+      {
+        key: 'registrations',
+        label: helpText('Events', 'Events_Home_FigureRegistrations'),
+        href: listHref(REGISTRATION)
+      }
+    ];
+    // A figure the server left out (registrations the person cannot read) gets no tile.
+    return tiles
+      .filter((tile) => typeof figures[tile.key] === 'number')
+      .map((tile) => ({ ...tile, value: figures[tile.key] }));
+  }
+
   get showEmpty() {
-    return !this.isLoading && !this.hasError && !this.hasRows;
+    return !this.isLoading && !this.hasError && !this.hasRows && !this.firstRun;
   }
 
   get emptyMessage() {
@@ -214,4 +252,9 @@ export default class EventsHome extends NavigationMixin(LightningElement) {
   toast(message, variant) {
     this.dispatchEvent(new ShowToastEvent({ message, variant }));
   }
+}
+
+/** An object's list, from its schema import so the name carries any namespace. */
+function listHref(schema) {
+  return `/lightning/o/${schema.objectApiName}/list`;
 }

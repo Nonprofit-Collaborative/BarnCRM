@@ -162,4 +162,38 @@ describe('c-events-home', () => {
     await flush();
     expect(one(element, '[data-id="error-message"]').message).toBe('No access');
   });
+
+  it('shows the figures row, each figure a link to its list', async () => {
+    const element = await render({
+      ...HOME,
+      figures: { upcoming: 5, open: 2, registrations: 14 }
+    });
+    const tiles = all(element, '[data-id="tiles"] c-barn-stat-tile');
+    expect(tiles.map((tile) => tile.label)).toEqual([
+      'c.Events_Home_FigureUpcoming',
+      'c.Events_Home_FigureOpen',
+      'c.Events_Home_FigureRegistrations'
+    ]);
+    expect(tiles.map((tile) => tile.value)).toEqual([5, 2, 14]);
+    expect(tiles[0].href).toBe('/lightning/o/Event__c/list');
+    expect(tiles[2].href).toBe('/lightning/o/Event_Registration__c/list');
+  });
+
+  it('leaves out a figure the server did not count', async () => {
+    const element = await render({ ...HOME, figures: { upcoming: 5, open: 2 } });
+    expect(all(element, '[data-id="tiles"] c-barn-stat-tile')).toHaveLength(2);
+  });
+
+  it('opens on the first-run panel before the first event', async () => {
+    const element = await render({ ...HOME, events: [], firstRun: true, figures: { upcoming: 0 } });
+    const panel = one(element, '[data-id="first-run"]');
+    expect(panel.illustration).toBe('setup');
+    expect(panel.heading).toBe('c.Events_Home_FirstRunHeading');
+    expect(one(element, '[data-id="tiles"]')).toBeNull();
+    expect(one(element, '[data-id="empty-state"]')).toBeNull();
+    one(element, '[data-id="first-run-new"]').click();
+    expect(mockNavigate).toHaveBeenCalledWith(
+      expect.objectContaining({ attributes: { objectApiName: 'Event__c', actionName: 'new' } })
+    );
+  });
 });
