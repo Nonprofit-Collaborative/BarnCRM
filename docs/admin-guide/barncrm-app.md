@@ -7,7 +7,7 @@ Five serve every organization, nonprofit or for-profit; four are for nonprofits.
 
 | App | Group | For | Pages |
 |---|---|---|---|
-| **BarnCRM Console** | Universal | Everyone with a BarnCRM role | Home, Contacts, Households, Organizations, Accounts, Addresses, Relationships, Affiliations, Household Members, Data Manager, then the everyday pages of modules with no app of their own (Form Submissions, Logic Models, Payments, Component Builder, Advanced Reporting) and of Scholarships and Outbound Grants |
+| **BarnCRM Console** | Universal | Everyone with a BarnCRM role | Home, Contacts, Households, Organizations, Accounts, Addresses, Relationships, Affiliations, Household Members, Data Manager, then the everyday pages of modules with no app of their own (Forms, Form Submissions, Logic Models, Payments, Component Builder, Advanced Reporting) and of Scholarships and Outbound Grants |
 | **BarnCRM Admin Console** | Universal | The BarnCRM Admin role only | BarnCRM Settings, Data Manager, Duplicate Matching, Automation, every installed module's admin pages (among them Forms Home and Forms, Portal Builder Home, Portals and Portal Accesses, and Super Connector), Error Log |
 | **BarnCRM Members and Partners** | Universal | Memberships and Corporate Hub role holders | Memberships Home, Memberships, Member Certifications, Membership Levels, Certifications, Corporate Hub Home, Library Documents, Compliance Obligations, Agreements, Boards and Committees, Board Meetings, Processing Activities, Data Subject Requests, Data Breaches, Reports, Dashboards, Error Log |
 | **BarnCRM Events** | Universal | Event Management role holders | Events Home, Event Calendar, Events, Event Speakers, Venues, Reports, Error Log |
@@ -129,7 +129,7 @@ from the module catalog, not from the app's own file:
 | Fundraising | (its own app) | **BarnCRM Admin Console**: Accounting Periods, Donor Levels and Scores, Stewardship Plan Templates, Pledge Reminders, Receipt Letters, Campaign Sync, Opportunity Mirror, Gift Transaction Mirror, Accounting Export |
 | Programs | (its own app) | **BarnCRM Admin Console**: Programs Settings |
 | Mirror | | **BarnCRM Admin Console**: Provider Requests |
-| Forms | **BarnCRM Console**: Form Submissions | **BarnCRM Admin Console**: Forms Home, Forms |
+| Forms | **BarnCRM Console**: Forms, Form Submissions | **BarnCRM Admin Console**: Forms Home, Forms |
 | Portal Builder | | **BarnCRM Admin Console**: Portal Builder Home, Portals, Portal Accesses |
 | BarnCRM Connector | | **BarnCRM Admin Console**: Super Connector |
 | Memberships | **BarnCRM Members and Partners**: Memberships Home, Memberships, Member Certifications | **BarnCRM Members and Partners** and **BarnCRM Admin Console**: Membership Levels, Certifications |

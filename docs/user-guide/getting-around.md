@@ -95,7 +95,7 @@ Memberships is not installed) and holds every Memberships and Corporate Hub page
 Grants** opens on **Grants Home**; with Scholarships and Outbound Grants installed, **Scholarships
 Home**, **Award Programs**, **Award Applications** and **Awards** follow the grant pages (they are in
 **BarnCRM Console** too).
-**Form Submissions** are in **BarnCRM Console**; building forms, portals and Super Connector are
+**Forms** and **Form Submissions** are in **BarnCRM Console**; building forms, portals and Super Connector are
 in **BarnCRM Admin Console**. The **Rollup Builder** is in **BarnCRM Admin Console**; anyone
 else who may view one of these pages opens it by typing its name in the App Launcher.
 

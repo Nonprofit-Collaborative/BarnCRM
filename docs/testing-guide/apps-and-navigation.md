@@ -15,7 +15,7 @@ takes the apps in a queued job: wait a minute and reload before checking the App
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As admin, open the App Launcher and type `BarnCRM`. | **BarnCRM Console** and **BarnCRM Admin Console** are listed: the first with Patch's face on a sage circle, the admin app with Patch standing in a round badge. With the modules deployed, **BarnCRM Fundraising** shows Patch holding a heart, **BarnCRM Volunteers** Patch in a safety vest, **BarnCRM Programs** Patch with a cap and clipboard, **BarnCRM Grants** Patch with a monocle, **BarnCRM Events** Patch in a party hat, **BarnCRM Projects** Patch in a hard hat and **BarnCRM Members and Partners** Patch wearing a green Member sash. No app named **BarnCRM** or **BarnCRM Admin** alone is listed. No app shows a generic initials tile. |
-| 2 | Open **BarnCRM Console** and its navigation menu (the arrow next to the app name). | Console navigation with a Barn Navy (#1E2A3A) header. **Home**, **Contacts**, **Households**, **Organizations**, **Addresses**, **Relationships**, **Affiliations**, **Household Members**, **Data Manager**, then the pages of installed modules with no app (for example **Form Submissions**) and the Scholarships and Outbound Grants pages. **Find** is not in the navigation. On a wide window, Patch waves beside **Welcome to BarnCRM** on **Home**; its alternative text (a screen reader reads it) is "Patch, the BarnCRM highland cow, waving hello". |
+| 2 | Open **BarnCRM Console** and its navigation menu (the arrow next to the app name). | Console navigation with a Barn Navy (#1E2A3A) header. **Home**, **Contacts**, **Households**, **Organizations**, **Addresses**, **Relationships**, **Affiliations**, **Household Members**, **Data Manager**, then the pages of installed modules with no app (for example **Forms** and **Form Submissions**) and the Scholarships and Outbound Grants pages. **Find** is not in the navigation. On a wide window, Patch waves beside **Welcome to BarnCRM** on **Home**; its alternative text (a screen reader reads it) is "Patch, the BarnCRM highland cow, waving hello". |
 | 3 | Open a household, then one of its addresses. | The household opens in its own tab; the address opens as a subtab under it. |
 | 4 | Open **BarnCRM Admin Console** and its navigation menu. | **BarnCRM Settings**, **Data Manager**, **Duplicate Matching**, **Automation**, the installed modules' admin pages, **Error Log** (last), each opening as a workspace tab. **Super Importer**, **Super Transformer** and **Import Rows** are not in the navigation. It opens on **BarnCRM Settings**. |
 | 5 | As staff, open the App Launcher and type `BarnCRM`. | **BarnCRM Console** is listed. **BarnCRM Admin Console** is not. |
@@ -45,7 +45,7 @@ takes the apps in a queued job: wait a minute and reload before checking the App
 |---|---|---|
 | 1 | Read the deploy output. | A stage "Module tabs in the BarnCRM apps" ran and succeeded. |
 | 2 | As admin, open **BarnCRM Admin Console**. | Before **Error Log**, which stays the last tab: **Rollup Builder**, **Accounting Periods**, **Donor Levels and Scores**, **Stewardship Plan Templates**, **Pledge Reminders**, **Receipt Letters**, **Campaign Sync**, **Opportunity Mirror**, **Gift Transaction Mirror**, **Accounting Export**, then **Forms Home** and **Forms** and the other module admin pages. |
-| 3 | Open **BarnCRM Console**. | After **Data Manager**: **Form Submissions**. No **Gifts**, **Memberships** or **Awards** tab: those are in their own apps. |
+| 3 | Open **BarnCRM Console**. | After **Data Manager**: **Forms**, **Form Submissions**. No **Gifts**, **Memberships** or **Awards** tab: those are in their own apps. |
 | 4 | Open **BarnCRM Console**, **Contacts**, a contact with gifts, then a gift from its related list. | The gift opens on the same record page as in **BarnCRM Fundraising**. |
 | 5 | From the App Launcher, search for "BarnCRM Rollup Builder". | No such app is listed; the **Rollup Builder** tab is. |
 | 6 | Open **BarnCRM Console**, **Home**, **Setup Checklist**, **Modules**. | Under **BarnCRM Memberships**: "Add to the module's app if they are not there, or to BarnCRM Console for a module with no app: Memberships Home, Memberships, Member Certifications" and "Add to BarnCRM Admin Console: Membership Levels, Certifications", then the App Manager steps. A module not installed lists no pages. |
@@ -160,8 +160,8 @@ Console instead. Every org, scratch and Developer Edition included, gets all nin
 | 1 | As admin, open the App Launcher and type `Forms`. | No **BarnCRM Forms** app; the **Forms Home**, **Forms** and **Form Submissions** items are listed. |
 | 2 | Open **BarnCRM Admin Console** and its navigation menu. | **Forms Home** and **Forms** are there, before **Error Log**. |
 | 3 | Open a form. | It opens on the form record page with its builder. |
-| 4 | Open **BarnCRM Console**. | **Form Submissions** is there, after **Data Manager**; **Forms Home** and **Forms** are not. |
-| 5 | As staff, open **BarnCRM Console**, **Form Submissions**. | The list opens. |
+| 4 | Open **BarnCRM Console**. | **Forms** and **Form Submissions** are there, after **Data Manager**; **Forms Home** is not. |
+| 5 | As staff, open **BarnCRM Console**, **Forms**, then a published form. | It opens on the form record page with **Fill In**; **Form Submissions** opens its list too. |
 
 ## T-APP-10: Portal Builder Pages in BarnCRM Admin Console
 
