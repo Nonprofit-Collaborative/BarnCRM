@@ -259,3 +259,20 @@ itself.
 | 6 | **Remove Sample Data**. | Every sample record above is gone; your own document stays. |
 
 **Cleanup:** None.
+
+## T-CH-17: Corporate Hub Home Figures
+
+**Purpose:** confirm Corporate Hub Home's figures row (Module Home pattern, ADR-0236).
+**Prerequisites:** admin and a staff user; one board, Active; a second board set Inactive; two active obligations, one due three days ago and one due in three days; one active agreement and one Draft agreement; a policy acknowledgment requested from the staff user.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As admin, open **BarnCRM Members and Partners**, **Corporate Hub Home**. | Above the lists, four figures: **Policies to Read** 0, **Overdue Obligations** 1, **Active Agreements** 1, **Active Boards and Committees** 1. |
+| 2 | Click each figure. | Policy Acknowledgments, Compliance Obligations, Agreements and Boards lists open. |
+| 3 | As the staff user, open the page. | **Policies to Read** 1, matching the line under **Policies to Acknowledge**. |
+| 4 | Mark the overdue obligation's cycle done (its next due date moves ahead) and reload. | **Overdue Obligations** 0. |
+| 5 | In an org with no board yet, open the page as admin. | **Set Up Your Board** shows and no figures. |
+| 6 | At phone width, open the page. | Figures two to a row. |
+
+**Cleanup:** None.

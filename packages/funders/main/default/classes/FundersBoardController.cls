@@ -78,7 +78,8 @@ public with sharing class FundersBoardController {
 			restrictedFunds(board);
 			board.firstRun =
 				Schema.SObjectType.Grant__c.isCreateable() &&
-				[SELECT Id FROM Grant__c WITH USER_MODE LIMIT 1].isEmpty();
+				[SELECT Id FROM Grant__c WITH USER_MODE LIMIT 1]
+				.isEmpty();
 			return board;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getBoard');

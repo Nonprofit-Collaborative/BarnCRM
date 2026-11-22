@@ -221,12 +221,12 @@ public with sharing class ProjectsController {
 		}
 		if (home.timeTracking && Schema.SObjectType.Time_Entry__c.isAccessible()) {
 			Decimal hours = (Decimal) [
-				SELECT SUM(Hours__c) total
-				FROM Time_Entry__c
-				WHERE Date__c = THIS_MONTH AND Status__c != 'Rejected'
-				WITH USER_MODE
-			][0]
-			.get('total');
+					SELECT SUM(Hours__c) total
+					FROM Time_Entry__c
+					WHERE Date__c = THIS_MONTH AND Status__c != 'Rejected'
+					WITH USER_MODE
+				][0]
+				.get('total');
 			home.figures.put('hours', hours == null ? 0 : hours);
 		}
 	}

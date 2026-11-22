@@ -10,7 +10,9 @@ Launcher).
 ## Corporate Hub Home
 
 Open the **Corporate Hub Home** tab, the app's first. Before your organization's first board or committee, it opens
-with **Set Up Your Board** and a **New Board or Committee** button. It shows:
+with **Set Up Your Board** and a **New Board or Committee** button. At the top, four figures
+open their lists: **Policies to Read**, **Overdue Obligations**, **Active Agreements** and
+**Active Boards and Committees**. It shows:
 
 - **Policies to Acknowledge**: the policies you have been asked to read, with their due dates.
   Open the policy to read its file, then press **I Have Read This**. It disappears from the list.

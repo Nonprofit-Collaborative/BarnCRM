@@ -88,7 +88,7 @@ Templates**, **Skills**, **Volunteer Requirements**, **Reports** and **Dashboard
 approved hours this month, hours waiting for approval and shifts that still need people, each
 a figure you click to open its list, above a chart of this year's hours by job. Before the first
 volunteer job, it opens with **Set Up Your First Volunteer Job** (**New Volunteer Job**, **Import
-a File**) instead. The module's settings are the **Volunteers** section of **BarnCRM Settings**.
+a File**) instead; after that, **New Volunteer Job** is in its header. The module's settings are the **Volunteers** section of **BarnCRM Settings**.
 
 **BarnCRM Members and Partners** opens on **Memberships Home** (or **Corporate Hub Home** when
 Memberships is not installed) and holds every Memberships and Corporate Hub page. **BarnCRM

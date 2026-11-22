@@ -12,7 +12,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | From the App Launcher, open **BarnCRM Volunteers**. | It opens on **Volunteers Home** with three figures: **Hours This Month** (badge **Approved**), **Volunteer Hours** (badge **Submitted**, 4) and **Shifts Needing Volunteers**, and the **Approved Hours This Year by Job** chart. Clicking **Volunteer Hours** opens **Approve Hours**; clicking **Shifts Needing Volunteers** opens that list view. The tabs **Volunteers Home**, **Volunteer Jobs**, **Volunteer Shifts**, **Volunteer Sign-Ups**, **Volunteer Hours**, **Approve Hours**, **Volunteer Letter Templates**, **Skills**, **Volunteer Requirements**, **Dashboards** and **Reports** show. There is no **Volunteer Settings** tab. |
+| 1 | From the App Launcher, open **BarnCRM Volunteers**. | It opens on **Volunteers Home** with three figures: **Hours This Month** (badge **Approved**), **Volunteer Hours** (badge **Submitted**, 4) and **Shifts Needing Volunteers**, and the **Approved Hours This Year by Job** chart. Clicking **Volunteer Hours** opens **Approve Hours**; clicking **Shifts Needing Volunteers** opens that list view. The tabs **Volunteers Home**, **Volunteer Jobs**, **Volunteer Shifts**, **Volunteer Sign-Ups**, **Volunteer Hours**, **Approve Hours**, **Volunteer Letter Templates**, **Skills**, **Volunteer Requirements**, **Reports** and **Dashboards** show. There is no **Volunteer Settings** tab. |
 | 1b | On an org where nothing is counted yet (all three figures 0), open **Volunteers Home**. | A note under the figures says the charts fill in once hours are approved, and what to do. The page header is the shared one, with the **Volunteers Home** icon and a one-line purpose. |
 | 1a | On an org with Volunteers and no volunteer job yet (before sample data), open **Volunteers Home** as admin. | **Set Up Your First Volunteer Job** shows instead of the figures, with **New Volunteer Job** and **Import a File**. **New Volunteer Job** opens the new job form; **Import a File** opens the **Import** tab. Save a job and reload: the panel is gone and the figures show. |
 | 2 | Open **Volunteer Jobs**, list view **All Jobs**. | **Food pantry sort**, **Front desk** and **Community garden** are listed. |
@@ -518,5 +518,19 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 3 | Open an upcoming **Front desk** shift. | Two sign-ups (one Confirmed, one Signed up), and **Suggested Volunteers** lists active sample volunteers with their reasons (for example "Available on Saturdays"); none of the two Inactive ones. |
 | 4 | Open a sample volunteer from a sign-up. | **Volunteer Status** Active, a **Volunteer Since** date, **Availability Days** and **Availability Times**. |
 | 5 | **Remove Sample Data**. | The sample jobs, shifts, sign-ups and hours are gone; your own job stays. |
+
+**Cleanup:** None.
+
+## T-VOL-34: New Volunteer Job on Volunteers Home
+
+**Purpose:** confirm the New Volunteer Job button in the Volunteers Home header and the first-run picture (Module Home pattern, ADR-0236).
+**Prerequisites:** admin and a Volunteers Read Only user; one volunteer job exists.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As admin, open **Volunteers Home**. | **New Volunteer Job** in the page header, above the figures. |
+| 2 | Click **New Volunteer Job**. | The new Volunteer Job form opens. |
+| 3 | As the Read Only user, open the page. | No **New Volunteer Job** button; the figures show. |
+| 4 | On an org with no volunteer job yet, open the page as admin. | The **Set Up Your First Volunteer Job** panel shows the setup picture, and the header has no second **New Volunteer Job** button. |
 
 **Cleanup:** None.

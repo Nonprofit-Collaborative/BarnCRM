@@ -543,7 +543,10 @@ Goals), so the dashboard is the Programs app's home page. Then a **By Program** 
 same figures for each program (including **Served Without Enrollment**), plus **Completed**
 (enrollments completed in the period), with each program's attendance rate drawn as a bar beside
 the percent; click a program's name to open it. It lists every Active program and any other
-program with activity in the period.
+program with activity in the period. With no program in the period, **No Programs in This Period**
+suggests another period or a new program. Until the org has a program, the page opens on **Set Up
+Your First Program** for anyone who may create one (D-200 R4), with **New Program**, instead of
+the tiles.
 
 Each person sees figures for the records they can see. With Participant Privacy set to Private,
 a staff member's dashboard counts only their own enrollments and deliveries, while Programs Admin

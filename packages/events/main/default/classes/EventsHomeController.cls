@@ -142,10 +142,7 @@ public with sharing class EventsHomeController {
 				]
 			);
 		}
-		home.firstRun =
-			home.canCreate &&
-			upcoming == 0 &&
-			[SELECT Id FROM Event__c WITH USER_MODE LIMIT 1].isEmpty();
+		home.firstRun = home.canCreate && upcoming == 0 && [SELECT Id FROM Event__c WITH USER_MODE LIMIT 1].isEmpty();
 	}
 
 	/**

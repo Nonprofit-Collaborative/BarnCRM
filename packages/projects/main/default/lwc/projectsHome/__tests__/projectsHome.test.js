@@ -8,7 +8,7 @@ import exportBillable from '@salesforce/apex/ProjectsController.exportBillable';
 import applyRates from '@salesforce/apex/ProjectsController.applyRates';
 // The object info test wire adapter is emitted to on purpose, which is how a wired component is
 // driven from a test.
-// eslint-disable-next-line @lwc/lwc/no-unexpected-wire-adapter-usages
+/* eslint-disable @lwc/lwc/no-unexpected-wire-adapter-usages */
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 
 const mockNavigate = jest.fn();

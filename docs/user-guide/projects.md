@@ -7,7 +7,10 @@ Entries in the BarnCRM app, and every Project Management page in the **BarnCRM P
 ## Projects Home
 
 Before your organization's first project, the page opens with **Start Your First Project**;
-click **Start a Project** to go to **New Project From Template**.
+click **Start a Project** to go to **New Project From Template**. After that, **New Project**
+is in the page header, and figures you click to open their lists show **Active Projects**,
+**My Open Tasks**, **Open Requests** and **Hours This Month** (the last two when your admin has
+Requests and time tracking on).
 
 - **Projects at Risk**: active projects that are At Risk or Off Track, with the reasons. Check
   **Only Mine** to see only projects you own.

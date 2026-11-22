@@ -10,7 +10,10 @@ look at them.
 
 Open the **Events Home** tab. **Upcoming** lists the events still to come, soonest first;
 **Past** lists those that ended or were cancelled. Click an event's name to open it. The
-**Events** tab has list views of every event.
+**Events** tab has list views of every event. Above the lists, **Upcoming Events**, **Open for
+Registration** and **Registrations This Month** are figures you click to open the Events list.
+Before your organization's first event, the page opens with **Plan Your First Event** and a
+**New Event** button.
 
 ## See Events on the Calendar
 

@@ -65,8 +65,18 @@ private class EventsHomeControllerTest {
 			Contact ben = TestDataFactory.person(new Contact(FirstName = 'Ben', LastName = 'Okafor'));
 			insert as user new List<Contact>{ ana, ben };
 			insert as user new List<Event_Registration__c>{
-				new Event_Registration__c(Event__c = open.Id, Contact__c = ana.Id, Status__c = 'Registered', Source__c = 'Staff'),
-				new Event_Registration__c(Event__c = open.Id, Contact__c = ben.Id, Status__c = 'Cancelled', Source__c = 'Staff')
+				new Event_Registration__c(
+					Event__c = open.Id,
+					Contact__c = ana.Id,
+					Status__c = 'Registered',
+					Source__c = 'Staff'
+				),
+				new Event_Registration__c(
+					Event__c = open.Id,
+					Contact__c = ben.Id,
+					Status__c = 'Cancelled',
+					Source__c = 'Staff'
+				)
 			};
 
 			Test.startTest();
@@ -74,7 +84,11 @@ private class EventsHomeControllerTest {
 			Test.stopTest();
 
 			Assert.isFalse(home.firstRun, 'Events exist');
-			Assert.areEqual(2, home.figures.get('upcoming'), 'Upcoming counts the two not over or cancelled, in either view');
+			Assert.areEqual(
+				2,
+				home.figures.get('upcoming'),
+				'Upcoming counts the two not over or cancelled, in either view'
+			);
 			Assert.areEqual(1, home.figures.get('open'), 'One is open for registration');
 			Assert.areEqual(1, home.figures.get('registrations'), 'A cancelled registration is not counted');
 		}

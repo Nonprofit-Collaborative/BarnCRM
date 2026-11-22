@@ -76,6 +76,9 @@ cycle on its Open Date and moves an Open cycle to Reviewing after its Close Date
 Until the org has an award program, **Scholarships Home** opens with **Set Up Your First Award
 Program** for anyone who may create one (D-200 R4). Its **New Award Program**
 button opens the new program form, step 1 below. It goes away once the first program is saved.
+From then on, **New Award Program** is in the page header for anyone who may create programs,
+above four figures that each open their list: **Active Award Programs**, **My Reviews to Do**,
+**Applications in Review** and **Awards This Year** (declined and cancelled awards left out).
 
 1. On **Award Programs**, press **New**: a name, a Type (Scholarship, Grant, Fellowship, Other),
    a public description and, if you like, an award letter template (see Award Letters).

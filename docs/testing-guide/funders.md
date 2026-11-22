@@ -390,3 +390,16 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | 3 | In Setup, **Permission Sets**. | The three sets read **Grants Admin**, **Grants Staff** and **Grants Read Only**; Setup, **Custom Settings** lists **Grants Settings**. |
 | 4 | Open the **BarnCRM Grants** app, then **Grant Finder** with the Grant Finder setting off. | The tab says to turn it on in **BarnCRM Settings, Grants**. |
 | 5 | In App Builder, find the Grants Home component. | It is named **Grants Home**. |
+
+## T-FUN-23: Grants Home First Run
+
+**Purpose:** confirm Grants Home opens on a first-run panel before the first grant (Module Home pattern, ADR-0236).
+**Prerequisites:** admin; an org with Grants and no grant yet; a Grants Read Only user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As admin, open **Grants Home**. | **Track Your First Grant** with the setup picture and **New Grant**; no figures or deadlines. |
+| 2 | As the Read Only user, open it. | No first-run panel; the figures show at 0. |
+| 3 | As admin, click **New Grant**. | The new Grant form opens. Save a grant and reload: the panel is gone and the figures show. |
+
+**Cleanup:** delete the grant from step 3.

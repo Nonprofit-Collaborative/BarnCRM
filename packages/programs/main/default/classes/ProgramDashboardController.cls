@@ -290,7 +290,8 @@ public with sharing class ProgramDashboardController {
 		result.firstRun =
 			programs.isEmpty() &&
 			Schema.SObjectType.Program__c.isCreateable() &&
-			[SELECT Id FROM Program__c WITH USER_MODE LIMIT 1].isEmpty();
+			[SELECT Id FROM Program__c WITH USER_MODE LIMIT 1]
+			.isEmpty();
 		for (Integer i = 0; i < programs.size() && i < MAX_PROGRAMS; i++) {
 			Program__c program = programs[i];
 			ProgramFigures figures = byProgram.containsKey(program.Id)

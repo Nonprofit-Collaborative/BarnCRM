@@ -22,7 +22,6 @@ EventSponsorsController.addDeliverable
 EventSponsorsController.removeSponsor
 EventSponsorsController.setDeliverableStatus
 EventVolunteersController.getVolunteers
-EventsHomeController.getEvents
 FormRunnerController.getPublishedForms
 FormSubmissionController.getSubmission
 FundraisingHomeController.getHome

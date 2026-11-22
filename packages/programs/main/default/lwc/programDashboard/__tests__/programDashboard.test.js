@@ -249,7 +249,12 @@ describe('c-program-dashboard', () => {
   });
 
   it('opens on the first-run panel before the first program, and New Program opens the form', async () => {
-    getDashboard.mockResolvedValue({ ...DASHBOARD, programs: [], activePrograms: 0, firstRun: true });
+    getDashboard.mockResolvedValue({
+      ...DASHBOARD,
+      programs: [],
+      activePrograms: 0,
+      firstRun: true
+    });
     const element = mount();
     await flush();
 

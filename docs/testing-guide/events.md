@@ -623,3 +623,22 @@ room or capacity.
 | 2 | Do the same for a sponsor with no leads. | A message that there are no leads to download; no file. |
 
 **Cleanup:** none.
+
+## T-EV-30: Events Home Figures and First Run
+
+**Purpose:** confirm Events Home's figures row and its first-run panel (Module Home pattern, ADR-0236).
+**Prerequisites:** an org with Event Management and no events (before sample data); Events Admin and Events Read Only users.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As admin, open **BarnCRM Events**. | **Events Home** shows **Plan Your First Event** with a setup illustration and **New Event**; no figures and no **Nothing Coming Up** panel. |
+| 2 | Click **New Event** in the panel. | The standard new event form opens. Save `Gala` (Open, starting in 20 days) and `Planning Day` (Draft, starting in 2 days). |
+| 3 | Reload **Events Home**. | The first-run panel is gone. Figures: **Upcoming Events** 2, **Open for Registration** 1, **Registrations This Month** 0; both events are listed. |
+| 4 | Add a registration to `Gala` and a second one set to Cancelled; reload. | **Registrations This Month** is 1. |
+| 5 | Switch the view to **Past**. | The figures stay the same: they count upcoming events whatever the view. |
+| 6 | Click **Upcoming Events**, then go back and click **Registrations This Month**. | The Events list opens, then the Event Registrations list. |
+| 7 | As read-only, open **Events Home**. | The same figures, no **New Event**. With no events, a read-only user sees **Nothing Coming Up** rather than the first-run panel. |
+| 8 | At phone width, open the page. | Figures two to a row. |
+
+**Cleanup:** delete the two events.

@@ -494,3 +494,17 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 6 | As a Programs Read Only user, open the person in the **BarnCRM Console** app. | The card shows its figures with no **Enroll** and no **Record Service**; the **Programs** card in the Programs app has no **Enroll**. |
 
 **Cleanup:** delete the service delivery and enrollment from steps 2 and 3.
+
+## T-PRG-29: Programs Home First Run and No Programs in This Period
+
+**Purpose:** confirm the Programs Home first-run panel and its compact empty state (Module Home pattern, ADR-0236).
+**Prerequisites:** admin; an org with Programs and no program yet; a Programs Read Only user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As admin, open **Programs Home** in the **BarnCRM Programs** app. | **Set Up Your First Program** with the setup picture and **New Program**; no figures; the tool tiles still show. |
+| 2 | As the Read Only user, open it. | No first-run panel; the figures show at 0 with **No Programs in This Period**. |
+| 3 | As admin, click **New Program**, save an active program and reload. | The panel is gone and the figures show. |
+| 4 | Pick **Last Year** in the period picker. | **No Programs in This Period**, in the compact size, with a line saying to pick another period or add a program. |
+
+**Cleanup:** delete the program from step 3.

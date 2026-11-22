@@ -133,7 +133,10 @@ public with sharing class CorporateHubController {
 					WITH USER_MODE
 				]
 			);
-			home.figures.put('agreements', [SELECT COUNT() FROM Agreement__c WHERE Status__c = 'Active' WITH USER_MODE]);
+			home.figures.put(
+				'agreements',
+				[SELECT COUNT() FROM Agreement__c WHERE Status__c = 'Active' WITH USER_MODE]
+			);
 			home.figures.put('boards', [SELECT COUNT() FROM Board__c WHERE Status__c = 'Active' WITH USER_MODE]);
 			return home;
 		} catch (Exception e) {

@@ -78,8 +78,16 @@ private class CorporateHubControllerTest {
 				new Board__c(Name = 'Old Committee', Type__c = 'Board', Status__c = 'Inactive')
 			};
 			insert new List<Compliance_Obligation__c>{
-				new Compliance_Obligation__c(Name = 'Late', Status__c = 'Active', Due_Date__c = Date.today().addDays(-3)),
-				new Compliance_Obligation__c(Name = 'Soon', Status__c = 'Active', Due_Date__c = Date.today().addDays(3)),
+				new Compliance_Obligation__c(
+					Name = 'Late',
+					Status__c = 'Active',
+					Due_Date__c = Date.today().addDays(-3)
+				),
+				new Compliance_Obligation__c(
+					Name = 'Soon',
+					Status__c = 'Active',
+					Due_Date__c = Date.today().addDays(3)
+				),
 				new Compliance_Obligation__c(Name = 'Paused', Status__c = 'Off', Due_Date__c = Date.today().addDays(-3))
 			};
 			insert new List<Agreement__c>{
