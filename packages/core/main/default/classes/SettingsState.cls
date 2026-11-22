@@ -182,7 +182,9 @@ public without sharing class SettingsState {
 		if (String.isNotBlank(key) && key.contains('.')) {
 			// A module key reads its registered legacy custom setting's field, as Core's does.
 			Setting_Module__mdt module = ModuleSettings.moduleByPrefix(key.substringBefore('.'));
-			return module == null ? null : ModuleSettings.legacyValue(module.Settings_Object__c, key.substringAfter('.'));
+			return module == null
+				? null
+				: ModuleSettings.legacyValue(module.Settings_Object__c, key.substringAfter('.'));
 		}
 		if (!isStateKey(key) || SettingStore.isCarriedOver()) {
 			return null;
