@@ -111,7 +111,9 @@ public with sharing class NightlyJobs {
 			RecordRetentionBatch.step(),
 			SetupChangeCopyJob.step(),
 			EmptyHouseholdTidyScheduler.step(),
+			BackupSetSchedule.step(),
 			EngagementScoreJob.step(),
+			ArchiveRulesStep.step(),
 			ErrorDigestScheduler.step()
 		};
 	}
@@ -301,13 +303,17 @@ public with sharing class NightlyJobs {
 	// Rows
 	// -------------------------------------------------------------------------------------
 
-	/** Every row by key (matched as job names are, ignoring case and spacing). */
+	/**
+	 * Every job row by key (matched as job names are, ignoring case and spacing). State and Seen
+	 * rows share the object and are not jobs (SettingsState), so they are left out.
+	 */
 	public static Map<String, Nightly_Job__c> rows() {
 		if (rowsByKey == null) {
 			rowsByKey = new Map<String, Nightly_Job__c>();
 			for (Nightly_Job__c row : [
 				SELECT Id, Name, Switch__c, Last_Started__c, Last_Finished__c, Last_Outcome__c, Last_Message__c
 				FROM Nightly_Job__c
+				WHERE Kind__c = NULL OR Kind__c = 'Job'
 				WITH SYSTEM_MODE
 				ORDER BY CreatedDate
 				LIMIT 500
@@ -322,7 +328,7 @@ public with sharing class NightlyJobs {
 	public static Nightly_Job__c rowFor(String key) {
 		Nightly_Job__c row = rows().get(rowKey(key));
 		if (row == null) {
-			row = new Nightly_Job__c(Name = key.left(80));
+			row = new Nightly_Job__c(Name = key.left(80), Kind__c = 'Job');
 			rowsByKey.put(rowKey(key), row);
 		}
 		return row;

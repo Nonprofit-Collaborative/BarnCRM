@@ -9,7 +9,7 @@ belongs to. A dry run checks everything first and loads nothing; the load can be
 
 ## 2. How to Turn It On
 
-There is nothing to turn on. You need **Manage BarnCRM Settings** (in **BarnCRM Admin**), as for
+There is nothing to turn on. You need **Manage BarnCRM Settings** (in **BarnCRM Admin Console**), as for
 every import. The files are saved with your own access: you own them, and you can only link a
 file to a record you can see.
 

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Record_JSON__c</fullName>
+  <description>
+    The record as JSON (R-ARC2): every field the archiving person could read, and its cascade-delete
+    children one level deep. A restore inserts the record again from it.
+  </description>
+  <label>Record</label>
+  <length>131072</length>
+  <type>LongTextArea</type>
+  <visibleLines>3</visibleLines>
+</CustomField>

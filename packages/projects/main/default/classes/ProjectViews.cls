@@ -72,7 +72,7 @@ public with sharing class ProjectViews {
 			budgetHours = record.Budget_Hours__c;
 			changeHours = record.Change_Hours__c;
 			budgetAmount = record.Budget_Amount__c;
-			actualCost = record.Actual_Cost__c;
+			actualCost = record.Actual_Cost_Amount__c;
 			remainingBudget = record.Remaining_Budget__c;
 			ownerName = record.Owner?.Name;
 		}

@@ -31,11 +31,11 @@ Migration Assistant (see [Moving From Outbound Funds](#moving-from-outbound-fund
 
 1. Deploy or install the `BarnCRM Scholarships and Outbound Grants` package after Core.
 2. In BarnCRM Settings, **Modules**, turn on **Scholarships and Outbound Grants**. It ships off.
-3. The Scholarships and Grants, Award Programs, Award Applications and Awards tabs are added at the
-   end of the BarnCRM and BarnCRM Console apps (in a package install the admin adds them in App
-   Manager; the Setup Assistant lists the tab names), and appear in the module's own app, **BarnCRM
-   Scholarships** (with Reports, Dashboards and Error Log), shown to everyone with a Scholarships
-   permission set. A scratch or Developer Edition org gets the tabs only.
+3. The Scholarships Home, Award Programs, Award Applications and Awards tabs are added to
+   **BarnCRM Grants**, after the grant pages and before Reports, Dashboards and Error Log, and to
+   the end of the BarnCRM Console app (in a package install the admin adds them in App
+   Manager; the Setup Assistant lists the tab names). The Scholarships permission sets show
+   BarnCRM Console; BarnCRM Grants is shown by the Grants permission sets.
 
 For applications with files, also install BarnCRM Forms and set up its public site (see
 [Forms](forms.md)). For the applicant portal, install Portal Builder.
@@ -60,7 +60,7 @@ program to a team, set the Award Program default to Private in Sharing Settings 
 
 ## Settings
 
-BarnCRM Settings, **Scholarships and Outbound Grants**. Every setting is org-wide.
+BarnCRM Settings, **Scholarships and Outbound Grants**. Every setting is org-wide. A save shows **Saving**, then **Saved**, and the value is still there when you reload.
 
 | Setting | Default | What it does |
 |---|---|---|
@@ -73,8 +73,8 @@ cycle on its Open Date and moves an Open cycle to Reviewing after its Close Date
 
 ## Programs and Cycles
 
-Until the org has an award program, the **Scholarships and Grants** page opens with **Set Up
-Your First Award Program** for anyone who may create one (D-200 R4). Its **New Award Program**
+Until the org has an award program, **Scholarships Home** opens with **Set Up Your First Award
+Program** for anyone who may create one (D-200 R4). Its **New Award Program**
 button opens the new program form, step 1 below. It goes away once the first program is saved.
 
 1. On **Award Programs**, press **New**: a name, a Type (Scholarship, Grant, Fellowship, Other),
@@ -146,7 +146,7 @@ Staff can also add an application on the cycle's Applications related list.
 
 ## Reviews and Decisions
 
-- A reviewer opens an application from the Scholarships and Grants tab (**My Reviews**). The
+- A reviewer opens an application from the Scholarships Home tab (**My Reviews**). The
   review panel shows the rubric; **Save** keeps a draft, **Submit Review** counts it, **Recuse**
   steps aside with a reason. Only the reviewer, or a holder of Manage Scholarships, can change a
   review.
@@ -175,7 +175,7 @@ Record the answer with **Accepted** or **Declined** on the award, or let the rec
 - **Mark Paid** records the date, method and reference after you pay in your accounting system. It
   is refused while a holding condition is Open or Submitted, and for anyone without Manage
   Scholarships. **Met** and **Waive** on a condition release it.
-- **Export Disbursements** on the Scholarships and Grants tab downloads a CSV of the payments
+- **Export Disbursements** on the Scholarships Home tab downloads a CSV of the payments
   scheduled or paid in a date range (number, award, recipient, payee, amount, dates, method,
   reference, program, cycle) and stamps their Exported Date. Import it into your accounting
   system.

@@ -14,9 +14,9 @@ With Fundraising installed the assistant has nine steps; with Core alone it has 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As staff, open the **BarnCRM** app. | A window over the home page reads "An administrator needs to finish setting up BarnCRM." and nothing else. There is no **Finish Setup** button. |
+| 1 | As staff, open the **BarnCRM Console** app. | A window over the home page reads "An administrator needs to finish setting up BarnCRM." and nothing else. There is no **Finish Setup** button. |
 | 2 | As staff, open the **BarnCRM Settings** tab. | The same window, with the same sentence. |
-| 3 | As admin, open the **BarnCRM** app. | A window titled **Set Up BarnCRM**: "Two questions before BarnCRM is ready. You are asked them once." It asks **Which edition?** as two cards, **Standard Edition** ("The full core suite of BarnCRM tools.") and **Nonprofit Edition** ("The core suite plus the nonprofit tools, starting with Fundraising."), each with an icon, and **What should BarnCRM turn on?** **Turn on all the default core features** is selected. Under them: "No module is installed now. Install modules later from BarnCRM Settings, Modules." The window has no close button. |
+| 3 | As admin, open the **BarnCRM Console** app. | A window titled **Set Up BarnCRM**: "Two questions before BarnCRM is ready. You are asked them once." It asks **Which edition?** as two cards, **Standard Edition** ("The full core suite of BarnCRM tools.") and **Nonprofit Edition** ("The core suite plus the nonprofit tools, starting with Fundraising."), each with an icon, and **What should BarnCRM turn on?** **Turn on all the default core features** is selected. Under them: "No module is installed now. Install modules later from BarnCRM Settings, Modules." The window has no close button. |
 | 4 | Look at **Finish Setup** before choosing an edition. | It is disabled. |
 | 5 | Press Escape, then press Tab several times. | The window stays open and focus stays inside it. |
 | 6 | Tab to the edition cards and press the Right arrow until **Nonprofit Edition** is selected. | The **Nonprofit Edition** card shows as selected. **Finish Setup** is enabled. |
@@ -34,7 +34,7 @@ With Fundraising installed the assistant has nine steps; with Core alone it has 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **BarnCRM** app. Click the **Standard Edition** card. | The **Set Up BarnCRM** window shows both questions. |
+| 1 | Open the **BarnCRM Console** app. Click the **Standard Edition** card. | The **Set Up BarnCRM** window shows both questions. |
 | 2 | Choose **Let me choose features**. | "Untick what you do not want yet. You can turn it on later in BarnCRM Settings, General. Turning a feature on cannot be undone." Eight ticked boxes: **Data Manager**, **Duplicate Matching**, **Org Optimizer and Health Check**, **Households**, **Addresses**, **Relationships**, **Affiliations**, **Preferred Email and Phone**, each with a help icon describing it. |
 | 3 | Untick **Data Manager** and **Duplicate Matching**. Click **Finish Setup**. | **BarnCRM Settings** opens on **General**. Without reloading the browser page, **Edition** reads **Standard Edition** (never "Not chosen yet"). **Data Manager** and **Duplicate Matching** show **Turn On**; the other six say **On**. |
 | 4 | Wait a few minutes (the tab sync runs in the background), reload, and open the app's navigation menu. | **Data Manager** is not listed (nor **Find**, which opens from Data Manager). **Org Optimizer** is listed. |
@@ -51,7 +51,7 @@ With Fundraising installed the assistant has nine steps; with Core alone it has 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **BarnCRM** app, **Home**. | A **Setup Checklist** card listing all nine steps, each with a progress ring and a **Done**, **Skipped** or **To Do** badge; step 1 has a check mark and **Done**. Only the first step not done (usually step 2) is open. **Setup Checklist** shows once, as the card title, and the only count is "{n} of 9 steps done". Step names are in Title Case. There is no **Back** button. |
+| 1 | Open the **BarnCRM Console** app, **Home**. | A **Setup Checklist** card listing all nine steps, each with a progress ring and a **Done**, **Skipped** or **To Do** badge; step 1 has a check mark and **Done**. Only the first step not done (usually step 2) is open. **Setup Checklist** shows once, as the card title, and the only count is "{n} of 9 steps done". Step names are in Title Case. There is no **Back** button. |
 | 2 | Click **1. Choose Your Edition** in the list. | Step 1 opens in place and step 2 closes. "Edition: **Nonprofit Edition**", "The edition is chosen once." and a **How to Change It Later** link. No edition choice and no **Confirm and Continue**. "Fundraising is installed. Its steps are part of this setup." |
 | 3 | Click **Next**. | Step 2, **Confirm How BarnCRM Fits Your Org**: "Your org uses Person Accounts. Household membership is tracked with one record per person, so a person can be in more than one household and everything you have keeps working." **Recommended for your org**, and **How BarnCRM fits this org** set to **Standalone**. (On the platform-only shape: "This looks like a fresh org, with no other household model and no Person Accounts. BarnCRM can run on its own.") |
 | 4 | Open **How BarnCRM fits this org**. | Only **Standalone** (no NPSP or Nonprofit Cloud is in this org). |
@@ -187,7 +187,7 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Run `scripts/org/deploy-packages.sh <alias>-src --core-only`. | The output includes **== Giving the person deploying the BarnCRM Admin permission set ==** and **== Running Core's post-install steps ==** with no error, and ends **== Every stage deployed ==**. The **Error Log** tab has no **You need the Manage BarnCRM Settings permission** entry from this run. |
-| 2 | Open the **BarnCRM** app as the admin who deployed. | The **Set Up BarnCRM** window shows, as in T-SA-01. |
+| 2 | Open the **BarnCRM Console** app as the admin who deployed. | The **Set Up BarnCRM** window shows, as in T-SA-01. |
 | 3 | Click the **Standard Edition** card, keep **Turn on all the default core features**, and click **Finish Setup**. | **BarnCRM Settings** opens on **General**. Every row under **Features** says **On**. |
 | 4 | Wait a few minutes, reload, and open the app's navigation menu. | **Data Manager** is listed (**Find** opens from it). In Setup, **Scheduled Jobs** lists **BarnCRM Tab Access Check**. |
 | 5 | Open **BarnCRM Settings**, **Automation**. | The automation switches are listed. |

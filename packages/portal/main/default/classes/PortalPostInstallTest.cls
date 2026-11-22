@@ -33,7 +33,7 @@ private class PortalPostInstallTest {
 
 			Assert.areEqual(1, adminSetsHeldBy(fresh), 'The installer holds the admin set');
 			Assert.areEqual(1, adminSetsHeldBy(alreadyHolding), 'Never given twice');
-			Assert.isFalse(Portal_Settings__c.getOrgDefaults().Enabled__c == true, 'Portal Sign-In ships off');
+			Assert.isFalse(ModuleSettings.flag('Portal_Enabled'), 'Portal Sign-In ships off');
 		}
 	}
 

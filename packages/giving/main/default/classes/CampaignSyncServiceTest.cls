@@ -9,11 +9,14 @@
  */
 @IsTest(testFor='ApexClass:CampaignSyncService')
 private class CampaignSyncServiceTest {
+	// Every test starts with the sync on: a store value lasts one transaction, so it is put here.
+	static {
+		switchOn(true);
+	}
+
 	@TestSetup
 	static void setup() {
-		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			switchOn(true);
-		}
+		TestUsers.adminWith('Giving_Admin');
 		// Built once for the class rather than in every test that runs as her.
 		User maria = TestDataFactory.createUserOnTheRunningUsersProfile(
 			'Maria',
@@ -25,9 +28,7 @@ private class CampaignSyncServiceTest {
 	}
 
 	private static void switchOn(Boolean enabled) {
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		settings.Campaign_Sync_Enabled__c = enabled;
-		upsert settings;
+		ModuleSettings.setForTest('Mirror_Campaign_Sync_Enabled', enabled);
 	}
 
 	/** Maria: an administrator who holds Campaign access and the Marketing User box. */

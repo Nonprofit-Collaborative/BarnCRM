@@ -86,17 +86,58 @@ public with sharing class PaymentService {
 
 	// ---- Settings and keys ----
 
-	public static Payments_Settings__c settings() {
-		Payments_Settings__c s = Payments_Settings__c.getOrgDefaults();
-		return s == null ? new Payments_Settings__c() : s;
+	// Settings are read from the settings store by DeveloperName; what the module records about
+	// this org (connections, the PayPal webhook and product ids, the cap time, the token's hash)
+	// is run state (ADR-0238 settings as custom metadata, decisions 6 and 11).
+	private static final String STATE_PREFIX = 'Payments';
+	public static final String STRIPE_CONNECTED = 'Stripe_Connected__c';
+	public static final String PAYPAL_CONNECTED = 'PayPal_Connected__c';
+	public static final String PAYPAL_WEBHOOK_ID = 'PayPal_Webhook_Id__c';
+	public static final String PAYPAL_PRODUCT_ID = 'PayPal_Product_Id__c';
+	private static final String CAP_HIT_AT = 'Webhook_Cap_Hit_At__c';
+	private static final String TOKEN_HASH = 'Webhook_Token_Hash';
+	/** The legacy field that held the token itself, read only to keep an upgraded org's addresses. */
+	private static final String LEGACY_TOKEN = 'Webhook_Token__c';
+
+	/** The run-state key of one of the module's values. */
+	public static String stateKey(String name) {
+		return SettingsState.moduleKey(STATE_PREFIX, name);
+	}
+
+	/** One recorded value of this org, such as `PAYPAL_WEBHOOK_ID`; null when none. */
+	public static String stateText(String name) {
+		String value = SettingsState.text(stateKey(name));
+		return String.isBlank(value) ? null : value;
+	}
+
+	public static Boolean stateFlag(String name) {
+		return SettingsState.flag(stateKey(name));
+	}
+
+	/** Records values of this org by name (`STRIPE_CONNECTED`...), synchronously, in one write. */
+	public static void putState(Map<String, Object> valuesByName) {
+		Map<String, Object> byKey = new Map<String, Object>();
+		for (String name : valuesByName.keySet()) {
+			byKey.put(stateKey(name), valuesByName.get(name));
+		}
+		SettingsState.put(byKey);
 	}
 
 	public static String mode() {
-		return settings().Mode__c == LIVE ? LIVE : TEST;
+		return ModuleSettings.text('Payments_Mode') == LIVE ? LIVE : TEST;
 	}
 
 	public static String defaultProcessor() {
-		return settings().Processor__c == PAYPAL ? PAYPAL : STRIPE;
+		return ModuleSettings.text('Payments_Processor') == PAYPAL ? PAYPAL : STRIPE;
+	}
+
+	/** The default currency, upper case; USD when none is set. */
+	public static String currencyCode() {
+		return (ModuleSettings.text('Payments_Currency') ?? 'USD').toUpperCase();
+	}
+
+	public static Boolean recurringOn() {
+		return ModuleSettings.flag('Payments_Recurring');
 	}
 
 	/**
@@ -104,50 +145,90 @@ public with sharing class PaymentService {
 	 * its Named Credential (R-PK1), and for PayPal the webhook id is entered. No secret is read.
 	 */
 	public static Boolean isReady(String processor) {
-		Payments_Settings__c s = settings();
 		return processor == PAYPAL
-			? s.PayPal_Connected__c == true && String.isNotBlank(s.PayPal_Webhook_Id__c)
-			: s.Stripe_Connected__c == true;
+			? stateFlag(PAYPAL_CONNECTED) && stateText(PAYPAL_WEBHOOK_ID) != null
+			: stateFlag(STRIPE_CONNECTED);
 	}
 
 	// ---- The receiver's address token (pre-batch review M1) ----
 
-	/** The token a processor's post must carry; made and saved on first need, or replaced. */
-	public static String webhookToken(Boolean replace) {
-		Payments_Settings__c s = settings();
-		if (replace == true || String.isBlank(s.Webhook_Token__c)) {
-			s.SetupOwnerId = UserInfo.getOrganizationId();
-			s.Webhook_Token__c = EncodingUtil.convertToHex(Crypto.generateAesKey(256));
-			upsert as system s;
-		}
-		return s.Webhook_Token__c;
+	/**
+	 * Makes a new token, keeps only its SHA-256 hash, and returns the token: the one time it is
+	 * known, for Payments Setup to show once. The addresses given before stop working.
+	 */
+	public static String newWebhookToken() {
+		String token = EncodingUtil.convertToHex(Crypto.generateAesKey(256));
+		putState(new Map<String, Object>{ TOKEN_HASH => hashOf(token) });
+		return token;
 	}
 
-	/** True when the post's token is the saved one; every character is compared, so timing tells nothing. */
+	/** True when a token is in use (its hash is kept, or an upgraded org's token is still read). */
+	public static Boolean hasWebhookToken() {
+		return savedHash() != null;
+	}
+
+	/** True when the post's token hashes to the kept hash; every character is compared, so timing tells nothing. */
 	public static Boolean tokenMatches(String given) {
-		String saved = settings().Webhook_Token__c;
-		if (String.isBlank(saved) || given == null) {
+		String saved = savedHash();
+		if (saved == null || String.isBlank(given)) {
 			return false;
 		}
-		Integer wrong = Math.abs(given.length() - saved.length());
+		String hash = hashOf(given.trim());
+		Integer wrong = Math.abs(hash.length() - saved.length());
 		for (Integer i = 0; i < saved.length(); i++) {
-			if (i >= given.length() || given.charAt(i) != saved.charAt(i)) {
+			if (i >= hash.length() || hash.charAt(i) != saved.charAt(i)) {
 				wrong++;
 			}
 		}
 		return wrong == 0;
 	}
 
+	/**
+	 * Keeps the hash of an upgraded org's token, from the legacy field, when no hash is kept yet,
+	 * so the addresses already given keep working after carry-over. Run at install; safe to rerun.
+	 */
+	public static void keepLegacyTokenHash() {
+		if (stateText(TOKEN_HASH) != null) {
+			return;
+		}
+		String legacy = legacyToken();
+		if (legacy != null) {
+			putState(new Map<String, Object>{ TOKEN_HASH => hashOf(legacy) });
+		}
+	}
+
+	private static String savedHash() {
+		String kept = stateText(TOKEN_HASH);
+		if (kept != null) {
+			return kept;
+		}
+		String legacy = legacyToken();
+		return legacy == null ? null : hashOf(legacy);
+	}
+
+	private static String legacyToken() {
+		Object legacy = ModuleSettings.legacyValue('Payments_Settings__c', LEGACY_TOKEN);
+		return legacy == null || String.isBlank(String.valueOf(legacy)) ? null : String.valueOf(legacy).trim();
+	}
+
+	@TestVisible
+	private static String hashOf(String token) {
+		return EncodingUtil.convertToHex(Crypto.generateDigest('SHA-256', Blob.valueOf(token)));
+	}
+
+	/** When the receiver last refused a post at its hourly cap, for Health Check; null when never. */
+	public static Datetime capHitAt() {
+		return SettingsState.moment(stateKey(CAP_HIT_AT));
+	}
+
 	/** Records a refusal at the hourly cap; true for the first one in an hour (the one to log). */
 	public static Boolean noteCapHit() {
-		Payments_Settings__c s = settings();
 		Datetime now = Datetime.now();
-		if (s.Webhook_Cap_Hit_At__c != null && s.Webhook_Cap_Hit_At__c > now.addHours(-1)) {
+		Datetime last = capHitAt();
+		if (last != null && last > now.addHours(-1)) {
 			return false;
 		}
-		s.SetupOwnerId = UserInfo.getOrganizationId();
-		s.Webhook_Cap_Hit_At__c = now;
-		upsert as system s;
+		putState(new Map<String, Object>{ CAP_HIT_AT => now });
 		return true;
 	}
 
@@ -170,7 +251,7 @@ public with sharing class PaymentService {
 		String cancelUrl = text(args, 'cancelUrl');
 		String processor = String.isBlank(text(args, 'processor')) ? defaultProcessor() : text(args, 'processor');
 		String currencyCode = (String.isBlank(text(args, 'currency'))
-				? (settings().Currency__c ?? 'USD')
+				? PaymentService.currencyCode()
 				: text(args, 'currency'))
 			.toUpperCase();
 		if (amount == null || amount <= 0) {
@@ -211,7 +292,7 @@ public with sharing class PaymentService {
 		String interval = text(args, 'interval')?.toLowerCase();
 		Object count = args.get('intervalCount');
 		Integer every = count instanceof Integer ? Math.max(1, Math.min(12, (Integer) count)) : 1;
-		if (settings().Recurring_Payments__c != true || !INTERVALS.contains(interval)) {
+		if (!recurringOn() || !INTERVALS.contains(interval)) {
 			interval = null;
 		}
 		try {
@@ -470,7 +551,7 @@ public with sharing class PaymentService {
 				'customerId' => c.customerId,
 				'event' => c.subscriptionEvent,
 				'eventKey' => o.event.Event_Key__c,
-				'eventDate' => (c.paidAt ?? Datetime.now()).date(),
+				'eventDate' => OrgDate.dateOf(c.paidAt ?? Datetime.now()),
 				'amount' => c.amount,
 				'cardExpires' => c.cardExpires,
 				'detail' => c.detail

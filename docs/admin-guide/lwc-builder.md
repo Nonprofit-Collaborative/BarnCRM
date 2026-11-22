@@ -28,7 +28,7 @@ page, gives you and every BarnCRM Admin holder Component Builder Admin, and give
 and Read Only sets to BarnCRM's other roles (see Access below). Installing changes no page: a
 built component shows only where you place it.
 
-The **Component Builder** tab is added at the end of the BarnCRM and BarnCRM Console apps, for admins (in a package install
+The **Component Builder** tab is added at the end of the BarnCRM Console app, for admins (in a package install
 the admin adds it in App Manager; the Setup Assistant lists the tab names).
 Component Builder has no app of its own.
 
@@ -46,7 +46,7 @@ viewer's object, field and record access allow.
 
 ## Settings
 
-BarnCRM Settings, **Component Builder**:
+BarnCRM Settings, **Component Builder**. Every setting is org-wide; a save shows **Saving**, then **Saved**, and the value is still there when you reload:
 
 | Setting | Default | What it does |
 |---|---|---|

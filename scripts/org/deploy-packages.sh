@@ -137,6 +137,13 @@ RETRY_BACKOFF_SECONDS="${RETRY_BACKOFF_SECONDS:-5}"
 # Settings (they insert their own), and a test org marked as a new install has every feature off.
 SOURCE_POST_INSTALL="${SOURCE_POST_INSTALL:-1}"
 STALLS_RECOVERED=0
+# 1 (the default) deploys every Apex class and trigger from a staged copy of the project with the
+# leading indentation removed (scripts/packaging/strip-apex-indent.py, AP-05, ADR-0241): an org
+# counts every character of Apex toward its 6,000,000 limit, indentation included. Newlines stay,
+# so line numbers are unchanged. 0 deploys the repository source as written (debugging, or to
+# have source tracking see the repository files).
+STRIP_APEX_INDENT="${STRIP_APEX_INDENT:-1}"
+STAGE_ROOT=""
 
 CONFIG_STAGES="${CONFIG_STAGES:-combined}"
 MODULE_STAGES="${MODULE_STAGES:-combined}"
@@ -178,13 +185,30 @@ while [[ $# -gt 0 ]]; do
 done
 for setting in "DATA_MODEL_STAGES:per-object|combined" "CONFIG_STAGES:separate|combined" \
   "MODULE_STAGES:separate|combined" "DEPLOY_APEX_ALWAYS:0|1" "DEPLOY_FULL:0|1" \
-  "MODULE_APPS:auto|capped|all"; do
+  "MODULE_APPS:auto|capped|all" "STRIP_APEX_INDENT:0|1"; do
   name="${setting%%:*}"
   if [[ ! "${!name}" =~ ^(${setting#*:})$ ]]; then
     echo "${name} must be one of ${setting#*:}, not ${!name}." >&2
     exit 1
   fi
 done
+
+# Stage the project without Apex indentation. Every sf deploy call runs from the staged copy
+# (sf_deploy_start), where the same relative paths exist; the repository is never modified.
+# The copy is removed on exit (restore_if_still_paused, below).
+if [[ "$STRIP_APEX_INDENT" == 1 ]]; then
+  STAGE_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/barn-stage.XXXXXX")"
+  python3 "$(dirname "${BASH_SOURCE[0]}")/../packaging/strip-apex-indent.py" --stage "$STAGE_ROOT" || {
+    echo "Could not stage the project without Apex indentation; set STRIP_APEX_INDENT=0 to deploy the source as written." >&2
+    rm -rf "$STAGE_ROOT"
+    exit 1
+  }
+fi
+
+# `sf project deploy start` from the staged project (or from here when staging is off).
+sf_deploy_start() {
+  (cd "${STAGE_ROOT:-.}" && exec sf project deploy start "$@")
+}
 
 # Run a command with its output in a file, abandoning it (and the node process under the
 # sf wrapper) after $1 seconds. On 2026-09-24 a single `sf project deploy report` call hung
@@ -242,7 +266,7 @@ submit_and_follow() {
   JOB_ID=""
   for try in 1 2 3; do
     since="$(python3 -c 'import datetime as d; print((d.datetime.now(d.timezone.utc) - d.timedelta(seconds=60)).strftime("%Y-%m-%dT%H:%M:%SZ"))')"
-    run_capped 300 "$capture" sf project deploy start "$@" --async --ignore-conflicts --target-org "$ALIAS" --json
+    run_capped 300 "$capture" sf_deploy_start "$@" --async --ignore-conflicts --target-org "$ALIAS" --json
     out="$(cat "$capture")"
     JOB_ID="$(jq -r '.result.id // empty' <<< "$out" 2> /dev/null)"
     [[ -n "$JOB_ID" ]] && break
@@ -509,6 +533,7 @@ restore_if_still_paused() {
   local code=$?
   trap '' INT TERM
   trap - EXIT
+  [[ -n "$STAGE_ROOT" ]] && rm -rf "$STAGE_ROOT"
   if [[ -n "$PAUSED_JOBS_FILE" && -s "$PAUSED_JOBS_FILE" ]]; then
     echo ""
     echo "== The deploy ended while scheduled jobs were paused =="
@@ -995,16 +1020,18 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   MODULES+=(orgoptimizer sampledata)
   RECORD_PACKAGES+=("${MODULES[@]}")
   # MODULE APPS ON A CAPPED ORG (ADR-0223, module apps). A scratch or Developer Edition org refuses
-  # a custom app past about 10 (barn-sales and oi-test, 2026-11-07), and the suite ships more. On
-  # such an org the modules capped-org-apps.py lists deploy without their applications and
-  # permissionsets folders, and their permission sets follow in a stage of their own with the
-  # left-out apps' visibilities removed (a set naming a missing app fails). Their tabs still join
-  # the BarnCRM apps below. Every other org gets every app.
+  # a custom app past about 10 (barn-sales and oi-test, 2026-11-07). On such an org the modules
+  # capped-org-apps.py lists deploy without their applications and permissionsets folders, and
+  # their permission sets follow in a stage of their own with the left-out apps' visibilities
+  # removed (a set naming a missing app fails). Every other org gets every app. The list is empty
+  # while the suite's nine console apps fit the budget (ADR-0237, nine console apps), so today
+  # every org gets every app.
   CAPPED_APP_MODULES=" "
   [[ "$MODULE_APPS" == "auto" ]] && MODULE_APPS="$(org_app_limit)"
   if [[ "$MODULE_APPS" == "capped" ]]; then
     CAPPED_APP_MODULES=" $(python3 scripts/org/capped-org-apps.py modules | paste -sd' ' -) "
-    echo "== Capped org (scratch or Developer Edition): leaving out the apps of${CAPPED_APP_MODULES}=="
+    [[ -n "${CAPPED_APP_MODULES// /}" ]] &&
+      echo "== Capped org (scratch or Developer Edition): leaving out the apps of${CAPPED_APP_MODULES}=="
   fi
   module_dirs() {
     if ! package_skipped "$1"; then
@@ -1068,15 +1095,14 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     rm -rf "$CAPPED_SETS_DIR"
   fi
 
-  # Core may not name a module's tab in its own apps (a Core-only deploy would fail on the
-  # missing tab, ADR-0013), so each deployed module's tabs join the BarnCRM apps here, from its
-  # BarnCRM_Module__mdt record (ADR-0137). The app
-  # copies are written to a temporary metadata-format package; the repository's app files are
-  # never changed. --all writes all four apps every time, so each holds exactly Core plus the
-  # modules deployed here, and a module left out has its tabs taken out (ADR-0192, Batch C
-  # modules add their tabs to the BarnCRM apps). Module tabs stay here even for a module with an
-  # app of its own, which is how a capped org reaches the modules whose apps it does not get
-  # (ADR-0223, module apps).
+  # An app may not name a tab its package does not ship (a Core-only deploy would fail on the
+  # missing tab, ADR-0013), so each deployed module's tabs join their host app here, from its
+  # BarnCRM_Module__mdt record (ADR-0137): BarnCRM Members and Partners (Memberships, Corporate
+  # Hub), BarnCRM Grants (Scholarships), BarnCRM Console (a module with no app) and BarnCRM Admin
+  # Console (every module's admin tabs). The app copies are written to a temporary
+  # metadata-format package; the repository's app files are never changed. --all writes every
+  # host app deployed here, so each holds exactly its own tabs plus the modules deployed here,
+  # and a module left out has its tabs taken out (ADR-0192, ADR-0237 nine console apps).
   deployed_modules=(rollups giving mirror programs logicmodels funders forms contactpoints events portal corporatehub payments lwcbuilder scholarships territory memberships projects addressverification reporting connector migration orgoptimizer sampledata)
   volunteers_has_metadata && deployed_modules+=(volunteers)
   APP_TABS_DIR="$(mktemp -d)"

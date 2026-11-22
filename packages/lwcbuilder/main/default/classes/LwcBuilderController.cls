@@ -17,8 +17,6 @@ public with sharing class LwcBuilderController {
 		)
 		.showingDml();
 	@TestVisible
-	private static final String SETTINGS_OBJECT = 'LWC_Builder_Settings__c';
-	@TestVisible
 	private static final Integer SCHEMA_VERSION = 1;
 	private static final Integer MAX_COLUMNS = 6;
 	private static final Integer MAX_ROWS = 200;
@@ -47,7 +45,7 @@ public with sharing class LwcBuilderController {
 			}
 			return new Map<String, Object>{
 				'components' => rows,
-				'sourceExport' => flag('Source_Export__c'),
+				'sourceExport' => ModuleSettings.flag('LwcBuilder_Source_Export'),
 				'rowsPerList' => rowsPerList(),
 				'canEdit' => Schema.SObjectType.Built_Component__c.isUpdateable()
 			};
@@ -124,7 +122,7 @@ public with sharing class LwcBuilderController {
 	public static Map<String, Object> loadComponent(String componentKey) {
 		try {
 			Map<String, Object> result = new Map<String, Object>{
-				'enabled' => flag('Components_Enabled__c'),
+				'enabled' => ModuleSettings.flag('LwcBuilder_Components_Enabled'),
 				'found' => false
 			};
 			if (result.get('enabled') == false || !isKey(componentKey)) {
@@ -397,17 +395,7 @@ public with sharing class LwcBuilderController {
 	/** Rows per List, 1 to 200; blank or unreadable is 10. */
 	@TestVisible
 	private static Integer rowsPerList() {
-		return SettingsService.number(SETTINGS_OBJECT, 'Rows_Per_List__c').intValue();
-	}
-
-	/** A checkbox setting; both ship on, so blank or unreadable is on. */
-	private static Boolean flag(String key) {
-		try {
-			Object stored = SettingsService.getValue(SETTINGS_OBJECT, key);
-			return stored == null || Boolean.valueOf(String.valueOf(stored));
-		} catch (Exception unreadable) {
-			return true;
-		}
+		return ModuleSettings.integerValue('LwcBuilder_Rows_Per_List');
 	}
 
 	/** The definition as a map, refused unless it is a schema version 1 document with sections. */

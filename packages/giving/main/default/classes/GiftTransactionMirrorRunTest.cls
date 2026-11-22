@@ -15,16 +15,21 @@ private class GiftTransactionMirrorRunTest {
 	private static final Date GIFT_DATE = Date.newInstance(2026, 9, 20);
 	private static final String PAID = 'Pending';
 
+	// The mirror's settings for every test: a store value lasts one transaction, so it is put here.
+	static {
+		ModuleSettings.setForTest(
+			'Mirror_Gift_Transaction_Mirror_Direction',
+			GiftTransactionMirrorService.GIFTS_TO_GIFT_TRANSACTIONS
+		);
+		ModuleSettings.setForTest('Mirror_Gift_Transaction_Mirror_Status', PAID);
+		ModuleSettings.setForTest('Mirror_Gift_Transaction_Mirror_Start', Datetime.newInstance(2026, 1, 1, 12, 0, 0));
+	}
+
 	@TestSetup
 	static void setup() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GivingTestDataFactory.ensureDefaultFund();
 			GivingTestDataFactory.insertHouseholdContact('The Garcia Household', 'Luis', 'Garcia');
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-			settings.Gift_Transaction_Mirror_Direction__c = GiftTransactionMirrorService.GIFTS_TO_GIFT_TRANSACTIONS;
-			settings.Gift_Transaction_Mirror_Status__c = PAID;
-			settings.Gift_Transaction_Mirror_Start__c = Datetime.newInstance(2026, 1, 1, 12, 0, 0);
-			upsert settings;
 		}
 		// Built once for the class rather than in every test that runs as her.
 		TestDataFactory.createUserOnTheRunningUsersProfile(
@@ -103,7 +108,7 @@ private class GiftTransactionMirrorRunTest {
 		List<Error_Log__c> warnings = logged('Warning');
 		Assert.areEqual(1, warnings.size());
 		Assert.isTrue(warnings[0].Message__c.contains('no Nonprofit Cloud Gift Transactions'));
-		Assert.isNull(Giving_Settings__c.getOrgDefaults().Gift_Transaction_Mirror_Last_Run__c);
+		Assert.isNull(GivingState.moment(GivingState.GIFT_TRANSACTION_MIRROR_LAST_RUN));
 	}
 
 	@IsTest
@@ -121,10 +126,9 @@ private class GiftTransactionMirrorRunTest {
 		List<Error_Log__c> info = logged('Info');
 		Assert.areEqual(1, info.size());
 		Assert.isTrue(info[0].Message__c.startsWith('Gift Transaction mirror run: 1 '), info[0].Message__c);
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		Assert.isNotNull(settings.Gift_Transaction_Mirror_Last_Run__c, 'The run is recorded.');
-		Assert.areEqual(info[0].Message__c, settings.Gift_Transaction_Mirror_Last_Summary__c);
-		Assert.areEqual(PAID, settings.Gift_Transaction_Mirror_Status__c, 'Settings are kept.');
+		Assert.isNotNull(GivingState.moment(GivingState.GIFT_TRANSACTION_MIRROR_LAST_RUN), 'The run is recorded.');
+		Assert.areEqual(info[0].Message__c, GivingState.text(GivingState.GIFT_TRANSACTION_MIRROR_SUMMARY));
+		Assert.areEqual(PAID, ModuleSettings.text('Mirror_Gift_Transaction_Mirror_Status'), 'Settings are kept.');
 	}
 
 	@IsTest
@@ -139,9 +143,8 @@ private class GiftTransactionMirrorRunTest {
 			batch.finish(null);
 			Test.stopTest();
 		}
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 		Assert.isNull(
-			settings.Gift_Transaction_Mirror_Last_Run__c,
+			GivingState.moment(GivingState.GIFT_TRANSACTION_MIRROR_LAST_RUN),
 			'The watermark stays, so the failed gift is read again.'
 		);
 		Assert.areEqual(1, logged('Info').size(), 'The run is still logged.');
@@ -149,9 +152,7 @@ private class GiftTransactionMirrorRunTest {
 
 	@IsTest
 	static void aRunThatIsNotReadyWarnsAndCopiesNothing() {
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		settings.Gift_Transaction_Mirror_Start__c = null;
-		update settings;
+		ModuleSettings.setForTest('Mirror_Gift_Transaction_Mirror_Start', null);
 		System.runAs(maria()) {
 			GiftTransactionMirrorSchema.useStandIns();
 			Gift__c gift = insertGift(100);

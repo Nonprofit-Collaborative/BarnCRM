@@ -10,4 +10,5 @@
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">10</value></values>
     <values><field>Description__c</field><value xsi:type="xsd:string">Whether the morning run (6:50 AM in your org time zone) sends the owner of each award a bell notification before a report or condition is due, once per date. Default: on.</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">scholarships.md</value></values>
+    <values><field>Default_Value__c</field><value xsi:type="xsd:string">true</value></values>
 </CustomMetadata>

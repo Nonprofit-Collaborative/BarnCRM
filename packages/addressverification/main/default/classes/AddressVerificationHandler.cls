@@ -62,7 +62,7 @@ public with sharing class AddressVerificationHandler extends TriggerHandler {
 		if (
 			records.isEmpty() ||
 			AddressVerifier.writing ||
-			AddressVerifier.settings().Verify_On_Save__c != true ||
+			!AddressVerifier.verifyOnSave() ||
 			!AddressVerifier.isReady() ||
 			System.isBatch() ||
 			System.isFuture() ||

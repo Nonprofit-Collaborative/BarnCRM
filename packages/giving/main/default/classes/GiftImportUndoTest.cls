@@ -13,6 +13,11 @@
  */
 @IsTest(testFor='ApexClass:GiftImportProcessor')
 public class GiftImportUndoTest {
+	// Totals are recalculated in the save in every test: a store value lasts one transaction.
+	static {
+		RollupTestSupport.recalculateInTheSave();
+	}
+
 	private static final Integer DONORS = 3;
 
 	@TestSetup

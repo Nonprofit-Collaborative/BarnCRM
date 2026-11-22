@@ -2,6 +2,8 @@ import { LightningElement, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import getStorage from '@salesforce/apex/OrgOptimizerStorageController.getStorage';
 import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
+import panelStateKey from '@salesforce/apex/DataManagerController.panelStateKey';
+import canViewArchive from '@salesforce/apex/ArchiveController.canViewArchive';
 import ARCHIVE_OLD from '@salesforce/label/c.Core_Archive_Title';
 
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
@@ -58,7 +60,10 @@ export default class OptimizerStorage extends NavigationMixin(LightningElement) 
     },
     refresh: REFRESH,
     nearLimit: NEAR_LIMIT,
-    archiveOld: ARCHIVE_OLD
+    archiveOld: ARCHIVE_OLD,
+    get viewArchived() {
+      return helpText('Core', 'Core_OrgOptimizer_ViewArchived');
+    }
   };
 
   get canArchive() {
@@ -70,6 +75,30 @@ export default class OptimizerStorage extends NavigationMixin(LightningElement) 
   async handleArchive() {
     this[NavigationMixin.Navigate](
       await tabPageReference('Find', { [this.toolStateKey.data]: 'archive' })
+    );
+  }
+
+  /** Data Manager's panel state key, with the namespace's prefix (never a literal `c__`). */
+  @wire(panelStateKey)
+  panelKey;
+
+  /** Whether the person holds the big object grant (BarnCRM Admin). */
+  @wire(canViewArchive)
+  archiveViewable;
+
+  get canViewArchived() {
+    return Boolean(
+      this.archiveViewable &&
+      this.archiveViewable.data === true &&
+      this.panelKey &&
+      this.panelKey.data
+    );
+  }
+
+  /** Opens Core's Data Manager on its Archived Records panel (D-221). */
+  async handleViewArchived() {
+    this[NavigationMixin.Navigate](
+      await tabPageReference('Data_Manager', { [this.panelKey.data]: 'archived' })
     );
   }
 

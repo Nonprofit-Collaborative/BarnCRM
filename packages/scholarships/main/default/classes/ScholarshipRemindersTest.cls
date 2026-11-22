@@ -73,12 +73,8 @@ private class ScholarshipRemindersTest {
 	}
 
 	private static void saveSettings(Boolean reminders, Boolean email) {
-		Scholarships_Settings__c settings = Scholarships_Settings__c.getOrgDefaults();
-		settings.SetupOwnerId = UserInfo.getOrganizationId();
-		settings.Reminders_Enabled__c = reminders;
-		settings.Email_Recipients__c = email;
-		upsert settings;
-		SettingsService.clearCaches();
+		ModuleSettings.setForTest('Scholarships_Reminders_Enabled', reminders);
+		ModuleSettings.setForTest('Scholarships_Email_Recipients', email);
 	}
 
 	private static Award_Requirement__c requirement(Id awardId, String name, Integer inDays) {

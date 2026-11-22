@@ -15,16 +15,22 @@ public class PaymentsTestData {
 	 * Both processors connected (as Check Connection leaves them), in Test mode, with the
 	 * processor given, and a processor stand-in in place for any event fetch.
 	 */
+	/** Puts Payments in the mode given (Test or Live), as a saved setting would. */
+	public static void mode(String mode) {
+		ModuleSettings.setForTest('Payments_Mode', mode);
+	}
+
 	public static void connect(String processor) {
-		Payments_Settings__c settings = Payments_Settings__c.getOrgDefaults();
-		settings.SetupOwnerId = UserInfo.getOrganizationId();
-		settings.Processor__c = processor;
-		settings.Mode__c = PaymentService.TEST;
-		settings.Currency__c = 'USD';
-		settings.Stripe_Connected__c = true;
-		settings.PayPal_Connected__c = true;
-		settings.PayPal_Webhook_Id__c = 'WH-1';
-		upsert settings;
+		ModuleSettings.setForTest('Payments_Processor', processor);
+		mode(PaymentService.TEST);
+		ModuleSettings.setForTest('Payments_Currency', 'USD');
+		PaymentService.putState(
+			new Map<String, Object>{
+				PaymentService.STRIPE_CONNECTED => true,
+				PaymentService.PAYPAL_CONNECTED => true,
+				PaymentService.PAYPAL_WEBHOOK_ID => 'WH-1'
+			}
+		);
 		processors();
 	}
 

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Memberships Home: active, expiring, grace and renewed memberships as figures, the terms
+    expiring soonest and the newest renewals, and New Membership (Module Home pattern).
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Memberships Home</masterLabel>
+  <targets>
+    <target>lightning__AppPage</target>
+    <target>lightning__Tab</target>
+  </targets>
+</LightningComponentBundle>

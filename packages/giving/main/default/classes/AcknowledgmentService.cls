@@ -361,7 +361,7 @@ public with sharing class AcknowledgmentService {
 
 	/** Whether gifts join the queue at all (R-AK5). */
 	public static Boolean isEnabled() {
-		return Giving_Settings__c.getOrgDefaults().Acknowledgments_Enabled__c == true;
+		return ModuleSettings.flag('Giving_Acknowledgments_Enabled');
 	}
 
 	/**
@@ -396,7 +396,7 @@ public with sharing class AcknowledgmentService {
 	 */
 	@TestVisible
 	public static Id fromAddressId() {
-		String configured = Giving_Settings__c.getOrgDefaults().Acknowledgment_From_Address__c;
+		String configured = ModuleSettings.text('Giving_Acknowledgment_From_Address');
 		if (String.isBlank(configured)) {
 			return null;
 		}
@@ -438,17 +438,11 @@ public with sharing class AcknowledgmentService {
 
 	/** Records what the last run did, so the page can say so without opening a run (R-AK12). */
 	public static void recordLastRun(String summary) {
-		// Only these two keys, on the locked stored record; a first save keeps the checkboxes
-		// that ship on (OrgSettingsSystemWriter, ADR-0021).
-		OrgSettingsSystemWriter.save(
-			Giving_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{
-				Giving_Settings__c.Acknowledgments_Last_Run__c => System.now(),
-				Giving_Settings__c.Acknowledgments_Last_Run_Summary__c => summary == null ||
-					summary.length() <= 255
-					? summary
-					: summary.substring(0, 255)
-			}
+		GivingState.recordRun(
+			GivingState.ACKNOWLEDGMENTS_LAST_RUN,
+			GivingState.ACKNOWLEDGMENTS_SUMMARY,
+			System.now(),
+			summary
 		);
 	}
 

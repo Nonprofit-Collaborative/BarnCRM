@@ -22,7 +22,7 @@ On a new install the **Data Manager** feature is off until you turn it on: choos
 on** in the **Data Manager** row in **BarnCRM Settings**, **General** (or leave it ticked in
 first-run setup); see [BarnCRM Settings](barncrm-settings.md). While it is off its tabs are
 hidden for everyone. Once it is on, the **Data Manager** tab is in the navigation of every
-BarnCRM app (BarnCRM, BarnCRM Console, BarnCRM Admin and BarnCRM Admin Console) for anyone with
+BarnCRM app (BarnCRM, BarnCRM Console, BarnCRM Admin Console) for anyone with
 the **BarnCRM Admin** role or one of the **BarnCRM Find and Export**, **BarnCRM Bulk Update**
 or **BarnCRM Bulk Delete** permission sets.
 
@@ -39,7 +39,9 @@ section and kind of job is shown only to people who may use it:
 | **Bring Data In** | **Saved Maps** ("Map fields once, check them on samples, and reuse the map.") | No | The Saved Maps panel, on this page in place of the tiles, with **Back to Data Manager** above it: every saved map with **Open**, **Rename** and **Delete**, and **New Map**, which opens the Mapper ([The Mapper and Saved Maps](mapper.md)) | Administrators |
 | **Find and Change** | **Find** ("Find records, then save or export them.") | No | The **Find** tab: find records, save the query, export them to a file | Anyone with **Find and Export Records** |
 | **Find and Change** | **Grid** ("Edit a saved query's records, and their related records, in one table.") | No | The **Find** tab on the Grid view: a saved query's records and up to two kinds of related record in editable tables, saved as named grids ([Grid](grid.md)) | Anyone with **Find and Export Records**; editing also needs **Bulk Update Records** |
-| **Find and Change** | **Backup Sets** ("Save the records of a saved Find query to a file in Files, whenever you want a copy.") | No | The Backup Sets panel, on this page in place of the tiles, with **Back to Data Manager** above it: your Backup Sets, **Run Now**, and your recent runs ([Backup Sets](backup-sets.md)) | Administrators with **Find and Export Records** |
+| **Find and Change** | **Backup Sets** ("Save the records of a saved Find query to files, when you choose or on a schedule.") | No | The Backup Sets panel, on this page in place of the tiles, with **Back to Data Manager** above it: your Backup Sets, **Run Now**, **Edit Schedule**, and your recent runs ([Backup Sets](backup-sets.md)) | Administrators with **Find and Export Records** |
+| **Find and Change** | **Archive Rules** ("Move old records out of their object to a file or the big object, now or on a schedule, and look them up or move them back later.") | No | The Archive Rules panel, on this page in place of the tiles, with **Back to Data Manager** above it: your rules, the archived record count, **Preview and Run**, and recent runs ([Archive Rules](archive-rules.md)) | Administrators with **Find and Export Records** and **Bulk Delete Records** |
+| **Find and Change** | **Archived Records** ("Look up records archived to the big object and move chosen ones back.") | No | The Archived Records panel, on this page in place of the tiles: archived records by kind and date, each record's fields, and **Restore** ([Archive Rules](archive-rules.md#6-archived-records-looking-records-up)). Org Optimizer's **View Archived Records** opens this page on the panel | Holders of the **BarnCRM Admin** permission set; **Restore** also needs **Find and Export Records** and **Bulk Delete Records** |
 | **Find and Change** | **Super Transformer** | No | The **Super Transformer** tab ("Change fields on many records at once, no file needed."): choose the object and the records, then change up to five fields on every record that matches ([Super Transformer](super-transform.md)). To start from a saved query, use Find's **Change Records**, **Super Transformer** instead | Anyone with **Bulk Update Records** |
 | **Check and Tidy** | **Org Optimizer** | No | The **Org Optimizer** tab; the tile shows only while the optional BarnCRM Org Optimizer package is installed ([Org Optimizer](org-optimizer.md)) | Anyone with **Find and Export Records**, and administrators |
 | **Check and Tidy** | **Duplicate Matching** ("Review possible duplicates and merge them.") | No | The **Duplicate Matching** tab ([Duplicates](duplicates.md)) | Administrators, and anyone with **BarnCRM Duplicate Review** or **BarnCRM Metadata Admin** |
@@ -137,7 +139,7 @@ only once. A job that can no longer be undone is still listed, with its counts.
 - **Looking for the Super Importer or Find tab in the navigation.** They are part of Data
   Manager: choose the **Super Importer** or **Find** tile, or type the task in **What do you
   want to do?**.
-- **Looking for the Import Rows tab.** It is not in the admin apps' navigation: open an import's
+- **Looking for the Import Rows tab.** It is not in BarnCRM Admin Console's navigation: open an import's
   results in Super Importer, or type **Import Rows** in the App Launcher, which opens the tab
   and its list views.
 - **A job is missing from the list.** Each person sees the kinds of jobs they may run: imports

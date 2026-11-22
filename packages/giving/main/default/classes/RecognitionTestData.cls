@@ -18,10 +18,7 @@ public class RecognitionTestData {
 	 * automatically.
 	 */
 	public static void setAutomaticHouseholdCredits(Boolean enabled) {
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		settings.SetupOwnerId = UserInfo.getOrganizationId();
-		settings.Automatic_Household_Soft_Credits__c = enabled;
-		upsert settings;
+		ModuleSettings.setForTest('Giving_Automatic_Household_Soft_Credits', enabled);
 	}
 
 	/**

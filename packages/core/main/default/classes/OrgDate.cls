@@ -36,6 +36,17 @@ public with sharing class OrgDate {
 		return cachedToday;
 	}
 
+	/**
+	 * The calendar date a moment falls on in the org's default time zone, or null for a null
+	 * moment. Online payments are applied by whichever user processes them (a Site guest, an
+	 * integration user, a queued job), so a gift, a membership or an invoice paid at 11 PM must
+	 * not take that user's date (D-219, OD-15).
+	 */
+	@NamespaceAccessible
+	public static Date dateOf(Datetime moment) {
+		return moment == null ? null : dateIn(moment, zone());
+	}
+
 	/** The org's default time zone; the running user's when it cannot be read. */
 	@NamespaceAccessible
 	public static TimeZone zone() {

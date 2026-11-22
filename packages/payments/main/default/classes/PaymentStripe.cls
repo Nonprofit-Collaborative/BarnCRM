@@ -84,7 +84,7 @@ public with sharing class PaymentStripe {
 					new Map<String, String>{
 						'mode' => 'setup',
 						'customer' => customerId,
-						'currency' => (PaymentService.settings().Currency__c ?? 'USD').toLowerCase(),
+						'currency' => PaymentService.currencyCode().toLowerCase(),
 						'success_url' => back,
 						'cancel_url' => back,
 						'metadata[barncrm_subscription]' => subscriptionId

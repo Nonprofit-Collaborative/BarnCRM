@@ -88,6 +88,21 @@ const TEXTS = {
   get Connector_Kind_SecretUrl() {
     return helpText('Connector', 'Connector_Kind_SecretUrl');
   },
+  get Connector_Kind_AwsSigV4() {
+    return helpText('Connector', 'Connector_Kind_AwsSigV4');
+  },
+  get Connector_Kind_OAuth() {
+    return helpText('Connector', 'Connector_Kind_OAuth');
+  },
+  get Connector_Form_AwsKeyId() {
+    return helpText('Connector', 'Connector_Form_AwsKeyId');
+  },
+  get Connector_Form_AwsSecret() {
+    return helpText('Connector', 'Connector_Form_AwsSecret');
+  },
+  get Connector_Error_AwsUrl() {
+    return helpText('Connector', 'Connector_Error_AwsUrl');
+  },
   get Connector_Outcome_Connected() {
     return helpText('Connector', 'Connector_Outcome_Connected');
   },

@@ -146,3 +146,11 @@ export function exportName(name) {
     .toLowerCase();
   return `${base || 'recipe'}.json`;
 }
+
+/** Backup Settings headers as the page edits and sends them (R-CN11): `Name: value`, one a line. */
+export function headerLines(headers) {
+  return (Array.isArray(headers) ? headers : [])
+    .filter((header) => header && header.name)
+    .map((header) => `${header.name}: ${header.value || ''}`)
+    .join('\n');
+}

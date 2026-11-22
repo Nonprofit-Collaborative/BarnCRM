@@ -93,6 +93,10 @@ const MULTI_PICKLIST_LABELS = {
 
 function operatorLabel(field, operator) {
   const special = field && field.dataType === 'multipicklist' && MULTI_PICKLIST_LABELS[operator];
+  if (operator === OPERATORS.MORE_THAN_N_DAYS_AGO) {
+    // Help catalog text (ADR-0164): read when shown, after the catalog has loaded.
+    return helpText('Core', 'Core_Filter_OpMoreThanNDaysAgo');
+  }
   return special || OPERATOR_LABELS[operator] || '';
 }
 
@@ -661,6 +665,11 @@ export default class FilterBuilder extends LightningElement {
       let text;
       if (row.operator === OPERATORS.LAST_N_DAYS) {
         text = format(LAST_N_DAYS_VALUE, String(row.inputValue));
+      } else if (row.operator === OPERATORS.MORE_THAN_N_DAYS_AGO) {
+        text = format(
+          helpText('Core', 'Core_Filter_MoreThanNDaysAgoValue'),
+          String(row.inputValue)
+        );
       } else {
         const valueText = this.valueText(field, kind, row.inputValue);
         text = [operatorLabel(field, row.operator), valueText].filter((part) => part).join(' ');

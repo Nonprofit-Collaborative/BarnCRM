@@ -28,10 +28,12 @@ into six kinds:
 | AffiliationUpkeepSelector | Integrity | Overlapping affiliations owned by someone else, so the primary-affiliation rule still refuses them | ADR-0021 category 2 |
 | AffiliationUpkeepWriter | Upkeep | The person's primary affiliation fields and their other affiliations, which the saver may not be able to edit | ADR-0021 category 2 |
 | BrandShareWriter | Platform | Brand groups, their members and Account shares granted to them, which a staff member assigning a brand cannot create; one default brand and entity and one primary assignment cleared on rows the saver may not edit | ADR-0021, ADR-0202 brand management and visibility |
-| AutomationSettingsWriter | Platform | The automation pause on the protected org settings and the Automation Setting rows from the shipped registry | ADR-0021 |
+| AutomationSettingsWriter | Platform | The automation pause on the protected BarnCRM Automation Control org default and the Automation Setting rows from the shipped registry | ADR-0021 |
+| BackupSetSchedule | Org job | Every saved query marked as a Backup Set with a schedule, private ones included, so the nightly run starts each one due; and the files of a scheduled set's runs past Backup Runs Kept, whoever ran them. The records a run saves are still read as the running user | ADR-0021, ADR-0213, ADR-0239 |
+| OffPlatformSendBatch | Org job | A Backup Set run's or an archive's CSV parts in Files, owned by whoever ran it, read one at a time to send to the org's backup destination when the nightly run sends waiting parts again; nothing is written but the job's own row | ADR-0021, ADR-0239, ADR-0240 |
 | AddressMatchKeyBatch | Org job | Every address without its Match Key, given one so duplicate matching reads addresses through the index; a key it cannot see would hide a duplicate | ADR-0021, D-200 P6 |
 | EmptyHouseholdTidyBatch | Org job | Every empty household, read and deleted as the scheduler, with the dependents check reaching every child record | ADR-0021, ADR-0036 |
-| ErrorDigestWriter | Platform | The digest run record on the protected org settings | ADR-0021, ADR-0027 |
+| ErrorDigestWriter | Platform | The digest run state rows, written by the scheduler | ADR-0021, ADR-0027 |
 | ErrorLogEventHandler | Upkeep | Writes the Error Log entry from the event, whoever raised it | ADR-0021 |
 | HouseholdSelector.OccupancyReader | Integrity | Which households any contact points at, whoever can see that contact, before an emptied household is deleted in contact mode; returns household ids only, never who is in them | ADR-0021 category 2 |
 | ErrorLogWriter | Upkeep | Writes the Error Log entry even when the user cannot create one | ADR-0021 |
@@ -41,10 +43,16 @@ into six kinds:
 | RelationshipUpkeepSelector | Integrity | The reciprocal and duplicate relationships owned by someone else | ADR-0021 category 2, ADR-0109 |
 | RelationshipUpkeepWriter | Upkeep | The other side of a relationship, usually owned by another user | ADR-0021 category 2, ADR-0109 |
 | SavedQuerySharingWriter | Platform | Shares on saved queries with an Apex sharing reason | ADR-0076, ADR-0021 |
+| SampleDataRemover | Org job | Every record tracked as sample data (a search must test `Sample_Data__c`), found and deleted for removal whoever loaded or owns it, so any admin with Manage BarnCRM Settings removes the whole set; every method refuses anyone without that permission, and Restrict lookups, rules and triggers still refuse a delete | ADR-0021, ADR-0233 (amendment 2026-11-21, SR-01) |
 | SeasonalAddressSelector | Org job | Every household due a seasonal address swap, so none is silently left out | ADR-0021, ADR-0027 |
 | SeasonalAddressWriter | Org job | The package's own address records for the nightly swap (the copy into standard address fields stays in user mode) | ADR-0021, ADR-0027 |
 | SetupChangeCopyJob | Org job | The package's own copy of Setup changes, written and pruned in full | ADR-0021 |
-| WhatsNewSeenWriter | Platform | The running user's own row of a protected hierarchy setting | ADR-0021, ADR-0087 |
+| OrganizationFlagBatch | Org job | Every account whose Is Organization flag disagrees with the organization record type, so the Organizations list view counts every one | ADR-0021, ADR-0238 settings as custom metadata |
+| SettingStore | Platform | Reads the org's Setting Value records and enqueues the metadata deployment of a save, which the caller has permission-checked | ADR-0021, ADR-0238 settings as custom metadata |
+| SettingValueDeployCallback | Platform | Writes the Setting Change audit rows and Error Log entry of a finished settings deployment, as the platform's callback user | ADR-0021, ADR-0238 settings as custom metadata |
+| SettingsCarryOver | Platform | Reads the protected legacy settings records and writes the package's own state and seen rows once, for a holder of Manage BarnCRM Settings | ADR-0021, ADR-0238 settings as custom metadata |
+| SettingsState | Org job | The package's own run-state rows (last runs, watermarks, setup markers), read and written for every user whose action moves them | ADR-0021, ADR-0238 settings as custom metadata |
+| WhatsNewSeenWriter | Platform | The running user's own Seen row on an object only BarnCRM Admin can read | ADR-0021, ADR-0087 |
 | WhereUsedSelector | Integrity | Every saved query, private ones included, before a field is retired | ADR-0021 |
 
 ## Rollup Builder
@@ -92,6 +100,7 @@ into six kinds:
 | VolunteerPersonDeleteHandler.Purge | Upkeep | The requirement rows and volunteer skills of a person the user has just deleted, which a Team Member holds no permission on; only Volunteers objects, by the ids the selector found | ADR-0021 |
 | VolunteersErasureExtension.LetterRemover | Upkeep | The generated volunteer letters of a person being erased, which belong to whoever generated them; only files identified exactly as generated letters, after the Volunteers access check | ADR-0021, ADR-0193 erasure start seam |
 | VolunteerNudgeSelector | Org job | Every unfilled shift and the email address of each volunteer who has helped on its job, for the morning nudges | ADR-0021 |
+| VolunteerSampleDataSelector | Org job | The sample jobs, shifts, schedules, sign-ups, skills and requirements to remove, and the real sign-ups, hours and skills that keep a sample record, whoever owns them; loading reads stay in user mode and deletes go through Core's `SampleDataRemover` | ADR-0021, ADR-0233 (amendment 2026-11-21, SR-01) |
 | VolunteerPublicPage | Platform | A Site guest user or the API's integration user reads the Open shifts still to come of jobs staff marked Show on Public Page (job name, description and location, shift times and place, places left as a count), and, only behind a signed claim the host checked, one person's own upcoming bookings, approved hours and last ten entries; never who else is booked, the coordinator or notes | ADR-0190 public event pages, ADR-0198 volunteer self-service |
 | VolunteerReminderSelector | Org job | Every booking and email address for the morning reminders | ADR-0021 |
 | VolunteersEngagementSignal | Org figure | Each person's Approved volunteer hours for the nightly engagement score, private hours included; returns totals only | ADR-0021, ADR-0212 engagement score |
@@ -162,12 +171,6 @@ into six kinds:
 | EventsPortalExtension | Portal | The open event a portal person proposes a talk for and that person's own proposal to withdraw; the integration user has no object access, and each write names only the person Portal Builder verified | ADR-0021, ADR-0191 portal templates |
 | EventAttendeeApp | Portal | The attendee app's actions, reached only through EventsPortalExtension: the other attendee's row at an event the person attends (opted in only), the person's own connection rows and their pair's other row, messages to or from the person, and the person's own agenda picks; contact details are copied only on accept, and every write names only the verified person and the other side of their own connection | ADR-0021, ADR-0215 events attendee app operations portal templates |
 | CorporateHubPortalExtension | Portal | A board member's own attendee row (packet read, minutes approved while submitted), own vote (only while voting is open) and own open policy or disclosure request; the integration user has no object access, and each action re-reads the row by the person Portal Builder verified | ADR-0021, ADR-0199 corporate hub board governance |
-
-## Mirror
-
-| Class | Kind | What it reaches past sharing for | Authority |
-|---|---|---|---|
-| MirrorSettingsWriter | Platform | Each mirror's run record on the protected org settings | ADR-0021, ADR-0038 |
 
 ## Payments
 

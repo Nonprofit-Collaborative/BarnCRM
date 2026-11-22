@@ -69,9 +69,9 @@ You should see: the gift in the record's **Gifts** list. For money promised but 
 
 ## To See Giving From the BarnCRM App
 
-In the **BarnCRM** app, a person, household or organization page has a **Giving at a Glance** card at the top of the sidebar: **Total Giving**, **Last Gift Date** and **Donor Level**.
+In the **BarnCRM Console** app, a person, household or organization page has a **Giving at a Glance** card at the top of the sidebar: **Total Giving**, **Last Gift Date** and **Donor Level**.
 
-1. Open the person, household or organization in the **BarnCRM** app.
+1. Open the person, household or organization in the **BarnCRM Console** app.
 2. Read the **Giving at a Glance** card.
 3. To record a gift, click **Enter a Gift** on the card. Quick Gift Entry opens with the donor filled in.
 

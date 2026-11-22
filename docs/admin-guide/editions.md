@@ -60,7 +60,7 @@ ways, and they do the same thing.
 
 ### In BarnCRM Settings (Recommended)
 
-1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM Admin**.
+1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM Admin Console**.
 2. Click **BarnCRM Settings**, then **General** in the left navigation.
 3. Find **Edition**. It shows the edition in force, for example "Standard Edition".
 4. Click **Change Edition** under it. It opens a short explanation and a button for the other

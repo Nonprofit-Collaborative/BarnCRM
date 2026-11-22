@@ -130,7 +130,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, **Volunteers**. | The section shows **Require hours approval**, **Create hours from attendance** and **Weeks ahead to create shifts** (8 weeks). |
-| 2 | Turn **Require hours approval** off. | The change saves at once. |
+| 2 | Turn **Require hours approval** off, then reload BarnCRM Settings. | The change shows "Saving..." then "Your settings are saved."; after the reload it is still off. |
 | 3 | Create an hours entry for a sample person on job **Front desk**, 1 hour, yesterday. | It saves with **Status** Approved and **Reviewed By** you. |
 | 4 | Turn **Require hours approval** back on. Create a second entry the same way. | It saves with **Status** Submitted. |
 
@@ -498,7 +498,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In the **BarnCRM** app, open the person. | The sidebar's glance area shows **Volunteering at a Glance**: **Volunteer Hours This Year** and **Last Volunteer Date** from the person, with **Log Hours**. |
+| 1 | In the **BarnCRM Console** app, open the person. | The sidebar's glance area shows **Volunteering at a Glance**: **Volunteer Hours This Year** and **Last Volunteer Date** from the person, with **Log Hours**. |
 | 2 | Click **Log Hours**, fill in a job, a date and 2 hours, and click **Save**. | The **Log Hours** tab opens with the person filled in. "Hours logged." and you are back on the person's page. |
 | 3 | Open **Log Hours** from the App Launcher. | The form opens empty. Save an entry: the form clears for the next one. |
 | 4 | Open the organization. | No **Volunteering at a Glance** card. |

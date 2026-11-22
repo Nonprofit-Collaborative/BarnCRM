@@ -33,16 +33,21 @@ public with sharing class GivingWhereUsedExtension implements WhereUsedExtension
 	 * Giving settings whose value names a field: the Donor Level source total (R-DL7), read on
 	 * both Account and Contact. Its effective value counts, because that is what levels run on.
 	 */
+	/** The setting's name as BarnCRM Settings shows it (its Setting Definition label). */
+	private static String settingLabel(String name) {
+		Setting_Definition__mdt row = ModuleSettings.definition(name);
+		return row == null ? name : row.MasterLabel;
+	}
+
 	@TestVisible
 	private static List<WhereUsedService.Reference> settingReferences(WhereUsedService.Target target) {
 		List<WhereUsedService.Reference> found = new List<WhereUsedService.Reference>();
 		// The gift mirror's extra-fields map, linked by record ID (R-OM12).
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		String chosen = settings == null ? null : settings.Opportunity_Mirror_Map__c;
+		String chosen = ModuleSettings.text('Mirror_Opportunity_Mirror_Map');
 		if (target.mapId != null && OpportunityMirrorMap.links(chosen, target.mapId, target.objectLabel)) {
 			found.add(
 				WhereUsedService.settingReference(
-					Schema.Giving_Settings__c.Opportunity_Mirror_Map__c.getDescribe().getLabel(),
+					settingLabel('Mirror_Opportunity_Mirror_Map'),
 					BarnHelp.text('Core', 'Core_WhereUsed_BreaksSettingValue'),
 					'Giving'
 				)
@@ -52,7 +57,7 @@ public with sharing class GivingWhereUsedExtension implements WhereUsedExtension
 		if (!target.isObject() && (target.matchesField('Contact', source) || target.matchesField('Account', source))) {
 			found.add(
 				WhereUsedService.settingReference(
-					Schema.Giving_Settings__c.Donor_Level_Source_Field__c.getDescribe().getLabel(),
+					settingLabel('Donor_Level_Source_Field'),
 					BarnHelp.text('Core', 'Core_WhereUsed_BreaksSettingValue'),
 					'Giving'
 				)

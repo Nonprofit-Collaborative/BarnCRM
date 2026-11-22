@@ -6,6 +6,11 @@
  */
 @IsTest(testFor='ApexClass:GiftImportProcessor')
 private class GiftImportUndoPersonAccountsTest {
+	// Totals are recalculated in the save in every test: a store value lasts one transaction.
+	static {
+		RollupTestSupport.recalculateInTheSave();
+	}
+
 	private static Boolean personAccountsOrg() {
 		return OrgShapeDetector.hasPersonAccounts() == true && OrgShapeDetector.creatablePersonRecordTypeId() != null;
 	}

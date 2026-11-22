@@ -1,0 +1,14 @@
+{
+  "key": "google-drive-backup",
+  "label": "Google Drive Backup Folder",
+  "version": 1,
+  "description": "Sends Backup Set and archive CSV files to a Google Drive folder. Make the connection in Setup first (an Auth Provider for Google, then an External Credential and a Named Credential named BarnConn_gdrive with the URL https://www.googleapis.com and principal OAuth), as the admin guide's Backup Destination section describes. After importing, choose that connection and replace FOLDER_ID in the metadata with the folder's ID from its Drive address.",
+  "auth": { "kind": "OAuth" },
+  "baseUrl": "https://www.googleapis.com",
+  "backup": {
+    "method": "POST",
+    "path": "/upload/drive/v3/files?uploadType=multipart",
+    "headers": [],
+    "metadata": { "name": "{file}", "parents": ["FOLDER_ID"] }
+  }
+}

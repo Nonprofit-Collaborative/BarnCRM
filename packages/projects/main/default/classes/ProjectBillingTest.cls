@@ -13,10 +13,7 @@ private class ProjectBillingTest {
 
 	/** Turns Create invoices on or off for the org. */
 	public static void billing(Boolean turnedOn) {
-		OrgSettingsSystemWriter.save(
-			Projects_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{ Projects_Settings__c.Billing_Enabled__c => turnedOn }
-		);
+		ModuleSettings.setForTest('Projects_Billing_Enabled', turnedOn);
 		SettingsService.clearCaches();
 	}
 

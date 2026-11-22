@@ -16,7 +16,10 @@
  */
 public without sharing class ContactPointSyncService {
 	public static final String CONTEXT = 'Contact Point Sync';
-	public static final String SETTINGS_OBJECT = 'Contact_Point_Sync_Settings__c';
+	/** The prefix of the module's run-state keys (the last backfill's time and summary). */
+	public static final String STATE_PREFIX = 'ContactPoints';
+	public static final String KEY_LAST_BACKFILL = SettingsState.moduleKey(STATE_PREFIX, 'Last_Backfill__c');
+	public static final String KEY_LAST_SUMMARY = SettingsState.moduleKey(STATE_PREFIX, 'Last_Backfill_Summary__c');
 
 	private static final Map<String, String> OBJECT_BY_KIND = new Map<String, String>{
 		ContactPointPlan.EMAIL => 'ContactPointEmail',
@@ -24,9 +27,9 @@ public without sharing class ContactPointSyncService {
 		ContactPointPlan.ADDRESS => 'ContactPointAddress'
 	};
 	private static final Map<String, String> SETTING_BY_KIND = new Map<String, String>{
-		ContactPointPlan.EMAIL => 'Sync_Emails__c',
-		ContactPointPlan.PHONE => 'Sync_Phones__c',
-		ContactPointPlan.ADDRESS => 'Sync_Addresses__c'
+		ContactPointPlan.EMAIL => 'Contact_Point_Sync_Emails',
+		ContactPointPlan.PHONE => 'Contact_Point_Sync_Phones',
+		ContactPointPlan.ADDRESS => 'Contact_Point_Sync_Addresses'
 	};
 	/** The Contact Point fields each kind writes, where the org's object has them. */
 	private static final Map<String, List<String>> FIELDS_BY_KIND = new Map<String, List<String>>{
@@ -114,13 +117,7 @@ public without sharing class ContactPointSyncService {
 
 	/** Whether the admin left this kind on (Sync Emails, Sync Phones, Sync Addresses). */
 	public static Boolean switchedOn(String kind) {
-		Object stored;
-		try {
-			stored = SettingsService.getValue(SETTINGS_OBJECT, SETTING_BY_KIND.get(kind));
-		} catch (Exception unreadable) {
-			stored = null;
-		}
-		return stored == null || stored == true || String.valueOf(stored) == 'true';
+		return ModuleSettings.flag(SETTING_BY_KIND.get(kind));
 	}
 
 	/** The kinds kept in step now: switched on, and the org has their object and Individual. */

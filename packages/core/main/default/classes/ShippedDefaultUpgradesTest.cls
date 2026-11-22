@@ -25,13 +25,22 @@ private class ShippedDefaultUpgradesTest {
 		SettingsService.clearCaches();
 	}
 
+	/**
+	 * The stored settings record (or, with none, what the org reads), with the marker read from
+	 * its run-state row.
+	 */
 	private static BarnCRM_Settings__c stored() {
-		return [
-			SELECT Error_Digest_Include_Admin_Summary__c, Shipped_Defaults_Applied__c
+		List<BarnCRM_Settings__c> rows = [
+			SELECT Id, Error_Digest_Include_Admin_Summary__c
 			FROM BarnCRM_Settings__c
 			WHERE SetupOwnerId = :UserInfo.getOrganizationId()
 			WITH SYSTEM_MODE
 		];
+		SettingsService.clearCaches();
+		BarnCRM_Settings__c record = rows.isEmpty() ? SettingsService.getSettings().clone(false) : rows[0];
+		SettingsState.clearCache();
+		record.Shipped_Defaults_Applied__c = SettingsState.text('Shipped_Defaults_Applied__c');
+		return record;
 	}
 
 	@IsTest

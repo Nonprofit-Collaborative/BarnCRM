@@ -24,10 +24,13 @@ at any time.
 1. Open the **Funds** tab.
 2. Create the other funds your organization actually uses. Most organizations start with two
    or three. You can add more at any time.
-3. To change which fund catches undesignated gifts, tick **Is Default** on that fund. Only one
-   fund can be the default: ticking it on a second fund clears it on the first.
-4. Open **BarnCRM Settings**, choose **Fundraising**, and confirm **Default fund** shows the
-   fund you just marked. Setting it in either place keeps the other in step.
+3. To change which fund catches undesignated gifts, open **BarnCRM Settings**, choose
+   **Fundraising**, and change **Default fund**. Click **Save** and wait for **Saved**. That
+   setting decides where gifts land.
+4. **Is Default** on each fund shows that setting: saving **Default fund** moves the flag to the
+   chosen fund at once, and ticking it on a different fund is refused with a message pointing to
+   **Default fund**. While **Default fund** is blank, the fund ticked **Is Default** catches
+   undesignated gifts instead, and ticking it on a second fund clears it on the first.
 
 No Salesforce Setup step is needed.
 

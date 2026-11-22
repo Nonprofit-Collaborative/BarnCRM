@@ -71,13 +71,9 @@ private class DonorScoreServiceTest {
 	@IsTest
 	static void theOrganizationsOwnCutoffsReplaceTheDefaults() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-			settings.SetupOwnerId = UserInfo.getOrganizationId();
-			settings.Donor_Score_Recency_Days__c = '10,20,30,40';
-			settings.Donor_Score_Frequency_Gifts__c = '3,2,1,0.5';
-			settings.Donor_Score_Monetary_Amount__c = 'not numbers';
-			upsert settings;
-			SettingsService.clearCaches();
+			ModuleSettings.setForTest('Donor_Score_Recency_Days', '10,20,30,40');
+			ModuleSettings.setForTest('Donor_Score_Frequency_Gifts', '3,2,1,0.5');
+			ModuleSettings.setForTest('Donor_Score_Monetary_Amount', 'not numbers');
 
 			Contact ana = [SELECT Id FROM Contact LIMIT 1];
 			ana.Last_Gift_Date__c = Date.today().addDays(-35);

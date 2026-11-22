@@ -124,7 +124,7 @@ public with sharing class ModuleSetups {
 
 	private static List<String> stored() {
 		List<String> keys = new List<String>();
-		String value = SettingsService.getSettings().Modules_Setup_Run__c;
+		String value = SettingsState.text(MARKER_KEY);
 		for (String part : String.isBlank(value) ? new List<String>() : value.split(',')) {
 			if (String.isNotBlank(part)) {
 				keys.add(part.trim());

@@ -19,6 +19,10 @@ private class ReceiptBrandingTest {
 	/** A template that says nothing about the organization, which is the case the block exists for. */
 	private static final String BARE_TEMPLATE = '<p>Dear {{DonorName}}, thank you for your gift of {{Amount}} received on {{GiftDate}}.</p>';
 
+	static {
+		ReceiptTestDataFactory.useReceiptSettings();
+	}
+
 	@TestSetup
 	static void setUp() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
@@ -45,20 +49,14 @@ private class ReceiptBrandingTest {
 		);
 		insert version;
 		Id documentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :version.Id].ContentDocumentId;
-		Giving_Settings__c giving = Giving_Settings__c.getOrgDefaults();
-		giving.SetupOwnerId = UserInfo.getOrganizationId();
-		giving.Receipt_Logo_Document_Id__c = documentId;
-		upsert giving;
+		ModuleSettings.setForTest('Giving_Receipt_Logo', String.valueOf(documentId));
 		ReceiptLogoSource.reset();
 		return documentId;
 	}
 
 	private static void setLogoDelivery(String route, Boolean printLogo) {
-		Giving_Settings__c giving = Giving_Settings__c.getOrgDefaults();
-		giving.SetupOwnerId = UserInfo.getOrganizationId();
-		giving.Receipt_Logo_Delivery__c = route;
-		giving.Receipt_Print_Logo__c = printLogo;
-		upsert giving;
+		ModuleSettings.setForTest('Giving_Receipt_Logo_Delivery', route);
+		ModuleSettings.setForTest('Giving_Receipt_Print_Logo', printLogo);
 		ReceiptLogoSource.reset();
 	}
 
@@ -241,10 +239,10 @@ private class ReceiptBrandingTest {
 	@IsTest
 	static void aLogoThatCannotBeFoundStillProducesADocument() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Giving_Settings__c giving = Giving_Settings__c.getOrgDefaults();
-			giving.SetupOwnerId = UserInfo.getOrganizationId();
-			giving.Receipt_Logo_Document_Id__c = FakeIds.of(ContentDocument.SObjectType, 0);
-			upsert giving;
+			ModuleSettings.setForTest(
+				'Giving_Receipt_Logo',
+				String.valueOf(FakeIds.of(ContentDocument.SObjectType, 0))
+			);
 			ReceiptLogoSource.reset();
 
 			Test.startTest();

@@ -7,7 +7,7 @@
     running or publishing anything (canonical model R-CR3).
   </description>
   <applicationVisibilities>
-    <application>BarnCRM_Connector</application>
+    <application>BarnCRM_Admin_Console</application>
     <visible>true</visible>
   </applicationVisibilities>
   <classAccesses>

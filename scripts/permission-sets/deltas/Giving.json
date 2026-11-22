@@ -20,12 +20,6 @@
         "Donor_Levels": {"visibility": "Visible"},
         "Giving_Accounting_Periods": {"visibility": "Visible"},
         "Stewardship_Plans": {"visibility": "Visible"}
-      },
-      "userPermissions": {
-        "CreateCustomizeDashboards": {"enabled": "true"},
-        "CreateCustomizeReports": {"enabled": "true"},
-        "EditMyDashboards": {"enabled": "true"},
-        "EditMyReports": {"enabled": "true"}
       }
     },
     "set": {

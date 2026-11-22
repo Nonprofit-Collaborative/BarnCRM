@@ -24,7 +24,7 @@ Error Log.`, and the Error Log then has the detail.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **BarnCRM** app and look at its tabs, then the App Launcher. | **Events Home**, **Event Calendar**, **Events** and **Event Speakers** follow **Data Manager** (and the other modules' pages); the App Launcher lists no BarnCRM Events, BarnCRM Forms or BarnCRM Portal Builder app (D-188), and **BarnCRM Admin** has **Portals** and **Portal Accesses** before **Error Log**, which is last. Open **Events Home**: the page says nothing is coming up and offers **New Event**. |
+| 1 | Open the App Launcher, then **BarnCRM Events** and its tabs. | The App Launcher lists **BarnCRM Events** and no BarnCRM Forms or BarnCRM Portal Builder app; **BarnCRM Events** opens on **Events Home**, followed by **Event Calendar**, **Events** and **Event Speakers**, and **BarnCRM Admin Console** has **Portals** and **Portal Accesses** before **Error Log**, which is last. Open **Events Home**: the page says nothing is coming up and offers **New Event**. |
 | 2 | Click **New Event**. Name `Spring Gala`, Start next Saturday 6:00 PM, End the same day 5:00 PM, save. | Refused: `End must be after Start.` |
 | 3 | Set End to 10:00 PM, Capacity `0`, save. | Refused: `Capacity must be at least 1. Leave it empty for no limit.` |
 | 4 | Set Capacity `200`, Venue Name `Town Hall`, save. | Saved as **Draft**, **In Person**. The page shows the highlights, a **Details** tab and the related lists in the sidebar. |
@@ -212,7 +212,7 @@ with Sam **Attended** (with an email) and Max **Registered**.
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, **Events**. | Six settings: the three switches Off, lead days 2, the two shipped template names. |
 | 2 | Leave them off; in **Nightly Jobs**, run the step **Event reminders, follow-ups and no-shows** now (or wait for 7:30 AM). | Nothing is emailed; no attendee changes. |
-| 3 | Turn **Send event reminders**, **Send follow-ups** and **Mark no-shows** on; run the step again. | Jane gets the reminder naming the event; her **Reminder Sent On** is set. Sam gets the follow-up; **Follow-Up Sent On** is set. Max is **No-Show**. |
+| 3 | Turn **Send event reminders**, **Send follow-ups** and **Mark no-shows** on, then reload BarnCRM Settings; run the step again. | Each change shows "Saving..." then "Your settings are saved."; after the reload all three are still on. Jane gets the reminder naming the event; her **Reminder Sent On** is set. Sam gets the follow-up; **Follow-Up Sent On** is set. Max is **No-Show**. |
 | 4 | Run the step again. | No second email to Jane or Sam. |
 | 5 | Set **Reminder email template** to `No_Such_Template`; clear Jane's **Reminder Sent On**; run again. | No email; the **Error Log** has a Warning naming `No_Such_Template`; Jane's stamp stays blank. |
 | 6 | Type `0` in **Days before an event to remind**. | Refused: the value must be from 1 to 30. |

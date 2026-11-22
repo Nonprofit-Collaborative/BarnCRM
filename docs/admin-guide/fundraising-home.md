@@ -19,7 +19,7 @@ me today" in one look, so a fundraiser starts on one page rather than a menu of 
 - **Enter a Gift**, which opens Quick Gift Entry.
 - **Fundraising Setup**: a tile for each setup page that left the app's menu (**Donor Levels
   and Scores**, **Stewardship Plan Templates**, **Pledge Reminders**, **Receipt Letters**). All four
-  are also tabs in **BarnCRM Admin** and **BarnCRM Admin Console**, before **Error Log**.
+  are also tabs in **BarnCRM Admin Console**, before **Error Log**.
 - **More**: a tile for each list that left the app's menu in release 1.24 (D-200): **Asks**,
   **Scheduled Payments**, **Funds**, **Appeals**, **Tributes**, **Donor Segments**, **Recurring
   Donor Health** and **Dashboards**. Each opens its list or page, and each is still in the App

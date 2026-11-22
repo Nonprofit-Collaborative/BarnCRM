@@ -16,12 +16,12 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | From the App Launcher, open the **BarnCRM Admin** app and click **Rollup Builder**. | The **Rollup Builder** tab opens. |
+| 1 | From the App Launcher, open the **BarnCRM Admin Console** app and click **Rollup Builder**. | The **Rollup Builder** tab opens. |
 | 2 | Look at the page. | A **Rollup Builder** card holds a **Rollups** card that starts "Every total BarnCRM keeps up to date for you, and when each one was last calculated." Above it, **Needs Attention** shows only while something needs attention (with a count badge). A collapsed **Advanced** section at the bottom holds **Instant Totals**. No read only notice is shown. |
 | 3 | Look at the buttons above the list. | **Schedule Nightly Recalculation** (or **Stop the Nightly Recalculation**), **Recalculate All**, **Restore Shipped Rollups** and **New Rollup** are all enabled. |
 | 4 | If the button reads **Stop the Nightly Recalculation**, click it. | The text above the buttons reads "Nightly recalculation is not scheduled yet." **Needs Attention** shows "The nightly run is not scheduled, so totals a bulk change missed are not put right overnight." |
 | 5 | Click **Schedule Nightly Recalculation**. | The text reads "Nightly recalculation is scheduled for 2:00 AM." The button now reads **Stop the Nightly Recalculation**, and the not scheduled warning under **Needs Attention** is gone. |
-| 6 | Open the **BarnCRM Admin** app, then **BarnCRM Settings**, then the **Rollups** section. | The section opens the same Rollup Builder list, with the same schedule message. |
+| 6 | Open the **BarnCRM Admin Console** app, then **BarnCRM Settings**, then the **Rollups** section. | The section opens the same Rollup Builder list, with the same schedule message. |
 
 **Cleanup:** leave the nightly run scheduled.
 
@@ -340,7 +340,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Rollups** section. | **Time of the nightly run** shows **2:00 AM**, never blank. Its list offers every hour from **12:00 AM (midnight)** to **11:00 PM**. |
+| 1 | Open **BarnCRM Settings**, **Rollups** section. | **Time of the nightly run** shows **2 AM**, never blank. Its list offers every hour from **12 AM (midnight)** to **11 PM**, and saving **11 PM** shows "Saving..." then "Your settings are saved.". Set it back to **2 AM**. |
 | 2 | Choose **11:00 PM** and save. | The setting saves and shows **11:00 PM**. |
 | 3 | Open the **Rollup Builder** tab. | The text above the buttons reads "Nightly recalculation is scheduled for 11:00 PM." |
 | 4 | In Setup, open **Scheduled Jobs**. | One job named **BarnCRM Nightly Jobs** (the nightly run all steps share, see [Nightly Jobs](../admin-guide/nightly-jobs.md)), next run at midnight; the Nightly Jobs panel lists the rollup step at 11:00 PM. |
@@ -697,6 +697,6 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 2 | Open the **Rollup Builder** tab. | Under the nightly schedule line: "The nightly run recalculates every Every night and Both total over every record on Sunday nights ...". |
 | 3 | Set the night to tomorrow's day of the week; after tomorrow's run, open **Apex Jobs** in Setup. | The night's rollup job is **RollupFullRecalcBatch**. |
 | 4 | Set the night to another day and add a gift during the day. After the next night's run, open **Apex Jobs**. | The night's rollup job is **RollupNightlyBatch**; the gift's donor shows the new total; donors whose gifts did not change keep their earlier **Rollups last calculated** time. |
-| 5 | Choose **Every night** and save; reopen the Rollup Builder. | The line says each nightly run recalculates every total over every record. |
+| 5 | Choose **Every night** and save; reload **BarnCRM Settings**, **Rollups**, then reopen the Rollup Builder. | The save shows "Saving..." then "Your settings are saved."; after the reload the night still shows **Every night** with no **Default** badge. The line says each nightly run recalculates every total over every record. |
 
 **Cleanup:** set the night back to Sunday.

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Backup_JSON__c</fullName>
+  <description>How Backup Sets and archives send their CSV files through this connection (canonical model R-CN11): method (PUT or POST), a path with the {file} slot and up to five fixed headers that hold no secret. Blank when the connection is not the backup destination; at most one row has it. Written and read by the module only, in system mode; never a key.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>How backup files are sent through this connection. Set on the Connections section of Super Connector.</inlineHelpText>
+  <label>Backup Settings</label>
+  <length>4000</length>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>3</visibleLines>
+</CustomField>

@@ -14,24 +14,15 @@ private class ReceiptRendererFactoryTest {
 
 	private static final String PROBE_CLASS = 'ReceiptTestDataFactory.ConstructionProbe';
 
-	/** The setting as an org default, written the way the settings console writes it. */
+	/** The setting as the org's value, as if a settings save had deployed it. */
 	private static void chooseRenderer(String value) {
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		settings.SetupOwnerId = UserInfo.getOrganizationId();
-		settings.Receipt_Renderer__c = value;
-		upsert settings;
+		ModuleSettings.setForTest('Giving_Receipt_Renderer', value);
 	}
 
 	/** The stored value, read back rather than assumed, since that is what the factory reads. */
 	private static String storedRenderer() {
-		return [
-			SELECT Receipt_Renderer__c
-			FROM Giving_Settings__c
-			WHERE SetupOwnerId = :UserInfo.getOrganizationId()
-			WITH SYSTEM_MODE
-			LIMIT 1
-		]
-		.Receipt_Renderer__c;
+		Object stored = ModuleSettings.stored('Giving_Receipt_Renderer');
+		return stored == null ? null : String.valueOf(stored);
 	}
 
 	/**
@@ -94,7 +85,11 @@ private class ReceiptRendererFactoryTest {
 				ReceiptRendererFactory.keyFrom('  Blob PDF  '),
 				'The factory trims the value it reads, whatever stored it.'
 			);
-			chooseRenderer('  Blob PDF  ');
+			// Through the save, as an administrator's edit is stored: the save trims text values.
+			SettingsService.saveSystemValues(
+				'Giving_Settings__c',
+				new Map<String, Object>{ 'Receipt_Renderer__c' => '  Blob PDF  ' }
+			);
 			Assert.areEqual(
 				'Blob PDF',
 				storedRenderer(),

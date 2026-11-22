@@ -39,12 +39,7 @@ public inherited sharing class EnrollmentCapacity extends TriggerHandler {
 
 	/** Programs' Waitlist When Full, off unless saved on. */
 	public static Boolean waitlistEnabled() {
-		try {
-			return SettingsService.getValue('Programs_Settings__c', 'Waitlist_Enabled__c') == true;
-		} catch (Exception unreadable) {
-			// Never saved or unreadable: the shipped value, off, applies.
-			return false;
-		}
+		return ModuleSettings.flag('Programs_Waitlist_Enabled');
 	}
 
 	/**

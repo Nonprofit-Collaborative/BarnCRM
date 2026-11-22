@@ -11,9 +11,9 @@ reminders in one nightly step, a member directory portal template
 Object names differ from Memberships Essentials' (`Membership__c`) on purpose: both are
 unpackaged today, so a shared name would collide on deploy.
 
-App `BarnCRM_Memberships` (BarnCRM Memberships, logo `BarnCRM_Patch_Memberships_Logo`), visible
-through the Memberships permission sets; left out of scratch and Developer Edition orgs (ADR-0223,
-module apps, and its 2026-11-14 amendment). The tabs also join the BarnCRM apps through the
-catalog row's `Staff_Tabs__c` and `Admin_Tabs__c`.
+No app of its own: the catalog row's `App_Name__c` is `BarnCRM_Members_Partners` (a Core app,
+shown by the Memberships permission sets), so `scripts/org/module-app-tabs.py` adds
+`Staff_Tabs__c` there first and `Admin_Tabs__c` to BarnCRM Admin Console and that app
+(ADR-0237 (nine console apps)).
 
 Admin guide: `docs/admin-guide/memberships.md`. Canonical model: Sections 29MEM1 to 29MEM4.

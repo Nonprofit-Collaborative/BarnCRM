@@ -97,10 +97,8 @@ private class RollupNightlyBatchTest {
 	}
 
 	private static void storeSettings(String day, Datetime coveredFrom) {
-		Rollup_Settings__c settings = Rollup_Settings__c.getOrgDefaults();
-		settings.Full_Recalc_Day__c = day;
-		settings.Nightly_Covered_From__c = coveredFrom;
-		Database.upsert(settings, AccessLevel.SYSTEM_MODE);
+		ModuleSettings.setForTest('Rollup_Full_Recalc_Day', day);
+		SettingsState.put(new Map<String, Object>{ RollupNightlyBatch.COVERED_KEY => coveredFrom });
 		SettingsService.clearCaches();
 	}
 

@@ -84,6 +84,50 @@ public with sharing class CommitmentService {
 	}
 
 	/**
+	 * Refuses, at save, a pledge whose last payment would be zero or less (D-219, OD-14): the
+	 * last installment absorbs the expected total minus the even amounts before it, so an
+	 * amount times the installments that passes the total would otherwise plan a zero or
+	 * negative payment. An update is checked only when the amount, total, count or type
+	 * changed, so an older pledge still saves its other edits. Nothing is queried.
+	 */
+	public static void refuseNonPositiveLastPayments(List<Commitment__c> commitments, Map<Id, Commitment__c> oldMap) {
+		for (Commitment__c commitment : commitments) {
+			if (
+				!TYPE_PLEDGE.equals(commitment.Type__c) ||
+				commitment.Expected_Total__c == null ||
+				commitment.Amount__c == null ||
+				commitment.Amount__c <= 0
+			) {
+				continue;
+			}
+			Commitment__c previous = oldMap == null ? null : oldMap.get(commitment.Id);
+			if (
+				previous != null &&
+				previous.Type__c == commitment.Type__c &&
+				previous.Amount__c == commitment.Amount__c &&
+				previous.Expected_Total__c == commitment.Expected_Total__c &&
+				previous.Installments_Planned__c == commitment.Installments_Planned__c
+			) {
+				continue;
+			}
+			Integer count = plannedCount(commitment);
+			if (count <= 0) {
+				continue;
+			}
+			Decimal last = (commitment.Expected_Total__c - commitment.Amount__c * (count - 1)).setScale(2);
+			if (last <= 0) {
+				commitment.addError(
+					BarnHelp.text(
+						'Giving',
+						'Giving_Commitment_LastPaymentNotPositive',
+						new List<Object>{ last.format() }
+					)
+				);
+			}
+		}
+	}
+
+	/**
 	 * The schedule a commitment implies, as unsaved installments in sequence order.
 	 * Nothing is queried and nothing is saved, so the same method serves the preview on
 	 * screen and the generation behind it.
@@ -634,11 +678,11 @@ public with sharing class CommitmentService {
 	 * bare timestamp says the job woke up, not that it did any work (R-IN5).
 	 */
 	public static void recordTopUpRun(Datetime completedAt, String summary) {
-		saveRunRecord(
-			new Map<Schema.SObjectField, Object>{
-				Giving_Settings__c.Installment_Top_Up_Last_Run__c => completedAt,
-				Giving_Settings__c.Installment_Top_Up_Last_Run_Summary__c => summary
-			}
+		GivingState.recordRun(
+			GivingState.INSTALLMENT_TOP_UP_LAST_RUN,
+			GivingState.INSTALLMENT_TOP_UP_SUMMARY,
+			completedAt,
+			summary
 		);
 	}
 
@@ -648,23 +692,12 @@ public with sharing class CommitmentService {
 	 * ran at all, which is the state every org was in before ADR-0038 (R-IN5).
 	 */
 	public static void recordOverdueRun(Datetime completedAt, String summary) {
-		saveRunRecord(
-			new Map<Schema.SObjectField, Object>{
-				Giving_Settings__c.Installment_Overdue_Last_Run__c => completedAt,
-				Giving_Settings__c.Installment_Overdue_Last_Run_Summary__c => summary
-			}
+		GivingState.recordRun(
+			GivingState.INSTALLMENT_OVERDUE_LAST_RUN,
+			GivingState.INSTALLMENT_OVERDUE_SUMMARY,
+			completedAt,
+			summary
 		);
-	}
-
-	/**
-	 * Saves a job's run record on the Giving settings, through the system mode writer the other
-	 * run records use (ADR-0021, ADR-0027): the protected setting cannot be granted to the
-	 * person the job runs as, and these keys are package-owned. Only the given keys are written,
-	 * on the locked stored record, and a first save keeps the checkboxes that ship on, where a
-	 * save starting from `getOrgDefaults()` stored them as false.
-	 */
-	private static void saveRunRecord(Map<Schema.SObjectField, Object> values) {
-		OrgSettingsSystemWriter.save(Giving_Settings__c.SObjectType, values);
 	}
 
 	// ---------------------------------------------------------------------- helpers

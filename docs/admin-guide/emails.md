@@ -42,7 +42,7 @@ Who can do what comes from the permission set somebody already holds:
 
 Maria does this from the sample data.
 
-1. Open the **BarnCRM** app, click the **Contacts** tab, and open **Maria
+1. Open the **BarnCRM Console** app, click the **Contacts** tab, and open **Maria
    Whitfield**.
 2. Look at the **Reaching This Person** section. The three boxes, **Personal Email**, **Work
    Email** and **Alternate Email**, are empty, and **Preferred Email** is empty too. The

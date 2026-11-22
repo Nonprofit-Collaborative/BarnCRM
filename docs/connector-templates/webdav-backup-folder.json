@@ -1,0 +1,19 @@
+{
+  "key": "webdav-backup",
+  "label": "WebDAV Backup Folder",
+  "version": 1,
+  "description": "Sends Backup Set and archive CSV files to a WebDAV folder (Nextcloud, ownCloud or a NAS). Type the folder's own address as the Base URL, such as https://cloud.example.org/remote.php/dav/files/barncrm/BarnCRM-Backups, and use an app password that may only write to that folder.",
+  "auth": {
+    "kind": "BasicAuth",
+    "params": [
+      { "name": "UserName", "label": "User name" },
+      { "name": "Password", "label": "App password" }
+    ]
+  },
+  "baseUrl": "",
+  "backup": {
+    "method": "PUT",
+    "path": "/{file}",
+    "headers": [{ "name": "Overwrite", "value": "T" }]
+  }
+}

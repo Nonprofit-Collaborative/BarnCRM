@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>Archive Rules (D-221): saved Find queries that move records to Files, the big object or an off-platform store, now or on a schedule.</description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

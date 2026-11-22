@@ -410,9 +410,9 @@ public with sharing class FindController {
 			} else {
 				Saved_Query__c stored = requireOwn(recordId);
 				query.Id = stored.Id;
-				// A Backup Set stays one when it is saved again from Find (R-SQ15).
+				// A Backup Set stays one, with its schedule, when saved again from Find (R-SQ15, R-SQ16).
 				if (BackupSetService.isBackupSet(stored.Query_JSON__c)) {
-					query.Query_JSON__c = BackupSetService.marked(queryJson);
+					query.Query_JSON__c = BackupSetService.marked(queryJson, stored.Query_JSON__c);
 				}
 				Database.update(query, AccessLevel.USER_MODE);
 			}

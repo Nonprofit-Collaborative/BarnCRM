@@ -159,6 +159,72 @@ private class MembershipRenewalsTest {
 		}
 	}
 
+	/**
+	 * D-219, OD-15: a user in another time zone, near midnight for the org, gets the org's date
+	 * for renewal and expiry. The user is at least 11 hours from the org, so for most of the day
+	 * their own date is a day ahead or behind; the old user-date rule then lapses the term that
+	 * ends today (ahead) or keeps the one that ended yesterday (behind), and these asserts fail.
+	 */
+	@IsTest
+	static void renewalAndExpiryUseTheOrgDateNotTheRunningUsersDate() {
+		User faraway = TestUsers.adminWith(ADMIN);
+		TestUsers.inAnotherTimeZone(faraway);
+		System.runAs(faraway) {
+			Assert.areNotEqual(OrgDate.zone().getID(), UserInfo.getTimeZone().getID(), 'a user in another zone');
+			Date orgToday = OrgDate.today();
+			Assert.areEqual(orgToday, MembershipService.today(), 'today is the org date');
+			Membership_Level__c individual = levels().get('Individual');
+			Contact endsToday = person('Zzmem Ends Today');
+			Contact endedYesterday = person('Zzmem Ended Yesterday');
+			Contact rejoins = person('Zzmem Rejoins');
+			Membership_Term__c lapsed = new Membership_Term__c(
+				Level__c = individual.Id,
+				Contact__c = rejoins.Id,
+				Status__c = 'Lapsed',
+				Start_Date__c = orgToday.addYears(-3),
+				End_Date__c = orgToday.addYears(-2)
+			);
+			insert as user new List<Membership_Term__c>{
+				new Membership_Term__c(
+					Level__c = individual.Id,
+					Contact__c = endsToday.Id,
+					Status__c = 'Current',
+					Start_Date__c = orgToday.addYears(-1),
+					End_Date__c = orgToday
+				),
+				new Membership_Term__c(
+					Level__c = individual.Id,
+					Contact__c = endedYesterday.Id,
+					Status__c = 'Current',
+					Start_Date__c = orgToday.addYears(-1).addDays(-1),
+					End_Date__c = orgToday.addDays(-1)
+				),
+				lapsed
+			};
+
+			Assert.areEqual(1, MembershipRenewals.lapse(), 'only the term that ended before the org date');
+			Assert.areEqual('Current', termsOf(endsToday.Id)[0].Status__c, 'a term ending on the org date is current');
+			Assert.areEqual('Grace', termsOf(endedYesterday.Id)[0].Status__c, 'ended the org day before');
+
+			Membership_Term__c rejoined = MembershipService.renew(
+				new List<MembershipService.Renewal>{ new MembershipService.Renewal(lapsed.Id) },
+				false
+			)[0];
+			Assert.areEqual(orgToday, rejoined.Start_Date__c, 'a rejoin starts on the org date');
+			Assert.areEqual(MembershipService.endOf(orgToday, individual), rejoined.End_Date__c, 'and ends from it');
+
+			Membership_Term__c joined = new Membership_Term__c(
+				Level__c = individual.Id,
+				Contact__c = person('Zzmem Joins').Id,
+				Status__c = 'Current'
+			);
+			insert as user joined;
+			joined = [SELECT Start_Date__c, End_Date__c FROM Membership_Term__c WHERE Id = :joined.Id WITH USER_MODE];
+			Assert.areEqual(orgToday, joined.Start_Date__c, 'a new term starts on the org date');
+			Assert.areEqual(MembershipService.endOf(orgToday, individual), joined.End_Date__c, 'and expires from it');
+		}
+	}
+
 	@IsTest
 	static void graceTermsAreLapsedOnlyOncePastTheirGraceDays() {
 		System.runAs(TestUsers.adminWith(ADMIN)) {
@@ -282,10 +348,7 @@ private class MembershipRenewalsTest {
 	static void remindersWithNoTemplateLogAWarningAndSendNothing() {
 		System.runAs(TestUsers.adminWith(ADMIN)) {
 			MembershipService.todayOverride = TODAY;
-			Memberships_Settings__c settings = Memberships_Settings__c.getOrgDefaults();
-			settings.SetupOwnerId = UserInfo.getOrganizationId();
-			settings.Reminder_Template__c = 'No_Such_Membership_Template';
-			upsert settings;
+			ModuleSettings.setForTest('Memberships_Reminder_Template', 'No_Such_Membership_Template');
 			RecordingEmailSender sender = new RecordingEmailSender();
 			MembershipRenewals.emailSender = sender;
 

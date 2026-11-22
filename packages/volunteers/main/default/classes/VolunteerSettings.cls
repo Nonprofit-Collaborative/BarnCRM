@@ -1,11 +1,11 @@
 /**
  * The Volunteers settings as the module's code reads them (canonical model Section 29N).
  *
- * Read through Core's typed `SettingsService` readers, which serve an org that has never saved
- * its Volunteer Settings the record its first save would store, so a checkbox that ships on reads
- * as on rather than as the false `getOrgDefaults()` hands back (ADR-0035). A blank or out of
- * range value reads as the field's declared default, the range being its Setting Definition's,
- * so no caller has to know the defaults.
+ * Read through Core's typed `SettingsService` readers, which serve each setting from the settings
+ * store (module `Volunteers`, ADR-0238 settings as custom metadata): a setting never saved reads
+ * its Setting Definition's shipped default, so a checkbox that ships on reads as on. A blank or
+ * out of range value reads as that default, the range being the definition's, so no caller has
+ * to know the defaults.
  */
 public with sharing class VolunteerSettings {
 	public static final String SETTINGS_OBJECT = 'Volunteer_Settings__c';

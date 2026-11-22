@@ -42,10 +42,7 @@ private class EventPaymentsTest {
 	}
 
 	private static FakePayments online(Boolean turnedOn) {
-		OrgSettingsSystemWriter.save(
-			Events_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{ Events_Settings__c.Online_Payments__c => turnedOn }
-		);
+		ModuleSettings.setForTest('Events_Online_Payments', turnedOn);
 		SettingsService.clearCaches();
 		FakePayments fake = new FakePayments();
 		EventPayments.apiForTest = fake;

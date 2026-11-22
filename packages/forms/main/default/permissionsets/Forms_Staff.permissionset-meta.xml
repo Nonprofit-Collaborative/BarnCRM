@@ -6,7 +6,7 @@
     Fills in published forms and works their submissions. Never builds or deletes a form.
   </description>
   <applicationVisibilities>
-    <application>BarnCRM_Forms</application>
+    <application>BarnCRM</application>
     <visible>true</visible>
   </applicationVisibilities>
   <classAccesses>
@@ -134,6 +134,10 @@
   </tabSettings>
   <tabSettings>
     <tab>Form__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Forms_Home</tab>
     <visibility>Visible</visibility>
   </tabSettings>
 </PermissionSet>

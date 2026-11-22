@@ -11,4 +11,5 @@
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">100</value></values>
     <values><field>Description__c</field><value xsi:type="xsd:string">The address service your organization has an account with. Connect it on Address Verification Setup. Smarty checks United States addresses only; Google checks most countries. Default Smarty.</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">address-verification.md</value></values>
+    <values><field>Default_Value__c</field><value xsi:type="xsd:string">"Smarty"</value></values>
 </CustomMetadata>

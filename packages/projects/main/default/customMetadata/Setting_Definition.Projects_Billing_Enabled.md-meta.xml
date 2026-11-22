@@ -10,4 +10,5 @@
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">90</value></values>
     <values><field>Description__c</field><value xsi:type="xsd:string">Billing types, invoice records built from approved time, expenses, milestones and retainers, a printable invoice and Export Invoices. No payments. Needs Track time and budgets. Default: off.</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">projects-psa.md</value></values>
+    <values><field>Default_Value__c</field><value xsi:type="xsd:string">false</value></values>
 </CustomMetadata>

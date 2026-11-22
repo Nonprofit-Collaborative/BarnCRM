@@ -71,6 +71,39 @@ private class OrgDateTest {
 		);
 	}
 
+	/**
+	 * A payment made at 9:30 PM in a Kiritimati org, applied by a user in Honolulu, keeps the
+	 * org's date, not the processing user's day before (D-219, OD-15).
+	 */
+	@IsTest
+	static void aPaymentMomentTakesTheOrgDateNotTheProcessingUsersDate() {
+		User person = personInHonolulu();
+		orgIn(ORG_ZONE);
+		Datetime lateEvening = Datetime.newInstanceGmt(2026, 11, 3, 7, 30, 0);
+
+		System.runAs(person) {
+			Assert.areEqual(
+				Date.newInstance(2026, 11, 2),
+				lateEvening.date(),
+				'The Honolulu user reads the day before'
+			);
+			Assert.areEqual(Date.newInstance(2026, 11, 3), OrgDate.dateOf(lateEvening), 'The org date');
+			Assert.isNull(OrgDate.dateOf(null), 'No moment, no date');
+		}
+	}
+
+	@IsTest
+	static void anotherTimeZoneGivesAMomentOnAnotherDate() {
+		User person = TestUsers.admin();
+		orgIn(ORG_ZONE);
+		Datetime moment = TestUsers.inAnotherTimeZone(person);
+
+		System.runAs(person) {
+			Assert.isNotNull(moment, 'A moment is found');
+			Assert.areNotEqual(moment.date(), OrgDate.dateOf(moment), 'The user and the org read different dates');
+		}
+	}
+
 	@IsTest
 	static void readsTheOrgTimeZoneWithoutAnOverride() {
 		// runs-as: deploying user (reads the org's own time zone, the same for every user)

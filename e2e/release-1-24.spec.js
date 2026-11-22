@@ -3,8 +3,8 @@
 
 const { test, expect, skipUnlessInOrg } = require('./fixtures');
 
-const STAFF_APP = 'BarnCRM_Standard';
-const ADMIN_APP = 'BarnCRM_Admin_Standard';
+const STAFF_APP = 'BarnCRM';
+const ADMIN_APP = 'BarnCRM_Admin_Console';
 
 test('Advanced Reporting home opens, and New Report opens the report builder', async ({
   sf,

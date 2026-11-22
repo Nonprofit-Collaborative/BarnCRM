@@ -17,13 +17,13 @@ Admin) and a second user with the Team Member role, called the staff user below.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the BarnCRM app. | Corporate Hub, Library Documents, Compliance Obligations and Agreements tabs, at the end of the app (in a package install, add them in App Manager first). |
-| 1a | Before any board or committee exists, open the **Corporate Hub** page as admin. | **Set Up Your Board** shows. **New Board or Committee** opens the new record form. After the first board is saved and the page reloaded, the panel is gone. |
+| 1 | Open the BarnCRM app. | Corporate Hub Home, Library Documents, Compliance Obligations and Agreements tabs, at the end of the app (in a package install, add them in App Manager first). |
+| 1a | Before any board or committee exists, open **Corporate Hub Home** as admin. | **Set Up Your Board** shows. **New Board or Committee** opens the new record form. After the first board is saved and the page reloaded, the panel is gone. |
 | 2 | Open Setup, the staff user's permission set assignments. | Corporate Hub Staff is assigned (within the hour, or after Finish Setup). |
 | 3 | Open the Compliance Obligations tab, All. | Eight template obligations, each Status Off, including Annual tax return (US: IRS Form 990 series) and the two Data Protection ones. |
 | 4 | Open the Library Documents tab, All. | Eight Draft policies: conflict of interest, whistleblower, document retention and destruction, gift acceptance, data protection, privacy notice, data subject request procedure, personal data breach response procedure. Each summary says it is not legal advice. |
 | 5 | In the App Launcher, open **Processing Activities**, All. | Five Draft activities, from Donor records and fundraising to Staff and board records. |
-| 6 | Edit the annual tax return obligation's Instructions; on the Corporate Hub page press **Add Missing Templates**. | A message that nothing was missing; your edit is unchanged; still eight obligations. |
+| 6 | Edit the annual tax return obligation's Instructions; on Corporate Hub Home press **Add Missing Templates**. | A message that nothing was missing; your edit is unchanged; still eight obligations. |
 | 7 | Delete the Registered agent renewal obligation, then press **Add Missing Templates** again. | One template added; it is back, Off. |
 
 **Cleanup:** None.
@@ -52,7 +52,7 @@ Admin) and a second user with the Team Member role, called the staff user below.
 | 1 | As admin, **Request Acknowledgments**, audience Everyone with a BarnCRM role. | A count of people asked. The panel shows 0 acknowledged and that many outstanding, the staff user among them. |
 | 2 | Press it again. | 0 people asked: nobody is asked twice for one version. |
 | 3 | As the staff user, check the bell. | A notification naming the policy; it opens the document. |
-| 4 | Open the Corporate Hub page. | The policy under Policies to Acknowledge, with its due date (today plus 30 days). |
+| 4 | Open Corporate Hub Home. | The policy under Policies to Acknowledge, with its due date (today plus 30 days). |
 | 5 | Press **I Have Read This**. | It leaves the list. As admin, the panel shows 1 acknowledged; the staff user is not outstanding. |
 | 6 | As admin, **Publish New Version**. | Open requests for the old version show Superseded; the same people are asked for version 3; the staff user is outstanding again. |
 
@@ -110,7 +110,7 @@ Admin) and a second user with the Team Member role, called the staff user below.
 | 1 | Run **Corporate Hub reminders** now. | Three bell notifications, each opening its record. Each record's Reminded For is its date. |
 | 2 | Run it again. | No new notification. |
 | 3 | Move the obligation's due date by a day and run it again. | One notification for the obligation. |
-| 4 | Turn off **Send Corporate Hub reminders** in Settings, **Corporate Hub**, move a date and run again. | No notification. Turn it back on. |
+| 4 | Turn off **Send Corporate Hub reminders** in Settings, **Corporate Hub**, move a date and run again. | **Saving**, then **Saved**; the setting is still off after a reload. No notification. Turn it back on. |
 
 **Cleanup:** None.
 
@@ -121,7 +121,7 @@ Admin) and a second user with the Team Member role, called the staff user below.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the Corporate Hub tab. | Policies to Acknowledge, Compliance Due (the overdue one first, marked Overdue) and Agreements to Act On. No Add Missing Templates button for the staff user. |
+| 1 | Open Corporate Hub Home. | Policies to Acknowledge, Compliance Due (the overdue one first, marked Overdue) and Agreements to Act On. No Add Missing Templates button for the staff user. |
 | 2 | Tab through the page. | Every link and button is reachable with a visible focus ring, in reading order. |
 | 3 | Open it in the Salesforce mobile app. | The lists stack in one column with no sideways scrolling. |
 
@@ -205,7 +205,7 @@ Admin) and a second user with the Team Member role, called the staff user below.
 
 ## T-CH-14: Data Subject Requests and the Erasure Link
 
-**Purpose:** confirm a data subject request is reminded once, shows on the Corporate Hub page and is linked to Core's erasure (CH-05).
+**Purpose:** confirm a data subject request is reminded once, shows on Corporate Hub Home and is linked to Core's erasure (CH-05).
 **Prerequisites:** admin; a staff user; a test Contact you may erase. **Send Corporate Hub reminders** on.
 
 | Step | Action | Expected result |
@@ -214,7 +214,7 @@ Admin) and a second user with the Team Member role, called the staff user below.
 | 1a | Create another request with Received Date 10 days ago and Due Date blank. Then change its Received Date to 20 days ago. | Due Date is 20 days from today after the first save, then 10 days from today after the change. A request whose Due Date you typed keeps it when the Received Date changes. |
 | 2 | Set Due Date before Received Date and save. | Refused: the due date cannot be before the date received. |
 | 3 | Set Status to Completed with no Completed Date and save. | Refused until Completed Date is filled in. Set Status back to Received. |
-| 4 | Open the Corporate Hub tab. | A **Data Protection** section lists "Data subject request: DSR-nnnnn" with its due date and type. |
+| 4 | Open Corporate Hub Home. | A **Data Protection** section lists "Data subject request: DSR-nnnnn" with its due date and type. |
 | 5 | As another staff user, open the Data Subject Requests tab, All. | The request is not listed (requests are private). |
 | 6 | As admin, run Core's **Erase a Person** on the test Contact with Request Reference the request number. | The erasure completes. |
 | 7 | Run **Corporate Hub reminders** now. | The request's **Erasure Record** is the erasure; Status is still Received. The owner gets one bell notification "Data subject request DSR-nnnnn is due ...". |
@@ -232,12 +232,12 @@ Admin) and a second user with the Team Member role, called the staff user below.
 |---|---|---|
 | 1 | From the App Launcher, open **Data Breaches** and create one: Breach Title "Lost laptop". | Status Open, Risk Not Yet Assessed, Discovered At now, Authority Deadline 72 hours later. The owner gets a bell at once ("Breach Lost laptop: report to the authority by ...") and Reminded For is the deadline date (CH-22, D-196). |
 | 2 | Set Status Closed and save. | Refused while the risk is Not Yet Assessed. Set Status back to Open. |
-| 3 | Open the Corporate Hub page. | Data Protection lists "Breach not yet reported: Lost laptop". |
-| 4 | Create a second breach with Risk **Unlikely to Result in Risk**. | It is not listed on the Corporate Hub page, and no bell is sent. |
+| 3 | Open Corporate Hub Home. | Data Protection lists "Breach not yet reported: Lost laptop". |
+| 4 | Create a second breach with Risk **Unlikely to Result in Risk**. | It is not listed on Corporate Hub Home, and no bell is sent. |
 | 5 | Open the Processing Activity "Donor records and fundraising": tick DPIA Required, DPIA Review Date in 10 days, Status Active. | Saved. |
 | 6 | Run **Corporate Hub reminders** now. | One bell notification: the DPIA review. None for the first breach (already told in step 1) or the low-risk breach. |
 | 7 | Run it again. | No new notification. |
-| 8 | Fill in Authority Notified At on the first breach. | It leaves the Corporate Hub page. |
+| 8 | Fill in Authority Notified At on the first breach. | It leaves Corporate Hub Home. |
 | 9 | On the Automations page turn off **Data Breach: ring the bell when logged**, then create a breach "Phishing email" with Risk **Risk**. | No bell on saving. Run **Corporate Hub reminders**: one bell for "Phishing email". Turn the row back on. |
 
 **Cleanup:** Delete the three breaches; set the activity back to Draft and untick DPIA Required.

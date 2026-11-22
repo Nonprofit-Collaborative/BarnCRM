@@ -6,6 +6,8 @@ const ALL = [
   'maps',
   'find',
   'backup',
+  'archive',
+  'archived',
   'update',
   'optimizer',
   'duplicates',

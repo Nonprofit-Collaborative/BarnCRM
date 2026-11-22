@@ -1,17 +1,19 @@
 /**
  * The Payments Setup page (ADR-0201 `0201-payments-module.md`, decision 7, as amended by ADR-0229): the receiver address of each active Site, for
- * each processor, with the random token every address carries (made on first need, replaced by
- * Regenerate Token); where each processor's secrets go in Setup (External Credential, principal and
- * parameter names, qualified for this org); whether each processor is connected, with Check
- * Connection; and the PayPal webhook id, the one value still typed here (not a secret, shown by
- * its last four characters only). Thin: plain JSON and every text the page shows (plan 9.9).
+ * each processor, and the random token every address carries: only its SHA-256 hash is kept, so the
+ * token is shown once, in the answer to Generate Token or Regenerate Token; where each processor's
+ * secrets go in Setup (External Credential, principal and parameter names, qualified for this org);
+ * whether each processor is connected, with Check Connection; and the PayPal webhook id, the one
+ * value still typed here (not a secret, shown by its last four characters only). Thin: plain JSON
+ * and every text the page shows (plan 9.9).
  *
- * Opened by holders of Payments Admin (class access). Saving, clearing and checking also need
- * Manage BarnCRM Settings, and write the protected setting in system mode.
+ * Opened by holders of Payments Admin (class access). Saving, clearing, checking and making a token
+ * also need Manage BarnCRM Settings, and record the org's run state in system mode (`SettingsState`).
  */
 public with sharing class PaymentsSetupController {
 	private static final String CONTEXT = 'PaymentsSetupController';
 	private static final String WEBHOOK_ID = 'payPalWebhookId';
+	private static final Integer WEBHOOK_ID_LENGTH = 64;
 
 	public class KeyStatus {
 		@AuraEnabled
@@ -58,6 +60,12 @@ public with sharing class PaymentsSetupController {
 		/** Whether event processing is scheduled (it never is until an admin chooses; D-195). */
 		@AuraEnabled
 		public Boolean scheduled;
+		/** Whether the addresses carry a token (its hash is kept). */
+		@AuraEnabled
+		public Boolean hasToken;
+		/** The token just made, in the answer to Generate Token only; null otherwise. */
+		@AuraEnabled
+		public String token;
 		@AuraEnabled
 		public List<Receiver> receivers = new List<Receiver>();
 		@AuraEnabled
@@ -84,14 +92,12 @@ public with sharing class PaymentsSetupController {
 	@AuraEnabled
 	public static Setup saveKeys(Map<String, String> keys) {
 		refuseUnlessManager();
-		Payments_Settings__c stored = stored();
+		Map<String, Object> changes = new Map<String, Object>();
 		String value = (keys == null ? new Map<String, String>() : keys).get(WEBHOOK_ID)?.trim();
 		if (String.isNotBlank(value)) {
-			stored.PayPal_Webhook_Id__c = value.left(
-				Payments_Settings__c.PayPal_Webhook_Id__c.getDescribe().getLength()
-			);
+			changes.put(PaymentService.PAYPAL_WEBHOOK_ID, value.left(WEBHOOK_ID_LENGTH));
 		}
-		return write(stored);
+		return write(changes);
 	}
 
 	/**
@@ -101,16 +107,16 @@ public with sharing class PaymentsSetupController {
 	@AuraEnabled
 	public static Setup clearKeys(String processor) {
 		refuseUnlessManager();
-		Payments_Settings__c stored = stored();
+		Map<String, Object> changes = new Map<String, Object>();
 		if (processor == PaymentService.STRIPE) {
-			stored.Stripe_Connected__c = false;
+			changes.put(PaymentService.STRIPE_CONNECTED, false);
 		} else if (processor == PaymentService.PAYPAL) {
-			stored.PayPal_Connected__c = false;
-			stored.PayPal_Webhook_Id__c = null;
+			changes.put(PaymentService.PAYPAL_CONNECTED, false);
+			changes.put(PaymentService.PAYPAL_WEBHOOK_ID, null);
 		} else {
 			throw UserErrors.message(BarnHelp.text('Payments', 'Payments_Error_BadProcessor'));
 		}
-		return write(stored);
+		return write(changes);
 	}
 
 	/**
@@ -121,18 +127,18 @@ public with sharing class PaymentsSetupController {
 	@AuraEnabled
 	public static Setup checkConnection(String processor) {
 		refuseUnlessManager();
-		Payments_Settings__c stored = stored();
+		Map<String, Object> changes = new Map<String, Object>();
 		PaymentStripe.Connection found;
 		if (processor == PaymentService.STRIPE) {
 			found = PaymentStripe.checkConnection();
-			stored.Stripe_Connected__c = found.ok;
+			changes.put(PaymentService.STRIPE_CONNECTED, found.ok);
 		} else if (processor == PaymentService.PAYPAL) {
 			found = PaymentPayPal.checkConnection();
-			stored.PayPal_Connected__c = found.ok;
+			changes.put(PaymentService.PAYPAL_CONNECTED, found.ok);
 		} else {
 			throw UserErrors.message(BarnHelp.text('Payments', 'Payments_Error_BadProcessor'));
 		}
-		Setup result = write(stored);
+		Setup result = write(changes);
 		if (found.failure != null) {
 			ErrorLogger.log(found.failure, CONTEXT + '.checkConnection');
 		}
@@ -165,15 +171,15 @@ public with sharing class PaymentsSetupController {
 	}
 
 	/**
-	 * Replaces the address token: the addresses already given to a processor stop working until
-	 * the new ones are pasted in.
+	 * Makes the address token, or replaces it: the addresses already given to a processor stop
+	 * working until the new ones are pasted in. The answer carries the token and the addresses
+	 * with it, this once; only its hash is kept.
 	 */
 	@AuraEnabled
 	public static Setup regenerateToken() {
 		refuseUnlessManager();
 		try {
-			PaymentService.webhookToken(true);
-			return setup();
+			return setup(PaymentService.newWebhookToken());
 		} catch (Exception unexpected) {
 			throw UserErrors.wrap(unexpected, CONTEXT, true);
 		}
@@ -197,15 +203,12 @@ public with sharing class PaymentsSetupController {
 		}
 	}
 
-	private static Payments_Settings__c stored() {
-		Payments_Settings__c stored = PaymentService.settings();
-		stored.SetupOwnerId = UserInfo.getOrganizationId();
-		return stored;
-	}
-
-	private static Setup write(Payments_Settings__c stored) {
+	/** Records the org's connection values (run state, synchronous), then answers the page. */
+	private static Setup write(Map<String, Object> changes) {
 		try {
-			upsert as system stored;
+			if (!changes.isEmpty()) {
+				PaymentService.putState(changes);
+			}
 			return setup();
 		} catch (Exception unexpected) {
 			throw UserErrors.wrap(unexpected, CONTEXT, true);
@@ -213,31 +216,41 @@ public with sharing class PaymentsSetupController {
 	}
 
 	private static Setup setup() {
+		return setup(null);
+	}
+
+	/**
+	 * The page's data. Each address ends in `?token=`, followed by the token only when it was just
+	 * made (`token`): the token is not kept, so it is never shown again.
+	 */
+	private static Setup setup(String token) {
 		Setup result = new Setup();
-		Payments_Settings__c stored = PaymentService.settings();
 		result.processor = PaymentService.defaultProcessor();
 		result.mode = PaymentService.mode();
 		result.canManage = HealthCheckService.canManageSettings();
 		result.scheduled = PaymentEventProcessor.isScheduled();
-		String token = PaymentService.webhookToken(false);
+		result.hasToken = PaymentService.hasWebhookToken();
+		result.token = token;
+		String suffix = token == null ? '' : token;
 		for (PaymentSites.SiteInfo site : PaymentSites.active()) {
 			if (site.url != null) {
 				Receiver receiver = new Receiver();
 				receiver.site = site.name;
-				receiver.stripeUrl = site.url + PaymentSites.RECEIVER_PATH + 'stripe?token=' + token;
-				receiver.payPalUrl = site.url + PaymentSites.RECEIVER_PATH + 'paypal?token=' + token;
+				receiver.stripeUrl = site.url + PaymentSites.RECEIVER_PATH + 'stripe?token=' + suffix;
+				receiver.payPalUrl = site.url + PaymentSites.RECEIVER_PATH + 'paypal?token=' + suffix;
 				result.receivers.add(receiver);
 			}
 		}
+		String webhookId = PaymentService.stateText(PaymentService.PAYPAL_WEBHOOK_ID);
 		KeyStatus webhook = new KeyStatus();
 		webhook.name = WEBHOOK_ID;
 		webhook.processor = PaymentService.PAYPAL;
-		webhook.lastFour = String.isBlank(stored.PayPal_Webhook_Id__c) ? null : stored.PayPal_Webhook_Id__c.right(4);
+		webhook.lastFour = webhookId == null ? null : webhookId.right(4);
 		result.keys.add(webhook);
 		result.credentials.add(
 			credential(
 				PaymentService.STRIPE,
-				stored.Stripe_Connected__c == true,
+				PaymentService.stateFlag(PaymentService.STRIPE_CONNECTED),
 				PaymentStripe.CREDENTIAL,
 				'Barn_Stripe_Key',
 				'SecretKey',
@@ -247,7 +260,7 @@ public with sharing class PaymentsSetupController {
 		result.credentials.add(
 			credential(
 				PaymentService.PAYPAL,
-				stored.PayPal_Connected__c == true,
+				PaymentService.stateFlag(PaymentService.PAYPAL_CONNECTED),
 				PaymentPayPal.CREDENTIAL,
 				'Barn_PayPal_App',
 				'ClientId, ClientSecret',

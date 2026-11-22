@@ -37,8 +37,14 @@ public with sharing class MembershipService {
 	@TestVisible
 	private static Date todayOverride;
 
+	/**
+	 * Today for every Memberships date rule (dues dates, renewal and lapse, expiry, reminders,
+	 * certifications): the org's date in its default time zone (`OrgDate`), never the running
+	 * user's, so a renewal processed near midnight by someone in another time zone gets the same
+	 * dates as anyone else's (D-219, OD-15; plan D-208).
+	 */
 	public static Date today() {
-		return todayOverride != null ? todayOverride : Date.today();
+		return todayOverride != null ? todayOverride : OrgDate.today();
 	}
 
 	/** Whether the module is on in the Module Manager. */

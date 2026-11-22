@@ -59,8 +59,8 @@ private class CertificationServiceTest {
 			panel = CertificationController.grant(made.Id);
 			Member_Certification__c held = reread(made.Id);
 			Assert.areEqual('Active', held.Status__c);
-			Assert.areEqual(Date.today(), held.Earned_On__c);
-			Assert.areEqual(Date.today().addMonths(24).addDays(-1), held.Expires_On__c);
+			Assert.areEqual(MembershipService.today(), held.Earned_On__c);
+			Assert.areEqual(MembershipService.today().addMonths(24).addDays(-1), held.Expires_On__c);
 			Assert.isFalse(panel.canGrant, 'Already Active.');
 			Assert.isNotNull(panel.renewRefusal, 'No credits yet.');
 		}
@@ -99,13 +99,13 @@ private class CertificationServiceTest {
 			update as user new Member_Certification__c(
 				Id = made.Id,
 				Status__c = 'Active',
-				Expires_On__c = Date.today().addDays(-3)
+				Expires_On__c = MembershipService.today().addDays(-3)
 			);
 			Assert.areEqual(1, CertificationService.expire());
 			Assert.areEqual('Expired', reread(made.Id).Status__c);
 
 			CertificationService.renew(made.Id);
-			Assert.areEqual(Date.today().addMonths(12).addDays(-1), reread(made.Id).Expires_On__c);
+			Assert.areEqual(MembershipService.today().addMonths(12).addDays(-1), reread(made.Id).Expires_On__c);
 		}
 	}
 

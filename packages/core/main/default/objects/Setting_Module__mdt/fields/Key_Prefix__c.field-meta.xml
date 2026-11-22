@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Key_Prefix__c</fullName>
+  <description>
+    The prefix of the module's run-state keys, such as Rollups: a state row is named
+    Prefix.Key (SettingsState.moduleKey), so two modules never share a row. Letters, digits
+    and underscores; unique across modules.
+  </description>
+  <externalId>false</externalId>
+  <fieldManageability>DeveloperControlled</fieldManageability>
+  <label>Key Prefix</label>
+  <length>20</length>
+  <required>true</required>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

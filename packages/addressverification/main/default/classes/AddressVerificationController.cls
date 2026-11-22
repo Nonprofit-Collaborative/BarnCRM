@@ -58,13 +58,11 @@ public with sharing class AddressVerificationController {
 		List<Exception> failure = new List<Exception>();
 		Integer status = AddressVerifier.checkConnection(provider, failure);
 		Boolean ok = status == 200;
-		Address_Verification_Settings__c stored = stored();
 		if (ok) {
-			stored.Connected_Provider__c = provider;
-		} else if (stored.Connected_Provider__c == provider) {
-			stored.Connected_Provider__c = null;
+			remember(provider);
+		} else if (AddressVerifier.connectedProvider() == provider) {
+			remember(null);
 		}
-		write(stored);
 		if (!failure.isEmpty()) {
 			ErrorLogger.log(failure[0], CONTEXT + '.checkConnection');
 		}
@@ -85,11 +83,9 @@ public with sharing class AddressVerificationController {
 	public static Setup clearKeys(String provider) {
 		refuseUnlessManager();
 		refuseUnlessProvider(provider);
-		Address_Verification_Settings__c stored = stored();
-		if (stored.Connected_Provider__c == provider) {
-			stored.Connected_Provider__c = null;
+		if (AddressVerifier.connectedProvider() == provider) {
+			remember(null);
 		}
-		write(stored);
 		return getSetup();
 	}
 
@@ -118,24 +114,10 @@ public with sharing class AddressVerificationController {
 		}
 	}
 
-	/** The stored row only, never the shipped defaults `AddressVerifier.settings()` fills in. */
-	private static Address_Verification_Settings__c stored() {
-		Address_Verification_Settings__c stored = Address_Verification_Settings__c.getOrgDefaults();
-		stored.SetupOwnerId = UserInfo.getOrganizationId();
-		return stored;
-	}
-
-	private static void write(Address_Verification_Settings__c stored) {
-		if (stored.Id == null) {
-			// A first save keeps the shipped choices the settings console would show (ADR-0035).
-			Address_Verification_Settings__c shipped = AddressVerifier.settings();
-			stored.Verify_On_Save__c = shipped.Verify_On_Save__c;
-			stored.Provider__c = shipped.Provider__c;
-			stored.Recheck_Months__c = shipped.Recheck_Months__c;
-			stored.Nightly_Limit__c = shipped.Nightly_Limit__c;
-		}
+	/** Records which provider is connected (null for none) as run state, at once (SET-03). */
+	private static void remember(String provider) {
 		try {
-			upsert as system stored;
+			SettingsState.put(new Map<String, Object>{ AddressVerifier.KEY_CONNECTED => provider });
 		} catch (Exception unexpected) {
 			throw UserErrors.wrap(unexpected, CONTEXT, true);
 		}
@@ -146,7 +128,7 @@ public with sharing class AddressVerificationController {
 		result.provider = AddressVerifier.provider();
 		result.ready = AddressVerifier.isReady();
 		result.canManage = HealthCheckService.canManageSettings();
-		String connected = AddressVerifier.settings().Connected_Provider__c;
+		String connected = AddressVerifier.connectedProvider();
 		result.credentials.add(credential(AddressVerifier.SMARTY, connected, 'Barn_Smarty_Key', 'AuthId, AuthToken'));
 		result.credentials.add(credential(AddressVerifier.GOOGLE, connected, 'Barn_Google_Address_Key', 'ApiKey'));
 		return result;

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Forms Home: published forms, recent and to-review submissions as figures, the forms changed
+    last and the newest submissions, and New Form (Module Home pattern).
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Forms Home</masterLabel>
+  <targets>
+    <target>lightning__AppPage</target>
+    <target>lightning__Tab</target>
+  </targets>
+</LightningComponentBundle>

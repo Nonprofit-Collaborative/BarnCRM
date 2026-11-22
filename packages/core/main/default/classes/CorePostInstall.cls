@@ -162,7 +162,7 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 	 */
 	@TestVisible
 	private static Boolean hasBeenSetUp() {
-		if (BarnCRM_Settings__c.getOrgDefaults().Id != null) {
+		if (BarnCRM_Settings__c.getOrgDefaults().Id != null || SettingStore.hasAnyValue()) {
 			return true;
 		}
 		Id householdType = HouseholdService.householdRecordTypeId();
@@ -282,6 +282,13 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 	private void storeOrganizationRecordType() {
 		try {
 			AccountKinds.storeDetectedIfBlank();
+		} catch (Exception e) {
+			ErrorLogger.log(e, ORGANIZATION_CONTEXT);
+		}
+		// Each install and upgrade sets Is Organization on any account whose flag disagrees: the
+		// first time on an org upgraded from the formula field, every organization.
+		try {
+			OrganizationFlagBatch.run();
 		} catch (Exception e) {
 			ErrorLogger.log(e, ORGANIZATION_CONTEXT);
 		}

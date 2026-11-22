@@ -6,6 +6,7 @@ import previewFile from '@salesforce/apex/BulkDeleteController.previewFile';
 import startFile from '@salesforce/apex/BulkDeleteController.startFile';
 import backupPage from '@salesforce/apex/BulkDeleteController.backupPage';
 import startArchive from '@salesforce/apex/BulkDeleteController.startArchive';
+import getArchiveDestination from '@salesforce/apex/BulkDeleteController.getArchiveDestination';
 import ARCHIVE_TITLE from '@salesforce/label/c.Core_Archive_Title';
 import ARCHIVE_BUTTON from '@salesforce/label/c.Core_Archive_Button';
 import EMPTY_BIN from '@salesforce/label/c.Core_Archive_EmptyBin';
@@ -59,6 +60,35 @@ export default class BulkDelete extends LightningElement {
         this.helpReady = true;
       });
     }
+    if (this.archive) {
+      Promise.resolve(getArchiveDestination())
+        .then((status) => {
+          this.destination = status;
+        })
+        .catch(() => {
+          this.destination = undefined;
+        });
+    }
+  }
+
+  /** The off-platform destination for an archive (R-SQ17): whether installed, and a note. */
+  destination;
+  offPlatform = false;
+
+  get offPlatformAvailable() {
+    return Boolean(this.destination && this.destination.available);
+  }
+
+  get offPlatformNote() {
+    return (this.destination && this.destination.note) || '';
+  }
+
+  get offPlatformLabel() {
+    return helpText('Core', 'Core_OffPlatform_ArchiveOption');
+  }
+
+  handleOffPlatform(event) {
+    this.offPlatform = event.target.checked;
   }
 
   @api queryJson;
@@ -307,7 +337,8 @@ export default class BulkDelete extends LightningElement {
         this.job = await startArchive({
           queryJson: this.queryJson,
           confirmedCount,
-          emptyConfirmedCount: this.emptyBin ? Number(this.emptyConfirmText) : null
+          emptyConfirmedCount: this.emptyBin ? Number(this.emptyConfirmText) : null,
+          destination: this.offPlatformAvailable && this.offPlatform ? 'offPlatform' : 'files'
         });
       } else {
         this.job = this.batchId

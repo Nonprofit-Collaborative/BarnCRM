@@ -23,7 +23,7 @@ public with sharing class DonorLevelSchedulable implements Schedulable {
 	private static Date todayOverride;
 
 	public void execute(SchedulableContext context) {
-		Datetime last = Giving_Settings__c.getOrgDefaults().Donor_Levels_Last_Recalculated__c;
+		Datetime last = GivingState.moment(GivingState.DONOR_LEVELS_RECALCULATED);
 		if (needsFullPass(last)) {
 			// Donor scores are kept whether or not levels are on (the Automation page switches
 			// them); the batch places levels only when they are enabled (G-19, R-DT5).

@@ -18,6 +18,29 @@
                 <c-barn-notice class="slds-var-m-bottom_small" message={labels.readOnly} data-id="read-only"></c-barn-notice>
             </template>
 
+            <template lwc:if={carryOverNeeded}>
+                <div
+                    class="slds-scoped-notification slds-scoped-notification_light slds-media slds-media_center slds-var-m-bottom_small"
+                    data-id="carry-over-banner"
+                >
+                    <div class="slds-media__figure">
+                        <lightning-icon icon-name="utility:info" size="small"></lightning-icon>
+                    </div>
+                    <div class="slds-media__body">
+                        <p class="slds-text-title_bold">{labels.carryOverTitle}</p>
+                        <p>{labels.carryOverText}</p>
+                    </div>
+                    <div class="slds-media__figure slds-media__figure_reverse">
+                        <lightning-button
+                            label={labels.carryOverButton}
+                            data-id="carry-over"
+                            disabled={saving}
+                            onclick={handleCarryOver}
+                        ></lightning-button>
+                    </div>
+                </div>
+            </template>
+
             <div class="slds-grid slds-wrap slds-gutters">
                 <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
                     <c-settings-search onsettingselect={handleSearchSelect}></c-settings-search>

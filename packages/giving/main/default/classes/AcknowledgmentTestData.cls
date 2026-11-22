@@ -6,10 +6,7 @@
 public class AcknowledgmentTestData {
 	/** Turns the feature on and grants the send permission for the length of the test. */
 	public static void enable() {
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		settings.SetupOwnerId = UserInfo.getOrganizationId();
-		settings.Acknowledgments_Enabled__c = true;
-		upsert settings;
+		ModuleSettings.setForTest('Giving_Acknowledgments_Enabled', true);
 		AcknowledgmentService.sendPermission = true;
 	}
 

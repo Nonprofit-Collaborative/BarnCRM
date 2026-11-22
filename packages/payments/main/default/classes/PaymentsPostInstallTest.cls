@@ -2,7 +2,7 @@
  * Maria installs Payments and can open it straight away: she holds Payments Admin, the roles hold
  * their sets, and nothing in the install can fail it.
  */
-@IsTest(testFor='ApexClass:PaymentsPostInstall')
+@IsTest(testFor='ApexClass:PaymentsPostInstall, ApexClass:PaymentService')
 private class PaymentsPostInstallTest {
 	@TestSetup
 	static void createTestUser() {
@@ -72,6 +72,34 @@ private class PaymentsPostInstallTest {
 			Test.stopTest();
 
 			Assert.isTrue(accessErrors() >= 1, 'The refusal is in the Error Log');
+		}
+	}
+
+	/**
+	 * An upgraded org whose legacy settings hold the receiver token: the install keeps only its
+	 * hash, so the addresses already given keep working once the legacy settings are gone.
+	 */
+	@IsTest
+	static void anUpgradedOrgsTokenKeepsWorkingAsAHash() {
+		System.runAs(TestUsers.admin()) {
+			String legacyToken = 'aa11bb22cc33dd44ee55ff66aa77bb88';
+			insert as system SettingsService.firstSaveRecord();
+			Payments_Settings__c legacy = new Payments_Settings__c(
+				SetupOwnerId = UserInfo.getOrganizationId(),
+				Webhook_Token__c = legacyToken
+			);
+			insert as system legacy;
+			ModuleSettings.clearCache();
+			Assert.isTrue(PaymentService.tokenMatches(legacyToken), 'Read from the legacy settings before the install');
+
+			new PaymentsPostInstall().runSetup(null);
+			delete as system legacy;
+			ModuleSettings.clearCache();
+			SettingsState.clearCache();
+
+			Assert.isTrue(PaymentService.hasWebhookToken(), 'The hash is kept');
+			Assert.isTrue(PaymentService.tokenMatches(legacyToken), 'The old addresses still work');
+			Assert.isFalse(PaymentService.tokenMatches('not-the-token'), 'Another token does not');
 		}
 	}
 }

@@ -76,10 +76,9 @@ private class AddressVerificationControllerTest {
 				'Through the Named Credential'
 			);
 			Assert.isTrue(AddressVerifier.isReady(), 'Smarty, the default provider, is ready');
-			Address_Verification_Settings__c stored = Address_Verification_Settings__c.getOrgDefaults();
-			Assert.areEqual(AddressVerifier.SMARTY, stored.Connected_Provider__c, 'Recorded');
-			Assert.isTrue(stored.Verify_On_Save__c, 'The first save keeps Verify On Save on');
-			Assert.areEqual(200, stored.Nightly_Limit__c, 'And the shipped limit');
+			Assert.areEqual(AddressVerifier.SMARTY, AddressVerifier.connectedProvider(), 'Recorded');
+			Assert.isTrue(AddressVerifier.verifyOnSave(), 'Verify On Save ships on');
+			Assert.areEqual(200, AddressVerifier.nightlyLimit(), 'And the shipped limit');
 		}
 	}
 
@@ -98,7 +97,7 @@ private class AddressVerificationControllerTest {
 
 			Assert.isTrue(said.contains('403'), said);
 			Assert.isFalse(AddressVerifier.isReady(), 'No longer used');
-			Assert.isNull(Address_Verification_Settings__c.getOrgDefaults().Connected_Provider__c);
+			Assert.isNull(AddressVerifier.connectedProvider());
 		}
 	}
 
@@ -132,7 +131,7 @@ private class AddressVerificationControllerTest {
 				Assert.isNotNull(expected.getMessage(), 'Refused with a message');
 			}
 		}
-		Assert.isNull(Address_Verification_Settings__c.getOrgDefaults().Connected_Provider__c, 'Nothing saved');
+		Assert.isNull(AddressVerifier.connectedProvider(), 'Nothing saved');
 	}
 
 	@IsTest
@@ -152,6 +151,7 @@ private class AddressVerificationControllerTest {
 			Assert.isFalse(stepBefore.active, 'The step waits for a connection');
 			Assert.isTrue(stepAfter.active, 'Then runs');
 			Assert.isTrue(stepAfter.switchDefault, 'Its switch ships on');
+			Assert.areEqual(230, stepAfter.minute, 'At 3:50, after the other 3:30 and 3:40 steps');
 			Assert.areEqual(
 				BarnHelp.text('AddressVerification', 'AddressVerification_Setup_NotStarted'),
 				notStarted,

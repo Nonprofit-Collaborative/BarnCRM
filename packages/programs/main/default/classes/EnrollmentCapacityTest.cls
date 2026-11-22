@@ -18,10 +18,7 @@ private class EnrollmentCapacityTest {
 		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 		settings.Auto_Create_Households__c = false;
 		TestDataFactory.saveSettings(settings);
-		OrgSettingsSystemWriter.save(
-			Programs_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{ Programs_Settings__c.Waitlist_Enabled__c => waitlist }
-		);
+		ModuleSettings.setForTest('Programs_Waitlist_Enabled', waitlist);
 		SettingsService.clearCaches();
 	}
 

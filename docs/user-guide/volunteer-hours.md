@@ -35,7 +35,7 @@ BarnCRM records hours for the length of the shift. See
 You should see: "Hours logged." and the form closes. The entry waits as **Submitted** until a
 coordinator approves it (if your organization requires approval).
 
-In the **BarnCRM** app, a person's page has a **Volunteering at a Glance** card with their
+In the **BarnCRM Console** app, a person's page has a **Volunteering at a Glance** card with their
 **Volunteer Hours This Year** and **Last Volunteer Date**. Its **Log Hours** button opens the
 same form on them, and after **Save** you are back on their page.
 

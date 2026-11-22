@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+  <brand>
+    <headerColor>#1E2A3A</headerColor>
+    <logo>BarnCRM_Patch_Members_Partners_Logo</logo>
+    <logoVersion>1</logoVersion>
+    <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
+  </brand>
+  <description>
+    Members and partners: memberships, levels and certifications from Memberships, and companies,
+    boards, agreements and compliance from Corporate Hub. Each installed module adds its pages.
+  </description>
+  <formFactors>Large</formFactors>
+  <formFactors>Small</formFactors>
+  <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
+  <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
+  <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
+  <label>BarnCRM Members and Partners</label>
+  <navType>Console</navType>
+  <tabs>standard-report</tabs>
+  <tabs>standard-Dashboard</tabs>
+  <tabs>Error_Log__c</tabs>
+  <uiType>Lightning</uiType>
+  <workspaceConfig>
+    <mappings>
+      <tab>standard-report</tab>
+    </mappings>
+    <mappings>
+      <tab>standard-Dashboard</tab>
+    </mappings>
+    <mappings>
+      <tab>Error_Log__c</tab>
+    </mappings>
+  </workspaceConfig>
+</CustomApplication>

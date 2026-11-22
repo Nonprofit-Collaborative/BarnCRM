@@ -90,6 +90,44 @@ public class ReceiptTestDataFactory {
 	}
 
 	/**
+	 * The organization that issues receipts. Saved on the legacy settings record, which a class
+	 * that sets up in @TestSetup keeps for every test (read until carry-over), and put in the
+	 * settings store for this transaction, which is read first and clears the cached settings.
+	 */
+	public static void useOrganization() {
+		Map<String, Object> organization = new Map<String, Object>{
+			'Organization_Legal_Name__c' => 'Hope For Homes',
+			'Organization_Street__c' => '14 Bridge Street',
+			'Organization_Street_2__c' => 'Suite 3',
+			'Organization_City__c' => 'Springfield',
+			'Organization_State__c' => 'IL',
+			'Organization_Postal_Code__c' => '62701'
+		};
+		BarnCRM_Settings__c core = BarnCRM_Settings__c.getOrgDefaults();
+		core.SetupOwnerId = UserInfo.getOrganizationId();
+		for (String key : organization.keySet()) {
+			core.put(key, organization.get(key));
+		}
+		upsert core;
+		for (String key : organization.keySet()) {
+			SettingsService.setForTest(key, organization.get(key));
+		}
+	}
+
+	/**
+	 * The Giving settings a receipt prints. A store value lasts one transaction, so a test class
+	 * whose setup issues receipts also calls this from a static block.
+	 */
+	public static void useReceiptSettings() {
+		ModuleSettings.setForTest('Giving_Receipt_Number_Prefix', 'HFH');
+		ModuleSettings.setForTest('Giving_Receipt_Next_Counter', 1);
+		ModuleSettings.setForTest('Giving_Receipt_Place_Of_Issue', 'Springfield');
+		ModuleSettings.setForTest('Giving_Organization_EIN', '12-3456789');
+		ModuleSettings.setForTest('Giving_Receipt_Signer_Name', 'Tom Alvarez');
+		ModuleSettings.setForTest('Giving_Receipt_Signer_Title', 'Executive Director');
+	}
+
+	/**
 	 * Everything a receipt needs before it can be issued: an organization to issue it, a numbering
 	 * prefix, a letter of each kind, permission to issue and to manage the letters, a renderer
 	 * that does not need a PDF engine, and a default fund so the gifts being receipted can be
@@ -98,25 +136,9 @@ public class ReceiptTestDataFactory {
 	public static RecordingRenderer setUpReceipting() {
 		GivingTestDataFactory.ensureDefaultFund();
 
-		BarnCRM_Settings__c core = BarnCRM_Settings__c.getOrgDefaults();
-		core.SetupOwnerId = UserInfo.getOrganizationId();
-		core.Organization_Legal_Name__c = 'Hope For Homes';
-		core.Organization_Street__c = '14 Bridge Street';
-		core.Organization_Street_2__c = 'Suite 3';
-		core.Organization_City__c = 'Springfield';
-		core.Organization_State__c = 'IL';
-		core.Organization_Postal_Code__c = '62701';
-		upsert core;
+		useOrganization();
 
-		Giving_Settings__c giving = Giving_Settings__c.getOrgDefaults();
-		giving.SetupOwnerId = UserInfo.getOrganizationId();
-		giving.Receipt_Number_Prefix__c = 'HFH';
-		giving.Receipt_Next_Counter__c = 1;
-		giving.Receipt_Place_Of_Issue__c = 'Springfield';
-		giving.Organization_EIN__c = '12-3456789';
-		giving.Receipt_Signer_Name__c = 'Tom Alvarez';
-		giving.Receipt_Signer_Title__c = 'Executive Director';
-		upsert giving;
+		useReceiptSettings();
 
 		insert new List<Receipt_Template__c>{
 			new Receipt_Template__c(

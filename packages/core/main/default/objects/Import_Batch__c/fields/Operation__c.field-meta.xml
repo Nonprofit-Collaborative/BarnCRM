@@ -41,6 +41,11 @@
         <default>false</default>
         <label>Files</label>
       </value>
+      <value>
+        <fullName>Archive</fullName>
+        <default>false</default>
+        <label>Archive</label>
+      </value>
     </valueSetDefinition>
   </valueSet>
 </CustomField>

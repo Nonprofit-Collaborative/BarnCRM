@@ -4,6 +4,7 @@
     "description": ["Part of the BarnCRM Admin role. Give the role, not this set. Settings, custom metadata,", "automation control, Error Log; View All and Modify All on Account and Contact (ADR-0142)."],
     "add": {
       "classAccesses": {
+        "ArchiveController": {"enabled": "true"},
         "AutoMergeController": {"enabled": "true"},
         "BackupSetController": {"enabled": "true"},
         "BulkUpdateController": {"enabled": "true"},
@@ -33,6 +34,12 @@
       },
       "fieldPermissions": {
         "Account.BillingAddress": {"editable": "true", "readable": "true"},
+        "Archived_Record__b.Owner_Id__c": {"editable": "true", "readable": "true"},
+        "Archived_Record__b.Person_Ids__c": {"editable": "true", "readable": "true"},
+        "Archived_Record__b.Record_JSON__c": {"editable": "true", "readable": "true"},
+        "Archived_Record__b.Record_Name__c": {"editable": "true", "readable": "true"},
+        "Archived_Record__b.Rule_Id__c": {"editable": "true", "readable": "true"},
+        "Archived_Record__b.Rule_Name__c": {"editable": "true", "readable": "true"},
         "Account.Phone": {"editable": "true", "readable": "true"},
         "Account.Sample_Data_Key__c": {"editable": "true", "readable": "true"},
         "Account.Sample_Data__c": {"editable": "true", "readable": "true"},
@@ -108,11 +115,13 @@
         "Merge_Journal__c.State_JSON__c": {"editable": "true", "readable": "true"},
         "Merge_Journal__c.Status__c": {"editable": "true", "readable": "true"},
         "Merge_Journal__c.Survivor_Id__c": {"editable": "true", "readable": "true"},
+        "Nightly_Job__c.Kind__c": {"editable": "false", "readable": "true"},
         "Nightly_Job__c.Last_Finished__c": {"editable": "false", "readable": "true"},
         "Nightly_Job__c.Last_Message__c": {"editable": "false", "readable": "true"},
         "Nightly_Job__c.Last_Outcome__c": {"editable": "false", "readable": "true"},
         "Nightly_Job__c.Last_Started__c": {"editable": "false", "readable": "true"},
         "Nightly_Job__c.Switch__c": {"editable": "false", "readable": "true"},
+        "Nightly_Job__c.Value__c": {"editable": "false", "readable": "true"},
         "Relationship__c.Sample_Data__c": {"editable": "true", "readable": "true"},
         "Saved_Query__c.Object_Name__c": {"editable": "true", "readable": "true"},
         "Saved_Query__c.Query_JSON__c": {"editable": "true", "readable": "true"},
@@ -130,6 +139,7 @@
         "Setup_Change__c.Section__c": {"editable": "false", "readable": "true"}
       },
       "objectPermissions": {
+        "Archived_Record__b": {"allowCreate": "true", "allowDelete": "false", "allowEdit": "false", "allowRead": "true", "modifyAllRecords": "false", "viewAllRecords": "false"},
         "Erasure__c": {"allowCreate": "false", "allowDelete": "false", "allowEdit": "false", "allowRead": "true", "modifyAllRecords": "false", "viewAllRecords": "false"},
         "Field_Utilization_Snapshot__c": {"allowCreate": "true", "allowDelete": "true", "allowEdit": "true", "allowRead": "true", "modifyAllRecords": "true", "viewAllRecords": "true"},
         "Import_Journal__c": {"allowCreate": "false", "allowDelete": "false", "allowEdit": "false", "allowRead": "true", "modifyAllRecords": "false", "viewAllRecords": "false"},

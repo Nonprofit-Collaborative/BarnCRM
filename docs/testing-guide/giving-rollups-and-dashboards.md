@@ -160,7 +160,7 @@ For every script on this page:
 | 7 | Read the charts. | **Giving by Month** (a column per month) and **Open Asks by Stage** (a bar per stage) show sample data, in Salesforce's own colors, and follow dark mode when it is on. Click one: its report opens from the **BarnCRM Fundraising** folder. |
 | 8 | As staff, open Fundraising Home. | The figures and **Enter a Gift** show. **Fundraising Setup** has **Pledge Reminders** and **Receipt Letters** only. |
 | 9 | As read-only, open Fundraising Home. | The figures show; **Enter a Gift** does not; **Fundraising Setup** has **Pledge Reminders** and **Receipt Letters**. |
-| 10 | As admin, open the **BarnCRM** app's **Home**. | Beside **Errors**, the **Errors Logged by Day** chart shows the last 30 days of Error and Critical Error Log entries. As staff, the chart does not show. |
+| 10 | As admin, open the **BarnCRM Console** app's **Home**. | Beside **Errors**, the **Errors Logged by Day** chart shows the last 30 days of Error and Critical Error Log entries. As staff, the chart does not show. |
 | 11 | On a phone, open BarnCRM Fundraising. | Fundraising Home shows the figures two across, then Enter a Gift, then the setup tiles and charts stacked. |
 | 12 | As admin, on Fundraising Home read **More**. | Eight tiles, each with an icon and one line: **Asks**, **Scheduled Payments**, **Funds**, **Appeals**, **Tributes**, **Donor Segments**, **Recurring Donor Health**, **Dashboards**. Click **Funds**: the Funds list opens. Go back and click **Donor Segments**: its page opens. Go back and click **Dashboards**: the Dashboards home opens. |
 | 13 | Open the App Launcher and search `Appeals`. | **Appeals** is listed and opens its list. |

@@ -125,6 +125,11 @@ private class ProjectRequestsTest {
 		System.runAs(ProjectsTestData.admin()) {
 			Database.SaveResult off = Database.insert(request('Off', 'Low', null), false);
 			Assert.isFalse(off.isSuccess(), 'Refused while requests are off');
+			Assert.areEqual(
+				BarnHelp.text('Projects', 'Projects_Requests_TurnedOff'),
+				off.getErrors()[0].getMessage(),
+				'By the request rules, saying how to turn them on'
+			);
 			Assert.isFalse(ProjectRequestsController.getRequests('open').enabled, 'Page off');
 			turnOn(false);
 			Project_Request__c outside = request('Outside', 'Low', null);

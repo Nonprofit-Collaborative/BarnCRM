@@ -81,6 +81,16 @@ public with sharing class DataManagerController {
 		return NamespaceUtil.stateKey('tool');
 	}
 
+	/**
+	 * The page state key that opens one of Data Manager's panels in place of the hub, for
+	 * example Archived Records from Org Optimizer: `c__panel` here, the namespace's own prefix
+	 * inside a managed package.
+	 */
+	@AuraEnabled(cacheable=true)
+	public static String panelStateKey() {
+		return NamespaceUtil.stateKey('panel');
+	}
+
 	/** Whether the Org Optimizer module is installed, so its card shows only when it opens. */
 	@AuraEnabled(cacheable=true)
 	public static Boolean orgOptimizerInstalled() {

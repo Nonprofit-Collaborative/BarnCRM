@@ -20,7 +20,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 6 | Look under **Salesforce's Own Tools**. | Three tiles: **Weekly Data Export**, **Recycle Bin**, **Data Import Wizard**, each with a small new-window icon after its name. |
 | 7 | Click the **Recycle Bin** tile. | A new browser tab opens Salesforce's Recycle Bin. Close it. |
 | 8 | Close **About This Tool** and reload the page. | It stays closed. |
-| 9 | Check the app's navigation bar, in **BarnCRM** and in **BarnCRM Admin**. | **Data Manager** is there in both. **Find**, **Super Importer**, **Super Transformer** and **Import Rows** are in neither. In **BarnCRM Admin** the tabs are **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matching** and **Error Log**, last. |
+| 9 | Check the app's navigation bar, in **BarnCRM Console** and in **BarnCRM Admin Console**. | **Data Manager** is there in both. **Find**, **Super Importer**, **Super Transformer** and **Import Rows** are in neither. In **BarnCRM Admin Console** the tabs are **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matching** and **Error Log**, last. |
 | 10 | With Fundraising and Volunteers installed, look at the module tabs in the navigation (for example **Gifts**, **Donor Levels**, **Volunteer Hours**). | Each tab has its own icon, and no two BarnCRM tabs show the same one. |
 
 **Cleanup:** None.
@@ -68,11 +68,11 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As admin, open **BarnCRM**, **BarnCRM Console**, **BarnCRM Admin** and **BarnCRM Admin Console** in turn, and check each navigation bar or menu. | **Data Manager** is in all four. **Find**, **Super Importer**, **Super Transformer** and **Import Rows** are in none. |
-| 2 | In **BarnCRM**, open **Data Manager** and click **Find**. | The **Find** tab opens and works: choose **Contact** and run a query. |
-| 3 | In **BarnCRM Admin**, open **Data Manager** and click **Super Importer**. | The **Super Importer** tab opens on its first step. |
+| 1 | As admin, open **BarnCRM Console**, **BarnCRM Console**, **BarnCRM Admin Console** in turn, and check each navigation bar or menu. | **Data Manager** is in all four. **Find**, **Super Importer**, **Super Transformer** and **Import Rows** are in none. |
+| 2 | In **BarnCRM Console**, open **Data Manager** and click **Find**. | The **Find** tab opens and works: choose **Contact** and run a query. |
+| 3 | In **BarnCRM Admin Console**, open **Data Manager** and click **Super Importer**. | The **Super Importer** tab opens on its first step. |
 | 4 | Open **Org Optimizer**, and press **Open in Find** next to any check. | The **Find** tab opens with that check's query. |
-| 5 | As staff, open **BarnCRM**. | **Data Manager** is in the navigation; **Find** is not. On **Data Manager**, the **Find** tile opens Find. |
+| 5 | As staff, open **BarnCRM Console**. | **Data Manager** is in the navigation; **Find** is not. On **Data Manager**, the **Find** tile opens Find. |
 
 **Cleanup:** None.
 

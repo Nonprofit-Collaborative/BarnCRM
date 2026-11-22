@@ -313,3 +313,79 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | 7 | Choose **Contact tidy** and press **Apply Map**. | A confirmation says the map replaces the changes already chosen. **Cancel** keeps the **Description** row as it was. |
 
 **Cleanup:** delete the Maptest contacts and the **Contact tidy** map.
+
+## T-BULK-19: Scheduled Backup Sets
+
+**Purpose:** confirm a Backup Set's schedule is saved and kept, the nightly Backup Sets step starts only the sets due, and a scheduled set keeps only its newest runs' files.
+**Prerequisites:** T-BULK-17's admin, contacts and saved query `Baktest people` added to Backup Sets; the nightly jobs scheduled (BarnCRM Settings, General, Nightly Jobs). A second saved query `Baktest other` added to Backup Sets. In BarnCRM Settings, Import, **Backup Runs Kept** set to 2.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open Backup Sets. | Each set shows "Not scheduled". **Edit Schedule** shows beside your own sets only. |
+| 2 | Press **Edit Schedule** beside `Baktest people`, choose **Weekly**, then today's day of the week, and **Save Schedule**. | "Schedule saved."; the set shows "Weekly on" today's day. A note says scheduled sets run at 2:00 AM and keep the files of their newest 2 runs. |
+| 3 | Give `Baktest other` **Weekly** on tomorrow's day of the week. In Find, open `Baktest people`, change a column and **Save**. Reopen Backup Sets. | `Baktest people` still shows its weekly schedule. |
+| 4 | In BarnCRM Settings, General, Nightly Jobs, press **Run Now** on **Backup Sets** if offered, or wait for the next night's run. | One new run of `Baktest people` only; its log says "Started by its weekly schedule." `Baktest other` did not run. |
+| 5 | Press **Run Now** on `Baktest people` twice, waiting for each to complete. | After the second, **Recent Runs** shows the oldest of the three runs with no file, and its log (Data Jobs) ends "Files removed: a scheduled set keeps the files of its newest 2 runs." Its file is gone from Files; the two newest files remain. |
+| 6 | Turn the nightly jobs' **Backup Sets** step off. Reopen Backup Sets. | A warning says the nightly jobs are not scheduled or their Backup Sets step is off. Turn the step back on. |
+| 7 | **Edit Schedule** on `Baktest people`, choose **Not scheduled**, **Save Schedule**, then **Run Now** twice. | Every run keeps its file: a set run only on demand keeps every file. |
+
+**Cleanup:** delete the runs' files and `Baktest other`; set **Backup Runs Kept** back to 7; then T-BULK-17's cleanup.
+
+## T-BULK-20: Off-Platform Backups and Archives
+
+**Purpose:** confirm the backup destination is offered only with a destination installed, a run's files are sent and kept or removed as set, a refused file waits and is sent again, and an archive deletes only after its file was accepted.
+**Prerequisites:** T-BULK-17's admin and `Baktest people` Backup Set. For steps 2 to 7: BarnCRM Connector with a connection set as the **Backup Destination** to a test HTTPS endpoint you can watch (T-CN-35 in the Connector testing guide sets one up), and BarnCRM Connections given to the admin and the nightly jobs' user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Without BarnCRM Connector installed, open Backup Sets and press **Edit Schedule**. Open Find, archive any query (Data Manager, **Archive by Query**) up to **Preview**. | No **Save To** choice; a note says to install BarnCRM Connector and set up a backup destination. The archive panel shows the same note and no send option. |
+| 2 | With the Connector set up, **Edit Schedule** on `Baktest people`, choose **Daily** and **Files and backup destination**, **Save Schedule**, then **Run Now**. | **Recent Runs** shows "Sending to backup destination", then "Sent to backup destination". The endpoint received one CSV file per part, named as in Files. The files are still in Files. |
+| 3 | In BarnCRM Settings, Import, turn on **Remove Files Copy After Sending**. **Run Now** again. | Once sent, the run's file link is gone and its log says the files were removed from Files. |
+| 4 | Make the endpoint refuse uploads (or point the connection's path at a place it refuses). **Run Now**. | The run shows "Not all sent: the next scheduled run tries again"; the Error Log has an Error naming the file and the endpoint's answer; the file stays in Files even with step 3's setting on. |
+| 5 | Let the endpoint accept uploads again. In BarnCRM Settings, General, Nightly Jobs, **Run Now** on **Backup Sets**. | The waiting run becomes "Sent to backup destination". |
+| 6 | Archive three test contacts with **Send the file to your backup destination before deleting** ticked while the endpoint refuses uploads. | The job ends **Failed**; its log says the file was not sent so nothing was deleted; the three contacts remain; the file is in Files. |
+| 7 | Repeat step 6 with the endpoint accepting uploads. | The log says the files were sent, then the delete runs and the three contacts are deleted. |
+
+**Cleanup:** turn **Remove Files Copy After Sending** off; set `Baktest people` back to **Not scheduled** and **Files**; delete the endpoint's test files and the runs' files; then T-BULK-17's cleanup.
+## T-BULK-21: Archive Rules to the Big Object
+
+**Purpose:** confirm an archive rule copies records into the Archived Record big object before deleting them, keeps records changed during the run, counts archived rows, and runs on its schedule (AR-10).
+**Prerequisites:** run in barn-platform (Platform-only). Admin with the **BarnCRM Admin** permission set; four contacts with Last Name `Arcbig` (First Name Big1 to Big4); a saved Find query `Arcbig people` (Contact, Last Name equals `Arcbig`). A second user with only **BarnCRM Find and Export**. Setup detail: [Archive Rules](../admin-guide/archive-rules.md).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Data Manager** as the admin, then as the second user. | The admin sees an **Archive Rules** tile under **Find and Change**; the second user does not. |
+| 2 | As the admin, select **Archive Rules**. | The panel shows "No rules yet", the **Archived records** meter against the 1,000,000 included, and **Add a Rule** offering `Arcbig people`. |
+| 3 | Choose `Arcbig people` and press **Add**. Set **Where Records Go** to **Off Platform** and press **Save**. | A message says no off-platform store is set up, and the rule is not saved. |
+| 4 | Set **Where Records Go** to **Big Object**, **How Often** to **Only when I run it**, and press **Save**. | The rule is listed with "Only when run". |
+| 5 | Press **Preview and Run**. | "4 Contacts match now", up to five sample names, and any related records deleted with them. **Run Now** stays disabled until **Number of records** holds `4`. |
+| 6 | Type `4` and press **Run Now**. While it shows Running, change Big4's Title. | **Recent Runs** shows the run, then "3 moved, 1 left out"; its run log names Big4 as changed since the run started. If the run ends before the edit, all four move; repeat with a fresh Big4. |
+| 7 | Run `Arcbig people` in Find. | Only Big4 is returned. The Recycle Bin holds Big1 to Big3. The meter counts 3 more archived records. |
+| 8 | In the Developer Console, query `SELECT Object_Name__c, Original_Id__c, Record_Name__c FROM Archived_Record__b WHERE Object_Name__c = 'Contact'`. | Three rows, for Big1 to Big3. |
+| 9 | **Edit** the rule, set **How Often** to **Weekly** and **Day** to today, and press **Save**. | A box asks for the current count, 1; another number is refused with "Nothing was saved". With `1` the rule shows "Weekly on" today. |
+| 10 | In **BarnCRM Settings**, **General**, **Nightly Jobs**, find **Archive Rules**, then let the nightly run happen. | The step is listed and on. After the run, **Recent Runs** lists a run that moved Big4. |
+| 11 | Untick **Active**, type the count if asked, and **Save**. | The rule shows "(paused)" and the next nightly run starts nothing for it. |
+| 12 | **Remove** the rule. | It moves back to **Add a Rule**; the saved query and the archived rows remain. |
+
+**Cleanup:** none before T-BULK-22, which views, restores and erases these archived rows. Afterwards delete the Arcbig households and the saved query.
+
+## T-BULK-22: Archived Records, Restore and Erasure
+
+**Purpose:** confirm the Archived Records panel lists and shows archived rows only to holders of the grant, a restore creates records again with new Ids, leaves out lookups to records gone, removes the rows and lowers the count, a failed row stays archived, and erasing a person deletes the archived rows that name them (AR-10).
+**Prerequisites:** run in barn-platform (Platform-only) right after T-BULK-21, with Big1 to Big4 archived. Before archiving, set Big1's **Reports To** to a contact `Arcboss Staff`, then delete `Arcboss Staff` after the archive run. The second user from T-BULK-21, and a third user with **BarnCRM Admin** but not **BarnCRM Bulk Delete**. Setup detail: [Archive Rules](../admin-guide/archive-rules.md#6-archived-records-looking-records-up).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Data Manager** as the second user. | No **Archived Records** tile. |
+| 2 | As the admin, open **Org Optimizer**, **Storage and Limits**, and press **View Archived Records**. | Data Manager opens on the **Archived Records** panel, which says each archived record holds every field the archiving person could read. |
+| 3 | Choose **Contact** and press **Show**. | Big1 to Big4 are listed newest first, with Original Id, Archived, Rule `Arcbig people` and Archived By. Setting **Archived From** and **Archived To** to yesterday and pressing **Show** lists nothing. |
+| 4 | Press **View** on Big1. | Its fields (First Name Big1, Last Name Arcbig, Reports To Id and the others) are listed. |
+| 5 | As the third user, open the panel and show Contact. | Rows show, but no tick boxes and no **Restore**. |
+| 6 | As the admin, tick Big1 and Big2 and press **Restore 2**. Confirm. | The box says each record gets a new Id and what may be left out. A message says the restore started. |
+| 7 | Open **Archive Rules**, **Recent Runs**. | A run named "Restore Contact" ends Complete; its log reads "Restored 003... as 003..." twice, "Left out of" Big1's old Id "ReportsToId", and "Moved 2 records back out of the archive; 0 stay archived". The meter counts 2 fewer. |
+| 8 | Run `Arcbig people` in Find; then show Contact in **Archived Records** again. | Big1 and Big2 are back with new Ids (Big1 without Reports To). Only Big3 and Big4 remain archived. |
+| 9 | As the admin, remove your create access to Contact's **Title** field in a permission set you hold, restore Big3, and put the access back. | Big3 is restored without its Title; the log lists Title as left out. |
+| 10 | Create contacts `Arcerase Two` and `Arcerase Child` (Reports To `Arcerase Two`). Archive `Arcerase Child` with a saved query and a Big Object rule run once. On `Arcerase Two`, open **Erase a Person** and press **Preview**. | The preview lists **Archived records** as deleted. After the preview, **Archived Records** still lists the Arcerase Child row. |
+| 11 | Erase `Arcerase Two`, wait a minute, and show Contact in **Archived Records**. | The Arcerase Child row is gone, and the meter counts 1 fewer. |
+
+**Cleanup:** delete the Arcbig and Arcerase contacts and households, the saved queries, and restore or `Database.deleteImmediate` any archived rows left.

@@ -7,7 +7,7 @@
     and member certification. Given to BarnCRM Admin holders.
   </description>
   <applicationVisibilities>
-    <application>BarnCRM_Memberships</application>
+    <application>BarnCRM_Members_Partners</application>
     <visible>true</visible>
   </applicationVisibilities>
   <classAccesses>
@@ -341,6 +341,10 @@
   </tabSettings>
   <tabSettings>
     <tab>Membership_Term__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Memberships_Home</tab>
     <visibility>Visible</visibility>
   </tabSettings>
 </PermissionSet>

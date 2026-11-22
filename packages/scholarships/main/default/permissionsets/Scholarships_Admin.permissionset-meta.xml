@@ -7,7 +7,7 @@
     awards, assign reviewers, mark disbursements paid). Given to BarnCRM Admin holders.
   </description>
   <applicationVisibilities>
-    <application>BarnCRM_Scholarships</application>
+    <application>BarnCRM</application>
     <visible>true</visible>
   </applicationVisibilities>
   <classAccesses>

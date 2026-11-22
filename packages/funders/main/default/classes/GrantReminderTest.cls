@@ -20,15 +20,9 @@ private class GrantReminderTest {
 	}
 
 	private static void settings(Boolean tasks, Boolean emails, Integer leadDays) {
-		OrgSettingsSystemWriter.save(
-			Funders_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{
-				Funders_Settings__c.Reminder_Tasks_Enabled__c => tasks,
-				Funders_Settings__c.Reminder_Emails_Enabled__c => emails,
-				Funders_Settings__c.Reminder_Lead_Days__c => leadDays
-			}
-		);
-		SettingsService.clearCaches();
+		ModuleSettings.setForTest('Funders_Reminder_Tasks_Enabled', tasks);
+		ModuleSettings.setForTest('Funders_Reminder_Emails_Enabled', emails);
+		ModuleSettings.setForTest('Funders_Reminder_Lead_Days', leadDays);
 	}
 
 	private static Grant__c awardedGrant() {

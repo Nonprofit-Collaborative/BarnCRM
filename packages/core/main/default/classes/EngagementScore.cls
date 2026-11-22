@@ -42,14 +42,14 @@ public with sharing class EngagementScore {
 
 	/** True while the organization has scoring on (R-ES1). */
 	public static Boolean isOn() {
-		return BarnCRM_Settings__c.getOrgDefaults()?.Engagement_Score_Enabled__c == true;
+		return SettingsService.getSettings().Engagement_Score_Enabled__c == true;
 	}
 
 	/** The score as the organization's settings have it. */
 	public EngagementScore() {
 		this(
-			BarnCRM_Settings__c.getOrgDefaults()?.Engagement_Score_Weights__c,
-			BarnCRM_Settings__c.getOrgDefaults()?.Engagement_Score_Targets__c
+			SettingsService.getSettings().Engagement_Score_Weights__c,
+			SettingsService.getSettings().Engagement_Score_Targets__c
 		);
 	}
 

@@ -53,22 +53,6 @@ public with sharing class SampleDataSelector {
 		return [SELECT COUNT() FROM Contact WHERE Sample_Data__c = TRUE WITH USER_MODE];
 	}
 
-	public List<Id> getSampleAccountIds() {
-		List<Id> ids = new List<Id>();
-		for (Account acct : [SELECT Id FROM Account WHERE Sample_Data__c = TRUE WITH USER_MODE]) {
-			ids.add(acct.Id);
-		}
-		return ids;
-	}
-
-	public List<Id> getSampleContactIds() {
-		List<Id> ids = new List<Id>();
-		for (Contact con : [SELECT Id FROM Contact WHERE Sample_Data__c = TRUE WITH USER_MODE]) {
-			ids.add(con.Id);
-		}
-		return ids;
-	}
-
 	/**
 	 * How many sample connections there are, as the admin guide counts them: one for each
 	 * pair of people, not one for each side. The loader flags both sides of a connection it
@@ -93,32 +77,6 @@ public with sharing class SampleDataSelector {
 
 	public Integer countSampleAffiliations() {
 		return [SELECT COUNT() FROM Affiliation__c WHERE Sample_Data__c = TRUE WITH USER_MODE];
-	}
-
-	public List<Id> getSampleRelationshipIds() {
-		List<Id> ids = new List<Id>();
-		for (Relationship__c row : [
-			SELECT Id
-			FROM Relationship__c
-			WHERE Sample_Data__c = TRUE
-			WITH USER_MODE
-		]) {
-			ids.add(row.Id);
-		}
-		return ids;
-	}
-
-	public List<Id> getSampleAffiliationIds() {
-		List<Id> ids = new List<Id>();
-		for (Affiliation__c row : [
-			SELECT Id
-			FROM Affiliation__c
-			WHERE Sample_Data__c = TRUE
-			WITH USER_MODE
-		]) {
-			ids.add(row.Id);
-		}
-		return ids;
 	}
 
 	/**

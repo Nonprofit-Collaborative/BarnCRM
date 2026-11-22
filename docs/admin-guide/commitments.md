@@ -36,7 +36,9 @@ Often** and **Start Date**. A one-line preview of the payments shows before anyt
 saved. The screen saves through the same code as the Ask Pipeline's **Record a Pledge**,
 so a pledge from either place is the same record: the total, the number of payments, and
 an amount each time that is the total divided evenly, rounded down, with the last payment
-taking up the cents (rule R-CM5). The override is set on the Commitment object for desktop
+taking up the cents (rule R-CM5). A pledge whose last payment would come to zero or less (the
+amount times the payments before it already reaches the total, which the New screen never makes
+but the standard Edit form or an import can) is refused at save with the reason. The override is set on the Commitment object for desktop
 and phone, through a small Aura wrapper (`commitmentNewOverride`), because Salesforce
 overrides a standard button only with an Aura component. **Edit** still opens the standard
 form, which is where **Day of Month** is set. To put the standard New form back, open

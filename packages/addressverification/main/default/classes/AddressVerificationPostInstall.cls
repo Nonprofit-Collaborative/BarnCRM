@@ -11,14 +11,6 @@
 public with sharing class AddressVerificationPostInstall implements InstallHandler, ModuleSetup {
 	private static final String SWITCH_CONTEXT = 'AddressVerificationPostInstall.ensureAutomationSwitches';
 
-	/**
-	 * Checkboxes that ship on, each turned on once in an org that saved the settings before it
-	 * existed (Core's `ShippedDefaultUpgrades`, QA-F2). Append only;
-	 * `scripts/ci/check-setting-defaults.py` fails the build when one is missing.
-	 */
-	@TestVisible
-	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{};
-
 	public void onInstall(InstallContext context) {
 		if (context != null) {
 			runSetup(context.installerId());
@@ -33,11 +25,6 @@ public with sharing class AddressVerificationPostInstall implements InstallHandl
 
 	public void runSetup(Id installerId) {
 		AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
-		ShippedDefaultUpgrades.apply(
-			AddressVerifier.MODULE,
-			Address_Verification_Settings__c.SObjectType,
-			SHIPPED_ON_ADDED_IN_UPGRADES
-		);
 		ModuleSetups.markRan(AddressVerifier.MODULE);
 		ModuleAccessSyncs.setUp(AddressVerifier.MODULE, installerId);
 	}

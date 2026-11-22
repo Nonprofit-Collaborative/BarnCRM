@@ -34,4 +34,8 @@
     <field>Sort_Order__c</field>
     <value xsi:type="xsd:double">80</value>
   </values>
+  <values>
+    <field>Default_Value__c</field>
+    <value xsi:type="xsd:string">"Gifts 1000, Hours 40, Events 4, Activity 90, Months 12"</value>
+  </values>
 </CustomMetadata>

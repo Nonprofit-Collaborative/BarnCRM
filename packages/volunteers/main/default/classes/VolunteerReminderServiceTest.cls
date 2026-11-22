@@ -17,13 +17,8 @@ private class VolunteerReminderServiceTest {
 	}
 
 	private static void settings(Boolean enabled, Integer leadDays) {
-		OrgSettingsSystemWriter.save(
-			Volunteer_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{
-				Volunteer_Settings__c.Reminders_Enabled__c => enabled,
-				Volunteer_Settings__c.Reminder_Lead_Days__c => leadDays
-			}
-		);
+		ModuleSettings.setForTest('Volunteers_Reminders_Enabled', enabled);
+		ModuleSettings.setForTest('Volunteers_Reminder_Lead_Days', leadDays);
 		SettingsService.clearCaches();
 	}
 

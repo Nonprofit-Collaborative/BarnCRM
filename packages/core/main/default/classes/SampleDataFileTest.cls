@@ -23,14 +23,15 @@ private class SampleDataFileTest {
 					' "count": {"object": "Saved_Query__c", "where": "Name LIKE \'Sample %\'"},' +
 					' "steps": [' +
 					'  {"object": "Saved_Query__c", "records": [' +
-					'   {"key": "first", "Name": "Sample first", "Object_Name__c": "Contact"}]},' +
+					'   {"key": "first", "Name": "Sample first", "Object_Name__c": "Contact", "Sample_Data__c": true}]},' +
 					'  {"object": "Saved_Query__c", "records": [' +
 					'   {"Name": "Sample second", "Object_Name__c": {"ref": "first"},' +
-					'    "Query_JSON__c": {"currentUser": true}},' +
-					'   {"Name": "Sample skipped", "Object_Name__c": {"ref": "nowhere"}},' +
-					'   {"Name": "Sample optional", "Object_Name__c": {"sample": "H999-9", "optional": true}}]},' +
+					'    "Query_JSON__c": {"currentUser": true}, "Sample_Data__c": true},' +
+					'   {"Name": "Sample skipped", "Object_Name__c": {"ref": "nowhere"}, "Sample_Data__c": true},' +
+					'   {"Name": "Sample optional", "Object_Name__c": {"sample": "H999-9", "optional": true},' +
+					'    "Sample_Data__c": true}]},' +
 					'  {"object": "No_Such_Object__c", "records": [{"Name": "x"}]}],' +
-					' "remove": [{"object": "Saved_Query__c", "where": "Name LIKE \'Sample %\'"}]}'
+					' "remove": [{"object": "Saved_Query__c", "where": "Sample_Data__c = TRUE AND Name LIKE \'Sample %\'"}]}'
 			)
 		);
 	}
@@ -96,12 +97,19 @@ private class SampleDataFileTest {
 
 			Saved_Query__c kept = new Saved_Query__c(Name = 'Sample kept', Object_Name__c = 'Contact');
 			insert kept;
-			String message = SampleDataFile.logKept('Testing', new Map<Id, String>{ kept.Id => 'Saved_Query__c' });
-			Assert.isTrue(message.contains('Sample kept'), 'The Warning names the kept record');
+			String message = SampleDataFile.logKept(
+				'Testing',
+				new Map<Id, String>{ kept.Id => 'Saved_Query__c' },
+				new Map<Id, String>{ kept.Id => 'A record of yours points at it' }
+			);
+			Assert.isTrue(
+				message.contains('Sample kept: A record of yours points at it'),
+				'The Warning names the kept record and the reason the delete was refused'
+			);
 			// The entry travels as a platform event; after stopTest it must be delivered.
 			Test.getEventBus().deliver();
 			Assert.areEqual(1, [SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'SampleDataFile']);
-			Assert.isNull(SampleDataFile.logKept('Testing', new Map<Id, String>()));
+			Assert.isNull(SampleDataFile.logKept('Testing', new Map<Id, String>(), null));
 		}
 	}
 

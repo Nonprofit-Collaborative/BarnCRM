@@ -69,7 +69,7 @@ permission set to everyone who holds the BarnCRM Admin role. You need **Manage B
 Settings**, and for a step that loads records also the permission to import (the **BarnCRM
 Admin** role has both).
 
-1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM Admin**.
+1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM Admin Console**.
 2. Open the **Migration Assistant** tab. It lists a kit for each app installed in your org that
    BarnCRM has a kit for, each with **Start**, and, under **Households**, the household tools
    that apply to your org.

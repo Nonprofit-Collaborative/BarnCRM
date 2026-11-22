@@ -609,15 +609,14 @@ private class CommitmentServiceTest {
 			CommitmentService.recordTopUpRun(finishedAt, 'Extended 3 recurring schedules.');
 			Test.stopTest();
 
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 			Assert.areNotEqual(
 				null,
-				settings.Installment_Top_Up_Last_Run__c,
+				GivingState.moment(GivingState.INSTALLMENT_TOP_UP_LAST_RUN),
 				'The job records when it finished, which is what the Hub shows.'
 			);
 			Assert.areEqual(
 				'Extended 3 recurring schedules.',
-				settings.Installment_Top_Up_Last_Run_Summary__c,
+				GivingState.text(GivingState.INSTALLMENT_TOP_UP_SUMMARY),
 				'It also records what it did, because a timestamp alone says only that the job woke up.'
 			);
 		}
@@ -632,15 +631,14 @@ private class CommitmentServiceTest {
 			CommitmentService.recordOverdueRun(finishedAt, 'No payments were overdue.');
 			Test.stopTest();
 
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 			Assert.areNotEqual(
 				null,
-				settings.Installment_Overdue_Last_Run__c,
+				GivingState.moment(GivingState.INSTALLMENT_OVERDUE_LAST_RUN),
 				'A pass that marked nothing still records that it ran, so a blank stamp means it never ran.'
 			);
 			Assert.areEqual(
 				'No payments were overdue.',
-				settings.Installment_Overdue_Last_Run_Summary__c,
+				GivingState.text(GivingState.INSTALLMENT_OVERDUE_SUMMARY),
 				'The sentence the Nightly Jobs page shows is the one the pass wrote.'
 			);
 		}

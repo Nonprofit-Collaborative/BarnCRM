@@ -3,6 +3,7 @@ import importlib.util
 import os
 import tempfile
 import unittest
+from unittest import mock
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
@@ -11,6 +12,11 @@ spec = importlib.util.spec_from_file_location(
 )
 coa = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(coa)
+
+
+def app_paths():
+    pattern = os.path.join(ROOT, "packages/*/main/default/applications/*.app-meta.xml")
+    return [p for p in glob.glob(pattern) if " 2." not in os.path.basename(p)]
 
 
 def app_names(pattern):
@@ -26,7 +32,7 @@ class CappedOrgApps(unittest.TestCase):
             )
 
     def test_a_capped_org_gets_no_more_apps_than_the_budget(self):
-        every = app_names("packages/*/main/default/applications/*.app-meta.xml")
+        every = {os.path.basename(p)[: -len(".app-meta.xml")] for p in app_paths()}
         kept = every - coa.left_out_apps(ROOT)
         self.assertLessEqual(
             len(kept),
@@ -34,6 +40,14 @@ class CappedOrgApps(unittest.TestCase):
             f"A scratch or Developer Edition org would get {len(kept)} apps ({', '.join(sorted(kept))}); "
             "add the new app's folder to LEFT_OUT in scripts/org/capped-org-apps.py (ADR-0223)",
         )
+
+    def test_the_suite_ships_nine_console_apps(self):
+        # ADR-0237 (nine console apps): only console-navigation apps ship, nine of them.
+        paths = app_paths()
+        self.assertEqual(len(paths), 9, sorted(os.path.basename(p) for p in paths))
+        for path in paths:
+            with open(path, encoding="utf-8") as handle:
+                self.assertIn("<navType>Console</navType>", handle.read(), os.path.basename(path))
 
     def test_only_left_out_folders_grant_a_left_out_app(self):
         # A set outside LEFT_OUT deploys unchanged, so naming a left-out app would fail there.
@@ -48,7 +62,8 @@ class CappedOrgApps(unittest.TestCase):
                 self.assertNotIn(f"<application>{app}</application>", text, path)
 
     def test_permission_sets_lose_only_the_left_out_visibilities(self):
-        with tempfile.TemporaryDirectory() as out:
+        # LEFT_OUT is empty today; the mechanism still works for a folder put in it.
+        with mock.patch.object(coa, "LEFT_OUT", ("events",)), tempfile.TemporaryDirectory() as out:
             written = coa.write_permission_sets(ROOT, out, ["events"])
             self.assertIn("Events_Staff", written)
             with open(os.path.join(out, "permissionsets", "Events_Staff.permissionset"), encoding="utf-8") as f:

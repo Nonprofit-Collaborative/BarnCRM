@@ -19,7 +19,7 @@ Relationships is part of Core, but on a new install it is off until you turn it 
 it ticked in first-run setup); see [BarnCRM Settings](barncrm-settings.md). There is nothing
 to install and no Setup step.
 
-1. Open the **BarnCRM Admin** app and choose **BarnCRM Settings**.
+1. Open the **BarnCRM Admin Console** app and choose **BarnCRM Settings**.
 2. In the left navigation choose **People and Households**. The setting is in the
    **Relationships** box.
 3. Leave **Keep both sides of relationships in step** switched on, which is how it ships.
@@ -94,7 +94,7 @@ You are Maria. Your Executive Director wants to know which of your members are r
 each other before the gala seating is decided, and the Garcia family keeps coming up. Start
 from the sample data.
 
-1. Open the **BarnCRM** app and choose **Households**. Open **The Garcia Family** and
+1. Open the **BarnCRM Console** app and choose **Households**. Open **The Garcia Family** and
    choose the person named **Harper Garcia**.
 2. Scroll to the **Relationships** card. It is empty: it shows **No Relationships Yet** with an
    **Add Relationship** button.

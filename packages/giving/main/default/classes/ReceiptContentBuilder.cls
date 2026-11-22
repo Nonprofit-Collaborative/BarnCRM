@@ -104,17 +104,16 @@ public with sharing class ReceiptContentBuilder {
 	 * entity, then settings. Brands off, this is exactly the settings identity.
 	 */
 	public static OrganizationDetails organizationDetails(Id brandId, Boolean useDefault) {
-		BarnCRM_Settings__c core = BarnCRM_Settings__c.getOrgDefaults();
-		Giving_Settings__c giving = Giving_Settings__c.getOrgDefaults();
+		BarnCRM_Settings__c core = SettingsService.getSettings();
 		BrandService.Profile brand = brandId != null || useDefault ? BrandService.profileFor(brandId) : null;
 		OrganizationDetails details = new OrganizationDetails();
 		details.legalName = core.Organization_Legal_Name__c;
-		details.taxId = giving.Organization_EIN__c;
+		details.taxId = ModuleSettings.text('Giving_Organization_EIN');
 		// One line per printable part, so the letterhead shows a real address block.
 		details.address = String.join(OrganizationAddress.lines(core), '\n');
-		details.placeOfIssue = giving.Receipt_Place_Of_Issue__c;
-		details.signerName = giving.Receipt_Signer_Name__c;
-		details.signerTitle = giving.Receipt_Signer_Title__c;
+		details.placeOfIssue = ModuleSettings.text('Giving_Receipt_Place_Of_Issue');
+		details.signerName = ModuleSettings.text('Giving_Receipt_Signer_Name');
+		details.signerTitle = ModuleSettings.text('Giving_Receipt_Signer_Title');
 		if (brand != null) {
 			details.brandName = brand.brandName;
 			details.logoDocumentId = brand.logoDocumentId;

@@ -21,10 +21,11 @@ private class OpportunityMirrorBatchTest {
 	}
 
 	private static void choose(String direction, Date startDate) {
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		settings.Opportunity_Mirror_Direction__c = direction;
-		settings.Opportunity_Mirror_Start__c = startDate == null ? null : midnightInTheOrgTimeZone(startDate);
-		upsert settings;
+		ModuleSettings.setForTest('Mirror_Opportunity_Mirror_Direction', direction);
+		ModuleSettings.setForTest(
+			'Mirror_Opportunity_Mirror_Start',
+			startDate == null ? null : midnightInTheOrgTimeZone(startDate)
+		);
 	}
 
 	/**

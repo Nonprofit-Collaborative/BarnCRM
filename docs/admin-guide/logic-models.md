@@ -37,7 +37,7 @@ finishes, BarnCRM does four things on its own:
 3. Gives you, the person who installed it, the **Logic Models Admin** permission set.
 4. Gives everyone who already has a BarnCRM role their Logic Models permission set (see below).
 
-Logic Models also has one nightly job, **Indicator Results** (3:30 AM), which works out computed
+Logic Models also has one nightly job, **Indicator Results** (3:40 AM), which works out computed
 indicators. It is a step of [BarnCRM Nightly Jobs](nightly-jobs.md), the one nightly run, and has
 no switch of its own. If **Health Check** says the nightly run is not scheduled, its **Schedule
 all nightly jobs** fix schedules it.
@@ -281,7 +281,7 @@ starter's module is installed, and the one shown for an indicator already built 
    - **Sum**: the total of a number field, for example Hours.
    - **Count Unique**: how many different values of a field, for example the person on a service
      delivery, so a person served ten times counts once (an unduplicated count).
-5. Save. The results are worked out within a few minutes, then every night at 3:30 AM. Click
+5. Save. The results are worked out within a few minutes, then every night at 3:40 AM. Click
    **Refresh Results** to work them out again now. While they are worked out the indicator says
    "Working out results"; the panel looks every ten seconds and shows the new results, with a
    note, as soon as they are in. If they take longer than three minutes it says so and offers
@@ -343,7 +343,7 @@ record ID, so neither module needs the other. See
 
 Do this as Maria, who holds the Admin role.
 
-1. In the **BarnCRM** app, open **Logic Models** and click **New**, name it "Reading
+1. In the **BarnCRM Console** app, open **Logic Models** and click **New**, name it "Reading
    Program Model" and save. **For** shows **The whole organization**.
 2. In the builder, add "Two tutors" under **Inputs**, "Weekly reading sessions" under
    **Activities**, "Sessions held" under **Outputs**, "Students read more at home" under **Short

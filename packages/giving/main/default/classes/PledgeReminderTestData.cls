@@ -9,10 +9,7 @@ public class PledgeReminderTestData {
 
 	/** Turns the feature on and grants the send permission for the length of the test. */
 	public static void enable() {
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		settings.SetupOwnerId = UserInfo.getOrganizationId();
-		settings.Pledge_Reminders_Enabled__c = true;
-		upsert settings;
+		ModuleSettings.setForTest('Giving_Pledge_Reminders_Enabled', true);
 		AcknowledgmentService.sendPermission = true;
 	}
 

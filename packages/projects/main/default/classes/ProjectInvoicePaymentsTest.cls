@@ -32,13 +32,8 @@ private class ProjectInvoicePaymentsTest {
 	}
 
 	private static FakePayments online(Boolean turnedOn) {
-		OrgSettingsSystemWriter.save(
-			Projects_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{
-				Projects_Settings__c.Billing_Enabled__c => true,
-				Projects_Settings__c.Online_Payments_Enabled__c => turnedOn
-			}
-		);
+		ModuleSettings.setForTest('Projects_Billing_Enabled', true);
+		ModuleSettings.setForTest('Projects_Online_Payments_Enabled', turnedOn);
 		SettingsService.clearCaches();
 		FakePayments fake = new FakePayments();
 		ProjectInvoicePayments.apiForTest = fake;
@@ -149,6 +144,31 @@ private class ProjectInvoicePaymentsTest {
 			Assert.areEqual('Sent', partly.Status__c, 'A refund sets it back to Sent');
 			Assert.areEqual(200, partly.Amount_Paid__c, 'Less the refund');
 			Assert.isNull(partly.Paid_Date__c, 'No longer paid');
+		}
+	}
+
+	/**
+	 * A payment near midnight, processed by a user in a time zone far from the org's, is dated
+	 * with the org's date (D-219, OD-15).
+	 */
+	@IsTest
+	static void thePaidDateIsTheOrgDateNotTheProcessingUsersDate() {
+		User processor = ProjectsTestData.admin();
+		Datetime paidAt = TestUsers.inAnotherTimeZone(processor);
+		System.runAs(processor) {
+			online(true);
+			Project_Invoice__c invoice = sentInvoice();
+			ProjectInvoicePayments.sendLink(invoice.Id);
+			Map<String, Object> paid = report(invoice.Id, 'Paid', 300, 0);
+			paid.put('paidAt', paidAt);
+
+			Test.startTest();
+			new ProjectInvoicePaymentListener().call('paymentChanged', paid);
+			Test.stopTest();
+
+			Date paidOn = reload(invoice.Id).Paid_Date__c;
+			Assert.areEqual(OrgDate.dateOf(paidAt), paidOn, 'The org date of the payment');
+			Assert.areNotEqual(paidAt.date(), paidOn, 'Not the processing user date');
 		}
 	}
 

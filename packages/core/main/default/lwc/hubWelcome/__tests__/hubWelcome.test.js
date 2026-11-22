@@ -1,6 +1,3 @@
-// The test wire adapters below are emitted to on purpose, which is how a wired component is
-// driven from a test.
-/* eslint-disable @lwc/lwc/no-unexpected-wire-adapter-usages */
 import { createElement } from 'lwc';
 import HubWelcome from 'c/hubWelcome';
 import getHomeModel from '@salesforce/apex/HubController.getHomeModel';

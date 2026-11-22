@@ -199,8 +199,7 @@ public with sharing class HealthCheckSettingsChecks {
 	}
 
 	private static HealthCheckService.Finding automationFinding() {
-		BarnCRM_Settings__c settings = SettingsService.getSettings();
-		Datetime pausedUntil = settings == null ? null : settings.Automation_Paused_Until__c;
+		Datetime pausedUntil = AutomationControl.pausedUntil();
 		if (pausedUntil == null || pausedUntil <= System.now()) {
 			return new HealthCheckService.Finding(
 				'automation_running',
@@ -306,7 +305,7 @@ public with sharing class HealthCheckSettingsChecks {
 		if (ErrorDigestScheduler.nextRunAt() == null) {
 			return null;
 		}
-		Datetime lastRun = SettingsService.getSettings().Error_Digest_Last_Run__c;
+		Datetime lastRun = SettingsState.moment(ErrorDigestWriter.LAST_RUN);
 		if (lastRun == null || lastRun > System.now().addDays(-DIGEST_STALE_DAYS)) {
 			return null;
 		}

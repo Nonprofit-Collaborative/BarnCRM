@@ -96,7 +96,7 @@ public with sharing class PaymentsApi implements Callable {
 				Object processor = given.get('processor');
 				return PaymentService.isReady(
 						processor == null ? PaymentService.defaultProcessor() : String.valueOf(processor)
-					) && (given.get('recurring') != true || PaymentService.settings().Recurring_Payments__c == true);
+					) && (given.get('recurring') != true || PaymentService.recurringOn());
 			}
 			when 'updateCard' {
 				return new Map<String, Object>{ 'url' => PaymentService.updateCard(given) };

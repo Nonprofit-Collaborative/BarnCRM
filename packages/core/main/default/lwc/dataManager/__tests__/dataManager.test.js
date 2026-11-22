@@ -1,3 +1,5 @@
+// Test wire adapters are emitted to on purpose, which is how a wired component is driven from a test.
+/* eslint-disable @lwc/lwc/no-unexpected-wire-adapter-usages */
 import { createElement } from 'lwc';
 import DataManager from 'c/dataManager';
 import getMappings from '@salesforce/apex/DataManagerController.getMappings';
@@ -15,7 +17,8 @@ jest.mock(
         }
       };
     NavigationMixin.Navigate = Navigate;
-    return { NavigationMixin, CurrentPageReference: null, __esModule: true };
+    const { createTestWireAdapter } = require('@salesforce/wire-service-jest-util');
+    return { NavigationMixin, CurrentPageReference: createTestWireAdapter(), __esModule: true };
   },
   { virtual: true }
 );
@@ -55,8 +58,27 @@ jest.mock(
   },
   { virtual: true }
 );
+jest.mock(
+  '@salesforce/apex/DataManagerController.panelStateKey',
+  () => {
+    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/apex/ArchiveController.canViewArchive',
+  () => {
+    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
+  { virtual: true }
+);
 import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
 import orgOptimizerInstalled from '@salesforce/apex/DataManagerController.orgOptimizerInstalled';
+import panelStateKey from '@salesforce/apex/DataManagerController.panelStateKey';
+import canViewArchive from '@salesforce/apex/ArchiveController.canViewArchive';
+import { CurrentPageReference } from 'lightning/navigation';
 
 // eslint-disable-next-line @lwc/lwc/no-async-operation
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
@@ -148,6 +170,7 @@ describe('c-data-manager', () => {
       'find',
       'grid',
       'backup',
+      'archive',
       'optimizer',
       'duplicates',
       'delete'
@@ -156,6 +179,36 @@ describe('c-data-manager', () => {
     expect(titles.find).toBe('c.Core_Find_Title');
     expect(titles.duplicates).toBe('c.Core_DuplicateMatching_Title');
     expect(titles.backup).toBe('c.Core_DataManager_BackupTitle');
+  });
+
+  it('shows Archived Records to holders of the big object grant and opens it on this page', async () => {
+    const element = await render();
+    expect(tiles(element).map((tile) => tile.name)).not.toContain('archived');
+    canViewArchive.emit(true);
+    await flush();
+    expect(tiles(element).map((tile) => tile.name)).toContain('archived');
+    select(element, 'archived');
+    await flush();
+    expect(mockNavigate).not.toHaveBeenCalled();
+    expect(one(element, 'panel').querySelector('c-archived-records')).not.toBeNull();
+  });
+
+  it('opens the panel a link names in the page state, by the namespaced key', async () => {
+    const element = await render();
+    CurrentPageReference.emit({ state: { c__panel: 'archived' } });
+    await flush();
+    expect(one(element, 'panel')).toBeNull();
+    panelStateKey.emit('c__panel');
+    await flush();
+    expect(one(element, 'panel').querySelector('c-archived-records')).not.toBeNull();
+  });
+
+  it('ignores a page state naming no panel', async () => {
+    const element = await render();
+    panelStateKey.emit('c__panel');
+    CurrentPageReference.emit({ state: { c__panel: 'nothing' } });
+    await flush();
+    expect(one(element, 'tools')).not.toBeNull();
   });
 
   it('leaves the Org Optimizer tile out until the Org Optimizer module is installed', async () => {

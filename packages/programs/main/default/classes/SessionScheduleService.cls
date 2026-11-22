@@ -16,7 +16,6 @@
  */
 public with sharing class SessionScheduleService {
 	public static final String MODULE_NAME = 'Programs';
-	private static final String SETTINGS_OBJECT = 'Programs_Settings__c';
 	private static Integer horizonWeeks;
 
 	/** Monday first, as the multi-select stores them. Not named WEEKDAYS (case-insensitive). */
@@ -48,7 +47,7 @@ public with sharing class SessionScheduleService {
 	/** How far ahead an active schedule keeps sessions: Weeks Ahead to Create Sessions, 1 to 26. */
 	public static Integer horizonWeeks() {
 		if (horizonWeeks == null) {
-			horizonWeeks = SettingsService.number(SETTINGS_OBJECT, 'Session_Horizon_Weeks__c').intValue();
+			horizonWeeks = ModuleSettings.integerValue('Programs_Session_Horizon_Weeks');
 		}
 		return horizonWeeks;
 	}

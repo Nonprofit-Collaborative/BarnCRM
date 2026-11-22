@@ -61,7 +61,7 @@ public with sharing class GiftPostingLock {
 
 	/** The last day of the latest closed period, or null when no period is closed. */
 	public static Date closedThrough() {
-		return Giving_Settings__c.getOrgDefaults().Books_Closed_Through__c;
+		return GivingState.dateValue(GivingState.BOOKS_CLOSED_THROUGH);
 	}
 
 	/** Whether the export would write this gift. An empty status is the field's default. */

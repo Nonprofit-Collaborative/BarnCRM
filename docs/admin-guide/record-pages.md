@@ -7,7 +7,7 @@
 ## What It Does
 
 BarnCRM ships the pages that open when you click a household, an organization or a person in
-the **BarnCRM** app. They show the right fields for the kind of record, put the actions you
+the **BarnCRM Console** app. They show the right fields for the kind of record, put the actions you
 use most in the bar at the top, and carry BarnCRM's own panels (members, household,
 affiliations, addresses), so you do not build any of it yourself. Because the pages choose
 what to show by the record, a household and an organization share one page and a person has
@@ -16,13 +16,15 @@ another, and nobody has to maintain separate page layouts for them.
 ## How to Turn It On
 
 There is nothing to turn on, and nothing to do in Salesforce Setup. The pages arrive with
-Core, and the **BarnCRM** app opens households, organizations and people on them, on the
+Core, and the **BarnCRM Console** app opens households, organizations and people on them, on the
 desktop and on the phone. Core ships one Account record type, **Household**, which no user has
 until Households is on ([Households](households.md)), and no Contact record type, so it
 does not disturb any you already have. An account is an organization when it has the record
 type chosen in **Record type for organizations** on **General** (or, when **No record type** is
 chosen, no record type); the pages and the **Organizations** list read that through the
-**Is Organization** field, so they follow your choice without being edited.
+**Is Organization** field, so they follow your choice without being edited. BarnCRM keeps that
+field up to date itself: it is set whenever an account is saved, and on every account after
+you change the setting or install a release.
 
 What ships:
 
@@ -62,7 +64,7 @@ The action bar holds **Edit**, **Log an Interaction** ([Interaction notes](inter
 ([Household merge and split](household-merge-split.md)), and **Erase Person** on a person for
 anyone with the permission to erase people ([Erase a person](erase-a-person.md)).
 
-**Where the pages are used.** They are assigned to the **BarnCRM** app, so a record opened
+**Where the pages are used.** They are assigned to the **BarnCRM Console** app, so a record opened
 in that app uses them. A record opened in another app, or on a page your organization
 assigned itself, uses that page instead. With Fundraising installed, the **BarnCRM Fundraising** app opens
 people, households and organizations on Fundraising's own pages, which add giving (see
@@ -72,8 +74,8 @@ people, households and organizations on Fundraising's own pages, which add givin
 built your own Account or Contact page and assigned it, it keeps showing wherever you
 assigned it. Each object also keeps one small fallback page layout, so a record that opens
 on a page of yours still has usable fields and related lists. No profile layout assignments
-ship: the new layouts are unassigned, so outside the **BarnCRM** app a record keeps the
-layout your profiles already use. The pages above apply only in the **BarnCRM** app, so tell
+ship: the new layouts are unassigned, so outside the **BarnCRM Console** app a record keeps the
+layout your profiles already use. The pages above apply only in the **BarnCRM Console** app, so tell
 staff to work there. The list views BarnCRM adds (for example **Households** and
 **Organizations**) are scoped to **Everything**: each person still sees only the records
 their own access allows, but there is no "my records" filter.
@@ -87,7 +89,7 @@ org's. Add the panel yourself. The steps are in
 
 Start with the sample data loaded ([Sample data](sample-data.md)).
 
-1. Open the **BarnCRM** app and choose the **Households** tab. Open **The Garcia Family**.
+1. Open the **BarnCRM Console** app and choose the **Households** tab. Open **The Garcia Family**.
    The **Details** tab has the **Details** section and **Name and Greetings**, with the
    formal and informal greetings. Click the **Connections** tab: the **Members** panel is
    there.
@@ -107,8 +109,8 @@ Start with the sample data loaded ([Sample data](sample-data.md)).
 ## Common Mistakes
 
 **"The Members panel, the Household panel or the Merge or split button is missing."** You are
-most likely looking at the record outside the **BarnCRM** app, or somebody assigned a
-different page in the Lightning App Builder. Open the record from the **BarnCRM** app, or add
+most likely looking at the record outside the **BarnCRM Console** app, or somebody assigned a
+different page in the Lightning App Builder. Open the record from the **BarnCRM Console** app, or add
 the panel to the page that is assigned.
 
 **"I added a field and it does not show."** The pages show fields from sections you place

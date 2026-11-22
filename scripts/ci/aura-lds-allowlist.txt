@@ -1,0 +1,52 @@
+# @AuraEnabled methods that are a single user-mode query or a single-record DML (ADR-0093).
+# Seeded with every match when scripts/ci/check-aura-lds.py was added. Remove an entry when its
+# method is converted to Lightning Data Service or GraphQL; a stale entry fails the check.
+# New code must not be added here without a reason written beside the line.
+
+AccessExplorerController.searchPeople
+AccessExplorerController.searchPermissionSets
+AskPipelineController.moveStage
+BulkUpdateController.getCopySources
+BulkUpdateController.getTargets
+CommitmentController.getSchedule
+CommitmentEntryController.save
+EligibilityController.saveRules
+EventAgendaController.moveSession
+EventProposalReview.removePresenter
+EventProposalReview.saveCriteria
+EventSeatingController.deleteTable
+EventSeatingController.saveNeeds
+EventSpeakersController.addSpeaker
+EventSpeakersController.assign
+EventSponsorsController.addDeliverable
+EventSponsorsController.removeSponsor
+EventSponsorsController.setDeliverableStatus
+EventVolunteersController.getVolunteers
+EventsHomeController.getEvents
+FormRunnerController.getPublishedForms
+FormSubmissionController.getSubmission
+FundraisingHomeController.getHome
+GrantAnswerController.getLibrary
+GrantAnswerController.markUsed
+GrantPipelineController.moveStage
+LwcBuilderController.getStudio  # also returns the module settings (store, no query), which LDS cannot read
+LwcBuilderController.loadComponent  # also returns the Components Enabled setting (store, no query)
+ProjectBillingController.getInvoiceActions
+ProjectBillingController.getProjectBilling
+ProjectRequestsController.addComment
+ProjectRequestsController.getRequest
+ProjectRequestsController.getRequests
+ProjectRequestsController.saveRequest
+ProjectTimesheetController.addExpense
+ProjectTimesheetController.getTasks
+ProjectsController.addTask
+ProjectsController.getAtRisk
+ProjectsController.logTime
+ProjectsController.setTaskStatus
+QuickGiftEntryController.getMatchableGifts
+ScholarshipsController.getAward
+ScholarshipsController.getBoard
+ScholarshipsController.getReview
+StewardshipPlanController.deleteStep
+StewardshipPlanController.setActive
+VolunteersHomeController.getFirstRun

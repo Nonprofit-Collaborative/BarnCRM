@@ -36,4 +36,8 @@
     <field>Sort_Order__c</field>
     <value xsi:type="xsd:double">10</value>
   </values>
+  <values>
+    <field>Default_Value__c</field>
+    <value xsi:type="xsd:string">false</value>
+  </values>
 </CustomMetadata>

@@ -140,18 +140,19 @@ public without sharing class RollupNightlyBatch implements Database.Batchable<SO
 		return full == null ? first : full;
 	}
 
+	/** The run-state key of the covered watermark. */
+	@TestVisible
+	private static final String COVERED_KEY = RollupService.stateKey('Nightly_Covered_From__c');
+
 	/** When the last covered run started, or null when none has finished. */
 	public static Datetime coveredFrom() {
-		return Rollup_Settings__c.getOrgDefaults().Nightly_Covered_From__c;
+		return SettingsState.moment(COVERED_KEY);
 	}
 
-	/** Stores the start of a run that covered every change before it. */
+	/** Stores the start of a run that covered every change before it (run state, not a setting). */
 	public static void markCovered(Datetime startedAt) {
 		try {
-			OrgSettingsSystemWriter.save(
-				Rollup_Settings__c.SObjectType,
-				new Map<Schema.SObjectField, Object>{ Rollup_Settings__c.Nightly_Covered_From__c => startedAt }
-			);
+			SettingsState.put(new Map<String, Object>{ COVERED_KEY => startedAt });
 		} catch (Exception notStored) {
 			// The next night then covers the same changes again, which costs time, not totals.
 			ErrorLogger.log(notStored, LOG_CONTEXT);

@@ -1,6 +1,9 @@
 # @AuraEnabled classes with no test running as a non-admin user (QA review Q1, D-200).
 # "admin only: reason" when only an administrator reaches the class; "not yet" is the ratchet,
 # which only shrinks. Checked by scripts/ci/check-aura-non-admin-tests.py.
+ArchiveDestinations # admin only: Archive Rules panel, needs Manage BarnCRM Settings and Bulk Delete Records
+ArchiveRules # admin only: Archive Rules panel, needs Manage BarnCRM Settings and Bulk Delete Records
+ArchiveStore # admin only: Archived Record big object, granted only by BarnCRM Admin
 CampaignSyncController # not yet
 CertificationController # not yet
 CommitmentEntryController # not yet

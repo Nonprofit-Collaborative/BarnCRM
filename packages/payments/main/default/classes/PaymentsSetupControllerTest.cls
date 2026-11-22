@@ -34,21 +34,34 @@ private class PaymentsSetupControllerTest {
 			PaymentsSetupController.Setup setup = PaymentsSetupController.getSetup();
 
 			Assert.areEqual(1, setup.receivers.size(), 'Only Sites with an address');
-			String token = PaymentService.webhookToken(false);
-			Assert.isTrue(token.length() >= 32, 'A token was made on first need');
+			Assert.isFalse(setup.hasToken, 'No token until one is generated');
+			Assert.isNull(setup.token, 'Nothing to show');
 			Assert.areEqual(
-				'https://zzpay.example.org/services/apexrest/barncrm/payments/v1/stripe?token=' + token,
+				'https://zzpay.example.org/services/apexrest/barncrm/payments/v1/stripe?token=',
 				setup.receivers[0].stripeUrl,
-				'The Stripe address'
+				'The Stripe address, waiting for its token'
 			);
-			Assert.isTrue(setup.receivers[0].payPalUrl.endsWith('/v1/paypal?token=' + token), 'The PayPal address');
+			Assert.isTrue(setup.receivers[0].payPalUrl.endsWith('/v1/paypal?token='), 'The PayPal address');
+
+			PaymentsSetupController.Setup made = PaymentsSetupController.regenerateToken();
+			String token = made.token;
+			Assert.isTrue(token.length() >= 32, 'A token was made');
+			Assert.isTrue(made.hasToken, 'Kept as a hash');
+			Assert.isTrue(
+				made.receivers[0].stripeUrl.endsWith('stripe?token=' + token),
+				'Shown once, in the addresses'
+			);
+			Assert.isTrue(PaymentService.tokenMatches(token), 'The new token is accepted');
+
+			PaymentsSetupController.Setup reopened = PaymentsSetupController.getSetup();
+			Assert.isNull(reopened.token, 'Never shown again');
+			Assert.isTrue(reopened.hasToken, 'Still in use');
+			Assert.isFalse(reopened.receivers[0].stripeUrl.contains(token), 'Not in the addresses either');
+
 			PaymentsSetupController.Setup replaced = PaymentsSetupController.regenerateToken();
-			Assert.isFalse(replaced.receivers[0].stripeUrl.endsWith('token=' + token), 'Regenerate gives a new token');
-			Assert.areEqual(
-				PaymentService.webhookToken(false),
-				replaced.receivers[0].stripeUrl.substringAfter('token='),
-				'The new token is the saved one'
-			);
+			Assert.areNotEqual(token, replaced.token, 'Regenerate gives a new token');
+			Assert.isFalse(PaymentService.tokenMatches(token), 'The old token stops working');
+			Assert.isTrue(PaymentService.tokenMatches(replaced.token), 'The new one works');
 			Map<String, PaymentsSetupController.Credential> found = byProcessor(setup);
 			Assert.isTrue(found.get(PaymentService.STRIPE).connected, 'Stripe connected');
 			Assert.areEqual(
@@ -82,7 +95,8 @@ private class PaymentsSetupControllerTest {
 				new Map<String, String>{ 'payPalWebhookId' => '  WH-98765  ' }
 			);
 			Assert.areEqual('8765', saved.keys[0].lastFour, 'Saved, trimmed');
-			Assert.areEqual('WH-98765', Payments_Settings__c.getOrgDefaults().PayPal_Webhook_Id__c, 'Stored');
+			SettingsState.clearCache();
+			Assert.areEqual('WH-98765', PaymentService.stateText(PaymentService.PAYPAL_WEBHOOK_ID), 'Stored');
 
 			PaymentsSetupController.Setup cleared = PaymentsSetupController.clearKeys(PaymentService.PAYPAL);
 			Assert.isFalse(byProcessor(cleared).get(PaymentService.PAYPAL).connected);
@@ -234,7 +248,7 @@ private class PaymentsSetupControllerTest {
 			}
 		}
 		System.runAs(PaymentsTestData.admin()) {
-			Assert.isNull(Payments_Settings__c.getOrgDefaults().PayPal_Webhook_Id__c, 'Nothing saved');
+			Assert.isNull(PaymentService.stateText(PaymentService.PAYPAL_WEBHOOK_ID), 'Nothing saved');
 		}
 	}
 }

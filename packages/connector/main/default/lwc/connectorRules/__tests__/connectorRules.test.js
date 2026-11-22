@@ -2,6 +2,7 @@ import {
   KINDS,
   kindKey,
   isSafeUrl,
+  isAwsUrl,
   isHeaderName,
   formProblems,
   statusOf,
@@ -9,15 +10,47 @@ import {
 } from 'c/connectorRules';
 
 describe('c/connectorRules', () => {
-  it('names the four built-in kinds and nothing else', () => {
+  it('names the five kinds New Connection makes, and names OAuth made in Setup', () => {
     expect(KINDS.map((entry) => entry.value)).toEqual([
       'ApiKeyHeader',
       'BearerToken',
       'BasicAuth',
-      'SecretUrl'
+      'SecretUrl',
+      'AwsSigV4'
     ]);
     expect(kindKey('BearerToken')).toBe('Connector_Kind_BearerToken');
-    expect(kindKey('OAuth')).toBe('');
+    expect(kindKey('OAuth')).toBe('Connector_Kind_OAuth');
+    expect(kindKey('Jwt')).toBe('');
+    expect(
+      formProblems(
+        { label: 'x', authKind: 'OAuth', baseUrl: 'https://a.org', hasSecret: true },
+        false
+      )
+    ).toContain('Connector_Error_Kind');
+  });
+
+  it('asks an AWS connection for a regional AWS address and its access key ID', () => {
+    expect(isAwsUrl('https://barn.s3.us-east-1.amazonaws.com')).toBe(true);
+    expect(isAwsUrl('https://s3.us-gov-west-1.amazonaws.com')).toBe(true);
+    expect(isAwsUrl('https://files.example.org')).toBe(false);
+    expect(isAwsUrl('https://my.bucket.s3.us-east-1.amazonaws.com')).toBe(false);
+    expect(isAwsUrl('not a url')).toBe(false);
+    const form = {
+      label: 'x',
+      authKind: 'AwsSigV4',
+      baseUrl: 'https://files.example.org',
+      hasSecret: true
+    };
+    expect(formProblems(form, false)).toEqual([
+      'Connector_Error_AwsUrl',
+      'Connector_Error_UserRequired'
+    ]);
+    expect(
+      formProblems(
+        { ...form, baseUrl: 'https://barn.s3.us-east-1.amazonaws.com', userName: 'AKIA' },
+        false
+      )
+    ).toEqual([]);
   });
 
   it('accepts only https addresses with a host and no user, query, fragment or merge field', () => {

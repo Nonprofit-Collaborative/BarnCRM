@@ -47,7 +47,7 @@ source object has) and asks to try a standard report first.
    heap limit rather than writing a wrong number. A period that has not started is left alone.
 5. **Refreshed nightly and on demand.** **Refresh Results** in the builder starts the chain for one
    indicator; saving a computed source starts it too. The nightly job **BarnCRM Indicator
-   Results** (3:30 AM, `IndicatorResultsScheduler`) refreshes every computed indicator, and is a
+   Results** (3:40 AM since D-219, `IndicatorResultsScheduler`) refreshes every computed indicator, and is a
    `NamedNightlyJob` returned by `LogicModelsNightlyJobProvider`, which Core's
    `NightlyJobs.PROVIDER_CLASSES` names, so Health Check counts and schedules it.
 6. **Access mode: the definition as the admin, the count in system mode.** The query is compiled

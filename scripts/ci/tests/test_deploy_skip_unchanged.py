@@ -219,19 +219,18 @@ class DeploySkipUnchanged(unittest.TestCase):
         self.assertIn(OBJECTS, self.sent())
         self.assertFalse(os.path.exists(self.record()))
 
-    def test_a_capped_org_gets_the_modules_without_the_left_out_apps(self):
+    def test_a_capped_org_gets_every_app_while_none_is_left_out(self):
         # ADR-0223 (module apps): a Developer Edition or scratch org refuses apps past about 10.
+        # The nine console apps fit (ADR-0237, nine console apps), so LEFT_OUT is empty and a
+        # capped org gets each module whole, with no permission set stage of its own.
         requests = self.deploy(FAKE_ORG_TYPE="Developer Edition")
         sent = [d for r in requests for d in r]
-        self.assertNotIn("packages/events", sent)
-        self.assertIn("packages/events/main/default/classes", sent)
-        self.assertNotIn("packages/events/main/default/applications", sent)
-        self.assertNotIn("packages/events/main/default/permissionsets", sent)
+        self.assertIn("packages/events", sent)
         self.assertIn("packages/funders", sent)
         modules = [r for r in requests if "packages/giving" in r][0]
         later = requests[requests.index(modules) + 1 :]
-        # The permission sets without the left-out apps, then the module tabs in the BarnCRM apps.
-        self.assertEqual(sum(1 for r in later if not r[0].startswith("packages/")), 2, later)
+        # Only the module tabs in the host apps.
+        self.assertEqual(sum(1 for r in later if not r[0].startswith("packages/")), 1, later)
 
         requests = self.deploy("--full")
         sent = [d for r in requests for d in r]

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Backup Destination on Super Connector's Connections tab: the connection Backup Sets and
+    archives send their CSV files through, with its method, path and fixed headers.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

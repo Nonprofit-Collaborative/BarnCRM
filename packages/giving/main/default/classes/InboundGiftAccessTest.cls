@@ -126,10 +126,7 @@ private class InboundGiftAccessTest {
 	@IsTest
 	static void aGiftIsRecordedWhileAcknowledgmentRulesAreOn() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-			settings.SetupOwnerId = UserInfo.getOrganizationId();
-			settings.Acknowledgments_Enabled__c = true;
-			upsert settings;
+			ModuleSettings.setForTest('Giving_Acknowledgments_Enabled', true);
 			insert new Acknowledgment_Rule__c(
 				Name = 'First gifts by letter',
 				Order__c = 1,

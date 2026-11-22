@@ -519,9 +519,8 @@ private class PledgeReminderServiceTest {
 
 			Assert.areEqual(1, sender.received.size());
 			Assert.areEqual(1, [SELECT COUNT() FROM Pledge_Reminder__c WHERE Status__c = 'Sent']);
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-			Assert.isNotNull(settings.Pledge_Reminders_Last_Run__c);
-			Assert.isTrue(settings.Pledge_Reminders_Last_Run_Summary__c.contains('1 reminder emails sent'));
+			Assert.isNotNull(GivingState.moment(GivingState.PLEDGE_REMINDERS_LAST_RUN));
+			Assert.isTrue(GivingState.text(GivingState.PLEDGE_REMINDERS_SUMMARY).contains('1 reminder emails sent'));
 		}
 	}
 

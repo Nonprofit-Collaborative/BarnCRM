@@ -33,10 +33,7 @@ private class VolunteerMinorsTest {
 	}
 
 	private static void consentRequired(Boolean required) {
-		OrgSettingsSystemWriter.save(
-			Volunteer_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{ Volunteer_Settings__c.Minor_Consent_Required__c => required }
-		);
+		ModuleSettings.setForTest('Volunteers_Minor_Consent_Required', required);
 		SettingsService.clearCaches();
 	}
 

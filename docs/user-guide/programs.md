@@ -345,7 +345,7 @@ there is no card.
 
 ## To See How Your Programs Are Doing
 
-1. In the **BarnCRM Programs** app, click the **Programs Dashboard** tab.
+1. In the **BarnCRM Programs** app, click the **Programs Home** tab.
 2. Pick a period at the top: **This Month** (the default), **Last Month**, **This Year**,
    **Last Year** or **Last 12 Months**.
 

@@ -491,15 +491,24 @@ public with sharing class GivingSampleDataLoader {
 	 * rest, because the two are removed one after the other.
 	 */
 	public static Integer removeStageCount() {
-		GivingSampleDataSelector selector = new GivingSampleDataSelector();
-		Integer reversals = selector.sampleReversalIds().size();
-		return chunksFor(selector.sampleAskIds().size()) +
+		Integer reversals = SampleDataRemover.count('Gift__c', SAMPLE_REVERSALS);
+		return chunksFor(SampleDataRemover.count('Ask__c', FLAGGED)) +
 			chunksFor(reversals) +
-			chunksFor(selector.sampleGiftIds().size() - reversals) +
-			chunksFor(selector.sampleCommitmentIds().size()) +
-			chunksFor(selector.sampleAppealIds().size()) +
-			chunksFor(selector.sampleFundIds().size());
+			chunksFor(SampleDataRemover.count('Gift__c', FLAGGED) - reversals) +
+			chunksFor(SampleDataRemover.count('Commitment__c', FLAGGED)) +
+			chunksFor(SampleDataRemover.count('Appeal__c', FLAGGED)) +
+			chunksFor(SampleDataRemover.count('Fund__c', FLAGGED));
 	}
+
+	/** The sample tracking every Giving kind carries. */
+	private static final String FLAGGED = 'Sample_Data__c = TRUE';
+	/**
+	 * The sample refunds and write-offs: the negative gifts that point back at an original. They
+	 * go before the rest, because a gift a reversal points at refuses to be deleted. The
+	 * employers' matching gifts go with them: deleting one unlinks the employee's gift, which
+	 * must not be in the same delete, because the unlink writes to it.
+	 */
+	private static final String SAMPLE_REVERSALS = 'Sample_Data__c = TRUE AND (Original_Gift__c != NULL OR (Matched_Gift__c != NULL AND Donor_Account__c != NULL))';
 
 	private static Integer chunksFor(Integer recordCount) {
 		return (recordCount + removeChunkSize - 1) / removeChunkSize;
@@ -522,27 +531,29 @@ public with sharing class GivingSampleDataLoader {
 	 * bypass the sample commitments would refuse to go and the whole remove would fail. The
 	 * bypass is per transaction, so the administrator's own next delete is protected as
 	 * usual.
+	 *
+	 * Found and deleted through Core's `SampleDataRemover`, in system mode past sharing, so any
+	 * admin with Manage BarnCRM Settings removes every sample gift, whoever loaded it (SR-01).
 	 */
 	public static Integer removeNext() {
-		GivingSampleDataSelector selector = new GivingSampleDataSelector();
 		AutomationControl.bypass(COMMITMENT_AUTOMATION);
 		AutomationControl.bypass(INSTALLMENT_AUTOMATION);
 		try {
-			Integer removed = deleteChunk(selector.sampleAskIds());
+			Integer removed = deleteChunk('Ask__c', FLAGGED);
 			if (removed == 0) {
-				removed = deleteChunk(selector.sampleReversalIds());
+				removed = deleteChunk('Gift__c', SAMPLE_REVERSALS);
 			}
 			if (removed == 0) {
-				removed = deleteChunk(selector.sampleGiftIds());
+				removed = deleteChunk('Gift__c', FLAGGED);
 			}
 			if (removed == 0) {
-				removed = deleteChunk(selector.sampleCommitmentIds());
+				removed = deleteChunk('Commitment__c', FLAGGED);
 			}
 			if (removed == 0) {
-				removed = deleteChunk(selector.sampleAppealIds());
+				removed = deleteChunk('Appeal__c', FLAGGED);
 			}
 			if (removed == 0) {
-				removed = deleteChunk(selector.sampleFundIds());
+				removed = deleteChunk('Fund__c', FLAGGED);
 			}
 			return removed;
 		} finally {
@@ -551,14 +562,9 @@ public with sharing class GivingSampleDataLoader {
 		}
 	}
 
-	private static Integer deleteChunk(List<Id> ids) {
-		List<Id> chunk = new List<Id>();
-		for (Integer i = 0; i < ids.size() && i < removeChunkSize; i++) {
-			chunk.add(ids[i]);
-		}
-		if (!chunk.isEmpty()) {
-			Database.delete(chunk, AccessLevel.USER_MODE);
-		}
+	private static Integer deleteChunk(String objectName, String condition) {
+		List<Id> chunk = SampleDataRemover.ids(objectName, condition, null, removeChunkSize);
+		SampleDataRemover.remove(chunk, true);
 		return chunk.size();
 	}
 

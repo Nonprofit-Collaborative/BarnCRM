@@ -111,8 +111,8 @@ public with sharing class ModuleDetectionService {
 		@AuraEnabled
 		public Boolean beta;
 		/**
-		 * For a module that is here, its tabs that belong in the BarnCRM and BarnCRM Console apps
-		 * (`Staff_Tabs__c`) and in the two admin apps (`Admin_Tabs__c`), by label and comma
+		 * For a module that is here, its everyday tabs (`Staff_Tabs__c`, for its app or BarnCRM
+		 * Console) and its admin tabs (`Admin_Tabs__c`, for BarnCRM Admin Console), by label and comma
 		 * separated, so an administrator can add them in App Manager after a package install;
 		 * otherwise null (ADR-0137).
 		 */

@@ -64,7 +64,8 @@ public with sharing class ConnectorRecipeFiles {
 		'pollers',
 		'webhook',
 		'requires',
-		'recipes'
+		'recipes',
+		'backup'
 	};
 	private static final Set<String> AUTH_KEYS = new Set<String>{ 'kind', 'headerName', 'params' };
 	private static final Set<String> PARAM_KEYS = new Set<String>{
@@ -115,6 +116,9 @@ public with sharing class ConnectorRecipeFiles {
 		/** The template's check path, which Check Connection asks for (e1); blank is the base URL. */
 		@AuraEnabled
 		public String checkPath;
+		/** The template's backup part (R-CN11), saved as Backup Settings after the create; else null. */
+		@AuraEnabled
+		public ConnectorBackupDestination.Settings backup;
 	}
 
 	public class UrlParam {
@@ -407,7 +411,9 @@ public with sharing class ConnectorRecipeFiles {
 		Prefill result = new Prefill();
 		result.label = label;
 		result.authKind = ConnectorRecipeDocument.textOf(auth.get('kind'));
-		if (!ConnectorConnections.KINDS.contains(result.authKind)) {
+		// An OAuth connection is made in Setup (R-CN12): its template only fills Backup Settings.
+		Boolean setupMade = result.authKind == ConnectorConnections.OAUTH && file.get('backup') != null;
+		if (!ConnectorConnections.KINDS.contains(result.authKind) && !setupMade) {
 			throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorAuth', detail(result.authKind)));
 		}
 		for (Object raw : ConnectorRecipeDocument.listOf(auth.get('params'))) {
@@ -436,7 +442,10 @@ public with sharing class ConnectorRecipeFiles {
 			params.put(param.name, param);
 		}
 		result.baseUrl = ConnectorRecipeDocument.textOf(file.get('baseUrl')).trim().removeEnd('/');
-		if (result.authKind != ConnectorConnections.SECRET_URL || String.isNotBlank(result.baseUrl)) {
+		// A Secret URL, or storage of the organization's own (a backup part, R-CN11), may leave the
+		// address for the person to type, as on New Connection.
+		Boolean typed = result.authKind == ConnectorConnections.SECRET_URL || file.get('backup') != null;
+		if (!typed || String.isNotBlank(result.baseUrl)) {
 			urlProblem(result.baseUrl, params);
 		}
 		result.urlParams = params.values();
@@ -450,7 +459,38 @@ public with sharing class ConnectorRecipeFiles {
 			throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorAction', detail('check')));
 		}
 		result.checkPath = check.isEmpty() ? null : ConnectorRecipeDocument.textOf(check.get('path'));
+		result.backup = backupOf(ConnectorRecipeDocument.mapOf(file.get('backup')));
 		return result;
+	}
+
+	/** A template's backup part, checked as Backup Settings are (R-CN11); null when absent. */
+	private static ConnectorBackupDestination.Settings backupOf(Map<String, Object> backup) {
+		if (backup.isEmpty()) {
+			return null;
+		}
+		refuseUnknown(backup, new Set<String>{ 'method', 'path', 'headers', 'metadata' });
+		List<ConnectorBackupDestination.Header> headers = new List<ConnectorBackupDestination.Header>();
+		for (Object raw : ConnectorRecipeDocument.listOf(backup.get('headers'))) {
+			Map<String, Object> header = ConnectorRecipeDocument.mapOf(raw);
+			refuseUnknown(header, new Set<String>{ 'name', 'value' });
+			headers.add(
+				new ConnectorBackupDestination.Header(
+					ConnectorRecipeDocument.textOf(header.get('name')),
+					ConnectorRecipeDocument.textOf(header.get('value'))
+				)
+			);
+		}
+		try {
+			return ConnectorBackupDestination.checked(
+				ConnectorRecipeDocument.textOf(backup.get('method')),
+				ConnectorRecipeDocument.textOf(backup.get('path')),
+				headers,
+				// Google Drive's multipart metadata: a JSON object in the file, kept as its text.
+				backup.get('metadata') == null ? null : JSON.serialize(backup.get('metadata'))
+			);
+		} catch (ConnectorConnections.ConnectorException refused) {
+			throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorAction', detail('backup')));
+		}
 	}
 
 	/**

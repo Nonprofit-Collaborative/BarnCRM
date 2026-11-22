@@ -244,6 +244,12 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0233](0233-org-optimizer-and-sample-data-modules.md) | Org Optimizer with Health Check, and the sample data loader, are optional modules (amends ADR-0124, ADR-0086, ADR-0103, ADR-0106) | Proposed |
 | [0234](0234-reusable-mapper.md) | A reusable Mapper in Core: the R-IT1 document as map document version 4, one mapping screen, maps saved as a kind of Saved Transform (amends ADR-0081) | Proposed |
 | [0235](0235-integration-module.md) | BarnCRM Connector module: recipes, connections on Named Credentials, polling and webhook triggers, run history; starts C-38 | Proposed |
+| [0236](0236-module-home-pattern.md) | Every module app opens on one Module Home pattern (builds on ADR-0223) | Accepted |
+| [0237](0237-nine-console-apps.md) | The suite ships nine console apps (amends ADR-0137, ADR-0192, ADR-0223, ADR-0226) | Accepted |
+| [0238](0238-settings-as-custom-metadata.md) | Settings as Custom Metadata: defaults on Setting Definition, changed values in Setting Value, run state on Nightly Job (supersedes ADR-0006 decision 1; amends ADR-0017, ADR-0035, ADR-0085, ADR-0087, ADR-0141, ADR-0166, ADR-0227) | Accepted |
+| [0239](0239-automatic-backups-and-off-platform-destination.md) | Backup Sets run on a schedule and send their files off platform through the Connector | Proposed |
+| [0240](0240-archive-rules-and-big-object-archive.md) | Archive rules move records to Files, a big object or an off-platform store, on a schedule | Proposed |
+| [0241](0241-strip-apex-indentation.md) | Strip leading indentation from Apex at deploy and package-build time | Accepted |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

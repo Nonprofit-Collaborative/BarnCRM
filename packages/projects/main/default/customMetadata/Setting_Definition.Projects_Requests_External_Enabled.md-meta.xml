@@ -10,4 +10,5 @@
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">140</value></values>
     <values><field>Description__c</field><value xsi:type="xsd:string">Requests from requesters in the portal and from other organizations' connections. Works only while Track requests and issues is on. Default: off.</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">projects-requests.md</value></values>
+    <values><field>Default_Value__c</field><value xsi:type="xsd:string">false</value></values>
 </CustomMetadata>

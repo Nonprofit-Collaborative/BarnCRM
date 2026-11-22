@@ -261,7 +261,8 @@ scheduled, and the **Provider Requests** extra permission on your user.
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | With Send Cases to a service provider off, create a Case of Type Service Provider. In Anonymous Apex run `System.enqueueJob(new CaseProviderRequests());`. | Nothing on the Provider Requests tab. |
-| 2 | Turn the setting on and run the same line. | A Provider Request named by the Case Number, with a Request Number and Provider Status New. The provider org has the request with Channel Partner Organization. |
+| 1a | In **BarnCRM Settings**, **Mirror**, turn on **Send Cases to a service provider** and save. Reload the page. | The save shows Saving, then Saved; after the reload the setting is still on and **Case type to send** reads Service Provider. |
+| 2 | With the setting on, run the same line. | A Provider Request named by the Case Number, with a Request Number and Provider Status New. The provider org has the request with Channel Partner Organization. |
 | 3 | Run it again. | Still one request at the provider; the row's Last Synced moves on. |
 | 4 | At the provider, resolve the request with a resolution. Run it again. | Provider Status Resolved and the resolution on the row. |
 | 5 | At the provider, untick Active on the connection. Create another Case and run it again. | Its row shows Last Error "The service provider refused the Case (403)..."; the Error Log has a Warning. |

@@ -47,9 +47,15 @@ public with sharing class ProjectRequestHandler extends TriggerHandler {
 			return;
 		}
 		Boolean canCreate = Schema.SObjectType.Project_Request__c.isCreateable();
+		// New requests need Track requests and issues; saved ones can still be worked.
+		Boolean turnedOn = ProjectsSettings.requestsEnabled();
 		List<Project_Request__c> needAccount = new List<Project_Request__c>();
 		Id me = UserInfo.getUserId();
 		for (Project_Request__c row : (List<Project_Request__c>) newRecords()) {
+			if (!turnedOn) {
+				row.addError(BarnHelp.text('Projects', 'Projects_Requests_TurnedOff'));
+				continue;
+			}
 			if (row.Channel__c == null) {
 				row.Channel__c = canCreate ? STAFF : PORTAL;
 			}

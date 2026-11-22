@@ -12,7 +12,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **BarnCRM Admin** app and the **Contact Point Sync** tab. | The page shows three lines, Email, Phone and Address, each `copied after every save.` A count line starts `This will check` with the number of people in the org. |
+| 1 | Open the **BarnCRM Admin Console** app and the **Contact Point Sync** tab. | The page shows three lines, Email, Phone and Address, each `copied after every save.` A count line starts `This will check` with the number of people in the org. |
 | 2 | Click **Copy Existing People**. | The button greys out and `Copying existing people now. Refresh the page later to see what it did.` shows. |
 | 3 | Wait a minute and reload. | `Existing people were last copied` with a time and `Created ...` counts. The managed count is above 0. |
 | 4 | Open a sample person with a personal email and a home phone, then their Individual. | One Contact Point Email with that address and one Contact Point Phone with that number, type Home. |
@@ -54,7 +54,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Contact Points**. Untick **Sync phones** and save. | The setting saves. The Contact Point Sync page says Phone is `turned off in BarnCRM Settings, Contact Points.` |
+| 1 | Open **BarnCRM Settings**, **Contact Points**. Untick **Sync phones** and save. | **Saving**, then **Saved**; reload and **Sync phones** is still unticked. The Contact Point Sync page says Phone is `turned off in BarnCRM Settings, Contact Points.` |
 | 2 | Change a person's **Home Phone** and save. | Their Contact Point Phone keeps the old number. |
 | 3 | Tick **Sync phones** again and save. Open the **Automation** page. | Four rows, **Contact Point Sync: people**, **Contact Point Sync: addresses**, **Contact Point Sync: person accounts** and **Contact Point Sync: household moves**, all on. |
 | 4 | Click **Pause All**. Change the person's **Personal Email** and save. | Their Contact Point Email keeps the old address. |

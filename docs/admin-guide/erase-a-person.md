@@ -34,6 +34,10 @@ The person's record is kept but made anonymous, so every total stays right:
 - **Field history** of the record (old values of tracked fields) is deleted a moment after the
   erasure, if you hold the Salesforce permission **Delete From Field History**. Without it the
   preview says the history is kept.
+- **BarnCRM field history** (the old values the Field History card shows) of the person and of
+  every record the erasure deletes or changes, such as their addresses and relationships, is
+  deleted as part of the erasure, whoever erases. The preview lists it as **Field History**
+  with a count.
 - **Totals stay**: giving totals, counts and dates on the person and the household are kept,
   because they say nothing about who the person was.
 
@@ -54,6 +58,11 @@ With BarnCRM Connector installed, every recipe run that names the person's recor
 their email addresses is deleted, whoever erases; recipes are kept. When too many runs match to be
 sure of finding every one, the erasure is refused. See
 [BarnCRM Connector](connector.md#erasing-a-person).
+
+When records were moved to the archive big object by an [archive rule](archive-rules.md),
+archived records that are the person, or that name them in a lookup, are deleted from the
+archive in the background once the erasure is saved; a preview deletes nothing. See
+[Archive Rules](archive-rules.md#8-erasing-a-person).
 
 Every erasure writes an **Erasure** record: who erased, when, the request reference you typed,
 and each record that changed with the fields that were emptied. It never holds an erased value.

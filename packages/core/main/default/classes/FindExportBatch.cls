@@ -18,6 +18,13 @@ public with sharing class FindExportBatch implements Database.Batchable<SObject>
 	private static Integer rowsPerPart = 50000;
 	@TestVisible
 	private static Integer charsPerPart = 4000000;
+	/**
+	 * An archive's or a Backup Set run's parts are smaller (R-SQ17), so one part and its request
+	 * fit one asynchronous transaction's heap and the callout size limit when sent off platform.
+	 */
+	@TestVisible
+	private static Integer archiveCharsPerPart = 3000000;
+	private Integer partChars = charsPerPart;
 
 	private static final String CRLF = '\r\n';
 	private static final String BYTE_ORDER_MARK = String.fromCharArray(new List<Integer>{ 65279 });
@@ -43,6 +50,8 @@ public with sharing class FindExportBatch implements Database.Batchable<SObject>
 	private Id archiveJobId;
 	/** A Backup Set run (R-SQ15): the archive's file, no delete, and its Backup job. */
 	private Id backupJobId;
+	/** An archive's or a Backup Set run's parts, in order (R-SQ16), so they can be found again. */
+	private List<Id> documentIds = new List<Id>();
 
 	/**
 	 * An archive's export (R-BD9): the query's records with these fields, at most `rowLimit`,
@@ -58,6 +67,7 @@ public with sharing class FindExportBatch implements Database.Batchable<SObject>
 		FindExportBatch archive = new FindExportBatch(queryJson, null, tag, rowLimit);
 		archive.archiveFields = new Set<String>(fields);
 		archive.archiveJobId = jobId;
+		archive.partChars = Math.min(charsPerPart, archiveCharsPerPart);
 		return archive;
 	}
 
@@ -137,7 +147,7 @@ public with sharing class FindExportBatch implements Database.Batchable<SObject>
 				bufferChars += line.length() + 2;
 				rowsInPart++;
 				rowsWritten++;
-				if (rowsInPart >= rowsPerPart || bufferChars >= charsPerPart) {
+				if (rowsInPart >= rowsPerPart || bufferChars >= partChars) {
 					writePart();
 				}
 			}
@@ -167,7 +177,13 @@ public with sharing class FindExportBatch implements Database.Batchable<SObject>
 			firstDocumentId
 		);
 		if (archiveJobId != null) {
-			BulkDeleteService.afterArchiveExport(archiveJobId, failed, rowsWritten, titleOf(objectName, tag, 1));
+			BulkDeleteService.afterArchiveExport(
+				archiveJobId,
+				failed,
+				rowsWritten,
+				titleOf(objectName, tag, 1),
+				documentIds
+			);
 		}
 		if (backupJobId != null) {
 			BackupSetService.afterExport(
@@ -177,7 +193,8 @@ public with sharing class FindExportBatch implements Database.Batchable<SObject>
 				parts,
 				firstDocumentId,
 				titleOf(objectName, tag, 1),
-				rowsWritten >= rowLimit
+				rowsWritten >= rowLimit,
+				documentIds
 			);
 		}
 	}
@@ -197,8 +214,8 @@ public with sharing class FindExportBatch implements Database.Batchable<SObject>
 			VersionData = Blob.valueOf(body)
 		);
 		Database.insert(version, AccessLevel.USER_MODE);
-		if (firstDocumentId == null) {
-			firstDocumentId = [
+		if (firstDocumentId == null || archiveFields != null) {
+			Id documentId = [
 				SELECT ContentDocumentId
 				FROM ContentVersion
 				WHERE Id = :version.Id
@@ -206,6 +223,8 @@ public with sharing class FindExportBatch implements Database.Batchable<SObject>
 				LIMIT 1
 			]
 			.ContentDocumentId;
+			firstDocumentId = firstDocumentId == null ? documentId : firstDocumentId;
+			documentIds.add(documentId);
 		}
 		buffer = new List<String>();
 		bufferChars = 0;

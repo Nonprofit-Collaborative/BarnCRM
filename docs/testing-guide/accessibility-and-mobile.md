@@ -14,7 +14,7 @@ These scripts cover what a person has to judge. Missing labels, button icons wit
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **BarnCRM Admin** app and the **BarnCRM Settings** tab. Press Tab until focus reaches the page content. | A visible focus ring sits on the **Search settings** box. |
+| 1 | Open the **BarnCRM Admin Console** app and the **BarnCRM Settings** tab. Press Tab until focus reaches the page content. | A visible focus ring sits on the **Search settings** box. |
 | 2 | Type `greeting`. | A **Search Results** list appears under the box as you type. |
 | 3 | Press Tab until focus is on the result **Formal greeting pattern**, then press Enter. | The **People and Households** section opens on the right, the page scrolls to the **Preview and Recompute** panel and focus is on its heading. |
 | 4 | Press Shift+Tab until focus is in the **Sections** list, then press Tab or Shift+Tab to reach **General** and press Enter. | The General section shows. Every section in the list can be reached with Tab and opened with Enter. |
@@ -32,7 +32,7 @@ These scripts cover what a person has to judge. Missing labels, button icons wit
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **Find** tab in the **BarnCRM** app. Tab to the **Kind of record** box. | Focus ring on **Kind of record**, placeholder **Choose a kind of record**. |
+| 1 | Open the **Find** tab in the **BarnCRM Console** app. Tab to the **Kind of record** box. | Focus ring on **Kind of record**, placeholder **Choose a kind of record**. |
 | 2 | Press Enter or Down Arrow, use the arrow keys to reach **Households**, press Enter. | The **Columns** chooser, **Conditions**, **Sort by** and the **Technical query (SOQL), read only** box appear. |
 | 3 | Tab into **Columns**. In the available list use the arrow keys to pick a field, then Tab to the move right button and press Enter. | The field moves to the chosen list. |
 | 4 | Tab to **Run** and press Enter. | A line **N rows found.** appears above the results table (N is a number), and the results table lists households. |

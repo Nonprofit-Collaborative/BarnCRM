@@ -102,7 +102,7 @@ with no shipped totals.
 
 One step is left for you, and nothing in the app does it on your behalf:
 
-1. From the App Launcher, open the **BarnCRM Admin** app and click the **Rollup
+1. From the App Launcher, open the **BarnCRM Admin Console** app and click the **Rollup
    Builder** tab. (In **BarnCRM Settings**, the **Rollups** section opens the same page.)
 2. You should see every total listed above, one row each.
 3. Click **Schedule Nightly Recalculation**. This switches the rollup recalculation step on
@@ -200,10 +200,12 @@ The nightly recalculation is a step of [BarnCRM Nightly Jobs](nightly-jobs.md), 
 nightly run all of BarnCRM's overnight work shares. The step starts at 2:00 AM by default (or
 as soon as the step before it has finished), in the time zone of the person who scheduled the
 run, and is switched on and off here, on the Rollups page. To run it at another hour, open **BarnCRM Settings**, **Rollups** section, and choose
-**Time of the nightly run** (any hour from 12:00 AM (midnight) to 11:00 PM). Saving a new
-hour moves the scheduled run straight away; if the nightly run is not scheduled, the new hour
-is used when you schedule it. Pick a quiet hour after the day's data entry and before the
-morning's reports.
+**Time of the nightly run** (any hour from 12 AM (midnight) to 11 PM). Saving a new
+hour moves the scheduled run straight away, once the save finishes; if the nightly run is not
+scheduled, the new hour is used when you schedule it. Pick a quiet hour after the day's data
+entry and before the morning's reports. Every Rollups setting saves like the rest of BarnCRM
+Settings: **Saving...** for a few seconds, then **Your settings are saved.** (see
+[Saving Your Changes](barncrm-settings.md#saving-your-changes)).
 
 **Every record once a week, what changed the other nights.** Each save already keeps its
 totals right, so most nights the run only checks what a save could have missed. Once a week,
@@ -350,7 +352,7 @@ What to know about them:
 ## The Rollup Builder
 
 Rollups are their own module, **BarnCRM Rollup Builder**, with one tab, **Rollup Builder**,
-in the **BarnCRM Admin** and **BarnCRM Admin Console** apps (the module has no app of its
+in the **BarnCRM Admin Console** app (the module has no app of its
 own). Its settings are in the **Rollups** section of **BarnCRM Settings**.
 
 The **Rollup Builder** tab is where you create a new total and edit any existing one, shipped
@@ -1079,7 +1081,7 @@ and so does changing a gift's status or deleting a gift. What is not here yet:
 Do this as Maria, with the sample data loaded. Steps 2 to 5 use the giving totals, so they
 need the Fundraising module; without it, do them on a rollup you have added.
 
-1. Open the **BarnCRM** app. On the home page, find the **Rollups** tile. It reads
+1. Open the **BarnCRM Console** app. On the home page, find the **Rollups** tile. It reads
    "Rollups Last Completed" with a time. If it has been more than 36 hours, the tile turns
    into a warning and offers a link to the Rollups section of **BarnCRM Settings**, which
    opens the Rollup Builder. Click that link, or open the **Rollup Builder** tab in

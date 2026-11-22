@@ -7,7 +7,11 @@
     fills them in and works their submissions.
   </description>
   <applicationVisibilities>
-    <application>BarnCRM_Forms</application>
+    <application>BarnCRM</application>
+    <visible>true</visible>
+  </applicationVisibilities>
+  <applicationVisibilities>
+    <application>BarnCRM_Admin_Console</application>
     <visible>true</visible>
   </applicationVisibilities>
   <classAccesses>
@@ -177,6 +181,10 @@
   </tabSettings>
   <tabSettings>
     <tab>Form__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Forms_Home</tab>
     <visibility>Visible</visibility>
   </tabSettings>
 </PermissionSet>

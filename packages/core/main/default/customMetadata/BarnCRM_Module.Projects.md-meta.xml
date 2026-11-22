@@ -44,7 +44,7 @@
   </values>
   <values>
     <field>Extensions__c</field>
-    <value xsi:type="xsd:string">NightlyStepProvider: ProjectsNightlyJobProvider</value>
+    <value xsi:type="xsd:string">NightlyStepProvider: ProjectsNightlyJobProvider; SettingsSavedExtension: ProjectsSettingsSaved</value>
   </values>
   <values>
     <field>Beta__c</field>

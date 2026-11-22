@@ -546,7 +546,8 @@ public with sharing class VolunteerSampleDataLoader {
 		Integer deleted = 0;
 		List<String> problems = new List<String>();
 		List<Id> problemIds = new List<Id>();
-		List<Database.DeleteResult> results = Database.delete(ids, false, AccessLevel.USER_MODE);
+		// System mode past sharing, gated by Manage BarnCRM Settings (SR-01).
+		List<Database.DeleteResult> results = SampleDataRemover.remove(ids, false);
 		for (Integer i = 0; i < results.size(); i++) {
 			if (results[i].isSuccess()) {
 				deleted++;

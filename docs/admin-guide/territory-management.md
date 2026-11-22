@@ -43,7 +43,7 @@ households and organizations it moves. A record they cannot see or edit is skipp
 
 ## Set Up Territories
 
-Open the **Territory Management** tab (in the BarnCRM admin apps, or from BarnCRM Settings,
+Open the **Territory Management** tab (in BarnCRM Admin Console, or from BarnCRM Settings,
 **Territory Management**, **Open**).
 
 1. Press **New Territory**. Give it a name, a priority (lower numbers are checked first; the

@@ -11,22 +11,26 @@ with Lanczos filtering on premultiplied alpha, so edges keep no halo. Patch is n
 recolored or stretched (every master is square, and the welcome pose keeps its aspect ratio).
 
   Asset (ContentAsset)               Package       Master (hires/)               App
-  BarnCRM_Patch_Logo                 core          marks/barncrm-icon            BarnCRM, BarnCRM Standard
-  BarnCRM_Patch_Admin_Logo           core          marks/barncrm-circular-badge  BarnCRM Admin, Admin Console
+  BarnCRM_Patch_Logo                 core          marks/barncrm-icon            BarnCRM Console
+  BarnCRM_Patch_Admin_Logo           core          marks/barncrm-circular-badge  BarnCRM Admin Console
+  BarnCRM_Patch_Members_Partners_Logo core         modules/memberships-logo      BarnCRM Members and Partners
   BarnCRM_Patch_Fundraising_Logo     giving        modules/giving-logo           BarnCRM Fundraising
   BarnCRM_Patch_Volunteers_Logo      volunteers    modules/volunteers-logo       BarnCRM Volunteers
   BarnCRM_Patch_Programs_Logo        programs      modules/programs-logo         BarnCRM Programs
   BarnCRM_Patch_Funders_Logo         funders       modules/funders-logo          BarnCRM Grants
   BarnCRM_Patch_Logic_Models_Logo    logicmodels   modules/logic-models-logo     (Module Manager tile)
-  BarnCRM_Patch_Forms_Logo           forms         modules/forms-logo            BarnCRM Forms
+  BarnCRM_Patch_Forms_Logo           forms         modules/forms-logo            (Module Manager tile)
   BarnCRM_Patch_Events_Logo          events        modules/event-management-logo BarnCRM Events
   BarnCRM_Patch_Projects_Logo        projects      modules/project-management-logo BarnCRM Projects
-  BarnCRM_Patch_Corporate_Hub_Logo   corporatehub  modules/corporate-hub-logo    BarnCRM Corporate Hub
-  BarnCRM_Patch_Portal_Logo          portal        modules/portal-builder-logo   BarnCRM Portal Builder
-  BarnCRM_Patch_Memberships_Logo     memberships   modules/memberships-logo      BarnCRM Memberships
-  BarnCRM_Patch_Scholarships_Logo    scholarships  modules/scholarships-logo     BarnCRM Scholarships
-  BarnCRM_Patch_Connector_Logo       connector     marks/barncrm-icon            BarnCRM Connector (until a
-                                                                                 Connector master exists)
+  BarnCRM_Patch_Corporate_Hub_Logo   corporatehub  modules/corporate-hub-logo    (module asset)
+  BarnCRM_Patch_Portal_Logo          portal        modules/portal-builder-logo   (module asset)
+  BarnCRM_Patch_Memberships_Logo     memberships   modules/memberships-logo      (module asset)
+  BarnCRM_Patch_Scholarships_Logo    scholarships  modules/scholarships-logo     (module asset)
+  BarnCRM_Connector_Patch_Logo       connector     modules/connector-logo        (module asset)
+
+The suite ships nine console apps (ADR-0237, nine console apps). BarnCRM Members and Partners is a
+Core app that Memberships and Corporate Hub fill, so Core ships its logo, made from the Memberships
+master. The module assets with no app stay for a Module Manager tile.
 
 Plus Core's static resource `BarnPatchWelcome` (hires/poses/hi-im-patch, 400 px wide), shown by
 c/hubWelcome on BarnCRM Home.
@@ -57,6 +61,7 @@ WELCOME_WIDTH = 400
 LOGOS = [
     ("core", "BarnCRM_Patch_Logo", "", "marks/barncrm-icon.png"),
     ("core", "BarnCRM_Patch_Admin_Logo", "admin", "marks/barncrm-circular-badge.png"),
+    ("core", "BarnCRM_Patch_Members_Partners_Logo", "members-partners", "modules/memberships-logo.png"),
     ("giving", "BarnCRM_Patch_Fundraising_Logo", "giving", "modules/giving-logo.png"),
     ("volunteers", "BarnCRM_Patch_Volunteers_Logo", "volunteers", "modules/volunteers-logo.png"),
     ("programs", "BarnCRM_Patch_Programs_Logo", "programs", "modules/programs-logo.png"),
@@ -69,7 +74,7 @@ LOGOS = [
     ("portal", "BarnCRM_Patch_Portal_Logo", "portal", "modules/portal-builder-logo.png"),
     ("memberships", "BarnCRM_Patch_Memberships_Logo", "memberships", "modules/memberships-logo.png"),
     ("scholarships", "BarnCRM_Patch_Scholarships_Logo", "scholarships", "modules/scholarships-logo.png"),
-    ("connector", "BarnCRM_Patch_Connector_Logo", "connector", "marks/barncrm-icon.png"),
+    ("connector", "BarnCRM_Connector_Patch_Logo", "connector", "modules/connector-logo.png"),
 ]
 WELCOME = ("core", "BarnPatchWelcome", "poses/hi-im-patch.png")
 

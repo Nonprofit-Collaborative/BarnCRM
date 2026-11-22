@@ -19,6 +19,8 @@ connector/ConnectorApplyMapAction.cls | global class ConnectorApplyMapAction
 connector/ConnectorApplyMapAction.cls | global class Request
 connector/ConnectorApplyMapAction.cls | global class Result
 connector/ConnectorApplyMapAction.cls | global static List<Result> apply(List<Request>)
+connector/ConnectorBackupDestination.cls | public ConnectorBackupDestination()
+connector/ConnectorBackupDestination.cls | public class ConnectorBackupDestination
 connector/ConnectorErasureExtension.cls | public ConnectorErasureExtension()
 connector/ConnectorErasureExtension.cls | public class ConnectorErasureExtension
 connector/ConnectorHealthCheckExtension.cls | public ConnectorHealthCheckExtension()
@@ -81,6 +83,44 @@ core/AddressMatchKeyHandler.cls | public class AddressMatchKeyHandler
 core/AddressMatchKeyHandler.cls | public class FilledCheck
 core/AddressService.cls | public class AddressService
 core/AddressService.cls | public static final String STATUS_UNDELIVERABLE
+core/ArchiveDestination.cls | public interface ArchiveDestination
+core/ArchiveDestinations.cls | public class ArchiveDestinations
+core/ArchiveDestinations.cls | public static ArchiveDestination forKey(String)
+core/ArchiveDestinations.cls | public static final String OFF_PLATFORM_CLASS
+core/ArchiveErasureExtension.cls | public ArchiveErasureExtension()
+core/ArchiveErasureExtension.cls | public class ArchiveErasureExtension
+core/ArchiveRules.cls | public Boolean scheduled()
+core/ArchiveRules.cls | public class ArchiveRuleException
+core/ArchiveRules.cls | public class ArchiveRules
+core/ArchiveRules.cls | public class Rule
+core/ArchiveRules.cls | public static Boolean isDue(Rule,Date)
+core/ArchiveRules.cls | public static Boolean isRule(String)
+core/ArchiveRules.cls | public static Date nextDue(Rule,Date)
+core/ArchiveRules.cls | public static Integer weekdayOf(Date)
+core/ArchiveRules.cls | public static Rule of(String)
+core/ArchiveRules.cls | public static String destinationOf(String)
+core/ArchiveRules.cls | public static String withRule(String,Rule)
+core/ArchiveRules.cls | public static final List<String> DESTINATIONS
+core/ArchiveRules.cls | public static final String BIG_OBJECT
+core/ArchiveRules.cls | public static final String FILES
+core/ArchiveRules.cls | public static final String OFF_PLATFORM
+core/ArchiveRules.cls | public static void check(Rule)
+core/ArchiveRun.cls | public ArchiveRun(Id,String,String,String,Integer)
+core/ArchiveRun.cls | public Boolean scheduled
+core/ArchiveRun.cls | public Id savedQueryId
+core/ArchiveRun.cls | public Integer confirmedCount
+core/ArchiveRun.cls | public String objectName
+core/ArchiveRun.cls | public String queryJson
+core/ArchiveRun.cls | public String ruleName
+core/ArchiveRun.cls | public class ArchiveRun
+core/ArchiveToBigObject.cls | public Import_Batch__c start(ArchiveRun)
+core/ArchiveToBigObject.cls | public String key()
+core/ArchiveToBigObject.cls | public String unavailableReason()
+core/ArchiveToBigObject.cls | public class ArchiveToBigObject
+core/ArchiveToFiles.cls | public Import_Batch__c start(ArchiveRun)
+core/ArchiveToFiles.cls | public String key()
+core/ArchiveToFiles.cls | public String unavailableReason()
+core/ArchiveToFiles.cls | public class ArchiveToFiles
 core/AsyncStarter.cls | public class AsyncStarter
 core/AsyncStarter.cls | public class BusyException
 core/AsyncStarter.cls | public static Id batch(Database.Batchable<SObject>,Integer,String)
@@ -284,6 +324,8 @@ core/EngagementSignalExtension.cls | public interface EngagementSignalExtension
 core/ErrorDigestScheduler.cls | public class ErrorDigestScheduler
 core/ErrorDigestScheduler.cls | public static Datetime nextRunAt()
 core/ErrorDigestScheduler.cls | public static Id start()
+core/ErrorDigestWriter.cls | public class ErrorDigestWriter
+core/ErrorDigestWriter.cls | public static final String LAST_RUN
 core/ErrorLogCountSelector.cls | public class ErrorLogCountSelector
 core/ErrorLogCountSelector.cls | public static Integer countNewUpTo(Integer)
 core/ErrorLogCountSelector.cls | public static String listViewUrl()
@@ -450,6 +492,7 @@ core/HealthCheckResult.cls | public class Counts
 core/HealthCheckResult.cls | public class HealthCheckResult
 core/HealthCheckResult.cls | public static Counts read()
 core/HealthCheckResult.cls | public static String text(Integer,Integer,Integer)
+core/HealthCheckResult.cls | public static void write(Integer,Integer,Integer)
 core/HealthCheckRun.cls | public interface HealthCheckRun
 core/HealthCheckService.cls | public Boolean getCanManageSettings()
 core/HealthCheckService.cls | public Boolean getModeNeedsAttention()
@@ -1144,6 +1187,30 @@ core/ModuleManagerService.cls | public static final String STATUS_OFF
 core/ModuleManagerService.cls | public static final String STATUS_ON
 core/ModuleManagerService.cls | public static void turnOff(String)
 core/ModuleManagerService.cls | public static void turnOn(String)
+core/ModuleSettings.cls | public class ModuleSettings
+core/ModuleSettings.cls | public static Boolean flag(String)
+core/ModuleSettings.cls | public static Boolean isStoreObject(String)
+core/ModuleSettings.cls | public static Date dateValue(String)
+core/ModuleSettings.cls | public static Datetime datetimeValue(String)
+core/ModuleSettings.cls | public static Decimal number(String)
+core/ModuleSettings.cls | public static Id save(Map<String,Object>)
+core/ModuleSettings.cls | public static Id saveSystem(Map<String,Object>)
+core/ModuleSettings.cls | public static Integer integerValue(String)
+core/ModuleSettings.cls | public static List<Setting_Module__mdt> registry()
+core/ModuleSettings.cls | public static Map<String,Setting_Definition__mdt> definitionsFor(String)
+core/ModuleSettings.cls | public static Map<String,Setting_Module__mdt> modules()
+core/ModuleSettings.cls | public static Object defaultValue(String)
+core/ModuleSettings.cls | public static Object legacyValue(String,String)
+core/ModuleSettings.cls | public static Object stored(String)
+core/ModuleSettings.cls | public static Object value(String)
+core/ModuleSettings.cls | public static SObject legacyRecord(String)
+core/ModuleSettings.cls | public static Set<String> stateFields(Setting_Module__mdt)
+core/ModuleSettings.cls | public static Setting_Definition__mdt definition(String)
+core/ModuleSettings.cls | public static Setting_Definition__mdt definitionFor(String,String)
+core/ModuleSettings.cls | public static Setting_Module__mdt moduleByPrefix(String)
+core/ModuleSettings.cls | public static String text(String)
+core/ModuleSettings.cls | public static void clearCache()
+core/ModuleSettings.cls | public static void setForTest(String,Object)
 core/ModuleSetup.cls | public interface ModuleSetup
 core/ModuleSetups.cls | public class ModuleSetups
 core/ModuleSetups.cls | public class SetupCheck
@@ -1233,7 +1300,13 @@ core/NpspHouseholdSource.cls | public virtual Map<String,Object> binds()
 core/NpspHouseholdSource.cls | public virtual String condition()
 core/NpspHouseholdSource.cls | public virtual String key()
 core/NpspHouseholdSource.cls | public virtual class NpspHouseholdSource
+core/OffPlatformArchiveDestination.cls | public Import_Batch__c start(ArchiveRun)
+core/OffPlatformArchiveDestination.cls | public String key()
+core/OffPlatformArchiveDestination.cls | public String unavailableReason()
+core/OffPlatformArchiveDestination.cls | public class OffPlatformArchiveDestination
+core/OffPlatformDestination.cls | public interface OffPlatformDestination
 core/OrgDate.cls | public class OrgDate
+core/OrgDate.cls | public static Date dateOf(Datetime)
 core/OrgDate.cls | public static Date today()
 core/OrgDate.cls | public static TimeZone zone()
 core/OrgLimitReader.cls | public Integer getPercent()
@@ -1442,6 +1515,11 @@ core/SampleDataModules.cls | public static void startRemoval()
 core/SampleDataRemoveBatch.cls | public SampleDataRemoveBatch(SampleDataStages)
 core/SampleDataRemoveBatch.cls | public class SampleDataRemoveBatch
 core/SampleDataRemoveBatch.cls | public static Id startRemoval(SampleDataStages)
+core/SampleDataRemover.cls | public class SampleDataRemover
+core/SampleDataRemover.cls | public static Integer count(String,String)
+core/SampleDataRemover.cls | public static List<Database.DeleteResult> remove(List<Id>,Boolean)
+core/SampleDataRemover.cls | public static List<Id> ids(String,String,Set<Id>,Integer)
+core/SampleDataRemover.cls | public static Map<Id,String> names(String,Set<Id>)
 core/SampleDataStageBatch.cls | public Boolean stopped
 core/SampleDataStageBatch.cls | public SampleDataStageBatch(SampleDataStages)
 core/SampleDataStageBatch.cls | public static Boolean everyStageInTest
@@ -1513,6 +1591,7 @@ core/SettingsController.cls | public class ConsoleModel
 core/SettingsController.cls | public class SettingsController
 core/SettingsController.cls | public static ConsoleModel consoleModel()
 core/SettingsController.cls | public static ConsoleModel save(Map<String,Object>)
+core/SettingsSavedExtension.cls | public interface SettingsSavedExtension
 core/SettingsService.cls | public class SettingsException
 core/SettingsService.cls | public class SettingsService
 core/SettingsService.cls | public static BarnCRM_Settings__c firstSaveRecord()
@@ -1525,6 +1604,8 @@ core/SettingsService.cls | public static Boolean hasKey(String,String)
 core/SettingsService.cls | public static Decimal number(String,String)
 core/SettingsService.cls | public static Decimal storedNumber(String)
 core/SettingsService.cls | public static Decimal toNumber(Object)
+core/SettingsService.cls | public static Id lastDeploymentId()
+core/SettingsService.cls | public static Id sendCollected()
 core/SettingsService.cls | public static Object getEffectiveValue(String,String,String)
 core/SettingsService.cls | public static Object getValue(String)
 core/SettingsService.cls | public static Object getValue(String,String)
@@ -1538,8 +1619,25 @@ core/SettingsService.cls | public static final String COEXISTENCE_MODE_DEFAULT
 core/SettingsService.cls | public static final String CORE_SETTINGS_OBJECT
 core/SettingsService.cls | public static final String MEMBERSHIP_MODE_DEFAULT
 core/SettingsService.cls | public static void clearCaches()
+core/SettingsService.cls | public static void collectSaves()
 core/SettingsService.cls | public static void logChange(String,String,String)
 core/SettingsService.cls | public static void saveBookkeeping(Map<String,Object>)
+core/SettingsService.cls | public static void saveSystemValues(String,Map<String,Object>)
+core/SettingsService.cls | public static void setForTest(String,Object)
+core/SettingsService.cls | public static void stopCollecting()
+core/SettingsState.cls | public class SettingsState
+core/SettingsState.cls | public static Boolean flag(String)
+core/SettingsState.cls | public static Boolean isStateKey(String)
+core/SettingsState.cls | public static Datetime moment(String)
+core/SettingsState.cls | public static Decimal number(String)
+core/SettingsState.cls | public static Object get(String)
+core/SettingsState.cls | public static Object lockOrCreate(String)
+core/SettingsState.cls | public static String moduleKey(String,String)
+core/SettingsState.cls | public static String text(String)
+core/SettingsState.cls | public static final Set<String> CORE_KEYS
+core/SettingsState.cls | public static void clearCache()
+core/SettingsState.cls | public static void lock(Set<String>)
+core/SettingsState.cls | public static void put(Map<String,Object>)
 core/SetupAssistantExtension.cls | public interface SetupAssistantExtension
 core/SetupAssistantExtensions.cls | public class SetupAssistantExtensions
 core/SetupAssistantExtensions.cls | public static List<SetupAssistantExtension> findAll()
@@ -1986,6 +2084,10 @@ programs/ServicePlanDatesHandler.cls | public ServicePlanDatesHandler()
 programs/ServicePlanDatesHandler.cls | public class ServicePlanDatesHandler
 programs/SessionScheduleTriggerHandler.cls | public SessionScheduleTriggerHandler()
 programs/SessionScheduleTriggerHandler.cls | public class SessionScheduleTriggerHandler
+projects/ProjectChangeRequestHandler.cls | public ProjectChangeRequestHandler()
+projects/ProjectChangeRequestHandler.cls | public class ProjectChangeRequestHandler
+projects/ProjectCostHandler.cls | public ProjectCostHandler()
+projects/ProjectCostHandler.cls | public class ProjectCostHandler
 projects/ProjectEntryHandler.cls | public ProjectEntryHandler()
 projects/ProjectEntryHandler.cls | public class ProjectEntryHandler
 projects/ProjectInvoiceHandler.cls | public ProjectInvoiceHandler()
@@ -2062,6 +2164,7 @@ rollups/RollupService.cls | public static Set<String> everyMode()
 rollups/RollupService.cls | public static Set<String> recalculateTargets(Set<Id>,String)
 rollups/RollupService.cls | public static Set<String> scheduledModes()
 rollups/RollupService.cls | public static String defaultMode()
+rollups/RollupService.cls | public static String stateKey(String)
 rollups/RollupService.cls | public static final Integer STALE_AFTER_HOURS
 rollups/RollupService.cls | public static final String FRESHNESS_FIELD
 rollups/RollupService.cls | public static final String MODE_BOTH
@@ -2073,6 +2176,7 @@ rollups/RollupService.cls | public static final String PROCESSING_BACKGROUND
 rollups/RollupService.cls | public static final String PROCESSING_IN_SAVE
 rollups/RollupService.cls | public static final String PROCESSING_SETTING
 rollups/RollupService.cls | public static final String SETTINGS_OBJECT
+rollups/RollupService.cls | public static final String STATE_PREFIX
 rollups/RollupService.cls | public static void catchUpAfterTurnedOn()
 rollups/RollupService.cls | public static void recalculate(Id)
 rollups/RollupService.cls | public static void runAfterDelete(String,List<SObject>)

@@ -619,7 +619,7 @@ public with sharing class GiftService {
 	 */
 	public static Id resolveDefaultFundId() {
 		Id settingFundId = null;
-		String stored = Giving_Settings__c.getOrgDefaults().Default_Fund__c;
+		String stored = ModuleSettings.text('Giving_Default_Fund');
 		if (String.isNotBlank(stored)) {
 			try {
 				settingFundId = Id.valueOf(stored);

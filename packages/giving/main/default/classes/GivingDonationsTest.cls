@@ -181,6 +181,33 @@ private class GivingDonationsTest {
 		}
 	}
 
+	/**
+	 * A donation paid near midnight and processed by a user in a time zone far from the org's
+	 * takes the org's date, both for the pending gift and once paid (D-219, OD-15).
+	 */
+	@IsTest
+	static void theGiftDateIsTheOrgDateNotTheProcessingUsersDate() {
+		User processor = admin();
+		Datetime paidAt = TestUsers.inAnotherTimeZone(processor);
+		System.runAs(processor) {
+			GivingDonations.paymentsForTest = new FakePayments();
+			Appeal__c open = appeal(true);
+
+			new GivingDonationPage().received(receipt(open.Id, donor().Id));
+			Gift__c pending = gift();
+			new GivingDonations()
+				.call(
+					'paymentChanged',
+					new Map<String, Object>{ 'paymentId' => 'pay-1', 'status' => 'Paid', 'paidAt' => paidAt }
+				);
+			Gift__c paid = gift();
+
+			Assert.areEqual(OrgDate.today(), pending.Gift_Date__c, 'Pending: the org date today');
+			Assert.areEqual(OrgDate.dateOf(paidAt), paid.Gift_Date__c, 'Paid: the org date of the payment');
+			Assert.areNotEqual(paidAt.date(), paid.Gift_Date__c, 'Not the processing user date');
+		}
+	}
+
 	@IsTest
 	static void thePaymentFirstLeavesTheGiftToProcessingWithItsStatus() {
 		System.runAs(admin()) {

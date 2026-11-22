@@ -129,11 +129,22 @@ fi
 mkdir -p "$(dirname "$OUT")"
 : >"$OUT"
 LAST="$(mktemp -t barn-version-XXXXXX)"
-trap 'rm -f "$LAST"' EXIT
+# The versions are built from a staged copy of the project with the leading indentation of every
+# Apex class and trigger removed, so an installed package counts about 8 percent fewer Apex
+# characters in the subscriber's org (AP-05, ADR-0241). STRIP_APEX_INDENT=0 builds the source as
+# written. The repository is never modified.
+BUILD_ROOT="$REPO_ROOT"
+STAGE=""
+if [[ "${STRIP_APEX_INDENT:-1}" != 0 ]]; then
+  STAGE="$(mktemp -d "${TMPDIR:-/tmp}/barn-stage.XXXXXX")"
+  python3 "$REPO_ROOT/scripts/packaging/strip-apex-indent.py" --root "$REPO_ROOT" --stage "$STAGE"
+  BUILD_ROOT="$STAGE"
+fi
+trap 'rm -f "$LAST"; [[ -n "$STAGE" ]] && rm -rf "$STAGE"' EXIT
 for i in "${!KEYS[@]}"; do
   echo "  [${KEYS[$i]}] building..."
   status=0
-  (cd "$REPO_ROOT" && sf package version create --package "${NAMES[$i]}" "${flags[@]}") >"$LAST" 2>/dev/null || status=$?
+  (cd "$BUILD_ROOT" && sf package version create --package "${NAMES[$i]}" "${flags[@]}") >"$LAST" 2>/dev/null || status=$?
   id="$(helper jget result.SubscriberPackageVersionId <"$LAST")"
   if [[ "$status" != 0 || "$id" != 04t* ]]; then
     echo "  [${KEYS[$i]}] FAILED: $(helper jget message <"$LAST" | head -c 300)" >&2

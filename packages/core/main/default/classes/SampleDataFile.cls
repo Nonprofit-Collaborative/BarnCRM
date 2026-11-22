@@ -35,8 +35,11 @@
  *
  * Removal deletes each `remove` entry's matches in order, a chunk per transaction, with partial
  * success: a record the organization's own records point at refuses the delete (a Restrict lookup
- * or a rule) and is kept, never deleted from under them, and one Warning in the Error Log says
- * how many of each were kept. `where` is SOQL written by the module, never by a user.
+ * or a rule) and is kept, never deleted from under them, and one Warning in the Error Log names
+ * each kept record with the reason the platform gave. `where` is SOQL written by the module,
+ * never by a user, and must test `Sample_Data__c`. Removal finds and deletes through
+ * `SampleDataRemover`, in system mode past sharing, so any admin with Manage BarnCRM Settings
+ * removes the whole set, whoever loaded it (SR-01, D-219).
  */
 @NamespaceAccessible
 public with sharing class SampleDataFile implements SampleDataModule {
@@ -352,6 +355,7 @@ public with sharing class SampleDataFile implements SampleDataModule {
 	public with sharing class RemoveStages implements SampleDataStages {
 		private final String resourceName;
 		private Map<Id, String> kept = new Map<Id, String>();
+		private Map<Id, String> reasons = new Map<Id, String>();
 
 		@NamespaceAccessible
 		public RemoveStages(String resourceName) {
@@ -370,25 +374,34 @@ public with sharing class SampleDataFile implements SampleDataModule {
 			// sample session still uses) can go once an earlier entry has been removed. A spare
 			// stage with nothing left to remove deletes nothing.
 			Integer stages = 0;
-			for (Object entry : find(resourceName).listOf('remove')) {
-				Integer rows = countOf((Map<String, Object>) entry, null);
+			for (Object raw : find(resourceName).listOf('remove')) {
+				Map<String, Object> entry = (Map<String, Object>) raw;
+				Integer rows = SampleDataRemover.count((String) entry.get('object'), (String) entry.get('where'));
 				stages += (rows + removeChunkSize - 1) / removeChunkSize + 1;
 			}
 			return stages;
 		}
 
-		/** Deletes the first entry's next chunk that has one; a refused row is kept. */
+		/** Deletes the first entry's next chunk that has one; a refused row is kept with its reason. */
 		@NamespaceAccessible
 		public void runStage(Integer stage) {
-			for (Object entry : find(resourceName).listOf('remove')) {
-				List<Id> ids = idsOf((Map<String, Object>) entry, kept.keySet());
+			for (Object raw : find(resourceName).listOf('remove')) {
+				Map<String, Object> entry = (Map<String, Object>) raw;
+				String objectName = (String) entry.get('object');
+				List<Id> ids = SampleDataRemover.ids(
+					objectName,
+					(String) entry.get('where'),
+					kept.keySet(),
+					removeChunkSize
+				);
 				if (ids.isEmpty()) {
 					continue;
 				}
-				List<Database.DeleteResult> results = Database.delete(ids, false, AccessLevel.USER_MODE);
+				List<Database.DeleteResult> results = SampleDataRemover.remove(ids, false);
 				for (Integer index = 0; index < results.size(); index++) {
 					if (!results[index].isSuccess()) {
-						kept.put(ids[index], (String) ((Map<String, Object>) entry).get('object'));
+						kept.put(ids[index], objectName);
+						reasons.put(ids[index], reasonOf(results[index]));
 					}
 				}
 				return;
@@ -398,14 +411,23 @@ public with sharing class SampleDataFile implements SampleDataModule {
 		@NamespaceAccessible
 		public void finish() {
 			SampleDataFile file = find(resourceName);
-			logKept(file.moduleName(), kept);
+			logKept(file.moduleName(), kept, reasons);
 			SampleDataModules.removeAfter(file.moduleName());
 		}
 	}
 
-	/** One Warning naming each record removal kept, by kind; null when none was. */
+	/** The platform's first reason for refusing a delete. */
+	private static String reasonOf(Database.DeleteResult result) {
+		List<Database.Error> errors = result.getErrors();
+		return errors.isEmpty() ? '' : errors[0].getMessage();
+	}
+
+	/**
+	 * One Warning naming each record removal kept, by kind, with the platform's reason for each;
+	 * null when none was.
+	 */
 	@TestVisible
-	private static String logKept(String moduleName, Map<Id, String> kept) {
+	private static String logKept(String moduleName, Map<Id, String> kept, Map<Id, String> reasons) {
 		if (kept.isEmpty()) {
 			return null;
 		}
@@ -419,18 +441,13 @@ public with sharing class SampleDataFile implements SampleDataModule {
 		}
 		List<String> parts = new List<String>();
 		for (String objectName : byObject.keySet()) {
-			Set<Id> ids = byObject.get(objectName);
-			List<String> names = new List<String>();
-			for (
-				SObject row : Database.queryWithBinds(
-					'SELECT Name FROM ' + objectName + ' WHERE Id IN :ids ORDER BY Name LIMIT 50',
-					new Map<String, Object>{ 'ids' => ids },
-					AccessLevel.USER_MODE
-				)
-			) {
-				names.add((String) row.get('Name'));
+			Map<Id, String> namesById = SampleDataRemover.names(objectName, byObject.get(objectName));
+			List<String> named = new List<String>();
+			for (Id recordId : namesById.keySet()) {
+				String reason = reasons == null ? null : reasons.get(recordId);
+				named.add(namesById.get(recordId) + (String.isBlank(reason) ? '' : ': ' + reason));
 			}
-			parts.add(NamespaceUtil.describe(objectName).getLabelPlural() + ' (' + String.join(names, ', ') + ')');
+			parts.add(NamespaceUtil.describe(objectName).getLabelPlural() + ' (' + String.join(named, '; ') + ')');
 		}
 		String message = String.format(
 			BarnHelp.text('Core', 'Core_SampleData_Kept'),
@@ -440,9 +457,13 @@ public with sharing class SampleDataFile implements SampleDataModule {
 		return message;
 	}
 
-	/** How many rows an entry matches, at most `cap` when one is given; 0 when unreadable. */
+	/**
+	 * How many rows an entry matches that the person can see, at most `cap` when one is given;
+	 * 0 when unreadable. For the status card, which anyone may read; removal counts through
+	 * `SampleDataRemover`.
+	 */
 	private static Integer countOf(Map<String, Object> entry, Integer cap) {
-		if (entry == null || !readable(entry, false)) {
+		if (entry == null || !readable(entry)) {
 			return 0;
 		}
 		return Database.countQueryWithBinds(
@@ -456,38 +477,9 @@ public with sharing class SampleDataFile implements SampleDataModule {
 		);
 	}
 
-	/** The next chunk of an entry's rows, leaving out the ones already kept. */
-	private static List<Id> idsOf(Map<String, Object> entry, Set<Id> kept) {
-		List<Id> ids = new List<Id>();
-		if (!readable(entry, true)) {
-			return ids;
-		}
-		// A semi-join must sit at the top level of the WHERE, never inside parentheses, and
-		// it cannot be ORed, so a clause with one is already a plain AND list; any other
-		// clause is wrapped so an OR in it stays apart from the kept rows.
-		String condition = (String) entry.get('where');
-		if (!condition.toUpperCase().contains('SELECT ')) {
-			condition = '(' + condition + ')';
-		}
-		for (
-			SObject row : Database.queryWithBinds(
-				'SELECT Id FROM ' +
-					(String) entry.get('object') +
-					' WHERE ' +
-					condition +
-					' AND Id NOT IN :kept LIMIT :chunk',
-				new Map<String, Object>{ 'kept' => kept, 'chunk' => removeChunkSize },
-				AccessLevel.USER_MODE
-			)
-		) {
-			ids.add(row.Id);
-		}
-		return ids;
-	}
-
-	/** Whether the object is in the org and the person can read it (and delete from it). */
-	private static Boolean readable(Map<String, Object> entry, Boolean toDelete) {
+	/** Whether the object is in the org and the person can read it. */
+	private static Boolean readable(Map<String, Object> entry) {
 		Schema.DescribeSObjectResult described = NamespaceUtil.describe((String) entry.get('object'));
-		return described != null && described.isAccessible() && (!toDelete || described.isDeletable());
+		return described != null && described.isAccessible();
 	}
 }

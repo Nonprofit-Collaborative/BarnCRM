@@ -13,20 +13,22 @@ private class OpportunityMirrorUnavailableTest {
 		'OpportunityMirrorController'
 	};
 
+	// Every test starts with the mirror on: a store value lasts one transaction, so it is put here.
+	static {
+		choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
+	}
+
 	@TestSetup
 	static void setup() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GivingTestDataFactory.ensureDefaultFund();
 			GivingTestDataFactory.insertHouseholdContact('The Garcia Household', 'Luis', 'Garcia');
-			choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
 		}
 	}
 
 	private static void choose(String direction) {
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		settings.Opportunity_Mirror_Direction__c = direction;
-		settings.Opportunity_Mirror_Start__c = Datetime.newInstance(2026, 1, 1);
-		upsert settings;
+		ModuleSettings.setForTest('Mirror_Opportunity_Mirror_Direction', direction);
+		ModuleSettings.setForTest('Mirror_Opportunity_Mirror_Start', Datetime.newInstance(2026, 1, 1));
 	}
 
 	/** Maria runs the mirror and manages the settings. */

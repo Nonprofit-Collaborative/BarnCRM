@@ -7,7 +7,7 @@
     loads, and every action on it fails, because the package writes in user mode.
   </description>
   <applicationVisibilities>
-    <application>Fundraising</application>
+    <application>BarnCRM_Fundraising</application>
     <visible>true</visible>
   </applicationVisibilities>
   <classAccesses>

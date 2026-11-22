@@ -6,7 +6,7 @@ enter a relationship once, on one person, and BarnCRM writes the other side for 
 current affiliation per person can be primary, and it shows on the person as **Primary
 Affiliation**.
 
-Before you start: open the **BarnCRM** app. Adding, changing and removing these needs the Team
+Before you start: open the **BarnCRM Console** app. Adding, changing and removing these needs the Team
 Member, Fundraising Staff or Admin role. The **Relationships** card is on every
 person while your admin has the **Relationships** feature on, and is hidden while it is off; the
 **Affiliations** card is on every person and organization while your admin has the

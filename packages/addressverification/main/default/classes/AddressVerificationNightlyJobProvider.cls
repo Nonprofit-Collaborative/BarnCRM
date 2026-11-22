@@ -19,15 +19,11 @@ public with sharing class AddressVerificationNightlyJobProvider implements Night
 					STEP_KEY,
 					BarnHelp.text('AddressVerification', 'AddressVerification_NightlyStep'),
 					3,
-					30,
+					50,
 					new AddressVerificationJob()
 				)
 				.withSwitch(true)
-				.activeWhen(
-					AddressVerifier.isOn() &&
-						AddressVerifier.isReady() &&
-						AddressVerifier.settings().Nightly_Limit__c > 0
-				)
+				.activeWhen(AddressVerifier.isOn() && AddressVerifier.isReady() && AddressVerifier.nightlyLimit() > 0)
 		};
 	}
 }

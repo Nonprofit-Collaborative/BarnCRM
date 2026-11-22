@@ -18,10 +18,7 @@ public with sharing class GivingNightlyJobProvider implements NightlyStepProvide
 
 	public List<NightlyStep> nightlySteps() {
 		List<NightlyStep> steps = GivingScheduler.steps();
-		steps.add(
-			AcknowledgmentScheduler.step()
-				.withSummary(Giving_Settings__c.getOrgDefaults().Acknowledgments_Last_Run_Summary__c)
-		);
+		steps.add(AcknowledgmentScheduler.step().withSummary(GivingState.text(GivingState.ACKNOWLEDGMENTS_SUMMARY)));
 		steps.add(OpportunityMirrorSchedulable.step());
 		steps.add(GiftTransactionMirrorSchedulable.step());
 		return steps;

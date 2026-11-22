@@ -61,7 +61,8 @@ BarnCRM itself never reads Contact Points. Only install this module if your org 
 
 ## Settings
 
-In **BarnCRM Settings**, **Contact Points** section:
+In **BarnCRM Settings**, **Contact Points** section (a save shows **Saving**, then **Saved**; when
+Copy Existing People last ran and what it did are not settings, the page records them at once):
 
 | Setting | What it does | Default |
 |---|---|---|

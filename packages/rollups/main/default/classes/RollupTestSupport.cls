@@ -8,8 +8,8 @@
  * marked records; `RollupBackgroundTest` and the Giving `GiftSaveRollupCostTest` pin the queued
  * path and its cost.
  *
- * The setting lives on the module's own `Rollup_Settings__c` (ADR-0125 decision 6) and is
- * saved through the settings service, as the console saves it.
+ * The setting is the module's `Rollup_Processing` row in the settings store (ADR-0238 settings
+ * as custom metadata), put there as if deployed.
  */
 @IsTest
 @NamespaceAccessible
@@ -27,9 +27,6 @@ public class RollupTestSupport {
 	}
 
 	private static void saveProcessing(String value) {
-		SettingsService.saveValues(
-			RollupService.SETTINGS_OBJECT,
-			new Map<String, Object>{ RollupService.PROCESSING_SETTING => value }
-		);
+		ModuleSettings.setForTest('Rollup_Processing', value);
 	}
 }

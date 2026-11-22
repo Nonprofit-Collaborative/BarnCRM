@@ -13,12 +13,16 @@ private class OpportunityMirrorServiceTest {
 	// detection-only: read by name so this class compiles where Opportunity does not exist
 	private static final String ROLE_OBJECT = 'OpportunityContactRole';
 
+	// Every test starts with the mirror on: a store value lasts one transaction, so it is put here.
+	static {
+		choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
+	}
+
 	@TestSetup
 	static void setup() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GivingTestDataFactory.ensureDefaultFund();
 			GivingTestDataFactory.insertHouseholdContact('The Garcia Household', 'Luis', 'Garcia');
-			choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
 		}
 		// Built once for the class rather than in every test that runs as her.
 		TestDataFactory.createUserOnTheRunningUsersProfile(
@@ -28,9 +32,7 @@ private class OpportunityMirrorServiceTest {
 	}
 
 	private static void choose(String direction) {
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		settings.Opportunity_Mirror_Direction__c = direction;
-		upsert settings;
+		ModuleSettings.setForTest('Mirror_Opportunity_Mirror_Direction', direction);
 	}
 
 	/** Maria: an administrator who can create Opportunities. */

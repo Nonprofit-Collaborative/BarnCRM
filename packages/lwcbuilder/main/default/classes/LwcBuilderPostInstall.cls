@@ -16,13 +16,6 @@
 public with sharing class LwcBuilderPostInstall implements InstallHandler, ModuleSetup {
 	public static final String MODULE_KEY = 'LwcBuilder';
 
-	/**
-	 * Checkboxes that ship on, each turned on once in an org that saved the settings before it
-	 * existed (QA-F2). Append only; `scripts/ci/check-setting-defaults.py` checks it.
-	 */
-	@TestVisible
-	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{};
-
 	/** Called by the platform after the module is installed or upgraded. */
 	public void onInstall(InstallContext context) {
 		if (context == null) {
@@ -42,7 +35,6 @@ public with sharing class LwcBuilderPostInstall implements InstallHandler, Modul
 	 * key added to the setup marker. Never throws.
 	 */
 	public void runSetup(Id installerId) {
-		ShippedDefaultUpgrades.apply(MODULE_KEY, LWC_Builder_Settings__c.SObjectType, SHIPPED_ON_ADDED_IN_UPGRADES);
 		ModuleSetups.markRan(MODULE_KEY);
 		ModuleAccessSyncs.setUp(MODULE_KEY, installerId);
 	}

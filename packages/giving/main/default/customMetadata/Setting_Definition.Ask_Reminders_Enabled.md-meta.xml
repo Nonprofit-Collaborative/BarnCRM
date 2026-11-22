@@ -34,4 +34,8 @@
         <field>Help_Path__c</field>
         <value xsi:type="xsd:string">ask-cadence.md</value>
     </values>
+    <values>
+        <field>Default_Value__c</field>
+        <value xsi:type="xsd:string">true</value>
+    </values>
 </CustomMetadata>

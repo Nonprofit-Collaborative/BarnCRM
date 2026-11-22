@@ -19,15 +19,12 @@ public class AddressVerificationTestData {
 	 * its External Credential, which a test cannot fill), with the other choices given.
 	 */
 	public static void connect(String provider, Boolean corrections) {
-		Address_Verification_Settings__c settings = Address_Verification_Settings__c.getOrgDefaults();
-		settings.SetupOwnerId = UserInfo.getOrganizationId();
-		settings.Provider__c = provider;
-		settings.Apply_Corrections__c = corrections;
-		settings.Verify_On_Save__c = true;
-		settings.Recheck_Months__c = 12;
-		settings.Nightly_Limit__c = 200;
-		settings.Connected_Provider__c = provider;
-		upsert settings;
+		ModuleSettings.setForTest('Address_Verification_Provider', provider);
+		ModuleSettings.setForTest('Address_Verification_Corrections', corrections);
+		ModuleSettings.setForTest('Address_Verification_On_Save', true);
+		ModuleSettings.setForTest('Address_Verification_Recheck', 12);
+		ModuleSettings.setForTest('Address_Verification_Nightly_Limit', 200);
+		SettingsState.put(new Map<String, Object>{ AddressVerifier.KEY_CONNECTED => provider });
 	}
 
 	/** Current addresses of one organization, inserted without the module's handler queueing. */

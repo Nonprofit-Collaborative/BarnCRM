@@ -95,7 +95,7 @@ public with sharing class VolunteerLetterController {
 		return new Map<String, Object>{
 			'canManage' => canManage,
 			'templates' => templates,
-			'organizationNameBlank' => String.isBlank(BarnCRM_Settings__c.getOrgDefaults().Organization_Legal_Name__c)
+			'organizationNameBlank' => String.isBlank(SettingsService.getSettings().Organization_Legal_Name__c)
 		};
 	}
 

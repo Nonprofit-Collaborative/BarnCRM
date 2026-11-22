@@ -110,3 +110,34 @@ and Read Only holders read Health Check.
   with it.
 - **One kit reference (ADR-0232):** the Migration package reads Core's `IntegrationAppService`
   kit query and `KitRef` type instead of its own copies.
+
+## Amendment, 2026-11-21 (D-219, release 1.34, SR-01): removal past sharing
+
+**Problem.** Removal ran in user mode, so it deleted only what the remover could delete. Most
+module admin sets give Delete without Modify All, and an object whose default access is
+Read/Write or Private gives no delete on another user's record, so an admin who held Manage
+BarnCRM Settings but was not a System Administrator, and had not loaded the set, left another
+admin's sample programs, cohorts, sessions, gifts and jobs behind. The Error Log then said
+"records of your own point at them", which was not the cause.
+
+**Decision.** Sample data removal finds and deletes only records tracked as sample data, in
+system mode past sharing, still gated by Manage BarnCRM Settings:
+
+1. Core's `SampleDataRemover` (`without sharing`, listed in the without sharing register) does
+   every removal count, search and delete. Each method refuses a person without Manage BarnCRM
+   Settings (the Sample Data page checks it first as well), and a search must test
+   `Sample_Data__c`, so a module's `remove` clause can only reach the sample tracking: a record
+   flagged itself, or one hanging off a flagged record as its module's set defines.
+2. `SampleDataFile.RemoveStages` (every JSON module set), Core's people removal
+   (`SampleDataRemoveStages`) and the Giving removal search and delete through it. The
+   Volunteers removal keeps its own reads, now in system mode in a `without sharing`
+   `VolunteerSampleDataSelector` (loading reads stay in user mode), so a real record the remover
+   cannot see still keeps its shift, job or skill; its deletes go through `SampleDataRemover`.
+3. The platform's guards still apply in system mode: a Restrict lookup, a validation rule or a
+   trigger refuses a delete, and the record is kept. The Warning names each kept record with
+   the reason the platform gave, not an assumed one.
+4. The status card's counts stay in the viewer's own access; only removal reaches past sharing.
+
+**Why not Modify All on the module admin sets.** It would let every module admin delete any
+record of those objects at any time, not only sample data during removal, and every new module
+would have to remember it.

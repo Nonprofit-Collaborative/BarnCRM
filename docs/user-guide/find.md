@@ -17,7 +17,7 @@ A colleague may see more or fewer rows than you for the same query.
 2. Type part of a name, an email address or a phone number.
 3. Choose a result, or press Enter to see all results grouped by kind of record.
 
-You should see: the record open in its own tab (in the **BarnCRM** app).
+You should see: the record open in its own tab (in the **BarnCRM Console** app).
 
 The name searches in BarnCRM's own screens (such as **Add Member** on a household) match the
 start of words: "gar" finds Ana Garcia, "cia" does not. A record saved in the last few minutes
@@ -49,7 +49,8 @@ page you came from, not to the tab.
    handle (touch: press and hold), or use its Move Up and Move Down buttons. The results follow
    the new order.
 4. Under **Conditions**, press **Add Condition**. Choose a **Field**, an **Operator** (such as
-   **equals**, **contains**, **is blank**, **is one of** or **is in the last N days**) and a
+   **equals**, **contains**, **is blank**, **is one of**, **is in the last N days** or **is more
+   than N days ago**) and a
    **Value**. Add more conditions the same way. With two or more conditions, drag one by its
    handle or use Move Up and Move Down to reorder them; custom condition logic follows, so
    `1 AND (2 OR 3)` still names the same conditions.
@@ -110,9 +111,9 @@ You should see: "Saved" followed by the name. To open it later, choose it in **S
 queries**. Queries shared with you show the sharer's name, for example "Springfield, no email
 (shared by Maria Lopez)". Only the person who saved a query can change, share or delete it.
 
-An administrator can make a saved query a **Backup Set**, so a copy of its records can be saved
-to a file whenever they want one ([Backup Sets](../admin-guide/backup-sets.md)). Saving the query
-again in Find keeps it a Backup Set.
+An administrator can make a saved query a **Backup Set**, so a copy of its records is saved to
+files when they choose or on a schedule ([Backup Sets](../admin-guide/backup-sets.md)). Saving the
+query again in Find keeps it a Backup Set, with its schedule.
 
 ## To Delete a Saved Query
 
@@ -172,4 +173,5 @@ You should see: the builder filled in from your text, ready to run.
 - Admin Guide: [Find and export](../admin-guide/find.md),
   [Super Transformer](../admin-guide/bulk-update.md), [Bulk delete](../admin-guide/bulk-delete.md),
   [Archive by Query](../admin-guide/archive-by-query.md), [Backup Sets](../admin-guide/backup-sets.md),
+  [Archive Rules](../admin-guide/archive-rules.md),
   [Access](../admin-guide/access.md)

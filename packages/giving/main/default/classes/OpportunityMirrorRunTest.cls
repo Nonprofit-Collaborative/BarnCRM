@@ -25,9 +25,14 @@ private class OpportunityMirrorRunTest {
 	}
 
 	private static void choose(String direction) {
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		settings.Opportunity_Mirror_Direction__c = direction;
-		upsert settings;
+		ModuleSettings.setForTest('Mirror_Opportunity_Mirror_Direction', direction);
+	}
+
+	/** The mirror for Opportunities to Gifts from 1 January 2026, on the record types listed. */
+	private static void opportunitiesToGifts(String recordTypes) {
+		choose(OpportunityMirrorService.OPPORTUNITIES_TO_GIFTS);
+		ModuleSettings.setForTest('Mirror_Opportunity_Mirror_Start', Datetime.newInstance(2026, 1, 1));
+		ModuleSettings.setForTest('Mirror_Opportunity_Mirror_Record_Types', recordTypes);
 	}
 
 	/** Maria runs the mirror and manages the settings, pause included. */
@@ -94,13 +99,8 @@ private class OpportunityMirrorRunTest {
 		Assert.isNull(OpportunityMirrorBatch.run(), 'And none can start.');
 	}
 
-	private static Giving_Settings__c stored() {
-		return [
-			SELECT Opportunity_Mirror_Last_Run__c, Opportunity_Mirror_Last_Summary__c
-			FROM Giving_Settings__c
-			WITH SYSTEM_MODE
-			LIMIT 1
-		];
+	private static Datetime lastRun() {
+		return GivingState.moment(GivingState.OPPORTUNITY_MIRROR_LAST_RUN);
 	}
 
 	@IsTest
@@ -122,7 +122,7 @@ private class OpportunityMirrorRunTest {
 			List<Error_Log__c> logged = runLogs();
 			Assert.areEqual(1, logged.size(), 'One Info entry.');
 			Assert.isTrue(logged[0].Message__c.contains('paused'), logged[0].Message__c);
-			Assert.isNull(stored().Opportunity_Mirror_Last_Run__c, 'A skipped run is not recorded.');
+			Assert.isNull(lastRun(), 'A skipped run is not recorded.');
 		}
 	}
 
@@ -180,7 +180,7 @@ private class OpportunityMirrorRunTest {
 			Assert.areEqual(1, logged.size(), 'One Info entry: the summary.');
 			Assert.isTrue(logged[0].Message__c.contains('3 left for the next run'), logged[0].Message__c);
 			Assert.isTrue(logged[0].Message__c.contains('paused'), 'It says why: ' + logged[0].Message__c);
-			Assert.isNull(stored().Opportunity_Mirror_Last_Run__c, 'An interrupted run is not recorded.');
+			Assert.isNull(lastRun(), 'An interrupted run is not recorded.');
 		}
 	}
 
@@ -223,12 +223,9 @@ private class OpportunityMirrorRunTest {
 				AccessLevel.SYSTEM_MODE
 			)[0];
 			Assert.areEqual(130, (Decimal) copy.get('Amount'), 'The skipped change is put right.');
-			Giving_Settings__c recorded = stored();
-			Assert.isTrue(recorded.Opportunity_Mirror_Last_Run__c >= before, 'The run is recorded.');
-			Assert.isTrue(
-				recorded.Opportunity_Mirror_Last_Summary__c.contains('1 updated'),
-				recorded.Opportunity_Mirror_Last_Summary__c
-			);
+			Assert.isTrue(lastRun() >= before, 'The run is recorded.');
+			String summary = GivingState.text(GivingState.OPPORTUNITY_MIRROR_SUMMARY);
+			Assert.isTrue(summary.contains('1 updated'), summary);
 		}
 	}
 
@@ -258,11 +255,7 @@ private class OpportunityMirrorRunTest {
 	@IsTest
 	static void aRecordTypeTheOrgDoesNotHaveMakesNoGifts() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-			settings.Opportunity_Mirror_Direction__c = OpportunityMirrorService.OPPORTUNITIES_TO_GIFTS;
-			settings.Opportunity_Mirror_Start__c = Datetime.newInstance(2026, 1, 1);
-			settings.Opportunity_Mirror_Record_Types__c = 'No_Such_Record_Type';
-			upsert settings;
+			opportunitiesToGifts('No_Such_Record_Type');
 			if (!OpportunityMirrorService.isAvailable()) {
 				assertNothingMirrored();
 				return;
@@ -286,8 +279,7 @@ private class OpportunityMirrorRunTest {
 					.contains('RecordTypeId IN :recordTypeIds'),
 				'The run filters on it (R-OM7).'
 			);
-			settings.Opportunity_Mirror_Record_Types__c = null;
-			upsert settings;
+			ModuleSettings.setForTest('Mirror_Opportunity_Mirror_Record_Types', null);
 			Assert.isNull(OpportunityGiftService.recordTypeIds(), 'Empty means every record type.');
 		}
 	}
@@ -295,11 +287,7 @@ private class OpportunityMirrorRunTest {
 	@IsTest
 	static void masterInTheRecordTypeListIsLeftOutAndNamedOnce() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-			settings.Opportunity_Mirror_Direction__c = OpportunityMirrorService.OPPORTUNITIES_TO_GIFTS;
-			settings.Opportunity_Mirror_Start__c = Datetime.newInstance(2026, 1, 1);
-			settings.Opportunity_Mirror_Record_Types__c = 'Master';
-			upsert settings;
+			opportunitiesToGifts('Master');
 			if (!OpportunityMirrorService.isAvailable()) {
 				assertNothingMirrored();
 				return;
@@ -331,8 +319,7 @@ private class OpportunityMirrorRunTest {
 				warned[0].Message__c,
 				'It says why Master matches nothing and what to do.'
 			);
-			settings.Opportunity_Mirror_Record_Types__c = 'master, No_Such_Record_Type';
-			upsert settings;
+			ModuleSettings.setForTest('Mirror_Opportunity_Mirror_Record_Types', 'master, No_Such_Record_Type');
 			Assert.isTrue(OpportunityGiftService.listsMasterRecordType(), 'In any case.');
 			Assert.areEqual(
 				new List<String>{ 'No_Such_Record_Type' },
@@ -445,9 +432,7 @@ private class OpportunityMirrorRunTest {
 	static void theStartDateIsReadInTheOrgTimeZone() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Datetime start = Datetime.newInstanceGmt(2026, 1, 1, 3, 0, 0);
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-			settings.Opportunity_Mirror_Start__c = start;
-			upsert settings;
+			ModuleSettings.setForTest('Mirror_Opportunity_Mirror_Start', start);
 			String zone = [SELECT TimeZoneSidKey FROM Organization LIMIT 1].TimeZoneSidKey;
 			Date expected = Date.valueOf(start.format('yyyy-MM-dd', zone));
 			// Maria's own time zone is GMT; the org's decides.

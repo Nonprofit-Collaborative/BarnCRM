@@ -15,7 +15,7 @@
             </template>
         </template>
         <template lwc:if={showUserName}>
-            <lightning-input label={labels.userName} value={userName} required data-field="userName" data-id="user-name" onchange={handleField}></lightning-input>
+            <lightning-input label={userNameLabel} value={userName} required data-field="userName" data-id="user-name" onchange={handleField}></lightning-input>
         </template>
         <!-- The key box: never prefilled, never bound to a tracked field, cleared after every call (F10). -->
         <lightning-input type="password" autocomplete="new-password" label={secretLabel} required data-id="secret"></lightning-input>

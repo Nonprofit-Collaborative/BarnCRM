@@ -38,4 +38,8 @@
     <field>Help_Path__c</field>
     <value xsi:type="xsd:string">receipts.md</value>
   </values>
+    <values>
+        <field>Default_Value__c</field>
+        <value xsi:type="xsd:string">"File download"</value>
+    </values>
 </CustomMetadata>

@@ -65,12 +65,11 @@ private class ErrorDigestControllerTest {
 				Test.stopTest();
 			}
 
-			BarnCRM_Settings__c after = BarnCRM_Settings__c.getOrgDefaults();
-			Assert.isNotNull(after.Error_Digest_Last_Run__c, 'The step ran the digest.');
+			SettingsState.clearCache();
+			Assert.isNotNull(SettingsState.moment(ErrorDigestWriter.LAST_RUN), 'The step ran the digest.');
 			Assert.isTrue(
-				after.Error_Digest_Last_Run_Summary__c.startsWith(
-					Label.Core_ErrorDigest_SummaryNothingNew.substringBefore('{0}')
-				),
+				SettingsState.text(ErrorDigestWriter.LAST_SUMMARY)
+					.startsWith(Label.Core_ErrorDigest_SummaryNothingNew.substringBefore('{0}')),
 				'With nothing new, it sent nothing and said so.'
 			);
 		}
@@ -108,7 +107,7 @@ private class ErrorDigestControllerTest {
 			}
 
 			Assert.isTrue(runJobs().isEmpty(), 'Nothing was scheduled.');
-			Assert.isNull(BarnCRM_Settings__c.getOrgDefaults().Error_Digest_Last_Run__c, 'And nothing was sent.');
+			Assert.isNull(SettingsState.moment(ErrorDigestWriter.LAST_RUN), 'And nothing was sent.');
 		}
 	}
 }

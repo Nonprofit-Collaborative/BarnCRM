@@ -12,4 +12,5 @@
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">130</value></values>
     <values><field>Description__c</field><value xsi:type="xsd:string">The nightly check looks up a verified address again once this many months have passed, since streets and postal codes change. 0 never checks a verified address again. Default 12.</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">address-verification.md</value></values>
+    <values><field>Default_Value__c</field><value xsi:type="xsd:string">12</value></values>
 </CustomMetadata>

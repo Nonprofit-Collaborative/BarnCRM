@@ -120,7 +120,7 @@ private class DonorLevelSchedulableTest {
 			Test.stopTest();
 			Assert.isNotNull(job, 'The rescoring pass ran');
 			Assert.isNull(
-				Giving_Settings__c.getOrgDefaults().Donor_Levels_Last_Recalculated__c,
+				GivingState.moment(GivingState.DONOR_LEVELS_RECALCULATED),
 				'A rescoring pass records no recalculation'
 			);
 		}

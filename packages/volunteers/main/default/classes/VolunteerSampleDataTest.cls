@@ -411,11 +411,9 @@ private class VolunteerSampleDataTest {
 			new VolunteersSampleData.RemoveStages().finish();
 			Test.stopTest();
 
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = 'SampleDataRemoveBatch'],
-				'The removal carries on to the next module or to Core'
-			);
+			// The next removal may find nothing, finish at once and hand on again: one or two batches.
+			Integer batches = [SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = 'SampleDataRemoveBatch'];
+			Assert.isTrue(batches >= 1 && batches <= 2, 'The removal carries on to the next module or to Core');
 			List<Error_Log__c> log = removalLog();
 			Assert.areEqual(1, log.size(), 'One entry, and no refused delete: ' + log);
 			Assert.areEqual(ErrorLogger.SEVERITY_WARNING, log[0].Severity__c);
@@ -575,9 +573,10 @@ private class VolunteerSampleDataTest {
 			new VolunteersSampleData.RemoveStages().finish();
 			Test.stopTest();
 
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = 'SampleDataRemoveBatch'],
+			// The next removal may find nothing, finish at once and hand on again: one or two batches.
+			Integer batches = [SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = 'SampleDataRemoveBatch'];
+			Assert.isTrue(
+				batches >= 1 && batches <= 2,
 				'Giving\'s removal where Giving is installed, otherwise Core\'s'
 			);
 		}

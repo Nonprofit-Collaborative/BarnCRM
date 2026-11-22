@@ -4,10 +4,10 @@ Scholarships and Outbound Grants tracks the money your organization gives: appli
 awards, payments and the reports recipients owe. Your admin turns it on; the setup is in the Admin
 Guide's [Scholarships and Outbound Grants](../admin-guide/scholarships.md) page.
 
-## The Scholarships and Grants Page
+## Scholarships Home
 
-Open the **BarnCRM Scholarships** app (or **BarnCRM** or **BarnCRM Console**) and its
-**Scholarships and Grants** tab. Before your organization's first award program, it
+Open the **BarnCRM Console** app (or **BarnCRM Grants**, if you work in grants too) and its
+**Scholarships Home** tab. Before your organization's first award program, it
 opens with **Set Up Your First Award Program** and a **New Award Program** button. It shows:
 
 - **My Reviews**: applications assigned to you that you have not submitted. Open one to review it.

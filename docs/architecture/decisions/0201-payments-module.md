@@ -128,6 +128,14 @@ user processes.
    the Payments Setup page; `Payments_Staff` (Team Member, Fundraising Staff): read payments;
    `Payments_Read_Only` (Read Only): read payments. Nobody edits a payment's status by hand: it
    comes only from the processor. `Payments_Webhook_Guest` is the guest's.
+   - **Why View All on all three sets (D-219, OD-12).** `Payment__c` is Private org-wide
+     because each record carries the payer's name and email. Almost no payment is owned by a
+     person who works with it: a checkout started from a public page is created by the Site
+     guest user, and one started by a form, an event or a gift job is created by an
+     integration or processing user. Owner-based sharing would therefore show staff nothing,
+     so `Payments_Staff`, `Payments_Read_Only` and `Payments_Admin` each grant View All on
+     `Payment__c` (read only for Staff and Read Only). The privacy line is who holds a Payments
+     set, which the role sync decides, not record ownership. Reviewed 2026-11-21 and kept.
 10. **Test and live.** The mode is stored on each payment, so test payments can be told apart
     and left out of reports. PayPal's test mode uses `api-m.sandbox.paypal.com`; Stripe's is
     chosen by the key.

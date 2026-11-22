@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    The Portal Builder app home: portals and their status, people with access and recent sign-ins,
+    with New Portal.
+  </description>
+  <label>Portal Builder Home</label>
+  <lwcComponent>portalBuilderHome</lwcComponent>
+  <motif>Custom68: Globe</motif>
+</CustomTab>

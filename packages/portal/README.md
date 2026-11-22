@@ -26,15 +26,14 @@ seam.
 
 ## Contents
 
-- Objects: `Portal__c`, `Portal_Access__c`, `Portal_Session__c`, settings `Portal_Settings__c`
-  (canonical model 29PB1 to 29PB4).
+- Objects: `Portal__c`, `Portal_Access__c`, `Portal_Session__c` (canonical model 29PB1 to
+  29PB3). Settings (29PB4): `Setting_Module.Portal` and the `Portal_*` Setting Definition rows,
+  read with `ModuleSettings`; the legacy `Portal_Settings__c` is read only until carry-over.
 - Apex REST API `PortalApi` (`/services/apexrest/barncrm/portal/v1/*`), with `PortalAuth`
   (sign-in, sessions), `PortalData` (pages), `PortalTemplate` (template checks) and
   `PortalTokens` (hashes, codes, authenticator codes).
 - Permission sets `Portal_Admin` (given to BarnCRM Admin holders by `PortalAccessSync`) and
   `Portal_Integration` (assigned by hand to the integration user only).
-- App `BarnCRM_Portal_Builder` (BarnCRM Portal Builder, logo `BarnCRM_Patch_Portal_Logo`), visible
-  through `Portal_Admin`; left out of scratch and Developer Edition orgs (ADR-0223, module apps).
-  The Portals and Portal Accesses tabs also join BarnCRM Admin and BarnCRM Admin Console, before
-  Error Log, through the catalog row's `Admin_Tabs__c` and `scripts/org/module-app-tabs.py`.
+- No app (ADR-0237 (nine console apps)): the Portal Builder Home, Portals and Portal Accesses tabs join
+  BarnCRM Admin Console, before Error Log, through the catalog row's `Admin_Tabs__c` and `scripts/org/module-app-tabs.py`.
 - Settings in the Portals section of BarnCRM Settings.

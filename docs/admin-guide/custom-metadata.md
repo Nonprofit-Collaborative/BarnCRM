@@ -48,7 +48,7 @@ entry changes the org's metadata.
    was installed as a package, turn on Deploy Metadata from Non-Certified Package Versions
    via Apex in Setup (Apex Settings), then save again. The Error Log has details." Where
    BarnCRM was deployed as source, the setting is not needed.
-3. Open the **BarnCRM Admin** app, click **BarnCRM Settings**, choose **General**, and scroll to
+3. Open the **BarnCRM Admin Console** app, click **BarnCRM Settings**, choose **General**, and scroll to
    **Custom Metadata**.
 
 A relationship type also has to be a choice in the **Type** list on a relationship, and

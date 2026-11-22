@@ -156,6 +156,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-37 Bulk delete | [bulk-delete.md](bulk-delete.md) | Core |
 | C-67 Archive by Query (save old records to a file in Files, then delete them; optionally empty the Recycle Bin) | [archive-by-query.md](archive-by-query.md) | Core |
 | C-66 Backup Sets (saved Find queries saved to files in Files on demand; restore through Load one object) | [backup-sets.md](backup-sets.md) | Core |
+| AR-10 Archive Rules (saved Find queries that move records to Files or the Archived Record big object, now or on a schedule) | [archive-rules.md](archive-rules.md) | Core |
 | C-70 Import Files (a zip with a manifest loaded into Files linked to records, with dry run and undo) | [files-import.md](files-import.md) | Core |
 | Org Optimizer (Data Quality, Field Use, Data Dictionary, Health Check, Errors, Storage and Limits, Unused Setup, Setup Changes, Access Explorer) | [org-optimizer.md](org-optimizer.md) | BarnCRM Org Optimizer |
 | C-28 Data Quality (the Data Quality section of Org Optimizer) | [data-hygiene.md](data-hygiene.md) | BarnCRM Org Optimizer |
@@ -259,7 +260,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | F-14 Answer and boilerplate library: Grant Answers | [funders.md](funders.md#answer-library) | BarnCRM Grants |
 | L-06 Link outcomes to grant deliverables: the Logic Model Outcomes card on a requirement | [funders.md](funders.md#outcomes-a-requirement-reports-on) | BarnCRM Grants |
 | F-06 Funder report merge template: Funder Report Templates | [funders.md](funders.md#funder-report-templates) | BarnCRM Grants |
-| F-07 Board dashboard: the Board Dashboard tab | [funders.md](funders.md#the-board-dashboard-tab) | BarnCRM Grants |
+| F-07 Board dashboard: the Grants Home tab | [funders.md](funders.md#the-grants-home-tab) | BarnCRM Grants |
 | C-45 Contact Point Sync: copying email, phone and addresses to Salesforce Contact Points, the settings, Copy Existing People | [contact-point-sync.md](contact-point-sync.md) | BarnCRM Contact Point Sync |
 | C-46 Address Verification: the org's own Smarty or Google key, checks on save and nightly, corrections, the nightly limit, Health Check | [address-verification.md](address-verification.md) | BarnCRM Address Verification |
 
@@ -267,14 +268,14 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 
 | Feature | Page | Package |
 |---|---|---|
-| C-42a to C-42c Forms: install, roles, the Form Builder (steps, questions, records to write, conditions, preview, publish), filling in a form, matching people and organizations, public forms on a Salesforce Site (Site setup, Health Check checks, processing, integrations), files and save for later, form submissions and Process Again | [forms.md](forms.md) | BarnCRM Forms |
+| C-42a to C-42c Forms: install, roles, Forms Home, the Form Builder (steps, questions, records to write, conditions, preview, publish), filling in a form, matching people and organizations, public forms on a Salesforce Site (Site setup, Health Check checks, processing, integrations), files and save for later, form submissions and Process Again | [forms.md](forms.md) | BarnCRM Forms |
 
 ### Event Management
 
 | Feature | Page | Package |
 |---|---|---|
 | EV-01 Events: install, roles, the Events page, Repeat Event, the event page; EV-03 ticket types and promo codes; EV-04 the Agenda Builder; EV-05 speakers; EV-06 the call for speakers; EV-09 sponsorship; EV-02 registrations, the waitlist and the Forms link; EV-11 the event dashboard and templates; EV-15 appointments; EV-08 volunteers; EV-12 check-in and QR codes; EV-14 settings, reminders, follow-ups and no-shows; EV-10 the Summit Events import | [events.md](events.md) | BarnCRM Event Management |
-| PB-01 Portal Builder: the integration user and its license, the External Client App, portals and templates, sign-in settings, the WordPress plugin | [portal-builder.md](portal-builder.md) | BarnCRM Portal Builder |
+| PB-01 Portal Builder: the integration user and its license, the External Client App, Portal Builder Home, portals and templates, sign-in settings, the WordPress plugin | [portal-builder.md](portal-builder.md) | BarnCRM Portal Builder |
 
 ### Corporate Hub
 
@@ -331,7 +332,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 
 | Feature | Page | Package |
 |---|---|---|
-| G-22a to G-22e, PAY-02, PB-09 Memberships: install, roles, levels and benefits, membership terms and their status, renewing by hand, from Fundraising gifts and recurring gifts, and online through Payments, lapse handling and reminders, the member directory portal, Memberships Essentials, certifications and continuing credits, erasure | [memberships.md](memberships.md) | BarnCRM Memberships (Fundraising, Payments and Portal Builder optional) |
+| G-22a to G-22e, PAY-02, PB-09 Memberships: install, roles, Memberships Home, levels and benefits, membership terms and their status, renewing by hand, from Fundraising gifts and recurring gifts, and online through Payments, lapse handling and reminders, the member directory portal, Memberships Essentials, certifications and continuing credits, erasure | [memberships.md](memberships.md) | BarnCRM Memberships (Fundraising, Payments and Portal Builder optional) |
 
 ### Moving From Another System
 

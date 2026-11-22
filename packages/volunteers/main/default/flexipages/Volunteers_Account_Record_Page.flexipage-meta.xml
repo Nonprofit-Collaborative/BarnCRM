@@ -46,7 +46,7 @@
         <identifier>RecordField_Website</identifier>
         <visibilityRule>
           <criteria>
-            <leftValue>{!Record.Is_Organization__c}</leftValue>
+            <leftValue>{!Record.Is_Organization_Account__c}</leftValue>
             <operator>EQUAL</operator>
             <rightValue>true</rightValue>
           </criteria>
@@ -165,7 +165,7 @@
             <rightValue>Household</rightValue>
           </criteria>
           <criteria>
-            <leftValue>{!Record.Is_Organization__c}</leftValue>
+            <leftValue>{!Record.Is_Organization_Account__c}</leftValue>
             <operator>EQUAL</operator>
             <rightValue>false</rightValue>
           </criteria>
@@ -184,7 +184,7 @@
             <rightValue>Household</rightValue>
           </criteria>
           <criteria>
-            <leftValue>{!Record.Is_Organization__c}</leftValue>
+            <leftValue>{!Record.Is_Organization_Account__c}</leftValue>
             <operator>EQUAL</operator>
             <rightValue>false</rightValue>
           </criteria>
@@ -203,7 +203,7 @@
             <rightValue>Household</rightValue>
           </criteria>
           <criteria>
-            <leftValue>{!Record.Is_Organization__c}</leftValue>
+            <leftValue>{!Record.Is_Organization_Account__c}</leftValue>
             <operator>EQUAL</operator>
             <rightValue>false</rightValue>
           </criteria>
@@ -222,7 +222,7 @@
             <rightValue>Household</rightValue>
           </criteria>
           <criteria>
-            <leftValue>{!Record.Is_Organization__c}</leftValue>
+            <leftValue>{!Record.Is_Organization_Account__c}</leftValue>
             <operator>EQUAL</operator>
             <rightValue>false</rightValue>
           </criteria>
@@ -241,7 +241,7 @@
             <rightValue>Household</rightValue>
           </criteria>
           <criteria>
-            <leftValue>{!Record.Is_Organization__c}</leftValue>
+            <leftValue>{!Record.Is_Organization_Account__c}</leftValue>
             <operator>EQUAL</operator>
             <rightValue>false</rightValue>
           </criteria>
@@ -260,7 +260,7 @@
             <rightValue>Household</rightValue>
           </criteria>
           <criteria>
-            <leftValue>{!Record.Is_Organization__c}</leftValue>
+            <leftValue>{!Record.Is_Organization_Account__c}</leftValue>
             <operator>EQUAL</operator>
             <rightValue>false</rightValue>
           </criteria>
@@ -391,7 +391,7 @@
                   <rightValue>Household</rightValue>
                 </criteria>
                 <criteria>
-                  <leftValue>{!Record.Is_Organization__c}</leftValue>
+                  <leftValue>{!Record.Is_Organization_Account__c}</leftValue>
                   <operator>EQUAL</operator>
                   <rightValue>false</rightValue>
                 </criteria>
@@ -445,7 +445,7 @@
         <identifier>affiliationPanel</identifier>
         <visibilityRule>
           <criteria>
-            <leftValue>{!Record.Is_Organization__c}</leftValue>
+            <leftValue>{!Record.Is_Organization_Account__c}</leftValue>
             <operator>EQUAL</operator>
             <rightValue>true</rightValue>
           </criteria>
@@ -542,7 +542,7 @@
             <rightValue>Household</rightValue>
           </criteria>
           <criteria>
-            <leftValue>{!Record.Is_Organization__c}</leftValue>
+            <leftValue>{!Record.Is_Organization_Account__c}</leftValue>
             <operator>EQUAL</operator>
             <rightValue>false</rightValue>
           </criteria>

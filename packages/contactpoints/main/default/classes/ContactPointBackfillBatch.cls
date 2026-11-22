@@ -31,17 +31,16 @@ public without sharing class ContactPointBackfillBatch implements Database.Batch
 	}
 
 	/**
-	 * Writes the last backfill's time and summary. Only those two keys are saved, so the
-	 * switches keep what they read, also on an org that never saved them (ADR-0035).
+	 * Writes the last backfill's time and summary as run state (SET-03), which a job writes at
+	 * once and which never touches the switches.
 	 */
 	@TestVisible
 	private static void record(ContactPointSyncService.Result done) {
 		try {
-			OrgSettingsSystemWriter.save(
-				Contact_Point_Sync_Settings__c.SObjectType,
-				new Map<Schema.SObjectField, Object>{
-					Contact_Point_Sync_Settings__c.Last_Backfill__c => System.now(),
-					Contact_Point_Sync_Settings__c.Last_Backfill_Summary__c => BarnHelp.text(
+			SettingsState.put(
+				new Map<String, Object>{
+					ContactPointSyncService.KEY_LAST_BACKFILL => System.now(),
+					ContactPointSyncService.KEY_LAST_SUMMARY => BarnHelp.text(
 						'ContactPoints',
 						'ContactPoints_Backfill_Summary',
 						new List<Object>{ done.created, done.updated, done.deleted, done.failed }

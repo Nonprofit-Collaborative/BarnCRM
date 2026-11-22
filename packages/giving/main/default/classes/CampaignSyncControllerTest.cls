@@ -10,9 +10,7 @@ private class CampaignSyncControllerTest {
 	}
 
 	private static void switchOn(Boolean enabled) {
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		settings.Campaign_Sync_Enabled__c = enabled;
-		upsert settings;
+		ModuleSettings.setForTest('Mirror_Campaign_Sync_Enabled', enabled);
 	}
 
 	/** Maria: BarnCRM Admin, Campaign access, Marketing User and the Campaign Sync set. */

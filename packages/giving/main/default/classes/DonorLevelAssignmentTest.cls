@@ -13,6 +13,12 @@ private class DonorLevelAssignmentTest {
 	private static final String SUSTAINER = 'Sustainer';
 	private static final String LEADERSHIP = 'Leadership Circle';
 
+	// Levels on, placed by Total Giving. A store value lasts one transaction, so it is put here.
+	static {
+		ModuleSettings.setForTest('Donor_Levels_Enabled', true);
+		ModuleSettings.setForTest('Donor_Level_Source_Field', 'Total_Giving__c');
+	}
+
 	@TestSetup
 	static void makeData() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
@@ -21,11 +27,6 @@ private class DonorLevelAssignmentTest {
 				new Donor_Level__c(Name = SUSTAINER, Minimum_Amount__c = 1000, Maximum_Amount__c = 5000),
 				new Donor_Level__c(Name = LEADERSHIP, Minimum_Amount__c = 5000)
 			};
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-			settings.SetupOwnerId = UserInfo.getOrganizationId();
-			settings.Donor_Levels_Enabled__c = true;
-			settings.Donor_Level_Source_Field__c = 'Total_Giving__c';
-			upsert settings;
 		}
 	}
 
@@ -204,7 +205,7 @@ private class DonorLevelAssignmentTest {
 			Test.stopTest();
 
 			Assert.isNotNull(
-				Giving_Settings__c.getOrgDefaults().Donor_Levels_Last_Recalculated__c,
+				GivingState.moment(GivingState.DONOR_LEVELS_RECALCULATED),
 				'The page has to be able to say when donors were last placed (Principle 2).'
 			);
 		}
@@ -213,10 +214,7 @@ private class DonorLevelAssignmentTest {
 	@IsTest
 	static void nobodyIsPlacedWhileLevelsAreOff() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-			settings.Donor_Levels_Enabled__c = false;
-			update settings;
-			SettingsService.clearCaches();
+			ModuleSettings.setForTest('Donor_Levels_Enabled', false);
 
 			Test.startTest();
 			Account household = TestDataFactory.household(

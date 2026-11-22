@@ -183,9 +183,8 @@ public with sharing class GiftTransactionMirrorController {
 		current.canRun = GiftTransactionMirrorService.canRun();
 		current.running = GiftTransactionMirrorSchedulable.isRunning();
 		current.nextRunAt = GiftTransactionMirrorSchedulable.nextRunAt();
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		current.lastRunAt = settings?.Gift_Transaction_Mirror_Last_Run__c;
-		current.lastSummary = settings?.Gift_Transaction_Mirror_Last_Summary__c;
+		current.lastRunAt = GivingState.moment(GivingState.GIFT_TRANSACTION_MIRROR_LAST_RUN);
+		current.lastSummary = GivingState.text(GivingState.GIFT_TRANSACTION_MIRROR_SUMMARY);
 		return current;
 	}
 }

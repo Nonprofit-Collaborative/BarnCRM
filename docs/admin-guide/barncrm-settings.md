@@ -33,7 +33,7 @@ BarnCRM support page on GitHub in a new tab.
 
 There is nothing to turn on, but there is one permission to give out.
 
-1. Open the **BarnCRM Admin** app and click the **BarnCRM Settings** tab.
+1. Open the **BarnCRM Admin Console** app and click the **BarnCRM Settings** tab.
 2. If you can change values, you already have the **Manage BarnCRM Settings**
    permission. If you see a notice at the top of the page saying you can read but not
    change settings, you do not.
@@ -162,7 +162,7 @@ Accounts Tab** each show one tab, and BarnCRM gives the chosen ones to everyone 
 Admin, Staff or Read Only role within a few minutes of saving (and takes the others away). The
 Households tab still needs the **Households** feature on. The setting only adds tabs: a person
 whose profile already shows the Accounts tab keeps it whatever you choose, so to hide it, change
-the profile's tab setting in Setup. The BarnCRM and BarnCRM Console apps list the Accounts tab,
+the profile's tab setting in Setup. The BarnCRM Console app lists the Accounts tab,
 so it shows in their navigation bar for anyone who can see it.
 
 ## Modules
@@ -189,7 +189,7 @@ Builder ships as its own package, installed from this section like the others. S
 
 Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
 
-1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM Admin** (or **BarnCRM Admin
+1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM Admin Console** (or **BarnCRM Admin
    Console**). It opens on the **BarnCRM Settings** tab.
 2. The console opens with the section list on the
    left and the first section showing on the right. The page name shows once, in the page
@@ -255,6 +255,43 @@ including changes made in another section before you moved on; **Discard** puts 
 back. The bar goes away once nothing is
 unsaved. While anything is unsaved, closing or reloading the browser tab asks you first;
 moving to another tab inside Salesforce does not ask, so save before you leave the page.
+
+### Where Your Settings Are Kept
+
+Every setting is custom metadata, so you can retrieve your settings, deploy them to a sandbox
+or another org, or send them in a change set like any other metadata. Each setting ships with
+its default on a **Setting Definition** record; a setting you change gets a **Setting Value**
+record of the same name holding your value. A setting with no Setting Value uses its default,
+and so does one whose Setting Value is blank or was edited in Setup into something that is
+not a valid value.
+
+Saving sends one small metadata deployment with every setting you changed. The page says
+**Saving...** while Salesforce applies it, usually a few seconds, then **Your settings are
+saved.** If Salesforce refuses it, the page shows Salesforce's reason, puts back what is really
+saved, and records the reason in the [Error Log](error-log.md). If it is still running after
+two minutes, the page says so; refresh it in a minute to see your values. **Recent Changes**
+lists a change once its deployment has finished. A package install needs one Setup switch
+before saves work (see [Installing](installing.md#step-3-set-it-up)). One save that changes
+settings in several sections or modules is still one deployment, and a module's own settings
+page saves and reports the same way.
+
+What BarnCRM records about its own runs (the last error digest, the last Health Check, the
+last seasonal swap, setup progress) is not a setting: it describes this org only, is never
+deployed, and is kept on BarnCRM's own job records. Who dismissed **What's New** is kept the
+same way, per person. The automation pause is kept on **BarnCRM Automation Control** (see
+[Automation Control](automation-control.md)).
+
+### Carry Your Settings Over
+
+An org whose settings are still held in the **BarnCRM Settings** custom setting keeps running
+on them, and BarnCRM Settings shows a **Carry Your Settings Over** banner to anyone who can
+change settings. Choose **Carry Over Settings** once: every value that differs from its
+default becomes a Setting Value in one deployment, BarnCRM's run records and each person's
+What's New dismissal are copied, and a pause that has not ended moves to Automation Control.
+The same carry-over covers every installed module whose settings are kept this way: its saved
+values join the one deployment and its run records are copied too. Each carried value is listed in **Recent Changes**. A value longer than 255 characters cannot
+be carried; the page names it, and it uses its default until you enter it again. The banner
+does not come back once the carry-over has finished.
 
 Every panel inside a section (Edition, Features, Module Manager, Error Digest, Adopt NPSP
 Households, household naming, the organization address, Sample Data, Custom Metadata,
@@ -380,7 +417,9 @@ you change this row. Orgs that already have a record type of their own never see
 
 Change it if the guess is wrong. Saving a person account record type or one named Household
 is refused. Accounts already saved keep their record type; only which accounts count as
-organizations changes. If you later deactivate or delete the chosen record type, or add an
+organizations changes. Once the save finishes, BarnCRM updates the **Is Organization** field
+on every account it affects in the background, a few minutes in a large org, and on each
+account as it is saved. If you later deactivate or delete the chosen record type, or add an
 Account record type while **No record type** is chosen, BarnCRM picks again the same way on
 its next upgrade, so check this row after one.
 

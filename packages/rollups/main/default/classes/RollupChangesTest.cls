@@ -7,11 +7,15 @@
 @IsTest(testFor='ApexClass:RollupChanges')
 private class RollupChangesTest {
 	/** Totals read right after each save: recalculated in the save (RollupTestSupport). */
+	// A test's setting override does not outlive @TestSetup, so each test method's
+	// transaction sets it as the class loads.
+	static {
+		RollupTestSupport.recalculateInTheSave();
+	}
+
 	@TestSetup
-	static void recalculateInTheSave() {
-		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			RollupTestSupport.recalculateInTheSave();
-		}
+	static void makeAdmin() {
+		TestUsers.adminWith('Rollup_Builder_Admin');
 	}
 
 	private static Account organization(String name) {

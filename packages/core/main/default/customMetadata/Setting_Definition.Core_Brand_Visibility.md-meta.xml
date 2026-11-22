@@ -10,4 +10,8 @@
     <values><field>Description__c</field><value xsi:type="xsd:string">Needs Use brands on. On, staff assigned to a brand can see and edit the households, people and organizations assigned to it. To hide other records from them, also set Accounts to Private in Setup (Sharing Settings); Health Check reminds you. Off removes every share BarnCRM added.</value></values>
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">82</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">brands.md</value></values>
+  <values>
+    <field>Default_Value__c</field>
+    <value xsi:type="xsd:string">false</value>
+  </values>
 </CustomMetadata>

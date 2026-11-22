@@ -12,6 +12,12 @@ private class VolunteerLetterServiceTest {
 	private static final Date FROM_DATE = Date.newInstance(2026, 3, 1);
 	private static final Date TO_DATE = Date.newInstance(2026, 3, 31);
 
+	// A test's setting override does not outlive @TestSetup, so each test method's
+	// transaction sets it as the class loads.
+	static {
+		VolunteersTestData.volunteerSettings(false, true);
+	}
+
 	@TestSetup
 	static void makeData() {
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
@@ -30,7 +36,6 @@ private class VolunteerLetterServiceTest {
 			settings.Organization_Postal_Code__c = '62701';
 			TestDataFactory.saveSettings(settings);
 			// Hours count as soon as they are saved, so every entry below is Approved.
-			VolunteersTestData.volunteerSettings(false, true);
 			VolunteersTestData.job('Food pantry');
 			VolunteerLetterTemplates.installDefaultsDuringInstall();
 		}

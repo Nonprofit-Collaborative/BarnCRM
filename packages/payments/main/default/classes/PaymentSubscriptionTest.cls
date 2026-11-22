@@ -38,9 +38,7 @@ private class PaymentSubscriptionTest {
 	}
 
 	private static void recurringOn() {
-		Payments_Settings__c settings = Payments_Settings__c.getOrgDefaults();
-		settings.Recurring_Payments__c = true;
-		update settings;
+		ModuleSettings.setForTest('Payments_Recurring', true);
 	}
 
 	private static Map<String, Object> checkout() {
@@ -185,7 +183,7 @@ private class PaymentSubscriptionTest {
 			// R-PAY7: the plan and product are remembered for the next payer.
 			Assert.areEqual(PLAN_KEY, payment.Plan_Key__c, 'Mode, currency, amount, interval');
 			Assert.areEqual('P-1', payment.Plan_Id__c, 'The plan it uses');
-			Assert.areEqual('PROD-1', Payments_Settings__c.getOrgDefaults().PayPal_Product_Id__c);
+			Assert.areEqual('PROD-1', PaymentService.stateText(PaymentService.PAYPAL_PRODUCT_ID));
 			Assert.areEqual(
 				'plan-' + PLAN_KEY + '-PROD-1',
 				mock.last('billing/plans').getHeader('PayPal-Request-Id'),
@@ -206,9 +204,7 @@ private class PaymentSubscriptionTest {
 
 	/** PayPal's shared product and the plan a first payer's subscription already uses. */
 	private static void remembered(String product, String plan) {
-		Payments_Settings__c stored = Payments_Settings__c.getOrgDefaults();
-		stored.PayPal_Product_Id__c = product;
-		update as system stored;
+		PaymentService.putState(new Map<String, Object>{ PaymentService.PAYPAL_PRODUCT_ID => product });
 		if (plan != null) {
 			Payment__c earlier = first(PaymentService.PAYPAL, 'I-0');
 			earlier.Plan_Key__c = PLAN_KEY;
@@ -351,7 +347,7 @@ private class PaymentSubscriptionTest {
 			Assert.areEqual('P-1', payment.Plan_Id__c, 'A plan on the new product');
 			Assert.areEqual(1, calls(mock, 'catalogs/products'), 'One new product');
 			Assert.areEqual(2, calls(mock, 'billing/plans'), 'Refused once, then made');
-			Assert.areEqual('PROD-1', Payments_Settings__c.getOrgDefaults().PayPal_Product_Id__c);
+			Assert.areEqual('PROD-1', PaymentService.stateText(PaymentService.PAYPAL_PRODUCT_ID));
 		}
 	}
 

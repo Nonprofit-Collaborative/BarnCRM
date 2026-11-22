@@ -11,4 +11,5 @@
     <values><field>Description__c</field><value xsi:type="xsd:string">The night the nightly run recalculates every total over every record. The other nights it recalculates only the totals that can have changed since the run before. Every night does the full recalculation each night, which takes longer on a large org. Default Sunday.</value></values>
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">25</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">rollups.md</value></values>
+    <values><field>Default_Value__c</field><value xsi:type="xsd:string">"Sunday"</value></values>
 </CustomMetadata>

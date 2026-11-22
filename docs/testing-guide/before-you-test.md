@@ -50,12 +50,12 @@ Do these in order.
    T-SA-08. Skip the "Deploy the modules", "Load Sample Data" and "Test users" steps below.
    Core alone runs on Contacts and Accounts.
 2. **Work in the BarnCRM apps.** The BarnCRM Contact and Account record pages apply only in the
-   four BarnCRM apps (App Launcher, **BarnCRM**, **BarnCRM Console**, **BarnCRM Admin** or
-   **BarnCRM Admin Console**). In any other app a record opens on the org's own page and steps
+   BarnCRM apps (App Launcher, **BarnCRM Console** or **BarnCRM Admin Console**, or a module
+   app). In any other app a record opens on the org's own page and steps
    that name a panel or action will not match. Open every record, **Contacts** and **Accounts**
-   included, from a BarnCRM app; a script that says "the **BarnCRM** app" works the same in
+   included, from a BarnCRM app; a script that says "the **BarnCRM Console** app" works the same in
    **BarnCRM Console**, and one that names a tool tab such as **BarnCRM Settings** means
-   **BarnCRM Admin** or **BarnCRM Admin Console**. The new page layouts ship unassigned, and
+   **BarnCRM Admin Console**. The new page layouts ship unassigned, and
    the shipped list views show everything the user can see (no "my records" filter), so expect
    the org's own layouts elsewhere and the full list in the BarnCRM list views.
 3. **Hold these permission sets.** A System Administrator is not a BarnCRM Admin. Open
@@ -126,6 +126,11 @@ Volunteers, Mirror and the rest) on top:
 ```bash
 scripts/org/deploy-packages.sh <alias>
 ```
+
+The script deploys Apex without its leading indentation (about 8 percent fewer characters toward
+the org's 6,000,000 limit), so a class opened in Setup or the Developer Console shows no
+indentation; it behaves the same and its line numbers match the repository. To deploy the source
+exactly as written, run it with `STRIP_APEX_INDENT=0`.
 
 Then give your login user the module admin permission sets:
 

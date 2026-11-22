@@ -26,9 +26,8 @@ referenced.
   `Award_Requirement__c`, settings `Scholarships_Settings__c` (canonical model 29SG1 to 29SG8).
 - Permission sets `Scholarships_Admin`, `Scholarships_Staff`, `Scholarships_Read_Only`, given by
   `ScholarshipsAccessSync`; custom permission `Scholarships_Manage`.
-- App `BarnCRM_Scholarships` (BarnCRM Scholarships, logo `BarnCRM_Patch_Scholarships_Logo`),
-  visible through the Scholarships permission sets; left out of scratch and Developer Edition
-  orgs (ADR-0223, module apps, and its 2026-11-14 amendment). The tabs also join BarnCRM and
-  BarnCRM Console before Error Log through the catalog row's `Staff_Tabs__c`.
+- No app of its own: the catalog row's `App_Name__c` is `BarnCRM_Funders`, so
+  `scripts/org/module-app-tabs.py` adds `Staff_Tabs__c` to BarnCRM Grants after the grant pages,
+  and to BarnCRM Console, which the Scholarships sets show (ADR-0237 (nine console apps)).
 - Settings in the Scholarships and Outbound Grants section of BarnCRM Settings; help text in
   `BarnHelp_Scholarships`.

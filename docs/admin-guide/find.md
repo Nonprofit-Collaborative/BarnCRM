@@ -86,7 +86,7 @@ a value; the operators offered depend on the field:
 | Picklist | equals, does not equal, is one of, is not one of, is blank, is not blank |
 | Multi-select picklist | is exactly, is not exactly (the whole set of chosen values), is blank, is not blank |
 | Number, currency, percent | equals, does not equal, is less than, is at most, is greater than, is at least, is blank, is not blank |
-| Date, date and time | the number operators, plus is this year, is last year, is in the last N days |
+| Date, date and time | the number operators, plus is this year, is last year, is in the last N days, is more than N days ago |
 | Checkbox | equals True or False |
 | Lookup | equals, does not equal, is one of, is not one of, is blank, is not blank (by record Id) |
 
@@ -95,7 +95,9 @@ a value; the operators offered depend on the field:
   example).
 - **Is one of** on a text field takes one value per line.
 - **Is this year** and **is last year** are calendar years. **Is in the last N days** counts
-  today and the N days before it.
+  today and the N days before it. **Is more than N days ago** is every date before that, so
+  "Close Date is more than 1825 days ago" finds records older than about five years; it suits
+  [archive rules](archive-rules.md). N is at most 3650.
 - **Condition logic.** With two or more conditions, tick **Use custom condition logic** to
   combine them with AND, OR, NOT and brackets, for example `1 AND (2 OR 3)`. Every condition
   must appear in the logic.

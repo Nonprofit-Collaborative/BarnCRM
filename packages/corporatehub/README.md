@@ -53,8 +53,7 @@ general guidance, not legal advice.
 - Reports: report types `Board_Members`, `Meeting_Attendees` and `Policy_Acknowledgments`, four
   reports and the `Board_Governance` dashboard in the folders `BarnCRM_Corporate_Hub` (CH-14).
 - Tabs: Corporate Hub, Library Documents, Compliance Obligations, Agreements, Boards and
-  Committees and Board Meetings; Processing Activities, Data Subject Requests and Data Breaches
-  (not in the catalog row). App `BarnCRM_Corporate_Hub` (BarnCRM Corporate Hub, logo
-  `BarnCRM_Patch_Corporate_Hub_Logo`) holds every tab, visible through the Corporate Hub permission
-  sets; left out of scratch and Developer Edition orgs (ADR-0223, module apps). The catalog row's
-  tabs also join BarnCRM and BarnCRM Console through its `Staff_Tabs__c`.
+  Committees and Board Meetings; Processing Activities, Data Subject Requests and Data Breaches. No app of its own: the catalog
+  row's `App_Name__c` is `BarnCRM_Members_Partners` (a Core app, shown by the Corporate Hub
+  permission sets), and its `Staff_Tabs__c` (every tab) join it after Memberships' pages
+  (ADR-0237 (nine console apps)).

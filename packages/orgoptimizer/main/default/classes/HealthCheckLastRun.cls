@@ -5,8 +5,8 @@
  * The one place that records and reads it. A page that wants "last result plus Run now" sets
  * the panel's lastResultFirst property; nothing else needs to know how the result is kept.
  *
- * The run record is package owned bookkeeping saved through OrgSettingsSystemWriter without an
- * audit row, like the other run stamps (ADR-0021). Only a run by someone with Manage BarnCRM
+ * The run record is package owned run state saved by Core's HealthCheckResult on a state row,
+ * without an audit row, like the other run stamps (ADR-0021). Only a run by someone with Manage BarnCRM
  * Settings is kept, because anyone else's run skips the access checks.
  */
 public with sharing class HealthCheckLastRun {
@@ -68,12 +68,7 @@ public with sharing class HealthCheckLastRun {
 	}
 
 	private static void save(Integer errors, Integer warnings, Integer infos) {
-		OrgSettingsSystemWriter.save(
-			new Map<Schema.SObjectField, Object>{
-				BarnCRM_Settings__c.Health_Check_Last_Run__c => Datetime.now(),
-				BarnCRM_Settings__c.Health_Check_Last_Result__c => HealthCheckResult.text(errors, warnings, infos)
-			}
-		);
+		HealthCheckResult.write(errors, warnings, infos);
 	}
 
 	/**

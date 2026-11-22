@@ -144,9 +144,7 @@ private class DonationMatcherTest {
 	@IsTest
 	static void theTemplateWindowAndToleranceComeBeforeTheSettings() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-			settings.Donation_Match_Date_Window_Days__c = 1;
-			upsert settings;
+			ModuleSettings.setForTest('Donation_Match_Date_Window_Days', 1);
 			Contact ana = GivingTestDataFactory.insertHouseholdContact('Ramirez', 'Ana', 'Ramirez');
 			List<Installment__c> payments = pledge(ana.Id, new Map<Integer, Decimal>{ 18 => 95 });
 			List<GiftImportRow> bySettings = new List<GiftImportRow>{ gift(ana.Id, ana.AccountId, 95) };

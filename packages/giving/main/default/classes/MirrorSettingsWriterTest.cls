@@ -1,7 +1,7 @@
 /**
- * Mirror saves its last completed run on the protected org-level Giving Settings: created from the
- * field defaults when none exists, and otherwise only the two run keys updated, so a direction
- * saved meanwhile is never undone (R-OM8, R-GT6).
+ * Mirror saves its last completed run as Giving run state: only the two run keys of the mirror
+ * that ran are written, so the other mirror's run and a direction saved meanwhile are never
+ * touched (R-OM8, R-GT6).
  */
 @IsTest(testFor='ApexClass:MirrorSettingsWriter')
 private class MirrorSettingsWriterTest {
@@ -14,63 +14,67 @@ private class MirrorSettingsWriterTest {
 		return TestUsers.adminWith('Giving_Admin');
 	}
 
-	private static Integer orgRecords() {
-		Id org = UserInfo.getOrganizationId();
-		return [SELECT COUNT() FROM Giving_Settings__c WHERE SetupOwnerId = :org];
-	}
-
 	@IsTest
-	static void createsTheOrgRecordWhenNoneExists() {
+	static void recordsTheRunWhenNoneWasRecordedBefore() {
 		System.runAs(admin()) {
 			Datetime ranAt = Datetime.newInstance(2026, 5, 1, 10, 30, 0);
-			delete [SELECT Id FROM Giving_Settings__c WHERE SetupOwnerId = :UserInfo.getOrganizationId()];
 
 			Test.startTest();
 			MirrorSettingsWriter.recordOpportunityMirrorRun(ranAt, '3 Opportunities created.');
 			Test.stopTest();
 
-			Giving_Settings__c saved = Giving_Settings__c.getOrgDefaults();
-			Assert.areEqual(1, orgRecords(), 'One org-level record is created');
-			Assert.areEqual(ranAt, saved.Opportunity_Mirror_Last_Run__c, 'The run time is saved');
+			Assert.areEqual(
+				ranAt,
+				GivingState.moment(GivingState.OPPORTUNITY_MIRROR_LAST_RUN),
+				'The run time is saved'
+			);
 			Assert.areEqual(
 				'3 Opportunities created.',
-				saved.Opportunity_Mirror_Last_Summary__c,
+				GivingState.text(GivingState.OPPORTUNITY_MIRROR_SUMMARY),
 				'The summary is saved'
 			);
-			Assert.isNull(saved.Gift_Transaction_Mirror_Last_Run__c, 'The other mirror has no run yet');
+			Assert.isNull(
+				GivingState.moment(GivingState.GIFT_TRANSACTION_MIRROR_LAST_RUN),
+				'The other mirror has no run yet'
+			);
 		}
 	}
 
 	@IsTest
-	static void updatesOnlyTheRunKeysOfAnExistingRecord() {
+	static void updatesOnlyTheRunKeysOfTheMirrorThatRan() {
 		System.runAs(admin()) {
-			Giving_Settings__c existing = Giving_Settings__c.getOrgDefaults();
-			existing.Opportunity_Mirror_Last_Summary__c = 'Kept';
-			upsert existing;
+			GivingState.put(new Map<String, Object>{ GivingState.OPPORTUNITY_MIRROR_SUMMARY => 'Kept' });
 			Datetime ranAt = Datetime.newInstance(2026, 5, 2, 8, 0, 0);
 
 			Test.startTest();
 			MirrorSettingsWriter.recordGiftTransactionMirrorRun(ranAt, '5 gifts copied.');
 			Test.stopTest();
 
-			Giving_Settings__c saved = Giving_Settings__c.getOrgDefaults();
-			Assert.areEqual(1, orgRecords(), 'The existing record is updated, not duplicated');
-			Assert.areEqual(ranAt, saved.Gift_Transaction_Mirror_Last_Run__c, 'The Gift Transaction run time is saved');
-			Assert.areEqual('5 gifts copied.', saved.Gift_Transaction_Mirror_Last_Summary__c, 'Its summary is saved');
+			Assert.areEqual(
+				ranAt,
+				GivingState.moment(GivingState.GIFT_TRANSACTION_MIRROR_LAST_RUN),
+				'The Gift Transaction run time is saved'
+			);
+			Assert.areEqual(
+				'5 gifts copied.',
+				GivingState.text(GivingState.GIFT_TRANSACTION_MIRROR_SUMMARY),
+				'Its summary is saved'
+			);
 			Assert.areEqual(
 				'Kept',
-				saved.Opportunity_Mirror_Last_Summary__c,
+				GivingState.text(GivingState.OPPORTUNITY_MIRROR_SUMMARY),
 				'The Opportunity mirror keys are untouched'
 			);
 		}
 	}
 
 	@IsTest
-	static void keepsAnotherSettingSavedBeforeTheRun() {
+	static void keepsADirectionSavedBeforeTheRun() {
 		System.runAs(admin()) {
-			Giving_Settings__c existing = Giving_Settings__c.getOrgDefaults();
-			existing.Opportunity_Mirror_Direction__c = OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES;
-			upsert existing;
+			ModuleSettings.setForTest(
+				'Mirror_Opportunity_Mirror_Direction',
+				OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES
+			);
 
 			Test.startTest();
 			MirrorSettingsWriter.recordOpportunityMirrorRun(System.now(), 'Done');
@@ -78,7 +82,7 @@ private class MirrorSettingsWriterTest {
 
 			Assert.areEqual(
 				OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES,
-				Giving_Settings__c.getOrgDefaults().Opportunity_Mirror_Direction__c,
+				ModuleSettings.text('Mirror_Opportunity_Mirror_Direction'),
 				'A direction saved before the run completes is not undone'
 			);
 		}
@@ -89,14 +93,13 @@ private class MirrorSettingsWriterTest {
 		System.runAs(admin()) {
 			Test.startTest();
 			MirrorSettingsWriter.recordOpportunityMirrorRun(System.now(), 'x'.repeat(400));
-			Giving_Settings__c longSaved = Giving_Settings__c.getOrgDefaults();
-			Integer savedLength = longSaved.Opportunity_Mirror_Last_Summary__c.length();
+			Integer savedLength = GivingState.text(GivingState.OPPORTUNITY_MIRROR_SUMMARY).length();
 			MirrorSettingsWriter.recordOpportunityMirrorRun(System.now(), null);
 			Test.stopTest();
 
-			Assert.areEqual(255, savedLength, 'A long summary is cut to the field length');
+			Assert.areEqual(255, savedLength, 'A long summary is cut to 255 characters');
 			Assert.isNull(
-				Giving_Settings__c.getOrgDefaults().Opportunity_Mirror_Last_Summary__c,
+				GivingState.text(GivingState.OPPORTUNITY_MIRROR_SUMMARY),
 				'A run with no summary clears the last one'
 			);
 		}

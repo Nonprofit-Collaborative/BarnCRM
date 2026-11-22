@@ -32,7 +32,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | Remove every column and select **Run**. | "Choose at least one column." Nothing runs. |
 | 2 | Add **First Name** back. Select **Add Condition** and leave the field empty. Select **Run**. | The condition shows "Choose a field." and the page says "Fix the conditions marked below, then try again." |
 | 3 | Choose **Last Name**, **equals**, and leave the value empty. Select **Run**. | The condition shows "Enter a value." |
-| 4 | Change the condition to **Birthdate**, **is in the last N days**, value `0`. | "Enter a whole number of days from 1 to 3650." |
+| 4 | Change the condition to **Birthdate**, **is in the last N days**, value `0`. Then choose **is more than N days ago**, value `3651`. | "Enter a whole number of days from 1 to 3650." both times. With value `3650` the condition is accepted and Run lists people born more than ten years ago. |
 | 5 | Change the condition to **Last Name**, **equals**, `Garcia`. Add a second condition **First Name**, **equals**, `Harper`. Tick **Use custom condition logic** and type `1` in **Condition logic**. | "The condition logic must use every condition. Add condition 2 to it, or remove the condition." |
 | 6 | Change the logic to `1 AND 3`. | "The condition logic names condition 3, which does not exist." |
 | 7 | Change the logic to `1 AND 2` and select **Run**. | One row: Harper Garcia. |

@@ -34,4 +34,5 @@
         <field>Help_Path__c</field>
         <value xsi:type="xsd:string">events.md</value>
     </values>
+    <values><field>Default_Value__c</field><value xsi:type="xsd:string">"BarnCRM_Event_Follow_Up"</value></values>
 </CustomMetadata>

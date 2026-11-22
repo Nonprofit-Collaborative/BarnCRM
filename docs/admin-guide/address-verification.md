@@ -66,7 +66,8 @@ shown.
 
 ## Settings
 
-All in **BarnCRM Settings**, **Addresses**, saved for the whole organization:
+All in **BarnCRM Settings**, **Addresses**, saved for the whole organization (a save shows **Saving**, then **Saved**). Which provider
+is connected is not a setting: Check Connection and Disconnect record it at once.
 
 | Setting | Default | What it does |
 |---|---|---|
@@ -82,7 +83,7 @@ All in **BarnCRM Settings**, **Addresses**, saved for the whole organization:
   back to **Unverified** at once, then it is looked up moments later. Up to 50 addresses of one
   save are looked up this way; the rest, and addresses saved by an import or another background
   job, wait for the nightly check.
-- **Every night**, in the [nightly run](nightly-jobs.md) as **Address Verification** at 3:30 AM:
+- **Every night**, in the [nightly run](nightly-jobs.md) as **Address Verification** at 3:50 AM:
   current addresses that are Unverified, and verified ones older than the re-check months, oldest
   first, up to the nightly limit. The step runs only while the module is on and your provider is
   connected.

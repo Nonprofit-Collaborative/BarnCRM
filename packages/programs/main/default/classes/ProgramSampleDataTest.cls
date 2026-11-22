@@ -347,4 +347,73 @@ private class ProgramSampleDataTest {
 			Assert.areEqual(0, [SELECT COUNT() FROM Enrollment__c], 'Nobody to enroll.');
 		}
 	}
+
+	/**
+	 * SR-01 (D-219): an admin on a standard profile who holds Manage BarnCRM Settings (BarnCRM
+	 * Admin) and Programs Admin, and did not load the set, removes every sample program, cohort,
+	 * session and enrollment another admin loaded, though Program, Cohort and Session give no
+	 * delete on someone else's record. A program not tracked as sample data stays.
+	 */
+	@IsTest
+	static void anotherAdminWhoDidNotLoadTheSetRemovesAllOfIt() {
+		Program__c own;
+		System.runAs(admin()) {
+			samplePeople(12);
+			loadEverything();
+			own = new Program__c(Name = 'Our own program');
+			insert own;
+		}
+		User remover = TestUsers.standardUserWith('OtherAdmin', new List<String>{ TestUsers.CORE_ADMIN, ADMIN });
+		SampleDataFile.removeChunkSize = 20;
+
+		Test.startTest();
+		System.runAs(remover) {
+			removeEverything();
+		}
+		Test.stopTest();
+
+		System.runAs(admin()) {
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Program__c WHERE Sample_Data__c = TRUE],
+				'Every sample program went.'
+			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Cohort__c], 'The cohorts went.');
+			Assert.areEqual(0, [SELECT COUNT() FROM Session__c], 'The sessions went.');
+			Assert.areEqual(0, [SELECT COUNT() FROM Session_Schedule__c], 'The schedule went.');
+			Assert.areEqual(0, [SELECT COUNT() FROM Enrollment__c], 'The enrollments went.');
+			Assert.areEqual(
+				new List<Id>{ own.Id },
+				new List<Id>(new Map<Id, Program__c>([SELECT Id FROM Program__c]).keySet()),
+				'The program not tracked as sample data stays.'
+			);
+			Assert.isTrue(keptWarnings().isEmpty(), 'Nothing was kept, so nothing blames records of your own.');
+		}
+	}
+
+	/** Without Manage BarnCRM Settings, removal is refused before anything is read or deleted. */
+	@IsTest
+	static void aModuleAdminWithoutManageBarnCrmSettingsIsRefused() {
+		System.runAs(admin()) {
+			samplePeople(12);
+			loadEverything();
+		}
+		User moduleOnly = TestUsers.standardUserWith('NoSettings', new List<String>{ ADMIN });
+
+		String refused;
+		Test.startTest();
+		System.runAs(moduleOnly) {
+			try {
+				removeEverything();
+			} catch (SampleDataException expected) {
+				refused = expected.getMessage();
+			}
+		}
+		Test.stopTest();
+
+		Assert.areEqual(BarnHelp.text('Core', 'Core_SampleData_NoPermission'), refused, 'Refused with the reason.');
+		System.runAs(admin()) {
+			Assert.areEqual(3, [SELECT COUNT() FROM Program__c WHERE Sample_Data__c = TRUE], 'Nothing was removed.');
+		}
+	}
 }

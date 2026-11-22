@@ -3,7 +3,11 @@ import BackupSets from 'c/backupSets';
 import getPage from '@salesforce/apex/BackupSetController.getPage';
 import setBackup from '@salesforce/apex/BackupSetController.setBackup';
 import runNow from '@salesforce/apex/BackupSetController.runNow';
+import setSchedule from '@salesforce/apex/BackupSetController.setSchedule';
 
+jest.mock('@salesforce/apex/BackupSetController.setSchedule', () => ({ default: jest.fn() }), {
+  virtual: true
+});
 jest.mock('@salesforce/apex/BackupSetController.getPage', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -87,6 +91,71 @@ describe('c-backup-sets', () => {
     element.shadowRoot.querySelector('[data-action="remove"]').click();
     await flush();
     expect(setBackup).toHaveBeenLastCalledWith({ queryId: 'q1', asSet: false });
+  });
+
+  it('edits a schedule, saves it weekly on the chosen day and warns while the nightly jobs are off', async () => {
+    const scheduled = {
+      ...PAGE,
+      runsKept: 7,
+      nightlyOn: false,
+      sets: [{ ...PAGE.sets[0], frequency: 'monthly', day: 15 }]
+    };
+    setSchedule.mockResolvedValue(scheduled);
+    const element = await render(scheduled);
+    expect(one(element, 'schedule').textContent).toBe('c.Core_BackupSets_MonthlyOn');
+    expect(one(element, 'schedule-note').textContent).toBe('c.Core_BackupSets_ScheduleNote');
+    expect(one(element, 'nightly-off')).not.toBeNull();
+
+    element.shadowRoot.querySelector('[data-action="edit-schedule"]').click();
+    await flush();
+    expect(one(element, 'day').value).toBe('15');
+    one(element, 'frequency').dispatchEvent(
+      new CustomEvent('change', { detail: { value: 'weekly' } })
+    );
+    await flush();
+    expect(one(element, 'day')).toBeNull();
+    one(element, 'weekday').dispatchEvent(new CustomEvent('change', { detail: { value: '3' } }));
+    await flush();
+    one(element, 'save-schedule').click();
+    await flush();
+    expect(setSchedule).toHaveBeenCalledWith({
+      queryId: 'q1',
+      frequency: 'weekly',
+      weekday: 3,
+      day: null,
+      destination: 'files'
+    });
+    expect(one(element, 'schedule-form')).toBeNull();
+    expect(one(element, 'notice').message).toBe('c.Core_BackupSets_ScheduleSaved');
+  });
+
+  it('offers the backup destination when one is installed and shows a run being sent', async () => {
+    const page = {
+      ...PAGE,
+      destination: { available: true, note: null },
+      sets: [{ ...PAGE.sets[0], frequency: 'daily', destination: 'offPlatform' }],
+      runs: [{ ...PAGE.runs[0], offPlatform: 'waiting' }]
+    };
+    setSchedule.mockResolvedValue(page);
+    const element = await render(page);
+    expect(one(element, 'off-platform').textContent).toBe('c.Core_BackupSets_RunWaiting');
+    element.shadowRoot.querySelector('[data-action="edit-schedule"]').click();
+    await flush();
+    expect(one(element, 'destination').value).toBe('offPlatform');
+    one(element, 'save-schedule').click();
+    await flush();
+    expect(setSchedule).toHaveBeenCalledWith(
+      expect.objectContaining({ destination: 'offPlatform' })
+    );
+  });
+
+  it('hides the destination choice and says why when no destination is installed', async () => {
+    const page = { ...PAGE, destination: { available: false, note: 'Install BarnCRM Connector.' } };
+    const element = await render(page);
+    element.shadowRoot.querySelector('[data-action="edit-schedule"]').click();
+    await flush();
+    expect(one(element, 'destination')).toBeNull();
+    expect(one(element, 'destination-note').textContent).toBe('Install BarnCRM Connector.');
   });
 
   it('shows a refusal as it came and an empty state with no sets', async () => {

@@ -5,10 +5,8 @@
  * Five things, each safe to run twice and none able to abort an install, since every failure
  * is written to the Error Log instead:
  *
- * 1. Give an org that has no module settings row one holding the shipped defaults (a new
- *    rollup starts in Both, real-time totals are recalculated just after the save), so the
- *    Settings console and every reader of the settings find a row. A row that exists is never
- *    touched.
+ * 1. Create the module's run-state rows, the run lock among them, when the org lacks them. A
+ *    row that exists is never touched.
  * 2. Create the shipped Rollup Definitions this org does not have yet, so a fresh org has its
  *    totals without anybody pressing a button, and leave every definition already here exactly
  *    as the administrator left it (R-R6, ADR-0029). The module sees only the shipped defaults
@@ -71,28 +69,27 @@ public with sharing class RollupsPostInstall implements InstallHandler, ModuleSe
 		ModuleAccessSyncs.setUp(MODULE_KEY, installerId);
 	}
 
+	/** The module's run-state rows, created at install so two first runs never each make one. */
+	@TestVisible
+	private static final List<String> STATE_NAMES = new List<String>{
+		'Last_Run_Started__c',
+		'Nightly_Covered_From__c',
+		'Processor_Requested_At__c'
+	};
+
 	/**
-	 * Creates the org-level Rollup Settings row with the shipped defaults when the org has none,
-	 * so a new or source-deployed org shows Default Rollup Mode Both and Rollup Processing
-	 * Background instead of two empty pickers. Does nothing when a row exists, whatever it
-	 * holds, so no saved value is ever overwritten. Written in system mode with no audit row:
-	 * it records the shipped state, not a change anybody made. Also run by
-	 * `scripts/org/deploy-packages.sh`. Never throws: a failure goes to the Error Log.
+	 * Creates the module's run-state rows when the org lacks them: the run lock
+	 * (`Rollups.Last_Run_Started__c`, which `RollupLargeParentBatch` locks), the nightly
+	 * watermark and the processor stamp, each holding what the org had (its legacy value until
+	 * carry-over), so a row that exists is never changed. The settings themselves need nothing:
+	 * an unsaved setting reads its shipped default (ADR-0238 settings as custom metadata). Also
+	 * run by `scripts/org/deploy-packages.sh`. Never throws: a failure goes to the Error Log.
 	 */
 	public static void ensureSettingsRow() {
 		try {
-			if (Rollup_Settings__c.getOrgDefaults().Id != null) {
-				return;
+			for (String name : STATE_NAMES) {
+				SettingsState.lockOrCreate(RollupService.stateKey(name));
 			}
-			Database.insert(
-				new Rollup_Settings__c(
-					SetupOwnerId = UserInfo.getOrganizationId(),
-					Rollup_Mode_Default__c = RollupService.MODE_BOTH,
-					Rollup_Processing__c = RollupService.PROCESSING_BACKGROUND
-				),
-				AccessLevel.SYSTEM_MODE
-			);
-			SettingsService.clearCaches();
 		} catch (Exception e) {
 			ErrorLogger.log(e, SETTINGS_CONTEXT);
 		}

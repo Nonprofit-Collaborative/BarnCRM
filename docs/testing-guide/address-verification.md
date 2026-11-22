@@ -44,7 +44,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **Addresses** settings turn **Apply corrections** on. | Saved. |
+| 1 | In **Addresses** settings turn **Apply corrections** on. | **Saving**, then **Saved**; reload and it is still on. |
 | 2 | Add the address `1600 amphitheatre parkway`, `mountain view`, `ca`, `94043`, country `United States`. Wait a minute and open it. | Verified, and the street, city, state and postal code are in the service's form (for example `1600 Amphitheatre Pkwy`, `Mountain View`, `CA`, `94043-1351`). The country is still `United States`. |
 | 3 | Turn **Apply corrections** off. | Saved. |
 
@@ -72,7 +72,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 1 | Set **Most addresses checked a night** to 3. | Saved. |
 | 2 | On **Address Verification Setup** select **Verify Waiting Addresses**. | "Started." |
 | 3 | After a minute, run a Find query on Addresses where Verification Status is Unverified. | 3 fewer than before. |
-| 4 | Open **Nightly Jobs** in Settings. | An **Address Verification** step at 3:30 AM, switched on. |
+| 4 | Open **Nightly Jobs** in Settings. | An **Address Verification** step at 3:50 AM, switched on. |
 
 **Cleanup:** Set the limit back to 200.
 

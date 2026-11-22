@@ -420,9 +420,7 @@ private class AcknowledgmentRunCoverageTest {
 			Test.stopTest();
 			Assert.areEqual(1, [SELECT COUNT() FROM Acknowledgment_Run__c], 'Switched on: a run starts');
 
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-			settings.Acknowledgments_Enabled__c = false;
-			upsert settings;
+			ModuleSettings.setForTest('Giving_Acknowledgments_Enabled', false);
 			new AcknowledgmentScheduler().execute(null);
 			Assert.areEqual(1, [SELECT COUNT() FROM Acknowledgment_Run__c], 'Switched off: nothing new');
 		}

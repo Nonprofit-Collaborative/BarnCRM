@@ -21,9 +21,9 @@ released, with its balance; received payments enter it on their own. The **Grant
 shows every deadline and expected payment on a month calendar. A grant also carries the fields a
 government award needs (see [Government Awards](#government-awards)), and the [Answer
 Library](#answer-library) keeps the application answers you reuse. A [funder report
-template](#funder-report-templates) turns a grant into a printable report, and the [Board
-Dashboard](#the-board-dashboard-tab) shows your board the year's revenue mix, how concentrated it
-is and the restricted balances.
+template](#funder-report-templates) turns a grant into a printable report, and [Grants
+Home](#the-grants-home-tab) shows your board the year's revenue mix, how concentrated it is and
+the restricted balances.
 
 To find and manage grants, the [Grant Finder](#the-grant-finder-tab) searches open federal
 opportunities on Grants.gov and saves one as a prospect, [application
@@ -39,7 +39,7 @@ year's application from it.
 - It needs only BarnCRM Core installed first.
 - It does not need the Programs, Fundraising or Logic Models modules. With Programs installed, a grant
   can name a program; with Fundraising installed, it can name the Giving fund its money is booked to,
-  and the Board Dashboard reads Fundraising's totals.
+  and Grants Home reads Fundraising's totals.
 
 ## Installing
 
@@ -50,8 +50,8 @@ finishes, BarnCRM does three things on its own:
 2. Gives you, the person who installed it, the **Grants Admin** permission set.
 3. Gives everyone who already has a BarnCRM role their Grants permission set (see below).
 
-Then open the **BarnCRM Grants** app from the App Launcher. It opens on the **Board Dashboard**,
-the module's home. Its tabs are **Board Dashboard**, **Grant Pipeline**, **Grant Calendar**,
+Then open the **BarnCRM Grants** app from the App Launcher. It opens on **Grants Home**, the
+module's home. Its tabs are **Grants Home**, **Grant Pipeline**, **Grant Calendar**,
 **Grant Finder**, **Grants**, **Grant Requirements**, **Grant Answers**,
 **Funder Report Templates** (admins only), **Grant Checklist**, **Reports** and **Error Log**; Grant Pipeline and
 Grants also join the BarnCRM apps. The morning reminder job is a step of
@@ -213,9 +213,10 @@ The **Grant Pipeline** tab is where most people work:
 Moving, dragging and the menu's stage choices are offered only to people who can edit grants, and **Mark
 Submitted** only to people who can change requirements.
 
-## The Board Dashboard Tab
+## The Grants Home Tab
 
-The **Board Dashboard** tab is the Grants app's home and answers the questions a board asks
+The **Grants Home** tab is the Grants app's home (see [Module Homes](barncrm-app.md#module-homes))
+and answers the questions a board asks
 about money, for the current fiscal year. Everyone with a Grants set sees it; it only reads, and
 it stores nothing. At the top, tiles show **Revenue This Fiscal Year**, **Awarded This Fiscal
 Year**, with Fundraising **Gifts to Funds**, and, with restricted fund tracking, **Restricted Grants:
@@ -427,7 +428,7 @@ grant in the chain, earlier and later, with its award period and amounts.
 
 ## Settings
 
-Open **BarnCRM Settings**, **Grants** (under Fundraising). Each setting saves for the whole
+Open **BarnCRM Settings**, **Grants** (under Fundraising). A save shows **Saving**, then **Saved**. Each setting saves for the whole
 organization.
 
 | Setting | Default | What it does |
@@ -526,7 +527,7 @@ without the app's header and navigation.
 **Load Sample Data** in BarnCRM Settings also loads eight sample grants to Core's sample
 organizations across the pipeline (two Prospect, one Letter of Inquiry, one Invited to Apply, one
 Applied, two Awarded, one Declined), with an application or report requirement on most of them
-(so the Grant Pipeline and Grant Calendar tabs and the Board Dashboard all show data), three
+(so the Grant Pipeline and Grant Calendar tabs and Grants Home all show data), three
 requirements on the main award, a
 two-payment schedule with the first payment received, and a restricted ledger with that payment's
 Received entry and one Spent entry, and two budget lines on the award (the Spent entry is on

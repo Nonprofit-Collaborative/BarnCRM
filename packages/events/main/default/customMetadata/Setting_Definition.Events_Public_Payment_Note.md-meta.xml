@@ -34,4 +34,5 @@
         <field>Help_Path__c</field>
         <value xsi:type="xsd:string">events.md</value>
     </values>
+    <values><field>Default_Value__c</field><value xsi:type="xsd:string">"Pay at the door or by arrangement with us."</value></values>
 </CustomMetadata>

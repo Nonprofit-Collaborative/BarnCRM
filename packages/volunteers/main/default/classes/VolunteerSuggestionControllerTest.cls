@@ -10,6 +10,12 @@ private class VolunteerSuggestionControllerTest {
 	/** A Saturday. Midday, so the org's time zone cannot move it to another day. */
 	private static final Datetime SATURDAY_NOON = Datetime.newInstance(2026, 3, 14, 12, 0, 0);
 
+	// A test's setting override does not outlive @TestSetup, so each test method's
+	// transaction sets it as the class loads.
+	static {
+		VolunteersTestData.volunteerSettings(false, false);
+	}
+
 	@TestSetup
 	static void makeData() {
 		TestUsers.standardUserWith(
@@ -19,7 +25,6 @@ private class VolunteerSuggestionControllerTest {
 		TestUsers.standardUserWith(READER, new List<String>{ 'BarnCRM_Read_Only', 'Volunteers_Read_Only' });
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
 			VolunteersTestData.contactModeWithoutAutomaticHouseholds();
-			VolunteersTestData.volunteerSettings(false, false);
 			Volunteer_Job__c job = VolunteersTestData.job('Food pantry sort');
 			Volunteer_Shift__c shift = VolunteersTestData.newShift(job.Id, SATURDAY_NOON, 3);
 			insert shift;
