@@ -9072,9 +9072,9 @@ Archive Rules panel, run a rule or restore.
 - **A schedule.** `frequency` other than `off` with `active` true is due each night (`daily`), on
   `weekday` (`weekly`) or on `monthDay` (`monthly`) in the org's time zone. Saving a schedule on
   asks for the current preview count, typed once. The nightly run's Archive Rules step (R-NJ2,
-  shipped on) runs every due rule, one after another, as the user who scheduled the nightly run,
-  each counted within the run limit; a rule over the limit or matching nothing is logged and
-  skipped. A night missed is not caught up: the rule runs on its next due day.
+  shipped on) starts its own job for each due rule, as the user who scheduled the nightly run;
+  each moves at most the run limit, a rule matching nothing starts no job, and a refused rule is
+  logged to the Error Log. A night missed is not caught up: the rule runs on its next due day.
 - **The job.** Every run of a `BigObject` rule, and every restore, is an `Import_Batch__c` with
   Operation Archive (Section 16), its definition `{ "version": 1, "action": "archive" |
   "restore", "savedQueryId", "name", "object", "notChangedAfter", "archivedAt" }`, Row Count, Rows
@@ -9130,46 +9130,47 @@ ADR-NEXT archive rules and big object archive.
 | Original Id | text (18) | yes | The record's Id before it was archived. Third index field. |
 | Name | text (255) | no | The record's name field, or its Id, for the viewer's list. |
 | Owner Id | text (18) | no | The record's owner, when the object has one. |
-| Record | long text (131072) | no | The record as JSON (R-AR2). |
-| People | long text (32768) | no | Contact and Account Ids the record or its children name, comma separated, for erasure (R-AR6). |
+| Record | long text (131072) | no | The record as JSON (R-ARC2). |
+| People | long text (32768) | no | Contact and Account Ids the record or its children name, comma separated, for erasure (R-ARC6). |
 | Rule Id | text (18) | no | The saved query (archive rule) that archived it. |
 | Rule Name | text (80) | no | That rule's name when it ran. |
 
 Who archived a row is its `CreatedById`.
 
-**R-AR1 Index.** Every read filters on the index fields in order without a gap: an object, then a
+**R-ARC1 Index.** Every read filters on the index fields in order without a gap: an object, then a
 range of Archived At, then Original Id (equals or IN). A read that skips a field aborts the
 transaction on the platform, so the viewer always asks for an object first. Rows are read in index
 order: an object's newest first.
 
-**R-AR2 The JSON.** `{ "version": 1, "fields": { <API name>: <value> }, "children": { <child
-object>: { "field": <lookup to the parent>, "rows": [ { <API name>: <value> } ] } } }`. `fields`
-is every field the archiving person could read (R-BD8's fields). `children` holds the records of
+**R-ARC2 The JSON.** `{ "version": 1, "record": <the record>, "children": { <child object>: {
+"field": <lookup to the parent>, "rows": [ <child record> ] } } }`, each record as Apex
+serializes an SObject. `record` holds every field the archiving person could read (R-BD8's
+fields). `children` holds the records of
 each cascade-delete child kind the person may read (the kinds the bulk delete preview lists), one
 level deep. A record whose JSON would pass 131,072 characters is not archived; the run names it.
 
-**R-AR3 Copy, then settle.** A big object run is a queueable chain whose links alternate and never
+**R-ARC3 Copy, then settle.** A big object run is a queueable chain whose links alternate and never
 mix DML with an immediate write: Copy deletes the copies the last Settle could not finish, reads up
 to one chunk of matching records in user mode, Id order, and `insertImmediate`s them; Settle reads
 the rows back by full key, reads the originals again, deletes in user mode those whose copy exists
 and that are unchanged since the run started, adds the rows to `Archived_Record_Count__c`, writes
 the job, and queues the next Copy with the copies whose original stayed. The run ends when no
-record matches, at the run's count, or at the cap (R-AR5).
+record matches, at the run's count, or at the cap (R-ARC5).
 
-**R-AR4 Restore.** The person picks rows of one object. A restore link inserts each record again in
+**R-ARC4 Restore.** The person picks rows of one object. A restore link inserts each record again in
 user mode with the fields the person may create, a lookup only when its target exists, then its
 children with the new parent Id; it logs each old Id with its new Id and what it left out. The next
 link `deleteImmediate`s the rows whose record was created; the one after subtracts them from the
 count and finishes the job. Restored records have new Ids.
 
-**R-AR5 Cap.** One million rows are included per org. The panels warn from 900,000; a Copy whose
+**R-ARC5 Cap.** One million rows are included per org. The panels warn from 900,000; a Copy whose
 chunk would pass 1,000,000 stops the run and says so. Nothing offers more capacity.
 
-**R-AR6 Erasure.** Erasing a person (Section 29H) queues a scan, which runs only once the Erasure
+**R-ARC6 Erasure.** Erasing a person (Section 29H) queues a scan, which runs only once the Erasure
 record exists: it reads every archived object by index and `deleteImmediate`s each row whose
 Original Id is the person or whose People names them, then subtracts them from the count.
 
-**R-AR7 Access.** `BarnCRM_Admin` grants read and create on the object and read on its optional
+**R-ARC7 Access.** `BarnCRM_Admin` grants read and create on the object and read on its optional
 fields; the viewer reads in user mode, so no one else sees an archived row. Copies and deletes run
 in system mode after the person's own permissions and record access have been checked.
 
@@ -20181,7 +20182,7 @@ mirrors the primary member).
 | 1.81 | 2026-11-20 | The Mapper and saved maps (MAP-01 to MAP-07, releases 1.31 to 1.33). `Saved_Transform__c` gains `Kind__c` (Step List, the default, or Map); new R-MAP1 to R-MAP4 (map document, paths, checks, preview) and R-ST5 (maps). `Giving_Settings__c` gains `Opportunity_Mirror_Map__c`, a Saved Transform record ID chosen with a record picker (a map name is read too); new R-OM12 (extra fields through a map). No object added. |
 | 1.82 | 2026-11-20 | BarnCRM Connector pre-batch review fixes (release 1.33). One object added, 199 to 200 in the suite: Connector Connection (`Connector_Connection__c`, `Check_Path__c`), which keeps a template's check path beside a connection (29CN1, new R-CN9: Check Connection asks for it and shows the account an answer names). New R-CN10: choosing the integration user needs the key-writing permissions and refuses an all-seeing user. R-CN8: Disconnect refuses a Secret URL. Connector Run's Status loses Rejected; Running marks runs claimed for the next runner job (R-RUN4). |
 | 1.83 | 2026-11-20 | R-CR6 the recipe clock: a claimed Running run counts as Queued for the clock, so the heartbeat keeps running while a lane has a Waiting run, a Queued run or a claimed Running run (batch Q gate fix). |
-| 1.84 | 2026-11-21 | Archive rules and the big object archive (D-221, AR-10, ADR-NEXT archive rules and big object archive). New Section 29D1 Archived Record (`Archived_Record__b`, a big object from the separate allocation; custom objects unchanged), rules R-AR1 to R-AR7. Saved Query gains R-SQ16, the `archive` key (destination Files, BigObject or OffPlatform through the `ArchiveDestination` seam, a schedule, an Active switch). R-R2 gains `more than n days ago`. `Import_Batch__c` Operation gains Archive. `BarnCRM_Settings__c` gains `Archived_Record_Count__c`. The nightly run gains the Archive Rules step. |
+| 1.84 | 2026-11-21 | Archive rules and the big object archive (D-221, AR-10, ADR-NEXT archive rules and big object archive). New Section 29D1 Archived Record (`Archived_Record__b`, a big object from the separate allocation; custom objects unchanged), rules R-ARC1 to R-ARC7. Saved Query gains R-SQ16, the `archive` key (destination Files, BigObject or OffPlatform through the `ArchiveDestination` seam, a schedule, an Active switch). R-R2 gains `more than n days ago`. `Import_Batch__c` Operation gains Archive. `BarnCRM_Settings__c` gains `Archived_Record_Count__c`. The nightly run gains the Archive Rules step. |
 
 ---
 ## 32. Entity ownership by package

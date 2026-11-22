@@ -36,6 +36,9 @@ public with sharing class ArchiveDestinations {
 			ArchiveDestination found = offPlatform();
 			return found == null ? new Missing() : found;
 		}
+		if (wanted == ArchiveRules.BIG_OBJECT) {
+			return new ArchiveToBigObject();
+		}
 		return new ArchiveToFiles();
 	}
 

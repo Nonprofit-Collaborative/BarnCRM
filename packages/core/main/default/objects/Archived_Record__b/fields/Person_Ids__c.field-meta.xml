@@ -3,7 +3,7 @@
   <fullName>Person_Ids__c</fullName>
   <description>
     Contact and Account Ids the record or its children name, comma separated, so erasing a person
-    also deletes their archived rows (R-AR6).
+    also deletes their archived rows (R-ARC6).
   </description>
   <label>People</label>
   <length>32768</length>

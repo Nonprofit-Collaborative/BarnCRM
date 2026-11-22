@@ -109,6 +109,10 @@ core/ArchiveRun.cls | public String objectName
 core/ArchiveRun.cls | public String queryJson
 core/ArchiveRun.cls | public String ruleName
 core/ArchiveRun.cls | public class ArchiveRun
+core/ArchiveToBigObject.cls | public Import_Batch__c start(ArchiveRun)
+core/ArchiveToBigObject.cls | public String key()
+core/ArchiveToBigObject.cls | public String unavailableReason()
+core/ArchiveToBigObject.cls | public class ArchiveToBigObject
 core/ArchiveToFiles.cls | public Import_Batch__c start(ArchiveRun)
 core/ArchiveToFiles.cls | public String key()
 core/ArchiveToFiles.cls | public String unavailableReason()

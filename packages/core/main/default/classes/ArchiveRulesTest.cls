@@ -2,7 +2,7 @@
  * Archive rules (canonical model R-SQ16): the `archive` key, its checks, its schedule, and the
  * destination seam's lookup.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ArchiveRules, ApexClass:ArchiveDestinations, ApexClass:ArchiveToFiles, ApexClass:ArchiveRun')
 private class ArchiveRulesTest {
 	// The one method that reads records runs as a user it creates; the rest need no user:
 	// runs-as: deploying user (pure logic: a JSON document, dates and the packaged help catalog, no DML)

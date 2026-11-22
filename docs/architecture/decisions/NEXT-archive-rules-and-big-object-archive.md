@@ -74,7 +74,7 @@ transaction; an optional field needs field permission for any user-mode read.
    typed count. Turning a schedule on asks for the same typed count once; each scheduled run is
    capped by the bulk delete run limit and logs what it did. Records are read and deleted in
    the running person's user mode. Scheduled rules run as the Archive Rules step of the nightly
-   run (ADR-0166), one rule after another, as the user who scheduled the nightly run; the step's
+   run (ADR-0166), each due rule starting its own job, as the user who scheduled the nightly run; the step's
    switch and each rule's Active switch are the automation's switches (ADR-0166 item 4). The
    Automation Registry is not used: it lists record-triggered automations.
 7. **The one-million cap.** `COUNT()` does not work, so Core keeps a running count on
