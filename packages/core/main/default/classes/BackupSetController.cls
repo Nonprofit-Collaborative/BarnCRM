@@ -49,4 +49,15 @@ public with sharing class BackupSetController {
 			throw ERRORS.wrap(e, 'BackupSetController.runNow');
 		}
 	}
+
+	/** Sets the schedule of one of the person's own Backup Sets (R-SQ16). */
+	@AuraEnabled
+	public static BackupSetService.Panel setSchedule(Id queryId, String frequency, Integer weekday, Integer day) {
+		try {
+			BackupSetService.setSchedule(queryId, frequency, weekday, day);
+			return BackupSetService.page();
+		} catch (Exception e) {
+			throw ERRORS.wrap(e, 'BackupSetController.setSchedule');
+		}
+	}
 }

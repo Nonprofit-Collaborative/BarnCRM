@@ -121,7 +121,7 @@ private class BackupSetServiceTest {
 				Run_Log__c = 'Started.'
 			);
 			insert job;
-			BackupSetService.afterExport(job.Id, true, 0, 1, null, 'Contact-x-part-1', false);
+			BackupSetService.afterExport(job.Id, true, 0, 1, null, 'Contact-x-part-1', false, null);
 			job = [
 				SELECT Status__c, File_Id__c, Run_Log__c
 				FROM Import_Batch__c

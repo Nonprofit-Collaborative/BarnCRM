@@ -1334,6 +1334,7 @@ Section 29E, R-BD2). Shown in the console's Import section.
 | `Bulk_Delete_Run_Limit__c` | integer | 10000 | The most records one bulk delete may delete (R-BD2). From 1 to 48,000; empty reads as 10,000, out of range as the nearest end. |
 | `Import_Row_Deletion__c` | picklist(Once_Complete, After_30_Days, After_90_Days, Never) | After_30_Days | Delete Import Rows: when the nightly Record Cleanup deletes the staged rows of a complete import (R-IR5, ADR-0149). Stored as text (ADR-0019); a blank or unknown value reads as After_30_Days. Replaces `Import_Row_Retention_Days__c` (a number of days, D-40), which is removed. |
 | `Bulk_Chunk_Size__c` | integer | 200 | Records each chunk of a bulk update or bulk delete handles (R-BU2, R-BD2). From 10 to 200; empty reads as 200, out of range as the nearest end. Stamped on the job when it starts. |
+| `Backup_Runs_Kept__c` | integer | 7 | Backup Runs Kept: how many runs of each scheduled Backup Set keep their files (R-SQ16, BK-10). From 1 to 365; empty reads as 7, out of range as the nearest end. A set run only on demand keeps every file. |
 
 ### v0.8 keys
 
@@ -9037,12 +9038,32 @@ Manage BarnCRM Settings and Find and Export Records may see the Backup Sets pane
   query could not run, with Completed At, Row Count (rows written), File Id (the first part's
   document), File Name (its title) and a Run Log line naming the parts. A run that wrote exactly
   the limit says in its log that the set may hold more. The Q-04 notification opens the first
-  part. Nothing is deleted, by the run or later: the files are the person's.
+  part. No record is deleted; files are deleted only for a scheduled set's runs past the number
+  kept (R-SQ16).
 - **The run list.** The person's own Backup jobs, newest first (`DataJobs.read`); Data Jobs lists
   them too. A Backup job has no undo and is not listed as an import.
 - **Restore.** No code: the file is loaded with Load one object as Update by record ID (values of
   records that still exist) or Create (records since deleted, as new records), as R-BD9's file is.
-- **Schedule.** None until C-38 (D-39).
+- **Schedule.** R-SQ16.
+
+**R-SQ16 Scheduled Backup Sets** (BK-10, D-221; ADR-NEXT
+`NEXT-automatic-backups-and-off-platform-destination.md`). The `backup` key may hold `schedule`:
+`{ "frequency": "daily" }`, `{ "frequency": "weekly", "weekday" }` (1 Monday to 7 Sunday) or
+`{ "frequency": "monthly", "day" }` (1 to 28). No schedule, or `off`, means Run Now only. Only the
+owner sets it (`BackupSetService.setSchedule`); Find keeps the whole `backup` key on a save.
+
+- **The step.** Core's nightly step Backup Sets (`BackupSetSchedule`, key `BarnCRM Backup Sets`,
+  2:00 AM, own switch shipped on) reads every saved query in system mode without sharing and starts
+  each set due today, as the nightly run's user, who must hold Manage BarnCRM Settings and Find and
+  Export Records; otherwise nothing starts and a Warning is logged. A set that cannot start is
+  logged and the others still start. The run's log says which schedule started it.
+- **Parts kept on the job.** A Backup run's finish (and an archive's) records every part's
+  document in the definition as `documents`, in order.
+- **Runs kept.** When a run of a set with a schedule completes, that set's complete runs past the
+  newest `Backup_Runs_Kept__c` (Section 12) lose their files: the documents in `documents` (or,
+  for a run without the list, its first file and the files its runner owns titled as its other
+  parts) are deleted in system mode, File Id and File Name are cleared, and a log line says why.
+  A failure to delete is a Warning in the Error Log. A set run only on demand keeps every file.
 
 ### Salesforce implementation
 
@@ -20058,6 +20079,7 @@ mirrors the primary member).
 | 1.81 | 2026-11-20 | The Mapper and saved maps (MAP-01 to MAP-07, releases 1.31 to 1.33). `Saved_Transform__c` gains `Kind__c` (Step List, the default, or Map); new R-MAP1 to R-MAP4 (map document, paths, checks, preview) and R-ST5 (maps). `Giving_Settings__c` gains `Opportunity_Mirror_Map__c`, a Saved Transform record ID chosen with a record picker (a map name is read too); new R-OM12 (extra fields through a map). No object added. |
 | 1.82 | 2026-11-20 | BarnCRM Connector pre-batch review fixes (release 1.33). One object added, 199 to 200 in the suite: Connector Connection (`Connector_Connection__c`, `Check_Path__c`), which keeps a template's check path beside a connection (29CN1, new R-CN9: Check Connection asks for it and shows the account an answer names). New R-CN10: choosing the integration user needs the key-writing permissions and refuses an all-seeing user. R-CN8: Disconnect refuses a Secret URL. Connector Run's Status loses Rejected; Running marks runs claimed for the next runner job (R-RUN4). |
 | 1.83 | 2026-11-20 | R-CR6 the recipe clock: a claimed Running run counts as Queued for the clock, so the heartbeat keeps running while a lane has a Waiting run, a Queued run or a claimed Running run (batch Q gate fix). |
+| 1.84 | 2026-11-21 | Scheduled Backup Sets (BK-10, D-221, release 1.36; ADR-NEXT `NEXT-automatic-backups-and-off-platform-destination.md`). Section 29D gains R-SQ16: the `backup` key's `schedule`, the nightly step Backup Sets, parts kept on the job as `documents`, and runs kept. Section 12 gains `Backup_Runs_Kept__c`. (Version number for the integrator to confirm at merge.) |
 
 ---
 ## 32. Entity ownership by package

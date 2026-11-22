@@ -22,6 +22,7 @@
                                 <span class="slds-col slds-grow">
                                     {set.name}
                                     <span class="slds-text-body_small slds-text-color_weak slds-var-m-left_x-small">{set.objectName}, {set.ownerName}</span>
+                                    <span class="slds-text-body_small slds-var-m-left_x-small" data-id="schedule">{set.scheduleText}</span>
                                 </span>
                                 <lightning-button
                                     label={labels.run}
@@ -33,6 +34,14 @@
                                 <template lwc:if={set.mine}>
                                     <lightning-button
                                         class="slds-var-m-left_x-small"
+                                        label={labels.editSchedule}
+                                        data-id={set.id}
+                                        data-action="edit-schedule"
+                                        disabled={busy}
+                                        onclick={handleEditSchedule}
+                                    ></lightning-button>
+                                    <lightning-button
+                                        class="slds-var-m-left_x-small"
                                         variant="base"
                                         label={labels.remove}
                                         data-id={set.id}
@@ -41,12 +50,63 @@
                                         onclick={handleRemove}
                                     ></lightning-button>
                                 </template>
+                                <template lwc:if={set.editing}>
+                                    <div class="slds-size_1-of-1 slds-grid slds-grid_vertical-align-end slds-wrap slds-var-m-top_x-small" data-id="schedule-form">
+                                        <lightning-combobox
+                                            class="slds-var-m-right_x-small"
+                                            label={labels.frequency}
+                                            options={frequencyOptions}
+                                            value={draft.frequency}
+                                            onchange={handleFrequency}
+                                            data-id="frequency"
+                                        ></lightning-combobox>
+                                        <template lwc:if={draftWeekly}>
+                                            <lightning-combobox
+                                                class="slds-var-m-right_x-small"
+                                                label={labels.weekday}
+                                                options={weekdayOptions}
+                                                value={draft.weekday}
+                                                onchange={handleWeekday}
+                                                data-id="weekday"
+                                            ></lightning-combobox>
+                                        </template>
+                                        <template lwc:if={draftMonthly}>
+                                            <lightning-combobox
+                                                class="slds-var-m-right_x-small"
+                                                label={labels.dayOfMonth}
+                                                options={dayOptions}
+                                                value={draft.day}
+                                                onchange={handleDay}
+                                                data-id="day"
+                                            ></lightning-combobox>
+                                        </template>
+                                        <lightning-button
+                                            variant="brand"
+                                            label={labels.saveSchedule}
+                                            disabled={busy}
+                                            onclick={handleSaveSchedule}
+                                            data-id="save-schedule"
+                                        ></lightning-button>
+                                        <lightning-button
+                                            class="slds-var-m-left_x-small"
+                                            label={labels.cancel}
+                                            onclick={handleCancelSchedule}
+                                            data-id="cancel-schedule"
+                                        ></lightning-button>
+                                    </div>
+                                </template>
                             </li>
                         </template>
                     </ul>
                 </template>
                 <template lwc:else>
                     <p class="slds-text-color_weak" data-id="none">{labels.none}</p>
+                </template>
+                <template lwc:if={anyScheduled}>
+                    <p class="slds-text-body_small slds-var-m-top_x-small" data-id="schedule-note">{scheduleNote}</p>
+                    <template lwc:if={nightlyOff}>
+                        <c-barn-notice variant="warning" message={labels.nightlyOff} data-id="nightly-off"></c-barn-notice>
+                    </template>
                 </template>
 
                 <div class="slds-grid slds-grid_vertical-align-end slds-wrap slds-var-m-top_small" data-id="add">

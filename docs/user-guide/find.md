@@ -110,9 +110,9 @@ You should see: "Saved" followed by the name. To open it later, choose it in **S
 queries**. Queries shared with you show the sharer's name, for example "Springfield, no email
 (shared by Maria Lopez)". Only the person who saved a query can change, share or delete it.
 
-An administrator can make a saved query a **Backup Set**, so a copy of its records can be saved
-to a file whenever they want one ([Backup Sets](../admin-guide/backup-sets.md)). Saving the query
-again in Find keeps it a Backup Set.
+An administrator can make a saved query a **Backup Set**, so a copy of its records is saved to
+files when they choose or on a schedule ([Backup Sets](../admin-guide/backup-sets.md)). Saving the
+query again in Find keeps it a Backup Set, with its schedule.
 
 ## To Delete a Saved Query
 

@@ -3,6 +3,7 @@ import { NavigationMixin } from 'lightning/navigation';
 import getPage from '@salesforce/apex/BackupSetController.getPage';
 import setBackup from '@salesforce/apex/BackupSetController.setBackup';
 import runNow from '@salesforce/apex/BackupSetController.runNow';
+import setSchedule from '@salesforce/apex/BackupSetController.setSchedule';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { format, messageFrom } from 'c/findCsv';
 import { startPolling } from 'c/jobPoller';
@@ -11,9 +12,10 @@ import { tabPageReference } from 'c/barnTabs';
 /**
  * The Backup Sets panel on Data Manager (C-66, canonical model R-SQ15, admin guide
  * backup-sets.md): the saved Find queries marked as Backup Sets, Run Now beside each, the
- * person's own saved queries to add, and their recent runs with each run's first file. A run
- * that is still saving is read again until it ends (c/jobPoller). Restoring is an import: the
- * panel links to Import and says which load to choose.
+ * person's own saved queries to add, and their recent runs with each run's first file. The owner
+ * of a set gives it a schedule (R-SQ16): off, daily, weekly on a weekday or monthly on a day from
+ * 1 to 28, run by the nightly jobs. A run that is still saving is read again until it ends
+ * (c/jobPoller). Restoring is an import: the panel links to Import and says which load to choose.
  */
 export default class BackupSets extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded('Core');
@@ -24,6 +26,9 @@ export default class BackupSets extends NavigationMixin(LightningElement) {
   noticeMessage;
   chosen;
   stopTimer;
+  /** The set whose schedule is being edited, and the schedule as edited so far. */
+  editingId;
+  draft = {};
 
   get title() {
     return helpText('Core', 'Core_DataManager_BackupTitle');
@@ -42,8 +47,41 @@ export default class BackupSets extends NavigationMixin(LightningElement) {
       runsHeading: helpText('Core', 'Core_BackupSets_RunsHeading'),
       runsNone: helpText('Core', 'Core_BackupSets_RunsNone'),
       restore: helpText('Core', 'Core_BackupSets_Restore'),
-      openImport: helpText('Core', 'Core_BackupSets_OpenImport')
+      openImport: helpText('Core', 'Core_BackupSets_OpenImport'),
+      editSchedule: helpText('Core', 'Core_BackupSets_EditSchedule'),
+      frequency: helpText('Core', 'Core_BackupSets_Frequency'),
+      weekday: helpText('Core', 'Core_BackupSets_Weekday'),
+      dayOfMonth: helpText('Core', 'Core_BackupSets_DayOfMonth'),
+      saveSchedule: helpText('Core', 'Core_BackupSets_SaveSchedule'),
+      cancel: helpText('Core', 'Core_BackupSets_Cancel'),
+      nightlyOff: helpText('Core', 'Core_BackupSets_NightlyOff')
     };
+  }
+
+  get frequencyOptions() {
+    return [
+      { label: helpText('Core', 'Core_BackupSets_FrequencyOff'), value: 'off' },
+      { label: helpText('Core', 'Core_BackupSets_FrequencyDaily'), value: 'daily' },
+      { label: helpText('Core', 'Core_BackupSets_FrequencyWeekly'), value: 'weekly' },
+      { label: helpText('Core', 'Core_BackupSets_FrequencyMonthly'), value: 'monthly' }
+    ];
+  }
+
+  /** Monday (1) to Sunday (7), named in the person's language: 1 January 2024 was a Monday. */
+  get weekdayOptions() {
+    return [1, 2, 3, 4, 5, 6, 7].map((day) => ({ label: weekdayName(day), value: String(day) }));
+  }
+
+  get dayOptions() {
+    return Array.from({ length: 28 }, (unused, index) => ({ label: String(index + 1), value: String(index + 1) }));
+  }
+
+  get draftWeekly() {
+    return this.draft.frequency === 'weekly';
+  }
+
+  get draftMonthly() {
+    return this.draft.frequency === 'monthly';
   }
 
   connectedCallback() {
@@ -81,7 +119,23 @@ export default class BackupSets extends NavigationMixin(LightningElement) {
   }
 
   get sets() {
-    return (this.page && this.page.sets) || [];
+    return ((this.page && this.page.sets) || []).map((set) => ({
+      ...set,
+      scheduleText: scheduleText(set),
+      editing: set.id === this.editingId
+    }));
+  }
+
+  get anyScheduled() {
+    return this.sets.some((set) => set.frequency && set.frequency !== 'off');
+  }
+
+  get nightlyOff() {
+    return Boolean(this.page) && this.page.nightlyOn === false;
+  }
+
+  get scheduleNote() {
+    return this.page ? format(helpText('Core', 'Core_BackupSets_ScheduleNote'), this.page.runsKept) : '';
   }
 
   get hasSets() {
@@ -171,7 +225,72 @@ export default class BackupSets extends NavigationMixin(LightningElement) {
     );
   }
 
+  handleEditSchedule(event) {
+    const set = this.sets.find((candidate) => candidate.id === event.target.dataset.id);
+    this.editingId = set.id;
+    this.draft = {
+      frequency: set.frequency || 'off',
+      weekday: String(set.weekday || 1),
+      day: String(set.day || 1)
+    };
+  }
+
+  handleFrequency(event) {
+    this.draft = { ...this.draft, frequency: event.detail.value };
+  }
+
+  handleWeekday(event) {
+    this.draft = { ...this.draft, weekday: event.detail.value };
+  }
+
+  handleDay(event) {
+    this.draft = { ...this.draft, day: event.detail.value };
+  }
+
+  handleCancelSchedule() {
+    this.editingId = undefined;
+  }
+
+  async handleSaveSchedule() {
+    const queryId = this.editingId;
+    const { frequency, weekday, day } = this.draft;
+    await this.act(
+      () =>
+        setSchedule({
+          queryId,
+          frequency,
+          weekday: frequency === 'weekly' ? Number(weekday) : null,
+          day: frequency === 'monthly' ? Number(day) : null
+        }),
+      helpText('Core', 'Core_BackupSets_ScheduleSaved')
+    );
+    if (!this.errorMessage) {
+      this.editingId = undefined;
+    }
+  }
+
   async handleOpenImport() {
     this[NavigationMixin.Navigate](await tabPageReference('Import'));
   }
+}
+
+/** A weekday's name, 1 Monday to 7 Sunday, in the person's language. */
+function weekdayName(day) {
+  return new Intl.DateTimeFormat(undefined, { weekday: 'long', timeZone: 'UTC' }).format(
+    new Date(Date.UTC(2024, 0, day))
+  );
+}
+
+/** What a set's schedule reads as beside its name. */
+function scheduleText(set) {
+  if (set.frequency === 'daily') {
+    return helpText('Core', 'Core_BackupSets_FrequencyDaily');
+  }
+  if (set.frequency === 'weekly') {
+    return format(helpText('Core', 'Core_BackupSets_WeeklyOn'), weekdayName(set.weekday));
+  }
+  if (set.frequency === 'monthly') {
+    return format(helpText('Core', 'Core_BackupSets_MonthlyOn'), set.day);
+  }
+  return helpText('Core', 'Core_BackupSets_FrequencyOff');
 }

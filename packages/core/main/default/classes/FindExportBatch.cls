@@ -43,6 +43,8 @@ public with sharing class FindExportBatch implements Database.Batchable<SObject>
 	private Id archiveJobId;
 	/** A Backup Set run (R-SQ15): the archive's file, no delete, and its Backup job. */
 	private Id backupJobId;
+	/** An archive's or a Backup Set run's parts, in order (R-SQ16), so they can be found again. */
+	private List<Id> documentIds = new List<Id>();
 
 	/**
 	 * An archive's export (R-BD9): the query's records with these fields, at most `rowLimit`,
@@ -177,7 +179,8 @@ public with sharing class FindExportBatch implements Database.Batchable<SObject>
 				parts,
 				firstDocumentId,
 				titleOf(objectName, tag, 1),
-				rowsWritten >= rowLimit
+				rowsWritten >= rowLimit,
+				documentIds
 			);
 		}
 	}
@@ -197,8 +200,8 @@ public with sharing class FindExportBatch implements Database.Batchable<SObject>
 			VersionData = Blob.valueOf(body)
 		);
 		Database.insert(version, AccessLevel.USER_MODE);
-		if (firstDocumentId == null) {
-			firstDocumentId = [
+		if (firstDocumentId == null || archiveFields != null) {
+			Id documentId = [
 				SELECT ContentDocumentId
 				FROM ContentVersion
 				WHERE Id = :version.Id
@@ -206,6 +209,8 @@ public with sharing class FindExportBatch implements Database.Batchable<SObject>
 				LIMIT 1
 			]
 			.ContentDocumentId;
+			firstDocumentId = firstDocumentId == null ? documentId : firstDocumentId;
+			documentIds.add(documentId);
 		}
 		buffer = new List<String>();
 		bufferChars = 0;
