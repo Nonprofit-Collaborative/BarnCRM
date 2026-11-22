@@ -1,5 +1,5 @@
 /**
- * The settings store (ADR-NEXT settings as custom metadata, R-SV1 and R-SV2): value then default,
+ * The settings store (ADR-NEXT settings as custom metadata, R-STV1 and R-STV2): value then default,
  * one deployment per save, read back in the same transaction, audited and applied by the
  * callback once the deployment succeeds, and a failure logged with Salesforce's reason.
  */

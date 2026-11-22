@@ -115,7 +115,7 @@ public without sharing class SettingStore {
 		return definition == null || String.isBlank(definition.Default_Value__c) ? null : definition.Default_Value__c;
 	}
 
-	/** True once the legacy custom setting values have been carried over (R-SV1). */
+	/** True once the legacy custom setting values have been carried over (R-STV1). */
 	public static Boolean isCarriedOver() {
 		return parse(saved(CARRIED_OVER)) == true;
 	}

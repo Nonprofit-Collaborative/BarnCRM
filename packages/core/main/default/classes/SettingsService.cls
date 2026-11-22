@@ -10,7 +10,7 @@
  *
  * A module still owns a protected hierarchy custom setting (ADR-0017) until phase 2. Every write
  * is validated against the object's own schema and the shipped rows and is audited as a Setting
- * Change record (canonical model Section 12, R-N3; R-SV2 for Core, once the save is deployed).
+ * Change record (canonical model Section 12, R-N3; R-STV2 for Core, once the save is deployed).
  */
 @NamespaceAccessible
 public with sharing class SettingsService {
@@ -104,7 +104,7 @@ public with sharing class SettingsService {
 
 	/**
 	 * What the org saved for a Core key, typed, or null when it saved nothing: the store's value;
-	 * before carry-over, with no store record, the legacy custom setting's (R-SV1).
+	 * before carry-over, with no store record, the legacy custom setting's (R-STV1).
 	 */
 	private static Object coreStored(Schema.SObjectField token) {
 		String name = coreName(token);
@@ -442,7 +442,7 @@ public with sharing class SettingsService {
 			return stored;
 		}
 		if (!fillable) {
-			// A Core checkbox nothing saved shows its shipped default (R-SV1).
+			// A Core checkbox nothing saved shows its shipped default (R-STV1).
 			return core ? coreDefault(field) : stored;
 		}
 		String name = field.getDescribe().getLocalName().toLowerCase();

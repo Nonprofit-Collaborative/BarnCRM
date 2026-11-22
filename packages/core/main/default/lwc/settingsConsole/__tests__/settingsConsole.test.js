@@ -1892,7 +1892,7 @@ describe('c-settings-console', () => {
     });
   });
 
-  describe('saving through a deployment (R-SV2)', () => {
+  describe('saving through a deployment (R-STV2)', () => {
     const realTimeout = global.setTimeout;
 
     beforeEach(() => {

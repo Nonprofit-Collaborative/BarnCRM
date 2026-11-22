@@ -544,7 +544,7 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
   }
 
   /**
-   * Follows a save's deployment until the callback reports it (R-SV2): shows "Saving..." and
+   * Follows a save's deployment until the callback reports it (R-STV2): shows "Saving..." and
    * asks about every two seconds for up to two minutes. Returns Succeeded, Failed or Pending;
    * a failure is shown and the page reloads what is really saved.
    */

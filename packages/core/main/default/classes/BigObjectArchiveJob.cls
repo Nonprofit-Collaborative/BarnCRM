@@ -28,6 +28,8 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 	private static final String COPY = 'copy';
 	private static final String SETTLE = 'settle';
 	private static final String CONTEXT = 'BigObjectArchiveJob';
+	/** The archived row count's run-state key (R-ARC5), the field name it had on BarnCRM Settings. */
+	public static final String COUNT_KEY = 'Archived_Record_Count__c';
 
 	/** Set by tests: links are added here instead of being queued, so a test runs each in turn. */
 	@TestVisible
@@ -368,24 +370,20 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 
 	/** The rows the big object holds, as Core counts them (R-ARC5). */
 	public static Integer archivedCount() {
-		BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
-		return settings == null ? 0 : DataJobs.intOf(settings.Archived_Record_Count__c);
+		return DataJobs.intOf(SettingsState.number(COUNT_KEY));
 	}
 
-	/** Adds to the count (or takes away, with a negative change); never below zero. */
+	/**
+	 * Adds to the count (or takes away, with a negative change); never below zero. The count is
+	 * run state (SettingsState), locked on its row so parallel links do not lose a change.
+	 */
 	public static void addToCount(Integer change) {
 		if (change == null || change == 0) {
 			return;
 		}
-		BarnCRM_Settings__c stored = OrgSettingsSystemWriter.lockStored();
-		Integer now = stored == null ? 0 : DataJobs.intOf(stored.Archived_Record_Count__c);
-		OrgSettingsSystemWriter.saveOver(
-			BarnCRM_Settings__c.SObjectType,
-			stored,
-			new Map<Schema.SObjectField, Object>{
-				BarnCRM_Settings__c.Archived_Record_Count__c => Math.max(0, now + change)
-			}
-		);
+		Object stored = SettingsState.lockOrCreate(COUNT_KEY);
+		Integer now = DataJobs.intOf(SettingsService.toNumber(stored));
+		SettingsState.put(new Map<String, Object>{ COUNT_KEY => Math.max(0, now + change) });
 	}
 
 	/** Queues the next link, or hands it to a test. */

@@ -1486,7 +1486,7 @@ in the console as a setting: the Archived Records panel shows it.
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
-| `Archived_Record_Count__c` | integer | 0 | How many rows `Archived_Record__b` (Section 29D1) holds, kept by the archive and restore links from the rows actually written or removed (the platform cannot count a big object). Warns from 900,000; a run that would pass 1,000,000 stops. Written by the archive job, without an audit row. |
+| `Archived_Record_Count__c` | integer | 0 | How many rows `Archived_Record__b` (Section 29D1) holds, kept by the archive and restore links from the rows actually written or removed (the platform cannot count a big object). Warns from 900,000; a run that would pass 1,000,000 stops. Run state (a State row, `SettingsState.CORE_KEYS`, R-STV3 carry-over), locked and written by the archive, restore and erasure links, without an audit row. |
 
 ### Brand keys
 
@@ -1626,14 +1626,14 @@ touches one. Retrieved and deployed like any metadata (`CustomMetadata:Setting_V
 | DeveloperName | text | The DeveloperName of the Setting Definition the value belongs to. |
 | `Value__c` | text (255) | The org's value as a JSON literal; blank means the default. |
 
-**R-SV1 Effective value.** The Setting Value when one exists and is not blank and parses as JSON,
+**R-STV1 Effective value.** The Setting Value when one exists and is not blank and parses as JSON,
 else the definition's `Default_Value__c`; a record with no definition (a module not installed) is
 ignored. Before `Settings_Carried_Over` is true, a value the org saved in the legacy custom
 setting is used ahead of the default.
-**R-SV2 Saving.** One save sends one deployment of every changed key. The page shows Saving
+**R-STV2 Saving.** One save sends one deployment of every changed key. The page shows Saving
 until the deployment ends, then Saved or the reason it was not. Each key's Setting Change is
 written when the deployment succeeds, with its Deployment Id (R-S6).
-**R-SV3 Carry-over.** Carry Over Settings (offered to a settings admin while the org has legacy
+**R-STV3 Carry-over.** Carry Over Settings (offered to a settings admin while the org has legacy
 values and no marker) deploys, in one deployment, every legacy value that differs from its
 default plus the marker, audited like any save; copies run state to State rows and What's New
 dismissals to Seen rows where none exists; and moves a pause that has not ended to the
@@ -1642,7 +1642,7 @@ reported; it reads its default. A second run, once the marker is deployed, does 
 same run carries every registered module (Setting Module below): each legacy value with a
 Setting Definition of the module's group joins the one deployment, and each state field gets
 its `Prefix.Field` State row.
-**R-SV4 Module settings.** A module whose settings group has a Setting Module record reads and
+**R-STV4 Module settings.** A module whose settings group has a Setting Module record reads and
 saves every row of that group through the store (`ModuleSettings` by DeveloperName, or
 `SettingsService` by group and key), from its definitions alone, so the group needs no object
 once the legacy custom setting is removed. Until then, and only before carry-over in an org
@@ -14038,7 +14038,7 @@ pages' Schedule and Stop buttons, which require Manage BarnCRM Settings.
   they are not deployable and not settings. Read once per transaction by `SettingsState` and
   written in system mode. The job registry (`NightlyJobs.rows`) reads Job rows only. Seen rows
   are Section 12A. A module's rows are named `Prefix.Name`, the prefix from its Setting Module
-  record (Section 13, R-SV4). A run lock is one such row read `FOR UPDATE`
+  record (Section 13, R-STV4). A run lock is one such row read `FOR UPDATE`
   (`SettingsState.lockOrCreate`), created by the module at install so two first runs cannot
   each make one.
 - **Classes:** `NightlyStep` (one step), `NightlyStepProvider` (a module's steps),
@@ -20376,8 +20376,8 @@ mirrors the primary member).
 | 1.88 | 2026-11-21 | Storage services for the backup destination (BK-10b, release 1.36; ADR-NEXT decision 8). New R-CN12: AWS Signature Version 4 connections, OAuth connections made in Setup, `{file}` in headers and Google Drive `metadata` in Backup Settings, and a short allowlist for a path's query. No object or field added. (Version number for the integrator to confirm at merge.) |
 | 1.89 | 2026-11-21 | Archive rules and the big object archive (D-221, AR-10, ADR-NEXT archive rules and big object archive). New Section 29D1 Archived Record (`Archived_Record__b`, a big object from the separate allocation; custom objects unchanged), rules R-ARC1 to R-ARC7. Saved Query gains R-SQ18, the `archive` key (destination Files, BigObject or OffPlatform through the `ArchiveDestination` seam, a schedule, an Active switch). R-R2 gains `more than n days ago`. `Import_Batch__c` Operation gains Archive. `BarnCRM_Settings__c` gains `Archived_Record_Count__c`. The nightly run gains the Archive Rules step. |
 | 1.90 | 2026-11-21 | Archived Records viewer, restore and archive erasure (D-221, AR-10 part 4). R-ARC4 gains the restore limits (50 rows, 25 per insert link) and keeps a row archived when its record or a child cannot be created; R-ARC6 names whom the scan matches and the `ArchiveErasureExtension` registration. No object or field added. |
-| 1.91 | 2026-11-21 | Settings as custom metadata, phase 1 Core (SET-01, D-219, ADR-NEXT settings as custom metadata). New custom metadata type `Setting_Value__mdt` with `Value__c` (Section 13, R-SV1 to R-SV3; not counted as an object). `Setting_Definition__mdt` gains `Default_Value__c` and the Hidden data type. `Nightly_Job__c` gains `Kind__c` and `Value__c` (state and What's New rows). `BarnCRM_Automation_Control__c` gains `Paused_Until__c`. New `Account.Is_Organization_Account__c`, a kept checkbox that replaces the `Is_Organization__c` formula everywhere it was read (Section 8; the platform refuses a formula-to-checkbox change, and the formula is removed in phase 2). `BarnCRM_Settings__c` and `Whats_New_Seen__c` are read only until carry-over and are removed in phase 2; no object count change in phase 1. |
-| 1.92 | 2026-11-21 | Settings as custom metadata, phase 2 Core prerequisite (SET-02, D-219). New custom metadata type `Setting_Module__mdt` with `Settings_Object__c`, `Key_Prefix__c` and `State_Fields__c` (Section 13; not counted as an object): a module registers its settings group, its State row prefix and its legacy state fields. New rule R-SV4 (module settings read and saved through the store by name or by group and key); R-SV3 carry-over covers every registered module; module State rows are `Prefix.Name` and a run lock is a State row read `FOR UPDATE` (Section 29 Nightly Jobs). No object count change. |
+| 1.91 | 2026-11-21 | Settings as custom metadata, phase 1 Core (SET-01, D-219, ADR-NEXT settings as custom metadata). New custom metadata type `Setting_Value__mdt` with `Value__c` (Section 13, R-STV1 to R-STV3; not counted as an object). `Setting_Definition__mdt` gains `Default_Value__c` and the Hidden data type. `Nightly_Job__c` gains `Kind__c` and `Value__c` (state and What's New rows). `BarnCRM_Automation_Control__c` gains `Paused_Until__c`. New `Account.Is_Organization_Account__c`, a kept checkbox that replaces the `Is_Organization__c` formula everywhere it was read (Section 8; the platform refuses a formula-to-checkbox change, and the formula is removed in phase 2). `BarnCRM_Settings__c` and `Whats_New_Seen__c` are read only until carry-over and are removed in phase 2; no object count change in phase 1. |
+| 1.92 | 2026-11-21 | Settings as custom metadata, phase 2 Core prerequisite (SET-02, D-219). New custom metadata type `Setting_Module__mdt` with `Settings_Object__c`, `Key_Prefix__c` and `State_Fields__c` (Section 13; not counted as an object): a module registers its settings group, its State row prefix and its legacy state fields. New rule R-STV4 (module settings read and saved through the store by name or by group and key); R-STV3 carry-over covers every registered module; module State rows are `Prefix.Name` and a run lock is a State row read `FOR UPDATE` (Section 29 Nightly Jobs). No object count change. |
 | 1.93 | 2026-11-21 | Settings as custom metadata, phase 2 modules (SET-03, D-219): Funders, Scholarships, Memberships, Corporate Hub, Connector, Contact Point Sync, Address Verification and LWC Builder. Each ships a `Setting_Module__mdt` record (`Funders`, `Scholarships`, `Memberships`, `CorporateHub`, `Connector`, `ContactPoints`, `AddressVerification`, `LwcBuilder`) and every Setting Definition row a `Default_Value__c`. Run state moves to State rows: `Connector.Recipes_Paused__c` (synchronous, toggled on the Connector page, so its Setting Definition row `Connector_Recipes_Paused` is removed), `Connector.Integration_User_Id__c`, `ContactPoints.Last_Backfill__c` and `ContactPoints.Last_Backfill_Summary__c`, `AddressVerification.Connected_Provider__c`. The eight legacy custom settings stay until the destructive deploy; no module reads them. No object count change. |
 
 ---

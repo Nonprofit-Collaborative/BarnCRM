@@ -1,5 +1,5 @@
 /**
- * Follows a settings save to its end (ADR-NEXT settings as custom metadata, R-SV2). A save is one
+ * Follows a settings save to its end (ADR-NEXT settings as custom metadata, R-STV2). A save is one
  * metadata deployment; this asks SettingsController.getSaveOutcome about every two seconds, for up
  * to two minutes, and resolves to { status, message }: Succeeded, Failed (message is Salesforce's
  * reason) or Pending (still running when it stopped asking). No deployment Id means the save is

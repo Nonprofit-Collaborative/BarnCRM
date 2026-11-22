@@ -1,7 +1,7 @@
 # Module settings
 
 How a module declares, reads and saves its settings and keeps its run state, in the settings
-store (ADR-NEXT settings as custom metadata, decision 11; canonical model Section 13, R-SV4).
+store (ADR-NEXT settings as custom metadata, decision 11; canonical model Section 13, R-STV4).
 Core names no module: everything below ships in the module's own package.
 
 ## 1. Declare

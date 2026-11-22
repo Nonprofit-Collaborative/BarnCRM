@@ -1,5 +1,5 @@
 /**
- * Records how a settings save ended (ADR-NEXT settings as custom metadata, R-SV2).
+ * Records how a settings save ended (ADR-NEXT settings as custom metadata, R-STV2).
  *
  * Success writes one Setting Change per audited key, with the deployment Id, so Recent Changes
  * lists the change once it has happened and the console can see that the save finished; then

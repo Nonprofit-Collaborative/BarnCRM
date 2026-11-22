@@ -224,7 +224,7 @@ public with sharing class SettingsController {
 		}
 	}
 
-	/** True when the org still has settings to carry over into custom metadata (R-SV1). */
+	/** True when the org still has settings to carry over into custom metadata (R-STV1). */
 	@AuraEnabled
 	public static Boolean getCarryOverNeeded() {
 		try {
@@ -258,7 +258,7 @@ public with sharing class SettingsController {
 	public static final String SAVE_FAILED = 'Failed';
 
 	/**
-	 * How a save's deployment ended, for the console's "Saving..." note (R-SV2): Pending until
+	 * How a save's deployment ended, for the console's "Saving..." note (R-STV2): Pending until
 	 * the callback has written its Setting Change rows (Succeeded) or its Error Log entry
 	 * (Failed, with Salesforce's reason as `message`).
 	 */

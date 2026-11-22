@@ -24,6 +24,7 @@ public without sharing class SettingsState {
 	 */
 	@NamespaceAccessible
 	public static final Set<String> CORE_KEYS = new Set<String>{
+		'Archived_Record_Count__c',
 		'Error_Digest_Covered_Until__c',
 		'Error_Digest_Last_Run__c',
 		'Error_Digest_Last_Run_Summary__c',

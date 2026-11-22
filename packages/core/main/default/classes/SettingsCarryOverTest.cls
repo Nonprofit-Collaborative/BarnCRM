@@ -1,6 +1,6 @@
 /**
  * The one-time carry-over of the legacy settings (ADR-NEXT settings as custom metadata,
- * decision 9; canonical model R-SV1): changed values become Setting Value records with the
+ * decision 9; canonical model R-STV1): changed values become Setting Value records with the
  * marker in one deployment, run state and seen versions become rows, a pause still running
  * moves to Automation Control, and a second run changes nothing.
  */
