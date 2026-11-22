@@ -44,6 +44,7 @@ into six kinds:
 | SeasonalAddressSelector | Org job | Every household due a seasonal address swap, so none is silently left out | ADR-0021, ADR-0027 |
 | SeasonalAddressWriter | Org job | The package's own address records for the nightly swap (the copy into standard address fields stays in user mode) | ADR-0021, ADR-0027 |
 | SetupChangeCopyJob | Org job | The package's own copy of Setup changes, written and pruned in full | ADR-0021 |
+| OrganizationFlagBatch | Org job | Every account whose Is Organization flag disagrees with the organization record type, so the Organizations list view counts every one | ADR-0021, ADR-NEXT settings as custom metadata |
 | SettingStore | Platform | Reads the org's Setting Value records and enqueues the metadata deployment of a save, which the caller has permission-checked | ADR-0021, ADR-NEXT settings as custom metadata |
 | SettingValueDeployCallback | Platform | Writes the Setting Change audit rows and Error Log entry of a finished settings deployment, as the platform's callback user | ADR-0021, ADR-NEXT settings as custom metadata |
 | SettingsCarryOver | Platform | Reads the protected legacy settings records and writes the package's own state and seen rows once, for a holder of Manage BarnCRM Settings | ADR-0021, ADR-NEXT settings as custom metadata |

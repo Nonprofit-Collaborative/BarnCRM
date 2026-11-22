@@ -823,15 +823,20 @@ Detection never creates, activates or shows a record type.
   resolver, `AccountKinds`, answers "is this an organization" and "which record type does a
   new organization get" for Core and every module; nothing else names a record type for
   organizations.
-- **Field:** `Is_Organization__c` (Checkbox, default false, kept by BarnCRM), true when the
-  account's record type developer name equals the Organization Record Type setting
-  (`Organization_Record_Type__c`, Section 12), or when the setting is `Master` and the account
-  has no record type (a blank `RecordTypeId`, or the master record type, which has no developer
-  name). The Account trigger handler sets it on insert and whenever the record type changes;
-  when the setting's saved value changes, `OrganizationFlagBatch` resets it on every Account
-  (ADR-NEXT settings as custom metadata, which replaced the formula over `$Setup`). The
-  Organizations list view and every record page rule for organizations filter on it. Read
-  access in the three role sets.
+- **Field:** `Is_Organization_Account__c` (Checkbox, label Is Organization, default false, kept
+  by BarnCRM), true when the account's record type developer name equals the Organization
+  Record Type setting (`Organization_Record_Type__c`, Section 12, read through
+  `AccountKinds.isOrganization`), or when the setting is `Master` and the account has no record
+  type (a blank `RecordTypeId`, or the master record type, which has no developer name). The
+  Account trigger handler sets it on every insert and update; `OrganizationFlagBatch` puts
+  right every Account whose flag disagrees when the setting's saved value changes and on each
+  install (ADR-NEXT settings as custom metadata). The Organizations list views, every record
+  page rule for organizations, the address capture flow template and the donor segment
+  template filter on it. Read access in the three role sets.
+- **Field:** `Is_Organization__c` (Checkbox formula over
+  `$Setup.BarnCRM_Settings__c.Organization_Record_Type__c`), unused by BarnCRM and removed in
+  phase 2 of ADR-NEXT settings as custom metadata with `BarnCRM_Settings__c`. Read access in the
+  three role sets until then.
 - **Fields:** standard `Name`; `Primary_Contact__c` (shared with Household, above);
   `Sample_Data__c` (Checkbox, shared field definition with Household, above);
   `Sample_Data_Key__c` (Text(20), shared with Household, holding the key the generated
@@ -1626,8 +1631,12 @@ setting is used ahead of the default.
 **R-SV2 Saving.** One save sends one deployment of every changed key. The page shows Saving
 until the deployment ends, then Saved or the reason it was not. Each key's Setting Change is
 written when the deployment succeeds, with its Deployment Id (R-S6).
-**R-SV3 Carry-over.** Carry Over Saved Settings deploys, in one deployment, every legacy value
-that differs from its default plus the marker, and copies run state to state rows.
+**R-SV3 Carry-over.** Carry Over Settings (offered to a settings admin while the org has legacy
+values and no marker) deploys, in one deployment, every legacy value that differs from its
+default plus the marker, audited like any save; copies run state to State rows and What's New
+dismissals to Seen rows where none exists; and moves a pause that has not ended to the
+Automation Control org default. A value longer than 255 characters is not carried and is
+reported; it reads its default. A second run, once the marker is deployed, does nothing.
 
 ### Automation Registry
 
@@ -6713,7 +6722,7 @@ other copy exists.
 and `filter` are the R-SQ1 and R-R2 parts, and names carry no namespace prefix: building a
 segment qualifies each custom name for the org. The built document adds `Email` after `Name`
 for people, a limit of 200 rows, and one more condition joined by AND to the template's logic:
-`Deceased__c` equals false for people, `Is_Organization__c` equals true for organizations
+`Deceased__c` equals false for people, `Is_Organization_Account__c` equals true for organizations
 (households are accounts too). A template's name is a custom label and its description is help
 text in the Giving help catalog (`BarnHelp_Giving`, ADR-0164 help-text-json). The five
 templates:
@@ -9927,7 +9936,7 @@ this step does not read. Ships off.
   picklist for blank, so a value an admin adds is not covered), or Volunteer Hours Total is
   above zero, or the user holds
   `Manage_Volunteers` (so a coordinator can set the status of someone new). On Account the six
-  attributes carry a field visibility rule (record type not Household and `Is_Organization__c`
+  attributes carry a field visibility rule (record type not Household and `Is_Organization_Account__c`
   false), and
   the Manage Volunteers clause applies only to that record type, so a household or
   organization shows only its totals, once it has hours.
@@ -20105,7 +20114,7 @@ mirrors the primary member).
 | 1.81 | 2026-11-20 | The Mapper and saved maps (MAP-01 to MAP-07, releases 1.31 to 1.33). `Saved_Transform__c` gains `Kind__c` (Step List, the default, or Map); new R-MAP1 to R-MAP4 (map document, paths, checks, preview) and R-ST5 (maps). `Giving_Settings__c` gains `Opportunity_Mirror_Map__c`, a Saved Transform record ID chosen with a record picker (a map name is read too); new R-OM12 (extra fields through a map). No object added. |
 | 1.82 | 2026-11-20 | BarnCRM Connector pre-batch review fixes (release 1.33). One object added, 199 to 200 in the suite: Connector Connection (`Connector_Connection__c`, `Check_Path__c`), which keeps a template's check path beside a connection (29CN1, new R-CN9: Check Connection asks for it and shows the account an answer names). New R-CN10: choosing the integration user needs the key-writing permissions and refuses an all-seeing user. R-CN8: Disconnect refuses a Secret URL. Connector Run's Status loses Rejected; Running marks runs claimed for the next runner job (R-RUN4). |
 | 1.83 | 2026-11-20 | R-CR6 the recipe clock: a claimed Running run counts as Queued for the clock, so the heartbeat keeps running while a lane has a Waiting run, a Queued run or a claimed Running run (batch Q gate fix). |
-| 1.84 | 2026-11-21 | Settings as custom metadata, phase 1 Core (SET-01, D-219, ADR-NEXT settings as custom metadata). New custom metadata type `Setting_Value__mdt` with `Value__c` (Section 13, R-SV1 to R-SV3; not counted as an object). `Setting_Definition__mdt` gains `Default_Value__c` and the Hidden data type. `Nightly_Job__c` gains `Kind__c` and `Value__c` (state and What's New rows). `BarnCRM_Automation_Control__c` gains `Paused_Until__c`. `Account.Is_Organization__c` becomes a kept checkbox (Section 8). `BarnCRM_Settings__c` and `Whats_New_Seen__c` are read only until carry-over and are removed in phase 2; no object count change in phase 1. |
+| 1.84 | 2026-11-21 | Settings as custom metadata, phase 1 Core (SET-01, D-219, ADR-NEXT settings as custom metadata). New custom metadata type `Setting_Value__mdt` with `Value__c` (Section 13, R-SV1 to R-SV3; not counted as an object). `Setting_Definition__mdt` gains `Default_Value__c` and the Hidden data type. `Nightly_Job__c` gains `Kind__c` and `Value__c` (state and What's New rows). `BarnCRM_Automation_Control__c` gains `Paused_Until__c`. New `Account.Is_Organization_Account__c`, a kept checkbox that replaces the `Is_Organization__c` formula everywhere it was read (Section 8; the platform refuses a formula-to-checkbox change, and the formula is removed in phase 2). `BarnCRM_Settings__c` and `Whats_New_Seen__c` are read only until carry-over and are removed in phase 2; no object count change in phase 1. |
 
 ---
 ## 32. Entity ownership by package

@@ -112,7 +112,7 @@ while [[ "$ELAPSED" -lt "$MAX_WAIT_SECONDS" ]]; do
 
   if [[ "$CONTACTS" -ge "$EXPECTED_CONTACTS" && "$RUNNING_JOBS" -eq 0 ]]; then
     HOUSEHOLDS="$(count_query "SELECT COUNT() FROM Account WHERE ${P}Sample_Data__c = true AND RecordType.DeveloperName = 'Household'")"
-    ORGANIZATIONS="$(count_query "SELECT COUNT() FROM Account WHERE ${P}Sample_Data__c = true AND ${P}Is_Organization__c = true")"
+    ORGANIZATIONS="$(count_query "SELECT COUNT() FROM Account WHERE ${P}Sample_Data__c = true AND ${P}Is_Organization_Account__c = true")"
     echo "Sample data load complete: ${HOUSEHOLDS} households, ${CONTACTS} contacts, ${ORGANIZATIONS} organizations."
     exit 0
   fi

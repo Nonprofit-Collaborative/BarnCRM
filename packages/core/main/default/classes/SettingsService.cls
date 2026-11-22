@@ -614,6 +614,14 @@ public with sharing class SettingsService {
 		if (jsonByKey.containsKey('brand_visibility__c') || jsonByKey.containsKey('brand_management__c')) {
 			BrandShareJob.requestFull();
 		}
+		if (jsonByKey.containsKey('organization_record_type__c')) {
+			try {
+				OrganizationFlagBatch.run();
+			} catch (Exception busy) {
+				// Logged; the next save of an account sets its flag, and the next install re-runs it.
+				ErrorLogger.log(busy, 'OrganizationFlagBatch');
+			}
+		}
 		if (jsonByKey.containsKey('seasonal_addresses_enabled__c')) {
 			SeasonalAddressScheduler.applySwitch(jsonByKey.get('seasonal_addresses_enabled__c') == 'true');
 		}

@@ -285,6 +285,13 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 		} catch (Exception e) {
 			ErrorLogger.log(e, ORGANIZATION_CONTEXT);
 		}
+		// Each install and upgrade sets Is Organization on any account whose flag disagrees: the
+		// first time on an org upgraded from the formula field, every organization.
+		try {
+			OrganizationFlagBatch.run();
+		} catch (Exception e) {
+			ErrorLogger.log(e, ORGANIZATION_CONTEXT);
+		}
 	}
 
 	/**

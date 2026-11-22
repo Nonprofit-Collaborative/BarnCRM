@@ -200,7 +200,7 @@ private class DonorSegmentControllerTest {
 			Integer expected = [
 				SELECT COUNT()
 				FROM Account
-				WHERE Id = :organization.Id AND Is_Organization__c = TRUE
+				WHERE Id = :organization.Id AND Is_Organization_Account__c = TRUE
 				WITH SYSTEM_MODE
 			];
 			Assert.areEqual(

@@ -57,16 +57,21 @@ are asynchronous; the owner has now accepted that cost in exchange for deployabl
    `WhatsNew:<UserId>`. Chosen as the lightest structure: no new object, the object already has
    a system-mode writer and admin-only access, and the job registry skips non-job rows. A User
    field was rejected (a standard object outside the mirror package) and so was a new object.
-8. **Is Organization is kept, not computed.** `Account.Is_Organization__c` was a formula over
+8. **Is Organization is kept, not computed.** `Account.Is_Organization__c` is a formula over
    `$Setup.BarnCRM_Settings__c.Organization_Record_Type__c`; a packaged formula cannot read an
-   org-created custom metadata record. It becomes a checkbox the Account handler sets on insert
-   and on record type change, and a batch resets on every Account when the setting changes
-   (amends ADR-0141).
+   org-created custom metadata record. The platform refuses to turn a formula field into
+   another type, so a new checkbox `Account.Is_Organization_Account__c` takes its place: the
+   Account handler sets it on every insert and update from `AccountKinds.isOrganization`, and
+   `OrganizationFlagBatch` puts right every account that disagrees when the setting changes and
+   on each install. List views, record page rules, the address flow and donor segments read the
+   checkbox. The formula field stays, unused, until phase 2 removes it with
+   `BarnCRM_Settings__c` (amends ADR-0141).
 9. **Carry-over.** Values an org saved in the old custom settings are read while the hidden
    marker `Settings_Carried_Over` is not true, so an upgraded org runs on its own values from
-   the moment it upgrades. The console's Carry Over Saved Settings action (shown while
-   something is waiting) deploys every saved value that differs from its default as Setting
-   Value records plus the marker in one deployment, and copies run state to state rows.
+   the moment it upgrades. The console's Carry Over Settings action (shown to settings admins
+   while the org has legacy values) deploys every saved value that differs from its default
+   as Setting Value records plus the marker in one deployment, copies run state and What's New
+   dismissals to their rows, and moves a running pause to Automation Control.
 10. **Phases.** Phase 1 moves Core (`BarnCRM_Settings__c`, `Whats_New_Seen__c`, the pause).
     Phase 2 moves every module settings object, then the integrator removes the old objects in a
     destructive deploy. `Automation_Setting__c` (the automation switch list) is not a setting
@@ -88,6 +93,11 @@ are asynchronous; the owner has now accepted that cost in exchange for deployabl
 - `SettingsService.SHIPPED_DEFAULTS`, the first-save blank handling and ADR-0035's trap no
   longer apply to Core: a setting added in an upgrade has no Setting Value, so its default
   applies. `check-setting-defaults.py` checks Core defaults on the definitions instead.
-- Apex cannot delete a custom metadata record: Restore Default writes a blank value.
+- Apex cannot delete a custom metadata record, so every value is stored explicitly: keeping a
+  shown default saves it as a Setting Value, and a record left blank in Setup reads the default.
+- Module menus need no switch of their own: a module's definitions ship in its package, so its
+  sections and settings appear on the BarnCRM Settings tab only where it is installed.
 - A module's Setting Value records outlive its uninstall and are ignored.
+- The deployment callback runs as the platform's automated process user, not the saver; the
+  audit row carries the saver from the save request.
 - After phase 2 the suite counts 181 objects (180 custom objects plus Automation Control).

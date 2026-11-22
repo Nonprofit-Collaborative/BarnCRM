@@ -124,7 +124,7 @@ public with sharing class DonorSegmentTemplates {
 			filter,
 			people
 				? DonorSegmentService.condition(qualifyPath('Deceased__c'), 'equals', false)
-				: DonorSegmentService.condition(qualifyPath('Is_Organization__c'), 'equals', true)
+				: DonorSegmentService.condition(qualifyPath('Is_Organization_Account__c'), 'equals', true)
 		);
 		Map<String, Object> orderBy = (Map<String, Object>) template.get('orderBy');
 		orderBy.put('field', qualifyPath((String) orderBy.get('field')));

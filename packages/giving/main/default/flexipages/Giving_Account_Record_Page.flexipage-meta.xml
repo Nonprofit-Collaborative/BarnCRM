@@ -70,7 +70,7 @@
         <identifier>RecordField_Website</identifier>
         <visibilityRule>
           <criteria>
-            <leftValue>{!Record.Is_Organization__c}</leftValue>
+            <leftValue>{!Record.Is_Organization_Account__c}</leftValue>
             <operator>EQUAL</operator>
             <rightValue>true</rightValue>
           </criteria>
@@ -493,7 +493,7 @@
         <identifier>affiliationPanel</identifier>
         <visibilityRule>
           <criteria>
-            <leftValue>{!Record.Is_Organization__c}</leftValue>
+            <leftValue>{!Record.Is_Organization_Account__c}</leftValue>
             <operator>EQUAL</operator>
             <rightValue>true</rightValue>
           </criteria>
@@ -639,7 +639,7 @@
         <identifier>givingOrganizationGiftsList</identifier>
         <visibilityRule>
           <criteria>
-            <leftValue>{!Record.Is_Organization__c}</leftValue>
+            <leftValue>{!Record.Is_Organization_Account__c}</leftValue>
             <operator>EQUAL</operator>
             <rightValue>true</rightValue>
           </criteria>
@@ -781,7 +781,7 @@
         <identifier>givingOrganizationCommitmentsList</identifier>
         <visibilityRule>
           <criteria>
-            <leftValue>{!Record.Is_Organization__c}</leftValue>
+            <leftValue>{!Record.Is_Organization_Account__c}</leftValue>
             <operator>EQUAL</operator>
             <rightValue>true</rightValue>
           </criteria>
@@ -975,7 +975,7 @@
         <identifier>givingOrganizationReceiptsList</identifier>
         <visibilityRule>
           <criteria>
-            <leftValue>{!Record.Is_Organization__c}</leftValue>
+            <leftValue>{!Record.Is_Organization_Account__c}</leftValue>
             <operator>EQUAL</operator>
             <rightValue>true</rightValue>
           </criteria>
@@ -1203,7 +1203,7 @@
                   <rightValue>Household</rightValue>
                 </criteria>
                 <criteria>
-                  <leftValue>{!Record.Is_Organization__c}</leftValue>
+                  <leftValue>{!Record.Is_Organization_Account__c}</leftValue>
                   <operator>EQUAL</operator>
                   <rightValue>false</rightValue>
                 </criteria>

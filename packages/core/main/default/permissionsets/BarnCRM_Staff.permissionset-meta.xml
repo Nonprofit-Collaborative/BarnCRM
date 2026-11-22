@@ -342,6 +342,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Account.Is_Organization_Account__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Account.Is_Organization__c</field>
     <readable>true</readable>
   </fieldPermissions>
