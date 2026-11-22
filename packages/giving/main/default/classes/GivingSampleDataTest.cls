@@ -26,9 +26,13 @@ private class GivingSampleDataTest {
 		Account household = TestDataFactory.household(
 			new Account(Name = 'The Sample Family', Sample_Data__c = true, Sample_Data_Key__c = 'H001')
 		);
+		// Of the record type the org chose for organizations, as Core's loader makes it: an org
+		// with several Account record types (Person Accounts) otherwise gives the user's default.
 		Account organization = TestDataFactory.organization(
-			new Account(Name = 'Cedar Valley Foundation', Sample_Data__c = true, Sample_Data_Key__c = ORGANIZATION_KEY)
+			AccountKindsTestData.organization('Cedar Valley Foundation')
 		);
+		organization.Sample_Data__c = true;
+		organization.Sample_Data_Key__c = ORGANIZATION_KEY;
 		insert new List<Account>{ household, organization };
 		insert new List<Contact>{
 			TestDataFactory.person(
