@@ -1,5 +1,6 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import { MessageContext } from 'lightning/messageService';
 import SIGNUP from '@salesforce/schema/Volunteer_Signup__c';
 import getPanel from '@salesforce/apex/VolunteerShiftSignupsController.getPanel';
 import addSignup from '@salesforce/apex/VolunteerShiftSignupsController.addSignup';
@@ -32,6 +33,11 @@ import CHANGED from '@salesforce/label/c.Core_Format_PairSentence';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import { bodyMessage, format } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import {
+  publishRecordChanged,
+  stopRecordChanged,
+  subscribeRecordChanged
+} from 'c/barnRecordChanged';
 
 const STATUS_SIGNED_UP = 'Signed up';
 const STATUS_ATTENDED = 'Attended';
@@ -47,6 +53,8 @@ const TONES = {
 };
 const CHOICE_NO_SHOW = 'noShow';
 const CHOICE_KEEP = 'keep';
+/** This panel's name on the BarnCRM Record Changed channel. */
+const SOURCE = 'shiftSignups';
 
 /**
  * The Sign-ups panel on a shift (V-02): places filled and remaining, who is booked, adding a
@@ -59,6 +67,9 @@ export default class ShiftSignups extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded('Volunteers');
 
   @api recordId;
+
+  @wire(MessageContext) messageContext;
+  subscription;
 
   labels = {
     title: TITLE,
@@ -102,19 +113,19 @@ export default class ShiftSignups extends NavigationMixin(LightningElement) {
       });
     }
     this.load();
-    // Suggested Volunteers on the same page tells this panel when it signs someone up (V-11).
-    window.addEventListener('barnshiftsignupschanged', this.handleSignupsChanged);
+    // Suggested Volunteers on the same page says when it signs someone up (V-11, PF-04).
+    this.subscription = subscribeRecordChanged(
+      this.messageContext,
+      () => this.recordId,
+      SOURCE,
+      () => this.load()
+    );
   }
 
   disconnectedCallback() {
-    window.removeEventListener('barnshiftsignupschanged', this.handleSignupsChanged);
+    stopRecordChanged(this.subscription);
+    this.subscription = null;
   }
-
-  handleSignupsChanged = (event) => {
-    if (event.detail && event.detail.shiftId === this.recordId) {
-      this.load();
-    }
-  };
 
   renderedCallback() {
     if (this.focusTarget) {
@@ -404,6 +415,8 @@ export default class ShiftSignups extends NavigationMixin(LightningElement) {
     return call
       .then((panel) => {
         this.panel = panel;
+        // Suggested Volunteers drops whoever is now booked.
+        publishRecordChanged(this.messageContext, this.recordId, SOURCE);
         const outcome = describe(panel);
         this.resultMessage = outcome.text;
         this.resultIsWarning = outcome.warning === true;

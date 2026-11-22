@@ -645,7 +645,8 @@ Below the Sign-Ups panel, the **Suggested Volunteers** card lists up to ten acti
 who could fill the shift, best match first, each with the reasons ("Has 1 of the 2 skills this
 job needs", "Available on Saturdays", "12 approved hours on this job"). **Sign Up** on a row books
 the person through the same save as **Add Sign-Up**, so the same rules apply (one sign-up per
-person per shift, the same permissions), and the Sign-Ups panel updates at once. The card
+person per shift, the same permissions), and the Sign-Ups panel updates at once; a change in
+the Sign-Ups panel updates the card at once too. The card
 changes nothing else and shows nothing to Read Only users or on a shift that is Cancelled or
 Completed. There is nothing to switch on.
 

@@ -1,5 +1,6 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import { MessageContext } from 'lightning/messageService';
 import getSuggestions from '@salesforce/apex/VolunteerSuggestionController.getSuggestions';
 import addSignup from '@salesforce/apex/VolunteerShiftSignupsController.addSignup';
 import { rankSuggestions, REASON } from './rankSuggestions';
@@ -21,21 +22,31 @@ import R_OPEN from '@salesforce/label/c.Volunteers_Suggestions_ReasonOpen';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import { bodyMessage, format } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import {
+  publishRecordChanged,
+  stopRecordChanged,
+  subscribeRecordChanged
+} from 'c/barnRecordChanged';
 
 /** How many suggestions the card shows. */
 const MAX_SHOWN = 10;
-/** Told to the Sign-ups panel on the same page, so it reloads (see shiftSignups.js). */
-const SIGNUPS_CHANGED = 'barnshiftsignupschanged';
+/** This panel's name on the BarnCRM Record Changed channel. */
+const SOURCE = 'volunteerSuggestions';
 
 /**
  * Suggested Volunteers on a shift (V-11): active people not yet signed up, best match first,
  * each with the reasons, and a button that signs them up through the Sign-ups panel's own save.
  * The ranking is the framework-free `rankSuggestions` module; Apex only gathers the facts.
+ * It and the Sign-ups panel tell each other about sign-ups on the BarnCRM Record Changed
+ * channel (PF-04), so a person signed up in either one leaves the suggestions and joins the list.
  */
 export default class VolunteerSuggestions extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded('Volunteers');
 
   @api recordId;
+
+  @wire(MessageContext) messageContext;
+  subscription;
 
   labels = {
     title: TITLE,
@@ -65,6 +76,17 @@ export default class VolunteerSuggestions extends NavigationMixin(LightningEleme
       });
     }
     this.load();
+    this.subscription = subscribeRecordChanged(
+      this.messageContext,
+      () => this.recordId,
+      SOURCE,
+      () => this.load()
+    );
+  }
+
+  disconnectedCallback() {
+    stopRecordChanged(this.subscription);
+    this.subscription = null;
   }
 
   load() {
@@ -166,9 +188,7 @@ export default class VolunteerSuggestions extends NavigationMixin(LightningEleme
           helpText('Volunteers', 'Volunteers_Suggestions_Booked'),
           row ? row.name : ''
         );
-        window.dispatchEvent(
-          new CustomEvent(SIGNUPS_CHANGED, { detail: { shiftId: this.recordId } })
-        );
+        publishRecordChanged(this.messageContext, this.recordId, SOURCE);
         return this.load();
       })
       .catch((error) => {

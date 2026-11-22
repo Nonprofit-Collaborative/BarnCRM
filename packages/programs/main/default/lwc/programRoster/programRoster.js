@@ -1,5 +1,6 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import { MessageContext } from 'lightning/messageService';
 import ENROLLMENT from '@salesforce/schema/Enrollment__c';
 import getRoster from '@salesforce/apex/ProgramRosterController.getRoster';
 import enroll from '@salesforce/apex/ProgramRosterController.enroll';
@@ -22,9 +23,12 @@ import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import { format, rosterRows, stageFigures, stageLabel, stageOptions } from './roster';
 import { bodyMessage } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { publishRecordChanged } from 'c/barnRecordChanged';
 
 const STAGE_ENROLLED = 'Enrolled';
 const MAX_SHOWN = 200;
+/** This panel's name on the BarnCRM Record Changed channel (PF-04). */
+const SOURCE = 'programRoster';
 
 /**
  * The Program Roster panel on a program (P-01): how many people are at each stage, who is
@@ -35,6 +39,8 @@ export default class ProgramRoster extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded('Programs');
 
   @api recordId;
+
+  @wire(MessageContext) messageContext;
 
   labels = {
     title: TITLE,
@@ -258,6 +264,8 @@ export default class ProgramRoster extends NavigationMixin(LightningElement) {
     return call
       .then((roster) => {
         this.roster = roster;
+        // The Service Delivery Log on the same program lists the people enrolled now.
+        publishRecordChanged(this.messageContext, this.recordId, SOURCE);
         this.resultMessage = describe(roster);
         this.focusTarget = 'result';
       })
