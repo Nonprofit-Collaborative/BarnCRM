@@ -1,5 +1,6 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
 import { RefreshEvent } from 'lightning/refresh';
+import { MessageContext } from 'lightning/messageService';
 import LOCALE from '@salesforce/i18n/locale';
 import getLog from '@salesforce/apex/ServiceDeliveryLogController.getLog';
 import save from '@salesforce/apex/ServiceDeliveryLogController.save';
@@ -46,9 +47,12 @@ import {
 import { bodyMessage } from 'c/findCsv';
 import BarnConfirmModal from 'c/barnConfirmModal';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { stopRecordChanged, subscribeRecordChanged } from 'c/barnRecordChanged';
 
 const SAVE_FIRST = 'save';
 const DISCARD_CHANGES = 'discard';
+/** This panel's name on the BarnCRM Record Changed channel. */
+const SOURCE = 'serviceDeliveryLog';
 
 /**
  * The Service Delivery Log panel on a program (P-02): for one active service and one day, the
@@ -62,6 +66,9 @@ export default class ServiceDeliveryLog extends LightningElement {
 
   @api recordId;
   @api objectApiName;
+
+  @wire(MessageContext) messageContext;
+  subscription;
 
   labels = {
     title: TITLE,
@@ -102,6 +109,31 @@ export default class ServiceDeliveryLog extends LightningElement {
       });
     }
     this.load();
+    // The Roster panel on the same program says when it enrolls someone or changes a stage
+    // (PF-04), so the list of people matches it without a page reload.
+    this.subscription = subscribeRecordChanged(
+      this.messageContext,
+      () => this.recordId,
+      SOURCE,
+      () => this.reloadUnlessUnsaved()
+    );
+  }
+
+  disconnectedCallback() {
+    stopRecordChanged(this.subscription);
+    this.subscription = null;
+  }
+
+  /**
+   * Reads the same service and day again, keeping the chosen service and date. Skipped while
+   * attendance is marked but not saved, so a reload never throws away work; the save reads the
+   * fresh list anyway.
+   */
+  reloadUnlessUnsaved() {
+    if (!this.log || this.unsavedCount > 0) {
+      return undefined;
+    }
+    return this.load(this.log.serviceId, this.log.deliveryDate);
   }
 
   get isSession() {

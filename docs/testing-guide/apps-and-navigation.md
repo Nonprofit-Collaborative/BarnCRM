@@ -218,7 +218,7 @@ Console instead. Every org, scratch and Developer Edition included, gets all nin
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As admin, open **BarnCRM Members and Partners** and its navigation menu. | It opens on **Memberships Home**. Tabs: **Memberships Home**, **Memberships**, **Member Certifications**, **Membership Levels**, **Certifications**, then the Corporate Hub pages of T-APP-11, **Reports**, **Dashboards**, **Error Log** (last). |
+| 1 | As admin, open **BarnCRM Members and Partners** and its navigation menu. | It opens on **Memberships Home**. Tabs: **Memberships Home**, **Memberships**, **Member Certifications**, **Membership Levels**, **Certifications**, then the Corporate Hub pages of T-APP-11, **Reports**, **Dashboards** (last). No **Error Log** tab. |
 | 2 | Open a membership. | It opens as a workspace tab on the membership record page. |
 | 3 | Open **BarnCRM Admin Console**. | **Membership Levels** and **Certifications** are there too, before **Error Log**. |
 | 4 | Open **BarnCRM Fundraising**, **BarnCRM Grants**, **BarnCRM Programs** and **BarnCRM Volunteers**. | None lists a Memberships or Corporate Hub page. |
@@ -232,7 +232,7 @@ Console instead. Every org, scratch and Developer Edition included, gets all nin
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As admin, open **BarnCRM Grants** and its navigation menu. | It opens on **Grants Home**. After the grant pages: **Scholarships Home**, **Award Programs**, **Award Applications**, **Awards**, then **Reports**, **Dashboards**, **Error Log** (last). |
+| 1 | As admin, open **BarnCRM Grants** and its navigation menu. | It opens on **Grants Home**. After the grant pages: **Scholarships Home**, **Award Programs**, **Award Applications**, **Awards**, then **Reports**, **Dashboards** (last). No **Error Log** tab. |
 | 2 | Open an award application. | It opens as a workspace tab on the application record page. |
 | 3 | Open **Dashboards**. | The Scholarships and Grants dashboard is listed. |
 | 4 | On BarnCRM Home, find Scholarships and Outbound Grants under **Modules**. | Its **Open the App** link opens **BarnCRM Grants**. |
@@ -257,7 +257,7 @@ Console instead. Every org, scratch and Developer Edition included, gets all nin
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open each module app from the App Launcher. | The first tab and the page title are: BarnCRM Events, **Events Home**; BarnCRM Fundraising, **Fundraising Home**; BarnCRM Grants, **Grants Home**; BarnCRM Members and Partners, **Memberships Home** (or **Corporate Hub Home** without Memberships); BarnCRM Programs, **Programs Home**; BarnCRM Projects, **Projects Home**; BarnCRM Volunteers, **Volunteers Home**. **Error Log** is still the last tab of each app that has it. |
+| 1 | Open each module app from the App Launcher. | The first tab and the page title are: BarnCRM Events, **Events Home**; BarnCRM Fundraising, **Fundraising Home**; BarnCRM Grants, **Grants Home**; BarnCRM Members and Partners, **Memberships Home** (or **Corporate Hub Home** without Memberships); BarnCRM Programs, **Programs Home**; BarnCRM Projects, **Projects Home**; BarnCRM Volunteers, **Volunteers Home**. None of these apps has an **Error Log** tab (OD-17); it is the last tab of **BarnCRM Admin Console**. |
 | 2 | On each home, look at the page. | The title and About This Tool at the top, the module's quick actions at the top right, then figures, then the module's lists. |
 | 3 | Open **BarnCRM Admin Console**. | It carries **Forms Home** and **Portal Builder Home**, and **Super Connector** with BarnCRM Connector installed. |
 

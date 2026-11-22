@@ -1,15 +1,45 @@
 import { LightningElement, api } from 'lwc';
+import { createRecord, updateRecord } from 'lightning/uiRecordApi';
 import getRequest from '@salesforce/apex/ProjectRequestsController.getRequest';
-import saveRequest from '@salesforce/apex/ProjectRequestsController.saveRequest';
-import addComment from '@salesforce/apex/ProjectRequestsController.addComment';
 import createTask from '@salesforce/apex/ProjectRequestsController.createTask';
 import createChangeRequest from '@salesforce/apex/ProjectRequestsController.createChangeRequest';
-import { messageFrom } from 'c/findCsv';
+import { messageFrom, recordErrorMessage } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { PRIORITIES, STATUSES, changesBetween, options } from 'c/projectsRequestsModel';
 import PROJECT from '@salesforce/schema/Project__c';
+import STATUS_FIELD from '@salesforce/schema/Project_Request__c.Status__c';
+import PRIORITY_FIELD from '@salesforce/schema/Project_Request__c.Priority__c';
+import OWNER_FIELD from '@salesforce/schema/Project_Request__c.OwnerId';
+import DUE_DATE_FIELD from '@salesforce/schema/Project_Request__c.Due_Date__c';
+import RESOLUTION_FIELD from '@salesforce/schema/Project_Request__c.Resolution__c';
+import PROJECT_FIELD from '@salesforce/schema/Project_Request__c.Project__c';
+import COMMENT from '@salesforce/schema/Project_Request_Comment__c';
+import COMMENT_REQUEST_FIELD from '@salesforce/schema/Project_Request_Comment__c.Request__c';
+import COMMENT_BODY_FIELD from '@salesforce/schema/Project_Request_Comment__c.Body__c';
+import COMMENT_SHARED_FIELD from '@salesforce/schema/Project_Request_Comment__c.Shared__c';
 
 const PKG = 'Projects';
+
+/**
+ * The editable fields by the name c/projectsRequestsModel uses, as schema imports so a save
+ * carries any namespace (ADR-0093 A1). Only these are saved: the list is the triage rule.
+ */
+const SAVED_FIELDS = Object.fromEntries(
+  [STATUS_FIELD, PRIORITY_FIELD, OWNER_FIELD, DUE_DATE_FIELD, RESOLUTION_FIELD, PROJECT_FIELD].map(
+    (field) => [field.fieldApiName.replace(/^\w+__(?=\w+__c$)/, ''), field.fieldApiName]
+  )
+);
+
+/** The updateRecord input for the changed fields: each model name as its API name. */
+function saveInput(recordId, changes) {
+  const fields = { Id: recordId };
+  Object.entries(changes).forEach(([name, value]) => {
+    if (SAVED_FIELDS[name]) {
+      fields[SAVED_FIELDS[name]] = value;
+    }
+  });
+  return { fields };
+}
 
 /**
  * One request for staff (D-201): triage (status, priority, owner, due date, project,
@@ -167,19 +197,16 @@ export default class ProjectsRequestPanel extends LightningElement {
       this.dispatchEvent(new CustomEvent('changed'));
     } catch (error) {
       this.notice = undefined;
-      this.errorMessage = messageFrom(error);
+      this.errorMessage = recordErrorMessage(error);
     } finally {
       this.isWorking = false;
     }
   }
 
+  /** Saves the triage changes as the user through Lightning Data Service (ADR-0093 A2). */
   handleSave() {
     return this.run(
-      () =>
-        saveRequest({
-          requestId: this._recordId,
-          changes: changesBetween(this.detail, this.draft)
-        }),
+      () => updateRecord(saveInput(this._recordId, changesBetween(this.detail, this.draft))),
       helpText('Projects', 'Projects_Requests_Saved')
     );
   }
@@ -187,7 +214,14 @@ export default class ProjectsRequestPanel extends LightningElement {
   handleAddComment() {
     return this.run(
       async () => {
-        await addComment({ requestId: this._recordId, body: this.comment, shared: this.share });
+        await createRecord({
+          apiName: COMMENT.objectApiName,
+          fields: {
+            [COMMENT_REQUEST_FIELD.fieldApiName]: this._recordId,
+            [COMMENT_BODY_FIELD.fieldApiName]: this.comment,
+            [COMMENT_SHARED_FIELD.fieldApiName]: this.share === true
+          }
+        });
         this.comment = '';
         this.share = false;
       },

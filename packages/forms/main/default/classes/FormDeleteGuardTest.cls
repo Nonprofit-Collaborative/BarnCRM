@@ -183,7 +183,13 @@ private class FormDeleteGuardTest {
 			delete as user new Form__c(Id = submission.Form__c);
 
 			Test.startTest();
-			FormSubmissionController.SubmissionView view = FormSubmissionController.getSubmission(submission.Id);
+			// The Submission panel reads these fields through GraphQL (ADR-0093).
+			Form_Submission__c view = [
+				SELECT Form__c, Form_Name__c, Form_Version__c, Answers__c
+				FROM Form_Submission__c
+				WHERE Id = :submission.Id
+				WITH USER_MODE
+			];
 			String refused;
 			try {
 				FormSubmitService.reprocess(submission.Id);
@@ -192,9 +198,10 @@ private class FormDeleteGuardTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(FORM_NAME, view.formName, 'The panel names the deleted form');
-			Assert.isFalse(view.canProcess, 'Process Again is not offered');
-			Assert.areEqual(1, view.answers.size(), 'The answers are still shown');
+			Assert.isNull(view.Form__c, 'The form is gone');
+			Assert.areEqual(FORM_NAME, view.Form_Name__c, 'The panel names the deleted form');
+			Assert.isNull(view.Form_Version__c, 'No version, so Process Again is not offered');
+			Assert.isTrue(String.isNotBlank(view.Answers__c), 'The answers are still shown');
 			Assert.areEqual(
 				BarnHelp.text('Forms', 'Forms_Submit_FormDeleted'),
 				refused,

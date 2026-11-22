@@ -87,22 +87,29 @@ private class ProjectRequestsTest {
 			Assert.isTrue(mine.enabled, 'On');
 			Assert.areEqual(1, mine.rows.size(), 'Mine lists it');
 
+			// The panel saves triage and comments through Lightning Data Service as the user
+			// (ADR-0093 A2); these are the same writes, so the rules and the handler still run.
 			try {
-				ProjectRequestsController.saveRequest(saved.Id, new Map<String, Object>{ 'Status__c' => 'Resolved' });
+				update as user new Project_Request__c(Id = saved.Id, Status__c = 'Resolved');
 				Assert.fail('Resolved needs a resolution');
-			} catch (AuraHandledException expected) {
-				Assert.isNotNull(expected.getMessage(), 'Refused in words');
+			} catch (DmlException expected) {
+				Assert.isNotNull(expected.getDmlMessage(0), 'Refused in words');
 			}
-			ProjectRequestsController.addComment(saved.Id, 'Looking into it', true);
-			ProjectRequestsController.addComment(saved.Id, 'Staff note', false);
-			ProjectRequestsController.saveRequest(
-				saved.Id,
-				new Map<String, Object>{
-					'Status__c' => 'Resolved',
-					'Resolution__c' => 'Fixed the filter',
-					'Due_Date__c' => String.valueOf(Date.today()),
-					'Name' => 'ignored'
-				}
+			insert as user new Project_Request_Comment__c(
+				Request__c = saved.Id,
+				Body__c = 'Looking into it',
+				Shared__c = true
+			);
+			insert as user new Project_Request_Comment__c(
+				Request__c = saved.Id,
+				Body__c = 'Staff note',
+				Shared__c = false
+			);
+			update as user new Project_Request__c(
+				Id = saved.Id,
+				Status__c = 'Resolved',
+				Resolution__c = 'Fixed the filter',
+				Due_Date__c = Date.today()
 			);
 			ProjectRequestsController.Detail detail = ProjectRequestsController.getRequest(saved.Id);
 			Assert.areEqual('Resolved', detail.status, 'Resolved');
@@ -198,7 +205,7 @@ private class ProjectRequestsTest {
 				Assert.isNotNull(expected.getMessage(), 'Refused in words');
 			}
 			Project__c project = ProjectsTestData.project('Active', 10);
-			ProjectRequestsController.saveRequest(saved.Id, new Map<String, Object>{ 'Project__c' => project.Id });
+			update as user new Project_Request__c(Id = saved.Id, Project__c = project.Id);
 			Id taskId = ProjectRequestsController.createTask(saved.Id);
 			Id changeId = ProjectRequestsController.createChangeRequest(saved.Id);
 			ProjectRequestsController.Detail detail = ProjectRequestsController.getRequest(saved.Id);

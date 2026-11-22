@@ -1,15 +1,14 @@
 import { LightningElement, api } from 'lwc';
-import { deleteRecord } from 'lightning/uiRecordApi';
+import { createRecord, deleteRecord } from 'lightning/uiRecordApi';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getSpeakers from '@salesforce/apex/EventSpeakersController.getSpeakers';
-import addSpeaker from '@salesforce/apex/EventSpeakersController.addSpeaker';
-import assign from '@salesforce/apex/EventSpeakersController.assign';
 import removeSpeaker from '@salesforce/apex/EventSpeakersController.removeSpeaker';
 import { format, messageFrom } from 'c/findCsv';
 import { badgeWord } from 'c/barnFormat';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import EventRecordModal from 'c/eventRecordModal';
 import SPEAKER from '@salesforce/schema/Event_Speaker__c';
+import SESSION_SPEAKER from '@salesforce/schema/Session_Speaker__c';
 import BarnConfirmModal from 'c/barnConfirmModal';
 
 import SPEAKERS from '@salesforce/label/c.Events_EventTab_Speakers';
@@ -167,7 +166,10 @@ export default class EventSpeakers extends LightningElement {
     return this.busy || !this.assigning || !this.assigning.sessionId;
   }
 
-  /** Picking a person adds them as a speaker at once, named after them (R-ESP2). */
+  /**
+   * Picking a person adds them as a speaker at once, named after them (R-ESP2). Saved as the user
+   * through Lightning Data Service (ADR-0093).
+   */
   async handlePick(event) {
     const contactId = event.detail.recordId;
     if (!contactId) {
@@ -175,7 +177,10 @@ export default class EventSpeakers extends LightningElement {
     }
     const picker = event.target;
     await this.run(async () => {
-      await addSpeaker({ eventId: this.recordId, contactId });
+      await createRecord({
+        apiName: SPEAKER.objectApiName,
+        fields: { Event__c: this.recordId, Contact__c: contactId }
+      });
       if (picker && typeof picker.clearSelection === 'function') {
         picker.clearSelection();
       }
@@ -216,7 +221,10 @@ export default class EventSpeakers extends LightningElement {
   async handleAssignSave() {
     const { speakerId, sessionId, role } = this.assigning;
     await this.run(async () => {
-      await assign({ sessionId, speakerId, role });
+      await createRecord({
+        apiName: SESSION_SPEAKER.objectApiName,
+        fields: { Event_Session__c: sessionId, Event_Speaker__c: speakerId, Role__c: role }
+      });
       this.assigning = undefined;
     });
   }

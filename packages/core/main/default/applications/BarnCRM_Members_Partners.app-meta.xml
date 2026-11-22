@@ -19,7 +19,6 @@
   <navType>Console</navType>
   <tabs>standard-report</tabs>
   <tabs>standard-Dashboard</tabs>
-  <tabs>Error_Log__c</tabs>
   <uiType>Lightning</uiType>
   <workspaceConfig>
     <mappings>
@@ -27,9 +26,6 @@
     </mappings>
     <mappings>
       <tab>standard-Dashboard</tab>
-    </mappings>
-    <mappings>
-      <tab>Error_Log__c</tab>
     </mappings>
   </workspaceConfig>
 </CustomApplication>

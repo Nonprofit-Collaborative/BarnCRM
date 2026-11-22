@@ -1,12 +1,8 @@
 /* eslint-disable @lwc/lwc/no-unexpected-wire-adapter-usages */
 import { createElement } from 'lwc';
 import GrantAwardModal from 'c/grantAwardModal';
-import recordAward from '@salesforce/apex/GrantPipelineController.recordAward';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
-
-jest.mock('@salesforce/apex/GrantPipelineController.recordAward', () => ({ default: jest.fn() }), {
-  virtual: true
-});
+import { updateRecord } from 'lightning/uiRecordApi';
 
 const GRANT = {
   id: 'a01000000000002AAA',
@@ -42,7 +38,6 @@ describe('c-grant-award-modal', () => {
   });
 
   it('asks the amount, the award period and Restricted, and saves them', async () => {
-    recordAward.mockResolvedValue();
     const element = render();
     getObjectInfo.emit({
       fields: {
@@ -66,18 +61,23 @@ describe('c-grant-award-modal', () => {
     one(element, '[data-id="award-save"]').click();
     await flush();
 
-    expect(recordAward).toHaveBeenCalledWith({
-      grantId: 'a01000000000002AAA',
-      amountAwarded: 24000,
-      startDate: '2027-01-01',
-      endDate: '2027-12-31',
-      restricted: true
+    expect(updateRecord).toHaveBeenCalledWith({
+      fields: {
+        Id: 'a01000000000002AAA',
+        Stage__c: 'Awarded',
+        Amount_Awarded__c: 24000,
+        Award_Start_Date__c: '2027-01-01',
+        Award_End_Date__c: '2027-12-31',
+        Restricted__c: true
+      }
     });
     expect(closed.mock.calls[0][0].detail).toEqual({ saved: true });
   });
 
   it('stays open with the reason when the save is refused, and closes on Cancel', async () => {
-    recordAward.mockRejectedValue({ body: { message: 'End before start' } });
+    updateRecord.mockRejectedValueOnce({
+      body: { message: 'An error occurred.', output: { errors: [{ message: 'End before start' }] } }
+    });
     const element = render({ ...GRANT, amountRequested: null });
     const closed = jest.fn();
     element.addEventListener('close', closed);
@@ -85,7 +85,8 @@ describe('c-grant-award-modal', () => {
     one(element, '[data-id="award-save"]').click();
     await flush();
 
-    expect(recordAward.mock.calls[0][0].amountAwarded).toBeNull();
+    // A blank amount leaves the grant's own amount as it is.
+    expect(updateRecord.mock.calls[0][0].fields).not.toHaveProperty('Amount_Awarded__c');
     expect(one(element, '[data-id="award-error"]').message).toBe('End before start');
     expect(closed).not.toHaveBeenCalled();
     one(element, '[data-id="award-cancel"]').click();

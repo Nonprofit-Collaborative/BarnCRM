@@ -7,6 +7,8 @@ import addCount from '@salesforce/apex/ServiceDeliveryLogController.addCount';
 import getSessionLog from '@salesforce/apex/ServiceDeliveryLogController.getSessionLog';
 import saveSession from '@salesforce/apex/ServiceDeliveryLogController.saveSession';
 import BarnConfirmModal from 'c/barnConfirmModal';
+import { subscribe, unsubscribe } from 'lightning/messageService';
+import RECORD_CHANGED from '@salesforce/messageChannel/BarnCRM_Record_Changed__c';
 import {
   entriesToSave,
   format,
@@ -267,6 +269,40 @@ describe('c-service-delivery-log', () => {
     date.dispatchEvent(new CustomEvent('change'));
     await flush();
     expect(getLog.mock.calls).toHaveLength(calls);
+  });
+
+  it('reloads the same service and day when the Roster changes this program, unless work is unsaved', async () => {
+    getLog.mockResolvedValue(logOf([ANA]));
+    subscribe.mockReturnValue({ id: 'subscription' });
+    const element = await render();
+    expect(subscribe).toHaveBeenCalledWith(undefined, RECORD_CHANGED, expect.any(Function));
+    const handler = subscribe.mock.calls[0][2];
+
+    handler({ recordId: 'a01000000000009AAA', source: 'programRoster' });
+    await flush();
+    expect(getLog).toHaveBeenCalledTimes(1);
+
+    getLog.mockResolvedValue(logOf([ANA, BEN]));
+    handler({ recordId: PROGRAM_ID, source: 'programRoster' });
+    await flush();
+    expect(getLog).toHaveBeenCalledTimes(2);
+    expect(getLog).toHaveBeenLastCalledWith({
+      programId: PROGRAM_ID,
+      serviceId: SERVICE_ID,
+      deliveryDate: '2026-10-31'
+    });
+    expect(findAll(element, 'row')).toHaveLength(2);
+
+    // Marked but not saved: the message never throws the marks away.
+    find(element, 'mark-all-present').click();
+    await flush();
+    handler({ recordId: PROGRAM_ID, source: 'programRoster' });
+    await flush();
+    expect(getLog).toHaveBeenCalledTimes(2);
+    expect(find(element, 'unsaved')).not.toBeNull();
+
+    document.body.removeChild(element);
+    expect(unsubscribe).toHaveBeenCalledWith({ id: 'subscription' });
   });
 
   it('asks before a change of service or day throws away unsaved attendance', async () => {

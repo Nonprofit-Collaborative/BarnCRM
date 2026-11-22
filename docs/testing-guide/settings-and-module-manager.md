@@ -191,6 +191,24 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 
 **Cleanup:** deactivate or delete `My_Test_Flow`.
 
+## T-SET-07H: Automations That Are Before-Save Flows
+
+**Purpose:** confirm a packaged before-save flow follows its switch, the module switch, the pause and Bypass, and that the one-field rule template copies the pattern.
+**Prerequisites:** admin user; Funders installed; automation not paused; no Bypass for you.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In Setup, **Flows**, open **Requirement: fill in the submitted date**. | It is active, starts **Before the record is saved**, and runs Automation Control, Get Switch Off, Get Module Off and Switch before Fill Submitted Date. **BarnCRM template: one-field rule before save** is listed too, inactive. |
+| 2 | On a grant, add a requirement with Status **Submitted** and no Submitted Date. | Submitted Date is today. |
+| 3 | In **BarnCRM Settings**, **Automation**, switch **Requirement: fill in the submitted date** off. Add another Submitted requirement. | Submitted Date stays blank. Switch it back on. |
+| 4 | Turn Funders off in the Module Manager, add a Submitted requirement, then turn Funders back on. | Submitted Date stays blank while Funders is off (the Module Manager save is a deployment: wait for "Saved" before adding the requirement). |
+| 5 | Pause automation for 1 hour and add a Submitted requirement; resume. Then add Bypass for yourself and do the same; remove it. | Submitted Date stays blank both times. |
+| 6 | Add a Data Subject Request with Received Date today and no Due Date, then switch **Data Subject Request: set the due date** off and add another. | The first has Due Date today plus 30 days; the second has none. Switch it back on. |
+| 7 | With Bypass on for yourself, set a running stewardship plan to Complete; remove Bypass. | Completed Date is today: that automation always runs. |
+| 8 | Save As **BarnCRM template: one-field rule before save** as `My_Country_Rule`, set `cSwitchName` to `Flow:My_Country_Rule`, activate it and list it under **Your Own Flows**. Save a contact with no mailing country, switch the row off, and save another. | The first contact gets United States; the second keeps a blank country. |
+
+**Cleanup:** deactivate and delete `My_Country_Rule` and remove its row; every switch on; no pause; no Bypass.
+
 ## T-SET-07D: The Automation Tab
 
 **Purpose:** confirm Automation has its own tab in BarnCRM Admin Console (D-184) and the Settings section still works.

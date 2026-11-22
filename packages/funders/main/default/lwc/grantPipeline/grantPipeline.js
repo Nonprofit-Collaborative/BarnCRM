@@ -1,10 +1,11 @@
 import { LightningElement } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import { updateRecord } from 'lightning/uiRecordApi';
 import GRANT from '@salesforce/schema/Grant__c';
+import GRANT_STAGE from '@salesforce/schema/Grant__c.Stage__c';
 import REQUIREMENT from '@salesforce/schema/Grant_Requirement__c';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getBoard from '@salesforce/apex/GrantPipelineController.getBoard';
-import moveStage from '@salesforce/apex/GrantPipelineController.moveStage';
 import markSubmitted from '@salesforce/apex/GrantPipelineController.markSubmitted';
 import undoSubmitted from '@salesforce/apex/GrantPipelineController.undoSubmitted';
 import {
@@ -19,7 +20,7 @@ import {
 } from 'c/grantPipelineModel';
 import { createDragController } from 'c/barnDrag';
 import { dragInstructions, dragMessages } from 'c/barnDragText';
-import { format, messageFrom } from 'c/findCsv';
+import { format, messageFrom, recordErrorMessage } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
 import { recordHref } from 'c/barnFormat';
 import GrantAwardModal from 'c/grantAwardModal';
@@ -437,14 +438,21 @@ export default class GrantPipeline extends NavigationMixin(LightningElement) {
     return undefined;
   }
 
+  /**
+   * Saved as the user through Lightning Data Service (ADR-0093 A2); the grant rules fill in the
+   * stage dates (R-GN3), and a refusal is shown in its own words.
+   */
   async move(grantId, stage) {
     try {
-      await moveStage({ grantId, stage, amountAwarded: null });
+      await updateRecord({ fields: { Id: grantId, [GRANT_STAGE.fieldApiName]: stage } });
       this.toast(format(MOVED, stage), 'success');
       await this.load();
       return true;
     } catch (error) {
-      this.toast(messageOf(error), 'error');
+      this.toast(
+        recordErrorMessage(error, helpText('Funders', 'Funders_Shared_NotSaved')),
+        'error'
+      );
       return false;
     }
   }

@@ -1,7 +1,6 @@
 import { createElement } from 'lwc';
+import { graphql } from 'lightning/graphql';
 import ReceiptSettings from 'c/receiptSettings';
-import getTemplates from '@salesforce/apex/ReceiptController.getTemplates';
-import getRuns from '@salesforce/apex/ReceiptController.getRuns';
 import getDefaultStatementYear from '@salesforce/apex/ReceiptController.getDefaultStatementYear';
 import startStatementRun from '@salesforce/apex/ReceiptController.startStatementRun';
 import getCanManageTemplates from '@salesforce/apex/ReceiptController.getCanManageTemplates';
@@ -9,22 +8,6 @@ import restoreDefaultTemplates from '@salesforce/apex/ReceiptController.restoreD
 import saveTemplate from '@salesforce/apex/ReceiptController.saveTemplate';
 import previewTemplate from '@salesforce/apex/ReceiptController.previewTemplate';
 
-jest.mock(
-  '@salesforce/apex/ReceiptController.getTemplates',
-  () => {
-    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
-    return { default: createApexTestWireAdapter(jest.fn()) };
-  },
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/apex/ReceiptController.getRuns',
-  () => {
-    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
-    return { default: createApexTestWireAdapter(jest.fn()) };
-  },
-  { virtual: true }
-);
 jest.mock(
   '@salesforce/apex/ReceiptController.getDefaultStatementYear',
   () => {
@@ -66,9 +49,6 @@ jest.mock(
   () => ({ default: jest.fn(() => Promise.resolve({ id: 'a03000000000001' })) }),
   { virtual: true }
 );
-jest.mock('@salesforce/apex', () => ({ refreshApex: jest.fn(() => Promise.resolve()) }), {
-  virtual: true
-});
 jest.mock('@salesforce/label/c.Core_Format_Parenthetical', () => ({ default: '{0} ({1})' }), {
   virtual: true
 });
@@ -95,6 +75,49 @@ const TEMPLATES = [
   }
 ];
 
+const field = (value) => ({ value });
+
+/**
+ * The letters and the runs as their two GraphQL wires receive them. The test adapter sends one
+ * answer to every graphql wire, so each answer holds both lists and each wire reads its own.
+ */
+function emitLists(templates, runs, refresh) {
+  graphql.emit(
+    {
+      uiapi: {
+        query: {
+          Receipt_Template__c: {
+            edges: templates.map((letter) => ({
+              node: {
+                Id: letter.id,
+                Name: field(letter.name),
+                Type__c: field(letter.type),
+                Body__c: field(letter.body),
+                Active__c: field(letter.active)
+              }
+            }))
+          },
+          Receipt_Run__c: {
+            edges: runs.map((run) => ({
+              node: {
+                Id: run.id,
+                Name: field(run.name),
+                Statement_Year__c: field(run.statementYear),
+                Status__c: field(run.status),
+                Donors_Processed__c: field(null),
+                Receipts_Issued__c: field(null),
+                Errors__c: field(run.errors)
+              }
+            }))
+          }
+        }
+      }
+    },
+    undefined,
+    refresh
+  );
+}
+
 function build() {
   const element = createElement('c-receipt-settings', { is: ReceiptSettings });
   document.body.appendChild(element);
@@ -111,8 +134,7 @@ function byId(element, id) {
 
 async function loaded(canManage) {
   const element = build();
-  getTemplates.emit(TEMPLATES);
-  getRuns.emit([]);
+  emitLists(TEMPLATES, []);
   getCanManageTemplates.emit(canManage);
   await flush();
   return element;
@@ -198,17 +220,19 @@ describe('c-receipt-settings', () => {
   });
 
   it('offers to restore the shipped letters when the org has none', async () => {
+    const refresh = jest.fn(() => Promise.resolve());
     const element = build();
-    getTemplates.emit([]);
-    getRuns.emit([]);
+    emitLists([], [], refresh);
     getCanManageTemplates.emit(true);
     await flush();
 
     expect(byId(element, 'editor')).toBeNull();
     byId(element, 'restore').click();
     await flush();
+    await flush();
 
     expect(restoreDefaultTemplates).toHaveBeenCalled();
+    expect(refresh).toHaveBeenCalled();
   });
 
   it('says so, and locks the editor, for somebody who cannot manage settings', async () => {
@@ -221,8 +245,7 @@ describe('c-receipt-settings', () => {
 
   it('explains the disabled restore button when there are no letters and no permission', async () => {
     const element = build();
-    getTemplates.emit([]);
-    getRuns.emit([]);
+    emitLists([], []);
     getCanManageTemplates.emit(false);
     await flush();
 
@@ -261,7 +284,7 @@ describe('c-receipt-settings', () => {
     const element = await loaded(true);
     expect(byId(element, 'no-runs').heading).toBe('c.Giving_Receipt_NoRuns');
 
-    getRuns.emit([
+    emitLists(TEMPLATES, [
       { id: 'r1', name: 'RR-1', statementYear: 2025, status: 'Completed with errors', errors: 2 },
       { id: 'r2', name: 'RR-2', statementYear: 2025, status: 'Failed', errors: 0 }
     ]);
@@ -271,5 +294,15 @@ describe('c-receipt-settings', () => {
     expect([...badges].map((badge) => badge.status)).toEqual(['warning', 'failed']);
     expect(badges[0].label).toBe('Completed with errors');
     expect(byId(element, 'no-runs')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="run"]').textContent).toContain('2025');
+  });
+
+  it('says the letters could not be read when the query fails', async () => {
+    const element = build();
+    graphql.emitErrors([{ message: 'No access' }]);
+    getCanManageTemplates.emit(true);
+    await flush();
+
+    expect(byId(element, 'load-error').message).toBe('c.Giving_Receipt_UnexpectedError');
   });
 });

@@ -56,13 +56,38 @@ export { format };
 
 /**
  * The message to show for a failed server call or a thrown error: the server's message, else the
- * error's own message, else the fallback.
+ * error's own message, else the fallback. A Lightning Data Service write (ADR-0093) puts the
+ * record's own error, such as a validation rule's message, under `body.output`; that comes first.
  */
 export function messageFrom(error, fallback = UNEXPECTED_ERROR) {
+  const recordError = recordErrorOf(error && error.body);
+  if (recordError) {
+    return recordError;
+  }
   if (error && error.body && error.body.message) {
     return error.body.message;
   }
   return error && error.message ? error.message : fallback;
+}
+
+/** The first record or field error a UI API write returned, or undefined. */
+function recordErrorOf(body) {
+  const output = body && body.output;
+  if (!output) {
+    return undefined;
+  }
+  const first = (output.errors || []).find((item) => item && item.message);
+  if (first) {
+    return first.message;
+  }
+  const fields = Object.values(output.fieldErrors || {});
+  for (const list of fields) {
+    const found = (list || []).find((item) => item && item.message);
+    if (found) {
+      return found.message;
+    }
+  }
+  return undefined;
 }
 
 /**
@@ -72,6 +97,15 @@ export function messageFrom(error, fallback = UNEXPECTED_ERROR) {
 export function bodyMessage(error, fallback = UNEXPECTED_ERROR) {
   const body = error && error.body;
   return (body && body.message) || fallback;
+}
+
+/**
+ * The message to show for a failed Lightning Data Service save (createRecord, updateRecord):
+ * the first record or field error the org returned, such as a validation rule's own words, else
+ * the server's or the error's message. Same as `messageFrom`, which reads `body.output` first.
+ */
+export function recordErrorMessage(error, fallback = UNEXPECTED_ERROR) {
+  return messageFrom(error, fallback);
 }
 
 /**

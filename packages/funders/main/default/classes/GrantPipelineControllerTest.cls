@@ -1,7 +1,7 @@
 /**
  * The Grant Pipeline tab's server side (F-01): open grants by stage with exact totals, awarded this
- * fiscal year, the deadlines coming up, Mine, the card cap, and moving a grant (with the amount
- * awarded) as the person, refused for a reader.
+ * fiscal year, the deadlines coming up, Mine and the card cap; and the writes the board makes
+ * when it moves a grant (with the amount awarded) as the person, refused for a reader.
  */
 @IsTest(testFor='ApexClass:GrantPipelineController')
 private class GrantPipelineControllerTest {
@@ -98,6 +98,9 @@ private class GrantPipelineControllerTest {
 		}
 	}
 
+	// The board's moves and Record the Award save through Lightning Data Service as the person
+	// (ADR-0093 A2). The tests below make the same writes, so the grant rules still run.
+
 	@IsTest
 	static void movingToAwardedRecordsTheAmountAndTheDecisionDate() {
 		System.runAs(TestUsers.adminWith(GrantTestData.ADMIN)) {
@@ -106,8 +109,8 @@ private class GrantPipelineControllerTest {
 			Id applied = byName.get('Applied').Id;
 
 			Test.startTest();
-			GrantPipelineController.moveStage(applied, GrantService.STAGE_AWARDED, 4500);
-			GrantPipelineController.moveStage(byName.get('Soon').Id, GrantService.STAGE_WITHDRAWN, 99);
+			update as user new Grant__c(Id = applied, Stage__c = GrantService.STAGE_AWARDED, Amount_Awarded__c = 4500);
+			update as user new Grant__c(Id = byName.get('Soon').Id, Stage__c = GrantService.STAGE_WITHDRAWN);
 			Test.stopTest();
 
 			Grant__c awarded = reread(applied);
@@ -130,8 +133,15 @@ private class GrantPipelineControllerTest {
 
 			Test.startTest();
 			GrantPipelineController.Board board = GrantPipelineController.getBoard(false);
-			GrantPipelineController.recordAward(applied, 4500, start, finish, true);
-			GrantPipelineController.recordAward(soon, null, null, null, null);
+			update as user new Grant__c(
+				Id = applied,
+				Stage__c = GrantService.STAGE_AWARDED,
+				Amount_Awarded__c = 4500,
+				Award_Start_Date__c = start,
+				Award_End_Date__c = finish,
+				Restricted__c = true
+			);
+			update as user new Grant__c(Id = soon, Stage__c = GrantService.STAGE_AWARDED);
 			Test.stopTest();
 
 			Grant__c awarded = [
@@ -164,34 +174,23 @@ private class GrantPipelineControllerTest {
 		System.runAs(TestUsers.adminWith(GrantTestData.ADMIN)) {
 			grantId = grants(Date.today()).get('Soon').Id;
 			try {
-				GrantPipelineController.moveStage(grantId, 'Nowhere', null);
+				update as user new Grant__c(Id = grantId, Stage__c = 'Nowhere');
 				Assert.fail('An unknown stage is refused');
-			} catch (AuraHandledException e) {
-				Assert.areEqual(BarnHelp.text('Funders', 'Funders_Pipeline_ErrorStage'), e.getMessage(), 'Says why');
+			} catch (DmlException e) {
+				Assert.isNotNull(e.getDmlMessage(0), 'Stage is a restricted picklist, so the save says why');
 			}
 		}
 		User reader = [SELECT Id FROM User WHERE LastName = 'Gpreader' WITH SYSTEM_MODE LIMIT 1];
 		System.runAs(reader) {
 			Test.startTest();
-			String refusal;
+			Boolean refused = false;
 			try {
-				GrantPipelineController.moveStage(grantId, GrantService.STAGE_APPLIED, null);
-			} catch (AuraHandledException e) {
-				refusal = e.getMessage();
-			}
-			String awardRefusal;
-			try {
-				GrantPipelineController.recordAward(grantId, 10, null, null, null);
-			} catch (AuraHandledException e) {
-				awardRefusal = e.getMessage();
+				update as user new Grant__c(Id = grantId, Stage__c = GrantService.STAGE_APPLIED);
+			} catch (Exception e) {
+				refused = true;
 			}
 			Test.stopTest();
-			Assert.areEqual(refusal, awardRefusal, 'Record the Award is refused the same way');
-			Assert.areEqual(
-				BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission'),
-				refusal,
-				'A reader is refused'
-			);
+			Assert.isTrue(refused, 'A reader cannot move a grant');
 		}
 		Assert.areEqual(GrantService.STAGE_PROSPECT, reread(grantId).Stage__c, 'Nothing moved');
 	}

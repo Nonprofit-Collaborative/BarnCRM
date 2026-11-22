@@ -1,6 +1,7 @@
 /**
- * The Submission panel shows the answers by question, as the version asked them, and what was
- * written, and processes a held submission again.
+ * Process Again on the Submission panel processes a held submission again and stores what it
+ * wrote; the panel reads the submission through GraphQL (ADR-0093) and shapes it in
+ * `c/formSubmissionModel`.
  */
 @IsTest(testFor='ApexClass:FormSubmissionController')
 private class FormSubmissionControllerTest {
@@ -9,8 +10,17 @@ private class FormSubmissionControllerTest {
 		TestUsers.adminWith(FormsTestData.ADMIN);
 	}
 
+	private static Form_Submission__c reread(Id submissionId) {
+		return [
+			SELECT Status__c, Form_Version__c, Outcome__c
+			FROM Form_Submission__c
+			WHERE Id = :submissionId
+			WITH USER_MODE
+		];
+	}
+
 	@IsTest
-	static void showsAnswersByQuestionAndProcessesAHeldOneAgain() {
+	static void processesAHeldOneAgain() {
 		System.runAs(TestUsers.adminWith(FormsTestData.ADMIN)) {
 			List<Contact> twins = new List<Contact>{
 				TestDataFactory.person(
@@ -30,30 +40,37 @@ private class FormSubmissionControllerTest {
 				null,
 				null
 			);
-			FormSubmissionController.SubmissionView before = FormSubmissionController.getSubmission(held.submissionId);
+			Form_Submission__c before = reread(held.submissionId);
 			update as user new Form_Submission__c(Id = held.submissionId, Person__c = twins[0].Id);
 			FormSubmitService.Result again = FormSubmissionController.processAgain(held.submissionId);
-			FormSubmissionController.SubmissionView after = FormSubmissionController.getSubmission(held.submissionId);
+			Form_Submission__c after = reread(held.submissionId);
 			Test.stopTest();
 
-			Assert.areEqual(FormSubmitService.NEEDS_REVIEW, before.status);
-			Assert.isTrue(before.canProcess, 'Process Again is offered');
-			Assert.areEqual('Volunteer Interest', before.formName);
-			Assert.areEqual(
-				new List<String>{ 'First', 'Last', 'Email' },
-				new List<String>{ before.answers[0].label, before.answers[1].label, before.answers[2].label },
-				'In the order the form asks'
-			);
+			Assert.areEqual(FormSubmitService.NEEDS_REVIEW, before.Status__c);
+			Assert.isNotNull(before.Form_Version__c, 'Names the version, so Process Again is offered');
 			Assert.areEqual(FormSubmitService.PROCESSED, again.status, 'Processed again: ' + again.message);
-			Assert.isFalse(after.canProcess, 'Nothing left to process');
-			Assert.areEqual(twins[0].Id, after.records[0].recordId, 'What was written');
+			Assert.areEqual(FormSubmitService.PROCESSED, after.Status__c, 'Nothing left to process');
+			Assert.isTrue(after.Outcome__c.contains(twins[0].Id), 'What was written');
 			try {
 				FormSubmissionController.processAgain(held.submissionId);
 				Assert.fail('Not processed twice');
 			} catch (AuraHandledException expected) {
 				Assert.isTrue(String.isNotBlank(expected.getMessage()), 'In plain words');
 			}
-			Assert.isNull(FormSubmissionController.getSubmission(form.Id), 'Not a submission, nothing shown');
+		}
+	}
+
+	@IsTest
+	static void aPersonWithoutFormsAccessGetsAPlainMessage() {
+		Id someSubmission =
+			Form_Submission__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() + '000000000001';
+		System.runAs(TestUsers.standardUser('Zzformless')) {
+			try {
+				FormSubmissionController.processAgain(someSubmission);
+				Assert.fail('Refused without access to submissions');
+			} catch (AuraHandledException expected) {
+				Assert.isTrue(String.isNotBlank(expected.getMessage()), 'In plain words');
+			}
 		}
 	}
 }

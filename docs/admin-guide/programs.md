@@ -237,7 +237,9 @@ panel under the roster:
 
 1. Pick the **Service** (only Active ones are offered) and the **Date** (today to start with).
 2. Everyone with an open enrollment (Applied or Enrolled) is listed, with what is already
-   recorded for them that day. Set each person's **Attendance** and **Quantity**, or click
+   recorded for them that day. An enrollment or stage change on the **Program Roster** panel
+   updates this list at once, unless attendance is marked but not saved (the save then reads
+   the new list). Set each person's **Attendance** and **Quantity**, or click
    **Mark All Present**.
 3. Click **Save**. One delivery per person is saved for that service and day; saving again
    changes those rows rather than adding new ones. If a delivery for that person, service and

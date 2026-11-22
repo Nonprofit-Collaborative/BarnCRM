@@ -3,10 +3,16 @@ import { NavigationMixin } from 'lightning/navigation';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { openInWorkspace } from 'c/workspaceTabs';
 import ERROR_LOG_OBJECT from '@salesforce/schema/Error_Log__c';
+import CONTEXT_FIELD from '@salesforce/schema/Error_Log__c.Context__c';
+import SEVERITY_FIELD from '@salesforce/schema/Error_Log__c.Severity__c';
+import TIMESTAMP_FIELD from '@salesforce/schema/Error_Log__c.Timestamp__c';
+import OCCURRENCES_FIELD from '@salesforce/schema/Error_Log__c.Occurrences__c';
+import OBJECT_NAME_FIELD from '@salesforce/schema/Error_Log__c.Object_Name__c';
+import TECHNICAL_DETAIL_FIELD from '@salesforce/schema/Error_Log__c.Technical_Detail__c';
+import { getRecords } from 'lightning/uiRecordApi';
 import { refreshApex } from '@salesforce/apex';
 import getTile from '@salesforce/apex/ErrorLogController.getTile';
 import acknowledge from '@salesforce/apex/ErrorLogController.acknowledge';
-import getBugReport from '@salesforce/apex/ErrorLogController.getBugReport';
 import Toast from 'lightning/toast';
 import { bugReportText } from 'c/bugReportText';
 
@@ -19,6 +25,37 @@ import { bodyMessage } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const ROW_COUNT = 5;
+
+/**
+ * What "Copy for Bug Report" reads (ADR-0093): the listed entries, as the user, through
+ * Lightning Data Service. Technical Detail is optional, so someone who may not read it (staff)
+ * still gets a report, without the detail.
+ */
+const BUG_REPORT_FIELDS = [
+  CONTEXT_FIELD,
+  SEVERITY_FIELD,
+  TIMESTAMP_FIELD,
+  OCCURRENCES_FIELD,
+  OBJECT_NAME_FIELD
+];
+
+/** One field's value from a UI API record, by its schema import. */
+function valueOf(record, field) {
+  const cell = record.fields[field.fieldApiName];
+  return cell ? cell.value : undefined;
+}
+
+/** A UI API record as the entry c/bugReportText turns into text. */
+function bugReportEntry(record) {
+  return {
+    context: valueOf(record, CONTEXT_FIELD),
+    severity: valueOf(record, SEVERITY_FIELD),
+    occurredAt: valueOf(record, TIMESTAMP_FIELD),
+    occurrences: valueOf(record, OCCURRENCES_FIELD),
+    objectName: valueOf(record, OBJECT_NAME_FIELD),
+    technicalDetail: valueOf(record, TECHNICAL_DETAIL_FIELD)
+  };
+}
 
 /** The bug report's headings, from the Core help catalog (QA review Q10). */
 function bugReportWords() {
@@ -73,6 +110,11 @@ export default class ErrorLogTile extends NavigationMixin(LightningElement) {
   errorMessage;
   busy = false;
   wiredTileResult;
+  /** The getRecords request for the listed entries; undefined while none are listed. */
+  bugReportQuery;
+  /** The listed entries' bug report records, by record id. */
+  bugReports = {};
+  bugReportError;
 
   @wire(EnclosingTabId) enclosingTabId;
 
@@ -80,10 +122,38 @@ export default class ErrorLogTile extends NavigationMixin(LightningElement) {
   wiredTile(result) {
     this.wiredTileResult = result;
     if (result.data) {
-      this.tile = result.data;
+      this.setTile(result.data);
       this.errorMessage = undefined;
     } else if (result.error) {
       this.errorMessage = bodyMessage(result.error, helpText('Core', 'Core_ErrorLog_ActionFailed'));
+    }
+  }
+
+  @wire(getRecords, { records: '$bugReportQuery' })
+  wiredBugReports({ data, error }) {
+    if (data) {
+      const byId = {};
+      (data.results || []).forEach((item) => {
+        if (item && item.result && item.result.id) {
+          byId[item.result.id] = item.result;
+        }
+      });
+      this.bugReports = byId;
+      this.bugReportError = undefined;
+    } else if (error) {
+      this.bugReportError = error;
+    }
+  }
+
+  /** Keeps the tile and asks for the listed entries' bug report fields when the list changes. */
+  setTile(tile) {
+    this.tile = tile;
+    const ids = (tile && tile.recent ? tile.recent : []).map((entry) => entry.recordId);
+    const current = this.bugReportQuery ? this.bugReportQuery[0].recordIds : [];
+    if (ids.join() !== current.join()) {
+      this.bugReportQuery = ids.length
+        ? [{ recordIds: ids, fields: BUG_REPORT_FIELDS, optionalFields: [TECHNICAL_DETAIL_FIELD] }]
+        : undefined;
     }
   }
 
@@ -157,7 +227,7 @@ export default class ErrorLogTile extends NavigationMixin(LightningElement) {
     this.errorMessage = undefined;
     return acknowledge({ errorLogId })
       .then((tile) => {
-        this.tile = tile;
+        this.setTile(tile);
       })
       .catch((error) => {
         this.errorMessage = bodyMessage(error, helpText('Core', 'Core_ErrorLog_ActionFailed'));
@@ -173,18 +243,20 @@ export default class ErrorLogTile extends NavigationMixin(LightningElement) {
   /**
    * Copy for Bug Report (QA review Q10): redacted text (c/bugReportText keeps only error codes
    * and stack lines, never the message or a record) on the clipboard, or shown to copy by hand.
+   * The entries were read when the list loaded, so the copy runs inside the click.
    */
   async handleCopyBugReport(event) {
     const errorLogId = event.target.dataset.entry;
     this.errorMessage = undefined;
     this.reportText = undefined;
-    let text;
-    try {
-      text = bugReportText(await getBugReport({ errorLogId }), bugReportWords());
-    } catch (error) {
-      this.errorMessage = bodyMessage(error, helpText('Core', 'Core_ErrorLog_ActionFailed'));
+    const record = this.bugReports[errorLogId];
+    if (!record) {
+      this.errorMessage = this.bugReportError
+        ? bodyMessage(this.bugReportError, helpText('Core', 'Core_ErrorLog_ActionFailed'))
+        : helpText('Core', 'Core_ErrorLog_EntryNotFound');
       return;
     }
+    const text = bugReportText(bugReportEntry(record), bugReportWords());
     try {
       await navigator.clipboard.writeText(text);
       Toast.show({ label: helpText('Core', 'Core_ErrorLogTile_Copied'), variant: 'success' }, this);

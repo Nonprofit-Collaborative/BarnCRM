@@ -5,7 +5,8 @@
  * (plan Section 9.9): counts, over-capacity warnings, the keep-a-party-together suggestion and the
  * CSV live in `eventSeatingModel`. A party is the people on one registration. Seating more people
  * than a table holds is allowed; the tab warns. Reads are user mode and writes use
- * `AccessLevel.USER_MODE`.
+ * `AccessLevel.USER_MODE`. Removing a table and saving a person's needs are Lightning Data Service
+ * writes in the LWC (ADR-0093).
  */
 public with sharing class EventSeatingController {
 	private static final String CONTEXT = 'EventSeatingController';
@@ -212,23 +213,6 @@ public with sharing class EventSeatingController {
 	}
 
 	/**
-	 * Removes a table. The people seated at it stay registered and have no table.
-	 *
-	 * @param tableId the table
-	 */
-	@AuraEnabled
-	public static void deleteTable(Id tableId) {
-		try {
-			delete as user new Event_Table__c(Id = tableId);
-		} catch (DmlException e) {
-			throw UserErrors.message(e.getDmlMessage(0));
-		} catch (Exception e) {
-			ErrorLogger.log(e, CONTEXT + '.deleteTable', tableId);
-			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Shared_NotSaved'));
-		}
-	}
-
-	/**
 	 * Seats people: sets each person's table, or takes them off a table. A table is never refused
 	 * for being full; the tab warns first. Every person and table must belong to the event.
 	 *
@@ -289,29 +273,6 @@ public with sharing class EventSeatingController {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.assignSeats', eventId);
-			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Shared_NotSaved'));
-		}
-	}
-
-	/**
-	 * Saves an attendee's dietary and access needs.
-	 *
-	 * @param attendeeId the attendee
-	 * @param dietary dietary needs, blank for none
-	 * @param access access needs, blank for none
-	 */
-	@AuraEnabled
-	public static void saveNeeds(Id attendeeId, String dietary, String access) {
-		try {
-			update as user new Event_Attendee__c(
-				Id = attendeeId,
-				Dietary_Needs__c = String.isBlank(dietary) ? null : dietary.trim(),
-				Access_Needs__c = String.isBlank(access) ? null : access.trim()
-			);
-		} catch (DmlException e) {
-			throw UserErrors.message(e.getDmlMessage(0));
-		} catch (Exception e) {
-			ErrorLogger.log(e, CONTEXT + '.saveNeeds', attendeeId);
 			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Shared_NotSaved'));
 		}
 	}

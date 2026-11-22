@@ -121,8 +121,13 @@ private class EventSessionRatingsTest {
 			Event_Session__c talk = session(event, 'Talk A', 'Confirmed');
 			Contact ana = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Garcia'));
 			insert as user ana;
-			Id speakerId = EventSpeakersController.addSpeaker(event.Id, ana.Id);
-			EventSpeakersController.assign(talk.Id, speakerId, 'Speaker');
+			Event_Speaker__c speaker = new Event_Speaker__c(Event__c = event.Id, Contact__c = ana.Id);
+			insert as user speaker;
+			insert as user new Session_Speaker__c(
+				Event_Session__c = talk.Id,
+				Event_Speaker__c = speaker.Id,
+				Role__c = 'Speaker'
+			);
 			EventFormAttachment attachment = new EventFormAttachment();
 			Id firstKey = UserInfo.getUserId();
 			Id secondKey = event.Id;

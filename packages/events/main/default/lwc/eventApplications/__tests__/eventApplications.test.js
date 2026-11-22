@@ -1,5 +1,6 @@
 import { createElement } from 'lwc';
 import EventApplications from 'c/eventApplications';
+import { deleteRecord } from 'lightning/uiRecordApi';
 import getApplications from '@salesforce/apex/EventApplicationsController.getApplications';
 import saveReview from '@salesforce/apex/EventApplicationsController.saveReview';
 import decide from '@salesforce/apex/EventApplicationsController.decide';
@@ -27,9 +28,7 @@ jest.mock('@salesforce/apex/EventProposalReview.saveCriteria', () => ({ default:
 jest.mock('@salesforce/apex/EventProposalReview.addPresenter', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock('@salesforce/apex/EventProposalReview.removePresenter', () => ({ default: jest.fn() }), {
-  virtual: true
-});
+jest.mock('lightning/uiRecordApi', () => ({ deleteRecord: jest.fn() }), { virtual: true });
 jest.mock('@salesforce/apex/EventProposalReview.assignReviewers', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -321,6 +320,25 @@ describe('c-event-applications', () => {
       contactId: '003000000000002AAA',
       role: 'Speaker'
     });
+  });
+
+  it('removes a presenter through the record API and reloads', async () => {
+    const PRESENTER = 'a0P000000000009AAA';
+    const element = await render({
+      ...DATA,
+      applications: [
+        {
+          ...DATA.applications[0],
+          presenters: [{ id: PRESENTER, name: 'Kim Ito', role: 'Speaker' }]
+        }
+      ]
+    });
+    deleteRecord.mockResolvedValue();
+    const before = getApplications.mock.calls.length;
+    element.shadowRoot.querySelector(`lightning-button-icon[data-id="${PRESENTER}"]`).click();
+    await flush();
+    expect(deleteRecord).toHaveBeenCalledWith(PRESENTER);
+    expect(getApplications.mock.calls.length).toBe(before + 1);
   });
 
   it('compares two selected proposals side by side and shows the matrix', async () => {

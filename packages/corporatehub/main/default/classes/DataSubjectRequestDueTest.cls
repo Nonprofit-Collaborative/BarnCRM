@@ -1,9 +1,10 @@
 /**
  * A data subject request's due date follows its received date: one month on, unless a person
- * set it (R-DS1).
+ * set it (R-DS1). The before-save flow Data_Subject_Request_Due does the work and follows the
+ * BarnCRM switches (ADR-0246, before-save flows); record-triggered flows run in Apex tests.
  */
-@IsTest(testFor='ApexClass:DataSubjectRequestHandler')
-private class DataSubjectRequestHandlerTest {
+@IsTest(testFor='ApexTrigger:DataSubjectRequestTrigger')
+private class DataSubjectRequestDueTest {
 	private static final String ADMIN_SET = 'Corporate_Hub_Admin';
 
 	@TestSetup
@@ -69,6 +70,41 @@ private class DataSubjectRequestHandlerTest {
 			update as user row;
 
 			Assert.areEqual(received.addDays(23), reload(row.Id).Due_Date__c, 'Moved with receipt');
+		}
+	}
+
+	@IsTest
+	static void switchedOffOnTheAutomationPageTheDueDateStaysBlank() {
+		System.runAs(TestUsers.adminWith(ADMIN_SET)) {
+			insert as system TestDataFactory.automationSetting('Data_Subject_Request_Due', false);
+			Data_Subject_Request__c row = request(Date.today(), null);
+			insert as user row;
+
+			Assert.isNull(reload(row.Id).Due_Date__c, 'The flow reads its switch and stands down');
+		}
+	}
+
+	@IsTest
+	static void aBypassedUserOrATimedPauseStopsTheFlow() {
+		System.runAs(TestUsers.adminWith(ADMIN_SET)) {
+			BarnCRM_Automation_Control__c bypass = new BarnCRM_Automation_Control__c(
+				SetupOwnerId = UserInfo.getUserId(),
+				Bypass__c = true
+			);
+			insert as system bypass;
+			Data_Subject_Request__c bypassed = request(Date.today(), null);
+			insert as user bypassed;
+
+			delete as system bypass;
+			insert as system new BarnCRM_Automation_Control__c(
+				SetupOwnerId = UserInfo.getOrganizationId(),
+				Paused_Until__c = System.now().addHours(1)
+			);
+			Data_Subject_Request__c paused = request(Date.today(), null);
+			insert as user paused;
+
+			Assert.isNull(reload(bypassed.Id).Due_Date__c, 'Bypass stops it for this user');
+			Assert.isNull(reload(paused.Id).Due_Date__c, 'The timed pause stops it');
 		}
 	}
 }

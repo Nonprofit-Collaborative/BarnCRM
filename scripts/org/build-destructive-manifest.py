@@ -49,6 +49,7 @@ FILES = {
     "prompts": ("Prompt", ".prompt-meta.xml"),
     "groups": ("Group", ".group-meta.xml"),
     "notificationtypes": ("CustomNotificationType", ".notiftype-meta.xml"),
+    "messageChannels": ("LightningMessageChannel", ".messageChannel-meta.xml"),
     "externalCredentials": ("ExternalCredential", ".externalCredential-meta.xml"),
     "namedCredentials": ("NamedCredential", ".namedCredential-meta.xml"),
     "remoteSiteSettings": ("RemoteSiteSetting", ".remoteSite-meta.xml"),

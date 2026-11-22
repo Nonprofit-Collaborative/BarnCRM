@@ -156,17 +156,6 @@ public with sharing class EventProposalReview {
 		}
 	}
 
-	/** Takes a presenter off a proposal. */
-	@AuraEnabled
-	public static void removePresenter(Id presenterId) {
-		try {
-			delete as user new Proposal_Presenter__c(Id = presenterId);
-		} catch (Exception e) {
-			ErrorLogger.log(e, CONTEXT + '.removePresenter', presenterId);
-			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Shared_NotSaved'));
-		}
-	}
-
 	/**
 	 * R-SA8: assigns a reviewer to the chosen undecided proposals, skipping any they already
 	 * review; an assignment is an unscored review.

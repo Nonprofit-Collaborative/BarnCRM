@@ -13393,9 +13393,10 @@ version number. Uploading needs edit access to the requirement.
 | Logic Model Outcome | `Outcome_Id__c` | Text(18) |
 | Checklist Item | `Checklist_Item__c` | Lookup to `Grant_Checklist_Item__c`, delete constraint SetNull, relationship name Tasks; read only in every permission set but Funders Admin |
 
-- **Trigger:** `GrantRequirementTrigger`, through the Core dispatcher; handlers
-  `GrantRequirementDatesHandler` (R-GQ2, registry row `Grant_Requirement_Dates`, switchable) and
-  `GrantRequirementRulesHandler` (R-GQ6, registry row `Grant_Requirement_Rules`, always runs);
+- **Trigger:** `GrantRequirementTrigger`, through the Core dispatcher; handler
+  `GrantRequirementRulesHandler` (R-GQ6, registry row `Grant_Requirement_Rules`, always runs).
+  R-GQ2 is the before-save flow `Grant_Requirement_Dates` (its registry row, switchable;
+  ADR-0246 one-field rules as before-save flows);
   the rules in `GrantRequirementService`.
 - **Outcomes (L-06):** `GrantOutcomeService` reads Logic Models' `Logic_Model_Element__c`,
   `Indicator__c` and `Indicator_Period__c` by describe, in user mode, into plain maps;
@@ -13631,8 +13632,10 @@ the date is then not stamped.
 | Topics | `Topics__c` | Text(255) |
 | Last Used Date | `Last_Used_Date__c` | Date |
 
-- **Controller:** `GrantAnswerController` (thin: the answers as plain JSON shapes, up to 500 by
-  title, and the last used stamp, both in user mode). The search, the topic list and the word
+- **Reads and writes:** no Apex controller. The card reads the answers with text, up to 500 by
+  title, through GraphQL, and stamps Last Used Date with `updateRecord`, both as the person
+  (ADR-0093 A2); `getObjectInfo` says whether the person can add answers and stamp the date. The
+  search, the topic list and the word
   counts run in the framework-free module `grantAnswerModel.js` (plan 9.9); the library is the
   `grantAnswerLibrary` card on the Grant record page.
 - **Permission sets:** Funders Admin and Funders Staff create, edit and delete answers; Funders
@@ -17290,7 +17293,7 @@ Section 29H), which writes an Erasure record; the request links to it.
 **R-DS1 Dates.** A blank Due Date is filled with Received Date plus 30 days on save; when
 Received Date changes and Due Date is still the old Received Date plus 30 (never edited), it
 follows the new date; a Due Date a person set stays. A switchable automation (registry row
-`Data_Subject_Request_Due`, handler `DataSubjectRequestHandler`). Due Date is on or after Received Date (`Due_After_Received`); a Completed or
+`Data_Subject_Request_Due`, the before-save flow of the same name). Due Date is on or after Received Date (`Due_After_Received`); a Completed or
 Refused request has a Completed Date (`Closed_Needs_Date`). The nightly step reminds the owner of
 a Received or In Progress request whose Due Date is within the reminder days (R-CR1).
 

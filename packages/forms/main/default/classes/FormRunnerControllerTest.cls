@@ -10,21 +10,17 @@ private class FormRunnerControllerTest {
 	}
 
 	@IsTest
-	static void offersPublishedFormsAndOpensTheOneGivenOrAttached() {
+	static void opensTheFormGivenOrAttached() {
 		System.runAs(TestUsers.adminWith(FormsTestData.ADMIN)) {
 			Form__c form = FormsTestData.volunteerInterest();
-			insert as user new Form__c(Name = 'Not Yet', Status__c = 'Draft');
 			Account gala = AccountKindsTestData.organization('Zzform Gala');
 			insert as user gala;
 			FormsTestModule.register();
 			FormsTestModule.attachedFormId = form.Id;
 
-			List<FormRunnerController.FormOption> options = FormRunnerController.getPublishedForms();
 			FormRunnerController.FormView given = FormRunnerController.getForm(form.Id, null);
 			FormRunnerController.FormView attached = FormRunnerController.getForm(null, gala.Id);
 
-			Assert.areEqual(1, options.size(), 'Only the published form is offered');
-			Assert.areEqual('Volunteer Interest', options[0].name);
 			Assert.areEqual(1, given.version, 'Its published version');
 			Assert.isTrue(given.definition.contains('"schemaVersion":1'), 'With its definition');
 			Assert.isTrue(given.canSubmit, 'The admin may send answers');

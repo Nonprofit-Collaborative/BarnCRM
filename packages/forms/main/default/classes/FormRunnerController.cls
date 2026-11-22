@@ -2,12 +2,11 @@
  * The Form Runner (C-42a): a published form to fill in, and sending the answers. Thin by design
  * (plan 9.9): plain shapes out; the steps, conditions and checks run in the framework-free
  * modules `c/formRules` and `c/formDefinition`, and `FormSubmitService` decides on the server.
- * Everything runs as the person.
+ * Everything runs as the person. The picker's published forms are a GraphQL read in the LWC
+ * (ADR-0093).
  */
 public with sharing class FormRunnerController {
 	private static final String CONTEXT = 'FormRunnerController';
-	@TestVisible
-	private static final Integer FORM_LIMIT = 500;
 
 	/** A published form, as the runner draws it. */
 	public class FormView {
@@ -29,38 +28,6 @@ public with sharing class FormRunnerController {
 		/** Whether the person may send answers (create submissions). */
 		@AuraEnabled
 		public Boolean canSubmit = false;
-	}
-
-	/** One form in the picker. */
-	public class FormOption {
-		@AuraEnabled
-		public String id;
-		@AuraEnabled
-		public String name;
-	}
-
-	/** The published forms, by name, for the runner's picker. */
-	@AuraEnabled(cacheable=true)
-	public static List<FormOption> getPublishedForms() {
-		try {
-			List<FormOption> options = new List<FormOption>();
-			for (Form__c form : [
-				SELECT Id, Name
-				FROM Form__c
-				WHERE Status__c = 'Published'
-				WITH USER_MODE
-				ORDER BY Name
-				LIMIT :FORM_LIMIT
-			]) {
-				FormOption option = new FormOption();
-				option.id = form.Id;
-				option.name = form.Name;
-				options.add(option);
-			}
-			return options;
-		} catch (Exception e) {
-			throw UserErrors.wrap(e, CONTEXT + '.getPublishedForms', false);
-		}
 	}
 
 	/**

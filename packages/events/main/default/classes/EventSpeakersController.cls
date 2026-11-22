@@ -1,8 +1,10 @@
 /**
  * The Speakers tab of the event page (EV-05, canonical model 29EV6 and 29EV7): the event's
  * speakers, each a Core person, with the sessions they are in. Thin by design (plan Section 9.9).
- * Reads in user mode; writes `AccessLevel.USER_MODE`. Speaker details are edited through the
- * platform's record form.
+ * Reads in user mode; writes `AccessLevel.USER_MODE`. Adding a speaker (named after the person,
+ * R-ESP2) and putting one in a session (R-SSP1) are Lightning Data Service creates in the LWC
+ * (ADR-0093); the record's own rules refuse a second add and a speaker from another event. Speaker details
+ * are edited through the platform's record form.
  */
 public with sharing class EventSpeakersController {
 	private static final String CONTEXT = 'EventSpeakersController';
@@ -189,35 +191,6 @@ public with sharing class EventSpeakersController {
 	}
 
 	/**
-	 * Adds a person as a speaker at the event, named after them (R-ESP1, R-ESP2).
-	 *
-	 * @param eventId the event
-	 * @param contactId the Core person
-	 * @return the new speaker's identifier
-	 */
-	@AuraEnabled
-	public static Id addSpeaker(Id eventId, Id contactId) {
-		Event_Speaker__c speaker = new Event_Speaker__c(Event__c = eventId, Contact__c = contactId);
-		save(speaker, 'addSpeaker');
-		return speaker.Id;
-	}
-
-	/**
-	 * Puts a speaker in a session of their event with a role (R-SSP1).
-	 *
-	 * @param sessionId the session
-	 * @param speakerId the speaker
-	 * @param role Speaker, Moderator or Panelist
-	 */
-	@AuraEnabled
-	public static void assign(Id sessionId, Id speakerId, String role) {
-		save(
-			new Session_Speaker__c(Event_Session__c = sessionId, Event_Speaker__c = speakerId, Role__c = role),
-			'assign'
-		);
-	}
-
-	/**
 	 * Removes a speaker and, first, their session assignments (R-ESP3).
 	 *
 	 * @param speakerId the speaker
@@ -240,17 +213,6 @@ public with sharing class EventSpeakersController {
 		} catch (Exception e) {
 			Database.rollback(savepoint);
 			ErrorLogger.log(e, CONTEXT + '.removeSpeaker', speakerId);
-			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Shared_NotSaved'));
-		}
-	}
-
-	private static void save(SObject record, String method) {
-		try {
-			insert as user record;
-		} catch (DmlException e) {
-			throw UserErrors.message(e.getDmlMessage(0));
-		} catch (Exception e) {
-			ErrorLogger.log(e, CONTEXT + '.' + method);
 			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Shared_NotSaved'));
 		}
 	}

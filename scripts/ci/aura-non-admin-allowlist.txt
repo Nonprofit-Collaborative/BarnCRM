@@ -34,8 +34,6 @@ FormBuilderController # not yet
 FormIntakeService # not yet
 FormPublicController # not yet
 FormRunnerController # not yet
-FormSubmissionController # not yet
-FormSubmitService # not yet
 FundersBoardController # not yet
 FundersUndoState # not yet
 GenericMergeController # not yet

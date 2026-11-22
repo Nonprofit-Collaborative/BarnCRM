@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <assignments>
+    <description>Fills in today as the Submitted Date.</description>
+    <name>Fill_Submitted_Date</name>
+    <label>Fill submitted date</label>
+    <locationX>50</locationX>
+    <locationY>650</locationY>
+    <assignmentItems>
+      <assignToReference>$Record.Submitted_Date__c</assignToReference>
+      <operator>Assign</operator>
+      <value>
+        <elementReference>$Flow.CurrentDate</elementReference>
+      </value>
+    </assignmentItems>
+  </assignments>
+  <decisions>
+    <description>Ends the flow when the BarnCRM Automation Control setting has Pause All or Bypass on for the person saving, or the timed pause on the Automation page is in effect, as the trigger dispatcher does.</description>
+    <name>Automation_Control</name>
+    <label>Automation control</label>
+    <locationX>50</locationX>
+    <locationY>150</locationY>
+    <defaultConnector>
+      <targetReference>Get_Switch_Off</targetReference>
+    </defaultConnector>
+    <defaultConnectorLabel>Runs</defaultConnectorLabel>
+    <rules>
+      <name>Paused_Or_Bypassed</name>
+      <conditionLogic>or</conditionLogic>
+      <conditions>
+        <leftValueReference>$Setup.BarnCRM_Automation_Control__c.Pause_All__c</leftValueReference>
+        <operator>EqualTo</operator>
+        <rightValue>
+          <booleanValue>true</booleanValue>
+        </rightValue>
+      </conditions>
+      <conditions>
+        <leftValueReference>$Setup.BarnCRM_Automation_Control__c.Bypass__c</leftValueReference>
+        <operator>EqualTo</operator>
+        <rightValue>
+          <booleanValue>true</booleanValue>
+        </rightValue>
+      </conditions>
+      <conditions>
+        <leftValueReference>fTimedPause</leftValueReference>
+        <operator>EqualTo</operator>
+        <rightValue>
+          <booleanValue>true</booleanValue>
+        </rightValue>
+      </conditions>
+      <label>Paused or bypassed</label>
+    </rules>
+  </decisions>
+  <decisions>
+    <description>Ends the flow when this automation's switch is off or the Funders module is turned off in the Module Manager.</description>
+    <name>Switch</name>
+    <label>Switch</label>
+    <locationX>50</locationX>
+    <locationY>500</locationY>
+    <defaultConnector>
+      <targetReference>Fill_Submitted_Date</targetReference>
+    </defaultConnector>
+    <defaultConnectorLabel>On</defaultConnectorLabel>
+    <rules>
+      <name>Switched_Off</name>
+      <conditionLogic>or</conditionLogic>
+      <conditions>
+        <leftValueReference>Get_Switch_Off</leftValueReference>
+        <operator>IsNull</operator>
+        <rightValue>
+          <booleanValue>false</booleanValue>
+        </rightValue>
+      </conditions>
+      <conditions>
+        <leftValueReference>Get_Module_Off</leftValueReference>
+        <operator>IsNull</operator>
+        <rightValue>
+          <booleanValue>false</booleanValue>
+        </rightValue>
+      </conditions>
+      <label>Switched off</label>
+    </rules>
+  </decisions>
+  <description
+  >BarnCRM automation "Requirement: fill in the submitted date" (registry row Grant_Requirement_Dates, canonical model R-GQ2). Fills in an empty Submitted Date with today when a grant requirement is created or changed to Submitted or Accepted; a date already typed is kept. Switch it off on the Automation page of BarnCRM Settings, never by deactivating this flow: an upgrade can activate it again. To change the rule, Save As your own flow, list it on the Automation page, and switch this one off. See ADR-0246 (before-save flows) and the admin guide page automation-control.md.</description>
+  <environments>Default</environments>
+  <formulas>
+    <description>True while the timed pause on the Automation page is in effect.</description>
+    <name>fTimedPause</name>
+    <dataType>Boolean</dataType>
+    <expression>AND(NOT(ISBLANK({!$Setup.BarnCRM_Automation_Control__c.Paused_Until__c})), {!$Setup.BarnCRM_Automation_Control__c.Paused_Until__c} &gt; {!$Flow.CurrentDateTime})</expression>
+  </formulas>
+  <interviewLabel>Requirement: fill in the submitted date {!$Flow.CurrentDateTime}</interviewLabel>
+  <label>Requirement: fill in the submitted date</label>
+  <processMetadataValues>
+    <name>BuilderType</name>
+    <value>
+      <stringValue>LightningFlowBuilder</stringValue>
+    </value>
+  </processMetadataValues>
+  <processMetadataValues>
+    <name>CanvasMode</name>
+    <value>
+      <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+    </value>
+  </processMetadataValues>
+  <processMetadataValues>
+    <name>OriginBuilderType</name>
+    <value>
+      <stringValue>LightningFlowBuilder</stringValue>
+    </value>
+  </processMetadataValues>
+  <processType>AutoLaunchedFlow</processType>
+  <recordLookups>
+    <description>The Funders module, when the Module Manager has turned it off.</description>
+    <name>Get_Module_Off</name>
+    <label>Get module off</label>
+    <locationX>50</locationX>
+    <locationY>400</locationY>
+    <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+    <connector>
+      <targetReference>Switch</targetReference>
+    </connector>
+    <filterLogic>and</filterLogic>
+    <filters>
+      <field>DeveloperName</field>
+      <operator>EqualTo</operator>
+      <value>
+        <stringValue>Modules_Turned_Off</stringValue>
+      </value>
+    </filters>
+    <filters>
+      <field>Value__c</field>
+      <operator>Contains</operator>
+      <value>
+        <stringValue>Funders</stringValue>
+      </value>
+    </filters>
+    <getFirstRecordOnly>true</getFirstRecordOnly>
+    <object>Setting_Value__mdt</object>
+    <queriedFields>Id</queriedFields>
+    <storeOutputAutomatically>true</storeOutputAutomatically>
+  </recordLookups>
+  <recordLookups>
+    <description>This automation's switch row on the Automation page, when it is off. No row means on.</description>
+    <name>Get_Switch_Off</name>
+    <label>Get switch off</label>
+    <locationX>50</locationX>
+    <locationY>300</locationY>
+    <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+    <connector>
+      <targetReference>Get_Module_Off</targetReference>
+    </connector>
+    <filterLogic>and</filterLogic>
+    <filters>
+      <field>Automation_Name__c</field>
+      <operator>EqualTo</operator>
+      <value>
+        <stringValue>Grant_Requirement_Dates</stringValue>
+      </value>
+    </filters>
+    <filters>
+      <field>Enabled__c</field>
+      <operator>EqualTo</operator>
+      <value>
+        <booleanValue>false</booleanValue>
+      </value>
+    </filters>
+    <getFirstRecordOnly>true</getFirstRecordOnly>
+    <object>Automation_Setting__c</object>
+    <queriedFields>Id</queriedFields>
+    <storeOutputAutomatically>true</storeOutputAutomatically>
+  </recordLookups>
+  <start>
+    <locationX>50</locationX>
+    <locationY>0</locationY>
+    <connector>
+      <targetReference>Automation_Control</targetReference>
+    </connector>
+    <filterFormula>AND(OR(ISNEW(), ISCHANGED({!$Record.Status__c})), OR(ISPICKVAL({!$Record.Status__c}, "Submitted"), ISPICKVAL({!$Record.Status__c}, "Accepted")), ISBLANK({!$Record.Submitted_Date__c}))</filterFormula>
+    <object>Grant_Requirement__c</object>
+    <recordTriggerType>CreateAndUpdate</recordTriggerType>
+    <triggerType>RecordBeforeSave</triggerType>
+  </start>
+  <status>Active</status>
+</Flow>

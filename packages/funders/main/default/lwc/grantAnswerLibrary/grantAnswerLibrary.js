@@ -1,11 +1,15 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import { gql, graphql } from 'lightning/graphql';
+import { getObjectInfo } from 'lightning/uiObjectInfoApi';
+import { updateRecord } from 'lightning/uiRecordApi';
 import ANSWER from '@salesforce/schema/Grant_Answer__c';
+import TOPICS_FIELD from '@salesforce/schema/Grant_Answer__c.Topics__c';
+import ANSWER_FIELD from '@salesforce/schema/Grant_Answer__c.Answer__c';
+import LAST_USED_FIELD from '@salesforce/schema/Grant_Answer__c.Last_Used_Date__c';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
-import getLibrary from '@salesforce/apex/GrantAnswerController.getLibrary';
-import markUsed from '@salesforce/apex/GrantAnswerController.markUsed';
 import { filterAnswers, preview, topicList } from 'c/grantAnswerModel';
-import { format, messageFrom as messageOf } from 'c/findCsv';
+import { format, localIsoDate, recordErrorMessage } from 'c/findCsv';
 import { showDate } from 'c/grantReportModel';
 
 import TITLE from '@salesforce/label/c.Funders_Answers_Title';
@@ -23,6 +27,58 @@ import NEW_ANSWER from '@salesforce/label/c.Funders_Answers_New';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const PREVIEW_LENGTH = 240;
+const ANSWER_LIMIT = 500;
+const ANSWER_OBJECT = ANSWER.objectApiName;
+const TOPICS = TOPICS_FIELD.fieldApiName;
+const TEXT = ANSWER_FIELD.fieldApiName;
+const LAST_USED_NAME = LAST_USED_FIELD.fieldApiName;
+
+/**
+ * The answers by title (R-GA1), read as the person (ADR-0093 A2), names from schema imports
+ * (A1). Answer is long text, which a query cannot filter on, so blank ones are left out here.
+ */
+const LIBRARY_QUERY = gql`
+  query grantAnswers {
+    uiapi {
+      query {
+        ${ANSWER_OBJECT}(orderBy: { Name: { order: ASC } }, first: ${ANSWER_LIMIT}) {
+          edges {
+            node {
+              Id
+              Name {
+                value
+              }
+              ${TOPICS} {
+                value
+              }
+              ${TEXT} {
+                value
+              }
+              ${LAST_USED_NAME} {
+                value
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const valueOf = (node, name) => (node[name] ? node[name].value : null);
+
+/** The answers with text, as the card draws them. */
+function answersOf(data) {
+  return data.uiapi.query[ANSWER_OBJECT].edges
+    .map(({ node }) => ({
+      id: node.Id,
+      title: valueOf(node, 'Name'),
+      topics: valueOf(node, TOPICS),
+      text: valueOf(node, TEXT),
+      lastUsed: valueOf(node, LAST_USED_NAME)
+    }))
+    .filter((answer) => answer.text && answer.text.trim());
+}
 
 /**
  * The Answer Library card on a grant's page (F-14, canonical model 29ZN): search and filter the
@@ -55,6 +111,9 @@ export default class GrantAnswerLibrary extends NavigationMixin(LightningElement
   expanded = new Set();
   errorMessage;
   isLoading = true;
+  /** Whether the person may add answers, and may stamp Last Used Date, from the object info. */
+  canCreate = false;
+  canStamp = false;
 
   connectedCallback() {
     if (!this.helpReady) {
@@ -62,19 +121,27 @@ export default class GrantAnswerLibrary extends NavigationMixin(LightningElement
         this.helpReady = true;
       });
     }
-    this.load();
   }
 
-  async load() {
-    this.isLoading = true;
-    try {
-      this.library = await getLibrary();
-      this.errorMessage = undefined;
-    } catch (error) {
+  @wire(graphql, { query: LIBRARY_QUERY })
+  receiveLibrary({ data, errors }) {
+    if (errors && errors.length) {
       this.library = undefined;
-      this.errorMessage = messageOf(error, helpText('Funders', 'Funders_Answers_ErrorLoad'));
-    } finally {
+      this.errorMessage = helpText('Funders', 'Funders_Answers_ErrorLoad');
       this.isLoading = false;
+    } else if (data) {
+      this.library = { answers: answersOf(data) };
+      this.errorMessage = undefined;
+      this.isLoading = false;
+    }
+  }
+
+  @wire(getObjectInfo, { objectApiName: ANSWER })
+  receiveInfo({ data }) {
+    if (data) {
+      const lastUsed = data.fields && data.fields[LAST_USED_NAME];
+      this.canCreate = data.createable === true;
+      this.canStamp = Boolean(lastUsed && lastUsed.updateable);
     }
   }
 
@@ -88,10 +155,6 @@ export default class GrantAnswerLibrary extends NavigationMixin(LightningElement
 
   get isEmpty() {
     return Boolean(this.library) && !this.hasAnswers;
-  }
-
-  get canCreate() {
-    return Boolean(this.library && this.library.canCreate);
   }
 
   get topicOptions() {
@@ -176,14 +239,20 @@ export default class GrantAnswerLibrary extends NavigationMixin(LightningElement
       return;
     }
     this.toast(helpText('Funders', 'Funders_Answers_Copied'), 'success');
+    // R-GA3: stamp Last Used Date with today, as the person, when they may edit it.
+    if (!this.canStamp) {
+      return;
+    }
+    const stamped = localIsoDate();
     try {
-      const stamped = await markUsed({ answerId: id });
-      if (stamped) {
-        const withDate = (each) => (each.id === id ? { ...each, lastUsed: stamped } : each);
-        this.library = { ...this.library, answers: this.answers.map(withDate) };
-      }
+      await updateRecord({ fields: { Id: id, [LAST_USED_NAME]: stamped } });
+      const withDate = (each) => (each.id === id ? { ...each, lastUsed: stamped } : each);
+      this.library = { ...this.library, answers: this.answers.map(withDate) };
     } catch (error) {
-      this.toast(messageOf(error, helpText('Funders', 'Funders_Answers_ErrorLoad')), 'error');
+      this.toast(
+        recordErrorMessage(error, helpText('Funders', 'Funders_Answers_ErrorStamp')),
+        'error'
+      );
     }
   }
 

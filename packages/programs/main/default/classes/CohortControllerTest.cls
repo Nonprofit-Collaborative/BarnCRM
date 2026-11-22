@@ -241,18 +241,4 @@ private class CohortControllerTest {
 			refusals
 		);
 	}
-
-	@IsTest
-	static void aPickedPersonIsNamed() {
-		System.runAs(admin()) {
-			contactMode();
-			Contact ana = person('Ana');
-			Test.startTest();
-			String name = CohortController.getPersonName(ana.Id);
-			String none = CohortController.getPersonName(null);
-			Test.stopTest();
-			Assert.areEqual('Pat Ana', name);
-			Assert.isNull(none);
-		}
-	}
 }

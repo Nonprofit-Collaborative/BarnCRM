@@ -1,9 +1,15 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
+import { getRecords } from 'lightning/uiRecordApi';
 import BarnConfirmModal from 'c/barnConfirmModal';
 import getMembers from '@salesforce/apex/CohortController.getMembers';
 import addMembers from '@salesforce/apex/CohortController.addMembers';
 import removeMember from '@salesforce/apex/CohortController.removeMember';
-import getPersonName from '@salesforce/apex/CohortController.getPersonName';
+
+/**
+ * A picked person's name, read as the person through Lightning Data Service (ADR-0093): a
+ * person is a Contact, or an Account where the org keeps people that way, so both are optional.
+ */
+const PERSON_NAME_FIELDS = ['Contact.Name', 'Account.Name'];
 
 import TITLE from '@salesforce/label/c.Programs_Cohort_Title';
 import MEMBER_COUNT from '@salesforce/label/c.Programs_Cohort_MemberCount';
@@ -83,6 +89,8 @@ export default class CohortMembers extends LightningElement {
   ticked = [];
   picked = [];
   pickedId;
+  /** The picked people's names, by record Id, as Lightning Data Service returns them. */
+  pickedNames = {};
   failures = [];
   loading = true;
   busy = false;
@@ -204,8 +212,34 @@ export default class CohortMembers extends LightningElement {
     return this.candidates.length > 0;
   }
 
+  /** The getRecords request for the picked people's names; undefined while none is picked. */
+  get pickedNameQuery() {
+    return this.picked.length
+      ? [{ recordIds: this.picked.map((one) => one.id), optionalFields: PERSON_NAME_FIELDS }]
+      : undefined;
+  }
+
+  @wire(getRecords, { records: '$pickedNameQuery' })
+  wiredPickedNames({ data }) {
+    if (!data) {
+      return;
+    }
+    const names = { ...this.pickedNames };
+    (data.results || []).forEach((item) => {
+      const record = item && item.result;
+      const name = record && record.fields && record.fields.Name && record.fields.Name.value;
+      if (record && record.id && name) {
+        names[record.id] = name;
+      }
+    });
+    this.pickedNames = names;
+  }
+
   get pickedPeople() {
-    return this.picked.map((one) => ({ ...one, takeOffLabel: format(TAKE_OFF_LIST, one.name) }));
+    return this.picked.map((one) => {
+      const name = this.pickedNames[one.id] || one.name;
+      return { ...one, name, takeOffLabel: format(TAKE_OFF_LIST, name) };
+    });
   }
 
   get hasPicked() {
@@ -274,16 +308,14 @@ export default class CohortMembers extends LightningElement {
       return Promise.resolve();
     }
     this.clearMessages();
-    return getPersonName({ personId })
-      .catch(() => undefined)
-      .then((name) => {
-        this.picked = withPerson(this.picked, { id: personId, name });
-        this.pickedId = undefined;
-        const picker = this.template.querySelector('[data-id="person-picker"]');
-        if (picker && typeof picker.clearSelection === 'function') {
-          picker.clearSelection();
-        }
-      });
+    // The name follows from wiredPickedNames; until it comes, the list shows the Id.
+    this.picked = withPerson(this.picked, { id: personId, name: this.pickedNames[personId] });
+    this.pickedId = undefined;
+    const picker = this.template.querySelector('[data-id="person-picker"]');
+    if (picker && typeof picker.clearSelection === 'function') {
+      picker.clearSelection();
+    }
+    return Promise.resolve();
   }
 
   handleTakeOff(event) {
