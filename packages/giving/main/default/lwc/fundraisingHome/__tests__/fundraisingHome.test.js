@@ -196,6 +196,7 @@ describe('c-fundraising-home', () => {
   it('offers a first gift and a file import before any gift exists', async () => {
     const element = await render({ ...HOME, firstRun: true, canImport: true });
     const panel = element.shadowRoot.querySelector('[data-id="first-run"]');
+    expect(panel.illustration).toBe('setup');
     expect(panel.heading).toBe('c.Giving_FundraisingHome_FirstRunHeading');
     expect(panel.message).toBe('c.Giving_FundraisingHome_FirstRunMessage');
     expect(element.shadowRoot.querySelector('[data-id="tiles"]')).toBeNull();

@@ -17,13 +17,12 @@ me today" in one look, so a fundraiser starts on one page rather than a menu of 
   - **Stewardship Plans** with **Running**: plans still under way. Opens the list view
     **Running Plans**.
 - **Enter a Gift**, which opens Quick Gift Entry.
-- **Fundraising Setup**: a tile for each setup page that left the app's menu (**Donor Levels
-  and Scores**, **Stewardship Plan Templates**, **Pledge Reminders**, **Receipt Letters**). All four
-  are also tabs in **BarnCRM Admin Console**, before **Error Log**.
-- **More**: a tile for each list that left the app's menu in release 1.24 (D-200): **Asks**,
-  **Scheduled Payments**, **Funds**, **Appeals**, **Tributes**, **Donor Segments**, **Recurring
-  Donor Health** and **Dashboards**. Each opens its list or page, and each is still in the App
-  Launcher.
+- **Fundraising Setup**: a tile for each setup page, none of which is in the app's menu
+  (**Donor Levels and Scores**, **Stewardship Plan Setup**, **Pledge Reminders**, **Receipt
+  Letters**). All four are also tabs in **BarnCRM Admin Console**, before **Error Log**.
+- **More**: a tile for each list not in the app's menu (D-200): **Asks**, **Scheduled Payments**,
+  **Funds**, **Appeals**, **Tributes**, **Donor Segments**, **Recurring Donor Health** and
+  **Dashboards**. Each opens its list or page, and each is in the App Launcher.
 - **Record Your First Gift**: until the org has a gift, a first-run panel replaces the empty
   figures with two actions, **Enter a Gift** and **Import a File** (the Import tab, for a file of
   past gifts). It goes away by itself once the first gift is saved. The **Enter a Gift** button
@@ -42,7 +41,7 @@ A figure counts at most 2,000 records and shows "2,000+" past that.
 
 Each figure, tile and button shows only to someone who can read the records behind it:
 **Enter a Gift** needs create access to gifts, the **Donor Levels and Scores** and **Stewardship
-Plan Templates** tiles need the **Manage BarnCRM Settings** permission, and the other two setup
+Plan Setup** tiles need the **Manage BarnCRM Settings** permission, and the other two setup
 tiles need read access to pledge reminders or receipt runs. A **More** tile needs read access to
 its object (gifts, for Donor Segments and Recurring Donor Health). The first-run panel shows only
 to someone who can create gifts, and **Import a File** only to someone who can create import
@@ -53,21 +52,14 @@ batches.
 Nothing to turn on. The page and its tab come with the Fundraising module, and the **Fundraising Admin**,
 **Fundraising Staff Access** and **Fundraising Read Only** permission sets show the tab.
 
-## What Changed in the App's Menu
+## The App's Menu
 
-The app's navigation now opens on **Fundraising Home** and adds **Scheduled Payments** after
-**Commitments**. Four setup pages left the default menu: **Donor Levels and Scores**, **Stewardship
-Plan Templates**, **Pledge Reminders** and **Receipt Letters**. Nothing was removed: each is a tile
-under **Fundraising Setup** on Fundraising Home, is still in the App Launcher, and the first two
-are also in the BarnCRM Admin apps. Anyone can add one back to their own menu with the pencil
-icon at the end of the navigation bar.
-
-In release 1.24 (D-200 R5) the menu went down to thirteen tabs: **Fundraising Home**, **Quick
-Gift Entry**, **Contacts**, **Households**, **Organizations**, **Gifts**, **Commitments**, **Ask
-Pipeline**, **Gift Batches**, **Receipts**, **Stewardship Plans**, **Thank-Yous** and
-**Reports**. **Asks**, **Scheduled Payments**, **Funds**, **Appeals**, **Tributes**, **Donor
-Segments**, **Recurring Donor Health** and **Dashboards** left it. They are tiles under **More**
-on Fundraising Home, are still in the App Launcher, and can be added back with the pencil icon.
+The app opens on **Fundraising Home**, and its menu has thirteen tabs (D-200 R5): **Fundraising
+Home**, **Quick Gift Entry**, **Contacts**, **Households**, **Organizations**, **Gifts**,
+**Commitments**, **Ask Pipeline**, **Gift Batches**, **Receipts**, **Stewardship Plans**,
+**Thank-Yous** and **Reports**. The setup pages are tiles under **Fundraising Setup** and the
+other lists are tiles under **More**; all of them are in the App Launcher. Anyone can add one to
+their own menu with the pencil icon at the end of the navigation bar.
 
 ## The Charts
 
@@ -103,7 +95,7 @@ region and pick a report). The figures and setup tiles are one component, **Fund
 
 ## Common Mistakes
 
-- **Expecting the setup pages in the menu.** They are tiles under **Fundraising Setup** now.
+- **Expecting the setup pages in the menu.** They are tiles under **Fundraising Setup**.
 - **Looking for Funds or Appeals in the menu.** They are tiles under **More**, and in the App
   Launcher.
 - **A chart says it has no data.** The person may lack the Run Reports permission or read access

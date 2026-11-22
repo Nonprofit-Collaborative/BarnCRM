@@ -182,8 +182,14 @@ describe('c-archived-records', () => {
 
     BarnConfirmModal.open.mockResolvedValueOnce(true);
     restoreArchivedRows.mockResolvedValue('a0J000000000001');
+    getArchivedRows.mockClear();
+    getArchivedRows.mockResolvedValueOnce({ rows: rowsFrom(1, 1), more: false });
     one(element, 'restore').click();
     await flush();
+    await flush();
+    // The same page read again, so a row being restored is not offered twice.
+    expect(getArchivedRows).toHaveBeenCalledTimes(1);
+    expect(getArchivedRows).toHaveBeenLastCalledWith(expect.objectContaining({ afterRowId: null }));
     expect(BarnConfirmModal.open.mock.calls[1][0].message).toBe(
       'c.Core_ArchiveViewer_RestoreConfirm'
     );

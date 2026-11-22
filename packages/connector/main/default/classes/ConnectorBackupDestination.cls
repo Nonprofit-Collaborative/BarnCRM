@@ -29,6 +29,11 @@ public with sharing class ConnectorBackupDestination implements OffPlatformDesti
 	private static final Pattern QUERY_VALUE = Pattern.compile('[A-Za-z0-9_-]{1,40}');
 	private static final Integer MAX_METADATA = 1000;
 	private static final Integer TIMEOUT = 120000;
+	/** A header value that is a typed sign-in (`Bearer ...`, `Basic ...`): the key belongs in the connection. */
+	private static final Pattern SIGN_IN_VALUE = Pattern.compile('(?is)(bearer|basic)\\b.*');
+	/** Characters per CSV part with metadata: the multipart body holds the part about three times. */
+	@TestVisible
+	private static final Integer MULTIPART_PART_CHARS = 1500000;
 
 	/** One fixed request header: never a key (F1). */
 	public class Header {
@@ -95,6 +100,16 @@ public with sharing class ConnectorBackupDestination implements OffPlatformDesti
 			return BarnHelp.text('Connector', 'Connector_Backup_NoAccess');
 		}
 		return null;
+	}
+
+	/** Smaller parts when the destination sends metadata (a multipart body); else Core's own size. */
+	public Integer partChars() {
+		try {
+			Connector_Connection__c row = currentRow();
+			return row == null || String.isBlank(parse(row.Backup_JSON__c).metadata) ? null : MULTIPART_PART_CHARS;
+		} catch (Exception unreadable) {
+			return null;
+		}
 	}
 
 	/**
@@ -164,20 +179,26 @@ public with sharing class ConnectorBackupDestination implements OffPlatformDesti
 		}
 		String boundary = 'barncrm' + EncodingUtil.convertToHex(Crypto.generateAesKey(128));
 		result.setHeader('Content-Type', 'multipart/related; boundary=' + boundary);
+		// Joined once, so the part is copied once more, not once per piece (heap).
 		result.setBody(
-			'--' +
-				boundary +
-				'\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n' +
-				settings.metadata.replace(FILE_SLOT, inJson) +
-				'\r\n--' +
-				boundary +
-				'\r\nContent-Type: ' +
-				contentType +
-				'\r\n\r\n' +
-				body.toString() +
-				'\r\n--' +
-				boundary +
-				'--'
+			String.join(
+				new List<String>{
+					'--' +
+					boundary +
+					'\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n' +
+					settings.metadata.replace(FILE_SLOT, inJson) +
+					'\r\n--' +
+					boundary +
+					'\r\nContent-Type: ' +
+					contentType +
+					'\r\n\r\n',
+					body.toString(),
+					'\r\n--' +
+					boundary +
+					'--'
+				},
+				''
+			)
 		);
 		return result;
 	}
@@ -304,6 +325,7 @@ public with sharing class ConnectorBackupDestination implements OffPlatformDesti
 			if (
 				!ConnectorRecipeDocument.headerNameOk(name) ||
 				ConnectorRecipeDocument.SIGN_IN_HEADER.matcher(name).matches() ||
+				SIGN_IN_VALUE.matcher(value).matches() ||
 				String.isBlank(value) ||
 				value.length() > 255 ||
 				ConnectorRecipeDocument.unsafeValue(value)
@@ -337,19 +359,25 @@ public with sharing class ConnectorBackupDestination implements OffPlatformDesti
 		return true;
 	}
 
-	/** Blank, or one JSON object with no `{!`, at most 1,000 characters; refused otherwise. */
+	/**
+	 * Blank, or one JSON object with no `{!` and no key that looks like a sign-in (as a header
+	 * name may not), at most 1,000 characters; refused otherwise.
+	 */
 	private static String metadataChecked(String metadata) {
 		if (String.isBlank(metadata)) {
 			return null;
 		}
 		String text = metadata.trim();
-		Boolean isObject;
+		Boolean ok = true;
 		try {
-			isObject = JSON.deserializeUntyped(text.replace(FILE_SLOT, 'x')) instanceof Map<String, Object>;
+			Map<String, Object> keys = (Map<String, Object>) JSON.deserializeUntyped(text.replace(FILE_SLOT, 'x'));
+			for (String key : keys.keySet()) {
+				ok = ok && !ConnectorRecipeDocument.SIGN_IN_HEADER.matcher(key).matches();
+			}
 		} catch (Exception unreadable) {
-			isObject = false;
+			ok = false;
 		}
-		if (!isObject || text.length() > MAX_METADATA || text.contains('{!')) {
+		if (!ok || text.length() > MAX_METADATA || text.contains('{!')) {
 			throw new ConnectorConnections.ConnectorException(
 				BarnHelp.text('Connector', 'Connector_Backup_ErrorMetadata')
 			);

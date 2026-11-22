@@ -95,6 +95,7 @@ private class PaymentsPostInstallTest {
 			new PaymentsPostInstall().runSetup(null);
 			delete as system legacy;
 			ModuleSettings.clearCache();
+			ModuleSettings.clearLegacyCache();
 			SettingsState.clearCache();
 
 			Assert.isTrue(PaymentService.hasWebhookToken(), 'The hash is kept');

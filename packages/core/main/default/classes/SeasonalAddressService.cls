@@ -222,7 +222,6 @@ public with sharing class SeasonalAddressService {
 	public static void recordRun(RunSummary summary, Datetime finishedAt) {
 		try {
 			SeasonalAddressWriter.recordRun(finishedAt, summary == null ? new RunSummary().text() : summary.text());
-			SettingsService.clearCaches();
 		} catch (Exception recordFailed) {
 			// A run that worked and could not say so is still a run that worked, so this is
 			// logged rather than thrown. It is also exactly the failure that would otherwise

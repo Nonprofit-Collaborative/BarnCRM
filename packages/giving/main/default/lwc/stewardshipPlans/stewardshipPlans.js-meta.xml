@@ -6,7 +6,7 @@
     order they come in, and whether the plan is switched on.
   </description>
   <isExposed>true</isExposed>
-  <masterLabel>Stewardship Plan Templates</masterLabel>
+  <masterLabel>Stewardship Plan Setup</masterLabel>
   <targets>
     <target>lightning__AppPage</target>
     <target>lightning__Tab</target>

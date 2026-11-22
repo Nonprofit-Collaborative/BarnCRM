@@ -71,7 +71,10 @@ Settings, **Automation**, Nightly Jobs, where it can be switched off).
 Create a project from **Projects Home**, **New Project From Template**, or with **New** on the
 Projects tab. Until the org has a project (templates do not count), Projects Home opens with
 **Start Your First Project** for anyone who may create one (D-200 R4); its **Start a Project**
-button goes to the New Project From Template form. A project's page shows:
+button goes to the New Project From Template form. After that, Projects Home has **New Project**
+in its header (for anyone who may create projects) and a figures row, each opening its list:
+**Active Projects** (templates left out), **My Open Tasks**, **Open Requests** (with Requests on)
+and **Hours This Month** (with time tracking on, rejected hours left out). A project's page shows:
 
 - the health badge and its reasons, with **Refresh Health**;
 - progress: tasks done of tasks, the percent complete, and, with time tracking on, Estimated,

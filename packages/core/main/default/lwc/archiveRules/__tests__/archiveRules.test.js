@@ -153,6 +153,18 @@ describe('c-archive-rules', () => {
     expect(one(element, 'notice')).not.toBeNull();
   });
 
+  it('keeps Run Now off while the rule is still running', async () => {
+    previewRule.mockResolvedValue({ count: 12, objectLabel: 'Contacts', sample: [], cascades: [] });
+    const element = await render({ ...PAGE, rules: [{ ...PAGE.rules[0], running: true }] });
+    element.shadowRoot.querySelector('[data-action="preview"]').click();
+    await flush();
+    one(element, 'run-count').dispatchEvent(new CustomEvent('change', { detail: { value: '12' } }));
+    await flush();
+    expect(one(element, 'run').disabled).toBe(true);
+    expect(one(element, 'still-running').textContent).toBe('c.Core_ArchiveRules_ErrorRunning');
+    await expectAccessible(element);
+  });
+
   it('shows a refusal and removes a rule', async () => {
     saveRule.mockRejectedValueOnce({ body: { message: 'Refused' } });
     const element = await render();

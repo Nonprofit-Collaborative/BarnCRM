@@ -150,10 +150,10 @@
     "Forms_Home_Received": "Submissions, Last 30 Days",
     "Forms_Home_NeedReview": "Need Review",
     "Forms_Home_RecentForms": "Recently Changed Forms",
-    "Forms_Home_NoForms": "No forms to show",
+    "Forms_Home_NoForms": "No Forms to Show",
     "Forms_Home_NoFormsNext": "Create a form with New Form.",
     "Forms_Home_RecentSubmissions": "Newest Submissions",
-    "Forms_Home_NoSubmissions": "No submissions yet",
+    "Forms_Home_NoSubmissions": "No Submissions Yet",
     "Forms_Home_NoSubmissionsNext": "Publish a form and share its link or page; submissions show here as they arrive.",
     "Forms_Home_LoadFailed": "Forms Home did not load. Try again. If it happens again, ask your BarnCRM admin to check the Error Log."
   }

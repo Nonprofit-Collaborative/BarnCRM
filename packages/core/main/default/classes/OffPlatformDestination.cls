@@ -21,4 +21,10 @@ public interface OffPlatformDestination {
 	 * answered with success, otherwise the failure in plain words (never a secret).
 	 */
 	String send(String fileName, Blob body);
+
+	/**
+	 * The most characters one CSV part may hold for this destination, or null for Core's own size.
+	 * A destination whose request copies the part (a multipart body) asks for smaller parts.
+	 */
+	Integer partChars();
 }

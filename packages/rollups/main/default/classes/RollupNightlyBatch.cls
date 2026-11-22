@@ -161,8 +161,7 @@ public without sharing class RollupNightlyBatch implements Database.Batchable<SO
 
 	/** The setting's night, or Every_Night; blank or unknown means Sunday. */
 	public static String fullRecalcDay() {
-		Object stored = SettingsService.getValue(RollupService.SETTINGS_OBJECT, DAY_SETTING);
-		String day = stored == null ? null : String.valueOf(stored);
+		String day = SettingsService.text(RollupService.SETTINGS_OBJECT, DAY_SETTING);
 		return day == EVERY_NIGHT || DAYS.contains(day) ? day : DEFAULT_DAY;
 	}
 

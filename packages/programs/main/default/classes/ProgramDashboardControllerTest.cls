@@ -136,4 +136,25 @@ private class ProgramDashboardControllerTest {
 		Assert.isFalse(withoutPrograms.canSee, 'No Programs set, no dashboard.');
 		Assert.isFalse(withoutPeriod.canSee, 'No period, nothing counted.');
 	}
+
+	@IsTest
+	static void theFirstRunShowsOnlyBeforeTheFirstProgram() {
+		System.runAs(TestUsers.adminWith(ADMIN)) {
+			Assert.isTrue(
+				ProgramDashboardController.getDashboard(Date.today(), Date.today()).firstRun,
+				'No program yet, and an admin may create one'
+			);
+			insert new Program__c(Name = 'Finished Pilot', Status__c = 'Completed');
+
+			Test.startTest();
+			ProgramDashboardController.Dashboard result = ProgramDashboardController.getDashboard(
+				Date.today(),
+				Date.today()
+			);
+			Test.stopTest();
+
+			Assert.isTrue(result.programs.isEmpty(), 'A completed program with no activity is not listed');
+			Assert.isFalse(result.firstRun, 'But it exists, so there is no first-run panel');
+		}
+	}
 }

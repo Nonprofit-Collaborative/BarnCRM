@@ -3,6 +3,9 @@ import { NavigationMixin } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getHome from '@salesforce/apex/CorporateHubController.getHome';
 import BOARD from '@salesforce/schema/Board__c';
+import ACKNOWLEDGMENT from '@salesforce/schema/Policy_Acknowledgment__c';
+import OBLIGATION from '@salesforce/schema/Compliance_Obligation__c';
+import AGREEMENT from '@salesforce/schema/Agreement__c';
 import acknowledge from '@salesforce/apex/CorporateHubController.acknowledge';
 import addMissingTemplates from '@salesforce/apex/CorporateHubController.addMissingTemplates';
 import { messageFrom } from 'c/findCsv';
@@ -146,6 +149,41 @@ export default class CorporateHubHome extends NavigationMixin(LightningElement) 
     return Boolean(this.home && this.home.canManage);
   }
 
+  get showTiles() {
+    return Boolean(this.home && !this.firstRun);
+  }
+
+  /** The figures row (Module Home pattern), each a link to the list behind it. */
+  get tiles() {
+    const figures = (this.home && this.home.figures) || {};
+    return [
+      {
+        key: 'to-read',
+        label: helpText('CorporateHub', 'CorporateHub_Home_FigureToRead'),
+        value: this.requests.length,
+        href: listHref(ACKNOWLEDGMENT)
+      },
+      {
+        key: 'overdue',
+        label: helpText('CorporateHub', 'CorporateHub_Home_FigureOverdue'),
+        value: figures.overdue || 0,
+        href: listHref(OBLIGATION)
+      },
+      {
+        key: 'agreements',
+        label: helpText('CorporateHub', 'CorporateHub_Home_FigureAgreements'),
+        value: figures.agreements || 0,
+        href: listHref(AGREEMENT)
+      },
+      {
+        key: 'boards',
+        label: helpText('CorporateHub', 'CorporateHub_Home_FigureBoards'),
+        value: figures.boards || 0,
+        href: listHref(BOARD)
+      }
+    ];
+  }
+
   async handleHaveRead(event) {
     await this.run(
       () => acknowledge({ acknowledgmentId: event.currentTarget.dataset.rowId }),
@@ -176,4 +214,9 @@ export default class CorporateHubHome extends NavigationMixin(LightningElement) 
       this.isWorking = false;
     }
   }
+}
+
+/** An object's list, from its schema import so the name carries any namespace. */
+function listHref(schema) {
+  return `/lightning/o/${schema.objectApiName}/list`;
 }

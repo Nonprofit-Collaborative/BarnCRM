@@ -45,6 +45,9 @@ public with sharing class FundersBoardController {
 		public List<Slice> restrictedGrants = new List<Slice>();
 		@AuraEnabled
 		public String currencyCode;
+		/** True when the person may create grants and none exists yet (Module Home first run). */
+		@AuraEnabled
+		public Boolean firstRun = false;
 	}
 
 	/** One named amount. */
@@ -73,6 +76,10 @@ public with sharing class FundersBoardController {
 			addGrants(board);
 			addGiving(board);
 			restrictedFunds(board);
+			board.firstRun =
+				Schema.SObjectType.Grant__c.isCreateable() &&
+				[SELECT Id FROM Grant__c WITH USER_MODE LIMIT 1]
+				.isEmpty();
 			return board;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getBoard');

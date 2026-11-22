@@ -54,6 +54,11 @@ Memberships and shown to everyone with a Corporate Hub permission set: those six
 opens on Memberships Home; without it, the app opens on Corporate Hub Home (see
 [The Module Apps](barncrm-app.md#the-module-apps)).
 
+Corporate Hub Home starts with four figures, each opening its list: **Policies to Read** (the
+person's own), **Overdue Obligations** (active, past their due date), **Active Agreements** and
+**Active Boards and Committees**. Before the first board or committee, the page opens on its
+first-run panel instead.
+
 ## Access
 
 | Permission set | Who gets it automatically | What it allows |

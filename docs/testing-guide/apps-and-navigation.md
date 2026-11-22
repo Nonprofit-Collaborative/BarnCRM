@@ -44,8 +44,8 @@ takes the apps in a queued job: wait a minute and reload before checking the App
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Read the deploy output. | A stage "Module tabs in the BarnCRM apps" ran and succeeded. |
-| 2 | As admin, open **BarnCRM Admin Console**. | Before **Error Log**, which stays the last tab: **Rollup Builder**, **Accounting Periods**, **Donor Levels and Scores**, **Stewardship Plan Templates**, **Pledge Reminders**, **Receipt Letters**, **Campaign Sync**, **Opportunity Mirror**, **Gift Transaction Mirror**, **Accounting Export**, then **Forms Home** and **Forms** and the other module admin pages. |
-| 3 | Open **BarnCRM Console**. | After **Data Manager**: **Forms**, **Form Submissions**. No **Gifts**, **Memberships** or **Awards** tab: those are in their own apps. |
+| 2 | As admin, open **BarnCRM Admin Console**. | Before **Error Log**, which stays the last tab: **Rollup Builder**, **Accounting Periods**, **Donor Levels and Scores**, **Stewardship Plan Setup**, **Pledge Reminders**, **Receipt Letters**, **Campaign Sync**, **Opportunity Mirror**, **Gift Transaction Mirror**, **Accounting Export**, then **Forms Home** and **Forms** and the other module admin pages. |
+| 3 | Open **BarnCRM Console**. | After **Data Manager**: **Scholarships Home**, **Award Programs**, **Award Applications**, **Awards** (they are in **BarnCRM Grants** too), then **Forms**, **Form Submissions**. No **Gifts** or **Memberships** tab: those are in their own apps. |
 | 4 | Open **BarnCRM Console**, **Contacts**, a contact with gifts, then a gift from its related list. | The gift opens on the same record page as in **BarnCRM Fundraising**. |
 | 5 | From the App Launcher, search for "BarnCRM Rollup Builder". | No such app is listed; the **Rollup Builder** tab is. |
 | 6 | Open **BarnCRM Console**, **Home**, **Setup Checklist**, **Modules**. | Under **BarnCRM Memberships**: "Add to the module's app if they are not there, or to BarnCRM Console for a module with no app: Memberships Home, Memberships, Member Certifications" and "Add to BarnCRM Admin Console: Membership Levels, Certifications", then the App Manager steps. A module not installed lists no pages. |
@@ -268,6 +268,6 @@ Console instead. Every org, scratch and Developer Edition included, gets all nin
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As staff, open **BarnCRM Fundraising** and its navigation menu. | Console navigation with the Barn Navy header. Tabs: **Fundraising Home**, **Quick Gift Entry**, **Contacts**, **Households**, **Organizations**, **Gifts**, **Commitments**, **Ask Pipeline**, **Gift Batches**, **Receipts**, **Stewardship Plans**, **Acknowledgments**, **Reports**. **Quick Gift Entry** is in the utility bar at the bottom. |
+| 1 | As staff, open **BarnCRM Fundraising** and its navigation menu. | Console navigation with the Barn Navy header. Tabs: **Fundraising Home**, **Quick Gift Entry**, **Contacts**, **Households**, **Organizations**, **Gifts**, **Commitments**, **Ask Pipeline**, **Gift Batches**, **Receipts**, **Stewardship Plans**, **Thank-Yous**, **Reports**. **Quick Gift Entry** is in the utility bar at the bottom. |
 | 2 | Open **Gifts** and a gift, then its donor. | The gift opens in a workspace tab on the gift page; the donor opens beside it. |
 | 3 | Open the App Launcher and type `Fundraising`. | One **BarnCRM Fundraising** app. |

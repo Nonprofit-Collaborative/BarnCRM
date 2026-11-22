@@ -8,9 +8,10 @@
  * carries its settings over, a value it saved in the legacy custom setting is read ahead of the
  * default. Core run state is not a setting: its keys are rows of `SettingsState`.
  *
- * A module still owns a protected hierarchy custom setting (ADR-0017) until phase 2. Every write
- * is validated against the object's own schema and the shipped rows and is audited as a Setting
- * Change record (canonical model Section 12, R-N3; R-STV2 for Core, once the save is deployed).
+ * Every module registered in `Setting_Module__mdt` keeps its settings in the same store
+ * (`ModuleSettings`, phase 2), reading its legacy custom setting only until carry-over. Every
+ * write is validated against the shipped rows and is audited as a Setting Change record
+ * (canonical model Section 12, R-N3; R-STV2), once the save is deployed.
  */
 @NamespaceAccessible
 public with sharing class SettingsService {
@@ -557,6 +558,7 @@ public with sharing class SettingsService {
 			applyCoreValues(values, requireDefinition, audit);
 			return getSettings();
 		}
+		// Unreachable: every module is in the store. Removed with the legacy objects' destructive step.
 		if (values == null || values.isEmpty()) {
 			return orgDefault(type);
 		}

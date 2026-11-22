@@ -349,6 +349,10 @@ there is no card.
 2. Pick a period at the top: **This Month** (the default), **Last Month**, **This Year**,
    **Last Year** or **Last 12 Months**.
 
+Before your organization's first program, the page opens with **Set Up Your First Program** and
+a **New Program** button. With no program in the period, it says **No Programs in This Period**:
+pick another period.
+
 You should see: tiles for active programs, open and new enrollments, people served, people
 counted without names, services delivered and the attendance rate, then a **Tools** tile for
 each Programs tab you can open, then a table with the same figures for each program (the

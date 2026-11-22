@@ -26,6 +26,23 @@ const OBJECT_INFOS = {
   ]
 };
 
+const mockNavigate = jest.fn();
+jest.mock(
+  'lightning/navigation',
+  () => {
+    const Navigate = Symbol('Navigate');
+    const NavigationMixin = (Base) =>
+      class extends Base {
+        [Navigate](...args) {
+          mockNavigate(...args);
+        }
+      };
+    NavigationMixin.Navigate = Navigate;
+    return { NavigationMixin, CurrentPageReference: null, __esModule: true };
+  },
+  { virtual: true }
+);
+
 jest.mock(
   '@salesforce/apex/ProgramDashboardController.getDashboard',
   () => ({ default: jest.fn() }),
@@ -212,7 +229,10 @@ describe('c-program-dashboard', () => {
     getDashboard.mockResolvedValue({ ...DASHBOARD, programs: [], moreThanShown: true });
     const element = mount();
     await flush();
-    expect(one(element, 'no-programs')).not.toBeNull();
+    const empty = one(element, 'no-programs');
+    expect(empty.size).toBe('compact');
+    expect(empty.heading).toBe('c.Programs_Dashboard_NoPrograms');
+    expect(empty.message).toBe('c.Programs_Dashboard_NoProgramsNext');
     expect(one(element, 'more')).not.toBeNull();
 
     getDashboard.mockResolvedValue({ canSee: false });
@@ -226,5 +246,29 @@ describe('c-program-dashboard', () => {
     await flush();
     expect(one(third, 'error').message).toContain('Programs_Fail_Dashboard');
     expect(one(third, 'error').variant).toBe('error');
+  });
+
+  it('opens on the first-run panel before the first program, and New Program opens the form', async () => {
+    getDashboard.mockResolvedValue({
+      ...DASHBOARD,
+      programs: [],
+      activePrograms: 0,
+      firstRun: true
+    });
+    const element = mount();
+    await flush();
+
+    const panel = one(element, 'first-run');
+    expect(panel.illustration).toBe('setup');
+    expect(panel.heading).toBe('c.Programs_Dashboard_FirstRunHeading');
+    expect(all(element, 'tile').length).toBe(0);
+    expect(one(element, 'no-programs')).toBeNull();
+    expect(one(element, 'tools')).not.toBeNull();
+
+    one(element, 'first-run-new').click();
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: 'standard__objectPage',
+      attributes: { objectApiName: 'Program__c', actionName: 'new' }
+    });
   });
 });

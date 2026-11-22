@@ -1,6 +1,11 @@
 <template>
   <template lwc:if={helpReady}>
     <c-barn-page-shell title={labels.title} purpose={labels.intro} icon-name={icon} data-id="shell">
+      <div slot="actions">
+        <template lwc:if={canCreate}>
+          <lightning-button data-id="new-project-action" variant="brand" label={labels.newProject} onclick={handleNewProject}></lightning-button>
+        </template>
+      </div>
       <template lwc:if={isLoading}>
         <lightning-spinner alternative-text={labels.title} size="small"></lightning-spinner>
       </template>
@@ -26,6 +31,16 @@
             data-id="first-run-start"
           ></lightning-button>
         </c-barn-empty-state>
+      </template>
+
+      <template lwc:if={showTiles}>
+        <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_small" data-id="tiles">
+          <template for:each={tiles} for:item="tile">
+            <div key={tile.key} class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-var-m-bottom_x-small">
+              <c-barn-stat-tile data-id={tile.key} label={tile.label} value={tile.value} href={tile.href} align="start" bordered></c-barn-stat-tile>
+            </div>
+          </template>
+        </div>
       </template>
 
       <c-projects-at-risk class="slds-var-m-bottom_medium" data-id="at-risk"></c-projects-at-risk>

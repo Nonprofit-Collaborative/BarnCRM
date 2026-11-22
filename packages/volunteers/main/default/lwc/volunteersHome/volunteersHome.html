@@ -1,5 +1,15 @@
 <template>
   <c-barn-page-shell title={title} purpose={purpose} icon-name={iconName} data-id="shell">
+    <div slot="actions">
+      <template lwc:if={showNewJob}>
+        <lightning-button
+          variant="brand"
+          label={firstRunText.newJob}
+          onclick={handleNewJob}
+          data-id="new-job"
+        ></lightning-button>
+      </template>
+    </div>
     <div class="slds-is-relative">
       <template lwc:if={loading}>
         <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
@@ -9,7 +19,7 @@
       </template>
       <template lwc:if={firstRun}>
         <c-barn-empty-state
-          illustration="no-data"
+          illustration="setup"
           heading={firstRunText.heading}
           message={firstRunText.message}
           heading-level="2"

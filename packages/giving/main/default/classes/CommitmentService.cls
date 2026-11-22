@@ -772,15 +772,7 @@ public with sharing class CommitmentService {
 
 	@TestVisible
 	private static Boolean autoApplyGifts() {
-		Object value = SettingsService.getValue(SETTINGS_OBJECT, KEY_AUTO_APPLY);
-		if (value == null) {
-			return true;
-		}
-		if (value instanceof Boolean) {
-			return (Boolean) value;
-		}
-		String text = String.valueOf(value).trim();
-		return String.isBlank(text) ? true : Boolean.valueOf(text);
+		return SettingsService.flag(SETTINGS_OBJECT, KEY_AUTO_APPLY);
 	}
 
 	/**

@@ -30,6 +30,9 @@ public with sharing class ArchiveRuleService {
 		public String destinationLabel;
 		@AuraEnabled
 		public Date nextRun;
+		/** True while the rule's last big object run is still going: Run Now waits for it. */
+		@AuraEnabled
+		public Boolean running;
 	}
 
 	/** One big object run or restore as the panel lists it. */
@@ -89,6 +92,7 @@ public with sharing class ArchiveRuleService {
 		result.destinations = ArchiveDestinations.choices();
 		Id me = UserInfo.getUserId();
 		Date today = OrgDate.today();
+		Set<String> running = BigObjectArchiveJob.running('archive', 'savedQueryId');
 		for (Saved_Query__c query : [
 			SELECT Id, Name, Object_Name__c, OwnerId, Owner.Name, Query_JSON__c
 			FROM Saved_Query__c
@@ -106,6 +110,7 @@ public with sharing class ArchiveRuleService {
 			if (view.rule != null) {
 				view.destinationLabel = ArchiveDestinations.labelOf(view.rule.destination);
 				view.nextRun = ArchiveRules.nextDue(view.rule, today);
+				view.running = running.contains(view.id);
 				result.rules.add(view);
 			} else if (view.mine) {
 				result.candidates.add(view);
@@ -272,6 +277,7 @@ public with sharing class ArchiveRuleService {
 		Integer confirmedCount,
 		Boolean scheduled
 	) {
+		BigObjectArchiveJob.requireIdle(query.Id);
 		ArchiveRules.Rule rule = ArchiveRules.of(query.Query_JSON__c);
 		ArchiveRun run = new ArchiveRun(query.Id, query.Name, query.Query_JSON__c, checked.objectName, confirmedCount);
 		run.scheduled = scheduled;

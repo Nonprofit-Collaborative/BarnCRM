@@ -55,6 +55,10 @@ page from any app.
 The **Events Home** tab lists the events still to come,
 soonest first, with their dates, status, format and place; **Past** lists those that ended or
 were cancelled, latest first. Each event's name opens it. **New Event** opens the new event form.
+Above the lists, three figures open the Events list: **Upcoming Events** (not cancelled),
+**Open for Registration** and **Registrations This Month** (not cancelled; shown only to someone
+who can read registrations). Until the org has an event, the page opens on **Plan Your First
+Event** for anyone who may create one (D-200 R4), with **New Event**.
 
 ### Event Calendar
 

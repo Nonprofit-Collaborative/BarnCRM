@@ -71,6 +71,41 @@ private class CorporateHubControllerTest {
 	}
 
 	@IsTest
+	static void theFiguresCountOverdueObligationsAndWhatIsActive() {
+		System.runAs(TestUsers.adminWith(ADMIN_SET)) {
+			insert new List<Board__c>{
+				new Board__c(Name = 'Board', Type__c = 'Board', Status__c = 'Active'),
+				new Board__c(Name = 'Old Committee', Type__c = 'Board', Status__c = 'Inactive')
+			};
+			insert new List<Compliance_Obligation__c>{
+				new Compliance_Obligation__c(
+					Name = 'Late',
+					Status__c = 'Active',
+					Due_Date__c = Date.today().addDays(-3)
+				),
+				new Compliance_Obligation__c(
+					Name = 'Soon',
+					Status__c = 'Active',
+					Due_Date__c = Date.today().addDays(3)
+				),
+				new Compliance_Obligation__c(Name = 'Paused', Status__c = 'Off', Due_Date__c = Date.today().addDays(-3))
+			};
+			insert new List<Agreement__c>{
+				new Agreement__c(Name = 'Lease', Status__c = 'Active', Start_Date__c = Date.today().addYears(-1)),
+				new Agreement__c(Name = 'Draft deal', Status__c = 'Draft')
+			};
+
+			Test.startTest();
+			Map<String, Integer> figures = CorporateHubController.getHome().figures;
+			Test.stopTest();
+
+			Assert.areEqual(1, figures.get('overdue'), 'Only the active obligation past its due date');
+			Assert.areEqual(1, figures.get('agreements'), 'Only the active agreement');
+			Assert.areEqual(1, figures.get('boards'), 'Only the active board');
+		}
+	}
+
+	@IsTest
 	static void theDocumentPanelCountsWhoHasReadIt() {
 		System.runAs(TestUsers.adminWith(ADMIN_SET)) {
 			Hub_Document__c document = policy();

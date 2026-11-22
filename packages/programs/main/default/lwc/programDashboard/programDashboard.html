@@ -26,7 +26,25 @@
           <c-barn-notice message={labels.noAccess} class="slds-show slds-var-m-bottom_small" data-id="no-access"></c-barn-notice>
         </template>
 
-        <template lwc:if={canSee}>
+        <template lwc:if={firstRun}>
+          <c-barn-empty-state
+            illustration="setup"
+            heading={labels.firstRunHeading}
+            message={labels.firstRunMessage}
+            heading-level="2"
+            class="slds-show slds-var-m-bottom_medium"
+            data-id="first-run"
+          >
+            <lightning-button
+              variant="brand"
+              label={labels.newProgram}
+              onclick={handleNewProgram}
+              data-id="first-run-new"
+            ></lightning-button>
+          </c-barn-empty-state>
+        </template>
+
+        <template lwc:if={showFigures}>
           <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_medium">
             <template for:each={tiles} for:item="tile">
               <div key={tile.key} class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-var-m-bottom_x-small">
@@ -46,11 +64,16 @@
 
         <c-barn-tool-grid groups={toolGroups} data-id="tools"></c-barn-tool-grid>
 
-        <template lwc:if={canSee}>
+        <template lwc:if={showFigures}>
           <section class="slds-var-m-top_medium" aria-labelledby="programs-by-program">
             <h2 class="slds-text-heading_medium slds-var-m-bottom_small" id="programs-by-program">{labels.byProgram}</h2>
             <template lwc:if={noRows}>
-              <c-barn-empty-state illustration="no-data" heading={labels.noPrograms} data-id="no-programs"></c-barn-empty-state>
+              <c-barn-empty-state
+                size="compact"
+                heading={labels.noPrograms}
+                message={labels.noProgramsNext}
+                data-id="no-programs"
+              ></c-barn-empty-state>
             </template>
             <template lwc:else>
               <table

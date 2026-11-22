@@ -172,11 +172,7 @@ private class RelationshipServiceTest {
 	static void writesNoOtherSideWhenTheOrgHasTurnedItOff() {
 		System.runAs(TestUsers.admin()) {
 			RelationshipTestDataFactory.quietOtherAutomations();
-			insert new BarnCRM_Settings__c(
-				SetupOwnerId = UserInfo.getOrganizationId(),
-				Relationship_Auto_Reciprocal__c = false
-			);
-			SettingsService.clearCaches();
+			SettingsService.setForTest('Relationship_Auto_Reciprocal__c', false);
 			List<Contact> people = RelationshipTestDataFactory.contacts(2, 'Garcia');
 
 			Test.startTest();
@@ -409,17 +405,12 @@ private class RelationshipServiceTest {
 			Relationship__c saved = RelationshipTestDataFactory.between(people[0], people[1], 'Spouse');
 			saved.Description__c = 'Married in 2010';
 			insert saved;
-			BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
-			settings.Relationship_Auto_Reciprocal__c = false;
-			upsert settings;
-			SettingsService.clearCaches();
+			SettingsService.setForTest('Relationship_Auto_Reciprocal__c', false);
 			update new Relationship__c(
 				Id = otherSideOf(people[1].Id).Id,
 				Description__c = 'Typed while the upkeep was off'
 			);
-			settings.Relationship_Auto_Reciprocal__c = true;
-			upsert settings;
-			SettingsService.clearCaches();
+			SettingsService.setForTest('Relationship_Auto_Reciprocal__c', true);
 
 			Test.startTest();
 			update new Relationship__c(Id = saved.Id);

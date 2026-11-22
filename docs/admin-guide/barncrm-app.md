@@ -12,7 +12,7 @@ Five serve every organization, nonprofit or for-profit; four are for nonprofits.
 | **BarnCRM Members and Partners** | Universal | Memberships and Corporate Hub role holders | Memberships Home, Memberships, Member Certifications, Membership Levels, Certifications, Corporate Hub Home, Library Documents, Compliance Obligations, Agreements, Boards and Committees, Board Meetings, Processing Activities, Data Subject Requests, Data Breaches, Reports, Dashboards, Error Log |
 | **BarnCRM Events** | Universal | Event Management role holders | Events Home, Event Calendar, Events, Event Speakers, Venues, Reports, Error Log |
 | **BarnCRM Projects** | Universal | Project Management role holders | Projects Home, Timesheet, Approvals, Requests, Projects, Time Entries, Project Expenses, Project Resources, Staffing, Project Rates, Project Invoices, Request Connections, Reports, Error Log |
-| **BarnCRM Fundraising** | Nonprofit | Fundraising role holders | Fundraising Home, Quick Gift Entry, Contacts, Households, Organizations, Gifts, Commitments, Ask Pipeline, Gift Batches, Receipts, Stewardship Plans, Acknowledgments, Reports, with its utility bar |
+| **BarnCRM Fundraising** | Nonprofit | Fundraising role holders | Fundraising Home, Quick Gift Entry, Contacts, Households, Organizations, Gifts, Commitments, Ask Pipeline, Gift Batches, Receipts, Stewardship Plans, Thank-Yous, Reports, with its utility bar |
 | **BarnCRM Grants** | Nonprofit | Grants role holders | Grants Home, Grant Pipeline, Grant Calendar, Grant Finder, Grants, Grant Requirements, Grant Answers, Funder Report Templates, Grant Checklist Items, then Scholarships Home, Award Programs, Award Applications and Awards (with Scholarships and Outbound Grants), Reports, Dashboards, Error Log |
 | **BarnCRM Programs** | Nonprofit | Programs role holders | Programs Home, Programs, Cohorts, Sessions, Enrollments, Service Deliveries, Case Notes, Referrals, Service Counts, Goals, Reports |
 | **BarnCRM Volunteers** | Nonprofit | Volunteers role holders | Volunteers Home, Volunteer Jobs, Shifts, Sign-Ups, Hours, Approve Hours, Letter Templates, Skills, Requirements, Reports, Dashboards |
@@ -126,7 +126,7 @@ from the module catalog, not from the app's own file:
 | Module | Everyday pages go to | Admin pages go to |
 |---|---|---|
 | Rollup Builder | | **BarnCRM Admin Console**: Rollup Builder |
-| Fundraising | (its own app) | **BarnCRM Admin Console**: Accounting Periods, Donor Levels and Scores, Stewardship Plan Templates, Pledge Reminders, Receipt Letters, Campaign Sync, Opportunity Mirror, Gift Transaction Mirror, Accounting Export |
+| Fundraising | (its own app) | **BarnCRM Admin Console**: Accounting Periods, Donor Levels and Scores, Stewardship Plan Setup, Pledge Reminders, Receipt Letters, Campaign Sync, Opportunity Mirror, Gift Transaction Mirror, Accounting Export |
 | Programs | (its own app) | **BarnCRM Admin Console**: Programs Settings |
 | Mirror | | **BarnCRM Admin Console**: Provider Requests |
 | Forms | **BarnCRM Console**: Forms, Form Submissions | **BarnCRM Admin Console**: Forms Home, Forms |

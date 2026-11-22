@@ -31,12 +31,8 @@ public class RecognitionTestData {
 	 * one, so it is switched off rather than worked around, as the Core household tests do.
 	 */
 	public static void useJunctionMembership() {
-		BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
-		settings.SetupOwnerId = UserInfo.getOrganizationId();
-		settings.Household_Membership_Mode__c = 'Junction';
-		settings.Auto_Create_Households__c = false;
-		upsert settings;
-		SettingsService.clearCaches();
+		SettingsService.setForTest('Household_Membership_Mode__c', 'Junction');
+		SettingsService.setForTest('Auto_Create_Households__c', false);
 	}
 
 	public static Account household(String name) {

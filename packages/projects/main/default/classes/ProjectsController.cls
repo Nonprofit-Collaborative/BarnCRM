@@ -43,6 +43,9 @@ public with sharing class ProjectsController {
 		/** True when the person may create projects and none exists yet (D-200 R4). */
 		@AuraEnabled
 		public Boolean firstRun = false;
+		/** The figures row: `active` projects, `requests` open, `hours` logged this month. */
+		@AuraEnabled
+		public Map<String, Decimal> figures = new Map<String, Decimal>();
 	}
 
 	@AuraEnabled
@@ -196,6 +199,38 @@ public with sharing class ProjectsController {
 		}
 	}
 
+	/**
+	 * The figures row, counted as the person. Open requests show with Requests on, hours with
+	 * time tracking on; a figure whose object the person cannot read is left out.
+	 */
+	private static void addFigures(Home home) {
+		home.figures.put(
+			'active',
+			[SELECT COUNT() FROM Project__c WHERE Status__c = 'Active' AND Is_Template__c = FALSE WITH USER_MODE]
+		);
+		if (ProjectsSettings.requestsEnabled() && Schema.SObjectType.Project_Request__c.isAccessible()) {
+			home.figures.put(
+				'requests',
+				[
+					SELECT COUNT()
+					FROM Project_Request__c
+					WHERE Status__c IN ('New', 'In Progress', 'Waiting on Requester')
+					WITH USER_MODE
+				]
+			);
+		}
+		if (home.timeTracking && Schema.SObjectType.Time_Entry__c.isAccessible()) {
+			Decimal hours = (Decimal) [
+					SELECT SUM(Hours__c) total
+					FROM Time_Entry__c
+					WHERE Date__c = THIS_MONTH AND Status__c != 'Rejected'
+					WITH USER_MODE
+				][0]
+				.get('total');
+			home.figures.put('hours', hours == null ? 0 : hours);
+		}
+	}
+
 	@AuraEnabled
 	public static Home getHome() {
 		try {
@@ -240,6 +275,7 @@ public with sharing class ProjectsController {
 					LIMIT 100
 				]
 			);
+			addFigures(home);
 			return home;
 		} catch (Exception e) {
 			throw ERRORS.wrap(e);

@@ -313,7 +313,7 @@ A recipe holds at most 25 steps. Records created by a recipe are owned by the **
 Records** you choose on the recipe, or by the Automated Process user when blank.
 
 **How Call an App keeps your keys safe.** Every request goes to `callout:` and the connection,
-then a path that must start with one `/` and cannot hold `//`, `@`, `\`, `?`, `#` or spaces, so a
+then a path that must start with one `/` and cannot hold `//`, `@`, `\`, `?`, `#`, a `..` folder or spaces, so a
 recipe can never reach another host. Each `{slot}` and query value is URL-encoded, so a value
 cannot add a path segment or a parameter. Authorization and the other sign-in headers come from
 the connection, never from a step: a header whose name looks like a sign-in header (with key,
@@ -621,10 +621,11 @@ backslashes escaped, anything outside plain ASCII as `\u` codes), as Dropbox req
    you the BarnCRM Connections permission set the send needs.
 3. Under **Backup Destination** on the Connections tab, select **Set Destination**. Choose the
    connection, the method (PUT for WebDAV), and the path: what follows the connection's address,
-   with `{file}` where the file name goes, such as `/barncrm/{file}`. Add any fixed header the
-   service needs, one a line as `Name: value` (at most five; never a key); a `Content-Type`
-   line replaces `text/csv`. **Upload Metadata** is for Google Drive only. Select **Save
-   Destination**. For S3 and the OAuth services, follow their sections below instead.
+   with `{file}` where the file name goes, such as `/barncrm/{file}` (no `..` folders). Add any
+   fixed header the service needs, one a line as `Name: value` (at most five; never a key, so a
+   value may not start with `Bearer` or `Basic`); a `Content-Type` line replaces `text/csv`.
+   **Upload Metadata** is for Google Drive only, and its names may not look like a sign-in (key,
+   token, secret and so on). Select **Save Destination**. For S3 and the OAuth services, follow their sections below instead.
 4. Assign the **BarnCRM Connections** permission set to the user the nightly jobs run as, so
    scheduled Backup Sets can send. Until a sender holds it, the destination says so.
 5. On Data Manager, open **Backup Sets**, select **Edit Schedule** on a set and choose **Files
@@ -633,7 +634,10 @@ backslashes escaped, anything outside plain ASCII as `\u` codes), as Dropbox req
 
 Each file is one request: `Content-Type: text/csv`, the CSV as the body, at most 120 seconds. Any
 2xx answer counts as sent; anything else is a failure that names the status, written to the
-Error Log and the run's log, and the file is sent again by the next nightly run. Only one
+Error Log and the run's log, and the file is sent again by the next nightly run. A refused send
+usually means a wrong path or a connection that may not write to that folder: check both. With
+Upload Metadata, each request holds the file more than once, so archives and Backup Sets save
+smaller parts (about 1.5 million characters instead of 3 million) while it is set. Only one
 connection is the destination: saving another replaces it. **Stop Using** leaves none; deleting
 the connection does the same. Retention at the storage is the service's own: BarnCRM never deletes
 anything there.

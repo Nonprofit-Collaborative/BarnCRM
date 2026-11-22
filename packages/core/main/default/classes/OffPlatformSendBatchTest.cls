@@ -27,6 +27,9 @@ private class OffPlatformSendBatchTest {
 			names.add(fileName);
 			return failure;
 		}
+		public Integer partChars() {
+			return null;
+		}
 	}
 
 	private static FakeDestination install(String failure) {

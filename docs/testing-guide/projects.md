@@ -384,3 +384,20 @@ and issues on.
 | 6 | **Remove Sample Data**. | All four sample projects, their tasks, hours and expenses, and the sample requests are gone; your own project stays. |
 
 **Cleanup:** None.
+
+## T-PM-35: Projects Home New Project and Figures
+
+**Purpose:** confirm the New Project button and the figures row on Projects Home (Module Home pattern, ADR-0236).
+**Prerequisites:** admin and a Projects Read Only user; Projects sample data loaded (T-PM-34); one open task assigned to you; time tracking and Requests on.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As admin, open **Projects Home**. | **New Project** in the page header; four figures: **Active Projects**, **My Open Tasks**, **Open Requests** and **Hours This Month**, matching the Projects list (Active, templates left out), your open tasks, the requests not yet resolved and this month's hours not rejected. |
+| 2 | Click each figure. | It opens the matching list. |
+| 3 | Click **New Project**. | The new Project form opens. |
+| 4 | Turn Requests off in **BarnCRM Settings** and reload. | **Open Requests** is gone; three figures remain. |
+| 5 | As the Read Only user, open the page. | No **New Project** button; the figures show. |
+| 6 | At phone width, open the page. | Figures two to a row; **New Project** stays in the header. |
+
+**Cleanup:** turn Requests back on.

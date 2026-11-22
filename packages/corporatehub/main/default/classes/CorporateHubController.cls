@@ -50,6 +50,9 @@ public with sharing class CorporateHubController {
 		/** True when the person may create a board or committee and none exists yet (D-200 R4). */
 		@AuraEnabled
 		public Boolean firstRun = false;
+		/** The figures row: `overdue` obligations, `agreements` and `boards` active. */
+		@AuraEnabled
+		public Map<String, Integer> figures = new Map<String, Integer>();
 	}
 
 	/** The document panel: its version and who has and has not acknowledged it. */
@@ -121,6 +124,20 @@ public with sharing class CorporateHubController {
 				);
 			}
 			addPrivacy(home);
+			home.figures.put(
+				'overdue',
+				[
+					SELECT COUNT()
+					FROM Compliance_Obligation__c
+					WHERE Status__c = 'Active' AND Due_Date__c < TODAY
+					WITH USER_MODE
+				]
+			);
+			home.figures.put(
+				'agreements',
+				[SELECT COUNT() FROM Agreement__c WHERE Status__c = 'Active' WITH USER_MODE]
+			);
+			home.figures.put('boards', [SELECT COUNT() FROM Board__c WHERE Status__c = 'Active' WITH USER_MODE]);
 			return home;
 		} catch (Exception e) {
 			throw ERRORS.wrap(e);

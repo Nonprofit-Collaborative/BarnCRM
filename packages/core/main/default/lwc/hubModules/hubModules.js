@@ -16,8 +16,8 @@ import { iconFor } from 'c/barnIcons';
 const MODULES_SECTION = 'Modules';
 const NOT_INSTALLED = 'NotInstalled';
 
-// Each module app's logo, a content asset its own package ships (vis-core-12). A module with
-// no app of its own shows the avatar's fallback icon.
+// Each module's logo, a content asset its own package ships (vis-core-12). A module without
+// one shows the avatar's fallback icon.
 const LOGOS = {
   Giving: 'BarnCRM_Patch_Fundraising_Logo',
   Volunteers: 'BarnCRM_Patch_Volunteers_Logo',
@@ -25,18 +25,21 @@ const LOGOS = {
   Funders: 'BarnCRM_Patch_Funders_Logo',
   LogicModels: 'BarnCRM_Patch_Logic_Models_Logo',
   Forms: 'BarnCRM_Patch_Forms_Logo',
-  Events: 'BarnCRM_Patch_Events_Logo'
+  Events: 'BarnCRM_Patch_Events_Logo',
+  CorporateHub: 'BarnCRM_Patch_Corporate_Hub_Logo',
+  Memberships: 'BarnCRM_Patch_Memberships_Logo',
+  Portal: 'BarnCRM_Patch_Portal_Logo',
+  Scholarships: 'BarnCRM_Patch_Scholarships_Logo',
+  Connector: 'BarnCRM_Connector_Patch_Logo',
+  Projects: 'BarnCRM_Patch_Projects_Logo'
 };
 
 function logoUrl(name) {
   return LOGOS[name] ? `/file-asset/${LOGOS[name]}` : undefined;
 }
 
-// A module with no logo shows its main tab's icon, so the icon here matches the tab (D-170):
-// Portal Builder its Portals tab, Contact Point Sync its page tab, Payments its Payments tab,
-// Memberships its Memberships tab, Project Management its Projects Home tab, Address Verification its setup page tab,
-// Advanced Reporting its Advanced Reporting tab, Migration its Migration Assistant tab. Others keep
-// the apps icon.
+// The avatar's fallback, shown when a module has no logo or its logo does not load: its main
+// tab's icon, so the icon here matches the tab (D-170). Others keep the apps icon.
 const FALLBACK_TABS = {
   Portal: 'Portal__c',
   ContactPoints: 'Contact_Point_Sync',

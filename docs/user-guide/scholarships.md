@@ -8,7 +8,10 @@ Guide's [Scholarships and Outbound Grants](../admin-guide/scholarships.md) page.
 
 Open the **BarnCRM Console** app (or **BarnCRM Grants**, if you work in grants too) and its
 **Scholarships Home** tab. Before your organization's first award program, it
-opens with **Set Up Your First Award Program** and a **New Award Program** button. It shows:
+opens with **Set Up Your First Award Program** and a **New Award Program** button. After that,
+**New Award Program** is in the page header, above four figures you click to open their lists:
+**Active Award Programs**, **My Reviews to Do**, **Applications in Review** and **Awards This
+Year**. It shows:
 
 - **My Reviews**: applications assigned to you that you have not submitted. Open one to review it.
 - **Open Cycles**: cycles taking applications or in review, with their close dates and how many

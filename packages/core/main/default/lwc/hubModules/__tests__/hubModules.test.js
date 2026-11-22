@@ -158,7 +158,7 @@ describe('c-hub-modules', () => {
     expect(logos[2].fallbackIconName).toBe('standard:apps');
   });
 
-  it('shows Portal Builder and Contact Point Sync with their tab icons', async () => {
+  it('shows Portal Builder with its logo and Contact Point Sync with its tab icon', async () => {
     getState.mockResolvedValue({
       canEdit: true,
       modules: [
@@ -169,8 +169,28 @@ describe('c-hub-modules', () => {
     const element = await build();
 
     const logos = all(element, 'module-logo');
+    expect(logos[0].src).toBe('/file-asset/BarnCRM_Patch_Portal_Logo');
     expect(logos[0].fallbackIconName).toBe('custom:custom47');
+    expect(logos[1].src).toBeUndefined();
     expect(logos[1].fallbackIconName).toBe('custom:custom59');
+  });
+
+  it('shows the logo each module package ships', async () => {
+    const logoOf = {
+      CorporateHub: 'BarnCRM_Patch_Corporate_Hub_Logo',
+      Memberships: 'BarnCRM_Patch_Memberships_Logo',
+      Scholarships: 'BarnCRM_Patch_Scholarships_Logo',
+      Connector: 'BarnCRM_Connector_Patch_Logo',
+      Projects: 'BarnCRM_Patch_Projects_Logo'
+    };
+    getState.mockResolvedValue({
+      canEdit: true,
+      modules: Object.keys(logoOf).map((name) => ({ name, status: 'On', canSwitch: true }))
+    });
+    const element = await build();
+
+    const sources = all(element, 'module-logo').map((logo) => logo.src);
+    expect(sources).toEqual(Object.values(logoOf).map((asset) => `/file-asset/${asset}`));
   });
 
   it('opens the Modules section of BarnCRM Settings by page reference', async () => {

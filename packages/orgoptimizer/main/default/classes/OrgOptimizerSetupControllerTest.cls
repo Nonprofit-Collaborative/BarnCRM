@@ -74,12 +74,9 @@ private class OrgOptimizerSetupControllerTest {
 				OrgOptimizerSetupController.apiVersion(),
 				'Empty reads as the default.'
 			);
-			BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
-			settings.Old_Api_Version__c = 5;
-			HouseholdTestDataFactory.save(settings);
+			SettingsService.setForTest('Old_Api_Version__c', 5);
 			Assert.areEqual(21, OrgOptimizerSetupController.apiVersion(), 'Below 21 reads as 21.');
-			settings.Old_Api_Version__c = 500;
-			HouseholdTestDataFactory.save(settings);
+			SettingsService.setForTest('Old_Api_Version__c', 500);
 			Assert.areEqual(80, OrgOptimizerSetupController.apiVersion(), 'Above 80 reads as 80.');
 			// Every class in the org is below version 80, so the check has something to list.
 			OrgOptimizerSetupController.permissionOverride = true;
@@ -135,15 +132,12 @@ private class OrgOptimizerSetupControllerTest {
 				OrgOptimizerSetupController.loginDays(),
 				'Empty reads as the default.'
 			);
-			BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
-			settings.Unused_Login_Days__c = 5;
-			settings.Unused_Report_Days__c = 5000;
-			HouseholdTestDataFactory.save(settings);
+			SettingsService.setForTest('Unused_Login_Days__c', 5);
+			SettingsService.setForTest('Unused_Report_Days__c', 5000);
 			Assert.areEqual(30, OrgOptimizerSetupController.loginDays(), 'Below 30 reads as 30.');
 			Assert.areEqual(1095, OrgOptimizerSetupController.reportDays(), 'Above 1095 reads as 1095.');
-			settings.Unused_Login_Days__c = 120;
-			settings.Unused_Report_Days__c = 200;
-			HouseholdTestDataFactory.save(settings);
+			SettingsService.setForTest('Unused_Login_Days__c', 120);
+			SettingsService.setForTest('Unused_Report_Days__c', 200);
 			OrgOptimizerSetupController.permissionOverride = true;
 
 			OrgOptimizerSetupController.Result result = OrgOptimizerSetupController.getFindings();

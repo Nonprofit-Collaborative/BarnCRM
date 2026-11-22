@@ -40,6 +40,9 @@ public with sharing class ScholarshipsController {
 		/** True when the person may create award programs and none exists yet (D-200 R4). */
 		@AuraEnabled
 		public Boolean firstRun = false;
+		/** The figures row: active `programs`, applications in `review`, `awards` decided this year. */
+		@AuraEnabled
+		public Map<String, Integer> figures = new Map<String, Integer>();
 	}
 
 	public class Board {
@@ -180,6 +183,20 @@ public with sharing class ScholarshipsController {
 				);
 			}
 			home.due = ScholarshipAwards.due(30);
+			home.figures.put('programs', [SELECT COUNT() FROM Award_Program__c WHERE Active__c = TRUE WITH USER_MODE]);
+			home.figures.put(
+				'review',
+				[SELECT COUNT() FROM Award_Application__c WHERE Status__c = 'In Review' WITH USER_MODE]
+			);
+			home.figures.put(
+				'awards',
+				[
+					SELECT COUNT()
+					FROM Award__c
+					WHERE Decision_Date__c = THIS_YEAR AND Status__c NOT IN ('Declined', 'Cancelled')
+					WITH USER_MODE
+				]
+			);
 			return home;
 		} catch (Exception e) {
 			throw ERRORS.wrap(e);

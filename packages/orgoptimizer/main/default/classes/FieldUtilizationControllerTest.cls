@@ -757,8 +757,7 @@ private class FieldUtilizationControllerTest {
 	@IsTest
 	static void anOnDemandCountSendsNoJobNotice() {
 		System.runAs(TestUsers.admin()) {
-			insert new BarnCRM_Settings__c(SetupOwnerId = UserInfo.getOrganizationId(), Job_Notifications__c = true);
-			SettingsService.clearCaches();
+			SettingsService.setForTest('Job_Notifications__c', true);
 
 			// Field utilization counts on demand on its own section (ADR-0101): the count runs
 			// while the person watches the page, so no job is left to tell them about.

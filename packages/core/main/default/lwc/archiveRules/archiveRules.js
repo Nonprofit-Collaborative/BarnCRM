@@ -225,8 +225,18 @@ export default class ArchiveRules extends LightningElement {
     }
   }
 
+  /** True while the previewed rule's last run is still going: Run Now waits for it. */
+  get previewRunning() {
+    const rule = this.preview && this.rules.find((one) => one.id === this.preview.ruleId);
+    return Boolean(rule && rule.running);
+  }
+
+  get stillRunningText() {
+    return helpText('Core', 'Core_ArchiveRules_ErrorRunning');
+  }
+
   get runDisabled() {
-    return this.busy || !this.typedCount;
+    return this.busy || !this.typedCount || this.previewRunning;
   }
 
   get runs() {

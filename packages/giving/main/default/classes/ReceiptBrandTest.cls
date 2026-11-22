@@ -15,9 +15,7 @@ private class ReceiptBrandTest {
 	}
 
 	private static Brand__c brandsOn(String scope) {
-		BarnCRM_Settings__c core = BarnCRM_Settings__c.getOrgDefaults();
-		core.Brand_Management__c = true;
-		upsert core;
+		SettingsService.setForTest('Brand_Management__c', true);
 		ModuleSettings.setForTest('Giving_Receipt_Numbering_Scope', scope);
 		SettingsService.clearCaches();
 		Legal_Entity__c entity = new Legal_Entity__c(Name = 'Barn Thrift LLC', Tax_Id__c = '98-7654321');
@@ -64,11 +62,7 @@ private class ReceiptBrandTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			ReceiptTestDataFactory.RecordingRenderer renderer = ReceiptTestDataFactory.setUpReceipting();
 			Brand__c thrift = brandsOn('Brand');
-			BarnCRM_Settings__c core = BarnCRM_Settings__c.getOrgDefaults();
-			core.Brand_Management__c = false;
-			upsert core;
-			// Every writer of a settings object clears the cache, as a settings save does.
-			SettingsService.clearCaches();
+			SettingsService.setForTest('Brand_Management__c', false);
 			Gift__c branded = gift(thrift.Id);
 
 			Test.startTest();

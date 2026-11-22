@@ -108,6 +108,9 @@ private class ConnectorBackupDestinationTest {
 			Assert.areEqual(badHeader, refusalOf('PUT', '/{file}', 'X-Api-Key: abc'), 'A sign-in header');
 			Assert.areEqual(badHeader, refusalOf('PUT', '/{file}', 'Authorization: Basic abc'), 'Authorization');
 			Assert.areEqual(badHeader, refusalOf('PUT', '/{file}', 'X-Folder'), 'No colon');
+			Assert.areEqual(badHeader, refusalOf('PUT', '/{file}', 'X-Pass: Bearer abc'), 'A bearer value');
+			Assert.areEqual(badHeader, refusalOf('PUT', '/{file}', 'X-Pass: basic abc'), 'A basic value, any case');
+			Assert.areEqual(badPath, refusalOf('PUT', '/a/../{file}', null), 'A parent segment');
 			Assert.areEqual(badHeader, refusalOf('PUT', '/{file}', 'A: 1\nB: 2\nC: 3\nD: 4\nE: 5\nF: 6'), 'Six');
 			Assert.areEqual(0, [SELECT COUNT() FROM Connector_Connection__c], 'Nothing kept');
 		}
@@ -153,6 +156,19 @@ private class ConnectorBackupDestinationTest {
 			Assert.areEqual('text/csv', storage.received.getHeader('Content-Type'));
 			Assert.areEqual('crm', storage.received.getHeader('X-Folder'));
 			Assert.areEqual('Id\r\n1\r\n', storage.received.getBody());
+			Assert.isNull(destination.partChars(), 'Without metadata, Core keeps its own part size');
+			ConnectorConnectionsController.saveBackupDestination(
+				SECOND,
+				'POST',
+				'/upload/{file}?uploadType=multipart',
+				null,
+				'{"name":"{file}"}'
+			);
+			Assert.areEqual(
+				ConnectorBackupDestination.MULTIPART_PART_CHARS,
+				destination.partChars(),
+				'A multipart upload asks for smaller parts'
+			);
 		}
 	}
 
@@ -437,7 +453,13 @@ private class ConnectorBackupDestinationTest {
 				refusalOfChecked('/u?uploadType=multipart', null, '{"name":"{!x}"}'),
 				'A formula'
 			);
+			Assert.areEqual(
+				badMetadata,
+				refusalOfChecked('/u?uploadType=multipart', null, '{"name":"{file}","accessToken":"abc"}'),
+				'A sign-in key'
+			);
 			Assert.isNull(refusalOfChecked('/u?uploadType=multipart', null, '{"name":"{file}"}'), 'Drive is accepted');
+			Assert.isNull(refusalOfChecked('/{file}', 'X-Note: Basically fine', null), 'A word that only starts alike');
 			Assert.areEqual('a\\nb', ConnectorBackupDestination.jsonText('a\nb'), 'A line break escaped');
 			Assert.areEqual('\\u00f1', ConnectorBackupDestination.jsonText('ñ'), 'Outside ASCII as \\u');
 

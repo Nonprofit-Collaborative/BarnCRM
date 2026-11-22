@@ -45,6 +45,32 @@ private class ScholarshipsControllerTest {
 	}
 
 	@IsTest
+	static void theFiguresCountActiveProgramsApplicationsInReviewAndThisYearsAwards() {
+		System.runAs(ScholarshipsTestData.admin()) {
+			Award_Cycle__c cycle = ScholarshipsTestData.cycle(null, null);
+			insert new Award_Program__c(Name = 'Retired Fund', Type__c = 'Scholarship', Active__c = false);
+			Contact lee = ScholarshipsTestData.person('Lee');
+			Contact kim = ScholarshipsTestData.person('Kim');
+			Award_Application__c reviewing = ScholarshipsTestData.application(cycle.Id, lee.Id, 'In Review');
+			Award_Application__c sent = ScholarshipsTestData.application(cycle.Id, kim.Id, 'Submitted');
+			Award__c kept = ScholarshipsTestData.award(cycle.Id, reviewing.Id, lee.Id, 500);
+			Award__c turnedDown = ScholarshipsTestData.award(cycle.Id, sent.Id, kim.Id, 500);
+			update new List<Award__c>{
+				new Award__c(Id = kept.Id, Decision_Date__c = Date.today()),
+				new Award__c(Id = turnedDown.Id, Decision_Date__c = Date.today(), Status__c = 'Declined')
+			};
+
+			Test.startTest();
+			Map<String, Integer> figures = ScholarshipsController.getHome().figures;
+			Test.stopTest();
+
+			Assert.areEqual(1, figures.get('programs'), 'Only the active program');
+			Assert.areEqual(1, figures.get('review'), 'Only the application in review');
+			Assert.areEqual(1, figures.get('awards'), 'A declined award is not counted');
+		}
+	}
+
+	@IsTest
 	static void theFirstRunPanelShowsBeforeTheFirstProgram() {
 		System.runAs(ScholarshipsTestData.admin()) {
 			Test.startTest();

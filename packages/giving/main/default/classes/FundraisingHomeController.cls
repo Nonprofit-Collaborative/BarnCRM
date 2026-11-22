@@ -280,8 +280,8 @@ public with sharing class FundraisingHomeController {
 	}
 
 	/**
-	 * The setup pages that left the app's menu, each named by its own tab label. The Donor Levels
-	 * and Scores and Stewardship Plan Templates pages change org-wide setup, so they need Manage BarnCRM
+	 * The setup pages not in the app's menu, each named by its own tab label. The Donor Levels
+	 * and Scores and Stewardship Plan Setup pages change org-wide setup, so they need Manage BarnCRM
 	 * Settings; Pledge Reminders and Receipt Letters show to anyone who can read what they list,
 	 * as their tabs do in the Giving permission sets.
 	 */

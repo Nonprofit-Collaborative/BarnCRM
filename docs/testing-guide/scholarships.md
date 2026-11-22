@@ -158,3 +158,19 @@ two users with the Team Member role (reviewer A and reviewer B), and a public gr
 | 6 | Open the Outbound Funds records. | Nothing changed. |
 
 **Cleanup:** undo the six steps in reverse order; switch reminders back on if they were on.
+
+## T-SG-11: Scholarships Home New Award Program and Figures
+
+**Purpose:** confirm the New Award Program button and the figures row on Scholarships Home (Module Home pattern, ADR-0236).
+**Prerequisites:** admin and a Scholarships Read Only user; Scholarships sample data loaded; one application in review assigned to you.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As admin, open **Scholarships Home**. | **New Award Program** in the page header; four figures: **Active Award Programs**, **My Reviews to Do**, **Applications in Review** and **Awards This Year**, matching the active programs, your open reviews, the applications In Review and this year's awards not declined or cancelled. |
+| 2 | Click each figure. | It opens the matching list. |
+| 3 | Click **New Award Program**. | The new Award Program form opens. |
+| 4 | As the Read Only user, open the page. | No **New Award Program** button; the figures show. |
+| 5 | On an org with no award program yet, open the page as admin. | **Set Up Your First Award Program** shows, with no figures and no header button. |
+| 6 | At phone width, open the page. | Figures two to a row. |
+
+**Cleanup:** None.

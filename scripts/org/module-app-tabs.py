@@ -61,15 +61,16 @@ def q(tag):
 
 
 def catalog(root):
-    """Each module record's values by field, in Sort_Order__c order."""
+    """Each module record's values by field, in Sort_Order__c order, then by file path so
+    records with the same order come out the same way on every run."""
     rows = []
     pattern = os.path.join(root, CORE, "customMetadata", "BarnCRM_Module.*.md-meta.xml")
     for path in glob.glob(pattern):
         values = {}
         for value in ET.parse(path).getroot().findall(q("values")):
             values[value.findtext(q("field"))] = (value.findtext(q("value")) or "").strip()
-        rows.append(values)
-    return sorted(rows, key=lambda row: float(row.get("Sort_Order__c") or 0))
+        rows.append((float(values.get("Sort_Order__c") or 0), path, values))
+    return [values for _order, _path, values in sorted(rows, key=lambda row: (row[0], row[1]))]
 
 
 def names(text):

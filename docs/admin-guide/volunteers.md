@@ -70,7 +70,8 @@ data.") until hours are approved. To change the chart, edit the page in the Ligh
 Until the org has a volunteer job, **Volunteers Home** opens on **Set Up Your First Volunteer
 Job** instead of empty figures (D-200 R4), for anyone who may create jobs. It offers **New
 Volunteer Job** and, for someone who may import, **Import a File** (the Import tab, for a file
-of volunteers or past hours). It goes away by itself once the first job is saved.
+of volunteers or past hours). It goes away by itself once the first job is saved. From then on,
+**New Volunteer Job** is in the page header for anyone who may create jobs.
 
 Each of Jobs, Shifts, Hours, Requirements and Skills opens with ready-made list views:
 **All Jobs**, **Active Jobs** and **Inactive Jobs**; **All Shifts**, **Shifts Needing Volunteers** (open shifts

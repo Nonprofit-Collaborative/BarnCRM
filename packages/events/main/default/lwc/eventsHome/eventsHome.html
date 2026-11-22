@@ -49,6 +49,40 @@
         ></c-barn-notice>
       </template>
 
+      <template lwc:if={firstRun}>
+        <c-barn-empty-state
+          illustration="setup"
+          heading={labels.firstRunHeading}
+          message={labels.firstRunMessage}
+          heading-level="2"
+          data-id="first-run"
+        >
+          <lightning-button
+            data-id="first-run-new"
+            variant="brand"
+            label={labels.newEvent}
+            onclick={handleNewEvent}
+          ></lightning-button>
+        </c-barn-empty-state>
+      </template>
+
+      <template lwc:if={showTiles}>
+        <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_small" data-id="tiles">
+          <template for:each={tiles} for:item="tile">
+            <div key={tile.key} class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-var-m-bottom_x-small">
+              <c-barn-stat-tile
+                data-id={tile.key}
+                label={tile.label}
+                value={tile.value}
+                href={tile.href}
+                align="start"
+                bordered
+              ></c-barn-stat-tile>
+            </div>
+          </template>
+        </div>
+      </template>
+
       <template lwc:if={showEmpty}>
         <c-barn-empty-state data-id="empty-state" size="compact" heading={emptyHeading} message={emptyMessage}>
           <template lwc:if={canCreate}>

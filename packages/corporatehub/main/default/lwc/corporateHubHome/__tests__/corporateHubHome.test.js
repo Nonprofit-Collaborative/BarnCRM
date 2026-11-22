@@ -132,6 +132,31 @@ describe('c-corporate-hub-home', () => {
     expect(find(element, 'first-run')).toBeNull();
   });
 
+  it('shows the figures row, each figure a link to its list', async () => {
+    getHome.mockResolvedValue({ ...HOME, figures: { overdue: 2, agreements: 5, boards: 1 } });
+    const element = mount();
+    await flush();
+
+    const tiles = [...element.shadowRoot.querySelectorAll('[data-id="tiles"] c-barn-stat-tile')];
+    expect(tiles.map((tile) => tile.label)).toEqual([
+      'c.CorporateHub_Home_FigureToRead',
+      'c.CorporateHub_Home_FigureOverdue',
+      'c.CorporateHub_Home_FigureAgreements',
+      'c.CorporateHub_Home_FigureBoards'
+    ]);
+    expect(tiles.map((tile) => tile.value)).toEqual([1, 2, 5, 1]);
+    expect(tiles[0].href).toBe('/lightning/o/Policy_Acknowledgment__c/list');
+    expect(tiles[1].href).toBe('/lightning/o/Compliance_Obligation__c/list');
+  });
+
+  it('shows no figures on the first-run panel', async () => {
+    getHome.mockResolvedValue({ ...HOME, firstRun: true, figures: {} });
+    const element = mount();
+    await flush();
+
+    expect(find(element, 'tiles')).toBeNull();
+  });
+
   it('shows the error when the page cannot load', async () => {
     getHome.mockRejectedValue({ body: { message: 'No access' } });
     const element = mount();

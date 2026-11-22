@@ -75,7 +75,7 @@ Fundraising Home, and are in the App Launcher.
 **Fundraising Home** shows five figures, each a link to its list: gifts waiting for a thank
 you, overdue scheduled payments, your asks due this month, open gift batches and running
 stewardship plans. **Enter a Gift** opens Quick Gift Entry. Under **Fundraising Setup** are the
-setup pages that are not in the app's menu (**Donor Levels and Scores**, **Stewardship Plan Templates**,
+setup pages that are not in the app's menu (**Donor Levels and Scores**, **Stewardship Plan Setup**,
 **Pledge Reminders**, **Receipt Letters**), each shown only to people who may use it; they are
 also tabs in **BarnCRM Admin Console**, and in the App Launcher. Before
 the first gift is saved, **Record Your First Gift** offers **Enter a Gift** and **Import a
@@ -83,12 +83,12 @@ File**. Below are two charts, **Giving by Month** and **Open Asks by Stage**; cl
 open its report.
 
 The **BarnCRM Volunteers** app has **Volunteers Home**, **Volunteer Jobs**, **Volunteer
-Shifts**, **Volunteer Hours**, **Approve Hours**, **Volunteer Letter Templates**, **Skills**,
-**Volunteer Requirements**, **Dashboards** and **Reports**. It opens on **Volunteers Home**:
+Shifts**, **Volunteer Sign-Ups**, **Volunteer Hours**, **Approve Hours**, **Volunteer Letter
+Templates**, **Skills**, **Volunteer Requirements**, **Reports** and **Dashboards**. It opens on **Volunteers Home**:
 approved hours this month, hours waiting for approval and shifts that still need people, each
 a figure you click to open its list, above a chart of this year's hours by job. Before the first
 volunteer job, it opens with **Set Up Your First Volunteer Job** (**New Volunteer Job**, **Import
-a File**) instead. The module's settings are the **Volunteers** section of **BarnCRM Settings**.
+a File**) instead; after that, **New Volunteer Job** is in its header. The module's settings are the **Volunteers** section of **BarnCRM Settings**.
 
 **BarnCRM Members and Partners** opens on **Memberships Home** (or **Corporate Hub Home** when
 Memberships is not installed) and holds every Memberships and Corporate Hub page. **BarnCRM
@@ -227,8 +227,6 @@ loads with **Import Files** show in each record's **Files** list, owned by that 
 ## Common Problems
 
 - Problem: you cannot find the **BarnCRM Console** app. You have no BarnCRM role yet. Ask your admin.
-- Problem: you cannot find a Forms, Portal Builder, Connector, Memberships, Corporate Hub or
-  Scholarships app. There is none: their pages are in the apps listed under The Apps above.
 - Problem: a tab such as **Find** or **Data Manager** is missing. Those tabs appear only once
   the feature is turned on and you have the matching add-on. Ask your admin.
 - Problem: a record replaced the page instead of opening in a tab. You are in an app that is

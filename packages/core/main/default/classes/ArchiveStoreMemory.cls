@@ -8,6 +8,8 @@ public class ArchiveStoreMemory extends ArchiveStore {
 	public Map<String, Archived_Record__b> rowsByKey = new Map<String, Archived_Record__b>();
 	/** Original Ids whose insert reports success but which are never stored. */
 	public Set<String> lostOnInsert = new Set<String>();
+	/** How many delete calls to refuse next, as the platform may. */
+	public Integer deletesRefused = 0;
 
 	/** Puts a memory store in place for this test and returns it. */
 	public static ArchiveStoreMemory install() {
@@ -32,6 +34,10 @@ public class ArchiveStoreMemory extends ArchiveStore {
 	}
 
 	public override Integer deleteRows(List<ArchiveStore.Key> keys) {
+		if (deletesRefused > 0) {
+			deletesRefused--;
+			throw new DmlException('Refused by the test');
+		}
 		Integer deleted = 0;
 		for (ArchiveStore.Key key : keys) {
 			if (rowsByKey.remove(keyOf(key.objectName, key.archivedAt, key.originalId)) != null) {

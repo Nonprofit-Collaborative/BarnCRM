@@ -121,14 +121,18 @@ private class ReceiptBrandingTest {
 	@IsTest
 	static void anOrganizationWithNoAddressPrintsNoAddressBlock() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			BarnCRM_Settings__c core = BarnCRM_Settings__c.getOrgDefaults();
-			core.Organization_Street__c = null;
-			core.Organization_Street_2__c = null;
-			core.Organization_City__c = null;
-			core.Organization_State__c = null;
-			core.Organization_Postal_Code__c = null;
-			core.Organization_Country__c = null;
-			upsert core;
+			for (
+				String key : new List<String>{
+					'Organization_Street__c',
+					'Organization_Street_2__c',
+					'Organization_City__c',
+					'Organization_State__c',
+					'Organization_Postal_Code__c',
+					'Organization_Country__c'
+				}
+			) {
+				SettingsService.setForTest(key, null);
+			}
 
 			Test.startTest();
 			String html = receiptFrom(BARE_TEMPLATE);

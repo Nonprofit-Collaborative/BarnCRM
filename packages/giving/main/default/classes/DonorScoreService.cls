@@ -122,8 +122,8 @@ public with sharing class DonorScoreService {
 		return changed;
 	}
 
+	/** The cutoffs as saved, or as shipped (Default_Value__c); DonorScoreMath falls back for a bad list. */
 	private static String text(String key) {
-		Object value = SettingsService.getValue(SETTINGS_OBJECT, key);
-		return value == null ? null : String.valueOf(value);
+		return SettingsService.text(SETTINGS_OBJECT, key);
 	}
 }

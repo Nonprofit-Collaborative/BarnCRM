@@ -196,6 +196,9 @@
                             onchange={handleTyped}
                             data-id="run-count"
                         ></lightning-input>
+                        <template lwc:if={previewRunning}>
+                            <p class="slds-text-body_small slds-var-m-top_x-small" data-id="still-running">{stillRunningText}</p>
+                        </template>
                         <div class="slds-var-m-top_small">
                             <lightning-button
                                 variant="destructive"

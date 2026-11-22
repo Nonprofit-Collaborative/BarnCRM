@@ -54,10 +54,13 @@ public class AccountKindsTestData {
 				break;
 			}
 		}
-		// Written as the system writes it: the Settings save refuses No record type where a
-		// candidate exists, which is exactly the org this test may be running in.
+		// Put in the store as if deployed: the Settings save refuses No record type where a
+		// candidate exists, which is exactly the org this test may be running in. A store value
+		// lasts one transaction, so the legacy record is also written for a caller in @TestSetup;
+		// it is read only until the org carries its settings over.
 		OrgSettingsSystemWriter.save(
 			new Map<Schema.SObjectField, Object>{ BarnCRM_Settings__c.Organization_Record_Type__c => usable }
 		);
+		SettingsService.setForTest('Organization_Record_Type__c', usable);
 	}
 }

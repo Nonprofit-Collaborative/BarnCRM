@@ -16,8 +16,9 @@ public with sharing class ArchiveToBigObject implements ArchiveDestination {
 			return BarnHelp.text('Core', 'Core_ArchiveRules_BigObjectNoAccess');
 		}
 		if (BigObjectArchiveJob.archivedCount() >= BigObjectArchiveJob.CAP) {
-			return String.format(
-				BarnHelp.text('Core', 'Core_ArchiveRules_LogCap'),
+			return BarnHelp.text(
+				'Core',
+				'Core_ArchiveRules_BigObjectFull',
 				new List<Object>{ BigObjectArchiveJob.CAP.format() }
 			);
 		}
@@ -30,6 +31,7 @@ public with sharing class ArchiveToBigObject implements ArchiveDestination {
 		if (reason != null) {
 			throw new ArchiveRules.ArchiveRuleException(reason);
 		}
+		BigObjectArchiveJob.requireIdle(run.savedQueryId);
 		Datetime now = Datetime.now();
 		Import_Batch__c job = new Import_Batch__c(
 			Operation__c = BigObjectArchiveJob.OPERATION_ARCHIVE,

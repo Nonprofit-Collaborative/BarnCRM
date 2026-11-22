@@ -1,17 +1,19 @@
 /**
  * A big object archive run (canonical model R-ARC3, ADR-0240 archive rules and big object archive):
- * a queueable chain whose links alternate between Copy and Settle, so no transaction mixes
- * ordinary DML with an immediate big object write (the platform refuses that, uncatchably).
+ * a queueable chain whose links alternate between Copy and Settle, because no immediate big
+ * object call may follow ordinary DML in a transaction (the platform refuses it, uncatchably).
  *
- * - Copy (no DML): deletes copies the last Settle could not finish, reads the next chunk of
- *   matching records in user mode, Id order, with every readable field and their cascade-delete
- *   children, and writes them with `insertImmediate`.
+ * - Copy (no DML): deletes copies the last Settle could not finish (one retry, then the run log
+ *   counts any that stay), reads the next chunk of matching records in user mode, Id order, with
+ *   every readable field and their cascade-delete children (the chunk halved until the children
+ *   fit `childRows`), and writes them with `insertImmediate`.
  * - Settle (DML only): reads the copies back by full key, reads the originals again, deletes in
  *   user mode those copied and unchanged since the run started, counts them, writes the job, and
  *   queues the next Copy with any copy whose original stayed.
  *
- * A Copy retried writes the same keys, which overwrite. A link that dies unexpectedly is caught
- * by its finalizer, which deletes that link's copies and marks the job Failed.
+ * Each Copy stamps its rows with a new archive time, so a later Copy never overwrites an earlier
+ * one's rows. A link that dies unexpectedly is caught by its finalizer, which deletes that link's
+ * copies (a Settle's too, since its deletes roll back) and marks the job Failed.
  */
 public with sharing class BigObjectArchiveJob implements Queueable {
 	public static final String OPERATION_ARCHIVE = 'Archive';
@@ -23,6 +25,9 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 	public static final Integer CAP = 1000000;
 	/** Where the panels start to warn. */
 	public static final Integer WARN_AT = 900000;
+	/** Cascade-delete child rows one Copy reads at most, for the heap and the query row limit. */
+	@TestVisible
+	private static Integer childRows = 2000;
 	/** Notes written to the Run Log per link; the rest are counted. */
 	private static final Integer NOTES_SHOWN = 20;
 	private static final String COPY = 'copy';
@@ -34,6 +39,9 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 	/** Set by tests: links are added here instead of being queued, so a test runs each in turn. */
 	@TestVisible
 	private static List<Object> queuedForTest;
+	/** The last link's finisher, for a test. */
+	@TestVisible
+	private static Finisher lastFinisher;
 
 	private final Id jobId;
 	private final String queryJson;
@@ -45,9 +53,14 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 	private Integer remaining;
 	private Id lastId;
 	private Datetime copiedAt;
-	private List<String> copiedIds = new List<String>();
+	/** The last Copy's saved rows: record name by Original Id. */
+	private Map<String, String> copiedNames = new Map<String, String>();
+	@TestVisible
 	private List<String> notes = new List<String>();
+	@TestVisible
 	private List<ArchiveStore.Key> orphans = new List<ArchiveStore.Key>();
+	/** Copies a Copy could not delete, told in the next run log write. */
+	private Integer copiesLeft = 0;
 	private Boolean done = false;
 	private String stopReason;
 
@@ -62,7 +75,8 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 	}
 
 	public void execute(QueueableContext context) {
-		Finisher finisher = new Finisher(jobId);
+		Finisher finisher = new Finisher(jobId, BarnHelp.text('Core', 'Core_ArchiveRules_LogStopped'));
+		lastFinisher = finisher;
 		if (context != null) {
 			System.attachFinalizer(finisher);
 		}
@@ -70,6 +84,10 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 			copy(finisher);
 			phase = SETTLE;
 		} else {
+			// A Settle that dies, queuing the next link included, rolls its deletes back: its copies go too.
+			for (String one : copiedNames.keySet()) {
+				finisher.copied.add(new ArchiveStore.Key(objectName, copiedAt, one));
+			}
 			settle();
 			phase = COPY;
 		}
@@ -83,11 +101,10 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 	// -------------------------------------------------------------------------------------
 
 	private void copy(Finisher finisher) {
-		copiedIds = new List<String>();
+		copiedNames = new Map<String, String>();
 		notes = new List<String>();
+		deleteOrphans();
 		try {
-			ArchiveStore.get().deleteRows(orphans);
-			orphans = new List<ArchiveStore.Key>();
 			if (done || remaining == null || remaining <= 0) {
 				done = true;
 				return;
@@ -110,7 +127,7 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 			List<Boolean> saved = ArchiveStore.get().insertRows(rows);
 			for (Integer i = 0; i < rows.size(); i++) {
 				if (saved[i]) {
-					copiedIds.add(rows[i].Original_Id__c);
+					copiedNames.put(rows[i].Original_Id__c, rows[i].Record_Name__c);
 					finisher.copied.add(new ArchiveStore.Key(objectName, copiedAt, rows[i].Original_Id__c));
 				} else {
 					notes.add(note(BarnHelp.text('Core', 'Core_ArchiveRules_NoteNotSaved'), rows[i].Record_Name__c));
@@ -122,20 +139,53 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 		}
 	}
 
+	/** Deletes the copies the last Settle kept out, retrying once; the run log counts any that stay. */
+	private void deleteOrphans() {
+		if (orphans.isEmpty()) {
+			return;
+		}
+		Integer gone = 0;
+		for (Integer tries = 0; tries < 2; tries++) {
+			try {
+				gone = ArchiveStore.get().deleteRows(orphans);
+				break;
+			} catch (Exception notDeleted) {
+				gone = 0;
+			}
+		}
+		copiesLeft += orphans.size() - gone;
+		orphans = new List<ArchiveStore.Key>();
+	}
+
 	/** The rows for a page of Ids, stopping early at the JSON budget; moves the cursor. */
 	@TestVisible
 	private List<Archived_Record__b> rowsFor(List<SObject> page) {
 		BulkDeleteService.Plan checked = BulkDeleteService.plan(queryJson);
 		Schema.DescribeSObjectResult described = checked.objectType.getDescribe(SObjectDescribeOptions.DEFERRED);
+		List<ArchiveRecordJson.ChildKind> kinds = ArchiveRecordJson.childKinds(described);
 		Set<Id> ids = new Map<Id, SObject>(page).keySet();
-		Set<String> fields = fieldNames(checked.objectType);
+		Map<String, String> fieldByObject = new Map<String, String>();
+		Map<Id, Map<String, List<SObject>>> children = childrenOf(kinds, ids, fieldByObject);
+		// Too many children to read at once: the first half of the parents, until one is left.
+		while (children == null && page.size() > 1) {
+			List<SObject> half = new List<SObject>();
+			for (Integer i = 0; i < page.size() / 2; i++) {
+				half.add(page[i]);
+			}
+			page = half;
+			ids = new Map<Id, SObject>(page).keySet();
+			children = childrenOf(kinds, ids, fieldByObject);
+		}
+		Boolean tooMany = children == null;
+		if (tooMany) {
+			children = new Map<Id, Map<String, List<SObject>>>();
+		}
+		Set<String> fields = new Set<String>(BulkDeleteService.backupFieldNames(checked.objectType));
 		fields.add('SystemModstamp');
 		QueryCompiler.Compiled read = QueryCompiler.compileSelection(queryJson, fields, ids);
 		Map<Id, SObject> records = new Map<Id, SObject>(
 			Database.queryWithBinds(read.soql, read.binds, AccessLevel.USER_MODE)
 		);
-		Map<String, String> fieldByObject = new Map<String, String>();
-		Map<Id, Map<String, List<SObject>>> children = childrenOf(described, ids, fieldByObject);
 		Boolean hasOwner = described.fields.getMap().containsKey('OwnerId');
 
 		copiedAt = Datetime.newInstance((Datetime.now().getTime() / 1000) * 1000);
@@ -158,8 +208,8 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 			Map<String, List<SObject>> mine = children.containsKey(record.Id)
 				? children.get(record.Id)
 				: new Map<String, List<SObject>>();
-			String body = ArchiveRecordJson.toJson(record, mine, fieldByObject);
-			if (body.length() > ArchiveRecordJson.MAX_JSON) {
+			String body = tooMany ? null : ArchiveRecordJson.toJson(record, mine, fieldByObject);
+			if (body == null || body.length() > ArchiveRecordJson.MAX_JSON) {
 				notes.add(note(BarnHelp.text('Core', 'Core_ArchiveRules_NoteTooLarge'), name));
 				continue;
 			}
@@ -189,30 +239,37 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 		return rows;
 	}
 
-	/** Each record's cascade-delete children, by record and child object, read in user mode. */
-	private Map<Id, Map<String, List<SObject>>> childrenOf(
-		Schema.DescribeSObjectResult described,
+	/**
+	 * Each record's cascade-delete children, by record and child object, read in user mode; null
+	 * when they come to more than `childRows`. One query per child object, each limited to the
+	 * room left, so the check costs no extra query.
+	 */
+	private static Map<Id, Map<String, List<SObject>>> childrenOf(
+		List<ArchiveRecordJson.ChildKind> kinds,
 		Set<Id> ids,
 		Map<String, String> fieldByObject
 	) {
 		Map<Id, Map<String, List<SObject>>> result = new Map<Id, Map<String, List<SObject>>>();
-		for (ArchiveRecordJson.ChildKind kind : ArchiveRecordJson.childKinds(described)) {
-			Schema.SObjectType childType = NamespaceUtil.objectType(kind.objectName);
+		Integer read = 0;
+		for (ArchiveRecordJson.ChildKind kind : kinds) {
 			fieldByObject.put(kind.objectName, kind.fieldName);
-			List<String> childFields = new List<String>(fieldNames(childType));
-			for (
-				SObject child : Database.queryWithBinds(
-					'SELECT ' +
-						String.join(childFields, ', ') +
-						' FROM ' +
-						kind.objectName +
-						' WHERE ' +
-						kind.fieldName +
-						' IN :ids',
-					new Map<String, Object>{ 'ids' => ids },
-					AccessLevel.USER_MODE
-				)
-			) {
+			List<String> childFields = BulkDeleteService.backupFieldNames(NamespaceUtil.objectType(kind.objectName));
+			List<SObject> found = Database.queryWithBinds(
+				'SELECT ' +
+					String.join(childFields, ', ') +
+					' FROM ' +
+					kind.objectName +
+					' WHERE ' +
+					kind.fieldName +
+					' IN :ids LIMIT :room',
+				new Map<String, Object>{ 'ids' => ids, 'room' => childRows - read + 1 },
+				AccessLevel.USER_MODE
+			);
+			read += found.size();
+			if (read > childRows) {
+				return null;
+			}
+			for (SObject child : found) {
 				Id parentId = (Id) child.get(kind.fieldName);
 				if (!result.containsKey(parentId)) {
 					result.put(parentId, new Map<String, List<SObject>>());
@@ -227,14 +284,6 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 		return result;
 	}
 
-	private static Set<String> fieldNames(Schema.SObjectType type) {
-		Set<String> names = new Set<String>();
-		for (Schema.DescribeFieldResult field : BulkDeleteService.backupFields(type)) {
-			names.add(field.getName());
-		}
-		return names;
-	}
-
 	// -------------------------------------------------------------------------------------
 	// Settle: DML only
 	// -------------------------------------------------------------------------------------
@@ -243,12 +292,12 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 		Integer deleted = 0;
 		Integer kept = 0;
 		try {
-			Set<String> present = copiedIds.isEmpty()
+			Set<String> present = copiedNames.isEmpty()
 				? new Set<String>()
-				: ArchiveStore.get().present(objectName, copiedAt, new Set<String>(copiedIds));
-			for (String copied : copiedIds) {
+				: ArchiveStore.get().present(objectName, copiedAt, copiedNames.keySet());
+			for (String copied : copiedNames.keySet()) {
 				if (!present.contains(copied)) {
-					notes.add(note(BarnHelp.text('Core', 'Core_ArchiveRules_NoteNotSaved'), copied));
+					notes.add(note(BarnHelp.text('Core', 'Core_ArchiveRules_NoteNotSaved'), copiedNames.get(copied)));
 				}
 			}
 			if (!present.isEmpty()) {
@@ -290,7 +339,9 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 				gone++;
 			} else if ((Datetime) original.get('SystemModstamp') > notChangedAfter) {
 				orphans.add(new ArchiveStore.Key(objectName, copiedAt, String.valueOf(one)));
-				notes.add(note(BarnHelp.text('Core', 'Core_ArchiveRules_NoteChanged'), String.valueOf(one)));
+				notes.add(
+					note(BarnHelp.text('Core', 'Core_ArchiveRules_NoteChanged'), copiedNames.get(String.valueOf(one)))
+				);
 			} else {
 				toDelete.add(original);
 			}
@@ -305,7 +356,10 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 				notes.add(
 					String.format(
 						BarnHelp.text('Core', 'Core_ArchiveRules_NoteNotDeleted'),
-						new List<Object>{ toDelete[i].Id, results[i].getErrors()[0].getMessage() }
+						new List<Object>{
+							copiedNames.get(String.valueOf(toDelete[i].Id)),
+							results[i].getErrors()[0].getMessage()
+						}
 					)
 				);
 			}
@@ -323,6 +377,12 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 			FOR UPDATE
 		];
 		List<String> lines = new List<String>{ job.Run_Log__c };
+		if (copiesLeft > 0) {
+			lines.add(
+				BarnHelp.text('Core', 'Core_ArchiveRules_NoteCopiesLeft', new List<Object>{ copiesLeft.format() })
+			);
+			copiesLeft = 0;
+		}
 		for (Integer i = 0; i < Math.min(notes.size(), NOTES_SHOWN); i++) {
 			lines.add(notes[i]);
 		}
@@ -386,6 +446,36 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 		SettingsState.put(new Map<String, Object>{ COUNT_KEY => Math.max(0, now + change) });
 	}
 
+	/**
+	 * The values under `key` in the definitions (Operation JSON) of the Archive jobs still running
+	 * with this `action`: `archive` and `savedQueryId` (R-SQ18), or `restore` and `rowIds`
+	 * (R-ARC4). Read in system mode: the package's own bookkeeping (ADR-0021).
+	 */
+	public static Set<String> running(String action, String key) {
+		Set<String> result = new Set<String>();
+		for (Import_Batch__c job : [
+			SELECT Operation_JSON__c
+			FROM Import_Batch__c
+			WHERE Operation__c = :OPERATION_ARCHIVE AND Status__c = :ImportBatchService.STATUS_COMMITTING
+			WITH SYSTEM_MODE
+			LIMIT 200
+		]) {
+			Map<String, Object> definition = (Map<String, Object>) JSON.deserializeUntyped(job.Operation_JSON__c);
+			Object value = action.equals(definition.get('action')) ? definition.get(key) : null;
+			for (Object one : value instanceof List<Object> ? (List<Object>) value : new List<Object>{ value }) {
+				result.add((String) one);
+			}
+		}
+		return result;
+	}
+
+	/** Refuses to start a rule whose last run is still going (R-SQ18). */
+	public static void requireIdle(Id savedQueryId) {
+		if (savedQueryId != null && running('archive', 'savedQueryId').contains(savedQueryId)) {
+			throw new ArchiveRules.ArchiveRuleException(BarnHelp.text('Core', 'Core_ArchiveRules_ErrorRunning'));
+		}
+	}
+
 	/** Queues the next link, or hands it to a test. */
 	public static void queue(Queueable next) {
 		if (queuedForTest != null) {
@@ -400,33 +490,49 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 	}
 
 	/**
-	 * Marks the job Failed when a link dies unexpectedly, after deleting that link's copies, so a
-	 * record is never left both live and archived. Runs in its own transaction.
+	 * The finalizer of every archive, restore and erasure link: when a link dies unexpectedly it
+	 * deletes that link's copies, so a record is never left both live and archived, then marks the
+	 * job Failed with the run log line `line` (a help text), or, with no job (erasure), logs that
+	 * line, {0} filled with the reason, as an Error. Runs in its own transaction.
 	 */
 	public with sharing class Finisher implements Finalizer {
 		private final Id jobId;
+		private final String line;
 		public List<ArchiveStore.Key> copied = new List<ArchiveStore.Key>();
 
-		public Finisher(Id jobId) {
+		public Finisher(Id jobId, String line) {
 			this.jobId = jobId;
+			this.line = line;
 		}
 
 		public void execute(FinalizerContext context) {
-			if (context == null || context.getResult() != ParentJobResult.UNHANDLED_EXCEPTION) {
-				return;
+			if (context != null && context.getResult() == ParentJobResult.UNHANDLED_EXCEPTION) {
+				stopped(context.getException()?.getMessage());
 			}
+		}
+
+		@TestVisible
+		private void stopped(String reason) {
 			try {
 				ArchiveStore.get().deleteRows(copied);
 			} catch (Exception notDeleted) {
 				// Logged below with the failure; the copies stay and the log says the run failed.
 				copied = new List<ArchiveStore.Key>();
 			}
-			fail(jobId, context.getException()?.getMessage());
+			if (jobId == null) {
+				ErrorLogger.logMessages(
+					new List<String>{ line.replace('{0}', String.valueOf(reason)) },
+					CONTEXT,
+					ErrorLogger.SEVERITY_ERROR
+				);
+			} else {
+				fail(jobId, line, reason);
+			}
 		}
 	}
 
-	/** Marks a job Failed with a reason, logging any failure to do so. Never throws. */
-	public static void fail(Id jobId, String reason) {
+	/** Marks a job Failed with the run log line `line` and a reason, logging any failure to do so. Never throws. */
+	public static void fail(Id jobId, String line, String reason) {
 		try {
 			Import_Batch__c job = DataJobs.forFinish(jobId);
 			Database.update(
@@ -434,11 +540,7 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 					Id = jobId,
 					Status__c = ImportBatchService.STATUS_FAILED,
 					Completed_At__c = Datetime.now(),
-					Run_Log__c = (job.Run_Log__c +
-						'\n' +
-						BarnHelp.text('Core', 'Core_ArchiveRules_LogStopped') +
-						(reason == null ? '' : ' ' + reason))
-						.right(32768)
+					Run_Log__c = (job.Run_Log__c + '\n' + line + (reason == null ? '' : ' ' + reason)).right(32768)
 				),
 				AccessLevel.SYSTEM_MODE
 			);

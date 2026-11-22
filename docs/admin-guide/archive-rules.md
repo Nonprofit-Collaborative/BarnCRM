@@ -9,7 +9,9 @@ Date is more than 1825 days ago goes to the big object, every Sunday night".
 Each rule sends its records to one **destination**:
 
 - **Files (CSV):** the records are saved as a CSV file in your **Files**, then deleted, as
-  [Archive by Query](archive-by-query.md) does. The Recycle Bin is left as it is.
+  [Archive by Query](archive-by-query.md) does. The Recycle Bin is left as it is. The file holds
+  only the records the query finds: the related records Salesforce deletes with them are not in
+  it, so they are kept only in the Recycle Bin, for 15 days.
 - **Big Object:** each record, with every field you can read and the related records Salesforce
   would delete with it, is copied into BarnCRM's **Archived Record** big object, then deleted.
   Big object rows do not use your data storage.
@@ -17,7 +19,12 @@ Each rule sends its records to one **destination**:
   Files as with **Files (CSV)**, the file is sent to your backup destination, and records are
   deleted only once every part of the file was accepted. It needs BarnCRM Connector with a
   connection set as the **Backup Destination** ([BarnCRM Connector, Backup Destination](connector.md#backup-destination)); until then it
-  shows as not set up and a rule cannot use it.
+  shows as not set up and a rule cannot use it. As with **Files (CSV)**, the file holds only the
+  records the query finds, so their related records are kept only in the Recycle Bin, for 15
+  days.
+
+Only **Big Object** keeps the related records with each record. Choose it when you may need them
+back.
 
 A record is only deleted after its copy is saved and read back. A record changed after the run
 started is left alone and named in the run's log.
@@ -53,7 +60,9 @@ Maria wants closed lost opportunities older than five years out of the way every
    number, as a bulk delete does. Type it and press **Save**.
 6. To run it now instead of waiting, press **Preview and Run**. The preview names five of the
    records and any related records Salesforce deletes with them. Type the count and press **Run
-   Now**. The run appears under **Recent Runs** and updates until it ends.
+   Now**. The run appears under **Recent Runs** and updates until it ends. While it runs, **Run
+  Now** stays off for that rule and says why, and the nightly run skips it (the Error Log says
+  so): a rule runs once at a time.
 
 ## 4. Limits
 
@@ -64,7 +73,8 @@ Maria wants closed lost opportunities older than five years out of the way every
   and says so. To make room, move records back or delete them from the archive. BarnCRM never
   goes past the included amount.
 - **Record size.** A record whose fields and related records add up to more than 131,072
-  characters is not archived; the run log names it and it stays where it is.
+  characters, or that has more than 2,000 related records, is not archived; the run log names it
+  and it stays where it is. Records with many related records are moved fewer at a time.
 - **Related records.** The records Salesforce deletes with a record (the kinds the preview lists)
   are saved inside it, one level deep. Their own related records are deleted by Salesforce and go
   to the Recycle Bin. Records that only look up to an archived record keep their record but lose
@@ -80,8 +90,12 @@ Maria wants closed lost opportunities older than five years out of the way every
 - A rule is a saved query: rename, share or delete it in Find. Only its owner can edit or remove
   the rule; someone it is shared with can preview and run it.
 - Each big object run is a data job with Operation **Archive**. **Recent Runs** shows how many
-  records each run moved and left out, and its log says why each one was left out. A Files run
+  records each run moved and left out, and its log names each one left out and says why. A Files run
   is an Archive by Query delete job, listed in Data Jobs.
+- If a run stops unexpectedly, its log says so and the run is **Failed**: records already moved
+  stay archived, the rest stay where they were, and running the rule again continues. In the rare
+  case an archived copy of a record that was kept cannot be removed, the log counts it: that
+  record is then both live and archived, so do not restore that copy.
 
 ## 6. Archived Records: Looking Records Up
 
@@ -110,7 +124,8 @@ Restore needs the same permissions as running a rule (section 2).
 1. In **Archived Records**, show a page of records and tick the ones to move back (up to 50, all
    of one kind, on one page).
 2. Press **Restore** and confirm. The restore runs in the background; its log is under **Recent
-   Runs** in **Archive Rules**.
+   Runs** in **Archive Rules**. The page is read again at once. A record already in a restore
+   that is still running cannot be restored again until that restore ends: the panel says so.
 
 What a restore does:
 
@@ -128,6 +143,8 @@ What a restore does:
 - Once records are created, their archived rows are removed and the **Archived records** count
   goes down. If a row cannot be removed, the log names the record, which is then both live and
   archived.
+- If a restore stops unexpectedly, it is **Failed** and its log says so: records already restored
+  stay restored, and the rest are still in the archive, so restore them again.
 
 ## 8. Erasing a Person
 
@@ -135,7 +152,8 @@ When you [erase a person](erase-a-person.md), archived records that are that per
 name them in a lookup (for example a gift whose donor was the person), are deleted from the
 archive in the background once the erasure is saved. The erasure summary lists **Archived
 records** as deleted, counted rather than listed. A preview deletes nothing. The archived record
-count goes down when the background work ends.
+count goes down when the background work ends. If that background work stops unexpectedly, an
+Error in the Error Log says so, naming no record: some archived records may still name the person.
 
 ## Field Reference
 

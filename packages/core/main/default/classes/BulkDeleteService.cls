@@ -417,13 +417,9 @@ public with sharing class BulkDeleteService {
 		Import_Batch__c job = jobFields(checked, count, confirmedCount);
 		job.Run_Log__c += '\n' + BarnHelp.text('Core', 'Core_Archive_LogSaving');
 		Database.insert(job, AccessLevel.SYSTEM_MODE);
-		List<String> fields = new List<String>();
-		for (Schema.DescribeFieldResult field : backupFields(checked.objectType)) {
-			fields.add(field.getName());
-		}
 		String tag = EncodingUtil.convertToHex(Crypto.generateAesKey(128)).left(6);
 		job.Job_Id__c = AsyncStarter.batch(
-			FindExportBatch.forArchive(queryJson, fields, tag, confirmedCount, job.Id),
+			FindExportBatch.forArchive(queryJson, backupFieldNames(checked.objectType), tag, confirmedCount, job.Id),
 			BACKUP_PAGE_SIZE,
 			'BulkDeleteService'
 		);
@@ -817,6 +813,15 @@ public with sharing class BulkDeleteService {
 			);
 		}
 		return page;
+	}
+
+	/** The API names of `backupFields`, in the same order: what an archive or a Backup Set saves. */
+	public static List<String> backupFieldNames(Schema.SObjectType type) {
+		List<String> names = new List<String>();
+		for (Schema.DescribeFieldResult field : backupFields(type)) {
+			names.add(field.getName());
+		}
+		return names;
 	}
 
 	/**

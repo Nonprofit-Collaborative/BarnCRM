@@ -1,7 +1,11 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import getHome from '@salesforce/apex/ScholarshipsController.getHome';
 import AWARD_PROGRAM from '@salesforce/schema/Award_Program__c';
+import AWARD_APPLICATION from '@salesforce/schema/Award_Application__c';
+import AWARD from '@salesforce/schema/Award__c';
+import APPLICATION_REVIEW from '@salesforce/schema/Application_Review__c';
 import exportDisbursements from '@salesforce/apex/ScholarshipsController.exportDisbursements';
 import { localIsoDate, messageFrom } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
@@ -11,15 +15,23 @@ import { recordHref } from 'c/barnFormat';
 
 const PKG = 'Scholarships';
 
+/** An object's list, from its schema import so the name carries any namespace. */
+function listHref(schema) {
+  return `/lightning/o/${schema.objectApiName}/list`;
+}
+
 /**
- * The Scholarships and Grants page (SG-03, SG-05, SG-10): my reviews to do, cycles open or in
- * review, disbursements due in 30 days with any held back, and, for a holder of Manage
- * Scholarships, Export Disbursements as a CSV built here (`c/scholarshipsModel`). Before the
- * first award program, a first-run panel offers New Award Program (D-200 R4).
+ * Scholarships Home (SG-03, SG-05, SG-10): New Award Program for whoever may create one, the
+ * figures row (active award programs, my reviews to do, applications in review, awards this
+ * year), my reviews to do, cycles open or in review, disbursements due in 30 days with any held
+ * back, and, for a holder of Manage Scholarships, Export Disbursements as a CSV built here
+ * (`c/scholarshipsModel`). Before the first award program, a first-run panel offers New Award
+ * Program (D-200 R4).
  */
 export default class ScholarshipsHome extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded([PKG]);
   icon = iconFor('Scholarships');
+  canCreate = false;
   home;
   isLoading = true;
   isWorking = false;
@@ -64,9 +76,50 @@ export default class ScholarshipsHome extends NavigationMixin(LightningElement) 
     return this.home?.canManage === true;
   }
 
+  /** New Award Program shows only to someone who may create award programs. */
+  @wire(getObjectInfo, { objectApiName: AWARD_PROGRAM })
+  receiveProgramInfo({ data }) {
+    this.canCreate = Boolean(data && data.createable);
+  }
+
   /** True before the org's first award program, for someone who may create one. */
   get firstRun() {
     return this.home?.firstRun === true;
+  }
+
+  get showTiles() {
+    return Boolean(this.home) && !this.firstRun;
+  }
+
+  /** The figures row (Module Home pattern), each a link to the list behind it. */
+  get tiles() {
+    const figures = this.home?.figures || {};
+    return [
+      {
+        key: 'programs',
+        label: helpText('Scholarships', 'Scholarships_Home_FigurePrograms'),
+        value: figures.programs || 0,
+        href: listHref(AWARD_PROGRAM)
+      },
+      {
+        key: 'my-reviews',
+        label: helpText('Scholarships', 'Scholarships_Home_FigureMyReviews'),
+        value: this.reviews.length,
+        href: listHref(APPLICATION_REVIEW)
+      },
+      {
+        key: 'review',
+        label: helpText('Scholarships', 'Scholarships_Home_FigureInReview'),
+        value: figures.review || 0,
+        href: listHref(AWARD_APPLICATION)
+      },
+      {
+        key: 'awards',
+        label: helpText('Scholarships', 'Scholarships_Home_FigureAwards'),
+        value: figures.awards || 0,
+        href: listHref(AWARD)
+      }
+    ];
   }
 
   handleNewProgram() {

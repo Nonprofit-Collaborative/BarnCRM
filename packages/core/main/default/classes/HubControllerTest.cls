@@ -374,11 +374,8 @@ private class HubControllerTest {
 		System.runAs(TestUsers.admin()) {
 			SetupAssistantTestExtension.useNone();
 			Datetime ranAt = Datetime.now().addHours(-2);
-			OrgSettingsSystemWriter.save(
-				new Map<Schema.SObjectField, Object>{
-					BarnCRM_Settings__c.Health_Check_Last_Run__c => ranAt,
-					BarnCRM_Settings__c.Health_Check_Last_Result__c => '1,2,3'
-				}
+			SettingsState.put(
+				new Map<String, Object>{ 'Health_Check_Last_Run__c' => ranAt, 'Health_Check_Last_Result__c' => '1,2,3' }
 			);
 			String moduleName = ModuleDetectionService.MODULE_ORG_OPTIMIZER;
 
@@ -409,10 +406,10 @@ private class HubControllerTest {
 		System.runAs(TestUsers.admin()) {
 			Assert.areEqual('4,0,1', HealthCheckResult.text(4, 0, 1));
 			for (String stored : new List<String>{ '1,2', 'a,b,c', null }) {
-				OrgSettingsSystemWriter.save(
-					new Map<Schema.SObjectField, Object>{
-						BarnCRM_Settings__c.Health_Check_Last_Run__c => Datetime.now(),
-						BarnCRM_Settings__c.Health_Check_Last_Result__c => stored
+				SettingsState.put(
+					new Map<String, Object>{
+						'Health_Check_Last_Run__c' => Datetime.now(),
+						'Health_Check_Last_Result__c' => stored
 					}
 				);
 				HealthCheckResult.Counts counts = HealthCheckResult.read();

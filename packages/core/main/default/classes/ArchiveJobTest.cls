@@ -166,7 +166,15 @@ private class ArchiveJobTest {
 			BigObjectArchiveJob.addToCount(1);
 		}
 		System.runAs(archivist()) {
-			System.Assert.isNotNull(new ArchiveToBigObject().unavailableReason(), 'At the cap it is refused');
+			System.Assert.areEqual(
+				BarnHelp.text(
+					'Core',
+					'Core_ArchiveRules_BigObjectFull',
+					new List<Object>{ BigObjectArchiveJob.CAP.format() }
+				),
+				new ArchiveToBigObject().unavailableReason(),
+				'At the cap it is refused in plain words, not as a run log line'
+			);
 		}
 	}
 
@@ -182,16 +190,176 @@ private class ArchiveJobTest {
 				Committed_By__c = UserInfo.getUserId()
 			);
 			insert as system job;
-			new BigObjectArchiveJob.Finisher(job.Id).execute(null);
+			BigObjectArchiveJob.Finisher finisher = new BigObjectArchiveJob.Finisher(
+				job.Id,
+				BarnHelp.text('Core', 'Core_ArchiveRules_LogStopped')
+			);
+			finisher.execute(null);
 			System.Assert.areEqual(
 				ImportBatchService.STATUS_COMMITTING,
 				reread(job.Id).Status__c,
 				'No context, no change'
 			);
-			BigObjectArchiveJob.fail(job.Id, 'Because');
+			finisher.stopped('Because');
 		}
 		job = reread(job.Id);
 		System.Assert.areEqual(ImportBatchService.STATUS_FAILED, job.Status__c, 'Failed');
-		System.Assert.isTrue(job.Run_Log__c.endsWith('Because'), 'With the reason');
+		System.Assert.isTrue(
+			job.Run_Log__c.endsWith(BarnHelp.text('Core', 'Core_ArchiveRules_LogStopped') + ' Because'),
+			'An archive run says to run the rule again, with the reason: ' + job.Run_Log__c
+		);
+	}
+
+	@IsTest
+	static void aSettleThatCannotQueueTheNextLinkTakesItsCopiesBack() {
+		System.runAs(TestUsers.admin()) {
+			makePeople(2);
+		}
+		ArchiveStoreMemory store = ArchiveStoreMemory.install();
+		BigObjectArchiveJob.queuedForTest = new List<Object>();
+		Import_Batch__c job;
+		System.runAs(archivist()) {
+			job = ArchiveDestinations.forKey(ArchiveRules.BIG_OBJECT)
+				.start(new ArchiveRun(null, 'Old Volunteers', VOLUNTEERS, 'Contact', 2));
+			((Queueable) BigObjectArchiveJob.queuedForTest.remove(0)).execute(null);
+			System.Assert.areEqual(2, store.rowsByKey.size(), 'The Copy saved both');
+			Queueable settle = (Queueable) BigObjectArchiveJob.queuedForTest.remove(0);
+			BigObjectArchiveJob.queuedForTest = null;
+			AsyncStarter.busyForTest = true;
+			try {
+				settle.execute(null);
+				System.Assert.fail('The next link could not be queued');
+			} catch (AsyncStarter.BusyException expected) {
+				// The platform rolls the Settle back and runs its finisher, as below.
+				BigObjectArchiveJob.lastFinisher.stopped(expected.getMessage());
+			}
+		}
+		System.Assert.areEqual(0, store.rowsByKey.size(), 'The Settle copies deleted, never left archived and live');
+		System.Assert.areEqual(ImportBatchService.STATUS_FAILED, reread(job.Id).Status__c, 'Failed');
+	}
+
+	@IsTest
+	static void copiesASettleKeptAreDeletedWithOneRetryAndCountedWhenTheyStay() {
+		System.runAs(TestUsers.admin()) {
+			makePeople(1);
+		}
+		ArchiveStoreMemory store = ArchiveStoreMemory.install();
+		BigObjectArchiveJob.queuedForTest = new List<Object>();
+		Datetime at = Datetime.newInstance((Datetime.now().getTime() / 1000) * 1000).addDays(-1);
+		store.insertRows(
+			new List<Archived_Record__b>{
+				new Archived_Record__b(Object_Name__c = 'Contact', Archived_At__c = at, Original_Id__c = 'kept1'),
+				new Archived_Record__b(Object_Name__c = 'Contact', Archived_At__c = at, Original_Id__c = 'kept2')
+			}
+		);
+		String left = BarnHelp.text('Core', 'Core_ArchiveRules_NoteCopiesLeft', new List<Object>{ '1' });
+		Import_Batch__c job;
+		System.runAs(archivist()) {
+			// One refusal: the retry deletes the copy there; the one already gone is counted.
+			job = ArchiveDestinations.forKey(ArchiveRules.BIG_OBJECT)
+				.start(new ArchiveRun(null, 'Old Volunteers', VOLUNTEERS, 'Contact', 1));
+			BigObjectArchiveJob first = (BigObjectArchiveJob) BigObjectArchiveJob.queuedForTest[0];
+			first.orphans.add(new ArchiveStore.Key('Contact', at, 'kept1'));
+			first.orphans.add(new ArchiveStore.Key('Contact', at, 'gone'));
+			store.deletesRefused = 1;
+			drain();
+		}
+		Import_Batch__c finished = reread(job.Id);
+		System.Assert.areEqual(
+			ImportBatchService.STATUS_COMPLETE,
+			finished.Status__c,
+			'Complete: ' + finished.Run_Log__c
+		);
+		System.Assert.isTrue(finished.Run_Log__c.contains(left), 'One copy counted as left: ' + finished.Run_Log__c);
+		System.Assert.areEqual(1, finished.Rows_Deleted__c, 'The run went on');
+
+		System.runAs(TestUsers.admin()) {
+			makePeople(1);
+		}
+		// The second run gets its own limits, as a later run would.
+		Test.startTest();
+		System.runAs(archivist()) {
+			// Refused twice: the copy stays, the log counts it, and the chain still ends.
+			job = ArchiveDestinations.forKey(ArchiveRules.BIG_OBJECT)
+				.start(new ArchiveRun(null, 'Old Volunteers', VOLUNTEERS, 'Contact', 1));
+			((BigObjectArchiveJob) BigObjectArchiveJob.queuedForTest[0])
+				.orphans.add(new ArchiveStore.Key('Contact', at, 'kept2'));
+			store.deletesRefused = 2;
+			drain();
+		}
+		Test.stopTest();
+		finished = reread(job.Id);
+		System.Assert.isTrue(finished.Run_Log__c.contains(left), 'Counted: ' + finished.Run_Log__c);
+		Integer stayed = 0;
+		for (Archived_Record__b row : store.rowsByKey.values()) {
+			stayed += row.Original_Id__c.startsWith('kept') ? 1 : 0;
+		}
+		System.Assert.areEqual(1, stayed, 'Only the copy refused twice stays');
+	}
+
+	@IsTest
+	static void aChunkWhoseChildrenAreTooManyIsHalvedAndALoneParentLeftOut() {
+		DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
+		Map<String, Integer> childrenByName = new Map<String, Integer>{
+			'Kids Org A' => 2,
+			'Kids Org B' => 2,
+			'Kids Org C' => 6
+		};
+		System.runAs(TestUsers.admin()) {
+			Map<String, Account> orgs = new Map<String, Account>();
+			for (String name : childrenByName.keySet()) {
+				orgs.put(name, TestDataFactory.organization(new Account(Name = name)));
+			}
+			insert orgs.values();
+			List<Contact> kids = new List<Contact>();
+			for (String name : childrenByName.keySet()) {
+				for (Integer i = 0; i < childrenByName.get(name); i++) {
+					kids.add(
+						TestDataFactory.person(new Contact(LastName = name + ' ' + i, AccountId = orgs.get(name).Id))
+					);
+				}
+			}
+			insert kids;
+		}
+		String orgsQuery = VOLUNTEERS.replace('"Contact"', '"Account"')
+			.replace('"LastName"', '"Name"')
+			.replace('"Title"', '"Name"')
+			.replace('"equals"', '"contains"')
+			.replace('"Volunteer"', '"Kids Org"');
+		ArchiveStoreMemory.install();
+		BigObjectArchiveJob.queuedForTest = new List<Object>();
+		// Each organization with two children fits alone; the one with six never does.
+		BigObjectArchiveJob.childRows = 5;
+		// An organization has many kinds of cascade-delete children, each a query per Copy, so
+		// the test reads the rows of single Copies rather than running the whole chain.
+		Test.startTest();
+		System.runAs(archivist()) {
+			ArchiveDestinations.forKey(ArchiveRules.BIG_OBJECT)
+				.start(new ArchiveRun(null, 'Old Orgs', orgsQuery, 'Account', 3));
+			BigObjectArchiveJob first = (BigObjectArchiveJob) BigObjectArchiveJob.queuedForTest[0];
+			List<Account> page = [
+				SELECT Id, Name
+				FROM Account
+				WHERE Name LIKE 'Kids Org%'
+				WITH SYSTEM_MODE
+				ORDER BY Id
+			];
+			List<Archived_Record__b> rows = first.rowsFor(page);
+			System.Assert.areEqual(1, rows.size(), 'Halved to the first organization: ' + first.notes);
+			System.Assert.areEqual(String.valueOf(page[0].Id), rows[0].Original_Id__c, 'The first one');
+
+			Account tooMany = page[2].Name == 'Kids Org C'
+				? page[2]
+				: [
+						SELECT Id, Name
+						FROM Account
+						WHERE Name = 'Kids Org C'
+						WITH SYSTEM_MODE
+				  ];
+			rows = first.rowsFor(new List<SObject>{ tooMany });
+			System.Assert.isTrue(rows.isEmpty(), 'The organization with too many children is left out');
+			System.Assert.isTrue(String.join(first.notes, ' ').contains('Kids Org C'), 'By name: ' + first.notes);
+		}
+		Test.stopTest();
 	}
 }

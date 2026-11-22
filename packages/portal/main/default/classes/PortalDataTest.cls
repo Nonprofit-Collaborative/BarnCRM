@@ -94,10 +94,7 @@ private class PortalDataTest {
 	static void aBrandedPortalSendsItsBrandToTheClient() {
 		System.runAs(TestUsers.adminWith('Portal_Admin')) {
 			Fixture f = fixture();
-			BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
-			settings.Brand_Management__c = true;
-			upsert settings;
-			SettingsService.clearCaches();
+			SettingsService.setForTest('Brand_Management__c', true);
 			Brand__c thrift = new Brand__c(Name = 'Barn Thrift', Primary_Color__c = '#1B5E20', City__c = 'Shelbyville');
 			insert thrift;
 			f.session.portal.Brand__c = thrift.Id;

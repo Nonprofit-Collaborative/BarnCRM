@@ -96,6 +96,24 @@ private class ArchiveErasureTest {
 	}
 
 	@IsTest
+	static void aLinkThatDiesLogsAnError() {
+		System.runAs(TestUsers.admin()) {
+			// The erasure chain's finalizer: no job, so an Error naming no record.
+			BigObjectArchiveJob.Finisher finisher = new BigObjectArchiveJob.Finisher(
+				null,
+				BarnHelp.text('Core', 'Core_ArchiveErasure_Stopped')
+			);
+			finisher.execute(null);
+			System.Assert.areEqual(0, [SELECT COUNT() FROM Error_Log__c WITH SYSTEM_MODE], 'No context, no log');
+			finisher.stopped('Because');
+			Test.getEventBus().deliver();
+			Error_Log__c logged = [SELECT Severity__c, Message__c FROM Error_Log__c WITH SYSTEM_MODE LIMIT 1];
+			System.Assert.areEqual(ErrorLogger.SEVERITY_ERROR, logged.Severity__c, 'An Error');
+			System.Assert.isTrue(logged.Message__c.contains('Because'), 'With the reason: ' + logged.Message__c);
+		}
+	}
+
+	@IsTest
 	static void queuesNothingWhenTheArchiveIsEmpty() {
 		System.runAs(TestUsers.admin()) {
 			ArchiveStoreMemory.install();

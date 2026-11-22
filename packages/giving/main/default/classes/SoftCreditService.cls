@@ -48,14 +48,7 @@ public with sharing class SoftCreditService {
 	 * or unreadable setting is treated as on, because that is what the package ships with.
 	 */
 	public static Boolean automaticHouseholdCreditsEnabled() {
-		Object stored = SettingsService.getValue(SETTINGS_OBJECT, SETTING_AUTOMATIC_HOUSEHOLD_CREDITS);
-		if (stored == null) {
-			return true;
-		}
-		if (stored instanceof Boolean) {
-			return (Boolean) stored;
-		}
-		return Boolean.valueOf(String.valueOf(stored));
+		return SettingsService.flag(SETTINGS_OBJECT, SETTING_AUTOMATIC_HOUSEHOLD_CREDITS);
 	}
 
 	/**

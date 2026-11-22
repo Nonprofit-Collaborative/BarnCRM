@@ -67,7 +67,9 @@ public with sharing class FindExportBatch implements Database.Batchable<SObject>
 		FindExportBatch archive = new FindExportBatch(queryJson, null, tag, rowLimit);
 		archive.archiveFields = new Set<String>(fields);
 		archive.archiveJobId = jobId;
-		archive.partChars = Math.min(charsPerPart, archiveCharsPerPart);
+		// Smaller still when the destination asks: a multipart request holds the part more than once.
+		Integer asked = OffPlatformSendBatch.destination()?.partChars();
+		archive.partChars = Math.min(charsPerPart, Math.min(archiveCharsPerPart, asked ?? archiveCharsPerPart));
 		return archive;
 	}
 

@@ -24,7 +24,10 @@ Core names no module: everything below ships in the module's own package.
    every package shares one namespace, so two packages cannot ship the same DeveloperName, and
    group plus key cannot repeat. Prefer the module's name at the front of a new DeveloperName.
 
-`check-setting-defaults.py` enforces 2 and 3 and the registry's shape; `check-custom-metadata.py`
+A module row's `Picklist_Values__c` is at most 255 characters: `ModuleSettings` reads module rows
+through `SettingDefinitionSelector.getAllShortFields()`, which cuts long text to 255.
+
+`check-setting-defaults.py` enforces 2 and 3, the 255 character limit and the registry's shape; `check-custom-metadata.py`
 stops requiring a registered group's keys to be fields of an object.
 
 Nothing else changes for a row to appear on BarnCRM Settings: the console's module sections
@@ -47,7 +50,9 @@ throws:
 | `value(name)` | the raw parsed value (Boolean, Integer, Decimal, String) |
 
 `SettingsService.flag/number/text/getValue(group, key)` keep working for a registered group,
-so a module can move its readers in any order. Replace every `X_Settings__c.getOrgDefaults()`
+so a module can move its readers in any order. Prefer the typed readers: they apply the row's
+`Default_Value__c`, so the reader keeps no default of its own (`getValue` returns only what the
+org saved). Replace every `X_Settings__c.getOrgDefaults()`
 and `SettingsRecordSelector` read of the module's object; a formula, validation rule or flow
 that reads `$Setup.X_Settings__c` cannot read custom metadata records an org creates, so that
 logic moves to Apex.
@@ -63,8 +68,14 @@ logic moves to Apex.
   Succeeded, Failed (with Salesforce's reason) or Pending.
 - Values saved are read back in the same transaction; other transactions see them once the
   deployment ends. Never save from a trigger or a scheduled job: that is run state.
-- Tests: `ModuleSettings.setForTest(name, value)` puts a value in the store as if deployed; a
-  save in a test applies at once and runs the callback (no metadata is deployed).
+- Tests: `ModuleSettings.setForTest(name, value)` (Core: `SettingsService.setForTest(key,
+  value)`) puts a value in the store as if deployed, for one transaction: a value set in
+  `@TestSetup` does not reach the test methods, so set it in a `static { }` block or in each
+  method. A save in a test applies at once and runs the callback (no metadata is deployed).
+  Put run state with `SettingsState.put`, whose rows outlast `@TestSetup`. Do not write the
+  legacy custom setting record: it is read only until carry-over. A test that writes or deletes
+  a module's legacy record after reading it calls `ModuleSettings.clearLegacyCache()`, since
+  `clearCache()` keeps the legacy records read.
 
 ## 4. Run state
 

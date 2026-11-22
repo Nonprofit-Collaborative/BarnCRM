@@ -548,15 +548,11 @@ private class DataHygieneServiceTest {
 				DataHygieneService.staleYears(),
 				'Empty reads as the default.'
 			);
-			BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
-			settings.Stale_Record_Years__c = 50;
-			HouseholdTestDataFactory.save(settings);
+			SettingsService.setForTest('Stale_Record_Years__c', 50);
 			Assert.areEqual(20, DataHygieneService.staleYears(), 'Above the maximum reads as 20.');
-			settings.Stale_Record_Years__c = 0;
-			HouseholdTestDataFactory.save(settings);
+			SettingsService.setForTest('Stale_Record_Years__c', 0);
 			Assert.areEqual(1, DataHygieneService.staleYears(), 'Below the minimum reads as 1.');
-			settings.Stale_Record_Years__c = 3;
-			HouseholdTestDataFactory.save(settings);
+			SettingsService.setForTest('Stale_Record_Years__c', 3);
 			insertWithoutAutomaticHouseholds(HouseholdTestDataFactory.manyContacts(200, 'Fresh'));
 			User maria = maria();
 

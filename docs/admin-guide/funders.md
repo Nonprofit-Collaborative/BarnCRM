@@ -222,6 +222,8 @@ it stores nothing. At the top, tiles show **Revenue This Fiscal Year**, **Awarde
 Year**, with Fundraising **Gifts to Funds**, and, with restricted fund tracking, **Restricted Grants:
 Balance**. Under them, a tile for each Grants tab the person can open (Grant Pipeline, Grant
 Calendar, Grants, Grant Requirements, Grant Answers and, for admins, Funder Report Templates).
+Until the org has a grant, the page opens on **Track Your First Grant** for anyone who may create
+one (D-200 R4), with **New Grant**, instead of empty figures.
 
 - **Revenue Mix**: grants awarded this fiscal year (stage Awarded, decision date this fiscal year)
   totaled by **Funding Source**, and, with Fundraising, one more line for gifts designated to funds
