@@ -1,4 +1,4 @@
-# ADR-NEXT: One-Field Rules Ship as Before-Save Flows That Read Their Own Switch
+# ADR-0246: One-Field Rules Ship as Before-Save Flows That Read Their Own Switch
 
 **Status:** Proposed (builder decision under owner decision D-219, release 1.36 item PF-03)
 **Date:** 2026-11-22

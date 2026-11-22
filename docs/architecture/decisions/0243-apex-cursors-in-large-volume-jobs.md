@@ -1,4 +1,4 @@
-# ADR-NEXT: Apex Cursors in Large-Volume Jobs
+# ADR-0243: Apex Cursors in Large-Volume Jobs
 
 **Status:** Proposed
 **Date:** 2026-11-22

@@ -1,6 +1,6 @@
 /**
  * That Completed Date follows Status however the status was changed: by the package, or by a person
- * editing the plan. The before-save flow Stewardship_Plan_Completed_Date does the work (ADR-NEXT,
+ * editing the plan. The before-save flow Stewardship_Plan_Completed_Date does the work (ADR-0246,
  * before-save flows); record-triggered flows run in Apex tests, so these saves exercise it.
  */
 @IsTest(testFor='ApexTrigger:StewardshipPlanTrigger')

@@ -83,7 +83,7 @@
     </rules>
   </decisions>
   <description
-  >BarnCRM automation "Data Subject Request: set the due date" (registry row Data_Subject_Request_Due, canonical model R-DS1). A blank Due Date takes the Received Date plus 30 days; when the Received Date changes and the Due Date is still the old Received Date plus 30 (never edited), it follows the new date. A Due Date a person set stays as set. Switch it off on the Automation page of BarnCRM Settings, never by deactivating this flow: an upgrade can activate it again. To change the rule, Save As your own flow, list it on the Automation page, and switch this one off. See ADR-NEXT (before-save flows) and the admin guide page automation-control.md.</description>
+  >BarnCRM automation "Data Subject Request: set the due date" (registry row Data_Subject_Request_Due, canonical model R-DS1). A blank Due Date takes the Received Date plus 30 days; when the Received Date changes and the Due Date is still the old Received Date plus 30 (never edited), it follows the new date. A Due Date a person set stays as set. Switch it off on the Automation page of BarnCRM Settings, never by deactivating this flow: an upgrade can activate it again. To change the rule, Save As your own flow, list it on the Automation page, and switch this one off. See ADR-0246 (before-save flows) and the admin guide page automation-control.md.</description>
   <environments>Default</environments>
   <formulas>
     <description>The Received Date plus 30 days.</description>

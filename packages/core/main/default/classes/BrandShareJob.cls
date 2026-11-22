@@ -32,7 +32,7 @@ public with sharing class BrandShareJob implements Queueable {
 	private final Boolean full;
 	private final Set<Id> accountIds;
 	/**
-	 * A full run's Brand Assignments, read once and carried from page to page (ADR-NEXT Apex
+	 * A full run's Brand Assignments, read once and carried from page to page (ADR-0243 Apex
 	 * cursors in large-volume jobs). `position` is the next row to fetch, `lastId` the last Id
 	 * fetched, from which the cursor is opened again if the platform has let it go.
 	 */

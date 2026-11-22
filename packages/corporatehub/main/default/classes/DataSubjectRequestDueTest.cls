@@ -1,7 +1,7 @@
 /**
  * A data subject request's due date follows its received date: one month on, unless a person
  * set it (R-DS1). The before-save flow Data_Subject_Request_Due does the work and follows the
- * BarnCRM switches (ADR-NEXT, before-save flows); record-triggered flows run in Apex tests.
+ * BarnCRM switches (ADR-0246, before-save flows); record-triggered flows run in Apex tests.
  */
 @IsTest(testFor='ApexTrigger:DataSubjectRequestTrigger')
 private class DataSubjectRequestDueTest {

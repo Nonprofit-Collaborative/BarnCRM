@@ -22,7 +22,7 @@ And every Template_*.flow-meta.xml in Core:
 
 Scoped to Core. Giving's rows join when Giving's templates, or its reasons, are written.
 
-Packaged before-save flows (ADR-NEXT, before-save flows), in every package: a flow that is
+Packaged before-save flows (ADR-0246, before-save flows), in every package: a flow that is
 not a template is a packaged automation, and
 
 - is named after a registry row with no Handler_Class__c (its switch), and every such row has

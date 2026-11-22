@@ -53,7 +53,7 @@
     </rules>
   </decisions>
   <description
-  >BarnCRM automation "Stewardship Plan: set the completed date" (registry row Stewardship_Plan_Completed_Date). Keeps a plan's Completed Date in step with its Status, so the Completed_Date_Matches_Status validation rule accepts a status changed by hand: a plan set to Complete or Cancelled with no date gets today, a typed date is kept, and a plan set back to Running loses its date. It always runs (ADR-0024): without it a status changed by hand is refused by the validation rule, so it reads no switch, pause or bypass, and its row on the Automation page cannot be switched off. See ADR-NEXT (before-save flows).</description>
+  >BarnCRM automation "Stewardship Plan: set the completed date" (registry row Stewardship_Plan_Completed_Date). Keeps a plan's Completed Date in step with its Status, so the Completed_Date_Matches_Status validation rule accepts a status changed by hand: a plan set to Complete or Cancelled with no date gets today, a typed date is kept, and a plan set back to Running loses its date. It always runs (ADR-0024): without it a status changed by hand is refused by the validation rule, so it reads no switch, pause or bypass, and its row on the Automation page cannot be switched off. See ADR-0246 (before-save flows).</description>
   <environments>Default</environments>
   <interviewLabel>Stewardship Plan: set the completed date {!$Flow.CurrentDateTime}</interviewLabel>
   <label>Stewardship Plan: set the completed date</label>

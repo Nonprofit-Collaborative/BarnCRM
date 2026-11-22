@@ -92,7 +92,7 @@
     </rules>
   </decisions>
   <description
-  >Template for a one-field rule as a before-save (fast field update) flow that follows the BarnCRM switches. The example fills a blank mailing country on a contact. Save As a new flow, change the object, the entry condition, the field and the value, set cSwitchName to Flow: and your copy's API name, activate it, and list it on the Automation page of BarnCRM Settings so it gets a switch. Keep the Automation Control decision and the switch lookup: they make your rule stop with BarnCRM's own automation for a pause, a bypassed user, or its own switch. A before-save flow cannot call the Check BarnCRM Automation action, so it reads the same things directly. See ADR-NEXT (before-save flows) and the admin guide page automation-control.md.</description>
+  >Template for a one-field rule as a before-save (fast field update) flow that follows the BarnCRM switches. The example fills a blank mailing country on a contact. Save As a new flow, change the object, the entry condition, the field and the value, set cSwitchName to Flow: and your copy's API name, activate it, and list it on the Automation page of BarnCRM Settings so it gets a switch. Keep the Automation Control decision and the switch lookup: they make your rule stop with BarnCRM's own automation for a pause, a bypassed user, or its own switch. A before-save flow cannot call the Check BarnCRM Automation action, so it reads the same things directly. See ADR-0246 (before-save flows) and the admin guide page automation-control.md.</description>
   <environments>Default</environments>
   <formulas>
     <description>True while the timed pause on the Automation page is in effect.</description>

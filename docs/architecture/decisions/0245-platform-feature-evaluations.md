@@ -1,4 +1,4 @@
-# ADR-NEXT: Big Objects for Field History, Platform Cache and React Multi-Framework, evaluated
+# ADR-0245: Big Objects for Field History, Platform Cache and React Multi-Framework, evaluated
 
 **Status:** Proposed (build agent W8 R1.36, 2026-11-22; for the integrator and Brandon)
 **Date:** 2026-11-22

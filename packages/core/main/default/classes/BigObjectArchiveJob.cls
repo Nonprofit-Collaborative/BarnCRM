@@ -6,7 +6,7 @@
  * - Copy (no DML): deletes copies the last Settle could not finish (one retry, then the run log
  *   counts any that stay), takes the next chunk of matching records from an Apex cursor (opened
  *   once by the first Copy, in user mode, Id order, at most the confirmed count, and carried from
- *   link to link; ADR-NEXT Apex cursors in large-volume jobs), reads them again with every
+ *   link to link; ADR-0243 Apex cursors in large-volume jobs), reads them again with every
  *   readable field and their cascade-delete children (the chunk halved until the children fit
  *   `childRows`), and writes them with `insertImmediate`.
  * - Settle (DML only): reads the copies back by full key, reads the originals again, deletes in
@@ -61,7 +61,7 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 	private Integer remaining;
 	/**
 	 * The run's matching Ids, read once: the rule's filter, which may not be selective, is not run
-	 * again for every chunk (ADR-NEXT). `position` is the next row to fetch, `lastId` the last Id
+	 * again for every chunk (ADR-0243). `position` is the next row to fetch, `lastId` the last Id
 	 * fetched, from which the cursor is opened again if the platform has let it go.
 	 */
 	private Database.Cursor matches;

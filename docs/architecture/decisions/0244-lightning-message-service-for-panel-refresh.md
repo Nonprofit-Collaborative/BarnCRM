@@ -1,4 +1,4 @@
-# ADR-NEXT: Panels on One Page Refresh Each Other Through One Lightning Message Channel
+# ADR-0244: Panels on One Page Refresh Each Other Through One Lightning Message Channel
 
 **Status:** Accepted
 **Date:** 2026-11-22

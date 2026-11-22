@@ -83,7 +83,7 @@
     </rules>
   </decisions>
   <description
-  >BarnCRM automation "Requirement: fill in the submitted date" (registry row Grant_Requirement_Dates, canonical model R-GQ2). Fills in an empty Submitted Date with today when a grant requirement is created or changed to Submitted or Accepted; a date already typed is kept. Switch it off on the Automation page of BarnCRM Settings, never by deactivating this flow: an upgrade can activate it again. To change the rule, Save As your own flow, list it on the Automation page, and switch this one off. See ADR-NEXT (before-save flows) and the admin guide page automation-control.md.</description>
+  >BarnCRM automation "Requirement: fill in the submitted date" (registry row Grant_Requirement_Dates, canonical model R-GQ2). Fills in an empty Submitted Date with today when a grant requirement is created or changed to Submitted or Accepted; a date already typed is kept. Switch it off on the Automation page of BarnCRM Settings, never by deactivating this flow: an upgrade can activate it again. To change the rule, Save As your own flow, list it on the Automation page, and switch this one off. See ADR-0246 (before-save flows) and the admin guide page automation-control.md.</description>
   <environments>Default</environments>
   <formulas>
     <description>True while the timed pause on the Automation page is in effect.</description>

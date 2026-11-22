@@ -1,4 +1,4 @@
-# ADR-NEXT: Plain Child Lists on Module Record Pages Are Dynamic Related Lists
+# ADR-0242: Plain Child Lists on Module Record Pages Are Dynamic Related Lists
 
 **Status:** Accepted
 **Date:** 2026-11-22

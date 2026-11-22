@@ -102,17 +102,9 @@ export function bodyMessage(error, fallback = UNEXPECTED_ERROR) {
 /**
  * The message to show for a failed Lightning Data Service save (createRecord, updateRecord):
  * the first record or field error the org returned, such as a validation rule's own words, else
- * what `messageFrom` finds. The UI API puts those in `body.output`, under a general message.
+ * the server's or the error's message. Same as `messageFrom`, which reads `body.output` first.
  */
 export function recordErrorMessage(error, fallback = UNEXPECTED_ERROR) {
-  const output = error && error.body && error.body.output;
-  if (output) {
-    const fieldErrors = Object.values(output.fieldErrors || {}).flat();
-    const first = [...(output.errors || []), ...fieldErrors].find((item) => item && item.message);
-    if (first) {
-      return first.message;
-    }
-  }
   return messageFrom(error, fallback);
 }
 

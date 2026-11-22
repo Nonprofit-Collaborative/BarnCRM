@@ -13396,7 +13396,7 @@ version number. Uploading needs edit access to the requirement.
 - **Trigger:** `GrantRequirementTrigger`, through the Core dispatcher; handler
   `GrantRequirementRulesHandler` (R-GQ6, registry row `Grant_Requirement_Rules`, always runs).
   R-GQ2 is the before-save flow `Grant_Requirement_Dates` (its registry row, switchable;
-  ADR-NEXT one-field rules as before-save flows);
+  ADR-0246 one-field rules as before-save flows);
   the rules in `GrantRequirementService`.
 - **Outcomes (L-06):** `GrantOutcomeService` reads Logic Models' `Logic_Model_Element__c`,
   `Indicator__c` and `Indicator_Period__c` by describe, in user mode, into plain maps;

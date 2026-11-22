@@ -39,7 +39,7 @@ public with sharing class OrgAutomationInventory {
 
 	/**
 	 * BarnCRM's own flows, by API name: the inactive templates an admin copies (ADR-0090) and the
-	 * active before-save flows switched from their registry rows (ADR-NEXT, one-field rules as
+	 * active before-save flows switched from their registry rows (ADR-0246, one-field rules as
 	 * before-save flows). With no namespace they cannot be told from the org's own any other way.
 	 * A CI test keeps this list in step with the packages' flow folders. Deactivation never
 	 * changes them (R-AS5): a packaged flow is switched on the Automation page.

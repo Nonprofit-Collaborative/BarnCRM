@@ -296,7 +296,7 @@ alone turned missing field access into a failed Health Check.
   Integer room = (Limits.getLimitQueryRows() - Limits.getQueryRows() - QUERY_ROW_MARGIN) / 2;
   ```
 
-### Walking a large record set in a job (ADR-NEXT)
+### Walking a large record set in a job (ADR-0243)
 
 Pick the reader by what the job does with the rows:
 
