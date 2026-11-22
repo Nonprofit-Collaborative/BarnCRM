@@ -64,8 +64,12 @@ private class SettingsCarryOverTest {
 				'The running pause moved.'
 			);
 			Assert.isTrue(
-				[SELECT COUNT() FROM Setting_Change__c WHERE Setting_Name__c = 'BarnCRM_Settings__c.Fuzzy_Match_Threshold__c' WITH SYSTEM_MODE] >
-				0,
+				[
+					SELECT COUNT()
+					FROM Setting_Change__c
+					WHERE Setting_Name__c = 'BarnCRM_Settings__c.Fuzzy_Match_Threshold__c'
+					WITH SYSTEM_MODE
+				] > 0,
 				'Each carried value is in Recent Changes.'
 			);
 

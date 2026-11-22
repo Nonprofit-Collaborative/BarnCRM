@@ -276,7 +276,7 @@
     "Giving_SampleData_ResourceMissing": "The Fundraising sample data file is not in this org, so the gifts, appeals and funds cannot be loaded. Deploy the GivingSampleData static resource and try again.",
     "Giving_Appeal_ParentCycle": "That parent appeal would create a loop, because this appeal is already above it. Choose a different parent appeal, or leave Parent Appeal empty.",
     "Giving_Fund_DefaultFromSettings": "The default fund is chosen in BarnCRM Settings: choose Fundraising and change Default fund there. Is Default on each fund follows that setting.",
-    "Giving_Fund_DefaultNotSaved":"The default fund could not be saved. Nothing was changed. Open BarnCRM Settings, choose Fundraising, and set the default fund there, or ask your BarnCRM admin to check the Error Log.",
+    "Giving_Fund_DefaultNotSaved": "The default fund could not be saved. Nothing was changed. Open BarnCRM Settings, choose Fundraising, and set the default fund there, or ask your BarnCRM admin to check the Error Log.",
     "Giving_Fund_InUseNotDeletable": "Gifts are designated to this fund, so it cannot be deleted: those gifts would point at nothing. Untick Active instead. The fund stops being offered on new gifts and keeps its history.",
     "Giving_Fund_OneDefaultAtATime": "Only one fund can be the default. Save one default fund at a time, and BarnCRM will clear the flag on the previous one.",
     "Giving_GiftBatch_Balanced": "Balanced: the lines add up to the control total.",

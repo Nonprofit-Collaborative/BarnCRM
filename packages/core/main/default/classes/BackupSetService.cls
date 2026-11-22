@@ -116,8 +116,7 @@ public with sharing class BackupSetService {
 		Panel result = new Panel();
 		result.rowLimit = FindController.exportLimit();
 		result.runsKept = runsKept();
-		result.nightlyOn =
-			NightlyJobs.isScheduled() && NightlyJobs.isSwitchedOn(BackupSetSchedule.STEP_KEY, true);
+		result.nightlyOn = NightlyJobs.isScheduled() && NightlyJobs.isSwitchedOn(BackupSetSchedule.STEP_KEY, true);
 		result.destination = OffPlatformSendBatch.status();
 		Id me = UserInfo.getUserId();
 		for (Saved_Query__c query : [
@@ -443,11 +442,8 @@ public with sharing class BackupSetService {
 						'Core',
 						'Core_OffPlatform_LogWaiting',
 						new List<Object>{ waiting.size(), failures.isEmpty() ? '' : failures[0] }
-					);
-			Import_Batch__c changed = new Import_Batch__c(
-				Id = jobId,
-				Operation_JSON__c = JSON.serialize(definition)
-			);
+				  );
+			Import_Batch__c changed = new Import_Batch__c(Id = jobId, Operation_JSON__c = JSON.serialize(definition));
 			if (done && removeSentFiles()) {
 				Set<Id> documents = new Set<Id>();
 				for (Object documentId : allSent) {
@@ -474,7 +470,9 @@ public with sharing class BackupSetService {
 	public static String destinationOf(String queryJson) {
 		try {
 			Object value = backupOf((Map<String, Object>) JSON.deserializeUntyped(queryJson)).get('destination');
-			return value == OffPlatformSendBatch.OFF_PLATFORM ? OffPlatformSendBatch.OFF_PLATFORM : OffPlatformSendBatch.FILES;
+			return value == OffPlatformSendBatch.OFF_PLATFORM
+				? OffPlatformSendBatch.OFF_PLATFORM
+				: OffPlatformSendBatch.FILES;
 		} catch (Exception notJson) {
 			return OffPlatformSendBatch.FILES;
 		}
@@ -499,9 +497,7 @@ public with sharing class BackupSetService {
 	public static Map<String, Object> scheduleOf(String queryJson) {
 		try {
 			Object schedule = backupOf((Map<String, Object>) JSON.deserializeUntyped(queryJson)).get('schedule');
-			return schedule instanceof Map<String, Object>
-				? (Map<String, Object>) schedule
-				: new Map<String, Object>();
+			return schedule instanceof Map<String, Object> ? (Map<String, Object>) schedule : new Map<String, Object>();
 		} catch (Exception notJson) {
 			return new Map<String, Object>();
 		}
@@ -560,7 +556,9 @@ public with sharing class BackupSetService {
 	}
 
 	private static Integer numberOf(Object value) {
-		return value instanceof Decimal ? ((Decimal) value).intValue() : (value instanceof Integer ? (Integer) value : null);
+		return value instanceof Decimal
+			? ((Decimal) value).intValue()
+			: (value instanceof Integer ? (Integer) value : null);
 	}
 
 	private static Map<String, Object> backupOf(Map<String, Object> document) {

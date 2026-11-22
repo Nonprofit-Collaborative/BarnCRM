@@ -162,7 +162,9 @@ public with sharing class ArchiveRestoreJob implements Queueable {
 			}
 			ArchiveRecordJson.Restored restored = ArchiveRecordJson.restore(row.Record_JSON__c, existing);
 			if (restored.record == null) {
-				outcome.fail(BarnHelp.text('Core', 'Core_ArchiveViewer_NoteCannotCreate', new List<Object>{ originalId }));
+				outcome.fail(
+					BarnHelp.text('Core', 'Core_ArchiveViewer_NoteCannotCreate', new List<Object>{ originalId })
+				);
 				continue;
 			}
 			tried.add(rowId);
@@ -358,7 +360,6 @@ public with sharing class ArchiveRestoreJob implements Queueable {
 		return result;
 	}
 
-
 	/** What one Write did. */
 	private class Outcome {
 		Integer restored = 0;
@@ -393,7 +394,8 @@ public with sharing class ArchiveRestoreJob implements Queueable {
 			}
 			String reason = context.getException()?.getMessage();
 			if (removing) {
-				reason = BarnHelp.text('Core', 'Core_ArchiveViewer_LogRemoveStopped') + (reason == null ? '' : ' ' + reason);
+				reason =
+					BarnHelp.text('Core', 'Core_ArchiveViewer_LogRemoveStopped') + (reason == null ? '' : ' ' + reason);
 			}
 			BigObjectArchiveJob.fail(jobId, reason);
 		}

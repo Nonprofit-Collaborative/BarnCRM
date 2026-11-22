@@ -23,7 +23,11 @@ private class MirrorSettingsWriterTest {
 			MirrorSettingsWriter.recordOpportunityMirrorRun(ranAt, '3 Opportunities created.');
 			Test.stopTest();
 
-			Assert.areEqual(ranAt, GivingState.moment(GivingState.OPPORTUNITY_MIRROR_LAST_RUN), 'The run time is saved');
+			Assert.areEqual(
+				ranAt,
+				GivingState.moment(GivingState.OPPORTUNITY_MIRROR_LAST_RUN),
+				'The run time is saved'
+			);
 			Assert.areEqual(
 				'3 Opportunities created.',
 				GivingState.text(GivingState.OPPORTUNITY_MIRROR_SUMMARY),
@@ -67,7 +71,10 @@ private class MirrorSettingsWriterTest {
 	@IsTest
 	static void keepsADirectionSavedBeforeTheRun() {
 		System.runAs(admin()) {
-			ModuleSettings.setForTest('Mirror_Opportunity_Mirror_Direction', OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
+			ModuleSettings.setForTest(
+				'Mirror_Opportunity_Mirror_Direction',
+				OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES
+			);
 
 			Test.startTest();
 			MirrorSettingsWriter.recordOpportunityMirrorRun(System.now(), 'Done');

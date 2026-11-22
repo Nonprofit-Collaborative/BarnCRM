@@ -17,8 +17,18 @@ private class ArchiveStoreTest {
 	}
 
 	private static String sampleJson() {
-		Contact person = new Contact(Id = PERSON_ID, LastName = 'Arcstore', AccountId = ACCOUNT_ID, ReportsToId = MANAGER_ID);
-		Contact report = new Contact(Id = CHILD_ID, LastName = 'Report', ReportsToId = PERSON_ID, AccountId = ACCOUNT_ID);
+		Contact person = new Contact(
+			Id = PERSON_ID,
+			LastName = 'Arcstore',
+			AccountId = ACCOUNT_ID,
+			ReportsToId = MANAGER_ID
+		);
+		Contact report = new Contact(
+			Id = CHILD_ID,
+			LastName = 'Report',
+			ReportsToId = PERSON_ID,
+			AccountId = ACCOUNT_ID
+		);
 		return ArchiveRecordJson.toJson(
 			person,
 			new Map<String, List<SObject>>{ 'Contact' => new List<SObject>{ report }, 'Task' => new List<SObject>() },
@@ -58,7 +68,11 @@ private class ArchiveStoreTest {
 			SObject child = made.childrenByObject.get('Contact')[0];
 			System.Assert.isNull(child.get('ReportsToId'), 'The parent lookup is left for the caller');
 			System.Assert.isFalse(made.dropped.contains('Contact.ReportsToId'), 'And is not reported as dropped');
-			System.Assert.areEqual('ReportsToId', made.parentFieldByObject.get('Contact'), 'The field the caller fills');
+			System.Assert.areEqual(
+				'ReportsToId',
+				made.parentFieldByObject.get('Contact'),
+				'The field the caller fills'
+			);
 		}
 	}
 
@@ -83,7 +97,10 @@ private class ArchiveStoreTest {
 				Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 			);
 			for (ArchiveRecordJson.ChildKind kind : kinds) {
-				System.Assert.isFalse(BulkDeleteService.isSystemChild(kind.objectName), 'No system child: ' + kind.objectName);
+				System.Assert.isFalse(
+					BulkDeleteService.isSystemChild(kind.objectName),
+					'No system child: ' + kind.objectName
+				);
 				System.Assert.isNotNull(kind.fieldName, 'Each kind names its lookup');
 			}
 		}

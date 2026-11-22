@@ -128,11 +128,7 @@ private class GiftTransactionMirrorRunTest {
 		Assert.isTrue(info[0].Message__c.startsWith('Gift Transaction mirror run: 1 '), info[0].Message__c);
 		Assert.isNotNull(GivingState.moment(GivingState.GIFT_TRANSACTION_MIRROR_LAST_RUN), 'The run is recorded.');
 		Assert.areEqual(info[0].Message__c, GivingState.text(GivingState.GIFT_TRANSACTION_MIRROR_SUMMARY));
-		Assert.areEqual(
-			PAID,
-			ModuleSettings.text('Mirror_Gift_Transaction_Mirror_Status'),
-			'Settings are kept.'
-		);
+		Assert.areEqual(PAID, ModuleSettings.text('Mirror_Gift_Transaction_Mirror_Status'), 'Settings are kept.');
 	}
 
 	@IsTest

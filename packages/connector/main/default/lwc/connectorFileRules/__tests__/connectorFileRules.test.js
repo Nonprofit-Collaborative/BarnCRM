@@ -25,13 +25,16 @@ describe('backup destination templates (R-CN11)', () => {
 
   it('refuses a backup part with a sign-in header', () => {
     const file = { key: 'x', backup: { headers: [{ name: 'X-Api-Key', value: 'abc' }] } };
-    expect(fileProblem(text(file))).toEqual({ key: 'Connector_Import_ErrorSecret', detail: 'X-Api-Key' });
+    expect(fileProblem(text(file))).toEqual({
+      key: 'Connector_Import_ErrorSecret',
+      detail: 'X-Api-Key'
+    });
   });
 
   it('turns headers into Name: value lines', () => {
-    expect(headerLines([{ name: 'Overwrite', value: 'T' }, { name: 'X-Folder', value: 'crm' }, null])).toBe(
-      'Overwrite: T\nX-Folder: crm'
-    );
+    expect(
+      headerLines([{ name: 'Overwrite', value: 'T' }, { name: 'X-Folder', value: 'crm' }, null])
+    ).toBe('Overwrite: T\nX-Folder: crm');
     expect(headerLines(undefined)).toBe('');
   });
 });

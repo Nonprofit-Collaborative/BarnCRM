@@ -71,11 +71,7 @@ private class FundDefaultsServiceTest {
 
 			Assert.isNull(created, 'No fund is created when a default is already chosen.');
 			Assert.isTrue(allFunds().isEmpty(), 'No fund appears.');
-			Assert.areEqual(
-				chosen,
-				ModuleSettings.text('Giving_Default_Fund'),
-				'The chosen default is unchanged.'
-			);
+			Assert.areEqual(chosen, ModuleSettings.text('Giving_Default_Fund'), 'The chosen default is unchanged.');
 		}
 	}
 

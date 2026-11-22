@@ -72,11 +72,13 @@ private class BackupSetScheduleTest {
 	static void aScheduleWithoutItsDayOrOnAQueryThatIsNotASetIsRefused() {
 		System.runAs(TestUsers.admin()) {
 			Saved_Query__c query = backupSet('Volunteers');
-			for (List<Object> wrong : new List<List<Object>>{
-				new List<Object>{ 'weekly', null, null },
-				new List<Object>{ 'monthly', null, 29 },
-				new List<Object>{ 'hourly', null, null }
-			}) {
+			for (
+				List<Object> wrong : new List<List<Object>>{
+					new List<Object>{ 'weekly', null, null },
+					new List<Object>{ 'monthly', null, 29 },
+					new List<Object>{ 'hourly', null, null }
+				}
+			) {
 				try {
 					BackupSetController.setSchedule(
 						query.Id,
@@ -207,11 +209,17 @@ private class BackupSetScheduleTest {
 			Assert.areEqual(1, [SELECT COUNT() FROM ContentDocument WHERE Id = :documents[1]], 'The newest stays');
 			Import_Batch__c older = [SELECT File_Id__c, Run_Log__c FROM Import_Batch__c WHERE Id = :jobs[0].Id];
 			Assert.isNull(older.File_Id__c, 'No file to open');
-			Assert.isTrue(older.Run_Log__c.contains(BarnHelp.text('Core', 'Core_BackupSets_LogRemoved', new List<Object>{ 1 })));
+			Assert.isTrue(
+				older.Run_Log__c.contains(BarnHelp.text('Core', 'Core_BackupSets_LogRemoved', new List<Object>{ 1 }))
+			);
 
 			BackupSetService.setSchedule(query.Id, 'off', null, null);
 			BackupSetSchedule.keepNewest(query.Id);
-			Assert.areEqual(1, [SELECT COUNT() FROM ContentDocument WHERE Id = :documents[1]], 'On demand keeps every file');
+			Assert.areEqual(
+				1,
+				[SELECT COUNT() FROM ContentDocument WHERE Id = :documents[1]],
+				'On demand keeps every file'
+			);
 		}
 	}
 }

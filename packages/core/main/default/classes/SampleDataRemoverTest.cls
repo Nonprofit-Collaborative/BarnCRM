@@ -15,7 +15,11 @@ private class SampleDataRemoverTest {
 
 	@IsTest
 	static void aSettingsAdminRemovesSomeoneElsesSampleRecordsOnly() {
-		Saved_Query__c sample = new Saved_Query__c(Name = 'Sample query', Object_Name__c = 'Contact', Sample_Data__c = true);
+		Saved_Query__c sample = new Saved_Query__c(
+			Name = 'Sample query',
+			Object_Name__c = 'Contact',
+			Sample_Data__c = true
+		);
 		Saved_Query__c own = new Saved_Query__c(Name = 'Our own query', Object_Name__c = 'Contact');
 		System.runAs(TestUsers.admin()) {
 			insert new List<Saved_Query__c>{ sample, own };
@@ -74,8 +78,16 @@ private class SampleDataRemoverTest {
 			}
 		}
 
-		Assert.areEqual(BarnHelp.text('Core', 'Core_SampleData_NotTracked'), untracked, 'Only sample tracking is searched.');
+		Assert.areEqual(
+			BarnHelp.text('Core', 'Core_SampleData_NotTracked'),
+			untracked,
+			'Only sample tracking is searched.'
+		);
 		Assert.areEqual(0, missingObject, 'An object that is not installed counts nothing.');
-		Assert.areEqual(BarnHelp.text('Core', 'Core_SampleData_NoPermission'), refused, 'Manage BarnCRM Settings is needed.');
+		Assert.areEqual(
+			BarnHelp.text('Core', 'Core_SampleData_NoPermission'),
+			refused,
+			'Manage BarnCRM Settings is needed.'
+		);
 	}
 }

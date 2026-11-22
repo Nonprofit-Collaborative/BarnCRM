@@ -68,9 +68,8 @@ private class ErrorDigestControllerTest {
 			SettingsState.clearCache();
 			Assert.isNotNull(SettingsState.moment(ErrorDigestWriter.LAST_RUN), 'The step ran the digest.');
 			Assert.isTrue(
-				SettingsState.text(ErrorDigestWriter.LAST_SUMMARY).startsWith(
-					Label.Core_ErrorDigest_SummaryNothingNew.substringBefore('{0}')
-				),
+				SettingsState.text(ErrorDigestWriter.LAST_SUMMARY)
+					.startsWith(Label.Core_ErrorDigest_SummaryNothingNew.substringBefore('{0}')),
 				'With nothing new, it sent nothing and said so.'
 			);
 		}

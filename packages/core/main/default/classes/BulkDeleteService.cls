@@ -525,7 +525,8 @@ public with sharing class BulkDeleteService {
 				LIMIT 1
 			];
 			if (waiting.isEmpty()) {
-				job.Run_Log__c += '\n' + BarnHelp.text('Core', 'Core_OffPlatform_LogSent', new List<Object>{ sent.size() });
+				job.Run_Log__c +=
+					'\n' + BarnHelp.text('Core', 'Core_OffPlatform_LogSent', new List<Object>{ sent.size() });
 				Database.update(job, AccessLevel.SYSTEM_MODE);
 				DataJobs.launch(new BulkDeleteBatch(job.Id), job);
 				return;

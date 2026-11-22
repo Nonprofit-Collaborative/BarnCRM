@@ -103,7 +103,11 @@ export default class ArchiveRules extends LightningElement {
     const warnAt = (this.page && this.page.warnAt) || cap;
     return {
       percent: Math.min(100, Math.round((count * 100) / cap)),
-      text: format(helpText('Core', 'Core_ArchiveRules_UsageText'), count.toLocaleString(), cap.toLocaleString()),
+      text: format(
+        helpText('Core', 'Core_ArchiveRules_UsageText'),
+        count.toLocaleString(),
+        cap.toLocaleString()
+      ),
       near: count >= warnAt,
       warning: format(helpText('Core', 'Core_ArchiveRules_NearCap'), cap.toLocaleString())
     };
@@ -115,16 +119,24 @@ export default class ArchiveRules extends LightningElement {
     }
     let when = helpText('Core', 'Core_ArchiveRules_FrequencyDaily');
     if (rule.frequency === 'weekly') {
-      when = format(helpText('Core', 'Core_ArchiveRules_ScheduleWeekly'), this.weekdayName(rule.weekday));
+      when = format(
+        helpText('Core', 'Core_ArchiveRules_ScheduleWeekly'),
+        this.weekdayName(rule.weekday)
+      );
     } else if (rule.frequency === 'monthly') {
       when = format(helpText('Core', 'Core_ArchiveRules_ScheduleMonthly'), rule.monthDay);
     }
-    return rule.active ? when : format(helpText('Core', 'Core_ArchiveRules_ScheduleInactive'), when);
+    return rule.active
+      ? when
+      : format(helpText('Core', 'Core_ArchiveRules_ScheduleInactive'), when);
   }
 
   weekdayName(day) {
     // 2024-01-01 was a Monday, so day 1 is Monday.
-    return new Date(Date.UTC(2024, 0, day, 12)).toLocaleDateString(undefined, { weekday: 'long', timeZone: 'UTC' });
+    return new Date(Date.UTC(2024, 0, day, 12)).toLocaleDateString(undefined, {
+      weekday: 'long',
+      timeZone: 'UTC'
+    });
   }
 
   get rules() {
@@ -220,7 +232,11 @@ export default class ArchiveRules extends LightningElement {
   get runs() {
     return ((this.page && this.page.runs) || []).map((run) => ({
       ...run,
-      detail: format(helpText('Core', 'Core_ArchiveRules_RunDetail'), run.moved || 0, run.leftOut || 0)
+      detail: format(
+        helpText('Core', 'Core_ArchiveRules_RunDetail'),
+        run.moved || 0,
+        run.leftOut || 0
+      )
     }));
   }
 
@@ -283,7 +299,9 @@ export default class ArchiveRules extends LightningElement {
     this.preview = undefined;
     this.typedCount = undefined;
     this.scheduleCount = undefined;
-    this.scheduledBefore =Boolean(rule.active && rule.frequency && rule.frequency !== 'off' && query.rule);
+    this.scheduledBefore = Boolean(
+      rule.active && rule.frequency && rule.frequency !== 'off' && query.rule
+    );
     this.editing = {
       id: query.id,
       name: query.name,
@@ -336,7 +354,9 @@ export default class ArchiveRules extends LightningElement {
   }
 
   handleRemove(event) {
-    return this.act(() => saveRule({ queryId: event.target.dataset.id, ruleJson: null, confirmedCount: null }));
+    return this.act(() =>
+      saveRule({ queryId: event.target.dataset.id, ruleJson: null, confirmedCount: null })
+    );
   }
 
   async handlePreview(event) {
@@ -352,13 +372,23 @@ export default class ArchiveRules extends LightningElement {
       this.preview = {
         ruleId: rule.id,
         ruleName: rule.name,
-        countText: format(helpText('Core', 'Core_ArchiveRules_PreviewCount'), shown.count, shown.objectLabel),
-        whereText: format(helpText('Core', 'Core_ArchiveRules_PreviewWhere'), rule.destinationLabel),
+        countText: format(
+          helpText('Core', 'Core_ArchiveRules_PreviewCount'),
+          shown.count,
+          shown.objectLabel
+        ),
+        whereText: format(
+          helpText('Core', 'Core_ArchiveRules_PreviewWhere'),
+          rule.destinationLabel
+        ),
         sample,
         hasSample: sample.length > 0,
         cascades,
         hasCascades: cascades.length > 0,
-        cascadeText: format(helpText('Core', 'Core_ArchiveRules_PreviewChildren'), cascades.join(', '))
+        cascadeText: format(
+          helpText('Core', 'Core_ArchiveRules_PreviewChildren'),
+          cascades.join(', ')
+        )
       };
     } catch (error) {
       this.errorMessage = messageFrom(error);

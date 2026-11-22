@@ -47,7 +47,10 @@ private class PaymentsSetupControllerTest {
 			String token = made.token;
 			Assert.isTrue(token.length() >= 32, 'A token was made');
 			Assert.isTrue(made.hasToken, 'Kept as a hash');
-			Assert.isTrue(made.receivers[0].stripeUrl.endsWith('stripe?token=' + token), 'Shown once, in the addresses');
+			Assert.isTrue(
+				made.receivers[0].stripeUrl.endsWith('stripe?token=' + token),
+				'Shown once, in the addresses'
+			);
 			Assert.isTrue(PaymentService.tokenMatches(token), 'The new token is accepted');
 
 			PaymentsSetupController.Setup reopened = PaymentsSetupController.getSetup();

@@ -24,9 +24,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value
-      xsi:type="xsd:string"
-    >Keeps a project's Actual Cost on every save: Time Amount with Use rate cards on, else Actual Hours times the Hourly Rate. A counted time entry's save saves its project too, so the cost follows every entry. Always runs: reports and Remaining Budget read the cost, so it cannot be left to a switch.</value>
+        <value xsi:type="xsd:string">Keeps a project's Actual Cost on every save: Time Amount with Use rate cards on, else Actual Hours times the Hourly Rate. A counted time entry's save saves its project too, so the cost follows every entry. Always runs: reports and Remaining Budget read the cost, so it cannot be left to a switch.</value>
     </values>
     <values>
         <field>Module__c</field>

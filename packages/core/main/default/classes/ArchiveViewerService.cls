@@ -136,7 +136,9 @@ public with sharing class ArchiveViewerService {
 		if (String.isBlank(objectName)) {
 			throw new ArchiveRules.ArchiveRuleException(BarnHelp.text('Core', 'Core_ArchiveViewer_ErrorNoObject'));
 		}
-		Datetime fromAt = fromDay == null ? Datetime.newInstance(0) : Datetime.newInstance(fromDay, Time.newInstance(0, 0, 0, 0));
+		Datetime fromAt = fromDay == null
+			? Datetime.newInstance(0)
+			: Datetime.newInstance(fromDay, Time.newInstance(0, 0, 0, 0));
 		Datetime toAt = toDay == null
 			? Datetime.now()
 			: Datetime.newInstance(toDay, Time.newInstance(0, 0, 0, 0)).addDays(1).addSeconds(-1);
@@ -147,7 +149,8 @@ public with sharing class ArchiveViewerService {
 			afterAt = after.archivedAt;
 			afterId = after.originalId;
 		}
-		List<Archived_Record__b> found = ArchiveStore.get().page(objectName, fromAt, toAt, afterAt, afterId, PAGE_SIZE + 1);
+		List<Archived_Record__b> found = ArchiveStore.get()
+			.page(objectName, fromAt, toAt, afterAt, afterId, PAGE_SIZE + 1);
 		RowPage result = new RowPage();
 		result.more = found.size() > PAGE_SIZE;
 		// Who archived a row is its CreatedById, read by name: the offline compiler does not know
@@ -159,9 +162,7 @@ public with sharing class ArchiveViewerService {
 				archivists.add(createdBy);
 			}
 		}
-		Map<Id, User> users = new Map<Id, User>(
-			[SELECT Id, Name FROM User WHERE Id IN :archivists WITH USER_MODE]
-		);
+		Map<Id, User> users = new Map<Id, User>([SELECT Id, Name FROM User WHERE Id IN :archivists WITH USER_MODE]);
 		for (Integer i = 0; i < Math.min(found.size(), PAGE_SIZE); i++) {
 			Archived_Record__b one = found[i];
 			Row row = new Row();

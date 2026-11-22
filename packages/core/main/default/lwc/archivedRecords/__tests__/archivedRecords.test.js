@@ -7,16 +7,22 @@ import restoreArchivedRows from '@salesforce/apex/ArchiveController.restoreArchi
 import BarnConfirmModal from 'c/barnConfirmModal';
 import { expectAccessible } from 'barn/a11y';
 
-jest.mock('@salesforce/apex/ArchiveController.getArchive', () => ({ default: jest.fn() }), { virtual: true });
+jest.mock('@salesforce/apex/ArchiveController.getArchive', () => ({ default: jest.fn() }), {
+  virtual: true
+});
 jest.mock('@salesforce/apex/ArchiveController.getArchivedRows', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock('@salesforce/apex/ArchiveController.getArchivedRow', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock('@salesforce/apex/ArchiveController.restoreArchivedRows', () => ({ default: jest.fn() }), {
-  virtual: true
-});
+jest.mock(
+  '@salesforce/apex/ArchiveController.restoreArchivedRows',
+  () => ({ default: jest.fn() }),
+  {
+    virtual: true
+  }
+);
 jest.mock('c/barnConfirmModal', () => ({ __esModule: true, default: { open: jest.fn() } }));
 
 // eslint-disable-next-line @lwc/lwc/no-async-operation
@@ -37,7 +43,12 @@ const VIEWER = {
 function rowsFrom(start, count) {
   const rows = [];
   for (let i = start; i < start + count; i++) {
-    rows.push({ id: `1000|006${i}`, originalId: `006${i}`, name: `Gift ${i}`, archivedAt: '2026-11-01T00:00:00Z' });
+    rows.push({
+      id: `1000|006${i}`,
+      originalId: `006${i}`,
+      name: `Gift ${i}`,
+      archivedAt: '2026-11-01T00:00:00Z'
+    });
   }
   return rows;
 }
@@ -106,7 +117,9 @@ describe('c-archived-records', () => {
     getArchivedRows.mockResolvedValueOnce({ rows: rowsFrom(2, 1), more: false });
     one(element, 'next').click();
     await flush();
-    expect(getArchivedRows).toHaveBeenLastCalledWith(expect.objectContaining({ afterRowId: '1000|0061' }));
+    expect(getArchivedRows).toHaveBeenLastCalledWith(
+      expect.objectContaining({ afterRowId: '1000|0061' })
+    );
     expect(one(element, 'next').disabled).toBe(true);
 
     getArchivedRows.mockResolvedValueOnce({ rows: rowsFrom(0, 2), more: true });
@@ -136,7 +149,9 @@ describe('c-archived-records', () => {
       children: [{ objectName: 'Note__c', label: 'Note', count: 2 }]
     });
     one(element, 'rows').dispatchEvent(
-      new CustomEvent('rowaction', { detail: { action: { name: 'view' }, row: { id: '1000|0060', name: 'Gift 0' } } })
+      new CustomEvent('rowaction', {
+        detail: { action: { name: 'view' }, row: { id: '1000|0060', name: 'Gift 0' } }
+      })
     );
     await flush();
     expect(getArchivedRow).toHaveBeenCalledWith({ objectName: 'Gift__c', rowId: '1000|0060' });
@@ -169,8 +184,13 @@ describe('c-archived-records', () => {
     restoreArchivedRows.mockResolvedValue('a0J000000000001');
     one(element, 'restore').click();
     await flush();
-    expect(BarnConfirmModal.open.mock.calls[1][0].message).toBe('c.Core_ArchiveViewer_RestoreConfirm');
-    expect(restoreArchivedRows).toHaveBeenCalledWith({ objectName: 'Gift__c', rowIds: ['1000|0060'] });
+    expect(BarnConfirmModal.open.mock.calls[1][0].message).toBe(
+      'c.Core_ArchiveViewer_RestoreConfirm'
+    );
+    expect(restoreArchivedRows).toHaveBeenCalledWith({
+      objectName: 'Gift__c',
+      rowIds: ['1000|0060']
+    });
     expect(one(element, 'notice')).not.toBeNull();
   });
 
@@ -192,10 +212,14 @@ describe('c-archived-records', () => {
   it('offers no selection or Restore to a viewer who may not restore', async () => {
     const element = await render({ ...VIEWER, canRestore: false });
     getArchivedRows.mockResolvedValueOnce({ rows: rowsFrom(0, 1), more: false });
-    one(element, 'object').dispatchEvent(new CustomEvent('change', { detail: { value: 'Thing__c' } }));
+    one(element, 'object').dispatchEvent(
+      new CustomEvent('change', { detail: { value: 'Thing__c' } })
+    );
     one(element, 'show').click();
     await flush();
-    expect(getArchivedRows).toHaveBeenLastCalledWith(expect.objectContaining({ objectName: 'Thing__c' }));
+    expect(getArchivedRows).toHaveBeenLastCalledWith(
+      expect.objectContaining({ objectName: 'Thing__c' })
+    );
     expect(one(element, 'rows').hideCheckboxColumn).toBe(true);
     expect(one(element, 'restore')).toBeNull();
   });

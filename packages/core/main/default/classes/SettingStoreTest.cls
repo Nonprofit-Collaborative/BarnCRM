@@ -84,7 +84,10 @@ private class SettingStoreTest {
 			SettingStore.deployer = deployer;
 
 			Id deploymentId = SettingStore.save(
-				new List<SettingStore.Change>{ change('Fuzzy_Match_Threshold', '85'), change('Job_Notifications', 'false') },
+				new List<SettingStore.Change>{
+					change('Fuzzy_Match_Threshold', '85'),
+					change('Job_Notifications', 'false')
+				},
 				true
 			);
 
@@ -168,7 +171,11 @@ private class SettingStoreTest {
 			Assert.areEqual(95, ((Decimal) SettingsService.getValue('Fuzzy_Match_Threshold__c')).intValue(), 'stored');
 			Assert.areEqual(
 				1,
-				[SELECT COUNT() FROM Setting_Change__c WHERE Setting_Name__c = 'BarnCRM_Settings__c.Fuzzy_Match_Threshold__c'],
+				[
+					SELECT COUNT()
+					FROM Setting_Change__c
+					WHERE Setting_Name__c = 'BarnCRM_Settings__c.Fuzzy_Match_Threshold__c'
+				],
 				'audited once'
 			);
 		}
@@ -195,7 +202,9 @@ private class SettingStoreTest {
 	static void runStateIsKeptOnStateRows() {
 		System.runAs(TestUsers.admin()) {
 			Datetime ranAt = Datetime.newInstanceGmt(2026, 11, 21, 3, 0, 0);
-			SettingsState.put(new Map<String, Object>{ 'Error_Digest_Last_Run__c' => ranAt, 'Match_Keys_Filled__c' => true });
+			SettingsState.put(
+				new Map<String, Object>{ 'Error_Digest_Last_Run__c' => ranAt, 'Match_Keys_Filled__c' => true }
+			);
 			SettingsState.clearCache();
 
 			Assert.areEqual(ranAt, SettingsState.moment('Error_Digest_Last_Run__c'), 'the time read back');

@@ -62,7 +62,13 @@ export default class ArchivedRecords extends LightningElement {
         label: helpText('Core', 'Core_ArchiveViewer_ColumnArchivedAt'),
         fieldName: 'archivedAt',
         type: 'date',
-        typeAttributes: { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }
+        typeAttributes: {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        }
       },
       { label: helpText('Core', 'Core_ArchiveViewer_ColumnRule'), fieldName: 'ruleName' },
       { label: helpText('Core', 'Core_ArchiveViewer_ColumnArchivedBy'), fieldName: 'archivedBy' },
@@ -115,7 +121,11 @@ export default class ArchivedRecords extends LightningElement {
   get usageText() {
     const count = (this.viewer && this.viewer.archivedCount) || 0;
     const cap = (this.viewer && this.viewer.cap) || 0;
-    return format(helpText('Core', 'Core_ArchiveRules_UsageText'), count.toLocaleString(), cap.toLocaleString());
+    return format(
+      helpText('Core', 'Core_ArchiveRules_UsageText'),
+      count.toLocaleString(),
+      cap.toLocaleString()
+    );
   }
 
   get canRestore() {
@@ -230,12 +240,22 @@ export default class ArchivedRecords extends LightningElement {
       const found = await getArchivedRow({ objectName: this.objectName, rowId: row.id });
       this.detail = {
         ...found,
-        heading: format(helpText('Core', 'Core_ArchiveViewer_DetailHeading'), found.name || row.name),
-        fields: (found.fields || []).map((field) => ({ ...field, valueKey: `${field.name}-value` })),
+        heading: format(
+          helpText('Core', 'Core_ArchiveViewer_DetailHeading'),
+          found.name || row.name
+        ),
+        fields: (found.fields || []).map((field) => ({
+          ...field,
+          valueKey: `${field.name}-value`
+        })),
         hasChildren: Boolean(found.children && found.children.length),
         children: (found.children || []).map((group) => ({
           ...group,
-          text: format(helpText('Core', 'Core_ArchiveViewer_RelatedCount'), group.label, group.count)
+          text: format(
+            helpText('Core', 'Core_ArchiveViewer_RelatedCount'),
+            group.label,
+            group.count
+          )
         }))
       };
     } catch (error) {

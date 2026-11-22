@@ -117,7 +117,11 @@ public with sharing class CommitmentService {
 			Decimal last = (commitment.Expected_Total__c - commitment.Amount__c * (count - 1)).setScale(2);
 			if (last <= 0) {
 				commitment.addError(
-					BarnHelp.text('Giving', 'Giving_Commitment_LastPaymentNotPositive', new List<Object>{ last.format() })
+					BarnHelp.text(
+						'Giving',
+						'Giving_Commitment_LastPaymentNotPositive',
+						new List<Object>{ last.format() }
+					)
 				);
 			}
 		}

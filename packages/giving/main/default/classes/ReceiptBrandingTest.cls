@@ -239,7 +239,10 @@ private class ReceiptBrandingTest {
 	@IsTest
 	static void aLogoThatCannotBeFoundStillProducesADocument() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			ModuleSettings.setForTest('Giving_Receipt_Logo', String.valueOf(FakeIds.of(ContentDocument.SObjectType, 0)));
+			ModuleSettings.setForTest(
+				'Giving_Receipt_Logo',
+				String.valueOf(FakeIds.of(ContentDocument.SObjectType, 0))
+			);
 			ReceiptLogoSource.reset();
 
 			Test.startTest();

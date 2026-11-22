@@ -82,7 +82,11 @@ private class OrgDateTest {
 		Datetime lateEvening = Datetime.newInstanceGmt(2026, 11, 3, 7, 30, 0);
 
 		System.runAs(person) {
-			Assert.areEqual(Date.newInstance(2026, 11, 2), lateEvening.date(), 'The Honolulu user reads the day before');
+			Assert.areEqual(
+				Date.newInstance(2026, 11, 2),
+				lateEvening.date(),
+				'The Honolulu user reads the day before'
+			);
 			Assert.areEqual(Date.newInstance(2026, 11, 3), OrgDate.dateOf(lateEvening), 'The org date');
 			Assert.isNull(OrgDate.dateOf(null), 'No moment, no date');
 		}

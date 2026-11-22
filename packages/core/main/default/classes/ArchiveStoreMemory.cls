@@ -69,7 +69,8 @@ public class ArchiveStoreMemory extends ArchiveStore {
 		for (Archived_Record__b row : rowsByKey.values()) {
 			if (row.Object_Name__c == objectName) {
 				// Newest first: a smaller sort key for a later time.
-				String sortKey = String.valueOf(9999999999999L - row.Archived_At__c.getTime()).leftPad(13, '0') + row.Original_Id__c;
+				String sortKey =
+					String.valueOf(9999999999999L - row.Archived_At__c.getTime()).leftPad(13, '0') + row.Original_Id__c;
 				keys.add(sortKey);
 				bySortKey.put(sortKey, row);
 			}
@@ -99,7 +100,8 @@ public class ArchiveStoreMemory extends ArchiveStore {
 			Boolean afterCursor =
 				afterAt == null ||
 				row.Archived_At__c < afterAt ||
-				(row.Archived_At__c == afterAt && row.Original_Id__c > afterId);
+				(row.Archived_At__c == afterAt &&
+				row.Original_Id__c > afterId);
 			if (inRange && afterCursor) {
 				result.add(row);
 			}
@@ -116,7 +118,8 @@ public class ArchiveStoreMemory extends ArchiveStore {
 			if (
 				afterAt == null ||
 				row.Archived_At__c < afterAt ||
-				(row.Archived_At__c == afterAt && row.Original_Id__c > afterId)
+				(row.Archived_At__c == afterAt &&
+				row.Original_Id__c > afterId)
 			) {
 				result.add(row);
 			}

@@ -58,7 +58,11 @@ public with sharing class ArchiveRecordJson {
 	}
 
 	/** The JSON of a record and its children, by child object. */
-	public static String toJson(SObject record, Map<String, List<SObject>> childrenByObject, Map<String, String> fieldByObject) {
+	public static String toJson(
+		SObject record,
+		Map<String, List<SObject>> childrenByObject,
+		Map<String, String> fieldByObject
+	) {
 		Map<String, Object> children = new Map<String, Object>();
 		for (String objectName : childrenByObject.keySet()) {
 			List<SObject> rows = childrenByObject.get(objectName);
@@ -168,7 +172,13 @@ public with sharing class ArchiveRecordJson {
 		return result;
 	}
 
-	private static SObject copy(SObject source, String skipField, Set<Id> existing, List<String> dropped, String prefix) {
+	private static SObject copy(
+		SObject source,
+		String skipField,
+		Set<Id> existing,
+		List<String> dropped,
+		String prefix
+	) {
 		Schema.SObjectType type = source.getSObjectType();
 		if (type == null || !type.getDescribe(SObjectDescribeOptions.DEFERRED).isCreateable()) {
 			dropped.add(prefix + 'record');

@@ -69,7 +69,11 @@ public with sharing class ErrorDigestService {
 		// Locked until this run ends, so Send now and the scheduled run take turns: the second
 		// reads the window the first moved, and never sends the same entries again.
 		SettingsState.lock(
-			new Set<String>{ ErrorDigestWriter.COVERED_UNTIL, ErrorDigestWriter.LAST_SUMMARY, ErrorDigestWriter.LAST_RUN }
+			new Set<String>{
+				ErrorDigestWriter.COVERED_UNTIL,
+				ErrorDigestWriter.LAST_SUMMARY,
+				ErrorDigestWriter.LAST_RUN
+			}
 		);
 		BarnCRM_Settings__c settings = SettingsService.getSettings();
 		Datetime coveredUntil = SettingsState.moment(ErrorDigestWriter.COVERED_UNTIL);

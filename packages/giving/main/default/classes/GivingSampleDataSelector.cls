@@ -74,5 +74,4 @@ public with sharing class GivingSampleDataSelector {
 		}
 		return [SELECT COUNT() FROM Gift__c WHERE Sample_Data__c = TRUE WITH USER_MODE];
 	}
-
 }

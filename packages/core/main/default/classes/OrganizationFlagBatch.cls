@@ -42,8 +42,10 @@ public without sharing class OrganizationFlagBatch implements Database.Batchable
 		Set<Id> organizationTypes = new Set<Id>();
 		Boolean noRecordType = AccountKinds.NO_RECORD_TYPE.equalsIgnoreCase(AccountKinds.organizationRecordTypeName());
 		if (noRecordType) {
-			for (Schema.RecordTypeInfo info : Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-				.getRecordTypeInfos()) {
+			for (
+				Schema.RecordTypeInfo info : Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+					.getRecordTypeInfos()
+			) {
 				if (info.isMaster()) {
 					organizationTypes.add(info.getRecordTypeId());
 				}
@@ -72,7 +74,10 @@ public without sharing class OrganizationFlagBatch implements Database.Batchable
 		List<Id> ids = new List<Id>();
 		for (Account record : scope) {
 			changed.add(
-				new Account(Id = record.Id, Is_Organization_Account__c = AccountKinds.isOrganization(record.RecordTypeId))
+				new Account(
+					Id = record.Id,
+					Is_Organization_Account__c = AccountKinds.isOrganization(record.RecordTypeId)
+				)
 			);
 			ids.add(record.Id);
 		}

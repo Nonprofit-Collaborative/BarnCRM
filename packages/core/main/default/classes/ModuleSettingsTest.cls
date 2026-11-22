@@ -44,7 +44,11 @@ private class ModuleSettingsTest {
 			row('Test_Hidden', 'Hidden__c', 'Hidden', null)
 		};
 		ModuleSettings.stubbedModules = new List<Setting_Module__mdt>{
-			new Setting_Module__mdt(DeveloperName = 'TestMod', Settings_Object__c = GROUP_NAME, Key_Prefix__c = 'TestMod')
+			new Setting_Module__mdt(
+				DeveloperName = 'TestMod',
+				Settings_Object__c = GROUP_NAME,
+				Key_Prefix__c = 'TestMod'
+			)
 		};
 		SettingsService.clearCaches();
 	}
@@ -54,7 +58,10 @@ private class ModuleSettingsTest {
 		System.runAs(TestUsers.admin()) {
 			registerModule();
 			Assert.isTrue(ModuleSettings.isStoreObject(GROUP_NAME));
-			Assert.isFalse(ModuleSettings.isStoreObject(SettingsService.CORE_SETTINGS_OBJECT), 'Core is never a module.');
+			Assert.isFalse(
+				ModuleSettings.isStoreObject(SettingsService.CORE_SETTINGS_OBJECT),
+				'Core is never a module.'
+			);
 			Assert.isTrue(ModuleSettings.flag('Test_Flag'));
 			Assert.areEqual(7, ModuleSettings.number('Test_Days').intValue());
 			Assert.areEqual(7, ModuleSettings.integerValue('Test_Days'));
@@ -109,7 +116,9 @@ private class ModuleSettingsTest {
 		System.runAs(TestUsers.admin()) {
 			registerModule();
 			Test.startTest();
-			ModuleSettings.save(new Map<String, Object>{ 'Test_Days' => '14', 'Test_Mode' => 'Slow', 'Test_Flag' => true });
+			ModuleSettings.save(
+				new Map<String, Object>{ 'Test_Days' => '14', 'Test_Mode' => 'Slow', 'Test_Flag' => true }
+			);
 			Test.stopTest();
 
 			Assert.areEqual(14, ModuleSettings.integerValue('Test_Days'));
@@ -131,14 +140,16 @@ private class ModuleSettingsTest {
 	static void aSaveIsRefusedWithTheSettingNamed() {
 		System.runAs(TestUsers.admin()) {
 			registerModule();
-			for (Map<String, Object> values : new List<Map<String, Object>>{
-				new Map<String, Object>{ 'Test_Days' => 'many' },
-				new Map<String, Object>{ 'Test_Days' => 45 },
-				new Map<String, Object>{ 'Test_Mode' => 'Sideways' },
-				new Map<String, Object>{ 'Test_Moment' => 'not a time' },
-				new Map<String, Object>{ 'Test_Hidden' => 'x' },
-				new Map<String, Object>{ 'No_Such_Setting' => 'x' }
-			}) {
+			for (
+				Map<String, Object> values : new List<Map<String, Object>>{
+					new Map<String, Object>{ 'Test_Days' => 'many' },
+					new Map<String, Object>{ 'Test_Days' => 45 },
+					new Map<String, Object>{ 'Test_Mode' => 'Sideways' },
+					new Map<String, Object>{ 'Test_Moment' => 'not a time' },
+					new Map<String, Object>{ 'Test_Hidden' => 'x' },
+					new Map<String, Object>{ 'No_Such_Setting' => 'x' }
+				}
+			) {
 				try {
 					ModuleSettings.save(values);
 					Assert.fail('Refused: ' + values);

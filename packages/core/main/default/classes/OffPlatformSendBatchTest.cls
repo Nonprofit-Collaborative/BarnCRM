@@ -141,7 +141,9 @@ private class OffPlatformSendBatchTest {
 			Assert.areEqual('sent', stateOf(job.Id).get('state'));
 			Import_Batch__c after = [SELECT File_Id__c, Run_Log__c FROM Import_Batch__c WHERE Id = :job.Id];
 			Assert.areEqual(documentId, after.File_Id__c, 'Files copy kept');
-			Assert.isTrue(after.Run_Log__c.contains(BarnHelp.text('Core', 'Core_OffPlatform_LogSent', new List<Object>{ 1 })));
+			Assert.isTrue(
+				after.Run_Log__c.contains(BarnHelp.text('Core', 'Core_OffPlatform_LogSent', new List<Object>{ 1 }))
+			);
 		}
 	}
 

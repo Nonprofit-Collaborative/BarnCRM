@@ -12,6 +12,8 @@
     </values>
     <values>
         <field>State_Fields__c</field>
-        <value xsi:type="xsd:string">Acknowledgments_Last_Run__c,Acknowledgments_Last_Run_Summary__c,Ask_Reminders_Last_Run__c,Ask_Reminders_Last_Run_Summary__c,Books_Closed_Through__c,Donor_Levels_Last_Recalculated__c,Gift_Transaction_Mirror_Last_Run__c,Gift_Transaction_Mirror_Last_Summary__c,Installment_Overdue_Last_Run__c,Installment_Overdue_Last_Run_Summary__c,Installment_Top_Up_Last_Run__c,Installment_Top_Up_Last_Run_Summary__c,Opportunity_Mirror_Last_Run__c,Opportunity_Mirror_Last_Summary__c,Pledge_Reminders_Last_Run__c,Pledge_Reminders_Last_Run_Summary__c</value>
+        <value
+      xsi:type="xsd:string"
+    >Acknowledgments_Last_Run__c,Acknowledgments_Last_Run_Summary__c,Ask_Reminders_Last_Run__c,Ask_Reminders_Last_Run_Summary__c,Books_Closed_Through__c,Donor_Levels_Last_Recalculated__c,Gift_Transaction_Mirror_Last_Run__c,Gift_Transaction_Mirror_Last_Summary__c,Installment_Overdue_Last_Run__c,Installment_Overdue_Last_Run_Summary__c,Installment_Top_Up_Last_Run__c,Installment_Top_Up_Last_Run_Summary__c,Opportunity_Mirror_Last_Run__c,Opportunity_Mirror_Last_Summary__c,Pledge_Reminders_Last_Run__c,Pledge_Reminders_Last_Run_Summary__c</value>
     </values>
 </CustomMetadata>

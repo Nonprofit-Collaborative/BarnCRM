@@ -109,7 +109,9 @@ describe('c-backup-sets', () => {
     element.shadowRoot.querySelector('[data-action="edit-schedule"]').click();
     await flush();
     expect(one(element, 'day').value).toBe('15');
-    one(element, 'frequency').dispatchEvent(new CustomEvent('change', { detail: { value: 'weekly' } }));
+    one(element, 'frequency').dispatchEvent(
+      new CustomEvent('change', { detail: { value: 'weekly' } })
+    );
     await flush();
     expect(one(element, 'day')).toBeNull();
     one(element, 'weekday').dispatchEvent(new CustomEvent('change', { detail: { value: '3' } }));
@@ -142,7 +144,9 @@ describe('c-backup-sets', () => {
     expect(one(element, 'destination').value).toBe('offPlatform');
     one(element, 'save-schedule').click();
     await flush();
-    expect(setSchedule).toHaveBeenCalledWith(expect.objectContaining({ destination: 'offPlatform' }));
+    expect(setSchedule).toHaveBeenCalledWith(
+      expect.objectContaining({ destination: 'offPlatform' })
+    );
   });
 
   it('hides the destination choice and says why when no destination is installed', async () => {

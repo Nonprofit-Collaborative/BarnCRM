@@ -119,7 +119,12 @@ public without sharing class OffPlatformSendBatch implements Database.Batchable<
 			failures.add(BarnHelp.text('Core', 'Core_OffPlatform_FileMissing'));
 		}
 		if (!failures.isEmpty()) {
-			ErrorLogger.logMessage(String.join(failures, '\n').left(30000), LOG_CONTEXT, ErrorLogger.SEVERITY_ERROR, jobId);
+			ErrorLogger.logMessage(
+				String.join(failures, '\n').left(30000),
+				LOG_CONTEXT,
+				ErrorLogger.SEVERITY_ERROR,
+				jobId
+			);
 		}
 		if (archive) {
 			BulkDeleteService.afterArchiveSent(jobId, sent, waiting, failures);

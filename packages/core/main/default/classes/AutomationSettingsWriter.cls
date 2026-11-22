@@ -63,7 +63,7 @@ public without sharing class AutomationSettingsWriter {
 					SetupOwnerId = UserInfo.getOrganizationId(),
 					Pause_All__c = false,
 					Bypass__c = false
-				);
+			  );
 		row.Paused_Until__c = pausedUntil;
 		upsert as system row;
 		lockedControlId = row.Id;

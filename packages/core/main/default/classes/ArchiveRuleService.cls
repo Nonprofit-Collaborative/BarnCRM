@@ -138,7 +138,8 @@ public with sharing class ArchiveRuleService {
 			view.leftOut = DataJobs.intOf(job.Rows_Rejected__c);
 			view.log = job.Run_Log__c;
 			try {
-				view.ruleName = (String) ((Map<String, Object>) JSON.deserializeUntyped(job.Operation_JSON__c)).get('name');
+				view.ruleName = (String) ((Map<String, Object>) JSON.deserializeUntyped(job.Operation_JSON__c))
+					.get('name');
 			} catch (Exception notJson) {
 				view.ruleName = null;
 			}

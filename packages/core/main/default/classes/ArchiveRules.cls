@@ -123,7 +123,9 @@ public with sharing class ArchiveRules {
 		if (rule.frequency == WEEKLY && (rule.weekday == null || rule.weekday < 1 || rule.weekday > 7)) {
 			throw new ArchiveRuleException(BarnHelp.text('Core', 'Core_ArchiveRules_ErrorWeekday'));
 		}
-		if (rule.frequency == MONTHLY && (rule.monthDay == null || rule.monthDay < 1 || rule.monthDay > LAST_MONTH_DAY)) {
+		if (
+			rule.frequency == MONTHLY && (rule.monthDay == null || rule.monthDay < 1 || rule.monthDay > LAST_MONTH_DAY)
+		) {
 			throw new ArchiveRuleException(BarnHelp.text('Core', 'Core_ArchiveRules_ErrorMonthDay'));
 		}
 	}

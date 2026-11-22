@@ -6,9 +6,7 @@
  * The big object is replaced by `ArchiveStoreMemory`, and each link is run in turn by the test,
  * since an Apex test can neither write a big object nor chain queueables.
  */
-@IsTest(
-	testFor='ApexClass:BigObjectArchiveJob, ApexClass:ArchiveToBigObject, ApexClass:ArchiveRecordJson'
-)
+@IsTest(testFor='ApexClass:BigObjectArchiveJob, ApexClass:ArchiveToBigObject, ApexClass:ArchiveRecordJson')
 private class ArchiveJobTest {
 	@TestSetup
 	// runs-as: deploying user (creates the test users themselves)
@@ -185,7 +183,11 @@ private class ArchiveJobTest {
 			);
 			insert as system job;
 			new BigObjectArchiveJob.Finisher(job.Id).execute(null);
-			System.Assert.areEqual(ImportBatchService.STATUS_COMMITTING, reread(job.Id).Status__c, 'No context, no change');
+			System.Assert.areEqual(
+				ImportBatchService.STATUS_COMMITTING,
+				reread(job.Id).Status__c,
+				'No context, no change'
+			);
 			BigObjectArchiveJob.fail(job.Id, 'Because');
 		}
 		job = reread(job.Id);

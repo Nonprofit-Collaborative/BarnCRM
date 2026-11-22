@@ -666,7 +666,10 @@ export default class FilterBuilder extends LightningElement {
       if (row.operator === OPERATORS.LAST_N_DAYS) {
         text = format(LAST_N_DAYS_VALUE, String(row.inputValue));
       } else if (row.operator === OPERATORS.MORE_THAN_N_DAYS_AGO) {
-        text = format(helpText('Core', 'Core_Filter_MoreThanNDaysAgoValue'), String(row.inputValue));
+        text = format(
+          helpText('Core', 'Core_Filter_MoreThanNDaysAgoValue'),
+          String(row.inputValue)
+        );
       } else {
         const valueText = this.valueText(field, kind, row.inputValue);
         text = [operatorLabel(field, row.operator), valueText].filter((part) => part).join(' ');

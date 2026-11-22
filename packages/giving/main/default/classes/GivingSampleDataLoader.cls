@@ -508,8 +508,7 @@ public with sharing class GivingSampleDataLoader {
 	 * employers' matching gifts go with them: deleting one unlinks the employee's gift, which
 	 * must not be in the same delete, because the unlink writes to it.
 	 */
-	private static final String SAMPLE_REVERSALS =
-		'Sample_Data__c = TRUE AND (Original_Gift__c != NULL OR (Matched_Gift__c != NULL AND Donor_Account__c != NULL))';
+	private static final String SAMPLE_REVERSALS = 'Sample_Data__c = TRUE AND (Original_Gift__c != NULL OR (Matched_Gift__c != NULL AND Donor_Account__c != NULL))';
 
 	private static Integer chunksFor(Integer recordCount) {
 		return (recordCount + removeChunkSize - 1) / removeChunkSize;

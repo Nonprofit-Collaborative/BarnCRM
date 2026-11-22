@@ -63,9 +63,13 @@ jest.mock('@salesforce/apex/SettingsController.getRecentChanges', () => ({ defau
 jest.mock('@salesforce/apex/SettingsController.getSaveOutcome', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock('@salesforce/apex/SettingsController.getCarryOverNeeded', () => ({ default: jest.fn() }), {
-  virtual: true
-});
+jest.mock(
+  '@salesforce/apex/SettingsController.getCarryOverNeeded',
+  () => ({ default: jest.fn() }),
+  {
+    virtual: true
+  }
+);
 jest.mock('@salesforce/apex/SettingsController.carryOverSettings', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -1918,7 +1922,9 @@ describe('c-settings-console', () => {
 
     it('says Saving... until the deployment succeeds, then Saved', async () => {
       saveSettings.mockResolvedValue({ ...model(true), deploymentId: '0Af000000000001' });
-      getSaveOutcome.mockResolvedValueOnce({ status: 'Pending' }).mockResolvedValueOnce({ status: 'Succeeded' });
+      getSaveOutcome
+        .mockResolvedValueOnce({ status: 'Pending' })
+        .mockResolvedValueOnce({ status: 'Succeeded' });
       const element = build();
       await settle();
 

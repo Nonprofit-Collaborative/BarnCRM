@@ -89,9 +89,9 @@ export default class OptimizerStorage extends NavigationMixin(LightningElement) 
   get canViewArchived() {
     return Boolean(
       this.archiveViewable &&
-        this.archiveViewable.data === true &&
-        this.panelKey &&
-        this.panelKey.data
+      this.archiveViewable.data === true &&
+      this.panelKey &&
+      this.panelKey.data
     );
   }
 

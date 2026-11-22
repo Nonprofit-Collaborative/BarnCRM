@@ -39,7 +39,7 @@ public with sharing class ArchiveErasureJob implements Queueable {
 		if (counting) {
 			// The final link: DML only.
 			if (failure != null) {
-				ErrorLogger.logMessages(new List<String>{ failure }, LOG_CONTEXT,ErrorLogger.SEVERITY_ERROR);
+				ErrorLogger.logMessages(new List<String>{ failure }, LOG_CONTEXT, ErrorLogger.SEVERITY_ERROR);
 			}
 			BigObjectArchiveJob.addToCount(-deleted);
 			return;

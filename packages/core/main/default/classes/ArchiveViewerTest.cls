@@ -69,7 +69,9 @@ private class ArchiveViewerTest {
 			staff = TestDataFactory.person(new Contact(LastName = 'Staff Person', Title = 'Staff'));
 			insert staff;
 			insert new List<Contact>{
-				TestDataFactory.person(new Contact(LastName = 'Archived One', Title = 'Volunteer', ReportsToId = staff.Id)),
+				TestDataFactory.person(
+					new Contact(LastName = 'Archived One', Title = 'Volunteer', ReportsToId = staff.Id)
+				),
 				TestDataFactory.person(new Contact(LastName = 'Archived Two', Title = 'Volunteer'))
 			};
 		}
@@ -113,7 +115,8 @@ private class ArchiveViewerTest {
 			System.Assert.areEqual(1, after.rows.size(), 'The page after the first row');
 			System.Assert.areEqual(
 				0,
-				ArchiveController.getArchivedRows('Contact', Date.today().addDays(-9), Date.today().addDays(-8), null).rows.size(),
+				ArchiveController.getArchivedRows('Contact', Date.today().addDays(-9), Date.today().addDays(-8), null)
+					.rows.size(),
 				'Nothing archived in an earlier range'
 			);
 
@@ -175,7 +178,11 @@ private class ArchiveViewerTest {
 			} catch (ArchiveRules.ArchiveRuleException refused) {
 				System.Assert.isNotNull(refused.getMessage(), 'Says why');
 			}
-			System.Assert.areEqual('Not_An_Object__x', ArchiveViewerService.labelOf('Not_An_Object__x'), 'Name when gone');
+			System.Assert.areEqual(
+				'Not_An_Object__x',
+				ArchiveViewerService.labelOf('Not_An_Object__x'),
+				'Name when gone'
+			);
 		}
 	}
 
@@ -207,7 +214,10 @@ private class ArchiveViewerTest {
 		System.Assert.areEqual(ImportBatchService.STATUS_COMPLETE, job.Status__c, 'Complete: ' + job.Run_Log__c);
 		System.Assert.areEqual(2, job.Rows_Created__c, 'Two created');
 		System.Assert.areEqual(2, job.Rows_Deleted__c, 'Two removed from the archive');
-		System.Assert.isTrue(job.Run_Log__c.contains(String.valueOf(back[0].Id)), 'The new Id logged: ' + job.Run_Log__c);
+		System.Assert.isTrue(
+			job.Run_Log__c.contains(String.valueOf(back[0].Id)),
+			'The new Id logged: ' + job.Run_Log__c
+		);
 		System.Assert.isTrue(job.Run_Log__c.contains('ReportsToId'), 'What was left out logged');
 		System.Assert.isTrue(job.Operation_JSON__c.contains('"restore"'), 'A restore');
 		System.runAs(archivist()) {
@@ -251,7 +261,11 @@ private class ArchiveViewerTest {
 				.Id;
 			drain();
 		}
-		System.Assert.areEqual(0, [SELECT COUNT() FROM Account WHERE Name = 'Archived Org' WITH SYSTEM_MODE], 'Taken back out');
+		System.Assert.areEqual(
+			0,
+			[SELECT COUNT() FROM Account WHERE Name = 'Archived Org' WITH SYSTEM_MODE],
+			'Taken back out'
+		);
 		System.Assert.areEqual(2, store.rowsByKey.size(), 'Both rows stay archived');
 		System.Assert.areEqual(2, BigObjectArchiveJob.archivedCount(), 'The count unchanged');
 		Import_Batch__c job = reread(jobId);
@@ -282,7 +296,8 @@ private class ArchiveViewerTest {
 		);
 		Id jobId;
 		System.runAs(archivist()) {
-			jobId = ArchiveViewerService.restore('Account', new List<String>{ at.getTime() + '|001000000000003AAA' }).Id;
+			jobId = ArchiveViewerService.restore('Account', new List<String>{ at.getTime() + '|001000000000003AAA' })
+				.Id;
 			// Write creates the records and Remove deletes the row; the row is then put back, as
 			// a delete that did not take would leave it.
 			Map<String, Archived_Record__b> before = store.rowsByKey.clone();
@@ -317,7 +332,11 @@ private class ArchiveViewerTest {
 			);
 			insert as system job;
 			new ArchiveRestoreJob.Finisher(job.Id, true).execute(null);
-			System.Assert.areEqual(ImportBatchService.STATUS_COMMITTING, reread(job.Id).Status__c, 'No context, no change');
+			System.Assert.areEqual(
+				ImportBatchService.STATUS_COMMITTING,
+				reread(job.Id).Status__c,
+				'No context, no change'
+			);
 			Set<Id> found = ArchiveRestoreJob.existingOf(new Set<Id>{ UserInfo.getUserId(), job.Id });
 			System.Assert.isTrue(found.contains(UserInfo.getUserId()), 'An active user exists');
 		}

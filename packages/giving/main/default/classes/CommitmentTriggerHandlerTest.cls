@@ -289,13 +289,21 @@ private class CommitmentTriggerHandlerTest {
 			Decimal negativeLast = -50.00;
 			Assert.isFalse(results[0].isSuccess(), 'A zero last payment is refused.');
 			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_Commitment_LastPaymentNotPositive', new List<Object>{ zeroLast.format() }),
+				BarnHelp.text(
+					'Giving',
+					'Giving_Commitment_LastPaymentNotPositive',
+					new List<Object>{ zeroLast.format() }
+				),
 				results[0].getErrors()[0].getMessage(),
 				'The error names the last payment and how to fix it.'
 			);
 			Assert.isFalse(results[1].isSuccess(), 'A negative last payment is refused.');
 			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_Commitment_LastPaymentNotPositive', new List<Object>{ negativeLast.format() }),
+				BarnHelp.text(
+					'Giving',
+					'Giving_Commitment_LastPaymentNotPositive',
+					new List<Object>{ negativeLast.format() }
+				),
 				results[1].getErrors()[0].getMessage(),
 				'The negative amount is named.'
 			);

@@ -14,8 +14,11 @@
  */
 public with sharing class ConnectorIntegrationUser {
 	/** Run state: the chosen user's Id (`Connector.Integration_User_Id__c`), written at once. */
-	public static final String KEY_USER = SettingsState.moduleKey(ConnectorClock.STATE_PREFIX, 'Integration_User_Id__c');
-	public static final String SUBSCRIBER ='BarnCRM_Connector_Start_User';
+	public static final String KEY_USER = SettingsState.moduleKey(
+		ConnectorClock.STATE_PREFIX,
+		'Integration_User_Id__c'
+	);
+	public static final String SUBSCRIBER = 'BarnCRM_Connector_Start_User';
 	public static final String LANE_TRIGGER = 'ConnectorStartUserTrigger';
 	public static final String ORG_CONNECTION = 'Barn_Org_Connection';
 	private static final String TOOLING = '/services/data/v67.0/tooling/';

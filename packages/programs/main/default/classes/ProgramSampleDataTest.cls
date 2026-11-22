@@ -373,7 +373,11 @@ private class ProgramSampleDataTest {
 		Test.stopTest();
 
 		System.runAs(admin()) {
-			Assert.areEqual(0, [SELECT COUNT() FROM Program__c WHERE Sample_Data__c = TRUE], 'Every sample program went.');
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Program__c WHERE Sample_Data__c = TRUE],
+				'Every sample program went.'
+			);
 			Assert.areEqual(0, [SELECT COUNT() FROM Cohort__c], 'The cohorts went.');
 			Assert.areEqual(0, [SELECT COUNT() FROM Session__c], 'The sessions went.');
 			Assert.areEqual(0, [SELECT COUNT() FROM Session_Schedule__c], 'The schedule went.');

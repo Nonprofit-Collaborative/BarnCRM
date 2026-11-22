@@ -90,7 +90,10 @@ export default class BackupSets extends NavigationMixin(LightningElement) {
   }
 
   get dayOptions() {
-    return Array.from({ length: 28 }, (unused, index) => ({ label: String(index + 1), value: String(index + 1) }));
+    return Array.from({ length: 28 }, (unused, index) => ({
+      label: String(index + 1),
+      value: String(index + 1)
+    }));
   }
 
   get draftWeekly() {
@@ -152,7 +155,9 @@ export default class BackupSets extends NavigationMixin(LightningElement) {
   }
 
   get scheduleNote() {
-    return this.page ? format(helpText('Core', 'Core_BackupSets_ScheduleNote'), this.page.runsKept) : '';
+    return this.page
+      ? format(helpText('Core', 'Core_BackupSets_ScheduleNote'), this.page.runsKept)
+      : '';
   }
 
   get hasSets() {

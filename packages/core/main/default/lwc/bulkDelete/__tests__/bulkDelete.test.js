@@ -10,9 +10,13 @@ import startArchive from '@salesforce/apex/BulkDeleteController.startArchive';
 import getArchiveDestination from '@salesforce/apex/BulkDeleteController.getArchiveDestination';
 import { setHelpTextForTest } from 'c/barnHelpText';
 
-jest.mock('@salesforce/apex/BulkDeleteController.getArchiveDestination', () => ({ default: jest.fn() }), {
-  virtual: true
-});
+jest.mock(
+  '@salesforce/apex/BulkDeleteController.getArchiveDestination',
+  () => ({ default: jest.fn() }),
+  {
+    virtual: true
+  }
+);
 
 setHelpTextForTest({
   Core_BulkDelete_BackupDone: 'Downloaded {0} records.',
@@ -321,7 +325,10 @@ describe('c-bulk-delete', () => {
   it('archives: no download, and emptying the Recycle Bin needs the count typed again (C-67)', async () => {
     previewDelete.mockResolvedValue({ ...PREVIEW, cascades: [] });
     startArchive.mockResolvedValue(RUNNING);
-    getArchiveDestination.mockResolvedValue({ available: false, note: 'Install BarnCRM Connector.' });
+    getArchiveDestination.mockResolvedValue({
+      available: false,
+      note: 'Install BarnCRM Connector.'
+    });
     capturePolls();
     const element = createElement('c-bulk-delete', { is: BulkDelete });
     element.queryJson = QUERY;
@@ -379,7 +386,9 @@ describe('c-bulk-delete', () => {
     await change(one(element, 'confirm'), '200');
     one(element, 'start').click();
     await flush();
-    expect(startArchive).toHaveBeenCalledWith(expect.objectContaining({ destination: 'offPlatform' }));
+    expect(startArchive).toHaveBeenCalledWith(
+      expect.objectContaining({ destination: 'offPlatform' })
+    );
   });
 
   it('shows a refusal and offers no delete', async () => {

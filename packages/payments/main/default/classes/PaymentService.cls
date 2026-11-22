@@ -292,7 +292,7 @@ public with sharing class PaymentService {
 		String interval = text(args, 'interval')?.toLowerCase();
 		Object count = args.get('intervalCount');
 		Integer every = count instanceof Integer ? Math.max(1, Math.min(12, (Integer) count)) : 1;
-		if (!recurringOn() ||!INTERVALS.contains(interval)) {
+		if (!recurringOn() || !INTERVALS.contains(interval)) {
 			interval = null;
 		}
 		try {

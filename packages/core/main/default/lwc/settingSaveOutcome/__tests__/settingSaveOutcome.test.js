@@ -23,7 +23,9 @@ describe('c-setting-save-outcome', () => {
   });
 
   it('asks until the deployment succeeds', async () => {
-    getSaveOutcome.mockResolvedValueOnce({ status: 'Pending' }).mockResolvedValueOnce({ status: 'Succeeded' });
+    getSaveOutcome
+      .mockResolvedValueOnce({ status: 'Pending' })
+      .mockResolvedValueOnce({ status: 'Succeeded' });
     const outcome = await waitForSave('0Af000000000001');
     expect(outcome.status).toBe('Succeeded');
     expect(getSaveOutcome).toHaveBeenCalledTimes(2);

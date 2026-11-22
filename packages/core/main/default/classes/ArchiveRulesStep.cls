@@ -24,7 +24,13 @@ public with sharing class ArchiveRulesStep implements Schedulable, Database.Batc
 	}
 
 	public static NightlyStep step() {
-		return new NightlyStep(JOB_NAME, BarnHelp.text('Core', 'Core_ArchiveRules_StepLabel'), 3, 0, new ArchiveRulesStep())
+		return new NightlyStep(
+				JOB_NAME,
+				BarnHelp.text('Core', 'Core_ArchiveRules_StepLabel'),
+				3,
+				0,
+				new ArchiveRulesStep()
+			)
 			.withSwitch(true);
 	}
 

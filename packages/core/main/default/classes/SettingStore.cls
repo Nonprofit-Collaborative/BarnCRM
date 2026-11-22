@@ -69,7 +69,9 @@ public without sharing class SettingStore {
 	}
 
 	@TestVisible
-	private static Deployer deployer = Test.isRunningTest() ? (Deployer) new InMemoryDeployer() : new PlatformDeployer();
+	private static Deployer deployer = Test.isRunningTest()
+		? (Deployer) new InMemoryDeployer()
+		: new PlatformDeployer();
 
 	/** Values a test set, or the in-memory deployer kept, by definition name. */
 	private static Map<String, String> deployedForTest = new Map<String, String>();

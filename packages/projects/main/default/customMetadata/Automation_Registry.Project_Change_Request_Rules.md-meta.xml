@@ -24,9 +24,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value
-      xsi:type="xsd:string"
-    >Refuses a new change request while Track change requests is off. Change requests saved while it was on can still be edited. Always runs: the setting decides whether change requests exist, which cannot be left to a switch.</value>
+        <value xsi:type="xsd:string">Refuses a new change request while Track change requests is off. Change requests saved while it was on can still be edited. Always runs: the setting decides whether change requests exist, which cannot be left to a switch.</value>
     </values>
     <values>
         <field>Module__c</field>

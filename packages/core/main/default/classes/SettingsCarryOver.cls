@@ -117,9 +117,14 @@ public without sharing class SettingsCarryOver {
 	private static List<Setting_Definition__mdt> coreDefinitions(Map<String, Schema.SObjectField> fields) {
 		List<Setting_Definition__mdt> rows = new List<Setting_Definition__mdt>();
 		for (Setting_Definition__mdt definition : SettingStore.definitions().values()) {
-			Boolean core = definition.Settings_Object__c != null &&
+			Boolean core =
+				definition.Settings_Object__c != null &&
 				definition.Settings_Object__c.trim().toLowerCase().endsWith(CORE_OBJECT);
-			if (core && definition.Setting_Key__c != null && fields.containsKey(definition.Setting_Key__c.trim().toLowerCase())) {
+			if (
+				core &&
+				definition.Setting_Key__c != null &&
+				fields.containsKey(definition.Setting_Key__c.trim().toLowerCase())
+			) {
 				rows.add(definition);
 			}
 		}
@@ -185,7 +190,12 @@ public without sharing class SettingsCarryOver {
 	 * The run state to copy: each listed field with a legacy value and no State row yet, keyed by
 	 * the field name (Core) or `Prefix.Field` (a module).
 	 */
-	private static Map<String, Object> stateValues(SObject legacy, Set<String> names, String prefix, Set<String> existing) {
+	private static Map<String, Object> stateValues(
+		SObject legacy,
+		Set<String> names,
+		String prefix,
+		Set<String> existing
+	) {
 		Map<String, Object> values = new Map<String, Object>();
 		for (String name : names) {
 			Schema.SObjectField token = NamespaceUtil.field(legacy.getSObjectType(), name);

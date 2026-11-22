@@ -6,9 +6,7 @@
  *
  * The big object is replaced by `ArchiveStoreMemory`; each link is run in turn by the test.
  */
-@IsTest(
-	testFor='ApexClass:ArchiveErasureExtension, ApexClass:ArchiveErasureJob, ApexClass:PersonErasureExtensions'
-)
+@IsTest(testFor='ApexClass:ArchiveErasureExtension, ApexClass:ArchiveErasureJob, ApexClass:PersonErasureExtensions')
 private class ArchiveErasureTest {
 	private static final String PERSON = String.valueOf(Id.valueOf('003000000000001'));
 	private static final String OTHER = String.valueOf(Id.valueOf('003000000000002'));
@@ -65,7 +63,10 @@ private class ArchiveErasureTest {
 			List<PersonErasure.Change> changes = new ArchiveErasureExtension().erase(Id.valueOf(PERSON));
 			System.Assert.areEqual(1, changes.size(), 'Reported as counted');
 			System.Assert.areEqual(PersonErasure.DELETED, changes[0].action, 'Deleted');
-			System.Assert.isTrue(new ArchiveErasureExtension().fieldsToKeep(Contact.SObjectType).isEmpty(), 'Keeps nothing');
+			System.Assert.isTrue(
+				new ArchiveErasureExtension().fieldsToKeep(Contact.SObjectType).isEmpty(),
+				'Keeps nothing'
+			);
 			System.Assert.areEqual(1, BigObjectArchiveJob.queuedForTest.size(), 'The scan queued');
 			drain();
 			System.Assert.areEqual(

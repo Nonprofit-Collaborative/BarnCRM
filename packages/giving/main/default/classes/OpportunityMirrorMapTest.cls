@@ -21,7 +21,10 @@ private class OpportunityMirrorMapTest {
 	}
 
 	private static void useMap(Id mapId) {
-		ModuleSettings.setForTest('Mirror_Opportunity_Mirror_Direction', OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
+		ModuleSettings.setForTest(
+			'Mirror_Opportunity_Mirror_Direction',
+			OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES
+		);
 		ModuleSettings.setForTest('Mirror_Opportunity_Mirror_Map', mapId == null ? null : String.valueOf(mapId));
 	}
 

@@ -5,10 +5,18 @@ import saveRule from '@salesforce/apex/ArchiveController.saveRule';
 import previewRule from '@salesforce/apex/ArchiveController.previewRule';
 import runRule from '@salesforce/apex/ArchiveController.runRule';
 
-jest.mock('@salesforce/apex/ArchiveController.getRules', () => ({ default: jest.fn() }), { virtual: true });
-jest.mock('@salesforce/apex/ArchiveController.saveRule', () => ({ default: jest.fn() }), { virtual: true });
-jest.mock('@salesforce/apex/ArchiveController.previewRule', () => ({ default: jest.fn() }), { virtual: true });
-jest.mock('@salesforce/apex/ArchiveController.runRule', () => ({ default: jest.fn() }), { virtual: true });
+jest.mock('@salesforce/apex/ArchiveController.getRules', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/ArchiveController.saveRule', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/ArchiveController.previewRule', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/ArchiveController.runRule', () => ({ default: jest.fn() }), {
+  virtual: true
+});
 
 // eslint-disable-next-line @lwc/lwc/no-async-operation
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
@@ -34,7 +42,17 @@ const PAGE = {
     }
   ],
   candidates: [{ id: 'q2', name: 'Old volunteers', objectName: 'Contact', mine: true }],
-  runs: [{ id: 'j1', ruleName: 'Old closed lost', status: 'Complete', running: false, moved: 12, leftOut: 1, log: 'Done' }]
+  runs: [
+    {
+      id: 'j1',
+      ruleName: 'Old closed lost',
+      status: 'Complete',
+      running: false,
+      moved: 12,
+      leftOut: 1,
+      log: 'Done'
+    }
+  ]
 };
 
 function one(element, id) {
@@ -77,22 +95,35 @@ describe('c-archive-rules', () => {
     await flush();
     expect(one(element, 'editor')).not.toBeNull();
 
-    one(element, 'destination').dispatchEvent(new CustomEvent('change', { detail: { value: 'OffPlatform' } }));
+    one(element, 'destination').dispatchEvent(
+      new CustomEvent('change', { detail: { value: 'OffPlatform' } })
+    );
     await flush();
     expect(one(element, 'destination-reason').textContent).toContain('Not set up');
 
-    one(element, 'destination').dispatchEvent(new CustomEvent('change', { detail: { value: 'BigObject' } }));
-    one(element, 'frequency').dispatchEvent(new CustomEvent('change', { detail: { value: 'monthly' } }));
+    one(element, 'destination').dispatchEvent(
+      new CustomEvent('change', { detail: { value: 'BigObject' } })
+    );
+    one(element, 'frequency').dispatchEvent(
+      new CustomEvent('change', { detail: { value: 'monthly' } })
+    );
     await flush();
     expect(previewRule).toHaveBeenCalledWith({ queryId: 'q2' });
     one(element, 'month-day').dispatchEvent(new CustomEvent('change', { detail: { value: '3' } }));
-    one(element, 'schedule-count').dispatchEvent(new CustomEvent('change', { detail: { value: '7' } }));
+    one(element, 'schedule-count').dispatchEvent(
+      new CustomEvent('change', { detail: { value: '7' } })
+    );
     await flush();
     one(element, 'save').click();
     await flush();
     expect(saveRule).toHaveBeenCalledWith({
       queryId: 'q2',
-      ruleJson: JSON.stringify({ destination: 'BigObject', frequency: 'monthly', active: true, monthDay: 3 }),
+      ruleJson: JSON.stringify({
+        destination: 'BigObject',
+        frequency: 'monthly',
+        active: true,
+        monthDay: 3
+      }),
       confirmedCount: 7
     });
     expect(one(element, 'editor')).toBeNull();

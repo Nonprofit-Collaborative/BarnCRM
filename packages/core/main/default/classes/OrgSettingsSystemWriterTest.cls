@@ -35,7 +35,9 @@ private class OrgSettingsSystemWriterTest {
 		System.runAs(TestUsers.admin()) {
 			Datetime until = System.now().addHours(2);
 			Test.startTest();
-			OrgSettingsSystemWriter.save(new Map<Schema.SObjectField, Object>{ BarnCRM_Settings__c.Automation_Paused_Until__c => until });
+			OrgSettingsSystemWriter.save(
+				new Map<Schema.SObjectField, Object>{ BarnCRM_Settings__c.Automation_Paused_Until__c => until }
+			);
 			Test.stopTest();
 
 			BarnCRM_Settings__c saved = stored();
@@ -49,7 +51,9 @@ private class OrgSettingsSystemWriterTest {
 		System.runAs(TestUsers.admin()) {
 			Datetime finishedAt = System.now();
 			Test.startTest();
-			OrgSettingsSystemWriter.save(new Map<Schema.SObjectField, Object>{ BarnCRM_Settings__c.Seasonal_Address_Last_Run__c => finishedAt });
+			OrgSettingsSystemWriter.save(
+				new Map<Schema.SObjectField, Object>{ BarnCRM_Settings__c.Seasonal_Address_Last_Run__c => finishedAt }
+			);
 			Test.stopTest();
 
 			BarnCRM_Settings__c saved = stored();
@@ -68,8 +72,14 @@ private class OrgSettingsSystemWriterTest {
 				Coexistence_Mode__c = 'Standalone'
 			);
 			Test.startTest();
-			OrgSettingsSystemWriter.save(new Map<Schema.SObjectField, Object>{ BarnCRM_Settings__c.Automation_Paused_Until__c => System.now().addHours(1) });
-			OrgSettingsSystemWriter.save(new Map<Schema.SObjectField, Object>{ BarnCRM_Settings__c.Automation_Paused_Until__c => null });
+			OrgSettingsSystemWriter.save(
+				new Map<Schema.SObjectField, Object>{
+					BarnCRM_Settings__c.Automation_Paused_Until__c => System.now().addHours(1)
+				}
+			);
+			OrgSettingsSystemWriter.save(
+				new Map<Schema.SObjectField, Object>{ BarnCRM_Settings__c.Automation_Paused_Until__c => null }
+			);
 			Test.stopTest();
 
 			BarnCRM_Settings__c saved = stored();
@@ -91,7 +101,9 @@ private class OrgSettingsSystemWriterTest {
 			Datetime until = System.now().addHours(2);
 
 			Test.startTest();
-			OrgSettingsSystemWriter.save(new Map<Schema.SObjectField, Object>{ BarnCRM_Settings__c.Automation_Paused_Until__c => until });
+			OrgSettingsSystemWriter.save(
+				new Map<Schema.SObjectField, Object>{ BarnCRM_Settings__c.Automation_Paused_Until__c => until }
+			);
 			Test.stopTest();
 
 			Assert.areEqual(

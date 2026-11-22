@@ -23,11 +23,7 @@ public with sharing class AddressVerificationNightlyJobProvider implements Night
 					new AddressVerificationJob()
 				)
 				.withSwitch(true)
-				.activeWhen(
-					AddressVerifier.isOn() &&
-						AddressVerifier.isReady() &&
-						AddressVerifier.nightlyLimit() > 0
-				)
+				.activeWhen(AddressVerifier.isOn() && AddressVerifier.isReady() && AddressVerifier.nightlyLimit() > 0)
 		};
 	}
 }

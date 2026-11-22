@@ -67,7 +67,12 @@ private class OrganizationFlagBatchTest {
 			Assert.isNotNull(jobId, 'The run started.');
 			Assert.areEqual(
 				0,
-				[SELECT COUNT() FROM Account WHERE Id IN :accounts AND Is_Organization_Account__c = TRUE WITH SYSTEM_MODE],
+				[
+					SELECT COUNT()
+					FROM Account
+					WHERE Id IN :accounts AND Is_Organization_Account__c = TRUE
+					WITH SYSTEM_MODE
+				],
 				'Every household is put right.'
 			);
 		}

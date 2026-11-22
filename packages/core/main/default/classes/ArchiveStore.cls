@@ -56,7 +56,8 @@ public virtual with sharing class ArchiveStore {
 		}
 		// NOPMD: ApexCRUDViolation, which does not see the isCreateable check above.
 		// Access mode: system. insertImmediate takes no AccessLevel; create access is checked above.
-		for (Database.SaveResult saved : Database.insertImmediate(rows)) { // NOPMD
+		for (Database.SaveResult saved : Database.insertImmediate(rows)) {
+			// NOPMD
 			result.add(saved.isSuccess());
 		}
 		return result;
@@ -75,7 +76,8 @@ public virtual with sharing class ArchiveStore {
 		// A big object grants only Read and Create, so there is no delete permission to check.
 		// Callers are admin paths (rule runs, restore) or erasure. NOPMD: ApexCRUDViolation.
 		// Access mode: system. deleteImmediate takes no AccessLevel.
-		for (Database.DeleteResult result : Database.deleteImmediate(rows)) { // NOPMD
+		for (Database.DeleteResult result : Database.deleteImmediate(rows)) {
+			// NOPMD
 			deleted += result.isSuccess() ? 1 : 0;
 		}
 		return deleted;
@@ -135,7 +137,14 @@ public virtual with sharing class ArchiveStore {
 		if (afterAt != null) {
 			result.addAll(
 				[
-					SELECT Object_Name__c, Archived_At__c, Original_Id__c, Record_Name__c, Owner_Id__c, Rule_Name__c, CreatedById
+					SELECT
+						Object_Name__c,
+						Archived_At__c,
+						Original_Id__c,
+						Record_Name__c,
+						Owner_Id__c,
+						Rule_Name__c,
+						CreatedById
 					FROM Archived_Record__b
 					WHERE Object_Name__c = :objectName AND Archived_At__c = :afterAt AND Original_Id__c > :afterId
 					WITH USER_MODE
@@ -148,7 +157,14 @@ public virtual with sharing class ArchiveStore {
 		if (room > 0) {
 			result.addAll(
 				[
-					SELECT Object_Name__c, Archived_At__c, Original_Id__c, Record_Name__c, Owner_Id__c, Rule_Name__c, CreatedById
+					SELECT
+						Object_Name__c,
+						Archived_At__c,
+						Original_Id__c,
+						Record_Name__c,
+						Owner_Id__c,
+						Rule_Name__c,
+						CreatedById
 					FROM Archived_Record__b
 					WHERE Object_Name__c = :objectName AND Archived_At__c >= :fromAt AND Archived_At__c <= :newest
 					WITH USER_MODE
@@ -208,7 +224,7 @@ public virtual with sharing class ArchiveStore {
 					WHERE Object_Name__c > :afterName
 					WITH SYSTEM_MODE
 					LIMIT 1
-				];
+			  ];
 		return found.isEmpty() ? null : found[0].Object_Name__c;
 	}
 }

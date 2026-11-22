@@ -131,7 +131,8 @@ private class ArchiveRulesTest {
 		);
 		System.runAs(TestUsers.withPermissionSets(new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Bulk_Delete' })) {
 			try {
-				ArchiveDestinations.forKey(ArchiveRules.FILES).start(new ArchiveRun(null, 'Rule', nobody, 'Contact', 5));
+				ArchiveDestinations.forKey(ArchiveRules.FILES)
+					.start(new ArchiveRun(null, 'Rule', nobody, 'Contact', 5));
 				System.Assert.fail('Nothing matches, so Archive by Query refuses');
 			} catch (BulkDeleteService.BulkDeleteException expected) {
 				System.Assert.isTrue(String.isNotBlank(expected.getMessage()), 'Its own refusal');
