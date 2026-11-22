@@ -83,10 +83,15 @@ public with sharing class ConnectorBackupDestination implements OffPlatformDesti
 	}
 
 	public String notReady() {
+		Boolean access = ConnectorConnections.holdsAccessSet();
 		if (currentRow() == null) {
-			return BarnHelp.text('Connector', 'Connector_Backup_NotSet');
+			// Connections are private: a user with neither set cannot see the row at all, so
+			// "not set" would be the wrong reason for them.
+			return access || ConnectorConnections.holdsAdminSet()
+				? BarnHelp.text('Connector', 'Connector_Backup_NotSet')
+				: BarnHelp.text('Connector', 'Connector_Backup_NoAccess');
 		}
-		if (!ConnectorConnections.holdsAccessSet()) {
+		if (!access) {
 			return BarnHelp.text('Connector', 'Connector_Backup_NoAccess');
 		}
 		return null;
@@ -99,7 +104,7 @@ public with sharing class ConnectorBackupDestination implements OffPlatformDesti
 	public String send(String fileName, Blob body) {
 		Connector_Connection__c row = currentRow();
 		if (row == null) {
-			return BarnHelp.text('Connector', 'Connector_Backup_NotSet');
+			return notReady();
 		}
 		Settings settings;
 		try {

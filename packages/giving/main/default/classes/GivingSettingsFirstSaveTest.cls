@@ -29,7 +29,10 @@ private class GivingSettingsFirstSaveTest {
 			ModuleSettings.flag('Giving_Automatic_Household_Soft_Credits'),
 			writer + ' left household soft credits on, as they ship'
 		);
-		Assert.isTrue(ModuleSettings.flag('Giving_Receipt_Print_Logo'), writer + ' left the receipt logo on, as it ships');
+		Assert.isTrue(
+			ModuleSettings.flag('Giving_Receipt_Print_Logo'),
+			writer + ' left the receipt logo on, as it ships'
+		);
 	}
 
 	@IsTest
@@ -130,7 +133,7 @@ private class GivingSettingsFirstSaveTest {
 			Id deployment = ModuleSettings.save(new Map<String, Object>{ 'Giving_Receipt_Number_Prefix' => 'R-' });
 			Test.stopTest();
 
-			Assert.isNotNull(deployment, 'The save returns its deployment');
+			Assert.isNull(deployment, 'In a test the save deploys in memory, so there is no deployment Id');
 			Assert.areEqual('R-', ModuleSettings.text('Giving_Receipt_Number_Prefix'), 'The setting is saved');
 			assertShippedOnKept('A settings save');
 		}
@@ -141,9 +144,9 @@ private class GivingSettingsFirstSaveTest {
 	static void theShippedDefaultsAreReadBeforeAnySave() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Test.startTest();
-			Object autoApply = SettingsService.getValue('Giving_Settings__c', 'Auto_Apply_Gifts_To_Installments__c');
-			Object softCredits = SettingsService.getValue('Giving_Settings__c', 'Automatic_Household_Soft_Credits__c');
-			Object logo = SettingsService.getValue('Giving_Settings__c', 'Receipt_Print_Logo__c');
+			Boolean autoApply = SettingsService.flag('Giving_Settings__c', 'Auto_Apply_Gifts_To_Installments__c');
+			Boolean softCredits = SettingsService.flag('Giving_Settings__c', 'Automatic_Household_Soft_Credits__c');
+			Boolean logo = SettingsService.flag('Giving_Settings__c', 'Receipt_Print_Logo__c');
 			Test.stopTest();
 
 			Assert.areEqual(true, autoApply, 'Applying gifts to installments reads as on');

@@ -93,6 +93,24 @@ public class ReceiptTestDataFactory {
 	 * The Giving settings a receipt prints. A store value lasts one transaction, so a test class
 	 * whose setup issues receipts also calls this from a static block.
 	 */
+	/**
+	 * The organization that issues receipts, put in the settings store for this transaction (a
+	 * store value lasts one transaction, so a class that sets up in @TestSetup calls this again).
+	 */
+	public static void useOrganization() {
+		Map<String, Object> organization = new Map<String, Object>{
+			'Organization_Legal_Name__c' => 'Hope For Homes',
+			'Organization_Street__c' => '14 Bridge Street',
+			'Organization_Street_2__c' => 'Suite 3',
+			'Organization_City__c' => 'Springfield',
+			'Organization_State__c' => 'IL',
+			'Organization_Postal_Code__c' => '62701'
+		};
+		for (String key : organization.keySet()) {
+			SettingsService.setForTest(key, organization.get(key));
+		}
+	}
+
 	public static void useReceiptSettings() {
 		ModuleSettings.setForTest('Giving_Receipt_Number_Prefix', 'HFH');
 		ModuleSettings.setForTest('Giving_Receipt_Next_Counter', 1);
@@ -111,15 +129,7 @@ public class ReceiptTestDataFactory {
 	public static RecordingRenderer setUpReceipting() {
 		GivingTestDataFactory.ensureDefaultFund();
 
-		BarnCRM_Settings__c core = BarnCRM_Settings__c.getOrgDefaults();
-		core.SetupOwnerId = UserInfo.getOrganizationId();
-		core.Organization_Legal_Name__c = 'Hope For Homes';
-		core.Organization_Street__c = '14 Bridge Street';
-		core.Organization_Street_2__c = 'Suite 3';
-		core.Organization_City__c = 'Springfield';
-		core.Organization_State__c = 'IL';
-		core.Organization_Postal_Code__c = '62701';
-		upsert core;
+		useOrganization();
 
 		useReceiptSettings();
 

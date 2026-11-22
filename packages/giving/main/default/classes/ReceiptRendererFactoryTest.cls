@@ -85,7 +85,11 @@ private class ReceiptRendererFactoryTest {
 				ReceiptRendererFactory.keyFrom('  Blob PDF  '),
 				'The factory trims the value it reads, whatever stored it.'
 			);
-			chooseRenderer('  Blob PDF  ');
+			// Through the save, as an administrator's edit is stored: the save trims text values.
+			SettingsService.saveSystemValues(
+				'Giving_Settings__c',
+				new Map<String, Object>{ 'Receipt_Renderer__c' => '  Blob PDF  ' }
+			);
 			Assert.areEqual(
 				'Blob PDF',
 				storedRenderer(),

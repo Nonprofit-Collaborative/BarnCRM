@@ -126,7 +126,8 @@ private class StewardshipCommitmentHandlerTest {
 			insert pledge;
 
 			Test.startTest();
-			pledge.Amount__c = 150;
+			// A smaller payment the expected total still covers (three at 150 would overshoot it).
+			pledge.Amount__c = 90;
 			update pledge;
 			Test.stopTest();
 
