@@ -38,6 +38,10 @@ The new term starts the day after the old one ends when it is Current or in Grac
 it has lapsed. Gifts to your membership fund and online payments can renew memberships by
 themselves; you do not need to renew those by hand.
 
+"Today" for memberships is your organization's date, not your own: if your time zone is ahead of
+or behind your organization's, a membership you add or renew late in the evening still gets your
+organization's date.
+
 ## To Send a Payment Link
 
 When your organization takes dues online, click **Email Payment Link** on the membership. The
