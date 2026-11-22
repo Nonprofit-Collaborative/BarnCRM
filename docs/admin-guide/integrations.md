@@ -18,7 +18,7 @@ changes nothing in BarnCRM. The page exists to show the direction and to collect
 
 There is nothing to turn on.
 
-1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM**.
+1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM Console**.
 2. Click **BarnCRM Settings**, then **Integrations** in the left navigation.
 
 Everyone who can open BarnCRM Settings sees the page. It has no settings to change, so it shows no save bar.

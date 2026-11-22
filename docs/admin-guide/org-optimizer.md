@@ -75,7 +75,7 @@ Without it there is no **Org Optimizer** tab, Data Manager has no **Org Optimize
 **BarnCRM Settings** shows no **Open Health Check** or **Open the Error Log** link. Everything
 else works as before: the Error Log, Field History and the nightly jobs are Core's.
 
-1. Open the **BarnCRM Admin** app and choose the **Org Optimizer** tab. **Data Manager** also opens it
+1. Open the **BarnCRM Admin Console** app and choose the **Org Optimizer** tab. **Data Manager** also opens it
    from its **Org Optimizer** card.
 2. The package gives the tab by role: BarnCRM Admin holders get every section; BarnCRM Staff,
    Read Only, Find and Export, Bulk Update and Bulk Delete holders get the tab with

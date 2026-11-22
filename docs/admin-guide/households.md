@@ -56,7 +56,7 @@ BarnCRM does not add an Organization record type. Organizations are the accounts
 record type you choose in **Record type for organizations** on **General** (see
 [BarnCRM Settings](barncrm-settings.md)), so your own business record type keeps working.
 
-1. Open the **BarnCRM Admin** app and click the **BarnCRM Settings** tab.
+1. Open the **BarnCRM Admin Console** app and click the **BarnCRM Settings** tab.
 2. Click **People and Households** in the left navigation.
 3. Check the four settings and change any that do not match how you work. The first two are
    in the **People** box, the other two in the **Households** box.
@@ -81,7 +81,7 @@ it would affect. Moving them across is a migration, which BarnCRM does not do ye
 
 Maria does this from the sample data.
 
-1. Open the **BarnCRM** app and click the **Contacts** tab.
+1. Open the **BarnCRM Console** app and click the **Contacts** tab.
 2. Click **New** and enter the first name `Maria` and the last name `Garcia`. Leave the
    household blank. Click **Save**.
 3. Look at the household field on the new person. It is filled in, and the household is

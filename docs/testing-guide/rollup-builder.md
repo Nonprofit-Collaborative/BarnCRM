@@ -16,12 +16,12 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | From the App Launcher, open the **BarnCRM Admin** app and click **Rollup Builder**. | The **Rollup Builder** tab opens. |
+| 1 | From the App Launcher, open the **BarnCRM Admin Console** app and click **Rollup Builder**. | The **Rollup Builder** tab opens. |
 | 2 | Look at the page. | A **Rollup Builder** card holds a **Rollups** card that starts "Every total BarnCRM keeps up to date for you, and when each one was last calculated." Above it, **Needs Attention** shows only while something needs attention (with a count badge). A collapsed **Advanced** section at the bottom holds **Instant Totals**. No read only notice is shown. |
 | 3 | Look at the buttons above the list. | **Schedule Nightly Recalculation** (or **Stop the Nightly Recalculation**), **Recalculate All**, **Restore Shipped Rollups** and **New Rollup** are all enabled. |
 | 4 | If the button reads **Stop the Nightly Recalculation**, click it. | The text above the buttons reads "Nightly recalculation is not scheduled yet." **Needs Attention** shows "The nightly run is not scheduled, so totals a bulk change missed are not put right overnight." |
 | 5 | Click **Schedule Nightly Recalculation**. | The text reads "Nightly recalculation is scheduled for 2:00 AM." The button now reads **Stop the Nightly Recalculation**, and the not scheduled warning under **Needs Attention** is gone. |
-| 6 | Open the **BarnCRM Admin** app, then **BarnCRM Settings**, then the **Rollups** section. | The section opens the same Rollup Builder list, with the same schedule message. |
+| 6 | Open the **BarnCRM Admin Console** app, then **BarnCRM Settings**, then the **Rollups** section. | The section opens the same Rollup Builder list, with the same schedule message. |
 
 **Cleanup:** leave the nightly run scheduled.
 

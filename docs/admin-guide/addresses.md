@@ -34,7 +34,7 @@ Addresses is part of Core, but on a new install it is off until you turn it on. 
 ticked in first-run setup); see [BarnCRM Settings](barncrm-settings.md). There is nothing to
 install and no Setup step. Once it is on, two things are worth setting once.
 
-1. Open the **BarnCRM Admin** app and choose **BarnCRM Settings**.
+1. Open the **BarnCRM Admin Console** app and choose **BarnCRM Settings**.
 2. In the left navigation choose **Addresses**.
 3. Set **Address Updates** to the behavior your organization wants. It always shows one of
    these three; a new install shows the first.
@@ -128,7 +128,7 @@ Primary** the record's own address boxes refresh too.
 You are Maria. The Garcia household spends January to March in Arizona and the rest of the
 year at home, and letters have been going to the wrong place. Start from the sample data.
 
-1. Open the **BarnCRM** app and choose **Households**. Open **The Garcia Family**.
+1. Open the **BarnCRM Console** app and choose **Households**. Open **The Garcia Family**.
 2. Scroll to the **Addresses** card. You will see one address already there, of type
    **Home**, with a **Primary** badge on it. BarnCRM created it from the address that
    was already in the household's standard address boxes when the household was created,
@@ -293,7 +293,7 @@ that the nightly job really works, before the winter mailing goes out.
 7. Now set the Arizona address's end date to yesterday, save, and choose **Run the Swap Now**
    again. The summary reads "0 moved to a seasonal address, 1 moved back", the badge is back
    on the home address, and the household's address boxes read Springfield again.
-8. Open the **BarnCRM** home page. The **Seasonal Addresses Last Swapped** tile shows
+8. Open the **BarnCRM Console** home page. The **Seasonal Addresses Last Swapped** tile shows
    the same time and the same sentence. That tile is where you will notice, on an ordinary
    morning, if the job has stopped running.
 

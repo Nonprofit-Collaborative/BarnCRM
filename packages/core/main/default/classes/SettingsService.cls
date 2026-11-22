@@ -382,11 +382,8 @@ public with sharing class SettingsService {
 		}
 		clearCaches();
 		applySeasonalSwitch(changed);
-		// Which apps and account tabs people see follow these settings (ADR-0137, C-73).
-		if (
-			changed.containsKey(BarnCRM_Settings__c.App_Navigation_Style__c) ||
-			changed.containsKey(BarnCRM_Settings__c.Account_Tabs__c)
-		) {
+		// Which account tabs people see follows this setting (C-73).
+		if (changed.containsKey(BarnCRM_Settings__c.Account_Tabs__c)) {
 			TabAccessService.requestSync();
 		}
 		// Brand visibility follows either brand switch: groups and shares added or removed (R-BR7).

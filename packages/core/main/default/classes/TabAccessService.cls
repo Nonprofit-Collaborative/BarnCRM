@@ -29,9 +29,9 @@
  * The Account Tabs setting (C-73) picks the Organizations tab set (with Households), the
  * standard Accounts tab set, or both, each going to every BarnCRM role while chosen.
  *
- * The four BarnCRM apps follow the same way (ADR-0137): each has a BarnCRM App set that shows that app
- * and nothing else, its audience is every BarnCRM role (the admin apps: BarnCRM Admin only), and
- * the App Navigation Style setting says which style's sets are on.
+ * The two Core role apps follow the same way (ADR-0137, ADR-NEXT nine console apps): each has a
+ * BarnCRM App set that shows that app and nothing else, and its audience is every BarnCRM role
+ * (BarnCRM Admin Console: BarnCRM Admin only). The sets are always on.
  */
 @NamespaceAccessible
 public with sharing class TabAccessService {
@@ -51,15 +51,8 @@ public with sharing class TabAccessService {
 	public static final String ACCOUNT_TABS_ACCOUNTS = 'Accounts';
 	public static final String ACCOUNT_TABS_BOTH = 'Both';
 
-	public static final String STANDARD_APP = 'BarnCRM_App_Standard';
 	public static final String CONSOLE_APP = 'BarnCRM_App_Console';
-	public static final String ADMIN_STANDARD_APP = 'BarnCRM_App_Admin_Standard';
 	public static final String ADMIN_CONSOLE_APP = 'BarnCRM_App_Admin_Console';
-
-	/** The stored values of App Navigation Style; anything else reads as Both. */
-	public static final String STYLE_STANDARD = 'Standard';
-	public static final String STYLE_CONSOLE = 'Console';
-	public static final String STYLE_BOTH = 'Both';
 
 	private static final String ADMIN = 'BarnCRM_Admin';
 	private static final String STAFF = 'BarnCRM_Staff';
@@ -86,27 +79,12 @@ public with sharing class TabAccessService {
 		HOUSEHOLDS_SET => new List<String>{ ADMIN, STAFF, READ_ONLY },
 		ORGANIZATIONS_TAB => new List<String>{ ADMIN, STAFF, READ_ONLY },
 		ACCOUNTS_TAB => new List<String>{ ADMIN, STAFF, READ_ONLY },
-		STANDARD_APP => new List<String>{ ADMIN, STAFF, READ_ONLY },
 		CONSOLE_APP => new List<String>{ ADMIN, STAFF, READ_ONLY },
-		ADMIN_STANDARD_APP => new List<String>{ ADMIN },
 		ADMIN_CONSOLE_APP => new List<String>{ ADMIN }
 	};
 
-	/**
-	 * The app sets the App Navigation Style setting turns on: one style's two apps, or all four
-	 * for Both, which is also what a blank or unknown value reads as.
-	 */
-	public static Set<String> appSetsOn() {
-		String style = SettingsService.getSettings().App_Navigation_Style__c;
-		Set<String> names = new Set<String>();
-		if (style != STYLE_CONSOLE) {
-			names.addAll(new List<String>{ STANDARD_APP, ADMIN_STANDARD_APP });
-		}
-		if (style != STYLE_STANDARD) {
-			names.addAll(new List<String>{ CONSOLE_APP, ADMIN_CONSOLE_APP });
-		}
-		return names;
-	}
+	/** The app sets are always on: each goes to its audience whatever the features say. */
+	private static final Set<String> APP_SETS = new Set<String>{ CONSOLE_APP, ADMIN_CONSOLE_APP };
 
 	/**
 	 * The account tab sets the Account Tabs setting turns on (C-73): Organizations for
@@ -191,7 +169,7 @@ public with sharing class TabAccessService {
 		Map<String, Id> setIds = packagedSetIds();
 		Map<Id, Set<Id>> groupIdsBySet = groupsContaining(setIds.values());
 		Set<String> turnedOn = FeatureSwitchService.tabSetsOn();
-		turnedOn.addAll(appSetsOn());
+		turnedOn.addAll(APP_SETS);
 		turnedOn.addAll(accountTabSetsOn());
 		// Accounts Tab (Standard) hides the Households tab too, whatever its feature says.
 		if (!turnedOn.contains(ORGANIZATIONS_TAB)) {

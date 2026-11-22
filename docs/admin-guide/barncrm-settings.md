@@ -33,7 +33,7 @@ BarnCRM support page on GitHub in a new tab.
 
 There is nothing to turn on, but there is one permission to give out.
 
-1. Open the **BarnCRM Admin** app and click the **BarnCRM Settings** tab.
+1. Open the **BarnCRM Admin Console** app and click the **BarnCRM Settings** tab.
 2. If you can change values, you already have the **Manage BarnCRM Settings**
    permission. If you see a notice at the top of the page saying you can read but not
    change settings, you do not.
@@ -162,7 +162,7 @@ Accounts Tab** each show one tab, and BarnCRM gives the chosen ones to everyone 
 Admin, Staff or Read Only role within a few minutes of saving (and takes the others away). The
 Households tab still needs the **Households** feature on. The setting only adds tabs: a person
 whose profile already shows the Accounts tab keeps it whatever you choose, so to hide it, change
-the profile's tab setting in Setup. The BarnCRM and BarnCRM Console apps list the Accounts tab,
+the profile's tab setting in Setup. The BarnCRM Console app lists the Accounts tab,
 so it shows in their navigation bar for anyone who can see it.
 
 ## Modules
@@ -189,7 +189,7 @@ Builder ships as its own package, installed from this section like the others. S
 
 Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
 
-1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM Admin** (or **BarnCRM Admin
+1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM Admin Console** (or **BarnCRM Admin
    Console**). It opens on the **BarnCRM Settings** tab.
 2. The console opens with the section list on the
    left and the first section showing on the right. The page name shows once, in the page

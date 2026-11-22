@@ -611,7 +611,6 @@ private class ConnectorRecipesControllerTest {
 					choice.name == 'BarnCRM_Admin' ||
 					(choice.name.endsWith('_Admin') &&
 					choice.name != 'BarnCRM_App_Admin_Console' &&
-					choice.name != 'BarnCRM_App_Admin_Standard' &&
 					choice.name != 'BarnCRM_Metadata_Admin' &&
 					choice.name != ConnectorConnections.ADMIN_SET),
 					choice.picked,

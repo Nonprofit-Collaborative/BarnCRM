@@ -67,7 +67,7 @@ the person's **Primary Affiliation** field refreshes too.
 You are Maria. A colleague is planning an outreach to local employers and needs to know who
 among your contacts works where. Start from the sample data.
 
-1. Open the **BarnCRM** app and choose **Households**. Open **The Garcia Family** and
+1. Open the **BarnCRM Console** app and choose **Households**. Open **The Garcia Family** and
    choose **Harper Garcia**.
 2. Scroll to the **Affiliations** card. It is empty: it shows **No Affiliations Yet** with an
    **Add Affiliation** button.

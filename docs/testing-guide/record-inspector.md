@@ -31,7 +31,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **BarnCRM Admin** app. | **Record Inspector** is not in the navigation (it is button only, D-183); **Error Log** is last. |
+| 1 | Open the **BarnCRM Admin Console** app. | **Record Inspector** is not in the navigation (it is button only, D-183); **Error Log** is last. |
 | 2 | Open the App Launcher, choose **All Items** and click **Record Inspector**. | The page shows a **Record ID or Link** box, an **Inspect** button and a short note on what to paste. No table. |
 | 3 | Type `not a record` and click **Inspect**. | An error says it is not a record ID or a link to a record. |
 | 4 | Copy the address of an Organization's record page, paste it in the box and press Enter. | The page reads the Organization: its name and **Account** above the table. The address bar now names the record, so the link can be shared with another admin. |

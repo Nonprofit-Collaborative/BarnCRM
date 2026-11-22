@@ -5,7 +5,7 @@
 Funder pipeline (grants applied for and awarded), reporting requirements and deadlines with
 reminders, government award fields, multi-year award schedules, restricted fund tracking, the
 Grant Calendar, an answer library, requirements linked to Logic Models outcomes, funder report
-templates and the Board Dashboard (plan Section 5.5, ADR-0161 `0161-funders-module.md`, ADR-0162
+templates and Grants Home (plan Section 5.5, ADR-0161 `0161-funders-module.md`, ADR-0162
 `0162-funders-restricted-funds-schedules-calendar.md`, ADR-0163 `0163-funders-reporting-links.md`).
 
 ## First ships in
@@ -46,6 +46,6 @@ and a Giving fund by record identifier (text), resolved by describe only where a
   `GrantOutcomeService`), resolved by describe only where Logic Models is installed.
 - `Funder_Report_Template__c` (29ZO) and its shipped defaults, merged in the browser by the
   Funder Report card (`grantReport`, framework-free `grantReportModel`, `GrantReportController`).
-- The **Board Dashboard** tab (`Funders_Board`, `fundersBoard`, framework-free `fundersBoardModel`,
+- The **Grants Home** tab (`Funders_Board`, `fundersBoard`, framework-free `fundersBoardModel`,
   `FundersBoardController`).
 - Permission sets Grants Admin, Staff and Read Only, given by role through `FundersAccessSync`.

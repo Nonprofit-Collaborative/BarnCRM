@@ -60,6 +60,7 @@ editions, not installed by default.
 - `ConnectorHealthCheckExtension` (registered in Core's `HealthCheckExtensions`),
   `ConnectorWhereUsedExtension` (registered in Core's `WhereUsedExtensions`) and
   `ConnectorPostInstall`.
-- App `BarnCRM_Connector` (console; left out on capped orgs, ADR-0223), tab `Super_Connector`,
+- No app (ADR-NEXT (nine console apps)): tab `Super_Connector` joins BarnCRM Admin Console through the catalog
+  row's `Admin_Tabs__c`;
   custom permission `Manage_BarnCRM_Connector`, permission sets `Connector_Admin` and
   `Connector_Viewer`, help texts `BarnHelp_Connector`.

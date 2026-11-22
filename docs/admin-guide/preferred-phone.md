@@ -36,7 +36,7 @@ person accounts are not touched, because their phone numbers live on fields only
 
 ## A Five-Minute Walkthrough
 
-1. Open the **BarnCRM** app, click the **Contacts** tab, and open a person.
+1. Open the **BarnCRM Console** app, click the **Contacts** tab, and open a person.
 2. Type a number into **Home Phone** and a different one into **Mobile**. Click **Save**. The
    ordinary **Phone** box does not change, because you have not said which to use.
 3. Click **Edit**, set **Preferred Phone** to **Mobile**, and click **Save**. The ordinary

@@ -86,6 +86,7 @@ const ICONS = Object.freeze({
   // Forms
   Form_Submission__c: 'custom:custom51',
   Form__c: 'custom:custom28',
+  Forms_Home: 'custom:custom27',
   // Logic Models
   Logic_Model__c: 'custom:custom62',
   // Contact Point Sync
@@ -93,6 +94,7 @@ const ICONS = Object.freeze({
   // Portal Builder
   Portal_Access__c: 'custom:custom77',
   Portal__c: 'custom:custom47',
+  Portal_Builder_Home: 'custom:custom68',
   // Corporate Hub
   Agreement__c: 'custom:custom93',
   Board__c: 'custom:custom47',
@@ -131,6 +133,7 @@ const ICONS = Object.freeze({
   Membership_Term__c: 'custom:custom45',
   Certification__c: 'custom:custom8',
   Member_Certification__c: 'custom:custom46',
+  Memberships_Home: 'custom:custom11',
   // Project Management
   Project__c: 'custom:custom62',
   Projects_Home: 'custom:custom64',

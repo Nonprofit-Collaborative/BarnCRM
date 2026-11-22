@@ -421,7 +421,7 @@ Dot,Zzshirt,dot.zzshirt@example.org,M,2026-10-04
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Import `import-test-1.csv` with **Generic contact list** as in T-IMP-01, steps 1 to 8. | **Created** 3, **Rejected** 1 (Dee, no last name). |
-| 2 | In the **BarnCRM Admin** app, open **Import Rows** from the App Launcher (it is not in the navigation bar) and choose each list view: **All Import Rows**, **Rejected Import Rows**, **Rejected Rows of Complete Imports**. | Each shows rows with **Import Batch**, **Row Number**, **Status** and **Data Job Status**; the rejected views show Dee's row with **Data Job Status** Complete. |
+| 2 | In the **BarnCRM Admin Console** app, open **Import Rows** from the App Launcher (it is not in the navigation bar) and choose each list view: **All Import Rows**, **Rejected Import Rows**, **Rejected Rows of Complete Imports**. | Each shows rows with **Import Batch**, **Row Number**, **Status** and **Data Job Status**; the rejected views show Dee's row with **Data Job Status** Complete. |
 | 3 | Log in as the Staff-only user and open Dee's row from the import's Data Job record (**Import Rows** list). | The card is read only and says you need the Manage BarnCRM Settings permission. |
 | 4 | Log in as the second user (not the one who committed the import) and open Dee's row. | A **Super Importer Row** card shows **Status** Rejected, a link to the import, **Why It Was Rejected**, and a table of **Column**, **File Value** and **Corrected Value** for every column of the file. |
 | 5 | Type `Nolast` in **Corrected Value** beside **Last Name** and select **Save Corrections**. | "Corrections saved. The file's values are kept beside them." **File Value** for Last Name is still empty; **Raw Values** in the details below is unchanged; "1 corrected rows in this import are ready to retry." |
@@ -518,7 +518,7 @@ ana.rowe@example.org,Rivergate Library,Volunteer,true,2026-03-01
 | 1 | Open **Super Importer**, choose **People and Organizations**, **Next**. | A dashed area labeled **Upload or drop a file here** holds the file control. |
 | 2 | Drag `import-test-1.csv` from your computer onto the area. | The file is read as if chosen with the control; the columns step opens on **Next**. On a phone the file picker does the same. |
 | 3 | Go on to **Preview**. | The footer button reads **Import 4 of 5 Rows**; with a file that rejects nothing it reads **Import All {n} Rows**. Above it, a box headed **Not sure? Try a few rows first.** has a button **Import the First 25 Rows** (it follows the number in **Rows to try**). |
-| 4 | Import the file. On **Results**, select **See Every Row**. | The data job's **Import Rows** list opens with one row per file row, including the rejected one. The **Import Rows** tab is not in the BarnCRM Admin app's navigation bar. |
+| 4 | Import the file. On **Results**, select **See Every Row**. | The data job's **Import Rows** list opens with one row per file row, including the rejected one. The **Import Rows** tab is not in the BarnCRM Admin Console app's navigation bar. |
 
 **Cleanup:** undo the import from **Recent Imports** (see T-IMP-03).
 

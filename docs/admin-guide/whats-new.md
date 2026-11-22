@@ -29,7 +29,7 @@ installed, and it fills itself from the notes each release ships.
 
 ## A Five-Minute Walkthrough
 
-1. Open the **BarnCRM** app and the **Home** tab. Result: at the top of the page, a card
+1. Open the **BarnCRM Console** app and the **Home** tab. Result: at the top of the page, a card
    headed "What's New in BarnCRM" lists the notes for the current release under "Version" and
    the release number.
 2. Read the first note. Result: a bold headline, and under it a line for each detail.

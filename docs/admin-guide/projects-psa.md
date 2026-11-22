@@ -64,7 +64,7 @@ with Projects Admin. A bookkeeper who is not a BarnCRM admin needs Projects Admi
 ## Rate Cards (PM-06)
 
 1. Turn on **Use rate cards**.
-2. Open the **Project Rates** tab (BarnCRM Admin app) and add rates. Each rate is for one
+2. Open the **Project Rates** tab (BarnCRM Admin Console app) and add rates. Each rate is for one
    **Person** or one **Role** (the same words as the Role on Project Assignments, such as Project
    Manager or Data Migration), with a **Bill Rate**, an optional **Cost Rate** and the dates it
    applies.

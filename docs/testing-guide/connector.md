@@ -13,7 +13,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | In **BarnCRM Settings**, **Modules**, install or turn on **BarnCRM Connector**. | Listed as Beta in both editions. You hold **BarnCRM Connector Admin**. |
-| 2 | Open the **BarnCRM Connector** app (or the **Super Connector** tab in a BarnCRM admin app on an org with capped apps). | **Super Connector** opens with the keys icon, **Connections** and **No connections yet**. **Error Log** is the last tab of the app. |
+| 2 | Open **BarnCRM Admin Console** and its **Super Connector** tab. | **Super Connector** opens with the keys icon, **Connections** and **No connections yet**. **Error Log** is the last tab of the app. |
 | 3 | Open **Setup**, **Permission Sets**. | No **BarnCRM Connections** set yet (it is created with the first connection). |
 
 **Cleanup:** None.

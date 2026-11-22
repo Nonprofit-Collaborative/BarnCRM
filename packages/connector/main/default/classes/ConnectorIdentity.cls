@@ -15,7 +15,6 @@ public with sharing class ConnectorIdentity {
 	};
 	private static final Set<String> NOT_DEFAULT = new Set<String>{
 		'BarnCRM_App_Admin_Console',
-		'BarnCRM_App_Admin_Standard',
 		'BarnCRM_Metadata_Admin'
 	};
 

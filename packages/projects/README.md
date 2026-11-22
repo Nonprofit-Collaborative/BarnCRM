@@ -29,7 +29,7 @@ No other module is referenced. Standard objects used: Account, Contact and User 
   text).
 - One nightly step, `ProjectHealth` at 6:40 AM; no trigger.
 - App `BarnCRM_Projects` (BarnCRM Projects, logo `BarnCRM_Patch_Projects_Logo`) holds every tab,
-  visible through the Projects permission sets; left out of scratch and Developer Edition orgs
-  (ADR-0223, module apps). The catalog row's tabs also join the BarnCRM apps before Error Log:
-  `Staff_Tabs__c` in BarnCRM and BarnCRM Console, `Admin_Tabs__c` in the admin apps.
+  visible through the Projects permission sets; every org gets it (ADR-0223, module apps;
+  ADR-NEXT (nine console apps)). The catalog row's `Admin_Tabs__c` also join BarnCRM Admin Console before
+  Error Log.
 - Settings in the Projects section of BarnCRM Settings.

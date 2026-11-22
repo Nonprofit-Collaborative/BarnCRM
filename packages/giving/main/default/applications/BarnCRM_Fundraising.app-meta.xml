@@ -94,8 +94,9 @@
   <formFactors>Large</formFactors>
   <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
   <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
+  <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
   <label>BarnCRM Fundraising</label>
-  <navType>Standard</navType>
+  <navType>Console</navType>
   <tabs>Fundraising_Home</tabs>
   <tabs>Quick_Gift_Entry</tabs>
   <tabs>standard-Contact</tabs>
@@ -111,4 +112,45 @@
   <tabs>standard-report</tabs>
   <uiType>Lightning</uiType>
   <utilityBar>Fundraising_Utility_Bar</utilityBar>
+  <workspaceConfig>
+    <mappings>
+      <tab>Fundraising_Home</tab>
+    </mappings>
+    <mappings>
+      <tab>Quick_Gift_Entry</tab>
+    </mappings>
+    <mappings>
+      <tab>standard-Contact</tab>
+    </mappings>
+    <mappings>
+      <tab>Households</tab>
+    </mappings>
+    <mappings>
+      <tab>Organizations</tab>
+    </mappings>
+    <mappings>
+      <tab>Gift__c</tab>
+    </mappings>
+    <mappings>
+      <tab>Commitment__c</tab>
+    </mappings>
+    <mappings>
+      <tab>Ask_Pipeline</tab>
+    </mappings>
+    <mappings>
+      <tab>Gift_Batch__c</tab>
+    </mappings>
+    <mappings>
+      <tab>Receipt__c</tab>
+    </mappings>
+    <mappings>
+      <tab>Stewardship_Plan__c</tab>
+    </mappings>
+    <mappings>
+      <tab>Acknowledgments</tab>
+    </mappings>
+    <mappings>
+      <tab>standard-report</tab>
+    </mappings>
+  </workspaceConfig>
 </CustomApplication>

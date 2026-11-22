@@ -25,7 +25,7 @@ turn it on: choose **Turn On** in the **Households** row in **BarnCRM Settings**
 [BarnCRM Settings](barncrm-settings.md). Once it is on, the patterns work out of the box.
 To change them:
 
-1. Open the **BarnCRM Admin** app and click the **BarnCRM Settings** tab.
+1. Open the **BarnCRM Admin Console** app and click the **BarnCRM Settings** tab.
 2. Click **People and Households** in the left navigation. The naming panel is in the
    **Household Names and Greetings** box, and
    it is the only place the three patterns are edited: they are not also listed as

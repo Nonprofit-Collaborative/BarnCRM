@@ -398,7 +398,7 @@ private class TabAccessServiceTest {
 	}
 
 	@IsTest
-	static void everyRoleSeesBothStylesAndOnlyAdminsSeeTheAdminApps() {
+	static void everyRoleSeesTheConsoleAndOnlyAdminsSeeTheAdminConsole() {
 		System.runAs(TestUsers.admin()) {
 			Id staff = userId(TEAM_MEMBER);
 
@@ -407,70 +407,19 @@ private class TabAccessServiceTest {
 			Test.stopTest();
 
 			Assert.areEqual(
-				new Set<String>{ TabAccessService.STANDARD_APP, TabAccessService.CONSOLE_APP },
+				new Set<String>{ TabAccessService.CONSOLE_APP },
 				appSetsOf(staff),
-				'Both is the default, so staff see BarnCRM and BarnCRM Console and no admin app'
+				'Staff see BarnCRM Console and no admin app'
 			);
 			Assert.areEqual(
-				new Set<String>{
-					TabAccessService.STANDARD_APP,
-					TabAccessService.CONSOLE_APP,
-					TabAccessService.ADMIN_STANDARD_APP,
-					TabAccessService.ADMIN_CONSOLE_APP
-				},
+				new Set<String>{ TabAccessService.CONSOLE_APP, TabAccessService.ADMIN_CONSOLE_APP },
 				appSetsOf(UserInfo.getUserId()),
-				'An admin sees all four apps'
+				'An admin sees both Core apps'
 			);
 			Assert.isTrue(
 				appSetsOf(userId(PRIYA)).isEmpty(),
 				'An extra permission alone is not a BarnCRM role, so it shows no app'
 			);
-		}
-	}
-
-	@IsTest
-	static void savingOneStyleHidesTheOtherAppsForEveryone() {
-		Id staff = userId(TEAM_MEMBER);
-		System.runAs(TestUsers.admin()) {
-			TabAccessService.syncNow();
-			Assert.areEqual(2, appSetsOf(staff).size(), 'Both styles before the change');
-		}
-		// A separate block: the platform does not mix the assignments with a settings write.
-		System.runAs(TestUsers.admin()) {
-			Test.startTest();
-			SettingsService.saveValues(
-				new Map<String, Object>{ 'App_Navigation_Style__c' => TabAccessService.STYLE_CONSOLE }
-			);
-			Test.stopTest();
-
-			Assert.areEqual(
-				new Set<String>{ TabAccessService.CONSOLE_APP },
-				appSetsOf(staff),
-				'The save queued the sync, which took the standard app away'
-			);
-			Assert.areEqual(
-				new Set<String>{ TabAccessService.CONSOLE_APP, TabAccessService.ADMIN_CONSOLE_APP },
-				appSetsOf(UserInfo.getUserId()),
-				'And the admin keeps the two console apps'
-			);
-		}
-	}
-
-	@IsTest
-	static void eachStyleTurnsOnItsOwnTwoApps() {
-		System.runAs(TestUsers.admin()) {
-			SettingsService.saveValues(
-				new Map<String, Object>{ 'App_Navigation_Style__c' => TabAccessService.STYLE_STANDARD }
-			);
-			Assert.areEqual(
-				new Set<String>{ TabAccessService.STANDARD_APP, TabAccessService.ADMIN_STANDARD_APP },
-				TabAccessService.appSetsOn(),
-				'Standard'
-			);
-			SettingsService.saveValues(
-				new Map<String, Object>{ 'App_Navigation_Style__c' => TabAccessService.STYLE_BOTH }
-			);
-			Assert.areEqual(4, TabAccessService.appSetsOn().size(), 'Both');
 		}
 	}
 

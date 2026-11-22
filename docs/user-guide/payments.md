@@ -7,7 +7,7 @@ You look payments up; you never enter or change one. Your BarnCRM admin sets pay
 
 ## To Find a Payment
 
-1. Open the **BarnCRM** (or **BarnCRM Console**) app and the **Payments** tab.
+1. Open the **BarnCRM Console** app and the **Payments** tab.
 2. Choose a list view, or search by the payment number (PAY-000123), the payer's name or email.
 3. Open the payment. It shows the amount, what it was for, who paid, its **Status**, when it was
    paid, any amount refunded and, if it failed or was cancelled, why.

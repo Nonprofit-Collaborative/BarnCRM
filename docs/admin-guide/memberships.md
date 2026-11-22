@@ -33,11 +33,30 @@ they are installed.
 Install it from **Module Manager** (see [Module Manager](module-manager.md)). When the install
 finishes, BarnCRM gives you, the person who installed it, the **Memberships Admin** permission
 set. Like every module it is installed **off**: turn it on in Module Manager when you are ready.
-It has its own app, **BarnCRM Memberships** (Memberships, Member Certifications, Membership
-Levels, Certifications, Reports and Error Log), shown to everyone with a Memberships permission
-set; a scratch or Developer Edition org gets the tabs only. Its tabs also join the BarnCRM apps:
-**Memberships** and **Member Certifications** for staff, **Membership Levels** and
-**Certifications** for admins.
+Its pages are in **BarnCRM Members and Partners**, a Core app shared with Corporate Hub and
+shown to everyone with a Memberships permission set: Memberships Home (the app opens on it),
+Memberships, Member Certifications, Membership Levels and Certifications, then Corporate Hub's
+pages when it is installed, Reports, Dashboards and Error Log. **Membership Levels** and
+**Certifications** are also in **BarnCRM Admin Console**.
+
+### Memberships Home
+
+**Memberships Home** is the app's first tab and follows the Module Home layout (see [Module
+Homes](barncrm-app.md#module-homes)). It shows:
+
+- **Active Members** (Current or Grace), **Expiring in 30 Days** (Current memberships whose End
+  Date is today or in the next 30 days), **In Grace Period** and **Renewals, Last 30 Days**
+  (memberships that follow an earlier one, added in the last 30 days) as figures; each opens the
+  Memberships list.
+- **Expiring Soon**: up to ten of those expiring memberships, soonest first, with member, level,
+  End Date and status.
+- **Recent Renewals**: up to ten of the newest renewals, with member, level, Start Date and status.
+- **New Membership** at the top right, for anyone who may create memberships.
+
+Before the first membership it shows a setup panel instead: **Set Up a Membership Level** with
+**New Membership Level** when there is no level yet (for anyone who may create one), then **Add
+Your First Member** with **New Membership**. Each person sees counts and rows for the memberships
+they may read. It stores nothing and has no settings.
 
 ### Who Gets What
 

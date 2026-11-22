@@ -25,7 +25,7 @@ reporting a clean org.
 
 Health Check's one home is **Org Optimizer**:
 
-1. Open the **BarnCRM Admin** app.
+1. Open the **BarnCRM Admin Console** app.
 2. Click the **Org Optimizer** tab and choose **Health Check** (in the list on the left, or
    in the **Show** box on a phone).
 3. The section shows the last full run. Click **Run Health Check** the first time, and
@@ -59,7 +59,7 @@ Maria has just installed BarnCRM into her organization's Salesforce org. Person 
 are on, and nothing else that keeps households is installed. She has not set anything up
 yet.
 
-1. Maria opens the **BarnCRM Admin** app, clicks **Org Optimizer**, chooses **Health
+1. Maria opens the **BarnCRM Admin Console** app, clicks **Org Optimizer**, chooses **Health
    Check**, and clicks **Run Health Check**.
 2. The first card is **What We Found in Your Org**. It says Person Accounts are enabled.
    Under it, the card shows the mode this org is in now and the mode BarnCRM recommends:

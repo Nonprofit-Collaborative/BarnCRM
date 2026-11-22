@@ -5,7 +5,7 @@ primary. The primary is copied into the standard address fields, so letters and 
 use the right one. People also get three email boxes and a choice of which one you write to,
 and a choice of which phone number to call.
 
-Before you start: open the **BarnCRM** app. Changing addresses, email and phone needs the Team
+Before you start: open the **BarnCRM Console** app. Changing addresses, email and phone needs the Team
 Member, Fundraising Staff or Admin role. The **Addresses** card appears once your
 admin has turned on the Addresses feature. Ask your admin; see
 [Addresses](../admin-guide/addresses.md).

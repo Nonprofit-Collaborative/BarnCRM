@@ -33,7 +33,7 @@ when you want it, and nothing of it is kept afterwards except the connection and
 
 1. Install the module from **BarnCRM Settings**, **Modules** (see [Module Manager](module-manager.md)).
    Holders of BarnCRM Admin get **BarnCRM Connector Admin**.
-2. Open the **BarnCRM Connector** app (or the **Super Connector** tab in the BarnCRM admin apps).
+2. Open **BarnCRM Admin Console** and its **Super Connector** tab.
 3. Select **New Connection** and fill it in (see [Creating a Connection](#creating-a-connection)).
 4. Turn on callouts for it in Setup, once (see [The One Setup Step](#the-one-setup-step)), then
    select **Check Again**.
@@ -630,8 +630,8 @@ recipe links.
 
 | Permission set | Gives |
 |---|---|
-| BarnCRM Connector Admin | The BarnCRM Connector app, the Super Connector tab, Manage BarnCRM Connector and every recipe and run. Give it only to system administrators: whoever holds it decides where your data goes. |
-| BarnCRM Connector Viewer | The BarnCRM Connector app and the Super Connector tab, to see recipes and Run History without changing them. The Connections tab tells a Viewer that Connector admins manage connections. |
+| BarnCRM Connector Admin | The Super Connector tab (in BarnCRM Admin Console), Manage BarnCRM Connector and every recipe and run. Give it only to system administrators: whoever holds it decides where your data goes. |
+| BarnCRM Connector Viewer | The Super Connector tab (in BarnCRM Admin Console), to see recipes and Run History without changing them. The Connections tab tells a Viewer that Connector admins manage connections. |
 | BarnCRM Connector Webhook Guest | For a Site's guest user only: the webhook receiver and nothing else (no object, record, connection or key). Health Check's **Give Webhook Access** assigns it. |
 | BarnCRM Connections | Created by BarnCRM in your org, not part of the package. It holds each connection's principal access and is given only to Connector admins when they create or check a connection, to the Automated Process user when you save Recipe Access, and to the integration user when you choose it. Do not add other permissions to it: Health Check warns when it holds anything else. |
 

@@ -3,6 +3,20 @@
   "texts": {
     "Portal_Code_Email_Body": "Your sign-in code for {0} is {1}. It works for {2} minutes.\n\nIf you did not ask to sign in, you can ignore this email: nobody can sign in without the code.",
     "Portal_Code_Email_Subject": "Your sign-in code for {0}",
-    "Portal_Scope_Capped": "A portal page reads at most {0} of a person''s scope records (newest first), so older ones are left out of the page. Narrow the page''s scope conditions if people need them."
+    "Portal_Scope_Capped": "A portal page reads at most {0} of a person''s scope records (newest first), so older ones are left out of the page. Narrow the page''s scope conditions if people need them.",
+    "Portal_Home_Title": "Portal Builder Home",
+    "Portal_Home_Intro": "Your portals and who uses them. People With Access counts active access records across every portal; Signed In counts people who signed in during the last 30 days.",
+    "Portal_Home_NewPortal": "New Portal",
+    "Portal_Home_FirstRunHeading": "Set Up Your First Portal",
+    "Portal_Home_FirstRunMessage": "Create a portal, choose its template and who may sign in, then make it active.",
+    "Portal_Home_Live": "Active Portals",
+    "Portal_Home_Access": "People With Access",
+    "Portal_Home_Suspended": "Suspended Access",
+    "Portal_Home_SignIns": "Signed In, Last 30 Days",
+    "Portal_Home_Portals": "Portals",
+    "Portal_Home_RecentSignIns": "Latest Sign-Ins",
+    "Portal_Home_NoSignIns": "No sign-ins in the last 30 days",
+    "Portal_Home_NoSignInsNext": "Make a portal active and invite people from its Portal Access list; their sign-ins show here.",
+    "Portal_Home_LoadFailed": "Portal Builder Home did not load. Try again. If it happens again, ask your BarnCRM admin to check the Error Log."
   }
 }

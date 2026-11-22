@@ -270,7 +270,7 @@ each save.
 
 ### Programs at a Glance
 
-In the **BarnCRM** apps a person opens on Core's page, which shows no programs. Programs adds a
+In the **BarnCRM Console** app a person opens on Core's page, which shows no programs. Programs adds a
 **Programs at a Glance** card to that page's glance area (the record glance seam, ADR-0167):
 **Open Enrollments** (enrollments the person has that are not completed or withdrawn) and
 **Last Service** (the latest service they attended), with **Enroll** (a new enrollment with the
@@ -519,7 +519,7 @@ person's Programs card, the delivery rules and Participant Privacy all count it 
 
 ## Program Dashboard
 
-The **Programs Dashboard** tab in the BarnCRM Programs app answers how your programs are doing,
+The **Programs Home** tab, the BarnCRM Programs app's home, answers how your programs are doing,
 for everyone with a Programs permission set. Pick a period at the top (**This Month**, the
 default, **Last Month**, **This Year**, **Last Year** or **Last 12 Months**). Tiles show:
 

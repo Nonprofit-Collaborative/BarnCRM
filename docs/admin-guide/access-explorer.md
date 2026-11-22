@@ -53,7 +53,7 @@ user sharing to show you people you could not otherwise see.
 
 Start from the sample data (see [Sample data](sample-data.md)).
 
-1. Open the **Org Optimizer** tab (in the admin apps, or from its card on **Data Manager**) and
+1. Open the **Org Optimizer** tab (in BarnCRM Admin Console, or from its card on **Data Manager**) and
    choose the **Access Explorer** tile.
 2. **By Person or Permission Set** is open, looking up a **Person**. Type part of a colleague's name in **Person** and choose them. The
    page shows their profile and an **Access Comes From** list: their profile, each permission set

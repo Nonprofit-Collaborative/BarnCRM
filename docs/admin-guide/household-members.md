@@ -36,7 +36,7 @@ and the product tells them the change was refused rather than pretending it work
 **Where the panels are.** Core ships the placement: the Members panel sits on the packaged
 Household record page, and the Household panel sits on the packaged Contact record page,
 both of which the BarnCRM app uses. If either is missing, you are most
-likely looking at the record outside the **BarnCRM** app, or somebody has overridden
+likely looking at the record outside the **BarnCRM Console** app, or somebody has overridden
 the page assignment in the Lightning App Builder.
 
 ## The Members Panel
@@ -154,7 +154,7 @@ means no current membership record names them.
 
 Maria does this from the sample data.
 
-1. Open the **BarnCRM** app and click the **Households** tab, then open **The Garcia
+1. Open the **BarnCRM Console** app and click the **Households** tab, then open **The Garcia
    Family**. The **Members** panel lists Harper, Luis and Diego Garcia, with a
    **Primary** badge on one of them.
 2. Open the menu on Luis's tile and choose **Make Primary**. The badge moves to Luis and the

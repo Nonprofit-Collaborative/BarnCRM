@@ -2,7 +2,7 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
   <apiVersion>67.0</apiVersion>
   <description>
-    The Scholarships and Grants page: my reviews, open cycles, disbursements due and Export
+    Scholarships Home: my reviews, open cycles, disbursements due and Export
     Disbursements for managers (SG-03, SG-05, SG-10).
   </description>
   <isExposed>true</isExposed>

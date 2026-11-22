@@ -7,7 +7,7 @@
     policy acknowledgments.
   </description>
   <applicationVisibilities>
-    <application>BarnCRM_Corporate_Hub</application>
+    <application>BarnCRM_Members_Partners</application>
     <visible>true</visible>
   </applicationVisibilities>
   <classAccesses>

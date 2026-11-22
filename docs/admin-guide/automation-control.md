@@ -27,7 +27,7 @@ ever missing, the automation still runs, and Health Check names it and offers to
 
 You will find it in these places:
 
-- **The Automation tab** in **BarnCRM Admin** and **BarnCRM Admin Console** (BarnCRM Admin
+- **The Automation tab** in **BarnCRM Admin Console** (BarnCRM Admin
   only, D-184). This is the full page. It opens with the page header every BarnCRM page shares,
   saying what the page is for. Its first card, **Pause and Catch Up**, holds the pause
   button and **Catch Up Now**. Its second card, **Automations**, holds the list of every
@@ -48,7 +48,7 @@ Maria is about to load a spreadsheet of 400 people from a partner organization. 
 the records in first and the automatic housekeeping to happen afterwards, so nothing runs
 400 times while she is watching.
 
-1. Open the **BarnCRM Admin** app and click **BarnCRM Settings**.
+1. Open the **BarnCRM Admin Console** app and click **BarnCRM Settings**.
 2. In the left navigation, click **Automation**. You see a list of every piece of
    automation BarnCRM ships, each with a plain-language description and a switch.
 3. In the **Pause and Catch Up** card, choose **2 hours** in the **How long** list, then click

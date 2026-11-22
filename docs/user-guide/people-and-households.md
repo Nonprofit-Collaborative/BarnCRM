@@ -5,7 +5,7 @@ history. BarnCRM creates a household for every new person, names it, writes its 
 keeps its member count right. Organizations (employers, foundations, congregations, partners)
 are kept separately.
 
-Before you start: open the **BarnCRM** app. Adding and changing people and households needs
+Before you start: open the **BarnCRM Console** app. Adding and changing people and households needs
 the Team Member, Fundraising Staff or Admin role. With Read Only you can look
 but not change; see [Read-only access](read-only-access.md).
 
@@ -187,7 +187,7 @@ Erasing a person on request is admin work. See [Erase a person](../admin-guide/e
 - Problem: **Household** is not offered when you click **New**. That is expected: use **New
   household** on the **Home** tab.
 - Problem: there is no **Merge or Split** button. You are on an organization, or outside the
-  **BarnCRM** app.
+  **BarnCRM Console** app.
 - Problem: "This person is in a household, so Account Name must stay a household, not an
   organization. To connect them to an organization, add an affiliation. To move them, use
   Move to another household." You put an organization in the person's **Account Name**. Put

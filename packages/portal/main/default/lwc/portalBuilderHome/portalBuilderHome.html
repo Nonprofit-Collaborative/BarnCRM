@@ -1,0 +1,117 @@
+<template>
+  <template lwc:if={helpReady}>
+    <c-barn-page-shell title={labels.title} purpose={labels.intro} icon-name={icon} data-id="shell">
+      <div slot="actions">
+        <template lwc:if={canCreate}>
+          <lightning-button
+            data-id="new-portal"
+            variant="brand"
+            label={labels.newPortal}
+            onclick={handleNewPortal}
+          ></lightning-button>
+        </template>
+      </div>
+
+      <template lwc:if={isLoading}>
+        <lightning-spinner alternative-text={labels.title} size="small"></lightning-spinner>
+      </template>
+
+      <template lwc:if={errorMessage}>
+        <c-barn-notice
+          variant="error"
+          message={errorMessage}
+          data-id="error-message"
+          class="slds-var-m-bottom_small"
+        ></c-barn-notice>
+      </template>
+
+      <template lwc:if={firstRun}>
+        <c-barn-empty-state
+          illustration="setup"
+          heading={labels.firstRunHeading}
+          message={labels.firstRunMessage}
+          heading-level="2"
+          data-id="first-run"
+        >
+          <template lwc:if={canCreate}>
+            <lightning-button
+              data-id="first-run-new"
+              variant="brand"
+              label={labels.newPortal}
+              onclick={handleNewPortal}
+            ></lightning-button>
+          </template>
+        </c-barn-empty-state>
+      </template>
+
+      <template lwc:if={showHome}>
+        <div class="slds-grid slds-wrap slds-gutters_x-small" data-id="tiles">
+          <template for:each={tiles} for:item="tile">
+            <div key={tile.key} class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-var-m-bottom_x-small">
+              <c-barn-stat-tile
+                data-id={tile.key}
+                label={tile.label}
+                value={tile.value}
+                href={tile.href}
+                align="start"
+                bordered
+              ></c-barn-stat-tile>
+            </div>
+          </template>
+        </div>
+
+        <template for:each={sections} for:item="section">
+          <section key={section.key} class="slds-var-m-top_medium" data-id={section.key}>
+            <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{section.heading}</h2>
+            <template lwc:if={section.hasRows}>
+              <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked">
+                <thead>
+                  <tr class="slds-line-height_reset">
+                    <template for:each={section.columns} for:item="column">
+                      <th key={column.key} scope="col">{column.label}</th>
+                    </template>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template for:each={section.rows} for:item="row">
+                    <tr key={row.id} data-id="row">
+                      <template for:each={row.cells} for:item="cell">
+                        <td key={cell.key} data-label={cell.column}>
+                          <template lwc:if={cell.isLink}>
+                            <a href={cell.href}>{cell.value}</a>
+                          </template>
+                          <template lwc:elseif={cell.isStatus}>
+                            <c-barn-status-badge status={cell.status} label={cell.value}></c-barn-status-badge>
+                          </template>
+                          <template lwc:elseif={cell.isDateTime}>
+                            <lightning-formatted-date-time
+                              value={cell.value}
+                              year="numeric"
+                              month="short"
+                              day="numeric"
+                              hour="numeric"
+                              minute="2-digit"
+                            ></lightning-formatted-date-time>
+                          </template>
+                          <template lwc:else>{cell.value}</template>
+                        </td>
+                      </template>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </template>
+            <template lwc:else>
+              <c-barn-empty-state
+                size="compact"
+                heading={section.empty}
+                message={section.next}
+                data-id="section-empty"
+              ></c-barn-empty-state>
+            </template>
+          </section>
+        </template>
+      </template>
+    </c-barn-page-shell>
+  </template>
+</template>

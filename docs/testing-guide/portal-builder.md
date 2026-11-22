@@ -283,3 +283,19 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 4 | **Remove Sample Data**. | The sample portal and its accesses are gone; your own portal and its access stay. |
 
 **Cleanup:** None.
+
+## T-PB-18: Portal Builder Home
+
+**Purpose:** confirm Portal Builder Home shows the portals, access and sign-in figures, and its first-run panel (Module Home pattern).
+**Prerequisites:** admin with Portal Builder Admin; no portals for step 1 (in a scratch org use the **Portal Builder Home** tab in **BarnCRM Admin Console**).
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Portal Builder**. | **Portal Builder Home** is the first tab and shows **Set Up Your First Portal** with **New Portal**; no figures. |
+| 2 | Click **New Portal**, save an Active, Invited portal `Home Test`, add three Portal Accesses (one Suspended), sign in once as one of the active people (T-PB-01). Reload **Portal Builder Home**. | **Active Portals** 1, **People With Access** 2, **Suspended Access** 1, **Signed In, Last 30 Days** 1. **Portals** lists `Home Test` with a green **Active** badge and **Invited**; **Latest Sign-Ins** lists the person, `Home Test` and the time. |
+| 3 | Click **People With Access**. | The Portal Accesses list opens. |
+| 4 | Narrow the window to phone width. | Two figures per row; table rows stack with their column names. |
+| 5 | As staff without Portal Builder Admin, open the App Launcher and type `Portal`. | No **BarnCRM Portal Builder**, and no **Portal Builder Home** tab in **BarnCRM Console**. |
+
+**Cleanup:** delete `Home Test` and its accesses.

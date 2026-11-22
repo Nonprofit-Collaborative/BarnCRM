@@ -80,9 +80,11 @@ Rules:
 | contactpoints | Contact_Point_Sync | Custom59: Can |
 | forms | Form_Submission__c | Custom51: Apple |
 | forms | Form__c | Custom28: Cellphone |
+| forms | Forms_Home | Custom27: Laptop |
 | logicmodels | Logic_Model__c | Custom62: Chalkboard |
 | portal | Portal_Access__c | Custom77: Locked |
 | portal | Portal__c | Custom47: Knight |
+| portal | Portal_Builder_Home | Custom68: Globe |
 | corporatehub | Agreement__c | Custom93: ShoppingCart |
 | corporatehub | Board__c | Custom47: Knight |
 | corporatehub | Board_Meeting__c | Custom84: Presenter |
@@ -98,6 +100,7 @@ Rules:
 | memberships | Membership_Term__c | Custom45: Ticket |
 | memberships | Certification__c | Custom8: Diamond |
 | memberships | Member_Certification__c | Custom46: Stamp |
+| memberships | Memberships_Home | Custom11: Star |
 | addressverification | Address_Verification_Setup | Custom73: HighwaySign |
 | connector | Super_Connector | Custom76: Keys |
 | payments | Payments_Setup | Custom70: Handsaw |

@@ -37,7 +37,7 @@ The install, and Finish Setup on the Modules page, gives you and every BarnCRM A
 Advanced Reporting Admin, and gives the module's Staff and Read Only sets to BarnCRM's other
 roles (see Access below).
 
-The **Advanced Reporting** tab is added at the end of the BarnCRM and BarnCRM Console apps (in a package install the admin
+The **Advanced Reporting** tab is added at the end of the BarnCRM Console app (in a package install the admin
 adds it in App Manager; the Setup Assistant lists the tab names).
 BarnCRM Settings has an **Advanced Reporting** row that opens it. There is nothing to set up.
 

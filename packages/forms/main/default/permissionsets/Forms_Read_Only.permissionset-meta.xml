@@ -4,7 +4,7 @@
   <label>Forms Read Only</label>
   <description>Reads forms and their submissions. Changes nothing.</description>
   <applicationVisibilities>
-    <application>BarnCRM_Forms</application>
+    <application>BarnCRM</application>
     <visible>true</visible>
   </applicationVisibilities>
   <classAccesses>
@@ -124,6 +124,10 @@
   </tabSettings>
   <tabSettings>
     <tab>Form__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Forms_Home</tab>
     <visibility>Visible</visibility>
   </tabSettings>
 </PermissionSet>

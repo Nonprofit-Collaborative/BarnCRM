@@ -12,7 +12,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **BarnCRM Admin** app and the **Contact Point Sync** tab. | The page shows three lines, Email, Phone and Address, each `copied after every save.` A count line starts `This will check` with the number of people in the org. |
+| 1 | Open the **BarnCRM Admin Console** app and the **Contact Point Sync** tab. | The page shows three lines, Email, Phone and Address, each `copied after every save.` A count line starts `This will check` with the number of people in the org. |
 | 2 | Click **Copy Existing People**. | The button greys out and `Copying existing people now. Refresh the page later to see what it did.` shows. |
 | 3 | Wait a minute and reload. | `Existing people were last copied` with a time and `Created ...` counts. The managed count is above 0. |
 | 4 | Open a sample person with a personal email and a home phone, then their Individual. | One Contact Point Email with that address and one Contact Point Phone with that number, type Home. |

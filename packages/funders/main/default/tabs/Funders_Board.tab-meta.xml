@@ -3,7 +3,7 @@
   <description>
     This fiscal year's revenue mix, funder concentration and restricted balances.
   </description>
-  <label>Board Dashboard</label>
+  <label>Grants Home</label>
   <lwcComponent>fundersBoard</lwcComponent>
   <motif>Custom100: TVWidescreen</motif>
 </CustomTab>

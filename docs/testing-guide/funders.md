@@ -18,7 +18,7 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **BarnCRM Grants** app. | It opens on **Board Dashboard** (first tab), then **Grant Pipeline**, **Grants**, **Reports**, **Error Log** (last). |
+| 1 | Open the **BarnCRM Grants** app. | It opens on **Grants Home** (first tab), then **Grant Pipeline**, **Grants**, **Reports**, **Error Log** (last). |
 | 2 | **Grants**, **New**. Name `2027 Literacy Grant`, leave **Funder** empty, **Save**. | Refused: **Funder** is required. |
 | 3 | Funder `Lakeside Foundation`, Funder Contact `Pat Rivera`, Amount Requested `25,000`, Application Deadline 10 days from today, **Save**. | The grant's page opens on **Overview** (details, and the **Program** card with Programs), with tabs **Money**, **Reporting**, **Writing** and **Related**; on a phone the same tabs. **Money** holds the Award Schedule, Payments and Restricted Fund Entries; **Reporting** the Requirements list, Logic Model Outcomes and Funder Report; **Writing** the Answer Library. **Stage** is **Prospect**; **Submitted Date** and **Decision Date** are empty. |
 | 4 | **Edit**, Stage **Applied**, **Save**. | **Submitted Date** is today. |
@@ -283,14 +283,14 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 
 **Cleanup:** delete `Short`, rename the grant `Youth Grant`.
 
-## T-FUN-16: Board Dashboard
+## T-FUN-16: Grants Home
 
-**Purpose:** confirm the board dashboard's revenue mix, concentration flags and restricted balances (F-07, R-GN9).
+**Purpose:** confirm Grants Home's revenue mix, concentration flags and restricted balances (F-07, R-GN9).
 **Prerequisites:** Fundraising installed; staff with Fundraising read access and staff without it; no other grants awarded this fiscal year. Two organizations, `Lakeside Foundation` and `State Agency`. Awarded with a decision date this fiscal year: `Federal award` (Lakeside, 30,000, Funding Source Federal) and `State award` (State Agency, 20,000, no funding source). Awarded two fiscal years ago: `Old award` (Lakeside, 99,000). In Fundraising, gifts this fiscal year of 12,000 to an active restricted fund `Scholarships` and 38,000 to an unrestricted fund, 5,000 of it from `Lakeside Foundation`.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As staff with Fundraising access, open the **BarnCRM Grants** app. | It opens on **Board Dashboard**. Tiles: **Revenue This Fiscal Year** 100,000, **Awarded This Fiscal Year** 50,000, **Gifts to Funds** 50,000. A **Tools** group has a tile per Grants tab staff can open (no Funder Report Templates); each opens its tab. **Revenue Mix**: a bar per line, `Gifts to Funds` 50,000 (50%), `Federal` 30,000 (30%), `Not set` 20,000 (20%). `Old award` is not counted. |
+| 1 | As staff with Fundraising access, open the **BarnCRM Grants** app. | It opens on **Grants Home**. Tiles: **Revenue This Fiscal Year** 100,000, **Awarded This Fiscal Year** 50,000, **Gifts to Funds** 50,000. A **Tools** group has a tile per Grants tab staff can open (no Funder Report Templates); each opens its tab. **Revenue Mix**: a bar per line, `Gifts to Funds` 50,000 (50%), `Federal` 30,000 (30%), `Not set` 20,000 (20%). `Old award` is not counted. |
 | 2 | Read **Concentration**. | `Lakeside Foundation` 35,000 (35%) first, then `State Agency`, each with a bar; one amber notice holding the two warnings: Lakeside gives 35% (above 25 percent), and the five largest give more than half. |
 | 3 | Read **Restricted Balances**. | Under **Restricted Funds: Raised This Fiscal Year**, `Scholarships` 12,000; the unrestricted fund is not listed. |
 | 4 | As staff without Fundraising access, open the tab. | Revenue Mix shows `Federal` and `Not set` only, total 50,000; Restricted Balances says `Nothing to show for this fiscal year yet.` |
@@ -389,4 +389,4 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | 2 | **BarnCRM Settings**: read the Fundraising group. | It lists **Fundraising**, **Receipts** and **Grants**; **Grants** shows the five reminder, Grant Finder and renewal settings. |
 | 3 | In Setup, **Permission Sets**. | The three sets read **Grants Admin**, **Grants Staff** and **Grants Read Only**; Setup, **Custom Settings** lists **Grants Settings**. |
 | 4 | Open the **BarnCRM Grants** app, then **Grant Finder** with the Grant Finder setting off. | The tab says to turn it on in **BarnCRM Settings, Grants**. |
-| 5 | In App Builder, find the Board Dashboard component. | It is named **Grants Board Dashboard**. |
+| 5 | In App Builder, find the Grants Home component. | It is named **Grants Home**. |

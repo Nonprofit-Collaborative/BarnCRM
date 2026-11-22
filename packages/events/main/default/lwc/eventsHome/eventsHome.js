@@ -114,8 +114,9 @@ export default class EventsHome extends NavigationMixin(LightningElement) {
     return (this.home && this.home.fieldLabels) || {};
   }
 
+  /** The tab's own words, as on every module home (Module Home pattern). */
   get title() {
-    return (this.home && this.home.title) || '';
+    return helpText('Events', 'Events_Home_Title');
   }
 
   get canCreate() {

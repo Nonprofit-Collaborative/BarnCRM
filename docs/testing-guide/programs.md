@@ -226,15 +226,15 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 
 **Cleanup:** delete the enrollment and delivery; leave the preset Shared; remove the staff users' roles.
 
-## T-PRG-14: The Programs Dashboard and a Person's Last Service
+## T-PRG-14: Programs Home and a Person's Last Service
 
 **Purpose:** confirm the dashboard counts a period correctly and the person card shows the last service.
 **Prerequisites:** the admin user; Programs sample data loaded (T-PRG-08), or any Active program with a service, two enrolled test people and today's deliveries recorded in the Service Delivery Log (one Present, one Unexcused Absence).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As the admin, open the **BarnCRM Programs** app. | **Programs Dashboard** is the first tab. |
-| 2 | Open **Programs Dashboard**. | Period **This Month**; seven tiles (Active Programs, Open Enrollments, New Enrollments, People Served, Served Without Enrollment, Services Delivered, Attendance Rate), a **Tools** row with a tile for each Programs tab (each opens its list), and a **By Program** table listing every Active program by name, the rate shown as a bar and a percent. |
+| 1 | As the admin, open the **BarnCRM Programs** app. | **Programs Home** is the first tab. |
+| 2 | Open **Programs Home**. | Period **This Month**; seven tiles (Active Programs, Open Enrollments, New Enrollments, People Served, Served Without Enrollment, Services Delivered, Attendance Rate), a **Tools** row with a tile for each Programs tab (each opens its list), and a **By Program** table listing every Active program by name, the rate shown as a bar and a percent. |
 | 3 | Compare the program's row with its **Program Roster** panel and today's log. | Open Enrollments matches the roster's Applied plus Enrolled; Services Delivered counts the Present delivery only; Attendance Rate is 50%; People Served is 1. |
 | 4 | Pick **Last Year**. | The figures reload for last year; a program with no activity then shows 0 and "None yet" for the rate in its row, and the **Attendance Rate** tile shows a dash with its label reading "Attendance Rate: None yet". |
 | 5 | Click a program's name. | The program opens. |
@@ -288,7 +288,7 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 4 | Change the **Date** to yesterday. | The total reads 0. Change it back to today. |
 | 5 | Open the **Service Counts** tab. | Two rows for today (12 and 8) in **All Service Counts**; **This Week** lists them too. |
 | 6 | Edit one row to -3 and save. | Refused: People Served cannot be negative. |
-| 7 | Open the **Programs Dashboard**, period **This Month**. | **Served Without Enrollment** shows 20 (more if earlier counts exist this month); **People Served** is unchanged and counts only named people. The program's row shows the same 20 in its own column. |
+| 7 | Open **Programs Home**, period **This Month**. | **Served Without Enrollment** shows 20 (more if earlier counts exist this month); **People Served** is unchanged and counts only named people. The program's row shows the same 20 in its own column. |
 | 8 | As a Read Only user, open the program and the dashboard. | The log shows the total without the input and button; the dashboard shows the figure. |
 | 9 | As the admin, try to delete the service. | Refused: a service with counts is kept. |
 
@@ -486,11 +486,11 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In the **BarnCRM** app, open the person. | The sidebar's glance area shows **Programs at a Glance**: **Open Enrollments** 1 and **Last Service** (the delivery's date), with **Enroll** and **Record Service**. |
+| 1 | In the **BarnCRM Console** app, open the person. | The sidebar's glance area shows **Programs at a Glance**: **Open Enrollments** 1 and **Last Service** (the delivery's date), with **Enroll** and **Record Service**. |
 | 2 | Click **Record Service**, pick a service and click **Save**. | The **Record Service** tab opens with the person filled in. "Service recorded." and you are back on the person's page. |
 | 3 | Click **Enroll**. | A new enrollment opens with the person filled in. Pick a program and save; back on the person, **Open Enrollments** is 2. |
 | 4 | In the **BarnCRM Programs** app, open the person. | The **Programs** card has an **Enroll** button beside refresh; it opens the same new enrollment. |
 | 5 | Open the household. | No **Programs at a Glance** card. |
-| 6 | As a Programs Read Only user, open the person in the **BarnCRM** app. | The card shows its figures with no **Enroll** and no **Record Service**; the **Programs** card in the Programs app has no **Enroll**. |
+| 6 | As a Programs Read Only user, open the person in the **BarnCRM Console** app. | The card shows its figures with no **Enroll** and no **Record Service**; the **Programs** card in the Programs app has no **Enroll**. |
 
 **Cleanup:** delete the service delivery and enrollment from steps 2 and 3.

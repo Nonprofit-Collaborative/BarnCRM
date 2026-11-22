@@ -89,7 +89,15 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 **Steps:** 1. Wait for the next nightly run. 2. Open the member certification.
 **Expected:** 2. Status Expired. Renew is offered again once the credits are in.
 
-## T-MEM-13: The Org's Date for Every User
+## T-MEM-13: Memberships Home
+
+**Purpose:** confirm Memberships Home shows the figures and lists, the first-run steps and New Membership only for creators (Module Home pattern).
+**Prerequisites:** a Memberships Admin and a Memberships Read Only user; an org with no levels or memberships for step 1.
+**Steps:** 1. As the admin, open **BarnCRM Members and Partners**. 2. Click **New Membership Level**, save a level `Home Test` (12 months), reload. 3. Add three memberships at that level: one Current ending in 10 days, one Current ending in 90 days, one Grace. Reload. 4. Renew the one ending in 10 days, reload. 5. Click **Active Members**. 6. Narrow the window to phone width. 7. As the Read Only user, open **Memberships Home**.
+**Expected:** 1. **Memberships Home** is the first tab and shows **Set Up a Membership Level** with **New Membership Level**; no figures. 2. **Add Your First Member** with **New Membership**. 3. **Active Members** 3, **Expiring in 30 Days** 1 (listed under **Expiring Soon** with its End Date and a green **Current** badge), **In Grace Period** 1, **Renewals, Last 30 Days** 0 with **No renewals in the last 30 days** and its next step. 4. **Renewals, Last 30 Days** 1, and the new term is listed under **Recent Renewals** with its Start Date; the renewed membership has left **Expiring Soon**. 5. The Memberships list opens. 6. Two figures per row; table rows stack with their column names. 7. The same figures and lists, no **New Membership**.
+**Cleanup:** delete the `Home Test` memberships and level.
+
+## T-MEM-14: The Org's Date for Every User
 
 **Purpose:** confirm renewal and expiry use the organization's date, not the running user's (D-219, OD-15).
 **Prerequisites:** a Team Member whose time zone (Settings, Personal Information) is at least 11 hours from the org's (**Setup**, **Company Information**), for example Pacific/Kiritimati when the org is in America; run it when that user's date differs from the org's (the org's late evening for a zone ahead). Two Current memberships: one ending on the org's today, one ending the org's yesterday; one Lapsed membership.

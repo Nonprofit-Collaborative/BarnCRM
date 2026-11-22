@@ -17,7 +17,7 @@ A colleague may see more or fewer rows than you for the same query.
 2. Type part of a name, an email address or a phone number.
 3. Choose a result, or press Enter to see all results grouped by kind of record.
 
-You should see: the record open in its own tab (in the **BarnCRM** app).
+You should see: the record open in its own tab (in the **BarnCRM Console** app).
 
 The name searches in BarnCRM's own screens (such as **Add Member** on a household) match the
 start of words: "gar" finds Ana Garcia, "cia" does not. A record saved in the last few minutes
