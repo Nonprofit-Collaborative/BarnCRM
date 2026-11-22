@@ -13,9 +13,6 @@ EligibilityController.saveRules  # keep: rules validated against the program's f
 EventProposalReview.saveCriteria  # keep: criteria JSON validated on the server
 EventVolunteersController.getVolunteers  # keep: Volunteers jobs through the extension point
 FundraisingHomeController.getHome  # keep: composes the home tiles
-GrantAnswerController.getLibrary  # convert: GraphQL
-GrantAnswerController.markUsed  # convert: updateRecord
-GrantPipelineController.moveStage  # convert: updateRecord
 LwcBuilderController.getStudio  # keep: also returns the module settings (store, no query), which LDS cannot read
 LwcBuilderController.loadComponent  # keep: also returns the Components Enabled setting (store, no query)
 ProjectBillingController.getInvoiceActions  # keep: billing setting, manage permission, payment availability

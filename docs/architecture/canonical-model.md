@@ -13632,8 +13632,10 @@ the date is then not stamped.
 | Topics | `Topics__c` | Text(255) |
 | Last Used Date | `Last_Used_Date__c` | Date |
 
-- **Controller:** `GrantAnswerController` (thin: the answers as plain JSON shapes, up to 500 by
-  title, and the last used stamp, both in user mode). The search, the topic list and the word
+- **Reads and writes:** no Apex controller. The card reads the answers with text, up to 500 by
+  title, through GraphQL, and stamps Last Used Date with `updateRecord`, both as the person
+  (ADR-0093 A2); `getObjectInfo` says whether the person can add answers and stamp the date. The
+  search, the topic list and the word
   counts run in the framework-free module `grantAnswerModel.js` (plan 9.9); the library is the
   `grantAnswerLibrary` card on the Grant record page.
 - **Permission sets:** Funders Admin and Funders Staff create, edit and delete answers; Funders

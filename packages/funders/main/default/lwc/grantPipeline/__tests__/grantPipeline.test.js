@@ -1,7 +1,7 @@
 import { createElement } from 'lwc';
 import GrantPipeline from 'c/grantPipeline';
+import { updateRecord } from 'lightning/uiRecordApi';
 import getBoard from '@salesforce/apex/GrantPipelineController.getBoard';
-import moveStage from '@salesforce/apex/GrantPipelineController.moveStage';
 import markSubmitted from '@salesforce/apex/GrantPipelineController.markSubmitted';
 import undoSubmitted from '@salesforce/apex/GrantPipelineController.undoSubmitted';
 import GrantAwardModal from 'c/grantAwardModal';
@@ -41,9 +41,6 @@ jest.mock(
   () => ({ default: 'Application' }),
   { virtual: true }
 );
-jest.mock('@salesforce/apex/GrantPipelineController.moveStage', () => ({ default: jest.fn() }), {
-  virtual: true
-});
 jest.mock('@salesforce/label/c.Core_Shared_MoveTo', () => ({ default: 'Move to {0}' }), {
   virtual: true
 });
@@ -160,7 +157,6 @@ describe('c-grant-pipeline', () => {
   });
 
   it('moves a grant through the menu to any other stage', async () => {
-    moveStage.mockResolvedValue();
     const element = await render();
     const menu = all(element, 'lightning-button-menu')[0];
     const items = [...menu.querySelectorAll('lightning-menu-item')].map((item) => item.label);
@@ -171,12 +167,25 @@ describe('c-grant-pipeline', () => {
     menu.dispatchEvent(new CustomEvent('select', { detail: { value: 'move:Applied' } }));
     await flush();
 
-    expect(moveStage).toHaveBeenCalledWith({
-      grantId: 'a01000000000001AAA',
-      stage: 'Applied',
-      amountAwarded: null
+    expect(updateRecord).toHaveBeenCalledWith({
+      fields: { Id: 'a01000000000001AAA', Stage__c: 'Applied' }
     });
     expect(getBoard).toHaveBeenCalledTimes(2);
+  });
+
+  it('shows the grant rules refusal of a move in its own words', async () => {
+    updateRecord.mockRejectedValueOnce({
+      body: { message: 'An error occurred.', output: { errors: [{ message: 'Date needed' }] } }
+    });
+    const element = await render();
+    const toasts = [];
+    element.addEventListener('lightning__showtoast', (event) => toasts.push(event.detail));
+    const menu = all(element, 'lightning-button-menu')[0];
+    menu.dispatchEvent(new CustomEvent('select', { detail: { value: 'move:Applied' } }));
+    await flush();
+
+    expect(toasts.map((toast) => toast.message)).toEqual(['Date needed']);
+    expect(getBoard).toHaveBeenCalledTimes(1);
   });
 
   it('opens Record the Award with the card and reloads once it is saved', async () => {
@@ -193,7 +202,7 @@ describe('c-grant-pipeline', () => {
     const options = GrantAwardModal.open.mock.calls[0][0];
     expect(options.grant.id).toBe('a01000000000002AAA');
     expect(options.label).toContain('Youth Grant');
-    expect(moveStage).not.toHaveBeenCalled();
+    expect(updateRecord).not.toHaveBeenCalled();
     expect(toasts[0].messageData[0].label).toBe('Youth Grant');
     expect(toasts[0].messageData[0].url).toContain('a01000000000002AAA');
     expect(getBoard).toHaveBeenCalledTimes(2);
@@ -311,7 +320,6 @@ describe('c-grant-pipeline', () => {
   });
 
   it('moves a grant by keyboard drag to the next column (DnD-1)', async () => {
-    moveStage.mockResolvedValue();
     const element = await render();
     const zones = all(element, '[data-id="drop-zone"]').map((zone) => zone.dataset.dropZone);
     expect(zones).toEqual(['Awarded', 'Declined', 'Withdrawn']);
@@ -327,10 +335,8 @@ describe('c-grant-pipeline', () => {
     press('Enter');
     await flush();
 
-    expect(moveStage).toHaveBeenCalledWith({
-      grantId: 'a01000000000001AAA',
-      stage: 'Letter of Inquiry',
-      amountAwarded: null
+    expect(updateRecord).toHaveBeenCalledWith({
+      fields: { Id: 'a01000000000001AAA', Stage__c: 'Letter of Inquiry' }
     });
     // The card menu is still there for the same move.
     expect(all(element, 'lightning-button-menu')).toHaveLength(2);
@@ -349,7 +355,7 @@ describe('c-grant-pipeline', () => {
 
     expect(GrantAwardModal.open).toHaveBeenCalled();
     expect(GrantAwardModal.open.mock.calls[0][0].grant.id).toBe('a01000000000002AAA');
-    expect(moveStage).not.toHaveBeenCalled();
+    expect(updateRecord).not.toHaveBeenCalled();
   });
 
   it('cancels a keyboard drag with Escape and moves nothing', async () => {
@@ -361,7 +367,7 @@ describe('c-grant-pipeline', () => {
     press('ArrowRight');
     press('Escape');
     await flush();
-    expect(moveStage).not.toHaveBeenCalled();
+    expect(updateRecord).not.toHaveBeenCalled();
     expect(GrantAwardModal.open).not.toHaveBeenCalled();
   });
 

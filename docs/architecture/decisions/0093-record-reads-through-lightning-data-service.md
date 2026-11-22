@@ -133,10 +133,10 @@ kept, with the reason.
 | EventVolunteersController.getVolunteers | events | read | Keep | Volunteers jobs through the extension point |
 | FormRunnerController.getPublishedForms | forms | read | Converted (AP-03 forms): GraphQL (`Form__c` Published, by Name) | |
 | FormSubmissionController.getSubmission | forms | read | Converted (AP-03 forms): GraphQL (`Form_Submission__c` with form and version) and `getObjectInfo`, shaped in `c/formSubmissionModel` | |
-| GrantAnswerController.getLibrary | funders | read | Convert: GraphQL (`Grant_Answer__c` by Name) and `getObjectInfo` | |
-| GrantAnswerController.markUsed | funders | write | Convert: `updateRecord` | |
-| GrantPipelineController.moveStage | funders | write | Convert: `updateRecord` | |
-| GrantPipelineController.recordAward | funders | write | Convert: `updateRecord` | |
+| GrantAnswerController.getLibrary | funders | read | Converted (AP-03 part 3): GraphQL (`Grant_Answer__c` by Name) and `getObjectInfo`; the emptied class is removed | |
+| GrantAnswerController.markUsed | funders | write | Converted (AP-03 part 3): `updateRecord` | |
+| GrantPipelineController.moveStage | funders | write | Converted (AP-03 part 3): `updateRecord` | |
+| GrantPipelineController.recordAward | funders | write | Converted (AP-03 part 3): `updateRecord` | |
 | LwcBuilderController.getStudio | lwcbuilder | read | Keep | Returns the module settings (custom metadata) |
 | LwcBuilderController.loadComponent | lwcbuilder | read | Keep | Returns the Components Enabled setting |
 | LwcBuilderController.saveComponent | lwcbuilder | write | Keep | Definition validated and versioned on the server |

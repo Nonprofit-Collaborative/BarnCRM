@@ -1,8 +1,13 @@
 import LightningModal from 'lightning/modal';
 import { api, wire } from 'lwc';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
-import recordAward from '@salesforce/apex/GrantPipelineController.recordAward';
-import { messageFrom } from 'c/findCsv';
+import { updateRecord } from 'lightning/uiRecordApi';
+import STAGE_FIELD from '@salesforce/schema/Grant__c.Stage__c';
+import AMOUNT_AWARDED_FIELD from '@salesforce/schema/Grant__c.Amount_Awarded__c';
+import AWARD_START_FIELD from '@salesforce/schema/Grant__c.Award_Start_Date__c';
+import AWARD_END_FIELD from '@salesforce/schema/Grant__c.Award_End_Date__c';
+import RESTRICTED_FIELD from '@salesforce/schema/Grant__c.Restricted__c';
+import { recordErrorMessage } from 'c/findCsv';
 import { helpText } from 'c/barnHelpText';
 
 import AWARD_AMOUNT from '@salesforce/label/c.Funders_Pipeline_AwardAmount';
@@ -11,12 +16,33 @@ import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 
 const GRANT_OBJECT = 'Grant__c';
 
+const STAGE_AWARDED = 'Awarded';
+
 const blankToNull = (value) => (value === '' || value === undefined ? null : value);
+
+/**
+ * The updateRecord input: the grant moves to Awarded, and each value given replaces the grant's
+ * own; a blank one leaves it as it is.
+ */
+function awardInput(grantId, values) {
+  const fields = { Id: grantId, [STAGE_FIELD.fieldApiName]: STAGE_AWARDED };
+  [
+    [AMOUNT_AWARDED_FIELD, values.amount],
+    [AWARD_START_FIELD, values.startDate],
+    [AWARD_END_FIELD, values.endDate],
+    [RESTRICTED_FIELD, values.restricted]
+  ].forEach(([field, value]) => {
+    if (value !== null && value !== undefined) {
+      fields[field.fieldApiName] = value;
+    }
+  });
+  return { fields };
+}
 
 /**
  * Record the Award (modules-16, vis-modules-11): a platform modal that moves a grant to Awarded
  * with what the award letter says, each optional: the amount awarded (filled in with the amount
- * requested), the award period and Restricted. It saves through GrantPipelineController and stays
+ * requested), the award period and Restricted. It saves through Lightning Data Service and stays
  * open with the reason when the save is refused. It resolves `{ saved: true }` once saved, and
  * undefined when closed without saving.
  *
@@ -94,16 +120,19 @@ export default class GrantAwardModal extends LightningModal {
     this.errorMessage = undefined;
     const amount = blankToNull(this.amount);
     try {
-      await recordAward({
-        grantId: this.grant.id,
-        amountAwarded: amount === null ? null : Number(amount),
-        startDate: blankToNull(this.startDate),
-        endDate: blankToNull(this.endDate),
-        restricted: this.restricted
-      });
+      // Saved as the user through Lightning Data Service (ADR-0093 A2); the grant rules check
+      // the dates and fill in the decision date (R-GN3).
+      await updateRecord(
+        awardInput(this.grant.id, {
+          amount: amount === null ? null : Number(amount),
+          startDate: blankToNull(this.startDate),
+          endDate: blankToNull(this.endDate),
+          restricted: this.restricted
+        })
+      );
       this.close({ saved: true });
     } catch (error) {
-      this.errorMessage = messageFrom(error, helpText('Funders', 'Funders_Shared_NotSaved'));
+      this.errorMessage = recordErrorMessage(error, helpText('Funders', 'Funders_Shared_NotSaved'));
     } finally {
       this.isSaving = false;
     }

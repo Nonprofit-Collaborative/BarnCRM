@@ -41,7 +41,7 @@ and a Giving fund by record identifier (text), resolved by describe only where a
   `GrantCalendarController`), reading the same rows as Upcoming Deadlines through
   `GrantDeadlineSelector`.
 - `Grant_Answer__c` (29ZN), the answer library (`grantAnswerLibrary`, framework-free
-  `grantAnswerModel`, `GrantAnswerController`).
+  `grantAnswerModel`), reading and stamping answers through Lightning Data Service.
 - The Logic Models outcomes card on a requirement (`grantOutcomes`, `GrantOutcomeController`,
   `GrantOutcomeService`), resolved by describe only where Logic Models is installed.
 - `Funder_Report_Template__c` (29ZO) and its shipped defaults, merged in the browser by the
