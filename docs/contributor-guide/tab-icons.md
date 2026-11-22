@@ -221,3 +221,24 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | volunteers | shiftScheduleShifts | custom:custom74 | Volunteer_Shift__c |
 | volunteers | shiftSignups | custom:custom2 | Volunteer_Signup__c |
 | volunteers | volunteerHoursApproval | custom:custom91 | Volunteer_Approve_Hours |
+
+## App Tabs
+
+Rules for the tabs an app lists (`packages/*/main/default/applications/*.app-meta.xml`), with
+the apps themselves in ADR-0237 (nine console apps):
+
+- Every app is a console app, and every tab it lists has a workspace mapping.
+- **Error Log is an admin tool (OD-17, D-135).** `Error_Log__c` is listed only in
+  `BarnCRM_Admin_Console`, as its last tab. No staff app lists it: BarnCRM Console, BarnCRM
+  Members and Partners, and every module app (Events, Projects, Fundraising, Grants, Programs,
+  Volunteers). A new app is a staff app unless it is added to `ADMIN_APPS` in
+  `scripts/ci/tests/test_module_app_tabs.py`.
+- A module's catalog row (`BarnCRM_Module__mdt`) never names `Error_Log__c` in `Staff_Tabs__c`,
+  since `scripts/org/module-app-tabs.py` would carry it into a staff app at deploy. Module tabs
+  go before an app's Reports, Dashboards and Error Log tabs.
+- Find, Import, Bulk Update, Import Rows and Record Inspector are in no app: they open from Data
+  Manager cards or buttons (D-135, D-183).
+
+`test_error_log_is_in_admin_apps_only_and_always_last` in
+`scripts/ci/tests/test_module_app_tabs.py` enforces the Error Log rules; the same file and
+`scripts/ci/tests/test_core_navigation.py` hold the rest.

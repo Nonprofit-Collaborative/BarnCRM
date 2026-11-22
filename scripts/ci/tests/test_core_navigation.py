@@ -179,7 +179,8 @@ class CoreAppOrder(unittest.TestCase):
     def test_members_and_partners_holds_only_closing_tabs_for_modules_to_fill(self):
         # Memberships and Corporate Hub add their tabs before these (module-app-tabs.py), so the
         # app opens on Memberships Home or Corporate Hub Home.
-        self.assertEqual(tabs("BarnCRM_Members_Partners"), ["standard-report", "standard-Dashboard", "Error_Log__c"])
+        # A staff app, so no Error Log (OD-17).
+        self.assertEqual(tabs("BarnCRM_Members_Partners"), ["standard-report", "standard-Dashboard"])
 
     def test_admin_console_ends_with_error_log(self):
         admin = tabs("BarnCRM_Admin_Console")
