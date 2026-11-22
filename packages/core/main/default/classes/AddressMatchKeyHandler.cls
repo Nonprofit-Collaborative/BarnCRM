@@ -73,7 +73,7 @@ public with sharing class AddressMatchKeyHandler extends TriggerHandler {
 	 * the finding does not stay forever and matching reads addresses by their keys.
 	 */
 	public static List<String> unfilledScope() {
-		if (SettingsService.getSettings().Match_Keys_Filled__c == true) {
+		if (SettingsState.flag(MATCH_KEYS_FILLED)) {
 			return new List<String>();
 		}
 		try {
@@ -98,6 +98,9 @@ public with sharing class AddressMatchKeyHandler extends TriggerHandler {
 			source.objectName == described.getName() &&
 			source.valueField == Address__c.Street__c.getDescribe().getName() &&
 			source.postalField == Address__c.Postal_Code__c.getDescribe().getName() &&
-			SettingsService.getSettings().Match_Keys_Filled__c == true;
+			SettingsState.flag(MATCH_KEYS_FILLED);
 	}
+
+	/** Run state: every address has its match key (AddressMatchKeyBatch writes it). */
+	private static final String MATCH_KEYS_FILLED = 'Match_Keys_Filled__c';
 }

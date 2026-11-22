@@ -11,6 +11,7 @@ public with sharing class SettingsController {
 	private static final String TYPE_PICKLIST = 'Picklist';
 	/** A value Setup holds, shown read only and never saved (ADR-0135). */
 	private static final String TYPE_SETUP_VALUE = 'SetupValue';
+	private static final String TYPE_HIDDEN = 'Hidden';
 	private static final String ERROR_CONTEXT = 'BarnCRM Settings console';
 	/** The module a Setting Definition row belongs to when it names none. */
 	private static final String CORE_MODULE = 'Core';
@@ -43,6 +44,12 @@ public with sharing class SettingsController {
 		public Boolean canEdit;
 		@AuraEnabled
 		public List<SectionModel> sections;
+		/**
+		 * The deployment a save sent (ADR-NEXT settings as custom metadata), which the console
+		 * follows with getSaveOutcome until it ends; null when nothing is pending.
+		 */
+		@AuraEnabled
+		public String deploymentId;
 
 		@NamespaceAccessible
 		public Boolean getCanEdit() {
@@ -197,13 +204,55 @@ public with sharing class SettingsController {
 			for (String settingsObject : byObject.keySet()) {
 				SettingsService.saveValues(settingsObject, byObject.get(settingsObject));
 			}
-			return buildModel();
+			ConsoleModel model = buildModel();
+			Id deploymentId = SettingsService.lastDeploymentId();
+			model.deploymentId = deploymentId == null ? null : String.valueOf(deploymentId);
+			return model;
 		} catch (SettingsService.SettingsException e) {
 			ErrorLogger.log(e, ERROR_CONTEXT);
 			throw UserErrors.message(e.getMessage());
 		} catch (Exception e) {
 			ErrorLogger.log(e, ERROR_CONTEXT);
 			throw UserErrors.message(BarnHelp.text('Core', 'Core_Settings_SaveErrorMessage'));
+		}
+	}
+
+	/** A save's deployment is still running. */
+	public static final String SAVE_PENDING = 'Pending';
+	public static final String SAVE_SUCCEEDED = 'Succeeded';
+	public static final String SAVE_FAILED = 'Failed';
+
+	/**
+	 * How a save's deployment ended, for the console's "Saving..." note (R-SV2): Pending until
+	 * the callback has written its Setting Change rows (Succeeded) or its Error Log entry
+	 * (Failed, with Salesforce's reason as `message`).
+	 */
+	@AuraEnabled
+	public static Map<String, String> getSaveOutcome(String deploymentId) {
+		if (!FeatureManagement.checkPermission(EDIT_PERMISSION)) {
+			throw UserErrors.message(BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError'));
+		}
+		Id jobId;
+		try {
+			jobId = Id.valueOf(deploymentId);
+		} catch (Exception notAnId) {
+			throw UserErrors.message(BarnHelp.text('Core', 'Core_Settings_LoadErrorMessage'));
+		}
+		Map<String, String> outcome = new Map<String, String>{ 'status' => SAVE_PENDING };
+		try {
+			if (CustomMetadataManagerSelector.hasSucceeded(jobId)) {
+				outcome.put('status', SAVE_SUCCEEDED);
+				return outcome;
+			}
+			String failure = CustomMetadataManagerSelector.failureMessage(jobId);
+			if (failure != null) {
+				outcome.put('status', SAVE_FAILED);
+				outcome.put('message', failure);
+			}
+			return outcome;
+		} catch (Exception e) {
+			ErrorLogger.log(e, ERROR_CONTEXT);
+			throw UserErrors.message(BarnHelp.text('Core', 'Core_Settings_LoadErrorMessage'));
 		}
 	}
 
@@ -676,6 +725,10 @@ public with sharing class SettingsController {
 	}
 
 	private static SettingModel toSetting(Setting_Definition__mdt definition) {
+		// A Hidden row holds a value another page or BarnCRM itself writes, never shown here.
+		if (TYPE_HIDDEN.equalsIgnoreCase(definition.Data_Type__c)) {
+			return null;
+		}
 		if (!isVisible(definition) || isHiddenByFeature(definition) || isHiddenByAccess(definition)) {
 			return null;
 		}

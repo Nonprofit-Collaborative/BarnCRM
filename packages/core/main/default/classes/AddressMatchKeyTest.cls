@@ -46,7 +46,7 @@ private class AddressMatchKeyTest {
 				new AddressMatchKeyHandler.FilledCheck().run(),
 				'Not filled yet: Health Check offers the fill'
 			);
-			Assert.isFalse(SettingsService.getSettings().Match_Keys_Filled__c == true, 'Not marked while one is left');
+			Assert.isFalse(SettingsState.flag('Match_Keys_Filled__c'), 'Not marked while one is left');
 
 			Test.startTest();
 			Assert.isNotNull(AddressMatchKeyBatch.run(), 'The fill starts');
@@ -54,7 +54,7 @@ private class AddressMatchKeyTest {
 			Test.stopTest();
 
 			SettingsService.clearCaches();
-			Assert.isTrue(SettingsService.getSettings().Match_Keys_Filled__c, 'Marked filled');
+			Assert.isTrue(SettingsState.flag('Match_Keys_Filled__c'), 'Marked filled');
 			Assert.isNull(new AddressMatchKeyHandler.FilledCheck().run(), 'Nothing to offer');
 		}
 	}
@@ -74,7 +74,7 @@ private class AddressMatchKeyTest {
 
 			SettingsService.clearCaches();
 			Assert.isTrue(
-				SettingsService.getSettings().Match_Keys_Filled__c,
+				SettingsState.flag('Match_Keys_Filled__c'),
 				'Marked filled, so no later run selects them again'
 			);
 			Assert.isNull(new AddressMatchKeyHandler.FilledCheck().run(), 'Not offered again');
@@ -103,7 +103,7 @@ private class AddressMatchKeyTest {
 			Test.stopTest();
 
 			SettingsService.clearCaches();
-			Assert.isTrue(SettingsService.getSettings().Match_Keys_Filled__c, 'Marked filled');
+			Assert.isTrue(SettingsState.flag('Match_Keys_Filled__c'), 'Marked filled');
 			Assert.areEqual(
 				0,
 				[SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'AddressMatchKeyBatch'],
@@ -149,7 +149,7 @@ private class AddressMatchKeyTest {
 			);
 			SettingsService.clearCaches();
 			Assert.isTrue(
-				SettingsService.getSettings().Match_Keys_Filled__c,
+				SettingsState.flag('Match_Keys_Filled__c'),
 				'And the keys are marked filled, so matching reads by them'
 			);
 			Assert.isNull(AddressMatchKeyBatch.run(), 'Nothing to fill: no job starts');

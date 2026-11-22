@@ -104,7 +104,7 @@ public with sharing class ReceiptContentBuilder {
 	 * entity, then settings. Brands off, this is exactly the settings identity.
 	 */
 	public static OrganizationDetails organizationDetails(Id brandId, Boolean useDefault) {
-		BarnCRM_Settings__c core = BarnCRM_Settings__c.getOrgDefaults();
+		BarnCRM_Settings__c core = SettingsService.getSettings();
 		Giving_Settings__c giving = Giving_Settings__c.getOrgDefaults();
 		BrandService.Profile brand = brandId != null || useDefault ? BrandService.profileFor(brandId) : null;
 		OrganizationDetails details = new OrganizationDetails();

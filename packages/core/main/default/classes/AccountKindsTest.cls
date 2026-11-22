@@ -319,7 +319,7 @@ private class AccountKindsTest {
 			AccountKinds.storeDetectedIfBlank();
 			Test.stopTest();
 
-			String stored = BarnCRM_Settings__c.getOrgDefaults().Organization_Record_Type__c;
+			String stored = SettingsService.getSettings().Organization_Record_Type__c;
 			Assert.areEqual(
 				AccountKinds.detectOrganizationRecordType(),
 				stored,
@@ -341,7 +341,7 @@ private class AccountKindsTest {
 			AccountKinds.storeDetectedIfBlank();
 			Assert.areEqual(
 				AccountKinds.NO_RECORD_TYPE,
-				BarnCRM_Settings__c.getOrgDefaults().Organization_Record_Type__c,
+				SettingsService.getSettings().Organization_Record_Type__c,
 				'Blank is filled with the detected value.'
 			);
 			AccountKinds.reset();
@@ -351,7 +351,7 @@ private class AccountKindsTest {
 
 			Assert.areEqual(
 				AccountKinds.NO_RECORD_TYPE,
-				BarnCRM_Settings__c.getOrgDefaults().Organization_Record_Type__c,
+				SettingsService.getSettings().Organization_Record_Type__c,
 				'A usable stored value is never overwritten.'
 			);
 		}
@@ -389,7 +389,7 @@ private class AccountKindsTest {
 			AccountKinds.storeDetectedIfBlank();
 			Test.stopTest();
 
-			String stored = BarnCRM_Settings__c.getOrgDefaults().Organization_Record_Type__c;
+			String stored = SettingsService.getSettings().Organization_Record_Type__c;
 			if (hasCandidate) {
 				Assert.isTrue(AccountKinds.isCandidate(stored), 'A candidate replaced it.');
 				Assert.areEqual(AccountKinds.detectOrganizationRecordType(), stored, 'The detected one.');

@@ -235,14 +235,12 @@ public with sharing class SeasonalAddressService {
 
 	/** When the swap last finished, or null when it has never run in this org. */
 	public static Datetime lastRun() {
-		BarnCRM_Settings__c settings = SettingsService.getSettings();
-		return settings == null ? null : settings.Seasonal_Address_Last_Run__c;
+		return SettingsState.moment(SeasonalAddressWriter.LAST_RUN);
 	}
 
 	/** What the last run did, in one sentence, or null when it has never run. */
 	public static String lastRunSummary() {
-		BarnCRM_Settings__c settings = SettingsService.getSettings();
-		return settings == null ? null : settings.Seasonal_Address_Last_Run_Summary__c;
+		return SettingsState.text(SeasonalAddressWriter.LAST_SUMMARY);
 	}
 
 	/**

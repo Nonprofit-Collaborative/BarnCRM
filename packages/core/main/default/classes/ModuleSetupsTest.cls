@@ -54,14 +54,14 @@ private class ModuleSetupsTest {
 			Assert.areEqual(1, giving.timesRun, 'Finish Setup ran the new steps');
 			Assert.areEqual(
 				'Core,Giving:2',
-				SettingsService.getSettings().Modules_Setup_Run__c,
+				SettingsState.text('Modules_Setup_Run__c'),
 				'The marker records the revision and keeps the others'
 			);
 			Assert.isFalse(ModuleSetups.isPending('Giving', ModuleSetups.ran()), 'Current now');
 			ModuleSetups.markRan('Giving');
 			Assert.areEqual(
 				'Core,Giving:2',
-				SettingsService.getSettings().Modules_Setup_Run__c,
+				SettingsState.text('Modules_Setup_Run__c'),
 				'Marking again changes nothing'
 			);
 		}
@@ -229,7 +229,7 @@ private class ModuleSetupsTest {
 				Assert.isTrue(pendingBefore, 'Core still needs its own Finish Setup');
 				Assert.areEqual(
 					'Giving',
-					SettingsService.getSettings().Modules_Setup_Run__c,
+					SettingsState.text('Modules_Setup_Run__c'),
 					'Marked once, however often it runs'
 				);
 				Assert.areEqual(

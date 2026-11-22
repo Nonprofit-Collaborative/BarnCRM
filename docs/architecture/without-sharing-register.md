@@ -28,10 +28,10 @@ into six kinds:
 | AffiliationUpkeepSelector | Integrity | Overlapping affiliations owned by someone else, so the primary-affiliation rule still refuses them | ADR-0021 category 2 |
 | AffiliationUpkeepWriter | Upkeep | The person's primary affiliation fields and their other affiliations, which the saver may not be able to edit | ADR-0021 category 2 |
 | BrandShareWriter | Platform | Brand groups, their members and Account shares granted to them, which a staff member assigning a brand cannot create; one default brand and entity and one primary assignment cleared on rows the saver may not edit | ADR-0021, ADR-0202 brand management and visibility |
-| AutomationSettingsWriter | Platform | The automation pause on the protected org settings and the Automation Setting rows from the shipped registry | ADR-0021 |
+| AutomationSettingsWriter | Platform | The automation pause on the protected BarnCRM Automation Control org default and the Automation Setting rows from the shipped registry | ADR-0021 |
 | AddressMatchKeyBatch | Org job | Every address without its Match Key, given one so duplicate matching reads addresses through the index; a key it cannot see would hide a duplicate | ADR-0021, D-200 P6 |
 | EmptyHouseholdTidyBatch | Org job | Every empty household, read and deleted as the scheduler, with the dependents check reaching every child record | ADR-0021, ADR-0036 |
-| ErrorDigestWriter | Platform | The digest run record on the protected org settings | ADR-0021, ADR-0027 |
+| ErrorDigestWriter | Platform | The digest run state rows, written by the scheduler | ADR-0021, ADR-0027 |
 | ErrorLogEventHandler | Upkeep | Writes the Error Log entry from the event, whoever raised it | ADR-0021 |
 | HouseholdSelector.OccupancyReader | Integrity | Which households any contact points at, whoever can see that contact, before an emptied household is deleted in contact mode; returns household ids only, never who is in them | ADR-0021 category 2 |
 | ErrorLogWriter | Upkeep | Writes the Error Log entry even when the user cannot create one | ADR-0021 |
@@ -44,7 +44,10 @@ into six kinds:
 | SeasonalAddressSelector | Org job | Every household due a seasonal address swap, so none is silently left out | ADR-0021, ADR-0027 |
 | SeasonalAddressWriter | Org job | The package's own address records for the nightly swap (the copy into standard address fields stays in user mode) | ADR-0021, ADR-0027 |
 | SetupChangeCopyJob | Org job | The package's own copy of Setup changes, written and pruned in full | ADR-0021 |
-| WhatsNewSeenWriter | Platform | The running user's own row of a protected hierarchy setting | ADR-0021, ADR-0087 |
+| SettingStore | Platform | Reads the org's Setting Value records and enqueues the metadata deployment of a save, which the caller has permission-checked | ADR-0021, ADR-NEXT settings as custom metadata |
+| SettingValueDeployCallback | Platform | Writes the Setting Change audit rows and Error Log entry of a finished settings deployment, as the platform's callback user | ADR-0021, ADR-NEXT settings as custom metadata |
+| SettingsState | Org job | The package's own run-state rows (last runs, watermarks, setup markers), read and written for every user whose action moves them | ADR-0021, ADR-NEXT settings as custom metadata |
+| WhatsNewSeenWriter | Platform | The running user's own Seen row on an object only BarnCRM Admin can read | ADR-0021, ADR-0087 |
 | WhereUsedSelector | Integrity | Every saved query, private ones included, before a field is retired | ADR-0021 |
 
 ## Rollup Builder

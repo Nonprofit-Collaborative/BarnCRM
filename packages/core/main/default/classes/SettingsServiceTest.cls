@@ -425,14 +425,18 @@ private class SettingsServiceTest {
 	@IsTest
 	static void aWriteIsSeenByTheNextRead() {
 		System.runAs(TestUsers.admin()) {
-			BarnCRM_Settings__c settings = TestDataFactory.defaultSettings();
-			Assert.isNull(SettingsService.getSettings().Automation_Paused_Until__c, 'Not paused.');
+			stubDefinitions();
+			Assert.areEqual(
+				'The {LastName} Family',
+				SettingsService.getSettings().Household_Name_Pattern__c,
+				'The shipped pattern.'
+			);
 
-			settings.Automation_Paused_Until__c = System.now().addHours(4);
-			TestDataFactory.saveSettings(settings);
+			SettingsService.saveValues(new Map<String, Object>{ TEXT_KEY => '{LastName} Household' });
 
-			Assert.isNotNull(
-				SettingsService.getSettings().Automation_Paused_Until__c,
+			Assert.areEqual(
+				'{LastName} Household',
+				SettingsService.getSettings().Household_Name_Pattern__c,
 				'Clearing the cache on write means the next read is not stale.'
 			);
 		}
@@ -574,7 +578,6 @@ private class SettingsServiceTest {
 			Test.stopTest();
 
 			BarnCRM_Settings__c stored = SettingsService.getSettings();
-			Assert.isNotNull(stored.Id, 'Saving one value creates the org level record');
 			Assert.areEqual('The {LastName} Family', stored.Household_Name_Pattern__c, 'With the value that was saved');
 			Assert.isTrue(
 				stored.Relationship_Auto_Reciprocal__c,
@@ -618,17 +621,14 @@ private class SettingsServiceTest {
 			SettingsService.saveValues(new Map<String, Object>{ CHECKBOX_KEY => false });
 			Test.stopTest();
 
-			BarnCRM_Settings__c saved = [
-				SELECT Household_Name_Pattern__c, Auto_Create_Households__c
-				FROM BarnCRM_Settings__c
-				WHERE Id = :recordId
-			];
+			BarnCRM_Settings__c saved = SettingsService.getSettings();
 			Assert.isFalse(saved.Auto_Create_Households__c, 'The key Maria changed is saved');
 			Assert.areEqual(
 				'{LastName} Household',
 				saved.Household_Name_Pattern__c,
 				'And the pattern the other administrator saved is not written back from her stale copy'
 			);
+			Assert.isFalse(SettingStore.has('Household_Name_Pattern'), 'Only the changed key is deployed');
 			List<Setting_Change__c> changes = SettingChangeSelector.getRecent(10);
 			Assert.areEqual(1, changes.size(), 'One audit row, for the one key she changed');
 		}
@@ -645,8 +645,7 @@ private class SettingsServiceTest {
 
 			Assert.areEqual(
 				'The {LastName} Family',
-				[SELECT Household_Name_Pattern__c FROM BarnCRM_Settings__c WHERE Id = :recordId]
-				.Household_Name_Pattern__c,
+				SettingsService.getSettings().Household_Name_Pattern__c,
 				'Her value matched only her stale copy, and it is still saved over the stored one'
 			);
 			List<Setting_Change__c> changes = SettingChangeSelector.getRecent(10);
@@ -852,7 +851,7 @@ private class SettingsServiceTest {
 			Assert.isNull(candidate, 'A candidate record type is accepted');
 			Assert.areEqual(
 				offered.isEmpty() ? AccountKinds.NO_RECORD_TYPE : offered[0].getDeveloperName(),
-				BarnCRM_Settings__c.getOrgDefaults().Organization_Record_Type__c,
+				SettingsService.getSettings().Organization_Record_Type__c,
 				'Saved org-wide'
 			);
 		}
@@ -895,7 +894,7 @@ private class SettingsServiceTest {
 				'A value the field does not list as active is refused: ' + refused
 			);
 			Assert.isNull(accepted, 'An active value is accepted');
-			Assert.areEqual(active, BarnCRM_Settings__c.getOrgDefaults().Address_Card_Fields__c, 'Saved org-wide');
+			Assert.areEqual(active, SettingsService.getSettings().Address_Card_Fields__c, 'Saved org-wide');
 			Assert.isNull(refusalOf('Address_Card_Fields__c', active), 'The stored value saves again unchanged');
 		}
 	}
@@ -984,7 +983,7 @@ private class SettingsServiceTest {
 			Assert.isNull(accepted, 'Fields the object offers are accepted');
 			Assert.areEqual(
 				verification + ',Name',
-				BarnCRM_Settings__c.getOrgDefaults().Address_Card_Fields__c,
+				SettingsService.getSettings().Address_Card_Fields__c,
 				'Saved on the org-wide settings record'
 			);
 		}
@@ -1060,7 +1059,7 @@ private class SettingsServiceTest {
 				SettingsService.getValue('Organization_Street__c'),
 				'The street is saved'
 			);
-			Assert.isNull(BarnCRM_Settings__c.getOrgDefaults().Organization_Street_2__c, 'Street 2 stays optional');
+			Assert.isNull(SettingsService.getSettings().Organization_Street_2__c, 'Street 2 stays optional');
 			Assert.areEqual(4, SettingChangeSelector.getRecent(10).size(), 'One change per part');
 		}
 	}

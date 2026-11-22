@@ -29,13 +29,13 @@ public with sharing class OrganizationAddress {
 	/** The saved address as printable lines: blanks skipped, `City, State Zip` on one line. */
 	@NamespaceAccessible
 	public static List<String> lines() {
-		return lines(BarnCRM_Settings__c.getOrgDefaults());
+		return lines(SettingsService.getSettings());
 	}
 
 	/** The saved address on one line, the lines joined with commas. Empty when none is saved. */
 	@NamespaceAccessible
 	public static String oneLine() {
-		return oneLine(BarnCRM_Settings__c.getOrgDefaults());
+		return oneLine(SettingsService.getSettings());
 	}
 
 	@NamespaceAccessible
@@ -61,7 +61,7 @@ public with sharing class OrganizationAddress {
 	 * that is not saved is an empty string, so a screen never has to tell null from blank.
 	 */
 	public static Map<String, String> savedParts() {
-		BarnCRM_Settings__c saved = BarnCRM_Settings__c.getOrgDefaults();
+		BarnCRM_Settings__c saved = SettingsService.getSettings();
 		Map<String, String> result = new Map<String, String>();
 		for (Schema.SObjectField part : parts()) {
 			String text = (String) saved.get(part);

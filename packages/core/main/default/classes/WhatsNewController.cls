@@ -2,8 +2,8 @@
  * What the What's new card on the BarnCRM home page shows, and its Dismiss (C-27).
  *
  * The notes are the shipped `Release_Note__mdt` records of every installed package, read as
- * shipped: they hold no organization data. What a person has already seen is their own
- * user-level `Whats_New_Seen__c` record (canonical model Section 12A, rules R-WN1 to R-WN4,
+ * shipped: they hold no organization data. What a person has already seen is their own Seen
+ * row, kept by `WhatsNewSeenWriter` (canonical model Section 12A, rules R-WN1 to R-WN4,
  * ADR-0087 `0087-whats-new-from-packaged-release-notes.md`).
  */
 public with sharing class WhatsNewController {
@@ -43,8 +43,7 @@ public with sharing class WhatsNewController {
 	@AuraEnabled
 	public static List<VersionView> getWhatsNew() {
 		try {
-			Whats_New_Seen__c row = Whats_New_Seen__c.getValues(UserInfo.getUserId());
-			return unseen(shippedNotes(), row == null ? null : row.Last_Seen_Version__c);
+			return unseen(shippedNotes(), WhatsNewSeenWriter.lastSeen());
 		} catch (Exception caught) {
 			throw ERRORS.wrap(caught, 'What\'s new');
 		}

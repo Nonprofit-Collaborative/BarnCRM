@@ -145,7 +145,7 @@ private class CorePostInstallTest {
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
 			new CorePostInstall().onInstall(new InstallBy(null, null, false));
-			String afterInstall = BarnCRM_Settings__c.getOrgDefaults().Organization_Record_Type__c;
+			String afterInstall = SettingsService.getSettings().Organization_Record_Type__c;
 			// A choice an administrator could save here: the last candidate, or No record type
 			// in an org with none (it is refused where a candidate exists).
 			List<Schema.RecordTypeInfo> offered = AccountKinds.candidateRecordTypes();
@@ -163,7 +163,7 @@ private class CorePostInstallTest {
 			);
 			Assert.areEqual(
 				chosen,
-				BarnCRM_Settings__c.getOrgDefaults().Organization_Record_Type__c,
+				SettingsService.getSettings().Organization_Record_Type__c,
 				'A source deploy never replaces a usable stored choice'
 			);
 		}
@@ -213,7 +213,7 @@ private class CorePostInstallTest {
 			CorePostInstall.scheduleNightlyInTests = true;
 			TestDataFactory.clearScheduledJobs(new List<String>{ NightlyJobs.jobName() });
 			ScheduledJobSelector.forget();
-			Integer rowsBefore = [SELECT COUNT() FROM Nightly_Job__c];
+			Integer rowsBefore = [SELECT COUNT() FROM Nightly_Job__c WHERE Kind__c = NULL OR Kind__c = 'Job'];
 
 			new CorePostInstall().onInstall(new InstallBy(null, null, false));
 			Assert.isTrue(NightlyJobs.isScheduled(), 'A new install schedules the nightly run');
@@ -229,7 +229,11 @@ private class CorePostInstallTest {
 				],
 				'Installing again or upgrading never makes a second schedule'
 			);
-			Assert.areEqual(rowsBefore, [SELECT COUNT() FROM Nightly_Job__c], 'No step switch was written or changed');
+			Assert.areEqual(
+				rowsBefore,
+				[SELECT COUNT() FROM Nightly_Job__c WHERE Kind__c = NULL OR Kind__c = 'Job'],
+				'No step switch was written or changed'
+			);
 		}
 	}
 
@@ -251,6 +255,7 @@ private class CorePostInstallTest {
 	 */
 	private static void forgetSavedSettings() {
 		delete [SELECT Id FROM BarnCRM_Settings__c];
+		SettingStore.resetForTest();
 		SettingsService.clearCaches();
 	}
 
@@ -331,10 +336,7 @@ private class CorePostInstallTest {
 			new List<String>{ SeasonalAddressScheduler.JOB_NAME, NightlyJobs.jobName() }
 		);
 		ScheduledJobSelector.forget();
-		OrgSettingsSystemWriter.save(
-			new Map<Schema.SObjectField, Object>{ BarnCRM_Settings__c.Seasonal_Addresses_Enabled__c => switchedOn }
-		);
-		SettingsService.clearCaches();
+		SettingsService.setForTest('Seasonal_Addresses_Enabled__c', switchedOn);
 		if (oldJobScheduled) {
 			ScheduledJobSelector.schedule(
 				SeasonalAddressScheduler.JOB_NAME,

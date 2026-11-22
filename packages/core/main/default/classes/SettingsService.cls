@@ -1,11 +1,16 @@
 /**
  * Reads and writes the org's settings.
  *
- * Each package owns a protected hierarchy custom setting (ADR-0017): Core's is
- * `BarnCRM_Settings__c` and a module ships its own, named on its Setting Definition rows.
- * Every write is validated against that object's own schema and against the shipped rows, is
- * audited as a Setting Change record, and clears the cached copy so the next transaction sees
- * the new value (canonical model Section 12, R-N3).
+ * Core's settings live in the settings store (`SettingStore`, ADR-NEXT settings as custom
+ * metadata): the default on each Setting Definition row, a changed value in a Setting Value
+ * record. They keep their `BarnCRM_Settings__c` field names as keys, and `getSettings()` returns
+ * a `BarnCRM_Settings__c` built in memory from the store, so readers are unchanged. Until the org
+ * carries its settings over, a value it saved in the legacy custom setting is read ahead of the
+ * default. Core run state is not a setting: its keys are rows of `SettingsState`.
+ *
+ * A module still owns a protected hierarchy custom setting (ADR-0017) until phase 2. Every write
+ * is validated against the object's own schema and the shipped rows and is audited as a Setting
+ * Change record (canonical model Section 12, R-N3; R-SV2 for Core, once the save is deployed).
  */
 @NamespaceAccessible
 public with sharing class SettingsService {
@@ -30,34 +35,11 @@ public with sharing class SettingsService {
 	public static final String FIELD_LIST = 'FieldList';
 	public static final String PICKLIST_FROM_FIELD = 'PicklistFromField';
 
-	/**
-	 * The Core checkbox settings that ship switched on, and the reason this map has to exist.
-	 *
-	 * A checkbox field can declare `<defaultValue>true</defaultValue>`, and that default is what
-	 * the platform applies when a record is created through the user interface. It is not what
-	 * Apex reads. `BarnCRM_Settings__c.getOrgDefaults()` on an org that has never saved its
-	 * settings returns a materialized record with every checkbox false, not null and not the
-	 * shipped default, so a feature that ships on reads as switched off on every fresh install
-	 * and does nothing at all, silently. That is what happened to the relationship reciprocal
-	 * upkeep: C-15 shipped a feature that wrote only the side the person entered.
-	 *
-	 * The default is applied to the record only while the org has never saved one. From the
-	 * first save onwards the stored value governs, including a deliberate false, and the first
-	 * save carries these defaults into the record it creates, because every first save starts
-	 * from `firstSaveRecord` (OrgSettingsSystemWriter). So an administrator who saves some
-	 * unrelated setting does not silently switch a shipped feature off.
-	 *
-	 * A field belongs here when it ships on. `scripts/ci/check-setting-defaults.py` fails the
-	 * build when a checkbox that ships on is missing from it (ADR-0035).
-	 */
-	private static final Map<Schema.SObjectField, Boolean> SHIPPED_DEFAULTS = new Map<Schema.SObjectField, Boolean>{
-		BarnCRM_Settings__c.Relationship_Auto_Reciprocal__c => true,
-		BarnCRM_Settings__c.Auto_Create_Households__c => true,
-		BarnCRM_Settings__c.Job_Notifications__c => true,
-		BarnCRM_Settings__c.Error_Digest_Include_Admin_Summary__c => true
-	};
-
 	private static BarnCRM_Settings__c cachedSettings;
+	private static BarnCRM_Settings__c cachedLegacy;
+	private static Map<String, Setting_Definition__mdt> cachedCoreDefinitions;
+	/** The deployment the last Core save in this transaction sent, for the console to follow. */
+	private static Id lastDeployment;
 	private static Map<String, SObject> cachedOrgDefaults = new Map<String, SObject>();
 	private static Map<String, Map<String, Schema.SObjectField>> cachedFields = new Map<String, Map<String, Schema.SObjectField>>();
 
@@ -67,32 +49,158 @@ public with sharing class SettingsService {
 	}
 
 	/**
-	 * The org-level Core settings record, from the static cache, then the platform. Never null:
-	 * an org that has never saved gets an empty record carrying the shipped defaults (see
-	 * `SHIPPED_DEFAULTS`). `getOrgDefaults()` costs no query: the platform serves custom
-	 * settings from its own cache across transactions and refreshes it when a save commits.
+	 * Core's settings as one record, built in memory once per transaction from the settings
+	 * store: each key's saved value, else (before carry-over) the legacy value, else its
+	 * default. Never null and never saved: it has no Id. A checkbox is never null. Run state is
+	 * not on it (`SettingsState`). Costs no query.
 	 */
 	@NamespaceAccessible
 	public static BarnCRM_Settings__c getSettings() {
 		if (cachedSettings == null) {
-			cachedSettings = withShippedDefaults(BarnCRM_Settings__c.getOrgDefaults());
+			BarnCRM_Settings__c record = new BarnCRM_Settings__c();
+			for (String key : fieldsByLocalName(BarnCRM_Settings__c.SObjectType).keySet()) {
+				Schema.SObjectField token = fieldsByLocalName(BarnCRM_Settings__c.SObjectType).get(key);
+				if (key.endsWith('__c') && !SettingsState.isStateKey(key)) {
+					record.put(token, coreEffective(token));
+				}
+			}
+			cachedSettings = record;
 		}
 		return cachedSettings;
 	}
 
+	/** The Core Setting Definition rows that hold a value, by key in lower case (shipped rows). */
+	private static Map<String, Setting_Definition__mdt> coreDefinitions() {
+		if (cachedCoreDefinitions == null) {
+			cachedCoreDefinitions = new Map<String, Setting_Definition__mdt>();
+			for (Setting_Definition__mdt definition : SettingStore.definitions().values()) {
+				Boolean core = objectName(definition.Settings_Object__c).equalsIgnoreCase(CORE_SETTINGS_OBJECT);
+				if (core && String.isNotBlank(definition.Setting_Key__c)) {
+					cachedCoreDefinitions.put(definition.Setting_Key__c.trim().toLowerCase(), definition);
+				}
+			}
+		}
+		return cachedCoreDefinitions;
+	}
+
 	/**
-	 * Puts the shipped defaults on a settings record the org has never saved, and leaves a saved
-	 * record exactly as the org left it. An unsaved hierarchy custom setting has no Id, which is
-	 * what tells the two apart.
+	 * The store name of a Core key: its shipped definition's, else the row the console was given
+	 * (a test's stand-in, SettingDefinitionSelector), else null.
 	 */
-	private static BarnCRM_Settings__c withShippedDefaults(BarnCRM_Settings__c record) {
-		if (record == null || record.Id != null) {
-			return record;
+	private static String coreName(Schema.SObjectField token) {
+		String key = token.getDescribe().getLocalName().toLowerCase();
+		Setting_Definition__mdt definition = coreDefinitions().get(key);
+		if (definition == null) {
+			// A test's stand-in rows; read without a query, which the read path must not spend.
+			for (Setting_Definition__mdt row : SettingDefinitionSelector.getAllShortFields()) {
+				Boolean core = objectName(row.Settings_Object__c).equalsIgnoreCase(CORE_SETTINGS_OBJECT);
+				if (core && String.isNotBlank(row.Setting_Key__c) && row.Setting_Key__c.trim().equalsIgnoreCase(key)) {
+					definition = row;
+				}
+			}
 		}
-		for (Schema.SObjectField field : SHIPPED_DEFAULTS.keySet()) {
-			record.put(field, SHIPPED_DEFAULTS.get(field));
+		return definition == null ? null : definition.DeveloperName;
+	}
+
+	/**
+	 * What the org saved for a Core key, typed, or null when it saved nothing: the store's value;
+	 * before carry-over, with no store record, the legacy custom setting's (R-SV1).
+	 */
+	private static Object coreStored(Schema.SObjectField token) {
+		String name = coreName(token);
+		if (name != null && SettingStore.has(name)) {
+			return typed(SettingStore.parse(SettingStore.saved(name)), token);
 		}
-		return record;
+		if (SettingStore.isCarriedOver()) {
+			return null;
+		}
+		BarnCRM_Settings__c legacy = legacySettings();
+		Object value = legacy.Id == null ? null : legacy.get(token);
+		return value instanceof String && String.isBlank((String) value) ? null : value;
+	}
+
+	/**
+	 * The shipped default of a Core key, typed, or null (a checkbox: false). A Core key whose
+	 * definition ships in a module that is not installed (Org Optimizer's) falls back to the
+	 * field's declared default, which the CI check keeps equal to the definition's.
+	 */
+	private static Object coreDefault(Schema.SObjectField token) {
+		String key = token.getDescribe().getLocalName().toLowerCase();
+		Object value = coreDefinitions().containsKey(key)
+			? typed(SettingStore.parse(SettingStore.defaultOf(coreDefinitions().get(key).DeveloperName)), token)
+			: declaredField(token);
+		return value == null && token.getDescribe().getType() == Schema.DisplayType.BOOLEAN ? false : value;
+	}
+
+	private static SObject declaredCore;
+
+	private static Object declaredField(Schema.SObjectField token) {
+		if (declaredCore == null) {
+			declaredCore = BarnCRM_Settings__c.SObjectType.newSObject(null, true);
+		}
+		return declaredCore.get(token);
+	}
+
+	private static Object coreEffective(Schema.SObjectField token) {
+		Object stored = coreStored(token);
+		return stored != null ? stored : coreDefault(token);
+	}
+
+	/** The legacy custom setting's org-level record, read once per transaction, never null. */
+	private static BarnCRM_Settings__c legacySettings() {
+		if (cachedLegacy == null) {
+			BarnCRM_Settings__c stored = BarnCRM_Settings__c.getOrgDefaults();
+			cachedLegacy = stored == null ? new BarnCRM_Settings__c() : stored;
+		}
+		return cachedLegacy;
+	}
+
+	/** A value parsed from JSON in the field's own type, or null when it cannot be. */
+	private static Object typed(Object value, Schema.SObjectField token) {
+		if (value == null || value instanceof Datetime || value instanceof Boolean) {
+			return value;
+		}
+		Schema.DisplayType kind = token.getDescribe().getType();
+		String text = String.valueOf(value);
+		try {
+			if (kind == Schema.DisplayType.BOOLEAN) {
+				return value instanceof Boolean ? value : Boolean.valueOf(text);
+			}
+			if (kind == Schema.DisplayType.INTEGER) {
+				return Integer.valueOf(text);
+			}
+			if (isNumeric(kind)) {
+				return Decimal.valueOf(text);
+			}
+			if (kind == Schema.DisplayType.DATETIME) {
+				return (Datetime) JSON.deserialize(JSON.serialize(text), Datetime.class);
+			}
+			if (kind == Schema.DisplayType.DATE) {
+				return (Date) JSON.deserialize(JSON.serialize(text), Date.class);
+			}
+		} catch (Exception unreadable) {
+			return null;
+		}
+		return text;
+	}
+
+	/**
+	 * Puts a Core setting in the store for a test, as if it were deployed (ADR-NEXT settings as
+	 * custom metadata: tests cannot deploy metadata). Keyed by the field name, as readers name it.
+	 */
+	@NamespaceAccessible
+	public static void setForTest(String key, Object value) {
+		Setting_Definition__mdt definition = coreDefinitions().get(key.trim().toLowerCase());
+		if (definition == null) {
+			throw new SettingsException(BarnHelp.text('Core', 'Core_Settings_UnknownKeyError'));
+		}
+		SettingStore.setForTest(definition.DeveloperName, value);
+		clearCaches();
+	}
+
+	/** The deployment the last Core save in this transaction sent, or null (none, or a test). */
+	public static Id lastDeploymentId() {
+		return lastDeployment;
 	}
 
 	/** True when Core's settings object actually has the given key. */
@@ -123,7 +231,12 @@ public with sharing class SettingsService {
 	@NamespaceAccessible
 	public static Object getValue(String settingsObject, String key) {
 		Schema.SObjectType type = settingsType(settingsObject);
-		return orgDefault(type).get(fieldFor(type, key));
+		Schema.SObjectField token = fieldFor(type, key);
+		if (!isCoreSettings(type)) {
+			return orgDefault(type).get(token);
+		}
+		// Core: what the org saved (null when nothing), or the run state under the key.
+		return SettingsState.isStateKey(key) ? typed(SettingsState.get(key.trim()), token) : coreStored(token);
 	}
 
 	// Typed readers (D-200 S8): every module reads its settings through these, so the shipped
@@ -197,6 +310,9 @@ public with sharing class SettingsService {
 	private static Object declaredValue(String settingsObject, String key) {
 		try {
 			Schema.SObjectType type = settingsType(settingsObject);
+			if (isCoreSettings(type)) {
+				return coreDefault(fieldFor(type, key));
+			}
 			String name = String.valueOf(type);
 			if (!declaredDefaults.containsKey(name)) {
 				declaredDefaults.put(name, type.newSObject(null, true));
@@ -247,15 +363,20 @@ public with sharing class SettingsService {
 	public static Object getEffectiveValue(String settingsObject, String key, String dataType) {
 		Schema.SObjectType type = settingsType(settingsObject);
 		Schema.SObjectField field = fieldFor(type, key);
-		Object stored = orgDefault(type).get(field);
+		Boolean core = isCoreSettings(type);
+		Object stored = core ? coreStored(field) : orgDefault(type).get(field);
 		Boolean blank = stored == null || (stored instanceof String && String.isBlank((String) stored));
 		Boolean fillable =
 			PICKLIST.equalsIgnoreCase(dataType) ||
 			PICKLIST_FROM_FIELD.equalsIgnoreCase(dataType) ||
 			NUMBER_TYPE.equalsIgnoreCase(dataType) ||
 			TEXT_TYPE.equalsIgnoreCase(dataType);
-		if (!blank || !fillable) {
+		if (!blank) {
 			return stored;
+		}
+		if (!fillable) {
+			// A Core checkbox nothing saved shows its shipped default (R-SV1).
+			return core ? coreDefault(field) : stored;
 		}
 		String name = field.getDescribe().getLocalName().toLowerCase();
 		if (isCoreSettings(type) && COEXISTENCE_FIELD.equals(name)) {
@@ -267,7 +388,7 @@ public with sharing class SettingsService {
 		if (SHOWN_AS_MY_DOMAIN.contains(type.getDescribe().getLocalName().toLowerCase() + '.' + name)) {
 			return Url.getOrgDomainUrl().toExternalForm();
 		}
-		Object declared = type.newSObject(null, true).get(field);
+		Object declared = core ? coreDefault(field) : type.newSObject(null, true).get(field);
 		return declared == null ? stored : declared;
 	}
 
@@ -328,6 +449,10 @@ public with sharing class SettingsService {
 		Boolean audit
 	) {
 		Schema.SObjectType type = settingsType(settingsObject);
+		if (isCoreSettings(type)) {
+			applyCoreValues(values, requireDefinition, audit);
+			return getSettings();
+		}
 		if (values == null || values.isEmpty()) {
 			return orgDefault(type);
 		}
@@ -381,57 +506,143 @@ public with sharing class SettingsService {
 			Database.insert(changes, AccessLevel.USER_MODE);
 		}
 		clearCaches();
-		applySeasonalSwitch(changed);
-		// Which apps and account tabs people see follow these settings (ADR-0137, C-73).
-		if (
-			changed.containsKey(BarnCRM_Settings__c.App_Navigation_Style__c) ||
-			changed.containsKey(BarnCRM_Settings__c.Account_Tabs__c)
-		) {
-			TabAccessService.requestSync();
+		// Core's own side effects follow its store saves (afterSaved); a module hands its keys on.
+		Set<String> keys = new Set<String>();
+		for (Schema.SObjectField token : changed.keySet()) {
+			keys.add(token.getDescribe().getLocalName());
 		}
-		// Brand visibility follows either brand switch: groups and shares added or removed (R-BR7).
-		if (
-			changed.containsKey(BarnCRM_Settings__c.Brand_Visibility__c) ||
-			changed.containsKey(BarnCRM_Settings__c.Brand_Management__c)
-		) {
-			BrandShareJob.requestFull();
-		}
-		notifyRollupEngine(objectName, changed);
+		notifyRollupEngine(objectName, keys);
 		return orgDefault(type);
 	}
 
 	/**
+	 * Validates Core values as `applyValues` does, then saves run-state keys as state rows at
+	 * once and every changed setting in one store deployment (ADR-NEXT settings as custom
+	 * metadata). Compared against what the org saved, so keeping a shown default saves it. The
+	 * save's side effects run when the deployment succeeds (`afterSaved`).
+	 */
+	private static void applyCoreValues(Map<String, Object> values, Boolean requireDefinition, Boolean audit) {
+		if (values == null || values.isEmpty()) {
+			return;
+		}
+		Schema.SObjectType type = BarnCRM_Settings__c.SObjectType;
+		// Compared against what is stored now, not a copy read earlier in this transaction, so
+		// the audit's old value is the one really stored.
+		clearCaches();
+		Map<String, Setting_Definition__mdt> rows = definitionsByKey(CORE_SETTINGS_OBJECT);
+		Map<String, Object> state = new Map<String, Object>();
+		Map<Schema.SObjectField, Object> changed = new Map<Schema.SObjectField, Object>();
+		List<SettingStore.Change> changes = new List<SettingStore.Change>();
+		for (String key : values.keySet()) {
+			Schema.SObjectField token = fieldFor(type, key);
+			Schema.DescribeFieldResult field = token.getDescribe();
+			String localName = field.getLocalName();
+			if (SettingsState.isStateKey(localName)) {
+				state.put(localName, coerce(values.get(key), field));
+				continue;
+			}
+			Setting_Definition__mdt definition = rows.get(localName.toLowerCase());
+			Setting_Definition__mdt shipped = coreDefinitions().get(localName.toLowerCase());
+			Setting_Definition__mdt row = definition != null ? definition : shipped;
+			Boolean consoleRow = definition != null && !TYPE_HIDDEN.equalsIgnoreCase(definition.Data_Type__c);
+			if (row == null || (requireDefinition && !consoleRow)) {
+				throw new SettingsException(BarnHelp.text('Core', 'Core_Settings_UnknownKeyError'));
+			}
+			Object oldValue = coreStored(token);
+			Object shownValue = oldValue != null ? oldValue : coreDefault(token);
+			Object newValue = checkedValue(values.get(key), field, row, shownValue);
+			String oldText = asText(oldValue);
+			String newText = asText(newValue);
+			if (oldText.equals(newText)) {
+				continue;
+			}
+			refuseIfMembershipDataWouldBeStranded(token, oldText, newText);
+			refuseIfDigestRecipientsAreNotUsers(token, newText);
+			refuseIfNoRecordTypeCannotWork(token, newText);
+			SettingStore.Change change = new SettingStore.Change();
+			change.name = shipped != null ? shipped.DeveloperName : definition.DeveloperName;
+			change.settingName = CORE_SETTINGS_OBJECT + '.' + localName;
+			change.oldText = stored(oldText);
+			change.newText = stored(newText);
+			change.json = SettingStore.toJson(newValue);
+			if (change.json.length() > STORE_VALUE_LIMIT) {
+				throw new SettingsException(
+					String.format(
+						System.Label.Core_Format_Pair,
+						new List<Object>{ row.MasterLabel, BarnHelp.text('Core', 'Core_Settings_InvalidValueError') }
+					)
+				);
+			}
+			changed.put(token, newValue);
+			changes.add(change);
+		}
+		if (!changed.isEmpty()) {
+			refuseIfAddressWouldBeIncomplete(type, getSettings(), changed);
+		}
+		SettingsState.put(state);
+		if (changes.isEmpty()) {
+			return;
+		}
+		if (!BarnCRMPermissions.canManageSettings()) {
+			throw new SettingsWriter.PermissionException(BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError'));
+		}
+		try {
+			lastDeployment = SettingStore.save(changes, audit);
+		} catch (SettingStore.SettingStoreException refused) {
+			throw new SettingsException(refused.getMessage());
+		}
+		clearCaches();
+	}
+
+	/**
+	 * What a Core save does once its deployment has succeeded (SettingValueDeployCallback): the
+	 * apps and account tabs people see follow their settings (ADR-0137, C-73), brand sharing
+	 * follows either brand switch (R-BR7), the seasonal job follows its switch, the rollup
+	 * engine hears of every change (ADR-0125), and organization flags follow the organization
+	 * record type (ADR-NEXT settings as custom metadata, decision 8).
+	 */
+	public static void afterSaved(List<SettingStore.Change> changes) {
+		clearCaches();
+		Map<String, String> jsonByKey = new Map<String, String>();
+		for (SettingStore.Change change : changes) {
+			String key = change.settingName == null ? '' : change.settingName.substringAfter('.');
+			jsonByKey.put(key.toLowerCase(), change.json);
+		}
+		if (jsonByKey.containsKey('app_navigation_style__c') || jsonByKey.containsKey('account_tabs__c')) {
+			TabAccessService.requestSync();
+		}
+		if (jsonByKey.containsKey('brand_visibility__c') || jsonByKey.containsKey('brand_management__c')) {
+			BrandShareJob.requestFull();
+		}
+		if (jsonByKey.containsKey('seasonal_addresses_enabled__c')) {
+			SeasonalAddressScheduler.applySwitch(jsonByKey.get('seasonal_addresses_enabled__c') == 'true');
+		}
+		Set<String> keys = new Set<String>();
+		for (SettingStore.Change change : changes) {
+			keys.add(change.settingName == null ? change.name : change.settingName.substringAfter('.'));
+		}
+		notifyRollupEngine(CORE_SETTINGS_OBJECT, keys);
+	}
+
+	private static final String TYPE_HIDDEN = 'Hidden';
+	private static final Integer STORE_VALUE_LIMIT = 255;
+
+	/**
 	 * Tells the rollup engine, when its module is installed, which settings a save changed, so a
 	 * setting that times a scheduled job (the nightly rollup run's hour) moves the job in the
-	 * same save, as Seasonal Addresses does below. Core cannot name the module's settings, so
-	 * it hands over every change and the engine picks its own (ADR-0125 decision 4, ADR-0136).
-	 * A failure is logged and the saved setting stands.
+	 * same save, as Seasonal Addresses does. Core cannot name the module's settings, so it hands
+	 * over every change and the engine picks its own (ADR-0125 decision 4, ADR-0136). A failure
+	 * is logged and the saved setting stands.
 	 */
-	private static void notifyRollupEngine(String objectName, Map<Schema.SObjectField, Object> changed) {
+	private static void notifyRollupEngine(String objectName, Set<String> keys) {
 		RollupEngineExtension engine = RollupEngineExtensions.find();
 		if (engine == null) {
 			return;
-		}
-		Set<String> keys = new Set<String>();
-		for (Schema.SObjectField token : changed.keySet()) {
-			keys.add(token.getDescribe().getLocalName());
 		}
 		try {
 			engine.afterSettingsSaved(objectName, keys);
 		} catch (Exception failed) {
 			ErrorLogger.log(failed, 'SettingsService.notifyRollupEngine');
-		}
-	}
-
-	/**
-	 * Seasonal Addresses is the one setting that starts and stops a nightly job, so the save is
-	 * where the job follows it, whichever way the value was written. Scheduling is idempotent,
-	 * so saving the switch on twice never doubles the job.
-	 */
-	private static void applySeasonalSwitch(Map<Schema.SObjectField, Object> changed) {
-		Schema.SObjectField token = BarnCRM_Settings__c.Seasonal_Addresses_Enabled__c;
-		if (changed.containsKey(token)) {
-			SeasonalAddressScheduler.applySwitch(changed.get(token) == true);
 		}
 	}
 
@@ -834,17 +1045,18 @@ public with sharing class SettingsService {
 	}
 
 	/**
-	 * The record a system mode writer creates when the org has never saved its settings: owned
-	 * by the org, with the shipped checkbox defaults on it (ADR-0035). Starting from a raw
-	 * `getOrgDefaults()` instead would store every shipped-on feature as switched off.
+	 * The record a system mode writer creates when the org has never saved its legacy Core
+	 * settings: owned by the org, with the checkbox defaults its field metadata declares
+	 * (ADR-0035). Only tests and the legacy writers still save that record (ADR-NEXT settings as
+	 * custom metadata); it is removed with the object in phase 2.
 	 */
 	@NamespaceAccessible
 	public static BarnCRM_Settings__c firstSaveRecord() {
-		return withShippedDefaults(new BarnCRM_Settings__c(SetupOwnerId = UserInfo.getOrganizationId()));
+		return (BarnCRM_Settings__c) firstSaveRecord(BarnCRM_Settings__c.SObjectType);
 	}
 
 	/**
-	 * The same for any settings object. Core's gets `SHIPPED_DEFAULTS`. A module's gets the
+	 * The same for any settings object. Each gets the
 	 * checkbox defaults its own field metadata declares, because Core cannot name a module's
 	 * fields (ADR-0059) and the module's readers already treat an unsaved checkbox as its
 	 * shipped value. Without this, a module's first save (a nightly job recording its run, say)
@@ -856,9 +1068,6 @@ public with sharing class SettingsService {
 	 */
 	@NamespaceAccessible
 	public static SObject firstSaveRecord(Schema.SObjectType type) {
-		if (isCoreSettings(type)) {
-			return firstSaveRecord();
-		}
 		SObject record = type.newSObject();
 		record.put(SETUP_OWNER, UserInfo.getOrganizationId());
 		SObject declared = type.newSObject(null, true);
@@ -963,7 +1172,10 @@ public with sharing class SettingsService {
 	@NamespaceAccessible
 	public static void clearCaches() {
 		cachedSettings = null;
+		cachedLegacy = null;
 		cachedOrgDefaults.clear();
+		SettingStore.clearCache();
+		cachedCoreDefinitions = null;
 	}
 
 	/** The shipped rows for one settings object, by the key each one edits. */

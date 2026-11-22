@@ -58,7 +58,7 @@ private class WhatsNewControllerTest {
 			Test.stopTest();
 
 			Assert.areEqual(0, shown.size(), 'Nothing shipped, nothing shown.');
-			Assert.areEqual(0, [SELECT COUNT() FROM Whats_New_Seen__c], 'Dismiss stored nothing.');
+			Assert.areEqual(0, [SELECT COUNT() FROM Nightly_Job__c WHERE Kind__c = 'Seen'], 'Dismiss stored nothing.');
 		}
 	}
 
@@ -151,13 +151,10 @@ private class WhatsNewControllerTest {
 			Test.stopTest();
 
 			Assert.areEqual(0, shown.size(), 'The card is hidden after Dismiss.');
-			List<Whats_New_Seen__c> rows = [
-				SELECT SetupOwnerId, Last_Seen_Version__c
-				FROM Whats_New_Seen__c
-			];
+			List<Nightly_Job__c> rows = [SELECT Name, Value__c FROM Nightly_Job__c WHERE Kind__c = 'Seen'];
 			Assert.areEqual(1, rows.size(), 'No organization-wide or other record is written (R-WN1).');
-			Assert.areEqual(person.Id, rows[0].SetupOwnerId);
-			Assert.areEqual('0.12', rows[0].Last_Seen_Version__c);
+			Assert.areEqual('WhatsNew:' + person.Id, rows[0].Name);
+			Assert.areEqual('"0.12"', rows[0].Value__c);
 		}
 	}
 
@@ -174,13 +171,10 @@ private class WhatsNewControllerTest {
 			}
 			Test.stopTest();
 
-			List<Whats_New_Seen__c> rows = [
-				SELECT Last_Seen_Version__c
-				FROM Whats_New_Seen__c
-				WHERE SetupOwnerId = :person.Id
-			];
+			String name = 'WhatsNew:' + person.Id;
+			List<Nightly_Job__c> rows = [SELECT Value__c FROM Nightly_Job__c WHERE Kind__c = 'Seen' AND Name = :name];
 			Assert.areEqual(1, rows.size(), 'One record per person.');
-			Assert.areEqual('0.7', rows[0].Last_Seen_Version__c);
+			Assert.areEqual('"0.7"', rows[0].Value__c);
 		}
 	}
 

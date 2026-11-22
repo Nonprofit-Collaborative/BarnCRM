@@ -162,7 +162,7 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 	 */
 	@TestVisible
 	private static Boolean hasBeenSetUp() {
-		if (BarnCRM_Settings__c.getOrgDefaults().Id != null) {
+		if (BarnCRM_Settings__c.getOrgDefaults().Id != null || SettingStore.hasAnyValue()) {
 			return true;
 		}
 		Id householdType = HouseholdService.householdRecordTypeId();

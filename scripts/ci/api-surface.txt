@@ -284,6 +284,8 @@ core/EngagementSignalExtension.cls | public interface EngagementSignalExtension
 core/ErrorDigestScheduler.cls | public class ErrorDigestScheduler
 core/ErrorDigestScheduler.cls | public static Datetime nextRunAt()
 core/ErrorDigestScheduler.cls | public static Id start()
+core/ErrorDigestWriter.cls | public class ErrorDigestWriter
+core/ErrorDigestWriter.cls | public static final String LAST_RUN
 core/ErrorLogCountSelector.cls | public class ErrorLogCountSelector
 core/ErrorLogCountSelector.cls | public static Integer countNewUpTo(Integer)
 core/ErrorLogCountSelector.cls | public static String listViewUrl()
@@ -450,6 +452,7 @@ core/HealthCheckResult.cls | public class Counts
 core/HealthCheckResult.cls | public class HealthCheckResult
 core/HealthCheckResult.cls | public static Counts read()
 core/HealthCheckResult.cls | public static String text(Integer,Integer,Integer)
+core/HealthCheckResult.cls | public static void write(Integer,Integer,Integer)
 core/HealthCheckRun.cls | public interface HealthCheckRun
 core/HealthCheckService.cls | public Boolean getCanManageSettings()
 core/HealthCheckService.cls | public Boolean getModeNeedsAttention()
@@ -1540,6 +1543,17 @@ core/SettingsService.cls | public static final String MEMBERSHIP_MODE_DEFAULT
 core/SettingsService.cls | public static void clearCaches()
 core/SettingsService.cls | public static void logChange(String,String,String)
 core/SettingsService.cls | public static void saveBookkeeping(Map<String,Object>)
+core/SettingsService.cls | public static void setForTest(String,Object)
+core/SettingsState.cls | public class SettingsState
+core/SettingsState.cls | public static Boolean flag(String)
+core/SettingsState.cls | public static Boolean isStateKey(String)
+core/SettingsState.cls | public static Datetime moment(String)
+core/SettingsState.cls | public static Object get(String)
+core/SettingsState.cls | public static String text(String)
+core/SettingsState.cls | public static final Set<String> CORE_KEYS
+core/SettingsState.cls | public static void clearCache()
+core/SettingsState.cls | public static void lock(Set<String>)
+core/SettingsState.cls | public static void put(Map<String,Object>)
 core/SetupAssistantExtension.cls | public interface SetupAssistantExtension
 core/SetupAssistantExtensions.cls | public class SetupAssistantExtensions
 core/SetupAssistantExtensions.cls | public static List<SetupAssistantExtension> findAll()

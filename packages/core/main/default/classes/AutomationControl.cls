@@ -153,11 +153,21 @@ public with sharing class AutomationControl {
 	 */
 	@NamespaceAccessible
 	public static Datetime pausedUntil() {
-		BarnCRM_Settings__c settings = SettingsService.getSettings();
-		if (settings == null || settings.Automation_Paused_Until__c == null) {
-			return null;
+		Datetime until = storedPauseEnd();
+		return until != null && until > System.now() ? until : null;
+	}
+
+	/**
+	 * The stored pause end, expired or not: the organization-level Automation Control value
+	 * (no query), else, until the org carries its settings over, the legacy BarnCRM Settings one
+	 * (ADR-NEXT settings as custom metadata, decision 7).
+	 */
+	private static Datetime storedPauseEnd() {
+		Datetime until = BarnCRM_Automation_Control__c.getOrgDefaults()?.Paused_Until__c;
+		if (until == null && !SettingStore.isCarriedOver()) {
+			until = BarnCRM_Settings__c.getOrgDefaults()?.Automation_Paused_Until__c;
 		}
-		return settings.Automation_Paused_Until__c > System.now() ? settings.Automation_Paused_Until__c : null;
+		return until;
 	}
 
 	// ---------------------------------------------------- BarnCRM Automation Control setting
@@ -297,15 +307,15 @@ public with sharing class AutomationControl {
 	 */
 	@NamespaceAccessible
 	public static Boolean resumeExpiredPause(Datetime expectedEnd) {
-		BarnCRM_Settings__c locked = OrgSettingsSystemWriter.lockStored();
-		Datetime stored = locked?.Automation_Paused_Until__c;
+		AutomationSettingsWriter.lockPause();
+		Datetime stored = storedPauseEnd();
 		if (stored == null || stored > System.now()) {
 			return false;
 		}
 		if (expectedEnd != null && !sameSecond(stored, expectedEnd)) {
 			return false;
 		}
-		AutomationSettingsWriter.savePausedUntil(locked, null);
+		AutomationSettingsWriter.savePausedUntil(null);
 		SettingsService.clearCaches();
 		SettingsService.logChange(PAUSE_SETTING_NAME, SettingsService.asText(stored), '');
 		catchUp(false);
@@ -350,9 +360,9 @@ public with sharing class AutomationControl {
 		requirePermission();
 		// Read under the lock the save below also takes, so the audit row's old value is the
 		// one stored, not one another person replaced a moment ago.
-		BarnCRM_Settings__c locked = OrgSettingsSystemWriter.lockStored();
-		Datetime previous = locked?.Automation_Paused_Until__c;
-		AutomationSettingsWriter.savePausedUntil(locked, until);
+		AutomationSettingsWriter.lockPause();
+		Datetime previous = storedPauseEnd();
+		AutomationSettingsWriter.savePausedUntil(until);
 		SettingsService.clearCaches();
 		// asText: the one way a value is written in Recent changes (ADMIN-20).
 		SettingsService.logChange(PAUSE_SETTING_NAME, SettingsService.asText(previous), SettingsService.asText(until));

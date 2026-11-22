@@ -35,18 +35,25 @@ private class ErrorDigestServiceTest {
 		);
 	}
 
+	/** The digest settings with the run's state rows read into their fields, for the asserts. */
 	private static BarnCRM_Settings__c settings() {
-		return BarnCRM_Settings__c.getOrgDefaults();
+		BarnCRM_Settings__c record = BarnCRM_Settings__c.getOrgDefaults();
+		SettingsState.clearCache();
+		record.Error_Digest_Last_Run__c = SettingsState.moment(ErrorDigestWriter.LAST_RUN);
+		record.Error_Digest_Covered_Until__c = SettingsState.moment(ErrorDigestWriter.COVERED_UNTIL);
+		record.Error_Digest_Last_Run_Summary__c = SettingsState.text(ErrorDigestWriter.LAST_SUMMARY);
+		return record;
 	}
 
 	private static void setDigest(String recipients, String frequency, Datetime coveredUntil) {
-		BarnCRM_Settings__c record = settings();
+		BarnCRM_Settings__c record = BarnCRM_Settings__c.getOrgDefaults();
 		record.Error_Digest_Recipients__c = recipients;
 		record.Error_Digest_Frequency__c = frequency;
-		record.Error_Digest_Covered_Until__c = coveredUntil;
 		// The factory saves the materialized false; the shipped default is on.
 		record.Error_Digest_Include_Admin_Summary__c = true;
 		TestDataFactory.saveSettings(record);
+		// The window is run state, kept on its state row.
+		SettingsState.put(new Map<String, Object>{ ErrorDigestWriter.COVERED_UNTIL => coveredUntil });
 	}
 
 	@IsTest
@@ -550,17 +557,9 @@ private class ErrorDigestServiceTest {
 			ErrorDigestWriter.recordRun(System.now(), 'Nothing new.', System.now());
 			Test.stopTest();
 
-			BarnCRM_Settings__c saved = [
-				SELECT
-					Error_Digest_Last_Run__c,
-					Relationship_Auto_Reciprocal__c,
-					Auto_Create_Households__c,
-					Coexistence_Mode__c,
-					Household_Membership_Mode__c
-				FROM BarnCRM_Settings__c
-				WHERE SetupOwnerId = :UserInfo.getOrganizationId()
-			];
-			Assert.isNotNull(saved.Error_Digest_Last_Run__c, 'The run is recorded.');
+			SettingsService.clearCaches();
+			BarnCRM_Settings__c saved = SettingsService.getSettings();
+			Assert.isNotNull(settings().Error_Digest_Last_Run__c, 'The run is recorded.');
 			Assert.isTrue(saved.Relationship_Auto_Reciprocal__c, 'A feature that ships on stays on.');
 			Assert.isTrue(saved.Auto_Create_Households__c, 'Households are still created by default.');
 			Assert.isNull(saved.Coexistence_Mode__c, 'Nobody confirmed a coexistence mode.');

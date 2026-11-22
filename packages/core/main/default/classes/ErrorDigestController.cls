@@ -81,8 +81,8 @@ public with sharing class ErrorDigestController {
 		view.canManage = canManage();
 		view.nextRunAt = ErrorDigestScheduler.nextRunAt();
 		view.scheduled = view.nextRunAt != null;
-		view.lastRun = settings.Error_Digest_Last_Run__c;
-		view.lastRunSummary = settings.Error_Digest_Last_Run_Summary__c;
+		view.lastRun = SettingsState.moment(ErrorDigestWriter.LAST_RUN);
+		view.lastRunSummary = SettingsState.text(ErrorDigestWriter.LAST_SUMMARY);
 		view.toAdministrators = String.isBlank(settings.Error_Digest_Recipients__c);
 		view.recipients = new List<String>();
 		for (User recipient : ErrorDigestRecipients.resolve(settings.Error_Digest_Recipients__c)) {
