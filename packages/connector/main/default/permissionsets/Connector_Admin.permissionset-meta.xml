@@ -3,14 +3,10 @@
   <hasActivationRequired>false</hasActivationRequired>
   <label>BarnCRM Connector Admin</label>
   <description>
-    The BarnCRM Connector app, Super Connector and Manage BarnCRM Connector: connections,
+    Super Connector (in BarnCRM Admin Console) and Manage BarnCRM Connector: connections,
     recipes, Run As and Recipe Access (saving a key also needs Customize Application or Manage
     Named Credentials). For system administrators only.
   </description>
-  <applicationVisibilities>
-    <application>BarnCRM_Connector</application>
-    <visible>true</visible>
-  </applicationVisibilities>
   <classAccesses>
     <apexClass>ConnectorConnectionsController</apexClass>
     <enabled>true</enabled>

@@ -2,39 +2,31 @@
 <CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
   <brand>
     <headerColor>#1E2A3A</headerColor>
-    <logo>BarnCRM_Patch_Portal_Logo</logo>
+    <logo>BarnCRM_Patch_Members_Partners_Logo</logo>
     <logoVersion>1</logoVersion>
     <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
   </brand>
   <description>
-    The BarnCRM Portal Builder module: portals people sign in to off-platform, and who may sign
-    in.
+    Members and partners: memberships, levels and certifications from Memberships, and companies,
+    boards, agreements and compliance from Corporate Hub. Each installed module adds its pages.
   </description>
   <formFactors>Large</formFactors>
   <formFactors>Small</formFactors>
   <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
   <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
   <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
-  <label>BarnCRM Portal Builder</label>
+  <label>BarnCRM Members and Partners</label>
   <navType>Console</navType>
-  <tabs>Portal_Builder_Home</tabs>
-  <tabs>Portal__c</tabs>
-  <tabs>Portal_Access__c</tabs>
   <tabs>standard-report</tabs>
+  <tabs>standard-Dashboard</tabs>
   <tabs>Error_Log__c</tabs>
   <uiType>Lightning</uiType>
   <workspaceConfig>
     <mappings>
-      <tab>Portal_Builder_Home</tab>
-    </mappings>
-    <mappings>
-      <tab>Portal__c</tab>
-    </mappings>
-    <mappings>
-      <tab>Portal_Access__c</tab>
-    </mappings>
-    <mappings>
       <tab>standard-report</tab>
+    </mappings>
+    <mappings>
+      <tab>standard-Dashboard</tab>
     </mappings>
     <mappings>
       <tab>Error_Log__c</tab>

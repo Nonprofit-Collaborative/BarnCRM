@@ -4,7 +4,7 @@
   <label>BarnCRM Auto: BarnCRM Admin Console App</label>
   <description>
     Shows the BarnCRM Admin Console app and nothing else. Given and taken by BarnCRM from the
-    BarnCRM Admin role and the App Navigation Style setting; do not assign by hand.
+    BarnCRM Admin role; do not assign by hand.
   </description>
   <applicationVisibilities>
     <application>BarnCRM_Admin_Console</application>

@@ -6,7 +6,7 @@
     Reads memberships, levels, benefits and certifications. Given to Read Only.
   </description>
   <applicationVisibilities>
-    <application>BarnCRM_Memberships</application>
+    <application>BarnCRM_Members_Partners</application>
     <visible>true</visible>
   </applicationVisibilities>
   <classAccesses>

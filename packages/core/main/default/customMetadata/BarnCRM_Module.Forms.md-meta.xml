@@ -20,15 +20,15 @@
   </values>
   <values>
     <field>App_Name__c</field>
-    <value xsi:type="xsd:string">BarnCRM_Forms</value>
+    <value xsi:nil="true" />
   </values>
   <values>
     <field>Staff_Tabs__c</field>
-    <value xsi:type="xsd:string">Forms_Home;Form__c;Form_Submission__c</value>
+    <value xsi:type="xsd:string">Form_Submission__c</value>
   </values>
   <values>
     <field>Admin_Tabs__c</field>
-    <value xsi:nil="true" />
+    <value xsi:type="xsd:string">Forms_Home;Form__c</value>
   </values>
   <values>
     <field>Probe_Object__c</field>

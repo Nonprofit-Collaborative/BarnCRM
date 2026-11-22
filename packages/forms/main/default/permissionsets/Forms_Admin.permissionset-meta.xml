@@ -6,10 +6,6 @@
     Builds, publishes and deletes forms, a form with submissions included (Manage Forms),
     fills them in and works their submissions.
   </description>
-  <applicationVisibilities>
-    <application>BarnCRM_Forms</application>
-    <visible>true</visible>
-  </applicationVisibilities>
   <classAccesses>
     <apexClass>FormBuilderController</apexClass>
     <enabled>true</enabled>

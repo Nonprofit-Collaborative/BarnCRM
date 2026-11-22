@@ -3,9 +3,9 @@
 A tab's icon comes from the number in its motif ("Custom20: ..." is always the airplane); the
 name after the colon is only a note, so a guessed name hides a wrong icon. Each Core tab's
 motif must pair its number with the icon Salesforce documents for it, and no two Core tabs may
-share one. The four Core apps keep one order: the everyday apps list records and then Data
-Manager last (module tabs follow it), the two admin apps hold the same tabs, and Error Log is
-the admin apps' last tab.
+share one. Core ships console apps only: BarnCRM Console lists records and then Data Manager last
+(module tabs follow it), Error Log is BarnCRM Admin Console's last tab, and BarnCRM Members and
+Partners holds only the closing tabs its modules fill.
 """
 
 import glob
@@ -159,17 +159,30 @@ class AppHeaderColor(unittest.TestCase):
 
 
 class CoreAppOrder(unittest.TestCase):
-    def test_everyday_apps_list_records_then_data_manager(self):
-        standard, console = tabs("BarnCRM_Standard"), tabs("BarnCRM")
-        self.assertEqual(standard[-1], "Data_Manager")
-        self.assertEqual(console[-1], "Data_Manager")
-        # The console keeps the related-record tabs its subtab mappings need, after the
-        # standard app's records.
-        self.assertEqual(console[: len(standard) - 1], standard[:-1])
+    def test_core_ships_console_apps_only(self):
+        # ADR-NEXT (nine console apps): BarnCRM Console, BarnCRM Admin Console and BarnCRM
+        # Members and Partners, each in console navigation.
+        pattern = os.path.join(CORE, "applications", "*.app-meta.xml")
+        names = sorted(os.path.basename(p)[: -len(".app-meta.xml")] for p in glob.glob(pattern))
+        self.assertEqual(names, ["BarnCRM", "BarnCRM_Admin_Console", "BarnCRM_Members_Partners"])
+        for name in names:
+            root = ET.parse(os.path.join(CORE, "applications", name + ".app-meta.xml")).getroot()
+            self.assertEqual(root.findtext("m:navType", namespaces=NS), "Console", name)
 
-    def test_admin_apps_match_and_end_with_error_log(self):
-        admin, admin_console = tabs("BarnCRM_Admin_Standard"), tabs("BarnCRM_Admin_Console")
-        self.assertEqual(admin, admin_console)
+    def test_the_console_lists_records_then_data_manager(self):
+        console = tabs("BarnCRM")
+        self.assertEqual(console[0], "BarnCRM_Home")
+        self.assertEqual(console[-1], "Data_Manager")
+        # The related-record tabs its subtab mappings need follow the main records.
+        self.assertEqual(console[1:5], ["standard-Contact", "Households", "Organizations", "standard-Account"])
+
+    def test_members_and_partners_holds_only_closing_tabs_for_modules_to_fill(self):
+        # Memberships and Corporate Hub add their tabs before these (module-app-tabs.py), so the
+        # app opens on Memberships Home or Corporate Hub Home.
+        self.assertEqual(tabs("BarnCRM_Members_Partners"), ["standard-report", "standard-Dashboard", "Error_Log__c"])
+
+    def test_admin_console_ends_with_error_log(self):
+        admin = tabs("BarnCRM_Admin_Console")
         self.assertEqual(admin[-1], "Error_Log__c")
         for tool in ("Find", "Import", "Bulk_Update"):
             self.assertNotIn(tool, admin, f"{tool} opens from its Data Manager card (D-135)")

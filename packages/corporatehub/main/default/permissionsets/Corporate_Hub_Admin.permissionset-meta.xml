@@ -7,7 +7,7 @@
     and board record, delete, and Manage Corporate Hub. Given to BarnCRM Admin holders.
   </description>
   <applicationVisibilities>
-    <application>BarnCRM_Corporate_Hub</application>
+    <application>BarnCRM_Members_Partners</application>
     <visible>true</visible>
   </applicationVisibilities>
   <classAccesses>

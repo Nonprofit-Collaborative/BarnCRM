@@ -58,7 +58,6 @@ const PAGE_GROUPS = {
         'Coexistence_Mode__c',
         'Organization_Record_Type__c',
         'Job_Notifications__c',
-        'App_Navigation_Style__c',
         'FiscalYearStartMonth'
       ]
     },
