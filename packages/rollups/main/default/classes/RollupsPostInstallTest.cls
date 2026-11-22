@@ -279,36 +279,27 @@ private class RollupsPostInstallTest {
 	}
 
 	@IsTest
-	static void aFreshOrgGetsASettingsRowHoldingTheShippedDefaults() {
+	static void aFreshOrgReadsTheShippedDefaultsAndGetsItsStateRows() {
 		System.runAs(admin()) {
-			Assert.isNull(Rollup_Settings__c.getOrgDefaults().Id, 'A fresh org has no row.');
 			Assert.areEqual(
 				RollupService.MODE_BOTH,
-				SettingsService.getEffectiveValue(
-					RollupService.SETTINGS_OBJECT,
-					RollupService.MODE_DEFAULT_SETTING,
-					'Picklist'
-				),
-				'Before any row exists the console already shows Both.'
+				ModuleSettings.text('Rollup_Mode_Default'),
+				'With nothing saved the setting reads its shipped default, Both.'
 			);
 			Assert.areEqual(
 				RollupService.PROCESSING_BACKGROUND,
-				SettingsService.getEffectiveValue(
-					RollupService.SETTINGS_OBJECT,
-					RollupService.PROCESSING_SETTING,
-					'Picklist'
-				),
+				ModuleSettings.text('Rollup_Processing'),
 				'And After the save (Background) for when instant totals are calculated.'
 			);
 
 			RollupsPostInstall.ensureSettingsRow();
 			RollupsPostInstall.ensureSettingsRow();
 
-			Assert.areEqual(1, [SELECT COUNT() FROM Rollup_Settings__c], 'One row, run twice.');
-			Rollup_Settings__c row = Rollup_Settings__c.getOrgDefaults();
-			Assert.areEqual(UserInfo.getOrganizationId(), row.SetupOwnerId, 'The org-level row.');
-			Assert.areEqual(RollupService.MODE_BOTH, row.Rollup_Mode_Default__c, 'Mode Both.');
-			Assert.areEqual(RollupService.PROCESSING_BACKGROUND, row.Rollup_Processing__c, 'Processing Background.');
+			Assert.areEqual(
+				RollupsPostInstall.STATE_NAMES.size(),
+				[SELECT COUNT() FROM Nightly_Job__c WHERE Kind__c = :SettingsState.KIND_STATE AND Name LIKE 'Rollups.%'],
+				'One row per run-state value, run twice.'
+			);
 			Assert.areEqual(0, [SELECT COUNT() FROM Setting_Change__c], 'Nothing audited.');
 			Assert.areEqual(
 				0,
@@ -323,45 +314,32 @@ private class RollupsPostInstallTest {
 	}
 
 	@IsTest
-	static void theSettingsRowStepNeverOverwritesASavedValue() {
+	static void theStateStepNeverOverwritesAStoredValue() {
 		System.runAs(admin()) {
-			Rollup_Settings__c existing = Rollup_Settings__c.getOrgDefaults();
-			existing.Rollup_Mode_Default__c = RollupService.MODE_SCHEDULED;
-			existing.Rollup_Processing__c = RollupService.PROCESSING_IN_SAVE;
-			Database.upsert(existing, AccessLevel.SYSTEM_MODE);
+			String key = RollupService.stateKey('Nightly_Covered_From__c');
+			Datetime covered = Datetime.newInstanceGmt(2026, 1, 4, 2, 0, 0);
+			SettingsState.put(new Map<String, Object>{ key => covered });
 
 			RollupsPostInstall.ensureSettingsRow();
+			SettingsState.clearCache();
 
-			Rollup_Settings__c row = Rollup_Settings__c.getOrgDefaults();
-			Assert.areEqual(
-				RollupService.MODE_SCHEDULED,
-				row.Rollup_Mode_Default__c,
-				'An upgrade keeps the mode the org chose.'
-			);
-			Assert.areEqual(
-				RollupService.PROCESSING_IN_SAVE,
-				row.Rollup_Processing__c,
-				'And when it chose to recalculate.'
-			);
-			Assert.areEqual(1, [SELECT COUNT() FROM Rollup_Settings__c], 'No second row.');
+			Assert.areEqual(covered, SettingsState.moment(key), 'An upgrade keeps the watermark the org had.');
+			Assert.areEqual(1, [SELECT COUNT() FROM Nightly_Job__c WHERE Name = :key], 'No second row.');
 		}
 	}
 
 	@IsTest
-	static void theInstallCreatesTheSettingsRow() {
+	static void theInstallCreatesTheRunLockRow() {
 		System.runAs(admin()) {
 			Test.startTest();
 			install(new RollupsPostInstall(), newInstaller());
 			Test.stopTest();
 
-			Assert.isNotNull(
-				Rollup_Settings__c.getOrgDefaults().Id,
-				'A new install leaves the module settings row in place.'
-			);
+			String key = RollupService.stateKey('Last_Run_Started__c');
 			Assert.areEqual(
-				RollupService.MODE_BOTH,
-				Rollup_Settings__c.getOrgDefaults().Rollup_Mode_Default__c,
-				'Both.'
+				1,
+				[SELECT COUNT() FROM Nightly_Job__c WHERE Kind__c = :SettingsState.KIND_STATE AND Name = :key],
+				'A new install leaves the run lock row in place, so two first runs share it.'
 			);
 		}
 	}

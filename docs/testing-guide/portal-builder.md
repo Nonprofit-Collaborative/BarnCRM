@@ -35,11 +35,12 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 ## T-PB-03: Wrong Codes Lock the Person
 
-**Purpose:** confirm lockout and unlocking.
-**Prerequisites:** admin; set **Wrong codes before lockout** to 3 in Settings, **Portals**.
+**Purpose:** confirm the lockout setting saves, lockout and unlocking.
+**Prerequisites:** admin.
 
 | Step | Action | Expected result |
 |---|---|---|
+| 0 | In **BarnCRM Settings**, **Portals**, set **Wrong codes before lockout** to 3 and save; reload the page. | "Saving..." then "Your settings are saved."; after the reload the setting still shows 3. |
 | 1 | Start two sign-ins (A and B). On B, send a wrong code three times. | 400 `code_invalid` each time. Pat's Portal Access shows Locked Until. |
 | 2 | On B, send its right code. | 400 `code_invalid`: B ended at the lockout. |
 | 3 | On A, send a wrong code, then A's right code. | 400 `code_invalid`, then 403 `locked`: the lockout is told only after the right code. |

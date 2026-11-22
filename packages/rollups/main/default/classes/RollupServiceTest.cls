@@ -46,8 +46,8 @@ private class RollupServiceTest {
 			);
 			System.Assert.areEqual(
 				RollupService.MODE_SCHEDULED,
-				Rollup_Settings__c.getOrgDefaults().Rollup_Mode_Default__c,
-				'Stored on the module settings object, not on Core'
+				ModuleSettings.text('Rollup_Mode_Default'),
+				'Stored in the settings store under the module setting'
 			);
 		}
 	}
@@ -55,13 +55,11 @@ private class RollupServiceTest {
 	@IsTest
 	static void anOrgThatHasNotChosenGetsBoth() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			// Written straight onto the record, not through the settings service: the service is
-			// right to refuse a mode the shipped row does not offer, and what is being measured
-			// here is what the reader does with a stored value that is wrong anyway, which is how
-			// an org upgraded from an older row would arrive.
-			Rollup_Settings__c settings = Rollup_Settings__c.getOrgDefaults();
-			settings.Rollup_Mode_Default__c = 'Nonsense';
-			Database.upsert(settings, AccessLevel.SYSTEM_MODE);
+			// Put straight in the store, not through the settings service: the service is right
+			// to refuse a mode the shipped row does not offer, and what is being measured here is
+			// what the reader does with a stored value that is wrong anyway, which is how a value
+			// edited by hand in Setup would arrive.
+			ModuleSettings.setForTest('Rollup_Mode_Default', 'Nonsense');
 			SettingsService.clearCaches();
 
 			System.Assert.areEqual(

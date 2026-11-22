@@ -209,21 +209,30 @@ private class RollupLargeParentBatchTest {
 
 			Assert.isTrue(started, 'Started under the lock');
 			Assert.isTrue(again, 'The same transaction holds it already');
-			Assert.areEqual(1, [SELECT COUNT() FROM Rollup_Run_Lock__c], 'One lock record');
+			Assert.areEqual(
+				1,
+				[SELECT COUNT() FROM Nightly_Job__c WHERE Name = :RollupLargeParentBatch.LOCK_KEY],
+				'One lock row, created the first time'
+			);
+			SettingsState.clearCache();
+			Assert.isNotNull(SettingsState.moment(RollupLargeParentBatch.LOCK_KEY), 'And it holds when the run started');
 		}
 	}
 
 	@IsTest
-	static void aLockRecordAnotherRunCreatedFirstIsWaitedFor() {
+	static void aLockThatTimesOutLeavesTheEntriesWaitingAsWhenBusy() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			RollupLargeParentBatch.competingLockForTest = true;
+			insertDefinitions();
+			Account parent = parentWith(1, 0);
+			Rollup_Queue__c entry = entryFor(parent.Id, 0);
+			RollupLargeParentBatch.busyLockForTest = true;
 
 			Test.startTest();
-			Boolean locked = RollupLargeParentBatch.lockRuns();
+			Boolean started = RollupLargeParentBatch.begin(new List<Rollup_Queue__c>{ entry }, true);
 			Test.stopTest();
 
-			Assert.isTrue(locked, 'Locked the record the other run created');
-			Assert.areEqual(1, [SELECT COUNT() FROM Rollup_Run_Lock__c], 'Still one record');
+			Assert.isFalse(started, 'Busy: no run starts');
+			Assert.isTrue(reread(entry.Id).Next_Attempt__c > Datetime.now(), 'The entry waits to be routed again');
 		}
 	}
 

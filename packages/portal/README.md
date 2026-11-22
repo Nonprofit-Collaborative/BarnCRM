@@ -26,8 +26,9 @@ seam.
 
 ## Contents
 
-- Objects: `Portal__c`, `Portal_Access__c`, `Portal_Session__c`, settings `Portal_Settings__c`
-  (canonical model 29PB1 to 29PB4).
+- Objects: `Portal__c`, `Portal_Access__c`, `Portal_Session__c` (canonical model 29PB1 to
+  29PB3). Settings (29PB4): `Setting_Module.Portal` and the `Portal_*` Setting Definition rows,
+  read with `ModuleSettings`; the legacy `Portal_Settings__c` is read only until carry-over.
 - Apex REST API `PortalApi` (`/services/apexrest/barncrm/portal/v1/*`), with `PortalAuth`
   (sign-in, sessions), `PortalData` (pages), `PortalTemplate` (template checks) and
   `PortalTokens` (hashes, codes, authenticator codes).

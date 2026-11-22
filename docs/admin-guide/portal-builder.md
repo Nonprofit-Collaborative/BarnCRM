@@ -313,7 +313,9 @@ edited in a portal").
 
 ## Settings
 
-BarnCRM Settings, Portals (every change saves for the whole org):
+BarnCRM Settings, Portals (every change saves for the whole org, showing **Saving...** for a
+few seconds, then **Your settings are saved.**; see
+[Saving Your Changes](barncrm-settings.md#saving-your-changes)):
 
 | Setting | Default | What it does |
 |---|---|---|

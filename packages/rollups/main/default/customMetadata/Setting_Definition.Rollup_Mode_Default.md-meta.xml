@@ -11,4 +11,5 @@
     <values><field>Description__c</field><value xsi:type="xsd:string">How a newly created rollup starts out. Instantly updates the number as records are saved, Every night updates it in the nightly run, Both does the first and checks it again every night.</value></values>
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">10</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">rollups.md</value></values>
+    <values><field>Default_Value__c</field><value xsi:type="xsd:string">"Both"</value></values>
 </CustomMetadata>

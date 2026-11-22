@@ -530,9 +530,13 @@ public without sharing class RollupQueue implements Queueable {
 		}
 		Datetime requestedAt = requestedAtForTest != null
 			? requestedAtForTest
-			: Rollup_Settings__c.getOrgDefaults().Processor_Requested_At__c;
+			: SettingsState.moment(REQUESTED_KEY);
 		return requestedAt != null && requestedAt > Datetime.now().addMinutes(-REQUEST_FRESH_MINUTES);
 	}
+
+	/** The run-state key of when the last processor was asked for (D-200 P13). */
+	@TestVisible
+	private static final String REQUESTED_KEY = RollupService.stateKey('Processor_Requested_At__c');
 
 	/** Queues a processor and notes when it is due, so saves can tell one is coming. */
 	private static void enqueueProcessor(RollupQueue job, Integer delayMinutes) {
@@ -546,25 +550,12 @@ public without sharing class RollupQueue implements Queueable {
 	}
 
 	/**
-	 * Stamps the request on the org-level Rollup Settings record: one update of that one field,
-	 * partial, so a busy moment's lock never fails the save that asked. With no record yet the
-	 * first one is written through Core's settings writer.
+	 * Stamps the request on its run-state row (created at install), caught, so a busy moment's
+	 * lock never fails the save that asked.
 	 */
 	private static void noteRequested(Datetime dueAt) {
 		try {
-			Id stored = Rollup_Settings__c.getOrgDefaults().Id;
-			if (stored == null) {
-				OrgSettingsSystemWriter.save(
-					Rollup_Settings__c.SObjectType,
-					new Map<Schema.SObjectField, Object>{ Rollup_Settings__c.Processor_Requested_At__c => dueAt }
-				);
-				return;
-			}
-			Database.update(
-				new Rollup_Settings__c(Id = stored, Processor_Requested_At__c = dueAt),
-				false,
-				AccessLevel.SYSTEM_MODE
-			);
+			SettingsState.put(new Map<String, Object>{ REQUESTED_KEY => dueAt });
 		} catch (Exception notNoted) {
 			// The stamp only saves a query later; without it the next save queues a processor.
 			ErrorLogger.log(notNoted, LOG_CONTEXT);

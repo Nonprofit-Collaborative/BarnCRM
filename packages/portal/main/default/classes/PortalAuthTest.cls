@@ -146,9 +146,7 @@ private class PortalAuthTest {
 	static void wrongCodesEndTheChallengeAndLockThePerson() {
 		System.runAs(TestUsers.adminWith('Portal_Admin')) {
 			PortalTestData.enable();
-			Portal_Settings__c settings = Portal_Settings__c.getOrgDefaults();
-			settings.Failures_Before_Lockout__c = 3;
-			upsert settings;
+			ModuleSettings.setForTest('Portal_Failures_Before_Lockout', 3);
 			Portal__c portal = PortalTestData.portal('Invited', 'Off');
 			PortalTestData.access(portal, PortalTestData.person('Zzportal', EMAIL));
 
@@ -180,9 +178,7 @@ private class PortalAuthTest {
 	static void aWrongCodeNeverSaysWhoIsOnFile() {
 		System.runAs(TestUsers.adminWith('Portal_Admin')) {
 			PortalTestData.enable();
-			Portal_Settings__c settings = Portal_Settings__c.getOrgDefaults();
-			settings.Failures_Before_Lockout__c = 3;
-			upsert settings;
+			ModuleSettings.setForTest('Portal_Failures_Before_Lockout', 3);
 			Portal__c portal = PortalTestData.portal('Invited', 'Off');
 			PortalTestData.access(portal, PortalTestData.person('Zzportal', EMAIL));
 
@@ -219,9 +215,7 @@ private class PortalAuthTest {
 	static void limitsSendNothingAndLookTheSame() {
 		System.runAs(TestUsers.adminWith('Portal_Admin')) {
 			PortalTestData.enable();
-			Portal_Settings__c settings = Portal_Settings__c.getOrgDefaults();
-			settings.Code_Requests_Per_Hour__c = 1;
-			upsert settings;
+			ModuleSettings.setForTest('Portal_Code_Requests', 1);
 			Portal__c portal = PortalTestData.portal('Invited', 'Off');
 			PortalTestData.access(portal, PortalTestData.person('Zzportal', EMAIL));
 

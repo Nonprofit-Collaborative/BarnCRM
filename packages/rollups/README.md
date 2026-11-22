@@ -16,10 +16,14 @@ Fundraising depends on this module. Offered in both editions.
 
 ## What is here
 
-- **Objects:** `Rollup_Definition__c`, `Rollup_Queue__c`, the `Rollup_Run_Lock__c` custom
-  setting, the `Rollup_Queue_Ready__e` platform event, the `Rollup_Definition_Default__mdt`
-  shipped defaults type, and `Rollup_Settings__c`, the module's own settings object, shown in
-  the Rollups section of BarnCRM Settings (canonical model Sections 13, 14, 14A and 14B).
+- **Objects:** `Rollup_Definition__c`, `Rollup_Queue__c`, the `Rollup_Queue_Ready__e` platform
+  event and the `Rollup_Definition_Default__mdt` shipped defaults type (canonical model
+  Sections 13, 14, 14A and 14B).
+- **Settings:** `Setting_Module.Rollups` and the module's Setting Definition rows, shown in the
+  Rollups section of BarnCRM Settings and read with `ModuleSettings`; run state (the large
+  parent run lock, the nightly watermark, the processor stamp) is `SettingsState` rows
+  `Rollups.<Name>` (`docs/contributor-guide/module-settings.md`). The legacy custom settings
+  `Rollup_Settings__c` and `Rollup_Run_Lock__c` are read only until carry-over.
 - **Engine:** `RollupService`, `RollupEngine` and the classes it plans and writes with, the
   queue and its processors, `RollupFullRecalcBatch` and `RollupScheduler`.
 - **Tab:** Rollup Builder. The module has no app of its own (ADR-0137): a source deploy adds

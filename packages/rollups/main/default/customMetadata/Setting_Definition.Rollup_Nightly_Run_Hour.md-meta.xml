@@ -11,4 +11,5 @@
     <values><field>Description__c</field><value xsi:type="xsd:string">When the nightly run recalculates every Every night and Both total, in the time zone of the person who scheduled it. Pick a quiet hour after the day's data entry. Changing it moves the scheduled run straight away.</value></values>
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">20</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">rollups.md</value></values>
+    <values><field>Default_Value__c</field><value xsi:type="xsd:string">2</value></values>
 </CustomMetadata>

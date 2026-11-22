@@ -50,9 +50,9 @@ public without sharing class PortalAuth {
 
 	// ---- Settings -------------------------------------------------------------------------
 
-	private static Portal_Settings__c settings() {
-		Portal_Settings__c stored = Portal_Settings__c.getOrgDefaults();
-		return stored == null ? new Portal_Settings__c() : stored;
+	/** A Portal setting by its Setting Definition name: the org's value, else the shipped one, kept in range. */
+	private static Integer setting(String name, Integer fallback, Integer low, Integer high) {
+		return setting(ModuleSettings.number(name), fallback, low, high);
 	}
 
 	private static Integer setting(Decimal stored, Integer fallback, Integer low, Integer high) {
@@ -61,7 +61,7 @@ public without sharing class PortalAuth {
 	}
 
 	private static void requireEnabled() {
-		if (settings().Enabled__c != true || ModuleManagerService.turnedOff().contains('portal')) {
+		if (!ModuleSettings.flag('Portal_Enabled') || ModuleManagerService.turnedOff().contains('portal')) {
 			throw new RefusalException('portal_unavailable');
 		}
 	}
@@ -202,7 +202,7 @@ public without sharing class PortalAuth {
 		if (portal.Status__c != STATUS_ACTIVE) {
 			throw new RefusalException('portal_unavailable');
 		}
-		Integer idle = setting(settings().Idle_Minutes__c, 30, 5, 480);
+		Integer idle = setting('Portal_Idle_Minutes', 30, 5, 480);
 		Datetime current = now();
 		Boolean usable =
 			record.Expires__c != null &&
@@ -329,7 +329,6 @@ public without sharing class PortalAuth {
 	}
 
 	private static Boolean withinLimits(Portal__c portal, Portal_Access__c access) {
-		Portal_Settings__c config = settings();
 		Datetime hourAgo = now().addHours(-1);
 		Integer mine = [
 			SELECT COUNT()
@@ -337,7 +336,7 @@ public without sharing class PortalAuth {
 			WHERE Portal_Access__c = :access.Id AND CreatedDate >= :hourAgo
 			WITH SYSTEM_MODE
 		];
-		if (mine >= setting(config.Code_Requests_Per_Hour__c, 5, 1, 20)) {
+		if (mine >= setting('Portal_Code_Requests', 5, 1, 20)) {
 			return false;
 		}
 		Integer portalWide = [
@@ -346,13 +345,13 @@ public without sharing class PortalAuth {
 			WHERE Portal_Access__r.Portal__c = :portal.Id AND CreatedDate >= :hourAgo
 			WITH SYSTEM_MODE
 		];
-		return portalWide < setting(config.Emails_Per_Portal_Hour__c, 200, 10, 5000);
+		return portalWide < setting('Portal_Emails_Per_Hour', 200, 10, 5000);
 	}
 
 	private static void sendCode(Portal__c portal, Portal_Access__c access, String address, String challenge) {
 		String code = PortalTokens.newCode();
 		String tokenHash = PortalTokens.hash(challenge);
-		Integer minutes = setting(settings().Code_Minutes__c, 10, 2, 30);
+		Integer minutes = setting('Portal_Code_Minutes', 10, 2, 30);
 		insert as system new Portal_Session__c(
 			Portal_Access__c = access.Id,
 			Stage__c = STAGE_CODE_SENT,
@@ -494,14 +493,13 @@ public without sharing class PortalAuth {
 
 	/** Counts a wrong code against the challenge and the person, then refuses (R-PA1). */
 	private static void fail(Portal_Session__c session, Portal_Access__c access) {
-		Portal_Settings__c config = settings();
 		session.Attempts__c = (session.Attempts__c == null ? 0 : session.Attempts__c) + 1;
-		if (session.Attempts__c >= setting(config.Attempts_Per_Code__c, 5, 1, 10)) {
+		if (session.Attempts__c >= setting('Portal_Attempts_Per_Code', 5, 1, 10)) {
 			session.Stage__c = STAGE_ENDED;
 		}
 		access.Failed_Attempts__c = (access.Failed_Attempts__c == null ? 0 : access.Failed_Attempts__c) + 1;
-		if (access.Failed_Attempts__c >= setting(config.Failures_Before_Lockout__c, 10, 3, 50)) {
-			access.Locked_Until__c = now().addMinutes(setting(config.Lockout_Minutes__c, 30, 5, 1440));
+		if (access.Failed_Attempts__c >= setting('Portal_Failures_Before_Lockout', 10, 3, 50)) {
+			access.Locked_Until__c = now().addMinutes(setting('Portal_Lockout_Minutes', 30, 5, 1440));
 			access.Failed_Attempts__c = 0;
 			session.Stage__c = STAGE_ENDED;
 		}

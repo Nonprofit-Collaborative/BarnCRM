@@ -228,59 +228,49 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
 	}
 
 	/**
-	 * Takes the run lock until this transaction ends: the org-level `Rollup_Run_Lock__c` record,
-	 * created the first time. Two processors routing records here at the same moment both found
-	 * no run going and both started one (the scale rerun had two or three at once); with the
-	 * lock the second waits for the first to commit, then sees its run. Only the start is
-	 * locked, never a save, and the processor commits soon after.
+	 * Takes the run lock until this transaction ends: the run-state row
+	 * `Rollups.Last_Run_Started__c` (ADR-NEXT settings as custom metadata, decision 11), which
+	 * the module creates at install and this creates when an org lacks it. Two processors
+	 * routing records here at the same moment both found no run going and both started one (the
+	 * scale rerun had two or three at once); with the lock the second waits for the first to
+	 * commit, then sees its run. Only the start is locked, never a save, and the processor
+	 * commits soon after.
 	 *
 	 * @return false when the lock could not be taken in time, so the entries wait as when busy
 	 */
 	@TestVisible
 	private static Boolean lockRuns() {
-		Id org = UserInfo.getOrganizationId();
-		lockRecord = null;
+		locked = false;
+		lastRunStarted = null;
 		try {
-			List<Rollup_Run_Lock__c> locked = lockedRow(org);
-			if (locked.isEmpty()) {
-				try {
-					if (competingLockForTest) {
-						Database.insert(new Rollup_Run_Lock__c(SetupOwnerId = org), AccessLevel.SYSTEM_MODE);
-					}
-					Rollup_Run_Lock__c created = new Rollup_Run_Lock__c(SetupOwnerId = org);
-					Database.insert(created, AccessLevel.SYSTEM_MODE);
-					locked.add(created);
-				} catch (DmlException collided) {
-					// Another run created it first: wait for it as for any holder.
-					locked = lockedRow(org);
-				}
+			if (busyLockForTest) {
+				throw new QueryException('Record currently unavailable');
 			}
-			lockRecord = locked.isEmpty() ? null : locked[0];
+			SettingsState.lockOrCreate(LOCK_KEY);
+			lastRunStarted = SettingsState.moment(LOCK_KEY);
+			locked = true;
 			return true;
 		} catch (QueryException unavailable) {
+			// Another run holds the row past the wait: busy, so the entries wait.
 			ErrorLogger.log(unavailable, LOG_CONTEXT);
 			return false;
 		}
 	}
 
-	private static List<Rollup_Run_Lock__c> lockedRow(Id org) {
-		return [
-			SELECT Id, Last_Run_Started__c
-			FROM Rollup_Run_Lock__c
-			WHERE SetupOwnerId = :org
-			WITH SYSTEM_MODE
-			LIMIT 1
-			FOR UPDATE
-		];
-	}
-
-	/** The lock row `lockRuns` took, with when the last run started. */
+	/** The run-state key the lock is taken on, which also holds when the last run started. */
 	@TestVisible
-	private static Rollup_Run_Lock__c lockRecord;
+	private static final String LOCK_KEY = RollupService.stateKey('Last_Run_Started__c');
 
-	/** Test seam: another run creates the lock record just before this one's first insert. */
+	/** True once `lockRuns` holds the lock in this transaction. */
+	private static Boolean locked = false;
+
+	/** When the last run started, as read under the lock. */
 	@TestVisible
-	private static Boolean competingLockForTest = false;
+	private static Datetime lastRunStarted;
+
+	/** Test seam: the lock wait times out, as when another run holds it too long. */
+	@TestVisible
+	private static Boolean busyLockForTest = false;
 
 	/**
 	 * Starts a run over these queue entries, which then wait an hour while it holds them, or,
@@ -344,28 +334,28 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
 	 * Blank or out of range is the shipped 1.
 	 */
 	public static Integer largeParentHours() {
-		Decimal stored = Rollup_Settings__c.getOrgDefaults().Large_Parent_Hours__c;
+		Decimal stored = ModuleSettings.number('Rollup_Large_Parent_Hours');
 		return stored == null || stored < 0 || stored > 24 ? 1 : stored.intValue();
 	}
 
 	/** When the next run may start: the last one's start plus the setting's hours. */
 	@TestVisible
 	private static Datetime nextRunAllowedAt() {
-		Datetime last = lockRecord == null ? null : lockRecord.Last_Run_Started__c;
-		return last == null ? Datetime.now() : last.addHours(largeParentHours());
+		return lastRunStarted == null ? Datetime.now() : lastRunStarted.addHours(largeParentHours());
 	}
 
 	/** Stamps the start on the locked row, inside the lock this transaction holds. */
 	private static void noteRunStarted() {
-		if (lockRecord == null || lockRecord.Id == null) {
+		if (!locked) {
 			return;
 		}
-		lockRecord.Last_Run_Started__c = Datetime.now();
-		Database.update(
-			new Rollup_Run_Lock__c(Id = lockRecord.Id, Last_Run_Started__c = Datetime.now()),
-			false,
-			AccessLevel.SYSTEM_MODE
-		);
+		lastRunStarted = Datetime.now();
+		try {
+			SettingsState.put(new Map<String, Object>{ LOCK_KEY => lastRunStarted });
+		} catch (DmlException notStamped) {
+			// The run has started; without the stamp the next one may start sooner.
+			ErrorLogger.log(notStamped, LOG_CONTEXT);
+		}
 	}
 
 	/**

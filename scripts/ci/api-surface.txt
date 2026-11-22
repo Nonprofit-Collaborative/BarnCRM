@@ -2108,6 +2108,7 @@ rollups/RollupService.cls | public static Set<String> everyMode()
 rollups/RollupService.cls | public static Set<String> recalculateTargets(Set<Id>,String)
 rollups/RollupService.cls | public static Set<String> scheduledModes()
 rollups/RollupService.cls | public static String defaultMode()
+rollups/RollupService.cls | public static String stateKey(String)
 rollups/RollupService.cls | public static final Integer STALE_AFTER_HOURS
 rollups/RollupService.cls | public static final String FRESHNESS_FIELD
 rollups/RollupService.cls | public static final String MODE_BOTH
@@ -2119,6 +2120,7 @@ rollups/RollupService.cls | public static final String PROCESSING_BACKGROUND
 rollups/RollupService.cls | public static final String PROCESSING_IN_SAVE
 rollups/RollupService.cls | public static final String PROCESSING_SETTING
 rollups/RollupService.cls | public static final String SETTINGS_OBJECT
+rollups/RollupService.cls | public static final String STATE_PREFIX
 rollups/RollupService.cls | public static void catchUpAfterTurnedOn()
 rollups/RollupService.cls | public static void recalculate(Id)
 rollups/RollupService.cls | public static void runAfterDelete(String,List<SObject>)

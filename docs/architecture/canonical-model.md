@@ -2799,7 +2799,8 @@ R-R13). It owns the entries it was given: it charges each one attempt as it take
 after the fifth), holds them with Next Attempt an hour ahead, renewed with every chunk, deletes
 them when the totals are written and releases them with the reason when a chunk stops, so a run
 that dies leaves them due again rather than lost. One batch runs at a time: a run starts only
-under a lock on the org-level `Rollup_Run_Lock__c` record (created the first time), so two
+under a lock on the State row `Rollups.Last_Run_Started__c` (Section 13 R-SV4; created at
+install, or the first time when missing), so two
 processors routing records at the same moment cannot both find none running and both start one.
 Entries routed while one runs, or when the lock cannot be taken in time, wait two minutes,
 uncharged, and are routed again.
@@ -2824,27 +2825,30 @@ uncharged, and are routed again.
   finalizer); the Rollup Builder's Needs attention list reads and retries entries.
 - **Batch:** `RollupLargeParentBatch`, the large parent route (R-RQ6): a batch over the source
   rows of each planned query, Ids only, chained query by query and entity by entity.
-- **Custom setting:** `Rollup_Run_Lock__c`, hierarchy, protected, one field,
-  `Last_Run_Started__c` (DateTime). Its one org-level record is the row a large parent run locks
-  before it starts (R-RQ6); the code creates it the first time and nothing else reads or writes
-  it. **Throttle (D-200 P2):** under the lock, a run starts only when `Large_Parent_Hours__c`
-  (Section 14B, default 1) has passed since `Last_Run_Started__c`, which the run stamps as it
-  starts; otherwise the entries routed to it wait, uncharged, until then (Next Attempt), and
+- **Run lock:** the State row `Rollups.Last_Run_Started__c` (name `Last_Run_Started__c`, prefix
+  `Rollups`; a `Nightly_Job__c` row of Kind State, Section 29; ADR-NEXT settings as custom metadata, decision 11), holding when the last
+  large parent run started. A run takes it with `SettingsState.lockOrCreate` before it starts
+  (R-RQ6); `RollupsPostInstall` creates it at install, and a lock wait that times out counts as
+  busy. The legacy custom setting `Rollup_Run_Lock__c` is no longer read or written; it is
+  removed with the legacy settings objects. **Throttle (D-200 P2):** under the lock, a run
+  starts only when `Large_Parent_Hours__c` (Section 14B, default 1) has passed since the time
+  that row holds, which the run stamps as it starts; otherwise the entries routed to it wait, uncharged, until then (Next Attempt), and
   the saves queued in between merge into that one run. The Rollup Builder page says how often.
 - **Event:** `Rollup_Queue_Ready__e`, a platform event with no fields, publish behavior Publish
   After Commit, published at most once per transaction by a save inside a Queueable job, or by
   one that queued entries and no processor (R-RQ3).
   `RollupQueueReadyTrigger` subscribes and starts the processor.
 - **Processor request stamp (D-200 P13):** a save that queues entries runs no query to find a
-  processor. It reads `Processor_Requested_At__c` on `Rollup_Settings__c` (from the platform's
-  cache):
+  processor. It reads the State row `Rollups.Processor_Requested_At__c` (name
+  `Processor_Requested_At__c`; the one State read a transaction shares, Section 29):
   within the last ten minutes it publishes the Ready event, whose subscriber checks the job list
   exactly after commit; otherwise it queues a processor and stamps the time (for a chained
   processor queued with a delay, the time it is due). A processor that died is still found
   missing: by the subscriber's exact check while the stamp is recent, and by the next save once
   it is not. The subscriber, background jobs and the nightly run keep the exact check.
 - **Nightly scope (D-200 P1, R-R4b):** `RollupNightlyBatch` plans each night from
-  `Full_Recalc_Day__c` and `Nightly_Covered_From__c` on `Rollup_Settings__c` (Section 14B):
+  the `Rollup_Full_Recalc_Day` setting (key `Full_Recalc_Day__c`) and the State row
+  `Rollups.Nightly_Covered_From__c` (name `Nightly_Covered_From__c`, Section 14B):
   the full run, or one batch pass per source entity that queues the targets of what changed.
   Each night it first releases held Pending entries (Next Attempt cleared) and retries Failed
   ones.
@@ -2863,10 +2867,16 @@ values an org stored on the Core object are not carried over: an org that change
 sets it again. Their Setting Definition rows name this object in `Settings_Object__c`, so the
 settings console shows them in its Rollups section as before.
 
-- **Custom setting:** `Rollup_Settings__c`, hierarchy, protected.
-- **Defaults (ADR-0035):** the field default only fills a record the platform creates; the
-  readers in `RollupService` and `RollupScheduler` treat blank, and anything outside the
-  allowed values, as the shipped value.
+- **Settings store (R-SV4, ADR-NEXT settings as custom metadata, decision 11):** the module
+  ships `Setting_Module.Rollups` (`Settings_Object__c` `Rollup_Settings__c`, `Key_Prefix__c`
+  `Rollups`, `State_Fields__c` `Nightly_Covered_From__c,Processor_Requested_At__c`), so the
+  keys below are Setting Values read by DeveloperName (`ModuleSettings`) or by group and key,
+  each Setting Definition shipping the default below as `Default_Value__c`. The two datetime
+  rows are run state: State rows `Rollups.<Key>`, written by the engine only, created at install
+  by `RollupsPostInstall` with the run lock. The legacy custom setting `Rollup_Settings__c`
+  (hierarchy, protected) is read only until the org carries its settings over, then removed.
+- **Defaults (ADR-0035):** the readers in `RollupService` and `RollupScheduler` treat blank,
+  and anything outside the allowed values, as the shipped value.
 - **Nightly run hour (ADR-0136):** the settings console shows `Nightly_Run_Hour__c` as a
   picklist of the 24 hours (values 0 to 23, labels 12:00 AM (midnight) to 11:00 PM) from its Setting Definition
   row, since a custom setting cannot hold a picklist. The nightly job, Run tonight and the
@@ -11545,8 +11555,9 @@ on the Programs settings page decides who is in that group:
   admin may add chosen users, roles or groups to the group in Setup; BarnCRM adds and removes
   only All Internal Users.
 
-The preset is stored in `Programs_Settings__c`, written only by the settings page and audited as
-a settings change. The group follows the preset at once when it is saved, and again at install,
+The preset is stored as the State row `Programs.Private_Participants__c` (Section 13 R-SV4,
+saved synchronously because the sharing it drives follows at once), written only by the settings
+page and audited as a settings change. The group follows the preset at once when it is saved, and again at install,
 at Turn on and in the hourly access check, which repairs a group changed by hand.
 
 **Intake fields hold choices, not typed text (P-07).** The intake and eligibility fields are dates
@@ -11605,18 +11616,23 @@ R-EN2, and is not counted as open on the dashboard or the person card. Cohorts h
   intake picklists' active values and default from describe, with a link to the enrollment's
   fields in Setup (Object Manager by API name). The section name `Programs` is in Core's
   `SettingSections`. It also holds the Participant Privacy preset (R-EN7).
-- **Weeks Ahead to Create Sessions:** `Programs_Settings__c` field `Session_Horizon_Weeks__c` (Number(2, 0),
+- **Settings store (R-SV4):** `Setting_Module.Programs` (`Settings_Object__c`
+  `Programs_Settings__c`, `Key_Prefix__c` `Programs`, `State_Fields__c`
+  `Private_Participants__c`); the two settings below are Setting Values read by DeveloperName,
+  each definition shipping its default. The legacy hierarchy custom setting
+  `Programs_Settings__c` is read only until carry-over, then removed.
+- **Weeks Ahead to Create Sessions:** Setting Definition `Programs_Session_Horizon_Weeks` (key `Session_Horizon_Weeks__c`, Number,
   default 8, 1 to 26), set in the Programs section of BarnCRM Settings
   (`Setting_Definition.Programs_Session_Horizon_Weeks`) and read by `SessionScheduleService.horizonWeeks` (R-SS2).
-- **Waitlist When Full (P-09):** `Programs_Settings__c` field `Waitlist_Enabled__c` (Checkbox,
+- **Waitlist When Full (P-09):** Setting Definition `Programs_Waitlist_Enabled` (key `Waitlist_Enabled__c`, Checkbox,
   default false), set in the Programs section of BarnCRM Settings
   (`Setting_Definition.Programs_Waitlist_Enabled`); R-EN10 by `EnrollmentCapacity`, called from
   the always-running `Enrollment_Rules` handler, and itself the handler of the registry row
   `Program_Capacity` (`ProgramTrigger`, after update), which promotes when Capacity is raised or
   cleared.
 - **Participant privacy (R-EN7, R-SD6):** the public group `Programs_Participants` (no bosses);
-  the hierarchy custom setting `Programs_Settings__c` with `Private_Participants__c` (Checkbox,
-  default unchecked, which is Shared); `ProgramsSharing` writes the shares (handler
+  the State row `Programs.Private_Participants__c` (true or false, blank is false, which is
+  Shared); `ProgramsSharing` writes the shares (handler
   `ProgramsSharingHandler`, registry rows `Enrollment_Sharing` and `Service_Delivery_Sharing`,
   always run), sets the group's All Internal Users member (queued, as a group member is a setup
   object), and shares records that have no share yet (`ProgramsSharingBatch`, run at install
@@ -12198,7 +12214,7 @@ day; Repeat Every 1 to 52; End Time after Start Time when both are set; End Date
 Start Date (validation rule).
 
 **R-SS2 Which days and how far.** A day is a session day by R-SSC1's rule (29T). An active
-schedule keeps sessions created from today to `Programs_Settings__c.Session_Horizon_Weeks__c`
+schedule keeps sessions created from today to the `Programs_Session_Horizon_Weeks` setting
 weeks ahead (Weeks Ahead to Create Sessions, 1 to 26, default 8; blank or out of range reads
 as 8). Each run creates the session days after Created Through (or from today, or Start
 Date, if later) up to the horizon and End Date, and moves Created Through forward. A day is
@@ -16107,9 +16123,13 @@ and answers as usual, so no answer says who is on file.
 
 ### Salesforce implementation
 
-- **Object:** `Portal_Settings__c`, hierarchy custom setting, visibility Protected.
+- **Settings store (Section 13 R-SV4):** `Setting_Module.Portal` (`Settings_Object__c`
+  `Portal_Settings__c`, `Key_Prefix__c` `Portal`, no state fields). Each key below is a Setting
+  Value read by its definition's DeveloperName (`ModuleSettings`), the definition shipping the
+  default as `Default_Value__c`. The legacy hierarchy custom setting `Portal_Settings__c`
+  (Protected) is read only until carry-over, then removed.
 
-| Attribute | API name | Type |
+| Attribute | Key | Type |
 |---|---|---|
 | Portal Sign-In | `Enabled__c` | Checkbox, default false |
 | Code Minutes | `Code_Minutes__c` | Number(2, 0), default 10 |
@@ -20144,6 +20164,7 @@ mirrors the primary member).
 | 1.83 | 2026-11-20 | R-CR6 the recipe clock: a claimed Running run counts as Queued for the clock, so the heartbeat keeps running while a lane has a Waiting run, a Queued run or a claimed Running run (batch Q gate fix). |
 | 1.84 | 2026-11-21 | Settings as custom metadata, phase 1 Core (SET-01, D-219, ADR-NEXT settings as custom metadata). New custom metadata type `Setting_Value__mdt` with `Value__c` (Section 13, R-SV1 to R-SV3; not counted as an object). `Setting_Definition__mdt` gains `Default_Value__c` and the Hidden data type. `Nightly_Job__c` gains `Kind__c` and `Value__c` (state and What's New rows). `BarnCRM_Automation_Control__c` gains `Paused_Until__c`. New `Account.Is_Organization_Account__c`, a kept checkbox that replaces the `Is_Organization__c` formula everywhere it was read (Section 8; the platform refuses a formula-to-checkbox change, and the formula is removed in phase 2). `BarnCRM_Settings__c` and `Whats_New_Seen__c` are read only until carry-over and are removed in phase 2; no object count change in phase 1. |
 | 1.85 | 2026-11-21 | Settings as custom metadata, phase 2 Core prerequisite (SET-02, D-219). New custom metadata type `Setting_Module__mdt` with `Settings_Object__c`, `Key_Prefix__c` and `State_Fields__c` (Section 13; not counted as an object): a module registers its settings group, its State row prefix and its legacy state fields. New rule R-SV4 (module settings read and saved through the store by name or by group and key); R-SV3 carry-over covers every registered module; module State rows are `Prefix.Name` and a run lock is a State row read `FOR UPDATE` (Section 29 Nightly Jobs). No object count change. |
+| 1.86 | 2026-11-21 | Settings as custom metadata, phase 2: Rollups, Programs and Portal (SET-03, D-219). Each ships a `Setting_Module__mdt` record (prefixes `Rollups`, `Programs`, `Portal`) and a `Default_Value__c` on every Setting Definition, and reads its settings from the store (R-SV4). Run state moves to State rows: `Rollups.Nightly_Covered_From__c`, `Rollups.Processor_Requested_At__c`, `Programs.Private_Participants__c` (the Participant Privacy preset, saved synchronously), and the large parent run lock `Rollups.Last_Run_Started__c` (Section 14A), which replaces `Rollup_Run_Lock__c` and is created at install. `Rollup_Settings__c`, `Rollup_Run_Lock__c`, `Programs_Settings__c` and `Portal_Settings__c` are no longer written; they stay until the destructive deploy. No object count change. |
 
 ---
 ## 32. Entity ownership by package

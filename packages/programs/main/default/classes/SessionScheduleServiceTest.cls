@@ -243,7 +243,7 @@ private class SessionScheduleServiceTest {
 	@IsTest
 	static void theHorizonFollowsWeeksAheadToCreateSessions() {
 		System.runAs(admin()) {
-			upsert new Programs_Settings__c(SetupOwnerId = UserInfo.getOrganizationId(), Session_Horizon_Weeks__c = 2);
+			ModuleSettings.setForTest('Programs_Session_Horizon_Weeks', 2);
 			Service__c service = tutoring();
 			Session_Schedule__c schedule = scheduleOf(service, 'Monday', 1);
 			AutomationControl.bypass('Session_Schedule_Rules');

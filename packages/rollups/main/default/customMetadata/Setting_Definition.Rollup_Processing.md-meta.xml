@@ -11,4 +11,5 @@
     <values><field>Description__c</field><value xsi:type="xsd:string">When totals in Instantly and Both mode are recalculated. After the save keeps every save fast and totals catch up within a minute. During the save updates them before the page refreshes, but makes each save slower and can make a save with a lot of automation fail.</value></values>
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">15</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">rollups.md</value></values>
+    <values><field>Default_Value__c</field><value xsi:type="xsd:string">"Background"</value></values>
 </CustomMetadata>
