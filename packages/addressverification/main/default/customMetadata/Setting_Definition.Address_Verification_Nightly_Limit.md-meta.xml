@@ -12,4 +12,5 @@
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">140</value></values>
     <values><field>Description__c</field><value xsi:type="xsd:string">The most addresses the nightly check looks up in one night, oldest first. Each lookup counts against your provider account's allowance, so set this to what your plan covers. 0 stops the nightly check. Default 200.</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">address-verification.md</value></values>
+    <values><field>Default_Value__c</field><value xsi:type="xsd:string">200</value></values>
 </CustomMetadata>

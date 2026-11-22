@@ -149,7 +149,8 @@ goes out: if the org's daily email limit refuses the send, the reminders are tri
 morning.
 
 Reminders are **off** when you install, because they email your members. To turn them on, go to
-**BarnCRM Settings**, **Memberships**:
+**BarnCRM Settings**, **Memberships**. Every setting is org-wide; a save shows **Saving**, then
+**Saved**, and the value is still there when you reload:
 
 | Setting | Default | What it does |
 |---|---|---|

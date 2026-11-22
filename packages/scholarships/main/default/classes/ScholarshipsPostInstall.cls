@@ -3,8 +3,7 @@
  * (ADR-0204 `0204-scholarships-outbound-grants-module.md`). Each step is safe to run twice and
  * none can abort an install, since every failure is written to the Error Log instead:
  *
- * 1. Turn on, once, a ship-on setting added in an upgrade (Core's `ShippedDefaultUpgrades`).
- * 2. Queue `ModuleAccessSyncs`, which gives Scholarships Admin to every BarnCRM Admin holder
+ * 1. Queue `ModuleAccessSyncs`, which gives Scholarships Admin to every BarnCRM Admin holder
  *    (the installer among them, given BarnCRM Admin by Core's own install) and the other sets to
  *    BarnCRM's roles. Queued, since a permission set assignment is a setup object write.
  *
@@ -14,13 +13,6 @@
 @NamespaceAccessible
 public with sharing class ScholarshipsPostInstall implements InstallHandler, ModuleSetup {
 	public static final String MODULE_KEY = 'Scholarships';
-	/**
-	 * Checkboxes that ship on, each turned on once in an org that saved the settings before it
-	 * existed (QA-F2). Append only; `scripts/ci/check-setting-defaults.py` checks it.
-	 */
-	@TestVisible
-	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{};
-
 	@NamespaceAccessible
 	public ScholarshipsPostInstall() {
 		// Built by name from Core (`ModuleSetups`) for Finish Setup, so it needs a public constructor.
@@ -35,7 +27,6 @@ public with sharing class ScholarshipsPostInstall implements InstallHandler, Mod
 
 	/** The install's steps, then the module's key added to the setup marker. Never throws. */
 	public void runSetup(Id installerId) {
-		ShippedDefaultUpgrades.apply(MODULE_KEY, Scholarships_Settings__c.SObjectType, SHIPPED_ON_ADDED_IN_UPGRADES);
 		ModuleSetups.markRan(MODULE_KEY);
 		try {
 			ModuleAccessSyncs.requestFor(MODULE_KEY);

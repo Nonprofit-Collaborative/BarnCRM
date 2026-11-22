@@ -263,7 +263,9 @@ Cleanup**, on by default at 2:40) restarts a heartbeat that stopped and deletes 
 heartbeat is going, with:
 
 - **Pause All Recipes**: the clock and the runners stop starting runs, org-wide, until you turn
-  it off. Queued runs wait; Test runs from the editor still run. BarnCRM's own pause in
+  it off. It takes effect the moment you switch it (there is no Save, and it is not a
+  BarnCRM Settings row), and only Connector managers can switch it. The integration user you
+  choose on this page is kept the same way. Queued runs wait; Test runs from the editor still run. BarnCRM's own pause in
   [Automation Control](automation-control.md) pauses recipes too.
 - **Restart Clock**: starts the heartbeat of each lane with work. Health Check sends you here
   when a lane stopped.

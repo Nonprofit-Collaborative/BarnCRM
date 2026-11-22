@@ -66,7 +66,8 @@ shown.
 
 ## Settings
 
-All in **BarnCRM Settings**, **Addresses**, saved for the whole organization:
+All in **BarnCRM Settings**, **Addresses**, saved for the whole organization (a save shows **Saving**, then **Saved**). Which provider
+is connected is not a setting: Check Connection and Disconnect record it at once.
 
 | Setting | Default | What it does |
 |---|---|---|

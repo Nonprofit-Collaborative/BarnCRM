@@ -55,7 +55,7 @@ a field).
 | 1 | Open the contact, **Edit Page**, drag **BarnCRM Built Component** on, pick *Donor Snapshot*, save and activate. | The component shows on the page. |
 | 2 | As the staff user, open the contact. | Email shows; Phone does not. |
 | 3 | As admin, clear **Active** on the component and save. | The component no longer shows on the page. Set it back. |
-| 4 | Turn **Show built components** off in Settings. | Nothing shows where it is placed. Turn it back on. |
+| 4 | Turn **Show built components** off in Settings. | **Saving**, then **Saved**; reload and it is still off. Nothing shows where it is placed. Turn it back on. |
 
 **Cleanup:** None.
 

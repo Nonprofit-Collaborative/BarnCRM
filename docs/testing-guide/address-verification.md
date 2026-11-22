@@ -44,7 +44,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **Addresses** settings turn **Apply corrections** on. | Saved. |
+| 1 | In **Addresses** settings turn **Apply corrections** on. | **Saving**, then **Saved**; reload and it is still on. |
 | 2 | Add the address `1600 amphitheatre parkway`, `mountain view`, `ca`, `94043`, country `United States`. Wait a minute and open it. | Verified, and the street, city, state and postal code are in the service's form (for example `1600 Amphitheatre Pkwy`, `Mountain View`, `CA`, `94043-1351`). The country is still `United States`. |
 | 3 | Turn **Apply corrections** off. | Saved. |
 

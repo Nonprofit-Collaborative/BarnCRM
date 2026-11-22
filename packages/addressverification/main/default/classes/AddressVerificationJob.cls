@@ -43,7 +43,7 @@ public with sharing class AddressVerificationJob implements Database.Batchable<S
 
 	public Database.QueryLocator start(Database.BatchableContext context) {
 		Integer most = limitTonight();
-		Integer months = AddressVerifier.settings().Recheck_Months__c.intValue();
+		Integer months = AddressVerifier.recheckMonths();
 		// Months 0 never re-checks: a cutoff before any possible date.
 		Date cutoff = months > 0 ? Date.today().addMonths(-months) : Date.newInstance(1700, 1, 1);
 		String unverified = AddressVerifier.UNVERIFIED;
@@ -79,6 +79,6 @@ public with sharing class AddressVerificationJob implements Database.Batchable<S
 	}
 
 	private static Integer limitTonight() {
-		return AddressVerifier.settings().Nightly_Limit__c.intValue();
+		return AddressVerifier.nightlyLimit();
 	}
 }

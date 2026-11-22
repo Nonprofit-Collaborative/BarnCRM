@@ -10,4 +10,5 @@
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">40</value></values>
     <values><field>Description__c</field><value xsi:type="xsd:string">Whether the board panel shows each seat's optional age range and gender beside the skills matrix. Both fields are optional on every seat; leave this off unless your board has agreed to collect them. Default: off.</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">corporate-hub.md</value></values>
+    <values><field>Default_Value__c</field><value xsi:type="xsd:string">false</value></values>
 </CustomMetadata>

@@ -26,7 +26,7 @@ public with sharing class AddressVerificationNightlyJobProvider implements Night
 				.activeWhen(
 					AddressVerifier.isOn() &&
 						AddressVerifier.isReady() &&
-						AddressVerifier.settings().Nightly_Limit__c > 0
+						AddressVerifier.nightlyLimit() > 0
 				)
 		};
 	}

@@ -14,7 +14,9 @@
 public with sharing class ConnectorClock implements Queueable {
 	public static final String LANE_AUTOMATION = 'Automation';
 	public static final String LANE_USER = 'IntegrationUser';
-	public static final String SETTINGS = 'Connector_Settings__c';
+	/** The prefix of the Connector's run-state keys (`Connector.Recipes_Paused__c`). */
+	public static final String STATE_PREFIX = 'Connector';
+	public static final String KEY_PAUSED = SettingsState.moduleKey(STATE_PREFIX, 'Recipes_Paused__c');
 	public static final Integer BEAT_MINUTES = 5;
 	public static final Integer POLL_MINUTES = 15;
 	public static final Set<String> GOING = new Set<String>{ 'Queued', 'Preparing', 'Processing', 'Holding' };
@@ -51,7 +53,7 @@ public with sharing class ConnectorClock implements Queueable {
 
 	public static Status status() {
 		Status result = new Status();
-		result.paused = SettingsService.flag(SETTINGS, 'Recipes_Paused__c');
+		result.paused = SettingsState.flag(KEY_PAUSED);
 		result.automationPaused = AutomationControl.isPaused() || AutomationControl.isOffForRunningUser();
 		Map<String, Id> users = new Map<String, Id>{
 			LANE_AUTOMATION => ConnectorIdentity.automatedProcessId(),
@@ -67,10 +69,14 @@ public with sharing class ConnectorClock implements Queueable {
 		return result;
 	}
 
-	/** Pause All Recipes on or off, org-wide and audited (R-CR7, R-CS1); off starts both lanes. */
+	/**
+	 * Pause All Recipes on or off, org-wide and at once (R-CR7, SET-03): run state, written
+	 * synchronously by Connector managers from the Connector page, not a deployed setting.
+	 * Off starts both lanes.
+	 */
 	public static Status setPaused(Boolean paused) {
 		ConnectorConnections.requireManager();
-		SettingsService.saveValues(SETTINGS, new Map<String, Object>{ 'Recipes_Paused__c' => paused == true });
+		SettingsState.put(new Map<String, Object>{ KEY_PAUSED => paused == true });
 		if (paused != true) {
 			publish(lanesNeeded());
 		}
@@ -122,7 +128,7 @@ public with sharing class ConnectorClock implements Queueable {
 
 	/** Pause All Recipes, or BarnCRM Automation Control's timed pause or Pause All (R-CR7). */
 	public static Boolean paused() {
-		return SettingsService.flag(SETTINGS, 'Recipes_Paused__c') ||
+		return SettingsState.flag(KEY_PAUSED) ||
 			AutomationControl.isPaused() ||
 			AutomationControl.isOffForRunningUser();
 	}

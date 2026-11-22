@@ -74,10 +74,7 @@ private class DataBreachHandlerTest {
 	@IsTest
 	static void theBellFollowsTheRemindersSwitch() {
 		System.runAs(TestUsers.adminWith(ADMIN_SET)) {
-			insert new Corporate_Hub_Settings__c(
-				SetupOwnerId = UserInfo.getOrganizationId(),
-				Reminders_Enabled__c = false
-			);
+			ModuleSettings.setForTest('CorporateHub_Reminders_Enabled', false);
 			Data_Breach__c row = breach('Lost laptop', 'Risk');
 			insert as user row;
 			Assert.isTrue(HubReminders.sentTitles.isEmpty(), 'Reminders off: no bell');

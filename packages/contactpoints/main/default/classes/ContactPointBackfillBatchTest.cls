@@ -21,12 +21,14 @@ private class ContactPointBackfillBatchTest {
 			ContactPointBackfillBatch.start();
 			Test.stopTest();
 
-			Contact_Point_Sync_Settings__c saved = Contact_Point_Sync_Settings__c.getOrgDefaults();
-			Assert.isNotNull(saved.Last_Backfill__c, 'When it finished');
-			Assert.isTrue(String.isNotBlank(saved.Last_Backfill_Summary__c), 'What it did');
-			Assert.isTrue(saved.Sync_Emails__c, 'A never-saved switch stays on');
-			Assert.isTrue(saved.Sync_Phones__c);
-			Assert.isTrue(saved.Sync_Addresses__c);
+			Assert.isNotNull(SettingsState.moment(ContactPointSyncService.KEY_LAST_BACKFILL), 'When it finished');
+			Assert.isTrue(
+				String.isNotBlank(SettingsState.text(ContactPointSyncService.KEY_LAST_SUMMARY)),
+				'What it did'
+			);
+			Assert.isTrue(ContactPointSyncService.switchedOn(ContactPointPlan.EMAIL), 'A never-saved switch stays on');
+			Assert.isTrue(ContactPointSyncService.switchedOn(ContactPointPlan.PHONE));
+			Assert.isTrue(ContactPointSyncService.switchedOn(ContactPointPlan.ADDRESS));
 		}
 	}
 }

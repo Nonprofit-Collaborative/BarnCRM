@@ -10,4 +10,5 @@
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">30</value></values>
     <values><field>Description__c</field><value xsi:type="xsd:string">The unique name of the email template a renewal reminder uses. Default: BarnCRM_Membership_Renewal, which BarnCRM ships for you to edit. The member is the recipient and the membership is the record the template merges.</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">memberships.md</value></values>
+    <values><field>Default_Value__c</field><value xsi:type="xsd:string">"BarnCRM_Membership_Renewal"</value></values>
 </CustomMetadata>

@@ -10,4 +10,5 @@
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">30</value></values>
     <values><field>Description__c</field><value xsi:type="xsd:string">Whether the Component Builder offers Export as LWC Source, which downloads a component as an LWC bundle for a developer to finish and deploy. Default: on.</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">lwc-builder.md</value></values>
+    <values><field>Default_Value__c</field><value xsi:type="xsd:string">true</value></values>
 </CustomMetadata>

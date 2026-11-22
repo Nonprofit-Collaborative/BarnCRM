@@ -76,7 +76,7 @@ own, Read Only reads their own.
 
 ## Settings
 
-BarnCRM Settings, **Corporate Hub**:
+BarnCRM Settings, **Corporate Hub**. Every setting is org-wide; a save shows **Saving**, then **Saved**, and the value is still there when you reload:
 
 | Setting | Default | What it does |
 |---|---|---|

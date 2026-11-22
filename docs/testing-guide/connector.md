@@ -251,7 +251,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 2 | Wait 15 minutes. | The run was tried again (Attempt 1) and waits again about 1 hour. |
 | 3 | In **Run Settings**, set **Retry Attempts** 0 and **Pause After Failures** 2, then **Save Run Settings**. Wait for two runs. | Both runs are Failed. The recipe is **Paused by Failures**; one Error Log entry says it was paused after 2 failures in a row. Health Check lists it under Recipes Paused by Failures. |
 | 4 | Make the endpoint answer 200. Select **Retry All Failed**, then **Resume**. | **Failed runs queued again: 2.** They end Succeeded. The recipe is Active and its failures in a row are 0. |
-| 5 | On **Recipe Clock**, turn on **Pause All Recipes**. Wait past the next run time. In the editor, select **Test**. | No new Schedule run; the Test run still runs. Health Check shows All Recipes Paused. |
+| 5 | On **Recipe Clock**, turn on **Pause All Recipes**: it takes effect at once and survives a reload (it is not a BarnCRM Settings row). Wait past the next run time. In the editor, select **Test**. | No new Schedule run; the Test run still runs. Health Check shows All Recipes Paused. |
 | 6 | Turn **Pause All Recipes** off. | **Pause All Recipes is off.** The next Schedule run appears on time. |
 
 **Cleanup:** Delete `Clock Test`.

@@ -223,9 +223,7 @@ private class AddressVerifierTest {
 		System.runAs(AddressVerificationTestData.admin()) {
 			// Google was connected, but Smarty is the provider chosen.
 			AddressVerificationTestData.connect(AddressVerifier.GOOGLE, false);
-			Address_Verification_Settings__c settings = Address_Verification_Settings__c.getOrgDefaults();
-			settings.Provider__c = AddressVerifier.SMARTY;
-			update settings;
+			ModuleSettings.setForTest('Address_Verification_Provider', AddressVerifier.SMARTY);
 			Address__c home = AddressVerificationTestData.addresses(1, null)[0];
 			AddressVerificationTestData.Provider smarty = new AddressVerificationTestData.Provider(
 				200,
@@ -334,9 +332,7 @@ private class AddressVerifierTest {
 	static void theNightlyBatchTakesOnlyWaitingAddressesUpToTheLimit() {
 		System.runAs(AddressVerificationTestData.admin()) {
 			AddressVerificationTestData.connect(AddressVerifier.SMARTY, false);
-			Address_Verification_Settings__c settings = Address_Verification_Settings__c.getOrgDefaults();
-			settings.Nightly_Limit__c = 3;
-			upsert settings;
+			ModuleSettings.setForTest('Address_Verification_Nightly_Limit', 3);
 			List<Address__c> rows = AddressVerificationTestData.addresses(5, null);
 			AddressVerifier.writing = true;
 			update new Address__c(

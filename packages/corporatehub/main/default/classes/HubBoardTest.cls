@@ -284,11 +284,7 @@ private class HubBoardTest {
 	@IsTest
 	static void thePanelsShowDemographicsActionItemsAttendeeMarksAndMotions() {
 		System.runAs(maria()) {
-			insert new Corporate_Hub_Settings__c(
-				SetupOwnerId = UserInfo.getOrganizationId(),
-				Board_Demographics__c = true
-			);
-			SettingsService.clearCaches();
+			ModuleSettings.setForTest('CorporateHub_Board_Demographics', true);
 			Board__c board = board();
 			Board_Member__c seat = [
 				SELECT Id, Person__c

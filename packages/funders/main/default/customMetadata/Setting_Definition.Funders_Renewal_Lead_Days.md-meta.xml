@@ -42,4 +42,8 @@
         <field>Help_Path__c</field>
         <value xsi:type="xsd:string">funders.md</value>
     </values>
+    <values>
+        <field>Default_Value__c</field>
+        <value xsi:type="xsd:string">90</value>
+    </values>
 </CustomMetadata>

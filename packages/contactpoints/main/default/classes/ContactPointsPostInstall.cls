@@ -19,14 +19,6 @@ public with sharing class ContactPointsPostInstall implements InstallHandler, Mo
 	public static final String MODULE_KEY = 'ContactPoints';
 	private static final String SWITCH_CONTEXT = 'ContactPointsPostInstall.ensureAutomationSwitches';
 
-	/**
-	 * Checkboxes that ship on, each turned on once in an org that saved the settings before it
-	 * existed (Core's `ShippedDefaultUpgrades`, QA-F2). Append only;
-	 * `scripts/ci/check-setting-defaults.py` fails the build when one is missing.
-	 */
-	@TestVisible
-	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{};
-
 	/** Called by the platform after the module is installed or upgraded. */
 	public void onInstall(InstallContext context) {
 		if (context == null) {
@@ -47,11 +39,6 @@ public with sharing class ContactPointsPostInstall implements InstallHandler, Mo
 	 */
 	public void runSetup(Id installerId) {
 		AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
-		ShippedDefaultUpgrades.apply(
-			MODULE_KEY,
-			Contact_Point_Sync_Settings__c.SObjectType,
-			SHIPPED_ON_ADDED_IN_UPGRADES
-		);
 		ModuleSetups.markRan(MODULE_KEY);
 		ModuleAccessSyncs.setUp(MODULE_KEY, installerId);
 	}

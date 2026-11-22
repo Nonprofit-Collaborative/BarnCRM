@@ -10,4 +10,5 @@
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">30</value></values>
     <values><field>Description__c</field><value xsi:type="xsd:string">Whether the same morning run also emails the recipient (the award's Recipient contact, when it has an email address) about a report or condition coming due, with their own report link. Uses your org's email limits. Default: off.</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">scholarships.md</value></values>
+    <values><field>Default_Value__c</field><value xsi:type="xsd:string">false</value></values>
 </CustomMetadata>

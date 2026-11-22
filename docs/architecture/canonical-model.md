@@ -13201,8 +13201,10 @@ searches nothing. A blank or out of range renewal lead time reads as 90.
 
 ### Salesforce implementation
 
-- **Object:** `Funders_Settings__c`, hierarchy custom setting, visibility Protected, read through
-  Core's `SettingsService` by `FundersSettings`.
+- **Object:** `Funders_Settings__c`, hierarchy custom setting, visibility Protected. The group
+  is registered in the settings store (`Setting_Module.Funders`, prefix `Funders`, no state
+  fields) and read through `ModuleSettings` by `FundersSettings`; the object is the legacy
+  carry-over source only (SET-03). Every row's `Default_Value__c` equals the default below.
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -14349,6 +14351,10 @@ three switches read as on before the first save.
 ### Salesforce implementation
 
 - **Object:** `Contact_Point_Sync_Settings__c`, hierarchy custom setting, visibility Protected.
+  Registered in the settings store (`Setting_Module.ContactPoints`, prefix `ContactPoints`);
+  the three switches are settings, and `Last_Backfill__c` and `Last_Backfill_Summary__c` are run
+  state (`ContactPoints.Last_Backfill__c`, `ContactPoints.Last_Backfill_Summary__c`) written
+  by the backfill (SET-03). The object is the legacy carry-over source only.
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -16503,6 +16509,9 @@ legal text. Existing records are never changed.
 ### Salesforce implementation
 
 - **Object:** `Corporate_Hub_Settings__c`, hierarchy custom setting, visibility Protected.
+  Registered in the settings store (`Setting_Module.CorporateHub`, prefix `CorporateHub`, no
+  state fields) and read through `ModuleSettings` (SET-03); the object is the legacy
+  carry-over source only.
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -17660,6 +17669,9 @@ Settings.
 ### Salesforce implementation
 
 - **Object:** `LWC_Builder_Settings__c`, hierarchy custom setting, visibility Protected.
+  Registered in the settings store (`Setting_Module.LwcBuilder`, prefix `LwcBuilder`, no state
+  fields) and read through `ModuleSettings` (SET-03); the object is the legacy carry-over
+  source only.
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -17909,6 +17921,9 @@ The module's org-wide settings, edited in the Scholarships and Outbound Grants s
 ### Salesforce implementation
 
 - **Object:** `Scholarships_Settings__c`, label Scholarships Settings, hierarchy custom setting, visibility Protected.
+  Registered in the settings store (`Setting_Module.Scholarships`, prefix `Scholarships`, no
+  state fields) and read through `ModuleSettings` (SET-03); the object is the legacy
+  carry-over source only.
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -18302,6 +18317,9 @@ The Memberships module's org-wide settings, in the Memberships section of BarnCR
 
 - **Object:** `Memberships_Settings__c`, hierarchy custom setting, protected; fields
   `Reminders_Enabled__c`, `Reminder_Days__c`, `Reminder_Template__c`, `Renew_From_Gifts__c`.
+  Registered in the settings store (`Setting_Module.Memberships`, prefix `Memberships`, no
+  state fields) and read through `ModuleSettings` (SET-03); the object is the legacy
+  carry-over source only.
 
 ---
 
@@ -18914,6 +18932,10 @@ the setup page last succeeded; lookups run only while it is the chosen provider.
 ### Salesforce implementation
 
 - **Object:** `Address_Verification_Settings__c`, hierarchy custom setting, visibility Protected.
+  Registered in the settings store (`Setting_Module.AddressVerification`, prefix
+  `AddressVerification`); the five rows are settings and `Connected_Provider__c` is run state
+  (`AddressVerification.Connected_Provider__c`), written at once by Check Connection and
+  Disconnect (SET-03). The object is the legacy carry-over source only.
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -19665,11 +19687,15 @@ F12). Turning Pause All Recipes off publishes both start events.
 
 ### Salesforce implementation
 
-- **Custom setting:** `Connector_Settings__c`, hierarchy, protected. Fields `Recipes_Paused__c`
-  (Checkbox, default false) and `Integration_User_Id__c` (Text(18)).
-- **Setting Definition row:** `Connector_Recipes_Paused` (Checkbox, Module `Connector`). The
-  Integration User has none: choosing one also assigns a permission set and writes the
-  subscriber configuration, which only Super Connector does.
+- **Custom setting:** `Connector_Settings__c`, hierarchy, protected, the legacy carry-over
+  source only. Registered in the settings store (`Setting_Module.Connector`, prefix
+  `Connector`, state fields `Recipes_Paused__c` and `Integration_User_Id__c`, SET-03). Both
+  are run state, written at once: `Connector.Recipes_Paused__c` (Checkbox, default false) is
+  toggled on the Connector page by Connector managers, and `Connector.Integration_User_Id__c`
+  (Text(18)) is set when a user is chosen.
+- **Setting Definition row:** none for either, since a deployed setting cannot be a
+  synchronous switch. Choosing the Integration User also assigns a permission set and writes
+  the subscriber configuration, which only Super Connector does.
 
 ---
 
@@ -20144,6 +20170,7 @@ mirrors the primary member).
 | 1.83 | 2026-11-20 | R-CR6 the recipe clock: a claimed Running run counts as Queued for the clock, so the heartbeat keeps running while a lane has a Waiting run, a Queued run or a claimed Running run (batch Q gate fix). |
 | 1.84 | 2026-11-21 | Settings as custom metadata, phase 1 Core (SET-01, D-219, ADR-NEXT settings as custom metadata). New custom metadata type `Setting_Value__mdt` with `Value__c` (Section 13, R-SV1 to R-SV3; not counted as an object). `Setting_Definition__mdt` gains `Default_Value__c` and the Hidden data type. `Nightly_Job__c` gains `Kind__c` and `Value__c` (state and What's New rows). `BarnCRM_Automation_Control__c` gains `Paused_Until__c`. New `Account.Is_Organization_Account__c`, a kept checkbox that replaces the `Is_Organization__c` formula everywhere it was read (Section 8; the platform refuses a formula-to-checkbox change, and the formula is removed in phase 2). `BarnCRM_Settings__c` and `Whats_New_Seen__c` are read only until carry-over and are removed in phase 2; no object count change in phase 1. |
 | 1.85 | 2026-11-21 | Settings as custom metadata, phase 2 Core prerequisite (SET-02, D-219). New custom metadata type `Setting_Module__mdt` with `Settings_Object__c`, `Key_Prefix__c` and `State_Fields__c` (Section 13; not counted as an object): a module registers its settings group, its State row prefix and its legacy state fields. New rule R-SV4 (module settings read and saved through the store by name or by group and key); R-SV3 carry-over covers every registered module; module State rows are `Prefix.Name` and a run lock is a State row read `FOR UPDATE` (Section 29 Nightly Jobs). No object count change. |
+| 1.86 | 2026-11-21 | Settings as custom metadata, phase 2 modules (SET-03, D-219): Funders, Scholarships, Memberships, Corporate Hub, Connector, Contact Point Sync, Address Verification and LWC Builder. Each ships a `Setting_Module__mdt` record (`Funders`, `Scholarships`, `Memberships`, `CorporateHub`, `Connector`, `ContactPoints`, `AddressVerification`, `LwcBuilder`) and every Setting Definition row a `Default_Value__c`. Run state moves to State rows: `Connector.Recipes_Paused__c` (synchronous, toggled on the Connector page, so its Setting Definition row `Connector_Recipes_Paused` is removed), `Connector.Integration_User_Id__c`, `ContactPoints.Last_Backfill__c` and `ContactPoints.Last_Backfill_Summary__c`, `AddressVerification.Connected_Provider__c`. The eight legacy custom settings stay until the destructive deploy; no module reads them. No object count change. |
 
 ---
 ## 32. Entity ownership by package

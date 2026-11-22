@@ -2,7 +2,7 @@
  * The integration user (canonical model R-CR4, R-CS1; design Section 3.10; security review F12):
  * the one user Integration User recipes run as. Salesforce sets a platform event trigger's running
  * user only through `PlatformEventSubscriberConfig`, which Setup shows but cannot edit, so choosing
- * the user here saves it in Connector Settings and queues a job, as the admin, that writes that
+ * the user here saves it as run state and queues a job, as the admin, that writes that
  * configuration for `ConnectorStartUserTrigger` through the org connection (ADR-0148), then gives
  * the user BarnCRM Connections and takes it from the previous one. The admin then suspends and
  * resumes the subscription in Setup so it takes effect at once.
@@ -13,7 +13,9 @@
  * Credentials or Customize Application), and BarnCRM Connections goes to no one else (F12).
  */
 public with sharing class ConnectorIntegrationUser {
-	public static final String SUBSCRIBER = 'BarnCRM_Connector_Start_User';
+	/** Run state: the chosen user's Id (`Connector.Integration_User_Id__c`), written at once. */
+	public static final String KEY_USER = SettingsState.moduleKey(ConnectorClock.STATE_PREFIX, 'Integration_User_Id__c');
+	public static final String SUBSCRIBER ='BarnCRM_Connector_Start_User';
 	public static final String LANE_TRIGGER = 'ConnectorStartUserTrigger';
 	public static final String ORG_CONNECTION = 'Barn_Org_Connection';
 	private static final String TOOLING = '/services/data/v67.0/tooling/';
@@ -44,7 +46,7 @@ public with sharing class ConnectorIntegrationUser {
 
 	/** The chosen user's Id, or null. */
 	public static Id chosenId() {
-		String stored = SettingsService.text(ConnectorClock.SETTINGS, 'Integration_User_Id__c');
+		String stored = SettingsState.text(KEY_USER);
 		return ConnectorRecipeDocument.isId(stored) ? Id.valueOf(stored) : null;
 	}
 
@@ -140,12 +142,7 @@ public with sharing class ConnectorIntegrationUser {
 			}
 		}
 		Id previous = chosenId();
-		OrgSettingsSystemWriter.save(
-			Connector_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{
-				Connector_Settings__c.Integration_User_Id__c => chosen == null ? null : String.valueOf(chosen)
-			}
-		);
+		SettingsState.put(new Map<String, Object>{ KEY_USER => chosen == null ? null : String.valueOf(chosen) });
 		try {
 			AsyncStarter.queue(new SubscriberJob(chosen, previous), 'ConnectorIntegrationUser.choose');
 		} catch (Exception busy) {

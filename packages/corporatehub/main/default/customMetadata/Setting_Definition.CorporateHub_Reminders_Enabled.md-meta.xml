@@ -10,4 +10,5 @@
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">10</value></values>
     <values><field>Description__c</field><value xsi:type="xsd:string">Whether the morning run (6:45 AM in your org time zone) sends the owner of each active compliance obligation, agreement and library document a bell notification before it is due, once per date. Staff only; nobody outside your org is contacted. Default: on.</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">corporate-hub.md</value></values>
+    <values><field>Default_Value__c</field><value xsi:type="xsd:string">true</value></values>
 </CustomMetadata>

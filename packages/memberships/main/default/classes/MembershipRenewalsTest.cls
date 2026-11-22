@@ -282,10 +282,7 @@ private class MembershipRenewalsTest {
 	static void remindersWithNoTemplateLogAWarningAndSendNothing() {
 		System.runAs(TestUsers.adminWith(ADMIN)) {
 			MembershipService.todayOverride = TODAY;
-			Memberships_Settings__c settings = Memberships_Settings__c.getOrgDefaults();
-			settings.SetupOwnerId = UserInfo.getOrganizationId();
-			settings.Reminder_Template__c = 'No_Such_Membership_Template';
-			upsert settings;
+			ModuleSettings.setForTest('Memberships_Reminder_Template', 'No_Such_Membership_Template');
 			RecordingEmailSender sender = new RecordingEmailSender();
 			MembershipRenewals.emailSender = sender;
 
