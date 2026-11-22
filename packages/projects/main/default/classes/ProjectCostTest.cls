@@ -71,6 +71,27 @@ private class ProjectCostTest {
 	}
 
 	@IsTest
+	static void aProjectThatCannotBeSavedDoesNotStopTheOthers() {
+		System.runAs(ProjectsTestData.admin()) {
+			Project__c live = ProjectsTestData.project('Active', 10);
+			Project__c gone = ProjectsTestData.project('Active', 10);
+			delete gone;
+			Project__c stale = new Project__c(Id = live.Id, Hourly_Rate__c = 10);
+			Project__c deleted = new Project__c(Id = gone.Id, Hourly_Rate__c = 10);
+
+			Test.startTest();
+			new ProjectCostSync().execute(null, new List<Project__c>{ deleted, stale });
+			Test.stopTest();
+
+			Assert.areEqual(
+				0,
+				read(live.Id).Actual_Cost_Amount__c,
+				'The project that can be saved is saved, its cost from its own stored figures'
+			);
+		}
+	}
+
+	@IsTest
 	static void noPassStartsWhileTheSettingIsAsLastApplied() {
 		System.runAs(ProjectsTestData.admin()) {
 			SettingsState.put(new Map<String, Object>{ ProjectCostSync.APPLIED_KEY => false });

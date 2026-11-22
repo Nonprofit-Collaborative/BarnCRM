@@ -2,7 +2,7 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Change_Requests_Turned_On</fullName>
     <active>false</active>
-    <description>Not used: the check is Apex (a validation rule cannot read the settings store); removed in the destructive deploy. New change requests need the Projects setting Track change requests (PM-12). Requests saved while it was on keep counting and can still be edited.</description>
+    <description>Not used: the check is Apex (a validation rule cannot read the settings store); removed in the destructive deploy. New change requests need the Projects setting Track change requests (PM-12).</description>
     <errorConditionFormula>ISNEW() &amp;&amp; NOT($Setup.Projects_Settings__c.Change_Requests_Enabled__c)</errorConditionFormula>
     <errorMessage>Change requests are turned off. An admin can turn on Track change requests in BarnCRM Settings, Projects.</errorMessage>
 </ValidationRule>
