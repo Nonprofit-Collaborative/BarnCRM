@@ -99,6 +99,7 @@ Rules:
 | memberships | Membership_Term__c | Custom45: Ticket |
 | memberships | Certification__c | Custom8: Diamond |
 | memberships | Member_Certification__c | Custom46: Stamp |
+| memberships | Memberships_Home | Custom11: Star |
 | addressverification | Address_Verification_Setup | Custom73: HighwaySign |
 | connector | Super_Connector | Custom76: Keys |
 | payments | Payments_Setup | Custom70: Handsaw |

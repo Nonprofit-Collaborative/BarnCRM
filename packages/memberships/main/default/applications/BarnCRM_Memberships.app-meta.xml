@@ -16,6 +16,7 @@
   <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
   <label>BarnCRM Memberships</label>
   <navType>Console</navType>
+  <tabs>Memberships_Home</tabs>
   <tabs>Membership_Term__c</tabs>
   <tabs>Member_Certification__c</tabs>
   <tabs>Membership_Level__c</tabs>
@@ -24,6 +25,9 @@
   <tabs>Error_Log__c</tabs>
   <uiType>Lightning</uiType>
   <workspaceConfig>
+    <mappings>
+      <tab>Memberships_Home</tab>
+    </mappings>
     <mappings>
       <tab>Membership_Term__c</tab>
     </mappings>

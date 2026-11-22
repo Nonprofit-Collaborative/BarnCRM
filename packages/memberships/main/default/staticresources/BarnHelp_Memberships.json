@@ -33,6 +33,25 @@
     "Memberships_Panel_PaymentsOff": "Turn on Payments to email the member a payment link.",
     "Memberships_Panel_Renew": "Renew",
     "Memberships_Panel_Title": "Membership",
-    "Memberships_Portal_LinkSent": "We have emailed you a link to pay your dues."
+    "Memberships_Portal_LinkSent": "We have emailed you a link to pay your dues.",
+    "Memberships_Home_Title": "Memberships Home",
+    "Memberships_Home_Intro": "Who belongs, who is due to renew and who has just renewed. Active counts current and grace-period memberships; Expiring counts current memberships that end in the next 30 days; Renewals counts memberships that follow an earlier one, added in the last 30 days.",
+    "Memberships_Home_NewMembership": "New Membership",
+    "Memberships_Home_NewLevel": "New Membership Level",
+    "Memberships_Home_Active": "Active Members",
+    "Memberships_Home_Expiring": "Expiring in 30 Days",
+    "Memberships_Home_Grace": "In Grace Period",
+    "Memberships_Home_Renewals": "Renewals, Last 30 Days",
+    "Memberships_Home_ExpiringList": "Expiring Soon",
+    "Memberships_Home_NoExpiring": "Nothing expires in the next 30 days",
+    "Memberships_Home_NoExpiringNext": "Memberships show here once their end date is 30 days away or less.",
+    "Memberships_Home_RenewalsList": "Recent Renewals",
+    "Memberships_Home_NoRenewals": "No renewals in the last 30 days",
+    "Memberships_Home_NoRenewalsNext": "Open an expiring membership and choose Renew to start its next term.",
+    "Memberships_Home_LevelFirstHeading": "Set Up a Membership Level",
+    "Memberships_Home_LevelFirstMessage": "A level sets the dues and how long a membership lasts. Create one, then add your first member.",
+    "Memberships_Home_MemberFirstHeading": "Add Your First Member",
+    "Memberships_Home_MemberFirstMessage": "Create a membership for a person or organization at one of your levels.",
+    "Memberships_Home_LoadFailed": "Memberships Home did not load. Try again. If it happens again, ask your BarnCRM admin to check the Error Log."
   }
 }

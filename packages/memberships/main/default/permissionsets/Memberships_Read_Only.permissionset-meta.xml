@@ -332,4 +332,8 @@
     <tab>Membership_Term__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>
+  <tabSettings>
+    <tab>Memberships_Home</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
 </PermissionSet>

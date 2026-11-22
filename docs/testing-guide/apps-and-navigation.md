@@ -228,9 +228,9 @@ each, the module is installed and on, and its access sync has run
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As admin, open the App Launcher and type `Memberships`. | **BarnCRM Memberships** is listed with Patch wearing a green Member sash. |
-| 2 | Open it and its navigation menu. | Console navigation with the Barn Navy header. Tabs: **Memberships**, **Member Certifications**, **Membership Levels**, **Certifications**, **Reports**, **Error Log** (last). |
+| 2 | Open it and its navigation menu. | Console navigation with the Barn Navy header. Tabs: **Memberships Home**, **Memberships**, **Member Certifications**, **Membership Levels**, **Certifications**, **Reports**, **Error Log** (last). |
 | 3 | Open a membership. | It opens as a workspace tab on the membership record page, the same page as in **BarnCRM**. |
-| 4 | Open **BarnCRM**. | **Memberships** and **Member Certifications** are still there, after **Data Manager**. |
+| 4 | Open **BarnCRM**. | **Memberships Home**, **Memberships** and **Member Certifications** are still there, after **Data Manager**. |
 | 5 | On BarnCRM Home, find Memberships under **Modules**. | It has an **Open the App** link to **BarnCRM Memberships**. |
 | 6 | As staff, open the App Launcher and type `Memberships`. | **BarnCRM Memberships** is listed. A user with no Memberships permission set does not see it. |
 
@@ -265,7 +265,7 @@ each, the module is installed and on, and its access sync has run
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open each module app from the App Launcher. | The first tab and the page title are: BarnCRM Corporate Hub, **Corporate Hub Home**; BarnCRM Events, **Events Home**; BarnCRM Forms, **Forms Home**; BarnCRM Fundraising, **Fundraising Home**; BarnCRM Grants, **Grants Home**; BarnCRM Programs, **Programs Home**; BarnCRM Projects, **Projects Home**; BarnCRM Scholarships, **Scholarships Home**; BarnCRM Volunteers, **Volunteers Home**. **Error Log** is still the last tab of each. |
+| 1 | Open each module app from the App Launcher. | The first tab and the page title are: BarnCRM Corporate Hub, **Corporate Hub Home**; BarnCRM Events, **Events Home**; BarnCRM Forms, **Forms Home**; BarnCRM Fundraising, **Fundraising Home**; BarnCRM Grants, **Grants Home**; BarnCRM Memberships, **Memberships Home**; BarnCRM Programs, **Programs Home**; BarnCRM Projects, **Projects Home**; BarnCRM Scholarships, **Scholarships Home**; BarnCRM Volunteers, **Volunteers Home**. **Error Log** is still the last tab of each. |
 | 2 | On each home, look at the page. | The title and About This Tool at the top, the module's quick actions at the top right, then figures, then the module's lists. |
-| 3 | Open **BarnCRM** (or **BarnCRM Console**). | The module homes it carries read **Corporate Hub Home**, **Forms Home**, **Programs Home** and **Scholarships Home**. |
+| 3 | Open **BarnCRM** (or **BarnCRM Console**). | The module homes it carries read **Corporate Hub Home**, **Forms Home**, **Memberships Home**, **Programs Home** and **Scholarships Home**. |
 | 4 | Open **BarnCRM Connector**. | It opens on **Super Connector** (a one-tool app, no home). |

@@ -106,7 +106,7 @@ Every BarnCRM module is in Beta right now: a **Beta** badge beside a module's na
 
 ### Memberships
 
-- [Memberships](memberships.md): adding a member, what a membership's status means, renewing, sending a payment link, and the directory listing.
+- [Memberships](memberships.md): Memberships Home, adding a member, what a membership's status means, renewing, sending a payment link, and the directory listing.
 
 ### Reports
 

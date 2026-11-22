@@ -85,13 +85,13 @@ Launcher.
 | **BarnCRM Portal Builder** | Portals, Portal Accesses, Reports, Error Log |
 | **BarnCRM Corporate Hub** | Corporate Hub Home, Library Documents, Compliance Obligations, Agreements, Boards and Committees, Board Meetings, Processing Activities, Data Subject Requests, Data Breaches, Reports, Dashboards, Error Log |
 | **BarnCRM Projects** | Projects Home, Timesheet, Approvals, Requests, Projects, Time Entries, Project Expenses, Project Resources, Staffing, Project Rates, Project Invoices, Request Connections, Reports, Error Log |
-| **BarnCRM Memberships** | Memberships, Member Certifications, Membership Levels, Certifications, Reports, Error Log |
+| **BarnCRM Memberships** | Memberships Home, Memberships, Member Certifications, Membership Levels, Certifications, Reports, Error Log |
 | **BarnCRM Scholarships** | Scholarships Home, Award Programs, Award Applications, Awards, Reports, Dashboards, Error Log |
 
 ### Module Homes
 
 Every module app opens on its home, the first tab, named for the module: Corporate Hub Home,
-Events Home, Forms Home, Fundraising Home, Grants Home, Programs Home, Projects Home, Scholarships Home and
+Events Home, Forms Home, Fundraising Home, Grants Home, Memberships Home, Programs Home, Projects Home, Scholarships Home and
 Volunteers Home. Each home has the same layout, so people know where to look in any module:
 
 - The page title, its About This Tool help, and the module's quick actions (such as **New
@@ -126,7 +126,7 @@ need not switch apps. The modules with no app have their pages only here:
 | Portal Builder | | Portals, Portal Accesses |
 | Corporate Hub | Corporate Hub Home, Library Documents, Compliance Obligations, Agreements, Boards and Committees, Board Meetings | |
 | Project Management | Projects Home, Timesheet, Approvals, Requests, Projects, Time Entries, Project Expenses, Project Resources, Staffing | Project Rates, Project Invoices, Request Connections |
-| Memberships | Memberships, Member Certifications | Membership Levels, Certifications |
+| Memberships | Memberships Home, Memberships, Member Certifications | Membership Levels, Certifications |
 | Scholarships and Outbound Grants | Scholarships Home, Award Programs, Award Applications, Awards | |
 
 A module's pages go after **Data Manager** in the everyday apps and before **Error Log** in

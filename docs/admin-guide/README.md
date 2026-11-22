@@ -331,7 +331,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 
 | Feature | Page | Package |
 |---|---|---|
-| G-22a to G-22e, PAY-02, PB-09 Memberships: install, roles, levels and benefits, membership terms and their status, renewing by hand, from Fundraising gifts and recurring gifts, and online through Payments, lapse handling and reminders, the member directory portal, Memberships Essentials, certifications and continuing credits, erasure | [memberships.md](memberships.md) | BarnCRM Memberships (Fundraising, Payments and Portal Builder optional) |
+| G-22a to G-22e, PAY-02, PB-09 Memberships: install, roles, Memberships Home, levels and benefits, membership terms and their status, renewing by hand, from Fundraising gifts and recurring gifts, and online through Payments, lapse handling and reminders, the member directory portal, Memberships Essentials, certifications and continuing credits, erasure | [memberships.md](memberships.md) | BarnCRM Memberships (Fundraising, Payments and Portal Builder optional) |
 
 ### Moving From Another System
 
