@@ -54,7 +54,9 @@ public with sharing class OrgAutomationInventory {
 		'Template_Relationship_Reciprocal_Delete',
 		'Template_Relationship_Validation',
 		'Recalculate_Rollups_Template',
-		'Grant_Requirement_Dates'
+		'Data_Subject_Request_Due',
+		'Grant_Requirement_Dates',
+		'Stewardship_Plan_Completed_Date'
 	};
 
 	/**
