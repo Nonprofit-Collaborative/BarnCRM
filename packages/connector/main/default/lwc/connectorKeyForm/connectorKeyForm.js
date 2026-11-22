@@ -4,7 +4,7 @@ import replaceKey from '@salesforce/apex/ConnectorConnectionsController.replaceK
 import saveFirstKey from '@salesforce/apex/ConnectorConnectionsController.saveFirstKey';
 import saveCheckPath from '@salesforce/apex/ConnectorConnectionsController.saveCheckPath';
 import saveBackupDestination from '@salesforce/apex/ConnectorConnectionsController.saveBackupDestination';
-import { KINDS, API_KEY, BASIC, SECRET_URL, formProblems } from 'c/connectorRules';
+import { KINDS, API_KEY, AWS, BASIC, SECRET_URL, formProblems } from 'c/connectorRules';
 import { say as text } from 'c/connectorText';
 import { headerLines, lockedUrl, partOfKey } from 'c/connectorFileRules';
 
@@ -113,10 +113,18 @@ export default class ConnectorKeyForm extends LightningElement {
   }
 
   get showUserName() {
-    return this.kind === BASIC;
+    return this.kind === BASIC || this.kind === AWS;
+  }
+
+  /** An AWS key pair's access key ID goes in the user name box: it is not a secret (F6). */
+  get userNameLabel() {
+    return this.kind === AWS ? text('Connector_Form_AwsKeyId') : this.labels.userName;
   }
 
   get secretLabel() {
+    if (this.kind === AWS) {
+      return text('Connector_Form_AwsSecret');
+    }
     return this.isSecretUrl ? text('Connector_Form_SecretUrl') : text('Connector_Form_Key');
   }
 
@@ -210,7 +218,8 @@ export default class ConnectorKeyForm extends LightningElement {
           name: result.name,
           method: backup.method,
           path: backup.path,
-          headers: headerLines(backup.headers)
+          headers: headerLines(backup.headers),
+          metadata: backup.metadata || null
         });
       }
       this.dispatchEvent(new CustomEvent('saved', { detail: { result } }));

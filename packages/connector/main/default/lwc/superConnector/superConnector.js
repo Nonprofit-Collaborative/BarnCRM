@@ -8,7 +8,7 @@ import manageConnector from '@salesforce/customPermission/Manage_BarnCRM_Connect
 import BarnConfirmModal from 'c/barnConfirmModal';
 import { isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { iconFor } from 'c/barnIcons';
-import { kindKey, statusOf, outcomeOf, SECRET_URL } from 'c/connectorRules';
+import { kindKey, statusOf, outcomeOf, OAUTH, SECRET_URL } from 'c/connectorRules';
 import { say as text } from 'c/connectorText';
 
 const PKG = 'Connector';
@@ -30,6 +30,8 @@ export default class SuperConnector extends LightningElement {
   formConnection;
   /** A template's connection settings for New Connection (CN-08, R-CR14); never a key. */
   formPrefill;
+  /** An OAuth template's Backup Settings, for the Backup Destination to open with (R-CN12). */
+  backupTemplate;
   openRecipeId;
   /** A recipe imported on the Templates tab, opened as a new draft on Recipes (R-CR13). */
   openDraft;
@@ -88,10 +90,16 @@ export default class SuperConnector extends LightningElement {
   /** Create Connection on an imported template: New Connection, filled in, host locked. */
   handleTemplateConnection(event) {
     this.clearMessages();
+    const prefill = event.detail.prefill;
     this.formConnection = undefined;
-    this.formPrefill = event.detail.prefill;
-    this.formMode = 'create';
     this.activeTab = 'connections';
+    if (prefill && prefill.authKind === OAUTH) {
+      // An OAuth connection is made in Setup: the template only fills the Backup Destination.
+      this.backupTemplate = { ...prefill.backup };
+      return;
+    }
+    this.formPrefill = prefill;
+    this.formMode = 'create';
   }
 
   /** Open as Draft on an imported recipe: the Recipes tab opens it unsaved. */
@@ -197,6 +205,8 @@ export default class SuperConnector extends LightningElement {
             ? text('Connector_Page_Check')
             : text('Connector_Page_CheckAgain'),
         canDisconnect: connection.authKind !== SECRET_URL && connection.keyStored,
+        // An OAuth connection signs in again from Setup, never with a typed key.
+        canReplace: connection.authKind !== OAUTH,
         statusId: `status-${connection.name}`,
         stepsId: `steps-${connection.name}`,
         checkId: `check-${connection.name}`,

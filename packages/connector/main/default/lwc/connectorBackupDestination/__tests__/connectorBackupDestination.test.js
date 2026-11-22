@@ -27,7 +27,11 @@ const CONNECTIONS = [
 const SET = {
   canWrite: true,
   name: 'BarnConn_rest_aaaaaa',
-  settings: { method: 'PUT', path: '/barncrm/{file}', headers: [{ name: 'Overwrite', value: 'T' }] },
+  settings: {
+    method: 'PUT',
+    path: '/barncrm/{file}',
+    headers: [{ name: 'Overwrite', value: 'T' }]
+  },
   note: null
 };
 
@@ -39,7 +43,9 @@ const flush = () =>
 const find = (element, id) => element.shadowRoot.querySelector(`[data-id="${id}"]`);
 
 function render(canWrite = true) {
-  const element = createElement('c-connector-backup-destination', { is: ConnectorBackupDestination });
+  const element = createElement('c-connector-backup-destination', {
+    is: ConnectorBackupDestination
+  });
   element.canWrite = canWrite;
   element.connections = CONNECTIONS;
   document.body.appendChild(element);
@@ -55,7 +61,12 @@ describe('c-connector-backup-destination', () => {
   });
 
   it('says when no connection is the destination and offers to set one', async () => {
-    getBackupDestination.mockResolvedValue({ canWrite: true, name: null, settings: null, note: 'c.Connector_Backup_NotSet' });
+    getBackupDestination.mockResolvedValue({
+      canWrite: true,
+      name: null,
+      settings: null,
+      note: 'c.Connector_Backup_NotSet'
+    });
     const element = render();
     await flush();
     expect(find(element, 'backup-summary').textContent).toBe('c.Connector_Backup_None');
@@ -66,7 +77,10 @@ describe('c-connector-backup-destination', () => {
 
   it('shows the destination and its note, and saves a change as header lines', async () => {
     getBackupDestination.mockResolvedValue({ ...SET, note: 'c.Connector_Backup_NoAccess' });
-    saveBackupDestination.mockResolvedValue({ ...SET, settings: { ...SET.settings, method: 'POST' } });
+    saveBackupDestination.mockResolvedValue({
+      ...SET,
+      settings: { ...SET.settings, method: 'POST' }
+    });
     const element = render();
     await flush();
     expect(find(element, 'backup-summary').textContent).toBe('Nextcloud: PUT /barncrm/{file}');
@@ -83,7 +97,8 @@ describe('c-connector-backup-destination', () => {
       name: 'BarnConn_rest_aaaaaa',
       method: 'POST',
       path: '/barncrm/{file}',
-      headers: 'Overwrite: T'
+      headers: 'Overwrite: T',
+      metadata: ''
     });
     expect(find(element, 'backup-form')).toBeNull();
     expect(find(element, 'backup-summary').textContent).toBe('Nextcloud: POST /barncrm/{file}');
@@ -91,7 +106,9 @@ describe('c-connector-backup-destination', () => {
 
   it('keeps the form open with the refusal when a save is refused', async () => {
     getBackupDestination.mockResolvedValue(SET);
-    saveBackupDestination.mockRejectedValue({ body: { message: 'The path must start with one slash.' } });
+    saveBackupDestination.mockRejectedValue({
+      body: { message: 'The path must start with one slash.' }
+    });
     const element = render();
     await flush();
     find(element, 'backup-edit').click();
@@ -104,13 +121,60 @@ describe('c-connector-backup-destination', () => {
 
   it('stops using the destination', async () => {
     getBackupDestination.mockResolvedValue(SET);
-    stopBackupDestination.mockResolvedValue({ canWrite: true, name: null, settings: null, note: 'x' });
+    stopBackupDestination.mockResolvedValue({
+      canWrite: true,
+      name: null,
+      settings: null,
+      note: 'x'
+    });
     const element = render();
     await flush();
     find(element, 'backup-stop').click();
     await flush();
     expect(stopBackupDestination).toHaveBeenCalled();
     expect(find(element, 'backup-summary').textContent).toBe('c.Connector_Backup_None');
+  });
+
+  it('opens filled in from an OAuth template, offering only OAuth connections (R-CN12)', async () => {
+    getBackupDestination.mockResolvedValue({
+      canWrite: true,
+      name: null,
+      settings: null,
+      note: null
+    });
+    saveBackupDestination.mockResolvedValue(SET);
+    const element = createElement('c-connector-backup-destination', {
+      is: ConnectorBackupDestination
+    });
+    element.canWrite = true;
+    element.connections = [
+      ...CONNECTIONS,
+      { name: 'BarnConn_gdrive', label: 'Google Drive', authKind: 'OAuth' }
+    ];
+    document.body.appendChild(element);
+    await flush();
+    element.fromTemplate = {
+      method: 'POST',
+      path: '/upload/drive/v3/files?uploadType=multipart',
+      headers: [],
+      metadata: '{"name":"{file}"}'
+    };
+    await flush();
+    expect(find(element, 'backup-template-note').message).toBe('c.Connector_Backup_FromTemplate');
+    expect(find(element, 'backup-connection').options).toEqual([
+      { label: 'Google Drive', value: 'BarnConn_gdrive' }
+    ]);
+    expect(find(element, 'backup-metadata').value).toBe('{"name":"{file}"}');
+    find(element, 'backup-save').click();
+    await flush();
+    expect(saveBackupDestination).toHaveBeenCalledWith({
+      name: 'BarnConn_gdrive',
+      method: 'POST',
+      path: '/upload/drive/v3/files?uploadType=multipart',
+      headers: '',
+      metadata: '{"name":"{file}"}'
+    });
+    expect(find(element, 'backup-form')).toBeNull();
   });
 
   it('offers no change to a person who may not write keys', async () => {

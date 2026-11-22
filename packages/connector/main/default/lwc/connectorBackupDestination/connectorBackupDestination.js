@@ -4,6 +4,7 @@ import saveBackupDestination from '@salesforce/apex/ConnectorConnectionsControll
 import stopBackupDestination from '@salesforce/apex/ConnectorConnectionsController.stopBackupDestination';
 import { helpText } from 'c/barnHelpText';
 import { headerLines } from 'c/connectorFileRules';
+import { OAUTH } from 'c/connectorRules';
 
 /**
  * Backup Destination on the Connections tab of Super Connector (BK-10; canonical model R-CN11;
@@ -31,6 +32,34 @@ export default class ConnectorBackupDestination extends LightningElement {
     this.load();
   }
 
+  /**
+   * An OAuth template's Backup Settings (R-CN12): the connection is made in Setup, so the form
+   * opens filled in, offering only OAuth connections, for the admin to choose one and save.
+   */
+  @api
+  get fromTemplate() {
+    return this._fromTemplate;
+  }
+
+  set fromTemplate(value) {
+    this._fromTemplate = value;
+    if (value && value.path) {
+      const oauth = this._connections.find((connection) => connection.authKind === OAUTH);
+      this.draft = {
+        name: oauth ? oauth.name : undefined,
+        method: value.method || 'PUT',
+        path: value.path,
+        headers: headerLines(value.headers),
+        metadata: value.metadata || ''
+      };
+      this.templateNote = helpText('Connector', 'Connector_Backup_FromTemplate');
+      this.editing = true;
+    }
+  }
+
+  _fromTemplate;
+  templateNote;
+
   get labels() {
     return {
       heading: helpText('Connector', 'Connector_Backup_Heading'),
@@ -41,6 +70,8 @@ export default class ConnectorBackupDestination extends LightningElement {
       pathHelp: helpText('Connector', 'Connector_Backup_PathHelp'),
       headers: helpText('Connector', 'Connector_Backup_Headers'),
       headersHelp: helpText('Connector', 'Connector_Backup_HeadersHelp'),
+      metadata: helpText('Connector', 'Connector_Backup_Metadata'),
+      metadataHelp: helpText('Connector', 'Connector_Backup_MetadataHelp'),
       set: helpText('Connector', 'Connector_Backup_Set'),
       change: helpText('Connector', 'Connector_Backup_Change'),
       save: helpText('Connector', 'Connector_Backup_Save'),
@@ -85,7 +116,9 @@ export default class ConnectorBackupDestination extends LightningElement {
   }
 
   get connectionOptions() {
-    return this._connections.map((connection) => ({ label: connection.label, value: connection.name }));
+    return this._connections
+      .filter((connection) => !this.templateNote || connection.authKind === OAUTH)
+      .map((connection) => ({ label: connection.label, value: connection.name }));
   }
 
   get methodOptions() {
@@ -101,8 +134,10 @@ export default class ConnectorBackupDestination extends LightningElement {
       name: (this.setup && this.setup.name) || (this._connections[0] && this._connections[0].name),
       method: settings.method || 'PUT',
       path: settings.path || '/{file}',
-      headers: headerLines(settings.headers)
+      headers: headerLines(settings.headers),
+      metadata: settings.metadata || ''
     };
+    this.templateNote = undefined;
     this.editing = true;
   }
 
@@ -112,12 +147,14 @@ export default class ConnectorBackupDestination extends LightningElement {
 
   handleCancel() {
     this.editing = false;
+    this.templateNote = undefined;
     this.errorMessage = undefined;
   }
 
   async handleSave() {
     if (await this.act(() => saveBackupDestination({ ...this.draft }))) {
       this.editing = false;
+      this.templateNote = undefined;
     }
   }
 
@@ -141,5 +178,8 @@ export default class ConnectorBackupDestination extends LightningElement {
 }
 
 function messageOf(failure) {
-  return (failure && failure.body && failure.body.message) || helpText('Connector', 'Connector_Error_Unexpected');
+  return (
+    (failure && failure.body && failure.body.message) ||
+    helpText('Connector', 'Connector_Error_Unexpected')
+  );
 }

@@ -1,0 +1,13 @@
+{
+  "key": "onedrive-backup",
+  "label": "OneDrive or SharePoint Backup Folder",
+  "version": 1,
+  "description": "Sends Backup Set and archive CSV files to a OneDrive folder through Microsoft Graph. Make the connection in Setup first (an Auth Provider for Microsoft, then an External Credential and a Named Credential named BarnConn_onedrive with the URL https://graph.microsoft.com and principal OAuth), as the admin guide's Backup Destination section describes. The path writes to the BarnCRM-Backups folder of the signed-in account's OneDrive; for a SharePoint library, change /me/drive to /sites/SITE_ID/drive.",
+  "auth": { "kind": "OAuth" },
+  "baseUrl": "https://graph.microsoft.com",
+  "backup": {
+    "method": "PUT",
+    "path": "/v1.0/me/drive/root:/BarnCRM-Backups/{file}:/content",
+    "headers": []
+  }
+}

@@ -84,6 +84,34 @@ still not depend on the Connector module (ADR-0013, ADR-0017).
    preloaded or shipped as metadata, and the example files live in the repository as
    documentation (`docs/connector-templates/`). A path holds no query string (F1 path rules), so
    storage that needs a secret in the URL's query (a SAS token) is not supported.
+8. **Common storage services, with Salesforce signing (BK-10b; amends decision 7 and ADR-0235
+   decision 3; canonical model R-CN12).** Two connection kinds join the four, and neither lets
+   Apex read a secret (ADR-0229):
+   - **AWS Signature Version 4** (`AwsSigV4`), made on New Connection: the External Credential
+     uses Salesforce's `AwsSv4` protocol with the authentication parameters `AwsService` and
+     `AwsRegion` read from the base URL's host (`<bucket>.s3.<region>.amazonaws.com`; any other
+     host is refused before anything is made), a named principal `AwsSigV4` holding
+     `awsAccessKeyId` (plain) and `awsSecretAccessKey` (encrypted), and a Named Credential with
+     **Generate Authorization Header** on and no formula header. Salesforce signs each callout.
+     This is how Amazon S3 works.
+   - **OAuth 2.0 made in Setup** (`OAuth`): the browser sign-in and the Auth Provider (which holds
+     the client secret) can only be set up in Setup, so BarnCRM does not create these. An admin
+     makes an External Credential and Named Credential of one name starting `BarnConn_`, with a
+     named principal `OAuth` and Generate Authorization Header on; BarnCRM lists it, adds its
+     principal to the Connections set on Check Connection, and uses it, but never writes its
+     credential (Replace Key and the first key are refused). This is how Google Drive, OneDrive
+     and SharePoint (Microsoft Graph), Dropbox and Azure Blob Storage (Microsoft Entra ID, browser
+     or client credentials flow) work.
+   Backup Settings gain what these services need, still holding nothing secret: `{file}` may
+   appear in a header value (written JSON-escaped and ASCII, for Dropbox's `Dropbox-API-Arg`) or
+   in optional `metadata`, one JSON object sent first in a `multipart/related` body (Google
+   Drive); `{file}` must appear at least once in the path, a header or the metadata, and at most
+   once in the path. A `Content-Type` header replaces `text/csv` (Dropbox wants
+   `application/octet-stream`). A path may end with a query only of names from a fixed list
+   (`uploadType`, `supportsAllDrives`) with plain values, so a signature or SAS token still
+   cannot be stored. A template whose auth kind is `OAuth` must carry a `backup` part; importing
+   it creates nothing and opens the Backup Destination form filled in, offering only OAuth
+   connections. Example templates for each service are in `docs/connector-templates/`.
 
 ## Alternatives considered
 
@@ -95,13 +123,24 @@ still not depend on the Connector module (ADR-0013, ADR-0017).
 - **Stream each part straight to the destination without Files.** Rejected: a failed callout
   would lose the rows (the export cannot be repeated for an archive whose records are deleted),
   and a retry needs the part kept somewhere; the Files copy is removed after sending instead.
-- **Signed requests for storage that needs them (AWS Signature Version 4).** Not built: Apex would
-  have to read the secret to sign, which ADR-0229 forbids. Storage reached with a header key, a
-  bearer token, Basic sign-in or a secret URL works.
+- **Signing AWS requests in Apex.** Rejected: Apex would have to read the secret to sign, which
+  ADR-0229 forbids. Salesforce's own AWS Signature Version 4 protocol signs instead (decision 8).
+- **Creating OAuth External Credentials from Apex.** Rejected: the Auth Provider, which holds the
+  client secret, and the browser sign-in are Setup steps in any case, so creating only the
+  External and Named Credential from Apex would save two Setup screens for more code and more
+  untestable `ConnectApi` surface.
+- **Azure shared key or SAS token.** Rejected: a shared key signs in Apex, and a SAS token is a
+  secret in the query that would sit in a record. Azure Blob Storage works through Microsoft
+  Entra ID OAuth instead.
 
 ## Consequences
 
 - Two Core settings, one Core nightly step and one Connector field; no new object.
+- OAuth storage needs the admin's Setup work (an Auth Provider, an External and Named Credential,
+  Authenticate); the admin guide gives the steps and values per service. An org whose release
+  refuses the `AwsSv4` credential from `ConnectApi` can make the same credential in Setup under
+  the same naming rules. The S3 request with Salesforce's signing is checked on a real bucket in
+  the release gate, since a test cannot reach AWS.
 - Files still count against file storage until runs pass Backup Runs Kept, or are sent with
   Remove Files Copy After Sending on.
 - A scheduled run's files are owned by the nightly run's user, and what it saves is what that user

@@ -173,7 +173,11 @@ describe('c-connector-key-form', () => {
         authKind: 'BearerToken',
         baseUrl: 'https://files.example.org',
         urlParams: [],
-        backup: { method: 'PUT', path: '/barncrm/{file}', headers: [{ name: 'X-Folder', value: 'crm' }] }
+        backup: {
+          method: 'PUT',
+          path: '/barncrm/{file}',
+          headers: [{ name: 'X-Folder', value: 'crm' }]
+        }
       }
     });
     await flush();
@@ -185,9 +189,41 @@ describe('c-connector-key-form', () => {
       name: 'BarnConn_rest_abc123',
       method: 'PUT',
       path: '/barncrm/{file}',
-      headers: 'X-Folder: crm'
+      headers: 'X-Folder: crm',
+      metadata: null
     });
     expect(JSON.stringify(saveBackupDestination.mock.calls)).not.toContain(SECRET);
+  });
+
+  it('asks an AWS connection for its access key ID and secret access key (R-CN12)', async () => {
+    createConnection.mockResolvedValue({ outcome: 'created', name: 'BarnConn_rest_s3aaaa' });
+    saveFirstKey.mockResolvedValue({ outcome: 'keySaved', page: { connections: [] } });
+    const element = render();
+    await flush();
+    const kind = find(element, 'kind');
+    kind.dispatchEvent(new CustomEvent('change', { detail: { value: 'AwsSigV4' } }));
+    await flush();
+    expect(find(element, 'user-name').label).toBe('c.Connector_Form_AwsKeyId');
+    expect(find(element, 'secret').label).toBe('c.Connector_Form_AwsSecret');
+    find(element, 'label').dispatchEvent(
+      new CustomEvent('change', { detail: { value: 'Backups' } })
+    );
+    find(element, 'base-url').dispatchEvent(
+      new CustomEvent('change', { detail: { value: 'https://barn.s3.us-east-1.amazonaws.com' } })
+    );
+    find(element, 'user-name').dispatchEvent(
+      new CustomEvent('change', { detail: { value: 'AKIAEXAMPLE' } })
+    );
+    find(element, 'secret').value = SECRET;
+    find(element, 'save').click();
+    await flush();
+    await flush();
+    expect(saveFirstKey).toHaveBeenCalledWith({
+      name: 'BarnConn_rest_s3aaaa',
+      userName: 'AKIAEXAMPLE',
+      secret: SECRET
+    });
+    expect(JSON.stringify(createConnection.mock.calls)).not.toContain(SECRET);
   });
 
   it('empties the box after a failure and passes on only the message', async () => {

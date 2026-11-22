@@ -3,7 +3,9 @@
  * send their files through it (BK-10; canonical model R-CN11, R-SQ17). A test cannot create a
  * Named Credential, so the credential store is a fake; the callout is an HttpCalloutMock.
  */
-@IsTest(testFor='ApexClass:ConnectorBackupDestination, ApexClass:ConnectorConnectionsController, ApexClass:ConnectorRecipeFiles')
+@IsTest(
+	testFor='ApexClass:ConnectorBackupDestination, ApexClass:ConnectorConnectionsController, ApexClass:ConnectorRecipeFiles'
+)
 private class ConnectorBackupDestinationTest {
 	private static final String FIRST = 'BarnConn_rest_aaaaaa';
 	private static final String SECOND = 'BarnConn_rest_bbbbbb';
@@ -82,7 +84,7 @@ private class ConnectorBackupDestinationTest {
 
 	private static String refusalOf(String method, String path, String headers) {
 		try {
-			ConnectorConnectionsController.saveBackupDestination(FIRST, method, path, headers);
+			ConnectorConnectionsController.saveBackupDestination(FIRST, method, path, headers, null);
 			return null;
 		} catch (AuraHandledException refused) {
 			return refused.getMessage();
@@ -95,7 +97,10 @@ private class ConnectorBackupDestinationTest {
 			useFake();
 			String badPath = BarnHelp.text('Connector', 'Connector_Backup_ErrorPath');
 			String badHeader = BarnHelp.text('Connector', 'Connector_Backup_ErrorHeader');
-			Assert.areEqual(BarnHelp.text('Connector', 'Connector_Backup_ErrorMethod'), refusalOf('GET', '/{file}', null));
+			Assert.areEqual(
+				BarnHelp.text('Connector', 'Connector_Backup_ErrorMethod'),
+				refusalOf('GET', '/{file}', null)
+			);
 			Assert.areEqual(badPath, refusalOf('PUT', '/backups', null), 'No file slot');
 			Assert.areEqual(badPath, refusalOf('PUT', '/{file}/{file}', null), 'Two file slots');
 			Assert.areEqual(badPath, refusalOf('PUT', '/{file}?sig=abc', null), 'A query');
@@ -112,12 +117,13 @@ private class ConnectorBackupDestinationTest {
 	static void oneConnectionIsTheDestinationAndEachFileIsOneRequest() {
 		System.runAs(dana()) {
 			useFake();
-			ConnectorConnectionsController.saveBackupDestination(FIRST, 'POST', '/old/{file}', null);
+			ConnectorConnectionsController.saveBackupDestination(FIRST, 'POST', '/old/{file}', null, null);
 			ConnectorBackupDestination.Setup setup = ConnectorConnectionsController.saveBackupDestination(
 				SECOND,
 				'put',
 				' /barncrm/{file} ',
-				'Overwrite: T\n\nX-Folder: crm'
+				'Overwrite: T\n\nX-Folder: crm',
+				null
 			);
 			Assert.areEqual(SECOND, setup.name, 'The last saved is the destination');
 			Assert.areEqual('PUT', setup.settings.method);
@@ -139,7 +145,10 @@ private class ConnectorBackupDestinationTest {
 
 			Assert.isNull(sent, 'A 2xx answer is sent');
 			Assert.areEqual('offPlatform', destination.key());
-			Assert.areEqual('callout:' + SECOND + '/barncrm/Contact%202026-11-21%20part-1.csv', storage.received.getEndpoint());
+			Assert.areEqual(
+				'callout:' + SECOND + '/barncrm/Contact%202026-11-21%20part-1.csv',
+				storage.received.getEndpoint()
+			);
 			Assert.areEqual('PUT', storage.received.getMethod());
 			Assert.areEqual('text/csv', storage.received.getHeader('Content-Type'));
 			Assert.areEqual('crm', storage.received.getHeader('X-Folder'));
@@ -151,7 +160,7 @@ private class ConnectorBackupDestinationTest {
 	static void aRefusedAnswerIsAFailureThatNamesTheStatus() {
 		System.runAs(dana()) {
 			useFake();
-			ConnectorConnectionsController.saveBackupDestination(FIRST, 'PUT', '/{file}', null);
+			ConnectorConnectionsController.saveBackupDestination(FIRST, 'PUT', '/{file}', null, null);
 			Test.setMock(HttpCalloutMock.class, new Storage(403));
 			Test.startTest();
 			String failure = new ConnectorBackupDestination().send('a.csv', Blob.valueOf('x'));
@@ -164,7 +173,7 @@ private class ConnectorBackupDestinationTest {
 	static void stopUsingLeavesNoDestinationAndSaysWhy() {
 		System.runAs(dana()) {
 			useFake();
-			ConnectorConnectionsController.saveBackupDestination(FIRST, 'PUT', '/{file}', null);
+			ConnectorConnectionsController.saveBackupDestination(FIRST, 'PUT', '/{file}', null, null);
 			ConnectorBackupDestination.Setup setup = ConnectorConnectionsController.stopBackupDestination();
 			Assert.isNull(setup.name, 'None');
 			Assert.areEqual(BarnHelp.text('Connector', 'Connector_Backup_NotSet'), setup.note);
@@ -180,7 +189,7 @@ private class ConnectorBackupDestinationTest {
 	static void staffWithoutTheConnectionsSetAreToldWhyTheyCannotSend() {
 		System.runAs(dana()) {
 			useFake();
-			ConnectorConnectionsController.saveBackupDestination(FIRST, 'PUT', '/{file}', null);
+			ConnectorConnectionsController.saveBackupDestination(FIRST, 'PUT', '/{file}', null, null);
 		}
 		User staff = TestUsers.standardUserWith('BackupStaff', new List<String>{ 'BarnCRM_Find_And_Export' });
 		System.runAs(staff) {
@@ -195,7 +204,7 @@ private class ConnectorBackupDestinationTest {
 				Assert.areEqual(BarnHelp.text('Connector', 'Connector_Error_NoManage'), refused.getMessage());
 			}
 			try {
-				ConnectorConnectionsController.saveBackupDestination(SECOND, 'PUT', '/{file}', null);
+				ConnectorConnectionsController.saveBackupDestination(SECOND, 'PUT', '/{file}', null, null);
 				Assert.fail('Refused');
 			} catch (AuraHandledException refused) {
 				Assert.areEqual(BarnHelp.text('Connector', 'Connector_Error_NoManage'), refused.getMessage());
@@ -216,7 +225,9 @@ private class ConnectorBackupDestinationTest {
 					'backup' => new Map<String, Object>{
 						'method' => 'PUT',
 						'path' => '/{file}',
-						'headers' => new List<Object>{ new Map<String, Object>{ 'name' => 'Overwrite', 'value' => 'T' } }
+						'headers' => new List<Object>{
+							new Map<String, Object>{ 'name' => 'Overwrite', 'value' => 'T' }
+						}
 					}
 				}
 			);
@@ -242,6 +253,221 @@ private class ConnectorBackupDestinationTest {
 			} catch (AuraHandledException refused) {
 				Assert.isTrue(refused.getMessage().contains('backup'), 'Names the part');
 			}
+		}
+	}
+
+	/** A storage template, as the files in docs/connector-templates hold it, imported. */
+	private static ConnectorBackupDestination.Settings imported(
+		String kind,
+		String baseUrl,
+		Map<String, Object> backup
+	) {
+		Map<String, Object> template = new Map<String, Object>{
+			'key' => 'storage',
+			'label' => 'Storage',
+			'version' => 1,
+			'auth' => new Map<String, Object>{ 'kind' => kind },
+			'baseUrl' => baseUrl,
+			'backup' => backup
+		};
+		if (baseUrl.contains('{bucket}')) {
+			template.put(
+				'urlParams',
+				new List<Object>{
+					new Map<String, Object>{ 'name' => 'bucket', 'label' => 'Bucket', 'pattern' => '^[a-z0-9-]+$' },
+					new Map<String, Object>{ 'name' => 'region', 'label' => 'Region', 'pattern' => '^[a-z0-9-]+$' }
+				}
+			);
+		}
+		return ConnectorRecipesController.importFile(JSON.serialize(template)).connection.backup;
+	}
+
+	private static Map<String, Object> backup(String method, String path, List<Object> headers) {
+		return new Map<String, Object>{ 'method' => method, 'path' => path, 'headers' => headers };
+	}
+
+	private static Map<String, Object> header(String name, String value) {
+		return new Map<String, Object>{ 'name' => name, 'value' => value };
+	}
+
+	@IsTest
+	static void s3OneDriveAndAzureNameTheFileInThePath() {
+		System.runAs(dana()) {
+			Blob body = Blob.valueOf('Id\r\n1\r\n');
+			HttpRequest s3 = ConnectorBackupDestination.request(
+				'BarnConn_rest_s3aaaa',
+				imported(
+					'AwsSigV4',
+					'https://{bucket}.s3.{region}.amazonaws.com',
+					backup('PUT', '/barncrm/{file}', null)
+				),
+				'Contact part-1.csv',
+				body
+			);
+			Assert.areEqual('callout:BarnConn_rest_s3aaaa/barncrm/Contact%20part-1.csv', s3.getEndpoint());
+			Assert.areEqual('PUT', s3.getMethod());
+			Assert.areEqual('text/csv', s3.getHeader('Content-Type'));
+			Assert.isNull(s3.getHeader('Authorization'), 'Salesforce signs it; Apex sets no sign-in');
+
+			HttpRequest oneDrive = ConnectorBackupDestination.request(
+				'BarnConn_onedrive',
+				imported(
+					'OAuth',
+					'https://graph.microsoft.com',
+					backup('PUT', '/v1.0/me/drive/root:/BarnCRM-Backups/{file}:/content', null)
+				),
+				'a.csv',
+				body
+			);
+			Assert.areEqual(
+				'callout:BarnConn_onedrive/v1.0/me/drive/root:/BarnCRM-Backups/a.csv:/content',
+				oneDrive.getEndpoint()
+			);
+
+			HttpRequest azure = ConnectorBackupDestination.request(
+				'BarnConn_azureblob',
+				imported(
+					'OAuth',
+					'',
+					backup(
+						'PUT',
+						'/barncrm-backups/{file}',
+						new List<Object>{ header('x-ms-blob-type', 'BlockBlob'), header('x-ms-version', '2023-11-03') }
+					)
+				),
+				'a.csv',
+				body
+			);
+			Assert.areEqual('callout:BarnConn_azureblob/barncrm-backups/a.csv', azure.getEndpoint());
+			Assert.areEqual('BlockBlob', azure.getHeader('x-ms-blob-type'));
+			Assert.areEqual('2023-11-03', azure.getHeader('x-ms-version'));
+			Assert.areEqual('Id\r\n1\r\n', azure.getBody());
+		}
+	}
+
+	@IsTest
+	static void dropboxNamesTheFileInAJsonHeader() {
+		System.runAs(dana()) {
+			ConnectorBackupDestination.Settings settings = imported(
+				'OAuth',
+				'https://content.dropboxapi.com',
+				backup(
+					'POST',
+					'/2/files/upload',
+					new List<Object>{
+						header('Dropbox-API-Arg', '{"path":"/BarnCRM-Backups/{file}","mode":"overwrite","mute":true}'),
+						header('Content-Type', 'application/octet-stream')
+					}
+				)
+			);
+			HttpRequest request = ConnectorBackupDestination.request(
+				'BarnConn_dropbox',
+				settings,
+				'Café "x" part-1.csv',
+				Blob.valueOf('Id\r\n1\r\n')
+			);
+			Assert.areEqual('callout:BarnConn_dropbox/2/files/upload', request.getEndpoint(), 'The path holds no file');
+			Assert.areEqual(
+				'{"path":"/BarnCRM-Backups/Caf\\u00e9 \\"x\\" part-1.csv","mode":"overwrite","mute":true}',
+				request.getHeader('Dropbox-API-Arg'),
+				'Escaped for JSON and kept ASCII'
+			);
+			Map<String, Object> parsed = (Map<String, Object>) JSON.deserializeUntyped(
+				request.getHeader('Dropbox-API-Arg')
+			);
+			Assert.areEqual(
+				'/BarnCRM-Backups/Café "x" part-1.csv',
+				parsed.get('path'),
+				'A name no quote can break out of'
+			);
+			Assert.areEqual('application/octet-stream', request.getHeader('Content-Type'), 'The header names the type');
+		}
+	}
+
+	@IsTest
+	static void googleDriveSendsMetadataThenTheFile() {
+		System.runAs(dana()) {
+			Map<String, Object> part = backup('POST', '/upload/drive/v3/files?uploadType=multipart', null);
+			part.put(
+				'metadata',
+				new Map<String, Object>{ 'name' => '{file}', 'parents' => new List<Object>{ 'folder1' } }
+			);
+			HttpRequest request = ConnectorBackupDestination.request(
+				'BarnConn_gdrive',
+				imported('OAuth', 'https://www.googleapis.com', part),
+				'a.csv',
+				Blob.valueOf('Id\r\n1\r\n')
+			);
+			Assert.areEqual(
+				'callout:BarnConn_gdrive/upload/drive/v3/files?uploadType=multipart',
+				request.getEndpoint()
+			);
+			String type = request.getHeader('Content-Type');
+			Assert.isTrue(type.startsWith('multipart/related; boundary=barncrm'), type);
+			String boundary = type.substringAfter('boundary=');
+			String sent = request.getBody();
+			Assert.isTrue(sent.startsWith('--' + boundary + '\r\nContent-Type: application/json'), 'Metadata first');
+			Assert.isTrue(sent.contains('"name":"a.csv"'), 'Named for the file');
+			Assert.isTrue(
+				sent.contains('Content-Type: text/csv\r\n\r\nId\r\n1\r\n\r\n--' + boundary + '--'),
+				'Then the file'
+			);
+		}
+	}
+
+	@IsTest
+	static void aQueryMetadataAndANamelessFileAreChecked() {
+		System.runAs(dana()) {
+			String badPath = BarnHelp.text('Connector', 'Connector_Backup_ErrorPath');
+			String badMetadata = BarnHelp.text('Connector', 'Connector_Backup_ErrorMetadata');
+			Assert.areEqual(
+				badPath,
+				refusalOfChecked('/upload?uploadType=multipart&sig=abc', null, null),
+				'A signature'
+			);
+			Assert.areEqual(badPath, refusalOfChecked('/upload?uploadType=a b', null, null), 'A value with a space');
+			Assert.areEqual(
+				badPath,
+				refusalOfChecked('/2/files/upload', 'X-Folder: crm', null),
+				'No file name anywhere'
+			);
+			Assert.areEqual(badMetadata, refusalOfChecked('/u?uploadType=multipart', null, '[1]'), 'Not an object');
+			Assert.areEqual(
+				badMetadata,
+				refusalOfChecked('/u?uploadType=multipart', null, '{"name":"{!x}"}'),
+				'A formula'
+			);
+			Assert.isNull(refusalOfChecked('/u?uploadType=multipart', null, '{"name":"{file}"}'), 'Drive is accepted');
+			Assert.areEqual('a\\nb', ConnectorBackupDestination.jsonText('a\nb'), 'A line break escaped');
+			Assert.areEqual('\\u00f1', ConnectorBackupDestination.jsonText('ñ'), 'Outside ASCII as \\u');
+
+			Map<String, Object> noBackup = new Map<String, Object>{
+				'key' => 'x',
+				'label' => 'X',
+				'version' => 1,
+				'auth' => new Map<String, Object>{ 'kind' => 'OAuth' },
+				'baseUrl' => 'https://api.example.com'
+			};
+			try {
+				ConnectorRecipesController.importFile(JSON.serialize(noBackup));
+				Assert.fail('An OAuth template only fills Backup Settings');
+			} catch (AuraHandledException refused) {
+				Assert.isNotNull(refused.getMessage(), 'Refused');
+			}
+		}
+	}
+
+	private static String refusalOfChecked(String path, String headerLines, String metadata) {
+		try {
+			ConnectorBackupDestination.checked(
+				'POST',
+				path,
+				ConnectorBackupDestination.headersOf(headerLines),
+				metadata
+			);
+			return null;
+		} catch (ConnectorConnections.ConnectorException refused) {
+			return refused.getMessage();
 		}
 	}
 }

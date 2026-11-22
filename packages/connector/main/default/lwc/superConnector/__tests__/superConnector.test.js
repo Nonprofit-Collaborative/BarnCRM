@@ -144,6 +144,22 @@ describe('c-super-connector', () => {
     await expectAccessible(element);
   });
 
+  it('hands an OAuth template to the Backup Destination and offers no Replace Key for it (R-CN12)', async () => {
+    const oauth = { ...READY, name: 'BarnConn_dropbox', label: 'Dropbox', authKind: 'OAuth' };
+    const element = await render({ canWrite: true, connections: [READY, oauth] });
+    expect(find(element, `replace-${oauth.name}`)).toBeNull();
+    expect(find(element, `replace-${READY.name}`)).not.toBeNull();
+    const backup = { method: 'POST', path: '/2/files/upload', headers: [] };
+    find(element, 'templates').dispatchEvent(
+      new CustomEvent('connection', {
+        detail: { prefill: { label: 'Dropbox', authKind: 'OAuth', backup } }
+      })
+    );
+    await flush();
+    expect(find(element, 'key-form')).toBeNull();
+    expect(find(element, 'backup-destination').fromTemplate).toEqual(backup);
+  });
+
   it('shows the empty state and hides writes for a manager without the credential permission', async () => {
     const element = await render({ canWrite: false, connections: [] });
     expect(find(element, 'empty')).not.toBeNull();

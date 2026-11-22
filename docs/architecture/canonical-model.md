@@ -19141,7 +19141,7 @@ is built in; app templates are imported files (D-216) that prefill this same sha
 | Key Stored | boolean | computed | Whether the principal holds a credential (Disconnect removes it). |
 | Access Granted | boolean | computed | Whether the principal is in the "BarnCRM Connections" permission set (R-CN7). |
 | Check Path | text | no | What follows the Base URL for Check Connection, such as `/ping`, from the template the connection was made from (R-CN9). Blank checks the Base URL. |
-| Backup Settings | JSON | no | How Backup Sets and archives send their files through this connection (R-CN11): `{ "method": "PUT" or "POST", "path": "/backups/{file}", "headers": [ { "name", "value" } ] }`. Blank when it is not the backup destination; at most one connection has it. |
+| Backup Settings | JSON | no | How Backup Sets and archives send their files through this connection (R-CN11): `{ "method": "PUT" or "POST", "path": "/backups/{file}", "headers": [ { "name", "value" } ], "metadata": "<JSON object text, optional>" }`. Blank when it is not the backup destination; at most one connection has it. |
 
 ### Rules
 
@@ -19207,6 +19207,24 @@ destination says so. A template's optional `backup` part (method, path, headers)
 when the connection is created from the template; such a template may leave `baseUrl` blank, so
 the person types the storage's own address as on New Connection (an app template still locks
 its host, R-CR14).
+**R-CN12 Storage services** (BK-10b; ADR-NEXT automatic backups, decision 8). Besides the four
+kinds, New Connection makes **AWS Signature Version 4** (`AwsSigV4`): an External Credential with
+Salesforce's `AwsSv4` protocol, `AwsService` and `AwsRegion` read from a base URL host of the
+form `[bucket.]service.region.amazonaws.com` (any other host is refused before anything is
+made), a named principal `AwsSigV4` holding `awsAccessKeyId` plain and `awsSecretAccessKey`
+encrypted, and a Named Credential that generates the Authorization header with no formula
+header. BarnCRM also lists and uses an **OAuth** connection an admin made in Setup: External and
+Named Credential of one `BarnConn_` name, linked, with a named principal `OAuth`; it never writes
+that credential (the first key and Replace Key are refused), and Check Connection adds its
+principal to the Connections set when the set does not yet give it. Backup Settings may put
+`{file}` in a header value, written JSON-escaped with anything outside printable ASCII as
+`\uXXXX`, or in `metadata`, one JSON object of at most 1,000 characters with no `{!`, sent first
+in a `multipart/related` body with the file after it; `{file}` appears at least once across the
+path, headers and metadata and at most once in the path. A `Content-Type` header replaces
+`text/csv`. The path may end with `?` and `name=value` pairs joined by `&`, each name from
+`uploadType` and `supportsAllDrives`, each value letters, digits, `_` or `-` (1 to 40). A
+template whose auth kind is `OAuth` must carry a `backup` part and creates no connection: it
+fills the Backup Destination form, which then offers only OAuth connections.
 
 ### Salesforce implementation
 
@@ -20122,6 +20140,7 @@ mirrors the primary member).
 | 1.84 | 2026-11-21 | Scheduled Backup Sets (BK-10, D-221, release 1.36; ADR-NEXT `NEXT-automatic-backups-and-off-platform-destination.md`). Section 29D gains R-SQ16: the `backup` key's `schedule`, the nightly step Backup Sets, parts kept on the job as `documents`, and runs kept. Section 12 gains `Backup_Runs_Kept__c`. (Version number for the integrator to confirm at merge.) |
 | 1.85 | 2026-11-21 | Off-platform destination seam (BK-10, D-221, release 1.36; ADR-NEXT). Section 29D gains R-SQ17: Core's `OffPlatformDestination` seam, a set's and an archive's `destination`, `OffPlatformSendBatch`, retries and the Files copy. Section 12 gains `Backup_Remove_Sent_Files__c`. (Version number for the integrator to confirm at merge.) |
 | 1.86 | 2026-11-21 | Connector backup destination (BK-10, D-221, release 1.36; ADR-NEXT). Connector Connection gains `Backup_JSON__c` (29CN1, new R-CN11): one connection at most sends Backup Set and archive files by PUT or POST, with a `{file}` path and fixed headers that hold no secret; templates may prefill it. (Version number for the integrator to confirm at merge.) |
+| 1.87 | 2026-11-21 | Storage services for the backup destination (BK-10b, release 1.36; ADR-NEXT decision 8). New R-CN12: AWS Signature Version 4 connections, OAuth connections made in Setup, `{file}` in headers and Google Drive `metadata` in Backup Settings, and a short allowlist for a path's query. No object or field added. (Version number for the integrator to confirm at merge.) |
 
 ---
 ## 32. Entity ownership by package

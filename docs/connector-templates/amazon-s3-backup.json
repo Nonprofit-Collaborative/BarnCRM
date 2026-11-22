@@ -1,0 +1,33 @@
+{
+  "key": "amazon-s3-backup",
+  "label": "Amazon S3 Backup Bucket",
+  "version": 1,
+  "description": "Sends Backup Set and archive CSV files to an Amazon S3 bucket your organization owns. Salesforce signs each upload with AWS Signature Version 4, so the secret access key stays in the External Credential. Use an IAM user whose only permission is s3:PutObject on this bucket. The bucket name must have no dots.",
+  "auth": {
+    "kind": "AwsSigV4",
+    "params": [
+      { "name": "awsAccessKeyId", "label": "Access key ID" },
+      { "name": "awsSecretAccessKey", "label": "Secret access key" }
+    ]
+  },
+  "baseUrl": "https://{bucket}.s3.{region}.amazonaws.com",
+  "urlParams": [
+    {
+      "name": "bucket",
+      "label": "Bucket name",
+      "help": "Lower case letters, digits and hyphens, no dots.",
+      "pattern": "^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$"
+    },
+    {
+      "name": "region",
+      "label": "Region",
+      "help": "The bucket's region, such as us-east-1.",
+      "pattern": "^[a-z]{2}(-gov)?-[a-z]+-[0-9]$"
+    }
+  ],
+  "backup": {
+    "method": "PUT",
+    "path": "/barncrm/{file}",
+    "headers": []
+  }
+}

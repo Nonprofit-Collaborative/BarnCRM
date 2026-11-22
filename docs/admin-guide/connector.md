@@ -47,8 +47,8 @@ when you want it, and nothing of it is kept afterwards except the connection and
 | Sign-in kind | How the app expects its key (below). The app's API documentation says which. |
 | Base URL | The address every request starts with, such as `https://api.example.org/v2`. It must start with `https://`. |
 | Header name | API Key in a Header only: the header the app reads, such as `X-Api-Key`. |
-| User name | Basic only. |
-| Key | The key, token or password. The box never shows a saved value. |
+| User name | Basic only. For AWS Signature Version 4, the **Access Key ID** (not a secret). |
+| Key | The key, token or password; for AWS, the **Secret Access Key**. The box never shows a saved value. |
 
 Sign-in kinds:
 
@@ -58,6 +58,8 @@ Sign-in kinds:
 | Bearer Token | `Authorization: Bearer` and the token. |
 | Basic | `Authorization: Basic` with the user name and password. |
 | Secret URL | Nothing extra: the address itself is the secret, as with a Microsoft Teams Workflows or Slack incoming webhook address. |
+| AWS Signature Version 4 | Salesforce signs each request with the access key pair, using the service and region in the Base URL (such as `https://my-bucket.s3.us-east-1.amazonaws.com`: service `s3`, region `us-east-1`). The Base URL must be an Amazon Web Services regional address. |
+| OAuth 2.0 (Made in Setup) | Not made here: you create it in Setup and BarnCRM lists and uses it (see [OAuth Connections Made in Setup](#oauth-connections-made-in-setup)). Salesforce holds and refreshes its tokens; it has no Replace Key. |
 
 **Secret URL connections are visible in Setup.** Salesforce cannot encrypt an address, so a
 Secret URL is stored as the Named Credential's URL, which every administrator who can view
@@ -584,18 +586,29 @@ owns, outside Salesforce, through one connection: the **Backup Destination**. Th
 the connection; BarnCRM keeps only how to send (method, path and extra headers), none of it
 secret. See [Backup Sets](backup-sets.md#sending-backups-off-platform) for choosing it on a set.
 
-**What storage works.** Any HTTPS service that accepts a file by PUT or POST, signed in by one of
-the four sign-in kinds, with the file name in the path:
+**What storage works.** Any HTTPS service that accepts a file by PUT or POST through a
+connection. Salesforce adds the sign-in to every request; BarnCRM never reads a key. Each service
+below has an example template in the repository's `docs/connector-templates/` folder (import it
+on the Templates tab; nothing is preloaded):
 
-- **A WebDAV folder** (Nextcloud, ownCloud, most NAS boxes): Basic sign-in with a user and an
-  app password, PUT to `/{file}` under the folder's address.
-- **An HTTPS endpoint with a key header**: API Key in a Header, PUT or POST to the path the
-  service documents.
+| Service | Sign-in | Template | Where the file name goes |
+|---|---|---|---|
+| WebDAV folder (Nextcloud, ownCloud, most NAS boxes) | Basic, with an app password | `webdav-backup-folder.json` | Path: PUT `/{file}` |
+| HTTPS endpoint with a key header | API Key in a Header | `https-put-with-key-header.json` | Path |
+| Amazon S3 | AWS Signature Version 4 | `amazon-s3-backup.json` | Path: PUT `/barncrm/{file}` |
+| Google Drive | OAuth 2.0, made in Setup | `google-drive-backup.json` | Upload Metadata: POST `/upload/drive/v3/files?uploadType=multipart` |
+| Microsoft OneDrive or SharePoint | OAuth 2.0, made in Setup | `onedrive-backup.json` | Path: PUT `/v1.0/me/drive/root:/BarnCRM-Backups/{file}:/content` |
+| Dropbox | OAuth 2.0, made in Setup | `dropbox-backup.json` | `Dropbox-API-Arg` header: POST `/2/files/upload` |
+| Azure Blob Storage | OAuth 2.0 (Microsoft Entra ID), made in Setup | `azure-blob-backup.json` | Path: PUT `/<container>/{file}` |
 
-Storage that signs each request with the secret (Amazon S3's Signature Version 4) or carries the
-secret in the address's query (an Azure SAS token) is not supported: BarnCRM never reads a key to
-sign with, and a path holds no query. Example templates are in the repository's
-`docs/connector-templates/` folder.
+Not supported: a secret in the address's query (an Azure SAS token, an S3 presigned URL) or an
+Azure shared key. BarnCRM keeps Backup Settings in a record, not a credential, so a path may end
+only with a fixed `uploadType` query, never one that carries a signature, and nothing signs with
+a key in Apex. Use the OAuth route for Azure instead.
+
+`{file}` is the part's title, such as `Contact Backup 2026-11-21 part-1.csv`. In the path it is
+URL-encoded; in a header value or the Upload Metadata it is written for JSON (quotes and
+backslashes escaped, anything outside plain ASCII as `\u` codes), as Dropbox requires.
 
 **Step by step.**
 
@@ -607,8 +620,9 @@ sign with, and a path holds no query. Example templates are in the repository's
 3. Under **Backup Destination** on the Connections tab, select **Set Destination**. Choose the
    connection, the method (PUT for WebDAV), and the path: what follows the connection's address,
    with `{file}` where the file name goes, such as `/barncrm/{file}`. Add any fixed header the
-   service needs, one a line as `Name: value` (at most five; never a key). Select **Save
-   Destination**.
+   service needs, one a line as `Name: value` (at most five; never a key); a `Content-Type`
+   line replaces `text/csv`. **Upload Metadata** is for Google Drive only. Select **Save
+   Destination**. For S3 and the OAuth services, follow their sections below instead.
 4. Assign the **BarnCRM Connections** permission set to the user the nightly jobs run as, so
    scheduled Backup Sets can send. Until a sender holds it, the destination says so.
 5. On Data Manager, open **Backup Sets**, select **Edit Schedule** on a set and choose **Files
@@ -621,6 +635,71 @@ Error Log and the run's log, and the file is sent again by the next nightly run.
 connection is the destination: saving another replaces it. **Stop Using** leaves none; deleting
 the connection does the same. Retention at the storage is the service's own: BarnCRM never deletes
 anything there.
+
+Parts are at most 3,000,000 characters (about 3 MB for plain text), within every service's
+single-request upload limit, including Microsoft Graph's simple upload (4 MB in its older
+documentation).
+
+### Amazon S3
+
+1. In AWS, create a bucket whose name has no dots, and an IAM user whose only permission is
+   `s3:PutObject` on `arn:aws:s3:::<bucket>/barncrm/*`. Create an access key for it. Use the
+   bucket's lifecycle rules for how long backups are kept.
+2. On the Templates tab, import `amazon-s3-backup.json` and select **Create Connection**. Type
+   the bucket name and region (such as `us-east-1`), the **Access Key ID** and the **Secret Access
+   Key**, then create it. BarnCRM creates an External Credential with Salesforce's AWS Signature
+   Version 4 protocol (service `s3`, the region) and a Named Credential that has Salesforce
+   generate the signed Authorization header; the Backup Destination is set to PUT
+   `/barncrm/{file}`.
+3. Do [The One Setup Step](#the-one-setup-step). **Check Connection** asks for the bucket's
+   address, which a key that may only write answers with 403: that is expected. Run one Backup
+   Set to confirm a file arrives.
+
+If your org refuses to create the credential, create it in Setup instead: an External
+Credential with Authentication Protocol **AWS Signature Version 4**, Service `s3`, your region
+and a named principal called `AwsSigV4` holding the key pair; and a Named Credential of the same
+name, which must start with `BarnConn_`, with the bucket's address as its URL and **Generate
+Authorization Header** on. BarnCRM then lists it like any other connection.
+
+### OAuth Connections Made in Setup
+
+Google Drive, OneDrive, SharePoint, Dropbox and Azure Blob Storage sign in with OAuth 2.0, which
+needs a sign-in page in a browser. Salesforce does that in Setup and then holds and refreshes the
+tokens; BarnCRM never sees them. The steps are the same for each service; the table after them
+has each one's values.
+
+1. **Register an app with the service** (its developer console) and note its client ID and
+   client secret. Leave its redirect address for step 2.
+2. In Setup, open **Auth. Providers** and select **New**. Choose the provider type from the
+   table, enter the client ID, client secret, the authorize and token endpoints, and the scopes,
+   and save. Copy the **Callback URL** Salesforce shows into the service app's redirect
+   addresses.
+3. In Setup, open **Named Credentials**, then **External Credentials**, and select **New**. Name
+   it `BarnConn_` and a short word (such as `BarnConn_dropbox`); Authentication Protocol **OAuth
+   2.0**, Authentication Flow Type **Browser Flow**, the Auth Provider from step 2 and the scope.
+   Add a principal named exactly `OAuth`, of type Named Principal. Save, then on the principal
+   choose **Authenticate** and sign in to the service with the account that owns the backup
+   folder.
+4. On the **Named Credentials** tab select **New**. Use the same name as the External
+   Credential, the service's URL from the table, the External Credential from step 3, and turn on
+   **Generate Authorization Header**. Leave formulas in headers and body off. Enable callouts.
+5. Back on Super Connector's Connections tab the connection appears with **OAuth 2.0 (Made in
+   Setup)**. Select **Check Connection** once: that adds its principal to the BarnCRM
+   Connections permission set.
+6. On the Templates tab, import the service's template and select **Create Connection**. Nothing
+   is created: the **Backup Destination** form opens with the template's settings. Choose the
+   connection, adjust the settings as the table says, and select **Save Destination**.
+
+| Service | Auth Provider | Scope | Named Credential URL | After importing |
+|---|---|---|---|---|
+| Google Drive | Google | `https://www.googleapis.com/auth/drive.file` | `https://www.googleapis.com` | Replace `FOLDER_ID` in Upload Metadata with the folder's ID (the end of its Drive address). |
+| OneDrive or SharePoint | Microsoft Access Control Service, or OpenID Connect with your tenant's endpoints | `Files.ReadWrite offline_access` | `https://graph.microsoft.com` | For a SharePoint library, change `/me/drive` in the path to `/sites/<site ID>/drive`. |
+| Dropbox | OpenID Connect, with Dropbox's authorize (`https://www.dropbox.com/oauth2/authorize?token_access_type=offline`) and token (`https://api.dropboxapi.com/oauth2/token`) endpoints | `files.content.write` | `https://content.dropboxapi.com` | Change `/BarnCRM-Backups` inside the `Dropbox-API-Arg` header to another folder if you want. |
+| Azure Blob Storage | Microsoft Entra ID (OpenID Connect with your tenant's endpoints); or the External Credential's OAuth 2.0 **Client Credentials** flow, with no Auth Provider | `https://storage.azure.com/user_impersonation offline_access` (browser flow) or `https://storage.azure.com/.default` (client credentials) | `https://<account>.blob.core.windows.net` | Replace `barncrm-backups` in the path with the container. Give the signed-in user or app the **Storage Blob Data Contributor** role on that container only. |
+
+An OAuth connection has no **Replace Key**: to sign in again, open its External Credential in
+Setup and choose **Authenticate** on the principal. **Delete** removes the Named and External
+Credential you made.
 
 ## Run History
 

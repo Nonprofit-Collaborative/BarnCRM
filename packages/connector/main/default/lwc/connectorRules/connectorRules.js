@@ -10,19 +10,30 @@ export const KINDS = [
   { value: 'ApiKeyHeader', key: 'Connector_Kind_ApiKeyHeader' },
   { value: 'BearerToken', key: 'Connector_Kind_BearerToken' },
   { value: 'BasicAuth', key: 'Connector_Kind_BasicAuth' },
-  { value: 'SecretUrl', key: 'Connector_Kind_SecretUrl' }
+  { value: 'SecretUrl', key: 'Connector_Kind_SecretUrl' },
+  { value: 'AwsSigV4', key: 'Connector_Kind_AwsSigV4' }
 ];
 
 export const SECRET_URL = 'SecretUrl';
 export const API_KEY = 'ApiKeyHeader';
 export const BASIC = 'BasicAuth';
+/** Salesforce signs each callout with the AWS key pair (R-CN12). */
+export const AWS = 'AwsSigV4';
+/** Made in Setup, never on New Connection; Salesforce holds its tokens (R-CN12). */
+export const OAUTH = 'OAuth';
+const SETUP_MADE = [{ value: OAUTH, key: 'Connector_Kind_OAuth' }];
 
 const RESERVED_HEADERS = ['authorization', 'host', 'cookie', 'content-length', 'transfer-encoding'];
 
-/** The help key naming a kind, or blank for an unknown one. */
+/** The help key naming a kind New Connection makes or one made in Setup, or blank for an unknown one. */
 export function kindKey(kind) {
-  const found = KINDS.find((entry) => entry.value === kind);
+  const found = [...KINDS, ...SETUP_MADE].find((entry) => entry.value === kind);
   return found ? found.key : '';
+}
+
+/** Whether New Connection makes this kind. */
+function creatable(kind) {
+  return KINDS.some((entry) => entry.value === kind);
 }
 
 /**
@@ -69,8 +80,11 @@ export function formProblems(form, replacing) {
     if (!label || label.length > 80 || label.includes('{!')) {
       problems.push('Connector_Error_Label');
     }
-    if (!kindKey(kind)) {
+    if (!creatable(kind)) {
       problems.push('Connector_Error_Kind');
+    }
+    if (kind === AWS && isSafeUrl(form.baseUrl) && !isAwsUrl(form.baseUrl)) {
+      problems.push('Connector_Error_AwsUrl');
     }
     if (kind && kind !== SECRET_URL && !isSafeUrl(form.baseUrl)) {
       problems.push('Connector_Error_Url');
@@ -79,13 +93,32 @@ export function formProblems(form, replacing) {
       problems.push('Connector_Error_HeaderName');
     }
   }
-  if (kind === BASIC && !(typeof form.userName === 'string' && form.userName.trim())) {
+  if (
+    (kind === BASIC || kind === AWS) &&
+    !(typeof form.userName === 'string' && form.userName.trim())
+  ) {
     problems.push('Connector_Error_UserRequired');
   }
   if (!form.hasSecret) {
     problems.push(kind === SECRET_URL ? 'Connector_Error_Url' : 'Connector_Error_KeyRequired');
   }
   return problems;
+}
+
+/**
+ * Whether an address names an AWS service and region Salesforce can sign for, as the server's
+ * `awsScope` reads it: `bucket.s3.us-east-1.amazonaws.com` or `s3.us-east-1.amazonaws.com`.
+ */
+export function isAwsUrl(value) {
+  let host;
+  try {
+    host = new URL(String(value).trim()).hostname.toLowerCase();
+  } catch {
+    return false;
+  }
+  return /^(?:[a-z0-9][a-z0-9-]*\.)?[a-z0-9]+\.[a-z]{2}(?:-gov)?-[a-z]+-[0-9]\.amazonaws\.com$/.test(
+    host
+  );
 }
 
 /** A connection's status as a help key and a notice variant (Setup step first). */

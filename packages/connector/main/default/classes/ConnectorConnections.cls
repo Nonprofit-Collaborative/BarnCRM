@@ -22,14 +22,35 @@ public with sharing class ConnectorConnections {
 	public static final String BEARER = 'BearerToken';
 	public static final String BASIC = 'BasicAuth';
 	public static final String SECRET_URL = 'SecretUrl';
-	public static final Set<String> KINDS = new Set<String>{ API_KEY, BEARER, BASIC, SECRET_URL };
+	/**
+	 * Amazon Web Services: the External Credential uses Salesforce's AWS Signature Version 4
+	 * protocol, so Salesforce signs each callout with the stored key pair and Apex never sees it.
+	 */
+	public static final String AWS = 'AwsSigV4';
+	/** The kinds New Connection makes. */
+	public static final Set<String> KINDS = new Set<String>{ API_KEY, BEARER, BASIC, SECRET_URL, AWS };
+	/**
+	 * An OAuth 2.0 connection an administrator makes in Setup (an Auth Provider, then an External
+	 * Credential and Named Credential both named `BarnConn_...`, principal `OAuth`): Salesforce
+	 * holds and refreshes the tokens. BarnCRM uses it and never writes its credential.
+	 */
+	public static final String OAUTH = 'OAuth';
+	/** Every kind BarnCRM lists and uses. */
+	public static final Set<String> KNOWN_KINDS = new Set<String>{ API_KEY, BEARER, BASIC, SECRET_URL, AWS, OAUTH };
 	/** The principal parameter that holds each kind's secret; Basic's user name is not one. */
 	public static final Map<String, String> SECRET_PARAMETER = new Map<String, String>{
 		API_KEY => 'Key',
 		BEARER => 'Token',
-		BASIC => 'Password'
+		BASIC => 'Password',
+		AWS => 'awsSecretAccessKey'
 	};
 	public static final String USER_PARAMETER = 'UserName';
+	/** The access key ID of an AWS key pair: not a secret, written plain like Basic's user name. */
+	public static final String AWS_KEY_ID_PARAMETER = 'awsAccessKeyId';
+	/** `service.region.amazonaws.com`, optionally after a bucket: the service and region signed for. */
+	private static final Pattern AWS_HOST = Pattern.compile(
+		'^(?:[a-z0-9][a-z0-9-]*\\.)?([a-z0-9]+)\\.([a-z]{2}(?:-gov)?-[a-z]+-[0-9])\\.amazonaws\\.com$'
+	);
 
 	private static final String JOURNAL_KIND = 'Connection';
 	private static final String JOURNAL_STATUS = 'Key Replaced';
@@ -235,6 +256,15 @@ public with sharing class ConnectorConnections {
 	// ---------------------------------------------------------------------------------------
 
 	public static ConnectApi.ExternalCredentialInput externalInput(String name, String label, String kind) {
+		return externalInput(name, label, kind, null);
+	}
+
+	/**
+	 * The External Credential with one named principal. An AWS connection uses the AWS Signature
+	 * Version 4 protocol with the service and region its address names (`awsScope`); every other
+	 * kind the Custom protocol.
+	 */
+	public static ConnectApi.ExternalCredentialInput externalInput(String name, String label, String kind, String url) {
 		ConnectApi.ExternalCredentialPrincipalInput principal = new ConnectApi.ExternalCredentialPrincipalInput();
 		principal.principalName = kind;
 		principal.principalType = ConnectApi.CredentialPrincipalType.NamedPrincipal;
@@ -242,9 +272,44 @@ public with sharing class ConnectorConnections {
 		ConnectApi.ExternalCredentialInput input = new ConnectApi.ExternalCredentialInput();
 		input.developerName = name;
 		input.masterLabel = label;
-		input.authenticationProtocol = ConnectApi.CredentialAuthenticationProtocol.Custom;
+		input.authenticationProtocol = protocolOf(kind);
 		input.principals = new List<ConnectApi.ExternalCredentialPrincipalInput>{ principal };
+		if (kind == AWS) {
+			List<String> scope = awsScope(url);
+			input.parameters = new List<ConnectApi.ExternalCredentialParameterInput>{
+				authParameter('AwsService', scope[0]),
+				authParameter('AwsRegion', scope[1])
+			};
+		}
 		return input;
+	}
+
+	private static ConnectApi.CredentialAuthenticationProtocol protocolOf(String kind) {
+		return kind == AWS
+			? ConnectApi.CredentialAuthenticationProtocol.AwsSv4
+			: ConnectApi.CredentialAuthenticationProtocol.Custom;
+	}
+
+	/** One External Credential authentication parameter (not a secret). */
+	private static ConnectApi.ExternalCredentialParameterInput authParameter(String name, String value) {
+		ConnectApi.ExternalCredentialParameterInput parameter = new ConnectApi.ExternalCredentialParameterInput();
+		parameter.parameterName = name;
+		parameter.parameterValue = value;
+		parameter.parameterType = ConnectApi.ExternalCredentialParameterType.AuthParameter;
+		return parameter;
+	}
+
+	/**
+	 * The service and region an AWS address signs for, from its host: `s3` and `us-east-1` for
+	 * `https://my-bucket.s3.us-east-1.amazonaws.com`. Refuses any other host, so a key pair is
+	 * only ever signed for an Amazon Web Services address.
+	 */
+	public static List<String> awsScope(String url) {
+		Matcher found = AWS_HOST.matcher(hostOf(url));
+		if (!found.matches()) {
+			throw new ConnectorException(BarnHelp.text('Connector', 'Connector_Error_AwsUrl'));
+		}
+		return new List<String>{ found.group(1), found.group(2) };
 	}
 
 	/**
@@ -257,8 +322,10 @@ public with sharing class ConnectorConnections {
 		link.developerName = name;
 		ConnectApi.NamedCredentialCalloutOptionsInput options = new ConnectApi.NamedCredentialCalloutOptionsInput();
 		options.allowMergeFieldsInBody = false;
-		options.allowMergeFieldsInHeader = kind != SECRET_URL;
-		options.generateAuthorizationHeader = false;
+		// AWS: Salesforce writes the signed Authorization header itself; no formula is needed.
+		Boolean formulaHeader = kind != SECRET_URL && kind != AWS;
+		options.allowMergeFieldsInHeader = formulaHeader;
+		options.generateAuthorizationHeader = kind == AWS;
 		ConnectApi.NamedCredentialInput input = new ConnectApi.NamedCredentialInput();
 		input.developerName = name;
 		input.masterLabel = label;
@@ -266,7 +333,7 @@ public with sharing class ConnectorConnections {
 		input.externalCredentials = new List<ConnectApi.ExternalCredentialInput>{ link };
 		input.calloutOptions = options;
 		input.customHeaders = new List<ConnectApi.CredentialCustomHeaderInput>();
-		if (kind != SECRET_URL) {
+		if (formulaHeader) {
 			ConnectApi.CredentialCustomHeaderInput auth = new ConnectApi.CredentialCustomHeaderInput();
 			auth.sequenceNumber = 1;
 			auth.headerName = kind == API_KEY ? header : 'Authorization';
@@ -295,7 +362,7 @@ public with sharing class ConnectorConnections {
 		input.externalCredential = name;
 		input.principalName = kind;
 		input.principalType = ConnectApi.CredentialPrincipalType.NamedPrincipal;
-		input.authenticationProtocol = ConnectApi.CredentialAuthenticationProtocol.Custom;
+		input.authenticationProtocol = protocolOf(kind);
 		input.credentials = new Map<String, ConnectApi.CredentialValueInput>();
 		return input;
 	}
@@ -319,7 +386,7 @@ public with sharing class ConnectorConnections {
 		Map<String, String> labels = org.labelsByName();
 		for (String name : labels.keySet()) {
 			ConnectorOrg.Pair pair = org.read(name, labels.get(name));
-			if (pair != null && pair.linked && KINDS.contains(pair.principal)) {
+			if (pair != null && pair.linked && KNOWN_KINDS.contains(pair.principal)) {
 				result.connections.add(shown(pair, pair.principalId != null && granted.contains(pair.principalId)));
 			}
 		}
@@ -418,10 +485,25 @@ public with sharing class ConnectorConnections {
 		}
 		Map<String, String> labels = org.labelsByName();
 		ConnectorOrg.Pair pair = labels.containsKey(name) ? org.read(name, labels.get(name)) : null;
-		if (pair == null || !pair.linked || !KINDS.contains(pair.principal)) {
+		if (pair == null || !pair.linked || !KNOWN_KINDS.contains(pair.principal)) {
 			throw new ConnectorException(BarnHelp.text('Connector', 'Connector_Error_NotOurs'));
 		}
 		return pair;
+	}
+
+	/**
+	 * Refuses a key write to a connection made in Setup (OAuth): Salesforce holds its tokens, and
+	 * the administrator signs in again from Setup instead (R-CN12).
+	 */
+	public static void refuseSetupMade(ConnectorOrg.Pair pair) {
+		if (pair.principal == OAUTH) {
+			throw new ConnectorException(BarnHelp.text('Connector', 'Connector_Error_SetupMade'));
+		}
+	}
+
+	/** Whether the Connections set already gives the connection's principal (R-CN7). */
+	public static Boolean principalGranted(ConnectorOrg.Pair pair) {
+		return pair.principalId != null && grantedPrincipals().contains(pair.principalId);
 	}
 
 	// ---------------------------------------------------------------------------------------

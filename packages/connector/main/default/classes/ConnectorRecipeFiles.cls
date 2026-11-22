@@ -411,7 +411,9 @@ public with sharing class ConnectorRecipeFiles {
 		Prefill result = new Prefill();
 		result.label = label;
 		result.authKind = ConnectorRecipeDocument.textOf(auth.get('kind'));
-		if (!ConnectorConnections.KINDS.contains(result.authKind)) {
+		// An OAuth connection is made in Setup (R-CN12): its template only fills Backup Settings.
+		Boolean setupMade = result.authKind == ConnectorConnections.OAUTH && file.get('backup') != null;
+		if (!ConnectorConnections.KINDS.contains(result.authKind) && !setupMade) {
 			throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorAuth', detail(result.authKind)));
 		}
 		for (Object raw : ConnectorRecipeDocument.listOf(auth.get('params'))) {
@@ -466,7 +468,7 @@ public with sharing class ConnectorRecipeFiles {
 		if (backup.isEmpty()) {
 			return null;
 		}
-		refuseUnknown(backup, new Set<String>{ 'method', 'path', 'headers' });
+		refuseUnknown(backup, new Set<String>{ 'method', 'path', 'headers', 'metadata' });
 		List<ConnectorBackupDestination.Header> headers = new List<ConnectorBackupDestination.Header>();
 		for (Object raw : ConnectorRecipeDocument.listOf(backup.get('headers'))) {
 			Map<String, Object> header = ConnectorRecipeDocument.mapOf(raw);
@@ -482,7 +484,9 @@ public with sharing class ConnectorRecipeFiles {
 			return ConnectorBackupDestination.checked(
 				ConnectorRecipeDocument.textOf(backup.get('method')),
 				ConnectorRecipeDocument.textOf(backup.get('path')),
-				headers
+				headers,
+				// Google Drive's multipart metadata: a JSON object in the file, kept as its text.
+				backup.get('metadata') == null ? null : JSON.serialize(backup.get('metadata'))
 			);
 		} catch (ConnectorConnections.ConnectorException refused) {
 			throw refusal(BarnHelp.text('Connector', 'Connector_Import_ErrorAction', detail('backup')));

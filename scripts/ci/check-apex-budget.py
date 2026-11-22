@@ -431,7 +431,10 @@ CAPS = {
     # check path and account, Where Used triggers, the import refusals): 267,980 measured,
     # plus about 2%. Raised 2026-11-21 for BK-10's backup destination (ConnectorBackupDestination,
     # its controller methods and the template backup part): 280,673 measured, plus about 1%.
-    "connector": 283_500,
+    # Raised 2026-11-21 for BK-10b storage services (AWS Signature Version 4 connections, OAuth
+    # connections made in Setup, {file} in headers and Google Drive multipart metadata):
+    # 286,836 measured, plus about 1%.
+    "connector": 289_700,
     # Mirror: the NPSP gifts migration kit's extension (MIG-05), 187,295 measured, then the
     # Nonprofit Cloud gifts kit's (MIG-04), 195,957 measured, then the Nonprofit Cloud
     # relationships kit's (MIG-02), about 200,500 combined, plus about 1%.
