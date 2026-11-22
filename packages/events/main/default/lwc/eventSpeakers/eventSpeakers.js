@@ -9,6 +9,11 @@ import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import EventRecordModal from 'c/eventRecordModal';
 import SPEAKER from '@salesforce/schema/Event_Speaker__c';
 import SESSION_SPEAKER from '@salesforce/schema/Session_Speaker__c';
+import SPEAKER_EVENT_FIELD from '@salesforce/schema/Event_Speaker__c.Event__c';
+import SPEAKER_CONTACT_FIELD from '@salesforce/schema/Event_Speaker__c.Contact__c';
+import ASSIGNMENT_SESSION_FIELD from '@salesforce/schema/Session_Speaker__c.Event_Session__c';
+import ASSIGNMENT_SPEAKER_FIELD from '@salesforce/schema/Session_Speaker__c.Event_Speaker__c';
+import ASSIGNMENT_ROLE_FIELD from '@salesforce/schema/Session_Speaker__c.Role__c';
 import BarnConfirmModal from 'c/barnConfirmModal';
 
 import SPEAKERS from '@salesforce/label/c.Events_EventTab_Speakers';
@@ -179,7 +184,10 @@ export default class EventSpeakers extends LightningElement {
     await this.run(async () => {
       await createRecord({
         apiName: SPEAKER.objectApiName,
-        fields: { Event__c: this.recordId, Contact__c: contactId }
+        fields: {
+          [SPEAKER_EVENT_FIELD.fieldApiName]: this.recordId,
+          [SPEAKER_CONTACT_FIELD.fieldApiName]: contactId
+        }
       });
       if (picker && typeof picker.clearSelection === 'function') {
         picker.clearSelection();
@@ -223,7 +231,11 @@ export default class EventSpeakers extends LightningElement {
     await this.run(async () => {
       await createRecord({
         apiName: SESSION_SPEAKER.objectApiName,
-        fields: { Event_Session__c: sessionId, Event_Speaker__c: speakerId, Role__c: role }
+        fields: {
+          [ASSIGNMENT_SESSION_FIELD.fieldApiName]: sessionId,
+          [ASSIGNMENT_SPEAKER_FIELD.fieldApiName]: speakerId,
+          [ASSIGNMENT_ROLE_FIELD.fieldApiName]: role
+        }
       });
       this.assigning = undefined;
     });

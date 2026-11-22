@@ -165,12 +165,14 @@ const noteValue = (value) => (value && String(value).trim()) || null;
 
 /**
  * The attendee fields a needs change saves (Event_Attendee__c): both notes, trimmed, blank as
- * none.
+ * none. This module stays framework-free, so the caller passes the field API names from its
+ * schema imports as `names` ({ dietary, access }), which keep working with any namespace
+ * (ADR-0093 A1).
  */
-export function needsFields(attendeeId, dietary, access) {
+export function needsFields(attendeeId, dietary, access, names) {
   return {
     Id: attendeeId,
-    Dietary_Needs__c: noteValue(dietary),
-    Access_Needs__c: noteValue(access)
+    [names.dietary]: noteValue(dietary),
+    [names.access]: noteValue(access)
   };
 }

@@ -51,16 +51,18 @@ const DELIVERABLE_NAME_LENGTH = 80;
 
 /**
  * A new checklist item's fields (Sponsor_Deliverable__c), or null when it has no name: the name
- * trimmed to what the field holds, and Type Other when none is chosen.
+ * trimmed to what the field holds, and Type Other when none is chosen. This module stays
+ * framework-free, so the caller passes the field API names from its schema imports as `names`
+ * ({ sponsor, name, type }), which keep working with any namespace (ADR-0093 A1).
  */
-export function deliverableFields(sponsorId, name, type) {
+export function deliverableFields(sponsorId, name, type, names) {
   const trimmed = String(name || '').trim();
   if (!trimmed) {
     return null;
   }
   return {
-    Event_Sponsor__c: sponsorId,
-    Name: trimmed.substring(0, DELIVERABLE_NAME_LENGTH),
-    Type__c: type && String(type).trim() ? type : 'Other'
+    [names.sponsor]: sponsorId,
+    [names.name]: trimmed.substring(0, DELIVERABLE_NAME_LENGTH),
+    [names.type]: type && String(type).trim() ? type : 'Other'
   };
 }
