@@ -7,7 +7,7 @@ Five serve every organization, nonprofit or for-profit; four are for nonprofits.
 
 | App | Group | For | Pages |
 |---|---|---|---|
-| **BarnCRM Console** | Universal | Everyone with a BarnCRM role | Home, Contacts, Households, Organizations, Accounts, Addresses, Relationships, Affiliations, Household Members, Data Manager, then the everyday pages of modules with no app of their own (Form Submissions, Logic Models, Payments, Component Builder, Advanced Reporting) |
+| **BarnCRM Console** | Universal | Everyone with a BarnCRM role | Home, Contacts, Households, Organizations, Accounts, Addresses, Relationships, Affiliations, Household Members, Data Manager, then the everyday pages of modules with no app of their own (Form Submissions, Logic Models, Payments, Component Builder, Advanced Reporting) and of Scholarships and Outbound Grants |
 | **BarnCRM Admin Console** | Universal | The BarnCRM Admin role only | BarnCRM Settings, Data Manager, Duplicate Matching, Automation, every installed module's admin pages (among them Forms Home and Forms, Portal Builder Home, Portals and Portal Accesses, and Super Connector), Error Log |
 | **BarnCRM Members and Partners** | Universal | Memberships and Corporate Hub role holders | Memberships Home, Memberships, Member Certifications, Membership Levels, Certifications, Corporate Hub Home, Library Documents, Compliance Obligations, Agreements, Boards and Committees, Board Meetings, Processing Activities, Data Subject Requests, Data Breaches, Reports, Dashboards, Error Log |
 | **BarnCRM Events** | Universal | Event Management role holders | Events Home, Event Calendar, Events, Event Speakers, Venues, Reports, Error Log |
@@ -67,7 +67,7 @@ is the answer to that question. You start in **BarnCRM Console**.
 | Rollup Builder (Rollup Builder module) | **BarnCRM Admin Console** |
 | Gifts and everything around them (Fundraising module) | **BarnCRM Fundraising**; its admin pages also in **BarnCRM Admin Console** |
 | Grants (Grants module) | **BarnCRM Grants** |
-| Award programs, applications and awards (Scholarships and Outbound Grants module) | **BarnCRM Grants**, after the grant pages; in **BarnCRM Console** when Grants is not installed |
+| Award programs, applications and awards (Scholarships and Outbound Grants module) | **BarnCRM Grants**, after the grant pages, and **BarnCRM Console** |
 | Programs, enrollments and services (Programs module) | **BarnCRM Programs** |
 | Volunteer shifts and hours (Volunteers module) | **BarnCRM Volunteers** |
 | Memberships and certifications (Memberships module) | **BarnCRM Members and Partners**; Membership Levels and Certifications also in **BarnCRM Admin Console** |
@@ -135,7 +135,7 @@ from the module catalog, not from the app's own file:
 | Memberships | **BarnCRM Members and Partners**: Memberships Home, Memberships, Member Certifications | **BarnCRM Members and Partners** and **BarnCRM Admin Console**: Membership Levels, Certifications |
 | Corporate Hub | **BarnCRM Members and Partners**: Corporate Hub Home, Library Documents, Compliance Obligations, Agreements, Boards and Committees, Board Meetings, Processing Activities, Data Subject Requests, Data Breaches | |
 | Project Management | (its own app) | **BarnCRM Admin Console**: Project Rates, Project Invoices, Request Connections |
-| Scholarships and Outbound Grants | **BarnCRM Grants** (or **BarnCRM Console** without Grants): Scholarships Home, Award Programs, Award Applications, Awards | |
+| Scholarships and Outbound Grants | **BarnCRM Grants** and **BarnCRM Console**: Scholarships Home, Award Programs, Award Applications, Awards | |
 | Logic Models, Payments, Component Builder, Advanced Reporting | **BarnCRM Console** | **BarnCRM Admin Console**: their setup pages |
 
 A module's pages go before an app's **Reports**, **Dashboards** and **Error Log** tabs, or at
@@ -172,6 +172,10 @@ one to the right people itself: **BarnCRM Console** to everyone with a BarnCRM r
 Admin Console** to the **BarnCRM Admin** role only. It does this through two permission sets
 named **BarnCRM Auto: ... App**, which it gives and takes as roles change on the Access page and
 again every hour; do not assign them by hand. A module app comes with its module's role sets.
+The sets of modules with no app show a Core app instead, so everyone who works in a module
+has an app: the Forms and Scholarships and Outbound Grants sets show **BarnCRM Console**,
+**Forms Admin** also shows **BarnCRM Admin Console**, and **Portal Builder Admin** and both
+BarnCRM Connector sets show **BarnCRM Admin Console**.
 
 1. Click the app launcher (the grid of dots at the top left of Salesforce).
 2. Type `BarnCRM` and choose **BarnCRM Console** (an administrator also sees **BarnCRM Admin
@@ -354,7 +358,8 @@ compare it with the page that came with the package.
   on the Access page. If the role was given a moment ago, wait a minute: BarnCRM gives the
   apps in a queued job.
 - **Looking for BarnCRM Settings in BarnCRM Console.** The settings and the admin tools are in
-  **BarnCRM Admin Console**, which only the BarnCRM Admin role sees. **Data Manager** is in
+  **BarnCRM Admin Console**, which the BarnCRM Admin role sees (and the Forms Admin, Portal
+  Builder Admin and BarnCRM Connector sets, for their own pages). **Data Manager** is in
   BarnCRM Console too, for anyone with the Find and Export, Bulk Update or Bulk Delete
   permission. Someone without the admin role who has the Duplicate Review permission opens Org
   Optimizer or Duplicate Matching by typing its name in the app launcher.

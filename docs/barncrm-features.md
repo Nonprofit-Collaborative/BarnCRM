@@ -908,7 +908,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 ## 10. Scholarships and Outbound Grants
 
-**Edition:** Nonprofit Edition. Depends on Core only; Forms and Portal Builder are used when installed, Fundraising and Grants are not referenced. Package `packages/scholarships` (BarnCRM Scholarships and Outbound Grants), no app of its own: its Scholarships Home, Award Programs, Award Applications and Awards tabs are in the BarnCRM Grants app after the grant pages, or in BarnCRM Console without Grants (ADR-NEXT (nine console apps), ADR-0204 scholarships outbound grants module). Release 1.12, SG-10 from 1.10 (plan 5.11, D-122, D-156). For organizations that give money: scholarships, fellowships, mini-grants and other outbound grants. BarnCRM records payments made elsewhere and moves no money.
+**Edition:** Nonprofit Edition. Depends on Core only; Forms and Portal Builder are used when installed, Fundraising and Grants are not referenced. Package `packages/scholarships` (BarnCRM Scholarships and Outbound Grants), no app of its own: its Scholarships Home, Award Programs, Award Applications and Awards tabs are in the BarnCRM Grants app after the grant pages and in BarnCRM Console, which the Scholarships sets show (ADR-NEXT (nine console apps), ADR-0204 scholarships outbound grants module). Release 1.12, SG-10 from 1.10 (plan 5.11, D-122, D-156). For organizations that give money: scholarships, fellowships, mini-grants and other outbound grants. BarnCRM records payments made elsewhere and moves no money.
 
 ### 10.1 Grantmaking
 
