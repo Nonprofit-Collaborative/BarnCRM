@@ -19141,6 +19141,7 @@ is built in; app templates are imported files (D-216) that prefill this same sha
 | Key Stored | boolean | computed | Whether the principal holds a credential (Disconnect removes it). |
 | Access Granted | boolean | computed | Whether the principal is in the "BarnCRM Connections" permission set (R-CN7). |
 | Check Path | text | no | What follows the Base URL for Check Connection, such as `/ping`, from the template the connection was made from (R-CN9). Blank checks the Base URL. |
+| Backup Settings | JSON | no | How Backup Sets and archives send their files through this connection (R-CN11): `{ "method": "PUT" or "POST", "path": "/backups/{file}", "headers": [ { "name", "value" } ] }`. Blank when it is not the backup destination; at most one connection has it. |
 
 ### Rules
 
@@ -19190,6 +19191,22 @@ Base URL when there is none, and when a 2xx answer names the account (`account_n
 **R-CN10 Integration user.** Choosing the integration user (R-CR4) needs the same permissions
 as writing a key (R-CN3), and refuses a user who is a System Administrator or holds Modify All
 Data or View All Data.
+**R-CN11 Backup destination** (BK-10, D-221; ADR-NEXT automatic backups). One connection at
+most is the backup destination: Core's `OffPlatformDestination` (R-SQ17), implemented by
+`ConnectorBackupDestination` and registered in the Connector catalog row. Saving it needs the
+key-writing permissions (R-CN3) and Connector Admin, gives the saver the Connections set (R-CN7)
+and clears the setting from every other row. Its Backup Settings hold the method (PUT or POST),
+a path that contains `{file}` once and otherwise follows R-CN9's path rules, and up to five
+headers, each a name a recipe may set (F1) that does not look like a sign-in header, with a value
+of at most 255 characters and no `{!`, CR or LF: nothing secret is stored there. Each file is
+one request to `callout:<connection>` plus the path, `{file}` replaced by the URL-encoded file
+name, the CSV as the body and `Content-Type: text/csv`, 120 seconds at most; any 2xx answer is
+success, anything else is a failure that names the status. The person who sends (the runner, or
+the nightly run's user for a scheduled set) needs the Connections set; until they hold it the
+destination says so. A template's optional `backup` part (method, path, headers) prefills it
+when the connection is created from the template; such a template may leave `baseUrl` blank, so
+the person types the storage's own address as on New Connection (an app template still locks
+its host, R-CR14).
 
 ### Salesforce implementation
 
@@ -19199,7 +19216,8 @@ Data or View All Data.
   principal's Id from `ConnectApi` is the setup entity of its principal access;
   `SetupEntityAccess` (principal access in `BarnCRM_Connections`), `PermissionSetAssignment`.
 - **Object:** `Connector_Connection__c` (Connector Connection), private, no tab, report or
-  search; Name (Text(80)) is the connection's developer name; `Check_Path__c` (Text(255)).
+  search; Name (Text(80)) is the connection's developer name; `Check_Path__c` (Text(255));
+  `Backup_JSON__c` (Long Text Area(4000)).
   Written and read by the module only, in system mode; granted by no permission set.
 - **Custom permission:** `Manage_BarnCRM_Connector`, granted only by `Connector_Admin`.
 - **Admin Journal:** Kind `Connection`, Status `Key Replaced` (Section 10A).
@@ -20103,6 +20121,7 @@ mirrors the primary member).
 | 1.83 | 2026-11-20 | R-CR6 the recipe clock: a claimed Running run counts as Queued for the clock, so the heartbeat keeps running while a lane has a Waiting run, a Queued run or a claimed Running run (batch Q gate fix). |
 | 1.84 | 2026-11-21 | Scheduled Backup Sets (BK-10, D-221, release 1.36; ADR-NEXT `NEXT-automatic-backups-and-off-platform-destination.md`). Section 29D gains R-SQ16: the `backup` key's `schedule`, the nightly step Backup Sets, parts kept on the job as `documents`, and runs kept. Section 12 gains `Backup_Runs_Kept__c`. (Version number for the integrator to confirm at merge.) |
 | 1.85 | 2026-11-21 | Off-platform destination seam (BK-10, D-221, release 1.36; ADR-NEXT). Section 29D gains R-SQ17: Core's `OffPlatformDestination` seam, a set's and an archive's `destination`, `OffPlatformSendBatch`, retries and the Files copy. Section 12 gains `Backup_Remove_Sent_Files__c`. (Version number for the integrator to confirm at merge.) |
+| 1.86 | 2026-11-21 | Connector backup destination (BK-10, D-221, release 1.36; ADR-NEXT). Connector Connection gains `Backup_JSON__c` (29CN1, new R-CN11): one connection at most sends Backup Set and archive files by PUT or POST, with a `{file}` path and fixed headers that hold no secret; templates may prefill it. (Version number for the integrator to confirm at merge.) |
 
 ---
 ## 32. Entity ownership by package

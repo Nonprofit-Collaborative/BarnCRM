@@ -19,6 +19,8 @@ connector/ConnectorApplyMapAction.cls | global class ConnectorApplyMapAction
 connector/ConnectorApplyMapAction.cls | global class Request
 connector/ConnectorApplyMapAction.cls | global class Result
 connector/ConnectorApplyMapAction.cls | global static List<Result> apply(List<Request>)
+connector/ConnectorBackupDestination.cls | public ConnectorBackupDestination()
+connector/ConnectorBackupDestination.cls | public class ConnectorBackupDestination
 connector/ConnectorErasureExtension.cls | public ConnectorErasureExtension()
 connector/ConnectorErasureExtension.cls | public class ConnectorErasureExtension
 connector/ConnectorHealthCheckExtension.cls | public ConnectorHealthCheckExtension()

@@ -572,7 +572,55 @@ with each path slot left to fill. `auth.kind` is one of `ApiKeyHeader` (with `he
 trigger, the query value `{{watermark}}` becomes `trigger.watermark`, the stamp of the newest
 item already seen; any other `{{...}}` value is refused. Template `pollers`, `webhook`, and an
 action's `inputs` and `body` are not imported yet: a template holding them is refused with the
-part named, so set that part up on the recipe after import instead.
+part named, so set that part up on the recipe after import instead. An optional `backup` part
+(`method`, `path`, `headers`) makes the connection you create the
+[Backup Destination](#backup-destination); a template with one may leave `baseUrl` empty, so you
+type your storage's own address.
+
+## Backup Destination
+
+Backup Sets and Archive by Query can send each CSV file they save to storage your organization
+owns, outside Salesforce, through one connection: the **Backup Destination**. The key stays in
+the connection; BarnCRM keeps only how to send (method, path and extra headers), none of it
+secret. See [Backup Sets](backup-sets.md#sending-backups-off-platform) for choosing it on a set.
+
+**What storage works.** Any HTTPS service that accepts a file by PUT or POST, signed in by one of
+the four sign-in kinds, with the file name in the path:
+
+- **A WebDAV folder** (Nextcloud, ownCloud, most NAS boxes): Basic sign-in with a user and an
+  app password, PUT to `/{file}` under the folder's address.
+- **An HTTPS endpoint with a key header**: API Key in a Header, PUT or POST to the path the
+  service documents.
+
+Storage that signs each request with the secret (Amazon S3's Signature Version 4) or carries the
+secret in the address's query (an Azure SAS token) is not supported: BarnCRM never reads a key to
+sign with, and a path holds no query. Example templates are in the repository's
+`docs/connector-templates/` folder.
+
+**Step by step.**
+
+1. Create a connection to the storage (see [Creating a Connection](#creating-a-connection)), or
+   import a template whose `backup` part fills the next step for you. Use an account or app
+   password that may only write to the backup folder.
+2. Do [The One Setup Step](#the-one-setup-step) and select **Check Connection**: that also gives
+   you the BarnCRM Connections permission set the send needs.
+3. Under **Backup Destination** on the Connections tab, select **Set Destination**. Choose the
+   connection, the method (PUT for WebDAV), and the path: what follows the connection's address,
+   with `{file}` where the file name goes, such as `/barncrm/{file}`. Add any fixed header the
+   service needs, one a line as `Name: value` (at most five; never a key). Select **Save
+   Destination**.
+4. Assign the **BarnCRM Connections** permission set to the user the nightly jobs run as, so
+   scheduled Backup Sets can send. Until a sender holds it, the destination says so.
+5. On Data Manager, open **Backup Sets**, select **Edit Schedule** on a set and choose **Files
+   and backup destination** under **Save To**; or, on Archive by Query, tick **Send the file to
+   your backup destination before deleting**.
+
+Each file is one request: `Content-Type: text/csv`, the CSV as the body, at most 120 seconds. Any
+2xx answer counts as sent; anything else is a failure that names the status, written to the
+Error Log and the run's log, and the file is sent again by the next nightly run. Only one
+connection is the destination: saving another replaces it. **Stop Using** leaves none; deleting
+the connection does the same. Retention at the storage is the service's own: BarnCRM never deletes
+anything there.
 
 ## Run History
 

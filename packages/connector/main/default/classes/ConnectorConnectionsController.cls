@@ -317,6 +317,43 @@ public with sharing class ConnectorConnectionsController {
 		return result;
 	}
 
+	/** The Backup Destination part of the section (R-CN11). */
+	@AuraEnabled
+	public static ConnectorBackupDestination.Setup getBackupDestination() {
+		try {
+			return ConnectorBackupDestination.setup();
+		} catch (Exception failure) {
+			throw shown(failure, 'getBackupDestination');
+		}
+	}
+
+	/** Makes the connection the backup destination (R-CN11); `headers` is `Name: value` lines. */
+	@AuraEnabled
+	public static ConnectorBackupDestination.Setup saveBackupDestination(
+		String name,
+		String method,
+		String path,
+		String headers
+	) {
+		try {
+			ConnectorBackupDestination.save(name, method, path, headers);
+			return ConnectorBackupDestination.setup();
+		} catch (Exception failure) {
+			throw shown(failure, 'saveBackupDestination');
+		}
+	}
+
+	/** No connection is the backup destination any more (R-CN11). */
+	@AuraEnabled
+	public static ConnectorBackupDestination.Setup stopBackupDestination() {
+		try {
+			ConnectorBackupDestination.stop();
+			return ConnectorBackupDestination.setup();
+		} catch (Exception failure) {
+			throw shown(failure, 'stopBackupDestination');
+		}
+	}
+
 	/**
 	 * Removes the key and keeps the connection (R-CN8). A Secret URL has no key apart from its
 	 * address, so it is refused: replace or delete it instead.

@@ -3,9 +3,10 @@ import createConnection from '@salesforce/apex/ConnectorConnectionsController.cr
 import replaceKey from '@salesforce/apex/ConnectorConnectionsController.replaceKey';
 import saveFirstKey from '@salesforce/apex/ConnectorConnectionsController.saveFirstKey';
 import saveCheckPath from '@salesforce/apex/ConnectorConnectionsController.saveCheckPath';
+import saveBackupDestination from '@salesforce/apex/ConnectorConnectionsController.saveBackupDestination';
 import { KINDS, API_KEY, BASIC, SECRET_URL, formProblems } from 'c/connectorRules';
 import { say as text } from 'c/connectorText';
-import { lockedUrl, partOfKey } from 'c/connectorFileRules';
+import { headerLines, lockedUrl, partOfKey } from 'c/connectorFileRules';
 
 /**
  * New Connection and Replace Key on Super Connector (CN-01). This form alone calls the Apex
@@ -202,6 +203,15 @@ export default class ConnectorKeyForm extends LightningElement {
       const checkPath = this.creating && this._prefill && this._prefill.checkPath;
       if (checkPath && result && result.name) {
         await saveCheckPath({ name: result.name, checkPath });
+      }
+      const backup = this.creating && this._prefill && this._prefill.backup;
+      if (backup && result && result.name) {
+        await saveBackupDestination({
+          name: result.name,
+          method: backup.method,
+          path: backup.path,
+          headers: headerLines(backup.headers)
+        });
       }
       this.dispatchEvent(new CustomEvent('saved', { detail: { result } }));
     } catch (failure) {

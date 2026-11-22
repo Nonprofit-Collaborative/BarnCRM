@@ -1,6 +1,6 @@
 # BarnCRM Connector
 
-Scripts for the optional BarnCRM Connector module, release 1.31: creating Connections of each sign-in kind, the one Setup step with Check Again, checking, replacing, disconnecting and deleting, the refusals that keep keys safe, access and Health Check (CN-01, T-CN-01 to T-CN-06); Recipe Access, recipes, Test, Publish, Run Now, Run History, Retry, Run As and the merge-field guard (CN-02, T-CN-07 to T-CN-12); the Flow actions and Where Used (CN-06, T-CN-13 and T-CN-14); the recipe clock, Schedule and Record Change triggers, retries, pausing, the integration user, Health Check and the nightly cleanup (CN-03, release 1.32, T-CN-15 to T-CN-20); scheduled imports through Load Rows with an Import Template (CN-09, release 1.32, T-CN-21 and T-CN-22); webhooks in, their refusals, fetch back and Send to Webhook (CN-04, release 1.32, T-CN-23 to T-CN-25); For Each, Wait and Change Data (CN-05, release 1.32, T-CN-26 to T-CN-28); versions, Roll Back, Export Recipe and the Templates tab (CN-08, release 1.32, T-CN-29 to T-CN-31); watching an app for new items and erasing a person's runs (CN-13, CN-18, release 1.33, T-CN-32 to T-CN-34). Setup detail: [BarnCRM Connector](../admin-guide/connector.md).
+Scripts for the optional BarnCRM Connector module, release 1.31: creating Connections of each sign-in kind, the one Setup step with Check Again, checking, replacing, disconnecting and deleting, the refusals that keep keys safe, access and Health Check (CN-01, T-CN-01 to T-CN-06); Recipe Access, recipes, Test, Publish, Run Now, Run History, Retry, Run As and the merge-field guard (CN-02, T-CN-07 to T-CN-12); the Flow actions and Where Used (CN-06, T-CN-13 and T-CN-14); the recipe clock, Schedule and Record Change triggers, retries, pausing, the integration user, Health Check and the nightly cleanup (CN-03, release 1.32, T-CN-15 to T-CN-20); scheduled imports through Load Rows with an Import Template (CN-09, release 1.32, T-CN-21 and T-CN-22); webhooks in, their refusals, fetch back and Send to Webhook (CN-04, release 1.32, T-CN-23 to T-CN-25); For Each, Wait and Change Data (CN-05, release 1.32, T-CN-26 to T-CN-28); versions, Roll Back, Export Recipe and the Templates tab (CN-08, release 1.32, T-CN-29 to T-CN-31); watching an app for new items and erasing a person's runs (CN-13, CN-18, release 1.33, T-CN-32 to T-CN-34); the backup destination (BK-10, release 1.36, T-CN-35). Setup detail: [BarnCRM Connector](../admin-guide/connector.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core and BarnCRM Connector deployed, and an HTTPS test endpoint that echoes requests (for example a free request bin you control). Use made-up keys such as `test-key-1234`; never a real one. In a Developer Edition or trial org, Salesforce stops a chain of queued jobs after 5 links, so many runs queued at once (more than about 5 batches of 50, or a long run that continues across many transactions) may stop partway: the rest wait for the next start, and Health Check may show runs waiting. That is the org's limit, not a fault; a sandbox or production org has no such cap.
 
@@ -497,3 +497,22 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 3 | Erase Ana. | The first two runs are gone from Run History; the `joana.lee` run and the recipe stay. The Erasure record lists the two run Ids and no email address. |
 
 **Cleanup:** Delete the webhook recipe and its remaining run.
+
+## T-CN-35: The Backup Destination
+
+**Purpose:** confirm one connection becomes the backup destination, unsafe settings are refused, each Backup Set file is one request through the connection, and nothing secret is kept (BK-10, R-CN11).
+**Prerequisites:** admin, after T-CN-02; an HTTPS test endpoint that echoes requests and can be set to answer 201 or 403; Core's Backup Sets with one set (T-BULK-17).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Create a Bearer Token connection `Backup Bin` to the test endpoint and select **Check Connection**. | Created; the check answers. Under **Backup Destination**: **No connection is the backup destination.** |
+| 2 | Select **Set Destination**. Choose `Backup Bin`, PUT, path `/backups`, and save. | Refused: the path must hold `{file}` once. |
+| 3 | Change the path to `/backups/{file}` and add the header line `X-Api-Key: abc`. Save. | Refused: a header name may not look like a sign-in header. |
+| 4 | Replace the header with `X-Folder: crm` and save. | The section shows `Backup Bin: PUT /backups/{file}` with no warning. |
+| 5 | On **Backup Sets**, choose **Files and backup destination** under **Save To** for the set and select **Run Now**. | The run ends **Sent to backup destination**. The endpoint received one PUT per part to `/backups/<part title>.csv`, with `Content-Type: text/csv`, `X-Folder: crm`, the bearer header and the CSV as the body. |
+| 6 | Set the endpoint to answer 403 and select **Run Now** again. | The run shows **Not all sent: the next scheduled run tries again**. The Error Log names status 403 and no key. |
+| 7 | Log in as a user without BarnCRM Connections and open **Backup Sets**. | Edit Schedule says why the backup destination cannot be used now. |
+| 8 | Back as the admin, select **Stop Using**. | **No connection is the backup destination.** Backup Sets shows the note in place of a send. |
+| 9 | On the **Templates** tab, import `docs/connector-templates/webdav-backup-folder.json` from the repository and select **Create Connection**. | The Base URL is typed by you, not locked. After saving the key, the Backup Destination shows the new connection with PUT `/{file}`. |
+
+**Cleanup:** Stop Using, then delete `Backup Bin` and the WebDAV connection.

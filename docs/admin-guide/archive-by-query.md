@@ -62,7 +62,7 @@ file and take them out of Salesforce.
    somewhere safe; download them if your org's file storage is also tight.
 
 **Sending the archive to your own storage.** With BarnCRM Connector installed and a connection
-marked **Use for Backups** ([Backup Sets](backup-sets.md#sending-backups-off-platform) and
+set as the **Backup Destination** ([Backup Sets](backup-sets.md#sending-backups-off-platform) and
 [BarnCRM Connector](connector.md#backup-destination)), the panel offers **Send the file to your
 backup destination before deleting**. Tick it before step 7. BarnCRM saves the file in Files,
 sends each part to your storage, and starts the delete only when every part was accepted. If any

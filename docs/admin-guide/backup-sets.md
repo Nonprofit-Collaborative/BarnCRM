@@ -82,9 +82,10 @@ Without the Connector, **Edit Schedule** has no **Save To** choice and shows a s
 
 **Step by step:**
 
-1. Install BarnCRM Connector and set up a connection to your storage, then mark it **Use for
-   Backups** (see [BarnCRM Connector, Backup Destination](connector.md#backup-destination)). The
-   connection holds the key; BarnCRM never shows or stores it anywhere else.
+1. Install BarnCRM Connector, set up a connection to your storage, and make it the **Backup
+   Destination** on the Connections tab of Super Connector (see
+   [BarnCRM Connector, Backup Destination](connector.md#backup-destination)). The connection holds
+   the key; BarnCRM never shows or stores it anywhere else.
 2. Open **Data Manager**, **Backup Sets**, and press **Edit Schedule** beside one of your sets.
 3. Under **Save To**, choose **Files and backup destination**, then **Save Schedule**.
 4. Press **Run Now** to try it. **Recent Runs** shows "Sending to backup destination", then "Sent
@@ -101,8 +102,8 @@ How sending works:
   shows "Not all sent: the next scheduled run tries again". The next night's Backup Sets step
   sends it again.
 - The person who runs the set (for scheduled runs, the user the nightly jobs run as) needs the
-  **BarnCRM Connections** permission set, which holds access to the connection's key. Marking a
-  connection **Use for Backups** gives it to you; give it to the nightly jobs' user too.
+  **BarnCRM Connections** permission set, which holds access to the connection's key. Creating
+  or checking the connection gives it to you; give it to the nightly jobs' user too.
 - How long copies are kept in your storage is up to its own rules (such as a lifecycle or
   retention rule); BarnCRM never deletes anything there.
 

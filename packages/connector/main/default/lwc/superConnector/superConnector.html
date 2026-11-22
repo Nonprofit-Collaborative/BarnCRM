@@ -61,6 +61,7 @@
                                 </template>
                             </ul>
                         </section>
+                        <c-connector-backup-destination connections={page.connections} can-write={canWrite} data-id="backup-destination"></c-connector-backup-destination>
                     </template>
                 </lightning-tab>
                 <lightning-tab label={labels.templatesTab} value="templates" onactive={handleTabActive} data-id="tab-templates">

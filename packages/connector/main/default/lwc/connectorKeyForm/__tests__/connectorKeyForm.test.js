@@ -4,7 +4,14 @@ import createConnection from '@salesforce/apex/ConnectorConnectionsController.cr
 import replaceKey from '@salesforce/apex/ConnectorConnectionsController.replaceKey';
 import saveCheckPath from '@salesforce/apex/ConnectorConnectionsController.saveCheckPath';
 import saveFirstKey from '@salesforce/apex/ConnectorConnectionsController.saveFirstKey';
+import saveBackupDestination from '@salesforce/apex/ConnectorConnectionsController.saveBackupDestination';
 import { expectAccessible } from 'barn/a11y';
+
+jest.mock(
+  '@salesforce/apex/ConnectorConnectionsController.saveBackupDestination',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
 
 jest.mock(
   '@salesforce/apex/ConnectorConnectionsController.createConnection',
@@ -153,7 +160,34 @@ describe('c-connector-key-form', () => {
       checkPath: '/ping'
     });
     expect(JSON.stringify(saveCheckPath.mock.calls)).not.toContain(SECRET);
+    expect(saveBackupDestination).not.toHaveBeenCalled();
     expect(saved).toHaveBeenCalledTimes(1);
+  });
+
+  it('saves a template backup part as the backup destination after the create (R-CN11)', async () => {
+    createConnection.mockResolvedValue({ outcome: 'created', name: 'BarnConn_rest_abc123' });
+    saveBackupDestination.mockResolvedValue({});
+    const element = render({
+      prefill: {
+        label: 'Storage',
+        authKind: 'BearerToken',
+        baseUrl: 'https://files.example.org',
+        urlParams: [],
+        backup: { method: 'PUT', path: '/barncrm/{file}', headers: [{ name: 'X-Folder', value: 'crm' }] }
+      }
+    });
+    await flush();
+    find(element, 'secret').value = SECRET;
+    find(element, 'save').click();
+    await flush();
+    await flush();
+    expect(saveBackupDestination).toHaveBeenCalledWith({
+      name: 'BarnConn_rest_abc123',
+      method: 'PUT',
+      path: '/barncrm/{file}',
+      headers: 'X-Folder: crm'
+    });
+    expect(JSON.stringify(saveBackupDestination.mock.calls)).not.toContain(SECRET);
   });
 
   it('empties the box after a failure and passes on only the message', async () => {

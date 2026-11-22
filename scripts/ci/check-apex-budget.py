@@ -429,8 +429,9 @@ CAPS = {
     # merged together: 254,714 measured, plus about 2%. Raised 2026-11-20 for the batch Q
     # Connector review fixes (the Running claim model, step and heap guards, the template
     # check path and account, Where Used triggers, the import refusals): 267,980 measured,
-    # plus about 2%.
-    "connector": 273_400,
+    # plus about 2%. Raised 2026-11-21 for BK-10's backup destination (ConnectorBackupDestination,
+    # its controller methods and the template backup part): 280,673 measured, plus about 1%.
+    "connector": 283_500,
     # Mirror: the NPSP gifts migration kit's extension (MIG-05), 187,295 measured, then the
     # Nonprofit Cloud gifts kit's (MIG-04), 195,957 measured, then the Nonprofit Cloud
     # relationships kit's (MIG-02), about 200,500 combined, plus about 1%.

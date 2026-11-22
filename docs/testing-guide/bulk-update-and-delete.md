@@ -334,7 +334,7 @@ Test contacts for the delete scripts: create three contacts with first names `De
 ## T-BULK-20: Off-Platform Backups and Archives
 
 **Purpose:** confirm the backup destination is offered only with a destination installed, a run's files are sent and kept or removed as set, a refused file waits and is sent again, and an archive deletes only after its file was accepted.
-**Prerequisites:** T-BULK-17's admin and `Baktest people` Backup Set. For steps 2 to 7: BarnCRM Connector with a connection marked **Use for Backups** to a test HTTPS endpoint you can watch (T-CN-20 in the Connector testing guide sets one up), and BarnCRM Connections given to the admin and the nightly jobs' user.
+**Prerequisites:** T-BULK-17's admin and `Baktest people` Backup Set. For steps 2 to 7: BarnCRM Connector with a connection set as the **Backup Destination** to a test HTTPS endpoint you can watch (T-CN-35 in the Connector testing guide sets one up), and BarnCRM Connections given to the admin and the nightly jobs' user.
 
 | Step | Action | Expected result |
 |---|---|---|

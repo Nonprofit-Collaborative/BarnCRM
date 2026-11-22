@@ -1,0 +1,17 @@
+{
+  "key": "https-put-backup",
+  "label": "HTTPS Backup Endpoint",
+  "version": 1,
+  "description": "Sends Backup Set and archive CSV files to an HTTPS endpoint your organization runs or rents that accepts a PUT with a key in a header. Type the endpoint's address as the Base URL; change the header name and the path to what the endpoint documents.",
+  "auth": {
+    "kind": "ApiKeyHeader",
+    "headerName": "X-Api-Key",
+    "params": [{ "name": "Key", "label": "Upload key" }]
+  },
+  "baseUrl": "",
+  "backup": {
+    "method": "PUT",
+    "path": "/barncrm/{file}",
+    "headers": []
+  }
+}

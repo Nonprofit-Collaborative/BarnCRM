@@ -65,20 +65,25 @@ still not depend on the Connector module (ADR-0013, ADR-0017).
 6. **An archive deletes only after the copy is safe.** With destination Off Platform, Archive by
    Query's delete starts only when every part was sent with a success answer. A failed send ends
    the job Failed with nothing deleted and the Files copy kept.
-7. **The Off Platform destination lives in the Connector (amends ADR-0235 decision 3).** It is a
-   Generic REST connection the admin marks **Use for Backups**, with a method (PUT or POST), a
-   path with the `{file}` slot (and optional `{date}`), and up to five fixed request headers that
-   hold no secret (F1 rules: no `{!`, no sign-in header). One connection at most is the backup
-   destination. The request is `callout:<connection>` plus the checked path, the part's CSV as
-   the body, `Content-Type: text/csv`; any 2xx answer is success. The key stays in the Named and
-   External Credential; the user who sends (the runner, or the nightly run's user) needs the
-   connection's principal access (BarnCRM Connections), which Use for Backups gives the admin who
-   saves it. CN-08 templates gain an optional `backup` part (method, path, headers) so templates
-   for common storage services (an HTTPS endpoint that accepts PUT with a header key, or a WebDAV
-   folder such as Nextcloud, ownCloud or a NAS) prefill it; none is preloaded or shipped as
-   metadata, and the example files live in the repository as documentation. A path holds no
-   query string (F1 path rules), so storage that needs a secret in the URL's query (a SAS token)
-   is not supported.
+7. **The Off Platform destination lives in the Connector (amends ADR-0235 decision 3).** `ConnectorBackupDestination`
+   implements the seam and is registered in the Connector catalog row. The admin makes one
+   connection the **Backup Destination** on the Connections tab, with a method (PUT or POST), a
+   path with the `{file}` slot (part titles already carry the date), and up to five fixed request
+   headers that hold no secret (F1 rules: no `{!`, no sign-in header), kept in the new Connector
+   Connection field `Backup_JSON__c`. One connection at most is the backup destination. The
+   request is `callout:<connection>` plus the checked path, the part's CSV as the body,
+   `Content-Type: text/csv`; any 2xx answer is success. The key stays in the Named and External
+   Credential; the user who sends (the runner, or the nightly run's user) needs the connection's
+   principal access (BarnCRM Connections), which the creator of a connection already has; the
+   nightly run's user is given it by the admin, and until then the destination says so. Saving
+   writes only the row: giving the set is a setup write that may not share the transaction.
+   CN-08 templates gain an optional `backup` part (method, path, headers) so templates for
+   common storage services (an HTTPS endpoint that accepts PUT with a header key, or a WebDAV
+   folder such as Nextcloud, ownCloud or a NAS) prefill it, and such a template may leave its
+   base URL for the person to type (storage has no fixed host to lock, unlike an app); none is
+   preloaded or shipped as metadata, and the example files live in the repository as
+   documentation (`docs/connector-templates/`). A path holds no query string (F1 path rules), so
+   storage that needs a secret in the URL's query (a SAS token) is not supported.
 
 ## Alternatives considered
 
