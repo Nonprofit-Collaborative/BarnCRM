@@ -43,7 +43,7 @@ page, even if that puts it out of reading order.
 | [People and households](people-and-households.md) | HH | 23 | Households, members, naming and greetings, merge and split, preferred phone, interactions, record pages, record types, adopting NPSP households, the engagement score |
 | [Addresses](addresses.md) | ADDR | 21 | Address records, primary address, the Address Updates setting, Move the Household Here and Give This Address to Members, seasonal addresses and the nightly swap, address history (status, dates, former addresses, undeliverable), Address Card Fields and the addresses of deleted records |
 | [Relationships and affiliations](relationships-and-affiliations.md) | REL | 13 | Two-sided relationships, affiliations, primary affiliation, turning shipped types off, hiding while off |
-| [Apps and Navigation](apps-and-navigation.md) | APP | 17 | The four BarnCRM apps, who sees each, their tabs, App Navigation Style, module pages in them, full list views behind the Households and Organizations tabs, the Account Tabs setting, every module app opening on its home |
+| [Apps and Navigation](apps-and-navigation.md) | APP | 18 | The nine BarnCRM console apps, who sees each, their tabs, module pages in them, full list views behind the Households and Organizations tabs, the Account Tabs setting, every module app opening on its home |
 | [Settings and Module Manager](settings-and-module-manager.md) | SET | 37 | BarnCRM Settings console, Access, Module Manager, editions, automation control, the Automation tab, its inventory, scan and deactivate tool, home page, organization address, values from Setup, Integrations, People and Households and boxes, keeping a shown default, Finish Setup, save cues, Health and Error Log links, narrow screens, name pattern parts |
 | [Setup Assistant](setup-assistant.md) | SA | 11 | First-run setup, edition choice, Setup Assistant steps, sample data load and remove |
 | [Imports](imports.md) | IMP | 28 | Import wizard, templates, row rules, matching (including match sources), several sheets, two-part headings, best guesses for near spellings, several objects in one file, new fields from a column, undo, row retention, correcting and retrying rows, the field picker, Import Files from a zip, saved maps on Check Columns, Check Columns drawn by the Mapper |
@@ -98,7 +98,7 @@ scripts use what an earlier one created, so keep the order.
 **Core-only real-org sandbox (for example `mwdbdevsb`).** Run items 1 to 15 only; skip 16 to 25
 (Fundraising, Volunteers and Rollup Builder are not deployed). Set up as in
 [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox): Core deployed
-with `--core-only`, no sample data, work in the **BarnCRM** app, hold **BarnCRM Admin**,
+with `--core-only`, no sample data, work in the **BarnCRM Console** app, hold **BarnCRM Admin**,
 and create the **Zztest** fixture first. Read Garcia as Zztest in every script. Extra
 permissions: **BarnCRM Duplicate Review** for item 13 and **BarnCRM Erase People** for item
 15 only, removed straight after. Item 15 erases a fixture contact you created (Luis Zztest),

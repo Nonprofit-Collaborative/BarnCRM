@@ -10,35 +10,39 @@ Admin). If you cannot find the apps, ask your admin. See
 
 ## The Apps
 
-| App | What it is for | How it looks |
-|---|---|---|
-| **BarnCRM** | People, households and organizations, every day | Standard navigation: each record replaces the page |
-| **BarnCRM Console** | The same work as **BarnCRM** | Console navigation: records open in tabs across the top |
-| **BarnCRM Admin** | BarnCRM Settings and the data tools (admins only) | Standard navigation |
-| **BarnCRM Admin Console** | The same as **BarnCRM Admin** (admins only) | Console navigation |
-| **BarnCRM Fundraising** | Gifts and everything around them (with the Fundraising module) | A standard app: each record replaces the page |
-| **BarnCRM Volunteers** | Jobs, shifts and volunteer hours (with the Volunteers module) | A console, like BarnCRM Console |
-| **BarnCRM Programs** | Programs, the services they offer and the people enrolled in them (with the Programs module) | A console, like BarnCRM Console |
-| **BarnCRM Grants** | Grants applied for and awarded, and what each award requires (with the Grants module) | A console, like BarnCRM Console |
+Every BarnCRM app is a console: records open in tabs across the top and stay open side by side.
+You see an app only once its module is installed and you have its role.
 
-**Which one should I open?** For everyday work, open **BarnCRM** or **BarnCRM Console**: they
-hold the same things and differ only in how records open, so pick the one you like and star it.
-Your admin may have hidden one of them for everyone. Open **BarnCRM Fundraising** for gifts and **BarnCRM
-Volunteers** for volunteers. **BarnCRM Admin** and **BarnCRM Admin Console** are for
+| App | What it is for |
+|---|---|
+| **BarnCRM Console** | People, households and organizations, every day, plus form submissions and the pages of smaller modules |
+| **BarnCRM Admin Console** | BarnCRM Settings, the data tools and every module's admin pages, among them building forms, portals and Super Connector (admins only) |
+| **BarnCRM Members and Partners** | Memberships and member certifications (Memberships module), and the library, compliance, agreements and boards (Corporate Hub module) |
+| **BarnCRM Events** | Events, speakers and venues (Event Management module) |
+| **BarnCRM Projects** | Projects, time and expenses (Project Management module) |
+| **BarnCRM Fundraising** | Gifts and everything around them (Fundraising module) |
+| **BarnCRM Grants** | Grants applied for and awarded, and what each award requires (Grants module), then award programs, applications and awards (Scholarships and Outbound Grants module) |
+| **BarnCRM Programs** | Programs, the services they offer and the people enrolled in them (Programs module) |
+| **BarnCRM Volunteers** | Jobs, shifts and volunteer hours (Volunteers module) |
+
+**Which one should I open?** For everyday work, open **BarnCRM Console** and star it. Open the
+app of the module you work in: **BarnCRM Fundraising** for gifts, **BarnCRM Volunteers** for
+volunteers, **BarnCRM Members and Partners** for members. **BarnCRM Admin Console** is for
 administrators only.
 
-**BarnCRM** has **Home**, **Contacts**, **Households**, **Organizations** and **Data
-Manager**. **BarnCRM Console** has the same, plus **Addresses**, **Relationships**,
-**Affiliations** and **Household Members** just before **Data Manager**. If your admin chose
+**BarnCRM Console** has **Home**, **Contacts**, **Households**, **Organizations**,
+**Addresses**, **Relationships**, **Affiliations**, **Household Members** and **Data
+Manager**, then the pages of installed modules that have no app of their own, such as **Form
+Submissions**. If your admin chose
 the standard **Accounts** tab instead, you see **Accounts** in place of **Households** and
 **Organizations**: open its list view menu for **Households** or **Organizations** (or both
-kinds of tab, if your admin chose Both). The admin apps
-have **BarnCRM Settings**, **Data Manager**, **Duplicate Matching**, **Automation** and
+kinds of tab, if your admin chose Both). **BarnCRM Admin Console**
+has **BarnCRM Settings**, **Data Manager**, **Duplicate Matching**, **Automation** and
 **Error Log**, plus **Org Optimizer** and **Sample Data** where your admin installed those
-optional packages. You see only the tabs your access allows, so your menu may be shorter. **Find**,
+optional packages, and each installed module's admin pages. You see only the tabs your access allows, so your menu may be shorter. **Find**,
 **Super Importer** and **Super Transformer** are not in the navigation: open them from their
 cards on the **Data Manager** tab. A finished import's **See Every Row** link opens the list
-of its rows, which has no tab of its own in the admin apps. Every tab, including those Fundraising, Volunteers and Programs add,
+of its rows, which has no tab of its own in BarnCRM Admin Console. Every tab, including those Fundraising, Volunteers and Programs add,
 has its own icon, so a tab is easy to spot in the menu. Administrators also find a **Data
 Dictionary** section inside **Org Optimizer**, which lists every field (and, when asked, the
 flows and Apex triggers that run on each kind of record) and downloads it as a CSV, an
@@ -73,7 +77,7 @@ you, overdue scheduled payments, your asks due this month, open gift batches and
 stewardship plans. **Enter a Gift** opens Quick Gift Entry. Under **Fundraising Setup** are the
 setup pages that are not in the app's menu (**Donor Levels and Scores**, **Stewardship Plan Templates**,
 **Pledge Reminders**, **Receipt Letters**), each shown only to people who may use it; they are
-also tabs in **BarnCRM Admin** and **BarnCRM Admin Console**, and in the App Launcher. Before
+also tabs in **BarnCRM Admin Console**, and in the App Launcher. Before
 the first gift is saved, **Record Your First Gift** offers **Enter a Gift** and **Import a
 File**. Below are two charts, **Giving by Month** and **Open Asks by Stage**; click a chart to
 open its report.
@@ -86,10 +90,13 @@ a figure you click to open its list, above a chart of this year's hours by job. 
 volunteer job, it opens with **Set Up Your First Volunteer Job** (**New Volunteer Job**, **Import
 a File**) instead. The module's settings are the **Volunteers** section of **BarnCRM Settings**.
 
-Your admin may also have added the module pages you use most to the BarnCRM apps: **Quick Gift
-Entry**, **Gifts**, **Commitments** and **Gift Batches**, or **Volunteer Shifts** and
-**Volunteer Hours**, at the end of the navigation menu. The **Rollup Builder** is in the admin
-apps; anyone else who may view it opens it by typing its name in the App Launcher.
+**BarnCRM Members and Partners** opens on **Memberships Home** (or **Corporate Hub Home** when
+Memberships is not installed) and holds every Memberships and Corporate Hub page. **BarnCRM
+Grants** opens on **Grants Home**; with Scholarships and Outbound Grants installed, **Scholarships
+Home**, **Award Programs**, **Award Applications** and **Awards** follow the grant pages.
+**Form Submissions** are in **BarnCRM Console**; building forms, portals and Super Connector are
+in **BarnCRM Admin Console**. The **Rollup Builder** is in **BarnCRM Admin Console**; anyone
+else who may view one of these pages opens it by typing its name in the App Launcher.
 
 ## To Open an App
 
@@ -97,11 +104,12 @@ apps; anyone else who may view it opens it by typing its name in the App Launche
 2. Type `BarnCRM` (or `BarnCRM Fundraising`) and choose the app.
 3. Optional: click the star next to the app name to open it by default.
 
-You should see: the app's first tab. In **BarnCRM** and **BarnCRM Console** that is **Home**.
+You should see: the app's first tab. In **BarnCRM Console** that is **Home**; in a module app it
+is the module's home.
 
 ## To Work with Records in Console Tabs
 
-In the **BarnCRM Console** and **BarnCRM Volunteers** apps, records stay open side by side.
+In every BarnCRM app, records stay open side by side.
 
 1. Open a household, organization or person. It opens in its own tab across the top.
 2. Open something that belongs to it, such as an address on the household or a relationship
@@ -117,7 +125,7 @@ On a phone, the Salesforce mobile app shows BarnCRM Console as an ordinary app w
 
 ## To Use the Home Page
 
-Open the **BarnCRM** app and choose **Home**. As a staff member you see:
+Open the **BarnCRM Console** app and choose **Home**. As a staff member you see:
 
 - **What's New in BarnCRM**: what changed in the latest upgrade, with a headline and a few
   lines for each change. Read it, then click **Dismiss**. It comes back only when a later
@@ -217,11 +225,13 @@ loads with **Import Files** show in each record's **Files** list, owned by that 
 
 ## Common Problems
 
-- Problem: you cannot find the **BarnCRM** app. You have no BarnCRM role yet. Ask your admin.
+- Problem: you cannot find the **BarnCRM Console** app. You have no BarnCRM role yet. Ask your admin.
+- Problem: you cannot find a Forms, Portal Builder, Connector, Memberships, Corporate Hub or
+  Scholarships app. There is none: their pages are in the apps listed under The Apps above.
 - Problem: a tab such as **Find** or **Data Manager** is missing. Those tabs appear only once
   the feature is turned on and you have the matching add-on. Ask your admin.
-- Problem: a record replaced the page instead of opening in a tab. You are in the
-  **BarnCRM Fundraising** app, which is a standard app, or another app. Switch to **BarnCRM**.
+- Problem: a record replaced the page instead of opening in a tab. You are in an app that is
+  not a BarnCRM app. Switch to **BarnCRM Console**.
 - Problem: "What's new could not be updated. Refresh the page and try again. The problem is
   recorded in the Error Log." Refresh the page. If it keeps happening, tell your admin.
 - Problem: "The home page could not load everything. The error is recorded in the Error
