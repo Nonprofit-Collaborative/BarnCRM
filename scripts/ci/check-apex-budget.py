@@ -145,7 +145,9 @@ CAPS = {
     # after carry-over), OrganizationFlagBatch and ModuleSettings, less the removed
     # shipped-defaults table: 1,973,350 measured, plus about 0.1%. Every module's own settings
     # readers and writers go in SET-03, which is where the suite gets this back.
-    "core": 1_975_400,
+    # Raised 2026-11-22 for the batch T review fixes (archive run lock, restore lock, child-row
+    # bound, typed settings readers): 1,975,719 measured, plus about 0.1%.
+    "core": 1_977_700,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured
