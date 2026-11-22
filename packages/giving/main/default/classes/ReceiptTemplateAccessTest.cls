@@ -5,7 +5,8 @@
  * from `getTemplates`, which is `@AuraEnabled(cacheable=true)`, and **Apex cannot perform DML in a
  * cacheable method**: on an org that had never issued a receipt, the first screen an administrator
  * opened threw. And the letters were written with no permission check at all, on the object whose
- * body is the letter a donor's accountant reads.
+ * body is the letter a donor's accountant reads. The page now reads the letters through GraphQL
+ * (ADR-0093 A2), which writes nothing, so what is left to test is the restore and the writes.
  *
  * These tests have not been executed: no Salesforce org exists in this environment.
  */
@@ -14,31 +15,6 @@ private class ReceiptTemplateAccessTest {
 	@TestSetup
 	static void createTestUser() {
 		TestUsers.adminWith('Giving_Admin');
-	}
-
-	@IsTest
-	static void theReceiptsPageReadsTheLettersAndWritesNothing() {
-		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			// No setUpReceipting here on purpose: this is the org that has never issued a receipt,
-			// which is the org the page used to throw on.
-			Integer dmlBefore = Limits.getDmlStatements();
-
-			Test.startTest();
-			List<ReceiptController.TemplateView> views = ReceiptController.getTemplates();
-			Test.stopTest();
-
-			Assert.areEqual(
-				dmlBefore,
-				Limits.getDmlStatements(),
-				'A cacheable method performs no DML, which is the platform rule this broke.'
-			);
-			Assert.isTrue(views.isEmpty(), 'It reports what is there, which on this org is nothing.');
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Receipt_Template__c],
-				'And it created nothing as a side effect of somebody reading a page.'
-			);
-		}
 	}
 
 	@IsTest

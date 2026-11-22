@@ -1,7 +1,7 @@
 import { createElement } from 'lwc';
 import AskPipeline from 'c/askPipeline';
+import { updateRecord } from 'lightning/uiRecordApi';
 import getBoard from '@salesforce/apex/AskPipelineController.getBoard';
-import moveStage from '@salesforce/apex/AskPipelineController.moveStage';
 import closeAsk from '@salesforce/apex/AskPipelineController.closeAsk';
 import reopenAsk from '@salesforce/apex/AskPipelineController.reopenAsk';
 import BarnConfirmModal from 'c/barnConfirmModal';
@@ -10,9 +10,6 @@ jest.mock('@salesforce/apex/AskPipelineController.reopenAsk', () => ({ default: 
   virtual: true
 });
 jest.mock('@salesforce/apex/AskPipelineController.getBoard', () => ({ default: jest.fn() }), {
-  virtual: true
-});
-jest.mock('@salesforce/apex/AskPipelineController.moveStage', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock('@salesforce/apex/AskPipelineController.closeAsk', () => ({ default: jest.fn() }), {
@@ -113,7 +110,6 @@ describe('c-ask-pipeline', () => {
   });
 
   it('offers a move to every other stage and moves through the menu', async () => {
-    moveStage.mockResolvedValue();
     const element = await render();
     const menu = all(element, 'lightning-button-menu')[0];
     const items = [...menu.querySelectorAll('lightning-menu-item')].map((item) => item.label);
@@ -123,12 +119,28 @@ describe('c-ask-pipeline', () => {
     menu.dispatchEvent(new CustomEvent('select', { detail: { value: 'move:Identified' } }));
     await flush();
 
-    expect(moveStage).toHaveBeenCalledWith({ askId: 'a01000000000001AAA', stage: 'Identified' });
+    expect(updateRecord).toHaveBeenCalledWith({
+      fields: { Id: 'a01000000000001AAA', Stage__c: 'Identified' }
+    });
     expect(getBoard).toHaveBeenCalledTimes(2);
   });
 
+  it('shows the ask rules refusal of a move in its own words', async () => {
+    updateRecord.mockRejectedValueOnce({
+      body: { message: 'An error occurred.', output: { errors: [{ message: 'Stage refused' }] } }
+    });
+    const element = await render();
+    const toasts = [];
+    element.addEventListener('lightning__showtoast', (event) => toasts.push(event.detail));
+    const menu = all(element, 'lightning-button-menu')[0];
+    menu.dispatchEvent(new CustomEvent('select', { detail: { value: 'move:Identified' } }));
+    await flush();
+
+    expect(toasts).toEqual([{ message: 'Stage refused', variant: 'error' }]);
+    expect(getBoard).toHaveBeenCalledTimes(1);
+  });
+
   it('moves a card dragged with the mouse onto another column, and announces it', async () => {
-    moveStage.mockResolvedValue();
     const element = await render();
     const columns = all(element, '[data-id="column"]');
     columns.forEach((column, index) => {
@@ -149,7 +161,9 @@ describe('c-ask-pipeline', () => {
     window.dispatchEvent(pointer('pointerup', 'mouse', 40, 50));
     await flush();
     await flush();
-    expect(moveStage).toHaveBeenCalledWith({ askId: 'a01000000000001AAA', stage: 'Identified' });
+    expect(updateRecord).toHaveBeenCalledWith({
+      fields: { Id: 'a01000000000001AAA', Stage__c: 'Identified' }
+    });
     expect(one(element, '[data-id="live"]').textContent).toBe('c.Core_Drag_Dropped');
   });
 
@@ -307,7 +321,7 @@ describe('c-ask-pipeline', () => {
     window.dispatchEvent(pointer('pointermove', 'mouse', 40, 50));
     window.dispatchEvent(pointer('pointerup', 'mouse', 40, 50));
     await flush();
-    expect(moveStage).not.toHaveBeenCalled();
+    expect(updateRecord).not.toHaveBeenCalled();
   });
 
   it('uses the shared page header and keeps the won badge green only when an ask was won', async () => {

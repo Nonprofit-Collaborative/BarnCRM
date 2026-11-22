@@ -1,12 +1,20 @@
 import { LightningElement, wire } from 'lwc';
-import { refreshApex } from '@salesforce/apex';
-import getTemplates from '@salesforce/apex/ReceiptController.getTemplates';
+import { gql, graphql } from 'lightning/graphql';
+import TEMPLATE from '@salesforce/schema/Receipt_Template__c';
+import TEMPLATE_TYPE from '@salesforce/schema/Receipt_Template__c.Type__c';
+import TEMPLATE_BODY from '@salesforce/schema/Receipt_Template__c.Body__c';
+import TEMPLATE_ACTIVE from '@salesforce/schema/Receipt_Template__c.Active__c';
+import RUN from '@salesforce/schema/Receipt_Run__c';
+import RUN_YEAR from '@salesforce/schema/Receipt_Run__c.Statement_Year__c';
+import RUN_STATUS from '@salesforce/schema/Receipt_Run__c.Status__c';
+import RUN_DONORS from '@salesforce/schema/Receipt_Run__c.Donors_Processed__c';
+import RUN_ISSUED from '@salesforce/schema/Receipt_Run__c.Receipts_Issued__c';
+import RUN_ERRORS from '@salesforce/schema/Receipt_Run__c.Errors__c';
 import getCanManageTemplates from '@salesforce/apex/ReceiptController.getCanManageTemplates';
 import restoreDefaultTemplates from '@salesforce/apex/ReceiptController.restoreDefaultTemplates';
 import saveTemplate from '@salesforce/apex/ReceiptController.saveTemplate';
 import previewTemplate from '@salesforce/apex/ReceiptController.previewTemplate';
 import activateTemplate from '@salesforce/apex/ReceiptController.activateTemplate';
-import getRuns from '@salesforce/apex/ReceiptController.getRuns';
 import getDefaultStatementYear from '@salesforce/apex/ReceiptController.getDefaultStatementYear';
 import startStatementRun from '@salesforce/apex/ReceiptController.startStatementRun';
 
@@ -57,6 +65,107 @@ const TOKENS = [
  * the renderer accepts no web fonts and no `data:` images (ADR-0016).
  */
 const FORMATS = ['bold', 'italic', 'underline', 'list', 'indent', 'align', 'link', 'header'];
+
+// The letters and the recent runs, read as the user through GraphQL (ADR-0093 A2), every name
+// from a schema import (A1) so the queries work with any namespace.
+const TEMPLATE_OBJECT = TEMPLATE.objectApiName;
+const RUN_OBJECT = RUN.objectApiName;
+const RECENT_RUNS = 10;
+
+const TEMPLATES_QUERY = gql`
+  query receiptTemplates {
+    uiapi {
+      query {
+        ${TEMPLATE_OBJECT}(
+          orderBy: { ${TEMPLATE_TYPE.fieldApiName}: { order: ASC }, Name: { order: ASC } }
+          first: 2000
+        ) {
+          edges {
+            node {
+              Id
+              Name {
+                value
+              }
+              ${TEMPLATE_TYPE.fieldApiName} {
+                value
+              }
+              ${TEMPLATE_BODY.fieldApiName} {
+                value
+              }
+              ${TEMPLATE_ACTIVE.fieldApiName} {
+                value
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const RUNS_QUERY = gql`
+  query receiptRuns {
+    uiapi {
+      query {
+        ${RUN_OBJECT}(orderBy: { CreatedDate: { order: DESC } }, first: ${RECENT_RUNS}) {
+          edges {
+            node {
+              Id
+              Name {
+                value
+              }
+              ${RUN_YEAR.fieldApiName} {
+                value
+              }
+              ${RUN_STATUS.fieldApiName} {
+                value
+              }
+              ${RUN_DONORS.fieldApiName} {
+                value
+              }
+              ${RUN_ISSUED.fieldApiName} {
+                value
+              }
+              ${RUN_ERRORS.fieldApiName} {
+                value
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const valueOf = (node, field) => {
+  const name = typeof field === 'string' ? field : field.fieldApiName;
+  return node[name] ? node[name].value : null;
+};
+
+/** A count as a whole number, blank as 0 (as the run history always showed it). */
+const countOf = (node, field) => Math.trunc(Number(valueOf(node, field)) || 0);
+
+function templateOf(node) {
+  return {
+    id: node.Id,
+    name: valueOf(node, 'Name'),
+    type: valueOf(node, TEMPLATE_TYPE),
+    body: valueOf(node, TEMPLATE_BODY),
+    active: valueOf(node, TEMPLATE_ACTIVE) === true
+  };
+}
+
+function runOf(node) {
+  return {
+    id: node.Id,
+    name: valueOf(node, 'Name'),
+    statementYear: countOf(node, RUN_YEAR),
+    status: valueOf(node, RUN_STATUS),
+    donorsProcessed: countOf(node, RUN_DONORS),
+    receiptsIssued: countOf(node, RUN_ISSUED),
+    errors: countOf(node, RUN_ERRORS)
+  };
+}
 
 /** A statement run's Status__c value as a word of the suite status vocabulary (c/barnStatus). */
 const TONE_BY_STATUS = {
@@ -159,9 +268,10 @@ export default class ReceiptSettings extends LightningElement {
   };
 
   templates = [];
-  wiredTemplates;
+  /** Each query's refresh function, from its wire result. */
+  refreshTemplates;
   runs = [];
-  wiredRuns;
+  refreshRuns;
   selectedTemplateId;
   draftBody = '';
   previewHtml;
@@ -176,17 +286,19 @@ export default class ReceiptSettings extends LightningElement {
   tokens = TOKENS;
   formats = FORMATS;
 
-  @wire(getTemplates)
+  @wire(graphql, { query: TEMPLATES_QUERY })
   handleTemplates(result) {
-    this.wiredTemplates = result;
-    if (result.data) {
-      this.templates = result.data;
+    this.refreshTemplates = result.refresh;
+    if (result.errors && result.errors.length) {
+      this.loadError = helpText('Giving', 'Giving_Receipt_UnexpectedError');
+    } else if (result.data) {
+      this.templates = result.data.uiapi.query[TEMPLATE_OBJECT].edges.map(({ node }) =>
+        templateOf(node)
+      );
       this.loadError = undefined;
       if (!this.selectedTemplateId && this.templates.length > 0) {
         this.selectTemplate(this.templates[0]);
       }
-    } else if (result.error) {
-      this.loadError = this.messageOf(result.error);
     }
   }
 
@@ -198,11 +310,11 @@ export default class ReceiptSettings extends LightningElement {
     }
   }
 
-  @wire(getRuns)
+  @wire(graphql, { query: RUNS_QUERY })
   handleRuns(result) {
-    this.wiredRuns = result;
+    this.refreshRuns = result.refresh;
     if (result.data) {
-      this.runs = result.data;
+      this.runs = result.data.uiapi.query[RUN_OBJECT].edges.map(({ node }) => runOf(node));
     }
   }
 
@@ -286,7 +398,7 @@ export default class ReceiptSettings extends LightningElement {
     await this.act(
       () => restoreDefaultTemplates(),
       helpText('Giving', 'Giving_Receipt_RestoredMessage'),
-      this.wiredTemplates
+      'refreshTemplates'
     );
   }
 
@@ -294,7 +406,7 @@ export default class ReceiptSettings extends LightningElement {
     await this.act(
       () => saveTemplate({ templateId: this.selectedTemplateId, body: this.draftBody }),
       helpText('Giving', 'Giving_Receipt_SavedMessage'),
-      this.wiredTemplates
+      'refreshTemplates'
     );
   }
 
@@ -320,7 +432,7 @@ export default class ReceiptSettings extends LightningElement {
     await this.act(
       () => activateTemplate({ templateId: this.selectedTemplateId }),
       helpText('Giving', 'Giving_Receipt_ActivatedMessage'),
-      this.wiredTemplates
+      'refreshTemplates'
     );
   }
 
@@ -328,25 +440,33 @@ export default class ReceiptSettings extends LightningElement {
     await this.act(
       () => startStatementRun({ statementYear: this.statementYear }),
       helpText('Giving', 'Giving_Receipt_StartedMessage'),
-      this.wiredRuns
+      'refreshRuns'
     );
   }
 
   async handleRefreshRuns() {
-    await refreshApex(this.wiredRuns);
+    await this.reread('refreshRuns');
+  }
+
+  /** Reads a list again through its query's refresh function, once the wire has given one. */
+  async reread(refreshName) {
+    const refresh = this[refreshName];
+    if (refresh) {
+      await refresh();
+    }
   }
 
   /**
    * Every write is the same four steps, so they are written once. The outcome stays on the page
    * as a notice above the tabs rather than a toast that disappears.
    */
-  async act(call, successMessage, wired) {
+  async act(call, successMessage, refreshName) {
     this.working = true;
     this.showResult();
     try {
       await call();
       this.showResult(successMessage, 'success');
-      await refreshApex(wired);
+      await this.reread(refreshName);
     } catch (error) {
       this.showResult(this.messageOf(error), 'error');
     } finally {

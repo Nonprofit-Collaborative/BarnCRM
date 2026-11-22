@@ -3,14 +3,22 @@ import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
 import Toast from 'lightning/toast';
 import LOCALE from '@salesforce/i18n/locale';
 import CURRENCY from '@salesforce/i18n/currency';
+import { gql, graphql } from 'lightning/graphql';
 
 import GIFT_OBJECT from '@salesforce/schema/Gift__c';
+import GIFT_AMOUNT from '@salesforce/schema/Gift__c.Amount__c';
+import GIFT_DATE from '@salesforce/schema/Gift__c.Gift_Date__c';
+import GIFT_DONOR_CONTACT from '@salesforce/schema/Gift__c.Donor_Contact__c';
+import GIFT_DONOR_ACCOUNT from '@salesforce/schema/Gift__c.Donor_Account__c';
+import GIFT_MATCHED_GIFT from '@salesforce/schema/Gift__c.Matched_Gift__c';
+import GIFT_ORIGINAL_GIFT from '@salesforce/schema/Gift__c.Original_Gift__c';
+import CONTACT_EMPLOYER from '@salesforce/schema/Contact.Employer__c';
+import ACCOUNT_EMPLOYER from '@salesforce/schema/Account.Employer__c';
 import FUND_OBJECT from '@salesforce/schema/Fund__c';
 import APPEAL_OBJECT from '@salesforce/schema/Appeal__c';
 
 import getDefaults from '@salesforce/apex/QuickGiftEntryController.getDefaults';
 import getDonorKind from '@salesforce/apex/QuickGiftEntryController.getDonorKind';
-import getMatchableGifts from '@salesforce/apex/QuickGiftEntryController.getMatchableGifts';
 import saveGift from '@salesforce/apex/QuickGiftEntryController.saveGift';
 import getPaymentChoices from '@salesforce/apex/QuickGiftEntryController.getPaymentChoices';
 
@@ -92,6 +100,87 @@ const SECTION_OF = {
   matchedGiftId: 'match',
   allocations: 'split'
 };
+
+// The matchable gifts query (ADR-0093 A2): every name from a schema import (A1), so it works
+// with any namespace. A lookup's relationship is its field name ending in __r.
+const relationshipOf = (field) => field.fieldApiName.replace(/__c$/, '__r');
+const GIFT = GIFT_OBJECT.objectApiName;
+const AMOUNT = GIFT_AMOUNT.fieldApiName;
+const GIFT_DATE_NAME = GIFT_DATE.fieldApiName;
+const BY_CONTACT = relationshipOf(GIFT_DONOR_CONTACT);
+const BY_ACCOUNT = relationshipOf(GIFT_DONOR_ACCOUNT);
+const MATCHABLE_GIFT_LIMIT = 50;
+
+/**
+ * The gifts an organization's gift can match (people-giving-23), read as the user: recent gifts
+ * of money from people whose Employer is this organization (through either donor lookup), not
+ * matched yet and not refunds. The gift trigger still checks the pair when the gift is saved
+ * (R-G11); this list only narrows the choice to the gifts that can pass.
+ */
+const MATCHABLE_GIFTS_QUERY = gql`
+  query matchableGifts($employerId: ID) {
+    uiapi {
+      query {
+        ${GIFT}(
+          where: {
+            and: [
+              {
+                or: [
+                  { ${BY_CONTACT}: { ${CONTACT_EMPLOYER.fieldApiName}: { eq: $employerId } } }
+                  { ${BY_ACCOUNT}: { ${ACCOUNT_EMPLOYER.fieldApiName}: { eq: $employerId } } }
+                ]
+              }
+              { ${GIFT_MATCHED_GIFT.fieldApiName}: { eq: null } }
+              { ${GIFT_ORIGINAL_GIFT.fieldApiName}: { eq: null } }
+              { ${AMOUNT}: { gt: 0 } }
+            ]
+          }
+          orderBy: { ${GIFT_DATE_NAME}: { order: DESC }, Name: { order: DESC } }
+          first: ${MATCHABLE_GIFT_LIMIT}
+        ) {
+          edges {
+            node {
+              Id
+              Name {
+                value
+              }
+              ${AMOUNT} {
+                value
+              }
+              ${GIFT_DATE_NAME} {
+                value
+              }
+              ${BY_CONTACT} {
+                Name {
+                  value
+                }
+              }
+              ${BY_ACCOUNT} {
+                Name {
+                  value
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const valueOf = (node, name) => (node && node[name] ? node[name].value : null);
+
+/** One matchable gift node as a choice: id, name, donor name, amount and date. */
+function matchChoiceOf(node) {
+  const donor = node[BY_CONTACT] || node[BY_ACCOUNT];
+  return {
+    id: node.Id,
+    name: valueOf(node, 'Name'),
+    donorName: donor ? valueOf(donor, 'Name') : null,
+    amount: valueOf(node, AMOUNT),
+    giftDate: valueOf(node, GIFT_DATE_NAME)
+  };
+}
 
 /**
  * One line of the "Matches an Employee's Gift" list: who gave, how much and when, then the
@@ -236,7 +325,11 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
   matchedGiftId = '';
   matchChoices = [];
   matchLoaded = false;
-  matchLookup = 0;
+  /** The matchable gifts query's variables; undefined until an organization is the donor. */
+  matchVariables;
+  /** The last wired answer, and the wire's refresh function. */
+  lastMatches = [];
+  refreshMatches;
   /** The funds the gift is split across (people-giving-16), as { fundId, amount }. */
   allocations = [];
   /** The collapsed sections the person has opened. */
@@ -489,33 +582,63 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
 
   /** Another donor has other employees: the gift matched for the last one goes. */
   forgetMatch() {
-    this.matchLookup += 1;
     this.matchChoices = [];
     this.matchLoaded = false;
     this.matchedGiftId = '';
   }
 
+  /** True while the organization the matchable gifts were asked for is still the donor. */
+  get isMatchDonor() {
+    return (
+      this.donorKind === ORGANIZATION &&
+      Boolean(this.donorId) &&
+      Boolean(this.matchVariables) &&
+      this.matchVariables.employerId === this.donorId
+    );
+  }
+
   /**
-   * Asks for the gifts this organization's gift can match. Only the latest answer is used, and
-   * a failure leaves the section empty: the gift still saves, and the match can be linked from
-   * the gift page later.
+   * The gifts this organization's gift can match, read through GraphQL (ADR-0093 A2). Only the
+   * answer for the donor on screen is used, and a failure leaves the section empty: the gift
+   * still saves, and the match can be linked from the gift page later.
+   */
+  @wire(graphql, { query: MATCHABLE_GIFTS_QUERY, variables: '$matchVariables' })
+  receiveMatches(result) {
+    this.refreshMatches = result.refresh;
+    const { data, errors } = result;
+    if (!data && !(errors && errors.length)) {
+      return;
+    }
+    this.lastMatches = data
+      ? data.uiapi.query[GIFT].edges.map(({ node }) => matchChoiceOf(node))
+      : [];
+    if (this.isMatchDonor) {
+      this.matchChoices = this.lastMatches;
+      this.matchLoaded = true;
+    }
+  }
+
+  /**
+   * Asks for the gifts this organization's gift can match. Asking again for the same
+   * organization (after a save) reads them afresh, so a gift just matched is not offered again.
    */
   async lookUpMatches() {
     if (this.donorKind !== ORGANIZATION || !this.donorId) {
       return;
     }
-    const lookup = ++this.matchLookup;
+    if (!this.isMatchDonor || !this.refreshMatches) {
+      this.matchVariables = { employerId: this.donorId };
+      return;
+    }
     try {
-      const choices = await getMatchableGifts({ organizationId: this.donorId });
-      if (lookup === this.matchLookup) {
-        this.matchChoices = Array.isArray(choices) ? choices : [];
-        this.matchLoaded = true;
-      }
+      await this.refreshMatches();
     } catch {
-      if (lookup === this.matchLookup) {
-        this.matchChoices = [];
-        this.matchLoaded = true;
-      }
+      this.lastMatches = [];
+    }
+    // A refresh that found nothing new does not call the wire again.
+    if (this.isMatchDonor && !this.matchLoaded) {
+      this.matchChoices = this.lastMatches;
+      this.matchLoaded = true;
     }
   }
 

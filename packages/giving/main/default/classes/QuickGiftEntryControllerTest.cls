@@ -517,7 +517,7 @@ private class QuickGiftEntryControllerTest {
 	}
 
 	@IsTest
-	static void offersAnEmployeesGiftAndSavesTheMatch() {
+	static void savesTheMatchOfAnEmployeesGift() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			makeFund();
 			RecognitionTestData.setAutomaticHouseholdCredits(false);
@@ -527,23 +527,16 @@ private class QuickGiftEntryControllerTest {
 			ana.Employer__c = riverbend.Id;
 			update ana;
 			Gift__c employeeGift = RecognitionTestData.gift(ana.Id, null, 500);
-			Contact stranger = RecognitionTestData.person('Lee', 'Park', garcias.Id);
-			RecognitionTestData.gift(stranger.Id, null, 75);
 
+			// The form lists the matchable gifts through GraphQL (ADR-0093 A2).
 			Test.startTest();
-			List<QuickGiftEntryController.GiftChoice> choices = QuickGiftEntryController.getMatchableGifts(
-				riverbend.Id
-			);
 			QuickGiftEntryController.GiftInput input = baseInput();
 			input.amount = 500;
 			input.donorAccountId = riverbend.Id;
-			input.matchedGiftId = choices.isEmpty() ? null : choices[0].id;
+			input.matchedGiftId = employeeGift.Id;
 			QuickGiftEntryController.SaveResult result = QuickGiftEntryController.saveGift(input);
 			Test.stopTest();
 
-			Assert.areEqual(1, choices.size(), 'Only the employee gift is offered.');
-			Assert.areEqual(employeeGift.Id, choices[0].id, 'Ana gift.');
-			Assert.areEqual('Ana Garcia', choices[0].donorName, 'Who gave it.');
 			Assert.isTrue(result.success, 'Saved: ' + result.formError);
 			Gift__c matched = [
 				SELECT Matched_Gift__c

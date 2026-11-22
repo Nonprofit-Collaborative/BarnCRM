@@ -107,13 +107,13 @@ kept, with the reason.
 | ImportController.saveFile | core | write | Keep | Import permission, file decoded and stored as a ContentVersion |
 | AccessExplorerController.searchPeople | orgoptimizer | read | Keep | SOSL name search and the Access Explorer permission |
 | AccessExplorerController.searchPermissionSets | orgoptimizer | read | Keep | PermissionSet is not in the UI API |
-| AskPipelineController.moveStage | giving | write | Convert: `updateRecord` | |
+| AskPipelineController.moveStage | giving | write | Converted (AP-03 part 3): `updateRecord` | |
 | CommitmentController.getSchedule | giving | read | Keep | Two objects and record edit access |
 | CommitmentEntryController.save | giving | write | Keep | Server validation and the draft built from the entry |
 | FundraisingHomeController.getHome | giving | read | Keep | Composes the home tiles; the one query is a first-run check |
-| QuickGiftEntryController.getMatchableGifts | giving | read | Convert: GraphQL (`Gift__c`, employer filter through both donor lookups) | |
-| ReceiptController.getTemplates | giving | read | Convert: GraphQL (`Receipt_Template__c` by Type, Name) | |
-| ReceiptController.getRuns | giving | read | Convert: GraphQL (`Receipt_Run__c`, latest 10) | |
+| QuickGiftEntryController.getMatchableGifts | giving | read | Converted (AP-03 part 3): GraphQL (`Gift__c`, employer filter through both donor lookups) | |
+| ReceiptController.getTemplates | giving | read | Converted (AP-03 part 3): GraphQL (`Receipt_Template__c` by Type, Name) | |
+| ReceiptController.getRuns | giving | read | Converted (AP-03 part 3): GraphQL (`Receipt_Run__c`, latest 10) | |
 | RecurringHealthController.createFollowUp | giving | write | Keep | Reads the commitment and writes a Task (two objects) |
 | StewardshipPlanController.deleteStep | giving | write | Keep | Manage BarnCRM Settings permission |
 | StewardshipPlanController.setActive | giving | write | Keep | Manage BarnCRM Settings permission |

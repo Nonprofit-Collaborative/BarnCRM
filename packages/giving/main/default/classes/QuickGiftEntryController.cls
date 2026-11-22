@@ -19,8 +19,6 @@ public with sharing class QuickGiftEntryController {
 	private static final String CONTEXT = 'QuickGiftEntryController';
 	private static final String KIND_PERSON = 'person';
 	private static final String KIND_ORGANIZATION = 'organization';
-	/** How many employee gifts the "Matches an Employee's Gift" list offers, newest first. */
-	private static final Integer MATCHABLE_GIFT_LIMIT = 50;
 
 	/**
 	 * The values a new gift starts from: today's date, the org's default fund and appeal,
@@ -66,42 +64,6 @@ public with sharing class QuickGiftEntryController {
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getDonorKind');
 			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_QuickGiftEntry_ErrorLoadDefaults'));
-		}
-	}
-
-	/**
-	 * The gifts an organization's gift can match (people-giving-23): recent gifts of money from
-	 * people whose Employer is this organization, not matched yet, and not refunds. The gift
-	 * trigger still checks the pair when the gift is saved (R-G11); this list only narrows the
-	 * choice to the gifts that can pass.
-	 */
-	@AuraEnabled
-	public static List<GiftChoice> getMatchableGifts(String organizationId) {
-		Id employerId = asId(organizationId, Account.SObjectType);
-		List<GiftChoice> choices = new List<GiftChoice>();
-		if (employerId == null) {
-			return choices;
-		}
-		try {
-			for (Gift__c gift : [
-				SELECT Id, Name, Amount__c, Gift_Date__c, Donor_Contact__r.Name, Donor_Account__r.Name
-				FROM Gift__c
-				WHERE
-					(Donor_Contact__r.Employer__c = :employerId
-					OR Donor_Account__r.Employer__c = :employerId)
-					AND Matched_Gift__c = NULL
-					AND Original_Gift__c = NULL
-					AND Amount__c > 0
-				WITH USER_MODE
-				ORDER BY Gift_Date__c DESC, Name DESC
-				LIMIT :MATCHABLE_GIFT_LIMIT
-			]) {
-				choices.add(new GiftChoice(gift));
-			}
-			return choices;
-		} catch (Exception e) {
-			ErrorLogger.log(e, CONTEXT + '.getMatchableGifts');
-			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_QuickGiftEntry_ErrorUnexpected'));
 		}
 	}
 
@@ -381,30 +343,6 @@ public with sharing class QuickGiftEntryController {
 		public PicklistOption(String label, String value) {
 			this.label = label;
 			this.value = value;
-		}
-	}
-
-	/** One employee gift an organization's gift can match. */
-	public class GiftChoice {
-		@AuraEnabled
-		public String id;
-		@AuraEnabled
-		public String name;
-		@AuraEnabled
-		public String donorName;
-		@AuraEnabled
-		public Decimal amount;
-		@AuraEnabled
-		public Date giftDate;
-
-		public GiftChoice(Gift__c gift) {
-			this.id = gift.Id;
-			this.name = gift.Name;
-			this.amount = gift.Amount__c;
-			this.giftDate = gift.Gift_Date__c;
-			this.donorName = gift.Donor_Contact__r != null
-				? gift.Donor_Contact__r.Name
-				: (gift.Donor_Account__r != null ? gift.Donor_Account__r.Name : null);
 		}
 	}
 

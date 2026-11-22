@@ -4,7 +4,7 @@ import { CurrentPageReference } from 'lightning/navigation';
 import QuickGiftEntry, { matchChoiceLabel } from 'c/quickGiftEntry';
 import getDefaults from '@salesforce/apex/QuickGiftEntryController.getDefaults';
 import getDonorKind from '@salesforce/apex/QuickGiftEntryController.getDonorKind';
-import getMatchableGifts from '@salesforce/apex/QuickGiftEntryController.getMatchableGifts';
+import { graphql } from 'lightning/graphql';
 import saveGift from '@salesforce/apex/QuickGiftEntryController.saveGift';
 import getPaymentChoices from '@salesforce/apex/QuickGiftEntryController.getPaymentChoices';
 import HouseholdAddMemberModal from 'c/householdAddMemberModal';
@@ -33,12 +33,6 @@ jest.mock('@salesforce/apex/QuickGiftEntryController.getDefaults', () => ({ defa
 
 jest.mock(
   '@salesforce/apex/QuickGiftEntryController.getDonorKind',
-  () => ({ default: jest.fn() }),
-  { virtual: true }
-);
-
-jest.mock(
-  '@salesforce/apex/QuickGiftEntryController.getMatchableGifts',
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
@@ -139,7 +133,6 @@ describe('c-quick-gift-entry', () => {
   beforeEach(() => {
     getDefaults.mockResolvedValue({ ...DEFAULTS });
     getDonorKind.mockResolvedValue('organization');
-    getMatchableGifts.mockResolvedValue([]);
     saveGift.mockResolvedValue({
       success: true,
       giftId: '004000000000000AAA',
@@ -583,15 +576,6 @@ describe('c-quick-gift-entry', () => {
   });
 
   it('asks whether an account is a person or an organization, and offers its matches', async () => {
-    getMatchableGifts.mockResolvedValue([
-      {
-        id: 'a05000000000001AAA',
-        name: 'G-000042',
-        donorName: 'Ana Garcia',
-        amount: 100,
-        giftDate: '2026-10-01'
-      }
-    ]);
     const element = build({ recordId: ACCOUNT_ID, objectApiName: 'Account' });
     await settle();
 
@@ -600,9 +584,32 @@ describe('c-quick-gift-entry', () => {
     expect(pick(element, 'donor-organization').displayInfo).toEqual({
       additionalFields: ['BillingCity']
     });
-    expect(getMatchableGifts).toHaveBeenCalledWith({ organizationId: ACCOUNT_ID });
+    expect(graphql.getLastConfig().variables).toEqual({ employerId: ACCOUNT_ID });
+    graphql.emit({
+      uiapi: {
+        query: {
+          Gift__c: {
+            edges: [
+              {
+                node: {
+                  Id: 'a05000000000001AAA',
+                  Name: { value: 'G-000042' },
+                  Amount__c: { value: 100 },
+                  Gift_Date__c: { value: '2026-10-01' },
+                  Donor_Contact__r: { Name: { value: 'Ana Garcia' } },
+                  Donor_Account__r: null
+                }
+              }
+            ]
+          }
+        }
+      }
+    });
+    await settle();
     const matched = pick(element, 'matched-gift');
     expect(matched.options.map((option) => option.value)).toEqual(['', 'a05000000000001AAA']);
+    expect(matched.options[1].label).toContain('Ana Garcia');
+    expect(matched.options[1].label).toContain('(G-000042)');
 
     change(pick(element, 'amount'), { value: '100' });
     change(pick(element, 'gift-type'), { value: 'Check' });
@@ -613,6 +620,23 @@ describe('c-quick-gift-entry', () => {
     const sent = saveGift.mock.calls[0][0].input;
     expect(sent.donorAccountId).toBe(ACCOUNT_ID);
     expect(sent.matchedGiftId).toBe('a05000000000001AAA');
+  });
+
+  it('reads the matches afresh for the same organization after save and new', async () => {
+    const refresh = jest.fn().mockResolvedValue(undefined);
+    const element = build({ recordId: ACCOUNT_ID, objectApiName: 'Account' });
+    await settle();
+    graphql.emit({ uiapi: { query: { Gift__c: { edges: [] } } } }, undefined, refresh);
+    await settle();
+    expect(pick(element, 'matched-gift')).toBeNull();
+
+    change(pick(element, 'amount'), { value: '100' });
+    change(pick(element, 'gift-type'), { value: 'Check' });
+    pick(element, 'save-and-new').click();
+    await settle();
+
+    expect(refresh).toHaveBeenCalled();
+    expect(graphql.getLastConfig().variables).toEqual({ employerId: ACCOUNT_ID });
   });
 
   it('treats a person account as a person and offers no match', async () => {
