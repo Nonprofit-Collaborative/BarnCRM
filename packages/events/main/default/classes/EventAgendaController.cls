@@ -1,9 +1,10 @@
 /**
  * The Agenda tab of the event page (EV-04, canonical model 29EV4 and 29EV5): the event's tracks
- * and sessions, and moving a session to another track (R-ESN5). Thin by design (plan Section
- * 9.9): days, columns and clash flags are worked out in the browser module `eventAgendaModel`.
- * Reads in user mode; the move writes `AccessLevel.USER_MODE`. Tracks and sessions are added and
- * edited through the platform's record forms.
+ * and sessions. Thin by design (plan Section 9.9): days, columns and clash flags are worked out in
+ * the browser module `eventAgendaModel`. Reads in user mode. Moving a session to another track
+ * (R-ESN5) is a Lightning Data Service update in the LWC (ADR-0093); the lookup filter keeps the
+ * track in the session's own event. Tracks and sessions are added and edited through the
+ * platform's record forms.
  */
 public with sharing class EventAgendaController {
 	private static final String CONTEXT = 'EventAgendaController';
@@ -135,25 +136,6 @@ public with sharing class EventAgendaController {
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getAgenda', eventId);
 			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Agenda_LoadFailed'));
-		}
-	}
-
-	/**
-	 * Moves a session to another track of its event, or to no track (R-ESN5): only its Track
-	 * changes. The lookup filter keeps the track in the session's own event.
-	 *
-	 * @param sessionId the session
-	 * @param trackId the track, or null for no track
-	 */
-	@AuraEnabled
-	public static void moveSession(Id sessionId, Id trackId) {
-		try {
-			update as user new Event_Session__c(Id = sessionId, Track__c = trackId);
-		} catch (DmlException e) {
-			throw UserErrors.message(e.getDmlMessage(0));
-		} catch (Exception e) {
-			ErrorLogger.log(e, CONTEXT + '.moveSession', sessionId);
-			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Shared_NotSaved'));
 		}
 	}
 

@@ -98,6 +98,24 @@ describe('c/findCsv', () => {
     expect(format('No placeholders')).toBe('No placeholders');
   });
 
+  it('reads the record error a Lightning Data Service write returns first', () => {
+    const generic = 'An error occurred while trying to update the record.';
+    expect(
+      messageFrom({ body: { message: generic, output: { errors: [{ message: 'Rule says no' }] } } })
+    ).toBe('Rule says no');
+    expect(
+      messageFrom({
+        body: {
+          message: generic,
+          output: { errors: [], fieldErrors: { Name: [{ message: 'Name is too long' }] } }
+        }
+      })
+    ).toBe('Name is too long');
+    expect(
+      messageFrom({ body: { message: generic, output: { errors: [], fieldErrors: {} } } })
+    ).toBe(generic);
+  });
+
   it('falls back to the given message', () => {
     expect(messageFrom(undefined, 'Fallback')).toBe('Fallback');
     expect(messageFrom(new Error('Thrown'), 'Fallback')).toBe('Thrown');

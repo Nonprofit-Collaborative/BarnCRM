@@ -41,6 +41,22 @@ private class EventSpeakersControllerTest {
 		return record;
 	}
 
+	/** Adds a speaker as the tab does, through Lightning Data Service (ADR-0093). */
+	private static Id addSpeaker(Id eventId, Id contactId) {
+		Event_Speaker__c record = new Event_Speaker__c(Event__c = eventId, Contact__c = contactId);
+		insert as user record;
+		return record.Id;
+	}
+
+	/** Puts a speaker in a session as the tab does, through Lightning Data Service. */
+	private static void assign(Id sessionId, Id speakerId, String role) {
+		insert as user new Session_Speaker__c(
+			Event_Session__c = sessionId,
+			Event_Speaker__c = speakerId,
+			Role__c = role
+		);
+	}
+
 	@IsTest
 	static void addsAPersonAsASpeakerNamedAfterThem() {
 		System.runAs(staff()) {
@@ -48,7 +64,7 @@ private class EventSpeakersControllerTest {
 			Contact ana = person();
 
 			Test.startTest();
-			EventSpeakersController.addSpeaker(event.Id, ana.Id);
+			addSpeaker(event.Id, ana.Id);
 			EventSpeakersController.Speakers result = EventSpeakersController.getSpeakers(event.Id);
 			Test.stopTest();
 
@@ -66,7 +82,7 @@ private class EventSpeakersControllerTest {
 	static void countsTheSpeakerChecklist() {
 		System.runAs(staff()) {
 			Event__c event = conference('Community Dreamin');
-			Id speakerId = EventSpeakersController.addSpeaker(event.Id, person().Id);
+			Id speakerId = addSpeaker(event.Id, person().Id);
 			update as user new Event_Speaker__c(
 				Id = speakerId,
 				Agreement_Signed__c = true,
@@ -87,16 +103,16 @@ private class EventSpeakersControllerTest {
 		System.runAs(staff()) {
 			Event__c event = conference('Community Dreamin');
 			Contact ana = person();
-			EventSpeakersController.addSpeaker(event.Id, ana.Id);
+			addSpeaker(event.Id, ana.Id);
 
 			Test.startTest();
 			Boolean refused = false;
 			try {
-				EventSpeakersController.addSpeaker(event.Id, ana.Id);
-			} catch (AuraHandledException e) {
+				addSpeaker(event.Id, ana.Id);
+			} catch (DmlException e) {
 				refused = true;
 			}
-			Id other = EventSpeakersController.addSpeaker(conference('Second Event').Id, ana.Id);
+			Id other = addSpeaker(conference('Second Event').Id, ana.Id);
 			Test.stopTest();
 
 			Assert.isTrue(refused, 'A second add of the same person is refused');
@@ -109,14 +125,14 @@ private class EventSpeakersControllerTest {
 		System.runAs(staff()) {
 			Event__c event = conference('Community Dreamin');
 			Event_Session__c keynote = session(event, 'Keynote');
-			Id speakerId = EventSpeakersController.addSpeaker(event.Id, person().Id);
+			Id speakerId = addSpeaker(event.Id, person().Id);
 
 			Test.startTest();
-			EventSpeakersController.assign(keynote.Id, speakerId, 'Speaker');
+			assign(keynote.Id, speakerId, 'Speaker');
 			Boolean refused = false;
 			try {
-				EventSpeakersController.assign(keynote.Id, speakerId, 'Moderator');
-			} catch (AuraHandledException e) {
+				assign(keynote.Id, speakerId, 'Moderator');
+			} catch (DmlException e) {
 				refused = true;
 			}
 			EventSpeakersController.Speakers result = EventSpeakersController.getSpeakers(event.Id);
@@ -135,13 +151,13 @@ private class EventSpeakersControllerTest {
 		System.runAs(staff()) {
 			Event__c event = conference('Community Dreamin');
 			Event_Session__c keynote = session(event, 'Keynote');
-			Id otherSpeaker = EventSpeakersController.addSpeaker(conference('Second Event').Id, person().Id);
+			Id otherSpeaker = addSpeaker(conference('Second Event').Id, person().Id);
 
 			Test.startTest();
 			Boolean refused = false;
 			try {
-				EventSpeakersController.assign(keynote.Id, otherSpeaker, 'Speaker');
-			} catch (AuraHandledException e) {
+				assign(keynote.Id, otherSpeaker, 'Speaker');
+			} catch (DmlException e) {
 				refused = true;
 			}
 			Test.stopTest();
@@ -156,8 +172,8 @@ private class EventSpeakersControllerTest {
 		System.runAs(staff()) {
 			Event__c event = conference('Community Dreamin');
 			Event_Session__c keynote = session(event, 'Keynote');
-			Id speakerId = EventSpeakersController.addSpeaker(event.Id, person().Id);
-			EventSpeakersController.assign(keynote.Id, speakerId, 'Speaker');
+			Id speakerId = addSpeaker(event.Id, person().Id);
+			assign(keynote.Id, speakerId, 'Speaker');
 
 			Test.startTest();
 			EventSpeakersController.removeSpeaker(speakerId);

@@ -1,11 +1,11 @@
 import { LightningElement, api } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { deleteRecord } from 'lightning/uiRecordApi';
 import getApplications from '@salesforce/apex/EventApplicationsController.getApplications';
 import saveReview from '@salesforce/apex/EventApplicationsController.saveReview';
 import decide from '@salesforce/apex/EventApplicationsController.decide';
 import saveCriteria from '@salesforce/apex/EventProposalReview.saveCriteria';
 import addPresenter from '@salesforce/apex/EventProposalReview.addPresenter';
-import removePresenter from '@salesforce/apex/EventProposalReview.removePresenter';
 import assignReviewers from '@salesforce/apex/EventProposalReview.assignReviewers';
 import { format, messageFrom } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
@@ -559,7 +559,8 @@ export default class EventApplications extends LightningElement {
 
   async handleRemovePresenter(event) {
     const presenterId = event.currentTarget.dataset.id;
-    await this.run(() => removePresenter({ presenterId }));
+    // Deleted as the user through Lightning Data Service (ADR-0093).
+    await this.run(() => deleteRecord(presenterId));
   }
 
   async edit(application) {

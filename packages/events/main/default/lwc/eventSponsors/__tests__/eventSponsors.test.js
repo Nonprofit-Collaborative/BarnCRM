@@ -2,10 +2,7 @@ import { createElement } from 'lwc';
 import EventSponsors from 'c/eventSponsors';
 import getSponsors from '@salesforce/apex/EventSponsorsController.getSponsors';
 import addSponsor from '@salesforce/apex/EventSponsorsController.addSponsor';
-import addDeliverable from '@salesforce/apex/EventSponsorsController.addDeliverable';
-import setDeliverableStatus from '@salesforce/apex/EventSponsorsController.setDeliverableStatus';
-import removeSponsor from '@salesforce/apex/EventSponsorsController.removeSponsor';
-import { deleteRecord } from 'lightning/uiRecordApi';
+import { createRecord, deleteRecord, updateRecord } from 'lightning/uiRecordApi';
 import EventRecordModal from 'c/eventRecordModal';
 import { setHelpTextForTest } from 'c/barnHelpText';
 import getLeads from '@salesforce/apex/EventSponsorsController.getLeads';
@@ -18,21 +15,10 @@ jest.mock('@salesforce/apex/EventSponsorsController.addSponsor', () => ({ defaul
   virtual: true
 });
 jest.mock(
-  '@salesforce/apex/EventSponsorsController.addDeliverable',
-  () => ({ default: jest.fn() }),
+  'lightning/uiRecordApi',
+  () => ({ createRecord: jest.fn(), deleteRecord: jest.fn(), updateRecord: jest.fn() }),
   { virtual: true }
 );
-jest.mock(
-  '@salesforce/apex/EventSponsorsController.setDeliverableStatus',
-  () => ({ default: jest.fn() }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/apex/EventSponsorsController.removeSponsor',
-  () => ({ default: jest.fn() }),
-  { virtual: true }
-);
-jest.mock('lightning/uiRecordApi', () => ({ deleteRecord: jest.fn() }), { virtual: true });
 jest.mock('@salesforce/apex/EventSponsorsController.getLeads', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -180,15 +166,12 @@ describe('c-event-sponsors', () => {
 
   it('changes a deliverable status and removes a deliverable', async () => {
     const element = await render();
-    setDeliverableStatus.mockResolvedValue();
+    updateRecord.mockResolvedValue({});
     deleteRecord.mockResolvedValue();
     const status = one(element, '[data-kind="deliverable-status"]');
     status.dispatchEvent(new CustomEvent('change', { detail: { value: 'Pending' } }));
     await flush();
-    expect(setDeliverableStatus).toHaveBeenCalledWith({
-      deliverableId: LOGO,
-      status: 'Pending'
-    });
+    expect(updateRecord).toHaveBeenCalledWith({ fields: { Id: LOGO, Status__c: 'Pending' } });
     one(element, '[data-kind="deliverable-remove"]').click();
     await flush();
     expect(deleteRecord).toHaveBeenCalledWith(LOGO);
@@ -196,25 +179,35 @@ describe('c-event-sponsors', () => {
 
   it('adds a deliverable from the sponsor menu once it has a name', async () => {
     const element = await render();
-    addDeliverable.mockResolvedValue();
+    createRecord.mockResolvedValue({ id: 'a0D000000000009AAA' });
     choose(sponsorMenu(element, 0), 'deliverable');
     await flush();
     expect(one(element, '[data-id="deliverable-save"]').disabled).toBe(true);
     one(element, '[data-id="deliverable-name"]').dispatchEvent(
-      new CustomEvent('change', { detail: { value: 'Banner' } })
+      new CustomEvent('change', { detail: { value: ' Banner ' } })
     );
     one(element, '[data-id="deliverable-type"]').dispatchEvent(
-      new CustomEvent('change', { detail: { value: 'Other' } })
+      new CustomEvent('change', { detail: { value: 'Booth' } })
     );
     await flush();
     one(element, '[data-id="deliverable-save"]').click();
     await flush();
-    expect(addDeliverable).toHaveBeenCalledWith({
-      sponsorId: ACME,
-      name: 'Banner',
-      type: 'Other'
+    expect(createRecord).toHaveBeenCalledWith({
+      apiName: 'Sponsor_Deliverable__c',
+      fields: { Event_Sponsor__c: ACME, Name: 'Banner', Type__c: 'Booth' }
     });
     expect(one(element, '[data-id="deliverable-form-row"]')).toBeNull();
+  });
+
+  it('keeps Save off while the deliverable name is only spaces', async () => {
+    const element = await render();
+    choose(sponsorMenu(element, 0), 'deliverable');
+    await flush();
+    one(element, '[data-id="deliverable-name"]').dispatchEvent(
+      new CustomEvent('change', { detail: { value: '   ' } })
+    );
+    await flush();
+    expect(one(element, '[data-id="deliverable-save"]').disabled).toBe(true);
   });
 
   it('edits a sponsor and a level, and adds a level', async () => {
@@ -259,13 +252,12 @@ describe('c-event-sponsors', () => {
 
   it('removes a sponsor and a level after the person confirms', async () => {
     const element = await render();
-    removeSponsor.mockResolvedValue();
     deleteRecord.mockResolvedValue();
     EventRecordModal.open.mockResolvedValueOnce(true);
     choose(sponsorMenu(element, 0), 'remove');
     await flush();
     await flush();
-    expect(removeSponsor).toHaveBeenCalledWith({ sponsorId: ACME });
+    expect(deleteRecord).toHaveBeenCalledWith(ACME);
     EventRecordModal.open.mockResolvedValueOnce(true);
     choose(levelMenu(element, 0), 'remove');
     await flush();
@@ -275,7 +267,7 @@ describe('c-event-sponsors', () => {
 
   it('shows a refusal in a toast and the load error', async () => {
     const element = await render();
-    removeSponsor.mockRejectedValue({ body: { message: 'Not yours' } });
+    deleteRecord.mockRejectedValue({ body: { message: 'Not yours' } });
     const toasts = jest.fn();
     element.addEventListener('lightning__showtoast', toasts);
     EventRecordModal.open.mockResolvedValueOnce(true);

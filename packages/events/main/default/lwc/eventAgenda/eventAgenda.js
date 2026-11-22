@@ -1,10 +1,9 @@
 import { LightningElement, api } from 'lwc';
-import { deleteRecord } from 'lightning/uiRecordApi';
+import { deleteRecord, updateRecord } from 'lightning/uiRecordApi';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import LOCALE from '@salesforce/i18n/locale';
 import TIME_ZONE from '@salesforce/i18n/timeZone';
 import getAgenda from '@salesforce/apex/EventAgendaController.getAgenda';
-import moveSession from '@salesforce/apex/EventAgendaController.moveSession';
 import { whenText } from 'c/eventsModel';
 import { NO_TRACK, UNSCHEDULED, clashesOf, columnsFor, daysOf } from 'c/eventAgendaModel';
 import { createDragController } from 'c/barnDrag';
@@ -364,10 +363,15 @@ export default class EventAgenda extends LightningElement {
     }
   }
 
-  /** R-ESN5: only the track changes; the menu, the drag and the keyboard all end here. */
+  /**
+   * R-ESN5: only the track changes; the menu, the drag and the keyboard all end here. Saved as
+   * the user through Lightning Data Service (ADR-0093).
+   */
   async moveTo(sessionId, columnId) {
     try {
-      await moveSession({ sessionId, trackId: columnId === NO_TRACK ? null : columnId });
+      await updateRecord({
+        fields: { Id: sessionId, Track__c: columnId === NO_TRACK ? null : columnId }
+      });
       await this.load();
     } catch (error) {
       this.toast(messageFrom(error, helpText('Events', 'Events_Shared_NotSaved')));

@@ -1,16 +1,16 @@
 import { LightningElement, api } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { deleteRecord, updateRecord } from 'lightning/uiRecordApi';
 import getSeating from '@salesforce/apex/EventSeatingController.getSeating';
 import saveTable from '@salesforce/apex/EventSeatingController.saveTable';
-import deleteTable from '@salesforce/apex/EventSeatingController.deleteTable';
 import assignSeats from '@salesforce/apex/EventSeatingController.assignSeats';
-import saveNeeds from '@salesforce/apex/EventSeatingController.saveNeeds';
 import BarnConfirmModal from 'c/barnConfirmModal';
 import { localIsoDate, messageFrom, saveBlob } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import {
   guestsAt,
   moveSeats,
+  needsFields,
   overflowAfter,
   seatingCsv,
   suggestSeating,
@@ -338,7 +338,8 @@ export default class EventSeating extends LightningElement {
     if (!confirmed) {
       return;
     }
-    await this.run(() => deleteTable({ tableId: id }));
+    // The people seated at it stay registered and have no table. As the user (ADR-0093).
+    await this.run(() => deleteRecord(id));
   }
 
   async handleSeat(event) {
@@ -384,7 +385,7 @@ export default class EventSeating extends LightningElement {
     if ((guest[field] || '') === value) {
       return;
     }
-    await this.run(() => saveNeeds({ attendeeId: id, dietary, access }));
+    await this.run(() => updateRecord({ fields: needsFields(id, dietary, access) }));
   }
 
   handleExport() {
