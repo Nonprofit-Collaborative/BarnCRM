@@ -96,6 +96,8 @@ private class ArchiveRuleServiceTest {
 			BulkDeleteService.Preview preview = ArchiveController.previewRule(query.Id);
 			System.Assert.areEqual(2, preview.count, 'The preview counts');
 
+			// The run and what follows get their own limits, as a person's later clicks would.
+			Test.startTest();
 			panel = ArchiveController.runRule(query.Id, 2);
 			drain();
 			panel = ArchiveController.getRules();
@@ -111,6 +113,7 @@ private class ArchiveRuleServiceTest {
 			} catch (AuraHandledException expected) {
 				System.Assert.isTrue(String.isNotBlank(expected.getMessage()), 'Refused');
 			}
+			Test.stopTest();
 		}
 	}
 
@@ -143,7 +146,11 @@ private class ArchiveRuleServiceTest {
 				Query_JSON__c = ArchiveRules.withRule(VOLUNTEERS, settings)
 			);
 			insert as user query;
-			System.Assert.areEqual(new Set<Id>{ query.Id }, ArchiveRuleService.dueRuleIds(OrgDate.today()), 'Due daily');
+			System.Assert.areEqual(
+				new Set<Id>{ query.Id },
+				ArchiveRuleService.dueRuleIds(OrgDate.today()),
+				'Due daily'
+			);
 			NightlyStep step = ArchiveRulesStep.step();
 			System.Assert.areEqual(ArchiveRulesStep.JOB_NAME, step.key, 'The step key');
 			System.Assert.isTrue(step.hasSwitch(), 'The step has a switch');

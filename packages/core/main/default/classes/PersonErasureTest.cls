@@ -86,12 +86,17 @@ private class PersonErasureTest {
 
 			Assert.areEqual(
 				0,
-				[SELECT COUNT() FROM Field_History__c WHERE Record_Id__c IN :new List<String>{ jordan.Id, home.Id }],
+				[
+					SELECT COUNT()
+					FROM Field_History__c
+					WHERE Record_Id__c IN :new List<String>{ jordan.Id, home.Id }
+					WITH SYSTEM_MODE
+				],
 				'The person and their deleted address lose their field history'
 			);
 			Assert.areEqual(
 				1,
-				[SELECT COUNT() FROM Field_History__c WHERE Record_Id__c = :other.Id],
+				[SELECT COUNT() FROM Field_History__c WHERE Record_Id__c = :other.Id WITH SYSTEM_MODE],
 				'Another person keeps theirs'
 			);
 			Integer listed = 0;
@@ -122,7 +127,7 @@ private class PersonErasureTest {
 
 			Assert.areEqual(
 				1,
-				[SELECT COUNT() FROM Field_History__c WHERE Record_Id__c = :jordan.Id],
+				[SELECT COUNT() FROM Field_History__c WHERE Record_Id__c = :jordan.Id WITH SYSTEM_MODE],
 				'The preview rolls the deletion back'
 			);
 			Boolean listed = false;

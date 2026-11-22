@@ -90,12 +90,9 @@ public class ReceiptTestDataFactory {
 	}
 
 	/**
-	 * The Giving settings a receipt prints. A store value lasts one transaction, so a test class
-	 * whose setup issues receipts also calls this from a static block.
-	 */
-	/**
-	 * The organization that issues receipts, put in the settings store for this transaction (a
-	 * store value lasts one transaction, so a class that sets up in @TestSetup calls this again).
+	 * The organization that issues receipts. Saved on the legacy settings record, which a class
+	 * that sets up in @TestSetup keeps for every test (read until carry-over), and put in the
+	 * settings store for this transaction, which is read first and clears the cached settings.
 	 */
 	public static void useOrganization() {
 		Map<String, Object> organization = new Map<String, Object>{
@@ -106,11 +103,21 @@ public class ReceiptTestDataFactory {
 			'Organization_State__c' => 'IL',
 			'Organization_Postal_Code__c' => '62701'
 		};
+		BarnCRM_Settings__c core = BarnCRM_Settings__c.getOrgDefaults();
+		core.SetupOwnerId = UserInfo.getOrganizationId();
+		for (String key : organization.keySet()) {
+			core.put(key, organization.get(key));
+		}
+		upsert core;
 		for (String key : organization.keySet()) {
 			SettingsService.setForTest(key, organization.get(key));
 		}
 	}
 
+	/**
+	 * The Giving settings a receipt prints. A store value lasts one transaction, so a test class
+	 * whose setup issues receipts also calls this from a static block.
+	 */
 	public static void useReceiptSettings() {
 		ModuleSettings.setForTest('Giving_Receipt_Number_Prefix', 'HFH');
 		ModuleSettings.setForTest('Giving_Receipt_Next_Counter', 1);
