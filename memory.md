@@ -283,7 +283,7 @@ Donor portal and online giving; email marketing beyond export; grantmaking as a 
 
 ## Pending owner decisions and notes (2026-10-30)
 
-- Decided (2026-11-21, plan row Q-01, D-219): settings move to custom metadata before the first package version (SET-01, release 1.34), taking the suite from 201 to 181 custom objects, under Enterprise Edition's 200. CN-19 (Connector logo) waits on the owner's logo; the master is added by the CN-19 PR.
+- Decided (2026-11-21, plan row Q-01, D-219): settings move to custom metadata before the first package version (SET-01, release 1.34), taking the suite from 201 to 181 custom objects, under Enterprise Edition's 200. CN-19 (Connector logo) is built (#1384).
 - Open (2026-11-21, plan row Q-02): module UX findings from the screenshot review, planned with the module rollouts; owner to say whether to fix them now.
 
 - Sample households with custom names get greetings at load only (#728); R-H8 is unchanged. Pending Brandon: should normal upkeep fill blank greetings on custom-named households (never touching the name or entered greetings)? Recommended yes.
