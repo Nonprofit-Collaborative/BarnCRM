@@ -72,6 +72,9 @@ jobs:
       - name: Check each package's Apex code size against its budget
         run: python3 scripts/ci/check-apex-budget.py
 
+      - name: Check no new Aura method is a single query or record write that LDS can do (ADR-0093)
+        run: python3 scripts/ci/check-aura-lds.py
+
       - name: Check every without sharing class is in the register
         run: python3 scripts/ci/check-without-sharing-register.py
 
