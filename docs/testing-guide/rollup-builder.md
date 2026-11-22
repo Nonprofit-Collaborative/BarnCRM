@@ -340,7 +340,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Rollups** section. | **Time of the nightly run** shows **2:00 AM**, never blank. Its list offers every hour from **12:00 AM (midnight)** to **11:00 PM**. |
+| 1 | Open **BarnCRM Settings**, **Rollups** section. | **Time of the nightly run** shows **2 AM**, never blank. Its list offers every hour from **12 AM (midnight)** to **11 PM**, and saving **11 PM** shows "Saving..." then "Your settings are saved.". Set it back to **2 AM**. |
 | 2 | Choose **11:00 PM** and save. | The setting saves and shows **11:00 PM**. |
 | 3 | Open the **Rollup Builder** tab. | The text above the buttons reads "Nightly recalculation is scheduled for 11:00 PM." |
 | 4 | In Setup, open **Scheduled Jobs**. | One job named **BarnCRM Nightly Jobs** (the nightly run all steps share, see [Nightly Jobs](../admin-guide/nightly-jobs.md)), next run at midnight; the Nightly Jobs panel lists the rollup step at 11:00 PM. |
