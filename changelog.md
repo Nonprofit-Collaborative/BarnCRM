@@ -6,6 +6,8 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ## 2026-11-22
 
+- Playwright e2e on `barn-platform` at main fffcdd386 (after #1441, #1442, #1444): 144 passed, 0 failed, 11 skipped (10 pages without BarnCRM code, Provider Request tab hidden with its feature off), 0 flaky.
+
 - PR #1444 squash-merged as ab3fc9573: the 67 custom-object layouts without a `platformActionList` now list their own record actions (Edit, Clone, Delete; Change Owner unless ControlledByParent; Sharing when Private or Read; Log a Call, New Task, New Event with activities), so a record no longer shows the org's global actions (the Event page offered New Contact and New Opportunity). Gate `barn-platform` 165 of 165; the Event page there shows Edit, Change Owner, Clone and Delete.
 
 - UX screenshot check on `barn-platform` after main 0e2389817 was deployed (incremental gate 165 of 165): Projects Home tiles and New Project button show their labels; Projects Home, Volunteers Home, Fundraising Home, Automation, Import and Super Transformer each print their name once; no missing help text warnings.
