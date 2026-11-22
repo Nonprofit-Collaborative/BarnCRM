@@ -1,20 +1,11 @@
 import { createElement } from 'lwc';
+import { createRecord, updateRecord } from 'lightning/uiRecordApi';
 import ProjectsRequestPanel from 'c/projectsRequestPanel';
 import getRequest from '@salesforce/apex/ProjectRequestsController.getRequest';
-import saveRequest from '@salesforce/apex/ProjectRequestsController.saveRequest';
-import addComment from '@salesforce/apex/ProjectRequestsController.addComment';
 import createTask from '@salesforce/apex/ProjectRequestsController.createTask';
 import createChangeRequest from '@salesforce/apex/ProjectRequestsController.createChangeRequest';
 
 jest.mock('@salesforce/apex/ProjectRequestsController.getRequest', () => ({ default: jest.fn() }), {
-  virtual: true
-});
-jest.mock(
-  '@salesforce/apex/ProjectRequestsController.saveRequest',
-  () => ({ default: jest.fn() }),
-  { virtual: true }
-);
-jest.mock('@salesforce/apex/ProjectRequestsController.addComment', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock('@salesforce/apex/ProjectRequestsController.createTask', () => ({ default: jest.fn() }), {
@@ -68,7 +59,6 @@ describe('c-projects-request-panel', () => {
 
   it('shows the thread with what the requester sees marked, and saves only changes', async () => {
     getRequest.mockResolvedValue(DETAIL);
-    saveRequest.mockResolvedValue();
     const element = mount();
     const changed = jest.fn();
     element.addEventListener('changed', changed);
@@ -80,17 +70,13 @@ describe('c-projects-request-panel', () => {
     await flush();
     find(element, 'save').click();
     await flush();
-    expect(saveRequest).toHaveBeenCalledWith({
-      requestId: 'r1',
-      changes: { Status__c: 'In Progress' }
-    });
+    expect(updateRecord).toHaveBeenCalledWith({ fields: { Id: 'r1', Status__c: 'In Progress' } });
     expect(changed).toHaveBeenCalled();
     expect(find(element, 'notice')).not.toBeNull();
   });
 
   it('adds a shared comment and creates a task and a change request', async () => {
     getRequest.mockResolvedValue(DETAIL);
-    addComment.mockResolvedValue();
     createTask.mockResolvedValue('t1');
     createChangeRequest.mockResolvedValue('x1');
     const element = mount();
@@ -102,7 +88,10 @@ describe('c-projects-request-panel', () => {
     await flush();
     find(element, 'add-comment').click();
     await flush();
-    expect(addComment).toHaveBeenCalledWith({ requestId: 'r1', body: 'On it', shared: true });
+    expect(createRecord).toHaveBeenCalledWith({
+      apiName: 'Project_Request_Comment__c',
+      fields: { Request__c: 'r1', Body__c: 'On it', Shared__c: true }
+    });
     find(element, 'create-task').click();
     await flush();
     expect(createTask).toHaveBeenCalledWith({ requestId: 'r1' });
@@ -113,8 +102,11 @@ describe('c-projects-request-panel', () => {
 
   it('cannot make a task without a project, and shows a refusal', async () => {
     getRequest.mockResolvedValue({ ...DETAIL, projectId: null, comments: [] });
-    saveRequest.mockRejectedValue({
-      body: { message: 'Enter a resolution before marking the request Resolved.' }
+    updateRecord.mockRejectedValueOnce({
+      body: {
+        message: 'An error occurred while trying to update the record. Please try again.',
+        output: { errors: [{ message: 'Enter a resolution before marking the request Resolved.' }] }
+      }
     });
     const element = mount();
     await flush();
@@ -126,6 +118,8 @@ describe('c-projects-request-panel', () => {
     await flush();
     find(element, 'save').click();
     await flush();
-    expect(find(element, 'error-message')).not.toBeNull();
+    expect(find(element, 'error-message').message).toBe(
+      'Enter a resolution before marking the request Resolved.'
+    );
   });
 });

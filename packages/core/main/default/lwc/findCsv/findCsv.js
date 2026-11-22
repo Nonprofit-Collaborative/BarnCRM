@@ -75,6 +75,23 @@ export function bodyMessage(error, fallback = UNEXPECTED_ERROR) {
 }
 
 /**
+ * The message to show for a failed Lightning Data Service save (createRecord, updateRecord):
+ * the first record or field error the org returned, such as a validation rule's own words, else
+ * what `messageFrom` finds. The UI API puts those in `body.output`, under a general message.
+ */
+export function recordErrorMessage(error, fallback = UNEXPECTED_ERROR) {
+  const output = error && error.body && error.body.output;
+  if (output) {
+    const fieldErrors = Object.values(output.fieldErrors || {}).flat();
+    const first = [...(output.errors || []), ...fieldErrors].find((item) => item && item.message);
+    if (first) {
+      return first.message;
+    }
+  }
+  return messageFrom(error, fallback);
+}
+
+/**
  * Saves a Blob as a file through a temporary link. With a delay, the address is released that
  * many milliseconds after the click (some browsers start the download only after the click
  * handler returns); without one, at once.

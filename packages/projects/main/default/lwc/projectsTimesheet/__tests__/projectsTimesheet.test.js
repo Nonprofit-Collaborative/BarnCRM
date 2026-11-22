@@ -1,7 +1,7 @@
 import { createElement } from 'lwc';
+import { graphql } from 'lightning/graphql';
 import ProjectsTimesheet from 'c/projectsTimesheet';
 import getWeek from '@salesforce/apex/ProjectTimesheetController.getWeek';
-import getTasks from '@salesforce/apex/ProjectTimesheetController.getTasks';
 import saveWeek from '@salesforce/apex/ProjectTimesheetController.saveWeek';
 import submitWeek from '@salesforce/apex/ProjectTimesheetController.submitWeek';
 import recallWeek from '@salesforce/apex/ProjectTimesheetController.recallWeek';
@@ -14,9 +14,6 @@ const MONDAY = mondayOf(localIsoDate());
 const TUESDAY = addDays(MONDAY, 1);
 
 jest.mock('@salesforce/apex/ProjectTimesheetController.getWeek', () => ({ default: jest.fn() }), {
-  virtual: true
-});
-jest.mock('@salesforce/apex/ProjectTimesheetController.getTasks', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock('@salesforce/apex/ProjectTimesheetController.saveWeek', () => ({ default: jest.fn() }), {
@@ -142,7 +139,6 @@ describe('c-projects-timesheet', () => {
 
   it('adds a row for a project and task and adds an expense', async () => {
     getWeek.mockResolvedValue({ ...WEEK(), entries: [] });
-    getTasks.mockResolvedValue([{ id: 'a03000000000001AAA', name: 'Build' }]);
     addExpense.mockResolvedValue('a09000000000001AAA');
     const element = mount();
     await flush();
@@ -150,7 +146,20 @@ describe('c-projects-timesheet', () => {
       new CustomEvent('change', { detail: { value: 'a01000000000001AAA' } })
     );
     await flush();
-    expect(getTasks).toHaveBeenCalledWith({ projectId: 'a01000000000001AAA' });
+    expect(graphql.getLastConfig().variables).toEqual({ projectId: 'a01000000000001AAA' });
+    graphql.emit({
+      uiapi: {
+        query: {
+          Project_Task__c: {
+            edges: [{ node: { Id: 'a03000000000001AAA', Name: { value: 'Build' } } }]
+          }
+        }
+      }
+    });
+    await flush();
+    expect(find(element, 'row-task').options).toEqual([
+      { label: 'Build', value: 'a03000000000001AAA' }
+    ]);
     find(element, 'add-row-button').click();
     await flush();
     expect(all(element, 'row')).toHaveLength(1);

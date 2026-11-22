@@ -1,7 +1,8 @@
 import { createElement } from 'lwc';
 import ProjectsHome from 'c/projectsHome';
 import getHome from '@salesforce/apex/ProjectsController.getHome';
-import setTaskStatus from '@salesforce/apex/ProjectsController.setTaskStatus';
+import { updateRecord } from 'lightning/uiRecordApi';
+import { localIsoDate } from 'c/findCsv';
 import createFromTemplate from '@salesforce/apex/ProjectsController.createFromTemplate';
 import getUtilization from '@salesforce/apex/ProjectsController.getUtilization';
 import exportBillable from '@salesforce/apex/ProjectsController.exportBillable';
@@ -33,9 +34,6 @@ jest.mock('@salesforce/apex/ProjectsController.applyRates', () => ({ default: je
 });
 
 jest.mock('@salesforce/apex/ProjectsController.getHome', () => ({ default: jest.fn() }), {
-  virtual: true
-});
-jest.mock('@salesforce/apex/ProjectsController.setTaskStatus', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock(
@@ -124,7 +122,6 @@ describe('c-projects-home', () => {
         capacity: 40
       }
     ]);
-    setTaskStatus.mockResolvedValue();
     createFromTemplate.mockResolvedValue('a01000000000002AAA');
     const element = mount();
     await flush();
@@ -133,7 +130,9 @@ describe('c-projects-home', () => {
     expect(find(element, 'person').textContent).toContain('50%');
     find(element, 'done').click();
     await flush();
-    expect(setTaskStatus).toHaveBeenCalledWith({ taskId: 'a03000000000001AAA', status: 'Done' });
+    expect(updateRecord).toHaveBeenCalledWith({
+      fields: { Id: 'a03000000000001AAA', Status__c: 'Done', Completed_Date__c: localIsoDate() }
+    });
     find(element, 'template').dispatchEvent(
       new CustomEvent('change', { detail: { value: 'salesforce_implementation' } })
     );

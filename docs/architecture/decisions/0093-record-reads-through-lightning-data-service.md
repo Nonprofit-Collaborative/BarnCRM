@@ -139,22 +139,24 @@ kept, with the reason.
 | ProjectBillingController.getInvoiceActions | projects | read | Keep | Billing setting, manage permission, payment availability |
 | ProjectBillingController.getProjectBilling | projects | read | Keep | Billing setting and manage permission |
 | ProjectBillingController.exportInvoices | projects | read | Keep | Stamps every exported invoice |
-| ProjectRequestsController.addComment | projects | write | Convert: `createRecord` | |
-| ProjectRequestsController.getRequest | projects | read | Convert: GraphQL (`Project_Request__c` with comments) | |
+| ProjectRequestsController.addComment | projects | write | Converted (AP-03 part 3): `createRecord` | |
+| ProjectRequestsController.getRequest | projects | read | Keep (reviewed in AP-03 part 3) | Change Requests setting (custom metadata) read with the request; it enables Create Change Request |
 | ProjectRequestsController.getRequests | projects | read | Keep | Requests setting read with the list |
-| ProjectRequestsController.saveRequest | projects | write | Convert: `updateRecord` (editable fields listed in the LWC) | |
+| ProjectRequestsController.saveRequest | projects | write | Converted (AP-03 part 3): `updateRecord`, editable fields listed in the LWC | |
 | ProjectStaffingController.saveResource | projects | write | Keep | Upsert by user and the staffing setting |
 | ProjectTimesheetController.addExpense | projects | write | Keep | Expenses setting |
-| ProjectTimesheetController.getTasks | projects | read | Convert: GraphQL (`Project_Task__c` open, by Sort Order) | |
-| ProjectsController.addTask | projects | write | Convert: `createRecord` | |
-| ProjectsController.getAtRisk | projects | read | Convert: GraphQL (`Project__c` at risk or off track) | |
+| ProjectTimesheetController.getTasks | projects | read | Converted (AP-03 part 3): GraphQL (`Project_Task__c` open, by Sort Order) | |
+| ProjectsController.addTask | projects | write | Converted (AP-03 part 3): `createRecord`, blank name refused in the LWC | |
+| ProjectsController.getAtRisk | projects | read | Converted (AP-03 part 3): GraphQL (`Project__c` at risk or off track), Only Mine filtered in the LWC | |
 | ProjectsController.logTime | projects | write | Keep | Time tracking setting |
-| ProjectsController.setTaskStatus | projects | write | Convert: `updateRecord` (Completed Date set in the LWC) | |
+| ProjectsController.setTaskStatus | projects | write | Converted (AP-03 part 3): `updateRecord`, Completed Date set in the LWC | |
 | ReportingLibrary.remove | reporting | write | Keep | Owner check on a ContentDocument |
 | ScholarshipsController.getAward | scholarships | read | Keep | Payments from a second object and the manage permission |
 | ScholarshipsController.getBoard | scholarships | read | Keep | Review board across objects, blind review |
 | ScholarshipsController.getReview | scholarships | read | Keep | Rubric, the reviewer's own review, blind review |
 | VolunteersHomeController.getFirstRun | volunteers | read | Convert: GraphQL (`Volunteer_Job__c`, first 1) and `getObjectInfo` | |
 
-Of the 61 methods, 29 are converted (1 in this part, 28 in the module follow-ups) and 32 stay
-in Apex.
+Of the 61 methods, 28 are converted (1 in this part, 27 in the module follow-ups) and 33 stay
+in Apex. `ProjectRequestsController.getRequest` was first listed to convert; the projects
+follow-up kept it, since the panel's Create Change Request needs the Change Requests setting,
+which the UI API does not read.
