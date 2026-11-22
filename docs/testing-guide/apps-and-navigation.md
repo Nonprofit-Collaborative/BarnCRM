@@ -44,7 +44,7 @@ takes the apps in a queued job: wait a minute and reload before checking the App
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Read the deploy output. | A stage "Module tabs in the BarnCRM apps" ran and succeeded. |
-| 2 | As admin, open **BarnCRM Admin Console**. | Before **Error Log**, which stays the last tab: **Rollup Builder**, **Accounting Periods**, **Donor Levels and Scores**, **Stewardship Plan Templates**, **Pledge Reminders**, **Receipt Letters**, **Campaign Sync**, **Opportunity Mirror**, **Gift Transaction Mirror**, **Accounting Export**, then **Forms Home** and **Forms** and the other module admin pages. |
+| 2 | As admin, open **BarnCRM Admin Console**. | Before **Error Log**, which stays the last tab: **Rollup Builder**, **Accounting Periods**, **Donor Levels and Scores**, **Stewardship Plan Setup**, **Pledge Reminders**, **Receipt Letters**, **Campaign Sync**, **Opportunity Mirror**, **Gift Transaction Mirror**, **Accounting Export**, then **Forms Home** and **Forms** and the other module admin pages. |
 | 3 | Open **BarnCRM Console**. | After **Data Manager**: **Scholarships Home**, **Award Programs**, **Award Applications**, **Awards** (they are in **BarnCRM Grants** too), then **Forms**, **Form Submissions**. No **Gifts** or **Memberships** tab: those are in their own apps. |
 | 4 | Open **BarnCRM Console**, **Contacts**, a contact with gifts, then a gift from its related list. | The gift opens on the same record page as in **BarnCRM Fundraising**. |
 | 5 | From the App Launcher, search for "BarnCRM Rollup Builder". | No such app is listed; the **Rollup Builder** tab is. |

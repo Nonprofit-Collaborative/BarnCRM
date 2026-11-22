@@ -126,7 +126,7 @@ from the module catalog, not from the app's own file:
 | Module | Everyday pages go to | Admin pages go to |
 |---|---|---|
 | Rollup Builder | | **BarnCRM Admin Console**: Rollup Builder |
-| Fundraising | (its own app) | **BarnCRM Admin Console**: Accounting Periods, Donor Levels and Scores, Stewardship Plan Templates, Pledge Reminders, Receipt Letters, Campaign Sync, Opportunity Mirror, Gift Transaction Mirror, Accounting Export |
+| Fundraising | (its own app) | **BarnCRM Admin Console**: Accounting Periods, Donor Levels and Scores, Stewardship Plan Setup, Pledge Reminders, Receipt Letters, Campaign Sync, Opportunity Mirror, Gift Transaction Mirror, Accounting Export |
 | Programs | (its own app) | **BarnCRM Admin Console**: Programs Settings |
 | Mirror | | **BarnCRM Admin Console**: Provider Requests |
 | Forms | **BarnCRM Console**: Forms, Form Submissions | **BarnCRM Admin Console**: Forms Home, Forms |

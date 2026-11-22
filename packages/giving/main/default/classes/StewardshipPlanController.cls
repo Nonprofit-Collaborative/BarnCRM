@@ -1,5 +1,5 @@
 /**
- * What the Stewardship Plan Templates page in the settings console calls (feature G-15).
+ * What the Stewardship Plan Setup page in the settings console calls (feature G-15).
  *
  * The page exists because of the rule that every administrator setting is reachable in the app: a
  * plan template, its steps and the order they come in are settings, and managing them on raw

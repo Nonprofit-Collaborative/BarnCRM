@@ -501,7 +501,7 @@
     "Giving_Stewardship_ErrorAlreadyRunning": "This plan is already running for this donor. Mark the running one complete or cancelled before starting it again, so the same tasks are not created twice.",
     "Giving_Stewardship_ErrorDonorNotVisible": "You cannot see this donor, so no plan was started.",
     "Giving_Stewardship_ErrorNameRequired": "A plan needs a name before it can be saved.",
-    "Giving_Stewardship_ErrorNoTemplate": "That plan is not available. It may have been deleted, or turned off on the Stewardship Plan Templates page.",
+    "Giving_Stewardship_ErrorNoTemplate": "That plan is not available. It may have been deleted, or turned off on the Stewardship Plan Setup page.",
     "Giving_Stewardship_ErrorNotPermitted": "Changing stewardship plans needs the Manage BarnCRM Settings permission. Ask whoever administers BarnCRM for your organization.",
     "Giving_Stewardship_ErrorOneDonor": "Choose one person or one organization to run this plan for, not both and not neither.",
     "Giving_Stewardship_ErrorStartFailed": "BarnCRM could not start one or more stewardship plans because the plans and their templates did not line up. No tasks were created. This is a fault in BarnCRM, not something to correct in your data.",
