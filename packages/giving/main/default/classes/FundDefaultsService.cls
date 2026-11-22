@@ -3,8 +3,10 @@
  * default fund is set" before anybody has opened the Funds tab (R-F4).
  *
  * It creates an active, unrestricted fund named by the `Giving_Fund_DefaultName` label, with no
- * accounting code, and marks it as the default, which writes the Default Fund key in Giving's
- * settings through the fund trigger. It does that only for an org that has made no decision yet:
+ * accounting code, and flags it as the default. No setting is saved at install: while the Default
+ * Fund setting is blank, gifts go to the flagged fund (R-F4, `GiftService.resolveDefaultFundId`),
+ * and choosing a Default Fund in BarnCRM Settings takes over. It does that only for an org that
+ * has made no decision yet:
  * no fund exists at all and no default fund is set. An org with any fund, including an inactive
  * one, and an org whose Default Fund key is already filled in are left exactly as they are, so
  * running it again at every upgrade never adds a second fund and never overwrites a choice.
@@ -33,7 +35,6 @@ public with sharing class FundDefaultsService {
 			Restricted__c = false,
 			Is_Default__c = true
 		);
-		// Marking it the default also saves the Default Fund key, in the same transaction.
 		insert as system fund;
 		return fund;
 	}
@@ -56,7 +57,7 @@ public with sharing class FundDefaultsService {
 
 	/** True only when there is no fund of any kind and the Default Fund key is blank. */
 	private static Boolean hasMadeNoFundDecision() {
-		if (String.isNotBlank(Giving_Settings__c.getOrgDefaults().Default_Fund__c)) {
+		if (ModuleSettings.text('Giving_Default_Fund') != null) {
 			return false;
 		}
 		Integer funds = [SELECT COUNT() FROM Fund__c WITH SYSTEM_MODE];

@@ -243,15 +243,12 @@ public without sharing class ReceiptNumberSequence {
 	 * and what stops a mid year settings edit renumbering documents donors already hold.
 	 */
 	private static void createSeries(String key, String receiptType, Integer statementYear) {
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
+		String typedPrefix = ModuleSettings.text('Giving_Receipt_Number_Prefix');
 		String prefix = String.isNotBlank(scopedPrefix)
 			? scopedPrefix.trim()
-			: String.isBlank(settings.Receipt_Number_Prefix__c)
-					? DEFAULT_PREFIX
-					: settings.Receipt_Number_Prefix__c.trim();
-		Integer start = settings.Receipt_Next_Counter__c == null
-			? 1
-			: Math.max(1, settings.Receipt_Next_Counter__c.intValue());
+			: typedPrefix == null ? DEFAULT_PREFIX : typedPrefix;
+		Integer counter = ModuleSettings.integerValue('Giving_Receipt_Next_Counter');
+		Integer start = counter == null ? 1 : Math.max(1, counter);
 		try {
 			ReceiptWriter.insertSequence(
 				new Receipt_Number_Sequence__c(

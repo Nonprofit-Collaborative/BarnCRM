@@ -14,14 +14,9 @@ private class AskRulesTest {
 		return TestUsers.adminWith('Giving_Staff');
 	}
 
-	/** The setting is the administrator's, so it is written here in system mode. */
+	/** The administrator's setting, as if a settings save had deployed it. */
 	private static void useStages(String stages) {
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		settings.Ask_Stages__c = stages;
-		if (settings.Id == null) {
-			settings.SetupOwnerId = UserInfo.getOrganizationId();
-		}
-		Database.upsert(settings, true, AccessLevel.SYSTEM_MODE);
+		ModuleSettings.setForTest('Giving_Ask_Stages', stages);
 	}
 
 	private static Contact person() {

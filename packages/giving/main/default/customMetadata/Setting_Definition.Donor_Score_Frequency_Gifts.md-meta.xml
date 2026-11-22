@@ -34,4 +34,8 @@
     <field>Help_Path__c</field>
     <value xsi:type="xsd:string">donor-scoring.md</value>
   </values>
+    <values>
+        <field>Default_Value__c</field>
+        <value xsi:type="xsd:string">"6,4,2,1"</value>
+    </values>
 </CustomMetadata>

@@ -49,14 +49,13 @@ public without sharing class AskReminderWriter {
 		return stamps.size();
 	}
 
-	/** Records when a pass finished and what it did, on the locked stored settings record. */
+	/** Records when a pass finished and what it did, as run state (`GivingState`). */
 	public static void stampRun(Datetime completedAt, String summary) {
-		OrgSettingsSystemWriter.save(
-			Giving_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{
-				Giving_Settings__c.Ask_Reminders_Last_Run__c => completedAt,
-				Giving_Settings__c.Ask_Reminders_Last_Run_Summary__c => summary
-			}
+		GivingState.recordRun(
+			GivingState.ASK_REMINDERS_LAST_RUN,
+			GivingState.ASK_REMINDERS_SUMMARY,
+			completedAt,
+			summary
 		);
 	}
 

@@ -472,7 +472,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | In-kind gifts | Major | Records gifts of goods or services with a description and fair market value, kept out of every money total. | Shipped | G-18, ADR-0030 |
 | Matching gifts | Major | Links an employer's matching gift to the employee's gift, visible from both, with the employee soft credited. | Shipped | G-10 |
 | Gift auto-numbering and donor rule | Minor | Gifts are numbered automatically, and each has exactly one donor: a person or an organization or household. | Shipped | G-01 |
-| Default fund | Minor | A gift entered without a designation goes to the default fund. | Shipped | G-01 |
+| Default fund | Minor | A gift entered without a designation goes to the default fund: the Default fund setting in BarnCRM Settings decides it, each fund's Is Default follows that setting on its next save and a tick that disagrees is refused, and while the setting is blank the fund ticked Is Default is used. | Shipped | G-01 |
 | Date defaults to today | Minor | A gift saved without a date is dated today. | Shipped | G-01 |
 | Gift statuses | Minor | Received, Pending, Refunded, Written off and Cancelled. | Shipped | G-01, G-04 |
 | Cancelled gifts | Minor | A Pending gift that will never be paid is set to Cancelled: no negative gift, out of every total and export, allowed even in a closed month, and logged. | Shipped | G-04, ADR-0054 |

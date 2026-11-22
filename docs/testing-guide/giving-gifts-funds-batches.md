@@ -6,19 +6,21 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 ## T-GIFT-01: Funds and the Default Fund
 
-**Purpose:** confirm one fund is the default, the flag moves when a second fund takes it, and a fund with gifts cannot be deleted.
+**Purpose:** confirm the Default fund setting decides the default, saves and survives a reload, each fund's **Is Default** follows it, and a fund with gifts cannot be deleted.
 **Prerequisites:** admin (see [Test users](before-you-test.md#test-users)).
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the **Funds** tab, list view **All Funds**. | **General Fund** to **Memorial Fund** show, 8 funds in all. On an org that started with a default fund (a new org's own starting **General Fund**, T-GIFT-13), that fund is the only **General Fund** and the other 7 are sample funds. |
-| 2 | Open **General Fund**. If **Is Default** is not ticked, click **Edit**, tick it, and save. | **Is Default** is ticked. **Total Raised**, **Gift Count**, **Last Gift Date** and **Totals Last Updated** are read only. |
-| 3 | Open **BarnCRM Settings**, **Fundraising**. | **Default fund** shows General Fund. |
-| 4 | On the **Funds** tab click **New**. Name `Test Fund`, tick **Active** and **Is Default**, and save. | Saved. |
-| 5 | Reopen **General Fund**. | **Is Default** is now unticked: only one default exists. |
-| 6 | Edit **General Fund**, tick **Is Default** again, and save. Reopen `Test Fund`. | `Test Fund` is no longer the default. |
-| 7 | On **General Fund**, choose **Delete** and confirm. | Refused: "Gifts have been designated to this fund, so it cannot be deleted: deleting it would leave those gifts pointing at nothing. Untick Active instead..." |
-| 8 | Delete `Test Fund` (it has no gifts). | Deleted. |
+| 2 | Open **BarnCRM Settings**, **Fundraising**. Set **Default fund** to General Fund and click **Save**. Reload the page. | **Saving** shows, then **Saved**. After the reload **Default fund** still shows General Fund. |
+| 3 | Open **General Fund**. | **Is Default** is ticked. **Total Raised**, **Gift Count**, **Last Gift Date** and **Totals Last Updated** are read only. |
+| 4 | On the **Funds** tab click **New**. Name `Test Fund`, tick **Active** and **Is Default**, and save. | Refused: "The default fund is chosen in BarnCRM Settings: choose Fundraising and change Default fund there..." |
+| 5 | Untick **Is Default** and save `Test Fund`. | Saved, not the default. |
+| 6 | In **BarnCRM Settings**, **Fundraising**, set **Default fund** to `Test Fund` and save. Enter a gift for any person without choosing a fund. | **Saved**. The gift's one allocation is to `Test Fund`. |
+| 7 | Edit `Test Fund` and save without changing anything. Reopen **General Fund**. | `Test Fund` shows **Is Default** ticked, and **General Fund** no longer does: only one default exists. |
+| 8 | Set **Default fund** back to General Fund and save. Edit **General Fund** and save without changes. Reopen `Test Fund`. | **General Fund** is the default again and `Test Fund` is not. |
+| 9 | On **General Fund**, choose **Delete** and confirm. | Refused: "Gifts have been designated to this fund, so it cannot be deleted: deleting it would leave those gifts pointing at nothing. Untick Active instead..." |
+| 10 | Delete the gift from step 6, then delete `Test Fund`. | Deleted. |
 
 **Cleanup:** keep **General Fund** as the default; every later script needs it.
 
@@ -254,13 +256,13 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the **Funds** tab, list view **All Funds**. | Exactly one fund: **General Fund**, **Active** ticked, **Restricted** and **Accounting Code** empty, **Is Default** ticked. |
-| 2 | Open **BarnCRM Settings**, **Fundraising**. | **Default fund** shows **General Fund**, not blank. |
-| 3 | Open the **Home** tab and the Setup Assistant step **Pick your default fund and appeal**. | The fund picker shows **General Fund** already chosen. |
-| 4 | Enter a gift for any person without choosing a fund. | It saves, with one allocation for the whole amount to **General Fund**. |
-| 5 | Rename the fund to `Annual Giving` and untick **Is Default**. Run the deploy script (or reinstall the package) again. | No second **General Fund** appears. **All Funds** still shows one fund, named `Annual Giving`, and the Default Fund setting is blank. |
+| 2 | Enter a gift for any person without choosing a fund. | It saves, with one allocation for the whole amount to **General Fund**: while **Default fund** is blank, the fund ticked **Is Default** catches the gift. |
+| 3 | Open the **Home** tab and the Setup Assistant step **Pick your default fund and appeal**. Choose **General Fund** and save. | The step saves and is done. In **BarnCRM Settings**, **Fundraising**, **Default fund** shows **General Fund**. |
+| 4 | Enter another gift without choosing a fund. | Its allocation is to **General Fund**. |
+| 5 | Rename the fund to `Annual Giving`. Run the deploy script (or reinstall the package) again. | No second **General Fund** appears. **All Funds** still shows one fund, named `Annual Giving`, and **Default fund** still names it. |
 | 6 | On a different org that already has a fund of your own, run the deploy script (or reinstall the package). | No fund is added and the Default Fund setting is not changed. |
 
-**Cleanup:** none (or delete the gift from step 4 and the fund).
+**Cleanup:** none (or delete the gifts from steps 2 and 4 and the fund).
 
 ## T-GIFT-14: List Views for Gifts, Funds, Appeals, Donor Levels and Batches
 

@@ -14,24 +14,15 @@ private class ReceiptRendererFactoryTest {
 
 	private static final String PROBE_CLASS = 'ReceiptTestDataFactory.ConstructionProbe';
 
-	/** The setting as an org default, written the way the settings console writes it. */
+	/** The setting as the org's value, as if a settings save had deployed it. */
 	private static void chooseRenderer(String value) {
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		settings.SetupOwnerId = UserInfo.getOrganizationId();
-		settings.Receipt_Renderer__c = value;
-		upsert settings;
+		ModuleSettings.setForTest('Giving_Receipt_Renderer', value);
 	}
 
 	/** The stored value, read back rather than assumed, since that is what the factory reads. */
 	private static String storedRenderer() {
-		return [
-			SELECT Receipt_Renderer__c
-			FROM Giving_Settings__c
-			WHERE SetupOwnerId = :UserInfo.getOrganizationId()
-			WITH SYSTEM_MODE
-			LIMIT 1
-		]
-		.Receipt_Renderer__c;
+		Object stored = ModuleSettings.stored('Giving_Receipt_Renderer');
+		return stored == null ? null : String.valueOf(stored);
 	}
 
 	/**

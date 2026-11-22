@@ -43,7 +43,8 @@ In the Receipts section:
   carry on from where it stopped. Set it once, before you issue anything. This is the only
   place a receipt number is ever chosen by a person: BarnCRM issues every number itself,
   from this counter, when it creates the receipt.
-- **Statement year.** The tax year the year-end run covers. Set it in January to last year.
+- **Statement year.** The tax year the year-end run covers. It starts at 0, which means last
+  year, so a January run needs no change; type a year only to run a different one.
 - **Place of issue.** The city and region you issue from. Optional in the United States.
 
 One piece of first-time setup needs Salesforce Setup: the **Receipts** panel, which is where

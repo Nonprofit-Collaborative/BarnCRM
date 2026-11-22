@@ -1,9 +1,9 @@
 /**
  * The Accounting Periods page of the BarnCRM Settings console (G-20, R-G14, ADR-0053).
  *
- * It holds the one setting that closes the books: `Giving_Settings__c.Books_Closed_Through__c`.
- * The setting has no Setting Definition row naming its key, so the console's generic save cannot
- * reach it; this page is the only way it changes, and it enforces what a close date means:
+ * It holds the one value that closes the books, Books Closed Through: run state
+ * (`GivingState`, row `Giving.Books_Closed_Through__c`), not a setting, so the console's generic
+ * save cannot reach it; this page is the only way it changes, and it enforces what a close date means:
  *
  * - the date moves forward only, for anyone with Manage BarnCRM Settings;
  * - it is at least two days before today, so a refund or write-off, which is dated today, lands

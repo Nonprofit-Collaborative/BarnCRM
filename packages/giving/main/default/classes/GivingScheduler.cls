@@ -33,7 +33,6 @@ public with sharing class GivingScheduler {
 	 * the one before it has finished.
 	 */
 	public static List<NightlyStep> steps() {
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 		return new List<NightlyStep>{
 			new NightlyStep(
 					TOP_UP_JOB_NAME,
@@ -43,7 +42,7 @@ public with sharing class GivingScheduler {
 					new InstallmentTopUpSchedulable()
 				)
 				.withSwitch(true)
-				.withSummary(settings.Installment_Top_Up_Last_Run_Summary__c)
+				.withSummary(GivingState.text(GivingState.INSTALLMENT_TOP_UP_SUMMARY))
 				.runnableNow(),
 			new NightlyStep(
 					OVERDUE_JOB_NAME,
@@ -53,7 +52,7 @@ public with sharing class GivingScheduler {
 					new InstallmentSchedulable()
 				)
 				.withSwitch(true)
-				.withSummary(settings.Installment_Overdue_Last_Run_Summary__c)
+				.withSummary(GivingState.text(GivingState.INSTALLMENT_OVERDUE_SUMMARY))
 				.runnableNow(),
 			new NightlyStep(
 					LEVELS_JOB_NAME,
@@ -63,7 +62,9 @@ public with sharing class GivingScheduler {
 					new DonorLevelSchedulable()
 				)
 				.withSwitch(true),
-			PledgeReminderScheduler.step().withSummary(settings.Pledge_Reminders_Last_Run_Summary__c).runnableNow(),
+			PledgeReminderScheduler.step()
+				.withSummary(GivingState.text(GivingState.PLEDGE_REMINDERS_SUMMARY))
+				.runnableNow(),
 			new NightlyStep(
 					ASK_JOB_NAME,
 					System.Label.Giving_NightlyJobs_AskRemindersName,
@@ -72,7 +73,7 @@ public with sharing class GivingScheduler {
 					new AskReminderSchedulable()
 				)
 				.withSwitch(true)
-				.withSummary(settings.Ask_Reminders_Last_Run_Summary__c)
+				.withSummary(GivingState.text(GivingState.ASK_REMINDERS_SUMMARY))
 				.runnableNow()
 		};
 	}

@@ -165,9 +165,8 @@ public with sharing class PledgeReminderController {
 		view.scheduled = PledgeReminderScheduler.isScheduled();
 		view.nextRunAt = PledgeReminderScheduler.nextRunAt();
 
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		view.lastRun = settings.Pledge_Reminders_Last_Run__c;
-		view.lastRunSummary = settings.Pledge_Reminders_Last_Run_Summary__c;
+		view.lastRun = GivingState.moment(GivingState.PLEDGE_REMINDERS_LAST_RUN);
+		view.lastRunSummary = GivingState.text(GivingState.PLEDGE_REMINDERS_SUMMARY);
 
 		view.templates = GivingEmailTemplates.options();
 		view.steps = stepViews(GivingEmailTemplates.labelsByDeveloperName(view.templates));

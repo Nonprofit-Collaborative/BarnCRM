@@ -30,8 +30,11 @@ Nonprofit Cloud. Nonprofit Edition.
 Features G-01 (gifts, allocations, funds), G-04 (refunds and write-offs) and G-05 (appeals):
 
 - **Objects:** `Gift__c`, `Gift_Allocation__c`, `Fund__c`, `Appeal__c`, plus the giving rollup
-  target fields on Account and Contact and the module's settings object `Giving_Settings__c`
-  (canonical model Sections 18 to 21A and 26).
+  target fields on Account and Contact (canonical model Sections 18 to 21A and 26).
+- **Settings:** `Setting_Module.Giving` registers the group; every setting is read through
+  `ModuleSettings` by its Setting Definition name (or `SettingsService` by group and key), and
+  run state (last runs, Books Closed Through) goes through `GivingState`. The legacy
+  `Giving_Settings__c` is read only until carry-over.
 - **Services:** `GiftService` (household derivation, default allocations, allocation totals,
   refunds and write-offs), the selectors that hold every query, and `GiftController` for the
   screens that come next.
@@ -69,7 +72,7 @@ only in the gift mirror classes listed in it.
 - **Campaign sync (X-02).** The `Campaign_Sync` automation on Appeal (`CampaignSyncTriggerHandler`
   over `CampaignSyncService`) copies each appeal to a Campaign before it is saved, and stores the
   link in `Appeal__c.Campaign_Id__c`. `CampaignSyncBatch` is Sync all appeals, started from the
-  `campaignSync` page. Off until `Giving_Settings__c.Campaign_Sync_Enabled__c` is switched on.
+  `campaignSync` page. Off until the `Mirror_Campaign_Sync_Enabled` setting is switched on.
   See `docs/admin-guide/campaign-sync.md` and canonical model Section 29B.
 - **Opportunity mirror (X-01).** The `Opportunity_Mirror` automation on Gift
   (`OpportunityMirrorTriggerHandler` over `OpportunityMirrorService`) copies each gift to its
@@ -77,7 +80,7 @@ only in the gift mirror classes listed in it.
   `Gift__c.Opportunity_Id__c`. `OpportunityMirrorBatch` is Run now and the nightly run
   (`OpportunityMirrorSchedulable`); in Opportunities to Gifts it makes gifts through
   `OpportunityGiftService`. `OpportunityMirrorReconciliation` compares a date range. Off until
-  `Giving_Settings__c.Opportunity_Mirror_Direction__c` is chosen. Shared pieces with Campaign
+  the `Mirror_Opportunity_Mirror_Direction` setting is chosen. Shared pieces with Campaign
   sync are in `MirrorSync`. See `docs/admin-guide/opportunity-mirror.md` and canonical model
   Section 29C.
 - **Gift Transaction mirror (X-07).** Copies each received gift to a Nonprofit Cloud Gift
@@ -86,14 +89,14 @@ only in the gift mirror classes listed in it.
   01:35), over `GiftTransactionMirrorService`. The link is `Gift__c.Gift_Transaction_Id__c`.
   Every Nonprofit Cloud object is named only in `GiftTransactionMirrorSchema` and resolved
   through describe; tests use its stand-ins. Off until
-  `Giving_Settings__c.Gift_Transaction_Mirror_Direction__c` is chosen and a start date is set.
+  the `Mirror_Gift_Transaction_Mirror_Direction` setting is chosen and a start date is set.
   See `docs/admin-guide/gift-transaction-mirror.md` and canonical model Section 29C1.
 - **Gift migration kits (MIG-05).** `NpspGiftsKit` and `NpcGiftsKit` with their Migration Kit and
   Import Template Default rows. See `docs/admin-guide/migrating-from-npsp.md` and
   `docs/admin-guide/migrating-from-nonprofit-cloud.md`.
 - **Nightly and Health Check.** `GivingNightlyJobProvider` adds the two mirror runs to BarnCRM
   Nightly Jobs; `GivingHealthCheckExtension` adds `GiftMirrorHealthChecks`, which reports a
-  stalled run. `MirrorSettingsWriter` records each run on `Giving_Settings__c`. Help text is in
+  stalled run. `MirrorSettingsWriter` records each run as Giving run state. Help text is in
   `BarnHelp_Giving.json`.
 
 ## Post-install script

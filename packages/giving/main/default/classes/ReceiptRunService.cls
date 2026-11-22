@@ -60,8 +60,9 @@ public with sharing class ReceiptRunService {
 	 * they have not, because a statement run happens in January for the year that just ended.
 	 */
 	public static Integer defaultStatementYear() {
-		Decimal configured = Giving_Settings__c.getOrgDefaults().Receipt_Statement_Year__c;
-		return configured == null ? Date.today().year() - 1 : configured.intValue();
+		// 0, the shipped default, means the year that just ended.
+		Integer configured = ModuleSettings.integerValue('Giving_Receipt_Statement_Year');
+		return configured == null || configured < 2000 ? Date.today().year() - 1 : configured;
 	}
 
 	/** Counts written as the run goes, so a run that is still going shows real progress (R-RR3). */

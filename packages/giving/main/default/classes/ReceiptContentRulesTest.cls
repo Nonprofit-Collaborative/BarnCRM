@@ -12,6 +12,10 @@
 private class ReceiptContentRulesTest {
 	private static final Date GIFT_DATE = Date.newInstance(2026, 4, 12);
 
+	static {
+		ReceiptTestDataFactory.useReceiptSettings();
+	}
+
 	@TestSetup
 	static void setUp() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {

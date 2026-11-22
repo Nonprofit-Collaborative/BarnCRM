@@ -49,10 +49,9 @@ private class GivingSchedulerTest {
 				],
 				'The daily pass marks a payment forty days late Overdue.'
 			);
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 			Assert.areNotEqual(
 				null,
-				settings.Installment_Overdue_Last_Run__c,
+				GivingState.moment(GivingState.INSTALLMENT_OVERDUE_LAST_RUN),
 				'The pass records when it finished, which is what the Nightly Jobs page shows.'
 			);
 			Assert.areEqual(
@@ -60,7 +59,7 @@ private class GivingSchedulerTest {
 					BarnHelp.text('Giving', 'Giving_NightlyJobs_OverdueSummaryFormat'),
 					new List<String>{ '1' }
 				),
-				settings.Installment_Overdue_Last_Run_Summary__c,
+				GivingState.text(GivingState.INSTALLMENT_OVERDUE_SUMMARY),
 				'The pass says how many payments it marked, not just that it woke up.'
 			);
 		}
@@ -104,15 +103,14 @@ private class GivingSchedulerTest {
 				],
 				'A payment one day late is inside the five day grace period, so it stays Scheduled.'
 			);
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 			Assert.areNotEqual(
 				null,
-				settings.Installment_Overdue_Last_Run__c,
+				GivingState.moment(GivingState.INSTALLMENT_OVERDUE_LAST_RUN),
 				'A pass that found nothing still records that it ran, so a blank stamp means it has never run.'
 			);
 			Assert.areEqual(
 				BarnHelp.text('Giving', 'Giving_NightlyJobs_OverdueNoneFound'),
-				settings.Installment_Overdue_Last_Run_Summary__c,
+				GivingState.text(GivingState.INSTALLMENT_OVERDUE_SUMMARY),
 				'The page says the pass found nothing overdue rather than leaving the reader to guess.'
 			);
 		}
@@ -137,10 +135,9 @@ private class GivingSchedulerTest {
 			Test.stopTest();
 			// Test.stopTest() runs the batch the schedulable started, so its work is done here.
 
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 			Assert.areNotEqual(
 				null,
-				settings.Installment_Top_Up_Last_Run__c,
+				GivingState.moment(GivingState.INSTALLMENT_TOP_UP_LAST_RUN),
 				'The job says when it last finished, so Maria can see it is running.'
 			);
 			Assert.areEqual(
@@ -148,7 +145,7 @@ private class GivingSchedulerTest {
 					BarnHelp.text('Giving', 'Giving_NightlyJobs_TopUpSummaryFormat'),
 					new List<String>{ '1', '0' }
 				),
-				settings.Installment_Top_Up_Last_Run_Summary__c,
+				GivingState.text(GivingState.INSTALLMENT_TOP_UP_SUMMARY),
 				'The job says it extended one schedule and failed nowhere, which a timestamp alone cannot.'
 			);
 			Assert.isTrue(

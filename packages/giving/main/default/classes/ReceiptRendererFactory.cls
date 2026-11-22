@@ -55,7 +55,7 @@ public with sharing class ReceiptRendererFactory {
 		if (overrideRenderer != null) {
 			return overrideRenderer;
 		}
-		String chosen = keyFrom(Giving_Settings__c.getOrgDefaults().Receipt_Renderer__c);
+		String chosen = keyFrom(ModuleSettings.text('Giving_Receipt_Renderer'));
 		if (KEY_BLOB_PDF.equals(chosen)) {
 			// The shipped renderer is constructed directly, so the ordinary path never reaches
 			// reflection at all.

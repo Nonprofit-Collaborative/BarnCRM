@@ -30,12 +30,8 @@ private class DonorLevelServiceTest {
 	}
 
 	private static void turnLevelsOn(String sourceField) {
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		settings.SetupOwnerId = UserInfo.getOrganizationId();
-		settings.Donor_Levels_Enabled__c = true;
-		settings.Donor_Level_Source_Field__c = sourceField;
-		upsert settings;
-		SettingsService.clearCaches();
+		ModuleSettings.setForTest('Donor_Levels_Enabled', true);
+		ModuleSettings.setForTest('Donor_Level_Source_Field', sourceField);
 		DonorLevelService.clearCache();
 	}
 
@@ -224,11 +220,7 @@ private class DonorLevelServiceTest {
 	@IsTest
 	static void nothingIsAssignedOrClearedWhileLevelsAreOff() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-			settings.SetupOwnerId = UserInfo.getOrganizationId();
-			settings.Donor_Levels_Enabled__c = false;
-			upsert settings;
-			SettingsService.clearCaches();
+			ModuleSettings.setForTest('Donor_Levels_Enabled', false);
 			Donor_Level__c held = [SELECT Id FROM Donor_Level__c WHERE Name = :FRIEND];
 			Account household = TestDataFactory.household(
 				new Account(Name = 'The Okafor Family', Total_Giving__c = 9000, Donor_Level__c = held.Id)

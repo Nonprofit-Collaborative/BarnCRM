@@ -117,12 +117,7 @@ public class GivingTestDataFactory {
 	 * clears the lock's once per transaction answer about the override, so the next save asks.
 	 */
 	public static void closeBooksThrough(Date lastClosedDay) {
-		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		if (settings.Id == null) {
-			settings.SetupOwnerId = UserInfo.getOrganizationId();
-		}
-		settings.Books_Closed_Through__c = lastClosedDay;
-		upsert settings;
+		GivingState.put(new Map<String, Object>{ GivingState.BOOKS_CLOSED_THROUGH => lastClosedDay });
 		GiftPostingLock.overrideHeld = null;
 	}
 

@@ -70,13 +70,12 @@ private class GivingSmallClassesCoverageTest {
 			new InstallmentSchedulable().execute(null);
 			Test.stopTest();
 
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 			Assert.areEqual(
 				BarnHelp.text('Giving', 'Giving_NightlyJobs_OverdueNoneFound'),
-				settings.Installment_Overdue_Last_Run_Summary__c,
+				GivingState.text(GivingState.INSTALLMENT_OVERDUE_SUMMARY),
 				'The page says the pass ran and found nothing'
 			);
-			Assert.isNotNull(settings.Installment_Overdue_Last_Run__c, 'With the time it ran');
+			Assert.isNotNull(GivingState.moment(GivingState.INSTALLMENT_OVERDUE_LAST_RUN), 'With the time it ran');
 		}
 	}
 
@@ -93,7 +92,7 @@ private class GivingSmallClassesCoverageTest {
 
 			Assert.areEqual(
 				BarnHelp.text('Giving', 'Giving_NightlyJobs_RunFailed'),
-				Giving_Settings__c.getOrgDefaults().Installment_Overdue_Last_Run_Summary__c,
+				GivingState.text(GivingState.INSTALLMENT_OVERDUE_SUMMARY),
 				'A pass that could not read the payments says it failed rather than claiming none were late'
 			);
 		}

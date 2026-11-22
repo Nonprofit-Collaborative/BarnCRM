@@ -36,9 +36,8 @@ public with sharing class QuickGiftEntryController {
 			defaults.tributeTypes = picklistOptions(Tribute__c.Type__c.getDescribe());
 			defaults.fieldLabels = fieldLabels();
 			defaults.hasPersonAccounts = OrgShapeDetector.hasPersonAccounts();
-			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-			applyDefaultFund(defaults, settings);
-			applyDefaultAppeal(defaults, settings);
+			applyDefaultFund(defaults);
+			applyDefaultAppeal(defaults);
 			return defaults;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getDefaults');
@@ -298,8 +297,8 @@ public with sharing class QuickGiftEntryController {
 	 * R-GA2), so the form asks the domain the same question rather than showing an empty
 	 * Fund box and then designating the gift somewhere the person never saw.
 	 */
-	private static void applyDefaultFund(EntryDefaults defaults, Giving_Settings__c settings) {
-		Id fundId = asId(settings.Default_Fund__c, Fund__c.SObjectType);
+	private static void applyDefaultFund(EntryDefaults defaults) {
+		Id fundId = asId(ModuleSettings.text('Giving_Default_Fund'), Fund__c.SObjectType);
 		if (fundId == null) {
 			fundId = GiftService.resolveDefaultFundId();
 		}
@@ -314,8 +313,8 @@ public with sharing class QuickGiftEntryController {
 		}
 	}
 
-	private static void applyDefaultAppeal(EntryDefaults defaults, Giving_Settings__c settings) {
-		Id appealId = asId(settings.Default_Appeal__c, Appeal__c.SObjectType);
+	private static void applyDefaultAppeal(EntryDefaults defaults) {
+		Id appealId = asId(ModuleSettings.text('Giving_Default_Appeal'), Appeal__c.SObjectType);
 		if (appealId == null) {
 			return;
 		}

@@ -702,10 +702,7 @@ private class GivingSampleDataTest {
 			insertSamplePeople();
 			Fund__c ownFund = GivingTestDataFactory.buildFund('Our general fund', false);
 			insert ownFund;
-			insert new Giving_Settings__c(
-				SetupOwnerId = UserInfo.getOrganizationId(),
-				Default_Fund__c = String.valueOf(ownFund.Id)
-			);
+			ModuleSettings.setForTest('Giving_Default_Fund', String.valueOf(ownFund.Id));
 
 			Test.startTest();
 			loadEverything();

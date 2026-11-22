@@ -62,7 +62,7 @@ public with sharing class ReceiptService {
 		Id scopeId;
 		String scopePrefix;
 		BrandService.Profile brand = gift.Brand__c == null ? null : BrandService.profileFor(gift.Brand__c);
-		String scope = Giving_Settings__c.getOrgDefaults().Receipt_Numbering_Scope__c;
+		String scope = ModuleSettings.text('Giving_Receipt_Numbering_Scope');
 		if (brand != null && scope == 'Brand') {
 			scopeId = brand.brandId;
 			scopePrefix = brand.brandReceiptPrefix;
