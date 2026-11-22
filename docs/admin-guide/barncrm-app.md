@@ -81,7 +81,7 @@ Launcher.
 | App | Pages |
 |---|---|
 | **BarnCRM Events** | Events Home, Event Calendar, Events, Event Speakers, Venues, Reports, Error Log |
-| **BarnCRM Forms** | Forms, Form Submissions, Reports, Error Log |
+| **BarnCRM Forms** | Forms Home, Forms, Form Submissions, Reports, Error Log |
 | **BarnCRM Portal Builder** | Portals, Portal Accesses, Reports, Error Log |
 | **BarnCRM Corporate Hub** | Corporate Hub Home, Library Documents, Compliance Obligations, Agreements, Boards and Committees, Board Meetings, Processing Activities, Data Subject Requests, Data Breaches, Reports, Dashboards, Error Log |
 | **BarnCRM Projects** | Projects Home, Timesheet, Approvals, Requests, Projects, Time Entries, Project Expenses, Project Resources, Staffing, Project Rates, Project Invoices, Request Connections, Reports, Error Log |
@@ -91,7 +91,7 @@ Launcher.
 ### Module Homes
 
 Every module app opens on its home, the first tab, named for the module: Corporate Hub Home,
-Events Home, Fundraising Home, Grants Home, Programs Home, Projects Home, Scholarships Home and
+Events Home, Forms Home, Fundraising Home, Grants Home, Programs Home, Projects Home, Scholarships Home and
 Volunteers Home. Each home has the same layout, so people know where to look in any module:
 
 - The page title, its About This Tool help, and the module's quick actions (such as **New
@@ -121,7 +121,7 @@ need not switch apps. The modules with no app have their pages only here:
 | Fundraising | Quick Gift Entry, Gifts, Commitments, Gift Batches | Accounting Periods, Donor Levels and Scores, Stewardship Plan Templates, Pledge Reminders, Receipt Letters, Campaign Sync, Opportunity Mirror, Gift Transaction Mirror, Accounting Export |
 | Volunteers | Volunteer Shifts, Volunteer Hours | |
 | Mirror | | Provider Requests |
-| Forms | Forms, Form Submissions | |
+| Forms | Forms Home, Forms, Form Submissions | |
 | Event Management | Events Home, Event Calendar, Events, Event Speakers, Venues | |
 | Portal Builder | | Portals, Portal Accesses |
 | Corporate Hub | Corporate Hub Home, Library Documents, Compliance Obligations, Agreements, Boards and Committees, Board Meetings | |

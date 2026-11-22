@@ -86,6 +86,7 @@ const ICONS = Object.freeze({
   // Forms
   Form_Submission__c: 'custom:custom51',
   Form__c: 'custom:custom28',
+  Forms_Home: 'custom:custom27',
   // Logic Models
   Logic_Model__c: 'custom:custom62',
   // Contact Point Sync

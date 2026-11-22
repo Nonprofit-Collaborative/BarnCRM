@@ -62,7 +62,7 @@ Every BarnCRM module is in Beta right now: a **Beta** badge beside a module's na
 
 ### Forms
 
-- [Forms](forms.md): filling in a form a step at a time, seeing a submission and the records it wrote, and finishing one held for review.
+- [Forms](forms.md): Forms Home, filling in a form a step at a time, seeing a submission and the records it wrote, and finishing one held for review.
 
 ### Event Management
 

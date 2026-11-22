@@ -169,3 +169,18 @@ second published form `Zzdelete Empty` with none.
 | 5 | Open **Form Submissions** and the submission. | It is still there: **Form** and **Form Version** are empty, **Form Name** reads `Zzdelete Test`, **Version Number** `1`. The **Submission** tab shows the answers by question key and no **Process Again**. |
 
 **Cleanup:** delete the submission.
+
+## T-FORM-10: Forms Home
+
+**Purpose:** confirm Forms Home shows the module's figures and lists, its first-run panel and New Form only for creators (Module Home pattern).
+**Prerequisites:** admin and read-only testers; a production org or sandbox for the app (in a scratch org use the **Forms Home** tab in **BarnCRM**). Start with no forms for step 1.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As admin, before any form exists, open **BarnCRM Forms**. | **Forms Home** is the first tab and opens on **Build Your First Form** with **New Form**; no figures. |
+| 2 | Click **New Form**, save a form `Home Test`, publish it, fill it in twice, the second time as someone who matches two people so it is held (as in T-FORM-03). Reload **Forms Home**. | Figures: **Published Forms** 1, **Submissions, Last 30 Days** 2, **Need Review** 1. **Recently Changed Forms** lists `Home Test` with a **Published** badge; **Newest Submissions** lists both, the held one with an amber **Needs Review** badge. |
+| 3 | Click **Need Review**. | The Form Submissions list opens. |
+| 4 | Narrow the window to phone width. | Two figures per row; each table row stacks with its column names. |
+| 5 | As read-only, open **Forms Home**. | The same figures and lists; no **New Form**. |
+
+**Cleanup:** delete `Home Test` and its submissions.

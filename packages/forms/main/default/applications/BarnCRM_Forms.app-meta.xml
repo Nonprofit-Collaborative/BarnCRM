@@ -17,12 +17,16 @@
   <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
   <label>BarnCRM Forms</label>
   <navType>Console</navType>
+  <tabs>Forms_Home</tabs>
   <tabs>Form__c</tabs>
   <tabs>Form_Submission__c</tabs>
   <tabs>standard-report</tabs>
   <tabs>Error_Log__c</tabs>
   <uiType>Lightning</uiType>
   <workspaceConfig>
+    <mappings>
+      <tab>Forms_Home</tab>
+    </mappings>
     <mappings>
       <tab>Form__c</tab>
     </mappings>

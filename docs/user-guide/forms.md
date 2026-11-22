@@ -4,6 +4,14 @@ Forms let you take someone's answers a step at a time and have BarnCRM put them 
 records for you: it finds the person if they are already in BarnCRM and adds them if not. Your
 BarnCRM admin builds the forms (see [Forms](../admin-guide/forms.md) in the Admin Guide).
 
+## Forms Home
+
+Open the **BarnCRM Forms** app (or **BarnCRM**) and its **Forms Home** tab. The figures at the
+top count the published forms, the submissions from the last 30 days and the submissions that
+need review; click one to open its list. Below them are the forms changed most recently and the
+newest submissions; click a name to open it. If you may create forms, **New Form** is at the top
+right.
+
 ## To Fill In a Form
 
 1. Open the **BarnCRM Forms** app (or **BarnCRM**, or **BarnCRM Console**), the **Forms** tab,

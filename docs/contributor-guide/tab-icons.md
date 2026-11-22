@@ -80,6 +80,7 @@ Rules:
 | contactpoints | Contact_Point_Sync | Custom59: Can |
 | forms | Form_Submission__c | Custom51: Apple |
 | forms | Form__c | Custom28: Cellphone |
+| forms | Forms_Home | Custom27: Laptop |
 | logicmodels | Logic_Model__c | Custom62: Chalkboard |
 | portal | Portal_Access__c | Custom77: Locked |
 | portal | Portal__c | Custom47: Knight |

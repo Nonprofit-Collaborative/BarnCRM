@@ -31,14 +31,29 @@ Install it from **Module Manager** (see [Module Manager](module-manager.md)). Wh
 finishes, BarnCRM gives you, the person who installed it, the **Forms Admin** permission set,
 and gives everyone who already has a BarnCRM role their Forms permission set (see below).
 
-Forms has its own app, **BarnCRM Forms** (**Forms**, **Form Submissions**, **Reports** and
-**Error Log**), shown to everyone with a Forms permission set. Its **Forms** and **Form
-Submissions** tabs are also in the **BarnCRM** and **BarnCRM Console** apps, after **Data
-Manager**. A source install puts them there itself; after a package install, add them once in
+Forms has its own app, **BarnCRM Forms** (**Forms Home**, **Forms**, **Form Submissions**,
+**Reports** and **Error Log**), shown to everyone with a Forms permission set. Its **Forms
+Home**, **Forms** and **Form Submissions** tabs are also in the **BarnCRM** and **BarnCRM
+Console** apps, after **Data Manager**. A source install puts them there itself; after a package install, add them once in
 App Manager (see [The BarnCRM Apps](barncrm-app.md#a-modules-pages-in-the-barncrm-apps)). A
 scratch or Developer Edition org gets no BarnCRM Forms app, only the tabs in the BarnCRM apps
 (see [The Module Apps](barncrm-app.md#the-module-apps)). A form or submission opens on its own
 record page from any app.
+
+### Forms Home
+
+**Forms Home** is the app's first tab and follows the Module Home layout (see [Module
+Homes](barncrm-app.md#module-homes)). It shows:
+
+- **Published Forms**, **Submissions, Last 30 Days** and **Need Review** (submissions that need
+  review or failed to process) as figures; each opens its list.
+- **Recently Changed Forms**: the five forms changed last, with status and date.
+- **Newest Submissions**: the ten newest, with their form, status and date.
+- **New Form** at the top right, for anyone who may create forms.
+
+Before the first form it shows **Build Your First Form** in place of the figures and lists.
+Everyone with a Forms permission set sees the tab; each person sees counts and rows for the
+forms and submissions they may read. It stores nothing and has no settings.
 
 Forms has no org-wide settings: each form is set up on its own record. BarnCRM Settings has a
 **Forms** section with one row, **Open Forms**, which opens the Forms tab. That row is also how

@@ -179,4 +179,8 @@
     <tab>Form__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>
+  <tabSettings>
+    <tab>Forms_Home</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
 </PermissionSet>
