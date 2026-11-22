@@ -5,7 +5,8 @@
  * waiting for approval and upcoming open shifts that still need people. The names come from the
  * org's own metadata (object, picklist and list view labels) where one fits, so the page adds
  * one custom label. Each figure is read in user mode and capped; a figure the person cannot read
- * is left out, never shown as zero.
+ * is left out, never shown as zero. The first-run panel (D-200 R4) is decided in the LWC from a
+ * GraphQL read of one volunteer job and the objects' create access (ADR-0093).
  */
 public with sharing class VolunteersHomeController {
 	/** The most rows a count reads; past it the page shows "2,000+". */
@@ -54,34 +55,6 @@ public with sharing class VolunteersHomeController {
 				addShiftsTile(tiles);
 			}
 			return tiles;
-		} catch (Exception caught) {
-			throw UserErrors.wrap(caught, 'Volunteers Home', true);
-		}
-	}
-
-	/** The first-run panel (D-200 R4): whether it shows, and whether it offers a file import. */
-	public class FirstRun {
-		/** True when the person may create volunteer jobs and none exists yet. */
-		@AuraEnabled
-		public Boolean show = false;
-		@AuraEnabled
-		public Boolean canImport = false;
-	}
-
-	/**
-	 * Whether Volunteers Home opens on its first-run panel: no volunteer job exists yet and the
-	 * person may create one. A separate call, so getHome keeps its list of figures.
-	 */
-	@AuraEnabled
-	public static FirstRun getFirstRun() {
-		try {
-			FirstRun result = new FirstRun();
-			result.show =
-				Schema.SObjectType.Volunteer_Job__c.isCreateable() &&
-				[SELECT Id FROM Volunteer_Job__c WITH USER_MODE LIMIT 1]
-				.isEmpty();
-			result.canImport = result.show && Schema.SObjectType.Import_Batch__c.isCreateable();
-			return result;
 		} catch (Exception caught) {
 			throw UserErrors.wrap(caught, 'Volunteers Home', true);
 		}

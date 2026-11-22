@@ -39,4 +39,3 @@ ScholarshipsController.getBoard  # keep: review board across objects, blind revi
 ScholarshipsController.getReview  # keep: rubric, the reviewer's own review, blind review
 StewardshipPlanController.deleteStep  # keep: Manage BarnCRM Settings permission
 StewardshipPlanController.setActive  # keep: Manage BarnCRM Settings permission
-VolunteersHomeController.getFirstRun  # convert: GraphQL

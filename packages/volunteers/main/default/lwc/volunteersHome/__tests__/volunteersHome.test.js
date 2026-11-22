@@ -19,20 +19,31 @@ jest.mock(
 );
 import VolunteersHome from 'c/volunteersHome';
 import getHome from '@salesforce/apex/VolunteersHomeController.getHome';
-import getFirstRun from '@salesforce/apex/VolunteersHomeController.getFirstRun';
 import { setHelpTextForTest, clearHelpTextForTest } from 'c/barnHelpText';
 import { badgeStatusFor, pageReferenceFor, valueFor } from '../volunteersHomeModel';
-// The object info test wire adapter is emitted to on purpose, which is how a wired component is
-// driven from a test.
+// The object info and GraphQL test wire adapters are emitted to on purpose, which is how a wired
+// component is driven from a test.
 /* eslint-disable @lwc/lwc/no-unexpected-wire-adapter-usages */
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
+import { graphql } from 'lightning/graphql';
 
 jest.mock('@salesforce/apex/VolunteersHomeController.getHome', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock('@salesforce/apex/VolunteersHomeController.getFirstRun', () => ({ default: jest.fn() }), {
-  virtual: true
-});
+
+/** One object's info, to the wire that asked for that object only. */
+function emitInfo(objectApiName, createable) {
+  getObjectInfo.emit(
+    { apiName: objectApiName, createable },
+    (config) => config.objectApiName.objectApiName === objectApiName
+  );
+}
+
+/** The first-run read: how many volunteer jobs it found (none or one). */
+function emitJobs(count) {
+  const edges = count ? [{ node: { Id: 'a0V000000000001AAA' } }] : [];
+  graphql.emit({ uiapi: { query: { Volunteer_Job__c: { edges } } } });
+}
 
 const TILES = [
   {
@@ -76,13 +87,14 @@ describe('c-volunteers-home', () => {
       Volunteers_Home_FirstRunNewJob: 'New Volunteer Job',
       Volunteers_Home_FirstRunImport: 'Import a File'
     });
-    getFirstRun.mockResolvedValue({ show: false, canImport: false });
   });
 
   it('offers a first job and a file import before any job exists', async () => {
     getHome.mockResolvedValue(TILES);
-    getFirstRun.mockResolvedValue({ show: true, canImport: true });
     const element = build();
+    emitInfo('Volunteer_Job__c', true);
+    emitInfo('Import_Batch__c', true);
+    emitJobs(0);
     await flush();
 
     const panel = element.shadowRoot.querySelector('[data-id="first-run"]');
@@ -104,11 +116,36 @@ describe('c-volunteers-home', () => {
 
   it('shows the figures when the first-run state cannot be read', async () => {
     getHome.mockResolvedValue(TILES);
-    getFirstRun.mockRejectedValue({ body: { message: 'no' } });
     const element = build();
+    emitInfo('Volunteer_Job__c', true);
+    graphql.emitErrors([{ message: 'no' }]);
     await flush();
     expect(element.shadowRoot.querySelector('[data-id="first-run"]')).toBeNull();
     expect(element.shadowRoot.querySelectorAll('c-barn-stat-tile')).toHaveLength(2);
+  });
+
+  it('shows the figures once a job exists, and offers no import without import access', async () => {
+    getHome.mockResolvedValue(TILES);
+    const element = build();
+    emitInfo('Volunteer_Job__c', true);
+    emitInfo('Import_Batch__c', false);
+    emitJobs(1);
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="first-run"]')).toBeNull();
+
+    emitJobs(0);
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="first-run"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="first-run-import"]')).toBeNull();
+  });
+
+  it('offers no first-run panel to someone who may not create jobs', async () => {
+    getHome.mockResolvedValue(TILES);
+    const element = build();
+    emitInfo('Volunteer_Job__c', false);
+    emitJobs(0);
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="first-run"]')).toBeNull();
   });
 
   it('uses the shared page shell and explains the empty charts only when nothing is counted', async () => {
@@ -179,10 +216,10 @@ describe('c-volunteers-home', () => {
 
   it('keeps New Volunteer Job out of the header while the first-run panel offers it', async () => {
     getHome.mockResolvedValue(TILES);
-    getFirstRun.mockResolvedValue({ show: true, canImport: false });
     const element = build();
+    emitJobs(0);
     await flush();
-    getObjectInfo.emit({ apiName: 'Volunteer_Job__c', createable: true });
+    emitInfo('Volunteer_Job__c', true);
     await flush();
     expect(element.shadowRoot.querySelector('[data-id="new-job"]')).toBeNull();
   });

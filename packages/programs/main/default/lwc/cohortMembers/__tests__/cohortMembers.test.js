@@ -1,3 +1,4 @@
+/* eslint-disable @lwc/lwc/no-unexpected-wire-adapter-usages */
 import { setHelpTextForTest } from 'c/barnHelpText';
 import { createElement } from 'lwc';
 import BarnConfirmModal from 'c/barnConfirmModal';
@@ -5,7 +6,7 @@ import CohortMembers from 'c/cohortMembers';
 import getMembers from '@salesforce/apex/CohortController.getMembers';
 import addMembers from '@salesforce/apex/CohortController.addMembers';
 import removeMember from '@salesforce/apex/CohortController.removeMember';
-import getPersonName from '@salesforce/apex/CohortController.getPersonName';
+import { getRecords } from 'lightning/uiRecordApi';
 import {
   addPayload,
   addedMessage,
@@ -31,9 +32,6 @@ jest.mock('@salesforce/apex/CohortController.addMembers', () => ({ default: jest
   virtual: true
 });
 jest.mock('@salesforce/apex/CohortController.removeMember', () => ({ default: jest.fn() }), {
-  virtual: true
-});
-jest.mock('@salesforce/apex/CohortController.getPersonName', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock('@salesforce/label/c.Programs_Cohort_Chosen', () => ({ default: 'Chosen: {0}' }), {
@@ -146,7 +144,6 @@ describe('c-cohort-members', () => {
 
   it('adds ticked enrollments and picked people, and lists who failed', async () => {
     getMembers.mockResolvedValue(membersOf());
-    getPersonName.mockResolvedValue('Dee Park');
     addMembers.mockResolvedValue(
       membersOf({
         members: [ANA, BEN],
@@ -169,6 +166,19 @@ describe('c-cohort-members', () => {
     await flush();
     expect(qa(element, 'picked')).toHaveLength(1);
     expect(q(element, 'chosen').textContent).toBe('Chosen: 2');
+    const query = getRecords.getLastConfig().records[0];
+    expect(query.recordIds).toEqual(['003000000000009AAA']);
+    expect(query.optionalFields).toEqual(['Contact.Name', 'Account.Name']);
+    getRecords.emit({
+      results: [
+        {
+          statusCode: 200,
+          result: { id: '003000000000009AAA', fields: { Name: { value: 'Dee Park' } } }
+        }
+      ]
+    });
+    await flush();
+    expect(q(element, 'picked').label).toBe('Dee Park');
 
     q(element, 'add').click();
     await flush();
@@ -185,7 +195,6 @@ describe('c-cohort-members', () => {
 
   it('takes a picked person off the list, and removes a member', async () => {
     getMembers.mockResolvedValue(membersOf());
-    getPersonName.mockRejectedValue({});
     removeMember.mockResolvedValue(membersOf({ members: [] }));
     BarnConfirmModal.open.mockResolvedValue(true);
     const element = await render();
@@ -237,7 +246,6 @@ describe('c-cohort-members', () => {
   it('shows a refused add in its own words', async () => {
     getMembers.mockResolvedValue(membersOf({ candidates: [] }));
     addMembers.mockRejectedValue({});
-    getPersonName.mockResolvedValue('Dee Park');
     const element = await render();
     expect(q(element, 'no-candidates')).not.toBeNull();
     q(element, 'person-picker').dispatchEvent(
@@ -298,7 +306,6 @@ describe('c-cohort-members', () => {
 
     it('adds everyone ticked when the dragged person is ticked, and keeps picked people', async () => {
       getMembers.mockResolvedValue(membersOf());
-      getPersonName.mockResolvedValue('Dee Park');
       addMembers.mockResolvedValue(
         membersOf({ members: [ANA, BEN, CARA], candidates: [], added: 2 })
       );
