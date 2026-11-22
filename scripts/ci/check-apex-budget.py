@@ -114,7 +114,11 @@ CAPS = {
     # in phase 2) and OrganizationFlagBatch, less the removed shipped-defaults table.
     # 2,015,331 measured, plus about 0.1%. Over the 2.0M target until phase 2 removes the
     # carry-over and the legacy fallbacks in SettingsState, AutomationControl and the writers.
-    "core": 2_017_350,
+    # Raised again 2026-11-21 for SET-02 (the phase 2 Core prerequisite): ModuleSettings, the
+    # store path for module groups in SettingsService and the module state keys and lock.
+    # 2,032,185 measured, plus about 0.1%. Phase 2 also removes every module's own settings
+    # readers and writers, which is where the suite gets this back.
+    "core": 2_034_200,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured

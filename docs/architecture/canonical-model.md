@@ -1636,7 +1636,32 @@ values and no marker) deploys, in one deployment, every legacy value that differ
 default plus the marker, audited like any save; copies run state to State rows and What's New
 dismissals to Seen rows where none exists; and moves a pause that has not ended to the
 Automation Control org default. A value longer than 255 characters is not carried and is
-reported; it reads its default. A second run, once the marker is deployed, does nothing.
+reported; it reads its default. A second run, once the marker is deployed, does nothing. The
+same run carries every registered module (Setting Module below): each legacy value with a
+Setting Definition of the module's group joins the one deployment, and each state field gets
+its `Prefix.Field` State row.
+**R-SV4 Module settings.** A module whose settings group has a Setting Module record reads and
+saves every row of that group through the store (`ModuleSettings` by DeveloperName, or
+`SettingsService` by group and key), from its definitions alone, so the group needs no object
+once the legacy custom setting is removed. Until then, and only before carry-over in an org
+that saved Core's legacy settings, a key with no Setting Value reads the legacy field. Keys
+(DeveloperNames, and group plus key) are unique across every package; a registered module's
+Checkbox, Number and Picklist rows ship a `Default_Value__c`, and every row whose legacy field
+declares a default ships the same value (`check-setting-defaults.py`). A console save touching
+Core and modules sends one deployment.
+
+### Setting Module
+
+`Setting_Module__mdt` (Core, Public; not counted as an object): one record per module whose
+settings live in the store, shipped in the module's own package, so Core reads, saves and carries
+over the module's settings without naming it (ADR-0059, ADR-NEXT settings as custom metadata).
+DeveloperName is the module's name, as on its BarnCRM Module record.
+
+| Field | Type | Definition |
+|---|---|---|
+| `Settings_Object__c` | text (80), required | The settings group the module's Setting Definition rows name in `Settings_Object__c`, which is also its legacy hierarchy custom setting's API name without a prefix. Never `BarnCRM_Settings__c`. |
+| `Key_Prefix__c` | text (20), required | The prefix of the module's State row names: `Prefix.Name` (`SettingsState.moduleKey`). Unique across modules. |
+| `State_Fields__c` | long text | The legacy fields that hold run state, comma separated; carry-over copies each to its State row and never carries it as a setting. |
 
 ### Automation Registry
 
@@ -13845,7 +13870,10 @@ pages' Schedule and Stop buttons, which require Manage BarnCRM Settings.
   value. They hold what ran in this org (last runs, summaries, watermarks, setup markers), so
   they are not deployable and not settings. Read once per transaction by `SettingsState` and
   written in system mode. The job registry (`NightlyJobs.rows`) reads Job rows only. Seen rows
-  are Section 12A.
+  are Section 12A. A module's rows are named `Prefix.Name`, the prefix from its Setting Module
+  record (Section 13, R-SV4). A run lock is one such row read `FOR UPDATE`
+  (`SettingsState.lockOrCreate`), created by the module at install so two first runs cannot
+  each make one.
 - **Classes:** `NightlyStep` (one step), `NightlyStepProvider` (a module's steps),
   `NightlyJobs` (the registry, switches, results, scheduling and adoption), `NightlyRun` (the
   run: schedulable and queueable). Each former scheduler class keeps its `start`, `stop`,
@@ -20115,6 +20143,7 @@ mirrors the primary member).
 | 1.82 | 2026-11-20 | BarnCRM Connector pre-batch review fixes (release 1.33). One object added, 199 to 200 in the suite: Connector Connection (`Connector_Connection__c`, `Check_Path__c`), which keeps a template's check path beside a connection (29CN1, new R-CN9: Check Connection asks for it and shows the account an answer names). New R-CN10: choosing the integration user needs the key-writing permissions and refuses an all-seeing user. R-CN8: Disconnect refuses a Secret URL. Connector Run's Status loses Rejected; Running marks runs claimed for the next runner job (R-RUN4). |
 | 1.83 | 2026-11-20 | R-CR6 the recipe clock: a claimed Running run counts as Queued for the clock, so the heartbeat keeps running while a lane has a Waiting run, a Queued run or a claimed Running run (batch Q gate fix). |
 | 1.84 | 2026-11-21 | Settings as custom metadata, phase 1 Core (SET-01, D-219, ADR-NEXT settings as custom metadata). New custom metadata type `Setting_Value__mdt` with `Value__c` (Section 13, R-SV1 to R-SV3; not counted as an object). `Setting_Definition__mdt` gains `Default_Value__c` and the Hidden data type. `Nightly_Job__c` gains `Kind__c` and `Value__c` (state and What's New rows). `BarnCRM_Automation_Control__c` gains `Paused_Until__c`. New `Account.Is_Organization_Account__c`, a kept checkbox that replaces the `Is_Organization__c` formula everywhere it was read (Section 8; the platform refuses a formula-to-checkbox change, and the formula is removed in phase 2). `BarnCRM_Settings__c` and `Whats_New_Seen__c` are read only until carry-over and are removed in phase 2; no object count change in phase 1. |
+| 1.85 | 2026-11-21 | Settings as custom metadata, phase 2 Core prerequisite (SET-02, D-219). New custom metadata type `Setting_Module__mdt` with `Settings_Object__c`, `Key_Prefix__c` and `State_Fields__c` (Section 13; not counted as an object): a module registers its settings group, its State row prefix and its legacy state fields. New rule R-SV4 (module settings read and saved through the store by name or by group and key); R-SV3 carry-over covers every registered module; module State rows are `Prefix.Name` and a run lock is a State row read `FOR UPDATE` (Section 29 Nightly Jobs). No object count change. |
 
 ---
 ## 32. Entity ownership by package

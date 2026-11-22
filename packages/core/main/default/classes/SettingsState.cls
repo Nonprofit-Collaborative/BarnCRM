@@ -7,6 +7,10 @@
  * Every state row is read in one query, once per transaction. A key that has no row yet is read
  * from the legacy custom setting field of the same name until the org carries its settings over,
  * so an upgraded org keeps its last runs and markers.
+ *
+ * A module's keys are `Prefix.Name` (`moduleKey`), the prefix from its `Setting_Module__mdt`
+ * record; until carry-over, such a key with no row reads the field Name of that module's legacy
+ * custom setting. `lockOrCreate` gives a module a run lock on one row.
  */
 @NamespaceAccessible
 public without sharing class SettingsState {
@@ -37,6 +41,15 @@ public without sharing class SettingsState {
 
 	private static Map<String, Nightly_Job__c> rowsByKey;
 
+	/**
+	 * A module's state key: its registry record's `Key_Prefix__c`, a dot, and the name (the
+	 * legacy field name, such as `Rollups.Last_Run_Started__c`), so no two modules share a row.
+	 */
+	@NamespaceAccessible
+	public static String moduleKey(String prefix, String name) {
+		return prefix.trim() + '.' + name.trim();
+	}
+
 	/** True when the key is Core run state rather than a setting. */
 	@NamespaceAccessible
 	public static Boolean isStateKey(String key) {
@@ -62,6 +75,11 @@ public without sharing class SettingsState {
 	@NamespaceAccessible
 	public static Boolean flag(String key) {
 		return get(key) == true;
+	}
+
+	@NamespaceAccessible
+	public static Decimal number(String key) {
+		return SettingsService.toNumber(get(key));
 	}
 
 	@NamespaceAccessible
@@ -117,6 +135,24 @@ public without sharing class SettingsState {
 		}
 	}
 
+	/**
+	 * Takes a lock on one key's row until this transaction ends and returns its value, creating
+	 * the row (with the value read so far, the legacy one included) when it has none: a run lock,
+	 * such as the rollup engine's, where a second run waits for the first to commit and then sees
+	 * what it wrote. Two runs that both find no row can each create one, so a module creates its
+	 * lock row at install (`put`), and this only covers an org where it is missing. A wait that
+	 * times out throws the platform's QueryException, for the caller to treat as busy.
+	 */
+	@NamespaceAccessible
+	public static Object lockOrCreate(String key) {
+		String name = key.trim();
+		lock(new Set<String>{ name });
+		if (rows().get(normalized(name))?.Id == null) {
+			put(new Map<String, Object>{ name => get(name) });
+		}
+		return get(name);
+	}
+
 	/** Forgets the rows read, so the next read comes from the database. */
 	@NamespaceAccessible
 	public static void clearCache() {
@@ -142,6 +178,11 @@ public without sharing class SettingsState {
 
 	/** Until carry-over, a Core key with no row reads the legacy field of the same name. */
 	private static Object legacy(String key) {
+		if (String.isNotBlank(key) && key.contains('.')) {
+			// A module key reads its registered legacy custom setting's field, as Core's does.
+			Setting_Module__mdt module = ModuleSettings.moduleByPrefix(key.substringBefore('.'));
+			return module == null ? null : ModuleSettings.legacyValue(module.Settings_Object__c, key.substringAfter('.'));
+		}
 		if (!isStateKey(key) || SettingStore.isCarriedOver()) {
 			return null;
 		}

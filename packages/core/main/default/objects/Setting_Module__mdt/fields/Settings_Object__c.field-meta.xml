@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Settings_Object__c</fullName>
+  <description>
+    The settings group the module's Setting Definition rows name in their Settings Object, which
+    is also the API name, without a namespace prefix, of the module's legacy hierarchy custom
+    setting. Every row naming it reads and saves through the settings store; the legacy object
+    is read only until carry-over, and is skipped when the org no longer has it.
+  </description>
+  <externalId>false</externalId>
+  <fieldManageability>DeveloperControlled</fieldManageability>
+  <label>Settings Object</label>
+  <length>80</length>
+  <required>true</required>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

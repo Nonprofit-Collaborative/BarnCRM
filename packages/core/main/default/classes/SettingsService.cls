@@ -198,9 +198,44 @@ public with sharing class SettingsService {
 		clearCaches();
 	}
 
-	/** The deployment the last Core save in this transaction sent, or null (none, or a test). */
+	/** The deployment the last store save in this transaction sent, or null (none, or a test). */
+	@NamespaceAccessible
 	public static Id lastDeploymentId() {
 		return lastDeployment;
+	}
+
+	/** Store changes held back by `collectSaves`, sent as one deployment by `sendCollected`. */
+	private static List<SettingStore.Change> collected;
+	private static Boolean collectedAudit = true;
+
+	/**
+	 * Holds back every store save that follows until `sendCollected`, so one page save that
+	 * touches Core and modules sends one deployment, and the page follows one outcome.
+	 */
+	@NamespaceAccessible
+	public static void collectSaves() {
+		collected = new List<SettingStore.Change>();
+		collectedAudit = true;
+	}
+
+	/** Sends what `collectSaves` held back as one deployment and returns its Id (null when nothing). */
+	@NamespaceAccessible
+	public static Id sendCollected() {
+		List<SettingStore.Change> changes = collected;
+		Boolean audit = collectedAudit;
+		stopCollecting();
+		if (changes == null || changes.isEmpty()) {
+			return null;
+		}
+		sendStoreChanges(changes, audit);
+		return lastDeployment;
+	}
+
+	/** Stops holding saves back, dropping anything not sent (a save that failed part way). */
+	@NamespaceAccessible
+	public static void stopCollecting() {
+		collected = null;
+		collectedAudit = true;
 	}
 
 	/** True when Core's settings object actually has the given key. */
@@ -214,6 +249,9 @@ public with sharing class SettingsService {
 	public static Boolean hasKey(String settingsObject, String key) {
 		if (String.isBlank(key)) {
 			return false;
+		}
+		if (ModuleSettings.isStoreObject(settingsObject)) {
+			return ModuleSettings.definitionFor(settingsObject, key) != null;
 		}
 		// Called once per Setting Definition row by SettingsController.toSetting, so the type
 		// and its fields come from the per-transaction caches, never a fresh describe.
@@ -230,6 +268,9 @@ public with sharing class SettingsService {
 	/** The current value of one setting on the named settings object, or null. */
 	@NamespaceAccessible
 	public static Object getValue(String settingsObject, String key) {
+		if (ModuleSettings.isStoreObject(settingsObject)) {
+			return ModuleSettings.stored(storeName(settingsObject, key));
+		}
 		Schema.SObjectType type = settingsType(settingsObject);
 		Schema.SObjectField token = fieldFor(type, key);
 		if (!isCoreSettings(type)) {
@@ -246,6 +287,9 @@ public with sharing class SettingsService {
 	/** A checkbox setting: the stored value, else the field's declared default, else false. */
 	@NamespaceAccessible
 	public static Boolean flag(String settingsObject, String key) {
+		if (ModuleSettings.isStoreObject(settingsObject)) {
+			return ModuleSettings.flag(knownStoreName(settingsObject, key));
+		}
 		Object value = storedValue(settingsObject, key);
 		value = value == null ? declaredValue(settingsObject, key) : value;
 		return value == null ? false : Boolean.valueOf(String.valueOf(value));
@@ -257,6 +301,9 @@ public with sharing class SettingsService {
 	 */
 	@NamespaceAccessible
 	public static Decimal number(String settingsObject, String key) {
+		if (ModuleSettings.isStoreObject(settingsObject)) {
+			return ModuleSettings.number(knownStoreName(settingsObject, key));
+		}
 		Decimal value = toNumber(storedValue(settingsObject, key));
 		Setting_Definition__mdt row = value == null
 			? null
@@ -272,6 +319,9 @@ public with sharing class SettingsService {
 	/** A text setting, trimmed: the stored value, or the field's declared default when blank. */
 	@NamespaceAccessible
 	public static String text(String settingsObject, String key) {
+		if (ModuleSettings.isStoreObject(settingsObject)) {
+			return asText(ModuleSettings.text(knownStoreName(settingsObject, key)));
+		}
 		String value = asText(storedValue(settingsObject, key)).trim();
 		return String.isBlank(value) ? asText(declaredValue(settingsObject, key)).trim() : value;
 	}
@@ -294,6 +344,20 @@ public with sharing class SettingsService {
 		} catch (TypeException notANumber) {
 			return null;
 		}
+	}
+
+	/** The store name (definition DeveloperName) of a module key; throws when it has no definition. */
+	private static String storeName(String settingsObject, String key) {
+		String name = knownStoreName(settingsObject, key);
+		if (name == null) {
+			throw new SettingsException(BarnHelp.text('Core', 'Core_Settings_UnknownKeyError'));
+		}
+		return name;
+	}
+
+	private static String knownStoreName(String settingsObject, String key) {
+		Setting_Definition__mdt row = ModuleSettings.definitionFor(settingsObject, key);
+		return row == null ? null : row.DeveloperName;
 	}
 
 	private static Object storedValue(String settingsObject, String key) {
@@ -361,6 +425,9 @@ public with sharing class SettingsService {
 	 */
 	@NamespaceAccessible
 	public static Object getEffectiveValue(String settingsObject, String key, String dataType) {
+		if (ModuleSettings.isStoreObject(settingsObject)) {
+			return storeEffectiveValue(settingsObject, key);
+		}
 		Schema.SObjectType type = settingsType(settingsObject);
 		Schema.SObjectField field = fieldFor(type, key);
 		Boolean core = isCoreSettings(type);
@@ -393,6 +460,29 @@ public with sharing class SettingsService {
 	}
 
 	/**
+	 * `getEffectiveValue` for a module whose settings are in the store: what the org saved, else
+	 * the definition's default (a checkbox with none reads false), else, for a My Domain row, the
+	 * org's address. Needs no settings object, so it works once the legacy object is removed.
+	 */
+	private static Object storeEffectiveValue(String settingsObject, String key) {
+		String name = storeName(settingsObject, key);
+		Object stored = ModuleSettings.stored(name);
+		if (stored != null && !(stored instanceof String && String.isBlank((String) stored))) {
+			return stored;
+		}
+		Object shipped = ModuleSettings.defaultValue(name);
+		Setting_Definition__mdt row = ModuleSettings.definition(name);
+		if (shipped == null && 'Checkbox'.equalsIgnoreCase(row.Data_Type__c)) {
+			return false;
+		}
+		String qualified = (settingsObject.trim() + '.' + key.trim()).toLowerCase();
+		if (shipped == null && SHOWN_AS_MY_DOMAIN.contains(qualified)) {
+			return Url.getOrgDomainUrl().toExternalForm();
+		}
+		return shipped;
+	}
+
+	/**
 	 * Saves the given Core values, keyed by the API name of the BarnCRM Settings field.
 	 * Only keys that exist on the object and are listed in a Setting Definition row are
 	 * accepted. Returns the refreshed Core settings.
@@ -406,7 +496,8 @@ public with sharing class SettingsService {
 	/**
 	 * Saves the given values on the named settings object. The object has to be a hierarchy
 	 * custom setting named by at least one shipped Setting Definition row. Returns the saved
-	 * org-level record.
+	 * org-level record, or null for a module whose settings are in the store (`Setting_Module__mdt`):
+	 * those save in one deployment (`lastDeploymentId`).
 	 */
 	@NamespaceAccessible
 	public static SObject saveValues(String settingsObject, Map<String, Object> values) {
@@ -421,6 +512,15 @@ public with sharing class SettingsService {
 	public static BarnCRM_Settings__c saveSystemValue(String key, Object value) {
 		applyValues(CORE_SETTINGS_OBJECT, new Map<String, Object>{ key => value }, false, true);
 		return getSettings();
+	}
+
+	/**
+	 * Saves values a module writes itself on the named settings object, audited, Hidden rows
+	 * included (ModuleSettings.saveSystem). In the store, a key still needs a Setting Definition.
+	 */
+	@NamespaceAccessible
+	public static void saveSystemValues(String settingsObject, Map<String, Object> values) {
+		applyValues(settingsObject, values, false, true);
 	}
 
 	/**
@@ -448,6 +548,10 @@ public with sharing class SettingsService {
 		Boolean requireDefinition,
 		Boolean audit
 	) {
+		if (ModuleSettings.isStoreObject(settingsObject)) {
+			applyStoreValues(settingsObject.trim(), values, requireDefinition, audit);
+			return null;
+		}
 		Schema.SObjectType type = settingsType(settingsObject);
 		if (isCoreSettings(type)) {
 			applyCoreValues(values, requireDefinition, audit);
@@ -580,11 +684,121 @@ public with sharing class SettingsService {
 			refuseIfAddressWouldBeIncomplete(type, getSettings(), changed);
 		}
 		SettingsState.put(state);
+		sendStoreChanges(changes, audit);
+	}
+
+	/**
+	 * Validates a module's values as `applyCoreValues` does, from its Setting Definition rows
+	 * alone (no settings object is described, so this works once the legacy object is removed),
+	 * then saves every changed one in one store deployment. The module's run state is not saved
+	 * here: it goes to `SettingsState`.
+	 */
+	private static void applyStoreValues(
+		String settingsObject,
+		Map<String, Object> values,
+		Boolean requireDefinition,
+		Boolean audit
+	) {
+		if (values == null || values.isEmpty()) {
+			return;
+		}
+		clearCaches();
+		List<SettingStore.Change> changes = new List<SettingStore.Change>();
+		for (String key : values.keySet()) {
+			Setting_Definition__mdt row = ModuleSettings.definitionFor(settingsObject, key);
+			if (row == null || (requireDefinition && TYPE_HIDDEN.equalsIgnoreCase(row.Data_Type__c))) {
+				throw new SettingsException(BarnHelp.text('Core', 'Core_Settings_UnknownKeyError'));
+			}
+			Object oldValue = ModuleSettings.stored(row.DeveloperName);
+			Object shownValue = oldValue != null ? oldValue : ModuleSettings.defaultValue(row.DeveloperName);
+			Object newValue = checkedStoreValue(values.get(key), row, shownValue);
+			String oldText = asText(oldValue);
+			String newText = asText(newValue);
+			if (oldText.equals(newText)) {
+				continue;
+			}
+			SettingStore.Change change = new SettingStore.Change();
+			change.name = row.DeveloperName;
+			change.settingName = settingsObject + '.' + row.Setting_Key__c.trim();
+			change.oldText = stored(oldText);
+			change.newText = stored(newText);
+			change.json = SettingStore.toJson(newValue);
+			if (change.json.length() > STORE_VALUE_LIMIT) {
+				throw new SettingsException(
+					String.format(
+						System.Label.Core_Format_Pair,
+						new List<Object>{ row.MasterLabel, BarnHelp.text('Core', 'Core_Settings_InvalidValueError') }
+					)
+				);
+			}
+			changes.add(change);
+		}
+		sendStoreChanges(changes, audit);
+	}
+
+	/**
+	 * A module value read in its row's type (Checkbox a Boolean, Number a Decimal, DateTime a
+	 * Datetime, anything else trimmed text, blank null) and checked against the row, refused
+	 * with the setting's name as `checkedValue` does.
+	 */
+	private static Object checkedStoreValue(Object rawValue, Setting_Definition__mdt row, Object oldValue) {
+		try {
+			Object newValue = storeTyped(rawValue, row.Data_Type__c);
+			checkAllowedValue(row, newValue, oldValue);
+			return newValue;
+		} catch (SettingsException refused) {
+			if (refused.getMessage() != BarnHelp.text('Core', 'Core_Settings_InvalidValueError')) {
+				throw refused;
+			}
+			throw new SettingsException(
+				String.format(System.Label.Core_Format_Pair, new List<Object>{ row.MasterLabel, refused.getMessage() })
+			);
+		}
+	}
+
+	private static Object storeTyped(Object raw, String dataType) {
+		String text = raw == null ? null : asText(raw).trim();
+		if ('Checkbox'.equalsIgnoreCase(dataType)) {
+			return raw instanceof Boolean ? (Boolean) raw : 'true'.equalsIgnoreCase(text);
+		}
+		if (String.isBlank(text)) {
+			return null;
+		}
+		if (NUMBER_TYPE.equalsIgnoreCase(dataType)) {
+			Decimal parsed = toNumber(text);
+			if (parsed == null) {
+				throw new SettingsException(BarnHelp.text('Core', 'Core_Settings_InvalidValueError'));
+			}
+			return parsed;
+		}
+		if ('DateTime'.equalsIgnoreCase(dataType)) {
+			if (raw instanceof Datetime) {
+				return raw;
+			}
+			try {
+				return (Datetime) JSON.deserialize(JSON.serialize(text), Datetime.class);
+			} catch (Exception unreadable) {
+				throw new SettingsException(BarnHelp.text('Core', 'Core_Settings_InvalidValueError'));
+			}
+		}
+		return text;
+	}
+
+	/**
+	 * Sends store changes as one deployment, or holds them for `sendCollected`. Saving a setting
+	 * needs Manage BarnCRM Settings, whoever calls.
+	 */
+	private static void sendStoreChanges(List<SettingStore.Change> changes, Boolean audit) {
 		if (changes.isEmpty()) {
 			return;
 		}
 		if (!BarnCRMPermissions.canManageSettings()) {
 			throw new SettingsWriter.PermissionException(BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError'));
+		}
+		if (collected != null) {
+			collected.addAll(changes);
+			collectedAudit = collectedAudit && audit;
+			return;
 		}
 		try {
 			lastDeployment = SettingStore.save(changes, audit);
@@ -603,10 +817,20 @@ public with sharing class SettingsService {
 	 */
 	public static void afterSaved(List<SettingStore.Change> changes) {
 		clearCaches();
+		// Each change's settings group and key: `Group.Key`, or a bare name (the carry-over marker).
+		Map<String, Set<String>> keysByObject = new Map<String, Set<String>>();
 		Map<String, String> jsonByKey = new Map<String, String>();
 		for (SettingStore.Change change : changes) {
-			String key = change.settingName == null ? '' : change.settingName.substringAfter('.');
-			jsonByKey.put(key.toLowerCase(), change.json);
+			String settingName = change.settingName == null ? change.name : change.settingName;
+			String objectName = settingName.contains('.') ? settingName.substringBefore('.') : CORE_SETTINGS_OBJECT;
+			String key = settingName.contains('.') ? settingName.substringAfter('.') : settingName;
+			if (!keysByObject.containsKey(objectName)) {
+				keysByObject.put(objectName, new Set<String>());
+			}
+			keysByObject.get(objectName).add(key);
+			if (objectName.equalsIgnoreCase(CORE_SETTINGS_OBJECT)) {
+				jsonByKey.put(key.toLowerCase(), change.json);
+			}
 		}
 		if (jsonByKey.containsKey('app_navigation_style__c') || jsonByKey.containsKey('account_tabs__c')) {
 			TabAccessService.requestSync();
@@ -625,11 +849,9 @@ public with sharing class SettingsService {
 		if (jsonByKey.containsKey('seasonal_addresses_enabled__c')) {
 			SeasonalAddressScheduler.applySwitch(jsonByKey.get('seasonal_addresses_enabled__c') == 'true');
 		}
-		Set<String> keys = new Set<String>();
-		for (SettingStore.Change change : changes) {
-			keys.add(change.settingName == null ? change.name : change.settingName.substringAfter('.'));
+		for (String objectName : keysByObject.keySet()) {
+			notifyRollupEngine(objectName, keysByObject.get(objectName));
 		}
-		notifyRollupEngine(CORE_SETTINGS_OBJECT, keys);
 	}
 
 	private static final String TYPE_HIDDEN = 'Hidden';
@@ -1183,6 +1405,7 @@ public with sharing class SettingsService {
 		cachedLegacy = null;
 		cachedOrgDefaults.clear();
 		SettingStore.clearCache();
+		ModuleSettings.clearCache();
 		cachedCoreDefinitions = null;
 	}
 

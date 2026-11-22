@@ -1,7 +1,7 @@
 # ADR-NEXT: Settings as Custom Metadata: Defaults on Setting Definition, Changed Values in Setting Value, Run State on Nightly Job
 
-**Status:** Accepted (owner decision D-219, 2026-11-21); phase 1 (Core) built, phase 2 (modules)
-planned
+**Status:** Accepted (owner decision D-219, 2026-11-21); phase 1 (Core) built, phase 2 Core
+prerequisite built (decision 11), phase 2 module moves planned
 **Date:** 2026-11-21
 **Source:** Brandon, D-219: every BarnCRM setting lives in custom metadata (deployable), managed on
 the BarnCRM Settings tab, module menus shown only when the module is installed, done before the
@@ -76,6 +76,27 @@ are asynchronous; the owner has now accepted that cost in exchange for deployabl
     Phase 2 moves every module settings object, then the integrator removes the old objects in a
     destructive deploy. `Automation_Setting__c` (the automation switch list) is not a setting
     store in this sense and stays an object.
+11. **Modules register; Core names none** (amendment, SET-02). A module moves by shipping, in
+    its own package, one `Setting_Module__mdt` record (`Settings_Object__c` its settings group,
+    the legacy object's name; `Key_Prefix__c` its state prefix; `State_Fields__c` its legacy
+    state fields) and a `Default_Value__c` on each of its Setting Definition rows. From then on
+    `SettingsService` reads and saves every row of that group through the store from the
+    definitions alone (no describe, so the group outlives its object), the console's existing
+    module sections included; `ModuleSettings` gives module code typed reads by DeveloperName
+    and the same save. A console save touching Core and modules is one deployment
+    (`SettingsService.collectSaves`), and a module's own page follows its save with the shared
+    `c/settingSaveOutcome`. Module run state is `SettingsState` rows named `Prefix.Name`; a run
+    lock is one such row read `FOR UPDATE` (`SettingsState.lockOrCreate`), replacing
+    `Rollup_Run_Lock__c`. Carry-over reads each registered group's legacy record through
+    describe and skips a group whose object is gone. Until carry-over, a module key with no
+    Setting Value reads its legacy field, but only in an org that saved Core's legacy settings,
+    so a fresh org spends no query on it. One marker covers Core and every module: a module
+    upgraded after the org carried over starts on its defaults (acceptable while no package
+    version exists). Rejected: a registry on `BarnCRM_Module__mdt` (Core ships those records,
+    so a module could not add its own), a registry encoded as a special Setting Definition row
+    (mixes console rows with package wiring), and a unique key field on `Nightly_Job__c` for the
+    lock (the module creates its lock row at install instead; no schema change). How a module
+    declares and reads settings: `docs/contributor-guide/module-settings.md`.
 
 ## Alternatives considered
 
