@@ -34,9 +34,18 @@ checkbox has to be either listed in SHIPPED_BEFORE_UPGRADE_STEP below (the ones 
 the upgrade step; the list is closed) or registered in a `SHIPPED_ON_ADDED_IN_UPGRADES` list in
 the package's post-install class, which passes it to `ShippedDefaultUpgrades.apply` to turn it
 on once in such an org.
+
+Modules in the settings store (ADR-NEXT settings as custom metadata, phase 2): a module that
+ships a `Setting_Module__mdt` record reads every row of its group from the store, where an
+unsaved setting is its `Default_Value__c` and nothing else. So its Checkbox, Number and
+Picklist rows must ship one, a row whose legacy field declares a default must ship the same,
+and each must parse as JSON. The store names a value by the definition's DeveloperName and
+every package shares one namespace, so DeveloperNames (and group plus key) are unique across
+packages, and each registry record names its own group and prefix.
 """
 
 import glob
+import json
 import os
 import re
 import sys
@@ -153,15 +162,16 @@ def registered_defaults():
     return pairs, raw
 
 
-def core_field_defaults():
-    """Each Core settings field that declares a default, as the JSON its definition must ship."""
+def core_field_defaults(object_name=CORE_SETTINGS):
+    """Each field of a settings object that declares a default, as the JSON its definition must
+    ship (Core's by default; a registered module's legacy object while it still exists)."""
     expected = {}
-    pattern = f"packages/core/main/default/objects/{CORE_SETTINGS}/fields/*.field-meta.xml"
+    pattern = f"packages/*/main/default/objects/{object_name}/fields/*.field-meta.xml"
     for path in sorted(glob.glob(pattern)):
         root = ET.parse(path).getroot()
         name = text_of(root, "fullName")
         declared = text_of(root, "defaultValue")
-        if not declared or name in BLANK_BY_DESIGN:
+        if not declared or (object_name == CORE_SETTINGS and name in BLANK_BY_DESIGN):
             continue
         kind = text_of(root, "type")
         if kind == "Checkbox":
@@ -173,10 +183,100 @@ def core_field_defaults():
     return expected
 
 
+REGISTRY = "packages/*/main/default/customMetadata/Setting_Module.*.md-meta.xml"
+# Row types that always have a value to read, so a registered module ships it as the default.
+DEFAULT_REQUIRED = {"Checkbox", "Number", "Picklist"}
+PREFIX_SHAPE = re.compile(r"^[A-Za-z][A-Za-z0-9_]*$")
+
+
+def json_literal(text):
+    """True when the text is one JSON literal (true, 7, "Both"), as the store parses it."""
+    try:
+        json.loads(text)
+        return True
+    except ValueError:
+        return False
+
+
+def registry_problems():
+    """Setting Module records (ADR-NEXT settings as custom metadata, phase 2): each names a
+    settings group other than Core's and a prefix, and neither repeats. Returns the registered
+    groups and the problems."""
+    problems = []
+    groups = {}
+    prefixes = {}
+    for path in sorted(glob.glob(REGISTRY)):
+        text = open(path, encoding="utf-8").read()
+        group = definition_value(text, "Settings_Object__c")
+        prefix = definition_value(text, "Key_Prefix__c")
+        if not group or not prefix:
+            problems.append(f"{path}: a Setting Module names both Settings_Object__c and Key_Prefix__c.")
+            continue
+        if group == CORE_SETTINGS:
+            problems.append(f"{path}: Core's settings are not a module's; register the module's own group.")
+        if not PREFIX_SHAPE.match(prefix):
+            problems.append(f"{path}: Key_Prefix__c {prefix!r} must be letters, digits and underscores.")
+        if group.lower() in groups:
+            problems.append(f"{path}: {group} is already registered by {groups[group.lower()]}.")
+        if prefix.lower() in prefixes:
+            problems.append(f"{path}: the prefix {prefix} is already used by {prefixes[prefix.lower()]}.")
+        groups[group.lower()] = path
+        prefixes[prefix.lower()] = path
+    return set(groups), problems
+
+
+def store_definition_problems(registered_groups):
+    """Setting Definition keys are unique across every package (the store names a value by the
+    DeveloperName, and every package shares one namespace), as are group plus key; a registered
+    module's rows ship their defaults: Checkbox, Number and Picklist always, any row whose legacy
+    field declares a default the same value, each a JSON literal."""
+    problems = []
+    names = {}
+    keys = {}
+    legacy_defaults = {}
+    for path in sorted(glob.glob(DEFINITIONS)):
+        text = open(path, encoding="utf-8").read()
+        name = os.path.basename(path)[len("Setting_Definition.") : -len(".md-meta.xml")]
+        if name.lower() in names:
+            problems.append(f"{path}: the key {name} is also shipped by {names[name.lower()]}.")
+        names[name.lower()] = path
+        group = definition_value(text, "Settings_Object__c") or CORE_SETTINGS
+        key = definition_value(text, "Setting_Key__c")
+        if key:
+            pair = (group.lower(), key.lower())
+            if pair in keys:
+                problems.append(f"{path}: {group}.{key} is also edited by {keys[pair]}.")
+            keys[pair] = path
+        if group.lower() not in registered_groups:
+            continue
+        default = definition_value(text, "Default_Value__c")
+        kind = definition_value(text, "Data_Type__c")
+        if default and not json_literal(default):
+            problems.append(f"{path}: Default_Value__c {default} is not a JSON literal, so it reads as no default.")
+        if kind in DEFAULT_REQUIRED and not default:
+            problems.append(
+                f"{path}: a {kind} row of a module in the store ships no Default_Value__c, so an "
+                f"org that never saved it reads nothing. Ship the default as a JSON literal."
+            )
+        if group not in legacy_defaults:
+            legacy_defaults[group] = core_field_defaults(group)
+        expected = legacy_defaults[group].get(key)
+        if expected is not None and default != expected:
+            problems.append(
+                f"{path}: ships Default_Value__c {default or '(blank)'}, but {group}.{key} "
+                f"declares {expected}. Carry-over and every reader use the definition's, so the "
+                f"two have to agree."
+            )
+    return problems
+
+
 def main():
     registered, raw_defaults = registered_defaults()
 
     problems = []
+    registered_groups, module_problems = registry_problems()
+    problems.extend(module_problems)
+    problems.extend(store_definition_problems(registered_groups))
     for key, expected in sorted(core_field_defaults().items()):
         shipped = raw_defaults.get((CORE_SETTINGS, key))
         if shipped is None:
@@ -253,7 +353,7 @@ def main():
             )
 
     if problems:
-        print("Settings that ship on but would read off:")
+        print("Settings whose shipped default would read wrong:")
         for problem in problems:
             print(f"  - {problem}")
         print("")

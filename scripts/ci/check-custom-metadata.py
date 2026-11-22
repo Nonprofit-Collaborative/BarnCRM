@@ -148,6 +148,10 @@ def check_setting_rows(problems):
     objects = settings_objects()
     sections = known_sections()
     setup_values = set(re.findall(r"KEY_\w+ = '(\w+)'", open(SETUP_VALUE_SELECTOR).read()))
+    store_groups = {
+        (value_of(open(path, encoding="utf-8").read(), "Settings_Object__c") or "").lower()
+        for path in glob.glob("packages/*/main/default/customMetadata/Setting_Module.*.md-meta.xml")
+    }
     for record in sorted(glob.glob(SETTING_DEFINITIONS)):
         text = open(record, encoding="utf-8").read()
         section = value_of(text, "Section__c")
@@ -186,6 +190,11 @@ def check_setting_rows(problems):
             problems.append(f"{record}: is not a Component row and names no Setting_Key__c")
             continue
         settings_object = value_of(text, "Settings_Object__c") or CORE_SETTINGS_OBJECT
+        if settings_object.lower() in store_groups:
+            # A module in the settings store (Setting_Module__mdt) reads and saves the row from
+            # its definition alone; its legacy object may be gone (ADR-NEXT settings as custom
+            # metadata, phase 2). check-setting-defaults.py checks these rows instead.
+            continue
         fields = objects.get(settings_object)
         if fields is None:
             problems.append(

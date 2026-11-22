@@ -201,11 +201,18 @@ public with sharing class SettingsController {
 		}
 		try {
 			Map<String, Map<String, Object>> byObject = groupByObject(values);
-			for (String settingsObject : byObject.keySet()) {
-				SettingsService.saveValues(settingsObject, byObject.get(settingsObject));
+			// Core and every module in the store save in one deployment, so the page follows one.
+			SettingsService.collectSaves();
+			Id deploymentId;
+			try {
+				for (String settingsObject : byObject.keySet()) {
+					SettingsService.saveValues(settingsObject, byObject.get(settingsObject));
+				}
+				deploymentId = SettingsService.sendCollected();
+			} finally {
+				SettingsService.stopCollecting();
 			}
 			ConsoleModel model = buildModel();
-			Id deploymentId = SettingsService.lastDeploymentId();
 			model.deploymentId = deploymentId == null ? null : String.valueOf(deploymentId);
 			return model;
 		} catch (SettingsService.SettingsException e) {

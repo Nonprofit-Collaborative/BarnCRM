@@ -11,7 +11,11 @@
  *   so the legacy read stops exactly when they arrive);
  * - copies each run-state key that has no State row yet into one;
  * - copies a pause that has not ended onto the BarnCRM Automation Control org default;
- * - copies each person's What's New seen version into their Seen row.
+ * - copies each person's What's New seen version into their Seen row;
+ * - does the same for every module with a `Setting_Module__mdt` record whose legacy custom
+ *   setting the org still has and saved: each value with a Setting Definition row of that group
+ *   joins the one deployment, and each field the record lists as state is copied into the state
+ *   row `Prefix.Field`. Core names no module: the registry records say what to read.
  *
  * The legacy records are left in place; phase 2 removes the objects.
  *
@@ -44,6 +48,8 @@ public without sharing class SettingsCarryOver {
 			return false;
 		}
 		BarnCRM_Settings__c legacy = BarnCRM_Settings__c.getOrgDefaults();
+		// A module's legacy settings are read only in an org that saved Core's (ModuleSettings
+		// .legacyRecord), so Core's record also stands for theirs.
 		return (legacy != null && legacy.Id != null) || !seenRows().isEmpty();
 	}
 
@@ -58,11 +64,28 @@ public without sharing class SettingsCarryOver {
 		Map<String, Schema.SObjectField> fields = Schema.SObjectType.BarnCRM_Settings__c.fields.getMap();
 
 		List<SettingStore.Change> changes = new List<SettingStore.Change>();
+		Set<String> existing = stateRowNames();
+		Map<String, Object> state = new Map<String, Object>();
 		if (hasLegacy) {
-			changes.addAll(settingChanges(legacy, fields, result));
-			result.stateCount = carryState(legacy, fields);
+			changes.addAll(settingChanges(legacy, coreDefinitions(fields), CORE_SETTINGS_EXCLUDED, result));
+			state.putAll(stateValues(legacy, SettingsState.CORE_KEYS, null, existing));
 			carryPause(legacy);
 		}
+		for (Setting_Module__mdt module : ModuleSettings.registry()) {
+			SObject record = ModuleSettings.isStoreObject(module.Settings_Object__c)
+				? ModuleSettings.legacyRecord(module.Settings_Object__c)
+				: null;
+			if (record == null) {
+				continue;
+			}
+			Set<String> stateFields = ModuleSettings.stateFields(module);
+			List<Setting_Definition__mdt> definitions = ModuleSettings.definitionsFor(module.Settings_Object__c)
+				.values();
+			changes.addAll(settingChanges(record, definitions, stateFields, result));
+			state.putAll(stateValues(record, stateFields, module.Key_Prefix__c, existing));
+		}
+		SettingsState.put(state);
+		result.stateCount = state.size();
 		result.seenCount = carrySeen();
 		result.settingCount = changes.size();
 
@@ -79,35 +102,63 @@ public without sharing class SettingsCarryOver {
 		return result;
 	}
 
-	/** The legacy values that differ from their defaults, one change per shipped definition. */
+	/** Core's keys that are not carried as settings: the pause and the run state. */
+	private static final Set<String> CORE_SETTINGS_EXCLUDED = coreExcluded();
+
+	private static Set<String> coreExcluded() {
+		Set<String> keys = new Set<String>{ PAUSE_KEY };
+		for (String key : SettingsState.CORE_KEYS) {
+			keys.add(key.toLowerCase());
+		}
+		return keys;
+	}
+
+	/** Core's shipped definitions whose key is a field of the legacy object. */
+	private static List<Setting_Definition__mdt> coreDefinitions(Map<String, Schema.SObjectField> fields) {
+		List<Setting_Definition__mdt> rows = new List<Setting_Definition__mdt>();
+		for (Setting_Definition__mdt definition : SettingStore.definitions().values()) {
+			Boolean core = definition.Settings_Object__c != null &&
+				definition.Settings_Object__c.trim().toLowerCase().endsWith(CORE_OBJECT);
+			if (core && definition.Setting_Key__c != null && fields.containsKey(definition.Setting_Key__c.trim().toLowerCase())) {
+				rows.add(definition);
+			}
+		}
+		return rows;
+	}
+
+	/**
+	 * The legacy values that differ from their defaults, one change per definition whose key is a
+	 * field of the record and not excluded (lower-case keys), audited as `Object.Field`.
+	 */
 	private static List<SettingStore.Change> settingChanges(
-		BarnCRM_Settings__c legacy,
-		Map<String, Schema.SObjectField> fields,
+		SObject legacy,
+		List<Setting_Definition__mdt> definitions,
+		Set<String> excluded,
 		Result result
 	) {
 		List<SettingStore.Change> changes = new List<SettingStore.Change>();
-		for (Setting_Definition__mdt definition : SettingStore.definitions().values()) {
-			String key = definition.Setting_Key__c == null ? '' : definition.Setting_Key__c.trim().toLowerCase();
-			Boolean core = definition.Settings_Object__c != null &&
-				definition.Settings_Object__c.trim().toLowerCase().endsWith(CORE_OBJECT);
-			if (!core || !fields.containsKey(key) || key == PAUSE_KEY || SettingsState.isStateKey(key)) {
-				continue;
-			}
-			Object value = legacy.get(fields.get(key));
+		Schema.SObjectType type = legacy.getSObjectType();
+		String objectName = type.getDescribe(SObjectDescribeOptions.DEFERRED).getLocalName();
+		for (Setting_Definition__mdt definition : definitions) {
+			String key = definition.Setting_Key__c == null ? '' : definition.Setting_Key__c.trim();
+			Schema.SObjectField token = String.isBlank(key) || excluded.contains(key.toLowerCase())
+				? null
+				: NamespaceUtil.field(type, key);
+			Object value = token == null ? null : legacy.get(token);
 			if (isBlank(value) || SettingStore.has(definition.DeveloperName)) {
 				continue;
 			}
-			if (sameValue(value, SettingStore.parse(SettingStore.defaultOf(definition.DeveloperName)))) {
+			if (sameValue(value, SettingStore.parse(definition.Default_Value__c))) {
 				continue;
 			}
 			String json = SettingStore.toJson(value);
 			if (json.length() > SettingStore.VALUE_LIMIT) {
-				result.tooLong.add(definition.Setting_Key__c.trim());
+				result.tooLong.add(key);
 				continue;
 			}
 			SettingStore.Change change = new SettingStore.Change();
 			change.name = definition.DeveloperName;
-			change.settingName = 'BarnCRM_Settings__c.' + fields.get(key).getDescribe().getLocalName();
+			change.settingName = objectName + '.' + token.getDescribe().getLocalName();
 			change.newText = String.valueOf(value);
 			change.json = json;
 			changes.add(change);
@@ -115,8 +166,8 @@ public without sharing class SettingsCarryOver {
 		return changes;
 	}
 
-	/** Copies each run-state key with a legacy value and no State row; returns how many. */
-	private static Integer carryState(BarnCRM_Settings__c legacy, Map<String, Schema.SObjectField> fields) {
+	/** The names of the State rows the org already has, in lower case. */
+	private static Set<String> stateRowNames() {
 		Set<String> existing = new Set<String>();
 		for (Nightly_Job__c row : [
 			SELECT Name
@@ -127,17 +178,26 @@ public without sharing class SettingsCarryOver {
 		]) {
 			existing.add(row.Name.toLowerCase());
 		}
+		return existing;
+	}
+
+	/**
+	 * The run state to copy: each listed field with a legacy value and no State row yet, keyed by
+	 * the field name (Core) or `Prefix.Field` (a module).
+	 */
+	private static Map<String, Object> stateValues(SObject legacy, Set<String> names, String prefix, Set<String> existing) {
 		Map<String, Object> values = new Map<String, Object>();
-		for (String key : SettingsState.CORE_KEYS) {
-			Schema.SObjectField token = fields.get(key.toLowerCase());
+		for (String name : names) {
+			Schema.SObjectField token = NamespaceUtil.field(legacy.getSObjectType(), name);
 			Object value = token == null ? null : legacy.get(token);
+			String key = token == null ? name : token.getDescribe().getLocalName();
+			key = prefix == null ? key : SettingsState.moduleKey(prefix, key);
 			// An unchecked box reads the same with no row, so only a set value is copied.
 			if (!isBlank(value) && value != false && !existing.contains(key.toLowerCase())) {
 				values.put(key, value);
 			}
 		}
-		SettingsState.put(values);
-		return values.size();
+		return values;
 	}
 
 	/** A pause that has not ended moves to the Automation Control org default. */

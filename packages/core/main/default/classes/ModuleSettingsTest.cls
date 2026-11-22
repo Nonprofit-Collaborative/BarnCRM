@@ -2,7 +2,7 @@
  * A module's settings in the store (ADR-NEXT settings as custom metadata, phase 2): typed reads
  * by name answer the saved value, else the legacy value before carry-over, else the default;
  * saves through SettingsService are validated, audited and deployed once; run state uses
- * prefixed keys and a run lock.
+ * prefixed keys and a run lock; carry-over covers every registered module.
  *
  * The module here is a stand-in (registry and definitions set in memory): Core ships none, and
  * its settings group names no object, as after the legacy objects are removed.
@@ -189,12 +189,12 @@ private class ModuleSettingsTest {
 	}
 
 	/**
-	 * A registered module whose legacy custom setting the org saved: read until carry-over, for
-	 * settings and state alike. Automation Control stands in for the module's object, the one Core
-	 * hierarchy setting a test can name as if it were another package's.
+	 * A registered module whose legacy custom setting the org saved: read until carry-over, then
+	 * carried with the Core values. Automation Control stands in for the module's object, the one
+	 * Core hierarchy setting a test can name as if it were another package's.
 	 */
 	@IsTest
-	static void aModulesLegacyValuesAreReadBeforeCarryOver() {
+	static void aModulesLegacyValuesAreReadThenCarriedOver() {
 		System.runAs(TestUsers.admin()) {
 			Datetime pausedUntil = Datetime.newInstanceGmt(2030, 1, 2, 3, 4, 5);
 			String standIn = 'BarnCRM_Automation_Control__c';
@@ -228,10 +228,25 @@ private class ModuleSettingsTest {
 
 			Assert.isTrue(ModuleSettings.flag('Test_Pause_All'), 'The legacy value, before carry-over.');
 			Assert.areEqual(pausedUntil, SettingsState.moment(stateKey), 'Legacy state, before carry-over.');
-			Assert.isNull(ModuleSettings.legacyValue(standIn, 'Not_A_Field__c'), 'A missing field reads nothing.');
+			Assert.isTrue(SettingsCarryOver.isNeeded());
 
-			ModuleSettings.setForTest('Test_Pause_All', false);
-			Assert.isFalse(ModuleSettings.flag('Test_Pause_All'), 'A Setting Value wins over the legacy value.');
+			Test.startTest();
+			SettingsCarryOver.Result result = SettingsCarryOver.run();
+			Test.stopTest();
+
+			Assert.isTrue(SettingStore.isCarriedOver());
+			Assert.isTrue(SettingStore.has('Test_Pause_All'), 'The module value joined the deployment.');
+			Assert.areEqual(true, SettingStore.value('Test_Pause_All'));
+			Assert.isTrue(result.settingCount >= 1);
+			SettingsState.clearCache();
+			Assert.areEqual(pausedUntil, SettingsState.moment(stateKey), 'The state field has its row.');
+			Assert.isNull(ModuleSettings.legacyValue(standIn, 'Pause_All__c'), 'Not read after carry-over.');
+			String auditName = standIn + '.Pause_All__c';
+			Assert.areEqual(
+				1,
+				[SELECT COUNT() FROM Setting_Change__c WHERE Setting_Name__c = :auditName WITH SYSTEM_MODE],
+				'Audited as Object.Field.'
+			);
 		}
 	}
 }

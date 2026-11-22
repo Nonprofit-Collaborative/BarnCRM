@@ -271,7 +271,9 @@ saved.** If Salesforce refuses it, the page shows Salesforce's reason, puts back
 saved, and records the reason in the [Error Log](error-log.md). If it is still running after
 two minutes, the page says so; refresh it in a minute to see your values. **Recent Changes**
 lists a change once its deployment has finished. A package install needs one Setup switch
-before saves work (see [Installing](installing.md#step-3-set-it-up)).
+before saves work (see [Installing](installing.md#step-3-set-it-up)). One save that changes
+settings in several sections or modules is still one deployment, and a module's own settings
+page saves and reports the same way.
 
 What BarnCRM records about its own runs (the last error digest, the last Health Check, the
 last seasonal swap, setup progress) is not a setting: it describes this org only, is never
@@ -286,7 +288,8 @@ on them, and BarnCRM Settings shows a **Carry Your Settings Over** banner to any
 change settings. Choose **Carry Over Settings** once: every value that differs from its
 default becomes a Setting Value in one deployment, BarnCRM's run records and each person's
 What's New dismissal are copied, and a pause that has not ended moves to Automation Control.
-Each carried value is listed in **Recent Changes**. A value longer than 255 characters cannot
+The same carry-over covers every installed module whose settings are kept this way: its saved
+values join the one deployment and its run records are copied too. Each carried value is listed in **Recent Changes**. A value longer than 255 characters cannot
 be carried; the page names it, and it uses its default until you enter it again. The banner
 does not come back once the carry-over has finished.
 

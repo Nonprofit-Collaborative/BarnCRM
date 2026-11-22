@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Follows a settings save (one metadata deployment) until it succeeds, fails or is still
+    running after two minutes. Exposed so a module's own settings page follows its saves the
+    way the BarnCRM Settings tab does.
+  </description>
+  <isExposed>true</isExposed>
+</LightningComponentBundle>

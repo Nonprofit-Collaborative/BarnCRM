@@ -4,7 +4,7 @@ import getConsoleModel from '@salesforce/apex/SettingsController.getConsoleModel
 import saveSettings from '@salesforce/apex/SettingsController.saveSettings';
 import getRecentChanges from '@salesforce/apex/SettingsController.getRecentChanges';
 import getSettingsLink from '@salesforce/apex/SettingsController.getSettingsLink';
-import getSaveOutcome from '@salesforce/apex/SettingsController.getSaveOutcome';
+import { waitForSave } from 'c/settingSaveOutcome';
 import getCarryOverNeeded from '@salesforce/apex/SettingsController.getCarryOverNeeded';
 import carryOverSettings from '@salesforce/apex/SettingsController.carryOverSettings';
 import TITLE from '@salesforce/label/c.Core_Settings_Title';
@@ -44,16 +44,6 @@ import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 /** The page state key a link to a section uses: `c__section`, or the namespace's. */
 const SECTION_STATE = '__section';
 const RECENT_LIMIT = 10;
-/** A save is one metadata deployment: asked after every two seconds, for up to two minutes. */
-const POLL_INTERVAL_MS = 2000;
-const POLL_ATTEMPTS = 60;
-
-function pause(ms) {
-  return new Promise((resolve) => {
-    // eslint-disable-next-line @lwc/lwc/no-async-operation
-    setTimeout(resolve, ms);
-  });
-}
 /** The stored name of the General section (SettingSections.GENERAL), not a display label. */
 const GENERAL_SECTION = 'General';
 /** The stored name of the Integrations section: a read-only page with nothing to save. */
@@ -564,26 +554,15 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     }
     this.messageIsError = false;
     this.message = this.labels.savingNow;
-    for (let attempt = 0; attempt < POLL_ATTEMPTS; attempt++) {
-      // eslint-disable-next-line no-await-in-loop
-      await pause(POLL_INTERVAL_MS);
-      // eslint-disable-next-line no-await-in-loop
-      const outcome = await getSaveOutcome({ deploymentId });
-      const status = outcome && outcome.status;
-      if (status === 'Succeeded') {
-        return status;
-      }
-      if (status === 'Failed') {
-        this.messageIsError = true;
-        this.message = outcome.message || this.labels.saveError;
-        // eslint-disable-next-line no-await-in-loop
-        await this.reloadModel();
-        return status;
-      }
+    const outcome = await waitForSave(deploymentId);
+    if (outcome.status === 'Failed') {
+      this.messageIsError = true;
+      this.message = outcome.message || this.labels.saveError;
+      await this.reloadModel();
+    } else if (outcome.status === 'Pending') {
+      this.message = this.labels.stillSaving;
     }
-    this.messageIsError = false;
-    this.message = this.labels.stillSaving;
-    return 'Pending';
+    return outcome.status;
   }
 
   /** Reads the console model again without clearing the message on screen. */
