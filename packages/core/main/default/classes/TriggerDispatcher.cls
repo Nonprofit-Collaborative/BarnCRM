@@ -607,8 +607,9 @@ public with sharing class TriggerDispatcher {
 	 */
 	private static TriggerHandler instantiate(Automation_Registry__mdt entry, String objectApiName) {
 		String className = entry.Handler_Class__c;
+		// A row with no handler class is the switch of a packaged before-save flow, which reads
+		// its own switch (ADR-NEXT, before-save flows): there is nothing to build, and no warning.
 		if (String.isBlank(className)) {
-			skip(className, objectApiName);
 			return null;
 		}
 		Type handlerType = NamespaceUtil.resolveType(className);

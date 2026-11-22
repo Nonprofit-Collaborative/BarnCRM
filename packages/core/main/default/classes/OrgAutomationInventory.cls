@@ -38,19 +38,23 @@ public with sharing class OrgAutomationInventory {
 	public static final String STATUS_ALWAYS = 'AlwaysRuns';
 
 	/**
-	 * BarnCRM's own flows, by API name: the inactive templates an admin copies (ADR-0090). With no
-	 * namespace they cannot be told from the org's own any other way. A CI test keeps this list in
-	 * step with the packages' flow folders. Deactivation never changes them (R-AS5).
+	 * BarnCRM's own flows, by API name: the inactive templates an admin copies (ADR-0090) and the
+	 * active before-save flows switched from their registry rows (ADR-NEXT, one-field rules as
+	 * before-save flows). With no namespace they cannot be told from the org's own any other way.
+	 * A CI test keeps this list in step with the packages' flow folders. Deactivation never
+	 * changes them (R-AS5): a packaged flow is switched on the Automation page.
 	 */
 	public static final Set<String> BARN_FLOWS = new Set<String>{
 		'Template_Account_Address_Capture',
 		'Template_Affiliation_Primary',
 		'Template_Affiliation_Primary_Delete',
 		'Template_Affiliation_Validation',
+		'Template_Before_Save_Field_Rule',
 		'Template_Relationship_Reciprocal',
 		'Template_Relationship_Reciprocal_Delete',
 		'Template_Relationship_Validation',
-		'Recalculate_Rollups_Template'
+		'Recalculate_Rollups_Template',
+		'Grant_Requirement_Dates'
 	};
 
 	/**

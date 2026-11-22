@@ -4,7 +4,7 @@
  * and its deadline rows; a reader cannot mark one submitted; requirements go with their grant.
  */
 @IsTest(
-	testFor='ApexClass:GrantRequirementService, ApexClass:GrantRequirementDatesHandler, ApexClass:GrantPipelineController'
+	testFor='ApexClass:GrantRequirementService, ApexTrigger:GrantRequirementTrigger, ApexClass:GrantPipelineController'
 )
 private class GrantRequirementTest {
 	@TestSetup
@@ -69,9 +69,30 @@ private class GrantRequirementTest {
 				WITH SYSTEM_MODE
 			];
 			Assert.areEqual(1, rows.size(), 'The row ships');
-			Assert.areEqual('GrantRequirementDatesHandler', rows[0].Handler_Class__c, 'Named');
+			Assert.isNull(rows[0].Handler_Class__c, 'No handler: the before-save flow does the work');
 			Assert.isFalse(rows[0].Always_Runs__c, 'Switchable');
 			Assert.areEqual('Funders', rows[0].Module__c, 'The module owns it');
+			List<FlowDefinitionView> flows = [
+				SELECT IsActive
+				FROM FlowDefinitionView
+				WHERE ApiName = 'Grant_Requirement_Dates'
+				WITH SYSTEM_MODE
+			];
+			Assert.areEqual(1, flows.size(), 'The flow ships under the row name');
+			Assert.isTrue(flows[0].IsActive, 'Shipped active');
+		}
+	}
+
+	@IsTest
+	static void switchedOffTheSubmittedDateIsNotFilledIn() {
+		System.runAs(TestUsers.adminWith(GrantTestData.ADMIN)) {
+			insert as system TestDataFactory.automationSetting('Grant_Requirement_Dates', false);
+			Grant_Requirement__c sent = GrantTestData.requirement('Sent', grant().Id, Date.today());
+			sent.Status__c = GrantRequirementService.STATUS_SUBMITTED;
+
+			insert sent;
+
+			Assert.isNull(reread(sent.Id).Submitted_Date__c, 'The flow reads its switch and stands down');
 		}
 	}
 

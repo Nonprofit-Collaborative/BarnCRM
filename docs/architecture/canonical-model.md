@@ -13393,9 +13393,10 @@ version number. Uploading needs edit access to the requirement.
 | Logic Model Outcome | `Outcome_Id__c` | Text(18) |
 | Checklist Item | `Checklist_Item__c` | Lookup to `Grant_Checklist_Item__c`, delete constraint SetNull, relationship name Tasks; read only in every permission set but Funders Admin |
 
-- **Trigger:** `GrantRequirementTrigger`, through the Core dispatcher; handlers
-  `GrantRequirementDatesHandler` (R-GQ2, registry row `Grant_Requirement_Dates`, switchable) and
-  `GrantRequirementRulesHandler` (R-GQ6, registry row `Grant_Requirement_Rules`, always runs);
+- **Trigger:** `GrantRequirementTrigger`, through the Core dispatcher; handler
+  `GrantRequirementRulesHandler` (R-GQ6, registry row `Grant_Requirement_Rules`, always runs).
+  R-GQ2 is the before-save flow `Grant_Requirement_Dates` (its registry row, switchable;
+  ADR-NEXT one-field rules as before-save flows);
   the rules in `GrantRequirementService`.
 - **Outcomes (L-06):** `GrantOutcomeService` reads Logic Models' `Logic_Model_Element__c`,
   `Indicator__c` and `Indicator_Period__c` by describe, in user mode, into plain maps;
