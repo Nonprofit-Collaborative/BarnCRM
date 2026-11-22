@@ -137,6 +137,13 @@ RETRY_BACKOFF_SECONDS="${RETRY_BACKOFF_SECONDS:-5}"
 # Settings (they insert their own), and a test org marked as a new install has every feature off.
 SOURCE_POST_INSTALL="${SOURCE_POST_INSTALL:-1}"
 STALLS_RECOVERED=0
+# 1 (the default) deploys every Apex class and trigger from a staged copy of the project with the
+# leading indentation removed (scripts/packaging/strip-apex-indent.py, AP-05, ADR-NEXT): an org
+# counts every character of Apex toward its 6,000,000 limit, indentation included. Newlines stay,
+# so line numbers are unchanged. 0 deploys the repository source as written (debugging, or to
+# have source tracking see the repository files).
+STRIP_APEX_INDENT="${STRIP_APEX_INDENT:-1}"
+STAGE_ROOT=""
 
 CONFIG_STAGES="${CONFIG_STAGES:-combined}"
 MODULE_STAGES="${MODULE_STAGES:-combined}"
@@ -178,13 +185,30 @@ while [[ $# -gt 0 ]]; do
 done
 for setting in "DATA_MODEL_STAGES:per-object|combined" "CONFIG_STAGES:separate|combined" \
   "MODULE_STAGES:separate|combined" "DEPLOY_APEX_ALWAYS:0|1" "DEPLOY_FULL:0|1" \
-  "MODULE_APPS:auto|capped|all"; do
+  "MODULE_APPS:auto|capped|all" "STRIP_APEX_INDENT:0|1"; do
   name="${setting%%:*}"
   if [[ ! "${!name}" =~ ^(${setting#*:})$ ]]; then
     echo "${name} must be one of ${setting#*:}, not ${!name}." >&2
     exit 1
   fi
 done
+
+# Stage the project without Apex indentation. Every sf deploy call runs from the staged copy
+# (sf_deploy_start), where the same relative paths exist; the repository is never modified.
+# The copy is removed on exit (restore_if_still_paused, below).
+if [[ "$STRIP_APEX_INDENT" == 1 ]]; then
+  STAGE_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/barn-stage.XXXXXX")"
+  python3 "$(dirname "${BASH_SOURCE[0]}")/../packaging/strip-apex-indent.py" --stage "$STAGE_ROOT" || {
+    echo "Could not stage the project without Apex indentation; set STRIP_APEX_INDENT=0 to deploy the source as written." >&2
+    rm -rf "$STAGE_ROOT"
+    exit 1
+  }
+fi
+
+# `sf project deploy start` from the staged project (or from here when staging is off).
+sf_deploy_start() {
+  (cd "${STAGE_ROOT:-.}" && exec sf project deploy start "$@")
+}
 
 # Run a command with its output in a file, abandoning it (and the node process under the
 # sf wrapper) after $1 seconds. On 2026-09-24 a single `sf project deploy report` call hung
@@ -242,7 +266,7 @@ submit_and_follow() {
   JOB_ID=""
   for try in 1 2 3; do
     since="$(python3 -c 'import datetime as d; print((d.datetime.now(d.timezone.utc) - d.timedelta(seconds=60)).strftime("%Y-%m-%dT%H:%M:%SZ"))')"
-    run_capped 300 "$capture" sf project deploy start "$@" --async --ignore-conflicts --target-org "$ALIAS" --json
+    run_capped 300 "$capture" sf_deploy_start "$@" --async --ignore-conflicts --target-org "$ALIAS" --json
     out="$(cat "$capture")"
     JOB_ID="$(jq -r '.result.id // empty' <<< "$out" 2> /dev/null)"
     [[ -n "$JOB_ID" ]] && break
@@ -509,6 +533,7 @@ restore_if_still_paused() {
   local code=$?
   trap '' INT TERM
   trap - EXIT
+  [[ -n "$STAGE_ROOT" ]] && rm -rf "$STAGE_ROOT"
   if [[ -n "$PAUSED_JOBS_FILE" && -s "$PAUSED_JOBS_FILE" ]]; then
     echo ""
     echo "== The deploy ended while scheduled jobs were paused =="

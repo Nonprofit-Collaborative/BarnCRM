@@ -153,9 +153,11 @@ Salesforce org is needed for this job. Steps:
    is never a label: it goes in the package's help catalog (`docs/contributor-guide/ux-kit.md`,
    Help Text; ADR-0164 `0164-help-text-json.md`).
    `scripts/ci/check-apex-budget.py` fails when a package's non-test Apex, measured as the
-   org measures it (every character but comments; `@IsTest` classes excluded), passes its cap
-   (`CAPS` in the script, about 2 percent above each package's size on 2026-11-05), or when a
-   package has no cap. An org allows 6,000,000 characters for its own code and every unmanaged
+   org measures it (every character but comments; `@IsTest` classes excluded) after the
+   indentation strip described below, passes its cap (`CAPS` in the script, re-based to the
+   stripped size on 2026-11-21 and about 0.5 to 2 percent above each package's size), or when a
+   package has no cap. It prints the stripped total, which is what an org counts, and the raw
+   repository total beside it; the caps and targets apply to the stripped one. An org allows 6,000,000 characters for its own code and every unmanaged
    BarnCRM package together, and scratch orgs allow 10,000,000, so only this sees growth.
    Raise a cap only in the pull request that needs it, and say why. The trim pass targets
    3,600,000 for the full suite and 2,000,000 for Core (the check reports the gap);
@@ -168,6 +170,23 @@ Salesforce org is needed for this job. Steps:
    from 4,394,706 to 3,523,686 characters (Core from 2,421,585 to 1,942,950). Format with
    Prettier and the repository's configuration, so a hand-indented file does not creep the
    count back up.
+   **Deploys and package builds strip the indentation that is left (AP-05, ADR-NEXT).** The
+   repository stays formatted and readable; the copy that goes to an org loses the leading
+   spaces and tabs on every line of every `.cls` and `.trigger` file. On 2026-11-21 that took
+   the full suite from 5,307,460 raw characters (88 percent of 6,000,000) to 4,902,193 (82
+   percent). `scripts/packaging/strip-apex-indent.py --stage DIR` copies `sfdx-project.json`,
+   `.forceignore` and every package directory into `DIR`, with Apex stripped and every other
+   file, `-meta.xml` included, byte for byte; a line that starts inside a string literal is left
+   alone. Newlines stay, so stack traces and coverage report the repository's line numbers.
+   Apex viewed in Setup appears without indentation and behaves identically.
+   `deploy-packages.sh` (and so `run-org-tests.sh`, `create-scratch-org.sh` and the CI deploy),
+   `seed-sample-data.sh`, `create-versions.sh` and `package-upgrade-test.sh`'s builds each stage
+   once and run `sf` from the staged copy, and remove it on exit. `STRIP_APEX_INDENT=0` skips
+   staging and deploys the source as written (debugging, or when you want a scratch org's
+   source tracking to see the repository files: tracking records for a staged deploy live in
+   the staged copy and are discarded). Run `sf project deploy start` by hand from the
+   repository and the raw source goes, which an org counts about 8 percent larger. Unit tests:
+   `scripts/ci/tests/test_strip_apex_indent.py`.
    `scripts/ci/check-help-text.py` checks those catalogs (`BarnHelp_<Package>.json`): every
    key a `helpText`, `BarnHelp.text` or `help-key` names is in its package's catalog and
    written as a literal, every catalog key is used and is not also a label, translations are
@@ -995,6 +1014,11 @@ upgrade are in the Testing Guide, [Installing](../testing-guide/installing.md), 
 plan mode itself is T-INST-04 and `scripts/ci/tests/test_package_upgrade_test.py`.
 
 ### Creating package versions
+
+`create-versions.sh` (and the builds in `package-upgrade-test.sh`) run `sf package version
+create` from a staged copy of the project with Apex indentation removed (AP-05, ADR-NEXT; see
+the Apex budget note above), so a subscriber's org counts the stripped size. The repository is
+not changed. `STRIP_APEX_INDENT=0` builds the source as written.
 
 BarnCRM ships as 2GP managed packages from the first pilot, under the namespace `barn` (D-199),
 registered in a Partner Developer Edition org linked to the Partner Business Org Dev Hub. Until

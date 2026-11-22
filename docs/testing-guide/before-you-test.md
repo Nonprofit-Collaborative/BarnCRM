@@ -127,6 +127,11 @@ Volunteers, Mirror and the rest) on top:
 scripts/org/deploy-packages.sh <alias>
 ```
 
+The script deploys Apex without its leading indentation (about 8 percent fewer characters toward
+the org's 6,000,000 limit), so a class opened in Setup or the Developer Console shows no
+indentation; it behaves the same and its line numbers match the repository. To deploy the source
+exactly as written, run it with `STRIP_APEX_INDENT=0`.
+
 Then give your login user the module admin permission sets:
 
 ```bash
