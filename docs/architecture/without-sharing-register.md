@@ -46,6 +46,7 @@ into six kinds:
 | SetupChangeCopyJob | Org job | The package's own copy of Setup changes, written and pruned in full | ADR-0021 |
 | SettingStore | Platform | Reads the org's Setting Value records and enqueues the metadata deployment of a save, which the caller has permission-checked | ADR-0021, ADR-NEXT settings as custom metadata |
 | SettingValueDeployCallback | Platform | Writes the Setting Change audit rows and Error Log entry of a finished settings deployment, as the platform's callback user | ADR-0021, ADR-NEXT settings as custom metadata |
+| SettingsCarryOver | Platform | Reads the protected legacy settings records and writes the package's own state and seen rows once, for a holder of Manage BarnCRM Settings | ADR-0021, ADR-NEXT settings as custom metadata |
 | SettingsState | Org job | The package's own run-state rows (last runs, watermarks, setup markers), read and written for every user whose action moves them | ADR-0021, ADR-NEXT settings as custom metadata |
 | WhatsNewSeenWriter | Platform | The running user's own Seen row on an object only BarnCRM Admin can read | ADR-0021, ADR-0087 |
 | WhereUsedSelector | Integrity | Every saved query, private ones included, before a field is retired | ADR-0021 |

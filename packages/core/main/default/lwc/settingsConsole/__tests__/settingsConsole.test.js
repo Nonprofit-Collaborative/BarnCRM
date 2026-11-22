@@ -5,6 +5,9 @@ import FeatureSettings from 'c/featureSettings';
 import getConsoleModel from '@salesforce/apex/SettingsController.getConsoleModel';
 import saveSettings from '@salesforce/apex/SettingsController.saveSettings';
 import getRecentChanges from '@salesforce/apex/SettingsController.getRecentChanges';
+import getSaveOutcome from '@salesforce/apex/SettingsController.getSaveOutcome';
+import getCarryOverNeeded from '@salesforce/apex/SettingsController.getCarryOverNeeded';
+import carryOverSettings from '@salesforce/apex/SettingsController.carryOverSettings';
 import * as navigation from 'lightning/navigation';
 import { EnclosingTabId, setTabIcon, setTabLabel } from 'lightning/platformWorkspaceApi';
 
@@ -55,6 +58,15 @@ jest.mock('@salesforce/apex/SettingsController.saveSettings', () => ({ default: 
   virtual: true
 });
 jest.mock('@salesforce/apex/SettingsController.getRecentChanges', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/SettingsController.getSaveOutcome', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/SettingsController.getCarryOverNeeded', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/SettingsController.carryOverSettings', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock('@salesforce/apex/SettingsController.search', () => ({ default: jest.fn() }), {
@@ -1877,6 +1889,92 @@ describe('c-settings-console', () => {
       await settle();
       const cue = element.shadowRoot.querySelector('[data-saves-alone="Household_Naming_Preview"]');
       expect(cue.textContent).toContain('c.Core_Settings_SavesOnItsOwn');
+    });
+  });
+
+  describe('saving through a deployment (R-SV2)', () => {
+    const realTimeout = global.setTimeout;
+
+    beforeEach(() => {
+      // The two second wait between questions runs at once here.
+      jest.spyOn(global, 'setTimeout').mockImplementation((fn) => realTimeout(fn, 0));
+    });
+
+    afterEach(() => {
+      global.setTimeout.mockRestore();
+    });
+
+    function status(element) {
+      return element.shadowRoot.querySelector('p[role="status"]').textContent;
+    }
+
+    async function editAndSave(element) {
+      const input = element.shadowRoot.querySelector('lightning-input');
+      input.value = 'The {LastName} Household';
+      input.dispatchEvent(new CustomEvent('change'));
+      await settle();
+      clickSave(element);
+    }
+
+    it('says Saving... until the deployment succeeds, then Saved', async () => {
+      saveSettings.mockResolvedValue({ ...model(true), deploymentId: '0Af000000000001' });
+      getSaveOutcome.mockResolvedValueOnce({ status: 'Pending' }).mockResolvedValueOnce({ status: 'Succeeded' });
+      const element = build();
+      await settle();
+
+      await editAndSave(element);
+      await settle();
+      expect(status(element)).toBe('c.Core_Settings_SavingMessage');
+
+      for (let i = 0; i < 6; i++) {
+        // eslint-disable-next-line no-await-in-loop
+        await settle();
+      }
+      expect(getSaveOutcome).toHaveBeenCalledWith({ deploymentId: '0Af000000000001' });
+      expect(status(element)).toBe('c.Core_Settings_SavedMessage');
+    });
+
+    it('shows Salesforce reason and reloads the page when the deployment fails', async () => {
+      saveSettings.mockResolvedValue({ ...model(true), deploymentId: '0Af000000000002' });
+      getSaveOutcome.mockResolvedValue({ status: 'Failed', message: 'Turn on the Setup switch.' });
+      const element = build();
+      await settle();
+
+      await editAndSave(element);
+      for (let i = 0; i < 6; i++) {
+        // eslint-disable-next-line no-await-in-loop
+        await settle();
+      }
+      expect(status(element)).toBe('Turn on the Setup switch.');
+      expect(getConsoleModel).toHaveBeenCalledTimes(2);
+    });
+
+    it('offers the carry-over to Maria and follows it to the end', async () => {
+      getCarryOverNeeded.mockResolvedValue(true);
+      carryOverSettings.mockResolvedValue({ deploymentId: '0Af000000000003', tooLong: [] });
+      getSaveOutcome.mockResolvedValue({ status: 'Succeeded' });
+      const element = build();
+      await settle();
+
+      const button = element.shadowRoot.querySelector('lightning-button[data-id="carry-over"]');
+      expect(button.label).toBe('c.Core_Settings_CarryOverButton');
+      button.click();
+      for (let i = 0; i < 6; i++) {
+        // eslint-disable-next-line no-await-in-loop
+        await settle();
+      }
+      expect(carryOverSettings).toHaveBeenCalledTimes(1);
+      expect(status(element)).toBe('c.Core_Settings_CarryOverDone');
+      expect(element.shadowRoot.querySelector('[data-id="carry-over-banner"]')).toBeNull();
+    });
+
+    it('offers no carry-over to David, who cannot save settings', async () => {
+      getConsoleModel.mockResolvedValue(model(false));
+      getCarryOverNeeded.mockResolvedValue(true);
+      const element = build();
+      await settle();
+
+      expect(element.shadowRoot.querySelector('[data-id="carry-over-banner"]')).toBeNull();
     });
   });
 });

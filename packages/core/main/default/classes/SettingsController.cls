@@ -217,6 +217,34 @@ public with sharing class SettingsController {
 		}
 	}
 
+	/** True when the org still has settings to carry over into custom metadata (R-SV1). */
+	@AuraEnabled
+	public static Boolean getCarryOverNeeded() {
+		try {
+			return FeatureManagement.checkPermission(EDIT_PERMISSION) && SettingsCarryOver.isNeeded();
+		} catch (Exception e) {
+			ErrorLogger.log(e, ERROR_CONTEXT);
+			return false;
+		}
+	}
+
+	/** Carries the org's settings over in one deployment; the console follows it with getSaveOutcome. */
+	@AuraEnabled
+	public static SettingsCarryOver.Result carryOverSettings() {
+		if (!FeatureManagement.checkPermission(EDIT_PERMISSION)) {
+			throw UserErrors.message(BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError'));
+		}
+		try {
+			return SettingsCarryOver.run();
+		} catch (SettingStore.SettingStoreException e) {
+			ErrorLogger.log(e, ERROR_CONTEXT);
+			throw UserErrors.message(e.getMessage());
+		} catch (Exception e) {
+			ErrorLogger.log(e, ERROR_CONTEXT);
+			throw UserErrors.message(BarnHelp.text('Core', 'Core_Settings_SaveErrorMessage'));
+		}
+	}
+
 	/** A save's deployment is still running. */
 	public static final String SAVE_PENDING = 'Pending';
 	public static final String SAVE_SUCCEEDED = 'Succeeded';
