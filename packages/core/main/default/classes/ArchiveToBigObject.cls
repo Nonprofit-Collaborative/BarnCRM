@@ -43,7 +43,8 @@ public with sharing class ArchiveToBigObject implements ArchiveDestination {
 					'name' => run.ruleName,
 					'object' => run.objectName,
 					'notChangedAfter' => now,
-					'scheduled' => run.scheduled == true
+					'scheduled' => run.scheduled == true,
+					ArchiveCountSettle.PENDING => BigObjectArchiveJob.firstPending(run, now)
 				}
 			),
 			Status__c = ImportBatchService.STATUS_COMMITTING,

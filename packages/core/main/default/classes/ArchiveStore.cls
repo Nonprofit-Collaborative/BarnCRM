@@ -100,6 +100,27 @@ public virtual with sharing class ArchiveStore {
 		return found;
 	}
 
+	/**
+	 * The Original Ids of the rows at this object and time archived by this rule (any rule when
+	 * null), read in system mode: a Copy's rows, settled by `ArchiveCountSettle`. A rule runs once
+	 * at a time, and a Copy writes at most a chunk, so the read is small.
+	 */
+	public virtual Set<String> presentOfRule(String objectName, Datetime archivedAt, String ruleId) {
+		Set<String> found = new Set<String>();
+		for (Archived_Record__b row : [
+			SELECT Original_Id__c, Rule_Id__c
+			FROM Archived_Record__b
+			WHERE Object_Name__c = :objectName AND Archived_At__c = :archivedAt
+			WITH SYSTEM_MODE
+			LIMIT 2000
+		]) {
+			if (ruleId == null || ruleId.equals(row.Rule_Id__c)) {
+				found.add(row.Original_Id__c);
+			}
+		}
+		return found;
+	}
+
 	/** Whole rows by key, read in user mode. */
 	public virtual List<Archived_Record__b> rows(String objectName, Datetime archivedAt, Set<String> originalIds) {
 		return [

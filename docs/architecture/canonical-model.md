@@ -9330,6 +9330,13 @@ its page again after starting one.
 
 **R-ARC5 Cap.** One million rows are included per org. The panels warn from 900,000; a Copy whose
 chunk would pass 1,000,000 stops the run and says so. Nothing offers more capacity.
+`Archived_Record_Count__c` is settled from rows read back (D-223): before each immediate call,
+the link before it saves the rows about to be written (+1: object, archive time and rule, or Ids)
+or removed (-1: Ids) as `pending` in the job's definition; the next DML link, the finalizer of a
+link that died, or the nightly Archive Rules step's sweep (Failed jobs with entries left, and
+Committing jobs not written for 24 hours, which it marks Failed) reads them back under a lock on
+the job, changes the count by what it finds and clears the list. An erasure keeps its own
+Archive job (`"action": "erase"`) for this. No field added.
 
 **R-ARC6 Erasure.** Erasing a person (Section 29H) queues a scan, which runs only once the Erasure
 record exists: it reads every archived object by index and `deleteImmediate`s each row whose

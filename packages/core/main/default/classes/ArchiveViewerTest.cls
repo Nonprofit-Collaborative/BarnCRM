@@ -226,6 +226,48 @@ private class ArchiveViewerTest {
 	}
 
 	@IsTest
+	static void aRemoveThatDiesIsCountedByItsFinisherOrTheNightlySweep() {
+		ArchiveStoreMemory store = archiveVolunteers();
+		System.Assert.areEqual(2, BigObjectArchiveJob.archivedCount(), 'Two counted');
+		String stopped = BarnHelp.text('Core', 'Core_ArchiveViewer_LogRemoveStopped');
+		List<Id> jobIds = new List<Id>();
+		System.runAs(archivist()) {
+			List<String> rowIds = new List<String>();
+			for (ArchiveViewerService.Row row : ArchiveViewerService.rows('Contact', null, null, null).rows) {
+				rowIds.add(row.id);
+			}
+			// Two restores of one row each; each chain dies right after its Remove deleted the row.
+			for (String rowId : rowIds) {
+				jobIds.add(ArchiveController.restoreArchivedRows('Contact', new List<String>{ rowId }));
+				((Queueable) BigObjectArchiveJob.queuedForTest.remove(0)).execute(null);
+				((Queueable) BigObjectArchiveJob.queuedForTest.remove(0)).execute(null);
+				BigObjectArchiveJob.queuedForTest.clear();
+			}
+			System.Assert.areEqual(0, store.rowsByKey.size(), 'Both rows removed');
+			System.Assert.areEqual(2, BigObjectArchiveJob.archivedCount(), 'Not counted yet: no Write settled them');
+
+			// The first chain's finisher settles from the keys its Write saved; twice is once.
+			new BigObjectArchiveJob.Finisher(jobIds[0], stopped).stopped('Died');
+			new BigObjectArchiveJob.Finisher(jobIds[0], stopped).stopped('Again');
+			System.Assert.areEqual(1, BigObjectArchiveJob.archivedCount(), 'The finisher counted its row once');
+
+			// The second chain stopped with no finisher: the nightly sweep settles it once it is stale.
+			ArchiveCountSettle.sweep();
+			System.Assert.areEqual(1, BigObjectArchiveJob.archivedCount(), 'A recent job may still be running');
+			ArchiveCountSettle.staleHours = -1;
+			new ArchiveRulesStep().execute((SchedulableContext) null);
+			System.Assert.areEqual(0, BigObjectArchiveJob.archivedCount(), 'The sweep counted the second');
+		}
+		Import_Batch__c swept = reread(jobIds[1]);
+		System.Assert.areEqual(ImportBatchService.STATUS_FAILED, swept.Status__c, 'Marked failed');
+		System.Assert.isTrue(
+			swept.Run_Log__c.contains(BarnHelp.text('Core', 'Core_ArchiveRules_LogSwept')),
+			'Saying why: ' + swept.Run_Log__c
+		);
+		System.Assert.isFalse(swept.Operation_JSON__c.contains('"pending"'), 'Nothing left pending');
+	}
+
+	@IsTest
 	static void aRowAlreadyBeingRestoredIsRefused() {
 		archiveVolunteers();
 		// The restores get their own limits, as a person's later clicks would.

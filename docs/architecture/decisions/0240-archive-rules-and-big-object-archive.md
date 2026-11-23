@@ -150,3 +150,36 @@ Items 8 to 10 are built as decided, with these details settled:
    index order and `deleteImmediate` matches; the final link (DML only) subtracts the count and
    writes any failure to the Error Log, since an Error Log insert may not share a scan link's
    transaction.
+
+## Amendment: the archived count settled from saved keys (AR-13, 2026-11-23)
+
+Plan D-223 (Brandon, 2026-11-23: "Is there a way to fix this without excessive complexity? These
+features need to be reliable and have the users trust to handle exceptions and faults."). Item 7
+said the counter could drift only if a link fails between writing and counting; the restore chain
+held the rows its Remove deleted only in memory, so a chain that died after a Remove left the
+count too high. Items 4, 7 and amendment items 4 and 5 change as follows:
+
+1. **Pending rows are saved on the job before every immediate call.** A link that may do DML
+   writes, in the same update as the rest of the job, a `pending` list into the job's
+   definition (`Operation_JSON__c`; no new field): `{ "sign": 1 | -1, "object", "at", "ids" }`,
+   +1 for rows about to be written, -1 for rows about to be removed. A Copy's rows are saved as
+   the object, the archive time the link before it chose for the Copy, and the rule (no Ids; the
+   Copy chooses them), since a rule runs once at a time. The start saves the first Copy's; each
+   Settle saves the next Copy's and the kept copies the next Copy deletes; each restore Write
+   saves the rows its Remove deletes.
+2. **Settling reads back.** `ArchiveCountSettle.settle` locks the job row, reads each pending
+   entry back from the big object by key (the truth), adds the rows found for +1 and subtracts
+   the rows gone for -1, clears the list, all or nothing. A second settle finds nothing to do.
+   The count now includes every row a Copy wrote, kept copies too, and subtracts them when the
+   next Copy removes them.
+3. **Who settles.** The next DML link (Settle, restore Write, erasure Find) first, outside its
+   own error handling, so a failure ends the link instead of overwriting the list; the finalizer
+   of a link that died, after deleting that link's copies; and the nightly Archive Rules step,
+   which sweeps Archive jobs of the last 30 days that are Failed with entries left, or still
+   Committing but not written for 24 hours (a chain stopped with no finalizer, such as an
+   aborted job), settling them and marking the stopped ones Failed with a line saying so.
+4. **Erasure gets a job.** The erasure chain now alternates Find (settle, scan, save the rows
+   found as pending; DML) and Remove (`deleteImmediate`; no DML) and keeps its pending rows on an
+   Archive job of its own (`"action": "erase"`), made when the first rows are found and finished
+   with the count removed. It names no person, and its pending Ids are cleared once settled.
+   A link that dies still logs an Error naming no record, and its job is marked Failed.

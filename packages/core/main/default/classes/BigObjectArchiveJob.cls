@@ -13,9 +13,12 @@
  *   user mode those copied and unchanged since the run started, counts them, writes the job, and
  *   queues the next Copy with any copy whose original stayed.
  *
- * Each Copy stamps its rows with a new archive time, so a later Copy never overwrites an earlier
- * one's rows. A link that dies unexpectedly is caught by its finalizer, which deletes that link's
- * copies (a Settle's too, since its deletes roll back) and marks the job Failed.
+ * Each Copy stamps its rows with a new archive time, chosen by the link before it, so a later Copy
+ * never overwrites an earlier one's rows. The archived row count is settled by `ArchiveCountSettle`
+ * from the rows read back: each Settle (and the start) saves on the job what the next Copy will
+ * write and delete, and the next Settle counts it (D-223). A link that dies unexpectedly is caught
+ * by its finalizer, which deletes that link's copies (a Settle's too, since its deletes roll back),
+ * settles the count and marks the job Failed.
  */
 public with sharing class BigObjectArchiveJob implements Queueable {
 	public static final String OPERATION_ARCHIVE = 'Archive';
@@ -71,6 +74,8 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 	@TestVisible
 	private List<SObject> leftOver = new List<SObject>();
 	private Datetime copiedAt;
+	/** The archive time the next Copy stamps, chosen and saved as pending by the link before it. */
+	private Datetime nextCopyAt;
 	/** The last Copy's saved rows: record name by Original Id. */
 	private Map<String, String> copiedNames = new Map<String, String>();
 	@TestVisible
@@ -90,6 +95,22 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 		this.ruleName = run.ruleName;
 		this.remaining = run.confirmedCount;
 		this.notChangedAfter = notChangedAfter;
+		this.nextCopyAt = secondOf(notChangedAfter);
+	}
+
+	/**
+	 * The first Copy's pending count change (D-223), written with the job before the chain starts:
+	 * the rows of this rule the Copy stamps with `secondOf(startedAt)`.
+	 */
+	public static List<Object> firstPending(ArchiveRun run, Datetime startedAt) {
+		return new List<Object>{
+			ArchiveCountSettle.written(run.objectName, secondOf(startedAt), null, run.savedQueryId)
+		};
+	}
+
+	/** The time cut to the whole second, as an archive time is stored. */
+	public static Datetime secondOf(Datetime moment) {
+		return Datetime.newInstance((moment.getTime() / 1000) * 1000);
 	}
 
 	public void execute(QueueableContext context) {
@@ -261,7 +282,7 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 		);
 		Boolean hasOwner = described.fields.getMap().containsKey('OwnerId');
 
-		copiedAt = Datetime.newInstance((Datetime.now().getTime() / 1000) * 1000);
+		copiedAt = nextCopyAt;
 		List<Archived_Record__b> rows = new List<Archived_Record__b>();
 		Integer budget = JSON_BUDGET;
 		Integer used = 0;
@@ -366,7 +387,9 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 
 	private void settle() {
 		Integer deleted = 0;
-		Integer kept = 0;
+		// The count first, from the rows read back (D-223). A failure here ends the link, so its
+		// finalizer or the nightly sweep settles them instead.
+		ArchiveCountSettle.settle(jobId);
 		try {
 			Set<String> present = copiedNames.isEmpty()
 				? new Set<String>()
@@ -377,11 +400,9 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 				}
 			}
 			if (!present.isEmpty()) {
-				Integer[] counts = deleteOriginals(present);
-				deleted = counts[0];
-				kept = counts[1];
+				// The second count (originals already gone) needs nothing more: their rows were counted above.
+				deleted = deleteOriginals(present)[0];
 			}
-			addToCount(deleted + kept);
 			writeJob(deleted);
 		} catch (Exception failed) {
 			ErrorLogger.log(failed, CONTEXT, jobId);
@@ -445,13 +466,21 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 
 	private void writeJob(Integer deleted) {
 		Import_Batch__c job = [
-			SELECT Id, Run_Log__c, Rows_Deleted__c, Rows_Rejected__c
+			SELECT Id, Run_Log__c, Rows_Deleted__c, Rows_Rejected__c, Operation_JSON__c
 			FROM Import_Batch__c
 			WHERE Id = :jobId
 			WITH SYSTEM_MODE
 			LIMIT 1
 			FOR UPDATE
 		];
+		// What the next Copy will write and delete, saved before it runs (D-223).
+		List<Object> pending = new List<Object>();
+		if (!done || !orphans.isEmpty()) {
+			Datetime now = secondOf(Datetime.now());
+			nextCopyAt = copiedAt != null && copiedAt >= now ? copiedAt.addSeconds(1) : now;
+			pending.add(ArchiveCountSettle.written(objectName, nextCopyAt, null, ruleId));
+			pending.addAll(ArchiveCountSettle.removing(orphans));
+		}
 		List<String> lines = new List<String>{ job.Run_Log__c };
 		if (copiesLeft > 0) {
 			lines.add(
@@ -489,6 +518,7 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 				Id = jobId,
 				Rows_Deleted__c = totalDeleted,
 				Rows_Rejected__c = rejected,
+				Operation_JSON__c = ArchiveCountSettle.withPending(job.Operation_JSON__c, pending),
 				Run_Log__c = String.join(lines, '\n').right(32768),
 				Status__c = !finished
 					? ImportBatchService.STATUS_COMMITTING
@@ -567,7 +597,8 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 
 	/**
 	 * The finalizer of every archive, restore and erasure link: when a link dies unexpectedly it
-	 * deletes that link's copies, so a record is never left both live and archived, then marks the
+	 * deletes that link's copies, so a record is never left both live and archived, settles the
+	 * count from what the job left pending (`pendingJobId`, D-223), then marks the
 	 * job Failed with the run log line `line` (a help text), or, with no job (erasure), logs that
 	 * line, {0} filled with the reason, as an Error. Runs in its own transaction.
 	 */
@@ -575,10 +606,13 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 		private final Id jobId;
 		private final String line;
 		public List<ArchiveStore.Key> copied = new List<ArchiveStore.Key>();
+		/** The job whose pending count changes it settles (D-223): the job, or erasure's own. */
+		public Id pendingJobId;
 
 		public Finisher(Id jobId, String line) {
 			this.jobId = jobId;
 			this.line = line;
+			this.pendingJobId = jobId;
 		}
 
 		public void execute(FinalizerContext context) {
@@ -595,12 +629,21 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 				// Logged below with the failure; the copies stay and the log says the run failed.
 				copied = new List<ArchiveStore.Key>();
 			}
+			// After the deletes above (no immediate call may follow DML): the count from what is there.
+			if (pendingJobId != null) {
+				try {
+					ArchiveCountSettle.settle(pendingJobId);
+				} catch (Exception notSettled) {
+					// The nightly sweep settles it later.
+					ErrorLogger.log(notSettled, CONTEXT, pendingJobId);
+				}
+			}
 			if (jobId == null) {
-				ErrorLogger.logMessages(
-					new List<String>{ line.replace('{0}', String.valueOf(reason)) },
-					CONTEXT,
-					ErrorLogger.SEVERITY_ERROR
-				);
+				String logged = line.replace('{0}', String.valueOf(reason));
+				ErrorLogger.logMessages(new List<String>{ logged }, CONTEXT, ErrorLogger.SEVERITY_ERROR);
+				if (pendingJobId != null) {
+					fail(pendingJobId, logged, null);
+				}
 			} else {
 				fail(jobId, line, reason);
 			}
