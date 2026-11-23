@@ -124,7 +124,7 @@ Status as of 2026-11-23 (latest): batch W (release 1.37, D-223, D-224) landed on
 | C-65 | Field Access Manager (reverses the D-13 permission-management non-goal; ADR first) | Major | Landed (#815 to #817) | D-157 |
 | F-08 | Deadline calendar view | Minor | Landed (#849) | v0.10 |
 | L-06 | Link outcomes to grant deliverables | Minor | Landed (#846) | v0.10 |
-| X-05 | NPSP coexistence: adopt household accounts | Minor | Built (#812, #813, #819); landing B | Plan 6.3 |
+| X-05 | NPSP coexistence: adopt household accounts | Minor | Landed (#812, #813, #819; landing batch B #912) | Plan 6.3 |
 | C-57 | Picklist value usage | Minor | Landed (#809) | D-156 |
 | C-58 | Technical debt checks | Minor | Landed (#810) | D-156 |
 | C-60 | Automation inventory in the Data Dictionary; own Automation tab, whole-org inventory and scan, deactivate org flows and validation rules with snapshot and Restore (D-184, ADR-0174) | Minor | Landed (#821, #979) | D-156, D-184 |

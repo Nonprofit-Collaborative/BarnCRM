@@ -880,7 +880,7 @@ Portals into Batch C (Brandon, 2026-11-04, "Yes", D-178): C-46 Address Verificat
 | C-65 | Field Access Manager: grant or remove Read and Edit for chosen fields and objects across chosen permission sets on one page, with a preview and undo; extends Access Explorer (reverses the D-13 permission-management non-goal; ADR first, amends ADR-0047) | Major | Landed | D-157 |
 | F-08 | Deadline calendar view | Minor | Landed | Section 6 v0.10 |
 | L-06 | Link outcomes to grant deliverables when Funders is installed | Minor | Landed | Section 6 v0.10 |
-| X-05 | NPSP coexistence: adopt household accounts | Minor | Built (landing batch B) | Section 6.3 |
+| X-05 | NPSP coexistence: adopt household accounts | Minor | Landed (#912, landing batch B) | Section 6.3 |
 | C-57 | Picklist value usage in Field Utilization: records per value and last use | Minor | Landed | D-156 |
 | C-58 | Technical debt checks in Org Optimizer: Apex, triggers and flows on old API versions, inactive or undescribed flows (SOQL-readable setup only) | Minor | Landed | D-156 |
 | C-60 | Automation inventory in the Data Dictionary: flows and Apex triggers per object; validation rules listed as not covered (Tooling API) | Minor | Landed | D-156 |
