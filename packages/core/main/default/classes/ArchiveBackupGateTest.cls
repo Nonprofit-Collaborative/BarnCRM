@@ -145,6 +145,8 @@ private class ArchiveBackupGateTest {
 			);
 			// The export finishes without saving every part.
 			BackupSetService.afterExport(backup.Id, true, 0, 0, null, null, false, null);
+			// The Error Log is written by its platform event.
+			Test.getEventBus().deliver();
 			System.Assert.isTrue(BigObjectArchiveJob.queuedForTest.isEmpty(), 'No archive started');
 			ArchiveRuleService.Panel panel = ArchiveController.getRules();
 			System.Assert.isFalse(panel.rules[0].running, 'The rule is free to run again');

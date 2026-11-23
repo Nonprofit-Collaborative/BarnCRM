@@ -83,6 +83,13 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 	@TestVisible
 	private Set<Id> copiedChildIds = new Set<Id>();
 	private Map<String, String> childFieldByObject = new Map<String, String>();
+	/**
+	 * Set by a test about the chain itself: only these child objects are read and checked, so a
+	 * test running many links in one transaction is not charged a query per child kind of every
+	 * installed module. Null outside such a test: every kind.
+	 */
+	@TestVisible
+	private static Set<String> childObjectsForTest;
 	@TestVisible
 	private List<String> notes = new List<String>();
 	@TestVisible
@@ -263,6 +270,13 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 		BulkDeleteService.Plan checked = BulkDeleteService.plan(queryJson);
 		Schema.DescribeSObjectResult described = checked.objectType.getDescribe(SObjectDescribeOptions.DEFERRED);
 		List<ArchiveRecordJson.ChildKind> kinds = ArchiveRecordJson.childKinds(described);
+		if (childObjectsForTest != null) {
+			for (Integer index = kinds.size() - 1; index >= 0; index--) {
+				if (!childObjectsForTest.contains(kinds[index].objectName)) {
+					kinds.remove(index);
+				}
+			}
+		}
 		Set<Id> ids = new Map<Id, SObject>(page).keySet();
 		Map<String, String> fieldByObject = new Map<String, String>();
 		Map<Id, Map<String, List<SObject>>> children = childrenOf(kinds, ids, fieldByObject);

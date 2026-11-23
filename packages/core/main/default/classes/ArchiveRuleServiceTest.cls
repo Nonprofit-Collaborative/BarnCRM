@@ -46,6 +46,7 @@ private class ArchiveRuleServiceTest {
 
 	private static void makePeople(Integer howMany) {
 		DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
+		BigObjectArchiveJob.childObjectsForTest = new Set<String>{ 'Contact' };
 		List<Contact> people = new List<Contact>{
 			TestDataFactory.person(new Contact(LastName = 'Staff Person', Title = 'Staff'))
 		};

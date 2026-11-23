@@ -40,8 +40,12 @@ private class ArchiveJobTest {
 		return TestUsers.withPermissionSets(new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Bulk_Delete' });
 	}
 
+	/** Only Contact children are read: the tests' links share one transaction's queries. */
+	private static final Set<String> CHILD_OBJECTS = new Set<String>{ 'Contact' };
+
 	private static void makePeople(Integer howMany) {
 		DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
+		BigObjectArchiveJob.childObjectsForTest = CHILD_OBJECTS;
 		List<Contact> people = new List<Contact>{
 			TestDataFactory.person(new Contact(LastName = 'Staff Person', Title = 'Staff'))
 		};
@@ -395,6 +399,7 @@ private class ArchiveJobTest {
 	@IsTest
 	static void aRecordGivenAChildAfterItsCopyIsKeptLiveWhole() {
 		DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
+		BigObjectArchiveJob.childObjectsForTest = CHILD_OBJECTS;
 		Account org;
 		System.runAs(TestUsers.admin()) {
 			org = TestDataFactory.organization(new Account(Name = 'Kids Org Late'));
@@ -448,6 +453,7 @@ private class ArchiveJobTest {
 	@IsTest
 	static void aChunkWhoseChildrenAreTooManyIsHalvedAndALoneParentLeftOut() {
 		DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
+		BigObjectArchiveJob.childObjectsForTest = CHILD_OBJECTS;
 		Map<String, Integer> childrenByName = new Map<String, Integer>{
 			'Kids Org A' => 2,
 			'Kids Org B' => 2,

@@ -107,6 +107,7 @@ private class ArchiveViewerTest {
 		Contact staff;
 		System.runAs(TestUsers.admin()) {
 			DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
+			BigObjectArchiveJob.childObjectsForTest = new Set<String>{ 'Contact' };
 			staff = TestDataFactory.person(new Contact(LastName = 'Staff Person', Title = 'Staff'));
 			insert staff;
 			insert new List<Contact>{
