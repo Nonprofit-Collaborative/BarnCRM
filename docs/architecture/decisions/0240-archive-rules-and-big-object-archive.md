@@ -150,3 +150,27 @@ Items 8 to 10 are built as decided, with these details settled:
    index order and `deleteImmediate` matches; the final link (DML only) subtracts the count and
    writes any failure to the Error Log, since an Error Log insert may not share a scan link's
    transaction.
+
+## Amendment: scheduled owner check and children added mid-run (AR-11, AR-12, 2026-11-23)
+
+Plan D-223 (Brandon, 2026-11-23). Items 4 and 6 gain:
+
+1. **A scheduled rule's owner is checked each night (AR-11).** Item 6 runs scheduled rules as the
+   nightly-job user, so nothing rechecked the person who set the schedule. Before the Archive
+   Rules step starts a due rule, `ArchiveRuleService.runDueRule` checks the owner of its saved
+   query, in system mode: active, holding the three custom permissions that `allowed()` checks
+   when a rule is saved or run by hand (Manage BarnCRM Settings, Find and Export Records, Bulk
+   Delete Records, read through `PermissionSetAssignment` and `SetupEntityAccess`, which covers
+   permission sets, groups and the profile's own set), and, for the Big Object destination,
+   create access to `Archived_Record__b` (`ObjectPermissions`), which `ArchiveToBigObject`
+   requires of a person. A rule that fails is skipped, not run: a Failed Archive job for the
+   rule (`"skipped": true` in its definition) whose log names the reason and the remedy
+   (give the saved query to an active person with the permissions), and a Warning on the Error
+   Log naming the rule. The job is the rule's last run in Recent Runs; no new field.
+2. **A child added between Copy and Settle is never deleted uncopied (AR-12).** The Copy keeps
+   the Ids of the cascade-delete children it saved and each child object's parent field. The
+   Settle reads the originals `FOR UPDATE` (so no child can be added between the check and the
+   delete), then, one query per child kind for the chunk in user mode as the Copy read them,
+   finds children not in the copy. Such a parent is not deleted: its copy goes the way of a
+   changed record's (removed by the next Copy, never left both live and archived), the log says
+   a related record was added after the copy, and the next run archives it whole.

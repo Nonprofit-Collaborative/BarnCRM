@@ -9228,6 +9228,9 @@ Archive Rules panel, run a rule or restore.
   shipped on) starts its own job for each due rule, as the user who scheduled the nightly run;
   each moves at most the run limit, a rule matching nothing starts no job, and a refused rule is
   logged to the Error Log. A night missed is not caught up: the rule runs on its next due day.
+  A due rule whose query owner is inactive, or no longer holds those three permissions (and, for
+  `BigObject`, create on `Archived_Record__b`), is skipped (D-223): a Failed Archive job with
+  `"skipped": true` whose Run Log says why, and an Error Log Warning naming the rule.
 - **The job.** Every run of a `BigObject` rule, and every restore, is an `Import_Batch__c` with
   Operation Archive (Section 16), its definition `{ "version": 1, "action": "archive" |
   "restore", "savedQueryId", "name", "object", "notChangedAfter", "archivedAt", "rowIds" }`
@@ -9311,7 +9314,9 @@ the last Settle could not finish (retried once; any that stay are counted in the
 list is cleared, so the chain always ends), reads up to one chunk of matching records in user
 mode, Id order, and `insertImmediate`s them; Settle reads
 the rows back by full key, reads the originals again, deletes in user mode those whose copy exists
-and that are unchanged since the run started, adds the rows to `Archived_Record_Count__c`, writes
+and that are unchanged since the run started and have no cascade-delete child missing from their
+copy (one added after the Copy, D-223: kept live, its copy removed as a changed record's, the next
+run archives it whole), adds the rows to `Archived_Record_Count__c`, writes
 the job, and queues the next Copy with the copies whose original stayed. The run ends when no
 record matches, at the run's count, or at the cap (R-ARC5). Before reading children, Copy counts
 each cascade-delete kind's rows for the chunk and halves the chunk until they fit 2,000 rows; a

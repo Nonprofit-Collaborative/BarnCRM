@@ -10,8 +10,9 @@
  *   readable field and their cascade-delete children (the chunk halved until the children fit
  *   `childRows`), and writes them with `insertImmediate`.
  * - Settle (DML only): reads the copies back by full key, reads the originals again, deletes in
- *   user mode those copied and unchanged since the run started, counts them, writes the job, and
- *   queues the next Copy with any copy whose original stayed.
+ *   user mode those copied and unchanged since the run started (and with no cascade-delete child
+ *   added since the Copy, D-223), counts them, writes the job, and queues the next Copy with any
+ *   copy whose original stayed.
  *
  * Each Copy stamps its rows with a new archive time, so a later Copy never overwrites an earlier
  * one's rows. A link that dies unexpectedly is caught by its finalizer, which deletes that link's
@@ -73,6 +74,10 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 	private Datetime copiedAt;
 	/** The last Copy's saved rows: record name by Original Id. */
 	private Map<String, String> copiedNames = new Map<String, String>();
+	/** The cascade-delete children the last Copy saved, and each child object's parent field. */
+	@TestVisible
+	private Set<Id> copiedChildIds = new Set<Id>();
+	private Map<String, String> childFieldByObject = new Map<String, String>();
 	@TestVisible
 	private List<String> notes = new List<String>();
 	@TestVisible
@@ -120,6 +125,7 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 
 	private void copy(Finisher finisher) {
 		copiedNames = new Map<String, String>();
+		copiedChildIds = new Set<Id>();
 		notes = new List<String>();
 		deleteOrphans();
 		try {
@@ -253,6 +259,7 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 		if (tooMany) {
 			children = new Map<Id, Map<String, List<SObject>>>();
 		}
+		childFieldByObject = fieldByObject;
 		Set<String> fields = new Set<String>(BulkDeleteService.backupFieldNames(checked.objectType));
 		fields.add('SystemModstamp');
 		QueryCompiler.Compiled read = QueryCompiler.compileSelection(queryJson, fields, ids);
@@ -288,6 +295,7 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 			List<SObject> allChildren = new List<SObject>();
 			for (List<SObject> kind : mine.values()) {
 				allChildren.addAll(kind);
+				copiedChildIds.addAll(new Map<Id, SObject>(kind).keySet());
 			}
 			rows.add(
 				new Archived_Record__b(
@@ -402,24 +410,32 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 		}
 		Map<Id, SObject> originals = new Map<Id, SObject>(
 			Database.queryWithBinds(
-				'SELECT Id, SystemModstamp FROM ' + objectName + ' WHERE Id IN :ids',
+				// Locked, so no child is added between the check below and the delete.
+				'SELECT Id, SystemModstamp FROM ' +
+					objectName +
+					' WHERE Id IN :ids FOR UPDATE',
 				new Map<String, Object>{ 'ids' => ids },
 				AccessLevel.USER_MODE
 			)
 		);
+		Set<Id> grown = parentsWithNewChildren(originals.keySet());
 		Integer gone = 0;
 		List<SObject> toDelete = new List<SObject>();
 		for (Id one : ids) {
 			SObject original = originals.get(one);
+			String kept = null;
 			if (original == null) {
 				gone++;
 			} else if ((Datetime) original.get('SystemModstamp') > notChangedAfter) {
-				orphans.add(new ArchiveStore.Key(objectName, copiedAt, String.valueOf(one)));
-				notes.add(
-					note(BarnHelp.text('Core', 'Core_ArchiveRules_NoteChanged'), copiedNames.get(String.valueOf(one)))
-				);
+				kept = BarnHelp.text('Core', 'Core_ArchiveRules_NoteChanged');
+			} else if (grown.contains(one)) {
+				kept = BarnHelp.text('Core', 'Core_ArchiveRules_NoteChildAdded');
 			} else {
 				toDelete.add(original);
+			}
+			if (kept != null) {
+				orphans.add(new ArchiveStore.Key(objectName, copiedAt, String.valueOf(one)));
+				notes.add(note(kept, copiedNames.get(String.valueOf(one))));
 			}
 		}
 		Integer deleted = 0;
@@ -441,6 +457,34 @@ public with sharing class BigObjectArchiveJob implements Queueable {
 			}
 		}
 		return new List<Integer>{ deleted, gone };
+	}
+
+	/**
+	 * The records with a cascade-delete child their copy does not hold: one added since the Copy
+	 * read them, which deleting the record would delete with no copy (D-223). One query per child
+	 * object, read in user mode as the Copy read them. Such a record stays live this run, its copy
+	 * is removed as a kept record's is, and the next run archives it whole.
+	 */
+	private Set<Id> parentsWithNewChildren(Set<Id> parentIds) {
+		Set<Id> result = new Set<Id>();
+		if (parentIds.isEmpty()) {
+			return result;
+		}
+		for (String childObject : childFieldByObject.keySet()) {
+			String field = childFieldByObject.get(childObject);
+			for (
+				SObject child : Database.queryWithBinds(
+					'SELECT Id, ' + field + ' FROM ' + childObject + ' WHERE ' + field + ' IN :ids',
+					new Map<String, Object>{ 'ids' => parentIds },
+					AccessLevel.USER_MODE
+				)
+			) {
+				if (!copiedChildIds.contains(child.Id)) {
+					result.add((Id) child.get(field));
+				}
+			}
+		}
+		return result;
 	}
 
 	private void writeJob(Integer deleted) {

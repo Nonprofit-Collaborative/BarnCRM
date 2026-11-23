@@ -27,7 +27,9 @@ Only **Big Object** keeps the related records with each record. Choose it when y
 back.
 
 A record is only deleted after its copy is saved and read back. A record changed after the run
-started is left alone and named in the run's log.
+started is left alone and named in the run's log. So is a Big Object record that gained a
+related record after it was copied: deleting it would delete that related record with no copy,
+so it stays live, its copy is removed, and the next run archives it with all its related records.
 
 ## 2. How to Turn It On
 
@@ -44,6 +46,14 @@ Scheduled rules run in the nightly run's **Archive Rules** step (BarnCRM Setting
 Nightly Jobs), at 3:00 in the time zone of the person who scheduled the nightly jobs, and as that
 person. The step ships on and does nothing while no rule has a schedule. Turn the step off there
 to pause every rule at once.
+
+Each night, before a scheduled rule runs, BarnCRM checks the rule's owner (the owner of its saved
+query). If the owner is inactive, or no longer holds the three permissions above (and, for
+**Big Object**, BarnCRM Admin), the rule is **skipped**, not run: nothing is archived. The skip
+is listed under **Recent Runs** of the person who scheduled the nightly jobs as a **Failed** run
+whose log says why, and as a Warning on the Error Log naming the rule. To start it again, change
+the saved query's owner to an active person who holds those permissions (or give the owner the
+permissions back); the rule runs on its next due day.
 
 ## 3. A Five-Minute Walkthrough (as Maria)
 
@@ -78,7 +88,8 @@ Maria wants closed lost opportunities older than five years out of the way every
 - **Related records.** The records Salesforce deletes with a record (the kinds the preview lists)
   are saved inside it, one level deep. Their own related records are deleted by Salesforce and go
   to the Recycle Bin. Records that only look up to an archived record keep their record but lose
-  that lookup.
+  that lookup. Just before deleting, each run checks for related records added since the copy
+  was made; a record that has one is kept for that run (see section 1).
 - **A missed night is not caught up.** A weekly rule whose night was missed runs on its next day.
 
 ## 5. Managing Rules
