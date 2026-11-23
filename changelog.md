@@ -6,6 +6,7 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ## 2026-11-23
 
+- Test orgs `barn-sales`, `oi-test`, `barn-platform`: leftover permission sets BarnCRM_Tab_Data_Hygiene, BarnCRM_App_Admin_Standard and BarnCRM_App_Standard (no longer in the repo) deleted with their assignments (3, 3 and 6).
 - PR #1457 opened (`fix/archive-rules-icon`): the Data Manager Archive Rules tile named `standard:archive`, which SLDS does not ship (blank square on `mwdbdevsb`); now `standard:shipment`. New CI test `IconNamesExist` checks every icon name in package source against `@salesforce-ux/sds-metadata`; no other missing names. Rides the next `mwdbdevsb` deploy.
 - `mwdbdevsb` UX pass (Playwright, Core pages Home, Data Manager, BarnCRM Settings, Duplicate Matching, Automation): one title per page, no error toasts, no unlabelled buttons, no BarnCRM help-text warnings; console errors are Salesforce CSP messages only. One finding: the Archive Rules tile icon (#1457).
 - `mwdbdevsb` e2e (`scripts/org/run-e2e.sh mwdbdevsb`): 17 passed, 0 failed, 138 skipped (module apps and tabs not installed; Salesforce pages with no BarnCRM code). Every Core console tab passed.
