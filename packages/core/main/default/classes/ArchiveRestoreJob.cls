@@ -3,16 +3,19 @@
  * queueable chain whose links alternate, so no transaction mixes ordinary DML with an immediate
  * big object call (the platform refuses that, uncatchably).
  *
- * - Write (DML only): first settles the rows the last Remove deleted (reads them back by key and
- *   subtracts those gone from `Archived_Record_Count__c`), then inserts the next chunk of records
- *   in user mode with only the fields the person may create, a lookup only when its target exists,
- *   and their saved children with the new parent Id. A record whose child could not be created is
- *   deleted again and its row stays archived. Logs each old Id with its new Id and what was left
- *   out on the job, then queues a Remove, or finishes the job when nothing is left.
+ * - Write (DML only): first settles the rows the last Remove deleted (`ArchiveCountSettle` reads
+ *   them back by the keys saved on the job and subtracts those gone from
+ *   `Archived_Record_Count__c`), then inserts the next chunk of records in user mode with only the
+ *   fields the person may create, a lookup only when its target exists, and their saved children
+ *   with the new parent Id. A record whose child could not be created is deleted again and its row
+ *   stays archived. Logs each old Id with its new Id and what was left out on the job, saves the
+ *   keys the Remove will delete as pending (D-223), then queues a Remove, or finishes the job when
+ *   nothing is left.
  * - Remove (no DML): `deleteImmediate`s the rows whose record was created.
  *
  * A row that failed to restore stays archived and is named in the log. A link that dies
- * unexpectedly is caught by its finalizer, which marks the job Failed.
+ * unexpectedly is caught by its finalizer, which settles the count from the saved keys and marks
+ * the job Failed.
  */
 public with sharing class ArchiveRestoreJob implements Queueable {
 	/** Rows inserted per Write: each holds at most 131,072 characters of JSON. */
@@ -85,8 +88,10 @@ public with sharing class ArchiveRestoreJob implements Queueable {
 		Savepoint beforeInsert;
 		Integer linesBefore = 0;
 		Integer chunkSize = 0;
+		// Outside the try: a settle that fails ends the link, and its finalizer or the nightly sweep
+		// settles the saved keys instead of this Write overwriting them.
+		settleRemoved(outcome);
 		try {
-			settleRemoved(outcome);
 			restoredRows = new List<String>();
 			if (!pending.isEmpty()) {
 				List<String> chunk = new List<String>();
@@ -118,28 +123,16 @@ public with sharing class ArchiveRestoreJob implements Queueable {
 		writeJob(outcome);
 	}
 
-	/** Reads back the rows the last Remove deleted and counts those gone. */
+	/** Reads back the rows the last Remove deleted, from the keys saved on the job, and counts those gone. */
 	private void settleRemoved(Outcome outcome) {
-		if (restoredRows.isEmpty()) {
-			return;
-		}
-		Set<String> kept = new Set<String>();
-		Map<Datetime, Set<String>> byTime = groupByTime(restoredRows);
-		for (Datetime at : byTime.keySet()) {
-			for (String originalId : ArchiveStore.get().present(objectName, at, byTime.get(at))) {
-				kept.add(at.getTime() + '|' + originalId);
-			}
-		}
-		for (String rowId : kept) {
-			outcome.lines.add(
-				BarnHelp.text('Core', 'Core_ArchiveViewer_NoteCopyKept', new List<Object>{ rowId.substringAfter('|') })
-			);
+		ArchiveCountSettle.Settled settled = ArchiveCountSettle.settle(jobId);
+		for (String originalId : settled.kept) {
+			outcome.lines.add(BarnHelp.text('Core', 'Core_ArchiveViewer_NoteCopyKept', new List<Object>{ originalId }));
 		}
 		if (removeError != null) {
 			outcome.lines.add(removeError);
 		}
-		outcome.removed = restoredRows.size() - kept.size();
-		BigObjectArchiveJob.addToCount(-outcome.removed);
+		outcome.removed = settled.removed;
 	}
 
 	/** Inserts one chunk's records and their children in user mode. */
@@ -304,7 +297,7 @@ public with sharing class ArchiveRestoreJob implements Queueable {
 
 	private void writeJob(Outcome outcome) {
 		Import_Batch__c job = [
-			SELECT Id, Run_Log__c, Rows_Created__c, Rows_Deleted__c, Rows_Rejected__c
+			SELECT Id, Run_Log__c, Rows_Created__c, Rows_Deleted__c, Rows_Rejected__c, Operation_JSON__c
 			FROM Import_Batch__c
 			WHERE Id = :jobId
 			WITH SYSTEM_MODE
@@ -334,6 +327,11 @@ public with sharing class ArchiveRestoreJob implements Queueable {
 				Rows_Created__c = created,
 				Rows_Deleted__c = removed,
 				Rows_Rejected__c = rejected,
+				// The rows the Remove will delete, saved before it runs (D-223).
+				Operation_JSON__c = ArchiveCountSettle.withPending(
+					job.Operation_JSON__c,
+					ArchiveCountSettle.removing(keysOf(restoredRows))
+				),
 				Run_Log__c = String.join(lines, '\n').right(32768),
 				Status__c = !finished
 					? ImportBatchService.STATUS_COMMITTING

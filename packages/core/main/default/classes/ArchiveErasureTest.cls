@@ -1,8 +1,8 @@
 /**
  * Erasing a person and the archive (canonical model R-ARC6): the extension queues the scan only
  * when the archive holds rows; the scan does nothing without an Erasure record (a preview), and
- * otherwise deletes every row that is the person or names them, across objects and pages, then
- * lowers the count in a last link.
+ * otherwise deletes every row that is the person or names them, across objects and pages, and
+ * lowers the count from the rows saved as pending, even when a Remove link dies (D-223).
  *
  * The big object is replaced by `ArchiveStoreMemory`; each link is run in turn by the test.
  */
@@ -79,6 +79,41 @@ private class ArchiveErasureTest {
 				System.Assert.isFalse(ArchiveRecordJson.names(left.Person_Ids__c, PERSON), 'None names them');
 			}
 			System.Assert.areEqual(before - 3, BigObjectArchiveJob.archivedCount(), 'The count lowered');
+		}
+	}
+
+	@IsTest
+	static void aRemoveThatDiesIsCountedByItsFinisher() {
+		System.runAs(TestUsers.admin()) {
+			fill();
+			Integer before = BigObjectArchiveJob.archivedCount();
+			insert as system new Erasure__c(Erased_Record_Id__c = PERSON, Details__c = 'Test');
+			BigObjectArchiveJob.queuedForTest = new List<Object>();
+			new ArchiveErasureExtension().erase(Id.valueOf(PERSON));
+			ArchiveErasureJob link = (ArchiveErasureJob) BigObjectArchiveJob.queuedForTest.remove(0);
+			link.execute(null);
+			System.Assert.areEqual(3, link.doomed.size(), 'The Find saved the three rows before the Remove');
+			System.Assert.isTrue(
+				[SELECT Operation_JSON__c FROM Import_Batch__c WHERE Id = :link.jobId WITH SYSTEM_MODE]
+					.Operation_JSON__c.contains('"pending"'),
+				'On the erasure job'
+			);
+			((Queueable) BigObjectArchiveJob.queuedForTest.remove(0)).execute(null);
+			// The chain dies here: the Find that would settle never runs.
+			BigObjectArchiveJob.queuedForTest.clear();
+			System.Assert.areEqual(before, BigObjectArchiveJob.archivedCount(), 'Not counted yet');
+			BigObjectArchiveJob.Finisher finisher = new BigObjectArchiveJob.Finisher(
+				null,
+				BarnHelp.text('Core', 'Core_ArchiveErasure_Stopped')
+			);
+			finisher.pendingJobId = link.jobId;
+			finisher.stopped('Died');
+			System.Assert.areEqual(before - 3, BigObjectArchiveJob.archivedCount(), 'The finisher counted them');
+			System.Assert.areEqual(
+				ImportBatchService.STATUS_FAILED,
+				[SELECT Status__c FROM Import_Batch__c WHERE Id = :link.jobId WITH SYSTEM_MODE].Status__c,
+				'The erasure job failed'
+			);
 		}
 	}
 

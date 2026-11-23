@@ -35,8 +35,12 @@ public with sharing class ArchiveRulesStep implements Schedulable, Database.Batc
 			.withSwitch(true);
 	}
 
-	/** Starts the batch when a rule is due today; otherwise nothing. */
+	/**
+	 * Settles the archived row count of any archive, restore or erasure chain that stopped with
+	 * rows pending (D-223), then starts the batch when a rule is due today.
+	 */
 	public void execute(SchedulableContext context) {
+		ArchiveCountSettle.sweep();
 		Date today = OrgDate.today();
 		if (!ArchiveRuleService.dueRuleIds(today).isEmpty()) {
 			AsyncStarter.batch(new ArchiveRulesStep(today), 1, LOG_SOURCE);

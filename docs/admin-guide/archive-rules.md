@@ -107,6 +107,13 @@ Maria wants closed lost opportunities older than five years out of the way every
   stay archived, the rest stay where they were, and running the rule again continues. In the rare
   case an archived copy of a record that was kept cannot be removed, the log counts it: that
   record is then both live and archived, so do not restore that copy.
+- **The Archived records count stays true when a run stops.** Salesforce cannot count big object
+  rows, so BarnCRM keeps a running count. Before each step that writes or removes archived rows,
+  the run notes those rows on its data job; the next step, or the clean-up that runs when a step
+  stops unexpectedly, reads them back and counts only what is really there. If a run stops with
+  no clean-up at all (for example, someone aborts it in Setup), the nightly run's **Archive
+  Rules** step finds it a day later, brings the count up to date and marks the run **Failed**
+  with a line saying so. The same applies to restores and to erasures.
 
 ## 6. Archived Records: Looking Records Up
 
@@ -163,8 +170,11 @@ When you [erase a person](erase-a-person.md), archived records that are that per
 name them in a lookup (for example a gift whose donor was the person), are deleted from the
 archive in the background once the erasure is saved. The erasure summary lists **Archived
 records** as deleted, counted rather than listed. A preview deletes nothing. The archived record
-count goes down when the background work ends. If that background work stops unexpectedly, an
-Error in the Error Log says so, naming no record: some archived records may still name the person.
+count goes down as the background work goes. When it finds archived records to delete, the work is
+listed under **Recent Runs** of the person who erased, as "Erasure: removing archived records that
+name an erased person", with how many it removed; it names no person. If that background work
+stops unexpectedly, an Error in the Error Log says so, naming no record, and the run is
+**Failed**: some archived records may still name the person.
 
 ## Field Reference
 
@@ -172,7 +182,7 @@ Error in the Error Log says so, naming no record: some archived records may stil
 |---|---|---|
 | Saved query | Query (the `archive` key) | Where records go, how often, the day, and Active. |
 | Data Job | Operation | Archive, for a big object run. |
-| Data Job | Bulk Update Definition | The rule's saved query, name, object, and when the run started. |
+| Data Job | Bulk Update Definition | The rule's saved query, name, object, and when the run started; while it runs, the archived rows its next step writes or removes, until they are counted. |
 | Data Job | Row Count | The most records the run may move. |
 | Data Job | Rows Deleted | Records moved into the archive; for a restore, rows removed from the archive. |
 | Data Job | Rows Created | For a restore, records created again. |

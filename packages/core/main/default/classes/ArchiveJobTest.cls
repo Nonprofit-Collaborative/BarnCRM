@@ -1,12 +1,14 @@
 /**
  * The big object archive run (canonical model R-ARC3, R-ARC5): Copy then Settle, the originals
  * deleted only once their copies are read back, records changed since the start kept, the cap,
- * the job's counts and a failed link.
+ * the job's counts, a failed link, and the count settled from the rows read back (D-223).
  *
  * The big object is replaced by `ArchiveStoreMemory`, and each link is run in turn by the test,
  * since an Apex test can neither write a big object nor chain queueables.
  */
-@IsTest(testFor='ApexClass:BigObjectArchiveJob, ApexClass:ArchiveToBigObject, ApexClass:ArchiveRecordJson')
+@IsTest(
+	testFor='ApexClass:BigObjectArchiveJob, ApexClass:ArchiveToBigObject, ApexClass:ArchiveRecordJson, ApexClass:ArchiveCountSettle'
+)
 private class ArchiveJobTest {
 	@TestSetup
 	// runs-as: deploying user (creates the test users themselves)
@@ -273,6 +275,34 @@ private class ArchiveJobTest {
 			job.Run_Log__c.endsWith(BarnHelp.text('Core', 'Core_ArchiveRules_LogStopped') + ' Because'),
 			'An archive run says to run the rule again, with the reason: ' + job.Run_Log__c
 		);
+	}
+
+	@IsTest
+	static void aCopyThatDiesWithCopiesItCannotRemoveIsCountedAsItLeftThem() {
+		System.runAs(TestUsers.admin()) {
+			makePeople(2);
+		}
+		ArchiveStoreMemory store = ArchiveStoreMemory.install();
+		BigObjectArchiveJob.queuedForTest = new List<Object>();
+		Import_Batch__c job;
+		System.runAs(archivist()) {
+			job = ArchiveDestinations.forKey(ArchiveRules.BIG_OBJECT)
+				.start(new ArchiveRun(null, 'Old Volunteers', VOLUNTEERS, 'Contact', 2));
+			((Queueable) BigObjectArchiveJob.queuedForTest.remove(0)).execute(null);
+			System.Assert.areEqual(2, store.rowsByKey.size(), 'The Copy saved both');
+			System.Assert.areEqual(0, BigObjectArchiveJob.archivedCount(), 'Counted only once settled');
+			// The link dies and its finisher cannot take the copies back.
+			store.deletesRefused = 1;
+			BigObjectArchiveJob.lastFinisher.stopped('Died');
+			System.Assert.areEqual(
+				2,
+				BigObjectArchiveJob.archivedCount(),
+				'Counted as they are, from the rows read back'
+			);
+			ArchiveCountSettle.settle(job.Id);
+			System.Assert.areEqual(2, BigObjectArchiveJob.archivedCount(), 'Settling again changes nothing');
+		}
+		System.Assert.areEqual(ImportBatchService.STATUS_FAILED, reread(job.Id).Status__c, 'Failed');
 	}
 
 	@IsTest
