@@ -124,8 +124,8 @@ private class OrgShapeDetectorFacetsTest {
 			OrgShapeDetector.overrideShape = shape;
 			Assert.isNull(OrgShapeDetector.creatablePersonRecordTypeId(), 'No person types, so none to create with');
 
-			// An Id of the right kind that names no record type of the org.
-			shape.personAccountRecordTypeIds = new Set<Id>{ '012000000000000AAA' };
+			// An Id of the right kind that names no record type of the org (all zeros is Master).
+			shape.personAccountRecordTypeIds = new Set<Id>{ Id.valueOf('012000000000009') };
 			Assert.isNull(
 				OrgShapeDetector.creatablePersonRecordTypeId(),
 				'A person type the user cannot see is never chosen'

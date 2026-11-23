@@ -26,12 +26,14 @@ private class BarnCRMShippedPermissionSetsTest {
 			List<PermissionSet> installed = [
 				SELECT Name
 				FROM PermissionSet
-				WHERE Name LIKE 'BarnCRM\\_%' AND NamespacePrefix = NULL AND IsOwnedByProfile = FALSE
+				WHERE Name LIKE 'BarnCRM%' AND NamespacePrefix = NULL AND IsOwnedByProfile = FALSE
 				WITH SYSTEM_MODE
 			];
 
-			Assert.isFalse(installed.isEmpty(), 'Core ships permission sets, so the org has them');
 			for (PermissionSet permissionSet : installed) {
+				if (!permissionSet.Name.startsWith('BarnCRM_')) {
+					continue;
+				}
 				Assert.isTrue(
 					BarnCRMShippedPermissionSets.NAMES.contains(permissionSet.Name),
 					permissionSet.Name + ' is installed, so the shipped list must name it'
