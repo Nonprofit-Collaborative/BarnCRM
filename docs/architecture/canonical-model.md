@@ -1354,6 +1354,7 @@ Section 29E, R-BD2). Shown in the console's Import section.
 | `Bulk_Chunk_Size__c` | integer | 200 | Records each chunk of a bulk update or bulk delete handles (R-BU2, R-BD2). From 10 to 200; empty reads as 200, out of range as the nearest end. Stamped on the job when it starts. |
 | `Backup_Runs_Kept__c` | integer | 7 | Backup Runs Kept: how many runs of each scheduled Backup Set keep their files (R-SQ16, BK-10). From 1 to 365; empty reads as 7, out of range as the nearest end. A set run only on demand keeps every file. |
 | `Backup_Remove_Sent_Files__c` | boolean | false | Remove Files Copy After Sending: once every part of a Backup Set run reached the off-platform backup destination, the run's files are deleted from Files (R-SQ17). Off keeps them. |
+| `Skip_Backup_Before_Archive__c` | boolean | false | Skip Backup Before Archive: archive rule runs start without the backup to Files that otherwise comes first (R-SQ18, AR-15, D-223). Turning it on is confirmed in the console; who turned it on and when is its newest Setting Change, shown under it while on and written to each run's log. |
 
 ### v0.8 keys
 
@@ -9236,6 +9237,22 @@ Delete Records, may see the Archive Rules panel, run a rule or restore.
   `Files` rule's run is R-BD9's Delete job. A link that dies unexpectedly marks its job Failed
   with a line for its kind: an archive says to run the rule again, a restore to restore the rest
   again.
+- **Backup first** (AR-15, D-223). Every run of a rule, manual or scheduled, whatever its
+  destination, starts as a Backup data job (R-SQ15's export, Files only) of the records it will
+  archive, at most its count in Id order, and, in files of their own, their cascade-delete
+  related records (R-ARC2's kinds, read with each chunk of 100 in user mode; more than 10,000 in
+  a chunk fails the backup). The job's definition carries the run under `beforeArchive` (`{
+  "savedQueryId", "ruleName", "queryJson", "objectName", "confirmedCount", "scheduled",
+  "destination", "startedAt" }`) and no top-level `savedQueryId`, so Backup Set retention never
+  removes its files. While it is Committing the rule counts as running. Its finish starts the
+  run through the destination only when the backup is Complete with at least one record and the
+  rule's document is unchanged; the run then moves at most the records backed up, and a Big
+  Object run keeps records changed since the backup started. Otherwise the run is skipped: the
+  backup's log, a Failed Archive job (`"skipped": true`) and an Error Log entry give the reason.
+  With `Skip_Backup_Before_Archive__c` on, the run starts at once and its log says who turned
+  the setting on and when. A run started inside the nightly step's batch starts its backup from
+  a queueable. Archive by Query (R-BD9) is not gated: its own file is saved in full before any
+  delete.
 
 ### Salesforce implementation
 
@@ -9267,8 +9284,8 @@ Delete Records, may see the Archive Rules panel, run a rule or restore.
   panel of the Data Manager tab (component `backupSets`).
 - **Archive rules (R-SQ18):** seam `ArchiveDestination` with `ArchiveDestinations`,
   `ArchiveToFiles`, `ArchiveToBigObject` and `OffPlatformArchiveDestination`; services `ArchiveRules` (the `archive` key and its
-  schedule), `ArchiveRuleService`, `ArchiveController`, `ArchiveRulesStep` (the nightly step);
-  UI the Archive Rules panel of the Data Manager tab (component `archiveRules`).
+  schedule), `ArchiveRuleService`, `ArchiveController`, `ArchiveRulesStep` (the nightly step),
+  `ArchiveBackupGate` (the backup first, AR-15); UI the Archive Rules panel of the Data Manager tab (component `archiveRules`).
 
 ---
 

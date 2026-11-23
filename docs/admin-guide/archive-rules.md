@@ -29,6 +29,34 @@ back.
 A record is only deleted after its copy is saved and read back. A record changed after the run
 started is left alone and named in the run's log.
 
+### A Backup Before Every Run
+
+Every run, whether you press **Run Now** or the schedule starts it, first **backs up** the
+records it will archive to your Files, with the related records the archive takes with them (one
+file per kind of related record). The archive starts only once that backup is saved in full:
+
+- The backup is a data job with Operation **Backup**, listed under **Recent Runs** in
+  [Backup Sets](backup-sets.md) by the rule's name. Its files stay in your Files until you delete
+  them; **Backup Runs Kept** never removes them.
+- While the backup is being saved, the rule counts as running: **Run Now** stays off for it.
+- The run then moves at most the records the backup holds. A Big Object run keeps any record
+  changed since the backup started, so every record moved is as its backup holds it.
+- **If the backup is not saved in full** (the query cannot run, a file cannot be saved, or the
+  records have more than 10,000 related records in one step), the run does not start: nothing is
+  archived or deleted, **Recent Runs** in Archive Rules lists it as **Failed** with the reason,
+  and the Error Log says so. If the rule was changed, paused or removed while its backup was being
+  saved, the run is skipped the same way.
+
+[Archive by Query](archive-by-query.md) is not backed up again: it already saves every record to a
+file in Files before deleting anything.
+
+**Skip Backup Before Archive** (BarnCRM Settings, Import, in the Find, Bulk Update and Bulk Delete
+box; off by default) starts runs without the backup. It is riskier: if a run goes wrong, there is
+no backup to restore from. Turning it on asks you to confirm. BarnCRM records who turned it on and
+when: the setting shows "Turned on by" that person and the date and time while it is on, the
+**Recent Changes** list on BarnCRM Settings keeps every change to it, and each run started
+without a backup says so, and who turned the setting on, in its log.
+
 ## 2. How to Turn It On
 
 There is nothing to install. You need:
@@ -178,7 +206,9 @@ Error in the Error Log says so, naming no record: some archived records may stil
 | Data Job | Rows Created | For a restore, records created again. |
 | Data Job | Rows Rejected | Records left out (or, for a restore, left archived); the Run Log names them. |
 | Data Job | Run Log | For a restore, each old Id with its new Id and the fields left out. |
+| Data Job | Operation | Backup, for the backup before a run; its definition holds the run under `beforeArchive`. |
 | BarnCRM Settings | Archived Record Count | How many rows the archive holds, kept by BarnCRM. |
+| BarnCRM Settings, Import | Skip Backup Before Archive | Start runs without the backup first. Off by default; turning it on is confirmed and recorded. |
 | Archived Record | Object, Archived At, Original Id | The row's key. |
 | Archived Record | Name, Owner Id, Rule Name | What the viewer lists. |
 | Archived Record | Record | The record and its related records as JSON. |

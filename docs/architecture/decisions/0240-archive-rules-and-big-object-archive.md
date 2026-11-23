@@ -177,3 +177,53 @@ unless they have an Archive Admin permission set." Amends items 6 and 9 and amen
    see archived records, that a row shows every field the archiving person could read, and how to
    give someone access (Access page, BarnCRM Archive Admin, plus BarnCRM Bulk Delete to run rules
    and restore). The Access page's sentence and the refusal messages name the set.
+
+## Amendment: a backup before every archive run (AR-15, D-223, 2026-11-23)
+
+Brandon, D-223: "please run an automatic backup before archive will run. That backup must complete
+successfully for the archive to start its run. There can be a setting to skip mandatory backup
+before archive but if a user tries to enable it, have a pop up disclaimer saying that it is
+riskier to archive without a backup and record which user approved the setting and when be
+recorded and show who and when that setting was enabled by the setting." Amends items 2, 3 and 6.
+
+1. **What is gated.** Every archive rule run, Run Now and scheduled, whatever its destination
+   (Files, Big Object, Off Platform): `ArchiveRuleService.start` hands the run to
+   `ArchiveBackupGate.start` instead of the destination. Archive by Query on the Bulk Delete
+   panel (R-BD9) is not gated: it is itself the same export (`FindExportBatch`) of exactly the
+   records it deletes, saved in full to Files before any delete, so a second identical file would
+   add storage and no safety. Calling a destination directly (as the tests do) is not gated.
+2. **The backup.** A Backup data job (Operation Backup, Files only, never sent off platform) runs
+   Backup Sets' export (R-SQ15) over the rule's query, at most the run's count in Id order, as
+   the person, with every readable field. `FindExportBatch.forArchiveBackup` also writes the
+   cascade-delete related records the Big Object archive would take with each record (R-ARC2's
+   kinds, `ArchiveRecordJson.childKinds`), in user mode, one CSV per child object and field,
+   chunks of 100 records; more than 10,000 related rows in one chunk fails the backup. The run
+   is stored in the job's definition under `beforeArchive`; with no top-level `savedQueryId`,
+   Backup Set retention (`keepNewest`) never removes these files. They stay in the person's Files
+   until deleted there. Reused, not duplicated: the job, export, finish (`BackupSetService.afterExport`)
+   and Backup Sets' run list are the existing ones.
+3. **The chain.** The backup is a batch; its finish calls `ArchiveBackupGate.afterBackup`, which
+   starts the destination only when the backup is Complete with at least one record and the
+   rule's document is unchanged since (a rule edited, paused or removed meanwhile is skipped).
+   The run moves at most the records backed up, and a Big Object run keeps any record changed
+   since the backup started (`ArchiveRun.notChangedAfter`), so every record moved is as its
+   backup holds it. The finish does DML and queues; the big object calls stay in their own
+   queueable links (item 4). A run started inside the nightly step's batch execute, which may
+   not start a batch, starts its backup from a queueable (`ArchiveBackupGate.Starter`).
+4. **One at a time.** While a rule's backup is Committing, the rule counts as running: the panel
+   turns Run Now off and a second run is refused with the same message.
+5. **Skipped runs.** A backup that fails (query, file or related-records limit) skips the run:
+   the backup's log says so, a Failed Archive job (`"skipped": true`) under Recent Runs gives the
+   reason, and an Error goes to the Error Log (context ArchiveBackupGate). Nothing is archived or
+   deleted. A backup that finds no records ends the run with a log line and no error.
+6. **Skip Backup Before Archive.** A Core setting (`Skip_Backup_Before_Archive__c`, default off,
+   Import page, Find, Bulk Update and Bulk Delete box beside the Backup Sets settings: there is no
+   archive box, and the label budget is full). Turning it on in the console opens the kit's
+   confirm dialog saying archiving without a backup is riskier and the records cannot be
+   recovered from a backup; Cancel leaves it off and unsaved. Who turned it on and when is not a
+   new field: the settings save already writes a Setting Change on the server with the saver
+   from the save request (ADR-0238 item 4), so `ArchiveBackupGate.turnedOnNote` reads the newest
+   change for the key. The console shows "Turned on by <name> on <date and time>" under the box
+   while it is on, and each run started without a backup writes that sentence to its log.
+   Turning it off writes its own Setting Change, so the history stays in Recent Changes; nothing
+   is cleared. A value set outside the console (Setup) has no change row and says so.

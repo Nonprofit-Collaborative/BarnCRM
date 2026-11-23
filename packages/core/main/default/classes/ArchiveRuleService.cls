@@ -106,6 +106,8 @@ public with sharing class ArchiveRuleService {
 		Id me = UserInfo.getUserId();
 		Date today = OrgDate.today();
 		Set<String> running = BigObjectArchiveJob.running('archive', 'savedQueryId');
+		// A rule whose backup is still being saved is running too (AR-15).
+		running.addAll(ArchiveBackupGate.waiting());
 		for (Saved_Query__c query : [
 			SELECT Id, Name, Object_Name__c, OwnerId, Owner.Name, Query_JSON__c
 			FROM Saved_Query__c
@@ -294,7 +296,8 @@ public with sharing class ArchiveRuleService {
 		ArchiveRules.Rule rule = ArchiveRules.of(query.Query_JSON__c);
 		ArchiveRun run = new ArchiveRun(query.Id, query.Name, query.Query_JSON__c, checked.objectName, confirmedCount);
 		run.scheduled = scheduled;
-		return ArchiveDestinations.forKey(rule.destination).start(run);
+		// A backup first, which starts the run once saved, unless Skip Backup Before Archive (AR-15).
+		return ArchiveBackupGate.start(run, rule.destination);
 	}
 
 	private static Saved_Query__c readRule(Id queryId) {

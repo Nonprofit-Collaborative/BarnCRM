@@ -40,6 +40,7 @@ import { labelTab } from 'c/workspaceTabs';
 import { groupRows, findBox } from './settingsGroups';
 import { navigationGroups, openPageReference } from './settingsNavigation';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import BarnConfirmModal from 'c/barnConfirmModal';
 
 /** The page state key a link to a section uses: `c__section`, or the namespace's. */
 const SECTION_STATE = '__section';
@@ -69,6 +70,24 @@ const PANEL_SETTINGS = {
     'Organization_Country__c'
   ]
 };
+
+/**
+ * The dialog a checkbox asks before it is turned on, or null. Skip Backup Before Archive
+ * (D-223) is riskier, so turning it on is confirmed first; the server records who and when.
+ */
+function confirmationFor(key) {
+  if (key !== 'Skip_Backup_Before_Archive__c') {
+    return null;
+  }
+  return {
+    size: 'small',
+    label: helpText('Core', 'Core_ArchiveBackup_ConfirmTitle'),
+    message: helpText('Core', 'Core_ArchiveBackup_ConfirmMessage'),
+    confirmLabel: helpText('Core', 'Core_ArchiveBackup_ConfirmButton'),
+    cancelLabel: helpText('Core', 'Core_ArchiveRules_Cancel'),
+    confirmVariant: 'destructive'
+  };
+}
 
 /** The panel row that edits this setting, when its section shows that panel. */
 function panelRowFor(section, key) {
@@ -790,12 +809,19 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     }
   }
 
-  handleChange(event) {
-    const key = event.target.dataset.key;
-    const kind = event.target.dataset.kind;
+  async handleChange(event) {
+    const target = event.target;
+    const key = target.dataset.key;
+    const kind = target.dataset.kind;
     let value;
     if (kind === 'Checkbox') {
-      value = event.target.checked;
+      value = target.checked;
+      const confirmation = value === true ? confirmationFor(key) : null;
+      if (confirmation && (await BarnConfirmModal.open(confirmation)) !== true) {
+        // Cancelled: the box goes back to off and nothing is saved.
+        target.checked = false;
+        return;
+      }
     } else if (kind === 'Picklist') {
       value = event.detail.value;
     } else if (kind === 'Record') {

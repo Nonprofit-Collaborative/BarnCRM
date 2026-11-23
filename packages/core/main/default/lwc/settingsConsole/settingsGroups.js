@@ -302,7 +302,8 @@ const PAGE_GROUPS = {
         'Bulk_Delete_Run_Limit__c',
         'Bulk_Chunk_Size__c',
         'Backup_Runs_Kept__c',
-        'Backup_Remove_Sent_Files__c'
+        'Backup_Remove_Sent_Files__c',
+        'Skip_Backup_Before_Archive__c'
       ]
     }
   ]

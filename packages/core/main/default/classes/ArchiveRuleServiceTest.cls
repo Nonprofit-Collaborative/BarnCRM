@@ -37,6 +37,13 @@ private class ArchiveRuleServiceTest {
 		return TestUsers.withPermissionSets(new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Bulk_Delete' });
 	}
 
+	/** Runs start without the backup before them (AR-15): these tests drive the archive alone. */
+	private static void skipBackups() {
+		BarnCRM_Settings__c settings = TestDataFactory.defaultSettings();
+		settings.Skip_Backup_Before_Archive__c = true;
+		TestDataFactory.saveSettings(settings);
+	}
+
 	private static void makePeople(Integer howMany) {
 		DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
 		List<Contact> people = new List<Contact>{
@@ -63,6 +70,7 @@ private class ArchiveRuleServiceTest {
 	static void rulePanelSavesPreviewsAndRuns() {
 		System.runAs(TestUsers.admin()) {
 			makePeople(2);
+			skipBackups();
 		}
 		ArchiveStoreMemory.install();
 		BigObjectArchiveJob.queuedForTest = new List<Object>();
@@ -121,6 +129,7 @@ private class ArchiveRuleServiceTest {
 	static void aRuleStillRunningIsNotStartedAgain() {
 		System.runAs(TestUsers.admin()) {
 			makePeople(2);
+			skipBackups();
 		}
 		ArchiveStoreMemory.install();
 		BigObjectArchiveJob.queuedForTest = new List<Object>();
@@ -172,6 +181,7 @@ private class ArchiveRuleServiceTest {
 	static void nightlyStepStartsDueRules() {
 		System.runAs(TestUsers.admin()) {
 			makePeople(2);
+			skipBackups();
 		}
 		ArchiveStoreMemory store = ArchiveStoreMemory.install();
 		BigObjectArchiveJob.queuedForTest = new List<Object>();

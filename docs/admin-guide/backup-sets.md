@@ -156,5 +156,10 @@ undone like any other.
 | BarnCRM Settings, Import | Export row limit | The most records one run saves. Default 50,000. |
 | BarnCRM Settings, Import | Backup Runs Kept | How many runs of each scheduled set keep their files. Default 7. |
 | BarnCRM Settings, Import | Remove Files Copy After Sending | Delete a run's files from Files once every part reached your backup destination. Off by default. |
+| BarnCRM Settings, Import | Skip Backup Before Archive | Archive rule runs start without their backup first ([Archive Rules](archive-rules.md#a-backup-before-every-run)). Off by default. |
 | Saved query | Query document, `backup` key | `destination`: Files and backup destination, when chosen. |
 | BarnCRM Settings, General | Nightly Jobs, Backup Sets | The step that starts scheduled sets at 2:00 AM; on by default. |
+
+The backup an [archive rule](archive-rules.md#a-backup-before-every-run) makes before each run is
+listed among these runs by the rule's name. It is not a Backup Set: it is never sent off platform,
+and Backup Runs Kept never removes its files.

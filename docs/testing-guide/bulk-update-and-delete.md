@@ -408,3 +408,21 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | 7 | As the admin, open **Archived Records**. | Unchanged: the admin keeps full access without BarnCRM Archive Admin. |
 
 **Cleanup:** remove BarnCRM Archive Admin from `Arckeep Staff`; delete `Arckeep One` and its saved query.
+
+## T-BULK-24: A Backup Before Every Archive Run
+
+**Purpose:** confirm every archive rule run first backs up its records, with their related records, and starts only once that backup is saved; and that Skip Backup Before Archive is confirmed, records who turned it on and when, and keeps that history when turned off (AR-15, D-223).
+**Prerequisites:** run in barn-platform as an admin with BarnCRM Bulk Delete. Two contacts `Arcbak One` and `Arcbak Two`, each with one task, and a saved Find query `Arcbak` on Contact whose Last Name is `Arcbak`, made an archive rule with **Where Records Go** set to **Big Object**. Skip Backup Before Archive is off. Setup detail: [Archive Rules](../admin-guide/archive-rules.md#a-backup-before-every-run).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In **Archive Rules**, press **Preview and Run** on `Arcbak`, type `2` and press **Run Now**. | The message says the backup is saved first. Until it is saved, **Run Now** stays off for the rule. |
+| 2 | Open **Backup Sets** and look under **Recent Runs**. | A **Backup** run named `Arcbak` is Complete with 2 records; its log says the archive has started. Files holds a Contact file and a Task file for it. |
+| 3 | Back in **Archive Rules**, wait for the run to end. | The Archive run is Complete with 2 records moved; its log says they were backed up first. Both contacts are in **Archived Records**. |
+| 4 | In **BarnCRM Settings**, **Import**, tick **Skip Backup Before Archive**, then press **Cancel** in the dialog. | The dialog **Archive Without a Backup?** says it is riskier. After Cancel the box is unticked and nothing is saved. |
+| 5 | Tick it again, press **Turn On**, then save. | The box stays ticked; under it: "Turned on by" your name with today's date and time. **Recent Changes** lists the change with your name. |
+| 6 | Create `Arcbak Three`, then run `Arcbak` again. | No Backup run is added. The Archive run starts at once; its log says it started without a backup and who turned the setting on. |
+| 7 | Untick **Skip Backup Before Archive** and save. | No dialog. The "Turned on by" line is gone; **Recent Changes** keeps both changes. |
+| 8 | Edit the saved query `Arcbak` to use a field you then delete, and run the rule. | The backup fails; the rule's run is **Failed** with the reason, nothing is archived or deleted, and the Error Log has an entry from ArchiveBackupGate. |
+
+**Cleanup:** restore or delete the archived `Arcbak` contacts, delete their backup files from Files, and remove the rule, saved query and test field.

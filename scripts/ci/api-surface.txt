@@ -108,6 +108,7 @@ core/ArchiveRules.cls | public static final String OFF_PLATFORM
 core/ArchiveRules.cls | public static void check(Rule)
 core/ArchiveRun.cls | public ArchiveRun(Id,String,String,String,Integer)
 core/ArchiveRun.cls | public Boolean scheduled
+core/ArchiveRun.cls | public Datetime notChangedAfter
 core/ArchiveRun.cls | public Id savedQueryId
 core/ArchiveRun.cls | public Integer confirmedCount
 core/ArchiveRun.cls | public String objectName
