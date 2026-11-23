@@ -391,12 +391,21 @@ public with sharing class ArchiveRuleService {
 	 * Warning on the Error Log naming the rule. The package's own bookkeeping (ADR-0021).
 	 */
 	private static void skip(Saved_Query__c query, String reason) {
-		Datetime now = Datetime.now();
 		String line = BarnHelp.text(
 			'Core',
 			'Core_ArchiveRules_LogSkipped',
-			new List<Object>{ query.Name, now.format(), reason }
+			new List<Object>{ query.Name, Datetime.now().format(), reason }
 		);
+		recordSkipped(new ArchiveRun(query.Id, query.Name, null, query.Object_Name__c, 0), true, line);
+		ErrorLogger.logMessage(line, CONTEXT, ErrorLogger.SEVERITY_WARNING, query.Id);
+	}
+
+	/**
+	 * A run that did not start, as a Failed Archive job under Recent Runs whose log is `line`
+	 * (an owner check, AR-11, or a backup not saved, AR-15). The package's own bookkeeping.
+	 */
+	public static void recordSkipped(ArchiveRun run, Boolean scheduled, String line) {
+		Datetime now = Datetime.now();
 		Database.insert(
 			new Import_Batch__c(
 				Operation__c = BigObjectArchiveJob.OPERATION_ARCHIVE,
@@ -404,16 +413,16 @@ public with sharing class ArchiveRuleService {
 					new Map<String, Object>{
 						'version' => 1,
 						'action' => 'archive',
-						'savedQueryId' => query.Id,
-						'name' => query.Name,
-						'object' => query.Object_Name__c,
-						'scheduled' => true,
+						'savedQueryId' => run.savedQueryId,
+						'name' => run.ruleName,
+						'object' => run.objectName,
+						'scheduled' => scheduled,
 						'skipped' => true
 					}
 				),
 				Status__c = ImportBatchService.STATUS_FAILED,
 				Is_Dry_Run__c = false,
-				Row_Count__c = 0,
+				Row_Count__c = run.confirmedCount,
 				Rows_Created__c = 0,
 				Rows_Deleted__c = 0,
 				Rows_Rejected__c = 0,
@@ -424,7 +433,6 @@ public with sharing class ArchiveRuleService {
 			),
 			AccessLevel.SYSTEM_MODE
 		);
-		ErrorLogger.logMessage(line, CONTEXT, ErrorLogger.SEVERITY_WARNING, query.Id);
 	}
 
 	private static Import_Batch__c start(

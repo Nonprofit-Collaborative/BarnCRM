@@ -165,34 +165,7 @@ public with sharing class ArchiveBackupGate {
 		String line = BarnHelp.text('Core', 'Core_ArchiveBackup_Skipped', new List<Object>{ run.ruleName, reason });
 		try {
 			appendLog(backupJobId, line);
-			Datetime now = Datetime.now();
-			Database.insert(
-				new Import_Batch__c(
-					Operation__c = BigObjectArchiveJob.OPERATION_ARCHIVE,
-					Operation_JSON__c = JSON.serialize(
-						new Map<String, Object>{
-							'version' => 1,
-							'action' => 'archive',
-							'skipped' => true,
-							'savedQueryId' => run.savedQueryId,
-							'name' => run.ruleName,
-							'object' => run.objectName,
-							'scheduled' => run.scheduled == true
-						}
-					),
-					Status__c = ImportBatchService.STATUS_FAILED,
-					Is_Dry_Run__c = false,
-					Row_Count__c = run.confirmedCount,
-					Rows_Created__c = 0,
-					Rows_Deleted__c = 0,
-					Rows_Rejected__c = 0,
-					Started_At__c = now,
-					Completed_At__c = now,
-					Committed_By__c = UserInfo.getUserId(),
-					Run_Log__c = line
-				),
-				AccessLevel.SYSTEM_MODE
-			);
+			ArchiveRuleService.recordSkipped(run, run.scheduled == true, line);
 		} catch (Exception notWritten) {
 			ErrorLogger.log(notWritten, CONTEXT, backupJobId);
 		}
