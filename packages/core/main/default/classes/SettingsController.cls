@@ -130,6 +130,12 @@ public with sharing class SettingsController {
 		 */
 		@AuraEnabled
 		public String suggestedValue;
+		/**
+		 * Who turned a checkbox on and when, shown under it while it is on: Skip Backup Before
+		 * Archive (D-223), from its newest Setting Change, written on the server by the save.
+		 */
+		@AuraEnabled
+		public String turnedOnNote;
 	}
 
 	public class Option {
@@ -837,6 +843,9 @@ public with sharing class SettingsController {
 		}
 		Boolean isCheckbox = TYPE_CHECKBOX.equalsIgnoreCase(definition.Data_Type__c);
 		setting.checked = isCheckbox && value == true;
+		if (setting.checked && ArchiveBackupGate.SKIP_KEY.equalsIgnoreCase(definition.Setting_Key__c)) {
+			setting.turnedOnNote = ArchiveBackupGate.turnedOnNote();
+		}
 		// A checkbox is never blank (its shipped value is on the record, ADR-0035).
 		setting.unsavedDefault =
 			!isCheckbox &&

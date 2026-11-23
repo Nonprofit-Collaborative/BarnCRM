@@ -6,6 +6,7 @@ import canBulkUpdate from '@salesforce/customPermission/Bulk_Update_Records';
 import canBulkDelete from '@salesforce/customPermission/Bulk_Delete_Records';
 import canReviewDuplicates from '@salesforce/customPermission/Review_Duplicate_Suggestions';
 import canManageMetadata from '@salesforce/customPermission/Manage_BarnCRM_Metadata';
+import canManageArchive from '@salesforce/customPermission/Manage_Archive';
 import getMappings from '@salesforce/apex/DataManagerController.getMappings';
 import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
 import orgOptimizerInstalled from '@salesforce/apex/DataManagerController.orgOptimizerInstalled';
@@ -257,7 +258,7 @@ export default class DataManager extends NavigationMixin(LightningElement) {
     }
   }
 
-  /** Archived Records shows to holders of the big object grant (BarnCRM Admin). */
+  /** Archived Records shows to BarnCRM Admin and BarnCRM Archive Admin holders (D-223). */
   archiveViewable = false;
 
   @wire(canViewArchive)
@@ -327,17 +328,18 @@ export default class DataManager extends NavigationMixin(LightningElement) {
             'standard:database'
           )
         );
-        // Archive Rules (D-221): they delete, so they need Bulk Delete Records too.
-        if (canBulkDelete) {
-          findChange.push(
-            tile(
-              'archive',
-              helpText('Core', 'Core_ArchiveRules_Title'),
-              helpText('Core', 'Core_DataManager_ArchiveText'),
-              'standard:archive'
-            )
-          );
-        }
+      }
+      // Archive Rules (D-221): BarnCRM Admin or BarnCRM Archive Admin (D-223). They delete, so
+      // they need Bulk Delete Records too.
+      if ((canManageSettings || canManageArchive) && canBulkDelete) {
+        findChange.push(
+          tile(
+            'archive',
+            helpText('Core', 'Core_ArchiveRules_Title'),
+            helpText('Core', 'Core_DataManager_ArchiveText'),
+            'standard:archive'
+          )
+        );
       }
     }
     // Archived Records (D-221): the big object's rows, for holders of its grant.

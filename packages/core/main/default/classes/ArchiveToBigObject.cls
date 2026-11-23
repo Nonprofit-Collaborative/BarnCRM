@@ -33,6 +33,8 @@ public with sharing class ArchiveToBigObject implements ArchiveDestination {
 		}
 		BigObjectArchiveJob.requireIdle(run.savedQueryId);
 		Datetime now = Datetime.now();
+		// After a backup, records changed since it started are kept (AR-15).
+		Datetime notChangedAfter = run.notChangedAfter ?? now;
 		Import_Batch__c job = new Import_Batch__c(
 			Operation__c = BigObjectArchiveJob.OPERATION_ARCHIVE,
 			Operation_JSON__c = JSON.serialize(
@@ -42,7 +44,7 @@ public with sharing class ArchiveToBigObject implements ArchiveDestination {
 					'savedQueryId' => run.savedQueryId,
 					'name' => run.ruleName,
 					'object' => run.objectName,
-					'notChangedAfter' => now,
+					'notChangedAfter' => notChangedAfter,
 					'scheduled' => run.scheduled == true,
 					ArchiveCountSettle.PENDING => BigObjectArchiveJob.firstPending(run, now)
 				}
@@ -62,7 +64,7 @@ public with sharing class ArchiveToBigObject implements ArchiveDestination {
 		);
 		// The package's own bookkeeping (ADR-0021); the records are read and deleted as the person.
 		Database.insert(job, AccessLevel.SYSTEM_MODE);
-		BigObjectArchiveJob.queue(new BigObjectArchiveJob(job.Id, run, now));
+		BigObjectArchiveJob.queue(new BigObjectArchiveJob(job.Id, run, notChangedAfter));
 		return job;
 	}
 }

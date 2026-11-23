@@ -141,6 +141,14 @@
                                     data-kind="Checkbox"
                                     onchange={handleChange}
                                 ></lightning-input>
+                                <template lwc:if={row.turnedOnNote}>
+                                    <p
+                                        class="slds-text-body_small slds-var-m-top_xx-small"
+                                        data-turned-on={row.key}
+                                    >
+                                        {row.turnedOnNote}
+                                    </p>
+                                </template>
                             </template>
 
                             <template lwc:elseif={row.isText}>

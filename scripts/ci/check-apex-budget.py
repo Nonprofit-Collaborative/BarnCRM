@@ -152,7 +152,10 @@ CAPS = {
     # Raised 2026-11-23 for AR-13 (D-223: ArchiveCountSettle, the archived count settled from
     # rows read back, and the erasure chain's Find and Remove links): 1,984,467 measured, plus
     # about 0.1%.
-    "core": 1_986_500,
+    # Raised 2026-11-23 for AR-14 and AR-15 (D-223): the Archive Admin permission check and the
+    # backup before every archive run (ArchiveBackupGate, related-record files in
+    # FindExportBatch, the skip setting's who and when): 1,987,864 measured, plus about 0.1%.
+    "core": 1_989_900,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured

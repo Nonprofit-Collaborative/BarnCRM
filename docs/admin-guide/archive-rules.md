@@ -31,16 +31,46 @@ started is left alone and named in the run's log. So is a Big Object record that
 related record after it was copied: deleting it would delete that related record with no copy,
 so it stays live, its copy is removed, and the next run archives it with all its related records.
 
+### A Backup Before Every Run
+
+Every run, whether you press **Run Now** or the schedule starts it, first **backs up** the
+records it will archive to your Files, with the related records the archive takes with them (one
+file per kind of related record). The archive starts only once that backup is saved in full:
+
+- The backup is a data job with Operation **Backup**, listed under **Recent Runs** in
+  [Backup Sets](backup-sets.md) by the rule's name. Its files stay in your Files until you delete
+  them; **Backup Runs Kept** never removes them.
+- While the backup is being saved, the rule counts as running: **Run Now** stays off for it.
+- The run then moves at most the records the backup holds. A Big Object run keeps any record
+  changed since the backup started, so every record moved is as its backup holds it.
+- **If the backup is not saved in full** (the query cannot run, a file cannot be saved, or the
+  records have more than 10,000 related records in one step), the run does not start: nothing is
+  archived or deleted, **Recent Runs** in Archive Rules lists it as **Failed** with the reason,
+  and the Error Log says so. If the rule was changed, paused or removed while its backup was being
+  saved, the run is skipped the same way.
+
+[Archive by Query](archive-by-query.md) is not backed up again: it already saves every record to a
+file in Files before deleting anything.
+
+**Skip Backup Before Archive** (BarnCRM Settings, Import, in the Find, Bulk Update and Bulk Delete
+box; off by default) starts runs without the backup. It is riskier: if a run goes wrong, there is
+no backup to restore from. Turning it on asks you to confirm. BarnCRM records who turned it on and
+when: the setting shows "Turned on by" that person and the date and time while it is on, the
+**Recent Changes** list on BarnCRM Settings keeps every change to it, and each run started
+without a backup says so, and who turned the setting on, in its log.
+
 ## 2. How to Turn It On
 
-There is nothing to install. You need three permissions, all in **BarnCRM Admin**:
+There is nothing to install. You need:
 
-- **Manage BarnCRM Settings**;
-- **Find and Export Records**, to save the query;
-- **Bulk Delete Records**, because a rule deletes records.
+- **BarnCRM Admin**, or the **BarnCRM Archive Admin** permission set for someone who is not a
+  BarnCRM Admin;
+- **BarnCRM Bulk Delete** (Find and Export Records, to save the query, and Bulk Delete Records,
+  because a rule deletes records).
 
-The **Big Object** destination also needs the **BarnCRM Admin** permission set itself, which
-grants the Archived Record object. People without it cannot see archived records anywhere.
+The **Big Object** destination also needs the Archived Record object, which only **BarnCRM
+Admin** and **BarnCRM Archive Admin** grant. People with neither cannot see archived records
+anywhere. See [Who Can See Archived Records](#who-can-see-archived-records).
 
 Scheduled rules run in the nightly run's **Archive Rules** step (BarnCRM Settings, General,
 Nightly Jobs), at 3:00 in the time zone of the person who scheduled the nightly jobs, and as that
@@ -130,14 +160,23 @@ Records a Big Object rule moved are listed in **Data Manager**, **Archived Recor
 The panel always asks for a kind of record first, then dates: that is the only order Salesforce
 can read the archive in. Archived records are not in reports, list views or the weekly export.
 
-**Who can see them.** Only people with the **BarnCRM Admin** permission set, which grants the
-Archived Record object. Each archived record holds **every field the person who archived it
-could read**, and anyone who can open the panel sees all of those fields, whatever their own
-field access is. The panel says so. Give BarnCRM Admin only to people who may see every field.
+### Who Can See Archived Records
+
+Only **BarnCRM Admins**, and people given the **BarnCRM Archive Admin** permission set. Each
+archived record holds **every field the person who archived it could read**, and anyone who can
+open the panel sees all of those fields, whatever their own field access is. The Archive Rules
+and Archived Records panels say so. Give these only to people who may see every field.
+
+To give someone who is not a BarnCRM Admin access, open the [Access](access.md) page, choose the
+person, and add **BarnCRM Archive Admin** under **Extra Permissions**. With it alone they can look
+archived records up. Add **BarnCRM Bulk Delete** as well for them to run archive rules and
+restore records. BarnCRM Archive Admin grants nothing else of BarnCRM Admin: no settings, no
+Error Log, no other tools.
 
 ## 7. Moving Records Back (Restore)
 
-Restore needs the same permissions as running a rule (section 2).
+Restore needs the same permissions as running a rule (section 2): BarnCRM Admin or BarnCRM
+Archive Admin, with BarnCRM Bulk Delete.
 
 1. In **Archived Records**, show a page of records and tick the ones to move back (up to 50, all
    of one kind, on one page).
@@ -188,7 +227,9 @@ stops unexpectedly, an Error in the Error Log says so, naming no record, and the
 | Data Job | Rows Created | For a restore, records created again. |
 | Data Job | Rows Rejected | Records left out (or, for a restore, left archived); the Run Log names them. |
 | Data Job | Run Log | For a restore, each old Id with its new Id and the fields left out. |
+| Data Job | Operation | Backup, for the backup before a run; its definition holds the run under `beforeArchive`. |
 | BarnCRM Settings | Archived Record Count | How many rows the archive holds, kept by BarnCRM. |
+| BarnCRM Settings, Import | Skip Backup Before Archive | Start runs without the backup first. Off by default; turning it on is confirmed and recorded. |
 | Archived Record | Object, Archived At, Original Id | The row's key. |
 | Archived Record | Name, Owner Id, Rule Name | What the viewer lists. |
 | Archived Record | Record | The record and its related records as JSON. |

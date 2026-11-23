@@ -3,15 +3,19 @@
  * queries whose document carries the `archive` key, set up, previewed and run from the Archive
  * Rules panel, and run on their schedule by the nightly run's Archive Rules step.
  *
- * Saved queries are read and written as the person. Only people holding Manage BarnCRM Settings,
- * Find and Export Records and Bulk Delete Records may use it. A manual run is the bulk delete
+ * Saved queries are read and written as the person. Only people holding Manage BarnCRM Settings
+ * or Manage Archive (BarnCRM Archive Admin), with Find and Export Records and Bulk Delete Records,
+ * may use it. A manual run is the bulk delete
  * preview and typed count (R-BD2, R-BD4); a schedule is turned on with the same typed count once.
  */
 public with sharing class ArchiveRuleService {
 	private static final Integer RUNS_SHOWN = 20;
 	private static final Integer QUERIES_READ = 500;
 	private static final String CONTEXT = 'ArchiveRuleService';
-	/** The custom permissions a person needs to set up and run archive rules. */
+	/**
+	 * The custom permissions a person needs to set up and run archive rules; Manage Archive
+	 * (BarnCRM Archive Admin, AR-14) may stand in for the first.
+	 */
 	private static final List<String> RUN_PERMISSIONS = new List<String>{
 		DataJobs.EVERYONE_PERMISSION,
 		'Find_And_Export_Records',
@@ -83,14 +87,23 @@ public with sharing class ArchiveRuleService {
 		public Integer runLimit;
 	}
 
-	/** Whether the running user may use archive rules. */
+	/** The custom permission BarnCRM Archive Admin grants (D-223, ADR-0240 amendment AR-14). */
+	public static final String ARCHIVE_PERMISSION = 'Manage_Archive';
+
+	/**
+	 * Whether the running user is an archive administrator: a BarnCRM Admin (Manage BarnCRM
+	 * Settings) or a holder of BarnCRM Archive Admin (Manage Archive).
+	 */
+	public static Boolean archiveAdmin() {
+		return FeatureManagement.checkPermission(DataJobs.EVERYONE_PERMISSION) ||
+			FeatureManagement.checkPermission(ARCHIVE_PERMISSION);
+	}
+
+	/** Whether the running user may use archive rules: an archive administrator who may bulk delete. */
 	public static Boolean allowed() {
-		for (String permission : RUN_PERMISSIONS) {
-			if (!FeatureManagement.checkPermission(permission)) {
-				return false;
-			}
-		}
-		return true;
+		return archiveAdmin() &&
+			FeatureManagement.checkPermission('Find_And_Export_Records') &&
+			FeatureManagement.checkPermission(BulkDeleteController.PERMISSION);
 	}
 
 	public static Panel page() {
@@ -102,6 +115,8 @@ public with sharing class ArchiveRuleService {
 		Id me = UserInfo.getUserId();
 		Date today = OrgDate.today();
 		Set<String> running = BigObjectArchiveJob.running('archive', 'savedQueryId');
+		// A rule whose backup is still being saved is running too (AR-15).
+		running.addAll(ArchiveBackupGate.waiting());
 		for (Saved_Query__c query : [
 			SELECT Id, Name, Object_Name__c, OwnerId, Owner.Name, Query_JSON__c
 			FROM Saved_Query__c
@@ -322,16 +337,29 @@ public with sharing class ArchiveRuleService {
 			held.add(one.SetupEntityId);
 		}
 		List<String> missing = new List<String>();
+		// An archive administrator holds Manage BarnCRM Settings or Manage Archive (AR-14).
+		List<String> adminLabels = new List<String>();
+		Boolean admin = false;
+		Set<String> names = new Set<String>(RUN_PERMISSIONS);
+		names.add(ARCHIVE_PERMISSION);
 		for (CustomPermission one : [
-			SELECT Id, MasterLabel
+			SELECT Id, DeveloperName, MasterLabel
 			FROM CustomPermission
-			WHERE DeveloperName IN :RUN_PERMISSIONS
+			WHERE DeveloperName IN :names
 			WITH SYSTEM_MODE
 			ORDER BY MasterLabel
 		]) {
-			if (!held.contains(one.Id)) {
+			Boolean adminKind = one.DeveloperName == DataJobs.EVERYONE_PERMISSION ||
+				one.DeveloperName == ARCHIVE_PERMISSION;
+			if (adminKind) {
+				adminLabels.add(one.MasterLabel);
+				admin = admin || held.contains(one.Id);
+			} else if (!held.contains(one.Id)) {
 				missing.add(one.MasterLabel);
 			}
+		}
+		if (!admin && !adminLabels.isEmpty()) {
+			missing.add(0, String.join(adminLabels, ' or '));
 		}
 		if (
 			destination == ArchiveRules.BIG_OBJECT &&
@@ -408,7 +436,8 @@ public with sharing class ArchiveRuleService {
 		ArchiveRules.Rule rule = ArchiveRules.of(query.Query_JSON__c);
 		ArchiveRun run = new ArchiveRun(query.Id, query.Name, query.Query_JSON__c, checked.objectName, confirmedCount);
 		run.scheduled = scheduled;
-		return ArchiveDestinations.forKey(rule.destination).start(run);
+		// A backup first, which starts the run once saved, unless Skip Backup Before Archive (AR-15).
+		return ArchiveBackupGate.start(run, rule.destination);
 	}
 
 	private static Saved_Query__c readRule(Id queryId) {
