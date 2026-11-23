@@ -46,8 +46,10 @@ In the Receipts section:
 - **Statement year.** The tax year the year-end run covers. It starts at 0, which means last
   year, so a January run needs no change; type a year only to run a different one.
 - **Place of issue.** The city and region you issue from. Optional in the United States. Left
-  blank, the receipt has no "Issued at" line; BarnCRM does not stop a receipt without it, so
-  fill it in if you issue Canadian receipts.
+  blank, the receipt has no "Issued at" line. A Canadian receipt must state where it was
+  issued, so when your organization's country in Setup, Company Information, is Canada, BarnCRM
+  issues no receipt until this is filled in and says so. The EIN stays optional: US law does
+  not require it on a donor acknowledgment.
 
 Three more details print at the bottom of a receipt and each says what a blank means in its
 box: **Receipt signer name** (blank: no signer name; a template that uses it shows an empty

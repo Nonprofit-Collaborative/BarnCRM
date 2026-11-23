@@ -391,6 +391,7 @@
     "Giving_Receipt_NotFound": "That receipt could not be found, or you do not have access to it.",
     "Giving_Receipt_NothingToRender": "There was nothing to put on the receipt. Check that a receipt letter is switched on.",
     "Giving_Receipt_OrganizationIncomplete": "A receipt has to state who issued it. Open BarnCRM Settings, then Organization, and fill in your legal name.",
+    "Giving_Receipt_PlaceOfIssueRequired": "A Canadian receipt has to state where it was issued. Open BarnCRM Settings, then Fundraising, Receipts, and fill in Receipt place of issue (your city and province).",
     "Giving_Receipt_QuidProQuo": "In exchange for this contribution you received {0}. Our good faith estimate of the value of those goods or services is {1}. The amount of your contribution that is deductible for federal income tax purposes is limited to the excess of the amount contributed over that value, which is {2}.",
     "Giving_Receipt_ReissueNeedsGift": "A year end statement is reissued by voiding it and running statements again for that donor, not from this button.",
     "Giving_Receipt_ReissuedMessage": "Receipt {0} has been voided and reissued as {1}. The original file is unchanged.",
