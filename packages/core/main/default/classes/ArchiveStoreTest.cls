@@ -102,7 +102,33 @@ private class ArchiveStoreTest {
 					'No system child: ' + kind.objectName
 				);
 				System.Assert.isNotNull(kind.fieldName, 'Each kind names its lookup');
+				System.Assert.areNotEqual(
+					'ActionableListMember',
+					kind.objectName,
+					'A child the platform will not read by its parent is left out'
+				);
 			}
+		}
+	}
+
+	@IsTest
+	static void childrenThatCannotBeReadByTheirRecordAreNamedInTheLog() {
+		System.runAs(TestUsers.admin()) {
+			Schema.DescribeSObjectResult contacts = Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED);
+			List<String> notKept = ArchiveRecordJson.notKept(contacts);
+			String line = ArchiveRecordJson.notKeptLine(contacts);
+			System.Assert.isTrue(notKept.size() <= 1, 'Only Actionable List Members are named today');
+			if (!notKept.isEmpty()) {
+				System.Assert.isTrue(line.startsWith('\n'), 'The line starts on a new line');
+				System.Assert.isTrue(line.contains(notKept[0]), 'The line names them');
+			} else {
+				System.Assert.areEqual('', line, 'Nothing to name in an org without them');
+			}
+			System.Assert.areEqual(
+				'',
+				ArchiveRecordJson.notKeptLine(Saved_Query__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)),
+				'An object without such children has no line'
+			);
 		}
 	}
 

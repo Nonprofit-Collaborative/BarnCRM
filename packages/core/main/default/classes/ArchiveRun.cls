@@ -23,6 +23,12 @@ public with sharing class ArchiveRun {
 	/** True when the nightly run started it rather than a person. */
 	@NamespaceAccessible
 	public Boolean scheduled = false;
+	/**
+	 * When the backup before the run started (ADR-0240 amendment AR-15), or null: a record changed
+	 * after it is kept, so every record moved is as its backup holds it. Null means the run's start.
+	 */
+	@NamespaceAccessible
+	public Datetime notChangedAfter;
 
 	@NamespaceAccessible
 	public ArchiveRun(Id savedQueryId, String ruleName, String queryJson, String objectName, Integer confirmedCount) {

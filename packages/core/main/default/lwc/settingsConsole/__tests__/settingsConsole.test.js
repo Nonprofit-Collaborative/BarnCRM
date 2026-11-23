@@ -2,6 +2,7 @@ import { createElement } from 'lwc';
 import SettingsConsole from 'c/settingsConsole';
 import { openPageReference } from '../settingsNavigation';
 import FeatureSettings from 'c/featureSettings';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import getConsoleModel from '@salesforce/apex/SettingsController.getConsoleModel';
 import saveSettings from '@salesforce/apex/SettingsController.saveSettings';
 import getRecentChanges from '@salesforce/apex/SettingsController.getRecentChanges';
@@ -1981,6 +1982,112 @@ describe('c-settings-console', () => {
       await settle();
 
       expect(element.shadowRoot.querySelector('[data-id="carry-over-banner"]')).toBeNull();
+    });
+  });
+
+  // Skip Backup Before Archive (D-223): turning it on is confirmed first, and while it is on the
+  // row says who turned it on and when, as the server recorded it.
+  describe('Skip Backup Before Archive', () => {
+    function skipModel(checked, turnedOnNote) {
+      return {
+        canEdit: true,
+        sections: [
+          {
+            name: 'Import',
+            settings: [
+              {
+                key: 'Skip_Backup_Before_Archive__c',
+                label: 'Skip Backup Before Archive',
+                description: 'Riskier.',
+                dataType: 'Checkbox',
+                section: 'Import',
+                component: null,
+                helpUrl: null,
+                value: String(checked),
+                checked,
+                turnedOnNote,
+                options: []
+              }
+            ]
+          }
+        ]
+      };
+    }
+
+    function skipBox(element) {
+      return element.shadowRoot.querySelector(
+        'lightning-input[data-key="Skip_Backup_Before_Archive__c"]'
+      );
+    }
+
+    async function turnOn(element) {
+      const box = skipBox(element);
+      box.checked = true;
+      box.dispatchEvent(new CustomEvent('change'));
+      await settle();
+      return box;
+    }
+
+    beforeEach(() => {
+      getConsoleModel.mockResolvedValue(skipModel(false));
+    });
+
+    it('asks before turning it on and leaves it off when cancelled', async () => {
+      BarnConfirmModal.open.mockResolvedValue(false);
+      const element = build();
+      await settle();
+
+      const box = await turnOn(element);
+
+      expect(BarnConfirmModal.open).toHaveBeenCalledWith(
+        expect.objectContaining({ message: 'c.Core_ArchiveBackup_ConfirmMessage' })
+      );
+      expect(box.checked).toBe(false);
+      expect(saveBar(element).dirtyCount).toBe(0);
+      expect(saveSettings).not.toHaveBeenCalled();
+    });
+
+    it('saves it once confirmed', async () => {
+      BarnConfirmModal.open.mockResolvedValue(true);
+      const element = build();
+      await settle();
+
+      await turnOn(element);
+      clickSave(element);
+      await settle();
+
+      expect(saveSettings).toHaveBeenCalledWith({
+        values: { Skip_Backup_Before_Archive__c: true }
+      });
+    });
+
+    it('turns it off without asking', async () => {
+      getConsoleModel.mockResolvedValue(
+        skipModel(true, 'Turned on by Maria on 11/23/2026, 9:00 AM.')
+      );
+      const element = build();
+      await settle();
+
+      const box = skipBox(element);
+      box.checked = false;
+      box.dispatchEvent(new CustomEvent('change'));
+      await settle();
+
+      expect(BarnConfirmModal.open).not.toHaveBeenCalled();
+      expect(saveBar(element).dirtyCount).toBe(1);
+    });
+
+    it('says who turned it on and when while it is on', async () => {
+      getConsoleModel.mockResolvedValue(
+        skipModel(true, 'Turned on by Maria on 11/23/2026, 9:00 AM.')
+      );
+      const element = build();
+      await settle();
+
+      const note = element.shadowRoot.querySelector(
+        '[data-turned-on="Skip_Backup_Before_Archive__c"]'
+      );
+      expect(note.textContent).toContain('Turned on by Maria');
     });
   });
 });

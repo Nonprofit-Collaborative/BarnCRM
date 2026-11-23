@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    Lets a user who is not a BarnCRM Admin see archived records and, with Bulk Delete Records,
+    run archive rules and restore. In no role. Grants no record access; archiving and restoring
+    run with the user's own access.
+  </description>
+  <isLicensed>false</isLicensed>
+  <label>Manage Archive</label>
+</CustomPermission>

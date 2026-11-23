@@ -30,8 +30,16 @@ public with sharing class ArchiveRecordJson {
 	}
 
 	/**
+	 * Cascade-delete children the platform refuses to read by their parent: a query on them must
+	 * filter on another field (ActionableListMember only by its ActionableListId), so an archive
+	 * cannot copy them. Salesforce still deletes them with the record.
+	 */
+	private static final Set<String> NOT_READ_BY_PARENT = new Set<String>{ 'ActionableListMember' };
+
+	/**
 	 * The cascade-delete children of an object the running person may read, as the bulk delete
-	 * preview lists them (less sharing, history, feed and change event rows).
+	 * preview lists them (less sharing, history, feed and change event rows, and the children
+	 * that cannot be read by their parent, which `notKept` names).
 	 */
 	public static List<ChildKind> childKinds(Schema.DescribeSObjectResult described) {
 		List<ChildKind> result = new List<ChildKind>();
@@ -47,6 +55,7 @@ public with sharing class ArchiveRecordJson {
 				!childObject.isAccessible() ||
 				!childObject.isQueryable() ||
 				BulkDeleteService.isSystemChild(name) ||
+				NOT_READ_BY_PARENT.contains(name) ||
 				seen.contains(name)
 			) {
 				continue;
@@ -55,6 +64,35 @@ public with sharing class ArchiveRecordJson {
 			result.add(new ChildKind(name, child.getField().getDescribe().getName()));
 		}
 		return result;
+	}
+
+	/**
+	 * The plural labels of the cascade-delete children an archive cannot keep, because the
+	 * platform refuses to read them by their parent; the run log names them.
+	 */
+	public static List<String> notKept(Schema.DescribeSObjectResult described) {
+		Set<String> labels = new Set<String>();
+		for (Schema.ChildRelationship child : described.getChildRelationships()) {
+			if (
+				child.isCascadeDelete() &&
+				child.getChildSObject() != null &&
+				NOT_READ_BY_PARENT.contains(String.valueOf(child.getChildSObject()))
+			) {
+				labels.add(child.getChildSObject().getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural());
+			}
+		}
+		List<String> result = new List<String>(labels);
+		result.sort();
+		return result;
+	}
+
+	/** A run log line naming the children an archive cannot keep, starting on a new line; or ''. */
+	public static String notKeptLine(Schema.DescribeSObjectResult described) {
+		List<String> labels = notKept(described);
+		return labels.isEmpty()
+			? ''
+			: '\n' +
+			  BarnHelp.text('Core', 'Core_ArchiveRules_LogNotKept', new List<Object>{ String.join(labels, ', ') });
 	}
 
 	/** The JSON of a record and its children, by child object. */

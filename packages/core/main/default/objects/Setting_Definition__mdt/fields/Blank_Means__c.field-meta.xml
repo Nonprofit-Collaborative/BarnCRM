@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Blank_Means__c</fullName>
+  <description>
+    Text rows only: one plain sentence, written "Blank means ...", saying what BarnCRM does while the box is left empty. The console shows it in the empty box.
+  </description>
+  <externalId>false</externalId>
+  <fieldManageability>DeveloperControlled</fieldManageability>
+  <label>Blank Means</label>
+  <length>255</length>
+  <required>false</required>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

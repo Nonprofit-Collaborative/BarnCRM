@@ -140,6 +140,28 @@ private class CorePostInstallTest {
 		}
 	}
 
+	/** ST-01: the install user holds no BarnCRM permission, yet the feature list is stored. */
+	@IsTest
+	static void installStoresTheFeatureListForAUserWithoutTheSettingsPermission() {
+		System.runAs(TestUsers.admin()) {
+			TestSettings.neverSetUp();
+		}
+		System.runAs(TestUsers.withPermissionSets(new List<String>{ 'BarnCRM_Staff' })) {
+			Assert.isFalse(BarnCRMPermissions.canManageSettings(), 'The installer holds no settings permission');
+
+			Test.startTest();
+			new CorePostInstall().onInstall(new InstallBy(null, null, false));
+			Test.stopTest();
+
+			Assert.areEqual(
+				FeatureSwitchService.NONE_ON,
+				SettingsService.getSettings().Features_Turned_On__c,
+				'The install saved Features Turned On without the permission'
+			);
+			Assert.isFalse(BarnCRMPermissions.canSaveSettings(), 'The allowance ended with the install');
+		}
+	}
+
 	@IsTest
 	static void installAndSourceDeployStoreTheOrganizationRecordTypeAndNeverReplaceIt() {
 		System.runAs(TestUsers.admin()) {

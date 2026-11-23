@@ -62,16 +62,18 @@ public with sharing class TabAccessService {
 	private static final String BULK_DELETE = 'BarnCRM_Bulk_Delete';
 	private static final String DUPLICATE_REVIEW = 'BarnCRM_Duplicate_Review';
 	private static final String METADATA_ADMIN = 'BarnCRM_Metadata_Admin';
+	private static final String ARCHIVE_ADMIN = 'BarnCRM_Archive_Admin';
 
 	/**
 	 * Each tab set, and the permission sets whose holders see that tab while it is on.
 	 * Duplicate Review holders see Duplicate Matching, where the review list is (ADR-0139),
 	 * and so do Metadata Admin holders, who change its matching logic. Bulk Update and Bulk
 	 * Delete include Find and Export's grants (ADR-0194, D5), so their holders see its tabs.
+	 * Archive Admin holders see Data Manager, where Archived Records is (ADR-0240, AR-14).
 	 */
 	@TestVisible
 	private static final Map<String, List<String>> AUDIENCE = new Map<String, List<String>>{
-		DATA_MANAGER_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT, BULK_UPDATE, BULK_DELETE },
+		DATA_MANAGER_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT, BULK_UPDATE, BULK_DELETE, ARCHIVE_ADMIN },
 		IMPORT_TAB => new List<String>{ ADMIN },
 		FIND_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT, BULK_UPDATE, BULK_DELETE },
 		BULK_UPDATE_TAB => new List<String>{ ADMIN, BULK_UPDATE, BULK_DELETE },

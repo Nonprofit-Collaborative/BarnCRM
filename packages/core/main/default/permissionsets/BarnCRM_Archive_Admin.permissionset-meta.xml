@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+  <hasActivationRequired>false</hasActivationRequired>
+  <label>BarnCRM Archive Admin</label>
+  <description>
+    Archived Records for someone who is not a BarnCRM Admin (D-223). With BarnCRM Bulk Delete,
+    archive rules and restore too. In no role. Grants the Archived Record object only.
+  </description>
+  <classAccesses>
+    <apexClass>ArchiveController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>DataManagerController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <customPermissions>
+    <enabled>true</enabled>
+    <name>Manage_Archive</name>
+  </customPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Archived_Record__b.Owner_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Archived_Record__b.Person_Ids__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Archived_Record__b.Record_JSON__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Archived_Record__b.Record_Name__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Archived_Record__b.Rule_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Archived_Record__b.Rule_Name__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Archived_Record__b</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+</PermissionSet>

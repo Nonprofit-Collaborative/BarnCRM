@@ -794,7 +794,7 @@ public with sharing class SettingsService {
 		if (changes.isEmpty()) {
 			return;
 		}
-		if (!BarnCRMPermissions.canManageSettings()) {
+		if (!BarnCRMPermissions.canSaveSettings()) {
 			throw new SettingsWriter.PermissionException(
 				BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError')
 			);

@@ -83,23 +83,27 @@ public with sharing virtual class NpspHouseholdSource {
 	private static final String CONTACTS_AND_ORGS = 'npe01';
 	private static final String HOUSEHOLDS = 'npo02';
 
-	/** NPSP's "this account is a household" marker and its value (R-HA1). */
+	/**
+	 * NPSP's "this account is a household" marker and its value (R-HA1). The NPSP names from
+	 * here to the Account Model field are not final only so that a test can point them at
+	 * Core's own fields, objects and record types: no test org has NPSP.
+	 */
 	@TestVisible
-	private static final String ACCOUNT_TYPE_FIELD = npspField(CONTACTS_AND_ORGS, 'SYSTEM_AccountType');
+	private static String ACCOUNT_TYPE_FIELD = npspField(CONTACTS_AND_ORGS, 'SYSTEM_AccountType');
 	@TestVisible
 	private static final String HOUSEHOLD_ACCOUNT_TYPE = 'Household Account';
 	/** NPSP's household record type. */
 	@TestVisible
-	private static final String HOUSEHOLD_RECORD_TYPE = 'HH_Account';
+	private static String HOUSEHOLD_RECORD_TYPE = 'HH_Account';
 
 	@TestVisible
-	private static final String FORMAL_GREETING_FIELD = npspField(HOUSEHOLDS, 'Formal_Greeting');
+	private static String FORMAL_GREETING_FIELD = npspField(HOUSEHOLDS, 'Formal_Greeting');
 	@TestVisible
-	private static final String INFORMAL_GREETING_FIELD = npspField(HOUSEHOLDS, 'Informal_Greeting');
+	private static String INFORMAL_GREETING_FIELD = npspField(HOUSEHOLDS, 'Informal_Greeting');
 	@TestVisible
-	private static final String PRIMARY_CONTACT_FIELD = npspField(CONTACTS_AND_ORGS, 'One2OneContact');
+	private static String PRIMARY_CONTACT_FIELD = npspField(CONTACTS_AND_ORGS, 'One2OneContact');
 	@TestVisible
-	private static final String CUSTOM_NAMING_FIELD = npspField(HOUSEHOLDS, 'SYSTEM_CUSTOM_NAMING');
+	private static String CUSTOM_NAMING_FIELD = npspField(HOUSEHOLDS, 'SYSTEM_CUSTOM_NAMING');
 
 	/** Test seam: the source in use. */
 	@TestVisible
@@ -263,9 +267,9 @@ public with sharing virtual class NpspHouseholdSource {
 
 	/** NPSP's Account Model setting, and its field, read by describe (RT-04, R-HA6). */
 	@TestVisible
-	private static final String ACCOUNT_MODEL_SETTING = npspField(CONTACTS_AND_ORGS, 'Contacts_And_Orgs_Settings');
+	private static String ACCOUNT_MODEL_SETTING = npspField(CONTACTS_AND_ORGS, 'Contacts_And_Orgs_Settings');
 	@TestVisible
-	private static final String ACCOUNT_MODEL_FIELD = npspField(CONTACTS_AND_ORGS, 'Account_Processor');
+	private static String ACCOUNT_MODEL_FIELD = npspField(CONTACTS_AND_ORGS, 'Account_Processor');
 
 	private static Boolean householdsInUse;
 

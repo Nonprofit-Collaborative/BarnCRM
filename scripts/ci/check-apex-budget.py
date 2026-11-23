@@ -147,7 +147,19 @@ CAPS = {
     # readers and writers go in SET-03, which is where the suite gets this back.
     # Raised 2026-11-22 for the batch T review fixes (archive run lock, restore lock, child-row
     # bound, typed settings readers): 1,975,719 measured, plus about 0.1%.
-    "core": 1_977_700,
+    # Raised 2026-11-23 for AR-11 and AR-12 (D-223: the scheduled rule owner check, the
+    # children-added check before an archive delete): 1,980,190 measured, plus about 0.1%.
+    # Raised 2026-11-23 for AR-13 (D-223: ArchiveCountSettle, the archived count settled from
+    # rows read back, and the erasure chain's Find and Remove links): 1,984,467 measured, plus
+    # about 0.1%.
+    # Raised 2026-11-23 for AR-14 and AR-15 (D-223): the Archive Admin permission check and the
+    # backup before every archive run (ArchiveBackupGate, related-record files in
+    # FindExportBatch, the skip setting's who and when): 1,987,864 measured, plus about 0.1%.
+    # Landing batch W (release 1.37 together: ST-01, ST-02, AR-11 to AR-15, the carry-over fix,
+    # the owner check accepting Manage Archive, children not read by parent; the two skipped-run
+    # writers merged into one): 2,002,256 measured, plus about 0.1%. Core is now 2,256 over its
+    # informational 2,000,000 target; the next trim pass takes it back.
+    "core": 2_004_300,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured

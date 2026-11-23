@@ -58,7 +58,8 @@ Everything is in the app, with one exception noted at step 3.
      empty for any;
    - **first gift only**, for a welcome letter that goes to a donor's very first gift.
 5. Set **Acknowledgments from address** if your thank yous should come from
-   `giving@yourorg.org` rather than from whoever pressed Send. The address has to be one
+   `giving@yourorg.org` rather than from whoever pressed Send (left blank, each thank you
+   comes from the email address of the person who sends it). The address has to be one
    your org has already verified as an organization wide address. With brands on, a gift whose
    brand has a **Sender Email** set up as an organization wide address is thanked from that
    address instead. For brand-specific wording, add a rule per brand (match on the appeal) with

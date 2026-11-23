@@ -57,6 +57,17 @@ public class ArchiveStoreMemory extends ArchiveStore {
 		return found;
 	}
 
+	public override Set<String> presentOfRule(String objectName, Datetime archivedAt, String ruleId) {
+		Set<String> found = new Set<String>();
+		for (Archived_Record__b row : rowsByKey.values()) {
+			Boolean ofRule = ruleId == null || ruleId.equals(row.Rule_Id__c);
+			if (row.Object_Name__c == objectName && row.Archived_At__c == archivedAt && ofRule) {
+				found.add(row.Original_Id__c);
+			}
+		}
+		return found;
+	}
+
 	public override List<Archived_Record__b> rows(String objectName, Datetime archivedAt, Set<String> originalIds) {
 		List<Archived_Record__b> result = new List<Archived_Record__b>();
 		for (String one : originalIds) {

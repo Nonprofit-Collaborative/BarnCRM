@@ -319,6 +319,9 @@ public with sharing class BackupSetService {
 	) {
 		try {
 			Import_Batch__c job = DataJobs.forFinish(jobId);
+			Map<String, Object> definition = definitionOf(jobId);
+			// A backup before an archive run (AR-15) stops at the run's count on purpose.
+			Boolean beforeArchive = definition.get(ArchiveBackupGate.RUN_KEY) instanceof Map<String, Object>;
 			List<String> lines = new List<String>{ job.Run_Log__c };
 			if (failed) {
 				lines.add(BarnHelp.text('Core', 'Core_BackupSets_LogFailed'));
@@ -329,11 +332,10 @@ public with sharing class BackupSetService {
 						new List<Object>{ rows.format(), parts.format(), firstTitle }
 					)
 				);
-				if (full) {
+				if (full && !beforeArchive) {
 					lines.add(BarnHelp.text('Core', 'Core_BackupSets_LogFull'));
 				}
 			}
-			Map<String, Object> definition = definitionOf(jobId);
 			if (!failed && documentIds != null) {
 				definition.put('documents', documentIds);
 			}
@@ -361,6 +363,9 @@ public with sharing class BackupSetService {
 			);
 			if (send) {
 				startSending(jobId, documentIds);
+			}
+			if (beforeArchive) {
+				ArchiveBackupGate.afterBackup(jobId, definition, failed, rows);
 			}
 			if (!failed) {
 				BackupSetSchedule.keepNewest((Id) definition.get('savedQueryId'));

@@ -175,7 +175,7 @@ A few BarnCRM features are in no role on purpose, because most people should not
 and a module's own permission sets cannot be in a Core role. You give them to a person on this
 page too, alongside their role, under **Extra Permissions**. You never need Setup for them.
 
-Core's six are always listed:
+Core's seven are always listed:
 
 | Extra permission | What it lets the person do |
 |---|---|
@@ -185,6 +185,7 @@ Core's six are always listed:
 | BarnCRM Erase People | Erase a person on their request (the right to be forgotten), which cannot be undone. Marked with a warning. |
 | BarnCRM Duplicate Review | Review suggested duplicate people and households, including reading the **Review** list on the Duplicate Matching tab (scanning, dismissing and merging there stay with BarnCRM Admin). Works only for people with a Sales Cloud or Service Cloud license. |
 | BarnCRM Metadata Admin | Save changes on the Custom metadata page of BarnCRM Settings and in matching logic, which change the org's configuration. BarnCRM Admin already includes this, so it is only for someone who is not a BarnCRM Admin. |
+| BarnCRM Archive Admin | See records archived to the big object ([Archive Rules](archive-rules.md#who-can-see-archived-records)), for someone who is not a BarnCRM Admin. Each archived record shows every field the person who archived it could read. With BarnCRM Bulk Delete too, run archive rules and restore records. Nothing else of BarnCRM Admin. |
 
 A module's sets are listed after them, only where that module is installed:
 
@@ -248,7 +249,7 @@ feature is on:
 
 | Tab | Given to holders of |
 |---|---|
-| Data Manager | BarnCRM Admin, Find and Export, Bulk Update, Bulk Delete |
+| Data Manager | BarnCRM Admin, Find and Export, Bulk Update, Bulk Delete, Archive Admin |
 | Import | BarnCRM Admin |
 | Find | BarnCRM Admin, Find and Export, Bulk Update, Bulk Delete |
 | Super Transformer | BarnCRM Admin, Bulk Update, Bulk Delete |

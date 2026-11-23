@@ -52,6 +52,54 @@ public with sharing class FindExportBatch implements Database.Batchable<SObject>
 	private Id backupJobId;
 	/** An archive's or a Backup Set run's parts, in order (R-SQ16), so they can be found again. */
 	private List<Id> documentIds = new List<Id>();
+	/**
+	 * A backup before an archive rule run (AR-15): the cascade-delete related records the archive
+	 * would take with each record, written as CSV parts of their own, by child object and field.
+	 */
+	private Map<String, ChildPart> childParts;
+	/** Related rows one chunk reads at most; past it the backup fails, so no archive starts. */
+	@TestVisible
+	private static Integer childRowsPerChunk = 10000;
+
+	/** One kind of related record being backed up, and its unwritten rows. */
+	private class ChildPart {
+		String objectName;
+		String fieldName;
+		List<String> paths;
+		String header;
+		List<String> buffer = new List<String>();
+		Integer chars = 0;
+		Integer parts = 0;
+	}
+
+	/**
+	 * The backup before an archive rule run (AR-15): a Backup Set run's file of the records, plus
+	 * the related records of each kind in `childKinds`, read with each chunk in user mode.
+	 */
+	public static FindExportBatch forArchiveBackup(
+		String queryJson,
+		List<String> fields,
+		String tag,
+		Integer rowLimit,
+		Id jobId,
+		List<ArchiveRecordJson.ChildKind> childKinds
+	) {
+		FindExportBatch backup = forBackup(queryJson, fields, tag, rowLimit, jobId);
+		backup.childParts = new Map<String, ChildPart>();
+		for (ArchiveRecordJson.ChildKind kind : childKinds) {
+			ChildPart part = new ChildPart();
+			part.objectName = kind.objectName;
+			part.fieldName = kind.fieldName;
+			part.paths = BulkDeleteService.backupFieldNames(NamespaceUtil.objectType(kind.objectName));
+			List<String> names = new List<String>();
+			for (String path : part.paths) {
+				names.add(cell(path, false));
+			}
+			part.header = String.join(names, ',');
+			backup.childParts.put(kind.objectName + '.' + kind.fieldName, part);
+		}
+		return backup;
+	}
 
 	/**
 	 * An archive's export (R-BD9): the query's records with these fields, at most `rowLimit`,
@@ -153,14 +201,76 @@ public with sharing class FindExportBatch implements Database.Batchable<SObject>
 					writePart();
 				}
 			}
+			if (childParts != null && !records.isEmpty()) {
+				backUpChildren(new Map<Id, SObject>(records).keySet());
+			}
 		} catch (Exception e) {
 			failed = true;
 			ErrorLogger.log(e, 'FindExportBatch.execute');
 		}
 	}
 
+	/** Adds the related records of these records to their parts, in user mode, as the archive reads them. */
+	private void backUpChildren(Set<Id> ids) {
+		Integer read = 0;
+		for (ChildPart part : childParts.values()) {
+			List<SObject> found = Database.queryWithBinds(
+				'SELECT ' +
+					String.join(part.paths, ', ') +
+					' FROM ' +
+					part.objectName +
+					' WHERE ' +
+					part.fieldName +
+					' IN :ids ORDER BY Id LIMIT :room',
+				new Map<String, Object>{ 'ids' => ids, 'room' => childRowsPerChunk - read + 1 },
+				AccessLevel.USER_MODE
+			);
+			read += found.size();
+			if (read > childRowsPerChunk) {
+				failed = true;
+				return;
+			}
+			for (SObject child : found) {
+				List<String> cells = new List<String>();
+				for (String path : part.paths) {
+					cells.add(valueCell(child, path));
+				}
+				String line = String.join(cells, ',');
+				part.buffer.add(line);
+				part.chars += line.length() + 2;
+				if (part.buffer.size() >= rowsPerPart || part.chars >= partChars) {
+					writeChildPart(part);
+				}
+			}
+		}
+	}
+
+	/** Writes a related kind's rows as its next part, titled by its object and field. */
+	private void writeChildPart(ChildPart part) {
+		part.parts++;
+		parts++;
+		String title = titleOf(part.objectName + '.' + part.fieldName, tag, part.parts);
+		ContentVersion version = new ContentVersion(
+			Title = title,
+			PathOnClient = title + '.csv',
+			VersionData = Blob.valueOf(BYTE_ORDER_MARK + part.header + CRLF + String.join(part.buffer, CRLF) + CRLF)
+		);
+		Database.insert(version, AccessLevel.USER_MODE);
+		documentIds.add(
+			[SELECT ContentDocumentId FROM ContentVersion WHERE Id = :version.Id WITH USER_MODE LIMIT 1]
+			.ContentDocumentId
+		);
+		part.buffer = new List<String>();
+		part.chars = 0;
+	}
+
 	public void finish(Database.BatchableContext context) {
 		try {
+			for (ChildPart part : childParts == null ? new List<ChildPart>() : childParts.values()) {
+				if (!part.buffer.isEmpty()) {
+					writeChildPart(part);
+				}
+			}
 			if (!buffer.isEmpty() || parts == 0) {
 				writePart();
 			}

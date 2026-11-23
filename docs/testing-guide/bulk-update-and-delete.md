@@ -349,7 +349,7 @@ Test contacts for the delete scripts: create three contacts with first names `De
 **Cleanup:** turn **Remove Files Copy After Sending** off; set `Baktest people` back to **Not scheduled** and **Files**; delete the endpoint's test files and the runs' files; then T-BULK-17's cleanup.
 ## T-BULK-21: Archive Rules to the Big Object
 
-**Purpose:** confirm an archive rule copies records into the Archived Record big object before deleting them, keeps records changed during the run, counts archived rows, and runs on its schedule (AR-10).
+**Purpose:** confirm an archive rule copies records into the Archived Record big object before deleting them, keeps records changed during the run, counts archived rows, runs on its schedule, and skips a scheduled rule whose owner lost access (AR-10, AR-11). A record given a related record between its copy and its delete is kept live (AR-12); the Apex tests cover that timing.
 **Prerequisites:** run in barn-platform (Platform-only). Admin with the **BarnCRM Admin** permission set; four contacts with Last Name `Arcbig` (First Name Big1 to Big4); a saved Find query `Arcbig people` (Contact, Last Name equals `Arcbig`). A second user with only **BarnCRM Find and Export**. Setup detail: [Archive Rules](../admin-guide/archive-rules.md).
 
 | Step | Action | Expected result |
@@ -365,8 +365,10 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | 9 | In the Developer Console, query `SELECT Object_Name__c, Original_Id__c, Record_Name__c FROM Archived_Record__b WHERE Object_Name__c = 'Contact'`. | Three rows, for Big1 to Big3. |
 | 10 | **Edit** the rule, set **How Often** to **Weekly** and **Day** to today, and press **Save**. | A box asks for the current count, 1; another number is refused with "Nothing was saved". With `1` the rule shows "Weekly on" today. |
 | 11 | In **BarnCRM Settings**, **General**, **Nightly Jobs**, find **Archive Rules**, then let the nightly run happen. | The step is listed and on. After the run, **Recent Runs** lists a run that moved Big4. |
-| 12 | Untick **Active**, type the count if asked, and **Save**. | The rule shows "(paused)" and the next nightly run starts nothing for it. |
-| 13 | **Remove** the rule. | It moves back to **Add a Rule**; the saved query and the archived rows remain. |
+| 12 | Change the owner of the saved query `Arcbig people` to the second user, then let the nightly run happen again. | **Recent Runs** (of the person who scheduled the nightly jobs) lists a **Failed** run of `Arcbig people` whose log says the scheduled run was skipped because its owner no longer holds the permissions, naming them. The Error Log has a Warning naming the rule. Nothing was archived. |
+| 13 | Change the owner back to the admin. | The next nightly run starts the rule again. |
+| 14 | Untick **Active**, type the count if asked, and **Save**. | The rule shows "(paused)" and the next nightly run starts nothing for it. |
+| 15 | **Remove** the rule. | It moves back to **Add a Rule**; the saved query and the archived rows remain. |
 
 **Cleanup:** none before T-BULK-22, which views, restores and erases these archived rows. Afterwards delete the Arcbig households and the saved query.
 
@@ -388,6 +390,42 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | 9 | Run `Arcbig people` in Find; then show Contact in **Archived Records** again. | Big1 and Big2 are back with new Ids (Big1 without Reports To). Only Big3 and Big4 remain archived. |
 | 10 | As the admin, remove your create access to Contact's **Title** field in a permission set you hold, restore Big3, and put the access back. | Big3 is restored without its Title; the log lists Title as left out. |
 | 11 | Create contacts `Arcerase Two` and `Arcerase Child` (Reports To `Arcerase Two`). Archive `Arcerase Child` with a saved query and a Big Object rule run once. On `Arcerase Two`, open **Erase a Person** and press **Preview**. | The preview lists **Archived records** as deleted. After the preview, **Archived Records** still lists the Arcerase Child row. |
-| 12 | Erase `Arcerase Two`, wait a minute, and show Contact in **Archived Records**. | The Arcerase Child row is gone, and the meter counts 1 fewer. |
+| 12 | Erase `Arcerase Two`, wait a minute, and show Contact in **Archived Records**. | The Arcerase Child row is gone, and the meter counts 1 fewer. **Archive Rules**, **Recent Runs** lists "Erasure: removing archived records that name an erased person", Complete, with "Removed 1 archived records that named the erased person." and no name. |
+| 13 | Start a restore of Big4, and in **Setup**, **Apex Jobs**, abort the queued `ArchiveRestoreJob` as soon as it shows, before the restore finishes. After the first nightly run at least 24 hours later, open **Recent Runs**. | The restore is **Failed** with a line saying the nightly run marked it failed and brought the archived record count up to date; the meter matches the rows **Archived Records** lists. (If the restore finished before the abort, repeat with another row.) |
 
 **Cleanup:** delete the Arcbig and Arcerase contacts and households, the saved queries, and restore or `Database.deleteImmediate` any archived rows left.
+
+## T-BULK-23: BarnCRM Archive Admin
+
+**Purpose:** confirm someone who is not a BarnCRM Admin sees archived records only with BarnCRM Archive Admin, and with BarnCRM Bulk Delete too may run archive rules and restore, while BarnCRM Admins keep full access (AR-14, D-223).
+**Prerequisites:** run in barn-platform. A contact `Arckeep One` archived to the big object by a Big Object rule run as the admin. A user `Arckeep Staff` with the **BarnCRM Staff** role and **BarnCRM Bulk Delete**, and no other extra permission. Setup detail: [Archive Rules](../admin-guide/archive-rules.md#who-can-see-archived-records).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Data Manager** as `Arckeep Staff`. | No **Archive Rules** and no **Archived Records** tile. |
+| 2 | As the admin, open **Archive Rules**. | Under the intro, a note says who can see archived records, that each shows every field the archiving person could read, and to add BarnCRM Archive Admin on the Access page. |
+| 3 | As the admin, open **Access**, choose `Arckeep Staff`, and add **BarnCRM Archive Admin** under **Extra Permissions**. | It is listed with its sentence; the person now holds it. |
+| 4 | As `Arckeep Staff`, reload **Data Manager**. | **Archive Rules** and **Archived Records** tiles show. **Backup Sets** and **Import** do not. |
+| 5 | Open **Archived Records**, choose **Contact**, press **Show**, and restore `Arckeep One`. | The row is listed; the restore starts and ends Complete under **Recent Runs**. |
+| 6 | As the admin, remove **BarnCRM Bulk Delete** from `Arckeep Staff` on **Access**; as them, reload **Data Manager**. | **Archived Records** shows with no tick boxes and no **Restore**; **Archive Rules** is gone. |
+| 7 | As the admin, open **Archived Records**. | Unchanged: the admin keeps full access without BarnCRM Archive Admin. |
+
+**Cleanup:** remove BarnCRM Archive Admin from `Arckeep Staff`; delete `Arckeep One` and its saved query.
+
+## T-BULK-24: A Backup Before Every Archive Run
+
+**Purpose:** confirm every archive rule run first backs up its records, with their related records, and starts only once that backup is saved; and that Skip Backup Before Archive is confirmed, records who turned it on and when, and keeps that history when turned off (AR-15, D-223).
+**Prerequisites:** run in barn-platform as an admin with BarnCRM Bulk Delete. Two contacts `Arcbak One` and `Arcbak Two`, each with one task, and a saved Find query `Arcbak` on Contact whose Last Name is `Arcbak`, made an archive rule with **Where Records Go** set to **Big Object**. Skip Backup Before Archive is off. Setup detail: [Archive Rules](../admin-guide/archive-rules.md#a-backup-before-every-run).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In **Archive Rules**, press **Preview and Run** on `Arcbak`, type `2` and press **Run Now**. | The message says the backup is saved first. Until it is saved, **Run Now** stays off for the rule. |
+| 2 | Open **Backup Sets** and look under **Recent Runs**. | A **Backup** run named `Arcbak` is Complete with 2 records; its log says the archive has started. Files holds a Contact file and a Task file for it. |
+| 3 | Back in **Archive Rules**, wait for the run to end. | The Archive run is Complete with 2 records moved; its log says they were backed up first. Both contacts are in **Archived Records**. |
+| 4 | In **BarnCRM Settings**, **Import**, tick **Skip Backup Before Archive**, then press **Cancel** in the dialog. | The dialog **Archive Without a Backup?** says it is riskier. After Cancel the box is unticked and nothing is saved. |
+| 5 | Tick it again, press **Turn On**, then save. | The box stays ticked; under it: "Turned on by" your name with today's date and time. **Recent Changes** lists the change with your name. |
+| 6 | Create `Arcbak Three`, then run `Arcbak` again. | No Backup run is added. The Archive run starts at once; its log says it started without a backup and who turned the setting on. |
+| 7 | Untick **Skip Backup Before Archive** and save. | No dialog. The "Turned on by" line is gone; **Recent Changes** keeps both changes. |
+| 8 | Edit the saved query `Arcbak` to use a field you then delete, and run the rule. | The backup fails; the rule's run is **Failed** with the reason, nothing is archived or deleted, and the Error Log has an entry from ArchiveBackupGate. |
+
+**Cleanup:** restore or delete the archived `Arcbak` contacts, delete their backup files from Files, and remove the rule, saved query and test field.

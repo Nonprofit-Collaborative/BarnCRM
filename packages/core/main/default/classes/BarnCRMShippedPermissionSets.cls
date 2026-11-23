@@ -16,6 +16,7 @@ public with sharing class BarnCRMShippedPermissionSets {
 		'BarnCRM_Admin',
 		'BarnCRM_App_Admin_Console',
 		'BarnCRM_App_Console',
+		'BarnCRM_Archive_Admin',
 		'BarnCRM_Bulk_Delete',
 		'BarnCRM_Bulk_Update',
 		'BarnCRM_Duplicate_Review',

@@ -18,6 +18,47 @@ private class ArchiveViewerTest {
 		archivist();
 	}
 
+	/**
+	 * BarnCRM Archive Admin (D-223, ADR-0240 amendment AR-14): someone who is not a BarnCRM Admin
+	 * sees archived records only with it, and with BarnCRM Bulk Delete may run rules and restore.
+	 */
+	@IsTest
+	static void archiveAdminOpensTheArchiveAndOthersAreRefused() {
+		ArchiveStoreMemory.install();
+		User staff = TestUsers.standardUserWith(
+			'Archive Staff',
+			new List<String>{ 'BarnCRM_Staff', 'BarnCRM_Bulk_Delete' }
+		);
+		User keeper = TestUsers.standardUserWith(
+			'Archive Keeper',
+			new List<String>{ 'BarnCRM_Staff', 'BarnCRM_Bulk_Delete', 'BarnCRM_Archive_Admin' }
+		);
+		User viewer = TestUsers.standardUserWith(
+			'Archive Viewer',
+			new List<String>{ 'BarnCRM_Staff', 'BarnCRM_Archive_Admin' }
+		);
+		System.runAs(staff) {
+			System.Assert.isFalse(ArchiveViewerService.allowed(), 'Bulk Delete alone does not open the archive');
+			System.Assert.isFalse(ArchiveRuleService.allowed(), 'Nor archive rules');
+			try {
+				ArchiveViewerService.open();
+				System.Assert.fail('Refused');
+			} catch (ArchiveRules.ArchiveRuleException refused) {
+				System.Assert.isTrue(refused.getMessage().contains('Archive Admin'), refused.getMessage());
+			}
+		}
+		System.runAs(keeper) {
+			System.Assert.isTrue(ArchiveViewerService.allowed(), 'Archive Admin opens the archive');
+			System.Assert.isTrue(ArchiveRuleService.allowed(), 'With Bulk Delete, archive rules too');
+			ArchiveViewerService.Viewer opened = ArchiveViewerService.open();
+			System.Assert.isTrue(opened.canRestore, 'And restore');
+		}
+		System.runAs(viewer) {
+			System.Assert.isTrue(ArchiveViewerService.allowed(), 'Archive Admin alone views');
+			System.Assert.isFalse(ArchiveViewerService.canRestore(), 'Restoring also needs Bulk Delete');
+		}
+	}
+
 	private static final String VOLUNTEERS = JSON.serialize(
 		new Map<String, Object>{
 			'version' => 1,
@@ -66,6 +107,7 @@ private class ArchiveViewerTest {
 		Contact staff;
 		System.runAs(TestUsers.admin()) {
 			DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
+			BigObjectArchiveJob.childObjectsForTest = new Set<String>{ 'Contact' };
 			staff = TestDataFactory.person(new Contact(LastName = 'Staff Person', Title = 'Staff'));
 			insert staff;
 			insert new List<Contact>{
@@ -223,6 +265,48 @@ private class ArchiveViewerTest {
 		System.runAs(archivist()) {
 			System.Assert.areEqual(2, ArchiveRuleService.runs().size(), 'The run and the restore both listed');
 		}
+	}
+
+	@IsTest
+	static void aRemoveThatDiesIsCountedByItsFinisherOrTheNightlySweep() {
+		ArchiveStoreMemory store = archiveVolunteers();
+		System.Assert.areEqual(2, BigObjectArchiveJob.archivedCount(), 'Two counted');
+		String stopped = BarnHelp.text('Core', 'Core_ArchiveViewer_LogRemoveStopped');
+		List<Id> jobIds = new List<Id>();
+		System.runAs(archivist()) {
+			List<String> rowIds = new List<String>();
+			for (ArchiveViewerService.Row row : ArchiveViewerService.rows('Contact', null, null, null).rows) {
+				rowIds.add(row.id);
+			}
+			// Two restores of one row each; each chain dies right after its Remove deleted the row.
+			for (String rowId : rowIds) {
+				jobIds.add(ArchiveController.restoreArchivedRows('Contact', new List<String>{ rowId }));
+				((Queueable) BigObjectArchiveJob.queuedForTest.remove(0)).execute(null);
+				((Queueable) BigObjectArchiveJob.queuedForTest.remove(0)).execute(null);
+				BigObjectArchiveJob.queuedForTest.clear();
+			}
+			System.Assert.areEqual(0, store.rowsByKey.size(), 'Both rows removed');
+			System.Assert.areEqual(2, BigObjectArchiveJob.archivedCount(), 'Not counted yet: no Write settled them');
+
+			// The first chain's finisher settles from the keys its Write saved; twice is once.
+			new BigObjectArchiveJob.Finisher(jobIds[0], stopped).stopped('Died');
+			new BigObjectArchiveJob.Finisher(jobIds[0], stopped).stopped('Again');
+			System.Assert.areEqual(1, BigObjectArchiveJob.archivedCount(), 'The finisher counted its row once');
+
+			// The second chain stopped with no finisher: the nightly sweep settles it once it is stale.
+			ArchiveCountSettle.sweep();
+			System.Assert.areEqual(1, BigObjectArchiveJob.archivedCount(), 'A recent job may still be running');
+			ArchiveCountSettle.staleHours = -1;
+			new ArchiveRulesStep().execute((SchedulableContext) null);
+			System.Assert.areEqual(0, BigObjectArchiveJob.archivedCount(), 'The sweep counted the second');
+		}
+		Import_Batch__c swept = reread(jobIds[1]);
+		System.Assert.areEqual(ImportBatchService.STATUS_FAILED, swept.Status__c, 'Marked failed');
+		System.Assert.isTrue(
+			swept.Run_Log__c.contains(BarnHelp.text('Core', 'Core_ArchiveRules_LogSwept')),
+			'Saying why: ' + swept.Run_Log__c
+		);
+		System.Assert.isFalse(swept.Operation_JSON__c.contains('"pending"'), 'Nothing left pending');
 	}
 
 	@IsTest

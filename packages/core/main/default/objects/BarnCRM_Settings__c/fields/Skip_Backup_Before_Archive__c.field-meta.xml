@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Skip_Backup_Before_Archive__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description>Whether an archive rule's run starts without first backing up its records to Files (D-223, ADR-0240 amendment AR-15). Shipped false: every run is backed up first and starts only once the backup is saved in full.</description>
+  <inlineHelpText>Start archive rule runs without the backup to Files that otherwise comes first. Riskier: a run that goes wrong has no backup to restore from.</inlineHelpText>
+  <label>Skip Backup Before Archive</label>
+  <type>Checkbox</type>
+</CustomField>

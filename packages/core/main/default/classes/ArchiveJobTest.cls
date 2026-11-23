@@ -1,12 +1,14 @@
 /**
  * The big object archive run (canonical model R-ARC3, R-ARC5): Copy then Settle, the originals
  * deleted only once their copies are read back, records changed since the start kept, the cap,
- * the job's counts and a failed link.
+ * the job's counts, a failed link, and the count settled from the rows read back (D-223).
  *
  * The big object is replaced by `ArchiveStoreMemory`, and each link is run in turn by the test,
  * since an Apex test can neither write a big object nor chain queueables.
  */
-@IsTest(testFor='ApexClass:BigObjectArchiveJob, ApexClass:ArchiveToBigObject, ApexClass:ArchiveRecordJson')
+@IsTest(
+	testFor='ApexClass:BigObjectArchiveJob, ApexClass:ArchiveToBigObject, ApexClass:ArchiveRecordJson, ApexClass:ArchiveCountSettle'
+)
 private class ArchiveJobTest {
 	@TestSetup
 	// runs-as: deploying user (creates the test users themselves)
@@ -38,8 +40,12 @@ private class ArchiveJobTest {
 		return TestUsers.withPermissionSets(new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Bulk_Delete' });
 	}
 
+	/** Only Contact children are read: the tests' links share one transaction's queries. */
+	private static final Set<String> CHILD_OBJECTS = new Set<String>{ 'Contact' };
+
 	private static void makePeople(Integer howMany) {
 		DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
+		BigObjectArchiveJob.childObjectsForTest = CHILD_OBJECTS;
 		List<Contact> people = new List<Contact>{
 			TestDataFactory.person(new Contact(LastName = 'Staff Person', Title = 'Staff'))
 		};
@@ -276,6 +282,34 @@ private class ArchiveJobTest {
 	}
 
 	@IsTest
+	static void aCopyThatDiesWithCopiesItCannotRemoveIsCountedAsItLeftThem() {
+		System.runAs(TestUsers.admin()) {
+			makePeople(2);
+		}
+		ArchiveStoreMemory store = ArchiveStoreMemory.install();
+		BigObjectArchiveJob.queuedForTest = new List<Object>();
+		Import_Batch__c job;
+		System.runAs(archivist()) {
+			job = ArchiveDestinations.forKey(ArchiveRules.BIG_OBJECT)
+				.start(new ArchiveRun(null, 'Old Volunteers', VOLUNTEERS, 'Contact', 2));
+			((Queueable) BigObjectArchiveJob.queuedForTest.remove(0)).execute(null);
+			System.Assert.areEqual(2, store.rowsByKey.size(), 'The Copy saved both');
+			System.Assert.areEqual(0, BigObjectArchiveJob.archivedCount(), 'Counted only once settled');
+			// The link dies and its finisher cannot take the copies back.
+			store.deletesRefused = 1;
+			BigObjectArchiveJob.lastFinisher.stopped('Died');
+			System.Assert.areEqual(
+				2,
+				BigObjectArchiveJob.archivedCount(),
+				'Counted as they are, from the rows read back'
+			);
+			ArchiveCountSettle.settle(job.Id);
+			System.Assert.areEqual(2, BigObjectArchiveJob.archivedCount(), 'Settling again changes nothing');
+		}
+		System.Assert.areEqual(ImportBatchService.STATUS_FAILED, reread(job.Id).Status__c, 'Failed');
+	}
+
+	@IsTest
 	static void aSettleThatCannotQueueTheNextLinkTakesItsCopiesBack() {
 		System.runAs(TestUsers.admin()) {
 			makePeople(2);
@@ -363,8 +397,63 @@ private class ArchiveJobTest {
 	}
 
 	@IsTest
+	static void aRecordGivenAChildAfterItsCopyIsKeptLiveWhole() {
+		DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
+		BigObjectArchiveJob.childObjectsForTest = CHILD_OBJECTS;
+		Account org;
+		System.runAs(TestUsers.admin()) {
+			org = TestDataFactory.organization(new Account(Name = 'Kids Org Late'));
+			insert org;
+			insert TestDataFactory.person(new Contact(LastName = 'First Kid', AccountId = org.Id));
+		}
+		String orgsQuery = VOLUNTEERS.replace('"Contact"', '"Account"')
+			.replace('"LastName"', '"Name"')
+			.replace('"Title"', '"Name"')
+			.replace('"Volunteer"', '"Kids Org Late"');
+		ArchiveStoreMemory store = ArchiveStoreMemory.install();
+		BigObjectArchiveJob.queuedForTest = new List<Object>();
+		Import_Batch__c job;
+		// An organization has many kinds of cascade-delete children, each a query per link.
+		Test.startTest();
+		System.runAs(archivist()) {
+			job = ArchiveDestinations.forKey(ArchiveRules.BIG_OBJECT)
+				.start(new ArchiveRun(null, 'Old Orgs', orgsQuery, 'Account', 1));
+			BigObjectArchiveJob link = (BigObjectArchiveJob) BigObjectArchiveJob.queuedForTest.remove(0);
+			link.execute(null);
+			System.Assert.areEqual(1, store.rowsByKey.size(), 'The Copy saved the organization with its child');
+			System.Assert.isFalse(link.copiedChildIds.isEmpty(), 'And knows the children it saved');
+			// As if the child were added after the Copy: the Settle finds a child its copy does not
+			// hold (a real insert could touch the organization, which the changed check catches first).
+			link.copiedChildIds.clear();
+			drain();
+		}
+		Test.stopTest();
+		System.Assert.areEqual(
+			1,
+			[SELECT COUNT() FROM Account WHERE Id = :org.Id WITH SYSTEM_MODE],
+			'The organization stays live'
+		);
+		System.Assert.areEqual(
+			1,
+			[SELECT COUNT() FROM Contact WHERE AccountId = :org.Id WITH SYSTEM_MODE],
+			'Its child too'
+		);
+		System.Assert.isTrue(store.rowsByKey.isEmpty(), 'Its copy was removed, so it is not both live and archived');
+		job = reread(job.Id);
+		System.Assert.areEqual(ImportBatchService.STATUS_COMPLETE, job.Status__c, 'Complete: ' + job.Run_Log__c);
+		System.Assert.areEqual(0, job.Rows_Deleted__c, 'Nothing deleted');
+		System.Assert.isTrue(
+			job.Run_Log__c.contains(
+				BarnHelp.text('Core', 'Core_ArchiveRules_NoteChildAdded', new List<Object>{ 'Kids Org Late' })
+			),
+			'The log says why and that the next run takes it whole: ' + job.Run_Log__c
+		);
+	}
+
+	@IsTest
 	static void aChunkWhoseChildrenAreTooManyIsHalvedAndALoneParentLeftOut() {
 		DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
+		BigObjectArchiveJob.childObjectsForTest = CHILD_OBJECTS;
 		Map<String, Integer> childrenByName = new Map<String, Integer>{
 			'Kids Org A' => 2,
 			'Kids Org B' => 2,

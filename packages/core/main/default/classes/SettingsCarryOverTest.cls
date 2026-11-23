@@ -16,6 +16,51 @@ private class SettingsCarryOverTest {
 		insert as system values;
 	}
 
+	/** Counts the records written in the transaction when the deployment starts. */
+	private class DmlCountingDeployer implements SettingStore.Deployer {
+		Integer dmlBeforeDeploy;
+
+		public Id deploy(Metadata.DeployContainer container, Metadata.DeployCallback callback) {
+			dmlBeforeDeploy = Limits.getDmlStatements();
+			return null;
+		}
+	}
+
+	@IsTest
+	static void theDeploymentStartsBeforeAnyRecordIsWritten() {
+		System.runAs(TestUsers.admin()) {
+			storeLegacy(
+				new BarnCRM_Settings__c(
+					Fuzzy_Match_Threshold__c = 80,
+					Error_Digest_Last_Run__c = Datetime.newInstanceGmt(2026, 10, 1, 2, 0, 0),
+					Automation_Paused_Until__c = Datetime.now().addHours(3)
+				)
+			);
+			insert as system new Whats_New_Seen__c(SetupOwnerId = UserInfo.getUserId(), Last_Seen_Version__c = '0.9');
+			DmlCountingDeployer counting = new DmlCountingDeployer();
+			SettingStore.deployer = counting;
+
+			Test.startTest();
+			SettingsCarryOver.Result result = SettingsCarryOver.run();
+			Assert.areEqual(
+				0,
+				counting.dmlBeforeDeploy,
+				'A record written before the deployment makes Salesforce refuse it (mixed DML).'
+			);
+			Test.stopTest();
+
+			Assert.areEqual(1, result.stateCount);
+			Assert.areEqual(1, result.seenCount);
+			SettingsState.clearCache();
+			Assert.isNotNull(SettingsState.moment('Error_Digest_Last_Run__c'), 'The queued job wrote the state row.');
+			Assert.areEqual('0.9', WhatsNewSeenWriter.lastSeen(), 'The queued job wrote the seen row.');
+			Assert.isNotNull(
+				BarnCRM_Automation_Control__c.getOrgDefaults().Paused_Until__c,
+				'The queued job moved the running pause.'
+			);
+		}
+	}
+
 	@IsTest
 	static void anOrgWithNothingStoredHasNothingToCarryOver() {
 		System.runAs(TestUsers.admin()) {

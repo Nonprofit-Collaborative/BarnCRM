@@ -55,6 +55,22 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 
 **Cleanup:** set **Days to keep Error Log entries** back to 180 and save.
 
+## T-SET-03A: A Blank Module Text Setting Says What Blank Means
+
+**Purpose:** confirm a module text setting with no default explains its empty box, and that a fresh install fills Features Turned On.
+**Prerequisites:** admin user; Fundraising and Volunteers installed with none of the seven settings below saved.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Fundraising** and find **Acknowledgments from address**. | The empty box shows, in grey with the **Default** badge and no keep button: "Blank means each thank you is sent from the email address of the person who sends it." |
+| 2 | Find **Receipt signer name**, **Receipt signer title**, **Receipt place of issue** and **Organization EIN** (the last two may be on **Receipts**). | Each shows its own "Blank means ..." sentence: no signer name; name with no title; no "Issued at" line and not stopped for a Canadian receipt; no tax identification number printed. |
+| 3 | Open **Volunteers** and find **Self-service profile form**. | "Blank means volunteers get no personal page: shift reminders carry no link to one, and the public page offers no profile form." |
+| 4 | Open **Projects** and find **Invoice payment return page**. | The box shows your My Domain address, not an empty box. |
+| 5 | Type a value in **Receipt signer name** and click away. | The grey sentence is replaced by what you typed. Click **Discard** and it returns. |
+| 6 | Install the package into a fresh org as a person who has no BarnCRM permission yet (the installing user), then open **BarnCRM Settings**, **General**, **Features**. | **Features Turned On** is not blank: it reads `None` until first-run setup. |
+
+**Cleanup:** none (step 5 was discarded).
+
 ## T-SET-04: Give and Remove a Role on the Access Page
 
 **Purpose:** confirm a role can be given and taken away from the app, with a confirmation each time.

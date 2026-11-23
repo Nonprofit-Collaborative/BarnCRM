@@ -37,6 +37,7 @@ export default class ArchiveRules extends LightningElement {
     return {
       title: helpText('Core', 'Core_ArchiveRules_Title'),
       intro: helpText('Core', 'Core_ArchiveRules_Intro'),
+      accessNote: helpText('Core', 'Core_ArchiveRules_AccessNote'),
       usage: helpText('Core', 'Core_ArchiveRules_Usage'),
       rulesHeading: helpText('Core', 'Core_ArchiveRules_RulesHeading'),
       none: helpText('Core', 'Core_ArchiveRules_None'),

@@ -24,26 +24,68 @@ Each rule sends its records to one **destination**:
   days.
 
 Only **Big Object** keeps the related records with each record. Choose it when you may need them
-back.
+back. A few kinds of related record cannot be read by their record, so no destination keeps them,
+though Salesforce still deletes them: today that is Actionable List Members (a contact's place on
+an actionable list). Each run's log names any such kind.
 
 A record is only deleted after its copy is saved and read back. A record changed after the run
-started is left alone and named in the run's log.
+started is left alone and named in the run's log. So is a Big Object record that gained a
+related record after it was copied: deleting it would delete that related record with no copy,
+so it stays live, its copy is removed, and the next run archives it with all its related records.
+
+### A Backup Before Every Run
+
+Every run, whether you press **Run Now** or the schedule starts it, first **backs up** the
+records it will archive to your Files, with the related records the archive takes with them (one
+file per kind of related record). The archive starts only once that backup is saved in full:
+
+- The backup is a data job with Operation **Backup**, listed under **Recent Runs** in
+  [Backup Sets](backup-sets.md) by the rule's name. Its files stay in your Files until you delete
+  them; **Backup Runs Kept** never removes them.
+- While the backup is being saved, the rule counts as running: **Run Now** stays off for it.
+- The run then moves at most the records the backup holds. A Big Object run keeps any record
+  changed since the backup started, so every record moved is as its backup holds it.
+- **If the backup is not saved in full** (the query cannot run, a file cannot be saved, or the
+  records have more than 10,000 related records in one step), the run does not start: nothing is
+  archived or deleted, **Recent Runs** in Archive Rules lists it as **Failed** with the reason,
+  and the Error Log says so. If the rule was changed, paused or removed while its backup was being
+  saved, the run is skipped the same way.
+
+[Archive by Query](archive-by-query.md) is not backed up again: it already saves every record to a
+file in Files before deleting anything.
+
+**Skip Backup Before Archive** (BarnCRM Settings, Import, in the Find, Bulk Update and Bulk Delete
+box; off by default) starts runs without the backup. It is riskier: if a run goes wrong, there is
+no backup to restore from. Turning it on asks you to confirm. BarnCRM records who turned it on and
+when: the setting shows "Turned on by" that person and the date and time while it is on, the
+**Recent Changes** list on BarnCRM Settings keeps every change to it, and each run started
+without a backup says so, and who turned the setting on, in its log.
 
 ## 2. How to Turn It On
 
-There is nothing to install. You need three permissions, all in **BarnCRM Admin**:
+There is nothing to install. You need:
 
-- **Manage BarnCRM Settings**;
-- **Find and Export Records**, to save the query;
-- **Bulk Delete Records**, because a rule deletes records.
+- **BarnCRM Admin**, or the **BarnCRM Archive Admin** permission set for someone who is not a
+  BarnCRM Admin;
+- **BarnCRM Bulk Delete** (Find and Export Records, to save the query, and Bulk Delete Records,
+  because a rule deletes records).
 
-The **Big Object** destination also needs the **BarnCRM Admin** permission set itself, which
-grants the Archived Record object. People without it cannot see archived records anywhere.
+The **Big Object** destination also needs the Archived Record object, which only **BarnCRM
+Admin** and **BarnCRM Archive Admin** grant. People with neither cannot see archived records
+anywhere. See [Who Can See Archived Records](#who-can-see-archived-records).
 
 Scheduled rules run in the nightly run's **Archive Rules** step (BarnCRM Settings, General,
 Nightly Jobs), at 3:00 in the time zone of the person who scheduled the nightly jobs, and as that
 person. The step ships on and does nothing while no rule has a schedule. Turn the step off there
 to pause every rule at once.
+
+Each night, before a scheduled rule runs, BarnCRM checks the rule's owner (the owner of its saved
+query). If the owner is inactive, or no longer holds the three permissions above (and, for
+**Big Object**, BarnCRM Admin), the rule is **skipped**, not run: nothing is archived. The skip
+is listed under **Recent Runs** of the person who scheduled the nightly jobs as a **Failed** run
+whose log says why, and as a Warning on the Error Log naming the rule. To start it again, change
+the saved query's owner to an active person who holds those permissions (or give the owner the
+permissions back); the rule runs on its next due day.
 
 ## 3. A Five-Minute Walkthrough (as Maria)
 
@@ -78,7 +120,8 @@ Maria wants closed lost opportunities older than five years out of the way every
 - **Related records.** The records Salesforce deletes with a record (the kinds the preview lists)
   are saved inside it, one level deep. Their own related records are deleted by Salesforce and go
   to the Recycle Bin. Records that only look up to an archived record keep their record but lose
-  that lookup.
+  that lookup. Just before deleting, each run checks for related records added since the copy
+  was made; a record that has one is kept for that run (see section 1).
 - **A missed night is not caught up.** A weekly rule whose night was missed runs on its next day.
 
 ## 5. Managing Rules
@@ -96,6 +139,13 @@ Maria wants closed lost opportunities older than five years out of the way every
   stay archived, the rest stay where they were, and running the rule again continues. In the rare
   case an archived copy of a record that was kept cannot be removed, the log counts it: that
   record is then both live and archived, so do not restore that copy.
+- **The Archived records count stays true when a run stops.** Salesforce cannot count big object
+  rows, so BarnCRM keeps a running count. Before each step that writes or removes archived rows,
+  the run notes those rows on its data job; the next step, or the clean-up that runs when a step
+  stops unexpectedly, reads them back and counts only what is really there. If a run stops with
+  no clean-up at all (for example, someone aborts it in Setup), the nightly run's **Archive
+  Rules** step finds it a day later, brings the count up to date and marks the run **Failed**
+  with a line saying so. The same applies to restores and to erasures.
 
 ## 6. Archived Records: Looking Records Up
 
@@ -112,14 +162,23 @@ Records a Big Object rule moved are listed in **Data Manager**, **Archived Recor
 The panel always asks for a kind of record first, then dates: that is the only order Salesforce
 can read the archive in. Archived records are not in reports, list views or the weekly export.
 
-**Who can see them.** Only people with the **BarnCRM Admin** permission set, which grants the
-Archived Record object. Each archived record holds **every field the person who archived it
-could read**, and anyone who can open the panel sees all of those fields, whatever their own
-field access is. The panel says so. Give BarnCRM Admin only to people who may see every field.
+### Who Can See Archived Records
+
+Only **BarnCRM Admins**, and people given the **BarnCRM Archive Admin** permission set. Each
+archived record holds **every field the person who archived it could read**, and anyone who can
+open the panel sees all of those fields, whatever their own field access is. The Archive Rules
+and Archived Records panels say so. Give these only to people who may see every field.
+
+To give someone who is not a BarnCRM Admin access, open the [Access](access.md) page, choose the
+person, and add **BarnCRM Archive Admin** under **Extra Permissions**. With it alone they can look
+archived records up. Add **BarnCRM Bulk Delete** as well for them to run archive rules and
+restore records. BarnCRM Archive Admin grants nothing else of BarnCRM Admin: no settings, no
+Error Log, no other tools.
 
 ## 7. Moving Records Back (Restore)
 
-Restore needs the same permissions as running a rule (section 2).
+Restore needs the same permissions as running a rule (section 2): BarnCRM Admin or BarnCRM
+Archive Admin, with BarnCRM Bulk Delete.
 
 1. In **Archived Records**, show a page of records and tick the ones to move back (up to 50, all
    of one kind, on one page).
@@ -152,8 +211,11 @@ When you [erase a person](erase-a-person.md), archived records that are that per
 name them in a lookup (for example a gift whose donor was the person), are deleted from the
 archive in the background once the erasure is saved. The erasure summary lists **Archived
 records** as deleted, counted rather than listed. A preview deletes nothing. The archived record
-count goes down when the background work ends. If that background work stops unexpectedly, an
-Error in the Error Log says so, naming no record: some archived records may still name the person.
+count goes down as the background work goes. When it finds archived records to delete, the work is
+listed under **Recent Runs** of the person who erased, as "Erasure: removing archived records that
+name an erased person", with how many it removed; it names no person. If that background work
+stops unexpectedly, an Error in the Error Log says so, naming no record, and the run is
+**Failed**: some archived records may still name the person.
 
 ## Field Reference
 
@@ -161,13 +223,15 @@ Error in the Error Log says so, naming no record: some archived records may stil
 |---|---|---|
 | Saved query | Query (the `archive` key) | Where records go, how often, the day, and Active. |
 | Data Job | Operation | Archive, for a big object run. |
-| Data Job | Bulk Update Definition | The rule's saved query, name, object, and when the run started. |
+| Data Job | Bulk Update Definition | The rule's saved query, name, object, and when the run started; while it runs, the archived rows its next step writes or removes, until they are counted. |
 | Data Job | Row Count | The most records the run may move. |
 | Data Job | Rows Deleted | Records moved into the archive; for a restore, rows removed from the archive. |
 | Data Job | Rows Created | For a restore, records created again. |
 | Data Job | Rows Rejected | Records left out (or, for a restore, left archived); the Run Log names them. |
 | Data Job | Run Log | For a restore, each old Id with its new Id and the fields left out. |
+| Data Job | Operation | Backup, for the backup before a run; its definition holds the run under `beforeArchive`. |
 | BarnCRM Settings | Archived Record Count | How many rows the archive holds, kept by BarnCRM. |
+| BarnCRM Settings, Import | Skip Backup Before Archive | Start runs without the backup first. Off by default; turning it on is confirmed and recorded. |
 | Archived Record | Object, Archived At, Original Id | The row's key. |
 | Archived Record | Name, Owner Id, Rule Name | What the viewer lists. |
 | Archived Record | Record | The record and its related records as JSON. |

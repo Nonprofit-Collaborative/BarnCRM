@@ -1354,6 +1354,7 @@ Section 29E, R-BD2). Shown in the console's Import section.
 | `Bulk_Chunk_Size__c` | integer | 200 | Records each chunk of a bulk update or bulk delete handles (R-BU2, R-BD2). From 10 to 200; empty reads as 200, out of range as the nearest end. Stamped on the job when it starts. |
 | `Backup_Runs_Kept__c` | integer | 7 | Backup Runs Kept: how many runs of each scheduled Backup Set keep their files (R-SQ16, BK-10). From 1 to 365; empty reads as 7, out of range as the nearest end. A set run only on demand keeps every file. |
 | `Backup_Remove_Sent_Files__c` | boolean | false | Remove Files Copy After Sending: once every part of a Backup Set run reached the off-platform backup destination, the run's files are deleted from Files (R-SQ17). Off keeps them. |
+| `Skip_Backup_Before_Archive__c` | boolean | false | Skip Backup Before Archive: archive rule runs start without the backup to Files that otherwise comes first (R-SQ18, AR-15, D-223). Turning it on is confirmed in the console; who turned it on and when is its newest Setting Change, shown under it while on and written to each run's log. |
 
 ### v0.8 keys
 
@@ -1605,6 +1606,7 @@ settings to the console by shipping rows rather than by editing the console.
 | `Navigation_Label__c` | text (80) | The name of the page `Navigation_Target__c` opens, as its tab shows it (for example Rollup Builder). The console names the button for it, "Open Rollup Builder"; blank falls back to "Open this page". |
 | `Description__c` | long text | The plain-language help shown under the control. |
 | `Help_Path__c` | text (255) | The admin guide path, relative to `docs/admin-guide/`, behind the row's Learn more link. |
+| `Blank_Means__c` | text (255) | Text rows only: one plain sentence, "Blank means ...", saying what BarnCRM does while the box is empty. The console shows it in the empty box (never as a value to keep). A module row whose blank has no sensible default states it here; Core's own blank rows fall back to "Not set" (ST-02). |
 | `Required_Permission__c` | text (80) | Optional. The API name of a custom permission, without a namespace prefix; when set, the console shows the row only to someone who has it (the name as given, else with the package namespace). For a module page whose controller only a module permission set opens (X-01, ADR-0058). |
 | `Sort_Order__c` | number | The order of this row inside its section. |
 | `Min_Value__c` | number(18, 2) | Number rows only: the lowest value the console accepts. The console marks a lower value before Save, and `SettingsService` refuses it on the server whoever saves it, naming the setting and the range (owner decision 2026-10-13, ADMIN-27). Every shipped Number row sets it. |
@@ -9208,8 +9210,8 @@ one more optional key, `archive`: `{ "version": 1, "destination": "Files" | "Big
 "OffPlatform", "frequency": "off" | "daily" | "weekly" | "monthly", "weekday": 1-7 (Monday is 1),
 "monthDay": 1-28, "active": true | false }`. It marks a saved query as an archive rule; Find and
 the compiler ignore it. Only the query's owner adds, changes or removes it, and only a person
-holding Manage BarnCRM Settings, Find and Export Records and Bulk Delete Records may see the
-Archive Rules panel, run a rule or restore.
+holding Manage BarnCRM Settings or Manage Archive (R-ARC7), with Find and Export Records and Bulk
+Delete Records, may see the Archive Rules panel, run a rule or restore.
 
 - **Destinations.** `Files` is R-BD9 unchanged. `BigObject` copies each record to
   `Archived_Record__b` (Section 29D1) and then deletes it. `OffPlatform` is Core's
@@ -9227,6 +9229,9 @@ Archive Rules panel, run a rule or restore.
   shipped on) starts its own job for each due rule, as the user who scheduled the nightly run;
   each moves at most the run limit, a rule matching nothing starts no job, and a refused rule is
   logged to the Error Log. A night missed is not caught up: the rule runs on its next due day.
+  A due rule whose query owner is inactive, or no longer holds those three permissions (and, for
+  `BigObject`, create on `Archived_Record__b`), is skipped (D-223): a Failed Archive job with
+  `"skipped": true` whose Run Log says why, and an Error Log Warning naming the rule.
 - **The job.** Every run of a `BigObject` rule, and every restore, is an `Import_Batch__c` with
   Operation Archive (Section 16), its definition `{ "version": 1, "action": "archive" |
   "restore", "savedQueryId", "name", "object", "notChangedAfter", "archivedAt", "rowIds" }`
@@ -9236,6 +9241,22 @@ Archive Rules panel, run a rule or restore.
   `Files` rule's run is R-BD9's Delete job. A link that dies unexpectedly marks its job Failed
   with a line for its kind: an archive says to run the rule again, a restore to restore the rest
   again.
+- **Backup first** (AR-15, D-223). Every run of a rule, manual or scheduled, whatever its
+  destination, starts as a Backup data job (R-SQ15's export, Files only) of the records it will
+  archive, at most its count in Id order, and, in files of their own, their cascade-delete
+  related records (R-ARC2's kinds, read with each chunk of 100 in user mode; more than 10,000 in
+  a chunk fails the backup). The job's definition carries the run under `beforeArchive` (`{
+  "savedQueryId", "ruleName", "queryJson", "objectName", "confirmedCount", "scheduled",
+  "destination", "startedAt" }`) and no top-level `savedQueryId`, so Backup Set retention never
+  removes its files. While it is Committing the rule counts as running. Its finish starts the
+  run through the destination only when the backup is Complete with at least one record and the
+  rule's document is unchanged; the run then moves at most the records backed up, and a Big
+  Object run keeps records changed since the backup started. Otherwise the run is skipped: the
+  backup's log, a Failed Archive job (`"skipped": true`) and an Error Log entry give the reason.
+  With `Skip_Backup_Before_Archive__c` on, the run starts at once and its log says who turned
+  the setting on and when. A run started inside the nightly step's batch starts its backup from
+  a queueable. Archive by Query (R-BD9) is not gated: its own file is saved in full before any
+  delete.
 
 ### Salesforce implementation
 
@@ -9267,8 +9288,8 @@ Archive Rules panel, run a rule or restore.
   panel of the Data Manager tab (component `backupSets`).
 - **Archive rules (R-SQ18):** seam `ArchiveDestination` with `ArchiveDestinations`,
   `ArchiveToFiles`, `ArchiveToBigObject` and `OffPlatformArchiveDestination`; services `ArchiveRules` (the `archive` key and its
-  schedule), `ArchiveRuleService`, `ArchiveController`, `ArchiveRulesStep` (the nightly step);
-  UI the Archive Rules panel of the Data Manager tab (component `archiveRules`).
+  schedule), `ArchiveRuleService`, `ArchiveController`, `ArchiveRulesStep` (the nightly step),
+  `ArchiveBackupGate` (the backup first, AR-15); UI the Archive Rules panel of the Data Manager tab (component `archiveRules`).
 
 ---
 
@@ -9310,7 +9331,9 @@ the last Settle could not finish (retried once; any that stay are counted in the
 list is cleared, so the chain always ends), reads up to one chunk of matching records in user
 mode, Id order, and `insertImmediate`s them; Settle reads
 the rows back by full key, reads the originals again, deletes in user mode those whose copy exists
-and that are unchanged since the run started, adds the rows to `Archived_Record_Count__c`, writes
+and that are unchanged since the run started and have no cascade-delete child missing from their
+copy (one added after the Copy, D-223: kept live, its copy removed as a changed record's, the next
+run archives it whole), adds the rows to `Archived_Record_Count__c`, writes
 the job, and queues the next Copy with the copies whose original stayed. The run ends when no
 record matches, at the run's count, or at the cap (R-ARC5). Before reading children, Copy counts
 each cascade-delete kind's rows for the chunk and halves the chunk until they fit 2,000 rows; a
@@ -9330,6 +9353,13 @@ its page again after starting one.
 
 **R-ARC5 Cap.** One million rows are included per org. The panels warn from 900,000; a Copy whose
 chunk would pass 1,000,000 stops the run and says so. Nothing offers more capacity.
+`Archived_Record_Count__c` is settled from rows read back (D-223): before each immediate call,
+the link before it saves the rows about to be written (+1: object, archive time and rule, or Ids)
+or removed (-1: Ids) as `pending` in the job's definition; the next DML link, the finalizer of a
+link that died, or the nightly Archive Rules step's sweep (Failed jobs with entries left, and
+Committing jobs not written for 24 hours, which it marks Failed) reads them back under a lock on
+the job, changes the count by what it finds and clears the list. An erasure keeps its own
+Archive job (`"action": "erase"`) for this. No field added.
 
 **R-ARC6 Erasure.** Erasing a person (Section 29H) queues a scan, which runs only once the Erasure
 record exists: it reads every archived object by index and `deleteImmediate`s each row whose
@@ -9339,8 +9369,12 @@ is registered in `PersonErasureExtensions` and queues the scan only while the ar
 A scan link that dies unexpectedly is logged by its finalizer as an Error naming no record.
 
 **R-ARC7 Access.** `BarnCRM_Admin` grants read and create on the object and read on its optional
-fields; the viewer reads in user mode, so no one else sees an archived row. Copies and deletes run
-in system mode after the person's own permissions and record access have been checked.
+fields, and so does `BarnCRM_Archive_Admin` (D-223, AR-14), the extra permission for someone who
+is not a BarnCRM Admin, with custom permission `Manage_Archive` and nothing else of BarnCRM
+Admin. The viewer needs the object grant and Manage BarnCRM Settings or Manage Archive, and
+reads in user mode, so no one else sees an archived row. Running rules and restoring also need
+Find and Export Records and Bulk Delete Records (R-SQ18). Copies and deletes run in system mode
+after the person's own permissions and record access have been checked.
 
 ### Salesforce implementation
 
