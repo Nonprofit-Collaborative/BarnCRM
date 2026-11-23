@@ -34,4 +34,8 @@
     <field>Help_Path__c</field>
     <value xsi:type="xsd:string">receipts.md</value>
   </values>
+  <values>
+    <field>Blank_Means__c</field>
+    <value xsi:type="xsd:string">Blank means the receipt has no "Issued at" line. BarnCRM does not stop a receipt without it, so fill it in if you issue Canadian receipts.</value>
+  </values>
 </CustomMetadata>

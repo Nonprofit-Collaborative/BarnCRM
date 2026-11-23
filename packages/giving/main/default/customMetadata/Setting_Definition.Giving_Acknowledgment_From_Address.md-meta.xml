@@ -34,4 +34,8 @@
         <field>Help_Path__c</field>
         <value xsi:type="xsd:string">acknowledgments.md</value>
     </values>
+    <values>
+        <field>Blank_Means__c</field>
+        <value xsi:type="xsd:string">Blank means each thank you is sent from the email address of the person who sends it.</value>
+    </values>
 </CustomMetadata>

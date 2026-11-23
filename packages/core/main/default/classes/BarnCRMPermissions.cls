@@ -19,6 +19,40 @@ public with sharing class BarnCRMPermissions {
 	}
 
 	/**
+	 * True only while Core's package install handler (`CorePostInstall.onInstall`) is running.
+	 * Salesforce runs that handler as a special install user who cannot hold Manage BarnCRM
+	 * Settings, yet the handler must store the first Features Turned On value (ST-01). Private,
+	 * so only this class changes it; the two methods below are the only way, carry no
+	 * `@NamespaceAccessible` (ADR-0017, so no other package reaches them), and only the install
+	 * handler calls them.
+	 */
+	private static Boolean installRunning = false;
+
+	/** Called first by `CorePostInstall.onInstall`: saves are allowed until `leaveInstall`. */
+	public static void enterInstall() {
+		installRunning = true;
+	}
+
+	/** Called last by `CorePostInstall.onInstall`, in a finally block. */
+	public static void leaveInstall() {
+		installRunning = false;
+	}
+
+	/** Read by tests: whether the install context is on. */
+	@TestVisible
+	private static Boolean isInstallRunning() {
+		return installRunning;
+	}
+
+	/**
+	 * True when settings may be saved now: the running user may manage settings, or the package
+	 * install handler is running (ST-01). Every other caller needs the permission.
+	 */
+	public static Boolean canSaveSettings() {
+		return installRunning || canManageSettings();
+	}
+
+	/**
 	 * True when the running user may run Finish Setup and the install entry points
 	 * (`BarnInstallCheck`): they may manage settings, or no active user holds that permission
 	 * yet and they have Customize Application. The second case is the bootstrap: setup is what

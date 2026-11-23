@@ -106,7 +106,14 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 		if (context == null) {
 			return;
 		}
-		run(context.previousVersion() == null, context.installerId());
+		// The platform runs this as an install user who cannot hold Manage BarnCRM Settings; the
+		// settings saves below are allowed only while this runs (ST-01).
+		BarnCRMPermissions.enterInstall();
+		try {
+			run(context.previousVersion() == null, context.installerId());
+		} finally {
+			BarnCRMPermissions.leaveInstall();
+		}
 	}
 
 	/**

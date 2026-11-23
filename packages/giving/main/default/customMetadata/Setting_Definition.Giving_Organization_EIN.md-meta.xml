@@ -34,4 +34,8 @@
     <field>Sort_Order__c</field>
     <value xsi:type="xsd:double">20</value>
   </values>
+  <values>
+    <field>Blank_Means__c</field>
+    <value xsi:type="xsd:string">Blank means receipts print no tax identification number (a brand that has its own number still prints it). A donor needs it to claim the deduction, so fill it in before you send receipts.</value>
+  </values>
 </CustomMetadata>

@@ -34,4 +34,8 @@
     <field>Sort_Order__c</field>
     <value xsi:type="xsd:double">60</value>
   </values>
+  <values>
+    <field>Blank_Means__c</field>
+    <value xsi:type="xsd:string">Blank means the receipt prints no signer name, and a receipt template that uses the signer name shows an empty space there.</value>
+  </values>
 </CustomMetadata>

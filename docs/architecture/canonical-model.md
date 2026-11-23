@@ -1605,6 +1605,7 @@ settings to the console by shipping rows rather than by editing the console.
 | `Navigation_Label__c` | text (80) | The name of the page `Navigation_Target__c` opens, as its tab shows it (for example Rollup Builder). The console names the button for it, "Open Rollup Builder"; blank falls back to "Open this page". |
 | `Description__c` | long text | The plain-language help shown under the control. |
 | `Help_Path__c` | text (255) | The admin guide path, relative to `docs/admin-guide/`, behind the row's Learn more link. |
+| `Blank_Means__c` | text (255) | Text rows only: one plain sentence, "Blank means ...", saying what BarnCRM does while the box is empty. The console shows it in the empty box (never as a value to keep). A module row whose blank has no sensible default states it here; Core's own blank rows fall back to "Not set" (ST-02). |
 | `Required_Permission__c` | text (80) | Optional. The API name of a custom permission, without a namespace prefix; when set, the console shows the row only to someone who has it (the name as given, else with the package namespace). For a module page whose controller only a module permission set opens (X-01, ADR-0058). |
 | `Sort_Order__c` | number | The order of this row inside its section. |
 | `Min_Value__c` | number(18, 2) | Number rows only: the lowest value the console accepts. The console marks a lower value before Save, and `SettingsService` refuses it on the server whoever saves it, naming the setting and the range (owner decision 2026-10-13, ADMIN-27). Every shipped Number row sets it. |

@@ -1546,6 +1546,25 @@ private class SettingsControllerTest {
 		}
 	}
 
+	/** ST-02: a row that declares what its blank does shows that sentence in the empty box. */
+	@IsTest
+	static void aRowThatDeclaresWhatBlankMeansShowsIt() {
+		System.runAs(TestUsers.admin()) {
+			Setting_Definition__mdt recipients = effectiveDefaultRow(
+				'Test_Recipients_Declared',
+				'Error_Digest_Recipients__c',
+				'Text'
+			);
+			recipients.Blank_Means__c = 'Blank means the test sentence.';
+			SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{ recipients };
+			SettingsController.SettingModel row = rowsByKey(SettingsController.getConsoleModel())
+				.get('Error_Digest_Recipients__c');
+
+			Assert.areEqual('Blank means the test sentence.', row.defaultText, 'The row own sentence is shown');
+			Assert.isTrue(row.unsavedDefault, 'Marked Default, with nothing to keep');
+		}
+	}
+
 	private static Setting_Definition__mdt effectiveDefaultRow(String developerName, String key, String dataType) {
 		return new Setting_Definition__mdt(
 			DeveloperName = developerName,
