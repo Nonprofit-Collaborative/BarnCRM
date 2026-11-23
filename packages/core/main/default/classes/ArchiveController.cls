@@ -45,7 +45,7 @@ public with sharing class ArchiveController {
 		}
 	}
 
-	/** Whether the person may open Archived Records: the grant on the big object (BarnCRM Admin). */
+	/** Whether the person may open Archived Records: BarnCRM Admin or BarnCRM Archive Admin. */
 	@AuraEnabled(cacheable=true)
 	public static Boolean canViewArchive() {
 		return ArchiveViewerService.allowed();

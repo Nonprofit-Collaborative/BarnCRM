@@ -18,6 +18,47 @@ private class ArchiveViewerTest {
 		archivist();
 	}
 
+	/**
+	 * BarnCRM Archive Admin (D-223, ADR-0240 amendment AR-14): someone who is not a BarnCRM Admin
+	 * sees archived records only with it, and with BarnCRM Bulk Delete may run rules and restore.
+	 */
+	@IsTest
+	static void archiveAdminOpensTheArchiveAndOthersAreRefused() {
+		ArchiveStoreMemory.install();
+		User staff = TestUsers.standardUserWith(
+			'Archive Staff',
+			new List<String>{ 'BarnCRM_Staff', 'BarnCRM_Bulk_Delete' }
+		);
+		User keeper = TestUsers.standardUserWith(
+			'Archive Keeper',
+			new List<String>{ 'BarnCRM_Staff', 'BarnCRM_Bulk_Delete', 'BarnCRM_Archive_Admin' }
+		);
+		User viewer = TestUsers.standardUserWith(
+			'Archive Viewer',
+			new List<String>{ 'BarnCRM_Staff', 'BarnCRM_Archive_Admin' }
+		);
+		System.runAs(staff) {
+			System.Assert.isFalse(ArchiveViewerService.allowed(), 'Bulk Delete alone does not open the archive');
+			System.Assert.isFalse(ArchiveRuleService.allowed(), 'Nor archive rules');
+			try {
+				ArchiveViewerService.open();
+				System.Assert.fail('Refused');
+			} catch (ArchiveRules.ArchiveRuleException refused) {
+				System.Assert.isTrue(refused.getMessage().contains('Archive Admin'), refused.getMessage());
+			}
+		}
+		System.runAs(keeper) {
+			System.Assert.isTrue(ArchiveViewerService.allowed(), 'Archive Admin opens the archive');
+			System.Assert.isTrue(ArchiveRuleService.allowed(), 'With Bulk Delete, archive rules too');
+			ArchiveViewerService.Viewer opened = ArchiveViewerService.open();
+			System.Assert.isTrue(opened.canRestore, 'And restore');
+		}
+		System.runAs(viewer) {
+			System.Assert.isTrue(ArchiveViewerService.allowed(), 'Archive Admin alone views');
+			System.Assert.isFalse(ArchiveViewerService.canRestore(), 'Restoring also needs Bulk Delete');
+		}
+	}
+
 	private static final String VOLUNTEERS = JSON.serialize(
 		new Map<String, Object>{
 			'version' => 1,

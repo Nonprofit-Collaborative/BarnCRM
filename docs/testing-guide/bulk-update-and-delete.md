@@ -391,3 +391,20 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | 12 | Erase `Arcerase Two`, wait a minute, and show Contact in **Archived Records**. | The Arcerase Child row is gone, and the meter counts 1 fewer. |
 
 **Cleanup:** delete the Arcbig and Arcerase contacts and households, the saved queries, and restore or `Database.deleteImmediate` any archived rows left.
+
+## T-BULK-23: BarnCRM Archive Admin
+
+**Purpose:** confirm someone who is not a BarnCRM Admin sees archived records only with BarnCRM Archive Admin, and with BarnCRM Bulk Delete too may run archive rules and restore, while BarnCRM Admins keep full access (AR-14, D-223).
+**Prerequisites:** run in barn-platform. A contact `Arckeep One` archived to the big object by a Big Object rule run as the admin. A user `Arckeep Staff` with the **BarnCRM Staff** role and **BarnCRM Bulk Delete**, and no other extra permission. Setup detail: [Archive Rules](../admin-guide/archive-rules.md#who-can-see-archived-records).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Data Manager** as `Arckeep Staff`. | No **Archive Rules** and no **Archived Records** tile. |
+| 2 | As the admin, open **Archive Rules**. | Under the intro, a note says who can see archived records, that each shows every field the archiving person could read, and to add BarnCRM Archive Admin on the Access page. |
+| 3 | As the admin, open **Access**, choose `Arckeep Staff`, and add **BarnCRM Archive Admin** under **Extra Permissions**. | It is listed with its sentence; the person now holds it. |
+| 4 | As `Arckeep Staff`, reload **Data Manager**. | **Archive Rules** and **Archived Records** tiles show. **Backup Sets** and **Import** do not. |
+| 5 | Open **Archived Records**, choose **Contact**, press **Show**, and restore `Arckeep One`. | The row is listed; the restore starts and ends Complete under **Recent Runs**. |
+| 6 | As the admin, remove **BarnCRM Bulk Delete** from `Arckeep Staff` on **Access**; as them, reload **Data Manager**. | **Archived Records** shows with no tick boxes and no **Restore**; **Archive Rules** is gone. |
+| 7 | As the admin, open **Archived Records**. | Unchanged: the admin keeps full access without BarnCRM Archive Admin. |
+
+**Cleanup:** remove BarnCRM Archive Admin from `Arckeep Staff`; delete `Arckeep One` and its saved query.

@@ -83,6 +83,8 @@ describe('c-archive-rules', () => {
     expect(one(element, 'usage').value).toBe(95);
     expect(one(element, 'runs').textContent).toContain('Old closed lost');
     expect(one(element, 'choose').options).toEqual([{ label: 'Old volunteers', value: 'q2' }]);
+    // Who can see archived records, and how to give someone access (D-223).
+    expect(one(element, 'access-note').textContent).toContain('c.Core_ArchiveRules_AccessNote');
     await expectAccessible(element);
   });
 

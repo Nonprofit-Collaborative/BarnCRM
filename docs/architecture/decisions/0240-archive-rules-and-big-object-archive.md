@@ -150,3 +150,30 @@ Items 8 to 10 are built as decided, with these details settled:
    index order and `deleteImmediate` matches; the final link (DML only) subtracts the count and
    writes any failure to the Error Log, since an Error Log insert may not share a scan link's
    transaction.
+
+## Amendment: BarnCRM Archive Admin (AR-14, D-223, 2026-11-23)
+
+Brandon, D-223: "Explain this Archive Admin permission when enabling archive and then keep BarnCRM
+Admins full permissions to archive records. Non-admins should not have access to archived records
+unless they have an Archive Admin permission set." Amends items 6 and 9 and amendment item 2.
+
+1. **The set.** Core ships permission set `BarnCRM_Archive_Admin` (label BarnCRM Archive Admin,
+   following Core's own optional sets such as BarnCRM Metadata Admin; no label clash) with custom
+   permission `Manage_Archive`, read and create on `Archived_Record__b`, read on its optional
+   fields, and access to `ArchiveController` and `DataManagerController`. It is in no role and is
+   an extra permission on the Access page (`AccessService.ADD_ON_PERMISSION_SETS`); its holders
+   get the Data Manager tab (`TabAccessService`).
+2. **What it grants.** Alone: Archived Records (view). With BarnCRM Bulk Delete (Find and Export
+   Records and Bulk Delete Records): archive rules, Run Now, schedules and restore, exactly as a
+   BarnCRM Admin, who also needs BarnCRM Bulk Delete for those. Nothing else of BarnCRM Admin: no
+   Manage BarnCRM Settings, no Error Log, no other tool. Archive by Query (R-BD9) is unchanged: it
+   is part of BarnCRM Bulk Delete and never reads the big object.
+3. **Checks.** `ArchiveRuleService.archiveAdmin()` is Manage BarnCRM Settings or Manage Archive.
+   `ArchiveRuleService.allowed()` (rules and restore) is that plus Find and Export Records and Bulk
+   Delete Records. `ArchiveViewerService.allowed()` is the object grant and `archiveAdmin()`, so a
+   grant on the big object from an org's own permission set opens nothing without one of the two.
+   BarnCRM Admin's access is unchanged.
+4. **Explained where archive is set up.** The Archive Rules panel says, under its intro, who can
+   see archived records, that a row shows every field the archiving person could read, and how to
+   give someone access (Access page, BarnCRM Archive Admin, plus BarnCRM Bulk Delete to run rules
+   and restore). The Access page's sentence and the refusal messages name the set.

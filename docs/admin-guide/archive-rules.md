@@ -31,14 +31,16 @@ started is left alone and named in the run's log.
 
 ## 2. How to Turn It On
 
-There is nothing to install. You need three permissions, all in **BarnCRM Admin**:
+There is nothing to install. You need:
 
-- **Manage BarnCRM Settings**;
-- **Find and Export Records**, to save the query;
-- **Bulk Delete Records**, because a rule deletes records.
+- **BarnCRM Admin**, or the **BarnCRM Archive Admin** permission set for someone who is not a
+  BarnCRM Admin;
+- **BarnCRM Bulk Delete** (Find and Export Records, to save the query, and Bulk Delete Records,
+  because a rule deletes records).
 
-The **Big Object** destination also needs the **BarnCRM Admin** permission set itself, which
-grants the Archived Record object. People without it cannot see archived records anywhere.
+The **Big Object** destination also needs the Archived Record object, which only **BarnCRM
+Admin** and **BarnCRM Archive Admin** grant. People with neither cannot see archived records
+anywhere. See [Who Can See Archived Records](#who-can-see-archived-records).
 
 Scheduled rules run in the nightly run's **Archive Rules** step (BarnCRM Settings, General,
 Nightly Jobs), at 3:00 in the time zone of the person who scheduled the nightly jobs, and as that
@@ -112,14 +114,23 @@ Records a Big Object rule moved are listed in **Data Manager**, **Archived Recor
 The panel always asks for a kind of record first, then dates: that is the only order Salesforce
 can read the archive in. Archived records are not in reports, list views or the weekly export.
 
-**Who can see them.** Only people with the **BarnCRM Admin** permission set, which grants the
-Archived Record object. Each archived record holds **every field the person who archived it
-could read**, and anyone who can open the panel sees all of those fields, whatever their own
-field access is. The panel says so. Give BarnCRM Admin only to people who may see every field.
+### Who Can See Archived Records
+
+Only **BarnCRM Admins**, and people given the **BarnCRM Archive Admin** permission set. Each
+archived record holds **every field the person who archived it could read**, and anyone who can
+open the panel sees all of those fields, whatever their own field access is. The Archive Rules
+and Archived Records panels say so. Give these only to people who may see every field.
+
+To give someone who is not a BarnCRM Admin access, open the [Access](access.md) page, choose the
+person, and add **BarnCRM Archive Admin** under **Extra Permissions**. With it alone they can look
+archived records up. Add **BarnCRM Bulk Delete** as well for them to run archive rules and
+restore records. BarnCRM Archive Admin grants nothing else of BarnCRM Admin: no settings, no
+Error Log, no other tools.
 
 ## 7. Moving Records Back (Restore)
 
-Restore needs the same permissions as running a rule (section 2).
+Restore needs the same permissions as running a rule (section 2): BarnCRM Admin or BarnCRM
+Archive Admin, with BarnCRM Bulk Delete.
 
 1. In **Archived Records**, show a page of records and tick the ones to move back (up to 50, all
    of one kind, on one page).

@@ -3,8 +3,9 @@
  * queries whose document carries the `archive` key, set up, previewed and run from the Archive
  * Rules panel, and run on their schedule by the nightly run's Archive Rules step.
  *
- * Saved queries are read and written as the person. Only people holding Manage BarnCRM Settings,
- * Find and Export Records and Bulk Delete Records may use it. A manual run is the bulk delete
+ * Saved queries are read and written as the person. Only people holding Manage BarnCRM Settings
+ * or Manage Archive (BarnCRM Archive Admin), with Find and Export Records and Bulk Delete Records,
+ * may use it. A manual run is the bulk delete
  * preview and typed count (R-BD2, R-BD4); a schedule is turned on with the same typed count once.
  */
 public with sharing class ArchiveRuleService {
@@ -77,9 +78,21 @@ public with sharing class ArchiveRuleService {
 		public Integer runLimit;
 	}
 
-	/** Whether the running user may use archive rules. */
+	/** The custom permission BarnCRM Archive Admin grants (D-223, ADR-0240 amendment AR-14). */
+	public static final String ARCHIVE_PERMISSION = 'Manage_Archive';
+
+	/**
+	 * Whether the running user is an archive administrator: a BarnCRM Admin (Manage BarnCRM
+	 * Settings) or a holder of BarnCRM Archive Admin (Manage Archive).
+	 */
+	public static Boolean archiveAdmin() {
+		return FeatureManagement.checkPermission(DataJobs.EVERYONE_PERMISSION) ||
+			FeatureManagement.checkPermission(ARCHIVE_PERMISSION);
+	}
+
+	/** Whether the running user may use archive rules: an archive administrator who may bulk delete. */
 	public static Boolean allowed() {
-		return FeatureManagement.checkPermission(DataJobs.EVERYONE_PERMISSION) &&
+		return archiveAdmin() &&
 			FeatureManagement.checkPermission('Find_And_Export_Records') &&
 			FeatureManagement.checkPermission(BulkDeleteController.PERMISSION);
 	}

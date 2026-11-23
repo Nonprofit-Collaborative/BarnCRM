@@ -44,7 +44,8 @@ public with sharing class AccessService {
 		'BarnCRM_Bulk_Delete',
 		'BarnCRM_Erase_People',
 		'BarnCRM_Duplicate_Review',
-		'BarnCRM_Metadata_Admin'
+		'BarnCRM_Metadata_Admin',
+		'BarnCRM_Archive_Admin'
 	};
 
 	/** One plain sentence per add-on, and a warning flag on the two that remove data. */
@@ -54,7 +55,8 @@ public with sharing class AccessService {
 		'BarnCRM_Bulk_Delete' => new AddOnText(BarnHelp.text('Core', 'Core_Access_AddOnBulkDelete'), true),
 		'BarnCRM_Erase_People' => new AddOnText(BarnHelp.text('Core', 'Core_Access_AddOnErasePeople'), true),
 		'BarnCRM_Duplicate_Review' => new AddOnText(BarnHelp.text('Core', 'Core_Access_AddOnDuplicateReview'), false),
-		'BarnCRM_Metadata_Admin' => new AddOnText(BarnHelp.text('Core', 'Core_Access_AddOnMetadataAdmin'), false)
+		'BarnCRM_Metadata_Admin' => new AddOnText(BarnHelp.text('Core', 'Core_Access_AddOnMetadataAdmin'), false),
+		'BarnCRM_Archive_Admin' => new AddOnText(BarnHelp.text('Core', 'Core_Access_AddOnArchiveAdmin'), false)
 	};
 
 	/**

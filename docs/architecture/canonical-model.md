@@ -9208,8 +9208,8 @@ one more optional key, `archive`: `{ "version": 1, "destination": "Files" | "Big
 "OffPlatform", "frequency": "off" | "daily" | "weekly" | "monthly", "weekday": 1-7 (Monday is 1),
 "monthDay": 1-28, "active": true | false }`. It marks a saved query as an archive rule; Find and
 the compiler ignore it. Only the query's owner adds, changes or removes it, and only a person
-holding Manage BarnCRM Settings, Find and Export Records and Bulk Delete Records may see the
-Archive Rules panel, run a rule or restore.
+holding Manage BarnCRM Settings or Manage Archive (R-ARC7), with Find and Export Records and Bulk
+Delete Records, may see the Archive Rules panel, run a rule or restore.
 
 - **Destinations.** `Files` is R-BD9 unchanged. `BigObject` copies each record to
   `Archived_Record__b` (Section 29D1) and then deletes it. `OffPlatform` is Core's
@@ -9339,8 +9339,12 @@ is registered in `PersonErasureExtensions` and queues the scan only while the ar
 A scan link that dies unexpectedly is logged by its finalizer as an Error naming no record.
 
 **R-ARC7 Access.** `BarnCRM_Admin` grants read and create on the object and read on its optional
-fields; the viewer reads in user mode, so no one else sees an archived row. Copies and deletes run
-in system mode after the person's own permissions and record access have been checked.
+fields, and so does `BarnCRM_Archive_Admin` (D-223, AR-14), the extra permission for someone who
+is not a BarnCRM Admin, with custom permission `Manage_Archive` and nothing else of BarnCRM
+Admin. The viewer needs the object grant and Manage BarnCRM Settings or Manage Archive, and
+reads in user mode, so no one else sees an archived row. Running rules and restoring also need
+Find and Export Records and Bulk Delete Records (R-SQ18). Copies and deletes run in system mode
+after the person's own permissions and record access have been checked.
 
 ### Salesforce implementation
 
