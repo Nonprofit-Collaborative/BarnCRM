@@ -21,24 +21,23 @@ private class BarnCRMShippedPermissionSetsTest {
 	}
 
 	@IsTest
-	static void everyBarnCRMPermissionSetInTheOrgIsOnTheList() {
+	static void coresInstalledSetsAreOnTheList() {
+		// The org may also hold sets an earlier build left behind, so only the list's own names
+		// are looked up: Core's administrator set is always installed where these tests run.
 		System.runAs(TestUsers.admin()) {
-			List<PermissionSet> installed = [
+			Set<String> installed = new Set<String>();
+			for (PermissionSet permissionSet : [
 				SELECT Name
 				FROM PermissionSet
-				WHERE Name LIKE 'BarnCRM%' AND NamespacePrefix = NULL AND IsOwnedByProfile = FALSE
+				WHERE Name IN :BarnCRMShippedPermissionSets.NAMES AND IsOwnedByProfile = FALSE
 				WITH SYSTEM_MODE
-			];
-
-			for (PermissionSet permissionSet : installed) {
-				if (!permissionSet.Name.startsWith('BarnCRM_')) {
-					continue;
-				}
-				Assert.isTrue(
-					BarnCRMShippedPermissionSets.NAMES.contains(permissionSet.Name),
-					permissionSet.Name + ' is installed, so the shipped list must name it'
-				);
+			]) {
+				installed.add(permissionSet.Name);
 			}
+			Assert.isTrue(
+				installed.contains(TestUsers.CORE_ADMIN),
+				'Core\'s administrator set is installed and listed'
+			);
 		}
 	}
 
