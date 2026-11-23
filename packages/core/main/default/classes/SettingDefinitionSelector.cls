@@ -42,6 +42,7 @@ public with sharing class SettingDefinitionSelector {
 				Navigation_Label__c,
 				Description__c,
 				Help_Path__c,
+				Blank_Means__c,
 				Required_Permission__c,
 				Sort_Order__c,
 				Min_Value__c,

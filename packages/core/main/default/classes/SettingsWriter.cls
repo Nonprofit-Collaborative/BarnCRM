@@ -43,7 +43,7 @@ public with sharing class SettingsWriter {
 		if (changed == null || changed.isEmpty()) {
 			return;
 		}
-		if (!BarnCRMPermissions.canManageSettings()) {
+		if (!BarnCRMPermissions.canSaveSettings()) {
 			throw new PermissionException(BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError'));
 		}
 		OrgSettingsSystemWriter.saveOver(type, stored, changed);

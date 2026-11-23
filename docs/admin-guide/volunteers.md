@@ -250,7 +250,7 @@ the default below.
 | Waitlist when full | Off | A full shift waitlists new sign-ups and moves them up when a place frees. See Waitlists and Shift Minimums below. | Now |
 | Guardian consent required | Off | A young volunteer's sign-up is flagged and gets a guardian consent step. See Young Volunteers below. | Now |
 | Minor age | 18 | The age below which a volunteer needs guardian consent, from 1 to 21. | Now |
-| Self-service profile form | Empty | The public form volunteers use on their personal page. See Public Sign-Up Page below. | At the next 7:00 AM reminder run |
+| Self-service profile form | Empty | The public form volunteers use on their personal page. See Public Sign-Up Page below. While it is empty, volunteers get no personal page: reminders carry no link to one and the public page offers no profile form. | At the next 7:00 AM reminder run |
 
 ## Value of Volunteer Time
 

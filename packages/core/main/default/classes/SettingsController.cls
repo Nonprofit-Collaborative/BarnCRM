@@ -865,18 +865,26 @@ public with sharing class SettingsController {
 		Boolean organizationPage = SettingSections.ORGANIZATION.equalsIgnoreCase(
 			definition.Section__c == null ? '' : definition.Section__c.trim()
 		);
+		// A module row says what its own blank does in `Blank_Means__c` (ST-02).
+		Boolean declared = String.isNotBlank(definition.Blank_Means__c);
 		if (
 			!TYPE_TEXT.equalsIgnoreCase(definition.Data_Type__c) ||
 			String.isNotBlank(setting.value) ||
-			!(organizationPage || SettingsService.CORE_SETTINGS_OBJECT.equalsIgnoreCase(settingsObject))
+			!(declared ||
+			organizationPage ||
+			SettingsService.CORE_SETTINGS_OBJECT.equalsIgnoreCase(settingsObject))
 		) {
 			return;
 		}
 		String key = definition.Setting_Key__c;
 		setting.unsavedDefault = true;
-		setting.defaultText = DIGEST_RECIPIENTS.equalsIgnoreCase(key)
-			? System.Label.Core_Settings_DigestRecipientsDefault
-			: System.Label.Core_Settings_NotSet;
+		if (declared) {
+			setting.defaultText = definition.Blank_Means__c;
+		} else {
+			setting.defaultText = DIGEST_RECIPIENTS.equalsIgnoreCase(key)
+				? System.Label.Core_Settings_DigestRecipientsDefault
+				: System.Label.Core_Settings_NotSet;
+		}
 		if (LEGAL_NAME.equalsIgnoreCase(key)) {
 			setting.suggestedValue = CompanyInformation.name();
 		}

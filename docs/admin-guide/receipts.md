@@ -45,7 +45,15 @@ In the Receipts section:
   from this counter, when it creates the receipt.
 - **Statement year.** The tax year the year-end run covers. It starts at 0, which means last
   year, so a January run needs no change; type a year only to run a different one.
-- **Place of issue.** The city and region you issue from. Optional in the United States.
+- **Place of issue.** The city and region you issue from. Optional in the United States. Left
+  blank, the receipt has no "Issued at" line; BarnCRM does not stop a receipt without it, so
+  fill it in if you issue Canadian receipts.
+
+Three more details print at the bottom of a receipt and each says what a blank means in its
+box: **Receipt signer name** (blank: no signer name; a template that uses it shows an empty
+space), **Receipt signer title** (blank: the name prints with no title) and **Organization EIN**
+(blank: no tax identification number prints; fill it in, since a donor needs it to claim the
+deduction).
 
 One piece of first-time setup needs Salesforce Setup: the **Receipts** panel, which is where
 you issue, void and reissue, lives on a gift's record page, and BarnCRM ships a page

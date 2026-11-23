@@ -481,6 +481,14 @@ A text setting that is blank says what the blank means, in grey in its empty box
   Fundraising the tax identification number and receipt details) read **Not set**: a blank detail
   is left off letters and receipts, and Fundraising will not produce a receipt without a legal
   name.
+- A module's text setting with no sensible default says what BarnCRM does while it is blank, in
+  a sentence starting "Blank means": Fundraising's **Acknowledgments from address**,
+  **Receipt signer name**, **Receipt signer title**, **Receipt place of issue** and
+  **Organization EIN**, and Volunteers' **Self-service profile form**. Two of them matter: with
+  the EIN blank receipts print no tax identification number, and with the place of issue blank
+  a receipt has no "Issued at" line, which a Canadian receipt needs (BarnCRM does not stop it).
+  Projects' **Invoice payment return page** never shows an empty box: it shows your My Domain
+  address, which is what is used while it is blank.
 
 When Salesforce Setup's Company Information has a value BarnCRM can use, the blank setting
 offers it: under **Organization legal name**, "Company Information in Salesforce Setup has
@@ -610,5 +618,5 @@ changes.
 | A setting's value | The settings record of the module that owns it, one field per setting. Core's is BarnCRM Settings; a module such as Fundraising brings its own. |
 | A row in Recent Changes | Setting Change: setting name, old value, new value, changed by, changed at |
 | The list of settings the console shows | Setting Definition, a package-shipped list that upgrades bring you |
-| Which features are on | BarnCRM Settings, Features Turned On (a comma-separated list; `None` on a new install until first-run setup; `NoneChosen` when first-run setup was finished with every feature unticked) |
+| Which features are on | BarnCRM Settings, Features Turned On (a comma-separated list; `None` on a new install until first-run setup, which the install itself saves even though the person installing holds no BarnCRM permission yet; `NoneChosen` when first-run setup was finished with every feature unticked) |
 | Which modules are off | BarnCRM Settings, Modules Turned Off |
