@@ -337,7 +337,7 @@ export default class DataManager extends NavigationMixin(LightningElement) {
             'archive',
             helpText('Core', 'Core_ArchiveRules_Title'),
             helpText('Core', 'Core_DataManager_ArchiveText'),
-            'standard:archive'
+            'standard:shipment'
           )
         );
       }

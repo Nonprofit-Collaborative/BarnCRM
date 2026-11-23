@@ -9,6 +9,7 @@ Partners holds only the closing tabs its modules fill.
 """
 
 import glob
+import json
 import os
 import re
 import unittest
@@ -119,6 +120,27 @@ class CardIcons(unittest.TestCase):
             self.assertRegex(
                 source, rf"['\"]({icon}|{tab})['\"]", f"{component} does not use {icon}"
             )
+
+
+class IconNamesExist(unittest.TestCase):
+    """Every SLDS icon a component names exists, or Salesforce draws a blank square."""
+
+    def test_every_named_icon_is_in_the_slds_icon_list(self):
+        listing = os.path.join(ROOT, "node_modules", "@salesforce-ux", "sds-metadata", "current", "icons.json")
+        if not os.path.exists(listing):
+            self.skipTest("npm ci has not installed @salesforce-ux/sds-metadata")
+        with open(listing, encoding="utf-8") as handle:
+            known = {f"{group['name']}:{icon['symbol']}" for group in json.load(handle) for icon in group["icons"]}
+        pattern = re.compile(r"['\"]((?:standard|utility|action|doctype|custom):[a-z0-9_]+)['\"]")
+        missing = []
+        for path in sorted(glob.glob(os.path.join(ROOT, "packages", "*", "main", "default", "*", "**", "*.*"), recursive=True)):
+            if "__tests__" in path or not path.endswith((".js", ".html", ".cmp", ".json")):
+                continue
+            with open(path, encoding="utf-8") as handle:
+                for name in pattern.findall(handle.read()):
+                    if name not in known:
+                        missing.append(f"{os.path.relpath(path, ROOT)}: {name}")
+        self.assertEqual(missing, [], "icons Salesforce does not ship")
 
 
 class IconRegistry(unittest.TestCase):
