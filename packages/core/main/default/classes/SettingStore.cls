@@ -219,6 +219,12 @@ public without sharing class SettingStore {
 	private static Map<String, String> saved() {
 		if (savedByName == null) {
 			savedByName = new Map<String, String>();
+			// Custom metadata is visible to tests, so an org that saved settings (or carried them
+			// over) would change what every test reads. A test starts from an org that saved
+			// none and puts values with setForTest; no Setting Value ships in a package.
+			if (Test.isRunningTest()) {
+				return savedByName;
+			}
 			for (Setting_Value__mdt row : Setting_Value__mdt.getAll().values()) {
 				savedByName.put(row.DeveloperName, row.Value__c);
 			}
