@@ -93,6 +93,10 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 
 ## Gotchas
 
+- Custom metadata records are visible to Apex tests. An org that saved or carried over Setting Values changed what every test read, so `SettingStore` ignores the org's Setting Values in a test (values come from `setForTest`).
+- `ActionableListMember` is a cascade-delete child of Contact on Standard Edition orgs but can be queried only by `ActionableListId`; archive and backup leave it out (`ArchiveRecordJson.NOT_READ_BY_PARENT`).
+- A Core-only deploy with RunSpecifiedTests needs 75% per class from Core's own tests; a Core class covered only by module tests fails it.
+
 - A static resource read without its timestamp (`/resource/<Name>`) is served with `cache-control: public,max-age=3888000` (45 days), and Salesforce served the previous file a day after a deploy. `c/barnHelpText` adds an hourly `?v=` to module catalog URLs; anything else fetching a resource by bare name needs the same.
 - A CustomTab that names a `<flexiPage>` shows the platform page header (tab icon and name); a `<lwcComponent>` tab shows none. Page components on a FlexiPage tab pass `title-hidden` to `c-barn-page-shell` (ADR-0020 A3).
 - Source deploys never delete: removed objects, flexipages, tabs, classes and custom metadata must be destroyed in existing orgs. Scratch orgs need destructive changes plus purge-on-delete (Erase of deleted objects); old org-only flexipages (Rollup_Settings, Volunteer_Settings, BarnCRM_Settings) broke the Core UI until destroyed. Delete a keys object only after the new Apex replaces every old reference.
