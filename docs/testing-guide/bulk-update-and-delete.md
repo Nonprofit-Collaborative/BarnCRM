@@ -349,7 +349,7 @@ Test contacts for the delete scripts: create three contacts with first names `De
 **Cleanup:** turn **Remove Files Copy After Sending** off; set `Baktest people` back to **Not scheduled** and **Files**; delete the endpoint's test files and the runs' files; then T-BULK-17's cleanup.
 ## T-BULK-21: Archive Rules to the Big Object
 
-**Purpose:** confirm an archive rule copies records into the Archived Record big object before deleting them, keeps records changed during the run, counts archived rows, and runs on its schedule (AR-10).
+**Purpose:** confirm an archive rule copies records into the Archived Record big object before deleting them, keeps records changed during the run, counts archived rows, runs on its schedule, and skips a scheduled rule whose owner lost access (AR-10, AR-11). A record given a related record between its copy and its delete is kept live (AR-12); the Apex tests cover that timing.
 **Prerequisites:** run in barn-platform (Platform-only). Admin with the **BarnCRM Admin** permission set; four contacts with Last Name `Arcbig` (First Name Big1 to Big4); a saved Find query `Arcbig people` (Contact, Last Name equals `Arcbig`). A second user with only **BarnCRM Find and Export**. Setup detail: [Archive Rules](../admin-guide/archive-rules.md).
 
 | Step | Action | Expected result |
@@ -365,8 +365,10 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | 9 | In the Developer Console, query `SELECT Object_Name__c, Original_Id__c, Record_Name__c FROM Archived_Record__b WHERE Object_Name__c = 'Contact'`. | Three rows, for Big1 to Big3. |
 | 10 | **Edit** the rule, set **How Often** to **Weekly** and **Day** to today, and press **Save**. | A box asks for the current count, 1; another number is refused with "Nothing was saved". With `1` the rule shows "Weekly on" today. |
 | 11 | In **BarnCRM Settings**, **General**, **Nightly Jobs**, find **Archive Rules**, then let the nightly run happen. | The step is listed and on. After the run, **Recent Runs** lists a run that moved Big4. |
-| 12 | Untick **Active**, type the count if asked, and **Save**. | The rule shows "(paused)" and the next nightly run starts nothing for it. |
-| 13 | **Remove** the rule. | It moves back to **Add a Rule**; the saved query and the archived rows remain. |
+| 12 | Change the owner of the saved query `Arcbig people` to the second user, then let the nightly run happen again. | **Recent Runs** (of the person who scheduled the nightly jobs) lists a **Failed** run of `Arcbig people` whose log says the scheduled run was skipped because its owner no longer holds the permissions, naming them. The Error Log has a Warning naming the rule. Nothing was archived. |
+| 13 | Change the owner back to the admin. | The next nightly run starts the rule again. |
+| 14 | Untick **Active**, type the count if asked, and **Save**. | The rule shows "(paused)" and the next nightly run starts nothing for it. |
+| 15 | **Remove** the rule. | It moves back to **Add a Rule**; the saved query and the archived rows remain. |
 
 **Cleanup:** none before T-BULK-22, which views, restores and erases these archived rows. Afterwards delete the Arcbig households and the saved query.
 

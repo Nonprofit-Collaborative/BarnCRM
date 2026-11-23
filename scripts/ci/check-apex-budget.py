@@ -147,7 +147,9 @@ CAPS = {
     # readers and writers go in SET-03, which is where the suite gets this back.
     # Raised 2026-11-22 for the batch T review fixes (archive run lock, restore lock, child-row
     # bound, typed settings readers): 1,975,719 measured, plus about 0.1%.
-    "core": 1_977_700,
+    # Raised 2026-11-23 for AR-11 and AR-12 (D-223: the scheduled rule owner check, the
+    # children-added check before an archive delete): 1,980,190 measured, plus about 0.1%.
+    "core": 1_982_200,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured

@@ -11,6 +11,12 @@ public with sharing class ArchiveRuleService {
 	private static final Integer RUNS_SHOWN = 20;
 	private static final Integer QUERIES_READ = 500;
 	private static final String CONTEXT = 'ArchiveRuleService';
+	/** The custom permissions a person needs to set up and run archive rules. */
+	private static final List<String> RUN_PERMISSIONS = new List<String>{
+		DataJobs.EVERYONE_PERMISSION,
+		'Find_And_Export_Records',
+		BulkDeleteController.PERMISSION
+	};
 
 	/** A saved query as the panel lists it. */
 	public class RuleView {
@@ -79,9 +85,12 @@ public with sharing class ArchiveRuleService {
 
 	/** Whether the running user may use archive rules. */
 	public static Boolean allowed() {
-		return FeatureManagement.checkPermission(DataJobs.EVERYONE_PERMISSION) &&
-			FeatureManagement.checkPermission('Find_And_Export_Records') &&
-			FeatureManagement.checkPermission(BulkDeleteController.PERMISSION);
+		for (String permission : RUN_PERMISSIONS) {
+			if (!FeatureManagement.checkPermission(permission)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public static Panel page() {
@@ -242,11 +251,13 @@ public with sharing class ArchiveRuleService {
 
 	/**
 	 * Starts one due rule's run for the nightly step, within the run limit. A rule matching nothing
-	 * starts nothing; a rule that cannot start is logged. Returns whether a run started.
+	 * starts nothing; a rule that cannot start is logged. A rule whose owner is inactive or no
+	 * longer holds the permissions is skipped, with a Failed run saying why (D-223). Returns
+	 * whether a run started.
 	 */
 	public static Boolean runDueRule(Id queryId) {
 		List<Saved_Query__c> found = [
-			SELECT Id, Name, Query_JSON__c
+			SELECT Id, Name, OwnerId, Object_Name__c, Query_JSON__c
 			FROM Saved_Query__c
 			WHERE Id = :queryId
 			WITH SYSTEM_MODE
@@ -256,6 +267,11 @@ public with sharing class ArchiveRuleService {
 			return false;
 		}
 		Saved_Query__c query = found[0];
+		String ownerProblem = ownerProblem(query.OwnerId, ArchiveRules.of(query.Query_JSON__c).destination);
+		if (ownerProblem != null) {
+			skip(query, ownerProblem);
+			return false;
+		}
 		try {
 			BulkDeleteService.Plan checked = BulkDeleteService.plan(query.Query_JSON__c);
 			Integer ceiling = BulkDeleteService.runLimit();
@@ -269,6 +285,117 @@ public with sharing class ArchiveRuleService {
 			ErrorLogger.log(refused, CONTEXT, query.Id);
 			return false;
 		}
+	}
+
+	/**
+	 * Why the owner of a scheduled rule may no longer have it run, or null (D-223): inactive, or
+	 * without a permission `allowed` checks when a rule is saved or run by hand, or, for the big
+	 * object, without create access to it. Read in system mode: the nightly run is not the owner.
+	 * A profile's own permission set is assigned like any other, so one query covers both.
+	 */
+	@TestVisible
+	private static String ownerProblem(Id ownerId, String destination) {
+		List<User> owner = [SELECT Name, IsActive FROM User WHERE Id = :ownerId WITH SYSTEM_MODE LIMIT 1];
+		if (owner.isEmpty() || !owner[0].IsActive) {
+			return BarnHelp.text(
+				'Core',
+				'Core_ArchiveRules_SkipInactive',
+				new List<Object>{ owner.isEmpty() ? String.valueOf(ownerId) : owner[0].Name }
+			);
+		}
+		Set<Id> sets = new Set<Id>();
+		for (PermissionSetAssignment one : [
+			SELECT PermissionSetId
+			FROM PermissionSetAssignment
+			WHERE AssigneeId = :ownerId
+			WITH SYSTEM_MODE
+		]) {
+			sets.add(one.PermissionSetId);
+		}
+		Set<Id> held = new Set<Id>();
+		for (SetupEntityAccess one : [
+			SELECT SetupEntityId
+			FROM SetupEntityAccess
+			WHERE ParentId IN :sets AND SetupEntityType = 'CustomPermission'
+			WITH SYSTEM_MODE
+		]) {
+			held.add(one.SetupEntityId);
+		}
+		List<String> missing = new List<String>();
+		for (CustomPermission one : [
+			SELECT Id, MasterLabel
+			FROM CustomPermission
+			WHERE DeveloperName IN :RUN_PERMISSIONS
+			WITH SYSTEM_MODE
+			ORDER BY MasterLabel
+		]) {
+			if (!held.contains(one.Id)) {
+				missing.add(one.MasterLabel);
+			}
+		}
+		if (
+			destination == ArchiveRules.BIG_OBJECT &&
+			[
+				SELECT COUNT()
+				FROM ObjectPermissions
+				WHERE
+					ParentId IN :sets
+					AND SobjectType = :Schema.SObjectType.Archived_Record__b.getName()
+					AND PermissionsCreate = TRUE
+				WITH SYSTEM_MODE
+			] == 0
+		) {
+			missing.add(BarnHelp.text('Core', 'Core_ArchiveRules_SkipBigObject'));
+		}
+		return missing.isEmpty()
+			? null
+			: BarnHelp.text(
+					'Core',
+					'Core_ArchiveRules_SkipPermissions',
+					new List<Object>{ owner[0].Name, String.join(missing, ', ') }
+			  );
+	}
+
+	/**
+	 * Records a scheduled run skipped for its owner (D-223): a Failed Archive job for the rule,
+	 * whose log says why and what to do, so the rule's last run in the panel shows it, and a
+	 * Warning on the Error Log naming the rule. The package's own bookkeeping (ADR-0021).
+	 */
+	private static void skip(Saved_Query__c query, String reason) {
+		Datetime now = Datetime.now();
+		String line = BarnHelp.text(
+			'Core',
+			'Core_ArchiveRules_LogSkipped',
+			new List<Object>{ query.Name, now.format(), reason }
+		);
+		Database.insert(
+			new Import_Batch__c(
+				Operation__c = BigObjectArchiveJob.OPERATION_ARCHIVE,
+				Operation_JSON__c = JSON.serialize(
+					new Map<String, Object>{
+						'version' => 1,
+						'action' => 'archive',
+						'savedQueryId' => query.Id,
+						'name' => query.Name,
+						'object' => query.Object_Name__c,
+						'scheduled' => true,
+						'skipped' => true
+					}
+				),
+				Status__c = ImportBatchService.STATUS_FAILED,
+				Is_Dry_Run__c = false,
+				Row_Count__c = 0,
+				Rows_Created__c = 0,
+				Rows_Deleted__c = 0,
+				Rows_Rejected__c = 0,
+				Started_At__c = now,
+				Completed_At__c = now,
+				Committed_By__c = UserInfo.getUserId(),
+				Run_Log__c = line
+			),
+			AccessLevel.SYSTEM_MODE
+		);
+		ErrorLogger.logMessage(line, CONTEXT, ErrorLogger.SEVERITY_WARNING, query.Id);
 	}
 
 	private static Import_Batch__c start(

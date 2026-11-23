@@ -206,4 +206,84 @@ private class ArchiveRuleServiceTest {
 			System.Assert.isFalse(ArchiveRuleService.runDueRule(ruleId), 'Nothing matches now');
 		}
 	}
+
+	private static Saved_Query__c dailyRule(String name, Id ownerId) {
+		ArchiveRules.Rule settings = new ArchiveRules.Rule();
+		settings.destination = ArchiveRules.BIG_OBJECT;
+		settings.frequency = ArchiveRules.DAILY;
+		return new Saved_Query__c(
+			Name = name,
+			Object_Name__c = 'Contact',
+			Query_JSON__c = ArchiveRules.withRule(VOLUNTEERS, settings),
+			OwnerId = ownerId
+		);
+	}
+
+	@IsTest
+	static void aScheduledRuleWhoseOwnerLeftOrLostAccessIsSkipped() {
+		User leaver;
+		User staff;
+		System.runAs(TestUsers.admin()) {
+			leaver = TestUsers.onRunningProfileWith(
+				'Leaver',
+				new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Bulk_Delete' }
+			);
+			staff = TestUsers.standardUserWith('Staffer', new List<String>{ 'BarnCRM_Staff' });
+		}
+		Saved_Query__c leaverRule = dailyRule('Leaver Rule', leaver.Id);
+		Saved_Query__c staffRule = dailyRule('Staff Rule', staff.Id);
+		System.runAs(TestUsers.admin()) {
+			makePeople(2);
+			insert as system new List<Saved_Query__c>{ leaverRule, staffRule };
+		}
+		System.runAs(new User(Id = UserInfo.getUserId())) {
+			update as system new User(Id = leaver.Id, IsActive = false);
+		}
+		ArchiveStoreMemory store = ArchiveStoreMemory.install();
+		BigObjectArchiveJob.queuedForTest = new List<Object>();
+		System.runAs(archivist()) {
+			System.Assert.isNull(
+				ArchiveRuleService.ownerProblem(UserInfo.getUserId(), ArchiveRules.BIG_OBJECT),
+				'A person who holds every permission may have the rule run'
+			);
+			System.Assert.isFalse(ArchiveRuleService.runDueRule(leaverRule.Id), 'An inactive owner: skipped');
+			System.Assert.isFalse(ArchiveRuleService.runDueRule(staffRule.Id), 'An owner without access: skipped');
+			Test.getEventBus().deliver();
+		}
+		System.Assert.isTrue(BigObjectArchiveJob.queuedForTest.isEmpty(), 'Neither run started');
+		System.Assert.isTrue(store.rowsByKey.isEmpty(), 'Nothing archived');
+		System.Assert.areEqual(3, [SELECT COUNT() FROM Contact WITH SYSTEM_MODE], 'Nothing deleted');
+		Map<String, String> logByRule = new Map<String, String>();
+		for (Import_Batch__c job : [
+			SELECT Status__c, Run_Log__c, Operation_JSON__c
+			FROM Import_Batch__c
+			WHERE Operation__c = :BigObjectArchiveJob.OPERATION_ARCHIVE
+			WITH SYSTEM_MODE
+		]) {
+			System.Assert.areEqual(ImportBatchService.STATUS_FAILED, job.Status__c, 'A skipped run shows as Failed');
+			logByRule.put(
+				(String) ((Map<String, Object>) JSON.deserializeUntyped(job.Operation_JSON__c)).get('name'),
+				job.Run_Log__c
+			);
+		}
+		String inactive = BarnHelp.text('Core', 'Core_ArchiveRules_SkipInactive', new List<Object>{ 'X' })
+			.substringAfter('X');
+		System.Assert.isTrue(
+			logByRule.get('Leaver Rule').contains(inactive),
+			'Says the owner is inactive: ' + logByRule
+		);
+		String noAccess = BarnHelp.text('Core', 'Core_ArchiveRules_SkipPermissions', new List<Object>{ 'X', 'Y' })
+			.substringBetween('X', 'Y');
+		System.Assert.isTrue(logByRule.get('Staff Rule').contains(noAccess), 'Says what the owner lacks: ' + logByRule);
+		System.Assert.areEqual(
+			2,
+			[
+				SELECT COUNT()
+				FROM Error_Log__c
+				WHERE Severity__c = :ErrorLogger.SEVERITY_WARNING AND Context__c = 'ArchiveRuleService'
+				WITH SYSTEM_MODE
+			],
+			'Each skip is on the Error Log too'
+		);
+	}
 }
