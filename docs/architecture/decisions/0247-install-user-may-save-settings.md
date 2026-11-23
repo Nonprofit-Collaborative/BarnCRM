@@ -1,4 +1,4 @@
-# ADR-NEXT: The Install User May Save Settings During Install Only
+# ADR-0247: The Install User May Save Settings During Install Only
 
 **Status:** Accepted (owner decision D-223, 2026-11-23)
 **Date:** 2026-11-23

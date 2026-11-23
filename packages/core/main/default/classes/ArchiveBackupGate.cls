@@ -75,10 +75,10 @@ public with sharing class ArchiveBackupGate {
 			Started_At__c = now,
 			Committed_By__c = UserInfo.getUserId(),
 			Run_Log__c = BarnHelp.text(
-				'Core',
-				'Core_ArchiveBackup_LogStarted',
-				new List<Object>{ UserInfo.getName(), now.format(), run.ruleName, run.confirmedCount.format() }
-			)
+					'Core',
+					'Core_ArchiveBackup_LogStarted',
+					new List<Object>{ UserInfo.getName(), now.format(), run.ruleName, run.confirmedCount.format() }
+				) + ArchiveRecordJson.notKeptLine(objectType.getDescribe(SObjectDescribeOptions.DEFERRED))
 		);
 		// The package's own bookkeeping (ADR-0021); the records are read as the person.
 		Database.insert(job, AccessLevel.SYSTEM_MODE);

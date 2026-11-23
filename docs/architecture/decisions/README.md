@@ -255,6 +255,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0244](0244-lightning-message-service-for-panel-refresh.md) | Panels on one page refresh each other through one Lightning Message Channel | Accepted |
 | [0245](0245-platform-feature-evaluations.md) | Big Objects for field history, Platform Cache and React multi-framework, evaluated | Proposed |
 | [0246](0246-one-field-rules-as-before-save-flows.md) | One-field rules ship as before-save flows that read their own switch | Proposed |
+| [0247](0247-install-user-may-save-settings.md) | The install user may save settings during install only | Accepted |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

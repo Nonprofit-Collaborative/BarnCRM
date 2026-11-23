@@ -24,7 +24,9 @@ Each rule sends its records to one **destination**:
   days.
 
 Only **Big Object** keeps the related records with each record. Choose it when you may need them
-back.
+back. A few kinds of related record cannot be read by their record, so no destination keeps them,
+though Salesforce still deletes them: today that is Actionable List Members (a contact's place on
+an actionable list). Each run's log names any such kind.
 
 A record is only deleted after its copy is saved and read back. A record changed after the run
 started is left alone and named in the run's log. So is a Big Object record that gained a

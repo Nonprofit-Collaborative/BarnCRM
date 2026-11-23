@@ -349,7 +349,8 @@ public with sharing class ArchiveRuleService {
 			WITH SYSTEM_MODE
 			ORDER BY MasterLabel
 		]) {
-			Boolean adminKind = one.DeveloperName == DataJobs.EVERYONE_PERMISSION ||
+			Boolean adminKind =
+				one.DeveloperName == DataJobs.EVERYONE_PERMISSION ||
 				one.DeveloperName == ARCHIVE_PERMISSION;
 			if (adminKind) {
 				adminLabels.add(one.MasterLabel);

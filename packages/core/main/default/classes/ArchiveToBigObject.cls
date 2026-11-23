@@ -58,9 +58,9 @@ public with sharing class ArchiveToBigObject implements ArchiveDestination {
 			Started_At__c = now,
 			Committed_By__c = UserInfo.getUserId(),
 			Run_Log__c = String.format(
-				BarnHelp.text('Core', 'Core_ArchiveRules_LogStarted'),
-				new List<Object>{ UserInfo.getName(), now.format(), run.ruleName, run.confirmedCount.format() }
-			)
+					BarnHelp.text('Core', 'Core_ArchiveRules_LogStarted'),
+					new List<Object>{ UserInfo.getName(), now.format(), run.ruleName, run.confirmedCount.format() }
+				) + ArchiveRecordJson.notKeptLine(QueryFieldCatalog.describeObject(run.objectName))
 		);
 		// The package's own bookkeeping (ADR-0021); the records are read and deleted as the person.
 		Database.insert(job, AccessLevel.SYSTEM_MODE);

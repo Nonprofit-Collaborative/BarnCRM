@@ -284,3 +284,13 @@ recorded and show who and when that setting was enabled by the setting." Amends 
    while it is on, and each run started without a backup writes that sentence to its log.
    Turning it off writes its own Setting Change, so the history stays in Recent Changes; nothing
    is cleared. A value set outside the console (Setup) has no change row and says so.
+
+## Amendment: related records that cannot be read by their record (2026-11-23)
+
+Found validating on a Standard Edition sandbox: Contact has the cascade-delete child
+`ActionableListMember`, which the platform lets a query read only by `ActionableListId`, so
+reading children by parent failed every archive of contacts. `ArchiveRecordJson.childKinds` now
+leaves out such kinds (a named list, today only `ActionableListMember`), so neither the backup
+nor the big object copy reads them, and both run logs name them (`notKeptLine`): Salesforce still
+deletes them with the record. Any other kind the platform refuses fails the Copy before anything
+is deleted.
