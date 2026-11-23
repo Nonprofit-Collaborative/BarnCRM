@@ -66,10 +66,11 @@ public without sharing class SettingsCarryOver {
 		List<SettingStore.Change> changes = new List<SettingStore.Change>();
 		Set<String> existing = stateRowNames();
 		Map<String, Object> state = new Map<String, Object>();
+		Datetime pausedUntil = null;
 		if (hasLegacy) {
 			changes.addAll(settingChanges(legacy, coreDefinitions(fields), CORE_SETTINGS_EXCLUDED, result));
 			state.putAll(stateValues(legacy, SettingsState.CORE_KEYS, null, existing));
-			carryPause(legacy);
+			pausedUntil = legacy.Automation_Paused_Until__c;
 		}
 		for (Setting_Module__mdt module : ModuleSettings.registry()) {
 			SObject record = ModuleSettings.isStoreObject(module.Settings_Object__c)
@@ -84,9 +85,9 @@ public without sharing class SettingsCarryOver {
 			changes.addAll(settingChanges(record, definitions, stateFields, result));
 			state.putAll(stateValues(record, stateFields, module.Key_Prefix__c, existing));
 		}
-		SettingsState.put(state);
+		List<Nightly_Job__c> seen = seenToCopy();
 		result.stateCount = state.size();
-		result.seenCount = carrySeen();
+		result.seenCount = seen.size();
 		result.settingCount = changes.size();
 
 		SettingStore.Change marker = new SettingStore.Change();
@@ -97,9 +98,36 @@ public without sharing class SettingsCarryOver {
 		changes.add(marker);
 		// Audited: each carried value is listed in Recent Changes, and the console's poll sees the
 		// deployment end through those rows, as for any save.
+		// The deployment goes first, with no record written before it in this transaction:
+		// Salesforce refuses a deployment after any record change in the same transaction (mixed
+		// DML), so the state rows, the seen rows and the pause are written by a queued job.
 		Id deploymentId = SettingStore.save(changes, true);
 		result.deploymentId = deploymentId == null ? null : String.valueOf(deploymentId);
+		Boolean pauseRunning = pausedUntil != null && pausedUntil > Datetime.now();
+		if (!state.isEmpty() || !seen.isEmpty() || pauseRunning) {
+			System.enqueueJob(new CopyRunState(state, seen, pauseRunning ? pausedUntil : null));
+		}
 		return result;
+	}
+
+	/** Writes what the carry-over copies as records, in its own transaction after the deployment. */
+	@TestVisible
+	private without sharing class CopyRunState implements Queueable {
+		private final Map<String, Object> state;
+		private final List<Nightly_Job__c> seen;
+		private final Datetime pausedUntil;
+
+		CopyRunState(Map<String, Object> state, List<Nightly_Job__c> seen, Datetime pausedUntil) {
+			this.state = state;
+			this.seen = seen;
+			this.pausedUntil = pausedUntil;
+		}
+
+		public void execute(QueueableContext context) {
+			SettingsState.put(state);
+			carryPause(pausedUntil);
+			Database.insert(seen, AccessLevel.SYSTEM_MODE);
+		}
 	}
 
 	/** Core's keys that are not carried as settings: the pause and the run state. */
@@ -211,8 +239,7 @@ public without sharing class SettingsCarryOver {
 	}
 
 	/** A pause that has not ended moves to the Automation Control org default. */
-	private static void carryPause(BarnCRM_Settings__c legacy) {
-		Datetime pausedUntil = legacy.Automation_Paused_Until__c;
+	private static void carryPause(Datetime pausedUntil) {
 		if (pausedUntil == null || pausedUntil <= Datetime.now()) {
 			return;
 		}
@@ -223,11 +250,12 @@ public without sharing class SettingsCarryOver {
 		}
 	}
 
-	/** Each person's dismissed What's New version, as their Seen row when they have none. */
-	private static Integer carrySeen() {
+	/** Each person's dismissed What's New version, as the Seen row to write when they have none. */
+	private static List<Nightly_Job__c> seenToCopy() {
 		List<Whats_New_Seen__c> legacyRows = seenRows();
+		List<Nightly_Job__c> rows = new List<Nightly_Job__c>();
 		if (legacyRows.isEmpty()) {
-			return 0;
+			return rows;
 		}
 		Set<String> existing = new Set<String>();
 		for (Nightly_Job__c row : [
@@ -239,7 +267,6 @@ public without sharing class SettingsCarryOver {
 		]) {
 			existing.add(row.Name);
 		}
-		List<Nightly_Job__c> rows = new List<Nightly_Job__c>();
 		for (Whats_New_Seen__c seen : legacyRows) {
 			String name = SEEN_PREFIX + seen.SetupOwnerId;
 			if (!existing.contains(name)) {
@@ -252,8 +279,7 @@ public without sharing class SettingsCarryOver {
 				);
 			}
 		}
-		Database.insert(rows, AccessLevel.SYSTEM_MODE);
-		return rows.size();
+		return rows;
 	}
 
 	/** The per-user legacy seen records (the org default holds nobody's). */
