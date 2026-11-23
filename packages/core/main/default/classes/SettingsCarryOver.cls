@@ -105,7 +105,7 @@ public without sharing class SettingsCarryOver {
 		result.deploymentId = deploymentId == null ? null : String.valueOf(deploymentId);
 		Boolean pauseRunning = pausedUntil != null && pausedUntil > Datetime.now();
 		if (!state.isEmpty() || !seen.isEmpty() || pauseRunning) {
-			System.enqueueJob(new CopyRunState(state, seen, pauseRunning ? pausedUntil : null));
+			AsyncStarter.queue(new CopyRunState(state, seen, pauseRunning ? pausedUntil : null), 'SettingsCarryOver');
 		}
 		return result;
 	}
