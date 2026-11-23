@@ -596,6 +596,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Receipt file access | Minor | Receipt files follow access to the receipt and gift, not the donor, with role-based read access. | Shipped | ADR-0034 |
 | Issue Receipts permission | Minor | Separate permission for issuing, voiding and starting receipt runs. | Shipped | G-13 |
 | Failed receipt finding | Minor | Health Check counts receipts voided because generation failed. | Shipped | C-11 |
+| Canadian place of issue | Minor | An organization whose country in Company Information is Canada issues no receipt while Receipt place of issue is blank, and the message says what to fill in (Canada Revenue Agency requires it). Elsewhere it stays optional, and the EIN stays optional everywhere. | Built, not merged (`feature/rc-01-place-of-issue`) | RC-01, D-224 |
 | View PDF link | Minor | Each receipt in the Receipts panel has a View PDF link to the standard file preview. | Shipped | G-13 (UX pass) |
 | Letterhead on every receipt | Minor | The organization's name and address print above every receipt and statement, whatever the letter says, with a preview that writes nothing. | Shipped | G-13 (UX pass) |
 | Receipt letter editor and preview | Minor | Receipt letters are edited in a rich text editor limited to what the PDF prints, with a preview of the unsaved draft for a sample gift. | Shipped | G-13 (UX pass) |

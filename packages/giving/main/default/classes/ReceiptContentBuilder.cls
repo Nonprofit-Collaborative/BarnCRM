@@ -127,7 +127,32 @@ public with sharing class ReceiptContentBuilder {
 		if (String.isBlank(details.legalName)) {
 			throw new ReceiptContentException(BarnHelp.text('Giving', 'Giving_Receipt_OrganizationIncomplete'));
 		}
+		// D-224: an official Canadian receipt must state where it was issued (Canada Revenue Agency).
+		if (String.isBlank(details.placeOfIssue) && issuesCanadianReceipts()) {
+			throw new ReceiptContentException(BarnHelp.text('Giving', 'Giving_Receipt_PlaceOfIssueRequired'));
+		}
 		return details;
+	}
+
+	/** Set by a test: whether the organization is in Canada. Null reads Company Information. */
+	@TestVisible
+	private static Boolean canadianForTest;
+	private static Boolean canadian;
+
+	/**
+	 * Whether the organization issues Canadian receipts: its country in Company Information is
+	 * Canada. Read once per transaction; the Organization row is setup data every user may read.
+	 */
+	@TestVisible
+	private static Boolean issuesCanadianReceipts() {
+		if (canadianForTest != null) {
+			return canadianForTest;
+		}
+		if (canadian == null) {
+			String country = [SELECT Country FROM Organization WITH SYSTEM_MODE LIMIT 1].Country;
+			canadian = country != null && new Set<String>{ 'canada', 'ca' }.contains(country.trim().toLowerCase());
+		}
+		return canadian;
 	}
 
 	/** The identity for these gifts: their one shared brand, or the organization's when mixed. */

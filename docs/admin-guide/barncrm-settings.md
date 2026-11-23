@@ -486,7 +486,8 @@ A text setting that is blank says what the blank means, in grey in its empty box
   **Receipt signer name**, **Receipt signer title**, **Receipt place of issue** and
   **Organization EIN**, and Volunteers' **Self-service profile form**. Two of them matter: with
   the EIN blank receipts print no tax identification number, and with the place of issue blank
-  a receipt has no "Issued at" line, which a Canadian receipt needs (BarnCRM does not stop it).
+  a receipt has no "Issued at" line, which a Canadian receipt needs: an organization in Canada
+  (Company Information) cannot issue receipts until it is filled in.
   Projects' **Invoice payment return page** never shows an empty box: it shows your My Domain
   address, which is what is used while it is blank.
 
