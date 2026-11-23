@@ -6,6 +6,8 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ## 2026-11-23
 
+- PR #1457 (Archive Rules tile icon, icon name check) squash-merged as 4a944080a after `barn-platform` 166/166; PR #1458 (docs) merged as a3469302f. `mwdbdevsb` check-only of the Data Manager component at 4a944080a succeeded (0AfWF00000Hd6a20AB); the deploy waits on Brandon's approval.
+- BMemory plan and mirrors: X-05 status Built corrected to Landed (#912); every roadmap item is now Landed or Shipped except owner-blocked milestones M-0 to M-4.
 - Test orgs `barn-sales`, `oi-test`, `barn-platform`: leftover permission sets BarnCRM_Tab_Data_Hygiene, BarnCRM_App_Admin_Standard and BarnCRM_App_Standard (no longer in the repo) deleted with their assignments (3, 3 and 6).
 - PR #1457 opened (`fix/archive-rules-icon`): the Data Manager Archive Rules tile named `standard:archive`, which SLDS does not ship (blank square on `mwdbdevsb`); now `standard:shipment`. New CI test `IconNamesExist` checks every icon name in package source against `@salesforce-ux/sds-metadata`; no other missing names. Rides the next `mwdbdevsb` deploy.
 - `mwdbdevsb` UX pass (Playwright, Core pages Home, Data Manager, BarnCRM Settings, Duplicate Matching, Automation): one title per page, no error toasts, no unlabelled buttons, no BarnCRM help-text warnings; console errors are Salesforce CSP messages only. One finding: the Archive Rules tile icon (#1457).
