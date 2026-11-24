@@ -6,6 +6,8 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ## 2026-11-24
 
+- `barn-platform` full e2e at main fcad3b1b7 (all modules): 141 passed, 3 failed, 11 skipped. The 3 failures (Fundraising app, Volunteers app and Volunteers Home "page never settled" after 45 s) passed on a re-run of those apps (23 passed, 0 failed): load timing, not a defect. Module home UX pass (Fundraising, Volunteers, Events, Forms, Memberships, Projects, Portal Builder): no error toasts, no stuck spinners, no unlabelled buttons, no BarnCRM console errors; FlexiPage homes show the page title once (barnPageShell title hidden, per D-218).
+
 - `mwdbdevsb`: Data Manager icon fix (PR #1457, main 4a944080a) deployed on Brandon's approval ("Deploy icon fix"): deployment 0AfWF00000HePxB0AV, Data Manager component only, no tests (source tracking conflict overridden; the org copy was the batch W deploy). UX re-check: the Archive Rules tile shows its box icon.
 
 ## 2026-11-23
